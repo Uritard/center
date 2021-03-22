@@ -110,18 +110,20 @@ public class Constant {
     public static String WEBSOCKET_URL="";
 
     public static String websocketSendMsg(String url, String json) throws IOException {
-        CloseableHttpClient client = HttpClients.createDefault();
-        String result = "";
-        try {
-            URI uri = new URIBuilder(url).setParameter("json", json).build();
-            HttpPost httpGet = new HttpPost(uri);
-            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
-            httpGet.setHeader("Accept", "application/json");
-            CloseableHttpResponse response = client.execute(httpGet);
-            HttpEntity entity = response.getEntity();
-            result = EntityUtils.toString(entity, "UTF-8");
-        } catch (Exception e) {e.getMessage();}
-        return result;
+        //WebSocketServer.sendMsg(json);
+//        CloseableHttpClient client = HttpClients.createDefault();
+//        String result = "";
+//        try {
+//            URI uri = new URIBuilder(url).setParameter("json", json).build();
+//            HttpPost httpGet = new HttpPost(uri);
+//            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
+//            httpGet.setHeader("Accept", "application/json");
+//            CloseableHttpResponse response = client.execute(httpGet);
+//            HttpEntity entity = response.getEntity();
+//            result = EntityUtils.toString(entity, "UTF-8");
+//        } catch (Exception e) {e.getMessage();}
+//        return result;
+        return "666";
     }
 
 

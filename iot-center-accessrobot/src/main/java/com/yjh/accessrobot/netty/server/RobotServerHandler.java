@@ -385,6 +385,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         List<Map<String,Object>> robotMap = robotModel.getItems();
 //                        log.info("robotMap是："+robotMap);
                         robotService.robotFileIntoDB(deviceMap,robotMap,xmlBaseModel);
+
+                        robotService.upToCruise(xmlBaseModel);//国网要求
                     }else if (xmlBaseModel.getItems().get(0).size() == 0){
                         log.info("机器人收到检修区域指令了,这是机器人的响应");
                         //Deal with the maintenance area was issued successfully

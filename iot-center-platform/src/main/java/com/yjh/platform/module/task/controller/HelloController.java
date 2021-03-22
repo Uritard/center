@@ -146,6 +146,7 @@ public class HelloController {
             String json = JSON.toJSONString(map);
             log.info("发送给前端的消息：" + json);
             try{
+                String url = Constant.WEBSOCKET_URL;
                 Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
             }catch (Exception e){
                 System.out.println("发送websocket出错");

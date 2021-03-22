@@ -14,6 +14,7 @@ import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TSysParamService;
 import org.apache.catalina.connector.Connector;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -53,6 +54,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private RedisTemplate redisTemplate;
     @Autowired
     private TDeviceTypeImgService tDeviceTypeImgService;
+    @Value("${spring.websocket.send.url}")
+    private String url;
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
@@ -67,7 +70,7 @@ public class PlatformApplication  implements CommandLineRunner {
         tSysParamService.insertIntoRedis();
         tCameraInfoService.intoRedis();
         sysUserService.insertIntoRedis();
-        Constant.WEBSOCKET_URL = tSysParamService.selectByParamCode("systemGateWayServices").getContent();
+        Constant.WEBSOCKET_URL = url;
         tDeviceTypeImgService.findPic();//本地启动把此行注掉
         //Start RecordVoiceFileThread
         List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();

@@ -1,14 +1,12 @@
 package com.yjh.accesstcp.module.device.service;
 
 import com.yjh.accesstcp.common.Constant;
-import com.yjh.accesstcp.common.utils.CornUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.module.device.dao.SendToUpSystemDao;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
-import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -89,9 +87,9 @@ public class SendToUpSystemServices {
                     //SimpleDateFormat s = new SimpleDateFormat("HH:mm:ss");
                     //String s = Pattern.compile("[^0-9]").matcher(str).replaceAll("");
 
-                    item.put("cycle_month", CornUtil.translateToChinese(time,1));
-                    item.put("cycle_week",CornUtil.translateToChinese(time,2));
-                    item.put("cycle_execute_time",CornUtil.translateToChinese(time,4));
+//                    item.put("cycle_month", CornUtil.translateToChinese(time,1));
+//                    item.put("cycle_week",CornUtil.translateToChinese(time,2));
+//                    item.put("cycle_execute_time",CornUtil.translateToChinese(time,4));
 
                     item.put("cycle_start_time",simpleDateFormat.format(new Date()));
                     item.put("cycle_end_time","2025-01-01 00:00:00");
