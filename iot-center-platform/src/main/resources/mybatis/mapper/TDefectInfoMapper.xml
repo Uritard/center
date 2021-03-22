@@ -101,24 +101,24 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TDefectInfo">
         update t_defect_info a <set>
         <if test="defectId != null ">a.defect_id = #{defectId},</if>
-        <if test="defectLevel != null ">a.defect_level = #{defectLevel, jdbcType=INTEGER},</if>
+        a.defect_level = #{defectLevel, jdbcType=INTEGER},
         <if test="defectTime != null ">a.defect_time = #{defectTime, jdbcType=TIMESTAMP},</if>
-        <if test="defectType != null ">a.defect_type = #{defectType, jdbcType=INTEGER},</if>
+        a.defect_type = #{defectType, jdbcType=INTEGER},
         <if test="defectName != null ">a.defect_name = #{defectName},</if>
         <if test="defectContent != null">a.defect_content = #{defectContent},</if>
-        <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="cunstomId != null ">a.cunstom_id = #{cunstomId},</if>
-        <if test="instanceId != null ">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
-        <if test="stdMeteId != null ">a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},</if>
-        <if test="confMode != null ">a.conf_mode = #{confMode, jdbcType=INTEGER},</if>
-        <if test="isDefect != null ">a.is_defect = #{isDefect, jdbcType=INTEGER},</if>
-        <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
+        a.device_id = #{deviceId, jdbcType=BIGINT},
+        a.cunstom_id = #{cunstomId},
+        a.instance_id = #{instanceId, jdbcType=BIGINT},
+        a.std_mete_id = #{stdMeteId, jdbcType=BIGINT},
+        a.conf_mode = #{confMode, jdbcType=INTEGER},
+        a.is_defect = #{isDefect, jdbcType=INTEGER},
+        a.deal_type = #{dealType, jdbcType=INTEGER},
         <if test="dealInfo != null ">a.deal_info = #{dealInfo},</if>
-        <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
+        a.deal_person_id = #{dealPersonId},
         <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
-        <if test="ifDefectDisable != null ">a.if_defect_disable = #{ifDefectDisable, jdbcType=INTEGER},</if>
-        <if test="alarmSource != null ">a.alarm_source = #{alarmSource, jdbcType=INTEGER},</if>
-        <if test="defectSubtype != null ">a.defect_subtype = #{defectSubtype, jdbcType=INTEGER},</if>
+        a.if_defect_disable = #{ifDefectDisable, jdbcType=INTEGER},
+        a.alarm_source = #{alarmSource, jdbcType=INTEGER},
+        a.defect_subtype = #{defectSubtype, jdbcType=INTEGER},
         <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
         <if test="imagePath != null ">a.image_path = #{imagePath},</if>
         <if test="videoPath != null ">a.video_path = #{videoPath},</if>

@@ -56,13 +56,13 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TAlgorithmConfBak">
         update t_algorithm_conf_bak a <set>
         <if test="deviceMeteId != null">a.device_mete_id = #{deviceMeteId},</if>
-        <if test="algorithmId != null ">a.algorithm_id = #{algorithmId},</if>
+        a.algorithm_id = #{algorithmId},
         <if test="configName != null ">a.config_name = #{configName},</if>
-        <if test="status != null">a.status = #{status, jdbcType=INTEGER},</if>
-        <if test="ifDel != null">a.if_del = #{ifDel, jdbcType=INTEGER},</if>
-        <if test="ifShow != null">a.if_show = #{ifShow, jdbcType=INTEGER},</if>
+        a.status = #{status, jdbcType=INTEGER},
+        a.if_del = #{ifDel, jdbcType=INTEGER},
+        a.if_show = #{ifShow, jdbcType=INTEGER},
         <if test="picUrl != null">a.pic_url = #{picUrl},</if>
-        <if test="applyModule != null">a.apply_module = #{applyModule, jdbcType=INTEGER},</if>
+        a.apply_module = #{applyModule, jdbcType=INTEGER},
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
     </set>

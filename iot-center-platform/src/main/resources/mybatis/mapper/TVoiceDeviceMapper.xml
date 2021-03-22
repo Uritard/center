@@ -48,11 +48,11 @@
         update t_voice_device a <set>
         <if test="voiceDeviceId != null">a.voice_device_id = #{voiceDeviceId, jdbcType=BIGINT},</if>
         <if test="voiceDeviceName != null">a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR},</if>
-        <if test="stdDeviceId != null">a.std_device_id = #{stdDeviceId, jdbcType=BIGINT},</if>
+        a.std_device_id = #{stdDeviceId, jdbcType=BIGINT},
         <if test="deviceType != null">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
         <if test="state != null">a.state = #{state, jdbcType=VARCHAR},</if>
-        <if test="configId != null">a.config_id = #{configId, jdbcType=BIGINT},</if>
-        <if test="upRegionId != null">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
+        a.config_id = #{configId, jdbcType=BIGINT},
+        a.up_region_id = #{upRegionId, jdbcType=BIGINT},
     </set>
             where a.voice_device_id = #{voiceDeviceId, jdbcType=BIGINT}
     </update>
@@ -236,7 +236,7 @@
         <if test="stationId != null">a.station_id = #{stationId, jdbcType=VARCHAR},</if>
         <if test="owner != null">a.owner = #{owner, jdbcType=VARCHAR},</if>
         <if test="ownerCode != null">a.owner_code = #{ownerCode, jdbcType=VARCHAR},</if>
-        <if test="port != null">a.port = #{port, jdbcType=INTEGER},</if>
+        a.port = #{port, jdbcType=INTEGER},
         <if test="channelNum != null">a.channel_num = #{channelNum, jdbcType=VARCHAR},</if>
         <if test="absoluPath != null">a.absolu_path = #{absoluPath, jdbcType=VARCHAR},</if>
         <if test="relativePath != null">a.relative_path = #{relativePath, jdbcType=VARCHAR},</if>

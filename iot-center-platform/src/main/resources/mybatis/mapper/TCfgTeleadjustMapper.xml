@@ -79,20 +79,20 @@
         <if test="deviceId != null ">a.device_id = #{deviceId},</if>
         <if test="meteId != null ">a.mete_id = #{meteId},</if>
         <if test="meteName != null">a.mete_name = #{meteName},</if>
-        <if test="upEffect != null">a.up_effect = #{upEffect},</if>
-        <if test="downEffect != null ">a.down_effect = #{downEffec},</if>
-        <if test="metePrecision != null ">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
+        a.up_effect = #{upEffect},
+        a.down_effect = #{downEffec},
+        a.mete_precision = #{metePrecision, jdbcType=INTEGER},
         <if test="unit != null ">a.unit = #{unit},</if>
-        <if test="meteIndex != null">a.mete_index = #{meteIndex, jdbcType=INTEGER},</if>
-        <if test="meteCid != null ">a.mete_cid = #{meteCid, jdbcType=INTEGER},</if>
-        <if test="adjustKind != null ">a.adjust_kind = #{adjustKind, jdbcType=INTEGER},</if>
-        <if test="lastValue != null ">a.last_value = #{lastValue},</if>
+        a.mete_index = #{meteIndex, jdbcType=INTEGER},
+        a.mete_cid = #{meteCid, jdbcType=INTEGER},
+        a.adjust_kind = #{adjustKind, jdbcType=INTEGER},
+        a.last_value = #{lastValue},
         <if test="lastTime != null ">a.last_time = #{lastTime},</if>
         <if test="meteCode != null ">a.mete_code = #{meteCode},</if>
         <if test="deviceType != null">a.device_type = #{deviceType},</if>
         <if test="description != null ">a.description = #{description},</if>
-        <if test="stander != null ">a.stander = #{stander},</if>
-        <if test="controlenable != null ">a.controlenable = #{controlenable, jdbcType=INTEGER},</if>
+        a.stander = #{stander},
+        a.controlenable = #{controlenable, jdbcType=INTEGER},
     </set>
             where a.device_id = #{deviceId, jdbcType=VARCHAR}
     </update>

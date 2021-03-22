@@ -64,12 +64,12 @@
         update t_std_region a <set>
         <if test="regionId != null">a.region_id = #{regionId},</if>
         <if test="regionName != null ">a.region_name = #{regionName},</if>
-        <if test="sort != null ">a.sort = #{sort, jdbcType=INTEGER},</if>
-        <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
+        a.sort = #{sort, jdbcType=INTEGER},
+        a.up_region_id = #{upRegionId},
         <if test="upRegionIds != null ">a.up_region_ids = #{upRegionIds},</if>
         a.region_code = #{regionCode, jdbcType=INTEGER},
         <if test="stationId != null ">a.station_id = #{stationId},</if>
-        <if test="state != null ">a.state = #{state, jdbcType=INTEGER},</if>
+        a.state = #{state, jdbcType=INTEGER},
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="stationName != null">a.station_name = #{stationName, jdbcType=VARCHAR},</if>
     </set>

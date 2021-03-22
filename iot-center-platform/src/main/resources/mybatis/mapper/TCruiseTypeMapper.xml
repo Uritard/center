@@ -33,7 +33,7 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseType">
         update t_cruise_type a <set>
         <if test="subType != null">a.sub_type = #{subType, jdbcType=INTEGER},</if>
-        <if test="instanceId != null ">a.instance_id = #{instanceId},</if>
+        a.instance_id = #{instanceId},
         <if test="remark != null ">a.remark = #{remark},</if>
     </set>
             where a.sub_type = #{subType, jdbcType=INTEGER}

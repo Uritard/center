@@ -90,10 +90,10 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult">
         update t_cruise_data_result a <set>
         <if test="cruiseDataId != null ">a.cruise_data_id = #{cruiseDataId},</if>
-        <if test="cruiseResultId != null">a.cruise_result_id = #{cruiseResultId},</if>
+        a.cruise_result_id = #{cruiseResultId},
         <if test="cruiseId != null ">a.cruise_id = #{cruiseId},</if>
         <if test="cruiseName != null ">a.cruise_Name = #{cruiseName},</if>
-        <if test="cruiseType != null">a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
+        a.cruise_type = #{cruiseType, jdbcType=INTEGER},
         <if test="resultDesc != null ">a.result_desc = #{resultDesc},</if>
         <if test="resultNum != null ">a.result_num = #{resultNum},</if>
         <if test="modifyNum != null ">a.modify_num = #{modifyNum},</if>
@@ -102,16 +102,16 @@
         <if test="personCheck != null ">a.person_check = #{personCheck},</if>
         <if test="origPicAnl != null ">a.orig_pic_anl = #{origPicAnl},</if>
         <if test="origpic != null ">a.origpic = #{origpic},</if>
-        <if test="cruiseAbnormal != null">a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
-        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
-        <if test="evaluationState != null">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
-        <if test="identifyState != null">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
-        <if test="identifyResult != null">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
+        a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},
+        a.cruise_result = #{cruiseResult, jdbcType=INTEGER},
+        a.evaluation_state = #{evaluationState, jdbcType=INTEGER},
+        a.identify_state = #{identifyState, jdbcType=INTEGER},
+        a.identify_result = #{identifyResult, jdbcType=INTEGER},
         a.createtime = #{createtime, jdbcType=TIMESTAMP},
         <if test="remark != null">a.remark = #{remark},</if>
         <if test="checkUser != null ">a.check_user = #{checkUser=},</if>
         a.check_date = #{checkDate, jdbcType=TIMESTAMP},
-        <if test="isWarn != null ">a.remark = #{isWarn, jdbcType=INTEGER},</if>
+        a.remark = #{isWarn, jdbcType=INTEGER},
     </set>
             where a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
     </update>

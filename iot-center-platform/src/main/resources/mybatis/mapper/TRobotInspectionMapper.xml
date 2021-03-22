@@ -52,11 +52,11 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TRobotInspection">
         update t_robot_inspection a <set>
         <if test="inspectionCode != null "> a.inspection_code = #{inspectionCod},</if>
-        <if test="robotId != null ">a.robot_id = #{robotId},</if>
+        a.robot_id = #{robotId},
         <if test="inspectionName != null ">a.inspection_name = #{inspectionName},</if>
-        <if test="componentId != null ">a.component_id = #{componentId},</if>
-        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
-        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
+        a.component_id = #{componentId},
+        a.meter_type = #{meterType, jdbcType=INTEGER},
+        a.appearance_type = #{appearanceType, jdbcType=INTEGER},
         <if test="saveTypeList != null ">a.save_type_list = #{saveTypeList},</if>
         <if test="recognitionTypeList != null">a.recognition_type_list = #{recognitionTypeList},</if>
         <if test="phase != null ">a.phase = #{phase},</if>

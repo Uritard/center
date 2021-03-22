@@ -45,7 +45,7 @@
         update t_sys_param a <set>
         <if test="paramId != null ">a.param_id = #{paramId, jdbcType=INTEGER},</if>
         <if test="paramCode != null">a.param_code = #{paramCode},</if>
-        <if test="paramType != null ">a.param_type = #{paramType, jdbcType=INTEGER},</if>
+        a.param_type = #{paramType, jdbcType=INTEGER},
         <if test="paramName != null ">a.param_name = #{paramName},</if>
         <if test="content != null ">a.content = #{content},</if>
         <if test="remark != null">a.remark = #{remark},</if>

@@ -56,15 +56,15 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskAttr">
         update t_cruise_task_attr a <set>
         <if test="taskId != null">a.task_id = #{taskId},</if>
-        <if test="instanceId != null ">a.instance_id = #{instanceId},</if>
-        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
-        <if test="deviceId != null">a.device_id = #{deviceId},</if>
-        <if test="customId != null ">a.custom_id = #{customId},</if>
+        a.instance_id = #{instanceId},
+        a.device_mete_id = #{deviceMeteId},
+        a.device_id = #{deviceId},
+        a.custom_id = #{customId},
         <if test="pointTaskId != null ">a.point_task_id = #{pointTaskId},</if>
-        <if test="ifRobot != null">a.if_robot = #{ifRobot, jdbcType=INTEGER},</if>
-        <if test="ifVideo != null">a.if_video = #{ifVideo, jdbcType=INTEGER},</if>
-        <if test="ifInferad != null">a.if_inferad = #{ifInferad, jdbcType=INTEGER},</if>
-        <if test="ifArtificial != null">a.if_artificial = #{ifArtificial, jdbcType=INTEGER},</if>
+        a.if_robot = #{ifRobot, jdbcType=INTEGER},
+        a.if_video = #{ifVideo, jdbcType=INTEGER},
+        a.if_inferad = #{ifInferad, jdbcType=INTEGER},
+        a.if_artificial = #{ifArtificial, jdbcType=INTEGER},
     </set>
             where a.task_id = #{taskId, jdbcType=VARCHAR}
     </update>

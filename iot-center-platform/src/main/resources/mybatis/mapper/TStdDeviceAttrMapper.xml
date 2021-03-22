@@ -89,7 +89,7 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         update t_std_device_attr a <set>
         <if test="deviceId != null ">a.device_id = #{deviceId},</if>
-        <if test="deviceModel != null ">a.device_model = #{deviceModel, jdbcType=INTEGER},</if>
+        a.device_model = #{deviceModel, jdbcType=INTEGER},
         <if test="pmsType != null ">a.pms_type = #{pmsType},</if>
         <if test="pmsId != null ">a.pms_id = #{pmsId},</if>
         <if test="deviceVendor != null ">a.device_vendor = #{deviceVendor},</if>
