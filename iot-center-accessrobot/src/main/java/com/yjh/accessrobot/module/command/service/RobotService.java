@@ -196,7 +196,7 @@ public class RobotService {
         int res = tRobotInfoDao.update(tRobotInfo);
         log.info("robotCode为==="+robotCode+",robotId为==="+robotId+"的机器人状态是==="+tRobotInfo.getRobotStatus()+",修改结果==="+res);
         //机器人状态改变给前端推送webSocket
-        /*Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
+       /* Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
         String webSocketUrl = webSocketUrlMap.get("content");
         Map<String,Object> jasonMap=new HashMap<>();
         jasonMap.put("type","robotStatus");
@@ -582,7 +582,7 @@ public class RobotService {
                 log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
                 RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).sendHeartBeat(generateByteOrder(xmlString, rTII.getRobotCode()), rTII.getRobotCode());
             }
-                    }
+        }
     }
     @Transactional(rollbackFor = Exception.class)
     public int feignRobotTaskIssued2(Map<String,Object> resMap){
@@ -1219,23 +1219,22 @@ public class RobotService {
             }
             tCruiseTask.setType(cType);
             //贼几把难搞
-            /*tCruiseTask.setDateType();
-            if (Objects.nonNull(taskModelMap.get("fixed_start_time")) || "".equals(taskModelMap.get("fixed_start_time").toString())){
+//            tCruiseTask.setDateType();
+            /*if (Objects.nonNull(taskModelMap.get("fixed_start_time")) || "".equals(taskModelMap.get("fixed_start_time").toString())){
                 tCruiseTask.setIfRun();
-
             }else {
                 tCruiseTask.setIfRun();
             }*/
+            try {
+                tCruiseTask.setStartTime(sdf.parse(taskModelMap.get("fixed_start_time").toString()));
+            }catch (ParseException e){
+                e.getMessage();
+            }
             Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
             tCruiseTask.setRobotId(robotId);
             tCruiseTask.setTaskType(271);//机器人本体任务
             if (!"".equals(taskModelMap.get("priority").toString())){
                 tCruiseTask.setTaskLevel(Integer.valueOf(taskModelMap.get("priority").toString()));
-            }
-            try {
-                tCruiseTask.setStartTime(sdf.parse(taskModelMap.get("fixed_start_time").toString()));
-            }catch (ParseException e){
-                e.getMessage();
             }
             tCruiseTask.setCreateTime(new Date());
             tCruiseTaskList.add(tCruiseTask);
@@ -1331,6 +1330,15 @@ public class RobotService {
         log.info("入库结果: "+"tcpiRes==="+tcpiRes+",tctaRes==="+tctaRes+",tctRes==="+tctRes+",tcrRes==="+tcrRes);
 
         return  tcpiRes + tctaRes + tctRes + tcrRes;
+    }
+    public int insertWarn(TWarnInfo warnInfo){
+        return tRobotInfoDao.insertWarn(warnInfo);
+    }
+    public int updateIsWarn(Long cruiseDataId){
+        return tRobotInfoDao.updateIsWarn(cruiseDataId);
+    }
+    public TStdDeviceMete selectDeviceMeteInfo(Long instanceId){
+        return tRobotInfoDao.selectDeviceMeteInfo(instanceId);
     }
 }
 

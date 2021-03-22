@@ -860,5 +860,104 @@
             )
         </foreach>
     </insert>
-
+    <select id="selectDeviceMeteInfo"  parameterType="java.lang.Long" resultType="com.yjh.accessrobot.module.command.entity.TStdDeviceMete">
+        select
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.mete_id,
+        a.mete_kind,
+        a.mete_type,
+        a.mete_name,
+        a.device_type,
+        a.position_type,
+        a.unit,
+        a.alarm_note,
+        a.alarm_type,
+        a.up_effect,
+        a.down_effect,
+        a.state_zero,
+        a.state_one,
+        a.alarm_state,
+        a.alarm_level,
+        a.high_limit1,
+        a.low_limit1,
+        a.high_limit2,
+        a.low_limit2,
+        a.high_limit3,
+        a.low_limit3,
+        a.high_limit4,
+        a.low_limit4,
+        a.alarm_delay,
+        a.alarm_cnt,
+        a.threshold_abs,
+        a.threshold_per,
+        a.modulus,
+        a.remark
+        from t_cruise_point_instance b left join t_std_devicemete a
+        on b.device_mete_id=a.device_mete_id
+        where b.instance_id=#{instanceId,jdbcType=BIGINT}
+    </select>
+    <insert id="insertWarn" useGeneratedKeys="true" keyProperty="warnId" parameterType="com.yjh.accessrobot.module.command.entity.TWarnInfo">
+        insert into t_warn_info(
+            warn_id,
+            warn_level,
+            warn_time,
+            warn_type,
+            warn_name,
+            warn_content,
+            device_id,
+            cunstom_id,
+            instance_id,
+            std_mete_id,
+            conf_mode,
+            is_warn,
+            deal_type,
+            deal_info,
+            deal_person_id,
+            deal_time,
+            defect_model,
+            alarm_source,
+            warn_subtype,
+            device_code,
+            image_path,
+            video_path,
+            value,
+            out_range,
+            task_id
+        )values(
+                #{warnId, jdbcType=BIGINT},
+                #{warnLevel, jdbcType=INTEGER},
+                #{warnTime, jdbcType=TIMESTAMP},
+                #{warnType, jdbcType=INTEGER},
+                #{warnName, jdbcType=VARCHAR},
+                #{warnContent, jdbcType=VARCHAR},
+                #{deviceId, jdbcType=BIGINT},
+                #{cunstomId, jdbcType=VARCHAR},
+                #{instanceId, jdbcType=BIGINT},
+                #{stdMeteId, jdbcType=BIGINT},
+                #{confMode, jdbcType=INTEGER},
+                #{isWarn, jdbcType=INTEGER},
+                #{dealType, jdbcType=INTEGER},
+                #{dealInfo, jdbcType=VARCHAR},
+                #{dealPersonId, jdbcType=VARCHAR},
+                #{dealTime, jdbcType=TIMESTAMP},
+                #{defectModel, jdbcType=INTEGER},
+                #{alarmSource, jdbcType=INTEGER},
+                #{warnSubtype, jdbcType=INTEGER},
+                #{deviceCode, jdbcType=VARCHAR},
+                #{imagePath, jdbcType=VARCHAR},
+                #{videoPath, jdbcType=VARCHAR},
+                #{value, jdbcType=VARCHAR},
+                #{outRange, jdbcType=VARCHAR},
+                #{taskId, jdbcType=VARCHAR}
+        )
+    </insert>
+    <update id="updateIsWarn" parameterType="java.lang.Long">
+        UPDATE t_cruise_data_result a <set>
+        a.is_warn = 1
+    </set>
+        WHERE
+        a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+    </update>
 </mapper>

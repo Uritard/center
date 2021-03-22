@@ -1,6 +1,5 @@
 package com.yjh.accessrobot.netty.server;
 
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -22,7 +21,6 @@ import org.dom4j.io.SAXReader;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -170,10 +168,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         log.info("机器人发送的的指令是<start>" + Str + "<end>");
 
-        Packet = Packet + Str.toString().replace(" ","").toLowerCase();
-        log.info("socketMessageHex:"+Packet);
-        /*PacketDealThread packetDealThread = new PacketDealThread(this,socketMessageHex,headNum);
-        TaskExecutePool.getInstance().execute(packetDealThread);*/
+        Packet = Packet + Str.toString().replace(" ","");
+
+        log.info("Packet:"+Packet);
         int headNum = appearNumber(Packet,"eb90");
         openPackage(Packet,headNum);
 
@@ -244,7 +241,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 String body1 = socketMessageHex.substring(46,socketMessageHex.length()-4);
                 onePacketString = PlatformPacketUtil.toStringHex(body1);
                 log.info("准备解析的xml=="+onePacketString);
-                Packet = "";
+//                Packet = "";
+                Packet = Packet.replace(socketMessageHex,"");
                 stringToXml(onePacket,onePacketString);
                 return;
             }else{
@@ -354,12 +352,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     String robotCode = xmlBaseModel.getSendCode();
                     if (allRobotCodeMap.containsValue(robotCode)){
                         log.info("缓存有,发送心跳响应");
-                        heartBeatSuccessAfter(robotCode,sendSessionId,receiveSessionId);
+                        Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
+                        heartBeatSuccessAfter(robotCode,sendSessionId,receiveSessionId,robotStatusMap);
                     }else {
                         List<String> robotCodeList = robotService.selectAllRobotCode();
                         if (robotCodeList.contains(robotCode)){
                             log.info("缓存无,表中有,发送心跳相应");
-                            heartBeatSuccessAfter(robotCode,sendSessionId,receiveSessionId);
+                            Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
+                            heartBeatSuccessAfter(robotCode,sendSessionId,receiveSessionId,robotStatusMap);
                         }else {
                             log.info("缓存无,表中无,断开连接");
                             Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
@@ -731,6 +731,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+ftpFileName);
                     }*/
 //改版
+//旧版
                     String filePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
                     String splitArray[] = filePath.split("/");
                     String fileName = splitArray[splitArray.length - 1];
@@ -773,6 +774,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                     cruiseResultMap.put("relativePath",developRelativeUrl + "/" +fileName);//相对路径
                     cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+fileName);//绝对路径
+//旧版
                     cruiseResultMap.put("rectangle",xmlBaseModel.getItems().get(0).get("rectangle").toString());
                     cruiseResultMap.put("taskPatrolledId",xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
                     cruiseResultMap.put("valid",xmlBaseModel.getItems().get(0).get("valid").toString());
@@ -781,6 +783,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     //Start CruiseResultDealThread
                     CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate);
                     TaskExecutePool.getInstance().execute(cruiseResultDealThread);
+                    //判断结果是否产生告警
+                    Map<String, String> cResultMap = new HashMap<>();
+                    cResultMap.put("robotCode",xmlBaseModel.getSendCode());
+                    cResultMap.put("taskCode",xmlBaseModel.getItems().get(0).get("task_code").toString());
+                    cResultMap.put("deviceId",xmlBaseModel.getItems().get(0).get("device_id").toString());
+                    cResultMap.put("value",xmlBaseModel.getItems().get(0).get("value").toString());
+                    IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap,redisTemplate);
+                    TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
 
                     String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, cruiseResultXmlString);
@@ -903,15 +913,16 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     /*
      * 成功收到心跳指令,sendHeartResponse && updateRobotStatus
      * */
-    void heartBeatSuccessAfter(String robotCode,long sendSessionId,long receiveSessionId){
+    void heartBeatSuccessAfter(String robotCode,long sendSessionId,long receiveSessionId,Map<String, String> robotStatusMap){
         String heartXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,robotCode));
         byte[] heartProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, heartXmlString);
         send(ctx, heartProtocol,robotCode);
-
+        flag2 ++;
         log.info("成功收到心跳flag2的值==="+flag2);
-        if (flag2 == 0){
+        if (flag2 > 3){
             robotService.updateRobotInfo(robotCode,"在线");
-            flag2 = 1;
+            robotStatusMap.put("value","0");//正常
+            redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
         }
     }
     /*
@@ -920,12 +931,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     void heartBeatFailAfter(String robotCode,Map<String, String> robotStatusMap){
         removeLink(robotCode);
         log.info("没有收到心跳flag2的值==="+flag2);
-        if (flag2 == 1){
-            robotService.updateRobotInfo(robotCode,"离线");
-            robotStatusMap.put("value","1");//异常
-            redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
-            flag2 = 0;
-        }
+        robotService.updateRobotInfo(robotCode,"离线");
+        robotStatusMap.put("value","1");//异常
+        redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
+        flag2 = 0;
     }
     /*
     * 3、2、1走你
