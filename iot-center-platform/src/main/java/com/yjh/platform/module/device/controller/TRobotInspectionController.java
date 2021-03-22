@@ -3,11 +3,11 @@ package com.yjh.platform.module.device.controller;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.device.service.TRobotInspectionService;
@@ -192,7 +192,7 @@ public class TRobotInspectionController {
                     //jasonMap.put("taskId",tCruiseTask.getTaskId());
                     String json= JSON.toJSONString(jasonMap);
                     log.info("发送给前端的消息-停止调接口：   "+json);
-                    WebSocketServer.sendMsg(json);
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
                 }
                 resultMap.put("taskProgress",map.get("taskProgress"));
             }else {

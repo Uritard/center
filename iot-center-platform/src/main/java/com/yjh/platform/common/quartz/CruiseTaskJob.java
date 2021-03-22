@@ -8,7 +8,6 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.StaticContextAccessor;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -155,7 +154,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 jasonMap.put("taskId",tCruiseTask.getTaskId());
                 String json=JSON.toJSONString(jasonMap);
                 log.info("发送给前端的消息：   "+json);
-                WebSocketServer.sendMsg(json);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
                 log.info(taskDate+"需要执行的任务");
                 //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
                 String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
@@ -468,7 +467,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
                             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                             log.info("发送给前端的消息："+jsonMessage);
-                            WebSocketServer.sendMsg(jsonMessage);
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
 
                             {
                                 //巡视点结果上报站端
@@ -604,7 +603,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
                                 String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                                 log.info("发送给前端的消息："+jsonMessage);
-                                WebSocketServer.sendMsg(jsonMessage);
+                                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
                             }else {
                                 taskNormal = taskNormal+1;
                                 tCruiseResult = tCruiseResultDao.selectByPrimaryId(uuid);
@@ -647,7 +646,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
                                 String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                                 log.info("发送给前端的消息："+jsonMessage);
-                                WebSocketServer.sendMsg(jsonMessage);
+                                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
 
                                 {
                                     //巡视点结果上报站端
@@ -746,7 +745,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             jsonMap.put("taskId","");
                             String jsonForShut=JSON.toJSONString(jsonMap);
                             log.info("任务终止的消息：   "+jsonForShut);
-                            WebSocketServer.sendMsg(jsonForShut);
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonForShut);
                         }
                         Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
                         Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
@@ -770,7 +769,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             jsonForLastMap.put("taskId", taskId);
                             String jsonForLast = JSON.toJSONString(jsonForLastMap);
                             log.info("发送给前端的消息：" + jsonForLast);
-                            WebSocketServer.sendMsg(jsonForLast);
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonForLast);
 
                             Thread.sleep(15000);
                             tCruiseResult.setCState(240);

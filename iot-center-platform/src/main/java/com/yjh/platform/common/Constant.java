@@ -6,9 +6,19 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.entity.Channel;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.Max;
+import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -96,5 +106,23 @@ public class Constant {
     public static Map<String,Object> sequentialState = new HashMap<>();
 
     public static String isDecode;
+
+    public static String WEBSOCKET_URL="";
+
+    public static String websocketSendMsg(String url, String json) throws IOException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        String result = "";
+        try {
+            URI uri = new URIBuilder(url).setParameter("json", json).build();
+            HttpPost httpGet = new HttpPost(uri);
+            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
+            httpGet.setHeader("Accept", "application/json");
+            CloseableHttpResponse response = client.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+        } catch (Exception e) {e.getMessage();}
+        return result;
+    }
+
 
 }

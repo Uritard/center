@@ -14,7 +14,6 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.smUtil.Demo;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -528,7 +527,7 @@ public class TCruiseTaskService {
             jasonMapOnFinished.put("taskId",taskId);
             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
             log.info("发送给前端的消息："+jsonMessage);
-            WebSocketServer.sendMsg(jsonMessage);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
         } catch (Exception e) {
             log.error("任务暂停异常: " + e);
             e.printStackTrace();
@@ -542,7 +541,7 @@ public class TCruiseTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int taskGoOn(String taskId) {
+    public int taskGoOn(String taskId) throws Exception {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
         if (tCruiseResult.getCState() == 240) {
             return 1;
@@ -581,7 +580,7 @@ public class TCruiseTaskService {
         jasonMapOnFinished.put("taskId",taskId);
         String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
         log.info("发送给前端的消息："+jsonMessage);
-        WebSocketServer.sendMsg(jsonMessage);
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
 
         //任务状态上报站端
         //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
@@ -994,7 +993,7 @@ public class TCruiseTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int upSystemCtrl(XMLBaseModel xmlBaseModel) {
+    public int upSystemCtrl(XMLBaseModel xmlBaseModel) throws Exception{
         String com = xmlBaseModel.getCommand();
         String taskId = xmlBaseModel.getCode();
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);

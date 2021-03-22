@@ -1,6 +1,7 @@
 package com.yjh.platform;
 
 import com.rabbitmq.client.AMQP;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.tradio.RecordVoiceFileThread;
 import com.yjh.platform.module.device.entity.TDeviceTypeImg;
@@ -66,6 +67,7 @@ public class PlatformApplication  implements CommandLineRunner {
         tSysParamService.insertIntoRedis();
         tCameraInfoService.intoRedis();
         sysUserService.insertIntoRedis();
+        Constant.WEBSOCKET_URL = tSysParamService.selectByParamCode("systemGateWayServices").getContent();
         tDeviceTypeImgService.findPic();//本地启动把此行注掉
         //Start RecordVoiceFileThread
         List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();

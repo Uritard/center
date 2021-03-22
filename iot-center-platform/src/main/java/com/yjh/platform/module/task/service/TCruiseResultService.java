@@ -7,7 +7,6 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -278,7 +277,12 @@ public class TCruiseResultService{
         jasonMap.put("alarmId",warnId);
         String json= JSON.toJSONString(jasonMap);
         System.out.println(("发送给前端的消息==="+json));
-        WebSocketServer.sendMsg(json);
+        try{
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+        }catch (Exception e){
+            System.out.println("发送websocket出错");
+        }
+
     }
     @Transactional(rollbackFor = Exception.class)
     public List<StatisticalResult> taskStatistical(){

@@ -5,7 +5,6 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -245,7 +244,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
         jsonMap.put("taskId",taskId);
         String jsonForTaskAre= JSON.toJSONString(jsonMap);
         log.info("任务超期的消息：   "+jsonForTaskAre);
-        WebSocketServer.sendMsg(jsonForTaskAre);
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonForTaskAre);
 
 
         // webSocket通知前端调用巡视监控的接口
@@ -254,7 +253,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
         jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
         String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
         log.info("发送给前端的消息："+jsonMessage);
-        WebSocketServer.sendMsg(jsonMessage);
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
 
 
 

@@ -1,7 +1,7 @@
 package com.yjh.platform.common.quartz;
 
 import com.alibaba.fastjson.JSON;
-import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.common.Constant;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
@@ -33,7 +33,7 @@ public class DeviceDataJob extends QuartzJobBean {
             jasonMap2.put("taskId",6666);
             String json2=JSON.toJSONString(jasonMap2);
             log.info("发送给前端的消息：   "+json2);
-            WebSocketServer.sendMsg(json2);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json2);
            log.info("完成定时任务执行");
         } catch (Exception e) {
             log.error("定时任务异常" + e);

@@ -16,7 +16,6 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.QrCodeUtils;
 import com.yjh.platform.common.utils.ResultHandleUtils;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -87,7 +86,11 @@ public class HelloController {
         jasonMap.put("type","noTask");
         //jasonMap.put("taskId",tCruiseTask.getTaskId());
         String json= JSON.toJSONString(jasonMap);
-        WebSocketServer.sendMsg(json);
+        try{
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+        }catch (Exception e){
+            System.out.println("发送websocket出错");
+        }
         return result;
     }
 
@@ -104,10 +107,10 @@ public class HelloController {
             jasonMaps2.put("warnId", warnId);
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
-            ConcurrentHashMap<String,WebSocketServer> webSocketMap = WebSocketServer.getInstance().getWebSocketMap();
-            for (String userId :webSocketMap.keySet()) {
-                webSocketMap.get(userId).sendMessage(json);
-            }
+//            ConcurrentHashMap<String,WebSocketServer> webSocketMap = WebSocketServer.getInstance().getWebSocketMap();
+//            for (String userId :webSocketMap.keySet()) {
+//                webSocketMap.get(userId).sendMessage(json);
+//            }
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("webSocketBroadcast测试失败：" + e);
@@ -142,9 +145,10 @@ public class HelloController {
 
             String json = JSON.toJSONString(map);
             log.info("发送给前端的消息：" + json);
-            ConcurrentHashMap<String,WebSocketServer> webSocketMap = WebSocketServer.getInstance().getWebSocketMap();
-            for (String userId :webSocketMap.keySet()) {
-                webSocketMap.get(userId).sendMessage(json);
+            try{
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+            }catch (Exception e){
+                System.out.println("发送websocket出错");
             }
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -157,8 +161,8 @@ public class HelloController {
     public Result webSocketgetUserId() {
         Result result = new Result();
         try {
-            ConcurrentHashMap<String,WebSocketServer> webSocketMap = WebSocketServer.getInstance().getWebSocketMap();
-            log.info("webSocketMap：" + webSocketMap);
+            //ConcurrentHashMap<String,WebSocketServer> webSocketMap = WebSocketServer.getInstance().getWebSocketMap();
+            //log.info("webSocketMap：" + webSocketMap);
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("webSocketgetUserId测试失败：" + e);
@@ -205,215 +209,7 @@ public class HelloController {
         Map<String,List<Analysis>> analysisInfo=new HashMap<>();
         List<Analysis> analysisList=new ArrayList<>();
 
-        //缺陷算法发送测试
-//        List<String> picpath=new ArrayList<>();
-//        picpath.add("/home/yjh_iot_center/iot-picture/presets/21000000104/21000000104.jpg");
-//        picpath.add("/home/yjh_iot_center/iot-picture/presets/21000000105/21000000105.jpg");
-//        for(String pic:picpath){
-//            Analysis analysis=new Analysis();
-//            analysis.setAnalyseType("11");
-//            analysis.setPicPath(pic);
-//            analysis.setTaskId("12345");
-//            analysis.setIsAi(0);
-//            analysis.setInstanceId(Long.valueOf("0"));
-//            analysis.setPicModelPath("/home/xxxxxx");
-//            analysisList.add(analysis);
-//        }
-//        analysisInfo.put("list",analysisList);
-//        try {
-//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-//            if (null != serviceRestTemplate) {
-//                String str=serviceRestTemplate.postForObject(DEFECT_URL, analysisInfo, String.class);
-//                result.setData(str);
-//            }
-//        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
-//        }
-//
 
-//表计算法发送测试
-//        Analysis analysis=new Analysis();
-//        analysis.setTaskId("110001");
-//        analysis.setInstanceId(Long.valueOf("910009"));
-//        analysis.setPicModelPath("/home/yjh/iot-picture/model-picture/sync/Template/Infrared/PF45B5B49C694783A4EED16FA3155EFF");
-//        analysis.setAnalyseType("9");
-//        analysis.setPicPath("/home/yjh_iot_center/iot-picture/resultImg/20210303042709568.jpg");
-//        analysis.setIsAi(1);
-//
-//        analysisList.add(analysis);
-//        analysisInfo.put("list",analysisList);
-//        try {
-//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-//            if (null != serviceRestTemplate) {
-//                String str=serviceRestTemplate.postForObject(ALGORITHM_URL, analysisInfo, String.class);
-//                result.setData(str);
-//            }
-//        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
-//        }
-
-
-
-
-//          if(testString.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+"))
-//          {
-//              result.setData("数据正常");
-//          }else {
-//              result.setData("数据异常");
-//          }
-//        String finalValue = testString.replaceAll("[0-9]", "");
-//        String[] str2 = finalValue.split("\\s+");
-//        for(String str:str2){
-//            log.info("result"+str);
-//        }
-//        Long endTime=System.currentTimeMillis();
-//        List<Integer> results=new ArrayList<>();
-
-//          HashMap<String,Long> map1=new HashMap<>();
-//          map1.put("cameraId",Long.valueOf("40050"));
-//         Result result1=sendPostRequest(Constant.START_CAMERA_URL,map1);
-//         result.setData(result1.getData());
-//         log.info("---------："+result1.getData());
-
-//        Map<String,Object> maps=redisTemplate.opsForHash().entries("t_cruise_task_result:fc7a466fa9d24ab3aeb0669f9c345c86:11000000436");
-//        log.info("djkhwqedkfe:"+maps.get("remark"));
-//        TCruiseTask tCruiseTask=new TCruiseTask();
-//        tCruiseTask.setTaskId(maps.get("remark").toString());
-//        log.info("class.....:"+testString.getClass());
-//        log.info("content-length:"+testString.length());
-//
-//        log.info("Content表计:"+testString.matches("\\{\"msgData.*?\"2\"}"));
-//        log.info("Content缺陷:"+testString.matches("\\{\"msgType.*?}}}}"));
-
-//        log.info("Content前半:"+testString.matches());
-//        log.info("Content后半:"+testString.matches());
-
-
-
-//        String l1="{\"msgType\": \"4\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"errorCode\": \"0\"}}{\"msgType\": \"2\", \"msgID\": \"100000003\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"data\": {\"resultInfo1\": {\"taskId\": \"6d05cd9969d14a22a71c03d7ff10b94a\", \"instanceId\": \"11000000505\", \"analyseType\": \"3\", \"resultValue\": \"\"}}}}";
-//        String l3=l1.replaceAll("\\s+","");
-//        String l2=l3.replaceAll("\\{.*?\\}\\{","{");
-//        log.info("String:"+l2);
-//        log.info("String3:"+l3);
-//
-//
-//
-//        String meter="{9541}{\"msgData\":{\"data\":{\"resultInfo1\":{\"analyseType\":\"3\",\"instanceId\":\"11000000505\",\"resultValue\":\"--.7--\",\"taskId\":\"6d05cd9969d14a22a71c03d7ff10b94a\"}},\"desNode\":\"clientSocket001\",\"srcNode\":\"clientSocket001\"},\"msgID\":\"100000004\",\"msgType\":\"2\"}";
-//        String defect="{\"msgType\": \"2\", \"msgID\": \"100000003\", \"msgData\": {\"desNode\": \"clientSocket001\", \"srcNode\": \"serverSocket\", \"data\": {\"resultInfo1\": {\"taskId\": \"6d05cd9969d14a22a71c03d7ff10b94a\", \"instanceId\": \"11000000505\", \"analyseType\": \"3\", \"resultValue\": \"\"}}}}";
-////        String testString=",\"srcNode\":\"clientSocket001\"},\"msgID\":\"100000136\",\"msgType\":\"2\"}\n";
-//
-//
-//
-//        log.info("meter:"+meter.replaceAll("\\{\"msgData.*?\"2\"}","hahaha"));
-//        log.info("----+++:"+meter.split("\\{\"msgData.*?\"2\"}").length);
-//        log.info("defect:"+defect.replaceAll("\\{\"msgType.*?}}}}","123"));
-//
-////        log.info("Judge---"+defect.matches("^\\{\"msgType\"+.*?"));
-//
-//        log.info("Trans1:"+meter.matches("\\{\"msgData.*?\"2\"}"));
-//        log.info("Trans2:"+defect.matches("\\{\"msgType.*?}}}}"));
-//
-//        log.info("Rule1:"+meter.matches("\\{\"msgData.*?"));
-//        log.info("Rule2:"+meter.matches(".*?\"2\"}"));
-//
-//        log.info("result:"+testString.matches(".*?\"2\"}"));
-//
-//        log.info("testString:"+testString);
-//
-//
-//        String trulyMessage="";
-//        log.info("testString:"+testString);
-//        if(testString.matches("\\{\"msgData.*?\"2\"}")){ //表计整包
-//               log.info("整包数据1");
-//        }else if (testString.matches("\\{\"msgType.*?}}}}")){ //缺陷整包
-//               log.info("整包数据2");
-//        }else { //拆包
-//            if(testString.matches("\\{\"msgData.*?") || testString.matches("\\{\"msgType.*?")){ //拆包A
-//
-//                redisTemplate.opsForHash().put("algoResponse","A",testString);
-//                log.info("获取上半包数据");
-//            }else if (testString.matches(".*?\"2\"}") || testString.matches(".*?}}}}") |testString.matches("}")){ //拆包B
-//
-//                redisTemplate.opsForHash().put("algoResponse","B",testString);
-//                String success=(redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(testString);
-////                redisTemplate.delete("algoResponse");
-//                log.info("success:"+success);
-//                trulyMessage=success;
-//            }
-//        }
-//
-//      if(trulyMessage!="") {
-//          JSONObject jsonObject = JSON.parseObject(trulyMessage);
-//          log.info("JSON对象1：" + jsonObject);
-//          if (jsonObject.get("msgType").toString().equals("2")) {
-//              JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
-//              log.info("原生数据****：" + jsonObjectData);
-//              Iterator iterator = jsonObjectData.entrySet().iterator();//迭代器取出data中的每一个resultInfo
-//              while (iterator.hasNext()) {
-//                  Map.Entry entry = (Map.Entry) iterator.next();
-//                  //遍历每一个结果子集
-//                  JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
-//                  log.info("数据****：" + jsonObjectResult);//打印resultInfo
-//              }
-//          }
-//      }
-//
-
-//        redisTemplate.opsForList().leftPush("constant","helloWorld");
-//        redisTemplate.opsForList().leftPush("constant","JAVA");
-//
-//        List<String> list=redisTemplate.opsForList().range("constant",0,redisTemplate.opsForList().size("constant")-1);
-//        log.info("list:"+list);
-
-
-//        Float value=Float.valueOf("17.612");
-//        Float highLimit1=Float.valueOf("20");
-//        Float lowLimit1=Float.valueOf("10");
-//        Float highLimit2=Float.valueOf("25");
-//        Float lowLimit2=Float.valueOf("5");
-//        Float highLimit3=Float.valueOf("30");
-//        Float lowLimit3=Float.valueOf("4");
-//        Float highLimit4=Float.valueOf("40");
-//        Float lowLimit4=Float.valueOf("1");
-//
-//        Boolean emergency1 = false;
-//        Boolean emergency2 = false;
-//        Boolean worse1 = false;
-//        Boolean worse2 = false;
-//        Boolean general1 = false;
-//        Boolean general2 = false;
-//        Boolean warns1 = false;
-//        Boolean warns2 = false;
-//
-//        if (Objects.nonNull(lowLimit4))
-//            emergency1 = value <= lowLimit4;
-//        if (Objects.nonNull(highLimit4))
-//            emergency2 = value >= highLimit4;
-//        if (Objects.nonNull(lowLimit3))
-//            worse1 = value <= lowLimit3;
-//        if (Objects.nonNull(highLimit3))
-//            worse2 = value >= highLimit3;
-//        if (Objects.nonNull(lowLimit2))
-//            general1 = value <= lowLimit2;
-//        if (Objects.nonNull(highLimit2))
-//            general2 = value >= highLimit2;
-//        if (Objects.nonNull(lowLimit1))
-//            warns1 = value <= lowLimit1;
-//        if (Objects.nonNull(highLimit1))
-//            warns2 = value >= highLimit1;
-//
-//
-//        if (emergency1 || emergency2) {
-//            log.info("危急");
-//        } else if (worse1 || worse2) {
-//            log.info("严重");
-//        } else if (general1 || general2) {
-//            log.info("一般");
-//        } else if (warns1 || warns2) {
-//            log.info("预警");
-//        } else {
-//            log.info("正常");
-//        }
 
         return result;
     }
@@ -443,7 +239,11 @@ public class HelloController {
             jasonMaps2.put("unionId", taskId);
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
-            WebSocketServer.sendMsg(json);
+            try{
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+            }catch (Exception e){
+                System.out.println("发送websocket出错");
+            }
 //            result.setData(tCfgDataCurrentService.batchInsert(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

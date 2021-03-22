@@ -106,5 +106,10 @@ public class TSysParamService{
         return this.insertIntoRedis();
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public TSysParam selectByParamCode(String paramType) {
+        return this.tSysParamDao.selectByParamType(paramType);
+    }
+
 }
 

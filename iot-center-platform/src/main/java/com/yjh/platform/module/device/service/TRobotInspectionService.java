@@ -1,7 +1,7 @@
 package com.yjh.platform.module.device.service;
 
 import com.alibaba.fastjson.JSON;
-import com.yjh.platform.common.websocket.WebSocketServer;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.module.device.controller.TRobotInspectionController;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.*;
@@ -108,7 +108,7 @@ public class TRobotInspectionService{
             jasonMap.put("type","noTask");
             //jasonMap.put("taskId",tCruiseTask.getTaskId());
             String json= JSON.toJSONString(jasonMap);
-            WebSocketServer.sendMsg(json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
             log.info("发送给前端的消息-停止调接口：   "+json);
             return  null;
         }
@@ -214,7 +214,7 @@ public class TRobotInspectionService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object> selectRobotTaskProgress(Long robotId){
+    public Map<String,Object> selectRobotTaskProgress(Long robotId) throws Exception{
         Map<String,Object> reMap = new HashMap<>();
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
         Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode);
@@ -228,7 +228,7 @@ public class TRobotInspectionService{
             jasonMap.put("type","noTask");
             //jasonMap.put("taskId",tCruiseTask.getTaskId());
             String json= JSON.toJSONString(jasonMap);
-            WebSocketServer.sendMsg(json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
             log.info("发送给前端的消息-停止调接口：   "+json);
             return reMap;
         }

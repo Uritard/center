@@ -1,9 +1,9 @@
 package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.service.TCfgDeviceService;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.task.controller.TCruiseTaskController;
@@ -194,7 +194,7 @@ public class TCfgDataCurrentService {
 
     //TODO: 测试方法 用完删除
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) throws ScriptException {
+    public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) throws Exception {
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Set<Long> plans = new HashSet<>();//满足触发条件的预案
         Log cLogger = LogFactory.getLog(this.getClass());
@@ -315,7 +315,7 @@ public class TCfgDataCurrentService {
             jasonMap.put("warnContent",  tCfgDeviceService.selectByPrimaryId(currents.get(0).getDeviceId().toString()).getDeviceName()+"触发联动");
             String jsonT = JSON.toJSONString(jasonMap);
             log.info("发送给前端的消息：" + jsonT);
-            WebSocketServer.sendMsg(jsonT);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonT);
 
             TCfgUnionRule tCfgUnionRule = tCfgUnionRuleDao.selectByPrimaryId(unionRule.get(0).getRuleId());
             //根据该规则id是否设置了联动监控推送，若是，则将满足该条规则id产生的联动相关信息推送给前端；不是，不推
@@ -326,7 +326,7 @@ public class TCfgDataCurrentService {
                 jasonMaps2.put("unionId", taskId);
                 String json = JSON.toJSONString(jasonMaps2);
                 log.info("发送给前端的消息：" + json);
-                WebSocketServer.sendMsg(json);
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
             }
         }
 

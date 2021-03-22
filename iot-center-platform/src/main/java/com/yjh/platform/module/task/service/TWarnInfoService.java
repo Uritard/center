@@ -3,8 +3,8 @@ package com.yjh.platform.module.task.service;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.dao.TCameraAlarmDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
@@ -228,7 +228,7 @@ public class TWarnInfoService{
         return tWarnInfoDao.selectAlarmProcess(warnId);
     }
     @Transactional(rollbackFor = Exception.class)
-    public int warnReview(Long warnId,String dealInfo,Integer dealType,String userId,Integer defectModel) {
+    public int warnReview(Long warnId,String dealInfo,Integer dealType,String userId,Integer defectModel) throws Exception{
         Date date = new Date();
         TWarnInfo tWarnInfo = new TWarnInfo()
                 .setWarnId(warnId)
@@ -247,7 +247,7 @@ public class TWarnInfoService{
             jasonMap.put("alarmId", warnId);
             String json = JSON.toJSONString(jasonMap);
             log.info(("发送给前端的消息===" + json));
-            WebSocketServer.sendMsg(json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
         }
         return jieGuo;
     }
@@ -295,7 +295,11 @@ public class TWarnInfoService{
         jasonMap.put("alarmId",warnId);
         String json= JSON.toJSONString(jasonMap);
         System.out.println(("发送给前端的消息==="+json));
-        WebSocketServer.sendMsg(json);
+        try{
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+        }catch (Exception e){
+            System.out.println("发送websocket出错");
+        }
     }
     @Transactional(rollbackFor = Exception.class)
     public int alarmProcess(TWarnInfo tWarnInfoTemp,String userId) {
@@ -322,7 +326,11 @@ public class TWarnInfoService{
                 jasonMap.put("alarmId",warnId);
                 String json= JSON.toJSONString(jasonMap);
                 log.info(("发送给前端的消息==="+json));
-                WebSocketServer.sendMsg(json);
+                try{
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                }catch (Exception e){
+                    System.out.println("发送websocket出错");
+                }
             }
         }else if (alarmSource == 888)
         {
@@ -342,7 +350,11 @@ public class TWarnInfoService{
                 jasonMap.put("alarmId",warnId);
                 String json= JSON.toJSONString(jasonMap);
                 log.info(("发送给前端的消息==="+json));
-                WebSocketServer.sendMsg(json);
+                try{
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                }catch (Exception e){
+                    System.out.println("发送websocket出错");
+                }
             }
         }else{
             TWarnInfo tWarnInfo = new TWarnInfo();
@@ -361,7 +373,11 @@ public class TWarnInfoService{
                 jasonMap.put("alarmId",warnId);
                 String json= JSON.toJSONString(jasonMap);
                 log.info(("发送给前端的消息==="+json));
-                WebSocketServer.sendMsg(json);
+                try{
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+                }catch (Exception e){
+                    System.out.println("发送websocket出错");
+                }
             }
         }
         return jieGuo;

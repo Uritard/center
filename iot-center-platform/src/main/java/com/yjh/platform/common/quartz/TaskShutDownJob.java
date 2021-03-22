@@ -5,7 +5,6 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.Object2Map;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -364,7 +363,7 @@ public class TaskShutDownJob extends QuartzJobBean {
             jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
             String jsonMessage= JSON.toJSONString(jasonMapOnFinished);
             log.info("发送给前端的消息："+jsonMessage);
-            WebSocketServer.sendMsg(jsonMessage);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMessage);
 
         } catch (Exception e) {
             log.error("任务终止异常: " + e);

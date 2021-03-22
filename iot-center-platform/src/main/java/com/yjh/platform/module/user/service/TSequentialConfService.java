@@ -2,7 +2,6 @@ package com.yjh.platform.module.user.service;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.device.dao.TCfgDeviceDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCfgDevice;
@@ -158,7 +157,11 @@ public class TSequentialConfService{
             jasonMaps2.put("state", map.get("state"));
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
-            WebSocketServer.sendMsg(json);
+            try{
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,json);
+            }catch (Exception e){
+                System.out.println("发送websocket出错");
+            }
             //结果
 //            {"type": "newSequentialResult",
 //                    "cfgDeviceId": "1001",
@@ -219,7 +222,11 @@ public class TSequentialConfService{
             jasonMapsResult.put("identifyResult", map.get("state"));
             String jsonResult = JSON.toJSONString(jasonMapsResult);
             log.info("发送给前端的消息：" + jsonResult);
-            WebSocketServer.sendMsg(jsonResult);
+            try{
+                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonResult);
+            }catch (Exception e){
+                System.out.println("发送websocket出错");
+            }
 
             List<String> listSort = tSequentialConfDao.selectLastStep();
             if(listSort.get(listSort.size()-1).equals(meteId) ){
