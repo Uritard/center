@@ -117,11 +117,13 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         try {
             String body = new String(bytes, "UTF-8");
             log.info("接收服务端数据:" + body);
-            // TODO: 2020/11/4 构造线程池对象
-            //线程池数据处理
-            DataDealThread dataDealThread=new DataDealThread(body,redisTemplate,analyseDataOperateService,ctx);
-            TaskExecutePool.getInstance().execute(dataDealThread);
+            String usefulBody = analyseDataOperateService.nonUnpacking(body);//反拆包解析
+            if(usefulBody !="") {
+                //线程池数据处理
+                DataDealThread dataDealThread = new DataDealThread(usefulBody, redisTemplate, analyseDataOperateService, ctx);
+                TaskExecutePool.getInstance().execute(dataDealThread);
 //            handlerData(body); //单线程数据处理
+            }
         } catch (Exception e) {
             e.getMessage();
         }

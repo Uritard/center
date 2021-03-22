@@ -186,35 +186,6 @@ public class HelloController {
 
 
 
-    public String nonUnpacking(String body) {
-        //body清除空格
-        body = body.replaceAll("\\s++", "");
-        String usefulBody = "";//处理结果初始化
-        if (body.matches("\\{\"msgData.*?\"2\"}") || body.matches("\\{\"msgType.*?}}}}")) { //数据结果整包
-            log.info("整包数据...");
-            usefulBody = body;
-        } else if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?") || body.matches("}")) {  //结果半包
-            if (body.contains("\"msgType\":\"4\"")) { //注册消息
-
-            } else if (body.contains("\"msgType\":\"6\"")) {  //结束消息
-                usefulBody = body;
-            } else {                                         //数据结果（上半包）
-                redisTemplate.opsForHash().put("algoResponse", "A", body);
-                log.info("获取上半包数据");
-            }
-
-        } else if (body.matches(".*?\"2\"}") || body.matches(".*?}}}}")) {   //数据结果（下半包）
-            redisTemplate.opsForHash().put("algoResponse", "B", body);
-            usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body); //开始合体
-//                redisTemplate.delete("algoResponse");
-            log.info("success:" + usefulBody);
-        }
-        log.info("usefulBody:" + usefulBody);
-        return usefulBody;
-
-    }
-
-
 
     @ApiOperation("说hello")
     @PostMapping("/admin")
@@ -234,7 +205,6 @@ public class HelloController {
         Map<String,List<Analysis>> analysisInfo=new HashMap<>();
         List<Analysis> analysisList=new ArrayList<>();
 
-        result.setData(nonUnpacking(testString));
         //缺陷算法发送测试
 //        List<String> picpath=new ArrayList<>();
 //        picpath.add("/home/yjh_iot_center/iot-picture/presets/21000000104/21000000104.jpg");

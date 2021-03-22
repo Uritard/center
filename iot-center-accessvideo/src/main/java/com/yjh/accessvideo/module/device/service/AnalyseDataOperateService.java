@@ -347,13 +347,23 @@ public class AnalyseDataOperateService {
             } else {                                         //数据结果（上半包）
                 redisTemplate.opsForHash().put("algoResponse", "A", body);
                 log.info("获取上半包数据");
+                if(Objects.nonNull(redisTemplate.opsForHash().get("algoResponse","B"))){
+                    usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body); //开始合体
+                    log.info("success:" + usefulBody);
+                    redisTemplate.delete("algoResponse");
+                }
+
             }
 
         } else if (body.matches(".*?\"2\"}") || body.matches(".*?}}}}")) {   //数据结果（下半包）
             redisTemplate.opsForHash().put("algoResponse", "B", body);
-            usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body); //开始合体
-//                redisTemplate.delete("algoResponse");
-            log.info("success:" + usefulBody);
+            log.info("获取下半包数据");
+            if (Objects.nonNull(redisTemplate.opsForHash().get("algoResponse","A"))){
+                usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body); //开始合体
+                log.info("success:" + usefulBody);
+                redisTemplate.delete("algoResponse");
+            }
+
         }
         log.info("usefulBody:" + usefulBody);
         return usefulBody;
