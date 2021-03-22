@@ -190,7 +190,7 @@ public class SysUserService {
                             mapResult.put("info", ResultCodeEnum.CODE10102.getName());
                             return mapResult;
                         } else {
-                            if (yxTime>sysUserLogin.getInvalidTime()) {
+                            if (yxTime>=sysUserLogin.getInvalidTime()) {
                                 mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -227,7 +227,7 @@ public class SysUserService {
                         return mapResult;
                     }
                     if (sysUserLogin.getState() == 1) {
-                        if (yxTime>sysUserLogin.getInvalidTime()) {
+                        if (yxTime>=sysUserLogin.getInvalidTime()) {
                             mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
                         }
                         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
