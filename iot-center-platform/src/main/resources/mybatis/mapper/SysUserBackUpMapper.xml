@@ -101,30 +101,31 @@
         <if test="userName != null">a.user_name = #{userName},</if>
         <if test="password != null">a.PASSWORD = #{password},</if>
         <if test="trueName != null ">a.true_name = #{trueName},</if>
-        a.user_type = #{userType},
-        a.sex = #{sex, jdbcType=INTEGER},
+        <if test="userType != null">a.user_type = #{userType},</if>
+        <if test="sex != null">a.sex = #{sex, jdbcType=INTEGER},</if>
         <if test="eMail != null">a.e_mail = #{eMail},</if>
         <if test="workNo != null ">a.work_no = #{workNo},</if>
         <if test="faceId != null ">a.face_id = #{faceId, jdbcType=VARCHAR},</if>
         <if test="fingerId != null">a.finger_id = #{fingerId},</if>
         <if test="voiceId != null ">a.voice_id = #{voiceId, jdbcType=VARCHAR},</if>
-        a.state = #{state, jdbcType=INTEGER},
+        <if test="state != null">a.state = #{state, jdbcType=INTEGER},</if>
         <if test="userTitle != null ">a.user_title = #{userTitle},</if>
-        a.creator_id = #{creatorId},
+        <if test="creatorId != null ">a.creator_id = #{creatorId},</if>
         <if test="appkey != null  ">a.appkey = #{appkey},</if>
         <if test="imageUrl != null ">a.image_url = #{imageUrl},</if>
-        a.role_id = #{roleId},
-        a.org_id = #{orgId},
-        a.user_status = #{userStatus, jdbcType=INTEGER},
+        <if test="roleId != null ">a.role_id = #{roleId},</if>
+        <if test="orgId != null">a.org_id = #{orgId},</if>
+        <if test="userStatus != null">a.user_status = #{userStatus, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
         <if test="updateTime != null">a.update_time = #{updateTime, jdbcType=TIMESTAMP},</if>
-        a.invalid_time = #{invalidTime, jdbcType=INTEGER},
+        <if test="invalidTime != null">a.invalid_time = #{invalidTime, jdbcType=INTEGER},</if>
         <if test="lastLogin != null">a.last_login = #{lastLogin, jdbcType=TIMESTAMP},</if>
         <if test="lockTime != null">a.lock_time = #{lockTime, jdbcType=TIMESTAMP},</if>
         <if test="verfiCode != null">a.verfi_code = #{verfiCode, jdbcType=VARCHAR},</if>
     </set>
         where a.user_id = #{userId, jdbcType=BIGINT}
     </update>
+
 
 
 
