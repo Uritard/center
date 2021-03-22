@@ -487,7 +487,7 @@ public class DateTimeUtil {
             return date;
         }
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(getDatePattern());
+            SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
             date = sdf.parse(sdf.format(time));
         } catch (ParseException e) {
             logger.error(e.getMessage());
