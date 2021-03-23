@@ -109,7 +109,10 @@ public class zuulFilter extends ZuulFilter {
                             ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                             return false;
                         } else {
-                            redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
+                            if(!url.contains("/sysLog/v1/errLog")&&!url.contains("/tWarnInfo/v1/warnCountsNonIdentify")&&
+                                    !url.contains("/homePage/v1/getWeatherInfo")){
+                                redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
+                            }
                             if ("true".equals(isLogin)) {
                                 redisTemplate.opsForHash().put("user:" + userId, "expireTime", String.valueOf(System.currentTimeMillis()));
                             }
@@ -182,7 +185,6 @@ public class zuulFilter extends ZuulFilter {
                                 return false;
                             }
                         }
-                        log.info("参数" + body);
                         ctx.setRequest(requestWrapper);
                     }
                 } else {
