@@ -110,7 +110,19 @@ public class zuulFilter extends ZuulFilter {
                             return false;
                         } else {
                             if(!url.contains("/sysLog/v1/errLog")&&!url.contains("/tWarnInfo/v1/warnCountsNonIdentify")&&
-                                    !url.contains("/homePage/v1/getWeatherInfo")){
+                                    !url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/tUnionTask/v1/linkageMonitorData")&&
+                                    !url.contains("/homePage/v1/taskOnExecute")&&!url.contains("/homePage/v1/countByAlarmLevel")&&
+                                    !url.contains("/tRobotInspection/v1/selectRobotTaskMessage")&&!url.contains("/tRobotInspection/v1/selectRobotStatus")&&
+                                    !url.contains("/systemInfo/v1/getDiskOnUse")&&!url.contains("/systemInfo/v1/getCpuOnUse")&&
+                                    !url.contains("/systemInfo/v1/getDisk")&&!url.contains("/systemInfo/v1/getCPU")&&
+                                    !url.contains("/systemInfo/v1/getMemory")&&!url.contains("/tCameraScreen/v1/cameraStateTree")&&
+                                    !url.contains("/tCruiseTaskResult/v1/selectCruiseAdvance")&&!url.contains("/tCruiseTaskResult/v1/selectCurrentCruiseTaskResult")&&
+                                    !url.contains("/tCruiseTaskResult/v1/selectRealTimeWarnInfo")&&!url.contains("/tCruisePointInstance/v1/selectCruiseCountByType")&&
+                                    !url.contains("/tCruiseTaskResult/v1/selectCruiseStatusCount")&&!url.contains("/tCameraScreen/v1/selectCameraTreeWithRobot")&&
+                                    !url.contains("/tCameraInfo/v1/selectByPage")&&!url.contains("/tCameraRecorder/v1/selectByPage")&&
+                                    !url.contains("/tRobotInfo/v1/selectByPage")&&!url.contains("/videoIntercom/v1/selectByPage")&&
+                                    !url.contains("/tVoiceDevice/v1/selectByPage")
+                            ){
                                 redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
                             }
                             if ("true".equals(isLogin)) {
