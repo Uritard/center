@@ -262,4 +262,12 @@
         where robot_id = #{robotId,jdbcType=BIGINT}
     </select>
 
+    <select id="selectRobotTaskOnStart" resultType="java.lang.String">
+        SELECT DISTINCT
+            d.task_id
+        FROM
+            t_robot_inspection a, t_cruise_point_instance b , t_cruise_task_attr c , t_cruise_result d
+            WHERE a.robot_id = 8092 and a.inspection_id = b.cruise_id and b.instance_id = c.instance_id and c.task_id = d.task_id and d.c_state = 239
+    </select>
+
 </mapper>

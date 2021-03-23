@@ -47,4 +47,6 @@ public interface TRobotInspectionDao {
 
     String selectRobotCode(@Param(value = "robotId") Long robotId);
 
+    List<String> selectRobotTaskOnStart(@Param(value = "robotId") Long robotId);
+
 }

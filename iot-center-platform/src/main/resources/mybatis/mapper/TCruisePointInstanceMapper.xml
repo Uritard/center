@@ -508,6 +508,7 @@
         ) AS instanceName,
         b.analyse_type,
         b.is_ai,
+        b.is_judge,
         f.device_name,
         g.real_code,
         c.robot_id,

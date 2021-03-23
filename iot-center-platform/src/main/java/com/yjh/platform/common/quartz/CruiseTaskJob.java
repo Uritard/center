@@ -508,7 +508,7 @@ public class CruiseTaskJob extends QuartzJobBean {
 
 
                         }else {
-                            if(item.getAnalyseType() != null || "on".equals(item.getIsAi())){//配置了算法
+                            if(item.getAnalyseType() != null || "on".equals(item.getIsAi())  || "on".equals(item.getIsJudge())){//配置了算法
                                 tCruiseDataResult.setPicpath(urlPath);
                                 tCruiseDataResult.setOrigpic(absPath);
 

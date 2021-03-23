@@ -220,8 +220,80 @@ public class TRobotInspectionService{
     public Map<String,Object> selectRobotTaskProgress(Long robotId) throws Exception{
         Map<String,Object> reMap = new HashMap<>();
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
-        Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode);
-        if(mapForRobotInstance == null || mapForRobotInstance.size() == 0){
+        List<String> taskList = tRobotInspectionDao.selectRobotTaskOnStart(robotId);
+        if(taskList != null && taskList.size()>0){
+           for(String taskId:taskList){
+               Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode+":"+taskId);
+               if(mapForRobotInstance == null || mapForRobotInstance.size() == 0){
+                   reMap.put("taskProgress",0);
+                   reMap.put("taskName","");
+                   reMap.put("startTime","");
+                   reMap.put("taskState","");
+
+                   Map<String,String> jasonMap=new HashMap<>();
+                   jasonMap.put("type","noTask");
+                   //jasonMap.put("taskId",tCruiseTask.getTaskId());
+                   String json= JSON.toJSONString(jasonMap);
+                   Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
+                   log.info("发送给前端的消息-停止调接口：   "+json);
+                   return reMap;
+               }
+               //String taskId = (String)mapForRobotInstance.get("taskId");
+               String instanceList = (String)mapForRobotInstance.get("instanceIdList");
+               instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
+               String[] instanceIdList = instanceList.split(", ");
+               int i = 0;
+               for (String item:instanceIdList) {
+                   Map<String,Object> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+":"+item);
+                   if(mapForRobotTaskMessage.size() != 0){
+                       if("null".equals(mapForRobotTaskMessage.get("cruiseResult"))){
+                           continue;
+                       }
+                       i = i + 1;
+                   }
+               }
+               Integer re = (int) ((new BigDecimal((float) i / instanceIdList.length).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue())*100);
+               TCruiseResult tc = tCruiseResultDao.selectForTaskId(taskId);
+               if(tc == null){
+                   reMap.put("taskProgress",0);
+                   reMap.put("taskName","");
+                   reMap.put("startTime","");
+                   reMap.put("taskState","");
+               }else{
+                   if(tc.getCState() == 239 || tc.getCState() == 241){
+                       reMap.put("taskProgress",re);
+                       reMap.put("taskName",tc.getTaskName());
+                       reMap.put("startTime",mapForRobotInstance.get("startTime"));
+                       String state = mapForRobotInstance.get("taskState").toString();
+                       //1=已执行 2=正在执行 3=暂停 4=终止 5=未执行 6=超期
+                       if("1".equals(state)){
+                           state = "已执行";
+                       }
+                       if("2".equals(state)){
+                           state = "正在执行";
+                       }
+                       if("3".equals(state)){
+                           state = "暂停";
+                       }
+                       if("4".equals(state)){
+                           state = "终止";
+                       }
+                       if("5".equals(state)){
+                           state = "未执行";
+                       }
+                       if("6".equals(state)){
+                           state = "超期";
+                       }
+                       reMap.put("taskState",state);
+                   }else {
+                       reMap.put("taskProgress",0);
+                       reMap.put("taskName","");
+                       reMap.put("startTime","");
+                       reMap.put("taskState","");
+                   }
+               }
+           }
+        }else {
             reMap.put("taskProgress",0);
             reMap.put("taskName","");
             reMap.put("startTime","");
@@ -233,62 +305,8 @@ public class TRobotInspectionService{
             String json= JSON.toJSONString(jasonMap);
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
             log.info("发送给前端的消息-停止调接口：   "+json);
-            return reMap;
         }
-        String taskId = (String)mapForRobotInstance.get("taskId");
-        String instanceList = (String)mapForRobotInstance.get("instanceIdList");
-        instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
-        String[] instanceIdList = instanceList.split(", ");
-        int i = 0;
-        for (String item:instanceIdList) {
-            Map<String,Object> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+":"+item);
-            if(mapForRobotTaskMessage.size() != 0){
-                if("null".equals(mapForRobotTaskMessage.get("cruiseResult"))){
-                    continue;
-                }
-                i = i + 1;
-            }
-        }
-        Integer re = (int) ((new BigDecimal((float) i / instanceIdList.length).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue())*100);
-        TCruiseResult tc = tCruiseResultDao.selectForTaskId(taskId);
-        if(tc == null){
-            reMap.put("taskProgress",0);
-            reMap.put("taskName","");
-            reMap.put("startTime","");
-            reMap.put("taskState","");
-        }else{
-            if(tc.getCState() == 239 || tc.getCState() == 241){
-                reMap.put("taskProgress",re);
-                reMap.put("taskName",tc.getTaskName());
-                reMap.put("startTime",mapForRobotInstance.get("startTime"));
-                String state = mapForRobotInstance.get("taskState").toString();
-                //1=已执行 2=正在执行 3=暂停 4=终止 5=未执行 6=超期
-                if("1".equals(state)){
-                    state = "已执行";
-                }
-                if("2".equals(state)){
-                    state = "正在执行";
-                }
-                if("3".equals(state)){
-                    state = "暂停";
-                }
-                if("4".equals(state)){
-                    state = "终止";
-                }
-                if("5".equals(state)){
-                    state = "未执行";
-                }
-                if("6".equals(state)){
-                    state = "超期";
-                }
-                reMap.put("taskState",state);
-            }else {
-                reMap.put("taskProgress",0);
-                reMap.put("taskName","");
-                reMap.put("startTime","");
-                reMap.put("taskState","");
-            }
-        }
+
         return reMap;
     }
 
