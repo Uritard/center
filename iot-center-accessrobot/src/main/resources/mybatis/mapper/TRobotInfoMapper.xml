@@ -617,7 +617,7 @@
             t_robot_inspection a,
             t_cruise_point_instance b,
             t_std_devicemete d,
-            t_algorithm_conf_bak e,
+        t_algorithm_mete e,
             t_algorithm_info f
         WHERE 1 = 1
         <if test="inspectionCode != null and inspectionCode != ''">and a.inspection_code = #{inspectionCode,jdbcType=VARCHAR}</if>
@@ -694,7 +694,7 @@
     <select id="selectByDeviceMeteId" resultType="com.yjh.accessrobot.module.command.entity.TAlgorithmInfo">
         select
         b.*
-        from t_algorithm_conf_bak a
+        from t_algorithm_mete a
         left join t_algorithm_info b on a.algorithm_id = b.algorithm_id
         where a.device_mete_id = #{deviceMeteId}
     </select>

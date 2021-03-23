@@ -199,7 +199,7 @@
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
-				from t_algorithm_conf_bak a
+				from t_algorithm_mete a
         left join  t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
         LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
         LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
@@ -349,7 +349,7 @@
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name
-				from t_algorithm_conf_bak a
+				from t_algorithm_mete a
         left join  t_cruise_point_instance b on a.device_mete_id = b.device_mete_id
         LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
         LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"

@@ -23,7 +23,7 @@
 
 
     <insert id="add" useGeneratedKeys="true" keyProperty="deviceMeteId" parameterType="com.yjh.platform.module.device.entity.TAlgorithmConfBak">
-        insert into t_algorithm_conf_bak(
+        insert into t_algorithm_mete(
             device_mete_id,
             algorithm_id,
             config_name,
@@ -49,12 +49,12 @@
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete from t_algorithm_conf_bak
+        delete from t_algorithm_mete
                 where device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TAlgorithmConfBak">
-        update t_algorithm_conf_bak a <set>
+        update t_algorithm_mete a <set>
         <if test="deviceMeteId != null">a.device_mete_id = #{deviceMeteId},</if>
         a.algorithm_id = #{algorithmId},
         <if test="configName != null ">a.config_name = #{configName},</if>
@@ -82,7 +82,7 @@
         a.apply_module,
         a.create_time,
         a.update_time
-        from t_algorithm_conf_bak a
+        from t_algorithm_mete a
         where 1 = 1
             and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
         limit 1
@@ -100,7 +100,7 @@
         a.apply_module,
         a.create_time,
         a.update_time
-        from t_algorithm_conf_bak a
+        from t_algorithm_mete a
         where 1 = 1
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
@@ -126,7 +126,7 @@
         a.apply_module,
         a.create_time,
         a.update_time
-        from t_algorithm_conf_bak a
+        from t_algorithm_mete a
         where 1 = 1
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
@@ -141,7 +141,7 @@
     </select>
 
     <insert id="batchAdd">
-        insert into t_algorithm_conf_bak(
+        insert into t_algorithm_mete(
             device_mete_id,
             algorithm_id,
             config_name,
@@ -170,7 +170,7 @@
     </insert>
 
     <delete id="batchDelete">
-        delete from t_algorithm_conf_bak
+        delete from t_algorithm_mete
         where device_mete_id in (
             <foreach collection="list" item="deviceMeteId" separator=",">
                 #{deviceMeteId, jdbcType=BIGINT}

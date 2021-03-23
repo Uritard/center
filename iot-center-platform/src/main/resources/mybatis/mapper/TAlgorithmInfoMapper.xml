@@ -174,7 +174,7 @@
     <select id="selectByDeviceMeteId" resultType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
         select
         b.*
-        from t_algorithm_conf_bak a
+        from t_algorithm_mete a
         left join t_algorithm_info b on a.algorithm_id = b.algorithm_id
         where a.device_mete_id = #{deviceMeteId}
     </select>
@@ -183,7 +183,7 @@
         SELECT
             a.algorithm_id
         FROM
-            t_algorithm_conf_bak a
+            t_algorithm_mete a
         where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
     </select>
     <select id="selectDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
