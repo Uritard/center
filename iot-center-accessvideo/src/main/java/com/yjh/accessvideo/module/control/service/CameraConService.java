@@ -152,7 +152,7 @@ public class CameraConService {
             returnMap.put("rtmpUrl", rtmpUrl);
             if (videoHttps==1) {
                 String flvsUrl = "https://"+hostIp+":8088/live/"+livePath+".flv";
-                returnMap.put("flvsUrl", flvsUrl);
+                returnMap.put("flvUrl", flvsUrl);
             } else {
                 String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
                 returnMap.put("flvUrl", flvUrl);
@@ -249,7 +249,7 @@ public class CameraConService {
                     returnMap.put("rtmpUrl", rtmpUrl);
                     if (videoHttps==1) {
                         String flvsUrl = "https://"+hostIp+":8088/live/"+livePath+".flv";
-                        returnMap.put("flvsUrl", flvsUrl);
+                        returnMap.put("flvUrl", flvsUrl);
                     } else {
                         String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
                         returnMap.put("flvUrl", flvUrl);
@@ -298,7 +298,7 @@ public class CameraConService {
         returnLightMap.put("rtmpUrl", rtmpUrl);
         if (videoHttps==1) {
             String flvsUrl = "https://"+hostIp+":8088/live/"+livePath+".flv";
-            returnLightMap.put("flvsUrl", flvsUrl);
+            returnLightMap.put("flvUrl", flvsUrl);
         } else {
             String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
             returnLightMap.put("flvUrl", flvUrl);
@@ -323,7 +323,7 @@ public class CameraConService {
         returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
         if (videoHttps==1) {
             String flvsUrlInferad = "https://"+hostIp+":8088/live/"+livePath+".flv";
-            returnInferadMap.put("flvsUrlInferad", flvsUrlInferad);
+            returnInferadMap.put("flvUrlInferad", flvsUrlInferad);
         } else {
             String flvUrlInferad = "http://"+hostIp+":10080/live/"+livePath+".flv";
             returnInferadMap.put("flvUrlInferad", flvUrlInferad);
@@ -424,7 +424,7 @@ public class CameraConService {
             returnMap.put("rtmpUrl", rtmpUrl);
             if (videoHttps==1) {
                 String flvsUrl = "https://"+hostIp+":8088/live/"+historyPath+".flv";
-                returnMap.put("flvsUrl", flvsUrl);
+                returnMap.put("flvUrl", flvsUrl);
             } else {
                 String flvUrl = "http://"+hostIp+":10080/history/"+historyPath+".flv";
                 returnMap.put("flvUrl", flvUrl);
