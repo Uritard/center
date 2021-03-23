@@ -127,7 +127,7 @@ public class zuulFilter extends ZuulFilter {
                                     !url.contains("/tCruiseTaskResult/v1/selectCruiseStatusCount")&&!url.contains("/tCameraScreen/v1/selectCameraTreeWithRobot")&&
                                     !url.contains("/tCameraInfo/v1/selectByPage")&&!url.contains("/tCameraRecorder/v1/selectByPage")&&
                                     !url.contains("/tRobotInfo/v1/selectByPage")&&!url.contains("/videoIntercom/v1/selectByPage")&&
-                                    !url.contains("/tVoiceDevice/v1/selectByPage")
+                                    !url.contains("/tVoiceDevice/v1/selectByPage")&&!url.contains("/homePage/v1/warnInfo")
                             ){
                                 redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
                             }
