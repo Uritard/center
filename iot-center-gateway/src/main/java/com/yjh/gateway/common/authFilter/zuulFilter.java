@@ -64,6 +64,12 @@ public class zuulFilter extends ZuulFilter {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
             HttpServletResponse response = ctx.getResponse();
+            String ip = "";
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("X-Forwarded-For"); }
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("Proxy-Client-IP"); }
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("WL-Proxy-Client-IP"); }
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getRemoteAddr(); }
+            log.info("ip = request.getRemoteAddr();: "+ip);
             response.setHeader("Server", "unKnow");
             String url = request.getRequestURI();
             if (!url.contains("/sysUser/v1/login")) {
