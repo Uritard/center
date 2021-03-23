@@ -659,10 +659,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         taskStatusMap.put("description", xmlBaseModel.getItems().get(0).get("description").toString());
 
                     //先读缓存，进行修改
-                    Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode());
+                    Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode()
+                            +":"+xmlBaseModel.getItems().get(0).get("task_code").toString());
                     taskStatusMap.put("instanceList",listMap.get("instanceIdList"));
                     //再将taskStatusMap放进缓存
-                    redisTemplate.opsForHash().putAll("RobotTaskStatus:"+xmlBaseModel.getSendCode(), taskStatusMap);
+                    redisTemplate.opsForHash().putAll("RobotTaskStatus:"+xmlBaseModel.getSendCode()
+                            +":"+xmlBaseModel.getItems().get(0).get("task_code").toString(), taskStatusMap);
 
                     String taskStatusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, taskStatusXmlString);

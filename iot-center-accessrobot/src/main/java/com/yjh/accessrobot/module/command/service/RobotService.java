@@ -387,7 +387,7 @@ public class RobotService {
         Constant.robotResultMap.put("Type",xmlBaseModel.getType());
         Constant.robotResultMap.put("Code",xmlBaseModel.getCode());
         log.info("组成的robotResultMap是==="+Constant.robotResultMap);
-        if (xmlBaseModel.getItems().get(0).isEmpty()){
+        if (Objects.isNull(xmlBaseModel.getItems())){
             return Constant.robotResultMap;
         }
         Map<String,String> res = new HashMap<>();
@@ -406,14 +406,17 @@ public class RobotService {
         if (!"".equals(xmlBaseModel.getItems().get(0).get("robot_image_path"))){
             developAbsoluteUrl = developAbsoluteUrl + "CCD";
             developRelativeUrl = developRelativeUrl + "CCD";
+            temporaryPath = temporaryPath + xmlBaseModel.getItems().get(0).get("robot_image_path");
         }
         if (!"".equals(xmlBaseModel.getItems().get(0).get("robot_fir_path"))){
             developAbsoluteUrl = developAbsoluteUrl + "FIR";
             developRelativeUrl = developRelativeUrl + "FIR";
+            temporaryPath = temporaryPath + xmlBaseModel.getItems().get(0).get("robot_fir_path");
         }
         if (!"".equals(xmlBaseModel.getItems().get(0).get("robot_video_path"))){
             developAbsoluteUrl = developAbsoluteUrl + "Video";
             developRelativeUrl = developRelativeUrl + "Video";
+            temporaryPath = temporaryPath + xmlBaseModel.getItems().get(0).get("robot_video_path");
         }
 
         log.info("developAbsoluteUrl是: "+developAbsoluteUrl+"------developRelativeUrl是: "+developRelativeUrl);
@@ -520,7 +523,7 @@ public class RobotService {
                 Map<String, Object> instanceListMap = new HashMap<>();
                 instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
                 instanceListMap.put("taskId", rTII.getTaskId());
-                redisTemplate.opsForHash().putAll("RobotTaskStatus:" + rTII.getRobotCode(), instanceListMap);
+                redisTemplate.opsForHash().putAll("RobotTaskStatus:" + rTII.getRobotCode() + ":" + rTII.getTaskId(), instanceListMap);
 
                 for (Long instanceId : instanceIdList) {
                     String inspectionCode = tRobotInfoDao.selectInspectionCode(instanceId);
@@ -657,7 +660,7 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public void insertForPause(String robotCode, String taskId, Integer taskStatus) throws Exception {
         //统计巡视主机下发给机器人的巡检点大小
-        Map<String, String> redisInstanceIdMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode);
+        Map<String, String> redisInstanceIdMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode+ ":"+ taskId);
         String redisInstanceIdList = redisInstanceIdMap.get("instanceIdList");
         redisInstanceIdList = redisInstanceIdList.replaceAll("\\[", "").replaceAll("]", "");
         String[] instanceIdArray = redisInstanceIdList.split(", ");
@@ -1190,9 +1193,6 @@ public class RobotService {
         return 1;
     }
     public int robotTaskIntoDB(List<Map<String, Object>> taskModelMapList, XMLBaseModel xmlBaseModel) {
-        int tcpiRes = 0;
-        int tctaRes = 0;
-        int tcrRes = 0;
         List<TCruiseTask> tCruiseTaskList = new ArrayList<>();
         for (Map<String, Object> taskModelMap : taskModelMapList) {
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
@@ -1226,6 +1226,11 @@ public class RobotService {
             }else {
                 tCruiseTask.setIfRun();
             }*/
+            if (!"".equals(taskModelMap.get("cycle_execute_time")) || !"".equals(taskModelMap.get("interval_start_time"))){
+                tCruiseTask.setIfRun(172);//周期或间隔
+            }else{
+                tCruiseTask.setIfRun(174);//定期
+            }
             try {
                 tCruiseTask.setStartTime(sdf.parse(taskModelMap.get("fixed_start_time").toString()));
             }catch (ParseException e){
@@ -1270,7 +1275,7 @@ public class RobotService {
 
             }
             log.info("tCruisePointInstanceList==="+tCruisePointInstanceList);
-            tcpiRes = tRobotInfoDao.batchInsertInstance(tCruisePointInstanceList);
+            tRobotInfoDao.batchInsertInstance(tCruisePointInstanceList);
 
             /*
              * 构建t_cruise_task_attr
@@ -1294,23 +1299,23 @@ public class RobotService {
                 String deviceName = tRobotRegionDao.selectDeviceName(tCruisePointInstance.getCruiseId() + "");
                 redisInfoMap.put("deviceName",deviceName);
                 redisInfoList.add(redisInfoMap);
-                log.info("redisInfoList是===" + redisInfoList);
-                //放数据到缓存
-                for (int i = 0; i < redisInfoList.size(); i++) {
-                    redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
-                            + ":" + redisInfoList.get(i).get("taskId") + ":" +redisInfoList.get(i).get("instanceId"), redisInfoList.get(i));
-                }
-
             }
+            log.info("redisInfoList是===" + redisInfoList);
+            //放数据到缓存
+            for (int i = 0; i < redisInfoList.size(); i++) {
+                redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
+                        + ":" + redisInfoList.get(i).get("taskId") + ":" +redisInfoList.get(i).get("instanceId"), redisInfoList.get(i));
+            }
+
             log.info("tCruiseTaskAttrList==="+tCruiseTaskAttrList);
-            tctaRes = tRobotInfoDao.batchInsertTaskAttr(tCruiseTaskAttrList);
+            tRobotInfoDao.batchInsertTaskAttr(tCruiseTaskAttrList);
 
             //将instanceIdList放缓存，以备后续使用
             log.info("instanceIdList是===" + instanceIdList);
             Map<String, Object> instanceListMap = new HashMap<>();
             instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
             instanceListMap.put("taskId", newTaskId);
-            redisTemplate.opsForHash().putAll("RobotTaskStatus:" + xmlBaseModel.getSendCode(), instanceListMap);
+            redisTemplate.opsForHash().putAll("RobotTaskStatus:" + xmlBaseModel.getSendCode() + ":" +newTaskId, instanceListMap);
 
             /*
              * 构建t_cruise_result
@@ -1324,13 +1329,10 @@ public class RobotService {
                     .setTaskCode(taskModelMap.get("task_code").toString())
                     .setRemark("0");
             log.info("tCruiseResult==="+tCruiseResult);
-            tcrRes = tRobotInfoDao.insertTCruiseResult(tCruiseResult);
+            tRobotInfoDao.insertTCruiseResult(tCruiseResult);
         }
 
-        int tctRes = tRobotInfoDao.batchInsertTask(tCruiseTaskList);
-        log.info("入库结果: "+"tcpiRes==="+tcpiRes+",tctaRes==="+tctaRes+",tctRes==="+tctRes+",tcrRes==="+tcrRes);
-
-        return  tcpiRes + tctaRes + tctRes + tcrRes;
+        return  tRobotInfoDao.batchInsertTask(tCruiseTaskList);
     }
     public int insertWarn(TWarnInfo warnInfo){
         return tRobotInfoDao.insertWarn(warnInfo);

@@ -89,9 +89,10 @@ public class IsWarnAfterCruiseThread implements Runnable{
                         warnInfo.setCunstomId(tStdDevicemete.getCustomId());
                         warnInfo.setInstanceId(instanceId);
                         warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
-                        warnInfo.setConfMode(275);//已核查
+                        warnInfo.setConfMode(275);//未核查
+                        /*warnInfo.setConfMode(275);//已核查
                         warnInfo.setDealType(286);//属实
-                        warnInfo.setDealInfo("程序正常，告警属实");
+                        warnInfo.setDealInfo("程序正常，告警属实");*/
                         warnInfo.setDefectModel(405);//其他
                         warnInfo.setAlarmSource(282);//主辅设备
                         warnInfo.setImagePath(threadMap.get("relativePath"));
@@ -105,12 +106,10 @@ public class IsWarnAfterCruiseThread implements Runnable{
                             warnInfo.setWarnLevel(Integer.valueOf(map.get("warnLevel").toString()));
                             warnInfo.setWarnContent(map.get("warnContent").toString());
                             warnInfo.setOutRange(outRange);
-                            warnInfo.setDealTime(new Date());
+//                            warnInfo.setDealTime(new Date());
 //                            warnInfo.setDealPersonId(userId);
                             log.info("要插库的告警数据是==="+warnInfo);
                             StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
-//                    sendWebSocket(warnInfo.getWarnId());
-//                            StaticContextAccessor.getBean(RobotService.class).updateIsWarn(cruiseManualReview.getCruiseDataId());
                         }
                     }
                 }
