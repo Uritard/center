@@ -930,6 +930,7 @@
             t_warn_info
         GROUP BY
             warn_time DESC
+        Limit 1
     </select>
 
 </mapper>

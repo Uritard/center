@@ -493,6 +493,7 @@ public class DataDealThread implements Runnable {
                                                     boolean two = (Objects.nonNull(alarmLevel) && (warnLevel.compareTo(alarmLevel) == 0 || warnLevel > alarmLevel));
                                                     log.info("一层判断" + one + "二层判断"+two);
 
+
                                                     if (one) {
                                                         if (two) {
                                                             //webSocket通知前端调用查询告警弹框的接口
@@ -507,7 +508,11 @@ public class DataDealThread implements Runnable {
                                                         }
                                                     }
 
-                                                    redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3,TimeUnit.MINUTES);
+                                                    redisTemplate.opsForValue().set("currentWarn",(Object) currentWarnInfo,3, TimeUnit.MINUTES);
+                                                    log.info("currentWarnInfo666"+currentWarnInfo);
+
+//                                                    redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3,TimeUnit.MINUTES);
+
 //
 //                                                    //删除告警redis
 //                                                    redisTemplate.delete(warnName);

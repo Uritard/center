@@ -43,6 +43,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 
 @RestController
@@ -203,14 +204,9 @@ public class HelloController {
         System.out.println("map = " + map);
         result.setData(map);
         Long beginTime=System.currentTimeMillis();
-
-
-
-
+        
         Map<String,List<Analysis>> analysisInfo=new HashMap<>();
         List<Analysis> analysisList=new ArrayList<>();
-
-
 
         return result;
     }

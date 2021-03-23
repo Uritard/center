@@ -122,7 +122,7 @@ public class AnalysisService {
                     normalPictureDataObject.put("modelPath", analysis.getPicModelPath());
                     normalPictureDataObject.put("taskId", analysis.getTaskId());
                     normalPictureDataObject.put("instanceId", analysis.getInstanceId().toString());
-                    normalPictureDataObject.put("imagePath",analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId()));
+                    normalPictureDataObject.put("imagePath",analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId()).replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString()));
                     pictureInfoObject.put("pictureInfo"+i,normalPictureDataObject);
                     i++;
                 }

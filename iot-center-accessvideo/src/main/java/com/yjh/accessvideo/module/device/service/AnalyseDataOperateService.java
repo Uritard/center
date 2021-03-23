@@ -643,9 +643,11 @@ public class AnalyseDataOperateService {
                     defectValue=defectValue+"表计读数异常"+" ";
                     break;
                 case "normal":
-                    defectValue="有差异";
+                    defectValue="图像有差异";
+                    break;
                 case "abnormal":
-                    defectValue="无差异";
+                    defectValue="图像无差异";
+                    break;
                 default:
                     return "null";
             }
