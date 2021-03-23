@@ -204,7 +204,7 @@ public class HelloController {
         System.out.println("map = " + map);
         result.setData(map);
         Long beginTime=System.currentTimeMillis();
-        
+
         Map<String,List<Analysis>> analysisInfo=new HashMap<>();
         List<Analysis> analysisList=new ArrayList<>();
 

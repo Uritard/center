@@ -508,7 +508,7 @@ public class DataDealThread implements Runnable {
                                                         }
                                                     }
 
-                                                    redisTemplate.opsForValue().set("currentWarn",(Object) currentWarnInfo,3, TimeUnit.MINUTES);
+                                                    redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3, TimeUnit.MINUTES);
                                                     log.info("currentWarnInfo666"+currentWarnInfo);
 
 //                                                    redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3,TimeUnit.MINUTES);
@@ -555,16 +555,7 @@ public class DataDealThread implements Runnable {
                                     String analyseResultImg=resultImage.replaceAll(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content").toString(),redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content").toString());
                                     String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
 
-                                    if(jsonObjectResult.get("resultValue").toString().contains("normal")){
-                                        tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
-                                        tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
-//                                    tNormal++;
-                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", "--");
-                                        cruiseResultMap.put("resultNum", resultValue);
-                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
-                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
-                                        cruiseResultMap.put("picpath",analyseResultImg);
-                                    }else {
+                                    if(jsonObjectResult.get("resultValue").toString().contains("abnormal")){
 
                                         tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                         tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
@@ -574,8 +565,18 @@ public class DataDealThread implements Runnable {
                                         cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
                                         cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
                                         cruiseResultMap.put("picpath",analyseResultImg);
-                                    }
 
+                                    }else {
+
+                                        tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(0);
+                                        tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
+//                                    tNormal++;
+                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", "--");
+                                        cruiseResultMap.put("resultNum", resultValue);
+                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
+                                        cruiseResultMap.put("picpath",analyseResultImg);
+                                    }
 
                                     break;
                                 }
