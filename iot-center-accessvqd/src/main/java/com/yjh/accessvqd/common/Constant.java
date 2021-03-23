@@ -5,6 +5,7 @@ import com.yjh.accessvqd.commons.logs.SpringBeanUtils;
 import com.yjh.accessvqd.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvqd.commons.result.Result;
 import com.yjh.accessvqd.commons.utils.weatherUtils.SerialPortUtils;
+import io.netty.channel.ChannelHandlerContext;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashMap;
@@ -86,4 +87,6 @@ public class Constant {
     public static String path = "";
 
     public static SerialPortUtils serialPort;
+
+    public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
 }

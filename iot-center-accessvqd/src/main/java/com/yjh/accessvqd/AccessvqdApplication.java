@@ -2,8 +2,7 @@ package com.yjh.accessvqd;
 
 import com.yjh.accessvqd.module.diagnose.dao.TDiagnosePlanDao;
 import com.yjh.accessvqd.module.diagnose.service.ChanResultService;
-import com.yjh.accessvqd.module.diagnose.service.PlansService;
-import com.yjh.accessvqd.socket.SocketServerListenHandler;
+import com.yjh.accessvqd.netty.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -11,10 +10,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.session.data.redis.config.ConfigureRedisAction;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 
 /**
  * @Description
@@ -36,15 +39,21 @@ public class AccessvqdApplication implements CommandLineRunner {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    private NettyServer nettyServer = new NettyServer();
+
     public static void main(String[] args) {
         SpringApplication.run(AccessvqdApplication.class, args);
     }
 
     @Override
     public void run(String... strings) throws Exception {
-        SocketServerListenHandler socketServerListenHandler=new SocketServerListenHandler(18725,chanResultService,tDiagnosePlanDao,redisTemplate);
-        socketServerListenHandler.listenClientConnect();
-        log.info("socket服务开启------------------------");
+        String url = getLocalIp();
+        InetSocketAddress address = new InetSocketAddress(url, 18725);
+        log.info("accessrobot is running, url is : " + url);
+        nettyServer.start(address, chanResultService, redisTemplate, tDiagnosePlanDao);
+//        SocketServerListenHandler socketServerListenHandler=new SocketServerListenHandler(18725,chanResultService,tDiagnosePlanDao,redisTemplate);
+//        socketServerListenHandler.listenClientConnect();
+//        log.info("socket服务开启------------------------");
     }
 
 
@@ -52,6 +61,32 @@ public class AccessvqdApplication implements CommandLineRunner {
 //    public static ConfigureRedisAction configureRedisAction() {
 //        return ConfigureRedisAction.NO_OP;
 //    }
+
+    private static String getLocalIp() throws SocketException {
+        String ip = "";
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                String name = intf.getName();
+                if (!name.contains("docker") && !name.contains("lo")) {
+                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        if (!inetAddress.isLoopbackAddress()) {
+                            String ipaddress = inetAddress.getHostAddress();
+                            if (!ipaddress.contains("::") && !ipaddress.contains("0:0:") && !ipaddress.contains("fe80")) {
+                                log.info(ipaddress);
+                                ip = ipaddress;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+            ip = "127.0.0.1";
+            ex.getMessage();
+        }
+        return ip;
+    }
 
 
 }
