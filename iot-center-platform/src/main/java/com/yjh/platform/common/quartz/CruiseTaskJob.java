@@ -531,7 +531,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 if(tAlgorithmInfoList != null && tAlgorithmInfoList.size()>0){
                                     recognitionMode = 1;
                                 }
-                                if("on".equals(tStdDevicemete.getIsAi())){
+                                if("on".equals(tStdDevicemete.getIsAi()) || "on".equals(tStdDevicemete.getIsJudge())){
                                     if(recognitionMode == 1){
                                         recognitionMode = 0;
                                     }else {
