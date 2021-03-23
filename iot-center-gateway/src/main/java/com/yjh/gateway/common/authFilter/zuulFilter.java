@@ -63,15 +63,8 @@ public class zuulFilter extends ZuulFilter {
         if ("true".equals(isDecode)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
-            HttpServletResponse response = ctx.getResponse();
-            String ip = "";
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("X-Forwarded-For"); }
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("Proxy-Client-IP"); }
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("WL-Proxy-Client-IP"); }
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getRemoteAddr(); }
-            log.info("ip = request.getRemoteAddr();: "+ip);
-            response.setHeader("Server", "unKnow");
             String url = request.getRequestURI();
+            log.info("url: "+url);
             if (!url.contains("/sysUser/v1/login")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                 String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
