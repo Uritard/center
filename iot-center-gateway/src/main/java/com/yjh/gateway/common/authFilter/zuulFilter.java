@@ -64,7 +64,7 @@ public class zuulFilter extends ZuulFilter {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
             String url = request.getRequestURI();
-            log.info("url: "+url);
+            log.info("url: "+request.getRequestURL());
             if (!url.contains("/sysUser/v1/login")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                 String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
