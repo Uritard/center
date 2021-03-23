@@ -413,7 +413,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
                                 if(re == null){
                                     isOk = "";
-                                }else{
+                                }if("success".equals(re.getMessage())){
                                     JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
                                     //todo 对于相机的返回错误分析  任务异常终止/超期
                                     urlPath = (String) jsonForRe.get("urlPath");
