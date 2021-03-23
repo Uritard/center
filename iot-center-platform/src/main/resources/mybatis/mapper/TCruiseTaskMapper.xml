@@ -206,13 +206,14 @@
             a.area_id,
             (
         CASE
-				WHEN d.c_state=238 THEN 1
+		WHEN d.c_state=238 THEN -1
         WHEN d.c_state=239 THEN -1
         WHEN d.c_state=240 THEN 1
         WHEN d.c_state=241 THEN -1
         WHEN d.c_state=242 THEN 0
         WHEN d.c_state=243 THEN 0
         WHEN d.c_state=244 THEN 0
+        WHEN ISNULL(d.c_state) THEN -1
         END
         ) AS task_status,
             d.c_state AS task_state,
@@ -240,13 +241,14 @@
                 a.area_id,
                 (
         CASE
-				WHEN d.c_state=238 THEN 1
+		WHEN d.c_state=238 THEN -1
         WHEN d.c_state=239 THEN -1
         WHEN d.c_state=240 THEN 1
         WHEN d.c_state=241 THEN -1
         WHEN d.c_state=242 THEN 0
         WHEN d.c_state=243 THEN 0
         WHEN d.c_state=244 THEN 0
+        WHEN ISNULL(d.c_state) THEN -1
         END
         ) AS task_status,
                 d.c_state AS task_state,
@@ -275,13 +277,14 @@
                 a.area_id,
                 (
         CASE
-				WHEN d.c_state=238 THEN 1
+		WHEN d.c_state=238 THEN -1
         WHEN d.c_state=239 THEN -1
         WHEN d.c_state=240 THEN 1
         WHEN d.c_state=241 THEN -1
         WHEN d.c_state=242 THEN 0
         WHEN d.c_state=243 THEN 0
         WHEN d.c_state=244 THEN 0
+        WHEN ISNULL(d.c_state) THEN -1
         END
         ) AS task_status,
                 d.c_state AS task_state,
@@ -322,13 +325,14 @@ select *from (
         a.area_id,
         (
         CASE
-        WHEN d.c_state=238 THEN 1
+        WHEN d.c_state=238 THEN -1
         WHEN d.c_state=239 THEN -1
         WHEN d.c_state=240 THEN 1
         WHEN d.c_state=241 THEN -1
         WHEN d.c_state=242 THEN 0
         WHEN d.c_state=243 THEN 0
         WHEN d.c_state=244 THEN 0
+        WHEN ISNULL(d.c_state) THEN -1
         END
         ) AS task_status,
         d.c_state AS task_state,
@@ -358,13 +362,14 @@ select *from (
         a.area_id,
         (
         CASE
-        WHEN d.c_state=238 THEN 1
+        WHEN d.c_state=238 THEN -1
         WHEN d.c_state=239 THEN -1
         WHEN d.c_state=240 THEN 1
         WHEN d.c_state=241 THEN -1
         WHEN d.c_state=242 THEN 0
         WHEN d.c_state=243 THEN 0
         WHEN d.c_state=244 THEN 0
+        WHEN ISNULL(d.c_state) THEN -1
         END
         ) AS task_status,
         d.c_state AS task_state,
@@ -395,13 +400,14 @@ select *from (
         a.area_id,
         (
         CASE
-        WHEN d.c_state=238 THEN 1
+        WHEN d.c_state=238 THEN -1
         WHEN d.c_state=239 THEN -1
         WHEN d.c_state=240 THEN 1
         WHEN d.c_state=241 THEN -1
         WHEN d.c_state=242 THEN 0
         WHEN d.c_state=243 THEN 0
         WHEN d.c_state=244 THEN 0
+        WHEN ISNULL(d.c_state) THEN -1
         END
         ) AS task_status,
         d.c_state AS task_state,
