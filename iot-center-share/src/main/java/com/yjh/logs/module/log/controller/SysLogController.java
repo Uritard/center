@@ -392,13 +392,22 @@ public class SysLogController {
     @RequestMapping(value = "/errLog", method = RequestMethod.GET)
     public Result errLog() {
         Result result = new Result();
-        String errorLog = (String) redisTemplate.opsForValue().get("errorLog");
-        if (StringUtils.isNotBlank(errorLog)) {
-            redisTemplate.delete("errorLog");
-            result.setMessage(ResultCodeEnum.CODE0.getCode(), ResultCodeEnum.CODE0.getName());
-        } else {
-            result.setMessage(ResultCodeEnum.CODE1.getCode(), ResultCodeEnum.CODE1.getName());
+        try {
+            Map map=new HashMap();
+            String errorLog = (String) redisTemplate.opsForValue().get("errorLog");
+            if (StringUtils.isNotBlank(errorLog)) {
+                redisTemplate.delete("errorLog");
+                map.put("code",0);
+                result.setData(map);
+            } else {
+                map.put("code",1);
+                result.setData(map);
+            }
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("日志统计失败：" + e);
         }
-        return result;
+        return  result;
     }
+
 }
