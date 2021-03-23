@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.module.command.controller;
 
 import com.yjh.accessrobot.common.smUtil.Demo;
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
@@ -12,6 +13,9 @@ import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -55,8 +60,8 @@ public class RobotController {
                                     @RequestParam(value = "direction",required = false) String direction) {
         Result result = new Result();
         try {
-//            Long userId = Long.valueOf(request.getHeader("userId"));
-            Long userId = 10001l;
+            Long userId = Long.valueOf(request.getHeader("userId"));
+//            Long userId = 10001l;
 
             Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode =map.get("content");
@@ -188,7 +193,12 @@ public class RobotController {
     public Result methodTest(@RequestParam(value = "taskId",required = false) String taskId){
         Result result = new Result();
         try {
-            result.setData(robotService.methodTest1(taskId));
+//            result.setData(robotService.methodTest1(taskId));
+            XMLBaseModel taskModel = getXmlMessage("D:/testform/task_file.xml");
+            List<Map<String,Object>> taskModelMapList = taskModel.getItems();
+            log.info("taskModelItemsMap是："+taskModelMapList);
+            XMLBaseModel xmlBaseModel = new XMLBaseModel().setSendCode("Client01");
+            result.setData(robotService.robotTaskIntoDB(taskModelMapList,xmlBaseModel));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -197,5 +207,9 @@ public class RobotController {
         }
         return result;
     }
-
+    public static XMLBaseModel getXmlMessage(String filePathAndName) throws DocumentException {
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(new File(filePathAndName));
+        return PlatformXMLUtil.readStringXmlOut(document);
+    }
 }

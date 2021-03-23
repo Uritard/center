@@ -104,7 +104,7 @@ public class CruiseResultDealThread implements Runnable{
                     }
                 }
                 //获取机器人本体任务的状态并更新
-                Map<String, Object> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+cruiseResultMap.get("robotCode"));
+                Map<String, Object> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+cruiseResultMap.get("robotCode")+":"+taskId);
                 Integer taskState = Integer.valueOf(redisInfoMap.get("taskState").toString());
                 Integer cState = null;
                 switch (taskState){
@@ -276,7 +276,7 @@ public class CruiseResultDealThread implements Runnable{
                 log.info("机器人返回任务结果的大小===="+resultList.size());
 
                 //统计巡视主机下发给机器人的巡检点大小
-                Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:"+cruiseResultMap.get("robotCode"));
+                Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:"+cruiseResultMap.get("robotCode")+":"+taskId);
                 String instanceList = redisInfoMap2.get("instanceIdList");
                 instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
                 String[] instanceIdArray = instanceList.split(", ");

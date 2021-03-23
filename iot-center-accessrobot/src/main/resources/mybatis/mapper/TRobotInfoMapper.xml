@@ -711,7 +711,7 @@
         where
         a.up_region_id = -1
     </select>
-    <insert id="batchInsertInstance">
+    <insert id="batchInsertInstance" useGeneratedKeys="true" keyProperty="instanceId">
         insert into t_cruise_point_instance(
         instance_id,
         device_mete_id,
