@@ -951,7 +951,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     mapForAbnormal.put("normal",normal.toString());
                     redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
                 }
-                tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
+                //tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
 
                 //任务结束生成结果，
                 Analysis analysis = new Analysis();
