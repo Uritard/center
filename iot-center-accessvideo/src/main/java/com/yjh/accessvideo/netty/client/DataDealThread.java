@@ -181,11 +181,9 @@ public class DataDealThread implements Runnable {
                     String analyseType = jsonObjectResult.get("analyseType").toString();
                     if (analyseType.equals("11")) {
                         if (resultImage.equals("")) {
-                            // TODO: 2021/2/6 联调时修改完善
                             continue;
                         }
                     }
-
 
 
                     log.info("端口号：" + remotePort);
@@ -199,6 +197,8 @@ public class DataDealThread implements Runnable {
                                 //表计识别图片放入缓存(已考虑双算法)
                                 if(Objects.nonNull(jsonObjectResult.get("analyseResultImg")) && jsonObjectResult.get("analyseResultImg").toString().equals("") ){
                                     String analyseResultPic = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content").toString());
+                                    log.info("表计识别图片-------------------------------"+analyseResultPic);
+                                    log.info("缓存地址-----------------------"+redisName);
                                     if(recognitionMode.equals("-1") || recognitionMode.equals("-2")) {
                                         log.info("双算法-第二算法图片生成-M");
                                         redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName, "picpath").toString() + "," + analyseResultPic);

@@ -568,13 +568,13 @@ public class AnalyseDataOperateService {
                     defectValue = defectValue + "地面油污" + " ";
                     break;
                 case "yw_nc":
-                    defectValue = defectValue + "鸟窝" + " ";
+                    defectValue = defectValue + "异物-鸟巢" + " ";
                     break;
                 case "yw_gkxfw":
-                    defectValue = defectValue + "挂空悬浮物" + " ";
+                    defectValue = defectValue + "异物-挂空悬浮物" + " ";
                     break;
                 case "bmwh":
-                    defectValue = defectValue + "表面污秽" + " ";
+                    defectValue = defectValue + "绝缘子表面污秽" + " ";
                     break;
                 case "jyz_pl":
                     defectValue = defectValue + "绝缘子-破裂" + " ";
@@ -625,19 +625,19 @@ public class AnalyseDataOperateService {
                     defectValue=defectValue+"越线闯入"+ " ";
                     break;
                 case "hzyw":
-                    defectValue=defectValue+"烟火识别"+ " ";
+                    defectValue=defectValue+"火灾烟雾"+ " ";
                     break;
-                case "xdwsb":
-                    defectValue=defectValue+"小动物识别"+ " ";
+                case "xdwcr":
+                    defectValue=defectValue+"小动物闯入"+ " ";
                     break;
-                case "smdmjs":
-                    defectValue=defectValue+"积水检测"+ " ";
+                case "sndmjs":
+                    defectValue=defectValue+"室内地面积水"+ " ";
                     break;
                 case "kgg_ybf":
-                    defectValue=defectValue+"压板分"+ " ";
+                    defectValue=defectValue+"开关柜-压板分"+ " ";
                     break;
                 case "kgg_ybh":
-                    defectValue=defectValue+"压板合"+ " ";
+                    defectValue=defectValue+"开关柜-压板合"+ " ";
                     break;
                 case "bjdsyc":
                     defectValue=defectValue+"表计读数异常"+" ";

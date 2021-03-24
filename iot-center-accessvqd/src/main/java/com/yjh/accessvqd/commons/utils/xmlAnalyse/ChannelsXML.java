@@ -211,7 +211,7 @@ public class ChannelsXML {
         Element childNode22=root.addElement("ptzPoint");
         childNode22.setText(channel.getPtzPoint());
         Element childNode23=root.addElement("streamType");
-        childNode23.setText(channel.getStreakPoint());
+        childNode23.setText(channel.getStreamType());
         Element childNode24=root.addElement("protocol");
         childNode24.setText(channel.getProtocol());
         Element childNode25=root.addElement("devType");

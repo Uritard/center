@@ -2,6 +2,7 @@ package com.yjh.accessvqd.netty.server;
 
 import com.yjh.accessvqd.module.diagnose.dao.TDiagnosePlanDao;
 import com.yjh.accessvqd.module.diagnose.service.ChanResultService;
+import com.yjh.accessvqd.socket.PacketDataHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -103,12 +104,22 @@ public class VqdServerHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBuf = (ByteBuf) msg;
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
-
-        StringBuilder Str = new StringBuilder();
-        for (byte byteItem : bytes) {
-            Str.append(String.format("%02x ", byteItem));
+        try{
+            String diagnoseResultMsg=new String(bytes,"UTF-8");
+            log.info("VQD-result------"+diagnoseResultMsg);
+            if(diagnoseResultMsg.contains("</ChanResult>")){
+                PacketDataHandler packetDataHandler=new PacketDataHandler(chanResultService,tDiagnosePlanDao,redisTemplate);
+                packetDataHandler.analysisChanResult(diagnoseResultMsg);
+            }
+        }catch (Exception e){
+            log.error("结果接收失败-"+e);
         }
-        log.info("vqd发送的的指令是<start>" + Str + "<end>");
+//        StringBuilder Str = new StringBuilder();
+//        for (byte byteItem : bytes) {
+//            Str.append(String.format("%s ", byteItem));
+//            log.info("VQD-Result--"+Str);
+//        }
+//        log.info("vqd发送的的指令是<start>" + Str + "<end>");
     }
 
     /*

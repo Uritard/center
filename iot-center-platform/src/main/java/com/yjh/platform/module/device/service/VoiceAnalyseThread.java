@@ -5,7 +5,6 @@ import com.yjh.platform.common.utils.mp3.SpectrumMp3;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
 import com.yjh.platform.module.device.entity.VoiceDeviceInfoDetail;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.CORBA.INTERNAL;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.beans.Encoder;

@@ -49,7 +49,7 @@ public class AccessvqdApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
         InetSocketAddress address = new InetSocketAddress(url, 18725);
-        log.info("accessrobot is running, url is : " + url);
+        log.info("accessVqd is running, url is : " + url);
         nettyServer.start(address, chanResultService, redisTemplate, tDiagnosePlanDao);
 //        SocketServerListenHandler socketServerListenHandler=new SocketServerListenHandler(18725,chanResultService,tDiagnosePlanDao,redisTemplate);
 //        socketServerListenHandler.listenClientConnect();

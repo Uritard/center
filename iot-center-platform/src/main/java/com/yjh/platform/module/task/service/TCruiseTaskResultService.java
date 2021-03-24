@@ -307,10 +307,14 @@ public class TCruiseTaskResultService {
 
         //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
         Integer index = cruiseInspectResults.indexOf(inspectResult);
-
-
+        if(index==-1){
+            index=0;
+        }
         resultsMap.put("index", index);
         resultsMap.put("list", cruiseInspectResults);
+
+        log.info("currentItem!!!!!!!!!!!!!"+inspectResult);
+        log.info("list!!!!!!!!!!!!!!!!!!"+cruiseInspectResults);
 
         completeResult.add(resultsMap);
         return completeResult;
@@ -439,17 +443,19 @@ public class TCruiseTaskResultService {
         String cruiseExecuteFailed = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "执行失败");
         String cruiseUnknown = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未知");
 
+        log.info("未执行---------------："+cruiseNotExecuted);
+
         Set<Long> deviceMete = new HashSet<>();//全部标准测点
         Set<Long> deviceMeteAbnormal = new HashSet<>();//结果异常的标准测点
-        Set<Long> deviceMeteComp = new HashSet<>();//已执行的标准测点
-        List<Long> deviceMeteIds = new ArrayList<>();//测点对比器
+        Set<Long> deviceMeteNotComp = new HashSet<>();//已执行的标准测点
+//        List<Long> deviceMeteIds = new ArrayList<>();//测点对比器
         Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
 
         Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
         for (Long instanceId : instanceIds) {
             deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
-            deviceMeteIds.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
+//            deviceMeteIds.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
         }
 //        for(String keys:keyResult){
 //            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
@@ -463,18 +469,18 @@ public class TCruiseTaskResultService {
             Long deviceMeteId = Long.valueOf(resultMap.get("device_mete_id").toString());
             //巡视点执行失败、未知状态-异常测点
             if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
-                deviceMeteIds.remove(deviceMeteId);
-                if (!deviceMeteIds.contains(deviceMeteId)) {
-                    deviceMeteComp.add(deviceMeteId);
-                }
+//                deviceMeteIds.remove(deviceMeteId);
+//                if (!deviceMeteIds.contains(deviceMeteId)) {
+//                    deviceMeteComp.add(deviceMeteId);
+//                }
                 deviceMeteAbnormal.add(deviceMeteId);
-                //巡视点执行完成
-            } else if (resultMap.get("cruiseStatus").equals(cruiseExecuted)) {
-                deviceMeteIds.remove(deviceMeteId);
-                if (!deviceMeteIds.contains(deviceMeteId)) {
-                    deviceMeteComp.add(deviceMeteId);
-                }
-
+                //未完成的巡视点
+            } else if (resultMap.get("cruiseStatus").equals(cruiseNotExecuted)) {
+                deviceMeteNotComp.add(deviceMeteId);
+//                deviceMeteIds.remove(deviceMeteId);
+//                if (!deviceMeteIds.contains(deviceMeteId)) {
+//                    deviceMeteComp.add(deviceMeteId);
+//                }
             }
         }
 
@@ -492,13 +498,13 @@ public class TCruiseTaskResultService {
         cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
 
 
-        Integer cruisedNotCount = deviceMete.size() - deviceMeteComp.size();//已执行的标准测点数量
+        Integer cruisedComCount = deviceMete.size() - deviceMeteNotComp.size();//已执行的标准测点数量
         cruiseResultCounter.setAlarmCount(deviceMeteAbnormal.size());//异常点数
-        cruiseResultCounter.setCruisedCount(deviceMeteComp.size());//已执行的标准测点数量
-        cruiseResultCounter.setCruiseNotCount(cruisedNotCount);//未执行点数
+        cruiseResultCounter.setCruisedCount(cruisedComCount);//已执行的标准测点数量
+        cruiseResultCounter.setCruiseNotCount(deviceMeteNotComp.size());//未执行点数
 
         log.info("总点数：" + deviceMete.size());
-        log.info("已执行点数：" + deviceMeteComp.size());
+        log.info("已执行点数：" + cruisedComCount);
 
 
         return cruiseResultCounter;

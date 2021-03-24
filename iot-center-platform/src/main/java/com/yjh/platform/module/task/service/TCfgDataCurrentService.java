@@ -293,6 +293,7 @@ public class TCfgDataCurrentService {
         //将满足条件的联动规则预案生成任务并执行
         List<TCruiseTask>tCruiseTasks=new ArrayList<>();
         for(Long plan:plans){
+            log.info("planId----"+plan);
 //            TCruiseTask tCruiseTask=new TCruiseTask();
             TCruisePlanCount tCruisePlan=tCruisePlanDao.selectByPrimaryId(plan);
 //            tCruiseTasks.add(tCruiseTask);
