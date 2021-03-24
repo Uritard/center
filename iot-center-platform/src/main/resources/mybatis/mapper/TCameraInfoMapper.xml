@@ -66,6 +66,7 @@
         a.latitude,
         a.longitude,
         a.unit,
+        a.up_region_id,
         f.region_name as up_region_name
     </sql>
 

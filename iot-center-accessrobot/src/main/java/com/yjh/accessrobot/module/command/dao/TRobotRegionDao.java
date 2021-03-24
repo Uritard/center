@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YC
@@ -33,5 +34,5 @@ public interface TRobotRegionDao {
     int batchInsert(List<TRobotRegion> list);
     List<String> selectAllRobotRegion();
     int batchDelete(List<String> list);
-    String selectDeviceName(@Param(value = "inspectionCode") String inspectionCode);
+    Map<String,Object> selectInspectionId(@Param(value = "inspectionId")Long inspectionId);
 }

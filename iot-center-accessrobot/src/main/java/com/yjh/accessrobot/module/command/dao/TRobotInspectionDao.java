@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YC
@@ -38,5 +39,5 @@ public interface TRobotInspectionDao {
     int batchDeleteTRobotInspection(List<Long> list);
     int batchDeleteTCruisePointInstance(List<Long> list);
     int batchDeleteTCruisePlanAttr(List<Long> list);
-    String selectInspectionName(@Param(value = "inspectionCode") String inspectionCode);
+    Map<String,Object> selectInspection(@Param(value = "inspectionCode") String inspectionCode);
 }

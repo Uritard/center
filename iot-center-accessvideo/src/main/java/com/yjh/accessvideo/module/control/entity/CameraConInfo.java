@@ -65,4 +65,7 @@ public class CameraConInfo implements Serializable {
     @ApiModelProperty(value = "相机控制端口")
     private Integer port;
 
+    @ApiModelProperty(value = "红外测温端口")
+    private Integer infreadPort;
+
 }

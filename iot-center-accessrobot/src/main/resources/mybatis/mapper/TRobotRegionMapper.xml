@@ -182,13 +182,14 @@
             #{regionId, jdbcType=VARCHAR}
         </foreach>
     </delete>
-    <select id="selectDeviceName" parameterType="java.lang.String" resultType="java.lang.String">
+    <select id="selectInspectionId" parameterType="java.lang.String" resultType="java.util.Map">
         SELECT
-            d.region_name
+            d.region_name,
+            a.inspection_code
         FROM
         t_robot_inspection a,t_robot_region b,t_robot_region d
         WHERE 1 = 1
-        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
+        <if test="inspectionId != null"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
         and a.component_id = b.region_id
         and b.up_region_id = d.region_id
     </select>

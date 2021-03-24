@@ -240,8 +240,9 @@
             )
         </foreach>
     </insert>
-    <select id="selectInspectionName" parameterType="java.lang.String" resultType="java.lang.String">
+    <select id="selectInspection" parameterType="java.lang.String" resultType="java.util.Map">
         SELECT
+            a.inspection_id,
             a.inspection_name
         FROM
             t_robot_inspection a
