@@ -109,7 +109,8 @@ public class CameraConController {
                         Integer clients = streambeanJson.getInteger("clients"); //观看人数
                         String app = streambeanJson.getString("app");//类型：直播 or 回放
 
-                        if(app.equals("live") && name.equals(stream) && !( active && clients>=2)){
+//                        if(app.equals("live") && name.equals(stream) && !( active && clients>=2)){
+                        if(app.equals("live") && !( active && clients==0)){
                             //符合无人观看的条件
                             cid = publishjson.getString("cid");
                             //踢掉
