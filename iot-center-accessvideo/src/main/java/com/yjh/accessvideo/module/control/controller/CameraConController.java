@@ -94,16 +94,24 @@ public class CameraConController {
                 Integer clients = streambeanJson.getInteger("clients"); //观看人数
                 String app = streambeanJson.getString("app");//类型：直播 or 回放
 
-                if(app.equals("live") && !( active && clients==0)){
-                    //符合无人观看的条件
-                    cid = publishjson.getString("cid");
-                    //踢掉
-                    if(StringUtils.isNotEmpty(cid)){
-                        String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
-                        HttpClientUtils.httpDelete(delteUrl,null,null);
-                    }
-                    break;
+                //符合无人观看的条件
+                cid = publishjson.getString("cid");
+                //踢掉
+                if(StringUtils.isNotEmpty(cid)){
+                    String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
+                    HttpClientUtils.httpDelete(delteUrl,null,null);
                 }
+
+//                if(app.equals("live") && !active && clients==0){
+//                    //符合无人观看的条件
+//                    cid = publishjson.getString("cid");
+//                    //踢掉
+//                    if(StringUtils.isNotEmpty(cid)){
+//                        String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
+//                        HttpClientUtils.httpDelete(delteUrl,null,null);
+//                    }
+//                    break;
+//                }
             }
         }catch (Exception e){
             log.error("关流异常",e,this.getClass());
