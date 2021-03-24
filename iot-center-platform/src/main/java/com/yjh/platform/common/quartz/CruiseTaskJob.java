@@ -262,6 +262,8 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                 List<String> cruiseResultIdList = new ArrayList<>();
                 int countForInstance = 0;
+                List<TCruiseDataResult> TCDRList = new ArrayList<>();
+                List<TCruiseTaskResultDetail> TCTRDList = new ArrayList<>();
                 for (TCruisePointInstanceNameDetail item : instancesList) {
 
                     TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
@@ -297,11 +299,13 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseDataResult.setResultNum("设备检修中");
                             tCruiseDataResult.setEvaluationState(257);
                             tCruiseDataResult.setIsWarn(0);
-                            tCruiseDataResultDao.insert(tCruiseDataResult);
+                            //tCruiseDataResultDao.insert(tCruiseDataResult);
+                            TCDRList.add(tCruiseDataResult);
                             tCruiseTaskResultDetail.setCruiseStatus(255);
                             tCruiseTaskResultDetail.setEndTime(new Date());
                             tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
-                            tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            //tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            TCTRDList.add(tCruiseTaskResultDetail);
                             cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
                             //tCruiseDataResultService.updateCruiseAnalyze();
 
@@ -354,6 +358,106 @@ public class CruiseTaskJob extends QuartzJobBean {
                         tCruiseTaskResultDetailMap.put("robotId",item.getRobotId().toString());
                     }
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
+                    if(228 == item.getCruiseType()){//机器人离线
+                        TRobotInfo tRobotInfo = tRobotInspectionDao.selectRobot(item.getRobotId());
+                        if("离线".equals(tRobotInfo.getRobotStatus())){
+                            //机器人离线了 直接有结果
+                            tCruiseTaskResultDetailMap.put("cruiseTime", simpleDateFormat.format(new Date()));
+                            tCruiseTaskResultDetailMap.put("cruiseTaskTime", simpleDateFormat.format(new Date()));
+                            tCruiseTaskResultDetailMap.put("endTime", simpleDateFormat.format(new Date()));
+                            tCruiseTaskResultDetailMap.put("cruiseStatus", "253");//未执行
+                            tCruiseTaskResultDetailMap.put("resultNum", "机器人离线,未执行");
+                            tCruiseTaskResultDetailMap.put("cruiseResult", "247");//异常
+                            tCruiseTaskResultDetailMap.put("cruiseAbnormal", "250");//异常告警
+                            tCruiseTaskResultDetailMap.put("evaluationState", "257");//未审核
+                            tCruiseTaskResultDetailMap.put("createtime", simpleDateFormat.format(new Date()));
+
+                            redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
+
+                            tCruiseTaskResultDetail.setCruiseResultId(tCruiseTaskResultDetailMap.get("cruiseResultId").toString())
+                                    .setTaskResultId(tCruiseTaskResultDetailMap.get("taskResultId").toString())
+                                    .setInstanceId(Long.valueOf(tCruiseTaskResultDetailMap.get("instanceId").toString()))
+                                    .setInstanceName(tCruiseTaskResultDetailMap.get("instanceName").toString())
+                                    .setCruiseTime(simpleDateFormat.parse(tCruiseTaskResultDetailMap.get("cruiseTime").toString()))
+                                    .setEndTime(simpleDateFormat.parse(tCruiseTaskResultDetailMap.get("endTime").toString()))
+                                    .setDeviceId(Long.valueOf(tCruiseTaskResultDetailMap.get("deviceId").toString()))
+                                    .setDeviceName(tCruiseTaskResultDetailMap.get("deviceName").toString())
+                                    .setCruiseStatus(Integer.valueOf(tCruiseTaskResultDetailMap.get("cruiseStatus").toString()))
+                                    .setRemark(tCruiseTaskResultDetailMap.get("remark").toString());
+                            cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
+                            tCruiseDataResult.setCruiseResultId(tCruiseTaskResultDetailMap.get("cruiseResultId").toString())
+                                    .setCruiseId(Long.valueOf(tCruiseTaskResultDetailMap.get("cruiseId").toString()))
+                                    .setCruiseName(tCruiseTaskResultDetailMap.get("cruiseName").toString())
+                                    .setCruiseType(228)
+                                    .setResultNum(tCruiseTaskResultDetailMap.get("resultNum").toString())
+                                    .setModifyNum(tCruiseTaskResultDetailMap.get("modifyNum").toString())
+                                    .setPicpath(tCruiseTaskResultDetailMap.get("picpath").toString())
+                                    .setPicPathAnl(tCruiseTaskResultDetailMap.get("picPathAnl").toString())
+                                    .setOrigpic(tCruiseTaskResultDetailMap.get("origpic").toString())
+                                    .setOrigPicAnl(tCruiseTaskResultDetailMap.get("origPicAnl").toString())
+                                    .setEvaluationState(Integer.valueOf(tCruiseTaskResultDetailMap.get("evaluationState").toString()))
+                                    .setCreatetime(new Date())
+                                    .setIsWarn(0)
+                                    .setCruiseResult(Integer.valueOf(tCruiseTaskResultDetailMap.get("cruiseResult").toString()))
+                                    .setCruiseAbnormal(Integer.valueOf(tCruiseTaskResultDetailMap.get("cruiseAbnormal").toString()))
+                                    .setRemark(null);
+                            //tCruiseDataResultDao.insert(tCruiseDataResult);
+                            TCDRList.add(tCruiseDataResult);
+                            //tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            TCTRDList.add(tCruiseTaskResultDetail);
+                            taskAbnormal = taskAbnormal+1;
+                            tCruiseResult = tCruiseResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
+                            Integer taskWait = tCruiseResult.getTaskWait()-1;
+                            if(taskWait == 0 ){
+                                tCruiseResult.setCState(240);
+                            }
+                            tCruiseResult.setTaskWait(taskWait);
+                            tCruiseResultDao.update(tCruiseResult);
+                            // webSocket通知前端调用巡视监控的接口
+                            Map<String,String> jasonMapOnFinished=new HashMap<>();
+                            jasonMapOnFinished.put("type","finishedOneInstance");
+                            jasonMapOnFinished.put("taskId",taskId);
+                            String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
+                            log.info("发送给前端的消息："+jsonMessage);
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
+
+                            {
+                                //巡视点结果上报站端
+                                XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                                List<Map<String,Object>> xmlItems = new ArrayList<>();
+                                Map<String,Object> xmlItem = new HashMap<>();
+                                xmlBaseModel.setType("61");
+                                xmlItem.put("patroldevice_code",item);
+                                xmlItem.put("task_name",tCruiseTask.getTaskName());
+                                xmlItem.put("task_code",tCruiseTask.getTaskCode());
+                                xmlItem.put("device_name",item.getCruiseName());
+                                xmlItem.put("device_id",item.getInstanceId());
+                                xmlItem.put("material_id",item.getRealCode());
+                                xmlItem.put("value","");
+                                xmlItem.put("value_unit","");
+                                xmlItem.put("unit","");
+                                xmlItem.put("time",cruiseTime);
+                                //todo
+                                xmlItem.put("recognition_type","");
+                                xmlItem.put("file_type","2");
+                                xmlItem.put("file_path","");
+                                xmlItem.put("rectangle","");
+                                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                                xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
+                                xmlItem.put("data_type","0x01");
+                                xmlItem.put("valid","0");
+
+                                xmlItems.add(xmlItem);
+                                xmlBaseModel.setItems(xmlItems);
+                                List<XMLBaseModel> list = new ArrayList<>();
+                                list.add(xmlBaseModel);
+                                Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+                                cruiseResult.put("list",list);
+                                log.info("信息上报：-"+cruiseResult);
+                                Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+                            }
+                        }
+                    }
                     //一次循环 一个巡检点
                     if (229 == item.getCruiseType() || 230 == item.getCruiseType()) {//视频 红外
                         log.info("巡检点开始巡检"+new Date());
@@ -443,12 +547,14 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseDataResult.setResultNum("抓图失败");
                             tCruiseDataResult.setEvaluationState(257);
                             tCruiseDataResult.setIsWarn(0);
-                            tCruiseDataResultDao.insert(tCruiseDataResult);
+                            //tCruiseDataResultDao.insert(tCruiseDataResult);
+                            TCDRList.add(tCruiseDataResult);
                             tCruiseTaskResultDetail.setCruiseStatus(254);
                             tCruiseTaskResultDetail.setEndTime(new Date());
 
                             tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
-                            tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            //tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                            TCTRDList.add(tCruiseTaskResultDetail);
                             cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                              tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
@@ -622,11 +728,13 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseDataResult.setResultNum("已拍照");
                                 tCruiseDataResult.setEvaluationState(257);
                                 tCruiseDataResult.setIsWarn(0);
-                                tCruiseDataResultDao.insert(tCruiseDataResult);
+                                //tCruiseDataResultDao.insert(tCruiseDataResult);
+                                TCDRList.add(tCruiseDataResult);
                                 tCruiseTaskResultDetail.setCruiseStatus(252);
                                 tCruiseTaskResultDetail.setEndTime(new Date());
                                 tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseTime));
-                                tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                                //tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                                TCTRDList.add(tCruiseTaskResultDetail);
                                 cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
                                  tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
@@ -799,6 +907,15 @@ public class CruiseTaskJob extends QuartzJobBean {
                         log.info("任务停止执行"+tCruiseTask.getTaskId());
                         return;
                     }
+                }
+                //做完了 入库
+                log.info("开始入库");
+                if(TCDRList.size()>0){
+                    tCruiseDataResultDao.batchInsert(TCDRList);
+                }
+                if(TCTRDList.size()>0){
+                    tCruiseTaskResultDetailDao.batchInsert(TCTRDList);
+                    tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
                 }
                 //计算所有的异常巡检点
                 Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);

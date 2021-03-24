@@ -4,6 +4,7 @@ import com.yjh.platform.module.device.entity.Robot;
 import com.yjh.platform.module.device.entity.TCruisePointAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.task.entity.ConfirmImmediately;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -49,4 +50,5 @@ public interface TRobotInspectionDao {
 
     List<String> selectRobotTaskOnStart(@Param(value = "robotId") Long robotId);
 
+    TRobotInfo selectRobot(@Param(value = "robotId") Long robotId);
 }

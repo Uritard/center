@@ -242,7 +242,6 @@
             LEFT JOIN t_dict_business b ON a.robot_type = b.dict_code
             LEFT JOIN t_dict_business c ON a.robot_position = c.dict_code
         where 1=1
-
     </select>
 
     <select id="selectRobotIsRunning" resultType="java.lang.String">
@@ -269,5 +268,11 @@
             t_robot_inspection a, t_cruise_point_instance b , t_cruise_task_attr c , t_cruise_result d
             WHERE a.robot_id = 8092 and a.inspection_id = b.cruise_id and b.instance_id = c.instance_id and c.task_id = d.task_id and d.c_state = 239
     </select>
-
+    <select id="selectRobot" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+        SELECT
+            a.*
+        FROM
+            t_robot_info a
+            where a.robot_id = #{robotId}
+    </select>
 </mapper>
