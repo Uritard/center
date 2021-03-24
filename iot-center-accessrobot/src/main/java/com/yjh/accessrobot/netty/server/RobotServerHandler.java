@@ -690,12 +690,18 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cruiseResultMap.put("recognitionType",xmlBaseModel.getItems().get(0).get("recognition_type").toString());
                     cruiseResultMap.put("fileType",xmlBaseModel.getItems().get(0).get("file_type").toString());
 //改版
-                    /*String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
+                    String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
                     String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
                     String sArray[] = ftpFilePath.split("/");
                     String ftpFileName = sArray[sArray.length - 1];//巡视结果文件名称
                     String temporaryFilePath = filePathMap.get(redisValue) + "/" +ftpFilePath;
-                    String ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();//原图:红外bmp,可见光为标定
+
+                    String ftpOriginPath = null;
+                    if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")){
+                        ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();
+                    }else {
+                        ftpOriginPath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                    }
                     String sArray2[] = ftpOriginPath.split("/");
                     String ftpOriginName = sArray2[sArray2.length - 1];//原图文件名称
                     String temporaryOriginPath = filePathMap.get(redisValue) + "/" +ftpOriginPath;
@@ -733,15 +739,15 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         copyFileToDevelop(temporaryFilePath,developAbsoluteUrl);//拷贝巡视结果图
                         cruiseResultMap.put("relativePath",developRelativeUrl + "/" +ftpFileName);
                         cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+ftpFileName);
-                    }*/
+                    }
 //改版
 //旧版
-                    String filePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                    /*String filePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
                     String splitArray[] = filePath.split("/");
                     String fileName = splitArray[splitArray.length - 1];
-                    /*
+                    *//*
                     将ftp服务器上的文件复制到开发环境
-                    * */
+                    * *//*
                     String temporaryPath = filePathMap.get(redisValue) + "/" +filePath;//文件在ftp服务器上的绝对路径
                     log.info("temporaryPath是==="+temporaryPath);
 
@@ -777,7 +783,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }
 
                     cruiseResultMap.put("relativePath",developRelativeUrl + "/" +fileName);//相对路径
-                    cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+fileName);//绝对路径
+                    cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+fileName);//绝对路径*/
 //旧版
                     cruiseResultMap.put("rectangle",xmlBaseModel.getItems().get(0).get("rectangle").toString());
                     cruiseResultMap.put("taskPatrolledId",xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
@@ -785,7 +791,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                     log.info("机器人巡视结果数据是："+cruiseResultMap);
                     //Start CruiseResultDealThread
-                    CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate);
+                    /*CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate);
                     TaskExecutePool.getInstance().execute(cruiseResultDealThread);
                     //判断结果是否产生告警
                     Map<String, String> cResultMap = new HashMap<>();
@@ -795,7 +801,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cResultMap.put("value",xmlBaseModel.getItems().get(0).get("value").toString());
                     cResultMap.put("relativePath",developRelativeUrl + "/" +fileName);//相对路径
                     IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap,redisTemplate);
-                    TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
+                    TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);*/
 
                     String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, cruiseResultXmlString);
