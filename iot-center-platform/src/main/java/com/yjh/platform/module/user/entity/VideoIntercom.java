@@ -92,7 +92,7 @@ public class VideoIntercom implements Serializable {
     private String remark;
 
     @ApiModelProperty(value = "在线状态 0 在在线  1 离线")
-    private Integer state ;
+    private Integer state=0;
 
 
 }

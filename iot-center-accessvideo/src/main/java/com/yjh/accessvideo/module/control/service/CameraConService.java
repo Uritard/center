@@ -1194,7 +1194,7 @@ public class CameraConService {
                log.info("password"+password);
                String cameraIp = cameraConInfo.getCameraIp();
                log.info("cameraIp"+cameraIp);
-               String port =cameraConInfo.getPort().toString();
+               String port =cameraConInfo.getInfreadPort().toString();
                log.info("port:>>>"+port);
                if (! hCNetSDK.NET_DVR_Init())
                {
@@ -1307,7 +1307,7 @@ public class CameraConService {
             log.info("password"+password);
             String cameraIp = cameraConInfo.getCameraIp();
             log.info("cameraIp"+cameraIp);
-            String port =cameraConInfo.getPort().toString();
+            String port =cameraConInfo.getInfreadPort().toString();
             log.info("port:>>>"+port);
             if (! hCNetSDK.NET_DVR_Init())
             {
@@ -1442,6 +1442,9 @@ public class CameraConService {
         {
             int iErr = hCNetSDK.NET_DVR_GetLastError();
             log.info("系统异常"+iErr);
+        }finally {
+            hCNetSDK.NET_DVR_Logout(lUserID);
+            hCNetSDK.NET_DVR_Cleanup();
         }
         return map;
     }
@@ -1517,6 +1520,9 @@ public class CameraConService {
             log.info("NET_DVR_StartVoiceCom_V30 Exception"+iErr);
             log.info("NET_DVR_StartVoiceCom_V30 ....."+e.getMessage());
 
+        }finally {
+            hCNetSDK.NET_DVR_Logout(lUserID);
+            hCNetSDK.NET_DVR_Cleanup();
         }
         return re;
     }
@@ -1581,8 +1587,70 @@ public class CameraConService {
             String flvUrl = "http://"+hostIp+":10080/live/"+livePath+".flv";
             returnMap.put("flvUrl", flvUrl);
             log.info("returnMap: "+returnMap);
-        } catch (Exception e) {e.getMessage();}
+        } catch (Exception e) {e.getMessage();}finally {
+            hCNetSDK.NET_DVR_Logout(lUserID);
+            hCNetSDK.NET_DVR_Cleanup();
+        }
         return returnMap;
+    }
+
+    @Logs(title = "获取可视状态", code = "getVidemoIntercomStatus", content = "获取可视状态")
+    @Transactional(rollbackFor = Exception.class)
+    public int getVidemoIntercomStatus(Long videoIntercomId) {
+        int re=1;
+
+        NativeLong iChanNumTem = new NativeLong(0);
+        try {
+            log.info("开启可视对讲videoIntercomId：" + videoIntercomId);
+            String url = SERVICE_URL + "?videoIntercomId=" + videoIntercomId;
+            String services = HttpClientUtils.getInstance().getUrl(url, null);
+            log.info("services：" + services);
+            JSONObject jsonObject = JSONObject.parseObject(services);
+            Map<String, Object> videoIntercom = (Map<String, Object>) jsonObject.get("data");
+            String userName = videoIntercom.get("owner").toString();
+            log.info("userName" + userName);
+            String password = videoIntercom.get("ownerCode").toString();
+            log.info("password" + password);
+            String cameraIp = videoIntercom.get("cameraIp").toString();
+            log.info("cameraIp" + cameraIp);
+            String port = videoIntercom.get("port").toString();
+            log.info("port:>>>" + port);
+            if (!hCNetSDK.NET_DVR_Init()) {
+                log.info("初始化失败");
+            }
+            log.info("开始登录。。。。。");
+            m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+            System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
+            m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+            System.arraycopy(userName.getBytes(), 0, m_strLoginInfo.sUserName, 0, userName.length());
+            m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+            System.arraycopy(password.getBytes(), 0, m_strLoginInfo.sPassword, 0, password.length());
+            m_strLoginInfo.wPort = Short.parseShort(port);
+            m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
+            m_strLoginInfo.write();
+            log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
+            lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+            if (lUserID>-1)
+            {
+                re=0;
+            }else
+                {
+                    re=1;
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.info("获取可视状态 错误 "+iErr);
+                }
+
+
+        }catch (Exception e)
+        {
+            re=1;
+            int iErr = hCNetSDK.NET_DVR_GetLastError();
+            log.info("获取可视状态  Exception "+iErr);
+        }finally {
+            hCNetSDK.NET_DVR_Logout(lUserID);
+            hCNetSDK.NET_DVR_Cleanup();
+        }
+        return re;
     }
 
 

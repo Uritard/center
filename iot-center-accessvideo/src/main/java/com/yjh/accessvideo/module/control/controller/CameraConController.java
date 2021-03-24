@@ -553,6 +553,19 @@ public class CameraConController {
         return result;
     }
 
+    /**
+     * \获取可视对讲在  状态
+     * @param videoIntercomId
+     * @return
+     */
+    @RequestMapping(value = "/getVidemoIntercomStatus", method = RequestMethod.GET)
+    public Result  getVidemoIntercomStatus ( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)
+    {
+        Result result = new Result();
+        result.setData(cameraConService.getVidemoIntercomStatus(videoIntercomId));
+        return result;
+    }
+
 
     /*@ApiOperation(value = "门口机布防")
     @RequestMapping(value = "/doorMa", method = RequestMethod.GET)

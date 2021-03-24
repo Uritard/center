@@ -1,19 +1,27 @@
 package com.yjh.platform.module.user.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.user.dao.VideoIntercomDao;
 import com.yjh.platform.module.user.entity.VideoIntercom;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class VideoIntercomService {
 
     @Autowired
     private VideoIntercomDao  videoIntercomDao;
+    @Value("${video.videoUrl.path}")
+    private  String videoUrl;
 
 
     public int insert(VideoIntercom videoIntercom)
@@ -54,6 +62,35 @@ public class VideoIntercomService {
    public List<VideoIntercom> selectByPage( @Param(value = "cameraName") String cameraName,
                                       @Param(value = "regionIdList") List<Long> regionIdList)
    {
+       List<VideoIntercom> lists=new ArrayList<>();
+       List<VideoIntercom> list =videoIntercomDao.selectByPage(cameraName,regionIdList);
+      /*try {
+
+          for (int i=0;i<list.size();i++ )
+          {
+
+              VideoIntercom videoIntercom=new VideoIntercom();
+              String url = videoUrl + "?videoIntercomId=" +  list.get(i).getVideoIntercomId();
+              String services = HttpClientUtils.getInstance().getUrl(url, null);
+              JSONObject jsonObject = JSONObject.parseObject(services);
+              String re =jsonObject.get("data").toString();
+              if (Integer.parseInt(re)==0)
+              {
+                  list.get(i).setState(0);
+              }else
+              {
+                  list.get(i).setState(1);
+              }
+              videoIntercom=list.get(i);
+              lists.add(videoIntercom);
+
+          }
+      }catch (Exception e)
+      {
+          e.getMessage();
+      }
+      return lists;*/
+
        return videoIntercomDao.selectByPage(cameraName,regionIdList);
    }
 }
