@@ -268,7 +268,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
 
         TCruiseTaskResult tCruiseTaskResult ;
         tCruiseTaskResult = tCruiseTaskResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
-        if(tCruiseResult == null){
+        if(tCruiseTaskResult == null){
             tCruiseTaskResult = new TCruiseTaskResult();
             tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
             tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());

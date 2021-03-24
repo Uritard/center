@@ -19,12 +19,14 @@ import com.yjh.platform.common.utils.ResultHandleUtils;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
-import com.yjh.platform.module.task.entity.TCruiseTask;
-import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -211,16 +213,103 @@ public class HelloController {
         return result;
     }
 
+    @Autowired
+    TCruiseResultDao tCruiseResultDao;
+    @Autowired
+    TCruiseTaskResultDao tCruiseTaskResultDao;
 
+
+    private Result sendTaskStateToUp(TCruiseTask tCruiseTask, Integer state){
+        //任务状态上报站端
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        List<Map<String,Object>> items= new ArrayList<>();
+        Map<String,Object> item = new HashMap<>();
+        xmlBaseModel.setType("41");
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+        item.put("task_patrolled_id",tCruiseTask.getTaskId()+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
+        item.put("task_name",tCruiseTask.getTaskName());
+        item.put("task_code",tCruiseTask.getTaskCode());
+        item.put("task_state",state);
+        item.put("plan_start_time",tCruiseTask.getStartTime());
+        if(tCruiseTask.getIfRun() == 172){
+            try{
+                CronExpression expression = new CronExpression(tCruiseTask.getDateType());
+                item.put("start_time",expression.getNextValidTimeAfter(new Date()));
+            }catch (Exception e){
+                log.info("上报出错"+e.getMessage());
+            }
+        }else {
+            item.put("start_time",tCruiseTask.getStartTime());
+        }
+        item.put("task_progress","0%");
+        Integer i =0;
+        Map<String,String> mapForGet = redisTemplate.opsForHash().entries("countForAbnormal:"+tCruiseTask.getTaskId());
+        Integer all = Integer.valueOf(mapForGet.get("all"));
+        Integer normal = Integer.valueOf(mapForGet.get("normal"));
+        Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
+        i = all -normal -abnormal;
+
+
+        item.put("task_estimated_time",i*60*5);
+        item.put("description","");
+        items.add(item);
+        xmlBaseModel.setItems(items);
+
+        List<XMLBaseModel> list = new ArrayList<>();
+        list.add(xmlBaseModel);
+        Map<String,List<XMLBaseModel>> map = new HashMap<>();
+        map.put("list",list);
+        Result re = null;
+        try{
+            log.info("信息上报：-"+map);
+            re = Constant.otherServer(map,Constant.TCP_URL);//江苏要求
+        }catch (Exception e){
+            log.info("上报出错"+e.getMessage());
+        }
+        return re;
+    }
     @ApiOperation("发任务")
     @PostMapping("/task")
     @ResponseBody
     public Result task() throws Exception {
-        Result result = new Result();
-        Map<String,Object> map = new HashMap<>();
-        List<Long> list = new ArrayList<>();
-        map.put("list",list);
-        result.setData(map);
+        Result result = null;
+        TCruiseResult tCruiseResult = tCruiseResultDao.selectByPrimaryId("0b4f4a0a1fe14338b93108756cea37eb");
+        tCruiseResult.setCState(244);
+        tCruiseResult.setTaskWait(0);
+        tCruiseResultDao.update(tCruiseResult);
+
+        TCruiseTask tCruiseTask =tCruiseTaskDao.selectByPrimaryId("6e3f89c71be741b390932ba457fbe1c6");
+        String strForCountAbnormal = "countForAbnormal:"+tCruiseTask.getTaskId();
+        Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+        //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
+        //任务状态
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        TCruiseTaskResult tCruiseTaskResult ;
+        tCruiseTaskResult = tCruiseTaskResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
+        if(tCruiseTaskResult == null){
+            tCruiseTaskResult = new TCruiseTaskResult();
+            tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
+            tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
+            tCruiseTaskResult.setTaskAbnormal(6);
+            tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
+            tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
+            tCruiseTaskResult.setTaskStatus(244);
+            tCruiseTaskResult.setCruiseResult(247);
+            tCruiseTaskResultDao.insert(tCruiseTaskResult);
+        }else {
+            tCruiseTaskResult.setTaskResultId(tCruiseResult.getTaskResultId());
+            tCruiseTaskResult.setTaskId(tCruiseTask.getTaskId());
+            tCruiseTaskResult.setTaskAbnormal(6);
+            tCruiseTaskResult.setRunExecute(tCruiseTask.getIfRun().toString());
+            tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
+            tCruiseTaskResult.setTaskStatus(244);
+            tCruiseTaskResult.setCruiseResult(247);
+            tCruiseTaskResultDao.update(tCruiseTaskResult);
+        }
+
+        sendTaskStateToUp(tCruiseTask,6);
+
+        log.info("超期完毕");
         return result;
     }
 
