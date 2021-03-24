@@ -71,7 +71,7 @@ public class LogsAspect {
         }
 
         ip = request.getHeader("X-Real-IP");
-        log.info("ip = request.getRemoteAddr();: "+request.getRemoteAddr());
+        log.info("ip: "+request.getRequestURL());
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("X-Forwarded-For"); }
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("Proxy-Client-IP"); }
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("WL-Proxy-Client-IP"); }
