@@ -73,86 +73,41 @@ public class CameraConController {
 
     @ApiOperation(value = "视频进程关闭")
     @RequestMapping(value = "/stopProcess", method = RequestMethod.POST)
-    public void  stopProcess(HttpServletRequest request, HttpServletResponse response){
+    public void stopProcess(){
 
-        try {
-            byte buffer[] = getRequestPostBytes(request);
-            String charEncoding = request.getCharacterEncoding();
-            if (charEncoding == null) {
-                charEncoding = "UTF-8";
-            }
-            String requestPostStr = new String(buffer, charEncoding);
-            JSONObject stopJson = null;
-            if (StringUtils.isNotEmpty(requestPostStr)) {
-                stopJson = (JSONObject) JSONObject.parse(requestPostStr);
-            }
-            String action = stopJson.getString("action");
-            if(StringUtils.isNotEmpty(action) && action.equals("on_stop")){
-                Thread.sleep(1000*70);//SRS服务器有延迟，大概50-60秒 才更新管理数据
-                String stream= stopJson.getString("stream");
-                String cid=null;
-                try{
-                    //获取所有视频流信息
-                    //发送请求获取所有STREAM
-                    String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
-                    JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
-                    List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
-                    for (int i = 0; i < streamsJsonObjectList.size(); i++) {
-                        String streambeanStr = streamsJsonObjectList.get(i);
-                        JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
+        String cid=null;
+        try{
+            //获取所有视频流信息
+            //发送请求获取所有STREAM
+            String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
+            JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
+            List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
+            for (int i = 0; i < streamsJsonObjectList.size(); i++) {
+                String streambeanStr = streamsJsonObjectList.get(i);
+                JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
 
-                        //解析每一个stream，循环比对，找到页面传递的设备ID对应的流，并判断是否需要关闭
-                        String name = streambeanJson.getString("name");//设备ID
-                        String publish = streambeanJson.getString("publish");
-                        JSONObject publishjson = JSONObject.parseObject(publish);
-                        Boolean active = publishjson.getBoolean("active");//是否有人观看
-                        Integer clients = streambeanJson.getInteger("clients"); //观看人数
-                        String app = streambeanJson.getString("app");//类型：直播 or 回放
+                //解析每一个stream，循环比对，找到页面传递的设备ID对应的流，并判断是否需要关闭
+                String name = streambeanJson.getString("name");//设备ID
+                String publish = streambeanJson.getString("publish");
+                JSONObject publishjson = JSONObject.parseObject(publish);
+                Boolean active = publishjson.getBoolean("active");//是否有人观看
+                Integer clients = streambeanJson.getInteger("clients"); //观看人数
+                String app = streambeanJson.getString("app");//类型：直播 or 回放
+
+                if(app.equals("live") && !( active && clients==0)){
+                    //符合无人观看的条件
+                    cid = publishjson.getString("cid");
+                    //踢掉
+                    if(StringUtils.isNotEmpty(cid)){
                         String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
                         HttpClientUtils.httpDelete(delteUrl,null,null);
-
-//                        if(app.equals("live") && name.equals(stream) && !( active && clients>=2)){
-//                        if(app.equals("live") && !( active && clients==0)){
-//                            //符合无人观看的条件
-//                            cid = publishjson.getString("cid");
-//                            //踢掉
-//                            if(StringUtils.isNotEmpty(cid)){
-//                                String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
-//                                HttpClientUtils.httpDelete(delteUrl,null,null);
-//                            }
-//                            break;
-//                        }
                     }
-                }catch (Exception e){
-                    log.error("关流异常",e,this.getClass());
+                    break;
                 }
             }
-        }
-        catch (Exception e) {
+        }catch (Exception e){
             log.error("关流异常",e,this.getClass());
         }
-    }
-
-    /**
-     * 描述:获取 post 请求的 byte[] 数组
-     */
-    public static byte[] getRequestPostBytes(HttpServletRequest request)
-            throws IOException {
-        int contentLength = request.getContentLength();
-        if(contentLength<0){
-            return null;
-        }
-        byte buffer[] = new byte[contentLength];
-        for (int i = 0; i < contentLength;) {
-
-            int readlen = request.getInputStream().read(buffer, i,
-                    contentLength - i);
-            if (readlen == -1) {
-                break;
-            }
-            i += readlen;
-        }
-        return buffer;
     }
 
     @ApiOperation(value = "相机停止播放")
