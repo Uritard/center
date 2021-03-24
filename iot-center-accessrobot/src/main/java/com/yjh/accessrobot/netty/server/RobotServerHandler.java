@@ -709,36 +709,22 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                     String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
                     String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
-                    String developFirAbsoluteUrl = null;
-                    String developFirRelativeUrl = null;
-                    String developOriginAbsoluteUrl = null;
-                    String developOriginRelativeUrl = null;
                     if ("1".equals(fileType)){//红外
-                        developAbsoluteUrl = developAbsoluteUrl + "Infrared";
-                        developRelativeUrl = developRelativeUrl + "Infrared";
-                        developFirAbsoluteUrl = developAbsoluteUrl + "FIR";
-                        developFirRelativeUrl = developRelativeUrl + "FIR";
-                        copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl);//拷贝原图
-                        copyFileToDevelop(temporaryFilePath,developFirAbsoluteUrl);//拷贝巡视结果图
-                        cruiseResultMap.put("relativePath",developRelativeUrl + "/" +ftpOriginName);
-                        cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+ftpOriginName);
-                        cruiseResultMap.put("resultPic",developFirRelativeUrl + "/" +ftpFileName);
+                        copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "Infrared");//拷贝原图
+                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "FIR");//拷贝巡视结果图
+                        cruiseResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);
+                        cruiseResultMap.put("absolutePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);
+                        cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" +ftpFileName);
                     }else if ("2".equals(fileType)){//可见光
-                        developAbsoluteUrl = developAbsoluteUrl + "CCD";
-                        developRelativeUrl = developRelativeUrl + "CCD";
-                        developOriginAbsoluteUrl = developAbsoluteUrl + "BigImg";
-                        developOriginRelativeUrl = developRelativeUrl + "BigImg";
-                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl);//拷贝巡视结果图
-                        copyFileToDevelop(temporaryOriginPath,developOriginAbsoluteUrl);//拷贝原图
-                        cruiseResultMap.put("relativePath",developRelativeUrl + "/" +ftpFileName);
-                        cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+ftpFileName);
-                        cruiseResultMap.put("originRobotPic",developOriginAbsoluteUrl+"/"+ftpOriginName);
+                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "CCD");//拷贝巡视结果图
+                        copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "BigImg");//拷贝原图
+                        cruiseResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);
+                        cruiseResultMap.put("absolutePath",developAbsoluteUrl+ "BigImg" + "/"+ ftpFileName);
+                        cruiseResultMap.put("originRobotPic",developRelativeUrl + "BigImg" +"/"+ftpOriginName);
                     }else if ("3".equals(fileType)){//音频
-                        developAbsoluteUrl = developAbsoluteUrl + "Audio";
-                        developRelativeUrl = developRelativeUrl + "Audio";
-                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl);//拷贝巡视结果图
-                        cruiseResultMap.put("relativePath",developRelativeUrl + "/" +ftpFileName);
-                        cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+ftpFileName);
+                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "Audio");//拷贝巡视结果图
+                        cruiseResultMap.put("relativePath",developRelativeUrl + "Audio" + "/" +ftpFileName);
+                        cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpFileName);
                     }
 //改版
 //旧版
