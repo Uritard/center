@@ -91,7 +91,7 @@ public class CameraConController {
                 JSONObject publishjson = JSONObject.parseObject(publish);
                 Integer clients = streambeanJson.getInteger("clients"); //观看人数
 
-                if(clients==0){
+                if(clients==0 || Objects.equals("false",publishjson.getString("active"))){
                     //符合无人观看的条件
                     cid = publishjson.getString("cid");
                     //踢掉
