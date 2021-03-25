@@ -175,15 +175,18 @@ public class CruiseResultDealThread implements Runnable{
                             tCruiseTaskResultMap.put("cruiseResult","247");
                             tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常告警
                         }
-                        /*tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
+                        //新版
+                        tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
                         tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
                         if (cruiseResultMap.get("fileType").equals("1")){
                             tCruiseTaskResultMap.put("resultPic",cruiseResultMap.get("resultPic"));
-                        }*/
-                        if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
+                        }
+                        //旧版
+                        /*if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
                             tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
                         }
-                        tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
+                        tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));*/
+
                         tCruiseTaskResultMap.put("evaluationState","257");
                         tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
                         tCruiseTaskResultMap.put("isWarn","0");
@@ -353,6 +356,9 @@ public class CruiseResultDealThread implements Runnable{
                                     tCruiseDataResult.setRemark(redisInfoMap.get("remark"));
                                 }else {
                                     tCruiseDataResult.setRemark(null);
+                                }
+                                if (redisInfoMap.containsKey("resultPic")){
+                                    tCruiseDataResult.setResultDesc(redisInfoMap.get("resultPic"));
                                 }
                                 tCDRList.add(tCruiseDataResult);
                             }

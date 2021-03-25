@@ -499,6 +499,7 @@ public class RobotService {
                 if ("200".equals(mapRes1.get("code").toString())){
                     Map<String,Object> mapRes2 = robotTaskDragonService(rTII.getRobotCode(),"1","5","1");//任务模式
                     if ("200".equals(mapRes2.get("code").toString())){
+                        log.info("任务这才真正的下发到机器人,开始构建任务相关信息......");
                         //巡视类型
                         Integer planType = null;
                         switch (rTII.getCruiseType()) {

@@ -689,7 +689,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cruiseResultMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
                     cruiseResultMap.put("recognitionType",xmlBaseModel.getItems().get(0).get("recognition_type").toString());
                     cruiseResultMap.put("fileType",xmlBaseModel.getItems().get(0).get("file_type").toString());
-//改版
+                    /*
+                     * 新版的图片处理
+                     * */
                     String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
                     String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
                     String sArray[] = ftpFilePath.split("/");
@@ -713,7 +715,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "Infrared");//拷贝原图
                         copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "FIR");//拷贝巡视结果图
                         cruiseResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);
-                        cruiseResultMap.put("absolutePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);
+                        cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Infrared" + "/" + ftpOriginName);
                         cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" +ftpFileName);
                     }else if ("2".equals(fileType)){//可见光
                         copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "CCD");//拷贝巡视结果图
@@ -726,22 +728,19 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         cruiseResultMap.put("relativePath",developRelativeUrl + "Audio" + "/" +ftpFileName);
                         cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpFileName);
                     }
-//改版
-//旧版
+                    /*
+                    * 旧版的图片处理
+                    * */
                     /*String filePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
                     String splitArray[] = filePath.split("/");
                     String fileName = splitArray[splitArray.length - 1];
-                    *//*
-                    将ftp服务器上的文件复制到开发环境
-                    * *//*
+                    //将ftp服务器上的文件复制到开发环境
                     String temporaryPath = filePathMap.get(redisValue) + "/" +filePath;//文件在ftp服务器上的绝对路径
                     log.info("temporaryPath是==="+temporaryPath);
-
                     //开发环境图片绝对路径文件目录
                     String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
                     //开发环境图片相对路径文件目录
                     String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
-
                     if (xmlBaseModel.getItems().get(0).get("file_type").toString().equals("1")){//红外图谱和红外图片
                         developAbsoluteUrl = developAbsoluteUrl + "FIR";
                         developRelativeUrl = developRelativeUrl + "FIR";
@@ -759,7 +758,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         f.setWritable(true, false);
                         f.mkdirs();
                     }
-
                     try {
                         String url = "cp " + temporaryPath + " "+developAbsoluteUrl;
                         log.info("url是==="+url);
@@ -767,27 +765,31 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }catch (Exception e){
                         e.getMessage();
                     }
-
                     cruiseResultMap.put("relativePath",developRelativeUrl + "/" +fileName);//相对路径
                     cruiseResultMap.put("absolutePath",developAbsoluteUrl+"/"+fileName);//绝对路径*/
-//旧版
+
                     cruiseResultMap.put("rectangle",xmlBaseModel.getItems().get(0).get("rectangle").toString());
                     cruiseResultMap.put("taskPatrolledId",xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
                     cruiseResultMap.put("valid",xmlBaseModel.getItems().get(0).get("valid").toString());
 
                     log.info("机器人巡视结果数据是："+cruiseResultMap);
+
                     //Start CruiseResultDealThread
                     /*CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate);
-                    TaskExecutePool.getInstance().execute(cruiseResultDealThread);
-                    //判断结果是否产生告警
+                    TaskExecutePool.getInstance().execute(cruiseResultDealThread);*/
+                    //判断结果是否产生告警,只判断红外和可见光
                     Map<String, String> cResultMap = new HashMap<>();
                     cResultMap.put("robotCode",xmlBaseModel.getSendCode());
                     cResultMap.put("taskCode",xmlBaseModel.getItems().get(0).get("task_code").toString());
                     cResultMap.put("deviceId",xmlBaseModel.getItems().get(0).get("device_id").toString());
                     cResultMap.put("value",xmlBaseModel.getItems().get(0).get("value").toString());
-                    cResultMap.put("relativePath",developRelativeUrl + "/" +fileName);//相对路径
+                    if ("1".equals(fileType)){
+                        cResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);//相对路径
+                    }else if ( "2".equals(fileType)){
+                        cResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);//相对路径
+                    }
                     IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap,redisTemplate);
-                    TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);*/
+                    TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
 
                     String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, false, cruiseResultXmlString);
