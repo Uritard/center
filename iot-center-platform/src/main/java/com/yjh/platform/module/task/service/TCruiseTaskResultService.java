@@ -443,68 +443,80 @@ public class TCruiseTaskResultService {
         String cruiseExecuteFailed = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "执行失败");
         String cruiseUnknown = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未知");
 
-        log.info("未执行---------------："+cruiseNotExecuted);
-
         Set<Long> deviceMete = new HashSet<>();//全部标准测点
         Set<Long> deviceMeteAbnormal = new HashSet<>();//结果异常的标准测点
-        Set<Long> deviceMeteNotComp = new HashSet<>();//已执行的标准测点
-//        List<Long> deviceMeteIds = new ArrayList<>();//测点对比器
-        Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
+        Set<Long> deviceMeteComp = new HashSet<>();//已执行的标准测点
+        List<Long> deviceMeteIds = new ArrayList<>();//测点对比器
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
+        Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
 
-        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
-        for (Long instanceId : instanceIds) {
-            deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
-//            deviceMeteIds.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
-        }
+
+
+
+            Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
+            for (Long instanceId : instanceIds) {
+                deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
+                deviceMeteIds.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
+            }
+
+
+            log.info("Set测点数量---------"+deviceMete.size());
+            log.info("List测点数量--------"+deviceMeteIds.size());
+            log.info("redisSet长度-------"+keyResult.size());
 //        for(String keys:keyResult){
 //            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
 //            deviceMete.add(Long.valueOf(resultMap.get("device_mete_id").toString()));
 //            deviceMeteIds.add(Long.valueOf(resultMap.get("device_mete_id").toString()));
 //        }
-        for (String keys : keyResult) {
-            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
+        if(keyResult.size()!=0) {
+            for (String keys : keyResult) {
+                Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
 //            Long a = Long.valueOf(resultMap.get("cruiseId").toString());
 //            Long deviceMeteId=tStdDevicemeteDao.getdeviceMeteByPointinstance(a);//当前点对应的标准测点
-            Long deviceMeteId = Long.valueOf(resultMap.get("device_mete_id").toString());
-            //巡视点执行失败、未知状态-异常测点
-            if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
-//                deviceMeteIds.remove(deviceMeteId);
-//                if (!deviceMeteIds.contains(deviceMeteId)) {
-//                    deviceMeteComp.add(deviceMeteId);
-//                }
-                deviceMeteAbnormal.add(deviceMeteId);
-                //未完成的巡视点
-            } else if (resultMap.get("cruiseStatus").equals(cruiseNotExecuted)) {
-                deviceMeteNotComp.add(deviceMeteId);
-//                deviceMeteIds.remove(deviceMeteId);
-//                if (!deviceMeteIds.contains(deviceMeteId)) {
-//                    deviceMeteComp.add(deviceMeteId);
-//                }
+                Long deviceMeteId = Long.valueOf(resultMap.get("device_mete_id").toString());
+                //巡视点执行失败、未知状态-异常测点
+                if (resultMap.get("cruiseStatus").equals(cruiseExecuteFailed) || resultMap.get("cruiseStatus").equals(cruiseUnknown)) {
+                    deviceMeteIds.remove(deviceMeteId);
+                    if (!(deviceMeteIds.contains(deviceMeteId))) {
+                        deviceMeteComp.add(deviceMeteId);
+                    }
+                    deviceMeteAbnormal.add(deviceMeteId);
+                    //巡视点执行完成
+                } else if (resultMap.get("cruiseStatus").equals(cruiseExecuted)) {
+                    deviceMeteIds.remove(deviceMeteId);
+                    if (!(deviceMeteIds.contains(deviceMeteId))) {
+                        deviceMeteComp.add(deviceMeteId);
+                    }
+
+                }
             }
+
+            //计算运行时间
+
+            Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
+
+            //获取任务开始时间
+            String startTime = countResult.get("taskStart").toString();
+            //将两个时间字符串转为日期类型
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date d1 = simpleDateFormat.parse(startTime);
+            String d2String = simpleDateFormat.format(new Date());
+            Date d2 = simpleDateFormat.parse(d2String);
+            cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
+
+
+            Integer cruisedNotCount = deviceMete.size() - deviceMeteComp.size();//已执行的标准测点数量
+            cruiseResultCounter.setAlarmCount(deviceMeteAbnormal.size());//异常点数
+            cruiseResultCounter.setCruisedCount(deviceMeteComp.size());//已执行的标准测点数量
+            cruiseResultCounter.setCruiseNotCount(cruisedNotCount);//未执行点数
+        }else {
+            cruiseResultCounter.setAlarmCount(0);//异常点数
+            cruiseResultCounter.setCruisedCount(0);//已执行的标准测点数量
+            cruiseResultCounter.setCruiseNotCount(deviceMete.size());//未执行点数
         }
 
-        //计算运行时间
-
-        Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
-
-        //获取任务开始时间
-        String startTime = countResult.get("taskStart").toString();
-        //将两个时间字符串转为日期类型
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date d1 = simpleDateFormat.parse(startTime);
-        String d2String = simpleDateFormat.format(new Date());
-        Date d2 = simpleDateFormat.parse(d2String);
-        cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
-
-
-        Integer cruisedComCount = deviceMete.size() - deviceMeteNotComp.size();//已执行的标准测点数量
-        cruiseResultCounter.setAlarmCount(deviceMeteAbnormal.size());//异常点数
-        cruiseResultCounter.setCruisedCount(cruisedComCount);//已执行的标准测点数量
-        cruiseResultCounter.setCruiseNotCount(deviceMeteNotComp.size());//未执行点数
-
         log.info("总点数：" + deviceMete.size());
-        log.info("已执行点数：" + cruisedComCount);
+        log.info("已执行点数：" + deviceMeteComp.size());
 
 
         return cruiseResultCounter;

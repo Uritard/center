@@ -209,7 +209,7 @@ public class HelloController {
 
         Map<String,List<Analysis>> analysisInfo=new HashMap<>();
         List<Analysis> analysisList=new ArrayList<>();
-        
+
         return result;
     }
 
