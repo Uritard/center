@@ -1310,7 +1310,7 @@ public class RobotService {
                 Map<String,Object> map = tRobotRegionDao.selectInspectionId(tCruisePointInstance.getCruiseId());
                 redisInfoMap.put("inspectionCode", map.get("inspection_code").toString());
                 redisInfoMap.put("deviceName",map.get("region_name").toString());
-                redisInfoMap.put("taskId", newTaskId);
+                redisInfoMap.put("taskId", taskModelMap.get("task_code").toString());
                 redisInfoMap.put("inspectionName", tCruisePointInstance.getCruiseName());
                 redisInfoList.add(redisInfoMap);
             }
@@ -1328,7 +1328,7 @@ public class RobotService {
             log.info("instanceIdList是===" + instanceIdList);
             Map<String, Object> instanceListMap = new HashMap<>();
             instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
-            instanceListMap.put("taskId", newTaskId);
+            instanceListMap.put("taskId", taskModelMap.get("task_code").toString());
             redisTemplate.opsForHash().putAll("RobotTaskStatus:" + xmlBaseModel.getSendCode() + ":" +newTaskId, instanceListMap);
 
             /*
