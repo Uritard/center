@@ -921,12 +921,11 @@ public class RobotService {
 
         xmlBaseModel
                 .setSendCode("Server01")
-                .setReceiveCode(xmlBaseModel.getCode())
-                .setCode("省检018");
+                .setReceiveCode(Constant.robotCode);
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
         //根据不同的机器人对应不同的管道发送指令
-        RobotServerHandler.getRobotServerHandlerMap().get(xmlBaseModel.getCode()).sendHeartBeat( generateByteOrder(xmlString,xmlBaseModel.getCode()),xmlBaseModel.getCode());
+        RobotServerHandler.getRobotServerHandlerMap().get(Constant.robotCode).sendHeartBeat( generateByteOrder(xmlString,Constant.robotCode),Constant.robotCode);
         return "success";
     }
 

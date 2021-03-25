@@ -1,5 +1,6 @@
 package com.yjh.accessrobot;
 
+import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.service.SysLogsService;
 import com.yjh.accessrobot.netty.server.NettyServer;
@@ -38,6 +39,8 @@ public class AccessRobotApplication implements CommandLineRunner {
 
     @Value("${netty.server.code}")
     private String serverName;
+    @Value("${netty.server.robotCode}")
+    private String robotCode;
 
     @SuppressWarnings("rawtypes")
     @Autowired
@@ -57,6 +60,7 @@ public class AccessRobotApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
+        Constant.robotCode = robotCode;
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);
         nettyServer.start(address, serverName, redisTemplate, sysLogsService,robotService);

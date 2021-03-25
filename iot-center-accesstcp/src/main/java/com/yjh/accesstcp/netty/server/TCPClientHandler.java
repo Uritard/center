@@ -341,15 +341,15 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                             Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
                         }
                     }
-//                    //将数据放入redis 做个保存
-//                    redisTemplate.opsForHash().putAll("upSystemParameter",Constant.paramMap);
-//                    //心跳线程发心跳
-//                    HeartBeatThead heartBeatThead = new HeartBeatThead(this, true);
+                    //将数据放入redis 做个保存
+                    redisTemplate.opsForHash().putAll("upSystemParameter",Constant.paramMap);
+                    //心跳线程发心跳
+                    HeartBeatThead heartBeatThead = new HeartBeatThead(this, true);
 //                    //天气线程发天气
 //                    WeatherThread weatherThread = new WeatherThread(this,redisTemplate,true,sendToUpSystemServices);
 //                    //运行数据
 //
-//                    TaskExecutePool.getInstance().execute(heartBeatThead);
+                    TaskExecutePool.getInstance().execute(heartBeatThead);
 //                    TaskExecutePool.getInstance().execute(weatherThread);//江苏要求
 
                     Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();
@@ -394,7 +394,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//国网要求
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","3","100",null);
-            }else if("success".equals(re.getData().toString())){
+            }else if("200".equals(re.getCode())){
                 sendToUpSystemServices.sendResponse("251","3","200",null);
             }else {
                 sendToUpSystemServices.sendResponse("251","3","500",null);
@@ -416,7 +416,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             items.add(item);
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","4","100",items);
-            }else if("1".equals(re.getData().toString())){
+            }else if("200".equals(re.getCode())){
                 sendToUpSystemServices.sendResponse("251","4","200",items);
             }else {
                 sendToUpSystemServices.sendResponse("251","4","500",items);
@@ -605,7 +605,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             log.info("--响应检修--"+re);
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","3","100",null);
-            }else if("1".equals(re.getData().toString())){
+            }else if("200".equals(re.getCode())){
                 sendToUpSystemServices.sendResponse("251","3","200",null);
             }else {
                 sendToUpSystemServices.sendResponse("251","3","500",null);

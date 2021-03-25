@@ -400,9 +400,9 @@ public class TVoiceDeviceService{
         String[] getId = frequencyPath.replaceAll(realPath,"").split("/");
         if(getId != null && getId.length>2){
             if("".equals(getId[0])){
-                voiceDeviceId = Long.valueOf(getId[2]);
-            }else {
                 voiceDeviceId = Long.valueOf(getId[1]);
+            }else {
+                voiceDeviceId = Long.valueOf(getId[0]);
             }
         }
         frequencyPath = frequencyPath.replaceAll(realPath,absPath);
