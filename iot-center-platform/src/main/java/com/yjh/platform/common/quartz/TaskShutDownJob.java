@@ -155,6 +155,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                         }
                         if ("247".equals(mapForCruise.get("cruiseResult"))) {
                             abnormal = abnormal + 1;
+                            taskWait = taskWait + 1;
                         } else {
                             normal = normal + 1;
                             taskWait = taskWait + 1;
@@ -201,6 +202,9 @@ public class TaskShutDownJob extends QuartzJobBean {
                         tCruiseDataResult.setCreatetime(simpleDateFormat.parse(mapForCruise.get("cruiseTime")));
                         tCruiseDataResult.setCruiseResultId(mapForCruise.get("taskResultId").toString() + mapForCruise.get("instanceId").toString());
                         tCruiseDataResult.setEvaluationState(257);
+//                        if(mapForCruise.get("cruiseAbnormal") == null){
+//                            tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(mapForCruise.get("cruiseAbnormal")));
+//                        }
                         tCruiseDataResult.setIsWarn(0);
                         TCDRList.add(tCruiseDataResult);
                         redisTemplate.opsForHash().putAll("t_cruise_task_result:" + taskId + ":" + item.getInstanceId(), mapForCruise);
@@ -244,6 +248,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                     } else {
                         //未放入缓存的点 未开始巡视的点。
                         taskWait = taskWait + 1;
+                        abnormal = abnormal + 1;
                         TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                         tCruiseTaskResultDetail.setCruiseResultId(tCruiseResult.getTaskResultId() + item.getInstanceId().toString());
                         tCruiseTaskResultDetail.setTaskResultId(tCruiseResult.getTaskResultId());
@@ -265,7 +270,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                         tCruiseDataResult.setCruiseName(item.getCruiseName());
                         tCruiseDataResult.setResultNum("任务终止");
                         tCruiseDataResult.setCruiseResult(247);
-                        tCruiseDataResult.setCruiseAbnormal(250);
+                        //tCruiseDataResult.setCruiseAbnormal(250);
                         tCruiseDataResult.setCreatetime(new Date());
                         tCruiseDataResult.setEvaluationState(257);
                         tCruiseDataResult.setIsWarn(0);

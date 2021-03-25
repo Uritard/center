@@ -159,11 +159,11 @@ public class CheckTaskAreJob extends QuartzJobBean {
                 tCruiseDataResult.setCruiseName(mapForCruise.get("cruiseName"));
                 tCruiseDataResult.setEvaluationState(257);
                 tCruiseDataResult.setCruiseResult(Integer.valueOf(mapForCruise.get("cruiseResult").toString()));
-                if (mapForCruise.get("cruiseAbnormal").toString().equals("--") || mapForCruise.get("cruiseAbnormal").toString().equals("null")) {
-                    tCruiseDataResult.setCruiseAbnormal(null);
-                } else {
-                    tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(mapForCruise.get("cruiseAbnormal").toString()));
-                }
+//                if (mapForCruise.get("cruiseAbnormal").toString().equals("--") || mapForCruise.get("cruiseAbnormal").toString().equals("null")) {
+//                    tCruiseDataResult.setCruiseAbnormal(null);
+//                } else {
+//                    tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(mapForCruise.get("cruiseAbnormal").toString()));
+//                }
                 tCruiseDataResult.setEvaluationState(257);
                 tCruiseDataResult.setCreatetime(simpleDateFormat.parse(mapForCruise.get("cruiseTime").toString()));
                 tCruiseDataResult.setCruiseResultId(mapForCruise.get("taskResultId").toString() + mapForCruise.get("instanceId").toString());
