@@ -150,8 +150,6 @@ public class TVoiceDeviceService{
         }
         String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
         String absPath  = tSysParamDao.selectByParamType("absVoicePath").getContent();
-//        String realPath = "D:/code/qhTest";
-//        String absPath  = "D:/code/qhTest";
         diGui(areaInfoCountryList, listTree,realPath,absPath);
         return areaInfoCountryList;
     }
@@ -171,7 +169,7 @@ public class TVoiceDeviceService{
                     if("device".equals(areaInfoTem.getInfoType())){
                         //todo 记得加上日期这一层级日期
                         boolean flag = false;
-                        //File file = new File("D:/code/qhTest"+"/"+areaInfoTem.getId());
+
                         File channelFile = new File(absPath+"/"+areaInfoTem.getId());
                         File[] channelFileList = channelFile.listFiles();
                         if(channelFileList != null && channelFileList.length>0){
@@ -287,12 +285,10 @@ public class TVoiceDeviceService{
 //        if(Constant.voiceAnalyseResult.get(voiceDeviceId+":"+voicePath) != null){
 //            //此文件已经分析过了
 //        }
-        //String path = "D:/code/qhTest";
         Long voiceDeviceId = null;
         String absPath = tSysParamDao.selectByParamType("absVoicePath").getContent();
         String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
-//        String realPath = "D:/code/qhTest";
-//        String absPath  = "D:/code/qhTest";
+
         String[] getId = voicePath.replaceAll(realPath,"").split("/");
         if(getId != null && getId.length>2){
             if("".equals(getId[0])){

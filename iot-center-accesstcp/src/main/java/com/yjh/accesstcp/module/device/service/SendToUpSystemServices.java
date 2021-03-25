@@ -69,7 +69,7 @@ public class SendToUpSystemServices {
             Map<String,Object> map = new HashMap<>();
             Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
             String path = mapForPath.get("content")+"/"+stationCode+"/Model";
-            //String path = "D:/code/qhTest/66666";
+
             List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel();
             map.put("device_file_path",CreateModeXMLUtil.createXmlFile(list,path,"device_model.xml","Device_Model"));
             list = sendToUpSystemDao.selectRobotInfo();

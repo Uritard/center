@@ -92,8 +92,7 @@ public class TDeviceTypeImgService{
         List<TDictBusiness> list = tDictBusinessDao.selectQuery(colName);
         String realPath = tSysParamDao.selectByParamType("deviceTypeImgReaPath").getContent();
         String absPath  = tSysParamDao.selectByParamType("deviceTypeImgAbsPath").getContent();
-//        String realPath = "D:/code/qhTest/deviceTypeImage";
-//        String absPath  = "D:/code/qhTest/deviceTypeImage";
+
         for(TDictBusiness tDictBusiness : list){
             TDeviceTypeImg tDeviceTypeImg = new TDeviceTypeImg();
             tDeviceTypeImg.setTypeId(tDictBusiness.getDictCode());

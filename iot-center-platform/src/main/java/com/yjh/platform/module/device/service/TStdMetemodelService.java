@@ -338,11 +338,10 @@ public class TStdMetemodelService {
     @Transactional(rollbackFor = Exception.class)
     public String createModel(){
         Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-        //String path = (String) mapForCreatePath.get("content");
+        String path = (String) mapForCreatePath.get("content");
         Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
         String returnPath = (String) mapForReturnPath.get("content");
 
-        String path = "D:/code/qhTest/testModel";
         String fileName = "meteModel.xls";
         List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
        boolean isOk = createModel(name,fileName,path);
@@ -486,8 +485,7 @@ public class TStdMetemodelService {
 
     private String excelDataImport(MultipartFile file) {
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-        //String path = (String) mapForPicModelPath.get("content");
-        String path = "D:/code/qhTest/66666";
+        String path = (String) mapForPicModelPath.get("content");
         String fileName = "copy-meteModel.xlsx";
         // 将上传文件写入
         try {

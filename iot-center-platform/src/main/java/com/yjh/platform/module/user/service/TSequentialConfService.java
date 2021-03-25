@@ -184,10 +184,8 @@ public class TSequentialConfService{
             //Map<String,String> mapResult = this.sequentialInfo(meteId).get(0);
             TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
             String devicePath = tSysParam.getContent()+"/"+"sequential.txt";
-            //String devicePath = "D:/code/qhTest/sequential.txt";
             try{
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                //File txt=new File("D:/code/qhTest/sequential.txt");
                 File txt=new File(devicePath);
 
                 if(txt.exists()){
@@ -252,10 +250,8 @@ public class TSequentialConfService{
         TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
         TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
         String devicePath = tSysParam.getContent()+"/"+"unionTask.txt";
-        //String devicePath = "D:/code/qhTest/unionTask.txt";
         try{
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            //File txt=new File("D:/code/qhTest/sequential.txt");
             File txt=new File(devicePath);
 
             if(txt.exists()){
