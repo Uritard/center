@@ -394,7 +394,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//国网要求
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","3","100",null);
-            }else if("200".equals(re.getCode())){
+            }else if(200 == re.getCode()){
                 sendToUpSystemServices.sendResponse("251","3","200",null);
             }else {
                 sendToUpSystemServices.sendResponse("251","3","500",null);
@@ -416,7 +416,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             items.add(item);
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","4","100",items);
-            }else if("200".equals(re.getCode())){
+            }else if(200 == re.getCode()){
                 sendToUpSystemServices.sendResponse("251","4","200",items);
             }else {
                 sendToUpSystemServices.sendResponse("251","4","500",items);
@@ -501,7 +501,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     Result re = Constant.otherServer(map,Constant.ROBOT_TASK_URL);//国网要求
                     if(re == null){
                         sendToUpSystemServices.sendResponse("251","3","500",null);
-                    }else if("200".equals(re.getCode())){
+                    }else if(200 == re.getCode()){
                         sendToUpSystemServices.sendResponse("251","3","200",null);
                     }else {
                         sendToUpSystemServices.sendResponse("251","3","100",null);
@@ -548,7 +548,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                         xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(new Date()));
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse("251","4","100",xmlItems);
-                    }else if("200".equals(re.getCode())){
+                    }else if(200 == re.getCode()){
                         xmlItem.put("task_patrolled_id",re.getData());
                         xmlItem.put("error_code","0");
                         xmlItems.add(xmlItem);
@@ -605,7 +605,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             log.info("--响应检修--"+re);
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","3","100",null);
-            }else if("200".equals(re.getCode())){
+            }else if(200 == re.getCode()){
                 sendToUpSystemServices.sendResponse("251","3","200",null);
             }else {
                 sendToUpSystemServices.sendResponse("251","3","500",null);
