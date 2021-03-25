@@ -89,7 +89,7 @@ public class IsWarnAfterCruiseThread implements Runnable{
                         warnInfo.setCunstomId(tStdDevicemete.getCustomId());
                         warnInfo.setInstanceId(instanceId);
                         warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
-                        warnInfo.setConfMode(275);//未核查
+                        warnInfo.setConfMode(276);//未核查
                         /*warnInfo.setConfMode(275);//已核查
                         warnInfo.setDealType(286);//属实
                         warnInfo.setDealInfo("程序正常，告警属实");*/

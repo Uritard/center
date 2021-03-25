@@ -131,7 +131,7 @@ public class RobotService {
         log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
         //根据不同的机器人对应不同的管道发送指令
         RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-        Thread.sleep(500);
+        Thread.sleep(1000);
         String code = Constant.robotResultMap.get("Code");
         if ("200".equals(code)){
             scmap.put("code", 4);
@@ -404,24 +404,14 @@ public class RobotService {
         * */
         String temporaryPath = filePathMap.get("content");//文件在ftp服务器上的绝对路径
         //开发环境图片绝对路径文件目录
-        String developAbsoluteUrl = absoluteImgMap.get("content") + "/CameraLib/"+ todayTime  + "/";
+        String developAbsoluteUrl = absoluteImgMap.get("content") + "/"+ todayTime  + "/";
         //开发环境图片相对路径文件目录
-        String developRelativeUrl = relativeImgMap.get("content")+ "/CameraLib/"+ todayTime  + "/";
+        String developRelativeUrl = relativeImgMap.get("content")+ "/"+ todayTime  + "/";
 
-        if (!"".equals(xmlBaseModel.getItems().get(0).get("robot_image_path"))){
-            developAbsoluteUrl = developAbsoluteUrl + "CCD";
-            developRelativeUrl = developRelativeUrl + "CCD";
-            temporaryPath = temporaryPath + xmlBaseModel.getItems().get(0).get("robot_image_path");
-        }
-        if (!"".equals(xmlBaseModel.getItems().get(0).get("robot_fir_path"))){
-            developAbsoluteUrl = developAbsoluteUrl + "FIR";
-            developRelativeUrl = developRelativeUrl + "FIR";
-            temporaryPath = temporaryPath + xmlBaseModel.getItems().get(0).get("robot_fir_path");
-        }
-        if (!"".equals(xmlBaseModel.getItems().get(0).get("robot_video_path"))){
-            developAbsoluteUrl = developAbsoluteUrl + "Video";
-            developRelativeUrl = developRelativeUrl + "Video";
-            temporaryPath = temporaryPath + xmlBaseModel.getItems().get(0).get("robot_video_path");
+        if (Objects.nonNull(xmlBaseModel.getItems()) && !xmlBaseModel.getItems().isEmpty()){
+            temporaryPath = temporaryPath + xmlBaseModel.getItems().get(0).get("file_path");
+            developAbsoluteUrl = developAbsoluteUrl + "CameraLib";
+            developRelativeUrl = developRelativeUrl + "CameraLib";
         }
 
         log.info("developAbsoluteUrl是: "+developAbsoluteUrl+"------developRelativeUrl是: "+developRelativeUrl);

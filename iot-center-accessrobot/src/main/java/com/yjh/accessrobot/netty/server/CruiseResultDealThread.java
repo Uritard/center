@@ -94,7 +94,7 @@ public class CruiseResultDealThread implements Runnable{
                         }else {
                             tCruiseTaskResultMap.put("resultNum","--");
                             tCruiseTaskResultMap.put("cruiseResult","247");
-                            tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常告警
+                            tCruiseTaskResultMap.put("cruiseAbnormal","249");//数据异常
                         }
                         tCruiseTaskResultMap.put("evaluationState","257");
                         tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
@@ -173,7 +173,7 @@ public class CruiseResultDealThread implements Runnable{
                         }else {
                             tCruiseTaskResultMap.put("resultNum","--");
                             tCruiseTaskResultMap.put("cruiseResult","247");
-                            tCruiseTaskResultMap.put("cruiseAbnormal","250");//异常告警
+                            tCruiseTaskResultMap.put("cruiseAbnormal","249");//异常告警
                         }
                         //新版
                         tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
@@ -367,7 +367,7 @@ public class CruiseResultDealThread implements Runnable{
                         if ("null".equals(redisInfoMap.get("cruiseAbnormal"))){
                             normal = normal + 1;
                             log.info("这次变化的normal是==="+normal);
-                        }else if ("250".equals(redisInfoMap.get("cruiseAbnormal"))){
+                        }else if ("249".equals(redisInfoMap.get("cruiseAbnormal"))){
                             abnormal = abnormal + 1;
                             log.info("这次变化的abnormal是==="+abnormal);
                         }

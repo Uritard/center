@@ -775,8 +775,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("机器人巡视结果数据是："+cruiseResultMap);
 
                     //Start CruiseResultDealThread
-                    /*CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate);
-                    TaskExecutePool.getInstance().execute(cruiseResultDealThread);*/
+                    CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate);
+                    TaskExecutePool.getInstance().execute(cruiseResultDealThread);
                     //判断结果是否产生告警,只判断红外和可见光
                     Map<String, String> cResultMap = new HashMap<>();
                     cResultMap.put("robotCode",xmlBaseModel.getSendCode());
