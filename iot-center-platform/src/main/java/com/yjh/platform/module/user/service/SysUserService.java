@@ -194,8 +194,10 @@ public class SysUserService {
                                 mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
+                            SysUserSelect sysUserSelect=new SysUserSelect();
+                            BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
                             mapResult.put("roleMenuList", sysRoleMenuList);
-                            mapResult.put("sysUserLogin", sysUserLogin);
+                            mapResult.put("sysUserLogin", sysUserSelect);
                             String userId = String.valueOf(sysUserLogin.getUserId());
                             Map<String, Object> mapAccount = new HashMap<>();
                             Map<String, Object> mapAppKey = new HashMap<>();
@@ -231,8 +233,10 @@ public class SysUserService {
                             mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
                         }
                         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
+                        SysUserSelect sysUserSelect=new SysUserSelect();
+                        BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
                         mapResult.put("roleMenuList", sysRoleMenuList);
-                        mapResult.put("sysUserLogin", sysUserLogin);
+                        mapResult.put("sysUserLogin", sysUserSelect);
                         String userId = String.valueOf(sysUserLogin.getUserId());
                         Map<String, Object> mapAccount = new HashMap<>();
                         Map<String, Object> mapAppKey = new HashMap<>();
