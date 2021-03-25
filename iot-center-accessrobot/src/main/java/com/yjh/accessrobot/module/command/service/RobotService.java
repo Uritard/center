@@ -277,9 +277,9 @@ public class RobotService {
             if (!"".equals(deviceMap.get("phase").toString())){
                 tRobotInspection.setPhase(deviceMap.get("phase").toString());
             }
-            if (!"".equals(deviceMap.get("device_info").toString())){
+            /*if (!"".equals(deviceMap.get("device_info").toString())){
                 tRobotInspection.setDeviceInfo(deviceMap.get("device_info").toString());
-            }
+            }*/
             deviceList.add(tRobotInspection);
 
             //机器人区域层级
@@ -414,8 +414,8 @@ public class RobotService {
         String developRelativeUrl = relativeImgMap.get("content")+ "/"+ todayTime  + "/";
 
         if (Objects.nonNull(xmlBaseModel.getItems()) && !xmlBaseModel.getItems().isEmpty()){
-            developAbsoluteUrl = developAbsoluteUrl + "CameraLib"+ "/" + ftpFileName;
-            developRelativeUrl = developRelativeUrl + "CameraLib"+ "/" + ftpFileName;
+            developAbsoluteUrl = developAbsoluteUrl + "CameraLib"+ "/" ;
+            developRelativeUrl = developRelativeUrl + "CameraLib"+ "/" ;
         }
 
         log.info("developAbsoluteUrl是: "+developAbsoluteUrl+"------developRelativeUrl是: "+developRelativeUrl);
