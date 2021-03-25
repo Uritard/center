@@ -403,15 +403,19 @@ public class RobotService {
         将ftp服务器上的文件复制到开发环境
         * */
         String temporaryPath = filePathMap.get("content");//文件在ftp服务器上的绝对路径
+
+        String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+        String sArray[] = ftpFilePath.split("/");
+        String ftpFileName = sArray[sArray.length - 1];//巡视结果文件名称
+        temporaryPath  = temporaryPath + "/" + ftpFilePath;
         //开发环境图片绝对路径文件目录
         String developAbsoluteUrl = absoluteImgMap.get("content") + "/"+ todayTime  + "/";
         //开发环境图片相对路径文件目录
         String developRelativeUrl = relativeImgMap.get("content")+ "/"+ todayTime  + "/";
 
         if (Objects.nonNull(xmlBaseModel.getItems()) && !xmlBaseModel.getItems().isEmpty()){
-            temporaryPath = temporaryPath + xmlBaseModel.getItems().get(0).get("file_path");
-            developAbsoluteUrl = developAbsoluteUrl + "CameraLib";
-            developRelativeUrl = developRelativeUrl + "CameraLib";
+            developAbsoluteUrl = developAbsoluteUrl + "CameraLib"+ "/" + ftpFileName;
+            developRelativeUrl = developRelativeUrl + "CameraLib"+ "/" + ftpFileName;
         }
 
         log.info("developAbsoluteUrl是: "+developAbsoluteUrl+"------developRelativeUrl是: "+developRelativeUrl);
