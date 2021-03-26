@@ -132,7 +132,9 @@ public class RobotService {
         //根据不同的机器人对应不同的管道发送指令
         RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
         Thread.sleep(1000);
-        String code = Constant.robotResultMap.get("Code");
+//        String code = Constant.robotResultMap.get("Code");
+        String code = RobotServerHandler.getRobotResultMap().get("Code");
+
         if ("200".equals(code)){
             scmap.put("code", 4);
             scmap.put("result", "指令下发成功");
@@ -389,12 +391,19 @@ public class RobotService {
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String,String> receivingResponse(XMLBaseModel xmlBaseModel) {
-        Constant.robotResultMap.put("Type",xmlBaseModel.getType());
+        RobotServerHandler.getRobotResultMap().put("Type",xmlBaseModel.getType());
+        RobotServerHandler.getRobotResultMap().put("Code",xmlBaseModel.getCode());
+        log.info("组成的robotResultMap是==="+RobotServerHandler.getRobotResultMap());
+        if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
+            return RobotServerHandler.getRobotResultMap();
+        }
+
+        /*Constant.robotResultMap.put("Type",xmlBaseModel.getType());
         Constant.robotResultMap.put("Code",xmlBaseModel.getCode());
         log.info("组成的robotResultMap是==="+Constant.robotResultMap);
-        if (Objects.isNull(xmlBaseModel.getItems())){
+        if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
             return Constant.robotResultMap;
-        }
+        }*/
         Map<String,String> res = new HashMap<>();
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
@@ -409,13 +418,23 @@ public class RobotService {
         String ftpFileName = sArray[sArray.length - 1];//巡视结果文件名称
         temporaryPath  = temporaryPath + "/" + ftpFilePath;
         //开发环境图片绝对路径文件目录
-        String developAbsoluteUrl = absoluteImgMap.get("content") + "/"+ todayTime  + "/";
+        String developAbsoluteUrl = absoluteImgMap.get("content") + "/"+ todayTime  + "/CameraLib/";
         //开发环境图片相对路径文件目录
-        String developRelativeUrl = relativeImgMap.get("content")+ "/"+ todayTime  + "/";
+        String developRelativeUrl = relativeImgMap.get("content")+ "/" + todayTime  + "/CameraLib/";
 
-        if (Objects.nonNull(xmlBaseModel.getItems()) && !xmlBaseModel.getItems().isEmpty()){
+        /*if (Objects.nonNull(xmlBaseModel.getItems()) && !xmlBaseModel.getItems().isEmpty()){
             developAbsoluteUrl = developAbsoluteUrl + "CameraLib"+ "/" ;
             developRelativeUrl = developRelativeUrl + "CameraLib"+ "/" ;
+        }*/
+        if (ftpFileName.endsWith(".jpg")){//可见光抓图
+            developAbsoluteUrl = developAbsoluteUrl + "BigImg/";
+            developRelativeUrl = developRelativeUrl + "BigImg/";
+        }else if (ftpFileName.endsWith(".bmp")){//红外抓图
+            developAbsoluteUrl = developAbsoluteUrl + "Infrared/";
+            developRelativeUrl = developRelativeUrl + "Infrared/";
+        }else if (ftpFileName.endsWith(".mp4")){//录像
+            developAbsoluteUrl = developAbsoluteUrl + "Video/";
+            developRelativeUrl = developRelativeUrl + "Video/";
         }
 
         log.info("developAbsoluteUrl是: "+developAbsoluteUrl+"------developRelativeUrl是: "+developRelativeUrl);
@@ -471,7 +490,9 @@ public class RobotService {
 
         }
 
-        String code = Constant.robotResultMap.get("Code");
+//        String code = Constant.robotResultMap.get("Code");
+        String code = RobotServerHandler.getRobotResultMap().get("Code");
+
         if ("200".equals(code)){
             return "true";
         }
@@ -1462,7 +1483,9 @@ public class RobotService {
         log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
         RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
         Thread.sleep(1000);
-        String code = Constant.robotResultMap.get("Code");
+//        String code = Constant.robotResultMap.get("Code");
+        String code = RobotServerHandler.getRobotResultMap().get("Code");
+
         scmap.put("code", code);
         log.info("下发控制指令返回结果: "+scmap);
         return scmap;

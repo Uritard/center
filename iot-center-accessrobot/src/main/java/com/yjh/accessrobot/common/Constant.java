@@ -60,7 +60,7 @@ public class Constant {
 
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
-    public static Map<String,String> robotResultMap =  new HashMap<>();
+//    public static Map<String,String> robotResultMap =  new HashMap<>();
 
     //算法接口
     public static final String algorithmUrl = "http://iot-center-accessvideo/analysis/v1/algorithm";
