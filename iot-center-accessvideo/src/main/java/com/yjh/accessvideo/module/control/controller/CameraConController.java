@@ -617,7 +617,7 @@ public class CameraConController {
      * @param
      * @return
      */
-    @RequestMapping(value = "/PointTemperature", method = RequestMethod.GET)
+    @RequestMapping(value = "/PointTemperature", method = RequestMethod.POST)
     public Result  PointTemperature (@RequestParam(value = "points",required = false) String  points,
                                      @RequestParam(value = "cameraId",required = false) Long cameraId,
                                      @RequestParam(value = "picPath",required = false) String  picPath
