@@ -455,4 +455,9 @@
         </foreach>
     </update>
 
+    <select id="selectUserByUpdateTime" resultType="com.yjh.platform.module.user.entity.SysUserSelect">
+       SELECT * from sys_user t where t.state!=0 AND (UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(T.update_time))/86400 >=t.invalid_time
+   </select>
+
+
 </mapper>

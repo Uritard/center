@@ -500,5 +500,42 @@ public class SysUserController {
         return val;
     }
 
+    @ApiOperation(value = "账号锁定用户信息")
+    @RequestMapping(value = "/lockUserInfo", method = RequestMethod.GET)
+    @Logs(title = "账号锁定用户信息", content = "账号锁定用户信息", logType = 3)
+    public Result lockUserInfo() {
+        Result result = new Result();
+        try {
+            Set userInfo=redisTemplate.keys("lockUser"+"*");
+            List<Map> list=new ArrayList();
+            if(userInfo.size()>0){
+                for(Object value:userInfo){
+                    Map user=  (Map) redisTemplate.opsForValue().get(String.valueOf(value));
+                    list.add(user);
+                }
+                redisTemplate.delete(userInfo);
+            }
+          result.setData(list);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询账号锁定用户信息失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "账号密码到期用户信息")
+    @RequestMapping(value = "/passUserInfo", method = RequestMethod.GET)
+    @Logs(title = "账号密码到期用户信息", content = "账号密码到期用户信息", logType = 3)
+    public Result passUserInfo() {
+        Result result = new Result();
+        try {
+            List<SysUser> sysUsers=sysUserService.selectUserByUpdateTime();
+            result.setData(sysUsers);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询账号密码到期用户信息失败:", e);
+        }
+        return result;
+    }
 
 }

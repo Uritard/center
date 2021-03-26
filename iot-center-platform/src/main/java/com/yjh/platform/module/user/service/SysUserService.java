@@ -83,9 +83,13 @@ public class SysUserService {
 
     @Transactional(rollbackFor = Exception.class)
     public int update(SysUser sysUser) throws IOException {
+        SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(sysUser.getUserId());
         Long roleId = sysUser.getRoleId();
         if (roleId != null) {
             redisTemplate.opsForHash().put("userInfo:" + sysUser.getUserId(), "roleId", String.valueOf(sysUser.getRoleId()));
+        }else if(sysUserCurrent.getInvalidTime()!=sysUser.getInvalidTime()){
+            Date date = new Date();
+            sysUser.setUpdateTime(date);
         }
         return this.sysUserDao.update(sysUser);
     }
@@ -190,11 +194,29 @@ public class SysUserService {
                             mapResult.put("info", ResultCodeEnum.CODE10102.getName());
                             return mapResult;
                         } else {
-                            if (yxTime >= sysUserLogin.getInvalidTime()) {
+                            if (yxTime >= sysUserLogin.getInvalidTime()-1&&yxTime<sysUserLogin.getInvalidTime()) {
                                 mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
+                            }else if(yxTime>=sysUserLogin.getInvalidTime()){
+                                MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                                params.set("logType", "5");
+                                params.set("ip", request.getRemoteHost());
+                                params.set("title", "登录");
+                                params.set("state", 1);
+                                params.set("userId", "");
+                                params.set("userName", userName);
+                                params.set("requestOrigin", request.getRequestURL());
+                                params.set("requestPath", request.getRequestURI());
+                                params.set("requestMethod", request.getMethod());
+                                params.set("content", "密码超期登录失败，请联系管理员处理！");
+                                LogsAspect logsAspects = new LogsAspect();
+                                logsAspects.post(param);
+                                mapResult.put("errorCount", "密码超期登录失败，请联系管理员处理！");
+                                mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
+                                mapResult.put("info", ResultCodeEnum.CODE10108.getName());
+                                return mapResult;
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
-                            SysUserSelect sysUserSelect=new SysUserSelect();
+                            SysUserSelect sysUserSelect = new SysUserSelect();
                             BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
                             mapResult.put("roleMenuList", sysRoleMenuList);
                             mapResult.put("sysUserLogin", sysUserSelect);
@@ -229,11 +251,29 @@ public class SysUserService {
                         return mapResult;
                     }
                     if (sysUserLogin.getState() == 1) {
-                        if (yxTime >= sysUserLogin.getInvalidTime()) {
+                        if (yxTime >= sysUserLogin.getInvalidTime()-1&&yxTime<sysUserLogin.getInvalidTime()) {
                             mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
+                        }else if(yxTime>=sysUserLogin.getInvalidTime()){
+                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                            params.set("logType", "5");
+                            params.set("ip", request.getRemoteHost());
+                            params.set("title", "登录");
+                            params.set("state", 1);
+                            params.set("userId", "");
+                            params.set("userName", userName);
+                            params.set("requestOrigin", request.getRequestURL());
+                            params.set("requestPath", request.getRequestURI());
+                            params.set("requestMethod", request.getMethod());
+                            params.set("content", "密码超期登录失败，请联系管理员处理！");
+                            LogsAspect logsAspects = new LogsAspect();
+                            logsAspects.post(param);
+                            mapResult.put("errorCount", "密码超期登录失败，请联系管理员处理！");
+                            mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
+                            mapResult.put("info", ResultCodeEnum.CODE10108.getName());
+                            return mapResult;
                         }
                         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
-                        SysUserSelect sysUserSelect=new SysUserSelect();
+                        SysUserSelect sysUserSelect = new SysUserSelect();
                         BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
                         mapResult.put("roleMenuList", sysRoleMenuList);
                         mapResult.put("sysUserLogin", sysUserSelect);
@@ -296,15 +336,31 @@ public class SysUserService {
                 if (num == null) { //第一次访问错误
                     redisTemplate.opsForValue().set(key, 1);
                     num = 1;
-                } else if (num + 1 >= Integer.valueOf(loginNum.get("content"))) {//超过10次账户锁定
-                    if (!userId.equals("10001")) { //admin用户不可锁定
-                        SysUser user = new SysUser();
-                        user.setState(2);
-                        Date date = new Date();
-                        user.setLockTime(date);
-                        user.setUserId(sysUserList.get(0).getUserId());
-                        sysUserDao.update(user);
-                    }
+                } else if (num + 1 == Integer.valueOf(loginNum.get("content"))) {//超过10次账户锁定
+                    SysUserSelect sysUserSelect = new SysUserSelect();
+                    BeanUtils.copyProperties(sysUserList.get(0), sysUserSelect);
+                    redisTemplate.opsForValue().set("lockUser" + sysUserList.get(0).getUserId(), sysUserSelect);
+                    //    if (!userId.equals("10001")) { //admin用户不可锁定
+                    SysUser user = new SysUser();
+                    user.setState(2);
+                    Date date = new Date();
+                    user.setLockTime(date);
+                    user.setUserId(sysUserList.get(0).getUserId());
+                    sysUserDao.update(user);
+                    // }
+                    redisTemplate.opsForValue().increment(key, 1);
+                    num = num + 1;
+                    mapResult.put("errorCount", "账户已被锁定！");
+                    mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
+                    mapResult.put("info", ResultCodeEnum.CODE10102.getName());
+                    return mapResult;
+                } else if (num + 1 > Integer.valueOf(loginNum.get("content"))) {
+                    SysUser user = new SysUser();
+                    user.setState(2);
+                    Date date = new Date();
+                    user.setLockTime(date);
+                    user.setUserId(sysUserList.get(0).getUserId());
+                    sysUserDao.update(user);
                     redisTemplate.opsForValue().increment(key, 1);
                     num = num + 1;
                     mapResult.put("errorCount", "账户已被锁定！");
@@ -504,5 +560,10 @@ public class SysUserService {
         return val;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public List<SysUser> selectUserByUpdateTime() {
+        List<SysUser> list = this.sysUserDao.selectUserByUpdateTime();
+        return list;
+    }
 }
 
