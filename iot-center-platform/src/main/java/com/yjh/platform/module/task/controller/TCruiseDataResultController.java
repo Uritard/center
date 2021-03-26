@@ -421,7 +421,7 @@ public class TCruiseDataResultController {
     }
 
     @ApiOperation(value = "分页查询")
-    @PostMapping(value = "/selectByPicFirPage")
+    @RequestMapping(value = "/selectByPicFirPage",method = RequestMethod.GET)
     @Logs(title = "巡检点结果数据",content = "根据用户传递的参数分页查询巡检点结果数据",logType = 1)
     public Result selectByPicFirPage(@RequestParam(value = "endDate", required = false) String endDate,
                                      @RequestParam(value = "fileName", required = false) String fileName,
@@ -438,7 +438,7 @@ public class TCruiseDataResultController {
             resultMap.put("list", list);
             result.setData(resultMap);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("分页查询失败描述：", e);
         }
         return result;
