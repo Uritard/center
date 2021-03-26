@@ -255,15 +255,16 @@ public class TCruiseDataResultService {
         tCruiseDataResult.setPageNum(pageNum);
         tCruiseDataResult.setPageSize(pageSize);
         tCruiseDataResult.setFirName(fileName);
-        if (!startDate.isEmpty()){ tCruiseDataResult.setStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate));}
-       if (!endDate.isEmpty()){tCruiseDataResult.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate));}
+        if (!startDate.isEmpty()&&startDate!=""){ tCruiseDataResult.setStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate));}
+       if (!endDate.isEmpty()&&endDate!=""){tCruiseDataResult.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate));}
         List<FirAndPicInfo> listFir=new ArrayList<>();
         List<TCruiseDataResult>  list= tCruiseDataResultDao.selectByPage(tCruiseDataResult);
         for (TCruiseDataResult t:list){
             File file=new File(t.getResultPic());
             FirAndPicInfo f=new FirAndPicInfo();
             f.setCruiseDataId(t.getCruiseDataId());
-            f.setPicPath(file.getParent()+"/"+t.getFirName()+".jpg");
+            String [] arr= file.getParent().split("/");
+            f.setPicPath(arr[0]+"//"+arr[1]+"/"+arr[2]+"/resultImg"+"/"+t.getFirName()+".jpg");
             f.setFirPath(t.getResultPic());
             f.setFirName(t.getFirName());
             f.setDateTime(t.getFirDate().toString());
