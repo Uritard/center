@@ -66,4 +66,6 @@ public interface SysUserDao {
     SysUserLogin selectByUserNameAndL(@Param(value = "userName") String userName);
 
     int batchUpdate(@Param(value = "list") List<Long> list);
+
+    List<SysUser> selectUserByUpdateTime();
 }
