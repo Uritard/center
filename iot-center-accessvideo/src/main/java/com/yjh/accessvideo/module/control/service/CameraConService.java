@@ -1655,7 +1655,195 @@ public class CameraConService {
         }
         return re;
     }
+    /**
+     * 获取cvs上某行某列的值
+     * @param
+     * @param
+     * @param path
+     * @return
+     */
+    public  String lineTemperature(String path,String points)
+    {
+        int row, col;
+        String arrs[]=points.split(",");
 
+        int x1=0;
+        int y1=0;
+        if (arrs.length>2)
+        {
+            row=Integer.parseInt(arrs[0]);
+            col=Integer.parseInt(arrs[1]);
+            x1=Integer.parseInt(arrs[2]);
+            y1=Integer.parseInt(arrs[3]);
+        }else {
+            row=Integer.parseInt(arrs[0]);
+            col=Integer.parseInt(arrs[1]);
+        }
+        File file= new File(path);
+        String fileName = file.getName();
+        fileName=fileName.substring(0,fileName.lastIndexOf("."));
+        path= hotFirShow+fileName+".csv";
+        String temperature="";
+        try {
+            BufferedReader reade = new BufferedReader(new FileReader(path));//文件全路径
+            String line = null;
+            int index=0;
+            while((line=reade.readLine())!=null){
+                //CSV格式文件为逗号分隔符文件，这里根据逗号切分
+                String item[] = line.split("TJN");
+                if(index==row-1){
+                    if(item.length>=col-1){
+                        temperature= item[col-1];
+                    }
+                }
+                index++;
+                //if (arrs.length>2){if (index==x1&&item.length==y1){break;} }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return temperature;
+    }
+
+
+
+    /**
+     * 获取行列区域画面最高温度
+     * @param cameraId 摄像头id
+     * @return
+     */
+    public String getlineTemperature(long cameraId,String points)
+    {
+        String arrs[]=points.split(",");
+        int x;
+        int y;
+        int x1=0;
+        int y1=0;
+        if (arrs.length>2)
+        {
+            x=Integer.parseInt(arrs[0]);
+            y=Integer.parseInt(arrs[1]);
+            x1=Integer.parseInt(arrs[2]);
+            y1=Integer.parseInt(arrs[3]);
+        }else {
+            x=Integer.parseInt(arrs[0]);
+            y=Integer.parseInt(arrs[1]);
+        }
+
+        String list="";
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum()+32);
+            log.info("通道号："+cameraConInfo.getChannelNum());
+            log.info("getRecordId:"+cameraConInfo.getRecordId());
+            String userName = cameraConInfo.getCameraManager();
+            log.info("userName"+userName);
+            String password = cameraConInfo.getCameraCode();
+            log.info("password"+password);
+            String cameraIp = cameraConInfo.getCameraIp();
+            log.info("cameraIp"+cameraIp);
+            String port =cameraConInfo.getInfreadPort().toString();
+            log.info("port:>>>"+port);
+            if (! hCNetSDK.NET_DVR_Init())
+            {
+                log.info("初始化失败");
+            }
+            log.info("开始登录。。。。。");
+            m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+            System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
+            m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+            System.arraycopy(userName.getBytes(), 0, m_strLoginInfo.sUserName, 0, userName.length());
+            m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+            System.arraycopy(password.getBytes(), 0, m_strLoginInfo.sPassword, 0, password.length());
+            m_strLoginInfo.wPort = Short.parseShort(port);
+            m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
+            m_strLoginInfo.write();
+            log.info("登录账号:"+userName+"ip地址"+cameraIp+"登录密码"+password+"端口号"+port);
+            lUserID=hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+            log.info("NET_DVR_Login_V40:返回值"+lUserID);
+            //log.info("lUserIDLong:返回值"+lUserIDLong);
+            lUserIDLong =new NativeLong(lUserID);// new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            log.info("lUserIDLong"+lUserIDLong);
+            HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA   m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
+            m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
+            m_strJpegWithAppenData.dwChannel =1;
+            HCNetSDK.BYTE_ARRAY ptrJpegByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 *1024);
+            HCNetSDK.BYTE_ARRAY ptrP2PDataByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 *1024);
+            m_strJpegWithAppenData.pJpegPicBuff =ptrJpegByte.getPointer();
+            m_strJpegWithAppenData.pP2PDataBuff = ptrP2PDataByte.getPointer();
+            log.info("m_strJpegWithAppenData的值:"+m_strJpegWithAppenData.toString());
+            boolean bRet =hCNetSDK.NET_DVR_CaptureJPEGPicture_WithAppendData(lUserIDLong,2, m_strJpegWithAppenData);
+            log.info("bRet返回值："+bRet);
+            if (bRet)
+            {
+                if (m_strJpegWithAppenData.dwP2PDataLen>0)
+                {
+                  //  list.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                    byte [] byTempData = new byte[4];
+                    float[] arr =new float[m_strJpegWithAppenData.dwP2PDataLen];
+                    for (int i = 1 ;i<= m_strJpegWithAppenData.dwJpegPicWidth;i++)
+                    {
+                        if (i==y)
+                        {
+                            for (int j = 1 ;j<= m_strJpegWithAppenData.dwJpegPicHeight;j++)
+                            {
+                               if (x==j)
+                               {
+                                  /*if (arrs.length>2)
+                                  {
+                                      if (x1==              &&y1==i){break;}
+                                  }*/
+
+                                   ByteBuffer TempDatabuffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i-1)*(j-1)*4, 4);
+                                   TempDatabuffers.get(byTempData);
+                                   int l;
+                                   l = byTempData[0];
+                                   l &= 0xff;
+                                   l |= ((long) byTempData[1] << 8);
+                                   l &= 0xffff;
+                                   l |= ((long) byTempData[ 2] << 16);
+                                   l &= 0xffffff;
+                                   l |= ((long) byTempData[3] << 24);
+                                  // arr[i]=Float.intBitsToFloat(l);
+                                   list=String.valueOf(l);
+                               }
+
+                                //log.info("行数：" + i +"列数：" + j + "温度数据：" +   Float.intBitsToFloat(l) );
+                            }
+                        }
+                    }
+                    //获取最大温度值
+                    float max=arr[0];
+                    /*for (int i=0;i<arr.length;i++){
+                        //4.把获取到的数据一次和temp进行比较，并将最大的值赋值给temp
+                        if(arr[i]>max){
+                            max=arr[i];
+                        }
+                    }*/
+                    //转换保留后两位小数
+                   // list=new  DecimalFormat("##0.00").format(max)+"℃";
+
+                }else
+                {
+                    list=null;
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.info("温度不存在"+iErr);
+                }
+
+            }else{
+                int iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.info("温度获取失败错误码"+iErr);
+            }
+
+        }catch (Exception e){
+            int iErr = hCNetSDK.NET_DVR_GetLastError();
+            log.info("系统异常"+iErr);
+        }finally {
+            hCNetSDK.NET_DVR_Logout(lUserIDLong);
+            hCNetSDK.NET_DVR_Cleanup();
+        }
+        return list;
+    }
 
 }
 

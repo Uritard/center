@@ -1,5 +1,7 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
 import com.yjh.platform.module.task.entity.*;
@@ -8,7 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -240,6 +244,29 @@ public class TCruiseDataResultService {
     public List<String> QueryDifferentiateResult(String taskId){
       return tCruiseDataResultDao.selectResultImg(taskId);
     }
+
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<FirAndPicInfo> selectByPicFirPage(String startDate,String fileName,String endDate,int pageNum,int pageSize) {
+        TCruiseDataResult tCruiseDataResult =new TCruiseDataResult();
+        tCruiseDataResult.setPageNum(pageNum);
+        tCruiseDataResult.setPageSize(pageSize);
+        List<FirAndPicInfo> listFir=new ArrayList<>();
+        List<TCruiseDataResult>  list= tCruiseDataResultDao.selectByPage(tCruiseDataResult);
+        for (TCruiseDataResult t:list){
+            File file=new File(t.getResultPic());
+            FirAndPicInfo f=new FirAndPicInfo();
+            f.setCruiseDataId(t.getCruiseDataId());
+            f.setPicPath(file.getParent()+"/"+t.getFirName()+".jpg");
+            f.setFirPath(t.getResultPic());
+            f.setFirName(t.getFirName());
+            f.setDateTime(t.getFirDate().toString());
+            listFir.add(f);
+        }
+        return listFir;
+    }
+
 
 }
 

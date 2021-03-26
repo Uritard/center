@@ -419,4 +419,44 @@ public class TCruiseDataResultController {
         }
         return  result;
     }
+
+    @ApiOperation(value = "分页查询")
+    @PostMapping(value = "/selectByPicFirPage")
+    @Logs(title = "巡检点结果数据",content = "根据用户传递的参数分页查询巡检点结果数据",logType = 1)
+    public Result selectByPicFirPage(@RequestParam(value = "endDate", required = false) String endDate,
+                                     @RequestParam(value = "fileName", required = false) String fileName,
+                                     @RequestParam(value = "startDate", required = false) String startDate,
+                                     @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                     @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize
+    ) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize,true, null, true);
+            List<FirAndPicInfo> list = tCruiseDataResultService.selectByPicFirPage(endDate,fileName,startDate,pageNum,pageSize);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("分页查询失败描述：", e);
+        }
+        return result;
+    }
+
+    /*@ApiOperation(value = "主键查询")
+    @GetMapping(value = "/selectByPicFirPrimaryId")
+    @Logs(title = "巡检点结果数据",content = "根据用户传递的参数查询巡检点结果数据",logType = 1)
+    public Result selectByPicFirPrimaryId(@RequestParam(value = "cruiseDataId", required = true) Long cruiseDataId) {
+        Result result = new Result();
+        try {
+            FirAndPicInfo f = tCruiseDataResultService.selectByPicFirPrimaryId(cruiseDataId);
+            result.setData(f);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("主键查询失败描述：", e);
+        }
+        return result;
+    }*/
+
 }

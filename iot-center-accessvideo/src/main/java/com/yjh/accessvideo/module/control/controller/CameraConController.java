@@ -612,6 +612,34 @@ public class CameraConController {
         return result;
     }
 
+<<<<<<< Updated upstream
+=======
+    /**
+     *
+     * @param
+     * @return
+     */
+    @RequestMapping(value = "/PointTemperature", method = RequestMethod.GET)
+    public Result  PointTemperature (@RequestParam(value = "points",required = false) String  points,
+                                     @RequestParam(value = "cameraId",required = false) Long cameraId,
+                                     @RequestParam(value = "picPath",required = false) String  picPath
+                                     )
+    {
+        Result result = new Result();
+       if (picPath!=null&&picPath!="")
+       {
+           result.setData(cameraConService.lineTemperature(picPath,points));
+       }
+       else{
+           result.setData(cameraConService.getlineTemperature(cameraId,points));
+       }
+        return result;
+    }
+
+
+
+
+>>>>>>> Stashed changes
     /*@ApiOperation(value = "门口机布防")
     @RequestMapping(value = "/doorMa", method = RequestMethod.GET)
     public Result doorMa(@RequestParam(value = "presetId",required = false) Long presetId,
@@ -627,4 +655,9 @@ public class CameraConController {
         }
         return result;
     }*/
+
+
+
+
+
 }
