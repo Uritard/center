@@ -243,16 +243,29 @@ public class TCruiseTaskService {
             } else {
                 //判断当前周期任务是否已执行 --by tt 2021.3.10
                 if (Objects.isNull(tCruiseTask.getDateType())) { taskId = tCruiseTask.getTaskCode(); }
-                log.info("del taskId..."+taskId);
+                log.info("del taskId..."+taskId+", startTime; "+startTime);
+                log.info("taskMap..."+Constant.taskMap);
                 //删除整个周期任务
-                for (Iterator<ConcurrentHashMap<String, Object>> it = Constant.taskMap.iterator(); it.hasNext(); ) {
+                Iterator<ConcurrentHashMap<String, Object>> it = Constant.taskMap.iterator();
+                while(it.hasNext()){
                     ConcurrentHashMap<String, Object> mapItem = it.next();
                     //找到任务Id
                     if (mapItem.get("taskId").equals(taskId)) {
                         JobManager.removeJob(mapItem.get("jobName").toString(), mapItem.get("jobGroupName").toString(), mapItem.get("triggerName").toString(), mapItem.get("triggerGroupName").toString());
-                        Constant.taskMap.remove(mapItem);
+                        it.remove();
                     }
                 }
+                log.info("taskMap del..."+Constant.taskMap);
+
+
+//                for (Iterator<ConcurrentHashMap<String, Object>> it = Constant.taskMap.iterator(); it.hasNext(); ) {
+//                    ConcurrentHashMap<String, Object> mapItem = it.next();
+//                    //找到任务Id
+//                    if (mapItem.get("taskId").equals(taskId)) {
+//                        JobManager.removeJob(mapItem.get("jobName").toString(), mapItem.get("jobGroupName").toString(), mapItem.get("triggerName").toString(), mapItem.get("triggerGroupName").toString());
+//                        Constant.taskMap.remove(mapItem);
+//                    }
+//                }
                 log.info("del task totally...");
                 tCruiseTaskAttrDao.deleteByPrimaryId(taskId);
                 tCruiseTaskDelDao.deleteByPrimaryId(taskId);
