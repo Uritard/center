@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -248,10 +250,13 @@ public class TCruiseDataResultService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<FirAndPicInfo> selectByPicFirPage(String startDate,String fileName,String endDate,int pageNum,int pageSize) {
+    public List<FirAndPicInfo> selectByPicFirPage(String startDate,String fileName,String endDate,int pageNum,int pageSize) throws ParseException {
         TCruiseDataResult tCruiseDataResult =new TCruiseDataResult();
         tCruiseDataResult.setPageNum(pageNum);
         tCruiseDataResult.setPageSize(pageSize);
+        tCruiseDataResult.setFirName(fileName);
+        tCruiseDataResult.setStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate));
+        tCruiseDataResult.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate));
         List<FirAndPicInfo> listFir=new ArrayList<>();
         List<TCruiseDataResult>  list= tCruiseDataResultDao.selectByPage(tCruiseDataResult);
         for (TCruiseDataResult t:list){

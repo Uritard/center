@@ -1697,7 +1697,7 @@ public class CameraConService {
                     }
                 }
                 index++;
-                //if (arrs.length>2){if (index==x1&&item.length==y1){break;} }
+                //if (arrs.length>2){if (index==x1-1&&item.length==y1-1){break;} }
             }
         } catch (Exception e) {
             e.printStackTrace();
