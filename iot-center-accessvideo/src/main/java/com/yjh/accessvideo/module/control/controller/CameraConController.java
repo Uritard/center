@@ -612,8 +612,6 @@ public class CameraConController {
         return result;
     }
 
-<<<<<<< Updated upstream
-=======
     /**
      *
      * @param
@@ -638,8 +636,6 @@ public class CameraConController {
 
 
 
-
->>>>>>> Stashed changes
     /*@ApiOperation(value = "门口机布防")
     @RequestMapping(value = "/doorMa", method = RequestMethod.GET)
     public Result doorMa(@RequestParam(value = "presetId",required = false) Long presetId,
