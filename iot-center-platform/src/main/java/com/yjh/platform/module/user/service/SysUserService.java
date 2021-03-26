@@ -195,7 +195,7 @@ public class SysUserService {
                             return mapResult;
                         } else {
                             if (yxTime >= sysUserLogin.getInvalidTime()-1&&yxTime<sysUserLogin.getInvalidTime()) {
-                                mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
+                                mapResult.put("pwdExpirationTip", "密码还有一天即将到期，请及时更换密码！");
                             }else if(yxTime>=sysUserLogin.getInvalidTime()){
                                 MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                                 params.set("logType", "5");
@@ -252,7 +252,7 @@ public class SysUserService {
                     }
                     if (sysUserLogin.getState() == 1) {
                         if (yxTime >= sysUserLogin.getInvalidTime()-1&&yxTime<sysUserLogin.getInvalidTime()) {
-                            mapResult.put("pwdExpirationTip", "当前密码长时间未更换，需更换");
+                            mapResult.put("pwdExpirationTip", "密码还有一天即将到期，请及时更换密码！");
                         }else if(yxTime>=sysUserLogin.getInvalidTime()){
                             MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                             params.set("logType", "5");
