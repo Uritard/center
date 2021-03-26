@@ -255,8 +255,8 @@ public class TCruiseDataResultService {
         tCruiseDataResult.setPageNum(pageNum);
         tCruiseDataResult.setPageSize(pageSize);
         tCruiseDataResult.setFirName(fileName);
-        tCruiseDataResult.setStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate));
-        tCruiseDataResult.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate));
+        if (!startDate.isEmpty()){ tCruiseDataResult.setStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(startDate));}
+       if (!endDate.isEmpty()){tCruiseDataResult.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endDate));}
         List<FirAndPicInfo> listFir=new ArrayList<>();
         List<TCruiseDataResult>  list= tCruiseDataResultDao.selectByPage(tCruiseDataResult);
         for (TCruiseDataResult t:list){
