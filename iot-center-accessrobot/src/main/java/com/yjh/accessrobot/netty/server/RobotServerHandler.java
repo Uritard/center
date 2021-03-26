@@ -615,7 +615,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         weatherMap.put("valueUnit", res.get("value_unit").toString());
                         weatherMap.put("unit", res.get("unit").toString());
                         weatherList.add(weatherMap);
-                        //1=温度 2=湿度 3=风速 4=大气压  5=降雨量
+                        //1=温度 2=湿度 3=风速 4=大气压  5=降雨量 6=风向
                         if("1".equals(weatherMap.get("type"))){
                             info.put("temperature",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
                             info.put("temperatureUnit","℃");
@@ -636,6 +636,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             info.put("precipitation",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
                             info.put("precipitationUnit","mm");
                         }
+                        if("6".equals(weatherMap.get("type"))){
+                            info.put("windDirection",weatherMap.get("value").toString());
+                            //info.put("precipitationUnit","mm");
+                        }
                     });
                     //放缓存
                     for (int i = 0; i < weatherList.size(); i++) {
@@ -647,7 +651,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     send(ctx, weatherProtocol,xmlBaseModel.getSendCode());
                     log.info("巡视主机给机器人响应了");
 
-                    robotService.upToCruise(xmlBaseModel);//国网要求
+                    //robotService.upToCruise(xmlBaseModel);//国网要求
                     break;
                 //任务状态数据(接收并发送响应)
                 case "41":

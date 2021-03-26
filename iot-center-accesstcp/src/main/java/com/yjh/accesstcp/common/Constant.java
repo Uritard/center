@@ -96,4 +96,5 @@ public class Constant {
 
     //任务下发
     public static final String TASK_ISSUE_URL = "http://iot-center-platform/tCruiseTask/v1/upSystemIssuedTask";
+    public static  XMLBaseModel weatherXmlModel = null;
 }

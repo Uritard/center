@@ -208,6 +208,9 @@ public class TRobotInspectionService{
         Map<String,Object> mapForRobotState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
         if(mapForRobotState.size() != 0){
             re.put("robotState",mapForRobotState.get("value"));//机器人状态
+            if(! "2".equals(mapForRobotState.get("value"))){
+                re.put("cruiseMapPath","");//巡视路径地图路径
+            }
         }else {
             re.put("robotState","");//机器人状态
         }

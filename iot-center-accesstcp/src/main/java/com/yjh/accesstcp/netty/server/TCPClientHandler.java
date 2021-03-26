@@ -346,11 +346,11 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     //心跳线程发心跳
                     HeartBeatThead heartBeatThead = new HeartBeatThead(this, true);
 //                    //天气线程发天气
-//                    WeatherThread weatherThread = new WeatherThread(this,redisTemplate,true,sendToUpSystemServices);
+                    WeatherThread weatherThread = new WeatherThread(this,redisTemplate,true,sendToUpSystemServices);
 //                    //运行数据
 //
                     TaskExecutePool.getInstance().execute(heartBeatThead);
-//                    TaskExecutePool.getInstance().execute(weatherThread);//江苏要求
+                    TaskExecutePool.getInstance().execute(weatherThread);//江苏要求
 
                     Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();
                     List<XMLBaseModel> list = new ArrayList<>();
