@@ -30,6 +30,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
@@ -233,8 +234,10 @@ public class DataDealThread implements Runnable {
                                         //  JsonObject中存在 firDocPath 则放入缓存中
                                         if(Objects.nonNull(jsonObjectResult.get("firDocPath"))){
                                             if(!(jsonObjectResult.get("firDocPath").toString().equals(""))){
-                                                String firDocPath=jsonObjectResult.get("firDocPath").toString();
+                                                String firDocPath=jsonObjectResult.get("firDocPath").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content").toString());
                                                 cruiseResultMap.put("firDocPath",firDocPath);
+                                                File file=new File(firDocPath);
+                                                cruiseResultMap.put("firName",file.getName());//放入文件名
                                                 log.info("FIR-Doc-----:"+jsonObjectResult.get("firDocPath").toString());
                                             }
                                         }
@@ -954,6 +957,11 @@ public class DataDealThread implements Runnable {
                             tCruiseDataResult.setResultPic(cruiseWorkedMap.get("firDocPath").toString());
                         }else {
                             tCruiseDataResult.setResultPic("");
+                        }
+                        if(Objects.nonNull(cruiseWorkedMap.get("firName"))){
+                            tCruiseDataResult.setFirName(cruiseWorkedMap.get("firName").toString());
+                            tCruiseDataResult.setFirDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(tCruiseDataResult.getFirName().substring(0,tCruiseDataResult.getFirName().lastIndexOf("."))));
+                            // TODO: 2021/3/25 FIR文件名与时间赋值
                         }
                         log.info("TCDR内容：" + tCruiseDataResult);
                         dataList.add(tCruiseDataResult);

@@ -22,11 +22,14 @@
         <result column="identify_result" jdbcType="INTEGER" property="identifyResult" />
         <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
         <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="fir_name" jdbcType="VARCHAR" property="firName"/>
+        <result column="fir_date" jdbcType="TIMESTAMP" property="firDate"/>
+        <result column="result_pic" jdbcType="VARCHAR" property="resultPic"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        cruise_data_id, cruise_result_id, cruise_id,cruise_name, cruise_type, result_desc, result_num, modify_num, picpath, person_check, origpic, cruise_abnormal,cruise_result, evaluation_state, identify_state, identify_result, createtime, remark
+        cruise_data_id, cruise_result_id, cruise_id,cruise_name, cruise_type, result_desc, result_num, modify_num, picpath, person_check, origpic, cruise_abnormal,cruise_result, evaluation_state, identify_state, identify_result, createtime, remark,fir_name,fir_date,result_pic
     </sql>
 
 
@@ -140,7 +143,10 @@
         a.remark,
         a.check_user,
         a.check_date,
-        a.is_warn
+        a.is_warn,
+        a.fir_name,
+        a.fir_date,
+        a.result_pic
         from t_cruise_data_result a
         where 1 = 1
             and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
@@ -227,7 +233,10 @@
         a.check_user,
         a.check_date,
         a.is_warn,
-        a.cruise_result
+        a.cruise_result,
+        a.fir_name,
+        a.fir_date,
+        a.result_pic
         from t_cruise_data_result a
         where 1 = 1
         <if test="cruiseDataId != null and cruiseDataId != ''">and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
@@ -253,7 +262,13 @@
         <if test="checkUser != null and checkUser != ''">and a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
         <if test="checkDate != null and checkDate != ''">and a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
         <if test="isWarn != null ">and a.is_warn = #{isWarn, jdbcType=INTEGER},</if>
-        <if test="cruiseResult != null ">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null ">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER}</if>
+        <if test="firName !=null and firName !=''">and a.fir_name like concat('%',#{firName, jdbcType=VARCHAR},'%') </if>
+        <if test="startTime != null  ">
+            <if test="endTime != null ">and a.fir_date between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
     </select>
 
     <insert id="batchInsert">

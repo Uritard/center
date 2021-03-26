@@ -131,7 +131,25 @@ public class TCruiseDataResult implements Serializable {
     @ApiModelProperty(value = "机器人巡检图片分析,绝对")
     private String origPicAnl;
 
+
+    @ApiModelProperty(value = "红外FIR文件存储路径")
+    private String resultPic;
+
+    @ApiModelProperty(value = "FIR文件名称")
+    private String firName;
+
+    @ApiModelProperty(value = "FIR文件生成时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date firDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date startTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date endTime;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
+
 }
