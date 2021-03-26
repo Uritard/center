@@ -151,7 +151,7 @@
         <if test="cameraIp != null ">a.camera_ip = #{cameraIp},</if>
         <if test="url != null and url != ''">a.url = #{url, jdbcType=VARCHAR},</if>
         a.port = #{port, jdbcType=INTEGER},
-        a.infread_port = #{infreadPort, jdbcType=INTEGER},
+        <if test="infreadPort != null ">a.infread_port = #{infreadPort, jdbcType=INTEGER},</if>
         <if test="cameraManager != null">a.camera_manager = #{cameraManager, jdbcType=VARCHAR},</if>
         <if test="cameraCode != null">a.camera_code = #{cameraCode, jdbcType=VARCHAR},</if>
         a.camera_type = #{cameraType, jdbcType=INTEGER},
