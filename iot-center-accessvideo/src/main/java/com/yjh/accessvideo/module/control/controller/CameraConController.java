@@ -8,6 +8,7 @@ import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.hik.HCNetSDK;
+import com.yjh.accessvideo.module.control.entity.TemperatureInfo;
 import com.yjh.accessvideo.module.control.service.CameraConService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -617,19 +618,18 @@ public class CameraConController {
      * @param
      * @return
      */
+
+    @ApiOperation(value = "根据坐标获取温度")
     @RequestMapping(value = "/PointTemperature", method = RequestMethod.POST)
-    public Result  PointTemperature (@RequestParam(value = "points",required = false) String  points,
-                                     @RequestParam(value = "cameraId",required = false) Long cameraId,
-                                     @RequestParam(value = "picPath",required = false) String  picPath
-                                     )
+    public Result  PointTemperature (@RequestBody TemperatureInfo temperatureInfo)
     {
         Result result = new Result();
-       if (picPath!=null&&picPath!="")
+       if (temperatureInfo.getPicPath()!=null&&temperatureInfo.getPicPath()!="")
        {
-           result.setData(cameraConService.lineTemperature(picPath,points));
+           result.setData(cameraConService.lineTemperature(temperatureInfo.getPicPath(),temperatureInfo.getPoints()));
        }
        else{
-           result.setData(cameraConService.getlineTemperature(cameraId,points));
+           result.setData(cameraConService.getlineTemperature(temperatureInfo.getCameraId(),temperatureInfo.getPoints()));
        }
         return result;
     }
