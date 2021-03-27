@@ -547,6 +547,7 @@ public class AnalyseDataOperateService {
         String resultValue=resultValueOrigin.replaceAll(","," ");
         log.info("----缺陷识别结果解析---resultValue:" + resultValue);
         String defectValue = "";
+        List<String> flags=new ArrayList<>();
         String value = resultValue;
         String finalValue = value.replaceAll("[0-9]", "");
         String[] str2 = finalValue.split("\\s+");
@@ -554,105 +555,143 @@ public class AnalyseDataOperateService {
             switch (str2[i]) {
                 case "wcaqm":
                     defectValue = defectValue + "未穿安全帽" + " ";
+                    flags.add("1");
                     break;
                 case "wcgz":
                     defectValue = defectValue + "未穿工装" + " ";
+                    flags.add("1");
                     break;
                 case "rydd":
                     defectValue = defectValue + "人员倒地" + " ";
+                    flags.add("1");
                     break;
                 case "xy":
                     defectValue = defectValue + "吸烟" + " ";
+                    flags.add("1");
                     break;
                 case "sly_dmyw":
                     defectValue = defectValue + "地面油污" + " ";
+                    flags.add("1");
                     break;
                 case "yw_nc":
                     defectValue = defectValue + "异物-鸟巢" + " ";
+                    flags.add("1");
                     break;
                 case "yw_gkxfw":
                     defectValue = defectValue + "异物-挂空悬浮物" + " ";
+                    flags.add("1");
                     break;
                 case "bmwh":
                     defectValue = defectValue + "绝缘子表面污秽" + " ";
+                    flags.add("1");
                     break;
                 case "jyz_pl":
                     defectValue = defectValue + "绝缘子-破裂" + " ";
+                    flags.add("1");
                     break;
                 case "jyz_lw":
                     defectValue = defectValue + "绝缘子-裂纹" + " ";
+                    flags.add("1");
                     break;
                 case "hxq_gjbs":
                     defectValue = defectValue + "呼吸器-硅胶变色" + " ";
+                    flags.add("1");
                     break;
                 case "hxq_gjtps":
                     defectValue = defectValue + "呼吸器-硅胶筒破损" + " ";
+                    flags.add("1");
                     break;
                 case "ywzt_yfyc":
                     defectValue = defectValue + "油位状态-油封异常" + " ";
+                    flags.add("1");
                     break;
                 case "bj_bpmh":
                     defectValue = defectValue + "表计-表盘模糊" + " ";
+                    flags.add("1");
                     break;
                 case "bj_bpps":
                     defectValue = defectValue + "表计-表盘破损" + " ";
+                    flags.add("1");
                     break;
                 case "bj_wkps":
                     defectValue = defectValue + "表计-外壳破损" + " ";
+                    flags.add("1");
                     break;
                 case "mcqdmsh":
                     defectValue = defectValue + "门窗墙地面损坏" + " ";
+                    flags.add("1");
                     break;
                 case "gbps":
                     defectValue = defectValue + "盖板破损" + " ";
+                    flags.add("1");
                     break;
                 case "gjptwss":
                     defectValue = defectValue + "构架爬梯未上锁" + " ";
+                    flags.add("1");
                     break;
                 case "xmbhyc":
                     defectValue = defectValue + "箱门闭合异常" + " ";
+                    flags.add("1");
                     break;
                 case "jsxs":
                     defectValue = defectValue + "金属锈蚀" + " ";
+                    flags.add("1");
                     break;
                 case"sly_bjbmyw":
                     defectValue=defectValue+"部件表面油污"+ " ";
+                    flags.add("1");
                     break;
                 case "gbqs":
                     defectValue=defectValue+"盖板缺失"+ " ";
+                    flags.add("1");
                     break;
                 case "yxcr":
                     defectValue=defectValue+"越线闯入"+ " ";
+                    flags.add("1");
                     break;
                 case "hzyw":
                     defectValue=defectValue+"火灾烟雾"+ " ";
+                    flags.add("1");
                     break;
                 case "xdwcr":
                     defectValue=defectValue+"小动物闯入"+ " ";
+                    flags.add("1");
                     break;
                 case "sndmjs":
                     defectValue=defectValue+"室内地面积水"+ " ";
+                    flags.add("1");
                     break;
                 case "kgg_ybf":
                     defectValue=defectValue+"开关柜-压板分"+ " ";
+                    flags.add("1");
                     break;
                 case "kgg_ybh":
                     defectValue=defectValue+"开关柜-压板合"+ " ";
+                    flags.add("1");
                     break;
                 case "bjdsyc":
                     defectValue=defectValue+"表计读数异常"+" ";
+                    flags.add("1");
                     break;
                 case "normal":
                     defectValue="图像无差异";
+                    flags.add("1");
                     break;
                 case "abnormal":
                     defectValue="图像有差异";
+                    flags.add("1");
                     break;
                 default:
-                    return "null";
+                    defectValue=defectValue+"";
             }
         }
-        return defectValue;
+
+        if(flags.contains("1")){
+            return defectValue;
+        }else {
+            return "null";
+        }
+
     }
 
 
