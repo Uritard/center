@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.dao;
 
 import java.util.List;
 import java.util.Date;
+import java.util.Map;
 
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.TStdRegion;
@@ -30,6 +31,7 @@ public interface TStdRegionDao {
                                 @Param(value = "createTime") Date createTime);
     List<AreaInfoRegionCode> selectAreaTree();
 
+    int updateByMap(@Param("map") Map<String, Object> map);
     List<TStdRegion> selectByPage(TStdRegion tStdRegion);
     List<AreaInfoRegionCode> selectRegTreeByRegName(@Param(value = "regionName") String regionName);
     List<Long> selectRegionIds(Long upRegionId);
