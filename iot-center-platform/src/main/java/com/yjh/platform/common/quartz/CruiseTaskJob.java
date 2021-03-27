@@ -499,37 +499,43 @@ public class CruiseTaskJob extends QuartzJobBean {
                             }
 //                            mapForCameraState.put("taskId",tCruiseTask.getTaskId());
 //                            mapForCameraState.put("taskLevel",tCruiseTask.getTaskLevel().toString());
-                            if(waitFlag){
-                                mapForCameraState.put("state","1");
-                                redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
-                                Result re = null;
-                                HashMap<String, Object> map2 = new HashMap<>();
-                                map2.put("cameraId", tCameraPreset.getCameraId());
-                                if(item.getCruiseType().equals(230)){//红外专属拍照方法
-                                    re = redPicture(map);
+                            try{
+                                if(waitFlag){
+                                    mapForCameraState.put("state","1");
+                                    redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
+                                    Result re = null;
+                                    HashMap<String, Object> map2 = new HashMap<>();
+                                    map2.put("cameraId", tCameraPreset.getCameraId());
+                                    if(item.getCruiseType().equals(230)){//红外专属拍照方法
+                                        re = redPicture(map);
+                                    }else {
+                                        move(map);
+                                        Thread.sleep(waitTime);//等待摄像头转到预置位
+                                        //2.抓图
+                                        re = picture(map2);
+                                    }
+                                    mapForCameraState.put("state","0");
+                                    redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
+                                    if(re == null){
+                                        isOk = "";
+                                    }else if("success".equals(re.getMessage())){
+                                        JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
+                                        //todo 对于相机的返回错误分析  任务异常终止/超期
+                                        urlPath = (String) jsonForRe.get("urlPath");
+                                        absPath = (String) jsonForRe.get("absPath");
+                                        picPath = (String) jsonForRe.get("picPath");
+                                        csvPath = (String) jsonForRe.get("csvPath");
+                                        dataPath = (String) jsonForRe.get("dataPath");
+                                        isOk = re.getMessage();
+                                    }
+
                                 }else {
-                                    move(map);
-                                    Thread.sleep(waitTime);//等待摄像头转到预置位
-                                    //2.抓图
-                                    re = picture(map2);
+                                    isOk ="";
                                 }
+                            }catch (Exception e){
+                                log.error("设置摄像机状态出错"+e);
                                 mapForCameraState.put("state","0");
                                 redisTemplate.opsForHash().putAll("camera_info:"+tCameraPreset.getCameraId(),mapForCameraState);
-                                if(re == null){
-                                    isOk = "";
-                                }if("success".equals(re.getMessage())){
-                                    JSONObject jsonForRe = (JSONObject) JSON.toJSON(re.getData());
-                                    //todo 对于相机的返回错误分析  任务异常终止/超期
-                                    urlPath = (String) jsonForRe.get("urlPath");
-                                    absPath = (String) jsonForRe.get("absPath");
-                                    picPath = (String) jsonForRe.get("picPath");
-                                    csvPath = (String) jsonForRe.get("csvPath");
-                                    dataPath = (String) jsonForRe.get("dataPath");
-                                    isOk = re.getMessage();
-                                }
-
-                            }else {
-                                isOk ="";
                             }
                         }
                         if( !"success".equals(isOk)){

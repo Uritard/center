@@ -295,6 +295,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                     syAllInfo.setDeviceName(strArray[3]);
                     Integer meteKind = strArray[4].contains("遥信")?1:(strArray[4].contains("遥测")?2:(strArray[4].contains("遥控")?3:(strArray[4].contains("遥调")?4:5)));
                     syAllInfo.setMeteKind(meteKind);
+                    syAllInfo.setMeteCode(strArray[5]);
                     list.add(syAllInfo);
                     //list.add(str);
                 }
