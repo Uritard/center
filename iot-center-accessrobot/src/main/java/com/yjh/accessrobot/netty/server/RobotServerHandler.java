@@ -1056,16 +1056,23 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     * 和客户端断开连接
     * */
     public void removeLink(String robotCode){
+        log.info("准备断连的是=="+ctx.channel().id());
+        isThreadStart = false;
+        Channel channel = ctx.channel();
+        if (channel.id() != null) {
+            maps.remove(channel.id().toString());
+            log.info("id: " + channel.id() + ", strRobotCode: " + strRobotCode + " left," + "Onlinesize: " + maps.size());
+        }
         try {
-            log.info("准备断连的是=="+ctx.channel().id());
-            robotServerHandlerMap.remove(robotCode);
             ctx.close().sync();
             ctx.flush();
             super.channelInactive(ctx);
-            log.info("成功断开连接......");
         } catch (Exception e) {
             isThreadStart = false;
             log.error("clientDisconnect: " + e.getMessage());
         }
+        log.info("mapsAfterRemoved: " + maps);
+        robotServerHandlerMap.remove(robotCode);
+        log.info("channel.isActive(): " + channel.isActive());
     }
 }

@@ -37,6 +37,7 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -131,7 +132,13 @@ public class RobotService {
         log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
         //根据不同的机器人对应不同的管道发送指令
         RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-        Thread.sleep(1000);
+        if ("21".equals(type) && "7".equals(command) //抓图
+                || "21".equals(type) && "10".equals(command)//停止录像
+                || "22".equals(type) && "7".equals(command)){
+            TimeUnit.SECONDS.sleep(5);
+        }else {
+            TimeUnit.MILLISECONDS.sleep(500);
+        }
 //        String code = Constant.robotResultMap.get("Code");
         String code = RobotServerHandler.getRobotResultMap().get("Code");
 
