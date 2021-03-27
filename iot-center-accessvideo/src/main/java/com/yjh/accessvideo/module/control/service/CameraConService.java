@@ -1707,7 +1707,7 @@ public class CameraConService {
                     if(item.length>=col-1){
                         //temperature= item[col-1];
                         log.info("温度值:"+item[col-1]);
-                        temperature=   new DecimalFormat("##0.00").format( item[col-1]);
+                        temperature= String.format("%.2f", item[col-1]);
                         log.info("温度值转换后的:"+temperature);
 
                     }
