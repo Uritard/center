@@ -3,7 +3,6 @@ package com.yjh.accessrobot.module.command.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
@@ -23,14 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.MultiKeyCommands;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
 import javax.annotation.Resource;
 import java.io.File;
@@ -118,36 +112,38 @@ public class RobotService {
             log.info("该机器人处于离线状态,没有成功将控制指令下发到机器人......");
             scmap.put("code", 3);
             scmap.put("result", "机器人不在线");
-            return scmap;
-        }
-        XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode(sendCode)
-                .setReceiveCode(robotCode)
-                .setCode("省检018")
-                .setTime(sdf.format(new Date()))
-                .setType(type)
-                .setCommand(command)
-                .setItems(Item);
-        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
-        log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
-        //根据不同的机器人对应不同的管道发送指令
-        RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-        if ("21".equals(type) && "7".equals(command) //抓图
-                || "21".equals(type) && "10".equals(command)//停止录像
-                || "22".equals(type) && "7".equals(command)){
-            TimeUnit.SECONDS.sleep(5);
         }else {
-            TimeUnit.MILLISECONDS.sleep(500);
-        }
+            XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                    .setSendCode(sendCode)
+                    .setReceiveCode(robotCode)
+                    .setCode("省检018")
+                    .setTime(sdf.format(new Date()))
+                    .setType(type)
+                    .setCommand(command)
+                    .setItems(Item);
+            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+            log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
+            //根据不同的机器人对应不同的管道发送指令
+            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+            if ("21".equals(type) && "7".equals(command) //抓图
+                    || "21".equals(type) && "10".equals(command)//停止录像
+                    || "22".equals(type) && "7".equals(command)){
+                TimeUnit.SECONDS.sleep(5);
+            }else {
+                TimeUnit.MILLISECONDS.sleep(500);
+            }
 //        String code = Constant.robotResultMap.get("Code");
-        String code = RobotServerHandler.getRobotResultMap().get("Code");
+            String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
+            Map<String,Object> filePathMap = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item")));
+            log.info("filePath=="+filePathMap.get("file_path"));
 
-        if ("200".equals(code)){
-            scmap.put("code", 4);
-            scmap.put("result", "指令下发成功");
-        }else{
-            scmap.put("code", 3);
-            scmap.put("result", "指令下发失败");
+            if ("200".equals(code)){
+                scmap.put("code", 4);
+                scmap.put("result", "指令下发成功,"+filePathMap.get("file_path"));
+            }else{
+                scmap.put("code", 3);
+                scmap.put("result", "指令下发失败");
+            }
         }
         log.info("下发控制指令返回结果: "+scmap);
         return scmap;
@@ -397,9 +393,10 @@ public class RobotService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,String> receivingResponse(XMLBaseModel xmlBaseModel) {
+    public Map<String,Object> receivingResponse(XMLBaseModel xmlBaseModel) {
         RobotServerHandler.getRobotResultMap().put("Type",xmlBaseModel.getType());
         RobotServerHandler.getRobotResultMap().put("Code",xmlBaseModel.getCode());
+        RobotServerHandler.getRobotResultMap().put("Item",xmlBaseModel.getItems().get(0));
         log.info("组成的robotResultMap是==="+RobotServerHandler.getRobotResultMap());
         if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
             return RobotServerHandler.getRobotResultMap();
@@ -411,7 +408,7 @@ public class RobotService {
         if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
             return Constant.robotResultMap;
         }*/
-        Map<String,String> res = new HashMap<>();
+        Map<String,Object> res = new HashMap<>();
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
@@ -498,7 +495,7 @@ public class RobotService {
         }
 
 //        String code = Constant.robotResultMap.get("Code");
-        String code = RobotServerHandler.getRobotResultMap().get("Code");
+        String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
 
         if ("200".equals(code)){
             return "true";
@@ -1491,7 +1488,7 @@ public class RobotService {
         RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
         Thread.sleep(1000);
 //        String code = Constant.robotResultMap.get("Code");
-        String code = RobotServerHandler.getRobotResultMap().get("Code");
+        String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
 
         scmap.put("code", code);
         log.info("下发控制指令返回结果: "+scmap);
