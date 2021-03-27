@@ -1691,7 +1691,7 @@ public class CameraConService {
         fileName=fileName.substring(0,fileName.lastIndexOf("."));
         path= hotFirShow+fileName+".csv";
         log.info("cvs path:"+path);
-        String temperature="21.15";
+        String temperature="0.00";
         try {
             URL url = new URL(path);
             URLConnection connection = url.openConnection();
@@ -1707,7 +1707,7 @@ public class CameraConService {
                     if(item.length>=col-1){
                         //temperature= item[col-1];
                         log.info("温度值:"+item[col-1]);
-                        temperature= String.format("%.2f", item[col-1]);
+                        temperature= item[col-1].substring(0,5);
                         log.info("温度值转换后的:"+temperature);
 
                     }
