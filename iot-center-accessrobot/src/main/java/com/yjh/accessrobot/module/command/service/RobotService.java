@@ -135,7 +135,7 @@ public class RobotService {
 //        String code = Constant.robotResultMap.get("Code");
             String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
             Map<String,Object> filePathMap = new HashMap<>();
-            if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
+            if (Objects.isNull(RobotServerHandler.getRobotResultMap()) || !RobotServerHandler.getRobotResultMap().isEmpty()){
                 filePathMap = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item")));
                 log.info("filePath=="+filePathMap.get("file_path"));
             }
