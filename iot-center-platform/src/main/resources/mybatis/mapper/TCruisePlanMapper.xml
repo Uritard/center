@@ -53,7 +53,7 @@
         update t_cruise_plan a <set>
         <if test="map.planId != null">a.plan_id = #{map.planId},</if>
         <if test="map.planName != null ">a.plan_name = #{map.planName},</if>
-        a.type = #{type, jdbcType=INTEGER},
+        a.type = #{map.type, jdbcType=INTEGER},
         <if test="map.planPointTypes != null">a.plan_point_types = #{map.planPointTypes},</if>
         <if test="map.createTime != null ">a.create_time = #{map.createTime},</if>
         <if test="map.updateTime != null ">a.update_time = #{map.updateTime},</if>
