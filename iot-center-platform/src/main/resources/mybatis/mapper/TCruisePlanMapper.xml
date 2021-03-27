@@ -49,16 +49,16 @@
             where a.plan_id = #{planId, jdbcType=BIGINT}
     </update>
 
-    <update id="updateByMap" parameterType="Map">
+    <update id="updateByMap" parameterType="java.util.Map">
         update t_cruise_plan a <set>
-        <if test="planId != null">a.plan_id = #{planId},</if>
-        <if test="planName != null ">a.plan_name = #{planName},</if>
+        <if test="map.planId != null">a.plan_id = #{map.planId},</if>
+        <if test="map.planName != null ">a.plan_name = #{map.planName},</if>
         a.type = #{type, jdbcType=INTEGER},
-        <if test="planPointTypes != null">a.plan_point_types = #{planPointTypes},</if>
-        <if test="createTime != null ">a.create_time = #{createTime},</if>
-        <if test="updateTime != null ">a.update_time = #{updateTime},</if>
+        <if test="map.planPointTypes != null">a.plan_point_types = #{map.planPointTypes},</if>
+        <if test="map.createTime != null ">a.create_time = #{map.createTime},</if>
+        <if test="map.updateTime != null ">a.update_time = #{map.updateTime},</if>
     </set>
-        where a.plan_id = #{planId, jdbcType=BIGINT}
+        where a.plan_id = #{map.planId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruisePlanCount">
