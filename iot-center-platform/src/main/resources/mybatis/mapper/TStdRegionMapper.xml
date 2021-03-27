@@ -89,7 +89,7 @@
         <if test="map.createTime != null">a.create_time = #{map.createTime, jdbcType=TIMESTAMP},</if>
         <if test="map.stationName != null">a.station_name = #{map.stationName, jdbcType=VARCHAR},</if>
     </set>
-        where a.region_id = #{regionId, jdbcType=BIGINT}
+        where a.region_id = #{map.regionId, jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdRegion">
