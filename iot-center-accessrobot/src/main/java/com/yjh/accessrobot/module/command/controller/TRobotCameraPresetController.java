@@ -49,12 +49,13 @@ public class TRobotCameraPresetController {
             int i = tRobotCameraPresetService.add(tRobotCameraPreset);
             if(i == -1){
                 result.setCode(209,"此点号已存在");
+                return result;
             }
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","10",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
             if(request != null  && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
-                if("4".equals(map.get("code"))){
+                if(!"4".equals(map.get("code"))){
                     result.setCode(209,map.get("result").toString());
                 }
             }
@@ -78,7 +79,7 @@ public class TRobotCameraPresetController {
             if(request != null && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
-                if("4".equals(map.get("code"))){
+                if(!"4".equals(map.get("code"))){
                     result.setCode(209,map.get("result").toString());
                 }
             }
@@ -205,7 +206,7 @@ public class TRobotCameraPresetController {
             if(request != null  && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
-                if("4".equals(map.get("code"))){
+                if(!"4".equals(map.get("code"))){
                     result.setCode(209,map.get("result").toString());
                 }
             }
