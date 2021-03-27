@@ -1236,12 +1236,12 @@ public class RobotService {
     public int robotTaskIntoDB(List<Map<String, Object>> taskModelMapList, XMLBaseModel xmlBaseModel) {
         List<TCruiseTask> tCruiseTaskList = new ArrayList<>();
         for (Map<String, Object> taskModelMap : taskModelMapList) {
-            String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
+//            String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
             /*
             * 构建t_cruise_task
             * */
             TCruiseTask tCruiseTask = new TCruiseTask();
-            tCruiseTask.setTaskId(newTaskId);
+            tCruiseTask.setTaskId(taskModelMap.get("task_code").toString());
             tCruiseTask.setTaskCode(taskModelMap.get("task_code").toString());
             tCruiseTask.setTaskName(taskModelMap.get("task_name").toString());
             Integer cType = null;
@@ -1326,7 +1326,7 @@ public class RobotService {
             List<TCruiseTaskAttr> tCruiseTaskAttrList = new ArrayList<>();
             for (TCruisePointInstance tCruisePointInstance : tCruisePointInstanceList){
                 TCruiseTaskAttr tCruiseTaskAttr = new TCruiseTaskAttr()
-                        .setTaskId(newTaskId)
+                        .setTaskId(taskModelMap.get("task_code").toString())
                         .setInstanceId(tCruisePointInstance.getInstanceId());
                 tCruiseTaskAttrList.add(tCruiseTaskAttr);
                 instanceIdList.add(tCruisePointInstance.getInstanceId());
@@ -1356,14 +1356,14 @@ public class RobotService {
             Map<String, Object> instanceListMap = new HashMap<>();
             instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
             instanceListMap.put("taskId", taskModelMap.get("task_code").toString());
-            redisTemplate.opsForHash().putAll("RobotTaskStatus:" + xmlBaseModel.getSendCode() + ":" +newTaskId, instanceListMap);
+            redisTemplate.opsForHash().putAll("RobotTaskStatus:" + xmlBaseModel.getSendCode() + ":" +taskModelMap.get("task_code").toString(), instanceListMap);
 
             /*
              * 构建t_cruise_result
              * */
             TCruiseResult tCruiseResult = new TCruiseResult()
                     .setTaskResultId(String.valueOf(UUID.randomUUID()).replace("-", ""))
-                    .setTaskId(newTaskId)
+                    .setTaskId(taskModelMap.get("task_code").toString())
                     .setTaskName(taskModelMap.get("task_name").toString())
                     .setCType(cType)
                     .setCState(238)//任务未开始
