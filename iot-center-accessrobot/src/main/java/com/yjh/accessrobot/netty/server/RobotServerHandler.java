@@ -234,45 +234,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     /*
      * 拆包工具2
      * */
-    /*public void openPackage (String socketMessageHex,int headNum) throws Exception{
-        String onePacketString = null;
-        String residueString = null;
-        if(socketMessageHex.startsWith("eb90") && headNum >= 2) {
-            //有至少一个完整的包
-            int limitNum = socketMessageHex.indexOf("eb90", socketMessageHex.indexOf("eb90") + 1) + 3;//一个包的长度-1
-
-            if(socketMessageHex.length()-limitNum == 1){
-                byte[] onePacket = PlatformPacketUtil.HexString2Bytes(socketMessageHex);
-                StringBuilder Str2 = new StringBuilder();
-                for (byte byteItem : onePacket) {
-                    Str2.append(String.format("%02x ", byteItem));
-                }
-                log.info("一个完整的包,准备解析的字节数组="+Str2);
-
-                String body1 = socketMessageHex.substring(46,socketMessageHex.length()-4);
-                onePacketString = PlatformPacketUtil.toStringHex(body1);
-                log.info("准备解析的xml=="+onePacketString);
-//                Packet = "";
-                Packet = Packet.replace(socketMessageHex,"");
-                stringToXml(onePacket,onePacketString);
-                return;
-            }else{
-                log.info("大于一个完整的包==="+socketMessageHex);
-                onePacketString = socketMessageHex.substring(0,limitNum+1);
-                residueString = socketMessageHex.replace(onePacketString,"");//除去一个完整包剩余的内容
-                openPackage(onePacketString,appearNumber(onePacketString,"eb90"));
-
-                byte[] residuePacket = PlatformPacketUtil.HexString2Bytes(residueString);
-                StringBuilder Str2 = new StringBuilder();
-                for (byte byteItem : residuePacket) {
-                    Str2.append(String.format("%02x ", byteItem));
-                }
-                log.info("除去一个完整包剩余的字节数组="+Str2);
-                Packet = residueString;
-                openPackage(residueString,appearNumber(residueString,"eb90"));
-            }
-        }
-    }*/
     public void openPackage (String socketMessageHex,int headNum) throws Exception{
         String onePacketString = null;
         String residueString = null;
