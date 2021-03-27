@@ -1,5 +1,7 @@
 package com.yjh.accessrobot.module.command.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
@@ -49,6 +51,13 @@ public class TRobotCameraPresetController {
                 result.setCode(209,"此点号已存在");
             }
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","10",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
+            if(request != null){
+                Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
+                log.info("object转map的东西==="+map);
+                if("4".equals(map.get("code"))){
+                    result.setCode(209,map.get("result").toString());
+                }
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -66,6 +75,13 @@ public class TRobotCameraPresetController {
             TRobotCameraPreset tRobotCameraPreset = tRobotCameraPresetService.selectByPrimaryId(presetId);
             int i = tRobotCameraPresetService.deleteByPrimaryId(presetId);
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","12",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
+            if(request != null){
+                Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
+                log.info("object转map的东西==="+map);
+                if("4".equals(map.get("code"))){
+                    result.setCode(209,map.get("result").toString());
+                }
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
@@ -186,6 +202,13 @@ public class TRobotCameraPresetController {
         try {
             TRobotCameraPreset tRobotCameraPreset = tRobotCameraPresetService.selectByPrimaryId(presetId);
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","7",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
+            if(request != null){
+                Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
+                log.info("object转map的东西==="+map);
+                if("4".equals(map.get("code"))){
+                    result.setCode(209,map.get("result").toString());
+                }
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("机器人预置位调用异常:", e);
