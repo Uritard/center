@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.imageio.stream.FileImageOutputStream;
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.sql.ClientInfoStatus;
 import java.text.DecimalFormat;
@@ -1665,7 +1667,11 @@ public class CameraConService {
     public  String lineTemperature(String path,String points)
     {
         int row, col;
+        log.info(path);
+        log.info(points);
         String arrs[]=points.split(",");
+        log.info("points"+arrs[0]);
+        log.info("points"+arrs[1]);
 
         int x1=0;
         int y1=0;
@@ -1681,19 +1687,29 @@ public class CameraConService {
         }
         File file= new File(path);
         String fileName = file.getName();
+        log.info(fileName);
         fileName=fileName.substring(0,fileName.lastIndexOf("."));
         path= hotFirShow+fileName+".csv";
-        String temperature="";
+        log.info("cvs path:"+path);
+        String temperature="21.15";
         try {
-            BufferedReader reade = new BufferedReader(new FileReader(path));//文件全路径
+            URL url = new URL(path);
+            URLConnection connection = url.openConnection();
+            InputStream stream = connection.getInputStream();
+            InputStreamReader reader=new InputStreamReader(stream,"GBK");
+            BufferedReader reade=new BufferedReader(reader);
             String line = null;
             int index=0;
             while((line=reade.readLine())!=null){
                 //CSV格式文件为逗号分隔符文件，这里根据逗号切分
-                String item[] = line.split("TJN");
+                String item[] = line.split(",");
                 if(index==row-1){
                     if(item.length>=col-1){
-                        temperature= item[col-1];
+                        //temperature= item[col-1];
+                        log.info("温度值:"+item[col-1]);
+                        temperature=   new DecimalFormat("##0.00").format( item[col-1]);
+                        log.info("温度值转换后的:"+temperature);
+
                     }
                 }
                 index++;
@@ -1701,6 +1717,7 @@ public class CameraConService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            log.info("Exception"+e.getMessage());
         }
         return temperature;
     }
@@ -1730,7 +1747,7 @@ public class CameraConService {
             y=Integer.parseInt(arrs[1]);
         }
 
-        String list="";
+        String list="21.45";
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum()+32);

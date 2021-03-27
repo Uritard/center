@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -621,8 +622,9 @@ public class CameraConController {
 
     @ApiOperation(value = "根据坐标获取温度")
     @RequestMapping(value = "/PointTemperature", method = RequestMethod.POST)
-    public Result  PointTemperature (@RequestBody TemperatureInfo temperatureInfo)
+    public Result  PointTemperature ( @RequestBody TemperatureInfo temperatureInfo)
     {
+        log.info(temperatureInfo.toString());
         Result result = new Result();
        if (temperatureInfo.getPicPath()!=null&&temperatureInfo.getPicPath()!="")
        {
