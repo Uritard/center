@@ -51,7 +51,7 @@ public class TRobotCameraPresetController {
                 result.setCode(209,"此点号已存在");
             }
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","10",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
-            if(request != null){
+            if(request != null  && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
                 if("4".equals(map.get("code"))){
@@ -75,7 +75,7 @@ public class TRobotCameraPresetController {
             TRobotCameraPreset tRobotCameraPreset = tRobotCameraPresetService.selectByPrimaryId(presetId);
             int i = tRobotCameraPresetService.deleteByPrimaryId(presetId);
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","12",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
-            if(request != null){
+            if(request != null && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
                 if("4".equals(map.get("code"))){
@@ -202,7 +202,7 @@ public class TRobotCameraPresetController {
         try {
             TRobotCameraPreset tRobotCameraPreset = tRobotCameraPresetService.selectByPrimaryId(presetId);
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","7",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
-            if(request != null){
+            if(request != null  && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
                 if("4".equals(map.get("code"))){
