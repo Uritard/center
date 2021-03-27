@@ -129,7 +129,12 @@ public class TCruisePlanService{
             tCruisePlanAttrList.add(tCruisePlanAttr);
         }
         this.tCruisePlanAttrDao.deleteByPrimaryId(planId);
-        this.tCruisePlanDao.update(tCruisePlan);
+//        this.tCruisePlanDao.update(tCruisePlan);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("planId", planId);
+        map.put("planName", String.valueOf(planDetailMap.get("planName")));
+        this.tCruisePlanDao.updateByMap(map);
         if (tCruisePlanAttrList.size()>0){
             return tCruisePlanAttrDao.batchInsert(tCruisePlanAttrList);
         } else {return 0;}

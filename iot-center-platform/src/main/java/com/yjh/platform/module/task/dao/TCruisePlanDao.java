@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.dao;
 
 import java.util.List;
 import java.util.Date;
+import java.util.Map;
 
 import com.yjh.platform.module.task.entity.InstanceTree;
 import com.yjh.platform.module.task.entity.TCruisePlan;
@@ -30,6 +31,8 @@ public interface TCruisePlanDao {
                              @Param(value = "updateTime") Date updateTime);
     List<TCruisePlanCount> selectByPage(TCruisePlan tCruisePlan);
     List<TCruisePlanCountByPage> selectByPlanPage(TCruisePlan tCruisePlan);
+
+    int updateByMap(@Param("map") Map<String, Object> map);
 
     int batchInsert(List<TCruisePlan> list);
     List<InstanceTree> findInstanceTree(@Param("deviceIdList") List<Long> deviceIdList);
