@@ -7,6 +7,8 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -21,6 +23,8 @@ public class TStdRegionService{
 
     @Autowired
     private TStdRegionDao tStdRegionDao;
+
+    private Logger log = LoggerFactory.getLogger(TStdRegionService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TStdRegion tStdRegion) {
@@ -47,7 +51,9 @@ public class TStdRegionService{
 
     @Transactional(rollbackFor = Exception.class)
     public int update(Map<String, Object> map) {
-        if (map.get("regionCode").equals("")) map.replace("regionCode",null);
+//        if (map.get("regionCode").equals("")) map.replace("regionCode",null);
+        map.remove("regionCode");
+        log.info("map: "+map);
         return this.tStdRegionDao.updateByMap(map);
     }
 

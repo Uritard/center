@@ -9,6 +9,7 @@ import com.yjh.gateway.common.utils.Decode;
 import com.yjh.gateway.common.utils.GPSFormatUtils;
 import com.yjh.gateway.common.utils.IpUtil;
 import com.yjh.gateway.common.utils.MultisMap;
+import com.yjh.gateway.commons.utils.http.IPUtil;
 import com.yjh.gateway.commons.utils.smUtil.Demo;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +64,7 @@ public class zuulFilter extends ZuulFilter {
         if ("true".equals(isDecode)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
-            String url = request.getRequestURI();
+            String url = IPUtil.getRemoteIP(request);
             log.info("url: "+request.getRequestURL());
             if (!url.contains("/sysUser/v1/login")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";

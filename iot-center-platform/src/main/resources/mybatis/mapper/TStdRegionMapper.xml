@@ -92,7 +92,7 @@
         where a.region_id = #{regionId, jdbcType=BIGINT}
     </update>
 
-    <update id="updateByMap" parameterType="java.util.Map">
+    <update id="updateByMap" parameterType="java.util.Map">A
         update t_std_region a <set>
         <if test="map.regionId != null">a.region_id = #{map.regionId},</if>
         <if test="map.regionName != null ">a.region_name = #{map.regionName},</if>

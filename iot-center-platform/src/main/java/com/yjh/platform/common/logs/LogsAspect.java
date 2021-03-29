@@ -69,18 +69,10 @@ public class LogsAspect {
                 userName = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("userName"));
             } else { userName = "admin"; }
         }
-
-        ip = request.getHeader("X-Real-IP");
-        log.info("ip: "+request.getRequestURL());
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("X-Forwarded-For"); }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("Proxy-Client-IP"); }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getHeader("WL-Proxy-Client-IP"); }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) { ip = request.getRemoteAddr(); }
-
+        ip = IPUtil.getRemoteIP(request);
         Object result = null;
         if (annotation != null) {
             try {
-//                serviceId = logsConfig.getName();
                 params.set("logType", annotation.logType());
                 params.set("ip", ip);
                 params.set("title", annotation.title());
@@ -115,7 +107,6 @@ public class LogsAspect {
         try {
             return joinPoint.proceed();
         } catch (Throwable e) {
-            serviceId = logsConfig.getName();
             params.set("logType", annotation.logType());
             params.set("ip", ip);
             params.set("title", "内部接口错误");
