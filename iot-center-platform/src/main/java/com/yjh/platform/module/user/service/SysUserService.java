@@ -203,7 +203,7 @@ public class SysUserService {
                                 param.set("ip", request.getRemoteHost());
                                 param.set("title", "登录");
                                 param.set("state", 1);
-                                param.set("userId", "");
+                                param.set("userId", sysUserLogin.getUserId());
                                 param.set("userName", userName);
                                 param.set("requestOrigin", request.getRequestURL());
                                 param.set("requestPath", request.getRequestURI());
@@ -260,7 +260,7 @@ public class SysUserService {
                             param.set("ip", request.getRemoteHost());
                             param.set("title", "登录");
                             param.set("state", 1);
-                            param.set("userId", "");
+                            param.set("userId", sysUserLogin.getUserId());
                             param.set("userName", userName);
                             param.set("requestOrigin", request.getRequestURL());
                             param.set("requestPath", request.getRequestURI());
