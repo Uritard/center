@@ -87,7 +87,8 @@ public class SysUserService {
         Long roleId = sysUser.getRoleId();
         if (roleId != null) {
             redisTemplate.opsForHash().put("userInfo:" + sysUser.getUserId(), "roleId", String.valueOf(sysUser.getRoleId()));
-        }else if(sysUserCurrent.getInvalidTime()!=sysUser.getInvalidTime()){
+        }
+        if(sysUserCurrent.getInvalidTime()!=sysUser.getInvalidTime()){
             Date date = new Date();
             sysUser.setUpdateTime(date);
         }
