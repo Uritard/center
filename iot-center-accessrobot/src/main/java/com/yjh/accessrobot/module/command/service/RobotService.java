@@ -136,11 +136,11 @@ public class RobotService {
             String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
             Map<String,Object> filePathMap = new HashMap<>();
             String filePath = null;
-            if (Objects.isNull(RobotServerHandler.getRobotResultMap()) || !RobotServerHandler.getRobotResultMap().isEmpty()){
+            if (Objects.isNull(RobotServerHandler.getRobotResultMap().get("Item"))){
 //                filePathMap = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item")));
                 log.info("filePath=="+filePathMap.get("file_path"));
 
-                String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                String ftpFilePath = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).get("file_path").toString();
                 String sArray[] = ftpFilePath.split("/");
                 String ftpFileName = sArray[sArray.length - 1];
 
