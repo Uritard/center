@@ -135,14 +135,28 @@ public class RobotService {
 //        String code = Constant.robotResultMap.get("Code");
             String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
             Map<String,Object> filePathMap = new HashMap<>();
+            String filePath = null;
             if (Objects.isNull(RobotServerHandler.getRobotResultMap()) || !RobotServerHandler.getRobotResultMap().isEmpty()){
-                filePathMap = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item")));
+//                filePathMap = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item")));
                 log.info("filePath=="+filePathMap.get("file_path"));
-            }
 
+                String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                String sArray[] = ftpFilePath.split("/");
+                String ftpFileName = sArray[sArray.length - 1];
+
+                Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+                filePath = relativeImgMap.get("content")+ "/" + todayTime  + "/CameraLib/";
+                if (ftpFileName.endsWith(".jpg")){
+                    filePath = ftpFilePath + "BigImg/"+ftpFileName;
+                }else if (ftpFileName.endsWith(".bmp")){
+                    filePath = ftpFilePath + "Infrared/"+ftpFileName;
+                }else if (ftpFileName.endsWith(".mp4")){
+                    filePath = ftpFilePath + "Video/"+ftpFileName;
+                }
+            }
             if ("200".equals(code)){
                 scmap.put("code", 4);
-                scmap.put("result", "指令下发成功,"+filePathMap.get("file_path"));
+                scmap.put("result", "指令下发成功,"+filePath);
             }else{
                 scmap.put("code", 3);
                 scmap.put("result", "指令下发失败");
@@ -429,10 +443,6 @@ public class RobotService {
         //开发环境图片相对路径文件目录
         String developRelativeUrl = relativeImgMap.get("content")+ "/" + todayTime  + "/CameraLib/";
 
-        /*if (Objects.nonNull(xmlBaseModel.getItems()) && !xmlBaseModel.getItems().isEmpty()){
-            developAbsoluteUrl = developAbsoluteUrl + "CameraLib"+ "/" ;
-            developRelativeUrl = developRelativeUrl + "CameraLib"+ "/" ;
-        }*/
         if (ftpFileName.endsWith(".jpg")){//可见光抓图
             developAbsoluteUrl = developAbsoluteUrl + "BigImg/";
             developRelativeUrl = developRelativeUrl + "BigImg/";
