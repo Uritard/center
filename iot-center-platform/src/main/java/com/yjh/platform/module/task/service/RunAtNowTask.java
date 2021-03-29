@@ -440,7 +440,7 @@ public class RunAtNowTask implements Runnable{
                         tCruiseTaskResultDetailMap.put("cruiseStatus", "253");//未执行
                         tCruiseTaskResultDetailMap.put("resultNum", "机器人离线,未执行");
                         tCruiseTaskResultDetailMap.put("cruiseResult", "247");//异常
-                        tCruiseTaskResultDetailMap.put("cruiseAbnormal", "250");//异常告警
+                        //tCruiseTaskResultDetailMap.put("cruiseAbnormal", "250");//异常告警
                         tCruiseTaskResultDetailMap.put("evaluationState", "257");//未审核
                         tCruiseTaskResultDetailMap.put("createtime", simpleDateFormat.format(new Date()));
 
