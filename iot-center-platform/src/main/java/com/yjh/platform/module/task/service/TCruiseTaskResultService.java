@@ -491,10 +491,23 @@ public class TCruiseTaskResultService {
                 }
             }
 
-            //计算运行时间
+            Integer cruisedNotCount = deviceMete.size() - deviceMeteComp.size();//已执行的标准测点数量
+            cruiseResultCounter.setAlarmCount(deviceMeteAbnormal.size());//异常点数
+            cruiseResultCounter.setCruisedCount(deviceMeteComp.size());//已执行的标准测点数量
+            cruiseResultCounter.setCruiseNotCount(cruisedNotCount);//未执行点数
+
+        }else {
+            cruiseResultCounter.setAlarmCount(0);//异常点数
+            cruiseResultCounter.setCruisedCount(0);//已执行的标准测点数量
+            cruiseResultCounter.setCruiseNotCount(deviceMete.size());//未执行点数
+        }
+
+
+        //计算运行时间
 
             Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
 
+        if(Objects.nonNull(countResult)) {
             //获取任务开始时间
             String startTime = countResult.get("taskStart").toString();
             //将两个时间字符串转为日期类型
@@ -503,17 +516,12 @@ public class TCruiseTaskResultService {
             String d2String = simpleDateFormat.format(new Date());
             Date d2 = simpleDateFormat.parse(d2String);
             cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
-
-
-            Integer cruisedNotCount = deviceMete.size() - deviceMeteComp.size();//已执行的标准测点数量
-            cruiseResultCounter.setAlarmCount(deviceMeteAbnormal.size());//异常点数
-            cruiseResultCounter.setCruisedCount(deviceMeteComp.size());//已执行的标准测点数量
-            cruiseResultCounter.setCruiseNotCount(cruisedNotCount);//未执行点数
         }else {
-            cruiseResultCounter.setAlarmCount(0);//异常点数
-            cruiseResultCounter.setCruisedCount(0);//已执行的标准测点数量
-            cruiseResultCounter.setCruiseNotCount(deviceMete.size());//未执行点数
+            cruiseResultCounter.setRunningTime(Long.valueOf("0"));
         }
+
+
+
 
         log.info("总点数：" + deviceMete.size());
         log.info("已执行点数：" + deviceMeteComp.size());
