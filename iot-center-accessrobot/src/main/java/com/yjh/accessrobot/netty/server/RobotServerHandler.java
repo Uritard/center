@@ -165,10 +165,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public  void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //接收机器人发送的指令
+        log.info("收到包了！！！！！！！！！！！！！！！！！！！");
         ByteBuf byteBuf = (ByteBuf) msg;
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
         log.info("OnlineSize: " + maps.size());
+
 
         StringBuilder Str = new StringBuilder();
         for (byte byteItem : bytes) {
@@ -287,6 +289,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 log.info("连接可能断了，等待重连.....");
             } else {
                 doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
+                log.info("解包完成！！！！！！！！！！！！！！！！！！！");
             }
     }
     /*
@@ -847,6 +850,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 default:
                     break;
+
             }
         }
     }

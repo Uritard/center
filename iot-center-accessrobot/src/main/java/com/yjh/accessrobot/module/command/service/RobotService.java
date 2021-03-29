@@ -157,6 +157,7 @@ public class RobotService {
             if ("200".equals(code)){
                 scmap.put("code", 4);
                 scmap.put("result", "指令下发成功");
+                scmap.put("path",filePath);
             }else{
                 scmap.put("code", 3);
                 scmap.put("result", "指令下发失败");
@@ -1378,6 +1379,7 @@ public class RobotService {
                     .setCType(cType)
                     .setCState(238)//任务未开始
                     .setTaskCode(taskModelMap.get("task_code").toString())
+                    .setCreateTime(new Date())
                     .setRemark("0");
             log.info("tCruiseResult==="+tCruiseResult);
             tRobotInfoDao.insertTCruiseResult(tCruiseResult);

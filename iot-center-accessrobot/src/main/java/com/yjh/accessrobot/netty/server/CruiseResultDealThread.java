@@ -109,7 +109,7 @@ public class CruiseResultDealThread implements Runnable{
                 Integer cState = null;
                 switch (taskState){
                     case 1:
-                        cState = 240;break;//执行完成
+                        cState = 240;break;//已执行
                     case 2:
                         cState = 239;break;//正在执行
                     case 3:
@@ -122,7 +122,12 @@ public class CruiseResultDealThread implements Runnable{
                         cState = 244;break;//任务超期
                     default:break;
                 }
+                Set<String> cruiseKey = redisScan("t_cruise_task_result:" + taskId);
+                if (robotInfoKeys.size() == cruiseKey.size()){
+                    cState = 240;
+                }
                 tCruiseResult.setCState(cState);
+                tCruiseResult.setExecuteTime(sdf.parse(tCruiseTaskResultMap.get("createtime")));
                 log.info("tCruiseResult的内容是==="+tCruiseResult);
                 StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
             }
