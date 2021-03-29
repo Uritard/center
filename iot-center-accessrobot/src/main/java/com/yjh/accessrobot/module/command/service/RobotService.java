@@ -134,7 +134,7 @@ public class RobotService {
             }
 //        String code = Constant.robotResultMap.get("Code");
             String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
-            Map<String,Object> filePathMap = new HashMap<>();
+            /*Map<String,Object> filePathMap = new HashMap<>();
             String filePath = null;
             if (Objects.isNull(RobotServerHandler.getRobotResultMap().get("Item"))){
 //                filePathMap = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item")));
@@ -153,10 +153,10 @@ public class RobotService {
                 }else if (ftpFileName.endsWith(".mp4")){
                     filePath = ftpFilePath + "Video/"+ftpFileName;
                 }
-            }
+            }*/
             if ("200".equals(code)){
                 scmap.put("code", 4);
-                scmap.put("result", "指令下发成功,"+filePath);
+                scmap.put("result", "指令下发成功");
             }else{
                 scmap.put("code", 3);
                 scmap.put("result", "指令下发失败");
