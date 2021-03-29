@@ -46,17 +46,18 @@ public class TRobotCameraPresetController {
     public Result add(HttpServletRequest request, @RequestBody TRobotCameraPreset tRobotCameraPreset) {
         Result result = new Result();
         try {
-            int i = tRobotCameraPresetService.add(tRobotCameraPreset);
-            if(i == -1){
-                result.setCode(209,"此点号已存在");
-                return result;
-            }
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","10",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
             if(request != null  && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
                 if(!"4".equals(map.get("code"))){
                     result.setCode(209,map.get("result").toString());
+                    return  result;
+                }
+                int i = tRobotCameraPresetService.add(tRobotCameraPreset);
+                if(i == -1){
+                    result.setCode(209,"此点号已存在");
+                    return result;
                 }
             }
         } catch (BusinessException b) {
@@ -74,14 +75,15 @@ public class TRobotCameraPresetController {
         Result result = new Result();
         try {
             TRobotCameraPreset tRobotCameraPreset = tRobotCameraPresetService.selectByPrimaryId(presetId);
-            int i = tRobotCameraPresetService.deleteByPrimaryId(presetId);
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","12",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
             if(request != null && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
                 if(!"4".equals(map.get("code"))){
                     result.setCode(209,map.get("result").toString());
+                    return  result;
                 }
+                int i = tRobotCameraPresetService.deleteByPrimaryId(presetId);
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
