@@ -51,8 +51,7 @@ public class TStdRegionService{
 
     @Transactional(rollbackFor = Exception.class)
     public int update(Map<String, Object> map) {
-//        if (map.get("regionCode").equals("")) map.replace("regionCode",null);
-        map.remove("regionCode");
+        if (map.get("regionCode").equals("")) map.replace("regionCode",0);
         log.info("map: "+map);
         return this.tStdRegionDao.updateByMap(map);
     }
