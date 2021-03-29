@@ -1670,6 +1670,7 @@ public class CameraConService {
         log.info(path);
         log.info(points);
         String arrs[]=points.split(",");
+        log.info("arrs[]："+arrs.length);
         log.info("points"+arrs[0]);
         log.info("points"+arrs[1]);
 
@@ -1700,21 +1701,66 @@ public class CameraConService {
             BufferedReader reade=new BufferedReader(reader);
             String line = null;
             int index=0;
-            while((line=reade.readLine())!=null){
-                //CSV格式文件为逗号分隔符文件，这里根据逗号切分
-                String item[] = line.split(",");
-                if(index==row-1){
-                    if(item.length>=col-1){
-                        //temperature= item[col-1];
-                        log.info("温度值:"+item[col-1]);
-                        temperature= item[col-1].substring(0,5);
-                        log.info("温度值转换后的:"+temperature);
+            List<String > arr =new ArrayList<>();
+            if (arrs.length>2){
+                while ((line = reade.readLine()) != null) {
+                    //CSV格式文件为逗号分隔符文件，这里根据逗号切分
+                    String item[] = line.split(",");
+
+                    if (index >= row-1&&index<=x1-1) {
+                        for (int i=0;i<=item.length;i++)
+                        {
+                            if(col - 1<=i&&y1-1<=y1)
+                            {
+                                log.info("温度值:" + item[col - 1]);
+                                arr.add(item[col - 1]) ;
+                                log.info(arr.get(index));
+                            }
+                        }
 
                     }
+                    index++;
                 }
-                index++;
-                //if (arrs.length>2){if (index==x1-1&&item.length==y1-1){break;} }
+
+
+            }else {
+                while ((line = reade.readLine()) != null) {
+                    //CSV格式文件为逗号分隔符文件，这里根据逗号切分
+                    String item[] = line.split(",");
+                    if (index == row - 1) {
+                        if (item.length >= col - 1) {
+                            //temperature= item[col-1];
+                            log.info("温度值:" + item[col - 1]);
+                                temperature = new DecimalFormat("0.00").format(Double.parseDouble(item[col - 1]));
+                                log.info("温度值转换后的:" + temperature);
+                        }
+                    }
+                    index++;
+                }
             }
+            //获取最大温度值
+            if (arrs.length>2)
+            {
+
+                Double  [] arrss=new Double[arr.size()];
+                for (int i=0;i<arr.size();i++)
+                {
+                    arrss[i]=Double.parseDouble(arr.get(i));
+                }
+                Double max=arrss[0];
+                for (int i=0;i<arrss.length;i++){
+                    log.info(String.valueOf(arrss[i]));
+                    //4.把获取到的数据一次和temp进行比较，并将最大的值赋值给temp
+                    if(arrss[i]>max){
+                        max=arrss[i];
+                    }
+                }
+                //转换保留后两位小数
+                temperature= new DecimalFormat("0.00").format(max);
+                log.info("temperature转换保留后两位小数"+temperature);
+
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             log.info("Exception"+e.getMessage());
