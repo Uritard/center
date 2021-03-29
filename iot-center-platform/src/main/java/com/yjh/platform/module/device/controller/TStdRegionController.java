@@ -87,10 +87,10 @@ public class TStdRegionController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改区域",content = "根据用户传递的参数修改标准区域",logType = 3)
-    public Result update(@RequestBody TStdRegion tStdRegion) {
+    public Result update(@RequestBody Map<String, Object> map) {
         Result result = new Result();
         try {
-            result.setData(tStdRegionService.update(tStdRegion));
+            result.setData(tStdRegionService.update(map));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新区域异常:", e);

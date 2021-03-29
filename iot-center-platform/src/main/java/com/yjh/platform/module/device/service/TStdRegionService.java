@@ -40,15 +40,15 @@ public class TStdRegionService{
         return this.tStdRegionDao.deleteByPrimaryId(regionId);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public int update(TStdRegion tStdRegion) {
-        return this.tStdRegionDao.update(tStdRegion);
-    }
-
 //    @Transactional(rollbackFor = Exception.class)
-//    public int update(Map<String, Object> map) {
-//        return this.tStdRegionDao.updateByMap(map);
+//    public int update(TStdRegion tStdRegion) {
+//        return this.tStdRegionDao.update(tStdRegion);
 //    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int update(Map<String, Object> map) {
+        return this.tStdRegionDao.updateByMap(map);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public TStdRegion selectByPrimaryId(Long regionId) {

@@ -53,7 +53,7 @@ public class TStdRegion implements Serializable {
 
     @Max(value=999999999)
     @ApiModelProperty(value = "类型区域，标准测点区域类型：100；E机器人区域类型：101；相机区域类型：102")
-    @TableField(updateStrategy = FieldStrategy.NOT_NULL)
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Integer regionCode;
 
     @Length(max = 32,message = "stationId长度必须小于等于32")

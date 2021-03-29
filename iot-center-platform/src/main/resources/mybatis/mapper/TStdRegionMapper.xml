@@ -99,7 +99,7 @@
         <if test="map.sort != null ">a.sort = #{map.sort, jdbcType=INTEGER},</if>
         <if test="map.upRegionId != null ">a.up_region_id = #{map.upRegionId},</if>
         <if test="map.upRegionIds != null ">a.up_region_ids = #{map.upRegionIds},</if>
-        <if test="map.regionCode != null ">a.region_code = #{map.regionCode},</if>
+        a.region_code = #{map.regionCode},
         <if test="map.stationId != null ">a.station_id = #{map.stationId},</if>
         <if test="map.state != null ">a.state = #{map.state, jdbcType=INTEGER},</if>
         <if test="map.createTime != null">a.create_time = #{map.createTime, jdbcType=TIMESTAMP},</if>
