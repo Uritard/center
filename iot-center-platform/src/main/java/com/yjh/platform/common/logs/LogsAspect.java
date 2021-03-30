@@ -70,7 +70,7 @@ public class LogsAspect {
             } else { userName = "admin"; }
         }
         ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        log.info("tt-ip"+ip);
+        log.info("tt-ip: "+ip);
         Object result = null;
         if (annotation != null) {
             try {
