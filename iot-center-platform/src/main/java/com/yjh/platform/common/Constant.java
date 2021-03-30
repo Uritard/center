@@ -140,5 +140,6 @@ public class Constant {
         return "666";
     }
 
+    public static ConcurrentHashMap<String,Integer> taskStateMap=new ConcurrentHashMap<>();
 
 }

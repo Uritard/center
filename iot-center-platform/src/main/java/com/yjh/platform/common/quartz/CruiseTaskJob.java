@@ -150,6 +150,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseTaskAttrDao.batchInsert(attrList);
                 }
                 taskId = tCruiseTask.getTaskId();
+                Constant.taskStateMap.put(taskId,1);
                 Map<String,String> jasonMap=new HashMap<>();
                 jasonMap.put("type","newTask");
                 jasonMap.put("taskId",tCruiseTask.getTaskId());
@@ -861,6 +862,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             String jsonForShut=JSON.toJSONString(jsonMap);
                             log.info("任务终止的消息：   "+jsonForShut);
                             Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap);
+                            Constant.taskStateMap.put(taskId,0);
                         }
                         Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
                         Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
@@ -889,7 +891,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             Thread.sleep(15000);
                             tCruiseResult.setCState(240);
                             tCruiseResultDao.update(tCruiseResult);
-
+                            Constant.taskStateMap.put(taskId,0);
                             sendTaskStateToUp(tCruiseTask,1);
                         }
                         mapForAbnormal.put("abnormal",abnormal.toString());
@@ -911,6 +913,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         log.info("算法信息：    "+analysisMap);
                         analysis(analysisMap);
                         log.info("任务停止执行"+tCruiseTask.getTaskId());
+                        Constant.taskStateMap.put(taskId,0);
                         return;
                     }
                 }
@@ -949,7 +952,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     Thread.sleep(15000);
                     tCruiseResult.setCState(240);
                     tCruiseResultDao.update(tCruiseResult);
-
+                    Constant.taskStateMap.put(taskId,0);
                     sendTaskStateToUp(tCruiseTask,1);
 
                 }else {

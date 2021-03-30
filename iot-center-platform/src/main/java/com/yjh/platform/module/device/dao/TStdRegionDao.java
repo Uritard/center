@@ -18,7 +18,7 @@ public interface TStdRegionDao {
 
     int insert(TStdRegion tStdRegion);
     int deleteByPrimaryId(@Param(value = "regionId") Long regionId);
-    int update(TStdRegion tStdRegion);
+    int update(Map<String,Object> map);
     TStdRegion selectByPrimaryId(@Param(value = "regionId") Long regionId);
     List<TStdRegion> select(@Param(value = "regionId") Long regionId,
                                 @Param(value = "regionName") String regionName,

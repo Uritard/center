@@ -183,6 +183,7 @@ public class RunAtNowTask implements Runnable{
             log.info("开始进行任务" +taskStart);
             Long taskIsStart = taskStart.getTime();
             String taskId = tCruiseTask.getTaskId();
+            Constant.taskStateMap.put(taskId,1);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
             String taskDate = simpleDateFormat.format(tCruiseTask.getStartTime());
             Date date = null;
@@ -938,6 +939,7 @@ public class RunAtNowTask implements Runnable{
                         String jsonForShut=JSON.toJSONString(jsonMap);
                         log.info("任务终止的消息：   "+jsonForShut);
                         Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap);
+                        Constant.taskStateMap.put(taskId,0);
                     }
                     Integer abnormal = Integer.valueOf(mapForGet.get("abnormal")) + taskAbnormal;
                     Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
@@ -959,7 +961,7 @@ public class RunAtNowTask implements Runnable{
                         Thread.sleep(15000);
                         tCruiseResult.setCState(240);
                         tCruiseResultDao.update(tCruiseResult);
-
+                        Constant.taskStateMap.put(taskId,0);
                         sendTaskStateToUp(tCruiseTask,1);
                     }
                     mapForAbnormal.put("abnormal",abnormal.toString());
@@ -981,6 +983,7 @@ public class RunAtNowTask implements Runnable{
                     log.info("算法信息：    "+analysisMap);
                     analysis(analysisMap);
                     log.info("任务停止执行"+tCruiseTask.getTaskId());
+                    Constant.taskStateMap.put(taskId,0);
                     return;
                 }
             }
@@ -1026,7 +1029,7 @@ public class RunAtNowTask implements Runnable{
                 Thread.sleep(15000);
                 tCruiseResult.setCState(240);
                 tCruiseResultDao.update(tCruiseResult);
-
+                Constant.taskStateMap.put(taskId,0);
                 sendTaskStateToUp(tCruiseTask,1);
 
             }else {
