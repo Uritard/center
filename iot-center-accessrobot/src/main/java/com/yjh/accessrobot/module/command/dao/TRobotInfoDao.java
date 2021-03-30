@@ -81,4 +81,5 @@ public interface TRobotInfoDao {
     int insertWarn(TWarnInfo warnInfo);
     int updateIsWarn(@Param(value = "cruiseDataId")Long cruiseDataId);
     TStdDeviceMete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
+    Long selectIsRobotTask(@Param(value = "taskId")String taskId);
 }
