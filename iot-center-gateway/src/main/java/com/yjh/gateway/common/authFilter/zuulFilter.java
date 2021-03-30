@@ -66,6 +66,7 @@ public class zuulFilter extends ZuulFilter {
             HttpServletRequest request = ctx.getRequest();
             String url = request.getRequestURI();
             log.info("tt-url: "+ IPUtil.getRemoteIP(request));
+            ctx.getZuulRequestHeaders().put("HTTP_X_FORWARDED_FOR", IPUtil.getRemoteIP(request));
             if (!url.contains("/sysUser/v1/login")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                 String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
