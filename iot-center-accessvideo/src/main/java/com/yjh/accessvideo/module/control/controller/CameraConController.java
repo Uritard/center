@@ -375,8 +375,8 @@ public class CameraConController {
         Result result = new Result();
         try {
             cameraConService.isCameraControlled(cameraId);
-            String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
-            String filePath = capturePresetPath + filePathTem;
+//            String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
+//            String filePath = capturePresetPath + filePathTem;
             String cmd = "rm -rf "+capturePresetPath+"/"+presetId;
             log.info("删除语句"+cmd);
             Runtime.getRuntime().exec(cmd);

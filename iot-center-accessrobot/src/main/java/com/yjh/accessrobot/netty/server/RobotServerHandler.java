@@ -623,7 +623,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             info.put("precipitationUnit","mm");
                         }
                         if("6".equals(weatherMap.get("type"))){
-                            info.put("windDirection",weatherMap.get("value").toString());
+                            if("".equals(weatherMap.get("value")) || null==weatherMap.get("value")){
+                                info.put("windDirection","--");
+                            }else {
+                                info.put("windDirection",weatherMap.get("value").toString());
+                            }
+
                             //info.put("precipitationUnit","mm");
                         }
                     });
