@@ -116,13 +116,13 @@
         <if test="cameraIp != null">a.camera_ip = #{cameraIp},</if>
         <if test="owner != null">a.owner = #{owner},</if>
         <if test="ownerCode != null">a.owner_code = #{ownerCode},</if>
-        a.channel_num = #{channelNum},
-        a.camera_type = #{cameraType},
-        a.up_region_id = #{upRegionId},
+        <if test="channelNum != null">a.channel_num = #{channelNum},</if>
+        <if test="cameraType != null">a.camera_type = #{cameraType},</if>
+        <if test="upRegionId != null">a.up_region_id = #{upRegionId},</if>
         <if test="vendorId != null">a.vendor_id = #{vendorId},</if>
         <if test="protocolType != null">a.protocol_type = #{protocolType},</if>
-        a.protocol_type = #{protocolType},
-        a.port = #{port},
+        <if test="port != null">a.port = #{port},</if>
+        <if test="rtspPort != null">a.rtsp_port = #{rtspPort},</if>
         <if test="address != null">a.address = #{address},</if>
         <if test="cameraModel != null">a.camera_model = #{cameraModel},</if>
         <if test="remark != null">a.remark = #{remark},</if>

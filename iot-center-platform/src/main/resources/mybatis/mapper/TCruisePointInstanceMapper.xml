@@ -103,23 +103,23 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstance">
         update t_cruise_point_instance a <set>
         <if test="instanceId != null ">a.instance_id = #{instanceId},</if>
-        a.device_mete_id = #{deviceMeteId},
+        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
         <if test="stationId != null">a.station_id = #{stationId},</if>
         <if test="stationName != null">a.station_name = #{stationName},</if>
-        a.device_id = #{deviceId},
-        a.custom_id = #{customId},
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        <if test="customId != null ">a.custom_id = #{customId},</if>
         <if test="dataFormat != null ">a.data_format = #{dataFormat},</if>
-        a.identify_type = #{identifyType, jdbcType=INTEGER},
-        a.identify_son_type = #{identifySonType, jdbcType=INTEGER},
-        a.cruise_type = #{cruiseType, jdbcType=INTEGER},
-        a.cruise_id = #{cruiseId},
+        <if test="identifyType != null ">a.identify_type = #{identifyType, jdbcType=INTEGER},</if>
+        <if test="identifySonType != null ">a.identify_son_type = #{identifySonType, jdbcType=INTEGER},</if>
+        <if test="cruiseType != null ">a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
+        <if test="cruiseId != null ">a.cruise_id = #{cruiseId},</if>
         <if test="cruiseName != null ">a.cruise_name = #{cruiseName},</if>
         <if test="cruiseContent != null ">a.cruise_content = #{cruiseContent},</if>
         <if test="positionType != null ">a.position_type = #{positionType},</if>
         <if test="unit != null ">a.unit = #{unit},</if>
-        a.if_sy = #{ifSy, jdbcType=INTEGER},
-        a.sy_type = #{syType, jdbcType=INTEGER},
-        a.if_videotape = #{ifVideotape, jdbcType=INTEGER},
+        <if test="ifSy != null ">a.if_sy = #{ifSy, jdbcType=INTEGER},</if>
+        <if test="syType != null ">a.sy_type = #{syType, jdbcType=INTEGER},</if>
+        <if test="ifVideotape != null ">a.if_videotape = #{ifVideotape, jdbcType=INTEGER},</if>
         <if test="videotapeTime != null ">a.videotape_time = #{videotapeTime},</if>
         <if test="textDesc != null and textDesc != ''">a.text_desc = #{textDesc, jdbcType=VARCHAR},</if>
         <if test="sort != null and ">a.sort = #{sort},</if>

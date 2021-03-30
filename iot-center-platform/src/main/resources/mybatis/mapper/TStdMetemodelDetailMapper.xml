@@ -114,12 +114,12 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdMeteModelDetail">
         update t_std_metemodel_detail a <set>
         <if test="modelId != null ">a.model_id = #{modelId},</if>
-        a.mete_id = #{meteId},
-        a.custom_id = #{customType},
+        <if test="meteId != null ">a.mete_id = #{meteId},</if>
+        <if test="customType != null">a.custom_id = #{customType},</if>
         <if test="meteName != null ">a.mete_name = #{meteName},</if>
-        a.mete_type = #{meteType},
-         a.mete_kind = #{meteKind, jdbcType=INTEGER},
-         a.analyse_type = #{analyseType, jdbcType=INTEGER},
+        <if test="meteType != null ">a.mete_type = #{meteType},</if>
+        <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
+        <if test="analyseType != null"> a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
         <if test="unit != null ">a.unit = #{unit},</if>
         a.alarm_note = #{alarmNote},
         <if test="alarmExplain != null ">a.alarm_explain = #{alarmExplain},</if>

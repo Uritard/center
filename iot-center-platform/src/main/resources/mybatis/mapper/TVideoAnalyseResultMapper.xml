@@ -60,7 +60,7 @@
         a.algorithm_status = #{algorithmStatus, jdbcType=INTEGER},
         <if test="resultRate != null ">a.result_rate = #{resultRate},</if>
         <if test="resultDescribe != null ">a.result_describe = #{resultDescribe},</if>
-        a.reserver = #{reserver, jdbcType=INTEGER},
+        <if test="reserver != null ">a.reserver = #{reserver, jdbcType=INTEGER},</if>
     </set>
             where a.algorithm_result_id = #{algorithmResultId, jdbcType=BIGINT}
     </update>

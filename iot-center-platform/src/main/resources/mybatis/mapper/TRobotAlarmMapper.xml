@@ -78,15 +78,15 @@
         update t_robot_alarm a <set>
         <if test="robotAlarmId != null">a.robot_alarm_id = #{robotAlarmId},</if>
         <if test="alarmName != null">a.alarm_name = #{alarmName},</if>
-        a.robot_id = #{robotId},
+        <if test="robotId != null">a.robot_id = #{robotId},</if>
         <if test="stationId != null ">a.station_id = #{stationId},</if>
-        a.alarm_type = #{alarmType, jdbcType=INTEGER},
-        a.alarm_level = #{alarmLevel, jdbcType=INTEGER},
+        <if test="alarmType != null ">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
+        <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
         <if test="alarmInfo != null">a.alarm_info = #{alarmInfo},</if>
         <if test="alarmTime != null ">a.alarm_time = #{alarmTime},</if>
-        a.deal_type = #{dealType, jdbcType=INTEGER},
+        <if test="dealType != null ">a.deal_type = #{dealType, jdbcType=INTEGER},</if>
         <if test="dealInfo != null">a.deal_info = #{dealInfo},</if>
-        a.deal_person_id = #{dealPersonId},
+        <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
         <if test="dealTime != null ">a.deal_time = #{dealTime, jdbcType=TIMESTAMP},</if>
         <if test="positionStationNum != null">a.position_station_num = #{positionStationNum},</if>
         <if test="positionOffset != null ">a.position_offset = #{positionOffset},</if>

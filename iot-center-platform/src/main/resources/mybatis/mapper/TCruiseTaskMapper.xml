@@ -66,14 +66,14 @@
         update t_cruise_task a <set>
         <if test="taskId != null">a.task_id = #{taskId},</if>
         <if test="taskName != null">a.task_name = #{taskName},</if>
-        a.plan_id = #{planId},
-        a.area_id = #{areaId},
-        a.type = #{type, jdbcType=INTEGER},
-        a.if_run = #{ifRun, jdbcType=INTEGER},
-        a.robot_id = #{robotId},
+        <if test="planId != null">a.plan_id = #{planId},</if>
+        <if test="areaId != null ">a.area_id = #{areaId},</if>
+        <if test="type != null">a.type = #{type, jdbcType=INTEGER},</if>
+        <if test="ifRun != null">a.if_run = #{ifRun, jdbcType=INTEGER},</if>
+        <if test="robotId != null ">a.robot_id = #{robotId},</if>
         <if test="dateType != null ">a.date_type = #{dateType},</if>
-        a.task_type = #{taskType, jdbcType=INTEGER},
-        a.task_level = #{taskLevel, jdbcType=INTEGER},
+        <if test="taskType != null">a.task_type = #{taskType, jdbcType=INTEGER},</if>
+        <if test="taskLevel != null">a.task_level = #{taskLevel, jdbcType=INTEGER},</if>
         <if test="startTime != null ">a.start_time = #{startTime},</if>
         <if test="createTime != null ">a.create_time = #{createTime},</if>
     </set>

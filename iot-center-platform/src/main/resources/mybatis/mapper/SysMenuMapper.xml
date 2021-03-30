@@ -73,18 +73,18 @@
         <if test="menuId != null ">a.menu_id = #{menuId},</if>
         <if test="menuName != null">a.menu_name = #{menuName},</if>
         <if test="menuCode != null ">a.menu_code = #{menuCode},</if>
-        a.up_id = #{upId},
+        <if test="upId != null ">a.up_id = #{upId},</if>
         <if test="iconCode != null ">a.icon_code = #{iconCode},</if>
         <if test="iconUrl != null ">a.icon_url = #{iconUrl},</if>
-        a.menu_type = #{menuType, jdbcType=INTEGER},
-        a.menu_level = #{menuLevel, jdbcType=INTEGER},
+        <if test="menuType != null ">a.menu_type = #{menuType, jdbcType=INTEGER},</if>
+        <if test="menuLevel != null ">a.menu_level = #{menuLevel, jdbcType=INTEGER},</if>
         <if test="elementCode != null ">a.element_code = #{elementCode},</if>
-        a.state = #{state, jdbcType=INTEGER},
-        a.sort = #{sort, jdbcType=INTEGER},
-        a.link_type = #{linkType, jdbcType=INTEGER},
+        <if test="state != null ">a.state = #{state, jdbcType=INTEGER},</if>
+        <if test="sort != null ">a.sort = #{sort, jdbcType=INTEGER},</if>
+        <if test="linkType != null ">a.link_type = #{linkType, jdbcType=INTEGER},</if>
         <if test="url != null and">a.url = #{url},</if>
-        a.creator_id = #{creatorId},
-        a.sys_state = #{sysState, jdbcType=INTEGER},
+        <if test="creatorId != null">a.creator_id = #{creatorId},</if>
+        <if test="sysState != null ">a.sys_state = #{sysState, jdbcType=INTEGER},</if>
     </set>
             where a.menu_id = #{menuId, jdbcType=BIGINT}
     </update>

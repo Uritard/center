@@ -118,18 +118,18 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDevice">
         update t_std_device a <set>
         <if test="deviceId != null ">a.device_id = #{deviceId},</if>
-        a.custom_id = #{customId},
+        <if test="customId != null ">a.custom_id = #{customId},</if>
         <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
         <if test="deviceName != null">a.device_name = #{deviceName},</if>
         <if test="aliasName != null ">a.alias_name = #{aliasName},</if>
-        a.device_type = #{deviceType, jdbcType=INTEGER},
+        <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
         <if test="positionType != null ">a.position_type = #{positionType},</if>
         <if test="modelId != null ">a.model_id = #{modelId},</if>
         <if test="regionPath != null">a.region_path = #{regionPath},</if>
         <if test="upRegionId != null">a.up_region_id = #{upRegionId},</if>
         <if test="upRegionName != null ">a.up_region_name = #{upRegionName},</if>
         <if test="customName != null ">a.custom_name = #{customName},</if>
-        a.custom_type = #{customType, jdbcType=INTEGER},
+        <if test="customType != null ">a.custom_type = #{customType, jdbcType=INTEGER},</if>
         <if test="status != null ">a.status = #{status, jdbcType=INTEGER},</if>
         a.update_time = CURRENT_TIMESTAMP(),
     </set>

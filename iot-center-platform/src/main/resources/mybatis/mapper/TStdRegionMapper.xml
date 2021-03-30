@@ -76,14 +76,14 @@
         where a.region_id = #{regionId, jdbcType=BIGINT}
     </update>-->
 
-    <update id="update" parameterType="java.util.Map">
+    <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdRegion">
         update t_std_region a <set>
         <if test="regionId != null">a.region_id = #{regionId},</if>
         <if test="regionName != null ">a.region_name = #{regionName},</if>
         <if test="sort != null ">a.sort = #{sort, jdbcType=INTEGER},</if>
         <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
         <if test="upRegionIds != null ">a.up_region_ids = #{upRegionIds},</if>
-        <if test="regionCode != null ">a.region_code = #{regionCode},</if>
+        a.region_code = #{regionCode, jdbcType=INTEGER},
         <if test="stationId != null ">a.station_id = #{stationId},</if>
         <if test="state != null ">a.state = #{state, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>

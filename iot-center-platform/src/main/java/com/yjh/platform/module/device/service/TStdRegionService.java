@@ -47,16 +47,15 @@ public class TStdRegionService{
 
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdRegion tStdRegion) {
-        Map<String,Object> map = Object2Map.objectToMap(tStdRegion);
-        return this.tStdRegionDao.updateByMap(map);
+        return this.tStdRegionDao.update(tStdRegion);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public int update(Map<String, Object> map) {
-        if (map.get("regionCode").equals("")) map.replace("regionCode",0);
-        log.info("map: "+map);
-        return this.tStdRegionDao.updateByMap(map);
-    }
+//    @Transactional(rollbackFor = Exception.class)
+//    public int update(Map<String, Object> map) {
+//        if (map.get("regionCode").equals("")) map.replace("regionCode",0);
+//        log.info("map: "+map);
+//        return this.tStdRegionDao.updateByMap(map);
+//    }
 
     @Transactional(rollbackFor = Exception.class)
     public TStdRegion selectByPrimaryId(Long regionId) {

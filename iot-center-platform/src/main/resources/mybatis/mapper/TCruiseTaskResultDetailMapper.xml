@@ -56,14 +56,14 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruiseTaskResultDetail">
         update t_cruise_task_result_detail a <set>
         <if test="cruiseResultId != null ">a.cruise_result_id = #{cruiseResultId},</if>
-        a.task_result_id = #{taskResultId},
-        a.device_id = #{deviceId},
+        <if test="taskResultId != null">a.task_result_id = #{taskResultId},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
         <if test="deviceName != null ">a.device_name = #{deviceName},</if>
-        a.instance_id = #{instanceId},
+        <if test="instanceId != null">a.instance_id = #{instanceId},</if>
         <if test="instanceName != null ">a.instance_name = #{instanceName},</if>
         a.cruise_time = #{cruiseTime, jdbcType=TIMESTAMP},
         a.end_time = #{endTime, jdbcType=TIMESTAMP},
-        a.cruise_status = #{cruiseStatus, jdbcType=INTEGER},
+        <if test="cruiseStatus != null">a.cruise_status = #{cruiseStatus, jdbcType=INTEGER},</if>
         <if test="remark != null ">a.remark = #{remark},</if>
     </set>
             where a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR}

@@ -111,32 +111,32 @@
         update t_cfg_mete a <set>
         <if test="meteId != null">a.mete_id = #{meteId},</if>
         <if test="meteType != null">a.mete_type = #{meteType},</if>
-        a.mete_kind = #{meteKind, jdbcType=INTEGER},
+        <if test="meteKind != null ">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
         <if test="meteName != null ">a.mete_name = #{meteName},</if>
         <if test="meteCode != null ">a.mete_code = #{meteCode},</if>
         <if test="unit != null ">a.unit = #{unit},</if>
         <if test="meteExplainType != null ">a.mete_explain_type = #{meteExplainType},</if>
         <if test="createTime != null">a.create_time = #{createTime},</if>
         <if test="updateTime != null and">a.update_time = #{updateTime},</if>
-        a.modulus = #{modulus, jdbcType=INTEGER},
+        <if test="modulus != null ">a.modulus = #{modulus, jdbcType=INTEGER},</if>
         <if test="stationName != null">a.station_name = #{stationName},</if>
         <if test="stationId != null ">a.station_id = #{stationId},</if>
-        a.up_effect = #{upEffect, jdbcType=INTEGER},
-        a.down_effect = #{downEffect, jdbcType=INTEGER},
-        a.alarmlevel = #{alarmlevel, jdbcType=INTEGER},
-        a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER},
+        <if test="upEffect != null ">a.up_effect = #{upEffect, jdbcType=INTEGER},</if>
+        <if test="downEffect != null ">a.down_effect = #{downEffect, jdbcType=INTEGER},</if>
+        <if test="alarmlevel != null ">a.alarmlevel = #{alarmlevel, jdbcType=INTEGER},</if>
+        <if test="alarmthresbhold != null ">a.alarmthresbhold = #{alarmthresbhold, jdbcType=INTEGER},</if>
         <if test="describer != null">a.describer = #{describer},</if>
-        a.mete_precision = #{metePrecision, jdbcType=INTEGER},
-        a.change_limit = #{changeLimit},
-        a.hilimit1 = #{hilimit1},
-        a.lolimit1 = #{lolimit1},
-        a.hilimit2 = #{hilimit2},
-        a.lolimit2 = #{lolimit2},
-        a.hilimit3 = #{hilimit3},
-        a.lolimit3 = #{lolimit3},
-        a.hilimit4 = #{hilimit4},
-        a.stander = #{stander},
-        a.controlenable = #{controlenable, jdbcType=INTEGER},
+        <if test="metePrecision != null">a.mete_precision = #{metePrecision, jdbcType=INTEGER},</if>
+        <if test="changeLimit != null">a.change_limit = #{changeLimit},</if>
+        <if test="hilimit1 != null ">a.hilimit1 = #{hilimit1},</if>
+        <if test="lolimit1 != null ">a.lolimit1 = #{lolimit1},</if>
+        <if test="hilimit2 != null ">a.hilimit2 = #{hilimit2},</if>
+        <if test="lolimit2 != null ">a.lolimit2 = #{lolimit2},</if>
+        <if test="hilimit3 != null ">a.hilimit3 = #{hilimit3},</if>
+        <if test="lolimit3 != null ">a.lolimit3 = #{lolimit3},</if>
+        <if test="hilimit4 != null ">a.hilimit4 = #{hilimit4},</if>
+        <if test="stander != null ">a.stander = #{stander},</if>
+        <if test="controlenable != null ">a.controlenable = #{controlenable, jdbcType=INTEGER},</if>
     </set>
             where a.mete_id = #{meteId, jdbcType=VARCHAR}
     </update>

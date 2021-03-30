@@ -83,19 +83,19 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TVideoAlgoResult">
         update t_video_algo_result a <set>
         <if test="id!= null ">a.id = #{id},</if>
-        a.point_id = #{pointId},
+        <if test="pointId != null ">a.point_id = #{pointId},</if>
         <if test="taskId != null ">a.task_id = #{taskId},</if>
-        a.plan_id = #{planId},
-        a.device_id = #{deviceId},
-        a.preset_id = #{presetId},
-        a.device_mete_id = #{deviceMeteId},
+        <if test="planId != null ">a.plan_id = #{planId},</if>
+        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        <if test="presetId != null">a.preset_id = #{presetId},</if>
+        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
         <if test="picUrl != null ">a.pic_url = #{picUrl},</if>
         <if test="cusId != null ">a.cus_id = #{cusId},</if>
-        a.algorithm_id = #{algorithmId},
+        <if test="algorithmId != null ">a.algorithm_id = #{algorithmId},</if>
         <if test="status != null ">a.status = #{status},</if>
         <if test="analyseResult != null ">a.analyse_result = #{analyseResult},</if>
         <if test="picOrignal != null ">a.pic_orignal = #{picOrignal},</if>
-        a.evaluation_state = #{evaluationState, jdbcType=INTEGER},
+        <if test="evaluationState != null ">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
         <if test="signpic != null ">a.signpic = #{signpic},</if>
         <if test="algorithmType != null ">a.algorithm_type = #{algorithmType},</if>
         <if test="algorithmSonType != null ">a.algorithm_son_type = #{algorithmSonType},</if>
