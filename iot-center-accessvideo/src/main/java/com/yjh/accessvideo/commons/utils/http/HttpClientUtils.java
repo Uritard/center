@@ -236,43 +236,32 @@ public class HttpClientUtils {
     /**
      * 发送http delete请求
      */
-    public static void httpDelete(String url, Map<String,String> headers, String encode){
-        if(encode == null){
-            encode = "utf-8";
-        }
-        String content = null;
+    public static void httpDelete(String url, Map<String,String> headers){
+//        if(encode == null){ encode = "utf-8"; }
+//        String content = null;
         //since 4.3 不再使用 DefaultHttpClient
         CloseableHttpClient closeableHttpClient = HttpClientBuilder.create().build();
         HttpDelete httpdelete = new HttpDelete(url);
         //设置header
         if (headers != null && headers.size() > 0) {
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
-                httpdelete.setHeader(entry.getKey(),entry.getValue());
-            }
+            for (Map.Entry<String, String> entry : headers.entrySet()) { httpdelete.setHeader(entry.getKey(),entry.getValue()); }
         }
         CloseableHttpResponse httpResponse = null;
         try {
-            httpResponse = closeableHttpClient.execute(httpdelete);
-            HttpEntity entity = httpResponse.getEntity();
-            content = EntityUtils.toString(entity, encode);
+            closeableHttpClient.execute(httpdelete);
+//            httpResponse = closeableHttpClient.execute(httpdelete);
+//            HttpEntity entity = httpResponse.getEntity();
+//            content = EntityUtils.toString(entity, encode);
 //            response.setBody(content);
 //            response.setHeaders(httpResponse.getAllHeaders());
 //            response.setReasonPhrase(httpResponse.getStatusLine().getReasonPhrase());
 //            response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) { e.printStackTrace();
         }finally{
-            try {
-                httpResponse.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            try { httpResponse.close(); } catch (IOException e) { e.printStackTrace(); }
         }
-        try {   //关闭连接、释放资源
-            closeableHttpClient.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //关闭连接、释放资源
+        try { closeableHttpClient.close(); } catch (IOException e) { e.printStackTrace(); }
     }
 
 }

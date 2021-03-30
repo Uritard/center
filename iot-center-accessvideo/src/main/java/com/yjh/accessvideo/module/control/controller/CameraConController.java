@@ -99,7 +99,7 @@ public class CameraConController {
                     //踢掉
                     if(StringUtils.isNotEmpty(cid)){
                         String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
-                        HttpClientUtils.httpDelete(delteUrl,null,null);
+                        HttpClientUtils.httpDelete(delteUrl,null);
                     }
                     break;
                 }
