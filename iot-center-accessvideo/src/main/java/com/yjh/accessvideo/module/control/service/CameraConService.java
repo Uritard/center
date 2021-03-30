@@ -1422,9 +1422,7 @@ public class CameraConService {
                     log.info("hotFircsv地址：" + path);
                     byte[] byTempData = new byte[4];
                     FileWriter fos = new FileWriter(path);
-                    // for (int i = 1 ;i<= m_strJpegWithAppenData.dwJpegPicWidth;i++)
                     for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicHeight; i++) {
-//                        for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++) {
                         for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicWidth; j++) {
                             ByteBuffer buffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i - 1) * (j - 1) * 4, 4);
                             buffers.get(byTempData);
@@ -1717,7 +1715,7 @@ public class CameraConService {
                         {
                             if(col<=i&&i<=y1)
                             {
-                                log.info("框测温度值:" + item[col - 1]);
+                                //log.info("框测温度值:" + item[col - 1]);
                                 arr.add(item[col - 1]) ;
                                // log.info("框测温度值:"+arr.get(index));
                             }
@@ -1729,11 +1727,11 @@ public class CameraConService {
                 for (int i=0;i<arr.size();i++)
                 {
                     arrss[i]=Double.parseDouble(arr.get(i));
-                    log.info("Double arrss[i]="+arrss[i]);
+                     log.info("Double arrss[i]="+arrss[i]);
                 }
                 Double max=arrss[0];
                 for (int i=0;i<arrss.length;i++){
-                    log.info(String.valueOf(arrss[i]));
+                   // log.info(String.valueOf(arrss[i]));
                     //4.把获取到的数据一次和temp进行比较，并将最大的值赋值给temp
                     if(arrss[i]>max){
                         max=arrss[i];
@@ -1743,18 +1741,13 @@ public class CameraConService {
                 //转换保留后两位小数
                 temperature= new DecimalFormat("0.00").format(max);
                 log.info("框测temperature转换保留后两位小数"+temperature);
-
-
-
-
             }else {
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
                     String item[] = line.split(",");
                     if (index == row - 1) {
                         if (item.length >= col - 1) {
-                            //temperature= item[col-1];
-                            log.info("温度值:" + item[col - 1]);
+                            //log.info("温度值:" + item[col - 1]);
                                 temperature = new DecimalFormat("0.00").format(Double.parseDouble(item[col - 1]));
                                 log.info("温度值转换后的:" + temperature);
                         }
@@ -1784,15 +1777,22 @@ public class CameraConService {
         int y;
         int x1=0;
         int y1=0;
+        log.info("cameraId>:"+cameraId);
         if (arrs.length>2)
         {
             x=Integer.parseInt(arrs[0]);
             y=Integer.parseInt(arrs[1]);
             x1=Integer.parseInt(arrs[2]);
             y1=Integer.parseInt(arrs[3]);
+            log.info("x>:"+x);
+            log.info("y>:"+y);
+            log.info("x1>:"+x1);
+            log.info("y1>:"+y1);
         }else {
             x=Integer.parseInt(arrs[0]);
             y=Integer.parseInt(arrs[1]);
+            log.info("x>:"+x);
+            log.info("y>:"+y);
         }
 
         String list="00.00";
@@ -1843,15 +1843,13 @@ public class CameraConService {
             {
                 if (m_strJpegWithAppenData.dwP2PDataLen>0)
                 {
-                  //  list.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                     byte [] byTempData = new byte[4];
                     float[] arr =new float[m_strJpegWithAppenData.dwP2PDataLen];
-
                         if (arrs.length>2){
                             for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicWidth; i++) {
                                 if (i>=x&&i<=x1) {
                                     for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++) {
-                                        if (y <= j&& j<=y1) {
+                                        if (y<= j&& j<=y1) {
                                             ByteBuffer TempDatabuffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i - 1) * (j - 1) * 4, 4);
                                             TempDatabuffers.get(byTempData);
                                             int l;
@@ -1879,13 +1877,9 @@ public class CameraConService {
                             max=arr[i];
                         }
                     }
-
                            list=new  DecimalFormat("##0.00").format(max);
                      log.info("list框测"+list);
-
-
                         }else {
-
                             for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicWidth; i++) {
                                 if (i == x) {
                                     for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++) {
@@ -1901,7 +1895,8 @@ public class CameraConService {
                                             l &= 0xffffff;
                                             l |= ((long) byTempData[3] << 24);
                                             // arr[i]=Float.intBitsToFloat(l);
-                                            list = String.valueOf(l);
+                                            list=  new  DecimalFormat("##0.00").format(Float.intBitsToFloat(l));
+                                           // list = String.valueOf(l);
                                             log.info("list点测数据"+list);
                                         }
 
@@ -1910,8 +1905,6 @@ public class CameraConService {
                                 }
                             }
                         }
-
-
                 }else
                 {
                     list=null;

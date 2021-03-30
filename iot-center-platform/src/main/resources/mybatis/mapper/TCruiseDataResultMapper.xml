@@ -712,4 +712,15 @@
         WHERE a.task_id= #{taskId,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectByCameraId" parameterType="com.yjh.platform.module.task.entity.TCruiseDataResult" resultType="com.yjh.platform.module.task.entity.TCruiseDataResult">
+        select a.cruise_data_id,a.result_pic,a.fir_name,a.fir_date,d.camera_id  from  t_cruise_data_result a
+      LEFT JOIN t_cruise_task_result_detail b  on a.cruise_result_id=b.cruise_result_id
+			LEFT JOIN t_cruise_point_instance  c     on  b.instance_id  =c.instance_id
+			LEFT JOIN  t_camera_preset d             on  c.cruise_id=d.preset_id
+			 where d.camera_id=#{taskId,jdbcType=Long}
+			 and  fir_name={firName,jdbcType=VARCHAR}
+			 and  fir_date between {STR_TO_DATE(startTime,'%Y-%m-%d %H:%i:%s'),jdbcType=data} and  between {STR_TO_DATE(endTime,'%Y-%m-%d %H:%i:%s'),jdbcType=VARCHAR}
+
+    </select>
+
 </mapper>

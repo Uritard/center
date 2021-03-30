@@ -443,6 +443,32 @@ public class TCruiseDataResultController {
         }
         return result;
     }
+    @ApiOperation(value = "根据cameraId分页查询")
+    @RequestMapping(value = "/selectByCameraId",method = RequestMethod.GET)
+    @Logs(title = "根据cameraId分页查询",content = "根据cameraId分页查询",logType = 1)
+    public Result selectByCameraId(@RequestParam(value = "cameraId", required = false) Long cameraId,
+                                   @RequestParam(value = "endDate", required = false) String endDate,
+                                   @RequestParam(value = "fileName", required = false) String fileName,
+                                   @RequestParam(value = "startDate", required = false) String startDate,
+                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                   @RequestParam(value = "pageSize", required = false, defaultValue = "4") int pageSize)
+    {
+
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        Page page = PageHelper.startPage(pageNum, pageSize,true, null, true);
+        try {
+            List<FirAndPicInfo> list = tCruiseDataResultService.selectByCameraId(cameraId,startDate,endDate,fileName);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("cameraId查询：", e);
+        }
+        return result;
+    }
+
 
     /*@ApiOperation(value = "主键查询")
     @GetMapping(value = "/selectByPicFirPrimaryId")

@@ -64,24 +64,40 @@ public class VideoIntercomService {
    {
        List<VideoIntercom> lists=new ArrayList<>();
        List<VideoIntercom> list =videoIntercomDao.selectByPage(cameraName,regionIdList);
-      /*try {
+     /* try {
 
-          for (int i=0;i<list.size();i++ )
+          for (VideoIntercom t:list)
           {
 
               VideoIntercom videoIntercom=new VideoIntercom();
-              String url = videoUrl + "?videoIntercomId=" +  list.get(i).getVideoIntercomId();
+              String url = videoUrl + "?videoIntercomId=" +  t.getVideoIntercomId();
               String services = HttpClientUtils.getInstance().getUrl(url, null);
               JSONObject jsonObject = JSONObject.parseObject(services);
               String re =jsonObject.get("data").toString();
               if (Integer.parseInt(re)==0)
               {
-                  list.get(i).setState(0);
+                  videoIntercom.setState(0);
               }else
               {
-                  list.get(i).setState(1);
+                  videoIntercom.setState(1);
               }
-              videoIntercom=list.get(i);
+              videoIntercom.setVideoIntercomId(t.getVideoIntercomId());
+              videoIntercom.setOwner(t.getOwner());
+              videoIntercom.setAddress(t.getAddress());
+              videoIntercom.setCameraIp(t.getCameraIp());
+              videoIntercom.setCameraModel(t.getCameraModel());
+              videoIntercom.setCameraName(t.getCameraName());
+              videoIntercom.setCameraType(t.getCameraType());
+              videoIntercom.setChannelNum(t.getChannelNum());
+              videoIntercom.setOwnerCode(t.getOwnerCode());
+              videoIntercom.setPort(t.getPort());
+              videoIntercom.setProtocolType(t.getProtocolType());
+              videoIntercom.setRegionName(t.getRegionName());
+              videoIntercom.setRemark(t.getRemark());
+              videoIntercom.setRtspPort(t.getRtspPort());
+              videoIntercom.setUpRegionId(t.getUpRegionId());
+              videoIntercom.setVendor(t.getVendor());
+              videoIntercom.setVendorId(t.getVendorId());
               lists.add(videoIntercom);
 
           }
@@ -91,6 +107,6 @@ public class VideoIntercomService {
       }
       return lists;*/
 
-       return videoIntercomDao.selectByPage(cameraName,regionIdList);
+      return videoIntercomDao.selectByPage(cameraName,regionIdList);
    }
 }
