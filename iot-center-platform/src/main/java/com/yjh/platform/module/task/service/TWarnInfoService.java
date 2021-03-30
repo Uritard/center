@@ -261,7 +261,7 @@ public class TWarnInfoService{
         int jieGuo = 0;
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
         if (Objects.nonNull(defectModel)){
-            if (defectModel == warnFlag){//告警产生的缺陷：其他
+            if (defectModel.equals(warnFlag)){//告警产生的缺陷：其他
                 TWarnInfo tWarnInfo = new TWarnInfo()
                         .setDealInfo(dealInfo)
                         .setWarnId(warnId)
@@ -397,7 +397,7 @@ public class TWarnInfoService{
     public TWarnInfoDetail selectWarnPopUp(String warnId,Integer defectModel) throws Exception{
         TWarnInfoDetail tWarnInfoDetail = new TWarnInfoDetail();
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
-        if (defectModel == warnFlag){//告警信息
+        if (defectModel.equals(warnFlag)){//告警信息
             tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(Long.valueOf(warnId));
         }else {//缺陷信息
 //            tWarnInfoDetail = tDefectInfoDao.selectWarnPopUp(warnId);

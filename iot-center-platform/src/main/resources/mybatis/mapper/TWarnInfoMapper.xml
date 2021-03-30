@@ -844,7 +844,7 @@
         FROM
         t_dict_business a
         WHERE 1 = 1
-        <if test="dictCode != null "> and a.dict_cote = #{dictNote, jdbcType=VARCHAR}</if>
+        <if test="dictNote != null "> and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
         <if test="colName != null "> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
     </select>
     <select id="selectName" resultType="java.util.Map">
