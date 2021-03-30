@@ -443,6 +443,7 @@
         LEFT JOIN t_dict_business b ON a.c_state=b.dict_code AND b.col_name='task_state'
 
         WHERE a.c_state in(239,241)
+        AND a.robot IS NULL
         ORDER BY d.start_time DESC
 </select>
 

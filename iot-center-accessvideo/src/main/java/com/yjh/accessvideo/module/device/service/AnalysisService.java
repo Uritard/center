@@ -78,7 +78,7 @@ public class AnalysisService {
                 pictureDataObject.put("taskId", analysis.getTaskId());
                 pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
                 if(firHandelMap.size()!=0){
-                    pictureDataObject.put("csvPath",firHandelMap.get("csvPath"));
+                    pictureDataObject.put("csvPath",firHandelMap.get("dataPath"));
                     pictureDataObject.put("dataPath",firHandelMap.get("dataPath"));
                     pictureDataObject.put("imagePath",firHandelMap.get("picPath"));
                 }
