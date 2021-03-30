@@ -287,7 +287,7 @@ public class TCruiseDataResultService {
         List<FirAndPicInfo> listFir = new ArrayList<>();
         List<TCruiseDataResult> list = tCruiseDataResultDao.selectByCameraId(cameraId,startDate,endDate,firName);
         for (TCruiseDataResult t : list) {
-            if (t.getResultPic() != null && t.getResultPic() != "") {
+            if (t.getResultPic() != null && t.getResultPic() != "" &&!t.getResultPic().isEmpty()) {
                 File file = new File(t.getResultPic());
                 FirAndPicInfo f = new FirAndPicInfo();
                 f.setCruiseDataId(t.getCruiseDataId());
