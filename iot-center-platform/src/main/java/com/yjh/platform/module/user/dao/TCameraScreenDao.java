@@ -29,6 +29,7 @@ public interface TCameraScreenDao {
     int batchAdd(List<TCameraScreen> list);
     int batchDelete(List<String> list);
     List<AreaInfoDetail> selectCameraTreeDevice(@Param(value = "cameraName") String cameraName);
+    List<AreaInfoDetail> infraredCameraStateTree(@Param(value = "cameraName") String cameraName);
     List<Long> selectRecordId();
     List<Long> selectRecordId2();
     List<AreaInfoDetail> selectCameraTreeWithRobot(@Param(value = "cameraName") String cameraName);

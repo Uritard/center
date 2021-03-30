@@ -346,5 +346,40 @@ public class TCameraScreenService{
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public List<AreaInfoDetail> infraredCameraStateTree(String cameraName,Integer flag) {
+        List<AreaInfoDetail> listTree = new ArrayList<>();
+        listTree = tCameraScreenDao.infraredCameraStateTree(cameraName);
+        List<AreaInfoDetail> areaInfoCountryList = new ArrayList<>();
+        for(Iterator<AreaInfoDetail> it = listTree.iterator(); it.hasNext();){
+            AreaInfoDetail areaInfoMap = it.next();
+            if (Objects.nonNull(areaInfoMap.getUpId()) && areaInfoMap.getUpId()==-1) {
+                AreaInfoDetail areaInfoCountry = new AreaInfoDetail();
+                areaInfoCountry.setId(areaInfoMap.getId());
+                areaInfoCountry.setLabel(areaInfoMap.getLabel());
+                areaInfoCountry.setInfoType(areaInfoMap.getInfoType());
+                areaInfoCountryList.add(areaInfoCountry);
+            }
+        }
+        Map<String,String> map = new HashMap<>();
+        //获取相机的状态
+        List<Map<String,String>> listForState = new ArrayList<>();
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for(Long recordId:recordIdList){
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            if(re == null){
+                continue;
+            }
+            map.putAll((Map<String,String>)re.getData());
+        }
+//        for(Map<String,String> item:listForState){
+//            map.putAll(item);
+//        }
+        diGui(areaInfoCountryList, listTree,map,flag);
+        return areaInfoCountryList;
+    }
+
 }
 

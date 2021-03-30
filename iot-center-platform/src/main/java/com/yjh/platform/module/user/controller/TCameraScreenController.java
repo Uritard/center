@@ -209,4 +209,19 @@ public class TCameraScreenController {
         return result;
     }
 
+    @ApiOperation(value = "红外摄像机状态树")
+    @RequestMapping(value = "/infraredCameraStateTree", method = RequestMethod.GET)
+    @Logs(title = "查询红外摄像机状态树信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1)
+    public Result infraredCameraStateTree(@RequestParam(value = "cameraName",required = false) String cameraName,
+                                            @RequestParam(value = "flag",required = false) Integer flag) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
 }
