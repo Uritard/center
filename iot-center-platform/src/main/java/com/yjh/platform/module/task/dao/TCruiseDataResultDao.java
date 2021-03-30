@@ -94,11 +94,9 @@ public interface TCruiseDataResultDao {
 
 
     List<String> selectResultImg(@Param(value = "taskId")String taskId);
+
     List<TCruiseDataResult> selectByCameraId(@Param(value = "cameraId")Long cameraId,
                                              @Param(value = "startDate")String startDate,
                                              @Param(value = "endDate")String endDate,
-                                             @Param(value = "endDate")String fileName
-
-
-    );
+                                             @Param(value = "firName")String firName);
 }

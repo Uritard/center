@@ -283,9 +283,9 @@ public class TCruiseDataResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<FirAndPicInfo> selectByCameraId(Long cameraId, String startDate, String endDate, String fileName) {
+    public List<FirAndPicInfo> selectByCameraId(Long cameraId, String startDate, String endDate, String firName) {
         List<FirAndPicInfo> listFir = new ArrayList<>();
-        List<TCruiseDataResult> list = tCruiseDataResultDao.selectByCameraId(cameraId,startDate,endDate,fileName);
+        List<TCruiseDataResult> list = tCruiseDataResultDao.selectByCameraId(cameraId,startDate,endDate,firName);
         for (TCruiseDataResult t : list) {
             if (t.getResultPic() != null && t.getResultPic() != "") {
                 File file = new File(t.getResultPic());
