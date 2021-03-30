@@ -213,10 +213,10 @@ public class HelloController {
 //        Analysis analysis=new Analysis();
 //        analysis.setTaskId("110001");
 //        analysis.setInstanceId(Long.valueOf("910009"));
-//        analysis.setPicModelPath("/home/yjh/iot-picture/model-picture/sync/Template/BigImg/21000000238");
+//        analysis.setPicModelPath("/home/yjh/iot-picture/model-picture/sync/Template/BigImg/21000000237");
 //        analysis.setAnalyseType("9");
 //        analysis.setPicPath("/home/yjh_iot_center/iot-picture/resultImg/20210325020936977.jpg");
-//        analysis.setCsvPath("http://192.168.9.40:10086/imgs/infrared/20210325020936977.csv");
+//        analysis.setCsvPath("http://192.168.9.40:10086/imgs/infrared/20210325020936977.data");
 //        analysis.setDataPath("http://192.168.9.40:10086/imgs/infrared/20210325020936977.data");
 //        analysis.setIsAi(1);
 //
@@ -233,12 +233,12 @@ public class HelloController {
 //        }
 
 
-        Date date=new SimpleDateFormat("yyyyMMddhhmmssSSS").parse(testString);
-        String time=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-        Date date1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(time);
-        result.setData(time);
-        log.info("data"+date);
-        log.info("data1"+date1);
+//        Date date=new SimpleDateFormat("yyyyMMddhhmmssSSS").parse(testString);
+//        String time=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+//        Date date1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(time);
+//        result.setData(time);
+//        log.info("data"+date);
+//        log.info("data1"+date1);
 
 
         return result;

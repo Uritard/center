@@ -625,7 +625,7 @@
             #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP},
             #{TCruiseDataResult.isWarn, jdbcType=INTEGER},
             #{TCruiseDataResult.firName,jdbcType=VARCHAR},
-            #{TCruiseDataResult.firDate.jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.firDate,jdbcType=TIMESTAMP},
             #{TCruiseDataResult.resultPic,jdbcType=VARCHAR}
             )
         </foreach>
