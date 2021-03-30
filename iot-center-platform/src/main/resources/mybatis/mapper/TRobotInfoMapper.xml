@@ -153,7 +153,7 @@
         <if test="updateDate != null">a.update_date = #{updateDate, jdbcType=TIMESTAMP},</if>
         <if test="robotFactory != null ">a.robot_factory = #{robotFactory},</if>
         <if test="isUse != null ">a.is_use = #{isUse},</if>
-        <if test="commissionDate != null">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
+        a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},
         <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
         <if test="robotPosition != null">a.robot_position = #{robotPosition},</if>
         <if test="robotSource != null ">a.robot_source = #{robotSource},</if>
