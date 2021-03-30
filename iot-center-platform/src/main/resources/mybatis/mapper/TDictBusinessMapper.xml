@@ -50,7 +50,7 @@
         <if test="dictCode != null ">a.dict_code = #{dictCode},</if>
         <if test="colName != null ">a.col_name = #{colName},</if>
         <if test="dictNote != null ">a.dict_note = #{dictNote},</if>
-        a.up_dict = #{upDict, jdbcType=INTEGER},
+        <if test="upDict != null ">a.up_dict = #{upDict, jdbcType=INTEGER},</if>
         <if test="remark != null ">a.remark = #{remark},</if>
         <if test="sort != null ">a.sort = #{sort},</if>
     </set>

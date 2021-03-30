@@ -89,7 +89,7 @@
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDeviceAttr">
         update t_std_device_attr a <set>
         <if test="deviceId != null ">a.device_id = #{deviceId},</if>
-        a.device_model = #{deviceModel, jdbcType=INTEGER},
+        <if test="deviceModel != null ">a.device_model = #{deviceModel, jdbcType=INTEGER},</if>
         <if test="pmsType != null ">a.pms_type = #{pmsType},</if>
         <if test="pmsId != null ">a.pms_id = #{pmsId},</if>
         <if test="deviceVendor != null ">a.device_vendor = #{deviceVendor},</if>
@@ -103,11 +103,11 @@
         <if test="responsiblePerson != null ">a.responsible_person = #{responsiblePerson},</if>
         <if test="latitude != null ">a.latitude = #{latitude},</if>
         <if test="longitude != null">a.longitude = #{longitude},</if>
-        <if test="ip != null and ip != ''">a.ip = #{ip, jdbcType=VARCHAR},</if>
-        <if test="port != null ">a.port = #{port, jdbcType=INTEGER},</if>
+        <if test="ip != null ">a.ip = #{ip, jdbcType=VARCHAR},</if>
+        a.port = #{port, jdbcType=INTEGER},
         <if test="voltageLevel != null">a.voltage_level = #{voltageLevel},</if>
         <if test="sequencePoint != null ">a.sequence_point = #{sequencePoint},</if>
-        <if test="realCode != null ">a.real_code = #{realCode},</if>
+        a.real_code = #{realCode},
         <if test="address != null">a.address = #{address},</if>
     </set>
             where a.device_id = #{deviceId, jdbcType=BIGINT}

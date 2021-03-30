@@ -44,9 +44,9 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TSequentialConf">
         update t_sequential_conf a <set>
         <if test="cfgDeviceId != null ">a.cfg_device_id = #{cfgDeviceId},</if>
-        a.cfg_mete_id = #{cfgMeteId},
-        a.camera_id = #{cameraId},
-        a.preset_id = #{presetId},
+        <if test="cfgMeteId != null ">a.cfg_mete_id = #{cfgMeteId},</if>
+        <if test="cameraId != null ">a.camera_id = #{cameraId},</if>
+        <if test="presetId != null ">a.preset_id = #{presetId},</if>
         <if test="identifyResult != null">a.identify_result = #{identifyResult},</if>
         a.record_time = CURRENT_TIMESTAMP(),
     </set>

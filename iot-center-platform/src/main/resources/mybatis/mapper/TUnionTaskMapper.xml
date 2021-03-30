@@ -72,18 +72,18 @@
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TUnionTask">
         update t_union_task a <set>
         <if test="unionId != null">a.union_id = #{unionId},</if>
-        a.rule_id = #{ruleId},
+        <if test="ruleId != null ">a.rule_id = #{ruleId},</if>
         <if test="unionName != null">a.union_name = #{unionName},</if>
-        a.robot_id = #{robotId},
-        a.rule_delay = #{ruleDelay, jdbcType=INTEGER},
-        a.mete_id = #{meteId, jdbcType=BIGINT},
+        <if test="robotId != null ">a.robot_id = #{robotId},</if>
+        <if test="ruleDelay != null ">a.rule_delay = #{ruleDelay, jdbcType=INTEGER},</if>
+        <if test="meteId != null ">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         <if test="triggeringTime != null ">a.triggering_time = #{triggeringTime, jdbcType=TIMESTAMP},</if>
         <if test="ruleName != null ">a.rule_name = #{ruleName},</if>
-        a.is_finish = #{isFinish, jdbcType=INTEGER},
+        <if test="isFinish != null ">a.is_finish = #{isFinish, jdbcType=INTEGER},</if>
         <if test="startTime != null">a.start_time = #{startTime},</if>
         <if test="createTime != null ">a.create_time = #{createTime},</if>
         <if test="paramValues != null">a.param_values = #{paramValues},</if>
-        <if test="planName != null">a.plan_name = #{planName},</if>
+        <if test="planName != null">a.param_values = #{planName},</if>
         <if test="ruleContent != null">a.param_values = #{ruleContent},</if>
     </set>
         where a.union_id = #{unionId, jdbcType=VARCHAR}

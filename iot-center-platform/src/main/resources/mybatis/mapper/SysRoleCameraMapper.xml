@@ -35,7 +35,7 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.SysRoleCamera">
         update sys_role_camera a <set>
         <if test="roleId != null">a.role_id = #{roleId},</if>
-        a.camera_id = #{cameraId},
+        <if test="cameraId != null">a.camera_id = #{cameraId},</if>
         <if test="isChecked != null">a.is_checked = #{isChecked},</if>
     </set>
             where a.role_id = #{roleId, jdbcType=BIGINT}

@@ -58,11 +58,11 @@
         <if test="orgId != null ">a.org_id = #{orgId},</if>
         <if test="orgName != null">a.org_name = #{orgName},</if>
         <if test="orgCode != null ">a.org_code = #{orgCode},</if>
-        a.up_id = #{upId},
-        a.sort = #{sort, jdbcType=INTEGER},
+        <if test="upId != null ">a.up_id = #{upId},</if>
+        <if test="sort != null ">a.sort = #{sort, jdbcType=INTEGER},</if>
         <if test="createTime != null">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-        a.creator_id = #{creatorId},
-        a.org_level = #{orgLevel, jdbcType=INTEGER},
+        <if test="creatorId != null">a.creator_id = #{creatorId},</if>
+        <if test="orgLevel != null ">a.org_level = #{orgLevel, jdbcType=INTEGER},</if>
         <if test="orgPath != null">a.org_path = #{orgPath},</if>
         <if test="deptName != null ">a.dept_name = #{deptName},</if>
     </set>

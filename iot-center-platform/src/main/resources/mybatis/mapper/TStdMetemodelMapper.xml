@@ -43,7 +43,7 @@
         update t_std_metemodel a <set>
         <if test="modelId != null ">a.model_id = #{modelId},</if>
         <if test="modelName != null">a.model_name = #{modelName},</if>
-        a.device_type = #{deviceType, jdbcType=INTEGER},
+        <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
         <if test="remark != null ">a.remark = #{remark},</if>
     </set>
             where a.model_id = #{modelId, jdbcType=BIGINT}

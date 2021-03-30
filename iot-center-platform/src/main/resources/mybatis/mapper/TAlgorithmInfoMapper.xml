@@ -56,9 +56,9 @@
         <if test="describel != null ">a.describel = #{describel},</if>
         <if test="algorithmCode != null">a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR},</if>
         <if test="analyseType != null">a.analyse_type = #{analyseType},</if>
-        a.is_ai = #{isAi, jdbcType=INTEGER},
-        a.defect_type = #{defectType, jdbcType=INTEGER},
-        a.defect_level = #{defectLevel, jdbcType=INTEGER}
+        <if test="isAi != null ">a.is_ai = #{isAi, jdbcType=INTEGER},</if>
+        <if test="defectType != null ">a.defect_type = #{defectType, jdbcType=INTEGER},</if>
+        <if test="defectLevel != null ">a.defect_level = #{defectLevel, jdbcType=INTEGER}</if>
     </set>
             where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
     </update>

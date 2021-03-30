@@ -141,8 +141,8 @@
         <if test="aliasName != null">a.alias_name = #{aliasName},</if>
         <if test="recordIp != null">a.record_ip = #{recordIp},</if>
         <if test="protocol != null ">a.protocol = #{protocol},</if>
-        a.http_port = #{httpPort, jdbcType=INTEGER},
-        a.trans_port = #{transPort, jdbcType=INTEGER},
+        <if test="httpPort != null ">a.http_port = #{httpPort, jdbcType=INTEGER},</if>
+        <if test="transPort != null ">a.trans_port = #{transPort, jdbcType=INTEGER},</if>
         <if test="rtspPort != null ">a.rtsp_port = #{rtspPort, jdbcType=INTEGER},</if>
         <if test="identityManager != null ">a.identity_manager = #{identityManager},</if>
         <if test="identityCode != null ">a.identity_code = #{identityCode},</if>
@@ -151,7 +151,7 @@
         a.hdd_size = #{hddSize, jdbcType=INTEGER},
         a.buffer_day = #{bufferDay, jdbcType=INTEGER},
         a.time_long = #{timeLong, jdbcType=INTEGER},
-        <if test="unit != null ">a.unit = #{unit},</if>
+        a.unit = #{unit},
     </set>
             where a.record_id = #{recordId, jdbcType=BIGINT}
     </update>

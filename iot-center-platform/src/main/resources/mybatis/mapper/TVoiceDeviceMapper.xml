@@ -48,11 +48,11 @@
         update t_voice_device a <set>
         <if test="voiceDeviceId != null">a.voice_device_id = #{voiceDeviceId, jdbcType=BIGINT},</if>
         <if test="voiceDeviceName != null">a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR},</if>
-        a.std_device_id = #{stdDeviceId, jdbcType=BIGINT},
+        <if test="stdDeviceId != null">a.std_device_id = #{stdDeviceId, jdbcType=BIGINT},</if>
         <if test="deviceType != null">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
         <if test="state != null">a.state = #{state, jdbcType=VARCHAR},</if>
-        a.config_id = #{configId, jdbcType=BIGINT},
-        a.up_region_id = #{upRegionId, jdbcType=BIGINT},
+        <if test="configId != null">a.config_id = #{configId, jdbcType=BIGINT},</if>
+        <if test="upRegionId != null">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
     </set>
             where a.voice_device_id = #{voiceDeviceId, jdbcType=BIGINT}
     </update>

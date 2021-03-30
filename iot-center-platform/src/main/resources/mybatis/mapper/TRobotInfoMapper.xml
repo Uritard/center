@@ -135,7 +135,7 @@
         <if test="robotCode != null "> a.robot_code = #{robotCode},</if>
         <if test="robotName != null ">a.robot_name = #{robotName},</if>
         <if test="robotStatus != null ">a.robot_status = #{robotStatus},</if>
-        a.robot_type = #{robotType, jdbcType=INTEGER},
+        <if test="robotType != null ">a.robot_type = #{robotType, jdbcType=INTEGER},</if>
         <if test="robotIp != null ">a.robot_ip = #{robotIp},</if>
         a.robot_port = #{robotPort, jdbcType=INTEGER},
         <if test="lightIp != null ">a.light_ip = #{lightIp},</if>

@@ -35,7 +35,7 @@
     <update id="update" parameterType="com.yjh.platform.module.user.entity.SysRoleRegion">
         update sys_role_region a <set>
         <if test="roleId != null">a.role_id = #{roleId},</if>
-        a.region_id = #{regionId},
+        <if test="regionId != null ">a.region_id = #{regionId},</if>
         <if test="isChecked != null">a.is_checked = #{isChecked },</if>
     </set>
             where a.role_id = #{roleId, jdbcType=BIGINT}
