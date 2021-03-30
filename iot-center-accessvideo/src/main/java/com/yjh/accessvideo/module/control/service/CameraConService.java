@@ -764,7 +764,7 @@ public class CameraConService {
         String m_sUsername = recorderConInfo.getIdentityManager();
         String m_sPassword = recorderConInfo.getIdentityCode();
         Short m_port = recorderConInfo.getHttpPort().shortValue();
-        log.info("register nvr" + recorderConInfo.getRecordName() + ", ip is " + m_sDeviceIP + ", port is " + m_port);
+        log.info("register nvr {}, ip is {}, port is {}" , recorderConInfo.getRecordName(), m_sDeviceIP, m_port);
         //注册
         m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
         System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
