@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -44,10 +45,11 @@ public class TStdRegionService{
         return this.tStdRegionDao.deleteByPrimaryId(regionId);
     }
 
-//    @Transactional(rollbackFor = Exception.class)
-//    public int update(TStdRegion tStdRegion) {
-//        return this.tStdRegionDao.update(tStdRegion);
-//    }
+    @Transactional(rollbackFor = Exception.class)
+    public int update(TStdRegion tStdRegion) {
+        Map<String,Object> map = Object2Map.objectToMap(tStdRegion);
+        return this.tStdRegionDao.updateByMap(map);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public int update(Map<String, Object> map) {

@@ -100,15 +100,29 @@ public class HomePageService {
         List<TaskOnExecuteInfo> listTask=tCruiseTaskDao.selectTaskOnExecute();
         log.info("任务list: "+listTask);
         for (TaskOnExecuteInfo item: listTask) {
+            try {
                 CruiseResultCounter cruiseResultCounter = tCruiseTaskResultService.selectCruiseStatusCount(item.getTaskId());
                 item.setAlarmCount(cruiseResultCounter.getAlarmCount());
                 item.setCruisedCount(cruiseResultCounter.getCruisedCount());
                 item.setCruiseNotCount(cruiseResultCounter.getCruiseNotCount());
                 item.setRunningTime(cruiseResultCounter.getRunningTime());
+            } catch(Exception e){
+                log.info("出错了"+e);
+                item.setAlarmCount(null);
+                item.setCruisedCount(null);
+                item.setCruiseNotCount(null);
+                item.setRunningTime(null);
+            }
+            try{
                 Map<String,Object> map = tCruiseTaskResultService.selectCruiseAdvance(item.getTaskId());
                 Float i = (Float) map.get("rate");
                 i = i*100F;
                 item.setTaskProgress(i.intValue());
+            }catch (Exception e){
+                log.info("出错了"+e);
+                item.setTaskProgress(0);
+            }
+
         }
         return listTask;
     }

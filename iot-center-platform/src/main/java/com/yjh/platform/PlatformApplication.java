@@ -72,19 +72,19 @@ public class PlatformApplication  implements CommandLineRunner {
         sysUserService.insertIntoRedis();
         Constant.WEBSOCKET_URL = url;
         Constant.redisTemplate = redisTemplate;
-        tDeviceTypeImgService.findPic();//本地启动把此行注掉
-        //Start RecordVoiceFileThread
-        List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();
-        if (voiceDeviceAllInfoList.size()>0) {
-            for (VoiceDeviceAllInfo voiceDeviceAllInfo:voiceDeviceAllInfoList) {
-                RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
-                        voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
-                        voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true);
-                Thread thread = new Thread(recordVoiceFileThread);
-                thread.setDaemon(true);
-                thread.start();
-            }
-        }
+//        tDeviceTypeImgService.findPic();//本地启动把此行注掉
+//        //Start RecordVoiceFileThread
+//        List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();
+//        if (voiceDeviceAllInfoList.size()>0) {
+//            for (VoiceDeviceAllInfo voiceDeviceAllInfo:voiceDeviceAllInfoList) {
+//                RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
+//                        voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
+//                        voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true);
+//                Thread thread = new Thread(recordVoiceFileThread);
+//                thread.setDaemon(true);
+//                thread.start();
+//            }
+//        }
     }
 
     @Bean

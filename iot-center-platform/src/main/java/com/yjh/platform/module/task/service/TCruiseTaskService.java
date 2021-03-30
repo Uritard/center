@@ -547,6 +547,9 @@ public class TCruiseTaskService {
         if (tCruiseResult.getCState() == 240) {
             return 1;
         }
+        if(Constant.taskStateMap.get(taskId) != null && Constant.taskStateMap.get(taskId) == 1){
+            return 1;
+        }
         tCruiseResult.setCState(239);
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
         //模板图片路径

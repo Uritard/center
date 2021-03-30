@@ -35,6 +35,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
@@ -404,7 +405,7 @@ public class TCruiseTaskResultService {
 //        return imageArray;
 //    }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Map<String, Object> selectCruiseAdvance(String taskId) {
         Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
 
@@ -435,7 +436,7 @@ public class TCruiseTaskResultService {
     }
 
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public CruiseResultCounter selectCruiseStatusCount(String taskId) throws ParseException {
 
         String cruiseExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "已执行");
