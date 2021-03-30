@@ -216,7 +216,7 @@ public class TCameraScreenController {
                                             @RequestParam(value = "flag",required = false) Integer flag) {
         Result result = new Result();
         try {
-            result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag));
+            result.setData(tCameraScreenService.infraredCameraStateTree(cameraName,flag));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
