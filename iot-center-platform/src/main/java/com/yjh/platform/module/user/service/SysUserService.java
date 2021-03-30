@@ -120,7 +120,7 @@ public class SysUserService {
             if (Objects.equals(null, sysUserLogin)) {
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                 params.set("logType", "5");
-                params.set("ip", request.getRemoteHost());
+                params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                 params.set("title", "登录");
                 params.set("state", 1);
                 params.set("userId", "");
@@ -161,7 +161,7 @@ public class SysUserService {
                     sysUserLogin.setAppkey(appKey);
                     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                     params.set("logType", "5");
-                    params.set("ip", request.getRemoteHost());
+                    params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                     params.set("title", "登录");
                     params.set("state", 1);
                     params.set("userId", sysUserLogin.getUserId());
@@ -200,7 +200,7 @@ public class SysUserService {
                             }else if(yxTime>=sysUserLogin.getInvalidTime()){
                                 MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                                 param.set("logType", "5");
-                                param.set("ip", request.getRemoteHost());
+                                param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                                 param.set("title", "登录");
                                 param.set("state", 1);
                                 param.set("userId", sysUserLogin.getUserId());
@@ -257,7 +257,7 @@ public class SysUserService {
                         }else if(yxTime>=sysUserLogin.getInvalidTime()){
                             MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                             param.set("logType", "5");
-                            param.set("ip", request.getRemoteHost());
+                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                             param.set("title", "登录");
                             param.set("state", 1);
                             param.set("userId", sysUserLogin.getUserId());
@@ -309,7 +309,7 @@ public class SysUserService {
                 List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userName);
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                 params.set("logType", "5");
-                params.set("ip", request.getRemoteHost());
+                params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                 params.set("title", "登录");
                 params.set("state", 1);
                 if (sysUserList.size() == 0) {
