@@ -135,6 +135,7 @@ public class TaskShutDownJob extends QuartzJobBean {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
             Integer normal = Integer.valueOf(mapForGet.get("normal")) ;
+            Integer all = Integer.valueOf(mapForGet.get("all")) ;
             //检查每个点的状态
             List<TCruiseTaskResultDetail> TCTRDList = new ArrayList();
             List<TCruiseDataResult> TCDRList = new ArrayList();
@@ -325,6 +326,14 @@ public class TaskShutDownJob extends QuartzJobBean {
                     }
                 }
                 //将正常 异常放回redis
+                if((abnormal+normal) > all){
+                    if(normal > 0){
+                        abnormal = all - normal;
+                    }else {
+                        abnormal = all;
+                    }
+
+                }
                 mapForGet.put("abnormal", abnormal.toString());
                 mapForGet.put("normal", normal.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForGet);
