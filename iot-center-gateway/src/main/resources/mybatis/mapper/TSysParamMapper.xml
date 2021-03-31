@@ -20,8 +20,7 @@
 
 
     <select id="selectByPrimaryCode" resultType="com.yjh.gateway.module.entity.TSysParam">
-        select *
-        from t_sys_param
+        select * from t_sys_param
         where param_code = 'isDecode'
     </select>
 

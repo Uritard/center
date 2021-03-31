@@ -7,8 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TSysParamDao {
-
-
+    
     TSysParam selectByPrimaryCode();
 
     TSysParam selectByPrimaryUkey();

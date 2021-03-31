@@ -25,8 +25,7 @@
     </resultMap>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from sys_route
-        where route_id = #{routeId,jdbcType=BIGINT}
+        delete from sys_route where route_id = #{routeId,jdbcType=BIGINT}
     </delete>
 
     <insert id="insert" parameterType="com.yjh.gateway.module.entity.Route" useGeneratedKeys="true"
