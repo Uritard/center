@@ -81,6 +81,7 @@ public class CameraConController {
         try{
             //获取所有视频流信息
             //发送请求获取所有STREAM
+            log.info("关闭流接口回调：");
             String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
             JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
             List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
@@ -101,6 +102,7 @@ public class CameraConController {
                     if(StringUtils.isNotEmpty(cid)){
                         String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
                         HttpClientUtils.httpDelete(delteUrl,null);
+                        log.info("关闭流："+delteUrl);
                     }
                     break;
                 }
