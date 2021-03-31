@@ -1,6 +1,6 @@
-package com.yjh.gateway.module.gateway.dao;
+package com.yjh.gateway.module.dao;
 
-import com.yjh.gateway.module.gateway.entity.Route;
+import com.yjh.gateway.module.entity.Route;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

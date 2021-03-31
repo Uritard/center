@@ -1,4 +1,4 @@
-package com.yjh.gateway.module.gateway.entity;
+package com.yjh.gateway.module.entity;
 
 public class Route {
     private Long routeId;

@@ -1,6 +1,6 @@
 package com.yjh.gateway.configuration;
 
-import com.yjh.gateway.module.gateway.dao.RouteDao;
+import com.yjh.gateway.module.dao.RouteDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;

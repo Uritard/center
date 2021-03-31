@@ -1,8 +1,8 @@
-package com.yjh.gateway.module.gateway.controller;
+package com.yjh.gateway.module.controller;
 
 import com.yjh.gateway.commons.result.Result;
 import com.yjh.gateway.commons.result.ResultCodeEnum;
-import com.yjh.gateway.module.gateway.service.RefreshRouteService;
+import com.yjh.gateway.module.service.RefreshRouteService;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -97,7 +97,7 @@ public class CameraConController {
             String cid = publishjson.getString("cid");
             log.info("cid："+cid);
 
-            if(clients<=1 && StringUtils.isNotEmpty(cid)){
+            if(clients<=2 && StringUtils.isNotEmpty(cid)){
                 //踢掉
                 String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
                 try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}

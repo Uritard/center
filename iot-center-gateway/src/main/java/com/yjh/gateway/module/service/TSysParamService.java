@@ -1,8 +1,8 @@
-package com.yjh.gateway.module.gateway.service;
+package com.yjh.gateway.module.service;
 
 
-import com.yjh.gateway.module.gateway.dao.TSysParamDao;
-import com.yjh.gateway.module.gateway.entity.TSysParam;
+import com.yjh.gateway.module.dao.TSysParamDao;
+import com.yjh.gateway.module.entity.TSysParam;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;

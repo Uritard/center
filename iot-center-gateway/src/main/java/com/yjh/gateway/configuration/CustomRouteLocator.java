@@ -1,7 +1,7 @@
 package com.yjh.gateway.configuration;
 
-import com.yjh.gateway.module.gateway.dao.RouteDao;
-import com.yjh.gateway.module.gateway.entity.Route;
+import com.yjh.gateway.module.dao.RouteDao;
+import com.yjh.gateway.module.entity.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.netflix.zuul.filters.RefreshableRouteLocator;

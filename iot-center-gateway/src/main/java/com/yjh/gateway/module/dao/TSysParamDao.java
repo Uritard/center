@@ -1,7 +1,7 @@
-package com.yjh.gateway.module.gateway.dao;
+package com.yjh.gateway.module.dao;
 
 
-import com.yjh.gateway.module.gateway.entity.TSysParam;
+import com.yjh.gateway.module.entity.TSysParam;
 import org.springframework.stereotype.Repository;
 
 
