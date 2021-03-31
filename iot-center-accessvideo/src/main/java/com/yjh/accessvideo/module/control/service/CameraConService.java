@@ -1048,7 +1048,7 @@ public class CameraConService {
                                             log.info("nPos.getValue!:>>>" + nPos.getValue());
                                             judge = savePath + fileName;
                                             hCNetSDK.NET_DVR_Logout(m_lLoadHandle);
-                                            hCNetSDK.NET_DVR_Cleanup();
+                                           // hCNetSDK.NET_DVR_Cleanup();
                                             break;
                                         }
                                     }
@@ -1078,7 +1078,7 @@ public class CameraConService {
                     judge = null;
 
                 }
-          /*  } else {
+         /* } else {
                 iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.info("调用NET_DVR_Init 接口获取到：" + iErr);
                 log.info("视频初始化失败！！！");
@@ -1106,7 +1106,7 @@ public class CameraConService {
 
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
-           /* if (hCNetSDK.NET_DVR_Init()) {
+         /*  if (hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化成功开始注册登录：");*/
                 String login = registerNVR(cameraConInfo.getRecordId());
                 if (!login.isEmpty()) {
@@ -1188,7 +1188,7 @@ public class CameraConService {
                             }
                             //释放资源
                             hCNetSDK.NET_DVR_Logout(lUserIDLong);
-                            hCNetSDK.NET_DVR_Cleanup();
+                           // hCNetSDK.NET_DVR_Cleanup();
                         } else {
                             list = null;
                             int iErr = hCNetSDK.NET_DVR_GetLastError();
@@ -1231,7 +1231,7 @@ public class CameraConService {
             log.info("cameraIp" + cameraIp);
             String port = cameraConInfo.getInfreadPort().toString();
             log.info("port:>>>" + port);
-           /* if (!hCNetSDK.NET_DVR_Init()) {
+         /*  if (!hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化失败");
             }*/
             log.info("开始登录。。。。。");
@@ -1308,7 +1308,7 @@ public class CameraConService {
             log.info("系统异常" + iErr);
         } finally {
             hCNetSDK.NET_DVR_Logout(lUserIDLong);
-            hCNetSDK.NET_DVR_Cleanup();
+            //hCNetSDK.NET_DVR_Cleanup();
         }
         return list;
     }
@@ -1422,8 +1422,8 @@ public class CameraConService {
                     log.info("hotFircsv地址：" + path);
                     byte[] byTempData = new byte[4];
                     FileWriter fos = new FileWriter(path);
-                    for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicHeight; i++) {
-                        for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicWidth; j++) {
+                    for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicWidth; i++) {
+                        for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++) {
                             ByteBuffer buffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i - 1) * (j - 1) * 4, 4);
                             buffers.get(byTempData);
                             int l;
@@ -1459,7 +1459,7 @@ public class CameraConService {
             log.info("系统异常" + iErr);
         } finally {
             hCNetSDK.NET_DVR_Logout(lUserID);
-            hCNetSDK.NET_DVR_Cleanup();
+            //hCNetSDK.NET_DVR_Cleanup();
         }
         return map;
     }
@@ -1489,7 +1489,7 @@ public class CameraConService {
             log.info("cameraIp" + cameraIp);
             String port = videoIntercom.get("port").toString();
             log.info("port:>>>" + port);
-          /*  if (!hCNetSDK.NET_DVR_Init()) {
+           /* if (!hCNetSDK.NET_DVR_Init()) {
                 log.info("语音对讲初始化失败");
             }*/
             log.info("语音对讲开始登录。。。。。");
@@ -1516,9 +1516,12 @@ public class CameraConService {
                 } else {
                     re = 1;
                     log.info("NET_DVR_StartVoiceCom_V30 SUCC");
+                    hCNetSDK.NET_DVR_SetVoiceComClientVolume(new NativeLong(mVoiceTalkHandle), (short) 80);
+
                 }
             } else {
                 re = 1;
+                hCNetSDK.NET_DVR_SetVoiceComClientVolume(mVoiceTalkHandle, (short) 80);
                 log.info("NET_DVR_StartVoiceCom_V30 SUCC:开启对讲");
             }
         } catch (Exception e) {
@@ -1530,7 +1533,7 @@ public class CameraConService {
 
         } finally {
             hCNetSDK.NET_DVR_Logout(lUserID);
-            hCNetSDK.NET_DVR_Cleanup();
+            //hCNetSDK.NET_DVR_Cleanup();
         }
         return re;
     }
@@ -1595,7 +1598,7 @@ public class CameraConService {
             e.getMessage();
         } finally {
             hCNetSDK.NET_DVR_Logout(lUserID);
-            hCNetSDK.NET_DVR_Cleanup();
+           // hCNetSDK.NET_DVR_Cleanup();
         }
         return returnMap;
     }
@@ -1621,7 +1624,7 @@ public class CameraConService {
             log.info("cameraIp" + cameraIp);
             String port = videoIntercom.get("port").toString();
             log.info("port:>>>" + port);
-            /*if (!hCNetSDK.NET_DVR_Init()) {
+           /* if (!hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化失败");
             }*/
             log.info("开始登录。。。。。");
@@ -1651,7 +1654,7 @@ public class CameraConService {
             log.info("获取可视状态  Exception " + iErr);
         } finally {
             hCNetSDK.NET_DVR_Logout(lUserID);
-            hCNetSDK.NET_DVR_Cleanup();
+          //  hCNetSDK.NET_DVR_Cleanup();
         }
         return re;
     }
@@ -1922,7 +1925,7 @@ public class CameraConService {
             log.info("系统异常"+iErr);
         }finally {
             hCNetSDK.NET_DVR_Logout(lUserIDLong);
-            hCNetSDK.NET_DVR_Cleanup();
+           // hCNetSDK.NET_DVR_Cleanup();
         }
         return list;
     }
