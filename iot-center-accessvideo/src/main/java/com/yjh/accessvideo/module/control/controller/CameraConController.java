@@ -636,26 +636,4 @@ public class CameraConController {
         return result;
     }
 
-
-
-    /*@ApiOperation(value = "门口机布防")
-    @RequestMapping(value = "/doorMa", method = RequestMethod.GET)
-    public Result doorMa(@RequestParam(value = "presetId",required = false) Long presetId,
-                             @RequestParam(value = "cameraId",required = false) Long cameraId) {
-        Result result = new Result();
-
-        try {
-            doorMachineService.SetupAlarmChan();
-            result.setData("布防成功");
-        }catch (Exception e)
-        {
-            result.setData("布防失败");
-        }
-        return result;
-    }*/
-
-
-
-
-
 }
