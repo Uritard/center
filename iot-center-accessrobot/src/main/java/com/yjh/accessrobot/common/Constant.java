@@ -13,6 +13,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,19 +83,17 @@ public class Constant {
         re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
         return re;
     }
-    public static String getUrl(String url, String json) {
+    //请求webSocket发送方法
+    public static String postUrl(String url, String json) throws IOException, URISyntaxException {
         CloseableHttpClient client = HttpClients.createDefault();
-        String result = "";
-        try {
-            URI uri = new URIBuilder(url).setParameter("json", json).build();
-            HttpPost httpGet = new HttpPost(uri);
-            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
-            httpGet.setHeader("Accept", "application/json");
-            CloseableHttpResponse response = client.execute(httpGet);
-            HttpEntity entity = response.getEntity();
-            result = EntityUtils.toString(entity, "UTF-8");
-        } catch (Exception e) {e.getMessage();}
-        return result;
+        URI uri = new URIBuilder(url).setParameter("json", json).build();
+        HttpPost httpPost = new HttpPost(uri);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
+        CloseableHttpResponse response = client.execute(httpPost);
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, "UTF-8");
     }
     public static final String WARN_JUDGE = "http://iot-center-accessvideo/AnalysisDataOperate/v1/warnInfo?value={value}&stdDeviceMeteName={stdDeviceMeteName}&meteKind={meteKind}&alarmState={alarmState}&stateZero={stateZero}&stateOne={stateOne}&alarmLevel={alarmLevel}&highLimit1={highLimit1}&lowLimit1={lowLimit1}&highLimit2={highLimit2}&lowLimit2={lowLimit2}&highLimit3={highLimit3}&lowLimit3={lowLimit3}&highLimit4={highLimit4}&lowLimit4={lowLimit4}";
 
