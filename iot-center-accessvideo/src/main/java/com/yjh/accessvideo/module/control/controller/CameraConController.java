@@ -84,7 +84,8 @@ public class CameraConController {
             String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
             JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
             List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
-            for (int i = 0; i < streamsJsonObjectList.size(); i++) {
+            int streamListSize = streamsJsonObjectList.size();
+            for (int i = 0; i < streamListSize; i++) {
                 String streambeanStr = streamsJsonObjectList.get(i);
                 JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
 
@@ -93,7 +94,7 @@ public class CameraConController {
                 JSONObject publishjson = JSONObject.parseObject(publish);
                 Integer clients = streambeanJson.getInteger("clients"); //观看人数
 
-                if(clients==0 || Objects.equals("false",publishjson.getString("active"))){
+                if(clients==1 || Objects.equals("false",publishjson.getString("active"))){
                     //符合无人观看的条件
                     cid = publishjson.getString("cid");
                     //踢掉

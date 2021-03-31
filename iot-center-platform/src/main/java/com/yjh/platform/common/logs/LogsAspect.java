@@ -100,7 +100,7 @@ public class LogsAspect {
                 throw e;
             } catch (Throwable e) {
                 params.set("content", content.toString() + "；异常信息：" + e.getMessage());
-                params.set("state", 2);
+                params.set("state", 3);
                 post(params);
                 throw e;
             }
@@ -111,7 +111,7 @@ public class LogsAspect {
             params.set("logType", annotation.logType());
             params.set("ip", ip);
             params.set("title", "内部接口错误");
-            params.set("state", 2);
+            params.set("state", 3);
             params.set("content", "异常信息: " + e.getMessage() + "\n" + getStackMsg(e));
             params.set("userId", userId);
             params.set("userName", userName);
