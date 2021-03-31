@@ -93,17 +93,15 @@ public class CameraConController {
                 String publish = streambeanJson.getString("publish");
                 JSONObject publishjson = JSONObject.parseObject(publish);
                 Integer clients = streambeanJson.getInteger("clients"); //观看人数
+                //符合无人观看的条件
+                String cid = publishjson.getString("cid");
+                log.info("cid："+cid);
 
-                if(clients<=1 || Objects.equals("false",publishjson.getString("active"))){
-                    //符合无人观看的条件
-                    String cid = publishjson.getString("cid");
-                    log.info("cid："+cid);
+                if(clients<=1 && StringUtils.isNotEmpty(cid)){
                     //踢掉
-                    if(StringUtils.isNotEmpty(cid)){
-                        String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
-                        HttpClientUtils.httpDelete(delteUrl,null);
-                        log.info("关闭流："+delteUrl);
-                    }
+                    String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
+                    HttpClientUtils.httpDelete(delteUrl,null);
+                    log.info("关闭流："+delteUrl);
                 }
             }
         }catch (Exception e){
