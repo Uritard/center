@@ -104,7 +104,6 @@ public class CameraConController {
                         HttpClientUtils.httpDelete(delteUrl,null);
                         log.info("关闭流："+delteUrl);
                     }
-                    break;
                 }
             }
         }catch (Exception e){
