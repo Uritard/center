@@ -410,4 +410,38 @@ public class SysLogController {
         return  result;
     }
 
+
+    @ApiOperation(value = "分页查询")
+    @RequestMapping(value = "/selectByPageAsc", method = RequestMethod.GET)
+    public Result selectByPageAsc(@RequestParam(value = "userName", required = false) String userName,
+                               @RequestParam(value = "title", required = false) String title,
+                               @RequestParam(value = "logType", required = false) String logType,
+                               @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                               @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                               @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+
+            String isDecode = enmap.get("content");
+            if ("true".equals(isDecode)) {
+                userName = Demo.decrypt(userName);
+            }
+            if ("14".equals(logType)) {
+                logType = "";
+            }
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<SysLogDetail> list = sysLogService.selectByPageAsc(userName, title, startTime, endTime, logType);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
 }
