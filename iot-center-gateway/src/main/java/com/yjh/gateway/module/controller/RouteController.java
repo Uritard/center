@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Author tt
  * @Date 2019/6/4
  **/
-@Api(value = "zuul路由管理", tags = {"zuul路由管理"})
+@Api(value = "zuul路由管理", tags = {"zuul路由管理1"})
 @RestController
 @RequestMapping("/route")
 public class RouteController {
