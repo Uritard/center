@@ -274,7 +274,9 @@
         LEFT JOIN t_dict_business e ON a.c_state = e.dict_code
         LEFT JOIN t_cruise_task_result f ON a.task_result_id = f.task_result_id
         LEFT JOIN t_cruise_task_result_detail g ON f.task_result_id = g.task_result_id
-        LEFT JOIN t_std_device j on g.device_id = j.device_id
+        <if test="deviceType != -1">
+            LEFT JOIN t_std_device j on g.device_id = j.device_id
+        </if>
         LEFT JOIN t_cruise_point_instance m on m.instance_id = g.instance_id
         LEFT JOIN t_std_devicemete k on k.device_mete_id = m.device_mete_id
         where 1 = 1

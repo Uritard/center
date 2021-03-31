@@ -404,18 +404,20 @@ public class RobotService {
     public Map<String,Object> receivingResponse(XMLBaseModel xmlBaseModel,long receiveSessionId) {
         RobotServerHandler.getRobotResultMap().put("Code",xmlBaseModel.getCode());
         RobotServerHandler.getRobotResultMap().put("receiveSessionId",receiveSessionId);
-        log.info("组成的robotResultMap是==="+RobotServerHandler.getRobotResultMap());
+
         if (Constant.sendSessionId == receiveSessionId){
             log.info("-------------这是刚发命令的响应"+receiveSessionId+"-------------");
+            if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
+                RobotServerHandler.getRobotResultMap().put("Item",null);
+                return RobotServerHandler.getRobotResultMap();
+            }else{
+                RobotServerHandler.getRobotResultMap().put("Item",xmlBaseModel.getItems().get(0));
+            }
         }else{
             log.info("-------------这不是刚发命令的响应"+receiveSessionId+"-------------");
         }
-        if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
-            RobotServerHandler.getRobotResultMap().put("Item",null);
-            return RobotServerHandler.getRobotResultMap();
-        }else{
-            RobotServerHandler.getRobotResultMap().put("Item",xmlBaseModel.getItems().get(0));
-        }
+        log.info("组成的robotResultMap是==="+RobotServerHandler.getRobotResultMap());
+
         Map<String,Object> res = new HashMap<>();
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
@@ -1223,13 +1225,13 @@ public class RobotService {
     public TStdDeviceMete selectDeviceMete(Long deviceMeteId){
         return this.tRobotInfoDao.selectDeviceMete(deviceMeteId);
     }
-    public int methodTest1(String taskId){
+    public int methodTest1(String taskId)throws Exception{
         Map<String, Object> jasonMap = new HashMap<>();
         jasonMap.put("type", "finishedOneInstance");
         jasonMap.put("taskId", taskId);
         String json = JSON.toJSONString(jasonMap);
         log.info("发送给前端的消息：" + json);
-        Constant.getUrl(json,webSocketUrl);
+        Constant.postUrl(json,webSocketUrl);
         return 1;
     }
     public int robotTaskIntoDB(List<Map<String, Object>> taskModelMapList, XMLBaseModel xmlBaseModel) {
@@ -1384,9 +1386,9 @@ public class RobotService {
     public TStdDeviceMete selectDeviceMeteInfo(Long instanceId){
         return tRobotInfoDao.selectDeviceMeteInfo(instanceId);
     }
-    public int sendWebSocket(String json){
+    public int sendWebSocket(String json) throws Exception{
         log.info("发送给前端的消息：" + json);
-        Constant.getUrl(json,webSocketUrl);
+        Constant.postUrl(json,webSocketUrl);
         return 1;
     }
     public int robotDeviceIntoDB(List<Map<String, Object>> deviceMapList, XMLBaseModel xmlBaseModel){
