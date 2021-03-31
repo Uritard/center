@@ -343,7 +343,7 @@ public class TCruiseResultController {
         String userId = request.getHeader("userId");
         Result result=new Result();
         try{
-            result.setData(tCruiseResultService.manualReviewTask(taskResultId,userId));
+            result.setData(tCruiseResultService.manualReviewTask(taskResultId,userId,request));
         }catch(Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("审核任务失败描述",e);

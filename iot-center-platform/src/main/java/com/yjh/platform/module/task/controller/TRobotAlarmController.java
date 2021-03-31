@@ -55,8 +55,8 @@ public class TRobotAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (roleId.intValue() != 1234) {
+          //  Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (userId != 10001) {
                 if (tRobotAlarm.getAlarmState()!=null) {
                     throw new JurisdictionException();
                 }
@@ -95,8 +95,8 @@ public class TRobotAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (roleId.intValue() != 1234) {
+          //  Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (userId != 10001) {
                 TRobotAlarm list = tRobotAlarmService.selectByPrimaryId(tRobotAlarm.getRobotAlarmId());
                 if (list.getAlarmState()!=tRobotAlarm.getAlarmState()) {
                     throw new JurisdictionException();
@@ -186,8 +186,8 @@ public class TRobotAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (roleId.intValue() != 1234) {
+            //Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (userId != 10001) {
                 for (TRobotAlarm e : list) {
                     if (e.getAlarmState()!=null) {
                         throw new JurisdictionException();

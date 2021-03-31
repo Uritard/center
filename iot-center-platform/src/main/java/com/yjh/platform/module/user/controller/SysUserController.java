@@ -109,10 +109,10 @@ public class SysUserController {
     @ApiOperation(value = "系统用户表更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改系统用户数据", content = "根据用户传递的参数修改系统用户数据", logType = 3)
-    public Result update(@RequestBody SysUser sysUser) {
+    public Result update(@RequestBody SysUser sysUser,HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(sysUserService.update(sysUser));
+            result.setData(sysUserService.update(sysUser,request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新用户异常:", e);
@@ -344,7 +344,7 @@ public class SysUserController {
         try {
             String userId = request.getHeader("userId");
             String token = request.getHeader("token");
-            result.setData(this.sysUserService.userLogout(userId, token));
+            result.setData(this.sysUserService.userLogout(userId, token,request));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("登出失败:", e);

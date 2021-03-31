@@ -107,7 +107,7 @@ public class SystemInfoService {
         Double diskFreeMin=Double.parseDouble(map.get("content"));
         if(Double.parseDouble(deskOnUse.get("use").toString())/Double.parseDouble(deskOnUse.get("all").toString())*100>(100-diskFreeMin)){
             MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-            param.set("logType", "1");
+            param.set("logType", "5");
             param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
             param.set("title", "磁盘最小空闲报警");
             param.set("state", 1);

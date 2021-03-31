@@ -82,7 +82,7 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int update(SysUser sysUser) throws IOException {
+    public int update(SysUser sysUser,HttpServletRequest request) throws IOException {
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(sysUser.getUserId());
         Long roleId = sysUser.getRoleId();
         if (roleId != null) {
@@ -92,6 +92,19 @@ public class SysUserService {
             Date date = new Date();
             sysUser.setUpdateTime(date);
         }
+        MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+        param.set("logType", "3");
+        param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+        param.set("title", "用户信息修改");
+        param.set("state", 1);
+        param.set("userId", sysUser.getUserId());
+        param.set("userName", sysUserCurrent.getUserName());
+        param.set("requestOrigin", request.getRequestURL());
+        param.set("requestPath", request.getRequestURI());
+        param.set("requestMethod", request.getMethod());
+        param.set("content", "用户信息修改");
+        LogsAspect logsAspects = new LogsAspect();
+        logsAspects.post(param);
         return this.sysUserDao.update(sysUser);
     }
 
@@ -476,13 +489,27 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int userLogout(String userId, String token) {
+    public int userLogout(String userId, String token,HttpServletRequest request) {
         SysUser sysUserParams = new SysUser();
         sysUserParams.setLastLogin(new Date());
         long userIdLong = Long.valueOf(userId);
         sysUserParams.setUserId(userIdLong);
+        SysUserSelect sysUser = this.sysUserDao.selectByPrimaryIds(userIdLong);
         redisTemplate.delete("appKey:" + userId + ":" + token);
         redisTemplate.delete("user:" + userId);
+        MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+        param.set("logType", "7");
+        param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+        param.set("title", "登出");
+        param.set("state", 1);
+        param.set("userId", userId);
+        param.set("userName", sysUser.getUserName());
+        param.set("requestOrigin", request.getRequestURL());
+        param.set("requestPath", request.getRequestURI());
+        param.set("requestMethod", request.getMethod());
+        param.set("content", "登出");
+        LogsAspect logsAspects = new LogsAspect();
+        logsAspects.post(param);
         return this.sysUserDao.update(sysUserParams);
     }
 

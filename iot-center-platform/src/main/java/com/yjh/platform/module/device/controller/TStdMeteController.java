@@ -58,8 +58,8 @@ public class TStdMeteController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (roleId.intValue() != 1234) {
+          //  Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (userId != 10001) {
                 if (tStdMete.getLowLimit1() != null || tStdMete.getLowLimit2() != null || tStdMete.getLowLimit3() != null || tStdMete.getLowLimit4() != null
                         || tStdMete.getHighLimit1() != null || tStdMete.getHighLimit2() != null || tStdMete.getHighLimit3() != null || tStdMete.getHighLimit4() != null
                        ) {
@@ -100,8 +100,8 @@ public class TStdMeteController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (roleId.intValue() != 1234) {
+          //  Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (userId != 10001) {
                 TStdMete list = tStdMeteService.selectByPrimaryId(tStdMete.getStdMeteId());
                 if (tStdMete.getLowLimit1() != list.getLowLimit1() || tStdMete.getLowLimit2() != list.getLowLimit2() || tStdMete.getLowLimit3() != list.getLowLimit3() || tStdMete.getLowLimit4() != list.getLowLimit4()
                         || tStdMete.getHighLimit1() != list.getHighLimit1() || tStdMete.getHighLimit2() != list.getHighLimit2()  || tStdMete.getHighLimit3() != list.getHighLimit3()  || tStdMete.getHighLimit4() != list.getHighLimit4()
@@ -211,8 +211,8 @@ public class TStdMeteController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (roleId.intValue() != 1234) {
+           // Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (userId != 10001) {
                 for (TStdMete e : list) {
                     if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
                             || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null

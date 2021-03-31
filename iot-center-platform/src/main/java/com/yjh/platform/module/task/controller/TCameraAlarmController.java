@@ -57,8 +57,8 @@ public class TCameraAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (roleId.intValue() != 1234) {
+           // Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (userId != 10001) {
                 if (tCameraAlarm.getAlarmState() != null) {
                     throw new JurisdictionException();
                 }
@@ -97,8 +97,8 @@ public class TCameraAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (roleId.intValue() != 1234) {
+          //  Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (userId != 10001) {
                 TCameraAlarm list = tCameraAlarmService.selectByPrimaryId(tCameraAlarm.getCameraAlarmId());
                 if (list.getAlarmState() != tCameraAlarm.getAlarmState()) {
                     throw new JurisdictionException();
@@ -187,8 +187,8 @@ public class TCameraAlarmController {
         Result result = new Result();
         try {
             Integer userId = Integer.valueOf(request.getHeader("userId"));
-            Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (roleId.intValue() != 1234) {
+           // Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
+            if (userId != 10001) {
                 for (TCameraAlarm e : list) {
                     if (e.getAlarmState() != null) {
                         throw new JurisdictionException();

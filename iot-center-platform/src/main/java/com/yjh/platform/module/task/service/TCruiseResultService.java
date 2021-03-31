@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
@@ -19,7 +20,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -341,7 +345,7 @@ public class TCruiseResultService{
 
         return novelTaskList ;
     }
-    public int manualReviewTask(String taskId,String userId){
+    public int manualReviewTask(String taskId, String userId, HttpServletRequest request){
         Date date = new Date();
         String userName = tCruiseResultDao.selectUserName(Integer.valueOf(userId));
         //审核任务
@@ -368,6 +372,19 @@ public class TCruiseResultService{
         //自动生成巡视报告
         String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
         log.info("自动生成巡视报告的路径是=="+reportFilePath);
+        MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+        param.set("logType", "5");
+        param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+        param.set("title", "巡视审核");
+        param.set("state", 1);
+        param.set("userId",userId);
+        param.set("userName", userName);
+        param.set("requestOrigin", request.getRequestURL());
+        param.set("requestPath", request.getRequestURI());
+        param.set("requestMethod", request.getMethod());
+        param.set("content", "巡视审核");
+        LogsAspect logsAspects = new LogsAspect();
+        logsAspects.post(param);
         return result + list.size();
     }
 }
