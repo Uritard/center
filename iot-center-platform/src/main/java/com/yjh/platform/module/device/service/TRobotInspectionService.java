@@ -226,7 +226,7 @@ public class TRobotInspectionService{
         List<String> taskList = tRobotInspectionDao.selectRobotTaskOnStart(robotId);
         if(taskList != null && taskList.size()>0){
            for(String taskId:taskList){
-               Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode+":"+taskId);
+               Map<String,String> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode+":"+taskId);
                if(mapForRobotInstance == null || mapForRobotInstance.size() == 0){
                    reMap.put("taskProgress",0);
                    reMap.put("taskName","");
@@ -267,25 +267,29 @@ public class TRobotInspectionService{
                        reMap.put("taskProgress",re);
                        reMap.put("taskName",tc.getTaskName());
                        reMap.put("startTime",mapForRobotInstance.get("startTime"));
-                       String state = mapForRobotInstance.get("taskState").toString();
-                       //1=已执行 2=正在执行 3=暂停 4=终止 5=未执行 6=超期
-                       if("1".equals(state)){
-                           state = "已执行";
-                       }
-                       if("2".equals(state)){
-                           state = "正在执行";
-                       }
-                       if("3".equals(state)){
-                           state = "暂停";
-                       }
-                       if("4".equals(state)){
-                           state = "终止";
-                       }
-                       if("5".equals(state)){
-                           state = "未执行";
-                       }
-                       if("6".equals(state)){
-                           state = "超期";
+                       String state = mapForRobotInstance.get("taskState");
+                       if(state != null){
+                           //1=已执行 2=正在执行 3=暂停 4=终止 5=未执行 6=超期
+                           if("1".equals(state)){
+                               state = "已执行";
+                           }
+                           if("2".equals(state)){
+                               state = "正在执行";
+                           }
+                           if("3".equals(state)){
+                               state = "暂停";
+                           }
+                           if("4".equals(state)){
+                               state = "终止";
+                           }
+                           if("5".equals(state)){
+                               state = "未执行";
+                           }
+                           if("6".equals(state)){
+                               state = "超期";
+                           }
+                       }else {
+                           state="";
                        }
                        reMap.put("taskState",state);
                    }else {

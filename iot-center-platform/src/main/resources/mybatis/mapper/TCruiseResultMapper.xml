@@ -662,6 +662,7 @@
         select
         a.task_result_id,
         a.task_id,
+        a.task_name,
         a.area_id,
         a.c_type,
         a.c_state,
