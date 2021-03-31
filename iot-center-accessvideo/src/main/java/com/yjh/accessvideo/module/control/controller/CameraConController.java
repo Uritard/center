@@ -85,7 +85,6 @@ public class CameraConController {
             JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
             List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
             int streamListSize = streamsJsonObjectList.size();
-            String id= "";
             for (int i = 0; i < streamListSize; i++) {
                 String streambeanStr = streamsJsonObjectList.get(i);
                 JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
@@ -97,17 +96,18 @@ public class CameraConController {
 
                 if(clients<=1 || Objects.equals("false",publishjson.getString("active"))){
                     //符合无人观看的条件
-                    id = streambeanJson.getString("id");
+                    String cid = publishjson.getString("cid");
+                    log.info("cid："+cid);
                     //踢掉
-                    if(StringUtils.isNotEmpty(id)){
-                        String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+id;
+                    if(StringUtils.isNotEmpty(cid)){
+                        String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
                         HttpClientUtils.httpDelete(delteUrl,null);
                         log.info("关闭流："+delteUrl);
                     }
                 }
             }
         }catch (Exception e){
-            log.error("关流异常",e,this.getClass());
+            log.error("关流异常",e.getMessage(),this.getClass());
         }
     }
 
