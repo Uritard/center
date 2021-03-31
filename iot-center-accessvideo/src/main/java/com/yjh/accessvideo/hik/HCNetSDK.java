@@ -4295,7 +4295,7 @@ EMAIL参数结构
     public static interface FMSGCallBack_V31 extends StdCallLibrary.StdCallCallback  {
         public boolean invoke(int lCommand, NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser);
     }
-
+    public static final int  NET_SDK_MAX_FILE_PATH = 256;
     boolean  NET_DVR_Init();
     boolean  NET_DVR_SetSDKInitCfg(int enumType, Pointer lpInBuff);
     boolean  NET_DVR_Cleanup();

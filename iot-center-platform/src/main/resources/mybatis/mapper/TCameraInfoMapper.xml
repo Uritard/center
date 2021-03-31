@@ -41,7 +41,7 @@
         a.camera_id,
         a.camera_model,
         a.pms_id,
-        d.dict_note as camera_model_name,
+        e.dict_note as camera_model_name,
         a.camera_name,
         a.alias_name,
         a.record_id,

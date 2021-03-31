@@ -720,7 +720,7 @@
 			 where 1=1
         <if test="cameraId!=null  and cameraId!=''"> and  d.camera_id =  #{cameraId,jdbcType=BIGINT} </if>
         <if test="firName !=null and firName !=''">and a.fir_name like concat('%',#{firName, jdbcType=VARCHAR},'%') </if>
-        <if test="startDate != null and startDate != '' " ><if test="startDate != null and startDate != ''">and a.fir_date between #{startDate,jdbcType= Date} and #{startDate,jdbcType=Date}</if></if>
+        <if test="startDate != null and startDate != '' " ><if test="startDate != null and startDate != ''">and a.fir_date between #{startDate,jdbcType= TIMESTAMP} and #{startDate,jdbcType=TIMESTAMP}</if></if>
     </select>
 
 </mapper>

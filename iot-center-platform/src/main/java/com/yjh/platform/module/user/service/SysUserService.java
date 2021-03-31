@@ -122,7 +122,7 @@ public class SysUserService {
                 params.set("logType", "5");
                 params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                 params.set("title", "登录");
-                params.set("state", 1);
+                params.set("state", 2);
                 params.set("userId", "");
                 params.set("userName", userName);
                 params.set("requestOrigin", request.getRequestURL());
@@ -202,7 +202,7 @@ public class SysUserService {
                                 param.set("logType", "5");
                                 param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                                 param.set("title", "登录");
-                                param.set("state", 1);
+                                param.set("state", 2);
                                 param.set("userId", sysUserLogin.getUserId());
                                 param.set("userName", userName);
                                 param.set("requestOrigin", request.getRequestURL());
@@ -259,7 +259,7 @@ public class SysUserService {
                             param.set("logType", "5");
                             param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                             param.set("title", "登录");
-                            param.set("state", 1);
+                            param.set("state", 2);
                             param.set("userId", sysUserLogin.getUserId());
                             param.set("userName", userName);
                             param.set("requestOrigin", request.getRequestURL());
@@ -311,7 +311,7 @@ public class SysUserService {
                 params.set("logType", "5");
                 params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                 params.set("title", "登录");
-                params.set("state", 1);
+                params.set("state", 2);
                 if (sysUserList.size() == 0) {
                     params.set("userId", "");
                 } else {

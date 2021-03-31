@@ -112,6 +112,7 @@ public class RobotService {
             log.info("该机器人处于离线状态,没有成功将控制指令下发到机器人......");
             scmap.put("code", 3);
             scmap.put("result", "机器人不在线");
+            return scmap;
         }else {
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(sendCode)
@@ -124,48 +125,43 @@ public class RobotService {
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
             log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
             //根据不同的机器人对应不同的管道发送指令
-            RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-            if ("21".equals(type) && "7".equals(command) //抓图
-                    || "21".equals(type) && "10".equals(command)//停止录像
-                    || "22".equals(type) && "7".equals(command)){
-                TimeUnit.SECONDS.sleep(5);
-            }else {
-                TimeUnit.MILLISECONDS.sleep(500);
-            }
-//        String code = Constant.robotResultMap.get("Code");
-            String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
-            Map<String,Object> filePathMap = new HashMap<>();
-            String filePath = null;
-            if (Objects.nonNull(RobotServerHandler.getRobotResultMap().get("Item"))){
-//                filePathMap = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item")));
-                log.info("filePath=="+filePathMap.get("file_path"));
 
-                String ftpFilePath = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).get("file_path").toString();
-                String sArray[] = ftpFilePath.split("/");
-                String ftpFileName = sArray[sArray.length - 1];
-
-                Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
-                filePath = relativeImgMap.get("content")+ "/" + todayTime  + "/CameraLib/";
-                if (ftpFileName.endsWith(".jpg")){
-                    filePath = ftpFilePath + "BigImg/"+ftpFileName;
-                }else if (ftpFileName.endsWith(".bmp")){
-                    filePath = ftpFilePath + "Infrared/"+ftpFileName;
-                }else if (ftpFileName.endsWith(".mp4")){
-                    filePath = ftpFilePath + "Video/"+ftpFileName;
+            Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":61");
+            String robotPattern = robotStatusMap.get("value");
+            if ("1".equals(robotPattern) && !("1".equals(type) && "5".equals(command))){
+                log.info("当前机器人处于任务模式,请切换模式");
+                scmap.put("code", 3);
+                scmap.put("result", "当前机器人处于任务模式,请切换模式");
+                return scmap;
+            }else{
+                RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
+                if ("21".equals(type) && "7".equals(command) //抓图
+                        || "21".equals(type) && "10".equals(command)//停止录像
+                        || "22".equals(type) && "7".equals(command)){
+                    TimeUnit.SECONDS.sleep(5);
                 }
-            }
-            if ("200".equals(code)){
+                String filePath = null;
+                if (Objects.nonNull(RobotServerHandler.getRobotResultMap().get("Item"))){
+                    String ftpFilePath = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).get("file_path").toString();
+                    String sArray[] = ftpFilePath.split("/");
+                    String ftpFileName = sArray[sArray.length - 1];
+
+                    Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+                    filePath = relativeImgMap.get("content")+ "/" + todayTime  + "/CameraLib/";
+                    if (ftpFileName.endsWith(".jpg")){
+                        filePath = filePath + "BigImg/"+ftpFileName;
+                    }else if (ftpFileName.endsWith(".bmp")){
+                        filePath = filePath + "Infrared/"+ftpFileName;
+                    }else if (ftpFileName.endsWith(".mp4")){
+                        filePath = filePath + "Video/"+ftpFileName;
+                    }
+                }
                 scmap.put("code", 4);
                 scmap.put("result", "指令下发成功");
                 scmap.put("path",filePath);
-            }else{
-                scmap.put("code", 3);
-                scmap.put("result", "指令下发失败");
+                return scmap;
             }
         }
-        log.info("下发控制指令返回结果: "+scmap);
-        return scmap;
-
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -212,7 +208,8 @@ public class RobotService {
         } else {
             Constant.sendSessionId = 0L;
         }
-        log.info("发送会话序列号<start>" + sendSessionId + "<end>");
+        log.info("-------------这是刚发命令的请求"+sendSessionId+"-------------");
+
         byte[] requestProtocol = PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString);//生成发送的报文
 
         return requestProtocol;
@@ -226,14 +223,6 @@ public class RobotService {
                 .setRobotStatus(robotStatus);
         int res = tRobotInfoDao.update(tRobotInfo);
         log.info("robotCode为==="+robotCode+",robotId为==="+robotId+"的机器人状态是==="+tRobotInfo.getRobotStatus()+",修改结果==="+res);
-        //机器人状态改变给前端推送webSocket
-       /* Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
-        String webSocketUrl = webSocketUrlMap.get("content");
-        Map<String,Object> jasonMap=new HashMap<>();
-        jasonMap.put("type","robotStatus");
-        jasonMap.put("status",tRobotInfo.getRobotStatus());
-        String json= JSON.toJSONString(jasonMap);
-        Constant.getUrl(json,webSocketUrl);*/
         return res;
     }
     @Transactional(rollbackFor = Exception.class)
@@ -306,7 +295,7 @@ public class RobotService {
             deviceList.add(tRobotInspection);
 
             //机器人区域层级
-            /*TRobotRegion tr1 = new TRobotRegion();
+            TRobotRegion tr1 = new TRobotRegion();
             tr1.setRegionId(deviceMap.get("place_id").toString());
             tr1.setRegionName(deviceMap.get("place_name").toString());
             tr1.setUpRegionId("-1");
@@ -322,14 +311,15 @@ public class RobotService {
             tr3.setRegionId(deviceMap.get("main_device_id").toString());
             tr3.setRegionName(deviceMap.get("main_device_name").toString());
             tr3.setUpRegionId(deviceMap.get("bay_id").toString());
-            tr3.setDeviceType(deviceMap.get("device_type").toString());
+            Integer deviceType = selectDictCode("deviceType",deviceMap.get("device_type").toString(),"device_type");
+            tr3.setDeviceType(deviceType);
             tRobotRegionList.add(tr3);
 
             TRobotRegion tr4 = new TRobotRegion();
             tr4.setRegionId(deviceMap.get("component_id").toString());
             tr4.setRegionName(deviceMap.get("component_name").toString());
             tr4.setUpRegionId(deviceMap.get("main_device_id").toString());
-            tRobotRegionList.add(tr4);*/
+            tRobotRegionList.add(tr4);
         }
         log.info("获得的deviceList是：" + deviceList);
 
@@ -372,7 +362,7 @@ public class RobotService {
         }
 
         //机器人区域层级
-        /*log.info("获得的tRobotRegionList是："+tRobotRegionList);
+        log.info("获得的tRobotRegionList是："+tRobotRegionList);
         List<TRobotRegion> lst = tRobotRegionList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(
                 () -> new TreeSet<>(Comparator.comparing(o -> o.getRegionId() + "#" + o.getRegionName() + "#" + o.getUpRegionId()))),
                 ArrayList::new));
@@ -406,26 +396,26 @@ public class RobotService {
         log.info("准备更新的list是=="+lst);
         for (TRobotRegion tRobotRegion : lst){
             tRobotRegionDao.update(tRobotRegion);//更新TRR
-        }*/
+        }
         return 1;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object> receivingResponse(XMLBaseModel xmlBaseModel) {
-        RobotServerHandler.getRobotResultMap().put("Type",xmlBaseModel.getType());
+    public Map<String,Object> receivingResponse(XMLBaseModel xmlBaseModel,long receiveSessionId) {
         RobotServerHandler.getRobotResultMap().put("Code",xmlBaseModel.getCode());
-        RobotServerHandler.getRobotResultMap().put("Item",xmlBaseModel.getItems().get(0));
+        RobotServerHandler.getRobotResultMap().put("receiveSessionId",receiveSessionId);
         log.info("组成的robotResultMap是==="+RobotServerHandler.getRobotResultMap());
-        if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
-            return RobotServerHandler.getRobotResultMap();
+        if (Constant.sendSessionId == receiveSessionId){
+            log.info("-------------这是刚发命令的响应"+receiveSessionId+"-------------");
+        }else{
+            log.info("-------------这不是刚发命令的响应"+receiveSessionId+"-------------");
         }
-
-        /*Constant.robotResultMap.put("Type",xmlBaseModel.getType());
-        Constant.robotResultMap.put("Code",xmlBaseModel.getCode());
-        log.info("组成的robotResultMap是==="+Constant.robotResultMap);
         if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
-            return Constant.robotResultMap;
-        }*/
+            RobotServerHandler.getRobotResultMap().put("Item",null);
+            return RobotServerHandler.getRobotResultMap();
+        }else{
+            RobotServerHandler.getRobotResultMap().put("Item",xmlBaseModel.getItems().get(0));
+        }
         Map<String,Object> res = new HashMap<>();
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
@@ -439,18 +429,16 @@ public class RobotService {
         String sArray[] = ftpFilePath.split("/");
         String ftpFileName = sArray[sArray.length - 1];//巡视结果文件名称
         temporaryPath  = temporaryPath + "/" + ftpFilePath;
-        //开发环境图片绝对路径文件目录
         String developAbsoluteUrl = absoluteImgMap.get("content") + "/"+ todayTime  + "/CameraLib/";
-        //开发环境图片相对路径文件目录
         String developRelativeUrl = relativeImgMap.get("content")+ "/" + todayTime  + "/CameraLib/";
 
-        if (ftpFileName.endsWith(".jpg")){//可见光抓图
+        if (ftpFileName.endsWith(".jpg")){
             developAbsoluteUrl = developAbsoluteUrl + "BigImg/";
             developRelativeUrl = developRelativeUrl + "BigImg/";
-        }else if (ftpFileName.endsWith(".bmp")){//红外抓图
+        }else if (ftpFileName.endsWith(".bmp")){
             developAbsoluteUrl = developAbsoluteUrl + "Infrared/";
             developRelativeUrl = developRelativeUrl + "Infrared/";
-        }else if (ftpFileName.endsWith(".mp4")){//录像
+        }else if (ftpFileName.endsWith(".mp4")){
             developAbsoluteUrl = developAbsoluteUrl + "Video/";
             developRelativeUrl = developRelativeUrl + "Video/";
         }
@@ -1509,6 +1497,9 @@ public class RobotService {
         log.info("下发控制指令返回结果: "+scmap);
         return scmap;
 
+    }
+    public Long selectIsRobotTask(String taskId){
+        return tRobotInfoDao.selectIsRobotTask(taskId);
     }
 }
 

@@ -964,7 +964,7 @@ public class DataDealThread implements Runnable {
                         }
                         if(Objects.nonNull(cruiseWorkedMap.get("firName")) && !(cruiseWorkedMap.get("firName").equals("null"))){
                             tCruiseDataResult.setFirName(cruiseWorkedMap.get("firName").toString());
-                            tCruiseDataResult.setFirDate(new SimpleDateFormat("yyyyMMddhhmmssSSS").parse(tCruiseDataResult.getFirName()));
+                            tCruiseDataResult.setFirDate(new SimpleDateFormat("yyyyMMddHHmmssSSS").parse(tCruiseDataResult.getFirName()));
                             // TODO: 2021/3/25 FIR文件名与时间赋值
                         }
                         log.info("TCDR内容：" + tCruiseDataResult);

@@ -294,7 +294,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
 
         }
         //将正常 异常放回redis
-            if(abnormal>=all){
+            if((abnormal+normal) > all){
                 if(normal > 0){
                     abnormal = all - normal;
                 }else {

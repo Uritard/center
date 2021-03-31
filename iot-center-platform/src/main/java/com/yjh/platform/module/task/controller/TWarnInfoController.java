@@ -431,7 +431,7 @@ public class TWarnInfoController {
     }
     @ApiOperation(value = "告警弹框")
     @GetMapping(value = "/warnPopUp")
-    @Logs(title = "告警弹框",content = "告警弹窗",logType = 5)
+//    @Logs(title = "告警弹框",content = "告警弹窗",logType = 5)
     public Result warnPopUp(@RequestParam(value = "warnId", required = true) String warnId,
                             @RequestParam(value = "defectModel", required = true) Integer defectModel) {
         Result result = new Result();
@@ -447,7 +447,7 @@ public class TWarnInfoController {
 
     @ApiOperation(value = "查询当前三分钟以内最新告警")
     @GetMapping(value = "/SelectCurrentWarn")
-    @Logs(title = "查询最新告警",content = "三分中内最新告警ID",logType = 5)
+//    @Logs(title = "查询最新告警",content = "三分中内最新告警ID",logType = 5)
     public Result SelectCurrentWarn(){
         Result result=new Result();
         try{
@@ -463,7 +463,7 @@ public class TWarnInfoController {
 
     @ApiOperation(value = "查询当前三分钟以内最新联动信息")
     @GetMapping(value = "/SelectCurrentUnion")
-    @Logs(title = "查询最新联动",content = "三分中内最新联动任务ID",logType = 5)
+//    @Logs(title = "查询最新联动",content = "三分中内最新联动任务ID",logType = 5)
     public Result SelectCurrentUnion(){
         Result result=new Result();
         try{

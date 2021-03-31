@@ -764,7 +764,7 @@ public class CameraConService {
         String m_sUsername = recorderConInfo.getIdentityManager();
         String m_sPassword = recorderConInfo.getIdentityCode();
         Short m_port = recorderConInfo.getHttpPort().shortValue();
-        log.info("register nvr" + recorderConInfo.getRecordName() + ", ip is " + m_sDeviceIP + ", port is " + m_port);
+        log.info("register nvr {}, ip is {}, port is {}" , recorderConInfo.getRecordName(), m_sDeviceIP, m_port);
         //注册
         m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
         System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
@@ -965,8 +965,8 @@ public class CameraConService {
             //查询视频参数
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
-            if (hCNetSDK.NET_DVR_Init()) {
-                log.info("初始化成功开始注册登录：");
+           /* if (hCNetSDK.NET_DVR_Init()) {
+                log.info("初始化成功开始注册登录：");*/
                 String login = registerNVR(cameraConInfo.getRecordId());
                 if (!login.isEmpty()) {
                     log.info("登录成功：" + login);
@@ -1078,12 +1078,12 @@ public class CameraConService {
                     judge = null;
 
                 }
-            } else {
+          /*  } else {
                 iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.info("调用NET_DVR_Init 接口获取到：" + iErr);
                 log.info("视频初始化失败！！！");
                 judge = null;
-            }
+            }*/
         } catch (Exception e) {
             iErr = hCNetSDK.NET_DVR_GetLastError();
             log.info("获取视频方发异常：");
@@ -1106,8 +1106,8 @@ public class CameraConService {
 
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
-            if (hCNetSDK.NET_DVR_Init()) {
-                log.info("初始化成功开始注册登录：");
+           /* if (hCNetSDK.NET_DVR_Init()) {
+                log.info("初始化成功开始注册登录：");*/
                 String login = registerNVR(cameraConInfo.getRecordId());
                 if (!login.isEmpty()) {
                     log.info("登录成功：" + login);
@@ -1201,7 +1201,7 @@ public class CameraConService {
                         log.info("文件不存在:" + iErr);
                     }
                 }
-            }
+           // }
         } catch (Exception e) {
             list = null;
             log.error(e.getMessage());
@@ -1231,9 +1231,9 @@ public class CameraConService {
             log.info("cameraIp" + cameraIp);
             String port = cameraConInfo.getInfreadPort().toString();
             log.info("port:>>>" + port);
-            if (!hCNetSDK.NET_DVR_Init()) {
+           /* if (!hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化失败");
-            }
+            }*/
             log.info("开始登录。。。。。");
             m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
             System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
@@ -1337,9 +1337,9 @@ public class CameraConService {
             log.info("cameraIp" + cameraIp);
             String port = cameraConInfo.getInfreadPort().toString();
             log.info("port:>>>" + port);
-            if (!hCNetSDK.NET_DVR_Init()) {
+           /* if (!hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化失败");
-            }
+            }*/
             log.info("开始登录。。。。。");
             m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
             System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
@@ -1376,7 +1376,7 @@ public class CameraConService {
             log.info("bRet返回值：" + bRet);
             if (bRet) {
                 FileOutputStream fout;
-                String newName = new SimpleDateFormat("yyyyMMddhhmmssSSS").format(new Date());
+                String newName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
                 //测温图片
                 if (m_strJpegWithAppenData.dwJpegPicLen > 0) {
                     String path = hotPic + newName + ".jpg";
@@ -1489,9 +1489,9 @@ public class CameraConService {
             log.info("cameraIp" + cameraIp);
             String port = videoIntercom.get("port").toString();
             log.info("port:>>>" + port);
-            if (!hCNetSDK.NET_DVR_Init()) {
+          /*  if (!hCNetSDK.NET_DVR_Init()) {
                 log.info("语音对讲初始化失败");
-            }
+            }*/
             log.info("语音对讲开始登录。。。。。");
             m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
             System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
@@ -1621,9 +1621,9 @@ public class CameraConService {
             log.info("cameraIp" + cameraIp);
             String port = videoIntercom.get("port").toString();
             log.info("port:>>>" + port);
-            if (!hCNetSDK.NET_DVR_Init()) {
+            /*if (!hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化失败");
-            }
+            }*/
             log.info("开始登录。。。。。");
             m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
             System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
@@ -1809,10 +1809,10 @@ public class CameraConService {
             log.info("cameraIp"+cameraIp);
             String port =cameraConInfo.getInfreadPort().toString();
             log.info("port:>>>"+port);
-            if (! hCNetSDK.NET_DVR_Init())
+           /* if (! hCNetSDK.NET_DVR_Init())
             {
                 log.info("初始化失败");
-            }
+            }*/
             log.info("开始登录。。。。。");
             m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
             System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
