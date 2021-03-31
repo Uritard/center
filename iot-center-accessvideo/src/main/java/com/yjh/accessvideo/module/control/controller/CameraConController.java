@@ -77,7 +77,6 @@ public class CameraConController {
     @RequestMapping(value = "/stopProcess", method = RequestMethod.POST)
     public void stopProcess(){
 
-        String cid=null;
         try{
             //获取所有视频流信息
             //发送请求获取所有STREAM
@@ -86,6 +85,7 @@ public class CameraConController {
             JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
             List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
             int streamListSize = streamsJsonObjectList.size();
+            String id= "";
             for (int i = 0; i < streamListSize; i++) {
                 String streambeanStr = streamsJsonObjectList.get(i);
                 JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
@@ -97,10 +97,10 @@ public class CameraConController {
 
                 if(clients==1 || Objects.equals("false",publishjson.getString("active"))){
                     //符合无人观看的条件
-                    cid = publishjson.getString("cid");
+                    id = publishjson.getString("id");
                     //踢掉
-                    if(StringUtils.isNotEmpty(cid)){
-                        String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
+                    if(StringUtils.isNotEmpty(id)){
+                        String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+id;
                         HttpClientUtils.httpDelete(delteUrl,null);
                         log.info("关闭流："+delteUrl);
                     }
