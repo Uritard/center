@@ -11,6 +11,7 @@ import com.yjh.gateway.common.utils.IpUtil;
 import com.yjh.gateway.common.utils.MultisMap;
 import com.yjh.gateway.commons.utils.http.IPUtil;
 import com.yjh.gateway.commons.utils.smUtil.Demo;
+import com.yjh.gateway.logs.LogsAspect;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -99,8 +101,22 @@ public class zuulFilter extends ZuulFilter {
                         return false;
                     } else {
                         Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "expireTime")));
+                        String userName=String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
                         int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
                         if (System.currentTimeMillis() - expireTime > 60000 * logoutTime) {
+                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                            param.set("logType", "7");
+                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                            param.set("title", "登出");
+                            param.set("state", 1);
+                            param.set("userId", userId);
+                            param.set("userName", userName);
+                            param.set("requestOrigin", request.getRequestURL());
+                            param.set("requestPath", request.getRequestURI());
+                            param.set("requestMethod", request.getMethod());
+                            param.set("content", "用户登出");
+                            LogsAspect logsAspects = new LogsAspect();
+                            logsAspects.post(param);
                             log.error("token已失效===========================================================================");
                             redisTemplate.delete("appKey:" + userId + ":" + token);
                             if ("true".equals(isLogin)) {

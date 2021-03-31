@@ -507,7 +507,7 @@ public class SysUserService {
         param.set("requestOrigin", request.getRequestURL());
         param.set("requestPath", request.getRequestURI());
         param.set("requestMethod", request.getMethod());
-        param.set("content", "登出");
+        param.set("content", "用户登出");
         LogsAspect logsAspects = new LogsAspect();
         logsAspects.post(param);
         return this.sysUserDao.update(sysUserParams);

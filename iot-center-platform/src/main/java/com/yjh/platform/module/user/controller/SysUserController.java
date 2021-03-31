@@ -502,7 +502,7 @@ public class SysUserController {
 
     @ApiOperation(value = "账号锁定用户信息")
     @RequestMapping(value = "/lockUserInfo", method = RequestMethod.GET)
-    @Logs(title = "账号锁定用户信息", content = "账号锁定用户信息", logType = 3)
+   // @Logs(title = "账号锁定用户信息", content = "账号锁定用户信息", logType = 3)
     public Result lockUserInfo() {
         Result result = new Result();
         try {
@@ -525,7 +525,7 @@ public class SysUserController {
 
     @ApiOperation(value = "账号密码到期用户信息")
     @RequestMapping(value = "/passUserInfo", method = RequestMethod.GET)
-    @Logs(title = "账号密码到期用户信息", content = "账号密码到期用户信息", logType = 3)
+   // @Logs(title = "账号密码到期用户信息", content = "账号密码到期用户信息", logType = 3)
     public Result passUserInfo() {
         Result result = new Result();
         try {
