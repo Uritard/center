@@ -589,7 +589,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("巡视主机收到微气象数据了");
                     //Deal with robot micro climate data
                     List<Map<String,String>> weatherList = new ArrayList<>();
-                    Map<String,Object> info = new HashMap<>();
+                    Map<String,String> info = new HashMap<>();
                     DecimalFormat decimalFormat = new DecimalFormat("#0.0");
                     xmlBaseModel.getItems().forEach(res-> {
                         Map<String, String> weatherMap = new HashMap<>();

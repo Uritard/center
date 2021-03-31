@@ -248,8 +248,9 @@ public class VoiceAnalyseUtil {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         WaveOutMp3 wi = new WaveOutMp3(file);
-        wi.open();
-        wi.start();
+        boolean flag =  wi.open();
+        log.info("66666 "+flag);
+        //wi.start();
 
         FFT fft = new FFT();
         byte[] b = new byte[FFT.FFT_N << 1];

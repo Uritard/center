@@ -73,7 +73,7 @@ public class Constant {
     public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze";
 
     public static final String WEATHER_URL="http://iot-center-platform/homePage/v1/getWeatherInfoForService";
-    public static Result weatherServer(Map<String,Object> map, String url){
+    public static Result weatherServer(Map<String,String> map, String url){
         Result re = new Result();
         //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
         //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);

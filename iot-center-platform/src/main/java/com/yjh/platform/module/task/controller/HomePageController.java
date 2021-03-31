@@ -182,13 +182,17 @@ public class HomePageController {
 
     @ApiOperation(value = "用来接受微气象服务数据的接口")
     @RequestMapping(value = "/getWeatherInfoForService", method = RequestMethod.POST)
-    public Result getWeatherInfoForService(@RequestBody Map<String, Object> map)  {
+    public Result getWeatherInfoForService(@RequestBody Map<String, String> map)  {
         Result result = new Result();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             log.info("天气信息"+map);
             //Map mapa = JSON.parseObject(map);
             Map mapa = map;
+            Double sp = Double.valueOf(map.get("windSpeed"));
+            if(sp!= null && 0==sp){
+                map.put("windDirection","--");
+            }
 //            Integer temp1 = Integer.valueOf(mapa.get("windDirection").toString());
 //            String windDirection="";
 //            if(temp1 == 0 || temp1 ==360){

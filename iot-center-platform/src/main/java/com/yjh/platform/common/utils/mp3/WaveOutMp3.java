@@ -1,8 +1,11 @@
 package com.yjh.platform.common.utils.mp3;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.sound.sampled.*;
 import java.io.File;
 
+@Slf4j
 public class WaveOutMp3 {
 	private AudioFormat af;
 	private DataLine.Info dli;
@@ -26,10 +29,11 @@ public class WaveOutMp3 {
 				af = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED,af.getSampleRate(), 16, af.getChannels(),af.getChannels() * 2, af.getSampleRate(), false);
 				audioInputStream = AudioSystem.getAudioInputStream(af, audioInputStream);
 			}
-		    dli = new DataLine.Info(SourceDataLine.class, af);
-			tdl = (SourceDataLine) AudioSystem.getLine(dli);
-			tdl.open(af, FFT.FFT_N << 1);
+		    //dli = new DataLine.Info(SourceDataLine.class, af);
+//			tdl = (SourceDataLine) AudioSystem.getLine(dli);
+//			tdl.open(af, FFT.FFT_N << 1);
 		} catch (Exception e) {
+			log.error("错误"+e);
 			e.printStackTrace();
 			return false;
 		}
@@ -38,13 +42,20 @@ public class WaveOutMp3 {
 	}
 
 	public void close() {
-        tdl.drain();
-        tdl.stop();
-		tdl.close();
+		try{
+			audioInputStream.close();
+//			tdl.drain();
+//			tdl.stop();
+//			tdl.close();
+		}catch (Exception e){
+			log.error("关闭出错了"+e);
+		}
+
 	}
 
 	public void start() {
-		tdl.start();
+		log.info("是不是null " +tdl);
+		//tdl.start();
 	}
 
 	public void stop() {
