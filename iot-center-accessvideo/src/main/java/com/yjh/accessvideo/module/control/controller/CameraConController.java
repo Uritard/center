@@ -97,7 +97,7 @@ public class CameraConController {
 
                 if(clients<=1 || Objects.equals("false",publishjson.getString("active"))){
                     //符合无人观看的条件
-                    id = publishjson.getString("id");
+                    id = streambeanJson.getString("id");
                     //踢掉
                     if(StringUtils.isNotEmpty(id)){
                         String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+id;
