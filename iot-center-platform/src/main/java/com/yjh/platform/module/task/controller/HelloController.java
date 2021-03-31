@@ -85,13 +85,28 @@ public class HelloController {
     @ApiOperation(value = "测试一切")
     @RequestMapping(value = "/testAnything", method = RequestMethod.GET)
     public Result QrDecode() {
+
         Result result = new Result();
-        Map<String,String> jasonMap=new HashMap<>();
-        jasonMap.put("type","noTask");
-        //jasonMap.put("taskId",tCruiseTask.getTaskId());
-        String json= JSON.toJSONString(jasonMap);
         try{
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
+//        Map<String,String> jasonMap=new HashMap<>();
+//        jasonMap.put("type","noTask");
+//        //jasonMap.put("taskId",tCruiseTask.getTaskId());
+//        String json= JSON.toJSONString(jasonMap);
+        Map<String,String> jsonMap=new HashMap<>();
+        jsonMap.put("type","taskAre");
+        jsonMap.put("taskId","taskId");
+        String jsonForTaskAre= JSON.toJSONString(jsonMap);
+        log.info("任务超期的消息：   "+jsonForTaskAre);
+        //Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap);
+
+        // webSocket通知前端调用巡视监控的接口
+        Map<String,String> jasonMapOnFinished=new HashMap<>();
+        jasonMapOnFinished.put("type","finishedOneInstance");
+        jasonMapOnFinished.put("taskId","tCruiseTask.getTaskId()");
+        String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
+        log.info("发送给前端的消息："+jsonMessage);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
         }catch (Exception e){
             System.out.println("发送websocket出错");
         }

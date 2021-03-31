@@ -338,15 +338,6 @@ public class CheckTaskAreJob extends QuartzJobBean {
         Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap);
 
 
-        // webSocket通知前端调用巡视监控的接口
-        Map<String,String> jasonMapOnFinished=new HashMap<>();
-        jasonMapOnFinished.put("type","finishedOneInstance");
-        jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
-        String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
-        log.info("发送给前端的消息："+jsonMessage);
-        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
-
-
 
         Thread.sleep(15000);
 
@@ -380,7 +371,15 @@ public class CheckTaskAreJob extends QuartzJobBean {
             tCruiseTaskResultDao.update(tCruiseTaskResult);
         }
 
-            sendTaskStateToUp(tCruiseTask,6);
+        // webSocket通知前端调用巡视监控的接口
+        Map<String,String> jasonMapOnFinished=new HashMap<>();
+        jasonMapOnFinished.put("type","finishedOneInstance");
+        jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
+        String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
+        log.info("发送给前端的消息："+jsonMessage);
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
+
+        sendTaskStateToUp(tCruiseTask,6);
 
         log.info("超期完毕");
         } catch (Exception e) {
