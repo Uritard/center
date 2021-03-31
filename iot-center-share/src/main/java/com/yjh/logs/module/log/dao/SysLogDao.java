@@ -41,4 +41,9 @@ public interface SysLogDao {
 
     int batchInsert(List<SysLog> list);
     List<LongAnalyseDetail> logAnalyze();
+    List<SysLogDetail> selectByPageAsc(@Param(value = "userName") String userName,
+                                    @Param(value = "title") String title,
+                                    @Param(value = "startTime") Date startTime,
+                                    @Param(value = "endTime") Date endTime,
+                                    @Param(value = "logType") String logType);
 }

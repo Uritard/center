@@ -84,6 +84,37 @@ public class SysLogService {
         return sysOperateLogList;
     }
 
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<SysLogDetail> selectByPageAsc(String userName, String title, Date startTime, Date endTime,String logType) {
+        List<SysLogDetail> sysOperateLogList = sysLogDao.selectByPageAsc(userName,title,startTime,endTime,logType);
+        for (SysLogDetail item:sysOperateLogList) {
+            String type = item.getLogType();
+            if(type != null && !"".equals(type)){
+                type = NumToStringUtil.findType(type);
+                if(type != null){
+                    item.setLogType(type);
+                }
+            }
+            String state = item.getState();
+            if(state != null && !"".equals(state)){
+                if("1".equals(state)){
+                    state = "成功";
+                }
+                if("2".equals(state)){
+                    state = "失败";
+                }
+                if("3".equals(state)){
+                    state = "失败";
+                }
+                item.setState(state);
+            }
+        }
+        return sysOperateLogList;
+    }
+
+
+
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<SysLog> list) {
         return this.sysLogDao.batchInsert(list);

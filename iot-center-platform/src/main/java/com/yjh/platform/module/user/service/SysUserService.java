@@ -119,7 +119,7 @@ public class SysUserService {
             SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
             if (Objects.equals(null, sysUserLogin)) {
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "5");
+                params.set("logType", "6");
                 params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                 params.set("title", "登录");
                 params.set("state", 2);
@@ -160,7 +160,7 @@ public class SysUserService {
                     String appKey = getRandomNickname(10);
                     sysUserLogin.setAppkey(appKey);
                     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                    params.set("logType", "5");
+                    params.set("logType", "6");
                     params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                     params.set("title", "登录");
                     params.set("state", 1);
@@ -199,7 +199,7 @@ public class SysUserService {
                                 mapResult.put("pwdExpirationTip", "密码还有一天即将到期，请及时更换密码！");
                             }else if(yxTime>=sysUserLogin.getInvalidTime()){
                                 MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-                                param.set("logType", "5");
+                                param.set("logType", "6");
                                 param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                                 param.set("title", "登录");
                                 param.set("state", 2);
@@ -256,7 +256,7 @@ public class SysUserService {
                             mapResult.put("pwdExpirationTip", "密码还有一天即将到期，请及时更换密码！");
                         }else if(yxTime>=sysUserLogin.getInvalidTime()){
                             MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-                            param.set("logType", "5");
+                            param.set("logType", "6");
                             param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                             param.set("title", "登录");
                             param.set("state", 2);
@@ -308,7 +308,7 @@ public class SysUserService {
                 //登陆错误判断用户是否存在
                 List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userName);
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "5");
+                params.set("logType", "6");
                 params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                 params.set("title", "登录");
                 params.set("state", 2);
@@ -364,6 +364,19 @@ public class SysUserService {
                     sysUserDao.update(user);
                     redisTemplate.opsForValue().increment(key, 1);
                     num = num + 1;
+                    MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                    param.set("logType", "6");
+                    param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                    param.set("title", "登录");
+                    param.set("state", 2);
+                    param.set("userId", sysUserLogin.getUserId());
+                    param.set("userName", userName);
+                    param.set("requestOrigin", request.getRequestURL());
+                    param.set("requestPath", request.getRequestURI());
+                    param.set("requestMethod", request.getMethod());
+                    param.set("content", "账户已被锁定！");
+                    LogsAspect logsAspects = new LogsAspect();
+                    logsAspects.post(param);
                     mapResult.put("errorCount", "账户已被锁定！");
                     mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                     mapResult.put("info", ResultCodeEnum.CODE10102.getName());
@@ -490,7 +503,7 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int changePassword(Long userId, Map<String, String> map, String userName) throws IOException {
+    public int changePassword(Long userId, Map<String, String> map, String userName,HttpServletRequest request) throws IOException {
         Map linkedHashMap = new LinkedHashMap<>();
         linkedHashMap.put("userName", userName);
         SysUser sysUser = new SysUser();
@@ -510,6 +523,19 @@ public class SysUserService {
         BeanUtils.copyProperties(sysUser, sysUserBackUp);
         sysUserBackUp.setVerfiCode(Demo.summary(linkedHashMap.toString()));
         SysUserBackUpDao.update(sysUserBackUp);
+        MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+        param.set("logType", "3");
+        param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+        param.set("title", "修改密码");
+        param.set("state", 1);
+        param.set("userId", userId);
+        param.set("userName", userName);
+        param.set("requestOrigin", request.getRequestURL());
+        param.set("requestPath", request.getRequestURI());
+        param.set("requestMethod", request.getMethod());
+        param.set("content", "用户修改密码");
+        LogsAspect logsAspects = new LogsAspect();
+        logsAspects.post(param);
         return this.sysUserDao.update(sysUser);
     }
 

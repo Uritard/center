@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -102,10 +103,10 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取硬盘利用率")
     @RequestMapping(value = "/getDiskOnUse", method = RequestMethod.GET)
-    public Result getDiskOnUse() {
+    public Result getDiskOnUse(HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(systemInfoService.getDeskOnUse());
+            result.setData(systemInfoService.getDeskOnUse(request));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

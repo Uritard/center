@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.service;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
@@ -18,8 +19,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -97,11 +101,24 @@ public class SystemInfoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object> getDeskOnUse() throws Exception {
+    public Map<String,Object>  getDeskOnUse(HttpServletRequest request) throws Exception {
         Map<String,Object> deskOnUse=systemInfoUtil.getDeskOnUse();
         Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:DiskFreeMin");
         Double diskFreeMin=Double.parseDouble(map.get("content"));
         if(Double.parseDouble(deskOnUse.get("use").toString())/Double.parseDouble(deskOnUse.get("all").toString())*100>(100-diskFreeMin)){
+            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+            param.set("logType", "1");
+            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+            param.set("title", "磁盘最小空闲报警");
+            param.set("state", 1);
+            param.set("userId", "");
+            param.set("userName", "");
+            param.set("requestOrigin", request.getRequestURL());
+            param.set("requestPath", request.getRequestURI());
+            param.set("requestMethod", request.getMethod());
+            param.set("content", "磁盘最小空闲报警");
+            LogsAspect logsAspects = new LogsAspect();
+            logsAspects.post(param);
             deskOnUse.put("code","01");
         }else{
             deskOnUse.put("code","02");
