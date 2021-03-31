@@ -335,6 +335,7 @@ public class SysLogController {
                                @RequestParam(value = "logType", required = false) String logType,
                                @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                               @RequestParam(value = "sortFlag", required = false) int sortFlag,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
@@ -350,10 +351,17 @@ public class SysLogController {
                 logType = "";
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<SysLogDetail> list = sysLogService.selectByPage(userName, title, startTime, endTime, logType);
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
-            result.setData(resultMap);
+            if(sortFlag==1){
+                List<SysLogDetail> list = sysLogService.selectByPageAsc(userName, title, startTime, endTime, logType);
+                resultMap.put("count", page.getTotal());
+                resultMap.put("list", list);
+                result.setData(resultMap);
+            }else{
+                List<SysLogDetail> list = sysLogService.selectByPage(userName, title, startTime, endTime, logType);
+                resultMap.put("count", page.getTotal());
+                resultMap.put("list", list);
+                result.setData(resultMap);
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
