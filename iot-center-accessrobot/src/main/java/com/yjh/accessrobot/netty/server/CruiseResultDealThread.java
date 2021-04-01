@@ -193,12 +193,6 @@ public class CruiseResultDealThread implements Runnable{
                         if (cruiseResultMap.get("fileType").equals("1")){
                             tCruiseTaskResultMap.put("resultPic",cruiseResultMap.get("resultPic"));
                         }
-                        //旧版
-                        /*if (cruiseResultMap.get("fileType").equals("1") || cruiseResultMap.get("fileType").equals("2")){
-                            tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
-                        }
-                        tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));*/
-
                         tCruiseTaskResultMap.put("evaluationState","257");
                         tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
                         tCruiseTaskResultMap.put("isWarn","0");

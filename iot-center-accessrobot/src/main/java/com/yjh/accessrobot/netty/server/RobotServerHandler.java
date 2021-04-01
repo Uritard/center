@@ -139,7 +139,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         for(Map.Entry<Object,RobotServerHandler> vo : robotServerHandlerMap.entrySet()){
             log.info("当前的robotServerHandlerMap的key为"+vo.getKey());
-            robotServerHandlerMap.remove(vo.getKey());
+            String robotCode = vo.getKey().toString();
+            robotServerHandlerMap.remove(robotCode);
+            robotService.updateRobotInfo(vo.getKey().toString(),"离线");
+            Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
+            robotStatusMap.put("value","1");//异常
+            redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
+            flag2 = 0;
         }
         log.info("channel.isActive(): " + channel.isActive());
 
