@@ -19,7 +19,7 @@ public class Constant {
 
     public static Map<String, String> mapsForCamera = new HashMap<>();
 
-    public static Map<String, String> mapsForRobot = new HashMap<>();
+    public static Map<String, String> mapsForHistory = new HashMap<>();
 
     public static int connectTimeCounts = 0;
 
