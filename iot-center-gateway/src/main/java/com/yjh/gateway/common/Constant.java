@@ -47,7 +47,6 @@ public class Constant {
 
     public static final String DEVICE_STATE_OFFLINE = "OFFLINE";
 
-
     public static final String TYPE_OC = "OC";
 
     public static final String TYPE_104 = "104";
@@ -55,4 +54,6 @@ public class Constant {
     public static String isDecode;
 
     public static String isUkey;
+
+    public static final String LOGOUT_GATEWAY="http://127.0.0.1:18711/sysUser/v1/logoutGateway";
 }
