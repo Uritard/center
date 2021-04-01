@@ -379,11 +379,11 @@ public class TStdMetemodelService {
         anaList.add("defect_type");
         String[] analyseType = this.tStdMetemodelDetailDao.selectForDictByanalyseType(anaList).toArray(new String[0]);
         list.remove(list.get(5));//|| i==5 || i= 8 || i==14 || i==25 || i==28 || i==29
-        list.remove(list.get(8-1));//8-1
-        list.remove(list.get(12));//14-2
-        list.remove(list.get(22));//25-3
-        list.remove(list.get(24));//28-4
-        list.remove(list.get(24));//29-5
+        list.remove(list.get(6));//8-1-1
+        list.remove(list.get(11));//14-2-1
+        list.remove(list.get(21));//25-3-1
+        list.remove(list.get(23));//28-4-1
+        list.remove(list.get(23));//29-5-1
             for (int i = 0; i < list.size(); i++) {
                 if(i ==0 ){
                     continue;
@@ -395,7 +395,7 @@ public class TStdMetemodelService {
                     continue;
                 }
                 if(i == 2){
-                    cell.setCellValue("*"+list.get(i));
+                    cell.setCellValue(list.get(i));
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
                     // 创建下拉列表数据
