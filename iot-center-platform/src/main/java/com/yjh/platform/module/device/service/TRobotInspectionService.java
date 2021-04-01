@@ -93,16 +93,16 @@ public class TRobotInspectionService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<RobotTaskMessage> selectRobotTaskMessage(Long robotId) throws Exception{
+    public List<RobotTaskMessage> selectRobotTaskMessage(String taskId,Long robotId) throws Exception{
         List<RobotTaskMessage> re = new ArrayList<>();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //获取此机器人的巡视点
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
-        Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode);
-        Map<String,Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
-        String taskId = (String)mapForRobotInstance.get("taskId");
+        Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode+":"+taskId);
+        Map<String,Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":61");
+        //String taskId = (String)mapForRobotInstance.get("taskId");
         String robotState =(String) mapForRobotState.get("value");
-        if( !"2".equals(robotState)){
+        if( !"1".equals(robotState)){
             //机器人未在做任务
             Map<String,String> jasonMap=new HashMap<>();
             jasonMap.put("type","noTask");
@@ -215,6 +215,25 @@ public class TRobotInspectionService{
             re.put("robotState","");//机器人状态
         }
 
+        Map<String,String> mapForRobotDefeatState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":61");
+        if(mapForRobotDefeatState.size() != 0){
+            String value = mapForRobotDefeatState.get("value");
+            if("1".equals(value)){
+                re.put("modelType","任务模式");
+            }
+            if("2".equals(value)){
+                re.put("modelType","紧急定位模式");
+            }
+            if("3".equals(value)){
+                re.put("modelType","后台遥控模式");
+            }
+            if("4".equals(value)){
+                re.put("modelType","手持遥控模式");
+            }
+        }else {
+            re.put("modelType","");//机器人状态
+        }
+
         return re;
     }
 
@@ -225,7 +244,8 @@ public class TRobotInspectionService{
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
         List<String> taskList = tRobotInspectionDao.selectRobotTaskOnStart(robotId);
         if(taskList != null && taskList.size()>0){
-           for(String taskId:taskList){
+           String taskId = taskList.get(0);
+           reMap.put("taskId",taskId);
                Map<String,String> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode+":"+taskId);
                if(mapForRobotInstance == null || mapForRobotInstance.size() == 0){
                    reMap.put("taskProgress",0);
@@ -299,12 +319,12 @@ public class TRobotInspectionService{
                        reMap.put("taskState","");
                    }
                }
-           }
         }else {
             reMap.put("taskProgress",0);
             reMap.put("taskName","");
             reMap.put("startTime","");
             reMap.put("taskState","");
+            reMap.put("taskId","");
 
             Map<String,String> jasonMap=new HashMap<>();
             jasonMap.put("type","noTask");

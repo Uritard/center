@@ -182,9 +182,11 @@ public class TRobotInspectionController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            List<RobotTaskMessage> list =tRobotInspectionService.selectRobotTaskMessage(robotId);
-            resultMap.put("taskInfo",list);
             Map<String,Object> map = tRobotInspectionService.selectRobotTaskProgress(robotId);
+            String taskId = map.get("taskId").toString();
+            List<RobotTaskMessage> list =tRobotInspectionService.selectRobotTaskMessage(taskId,robotId);
+            resultMap.put("taskInfo",list);
+
             if(list != null){
                 if("100".equals(map.get("taskProgress")) ){
                     Map<String,String> jasonMap=new HashMap<>();
