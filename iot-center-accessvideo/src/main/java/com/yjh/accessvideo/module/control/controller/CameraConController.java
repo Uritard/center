@@ -117,6 +117,7 @@ public class CameraConController {
             } else {
                 if(clients<=2){
                     //踢掉
+                    log.info("关闭流开始");
                     String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
                     try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
                     String videoFlowId = streambeanJson.getString("id");
