@@ -1,5 +1,8 @@
 package com.yjh.platform.module.device.service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -90,13 +93,22 @@ public class TVoiceDeviceService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<VoiceDeviceAllInfoDetail> selectByPage(String voiceDeviceName,String deviceType,Long upRegionId) {
+    public Result selectByPage(String voiceDeviceName,String deviceType,Long upRegionId,int pageNum,int pageSize) {
+        Result result= new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        if("-1".equals(deviceType)){
+            deviceType = null;
+        }
         List<Long> list = tStdRegionDao.selectDownId(upRegionId);
         if(upRegionId != null){
             list.add(upRegionId);
         }
+        Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         List<VoiceDeviceAllInfoDetail> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(voiceDeviceName,deviceType,list,upRegionId);
-        return tVoiceDeviceList;
+        resultMap.put("count", page.getTotal());
+        resultMap.put("list", tVoiceDeviceList);
+        result.setData(resultMap);
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)
