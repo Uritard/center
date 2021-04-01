@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.accessvideo.common.Constant;
+import com.yjh.accessvideo.common.logs.LogsAspect;
 import com.yjh.accessvideo.common.logs.SpringBeanUtils;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
@@ -25,11 +26,14 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -475,6 +479,9 @@ public class DataDealThread implements Runnable {
                                                         log.info("告警上报：-" + map);
                                                         //Constant.otherServer(map, Constant.TCP_URL);//江苏要求
                                                     }
+
+
+
 
                                                     // webSocket通知前端刷新告警统计数量
                                                     Map<String, Object> jasonMaps = new HashMap<>();

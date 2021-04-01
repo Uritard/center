@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
@@ -34,12 +35,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.text.ParseException;
@@ -214,7 +218,7 @@ public class HelloController {
     @ApiOperation("说hello")
     @PostMapping("/admin")
     @ResponseBody
-    public Result sayHello(@RequestParam(value = "filePath") String filePath,@RequestParam String testString)  throws ParseException {
+    public Result sayHello(@RequestParam(value = "filePath") String filePath, @RequestParam String testString)  throws ParseException {
         Result result = new Result();
         ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
         tStdMetemodelDetailDao.selectForDictNote(resultHandler);
@@ -223,16 +227,17 @@ public class HelloController {
         result.setData(map);
         Long beginTime=System.currentTimeMillis();
 
-        Map<String,List<Analysis>> analysisInfo=new HashMap<>();
-        List<Analysis> analysisList=new ArrayList<>();
+//        Map<String,List<Analysis>> analysisInfo=new HashMap<>();
+//        List<Analysis> analysisList=new ArrayList<>();
 //        Analysis analysis=new Analysis();
 //        analysis.setTaskId("110001");
 //        analysis.setInstanceId(Long.valueOf("910009"));
-//        analysis.setPicModelPath("/home/yjh/iot-picture/model-picture/sync/Template/BigImg/21000000237");
+//        analysis.setPicModelPath("/home/yjh/iot-picture/model-picture/sync/Template/BigImg/21000000017" +
+//                " ");
 //        analysis.setAnalyseType("9");
 //        analysis.setPicPath("/home/yjh_iot_center/iot-picture/resultImg/20210325020936977.jpg");
-//        analysis.setCsvPath("http://192.168.9.40:10086/imgs/infrared/20210325020936977.data");
-//        analysis.setDataPath("http://192.168.9.40:10086/imgs/infrared/20210325020936977.data");
+//        analysis.setCsvPath("https://192.168.9.40:443/imgs/infrared/20210325020936977.data");
+//        analysis.setDataPath("https://192.168.9.40:443/imgs/infrared/20210325020936977.data");
 //        analysis.setIsAi(1);
 //
 //        analysisList.add(analysis);
@@ -246,6 +251,9 @@ public class HelloController {
 //        } catch (Exception e) {
 //            log.error(e.getMessage(), e);
 //        }
+
+
+
 
 
 //        Date date=new SimpleDateFormat("yyyyMMddhhmmssSSS").parse(testString);
