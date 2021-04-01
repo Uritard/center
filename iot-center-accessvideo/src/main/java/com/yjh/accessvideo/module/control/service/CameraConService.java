@@ -1475,6 +1475,8 @@ public class CameraConService {
         int re = 1;
         log.info("开启可视对讲");
         try {
+            String logpath="/home/yjh_iot_center/iot-center-accessvideo-1.0.0/logs/";
+            hCNetSDK.NET_DVR_SetLogToFile(3,logpath,false);
             log.info("开启可视对讲videoIntercomId：" + videoIntercomId);
             String url = SERVICE_URL + "?videoIntercomId=" + videoIntercomId;
             String services = HttpClientUtils.getInstance().getUrl(url, null);
