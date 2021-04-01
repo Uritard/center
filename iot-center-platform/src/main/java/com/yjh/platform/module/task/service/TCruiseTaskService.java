@@ -9,6 +9,7 @@ import com.yjh.platform.common.quartz.CruiseTaskJob;
 import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -940,8 +941,9 @@ public class TCruiseTaskService {
         //sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
         if (sysUser.getPassword().equals(password)) {
             return 1;
+        }else {
+            throw new BusinessException(10106,"密码错误");
         }
-        return -1;
     }
 
     private Result sendTaskStateToUp(TCruiseTask tCruiseTask, Integer state) {

@@ -369,8 +369,8 @@ public class TCruiseTaskController {
             }
             //result.setData(tCameraScreenService.update(tCameraScreen,userId));
         } catch (BusinessException e) {
-            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("更新异常:", e);
+            result.setMessage(ResultCodeEnum.CODE10106.getCode(), e.getMessage());
+            log.error("密码错误:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("更新错误:", e);
