@@ -25,6 +25,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -54,9 +55,10 @@ public class zuulFilter extends ZuulFilter {
 
     private static Logger log = LoggerFactory.getLogger(zuulFilter.class);
 
+    @Value("${spring.logout.path}")
+    private String LOGOUT_GATEWAY_URL;
     @Resource
     private RedisTemplate redisTemplate;
-
 
     @Override
     public String filterType() {
@@ -81,29 +83,29 @@ public class zuulFilter extends ZuulFilter {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
             String url = request.getRequestURI();
-            log.info("tt-url: "+ IPUtil.getRemoteIP(request));
+            log.info("tt-url: " + IPUtil.getRemoteIP(request));
             ctx.getZuulRequestHeaders().put("HTTP_X_FORWARDED_FOR", IPUtil.getRemoteIP(request));
             if (!url.contains("/sysUser/v1/login")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
-                String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
-                if (StringUtils.isNoneBlank(userId)) {
-                    StringBuilder sb = new StringBuilder();
-                    for (char c : userId.toCharArray()) {
-                        sb.append(Integer.toUnsignedString(c, 10));
-                    }
-                    String token = Demo.summary(sb.toString());
-                    if (!token.equals(absCode)) {
-                        log.error("参数篡改userId: " + userId + " ,之后的absCode: " + token + ",前端absCode: " + absCode);
-                        ctx.setSendZuulResponse(false);
-                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                        return false;
-                    }
-                } else {
-                    log.error("无userId====================================================================================");
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
-                    return false;
-                }
+//                String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
+//                if (StringUtils.isNoneBlank(userId)) {
+//                    StringBuilder sb = new StringBuilder();
+//                    for (char c : userId.toCharArray()) {
+//                        sb.append(Integer.toUnsignedString(c, 10));
+//                    }
+//                    String token = Demo.summary(sb.toString());
+//                    if (!token.equals(absCode)) {
+//                        log.error("参数篡改userId: " + userId + " ,之后的absCode: " + token + ",前端absCode: " + absCode);
+//                        ctx.setSendZuulResponse(false);
+//                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+//                        return false;
+//                    }
+//                } else {
+//                    log.error("无userId====================================================================================");
+//                    ctx.setSendZuulResponse(false);
+//                    ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+//                    return false;
+//                }
                 String token = request.getHeader("token") != null ? request.getHeader("token") : "";
                 if (StringUtils.isNoneBlank(token)) {
                     Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + userId + ":" + token);
@@ -119,7 +121,7 @@ public class zuulFilter extends ZuulFilter {
                         if (System.currentTimeMillis() - expireTime > 60000 * logoutTime) {
                             log.error("token已失效===========================================================================");
                             String userName = String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
-                            this.postUrl(token,IPUtil.getRemoteIP(request),userId,userName);
+                            this.postUrl(token, IPUtil.getRemoteIP(request), userId, userName);
 //                            log.error("token已失效===========================================================================");
 //                            redisTemplate.delete("appKey:" + userId + ":" + token);
 //                            if ("true".equals(isLogin)) {
@@ -129,20 +131,20 @@ public class zuulFilter extends ZuulFilter {
                             ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                             return false;
                         } else {
-                            if(!url.contains("/sysLog/v1/errLog")&&!url.contains("/tWarnInfo/v1/warnCountsNonIdentify")&&
-                                    !url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/tUnionTask/v1/linkageMonitorData")&&
-                                    !url.contains("/homePage/v1/taskOnExecute")&&!url.contains("/homePage/v1/countByAlarmLevel")&&
-                                    !url.contains("/tRobotInspection/v1/selectRobotTaskMessage")&&!url.contains("/tRobotInspection/v1/selectRobotStatus")&&
-                                    !url.contains("/systemInfo/v1/getDiskOnUse")&&!url.contains("/systemInfo/v1/getCpuOnUse")&&
-                                    !url.contains("/systemInfo/v1/getDisk")&&!url.contains("/systemInfo/v1/getCPU")&&
-                                    !url.contains("/systemInfo/v1/getMemory")&&!url.contains("/tCameraScreen/v1/cameraStateTree")&&
-                                    !url.contains("/tCruiseTaskResult/v1/selectCruiseAdvance")&&!url.contains("/tCruiseTaskResult/v1/selectCurrentCruiseTaskResult")&&
-                                    !url.contains("/tCruiseTaskResult/v1/selectRealTimeWarnInfo")&&!url.contains("/tCruisePointInstance/v1/selectCruiseCountByType")&&
-                                    !url.contains("/tCruiseTaskResult/v1/selectCruiseStatusCount")&&!url.contains("/tCameraScreen/v1/selectCameraTreeWithRobot")&&
-                                    !url.contains("/tCameraInfo/v1/selectByPage")&&!url.contains("/tCameraRecorder/v1/selectByPage")&&
-                                    !url.contains("/tRobotInfo/v1/selectByPage")&&!url.contains("/videoIntercom/v1/selectByPage")&&
-                                    !url.contains("/tVoiceDevice/v1/selectByPage")&&!url.contains("/homePage/v1/warnInfo")
-                            ){
+                            if (!url.contains("/sysLog/v1/errLog") && !url.contains("/tWarnInfo/v1/warnCountsNonIdentify") &&
+                                    !url.contains("/homePage/v1/getWeatherInfo") && !url.contains("/tUnionTask/v1/linkageMonitorData") &&
+                                    !url.contains("/homePage/v1/taskOnExecute") && !url.contains("/homePage/v1/countByAlarmLevel") &&
+                                    !url.contains("/tRobotInspection/v1/selectRobotTaskMessage") && !url.contains("/tRobotInspection/v1/selectRobotStatus") &&
+                                    !url.contains("/systemInfo/v1/getDiskOnUse") && !url.contains("/systemInfo/v1/getCpuOnUse") &&
+                                    !url.contains("/systemInfo/v1/getDisk") && !url.contains("/systemInfo/v1/getCPU") &&
+                                    !url.contains("/systemInfo/v1/getMemory") && !url.contains("/tCameraScreen/v1/cameraStateTree") &&
+                                    !url.contains("/tCruiseTaskResult/v1/selectCruiseAdvance") && !url.contains("/tCruiseTaskResult/v1/selectCurrentCruiseTaskResult") &&
+                                    !url.contains("/tCruiseTaskResult/v1/selectRealTimeWarnInfo") && !url.contains("/tCruisePointInstance/v1/selectCruiseCountByType") &&
+                                    !url.contains("/tCruiseTaskResult/v1/selectCruiseStatusCount") && !url.contains("/tCameraScreen/v1/selectCameraTreeWithRobot") &&
+                                    !url.contains("/tCameraInfo/v1/selectByPage") && !url.contains("/tCameraRecorder/v1/selectByPage") &&
+                                    !url.contains("/tRobotInfo/v1/selectByPage") && !url.contains("/videoIntercom/v1/selectByPage") &&
+                                    !url.contains("/tVoiceDevice/v1/selectByPage") && !url.contains("/homePage/v1/warnInfo")
+                            ) {
                                 redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
                             }
                             if ("true".equals(isLogin)) {
@@ -278,9 +280,9 @@ public class zuulFilter extends ZuulFilter {
     }
 
     //请求webSocket发送方法
-    public String postUrl(String token,String ip,String userId,String userName) throws IOException, URISyntaxException {
+    public String postUrl(String token, String ip, String userId, String userName) throws IOException, URISyntaxException {
         CloseableHttpClient client = HttpClients.createDefault();
-        URI uri = new URIBuilder(Constant.LOGOUT_GATEWAY).setParameter("token", token).setParameter("ip", ip).setParameter("userId", userId).setParameter("userName", userName).build();
+        URI uri = new URIBuilder(LOGOUT_GATEWAY_URL).setParameter("token", token).setParameter("ip", ip).setParameter("userId", userId).setParameter("userName", userName).build();
         HttpPost httpPost = new HttpPost(uri);
         httpPost.addHeader("Content-type", "application/json;charset=utf-8");
         httpPost.setHeader("Accept", "application/json");

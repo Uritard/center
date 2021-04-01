@@ -55,5 +55,4 @@ public class Constant {
 
     public static String isUkey;
 
-    public static final String LOGOUT_GATEWAY="http://192.168.9.40:18711/sysUser/v1/logoutGateway";
 }
