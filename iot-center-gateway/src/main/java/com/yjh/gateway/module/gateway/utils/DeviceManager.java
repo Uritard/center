@@ -1,4 +1,4 @@
-package com.yjh.gateway.module.utils;
+package com.yjh.gateway.module.gateway.utils;
 
 import org.springframework.data.redis.core.RedisTemplate;
 

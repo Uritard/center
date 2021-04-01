@@ -1,4 +1,4 @@
-package com.yjh.gateway.module.utils;
+package com.yjh.gateway.module.gateway.utils;
 
 import com.yjh.gateway.commons.utils.DateTimeUtil;
 import org.apache.commons.lang3.StringUtils;

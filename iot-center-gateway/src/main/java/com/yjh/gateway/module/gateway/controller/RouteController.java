@@ -1,8 +1,8 @@
-package com.yjh.gateway.module.controller;
+package com.yjh.gateway.module.gateway.controller;
 
 import com.yjh.gateway.commons.result.Result;
 import com.yjh.gateway.commons.result.ResultCodeEnum;
-import com.yjh.gateway.module.service.RefreshRouteService;
+import com.yjh.gateway.module.gateway.service.RefreshRouteService;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Author tt
  * @Date 2019/6/4
  **/
-@Api(value = "zuul路由管理", tags = {"zuul路由管理1"})
+@Api(value = "zuul路由管理", tags = {"zuul路由管理"})
 @RestController
 @RequestMapping("/route")
 public class RouteController {

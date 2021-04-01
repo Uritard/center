@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+import com.yjh.gateway.common.Constant;
 import com.yjh.gateway.common.utils.Decode;
+import com.yjh.gateway.common.utils.GPSFormatUtils;
 import com.yjh.gateway.common.utils.IpUtil;
 import com.yjh.gateway.common.utils.MultisMap;
 import com.yjh.gateway.commons.utils.http.IPUtil;
@@ -16,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
@@ -23,9 +26,12 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Component
 public class zuulFilter extends ZuulFilter {
@@ -93,7 +99,6 @@ public class zuulFilter extends ZuulFilter {
                         return false;
                     } else {
                         Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "expireTime")));
-                        String userName=String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
                         int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
                         if (System.currentTimeMillis() - expireTime > 60000 * logoutTime) {
                             log.error("token已失效===========================================================================");
