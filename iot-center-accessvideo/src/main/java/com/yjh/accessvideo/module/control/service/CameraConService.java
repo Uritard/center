@@ -1685,7 +1685,7 @@ public class CameraConService {
         return returnMap;
     }
 
-    @Logs(title = "获取可视状态", content = "获取可视状态",logType = 1)
+//    @Logs(title = "获取可视状态", content = "获取可视状态",logType = 1)
     @Transactional(rollbackFor = Exception.class)
     public int getVidemoIntercomStatus(Long videoIntercomId) {
         int re = 1;
