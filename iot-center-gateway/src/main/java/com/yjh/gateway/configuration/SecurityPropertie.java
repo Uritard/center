@@ -2,13 +2,14 @@ package com.yjh.gateway.configuration;
 
 
 import com.yjh.gateway.common.Constant;
-import com.yjh.gateway.module.entity.TSysParam;
-import com.yjh.gateway.module.service.TSysParamService;
+import com.yjh.gateway.module.gateway.entity.TSysParam;
+import com.yjh.gateway.module.gateway.service.TSysParamService;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Map;

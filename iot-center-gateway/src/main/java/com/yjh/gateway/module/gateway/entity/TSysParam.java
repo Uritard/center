@@ -1,4 +1,4 @@
-package com.yjh.gateway.module.entity;
+package com.yjh.gateway.module.gateway.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -16,7 +16,7 @@ import java.io.Serializable;
 
 /**
  * @author tt
- * @since 2020-08-06
+ * @since 2020-08-07
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

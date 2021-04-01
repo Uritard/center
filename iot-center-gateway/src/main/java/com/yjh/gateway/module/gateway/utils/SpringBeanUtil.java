@@ -1,4 +1,4 @@
-package com.yjh.gateway.module.utils;
+package com.yjh.gateway.module.gateway.utils;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

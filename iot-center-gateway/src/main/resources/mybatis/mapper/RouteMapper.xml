@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.gateway.module.dao.RouteDao">
-    <resultMap id="BaseResultMap" type="com.yjh.gateway.module.entity.Route">
+<mapper namespace="com.yjh.gateway.module.gateway.dao.RouteDao">
+    <resultMap id="BaseResultMap" type="com.yjh.gateway.module.gateway.entity.Route">
         <id column="route_id" jdbcType="BIGINT" property="routeId"/>
         <result column="service_id" jdbcType="VARCHAR" property="serviceId"/>
         <result column="url" jdbcType="VARCHAR" property="url"/>
@@ -25,10 +25,11 @@
     </resultMap>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from sys_route where route_id = #{routeId,jdbcType=BIGINT}
+        delete from sys_route
+        where route_id = #{routeId,jdbcType=BIGINT}
     </delete>
 
-    <insert id="insert" parameterType="com.yjh.gateway.module.entity.Route" useGeneratedKeys="true"
+    <insert id="insert" parameterType="com.yjh.gateway.module.gateway.entity.Route" useGeneratedKeys="true"
             keyProperty="routeId" keyColumn="route_id">
         insert into sys_route (route_id, service_id, url,
         strip_prefix, retry_able, api_name,
@@ -38,7 +39,7 @@
         #{enabled,jdbcType=INTEGER}, #{path,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR})
     </insert>
 
-    <update id="updateByPrimaryKey" parameterType="com.yjh.gateway.module.entity.Route">
+    <update id="updateByPrimaryKey" parameterType="com.yjh.gateway.module.gateway.entity.Route">
         update sys_route
         set service_id = #{serviceId,jdbcType=VARCHAR},
         url = #{url,jdbcType=VARCHAR},
