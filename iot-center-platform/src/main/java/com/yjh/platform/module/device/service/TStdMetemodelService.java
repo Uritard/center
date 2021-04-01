@@ -373,16 +373,17 @@ public class TStdMetemodelService {
         String[] meteType = this.tStdMetemodelDetailDao.selectForDict("mete_type").toArray(new String[0]);
         String[] meteKind = this.tStdMetemodelDetailDao.selectForDict("mete_kind").toArray(new String[0]);
         String[] alarmLevel = this.tStdMetemodelDetailDao.selectForDict("alarm_level").toArray(new String[0]);
-        String[] alarmType = this.tStdMetemodelDetailDao.selectForDict("alarm_type").toArray(new String[0]);
+        //String[] alarmType = this.tStdMetemodelDetailDao.selectForDict("alarm_type").toArray(new String[0]);
         List<String> anaList = new ArrayList<>();
         anaList.add("analyse_type");
         anaList.add("defect_type");
         String[] analyseType = this.tStdMetemodelDetailDao.selectForDictByanalyseType(anaList).toArray(new String[0]);
-        list.remove(list.get(5));//|| i==5 || i==14 || i==25 || i==28 || i==29
-        list.remove(list.get(13));//14-1
-        list.remove(list.get(23));//25-2
-        list.remove(list.get(25));//28-3
-        list.remove(list.get(25));//29-4
+        list.remove(list.get(5));//|| i==5 || i= 8 || i==14 || i==25 || i==28 || i==29
+        list.remove(list.get(8-1));//8-1
+        list.remove(list.get(12));//14-2
+        list.remove(list.get(22));//25-3
+        list.remove(list.get(24));//28-4
+        list.remove(list.get(24));//29-5
             for (int i = 0; i < list.size(); i++) {
                 if(i ==0 ){
                     continue;
@@ -426,18 +427,18 @@ public class TStdMetemodelService {
                     sheet.addValidationData(dataValidation3);
                     continue;
                 }
-                if(i == (8-1)){
-                    cell.setCellValue(list.get(i));
-                    // 设置第i列的2-5001行为下拉列表
-                    CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
-                    // 创建下拉列表数据
-                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(alarmType);
-                    // 绑定
-                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
-                    sheet.addValidationData(dataValidation3);
-                    continue;
-                }
-                if(i == (9-1)){
+//                if(i == (8-1)){
+//                    cell.setCellValue(list.get(i));
+//                    // 设置第i列的2-5001行为下拉列表
+//                    CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
+//                    // 创建下拉列表数据
+//                    DVConstraint constraint3 = DVConstraint.createExplicitListConstraint(alarmType);
+//                    // 绑定
+//                    HSSFDataValidation dataValidation3 = new HSSFDataValidation(regions3, constraint3);
+//                    sheet.addValidationData(dataValidation3);
+//                    continue;
+//                }
+                if(i == (9-1-1)){
                     cell.setCellValue(list.get(i));
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
@@ -448,7 +449,7 @@ public class TStdMetemodelService {
                     sheet.addValidationData(dataValidation3);
                     continue;
                 }
-                if(i == (13-1)){
+                if(i == (13-1-1)){
                     cell.setCellValue(list.get(i));
                     // 设置第i列的2-5001行为下拉列表
                     CellRangeAddressList regions3 = new CellRangeAddressList(1, 5000, i-1, i-1);
@@ -627,21 +628,21 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(7-1);
-                if (cell != null) {
-//设置单元格类型
-                    cell.setCellType(CellType.STRING);
-                    item = cell.getStringCellValue();
-                    if (checkString(item)) {
-                        errMsg.append("第" + (i + 1) + "行," + "第" + (8) + "列含有特殊字符<br>");
-                        result.setMessage(errMsg.toString());
-                        return result;
-                    }
-                    tStdMete.setAlarmType(nameMap.get(item).toString());
-                }
+//                cell = row.getCell(7-1);
+//                if (cell != null) {
+////设置单元格类型
+//                    cell.setCellType(CellType.STRING);
+//                    item = cell.getStringCellValue();
+//                    if (checkString(item)) {
+//                        errMsg.append("第" + (i + 1) + "行," + "第" + (8) + "列含有特殊字符<br>");
+//                        result.setMessage(errMsg.toString());
+//                        return result;
+//                    }
+//                    tStdMete.setAlarmType(nameMap.get(item).toString());
+//                }
 
 
-                cell = row.getCell(8-1);
+                cell = row.getCell(8-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -655,7 +656,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(9-1);
+                cell = row.getCell(9-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -668,7 +669,7 @@ public class TStdMetemodelService {
                     tStdMete.setUnit(item);
                 }
 
-                cell = row.getCell(10-1);
+                cell = row.getCell(10-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -682,7 +683,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(11-1);
+                cell = row.getCell(11-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -696,7 +697,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(12-1);
+                cell = row.getCell(12-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -710,7 +711,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(13-1);
+                cell = row.getCell(13-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -737,7 +738,7 @@ public class TStdMetemodelService {
 //                    tStdMete.setAlarmDelay(Integer.valueOf(item));
 //                }
 
-                cell = row.getCell(15-1-1);
+                cell = row.getCell(15-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -750,7 +751,7 @@ public class TStdMetemodelService {
                     tStdMete.setStateZero(item);
                 }
 
-                cell = row.getCell(16-1-1);
+                cell = row.getCell(16-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -764,7 +765,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(17-1-1);
+                cell = row.getCell(17-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -778,7 +779,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(18-1-1);
+                cell = row.getCell(18-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -792,7 +793,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(19-1-1);
+                cell = row.getCell(19-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -806,7 +807,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(20-1-1);
+                cell = row.getCell(20-1-1-1);
                 if (cell != null) {
                     //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -820,7 +821,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(21-1-1);
+                cell = row.getCell(21-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -834,7 +835,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(22-1-1);
+                cell = row.getCell(22-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -848,7 +849,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(23-1-1);
+                cell = row.getCell(23-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -862,7 +863,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(24-1-1);
+                cell = row.getCell(24-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -890,7 +891,7 @@ public class TStdMetemodelService {
 //                }
 
 
-                cell = row.getCell(26-1-1-1);
+                cell = row.getCell(26-1-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
@@ -904,7 +905,7 @@ public class TStdMetemodelService {
                 }
 
 
-                cell = row.getCell(27-1-1-1);
+                cell = row.getCell(27-1-1-1-1);
                 if (cell != null) {
 //设置单元格类型
                     cell.setCellType(CellType.STRING);
