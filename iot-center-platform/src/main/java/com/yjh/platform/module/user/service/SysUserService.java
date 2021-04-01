@@ -143,7 +143,7 @@ public class SysUserService {
                         Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("user:" + sysUserLogin.getUserId(), "expireTime")));
                         int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
                         if (System.currentTimeMillis() - expireTime < 60000 * logoutTime) {
-                            throw new BusinessException(500, "用户已登陆");
+                            throw new BusinessException(500, "用户已登录");
                         }
                     }
 
@@ -354,7 +354,7 @@ public class SysUserService {
                         logsAspect.post(params);
                     }
                 } else {
-                    throw new BusinessException(500, "用户已登陆");
+                    throw new BusinessException(500, "用户已登录");
                 }
             } else {
                 //登陆错误判断用户是否存在
@@ -550,16 +550,41 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int userLogout(String userId, String token,HttpServletRequest request) {
+    public int userLogout(String userId, String token) {
         SysUser sysUserParams = new SysUser();
         sysUserParams.setLastLogin(new Date());
         long userIdLong = Long.valueOf(userId);
         sysUserParams.setUserId(userIdLong);
-        SysUserSelect sysUser = this.sysUserDao.selectByPrimaryIds(userIdLong);
         redisTemplate.delete("appKey:" + userId + ":" + token);
         redisTemplate.delete("user:" + userId);
         return this.sysUserDao.update(sysUserParams);
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int userLogoutGateWay(String userId, String token,String ip,String userName,String requestOrigin,String requestPath,String requestMethod) {
+        SysUser sysUserParams = new SysUser();
+        sysUserParams.setLastLogin(new Date());
+        long userIdLong = Long.valueOf(userId);
+        sysUserParams.setUserId(userIdLong);
+        redisTemplate.delete("appKey:" + userId + ":" + token);
+        redisTemplate.delete("user:" + userId);
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.set("logType", "7");
+        params.set("ip", ip);
+        params.set("title", "登出");
+        params.set("state", 2);
+        params.set("userId", userId);
+        params.set("userName", userName);
+        params.set("requestOrigin",requestOrigin);
+        params.set("requestPath", requestPath);
+        params.set("requestMethod",requestMethod);
+        params.set("content", "用户登出");
+        LogsAspect logsAspect = new LogsAspect();
+        logsAspect.post(params);
+        return this.sysUserDao.update(sysUserParams);
+    }
+
+
 
     @Transactional(rollbackFor = Exception.class)
     public int unlockUserAccount(Map<String, String> map) throws IOException {

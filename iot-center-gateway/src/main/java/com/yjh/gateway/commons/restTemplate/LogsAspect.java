@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
 public class LogsAspect {
 
 
-    private static final String LOG_URL = "http://iot-center-share/sysLog/v1/add";
+    private static final String LOG_URL = "http://iot-center-platform/sysUser/v1/logoutGateway";
 
 
     @LoadBalanced
