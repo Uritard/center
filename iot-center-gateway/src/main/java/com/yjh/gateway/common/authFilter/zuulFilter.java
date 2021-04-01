@@ -103,20 +103,24 @@ public class zuulFilter extends ZuulFilter {
                         return false;
                     } else {
                         Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "expireTime")));
-                        String userName=String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
+                       // String userName=String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
                         int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
                         if (System.currentTimeMillis() - expireTime > 60000 * logoutTime) {
-                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-                            param.set("token", token);
-                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-                            param.set("userId", userId);
-                            param.set("userName", userName);
-                            param.set("requestOrigin", request.getRequestURL());
-                            param.set("requestPath", request.getRequestURI());
-                            param.set("requestMethod", request.getMethod());
-                            LogsAspect logsAspect=new LogsAspect();
-                            logsAspect.post(param);
+//                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+//                            param.set("token", token);
+//                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+//                            param.set("userId", userId);
+//                            param.set("userName", userName);
+//                            param.set("requestOrigin", request.getRequestURL());
+//                            param.set("requestPath", request.getRequestURI());
+//                            param.set("requestMethod", request.getMethod());
+//                            LogsAspect logsAspect=new LogsAspect();
+//                            logsAspect.post(param);
                             log.error("token已失效===========================================================================");
+                            redisTemplate.delete("appKey:" + userId + ":" + token);
+                            if ("true".equals(isLogin)) {
+                                redisTemplate.delete("user:" + userId);
+                            }
                             ctx.setSendZuulResponse(false);
                             ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                             return false;

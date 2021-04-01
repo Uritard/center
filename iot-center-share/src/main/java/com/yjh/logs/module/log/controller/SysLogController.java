@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -419,15 +420,17 @@ public class SysLogController {
     }
 
 
-    @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPageAsc", method = RequestMethod.GET)
-    public Result selectByPageAsc(@RequestParam(value = "userName", required = false) String userName,
-                               @RequestParam(value = "title", required = false) String title,
-                               @RequestParam(value = "logType", required = false) String logType,
-                               @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                               @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+    @ApiOperation(value = "导出")
+    @RequestMapping(value = "/export", method = RequestMethod.GET)
+    public Result export(@RequestParam(value = "userName", required = false) String userName,
+                         @RequestParam(value = "title", required = false) String title,
+                         @RequestParam(value = "logType", required = false) String logType,
+                         @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                         @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                         @RequestParam(value = "sortFlag", required = false) int sortFlag,
+                         @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
+                         @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,
+                         HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -441,10 +444,22 @@ public class SysLogController {
                 logType = "";
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<SysLogDetail> list = sysLogService.selectByPageAsc(userName, title, startTime, endTime, logType);
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
-            result.setData(resultMap);
+            if(sortFlag==1){
+                List<SysLogDetail> list = sysLogService.selectByPageAsc(userName, title, startTime, endTime, logType);
+                resultMap.put("count", page.getTotal());
+                resultMap.put("list", list);
+                result.setData(resultMap);
+            }else{
+                List<SysLogDetail> list = sysLogService.selectByPage(userName, title, startTime, endTime, logType);
+                resultMap.put("count", page.getTotal());
+                resultMap.put("list", list);
+                result.setData(resultMap);
+            }
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String token = request.getHeader("token");
+            String userNames=String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
+            String iP=request.getHeader("HTTP_X_FORWARDED_FOR");
+            this.insert("9",iP,"导出",1,"日志导出",userId,userNames,String.valueOf(request.getRequestURL()),request.getRequestURI(),request.getMethod());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
