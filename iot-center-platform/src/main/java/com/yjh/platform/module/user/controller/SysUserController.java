@@ -338,7 +338,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户登出")
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    @Logs(title = "用户登出", content = "用户登出", logType = 5)
+    @Logs(title = "登出", content = "用户登出", logType = 7)
     public Result userLogout(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -502,7 +502,6 @@ public class SysUserController {
 
     @ApiOperation(value = "账号锁定用户信息")
     @RequestMapping(value = "/lockUserInfo", method = RequestMethod.GET)
-   // @Logs(title = "账号锁定用户信息", content = "账号锁定用户信息", logType = 3)
     public Result lockUserInfo() {
         Result result = new Result();
         try {
@@ -525,7 +524,6 @@ public class SysUserController {
 
     @ApiOperation(value = "账号密码到期用户信息")
     @RequestMapping(value = "/passUserInfo", method = RequestMethod.GET)
-   // @Logs(title = "账号密码到期用户信息", content = "账号密码到期用户信息", logType = 3)
     public Result passUserInfo() {
         Result result = new Result();
         try {

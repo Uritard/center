@@ -372,19 +372,6 @@ public class TCruiseResultService{
         //自动生成巡视报告
         String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
         log.info("自动生成巡视报告的路径是=="+reportFilePath);
-        MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-        param.set("logType", "5");
-        param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-        param.set("title", "巡视审核");
-        param.set("state", 1);
-        param.set("userId",userId);
-        param.set("userName", userName);
-        param.set("requestOrigin", request.getRequestURL());
-        param.set("requestPath", request.getRequestURI());
-        param.set("requestMethod", request.getMethod());
-        param.set("content", "巡视审核");
-        LogsAspect logsAspects = new LogsAspect();
-        logsAspects.post(param);
         return result + list.size();
     }
 }
