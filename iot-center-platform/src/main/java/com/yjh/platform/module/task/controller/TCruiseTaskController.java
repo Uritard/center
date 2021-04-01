@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -20,9 +21,13 @@ import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -44,6 +49,8 @@ public class TCruiseTaskController {
     private TPeriodModelDao tPeriodModelDao;
     @Autowired
     private TCruisePlanDao tCruisePlanDao;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskController.class);
 
@@ -51,7 +58,7 @@ public class TCruiseTaskController {
         this.tCruiseTaskService = tCruiseTaskService;
     }
 
-    public Result insert(@RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
+    public Result insert(@RequestBody TCruiseTaskAdd tCruiseTaskAdd,HttpServletRequest request) {
         Result result = new Result();
         try {
             TCruiseTask tCruiseTask = new TCruiseTask();
@@ -106,7 +113,23 @@ public class TCruiseTaskController {
                 } else { tCruiseTask.setStartTime(new Date()); }
                 result.setData(tCruiseTaskService.insert(tCruiseTask));
             }
-
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String token = request.getHeader("token");
+            String userNames=String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
+            String iP=request.getHeader("HTTP_X_FORWARDED_FOR");
+            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+            params.set("logType", "2");
+            params.set("ip", iP);
+            params.set("title", "新增任务");
+            params.set("state", 1);
+            params.set("userId", userId);
+            params.set("userName", userNames);
+            params.set("requestOrigin",request.getRequestURL());
+            params.set("requestPath",request.getRequestURI());
+            params.set("requestMethod",request.getMethod());
+            params.set("content", "根据用户传递的参数新增数据");
+            LogsAspect logsAspect = new LogsAspect();
+            logsAspect.post(params);
 
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -336,7 +359,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增任务",content = "根据用户传递的参数新增数据",logType = 2)
+    //@Logs(title = "新增任务",content = "根据用户传递的参数新增数据",logType = 2)
     public Result taskConfirmation(HttpServletRequest request,@RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
         Result result = new Result();
         try {
@@ -362,8 +385,24 @@ public class TCruiseTaskController {
 //                tCruiseTaskAdd.setDayOfWeek(dayOfWeek);
 //                tCruiseTaskAdd.setYear(year);
 //                tCruiseTaskAdd.setPeriodId(periodId);
-                result = this.insert(tCruiseTaskAdd);
+                result = this.insert(tCruiseTaskAdd,request);
             }else {
+                String token = request.getHeader("token");
+                String userNames=String.valueOf(redisTemplate.opsForHash().get("appKey:" +  Long.valueOf(userId) + ":" + token, "userName"));
+                String iP=request.getHeader("HTTP_X_FORWARDED_FOR");
+                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                params.set("logType", "2");
+                params.set("ip", iP);
+                params.set("title", "新增任务");
+                params.set("state", 2);
+                params.set("userId",  Long.valueOf(userId));
+                params.set("userName", userNames);
+                params.set("requestOrigin",request.getRequestURL());
+                params.set("requestPath",request.getRequestURI());
+                params.set("requestMethod",request.getMethod());
+                params.set("content", "根据用户传递的参数新增数据");
+                LogsAspect logsAspect = new LogsAspect();
+                logsAspect.post(params);
                 result.setCode(209);
                 result.setMessage("密码错误");
             }
