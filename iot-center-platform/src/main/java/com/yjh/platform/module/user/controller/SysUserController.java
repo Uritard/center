@@ -354,17 +354,15 @@ public class SysUserController {
 
 
     @ApiOperation(value = "用户登出网关调用")
-    @RequestMapping(value = "/logoutGateway", method = RequestMethod.GET)
+    @RequestMapping(value = "/logoutGateway", method = RequestMethod.POST)
     public Result userLogoutGateWay(@RequestParam(value = "token", required = false) String token,
                                     @RequestParam(value = "ip", required = false) String ip,
                                     @RequestParam(value = "userId", required = false) String userId,
-                                    @RequestParam(value = "userName", required = false) String userName,
-                                    @RequestParam(value = "requestOrigin", required = false) String requestOrigin,
-                                    @RequestParam(value = "requestPath", required = false) String requestPath,
-                                    @RequestParam(value = "requestMethod", required = false) String requestMethod ) {
+                                    @RequestParam(value = "userName", required = false) String userName
+                                    ) {
         Result result = new Result();
         try {
-            result.setData(this.sysUserService.userLogoutGateWay(userId, token,ip,userName,requestOrigin,requestPath,requestMethod));
+            result.setData(this.sysUserService.userLogoutGateWay(userId, token,ip,userName));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("登出失败:", e);

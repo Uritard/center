@@ -14,7 +14,15 @@ import com.yjh.gateway.commons.utils.http.IPUtil;
 import com.yjh.gateway.commons.utils.smUtil.Demo;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -30,7 +38,11 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -103,24 +115,16 @@ public class zuulFilter extends ZuulFilter {
                         return false;
                     } else {
                         Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "expireTime")));
-                       // String userName=String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
                         int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
                         if (System.currentTimeMillis() - expireTime > 60000 * logoutTime) {
-//                            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-//                            param.set("token", token);
-//                            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-//                            param.set("userId", userId);
-//                            param.set("userName", userName);
-//                            param.set("requestOrigin", request.getRequestURL());
-//                            param.set("requestPath", request.getRequestURI());
-//                            param.set("requestMethod", request.getMethod());
-//                            LogsAspect logsAspect=new LogsAspect();
-//                            logsAspect.post(param);
                             log.error("token已失效===========================================================================");
-                            redisTemplate.delete("appKey:" + userId + ":" + token);
-                            if ("true".equals(isLogin)) {
-                                redisTemplate.delete("user:" + userId);
-                            }
+                            String userName = String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
+                            this.postUrl(token,IPUtil.getRemoteIP(request),userId,userName);
+//                            log.error("token已失效===========================================================================");
+//                            redisTemplate.delete("appKey:" + userId + ":" + token);
+//                            if ("true".equals(isLogin)) {
+//                                redisTemplate.delete("user:" + userId);
+//                            }
                             ctx.setSendZuulResponse(false);
                             ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                             return false;
@@ -271,5 +275,21 @@ public class zuulFilter extends ZuulFilter {
         String s = String.format("%s >>> %s", request.getMethod(), request.getRequestURL().toString());
         log.info(s);
         return null;
+    }
+
+    //请求webSocket发送方法
+    public String postUrl(String token,String ip,String userId,String userName) throws IOException, URISyntaxException {
+        CloseableHttpClient client = HttpClients.createDefault();
+        URI uri = new URIBuilder(Constant.LOGOUT_GATEWAY).setParameter("token", token).setParameter("ip", ip).setParameter("userId", userId).setParameter("userName", userName).build();
+        HttpPost httpPost = new HttpPost(uri);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(token, Charset.forName("UTF-8")));
+        httpPost.setEntity(new StringEntity(ip, Charset.forName("UTF-8")));
+        httpPost.setEntity(new StringEntity(userId, Charset.forName("UTF-8")));
+        httpPost.setEntity(new StringEntity(userName, Charset.forName("UTF-8")));
+        CloseableHttpResponse response = client.execute(httpPost);
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, "UTF-8");
     }
 }

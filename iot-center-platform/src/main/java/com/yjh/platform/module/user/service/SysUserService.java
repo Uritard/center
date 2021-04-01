@@ -561,7 +561,7 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int userLogoutGateWay(String userId, String token,String ip,String userName,String requestOrigin,String requestPath,String requestMethod) {
+    public int userLogoutGateWay(String userId, String token,String ip,String userName) {
         SysUser sysUserParams = new SysUser();
         sysUserParams.setLastLogin(new Date());
         long userIdLong = Long.valueOf(userId);
@@ -575,9 +575,9 @@ public class SysUserService {
         params.set("state", 2);
         params.set("userId", userId);
         params.set("userName", userName);
-        params.set("requestOrigin",requestOrigin);
-        params.set("requestPath", requestPath);
-        params.set("requestMethod",requestMethod);
+        params.set("requestOrigin","");
+        params.set("requestPath", "");
+        params.set("requestMethod","");
         params.set("content", "用户登出");
         LogsAspect logsAspect = new LogsAspect();
         logsAspect.post(params);
