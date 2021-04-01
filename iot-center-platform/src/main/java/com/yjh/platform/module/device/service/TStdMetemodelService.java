@@ -342,6 +342,9 @@ public class TStdMetemodelService {
         Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
         String returnPath = (String) mapForReturnPath.get("content");
 
+//        String path = "D:/code/voice";
+//        String returnPath = "D:/code/voice";
+
         String fileName = "meteModel.xls";
         List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
        boolean isOk = createModel(name,fileName,path);
@@ -379,11 +382,11 @@ public class TStdMetemodelService {
         anaList.add("defect_type");
         String[] analyseType = this.tStdMetemodelDetailDao.selectForDictByanalyseType(anaList).toArray(new String[0]);
         list.remove(list.get(5));//|| i==5 || i= 8 || i==14 || i==25 || i==28 || i==29
-        list.remove(list.get(6));//8-1-1
-        list.remove(list.get(11));//14-2-1
-        list.remove(list.get(21));//25-3-1
-        list.remove(list.get(23));//28-4-1
-        list.remove(list.get(23));//29-5-1
+        list.remove(list.get(13));//14-1
+        list.remove(list.get(23));//25-2
+        list.remove(list.get(25));//28-3
+        list.remove(list.get(25));//29-4
+        list.remove(list.get(6));
             for (int i = 0; i < list.size(); i++) {
                 if(i ==0 ){
                     continue;
@@ -537,12 +540,12 @@ public class TStdMetemodelService {
                     result.setMessage(errMsg.toString());
                     return result;
                 }
-                //第3列
-                if (row.getCell(2) == null || row.getCell(2).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(2).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(2).getStringCellValue()))) {
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (3) + "列不能为空<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
-                }
+//                //第3列
+//                if (row.getCell(2) == null || row.getCell(2).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(2).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(2).getStringCellValue()))) {
+//                    errMsg.append("第" + (i + 1) + "行," + "第" + (3) + "列不能为空<br>");
+//                    result.setMessage(errMsg.toString());
+//                    return result;
+//                }
                 //第5列
                 if (row.getCell(4) == null || row.getCell(4).getCellTypeEnum().equals(CellType.BLANK) || (row.getCell(4).getCellTypeEnum().equals(CellType.STRING) && "".equals(row.getCell(4).getStringCellValue()))) {
                     errMsg.append("第" + (i + 1) + "行," + "第" + (5) + "列不能为空<br>");
