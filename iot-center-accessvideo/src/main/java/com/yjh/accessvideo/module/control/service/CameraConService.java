@@ -124,68 +124,65 @@ public class CameraConService {
     public Map<String, Object> startRealPlay(Long cameraId) {
 
         Map<String, Object> returnMap = new HashMap<>();
-        Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + cameraId);
-        if (Objects.nonNull(cameraFlowMap.get("rtmpUrl"))) {
-            cameraFlowMap.put("cameraId", String.valueOf(cameraId));
-            return cameraFlowMap;
-        }
-        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-        String userName = cameraConInfo.getCameraManager();
-        String password = cameraConInfo.getCameraCode();
-        String cameraIp = cameraConInfo.getCameraIp();
-        int cameraPort = cameraConInfo.getPort();
-        int iChanNum = cameraConInfo.getCameraNum();
-        int cameraType = cameraConInfo.getCameraType();
-
-        int livePath = Constant.maps.get("livePath") + 1;
-        Constant.maps.put("livePath", livePath);
-
-        log.info("Constant.maps: " + Constant.maps);
-        log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + livePath);
-        String transUrl = "";
-        if (cameraType == 205) {
-            transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, livePath);
-        } else if (cameraType == 206) {
-            transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, livePath);
-        }
-
         try {
+            Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + cameraId);
+            if (Objects.nonNull(cameraFlowMap.get("rtmpUrl"))) {
+                cameraFlowMap.put("cameraId", String.valueOf(cameraId));
+                return cameraFlowMap;
+            }
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            String userName = cameraConInfo.getCameraManager();
+            String password = cameraConInfo.getCameraCode();
+            String cameraIp = cameraConInfo.getCameraIp();
+            int cameraPort = cameraConInfo.getPort();
+            int iChanNum = cameraConInfo.getCameraNum();
+            int cameraType = cameraConInfo.getCameraType();
+
+            int livePath = Constant.maps.get("livePath") + 1;
+            Constant.maps.put("livePath", livePath);
+
+            log.info("Constant.maps: " + Constant.maps);
+            log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + livePath);
+            String transUrl = "";
+            if (cameraType == 205) {
+                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, livePath);
+            } else if (cameraType == 206) {
+                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, livePath);
+            }
             Runtime.getRuntime().exec(transUrl);
             Thread.sleep(3000);
-        } catch (Exception e) { e.getMessage(); }
-
-        log.info("transUrl: " + transUrl);
-        String[] rtmpUrls = transUrl.split("rtmp");
-        String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
-        returnMap.put("rtmpUrl", rtmpUrl);
-        if (videoHttps == 1) {
-            String flvsUrl = "https://" + hostIp + ":8088/live/" + livePath + ".flv";
-            returnMap.put("flvUrl", flvsUrl);
-        } else {
-            String flvUrl = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
-            returnMap.put("flvUrl", flvUrl);
-        }
-
-        String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
-        JSONObject jsonList = new JSONObject();
-        try { jsonList = HttpClientUtils.sendGet(getInfoUrl, null); } catch (Exception e) {e.getMessage();}
-        List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
-        int streamListSize = streamsJsonObjectList.size();
-        for (int i = 0; i < streamListSize; i++) {
-            String streambeanStr = streamsJsonObjectList.get(i);
-            JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
-            //livePath
-            String name = streambeanJson.getString("name");
-            String videoFlowId = streambeanJson.getString("id");
-            if (Objects.equals(name, String.valueOf(livePath))) {
-                returnMap.put("videoFlowId", videoFlowId);
-                Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
-                redisTemplate.opsForHash().putAll("cameraRealFlow:" + cameraId, returnMap);
-                log.info("mapsForCamera: " + Constant.mapsForCamera);
-                log.info("returnMap: " + returnMap);
+            log.info("transUrl: " + transUrl);
+            String[] rtmpUrls = transUrl.split("rtmp");
+            String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
+            returnMap.put("rtmpUrl", rtmpUrl);
+            if (videoHttps == 1) {
+                String flvsUrl = "https://" + hostIp + ":8088/live/" + livePath + ".flv";
+                returnMap.put("flvUrl", flvsUrl);
+            } else {
+                String flvUrl = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
+                returnMap.put("flvUrl", flvUrl);
             }
-        }
 
+            String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
+            JSONObject jsonList = new JSONObject();
+            try { jsonList = HttpClientUtils.sendGet(getInfoUrl, null); } catch (Exception e) {e.getMessage();}
+            List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
+            int streamListSize = streamsJsonObjectList.size();
+            for (int i = 0; i < streamListSize; i++) {
+                String streambeanStr = streamsJsonObjectList.get(i);
+                JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
+                //livePath
+                String name = streambeanJson.getString("name");
+                String videoFlowId = streambeanJson.getString("id");
+                if (Objects.equals(name, String.valueOf(livePath))) {
+                    returnMap.put("videoFlowId", videoFlowId);
+                    Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
+                    redisTemplate.opsForHash().putAll("cameraRealFlow:" + cameraId, returnMap);
+                    log.info("mapsForCamera: " + Constant.mapsForCamera);
+                    log.info("returnMap: " + returnMap);
+                }
+            }
+        } catch (Exception e) { e.getMessage(); }
         return returnMap;
     }
 
@@ -308,9 +305,7 @@ public class CameraConService {
                     returnMapList.add(returnMap);
                 }
             }
-        } catch (Exception e) {
-            e.getMessage();
-        }
+        } catch (Exception e) { e.getMessage(); }
         log.info("returnMapList: " + returnMapList);
         return returnMapList;
     }
@@ -319,107 +314,106 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> robotStartRealPlay(Long robotId) {
         List<Map<String, Object>> returnMapList = new ArrayList<>();
-        RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
 
-        String lightIp = robotConInfo.getLightIp();
-        String lightPort = robotConInfo.getLightPort();
-        String lightUsername = robotConInfo.getIdentityManager();
-        String lightPassword = robotConInfo.getIdentityCode();
-
-        int livePath = Constant.maps.get("livePath") + 1;
-        Constant.maps.put("livePath", livePath);
-        log.info("Constant.maps: " + Constant.maps);
-        // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/Channels/10%s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
-        log.info("lightInfo: " + lightUsername + " " + lightPassword + " " + lightIp + " " + lightPort + " " + livePath);
-        String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, livePath);
-        try { Runtime.getRuntime().exec(transUrlLight); } catch (Exception e) { e.getMessage(); }
-        log.info("transUrlLight: " + transUrlLight);
-        String[] rtmpUrls = transUrlLight.split("rtmp");
-        String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
-
-        Map<String, Object> returnLightMap = new HashMap<>();
-        returnLightMap.put("light", String.valueOf(robotId));
-        returnLightMap.put("rtmpUrl", rtmpUrl);
-        if (videoHttps == 1) {
-            String flvsUrl = "https://" + hostIp + ":8088/live/" + livePath + ".flv";
-            returnLightMap.put("flvUrl", flvsUrl);
-        } else {
-            String flvUrl = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
-            returnLightMap.put("flvUrl", flvUrl);
-        }
-
-        String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
-        JSONObject jsonList = new JSONObject();
-        try { jsonList = HttpClientUtils.sendGet(getInfoUrl, null); } catch (Exception e) {e.getMessage();}
-        assert jsonList != null;
-        List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
-        int streamListSize = streamsJsonObjectList.size();
-        for (int i = 0; i < streamListSize; i++) {
-            String streambeanStr = streamsJsonObjectList.get(i);
-            JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
-            //livePath
-            String name = streambeanJson.getString("name");
-            String videoFlowId = streambeanJson.getString("id");
-            if (Objects.equals(name, String.valueOf(livePath))) {
-                returnLightMap.put("videoFlowId", videoFlowId);
-                Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":light");
-                redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":light", returnLightMap);
-                log.info("mapsForCamera: " + Constant.mapsForCamera);
-                log.info("returnMap: " + returnLightMap);
-            }
-        }
-        log.info("mapsForRobot: " + Constant.mapsForCamera);
-
-        String inferadIp = robotConInfo.getLnferadIp();
-        Integer inferadPort = robotConInfo.getInferadPort();
-        livePath = Constant.maps.get("livePath") + 1;
-        Constant.maps.put("livePath", livePath);
-        log.info("Constant.maps: " + Constant.maps);
-        log.info("inferadInfo: " + " " + inferadIp + " " + inferadPort + " " + livePath);
-        String transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, livePath);
         try {
-            Runtime.getRuntime().exec(transUrlinferad);
-        } catch (Exception e) {
-            e.getMessage();
-        }
-        log.info("transUrlinferad: " + transUrlinferad);
-        String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
-        String rtmpUrlInferad = "rtmp" + rtmpUrlsInferad[rtmpUrlsInferad.length - 1];
+            RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
 
-        Map<String, Object> returnInferadMap = new HashMap<>();
-        returnInferadMap.put("inferad", String.valueOf(robotId));
-        returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
-        if (videoHttps == 1) {
-            String flvsUrlInferad = "https://" + hostIp + ":8088/live/" + livePath + ".flv";
-            returnInferadMap.put("flvUrlInferad", flvsUrlInferad);
-        } else {
-            String flvUrlInferad = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
-            returnInferadMap.put("flvUrlInferad", flvUrlInferad);
-        }
+            String lightIp = robotConInfo.getLightIp();
+            String lightPort = robotConInfo.getLightPort();
+            String lightUsername = robotConInfo.getIdentityManager();
+            String lightPassword = robotConInfo.getIdentityCode();
 
-        JSONObject jsonListInferad = new JSONObject();
-        try { jsonListInferad = HttpClientUtils.sendGet(getInfoUrl, null); } catch (Exception e) {e.getMessage();}
-        assert jsonListInferad != null;
-        List<String> streamsJsonObjectListInferad = JSONArray.parseArray(jsonListInferad.getString("streams"),String.class);
-        int streamListSizeInferad = streamsJsonObjectListInferad.size();
-        for (int i = 0; i < streamListSizeInferad; i++) {
-            String streambeanStr = streamsJsonObjectListInferad.get(i);
-            JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
-            //livePath
-            String name = streambeanJson.getString("name");
-            String videoFlowId = streambeanJson.getString("id");
-            if (Objects.equals(name, String.valueOf(livePath))) {
-                returnLightMap.put("videoFlowId", videoFlowId);
-                Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":inferad");
-                redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":inferad", returnLightMap);
-                log.info("mapsForCamera: " + Constant.mapsForCamera);
-                log.info("returnMap: " + returnLightMap);
+            int livePath = Constant.maps.get("livePath") + 1;
+            Constant.maps.put("livePath", livePath);
+            log.info("Constant.maps: " + Constant.maps);
+            // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/Channels/10%s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
+            log.info("lightInfo: " + lightUsername + " " + lightPassword + " " + lightIp + " " + lightPort + " " + livePath);
+            String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, livePath);
+            Runtime.getRuntime().exec(transUrlLight);
+            log.info("transUrlLight: " + transUrlLight);
+            String[] rtmpUrls = transUrlLight.split("rtmp");
+            String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
+
+            Map<String, Object> returnLightMap = new HashMap<>();
+            returnLightMap.put("light", String.valueOf(robotId));
+            returnLightMap.put("rtmpUrl", rtmpUrl);
+            if (videoHttps == 1) {
+                String flvsUrl = "https://" + hostIp + ":8088/live/" + livePath + ".flv";
+                returnLightMap.put("flvUrl", flvsUrl);
+            } else {
+                String flvUrl = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
+                returnLightMap.put("flvUrl", flvUrl);
             }
-        }
-        log.info("mapsForRobot: " + Constant.mapsForCamera);
 
-        returnMapList.add(returnLightMap);
-        returnMapList.add(returnInferadMap);
+            String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
+            JSONObject jsonList = new JSONObject();
+            jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
+            assert jsonList != null;
+            List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
+            int streamListSize = streamsJsonObjectList.size();
+            for (int i = 0; i < streamListSize; i++) {
+                String streambeanStr = streamsJsonObjectList.get(i);
+                JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
+                //livePath
+                String name = streambeanJson.getString("name");
+                String videoFlowId = streambeanJson.getString("id");
+                if (Objects.equals(name, String.valueOf(livePath))) {
+                    returnLightMap.put("videoFlowId", videoFlowId);
+                    Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":light");
+                    redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":light", returnLightMap);
+                    log.info("mapsForCamera: " + Constant.mapsForCamera);
+                    log.info("returnMap: " + returnLightMap);
+                }
+            }
+            log.info("mapsForRobot: " + Constant.mapsForCamera);
+
+            String inferadIp = robotConInfo.getLnferadIp();
+            Integer inferadPort = robotConInfo.getInferadPort();
+            livePath = Constant.maps.get("livePath") + 1;
+            Constant.maps.put("livePath", livePath);
+            log.info("Constant.maps: " + Constant.maps);
+            log.info("inferadInfo: " + " " + inferadIp + " " + inferadPort + " " + livePath);
+            String transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, livePath);
+            Runtime.getRuntime().exec(transUrlinferad);
+            log.info("transUrlinferad: " + transUrlinferad);
+            String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
+            String rtmpUrlInferad = "rtmp" + rtmpUrlsInferad[rtmpUrlsInferad.length - 1];
+
+            Map<String, Object> returnInferadMap = new HashMap<>();
+            returnInferadMap.put("inferad", String.valueOf(robotId));
+            returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
+            if (videoHttps == 1) {
+                String flvsUrlInferad = "https://" + hostIp + ":8088/live/" + livePath + ".flv";
+                returnInferadMap.put("flvUrlInferad", flvsUrlInferad);
+            } else {
+                String flvUrlInferad = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
+                returnInferadMap.put("flvUrlInferad", flvUrlInferad);
+            }
+
+            JSONObject jsonListInferad = new JSONObject();
+            jsonListInferad = HttpClientUtils.sendGet(getInfoUrl, null);
+            assert jsonListInferad != null;
+            List<String> streamsJsonObjectListInferad = JSONArray.parseArray(jsonListInferad.getString("streams"),String.class);
+            int streamListSizeInferad = streamsJsonObjectListInferad.size();
+            for (int i = 0; i < streamListSizeInferad; i++) {
+                String streambeanStr = streamsJsonObjectListInferad.get(i);
+                JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
+                //livePath
+                String name = streambeanJson.getString("name");
+                String videoFlowId = streambeanJson.getString("id");
+                if (Objects.equals(name, String.valueOf(livePath))) {
+                    returnLightMap.put("videoFlowId", videoFlowId);
+                    Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":inferad");
+                    redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":inferad", returnLightMap);
+                    log.info("mapsForCamera: " + Constant.mapsForCamera);
+                    log.info("returnMap: " + returnLightMap);
+                }
+            }
+            log.info("mapsForRobot: " + Constant.mapsForCamera);
+
+            returnMapList.add(returnLightMap);
+            returnMapList.add(returnInferadMap);
+        } catch (Exception e) {e.getMessage();}
         log.info("returnMapList: " + returnMapList);
         return returnMapList;
     }
