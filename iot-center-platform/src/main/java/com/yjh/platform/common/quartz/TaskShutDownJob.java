@@ -116,7 +116,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                 robotTaskStates(robotTaskStatesMap);
             }
 
-            Thread.sleep(10000);
+            Thread.sleep(20000);
 
             log.info("任务终止开始操作");
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

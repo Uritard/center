@@ -958,7 +958,7 @@ public class RunAtNowTask implements Runnable{
                         }
 
                         tCruiseTaskResultDao.insert(tCruiseTaskResult);
-                        Thread.sleep(15000);
+                        //Thread.sleep(15000);
                         tCruiseResult.setCState(240);
                         tCruiseResultDao.update(tCruiseResult);
                         Constant.taskStateMap.put(taskId,0);

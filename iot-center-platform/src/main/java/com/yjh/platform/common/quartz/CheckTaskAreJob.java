@@ -90,7 +90,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
             robotTaskStatesMap.put("robotCodeList",robotCodeList);
             robotTaskStates(robotTaskStatesMap);
         }
-        Thread.sleep(10000);
+        Thread.sleep(20000);
 
             //获取已经做过的点
         List<Long> isFinishedInstanceList = tCruiseTaskResultDetailDao.selectInstanceForTaskGoOn(taskId);
