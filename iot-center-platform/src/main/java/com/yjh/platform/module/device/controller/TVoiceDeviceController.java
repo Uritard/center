@@ -151,14 +151,7 @@ public class TVoiceDeviceController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            if("-1".equals(deviceType)){
-                deviceType = null;
-            }
-            List<VoiceDeviceAllInfoDetail> list = tVoiceDeviceService.selectByPage(voiceDeviceName,deviceType,upRegionId);
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
-            result.setData(resultMap);
+            result = tVoiceDeviceService.selectByPage(voiceDeviceName,deviceType,upRegionId,pageNum,pageSize);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
