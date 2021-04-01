@@ -157,7 +157,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                         if ("247".equals(mapForCruise.get("cruiseResult"))) {
                             abnormal = abnormal + 1;
                             taskWait = taskWait + 1;
-                        } else {
+                        } else if("246".equals(mapForCruise.get("cruiseResult"))){
                             normal = normal + 1;
                             taskWait = taskWait + 1;
                         }
@@ -351,7 +351,7 @@ public class TaskShutDownJob extends QuartzJobBean {
 
             //终止
             tCruiseResult.setCState(242);
-            tCruiseResult.setTaskWait(taskWait);
+            tCruiseResult.setTaskWait(0);
             tCruiseResultDao.update(tCruiseResult);
 
             TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();

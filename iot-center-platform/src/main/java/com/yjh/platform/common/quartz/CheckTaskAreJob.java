@@ -122,7 +122,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
                 }
                 if("247".equals(mapForCruise.get("cruiseResult"))){
                     abnormal = abnormal+1;
-                }else {
+                }else if("246".equals(mapForCruise.get("cruiseResult"))){
                     normal = normal+1;
                 }
                 //TCTRD
