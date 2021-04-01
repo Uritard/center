@@ -68,6 +68,7 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         log.info("videoAccess is running...");
+        Constant.maps.put("livePath", 26);
         log.info(Constant.sdkPath);
         if (!hCNetSDK.NET_DVR_Init()) { log.error("init fail.."); return; }
         log.info("init success..");

@@ -3,6 +3,7 @@ package com.yjh.accessvideo.module.control.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
@@ -17,9 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -58,6 +61,9 @@ public class CameraConController {
     @Value("${srs.stop.url}")
     private String srsStopUrl;//srs停止播流
 
+    @Resource(name = "redisTemplate")
+    private RedisTemplate redisTemplate;
+
     @ApiOperation(value = "相机播放")
     @RequestMapping(value = "/startRealPlay", method = RequestMethod.GET)
     public Result startRealPlay(@RequestParam(value = "cameraId") Long cameraId) {
@@ -82,13 +88,17 @@ public class CameraConController {
         log.info("关闭流接口回调：");
         String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
         JSONObject jsonList = new JSONObject();
-        try { jsonList = HttpClientUtils.sendGet(getInfoUrl, null); } catch (Exception e) {e.getMessage();}
+        try {
+            Thread.sleep(1000*70);//SRS服务器有延迟，大概50-60秒 才更新管理数据
+            jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
+        } catch (Exception e) {e.getMessage();}
+
+        assert jsonList != null;
         List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
         int streamListSize = streamsJsonObjectList.size();
         for (int i = 0; i < streamListSize; i++) {
             String streambeanStr = streamsJsonObjectList.get(i);
             JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
-
             //解析每一个stream，循环比对，找到页面传递的设备ID对应的流，并判断是否需要关闭
             String publish = streambeanJson.getString("publish");
             JSONObject publishjson = JSONObject.parseObject(publish);
@@ -97,13 +107,25 @@ public class CameraConController {
             String cid = publishjson.getString("cid");
             log.info("cid："+cid);
 
-            if(clients<=2 && StringUtils.isNotEmpty(cid)){
-                //踢掉
-                String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
-                try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
-                log.info("关闭流："+delteUrl);
+            if (StringUtils.isEmpty(cid)) {
+                String videoFlowId = streambeanJson.getString("id");
+                redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
+                Constant.mapsForCamera.remove(videoFlowId);
+                log.info("关闭空链接：");
+            } else {
+                if(clients<=2){
+                    //踢掉
+                    String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
+                    try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
+                    String videoFlowId = streambeanJson.getString("id");
+                    redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
+                    Constant.mapsForCamera.remove(videoFlowId);
+                    log.info("关闭流："+delteUrl);
+                }
             }
+
         }
+
     }
 
     @ApiOperation(value = "相机停止播放")

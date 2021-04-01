@@ -207,7 +207,7 @@ public class TWarnInfoController {
     }
     @ApiOperation(value = "告警确认")
     @GetMapping(value = "/WarnConfirm")
-    @Logs(title = "告警确认",content = "根据用户传递的参数进行告警确认",logType = 5)
+//    @Logs(title = "告警确认",content = "根据用户传递的参数进行告警确认",logType = 5)
     public Result WarnConfirm(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
                               @RequestParam(value = "confMode", required = false) Integer confMode,
                               @RequestParam(value = "startTime", required = false) String startTime,
