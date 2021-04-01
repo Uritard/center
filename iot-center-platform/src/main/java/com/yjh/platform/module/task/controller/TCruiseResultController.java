@@ -338,7 +338,7 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "一键审核--任务下的所有巡视点")
     @GetMapping(value = "/manualReviewTask")
-    @Logs(title = "审核任务",content = "一键审核",logType = 1)
+    @Logs(title = "审核任务",content = "一键审核",logType = 5)
     public Result manualReviewTask(@RequestParam(value = "taskResultId") String taskResultId,HttpServletRequest request){
         String userId = request.getHeader("userId");
         Result result=new Result();
