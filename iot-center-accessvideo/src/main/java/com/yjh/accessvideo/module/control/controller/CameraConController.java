@@ -111,6 +111,8 @@ public class CameraConController {
                 String videoFlowId = streambeanJson.getString("id");
                 redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
                 Constant.mapsForCamera.remove(videoFlowId);
+                redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
+                Constant.mapsForHistory.remove(videoFlowId);
                 log.info("关闭空链接：");
             } else {
                 if(clients<=2){
@@ -120,6 +122,8 @@ public class CameraConController {
                     String videoFlowId = streambeanJson.getString("id");
                     redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
                     Constant.mapsForCamera.remove(videoFlowId);
+                    redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
+                    Constant.mapsForHistory.remove(videoFlowId);
                     log.info("关闭流："+delteUrl);
                 }
             }
