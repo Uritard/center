@@ -38,12 +38,13 @@ public class CruiseResultDealThread implements Runnable{
     private RedisTemplate redisTemplate;
 
     private Map<String,String> cruiseResultMap;
-    @Value("${other.webSocketUrl}")
+
     private String webSocketUrl;
 
-    public CruiseResultDealThread(Map<String,String> cruiseResultMap,RedisTemplate redisTemplate){
+    public CruiseResultDealThread(Map<String,String> cruiseResultMap,RedisTemplate redisTemplate,String webSocketUrl){
         this.cruiseResultMap = cruiseResultMap;
         this.redisTemplate = redisTemplate;
+        this.webSocketUrl = webSocketUrl;
     }
 
     @Override
@@ -102,6 +103,12 @@ public class CruiseResultDealThread implements Runnable{
 
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
                     }
+                    //做完一个点给前端推一次webSocket
+                    Map<String, Object> jasonMap = new HashMap<>();
+                    jasonMap.put("type", "finishedOneInstance");
+                    jasonMap.put("taskId", taskId);
+                    String json = JSON.toJSONString(jasonMap);
+                    Constant.postUrl(webSocketUrl,json);
                 }
                 //获取机器人本体任务的状态并更新
                 Map<String, Object> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+cruiseResultMap.get("robotCode")+":"+taskId);
@@ -267,7 +274,7 @@ public class CruiseResultDealThread implements Runnable{
                         jasonMap.put("type", "finishedOneInstance");
                         jasonMap.put("taskId", taskId);
                         String json = JSON.toJSONString(jasonMap);
-                        StaticContextAccessor.getBean(RobotService.class).sendWebSocket(json);
+                        Constant.postUrl(webSocketUrl,json);
 
                     }
                 }
@@ -433,7 +440,7 @@ public class CruiseResultDealThread implements Runnable{
                         jasonMap.put("type", "lastOneInstance");
                         jasonMap.put("taskId",taskId);
                         String json = JSON.toJSONString(jasonMap);
-                        StaticContextAccessor.getBean(RobotService.class).sendWebSocket(json);
+                        Constant.postUrl(webSocketUrl,json);
 
                     }else{
                         log.info("机器人巡检点不是最后一个点");

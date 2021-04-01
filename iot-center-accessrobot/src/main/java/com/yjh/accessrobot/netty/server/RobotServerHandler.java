@@ -75,6 +75,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
     public static String Packet2 = "";
 
+
+    public void setWebSocketUrl(String webSocketUrl) {
+        this.webSocketUrl = webSocketUrl;
+    }
+
+    private String webSocketUrl;
+
     public static Map<String, Object> getRobotResultMap() {
         return robotResultMap;
     }
@@ -129,6 +136,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             log.error("clientDisconnect: " + e.getMessage());
         }
         log.info("mapsAfterRemoved: " + maps);
+
+        for(Map.Entry<Object,RobotServerHandler> vo : robotServerHandlerMap.entrySet()){
+            log.info("当前的robotServerHandlerMap的key为"+vo.getKey());
+            robotServerHandlerMap.remove(vo.getKey());
+        }
+        log.info("channel.isActive(): " + channel.isActive());
+
         //1.判断是否为注册连接，是注册连接带strChannelID，不是则是空,无须修改状态 2.可以改为若strChannelID为空，则不可注册
         if (strRobotCode == null || strRobotCode.equals("")) {
             log.info("strChannelID is null, No need to modify the device status");
@@ -660,7 +674,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             jasonMap.put("type","newTask");
                             jasonMap.put("taskId",xmlBaseModel.getItems().get(0).get("task_code").toString());
                             String json= JSON.toJSONString(jasonMap);
-                            StaticContextAccessor.getBean(RobotService.class).sendWebSocket(json);
+                            Constant.postUrl(webSocketUrl,json);
                         }
 
                     //先读缓存，进行修改
@@ -786,7 +800,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("机器人巡视结果数据是："+cruiseResultMap);
 
                     //Start CruiseResultDealThread
-                    CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate);
+                    CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate,webSocketUrl);
                     TaskExecutePool.getInstance().execute(cruiseResultDealThread);
                     //判断结果是否产生告警,只判断红外和可见光
                     Map<String, String> cResultMap = new HashMap<>();

@@ -20,7 +20,7 @@ import java.net.InetSocketAddress;
 @lombok.extern.slf4j.Slf4j
 public class NettyServer {
 
-    public void start(InetSocketAddress address, String serverName, RedisTemplate redisTemplate, SysLogsService sysLogsService, RobotService robotService){
+    public void start(InetSocketAddress address, String serverName, RedisTemplate redisTemplate, SysLogsService sysLogsService, RobotService robotService,String websocketUrl){
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -28,7 +28,7 @@ public class NettyServer {
             .group(bossGroup,workerGroup)
             .channel(NioServerSocketChannel.class)
             .localAddress(address)
-            .childHandler(new RobotServerChannelInitializer(serverName, redisTemplate, sysLogsService,robotService))
+            .childHandler(new RobotServerChannelInitializer(serverName, redisTemplate, sysLogsService,robotService,websocketUrl))
             .option(ChannelOption.SO_BACKLOG, 2048)  //指定此套接口排队的最大连接个数
             .childOption(ChannelOption.SO_KEEPALIVE, true)  //保持连接生命，不因空闲而断开
             .childOption(ChannelOption.TCP_NODELAY, true)  //防止数据传输延迟 如果false的话会缓冲数据达到一定量在flush,降低系统网络调用（具体场景）

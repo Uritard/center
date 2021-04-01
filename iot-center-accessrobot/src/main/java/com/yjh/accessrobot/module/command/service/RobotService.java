@@ -1391,7 +1391,7 @@ public class RobotService {
         Constant.postUrl(json,webSocketUrl);
         return 1;
     }
-    public int robotDeviceIntoDB(List<Map<String, Object>> deviceMapList, XMLBaseModel xmlBaseModel){
+    /*public int robotDeviceIntoDB(List<Map<String, Object>> deviceMapList, XMLBaseModel xmlBaseModel){
         List<TRobotRegion> tRobotRegionList = new ArrayList<>();
         for (Map<String, Object> deviceMap : deviceMapList) {
 
@@ -1460,7 +1460,7 @@ public class RobotService {
             tRobotRegionDao.update(tRobotRegion);//更新TRR
         }
         return 1;
-    }
+    }*/
     //机器人任务一条龙服务
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> robotTaskDragonService(String robotCode, String type, String command, String value) throws Exception{

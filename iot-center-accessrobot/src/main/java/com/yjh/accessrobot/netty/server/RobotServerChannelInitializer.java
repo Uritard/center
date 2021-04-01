@@ -23,12 +23,14 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
     private SysLogsService sysLogsService;
     private String serverName;
     private RobotService robotService;
+    private String websocketUrl;
 
-    public RobotServerChannelInitializer(String serverName, RedisTemplate redisTemplate, SysLogsService sysLogsService,RobotService robotService) {
+    public RobotServerChannelInitializer(String serverName, RedisTemplate redisTemplate, SysLogsService sysLogsService,RobotService robotService,String websocketUrl) {
         this.serverName = serverName;
         this.redisTemplate = redisTemplate;
         this.sysLogsService = sysLogsService;
         this.robotService = robotService;
+        this.websocketUrl = websocketUrl;
     }
 
     @Override
@@ -58,6 +60,7 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
         robotServerHandler.setRedisTemplate(redisTemplate);
         robotServerHandler.setSysLogsService(sysLogsService);
         robotServerHandler.setRobotService(robotService);
+        robotServerHandler.setWebSocketUrl(websocketUrl);
         channel.pipeline().addLast(robotServerHandler);
 
     }

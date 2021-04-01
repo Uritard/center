@@ -193,13 +193,13 @@ public class RobotController {
     public Result methodTest(@RequestParam(value = "taskId",required = false) String taskId){
         Result result = new Result();
         try {
-//            result.setData(robotService.methodTest1(taskId));
-            XMLBaseModel model = getXmlMessage("D:/testform/task_model_E200.xml");
+            result.setData(robotService.methodTest1(taskId));
+//            XMLBaseModel model = getXmlMessage("D:/testform/task_model_E200.xml");
 //            XMLBaseModel model = getXmlMessage("D:/testform/device_model_E200.xml");
-            List<Map<String,Object>> modelMapList = model.getItems();
-            log.info("taskModelItemsMap是："+modelMapList);
-            XMLBaseModel xmlBaseModel = new XMLBaseModel().setSendCode("Client01");
-            result.setData(robotService.robotTaskIntoDB(modelMapList,xmlBaseModel));
+//            List<Map<String,Object>> modelMapList = model.getItems();
+//            log.info("taskModelItemsMap是："+modelMapList);
+//            XMLBaseModel xmlBaseModel = new XMLBaseModel().setSendCode("Client01");
+//            result.setData(robotService.robotTaskIntoDB(modelMapList,xmlBaseModel));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
