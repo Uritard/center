@@ -348,10 +348,7 @@ public class TCruiseTaskController {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
-            String token = request.getHeader("token");
-            String userNames=String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
-            String iP=request.getHeader("HTTP_X_FORWARDED_FOR");
-            int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getPassword());
+            int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getPassword(),request);
             if(i == 1){
 //                TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
 //                tCruiseTaskAdd.setTaskId(taskId);
@@ -373,33 +370,7 @@ public class TCruiseTaskController {
 //                tCruiseTaskAdd.setYear(year);
 //                tCruiseTaskAdd.setPeriodId(periodId);
                 result = this.insert(tCruiseTaskAdd);
-                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "2");
-                params.set("ip", iP);
-                params.set("title", "新增任务");
-                params.set("state", 1);
-                params.set("userId",  Long.valueOf(userId));
-                params.set("userName", userNames);
-                params.set("requestOrigin",request.getRequestURL());
-                params.set("requestPath",request.getRequestURI());
-                params.set("requestMethod",request.getMethod());
-                params.set("content", "根据用户传递的参数新增数据");
-                LogsAspect logsAspect = new LogsAspect();
-                logsAspect.post(params);
             }else {
-                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "2");
-                params.set("ip", iP);
-                params.set("title", "新增任务");
-                params.set("state", 2);
-                params.set("userId",  Long.valueOf(userId));
-                params.set("userName", userNames);
-                params.set("requestOrigin",request.getRequestURL());
-                params.set("requestPath",request.getRequestURI());
-                params.set("requestMethod",request.getMethod());
-                params.set("content", "根据用户传递的参数新增数据");
-                LogsAspect logsAspect = new LogsAspect();
-                logsAspect.post(params);
                 result.setCode(209);
                 result.setMessage("密码错误");
             }
