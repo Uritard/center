@@ -34,8 +34,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -151,10 +149,7 @@ public class CameraConService {
         } else if (cameraType == 206) {
             transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, livePath);
         }
-        try {
-            Runtime.getRuntime().exec(transUrl);
-            Thread.sleep(3000);
-        } catch (Exception e) { e.getMessage(); }
+        try { Runtime.getRuntime().exec(transUrl); } catch (Exception e) { e.getMessage(); }
         log.info("transUrl: " + transUrl);
         String[] rtmpUrls = transUrl.split("rtmp");
         String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
@@ -171,7 +166,7 @@ public class CameraConService {
         JSONObject jsonList = new JSONObject();
         try {
             jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
-            Thread.sleep(2000);
+            Thread.sleep(3000);
         } catch (Exception e) {e.getMessage();}
         List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
         int streamListSize = streamsJsonObjectList.size();
@@ -260,10 +255,7 @@ public class CameraConService {
                     transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, livePath);
                 }
 
-                try {
-                    Runtime.getRuntime().exec(transUrl);
-                    Thread.sleep(3000);
-                } catch (Exception e) { e.getMessage(); }
+                try { Runtime.getRuntime().exec(transUrl); } catch (Exception e) { e.getMessage(); }
 
                 log.info("transUrl: " + transUrl);
                 String[] rtmpUrls = transUrl.split("rtmp");
@@ -284,7 +276,7 @@ public class CameraConService {
                 JSONObject jsonList = new JSONObject();
                 try {
                     jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
-                    Thread.sleep(2000);
+                    Thread.sleep(3000);
                 } catch (Exception e) {e.getMessage();}
                 assert jsonList != null;
                 List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
@@ -328,10 +320,7 @@ public class CameraConService {
         // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/Channels/10%s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
         log.info("lightInfo: " + lightUsername + " " + lightPassword + " " + lightIp + " " + lightPort + " " + livePath);
         String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, livePath);
-        try {
-            Runtime.getRuntime().exec(transUrlLight);
-            Thread.sleep(2000);
-        } catch (Exception e) {e.getMessage();}
+        try { Runtime.getRuntime().exec(transUrlLight); } catch (Exception e) {e.getMessage();}
         log.info("transUrlLight: " + transUrlLight);
         String[] rtmpUrls = transUrlLight.split("rtmp");
         String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
@@ -351,7 +340,7 @@ public class CameraConService {
         JSONObject jsonList = new JSONObject();
         try {
             jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
-            Thread.sleep(2000);
+            Thread.sleep(3000);
         } catch (Exception e) {e.getMessage();}
         assert jsonList != null;
         List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
@@ -376,10 +365,7 @@ public class CameraConService {
         log.info("Constant.maps: " + Constant.maps);
         log.info("inferadInfo: " + " " + inferadIp + " " + inferadPort + " " + livePath);
         String transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, livePath);
-        try {
-            Runtime.getRuntime().exec(transUrlinferad);
-            Thread.sleep(2000);
-        } catch (Exception e) {e.getMessage();}
+        try { Runtime.getRuntime().exec(transUrlinferad); } catch (Exception e) {e.getMessage();}
         log.info("transUrlinferad: " + transUrlinferad);
         String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
         String rtmpUrlInferad = "rtmp" + rtmpUrlsInferad[rtmpUrlsInferad.length - 1];
@@ -398,7 +384,7 @@ public class CameraConService {
         JSONObject jsonListInferad = new JSONObject();
         try {
             jsonListInferad = HttpClientUtils.sendGet(getInfoUrl, null);
-            Thread.sleep(2000);
+            Thread.sleep(3000);
         } catch (Exception e) {e.getMessage();}
         assert jsonListInferad != null;
         List<String> streamsJsonObjectListInferad = JSONArray.parseArray(jsonListInferad.getString("streams"),String.class);
@@ -496,10 +482,7 @@ public class CameraConService {
                 + ",iChanNum: " + iChanNum + ",starttime: " + starttime + ",endtime: " + endtime + ",historyPath: " + livePath);
         String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1, starttime, endtime, livePath);
         log.info("transUrl: " + transUrl);
-        try {
-            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
-            Thread.sleep(3000);
-        } catch (Exception e) { e.getMessage(); }
+        try { Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl}); } catch (Exception e) { e.getMessage(); }
         String[] rtmpUrls = transUrl.split("rtmp");
         String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
 
@@ -517,7 +500,7 @@ public class CameraConService {
         JSONObject jsonList = new JSONObject();
         try {
             jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
-            Thread.sleep(2000);
+            Thread.sleep(3000);
         } catch (Exception e) {e.getMessage();}
         assert jsonList != null;
         List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
