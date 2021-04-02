@@ -47,10 +47,10 @@ public class TRobotCameraPresetController {
         Result result = new Result();
         try {
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","10",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
-            if(request != null  && result.getData() != null){
-                Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
+            if(result != null  && result.getData() != null){
+            Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
-                if(!"4".equals(map.get("code"))){
+                if(!"4".equals(map.get("code").toString())){
                     result.setCode(209,map.get("result").toString());
                     return  result;
                 }
@@ -76,10 +76,10 @@ public class TRobotCameraPresetController {
         try {
             TRobotCameraPreset tRobotCameraPreset = tRobotCameraPresetService.selectByPrimaryId(presetId);
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","12",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
-            if(request != null && result.getData() != null){
+            if(result != null && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
-                if(!"4".equals(map.get("code"))){
+                if(!"4".equals(map.get("code").toString())){
                     result.setCode(209,map.get("result").toString());
                     return  result;
                 }
@@ -205,10 +205,10 @@ public class TRobotCameraPresetController {
         try {
             TRobotCameraPreset tRobotCameraPreset = tRobotCameraPresetService.selectByPrimaryId(presetId);
             result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","7",tRobotCameraPreset.getPresetNum().toString(),null,null,null));
-            if(request != null  && result.getData() != null){
+            if(result != null  && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
-                if(!"4".equals(map.get("code"))){
+                if(!"4".equals(map.get("code").toString())){
                     result.setCode(209,map.get("result").toString());
                 }
             }

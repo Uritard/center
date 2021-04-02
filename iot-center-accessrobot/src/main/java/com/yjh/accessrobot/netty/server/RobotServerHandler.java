@@ -550,7 +550,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                         try {
                             String url = "cp " + temporaryPath + " " + developAbsoluteUrl;
-                            log.info("url是==="+url);
+//                            log.info("url是==="+url);
                             Runtime.getRuntime().exec(url);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -877,7 +877,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         try {
             String url = "cp " + source + " "+aim;
-            log.info("url是==="+url);
+//            log.info("url是==="+url);
             Runtime.getRuntime().exec(url);
         }catch (Exception e){
             e.getMessage();

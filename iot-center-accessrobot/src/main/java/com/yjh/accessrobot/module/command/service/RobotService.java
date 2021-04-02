@@ -252,7 +252,7 @@ public class RobotService {
         }
         try {
             String url = "cp " + picPath + " " + developMap;
-            log.info("url是===" + url);
+//            log.info("url是===" + url);
             Runtime.getRuntime().exec(url);
         } catch (Exception e) {
             e.getMessage();
@@ -456,7 +456,7 @@ public class RobotService {
 
         try {
             String url = "cp " + temporaryPath + " "+developAbsoluteUrl;
-            log.info("url是==="+url);
+//            log.info("url是==="+url);
             Runtime.getRuntime().exec(url);
         }catch (Exception e){
             e.getMessage();
@@ -712,7 +712,7 @@ public class RobotService {
         for (String i : instanceIdArray) {
             allInstanceIdList.add(i);
         }
-        log.info("发给机器人的巡检点的个数====" + allInstanceIdList.size());
+        log.info("巡视主机下发给机器人的巡检点大小====" + allInstanceIdList.size());
 
         List<Long> instanceIDList = Constant.flagMap.get(taskId);//已经做过的点
         log.info("已经做过的巡视点====" + instanceIDList);
@@ -1509,6 +1509,9 @@ public class RobotService {
     }
     public String selectDictCodeByNote(String dictNote,String colName){
         return tRobotInfoDao.selectDictCodeByNote(dictNote,colName);
+    }
+    public List<Long> selectInstanceForTaskGoOn(String taskId){
+        return tRobotInfoDao.selectInstanceForTaskGoOn(taskId);
     }
 }
 

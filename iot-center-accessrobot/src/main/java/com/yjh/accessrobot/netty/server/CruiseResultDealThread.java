@@ -268,6 +268,7 @@ public class CruiseResultDealThread implements Runnable{
                         jasonMap.put("type", "finishedOneInstance");
                         jasonMap.put("taskId", taskId);
                         String json = JSON.toJSONString(jasonMap);
+                        log.info("做完一个点-前端推送：" + json);
                         Constant.postUrl(webSocketUrl,json);
 
                     }
@@ -289,37 +290,39 @@ public class CruiseResultDealThread implements Runnable{
                 String instanceList = redisInfoMap2.get("instanceIdList");
                 instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
                 String[] instanceIdArray = instanceList.split(", ");
-                List<String> instanceIdList = new ArrayList<>();
+                List<String> allInstanceIdList = new ArrayList<>();
                 for (String i : instanceIdArray){
-                    instanceIdList.add(i);
+                    allInstanceIdList.add(i);
                 }
-                log.info("巡视主机下发给机器人的巡检点大小===="+instanceIdList.size());
+                log.info("巡视主机下发给机器人的巡检点大小===="+allInstanceIdList.size());
 
-                //比较任务相关时间(开始时间，超期时间)
-                /*Map<String, String> redisInfoMap3 = redisTemplate.opsForHash().entries("countForAbnormal:"+cruiseResultMap.get("taskCode"));
-                String taskStart = redisInfoMap3.get("taskStart");//开始时间
-                Integer overDay = Integer.valueOf(redisInfoMap3.get("overDay"));//超期时间
-                SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                log.info("开始的日期："+df.format(df.parse(taskStart)));
-                String overDayTime = df.format(new Date(df.parse(taskStart).getTime() + overDay * 24 * 60 * 60 * 1000));
-                log.info("overDay天后的日期：" + overDayTime );
-                boolean taskFlag = (df.parse(overDayTime).getTime() < new Date().getTime());
-                log.info("是否超期==="+taskFlag);*/
-
-                if(instanceIdList.size() == resultList.size() ) {
+                if(allInstanceIdList.size() == resultList.size() ) {
                     log.info("Task Finished......");
 
-                    List<Long> instanceIDList = Constant.flagMap.get(taskId);
-                    log.info("做过的点instanceIDList====" + instanceIDList);
+                    List<Long> instanceIDList = Constant.flagMap.get(taskId);//已经做过的点
+                    log.info("已经做过的巡视点====" + instanceIDList);
 
+                    //删除已经做过的点
                     if (instanceIDList != null && !instanceIDList.isEmpty()){
                         for (Long instanceId : instanceIDList){
-                            instanceIdList.remove(instanceId.toString());
+                            allInstanceIdList.remove(instanceId.toString());
                         }
                     }
-                    log.info("准备遍历的点是==="+instanceIdList);
+                    log.info("删除已经做过的巡视点后==="+allInstanceIdList);
 
-                    for (String instanceId : instanceIdList) {
+                    List<Long> isFinishedInstanceList = StaticContextAccessor.getBean(RobotService.class).selectInstanceForTaskGoOn(taskId);//已经入库的点
+                    log.info("已经入库的巡视点==="+isFinishedInstanceList);
+
+                    //删除已经入库的点
+                    if (isFinishedInstanceList != null && !isFinishedInstanceList.isEmpty()) {
+                        for (Long instanceIdInTable : isFinishedInstanceList) {
+                            allInstanceIdList.remove(instanceIdInTable.toString());
+                        }
+                    }
+                    log.info("删除已经入库的巡视点后==="+allInstanceIdList);
+                    log.info("准备遍历的点是==="+allInstanceIdList);
+
+                    for (String instanceId : allInstanceIdList) {
                         Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
                         //缓存中该巡检点有结果
                         if (!redisInfoMap.get("resultNum").equals("设备检修中")){
@@ -399,7 +402,7 @@ public class CruiseResultDealThread implements Runnable{
                     if (Constant.flagMap.get(taskId) != null && !Constant.flagMap.get(taskId).isEmpty()){
                         log.info("进来了？？？");
                         for (Long instancedId : Constant.flagMap.get(taskId)){
-                            instanceIdList.remove(instancedId.toString());
+                            allInstanceIdList.remove(instancedId.toString());
                         }
                     }
                     /*

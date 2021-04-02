@@ -61,9 +61,7 @@ public class ReportManageService {
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(list,startTime,endTime);
         for (TCruiseDataResultDetail tcdr : tCDRDList){
             String relativePath = tcdr.getPicPath();
-            /*String sArray2[] = relativePath.split("/");
-            String fileName = sArray2[sArray2.length - 1];//图片名称*/
-            relativePath.replace(absoluteImgMap.get("content"),relativeImgMap.get("content"));
+            relativePath = relativePath.replace(relativeImgMap.get("content"),absoluteImgMap.get("content"));
             tcdr.setPicPath(relativePath);
         }
         recordData.setTCDRDList(tCDRDList);
@@ -79,14 +77,14 @@ public class ReportManageService {
 
         String fileName = "Report-"+sdf.format(new Date())+".xlsx";
 
-        String reportPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+//        String reportPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
 //        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
 //        String finalFileName = toUTF8(fileName);
 
         //从缓存中获取系统参数
-//        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
-//        String reportPath = map.get("content")+"/"+fileName;
-//        log.info("reportPath:"+reportPath);
+        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
+        String reportPath = map.get("content")+"/"+fileName;
+        log.info("reportPath:"+reportPath);
         File file = new File(reportPath);
 
         ContentData contentData = ReportDataRepo.getData(recordData);
