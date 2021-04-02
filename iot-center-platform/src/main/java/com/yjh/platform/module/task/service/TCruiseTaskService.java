@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.quartz.CruiseTaskJob;
 import com.yjh.platform.common.quartz.JobManager;
@@ -37,7 +38,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -921,9 +925,10 @@ public class TCruiseTaskService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public int taskConfirmation(String userId, String password) throws Exception {
+    public int taskConfirmation(String userId, String password, HttpServletRequest request) throws Exception {
         //return 1;
         //todo 密码的解密
+        String iP=request.getHeader("HTTP_X_FORWARDED_FOR");
         SysUser sysUser = sysUserDao.selectByPrimaryId(Long.valueOf(userId));
         //判断开关
         Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
@@ -940,8 +945,34 @@ public class TCruiseTaskService {
         //password = Demo.decrypt(password);
         //sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
         if (sysUser.getPassword().equals(password)) {
+            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+            params.set("logType", "2");
+            params.set("ip", iP);
+            params.set("title", "新增任务");
+            params.set("state", 1);
+            params.set("userId",  Long.valueOf(userId));
+            params.set("userName", sysUser.getUserName());
+            params.set("requestOrigin",request.getRequestURL());
+            params.set("requestPath",request.getRequestURI());
+            params.set("requestMethod",request.getMethod());
+            params.set("content", "根据用户传递的参数新增数据");
+            LogsAspect logsAspect = new LogsAspect();
+            logsAspect.post(params);
             return 1;
         }else {
+            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+            params.set("logType", "2");
+            params.set("ip", iP);
+            params.set("title", "新增任务");
+            params.set("state", 2);
+            params.set("userId",  Long.valueOf(userId));
+            params.set("userName", sysUser.getUserName());
+            params.set("requestOrigin",request.getRequestURL());
+            params.set("requestPath",request.getRequestURI());
+            params.set("requestMethod",request.getMethod());
+            params.set("content", "根据用户传递的参数新增数据");
+            LogsAspect logsAspect = new LogsAspect();
+            logsAspect.post(params);
             throw new BusinessException(10106,"密码错误");
         }
     }
