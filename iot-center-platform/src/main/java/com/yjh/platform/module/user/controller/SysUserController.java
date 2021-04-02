@@ -554,7 +554,7 @@ public class SysUserController {
         return result;
     }
 
-    @ApiOperation(value = "用户登出网关调用")
+    @ApiOperation(value = "生成验证码")
     @RequestMapping(value = "/randomNumbers", method = RequestMethod.GET)
     public Result randomNumbers() {
         Result result = new Result();
