@@ -140,7 +140,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         for(Map.Entry<Object,RobotServerHandler> vo : robotServerHandlerMap.entrySet()){
             log.info("当前的robotServerHandlerMap的key为"+vo.getKey());
             String robotCode = vo.getKey().toString();
-            robotServerHandlerMap.remove(robotCode);
+//            robotServerHandlerMap.remove(strRobotCode);
             robotService.updateRobotInfo(vo.getKey().toString(),"离线");
             Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
             robotStatusMap.put("value","1");//异常
@@ -148,6 +148,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             flag2 = 0;
         }
         log.info("channel.isActive(): " + channel.isActive());
+        log.info("此时的packet====="+Packet);
 
         //1.判断是否为注册连接，是注册连接带strChannelID，不是则是空,无须修改状态 2.可以改为若strChannelID为空，则不可注册
         if (strRobotCode == null || strRobotCode.equals("")) {
@@ -668,7 +669,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         taskStatusMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
                         taskStatusMap.put("taskState", xmlBaseModel.getItems().get(0).get("task_state").toString());
                         taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time"));
-                        taskStatusMap.put("startTime", xmlBaseModel.getItems().get(0).get("start_time"));
+                        String startTime =  xmlBaseModel.getItems().get(0).get("start_time").toString();
+                        Date startDate = sdf.parse(startTime);
+                        taskStatusMap.put("startTime", sdf.format(startDate));
                         taskStatusMap.put("taskProgress", xmlBaseModel.getItems().get(0).get("task_progress").toString());
                         taskStatusMap.put("taskEstimatedTime", xmlBaseModel.getItems().get(0).get("task_estimated_time").toString());
                         taskStatusMap.put("description", xmlBaseModel.getItems().get(0).get("description").toString());
@@ -819,7 +822,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }else if ( "2".equals(fileType)){
                         cResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);//相对路径
                     }
-                    IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap,redisTemplate);
+                    IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap,redisTemplate,webSocketUrl);
                     TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
 
                     String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
@@ -836,7 +839,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     xmlBaseModel.getItems().get(0).put("data_type",mapForGet.get("0x02"));
                     xmlBaseModel.getItems().get(0).put("patroldevice_code",instanceId);
                     SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-                    xmlBaseModel.getItems().get(0).put("taskPatrolledId",mapForGet.get("taskId")+"_"+simpleDateFormat2.format(mapForGet.get("cruiseTime")));
+//                    xmlBaseModel.getItems().get(0).put("taskPatrolledId",mapForGet.get("taskId")+"_"+simpleDateFormat2.format(mapForGet.get("cruiseTime")));
                     xmlBaseModel.getItems().get(0).remove("robot_code");
                     List<XMLBaseModel> list = new ArrayList<>();
                     list.add(xmlBaseModel);

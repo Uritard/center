@@ -381,6 +381,15 @@
         <if test="colName != null and colName !=''">and a.col_name = #{colName, jdbcType=VARCHAR}</if>
         <if test="dictNote != null and dictNote !=''">and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
     </select>
+    <select id="selectDictCodeByNote" resultType="java.lang.String">
+        SELECT
+        a.dict_code
+        FROM
+        t_dict_business a
+        WHERE 1 = 1
+        <if test="dictNote != null "> and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
+        <if test="colName != null "> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
+    </select>
     <select id="selectStatusByRobotCode" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT a.robot_status FROM t_robot_info a
         WHERE 1 = 1
@@ -522,7 +531,10 @@
         remark,
         check_user,
         check_date,
-        is_warn
+        is_warn,
+        fir_name,
+        fir_date,
+        result_pic
         )values
         <foreach collection="list" item="TCruiseDataResult" separator=",">
             (
@@ -548,7 +560,10 @@
             #{TCruiseDataResult.remark, jdbcType=VARCHAR},
             #{TCruiseDataResult.checkUser, jdbcType=VARCHAR},
             #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP},
-            #{TCruiseDataResult.isWarn, jdbcType=INTEGER}
+            #{TCruiseDataResult.isWarn, jdbcType=INTEGER},
+            #{TCruiseDataResult.firName, jdbcType=VARCHAR},
+            #{TCruiseDataResult.firDate, jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.resultPic, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

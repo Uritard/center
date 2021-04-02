@@ -148,7 +148,8 @@ public class TCruiseResultService{
             warnInfo.setConfMode(275);//已核查
             warnInfo.setDealType(286);//属实
             warnInfo.setDealInfo("程序正常，告警属实");
-            warnInfo.setDefectModel(405);//其他
+            Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
+            warnInfo.setDefectModel(warnFlag);//其他
             warnInfo.setAlarmSource(282);//主辅设备
             warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
             warnInfo.setValue(afterManualReviewInfo.getPersonCheck());

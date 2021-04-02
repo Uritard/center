@@ -364,7 +364,7 @@ public class CruiseResultDealThread implements Runnable{
                                     tCruiseDataResult.setRemark(null);
                                 }
                                 if (redisInfoMap.containsKey("resultPic")){
-                                    tCruiseDataResult.setResultDesc(redisInfoMap.get("resultPic"));
+                                    tCruiseDataResult.setResultPic(redisInfoMap.get("resultPic"));
                                 }
                                 tCDRList.add(tCruiseDataResult);
                             }
