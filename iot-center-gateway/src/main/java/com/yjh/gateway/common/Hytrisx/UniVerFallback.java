@@ -63,7 +63,7 @@ public class UniVerFallback implements FallbackProvider {
             @Override
             public InputStream getBody() throws IOException {
                 //TODO 此处可以做日志记录
-                return new ByteArrayInputStream(JSON.toJSONString("服务凉凉了").getBytes("UTF-8"));
+                return new ByteArrayInputStream(JSON.toJSONString("服务正在启动中,请稍后").getBytes("UTF-8"));
             }
 
             /**

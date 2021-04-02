@@ -109,10 +109,10 @@ public class SysUserController {
     @ApiOperation(value = "系统用户表更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改系统用户数据", content = "根据用户传递的参数修改系统用户数据", logType = 3)
-    public Result update(@RequestBody SysUser sysUser,HttpServletRequest request) {
+    public Result update(@RequestBody SysUser sysUser, HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(sysUserService.update(sysUser,request));
+            result.setData(sysUserService.update(sysUser, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新用户异常:", e);
@@ -231,7 +231,7 @@ public class SysUserController {
     ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
-        Map<String,String> lockTimes= redisTemplate.opsForHash().entries("t_sys_param:lockTime");
+        Map<String, String> lockTimes = redisTemplate.opsForHash().entries("t_sys_param:lockTime");
         Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
         try {
             Page page = PageHelper.startPage(sysUser.getPageNum() != null ? sysUser.getPageNum() : 1, sysUser.getPageSize() != null ? sysUser.getPageSize() : 0, true, null, true);
@@ -245,9 +245,9 @@ public class SysUserController {
             }
             List<SysUserSelect> list = sysUserService.selectByPage(sysUser);
             List<SysUserSelect> userList = new ArrayList<>();
-            List<Long> userId=new ArrayList<>();
+            List<Long> userId = new ArrayList<>();
             for (SysUserSelect user : list) {
-                if(user.getState()==2){
+                if (user.getState() == 2) {
                     String timeStr1 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date date = sdf.parse(timeStr1);
@@ -264,7 +264,7 @@ public class SysUserController {
                 }
                 userList.add(user);
             }
-            if(userId.size()>0){
+            if (userId.size() > 0) {
                 sysUserDao.batchUpdate(userId);
             }
             resultMap.put("count", page.getTotal());
@@ -359,10 +359,10 @@ public class SysUserController {
                                     @RequestParam(value = "ip", required = false) String ip,
                                     @RequestParam(value = "userId", required = false) String userId,
                                     @RequestParam(value = "userName", required = false) String userName
-                                    ) {
+    ) {
         Result result = new Result();
         try {
-            result.setData(this.sysUserService.userLogoutGateWay(userId, token,ip,userName));
+            result.setData(this.sysUserService.userLogoutGateWay(userId, token, ip, userName));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("登出失败:", e);
@@ -389,10 +389,16 @@ public class SysUserController {
             }
             if (sysUser.getUserName().contains("admin") || sysUser.getUserName().contains("administrator")) {
                 result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
+                return result;
+            } else if (sysUser.getPassword().contains("admin") || sysUser.getPassword().contains("administrator")) {
+                result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
+                return result;
             } else if (sysUser.getPassword().contains(sysUser.getUserName())) {
                 result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
+                return result;
             } else if (!sysUser.getPassword().matches(PW_PATTERN)) {
                 result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
+                return result;
             } else {
                 sysUserService.insert(sysUser);
                 sysUserService.insertIntoRedis();
@@ -481,6 +487,9 @@ public class SysUserController {
                 if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(newPassword)) {
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
+                } else if (newPassword.contains("admin") || newPassword.contains("administrator")) {
+                    result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
+                    return result;
                 } else if (newPassword.contains(sysUserCurrent.getUserName())) {
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
@@ -488,7 +497,7 @@ public class SysUserController {
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else {
-                    result.setData(sysUserService.changePassword(userId, map, sysUserCurrent.getUserName(),httpServletRequest));
+                    result.setData(sysUserService.changePassword(userId, map, sysUserCurrent.getUserName(), httpServletRequest));
                 }
             } else {
                 Map<String, Object> mapResult = new HashMap<>();
@@ -523,16 +532,16 @@ public class SysUserController {
     public Result lockUserInfo() {
         Result result = new Result();
         try {
-            Set userInfo=redisTemplate.keys("lockUser"+"*");
-            List<Map> list=new ArrayList();
-            if(userInfo.size()>0){
-                for(Object value:userInfo){
-                    Map user=  (Map) redisTemplate.opsForValue().get(String.valueOf(value));
+            Set userInfo = redisTemplate.keys("lockUser" + "*");
+            List<Map> list = new ArrayList();
+            if (userInfo.size() > 0) {
+                for (Object value : userInfo) {
+                    Map user = (Map) redisTemplate.opsForValue().get(String.valueOf(value));
                     list.add(user);
                 }
                 redisTemplate.delete(userInfo);
             }
-          result.setData(list);
+            result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询账号锁定用户信息失败:", e);
@@ -545,7 +554,7 @@ public class SysUserController {
     public Result passUserInfo() {
         Result result = new Result();
         try {
-            List<SysUser> sysUsers=sysUserService.selectUserByUpdateTime();
+            List<SysUser> sysUsers = sysUserService.selectUserByUpdateTime();
             result.setData(sysUsers);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -560,7 +569,7 @@ public class SysUserController {
         Result result = new Result();
         try {
             String random = String.valueOf(System.currentTimeMillis());
-            redisTemplate.opsForValue().set("number",random);
+            redisTemplate.opsForValue().set("number", random);
             result.setData(random);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
