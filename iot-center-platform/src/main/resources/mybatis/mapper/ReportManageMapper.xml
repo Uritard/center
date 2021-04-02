@@ -44,7 +44,7 @@
 		f.evaluation_state,
 		p.dict_note as evaluation_state_name,
 		f.result_num,
-		f.origpic as picpath,
+		f.picpath,
 		f.cruise_result,
 		g.dict_note as cruise_result_name,
 		e.cruise_time,

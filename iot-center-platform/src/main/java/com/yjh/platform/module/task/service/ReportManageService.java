@@ -40,6 +40,8 @@ public class ReportManageService {
     private DateTimeUtil dateTimeUtil;
     @Transactional(rollbackFor = Exception.class)
     public int reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType) {
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         List<String> list = Arrays.asList(deviceIdList.split(","));
         //巡检记录报表对象
         ReportData recordData = new ReportData();
@@ -57,6 +59,13 @@ public class ReportManageService {
         recordData.setCpTypeItems(cpTypeItems);
         //3.明细-所选设备的所有测点巡检结果详情
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(list,startTime,endTime);
+        for (TCruiseDataResultDetail tcdr : tCDRDList){
+            String relativePath = tcdr.getPicPath();
+            /*String sArray2[] = relativePath.split("/");
+            String fileName = sArray2[sArray2.length - 1];//图片名称*/
+            relativePath.replace(absoluteImgMap.get("content"),relativeImgMap.get("content"));
+            tcdr.setPicPath(relativePath);
+        }
         recordData.setTCDRDList(tCDRDList);
 
 //        String fileName = sdf.format(new Date())+"-"+reportType+".xlsx";
@@ -68,16 +77,16 @@ public class ReportManageService {
             e.printStackTrace();
         }*/
 
-//        String reportPathLocal = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
+        String fileName = "Report-"+sdf.format(new Date())+".xlsx";
+
+        String reportPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile/"+fileName;
 //        String fileName = String.valueOf(UUID.randomUUID()).replace("-", "")+".xlsx";
 //        String finalFileName = toUTF8(fileName);
 
-        String fileName = "Report-"+sdf.format(new Date())+".xlsx";
-
         //从缓存中获取系统参数
-        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
-        String reportPath = map.get("content")+"/"+fileName;
-        log.info("reportPath:"+reportPath);
+//        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:reportReflect");
+//        String reportPath = map.get("content")+"/"+fileName;
+//        log.info("reportPath:"+reportPath);
         File file = new File(reportPath);
 
         ContentData contentData = ReportDataRepo.getData(recordData);

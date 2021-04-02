@@ -12,10 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author tt
@@ -170,7 +167,11 @@ public class TUnionTaskService{
                 lmd.setPresetId(Long.valueOf(redisInfoMap.get("cruiseId")));
                 lmd.setEndTime(redisInfoMap.get("endTime"));
                 lmd.setStartTime(redisInfoMap.get("startTime"));
-                lmd.setCameraId(Long.valueOf(redisInfoMap.get("cameraId")));
+                if (Objects.nonNull(redisInfoMap.get("cameraId")) || !"".equals(redisInfoMap.get("cameraId"))){
+                    lmd.setCameraId(Long.valueOf(redisInfoMap.get("cameraId")));
+                }else {
+                    lmd.setCameraId(Long.valueOf(redisInfoMap.get("robotId")));
+                }
                 Integer cruiseResult = Integer.valueOf(redisInfoMap.get("cruiseResult"));
                 String taskName = TUnionTaskAttrDao.selectTaskName(taskId);
                 String CruiseResultName = TUnionTaskAttrDao.selectCruiseResultName(cruiseResult);

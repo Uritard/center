@@ -31,10 +31,12 @@ public class IsWarnAfterCruiseThread implements Runnable{
     private Map<String,String> threadMap;
 
     private RedisTemplate redisTemplate;
+    private String webSocketUrl;
 
-    public IsWarnAfterCruiseThread(Map<String,String> threadMap, RedisTemplate redisTemplate){
+    public IsWarnAfterCruiseThread(Map<String,String> threadMap, RedisTemplate redisTemplate,String webSocketUrl){
         this.threadMap = threadMap;
         this.redisTemplate = redisTemplate;
+        this.webSocketUrl = webSocketUrl;
     }
 
     @Override
@@ -93,7 +95,8 @@ public class IsWarnAfterCruiseThread implements Runnable{
                         /*warnInfo.setConfMode(275);//已核查
                         warnInfo.setDealType(286);//属实
                         warnInfo.setDealInfo("程序正常，告警属实");*/
-                        warnInfo.setDefectModel(405);//其他
+                        Integer warnFlag = Integer.valueOf(StaticContextAccessor.getBean(RobotService.class).selectDictCodeByNote("其他","defect_model"));
+                        warnInfo.setDefectModel(warnFlag);
                         warnInfo.setAlarmSource(282);//主辅设备
                         warnInfo.setImagePath(threadMap.get("relativePath"));
                         warnInfo.setValue(threadMap.get("value"));
@@ -110,6 +113,16 @@ public class IsWarnAfterCruiseThread implements Runnable{
 //                            warnInfo.setDealPersonId(userId);
                             log.info("要插库的告警数据是==="+warnInfo);
                             StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
+
+                            // webSocket通知前端刷新告警统计数量
+                            Map<String, Object> jasonMaps = new HashMap<>();
+                            jasonMaps.put("type", "newAlarm");
+                            jasonMaps.put("alarmName", warnInfo.getWarnName());
+                            jasonMaps.put("alarmTime", warnInfo.getWarnTime());
+                            jasonMaps.put("alarmContent", warnInfo.getWarnContent());
+                            String jsons = JSON.toJSONString(jasonMaps);
+                            log.info("告警生成-前端推送：" + jsons);
+                            Constant.postUrl(webSocketUrl,jsons);
                         }
                     }
                 }

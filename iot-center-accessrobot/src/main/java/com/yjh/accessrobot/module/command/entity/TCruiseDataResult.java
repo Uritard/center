@@ -113,6 +113,13 @@ public class TCruiseDataResult implements Serializable {
     private String picPathAnl;
     @ApiModelProperty(value = "机器人巡检图片分析,绝对")
     private String origPicAnl;
+    @ApiModelProperty(value = "FIR文件存储路径")
+    private String resultPic;
+    @ApiModelProperty(value = "红外FIR文件名称")
+    private String firName;
+    @ApiModelProperty(value = "红外FIR文件生成时间")
+    private String firDate;
+
 
 
 }

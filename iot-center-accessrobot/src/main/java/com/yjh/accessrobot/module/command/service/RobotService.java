@@ -18,6 +18,7 @@ import com.yjh.accessrobot.module.command.dao.TRobotRegionDao;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -794,6 +795,9 @@ public class RobotService {
                     } else {
                         tCruiseDataResult.setCruiseAbnormal(null);
                     }
+                    if (redisInfoMap.containsKey("resultPic")){
+                        tCruiseDataResult.setResultPic(redisInfoMap.get("resultPic"));
+                    }
                     tCDRList.add(tCruiseDataResult);
 
                     if ("null".equals(redisInfoMap.get("cruiseAbnormal"))) {
@@ -1502,6 +1506,9 @@ public class RobotService {
     }
     public Long selectIsRobotTask(String taskId){
         return tRobotInfoDao.selectIsRobotTask(taskId);
+    }
+    public String selectDictCodeByNote(String dictNote,String colName){
+        return tRobotInfoDao.selectDictCodeByNote(dictNote,colName);
     }
 }
 
