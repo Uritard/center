@@ -87,25 +87,25 @@ public class zuulFilter extends ZuulFilter {
             ctx.getZuulRequestHeaders().put("HTTP_X_FORWARDED_FOR", IPUtil.getRemoteIP(request));
             if (!url.contains("/sysUser/v1/login")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
-//                String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
-//                if (StringUtils.isNoneBlank(userId)) {
-//                    StringBuilder sb = new StringBuilder();
-//                    for (char c : userId.toCharArray()) {
-//                        sb.append(Integer.toUnsignedString(c, 10));
-//                    }
-//                    String token = Demo.summary(sb.toString());
-//                    if (!token.equals(absCode)) {
-//                        log.error("参数篡改userId: " + userId + " ,之后的absCode: " + token + ",前端absCode: " + absCode);
-//                        ctx.setSendZuulResponse(false);
-//                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-//                        return false;
-//                    }
-//                } else {
-//                    log.error("无userId====================================================================================");
-//                    ctx.setSendZuulResponse(false);
-//                    ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
-//                    return false;
-//                }
+                String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
+                if (StringUtils.isNoneBlank(userId)) {
+                    StringBuilder sb = new StringBuilder();
+                    for (char c : userId.toCharArray()) {
+                        sb.append(Integer.toUnsignedString(c, 10));
+                    }
+                    String token = Demo.summary(sb.toString());
+                    if (!token.equals(absCode)) {
+                        log.error("参数篡改userId: " + userId + " ,之后的absCode: " + token + ",前端absCode: " + absCode);
+                        ctx.setSendZuulResponse(false);
+                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                        return false;
+                    }
+                } else {
+                    log.error("无userId====================================================================================");
+                    ctx.setSendZuulResponse(false);
+                    ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+                    return false;
+                }
                 String token = request.getHeader("token") != null ? request.getHeader("token") : "";
                 if (StringUtils.isNoneBlank(token)) {
                     Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + userId + ":" + token);
