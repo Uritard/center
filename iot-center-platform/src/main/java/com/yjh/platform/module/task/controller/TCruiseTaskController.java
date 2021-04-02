@@ -273,7 +273,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "任务暂停")
     @RequestMapping(value = "/taskPause", method = RequestMethod.GET)
-    @Logs(title = "任务暂停",content = "任务暂停",logType = 5)
+    @Logs(title = "任务暂停",content = "任务暂停",logType = 11)
     public Result taskPause(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
@@ -290,7 +290,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "任务继续")
     @RequestMapping(value = "/taskGoOn", method = RequestMethod.GET)
-    @Logs(title = "任务继续",content = "任务继续",logType = 5)
+    @Logs(title = "任务恢复",content = "任务恢复",logType = 13)
     public Result taskGoOn(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
@@ -307,7 +307,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "任务终止")
     @RequestMapping(value = "/taskShutDown", method = RequestMethod.GET)
-    @Logs(title = "任务终止",content = "任务终止",logType = 5)
+    @Logs(title = "任务终止",content = "任务终止",logType = 13)
     public Result taskShutDown(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {

@@ -284,7 +284,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "下载模板")
     @RequestMapping(value = "download",method = RequestMethod.GET)
-    @Logs(title = "下载模板",content = "下载模板",logType = 5)
+    @Logs(title = "下载模板",content = "下载模板",logType = 9)
     public Result download () {
         Result result =new Result();
         try {
@@ -302,7 +302,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "导入模板")
     @RequestMapping(value = "upload",method = RequestMethod.POST)
-    @Logs(title = "导入模板",content = "导入模板",logType = 5)
+    @Logs(title = "导入模板",content = "导入模板",logType = 8)
     public Result upload (@RequestParam(value="file", required=false) MultipartFile file) {
         Result result =new Result();
         try {
