@@ -155,18 +155,18 @@ public class RobotController {
         }
         return result;
     }
-    @ApiOperation(value = "巡视主机联动任务下给机器人的指令接口")
-    @RequestMapping(value = "/taskIssued2", method = RequestMethod.POST)
+    @ApiOperation(value = "巡视主机向机器人下发联动任务指令接口")
+    @RequestMapping(value = "/linkTaskIssued", method = RequestMethod.POST)
     @Logs(title = "给机器人下发联动任务",content = "根据用户传递的参数给机器人下发联动任务指令",logType = 5)
-    public Result feignRobotTaskIssued2(@RequestBody Map<String,Object> resMap){
+    public Result feignRobotLinkTaskIssued(@RequestBody Map<String,Object> resMap){
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotTaskIssued2(resMap));
+            result.setData(robotService.feignRobotLinkTaskIssued(resMap));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("巡视主机联动任务下给机器人的指令接口发生错误:", e);
+            log.error("巡视主机向机器人下发联动任务指令接口发生错误:", e);
         }
         return result;
     }

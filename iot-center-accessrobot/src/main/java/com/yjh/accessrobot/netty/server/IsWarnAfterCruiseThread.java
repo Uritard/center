@@ -50,7 +50,7 @@ public class IsWarnAfterCruiseThread implements Runnable{
             TCruiseTask tCruiseTask = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(threadMap.get("taskCode"));
             log.info("taskId是: "+threadMap.get("taskCode")+"的任务数据tCruiseTask是: "+tCruiseTask);
 
-            if (Objects.nonNull(tCruiseTask.getTaskType()) && tCruiseTask.getTaskType() != 271) {
+            if (Objects.isNull(tCruiseTask.getTaskType()) && tCruiseTask.getTaskType() != 271) {
                 for (String key : robotInfoKeys) {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
                     if (threadMap.get("robotCode").equals(redisInfoMap.get("robotCode"))

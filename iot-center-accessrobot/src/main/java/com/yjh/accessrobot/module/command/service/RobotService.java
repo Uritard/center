@@ -635,7 +635,7 @@ public class RobotService {
         }
     }
     @Transactional(rollbackFor = Exception.class)
-    public int feignRobotTaskIssued2(Map<String,Object> resMap){
+    public int feignRobotLinkTaskIssued(Map<String,Object> resMap){
         List<Map<String,Object>> mapList = new ArrayList<>();
         Map<String,Object> map = new HashMap<>();
         map.put("task_code",resMap.get("taskCode"));
@@ -655,7 +655,6 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
 
-        //根据不同的机器人对应不同的管道发送指令
         RobotServerHandler.getRobotServerHandlerMap().get(resMap.get("receiveCode").toString())
                 .sendHeartBeat(generateByteOrder(xmlString,resMap.get("receiveCode").toString()), resMap.get("receiveCode").toString());
         return 1;
