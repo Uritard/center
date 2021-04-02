@@ -9,6 +9,7 @@ import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.module.command.entity.TCruiseTask;
 import com.yjh.accessrobot.module.command.entity.TStdDeviceMete;
 import com.yjh.accessrobot.module.command.entity.TWarnInfo;
 import com.yjh.accessrobot.module.command.service.RobotService;
@@ -45,89 +46,93 @@ public class IsWarnAfterCruiseThread implements Runnable{
             log.info("Process Warn Starting >>>>>>> threadMap==="+threadMap);
             //查询该巡检点对应测点配置的告警阈值相关信息
             Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:"+threadMap.get("robotCode")+ ":" +threadMap.get("taskCode"));
+            //根据taskId查询相关内容
+            TCruiseTask tCruiseTask = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(threadMap.get("taskCode"));
+            log.info("taskId是: "+threadMap.get("taskCode")+"的任务数据tCruiseTask是: "+tCruiseTask);
 
-            for (String key : robotInfoKeys) {
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-                if (threadMap.get("robotCode").equals(redisInfoMap.get("robotCode"))
-                        && threadMap.get("taskCode").equals(redisInfoMap.get("taskId"))
-                        && threadMap.get("deviceId").equals(redisInfoMap.get("inspectionCode"))) {
-                    Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
-                    TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);
-                    log.info("tStdDeviceMete==="+tStdDevicemete);
+            if (Objects.nonNull(tCruiseTask.getTaskType()) && tCruiseTask.getTaskType() != 271) {
+                for (String key : robotInfoKeys) {
+                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+                    if (threadMap.get("robotCode").equals(redisInfoMap.get("robotCode"))
+                            && threadMap.get("taskCode").equals(redisInfoMap.get("taskId"))
+                            && threadMap.get("deviceId").equals(redisInfoMap.get("inspectionCode"))) {
+                        Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
+                        TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);
+//                        log.info("tStdDeviceMete===" + tStdDevicemete);
 
-                    //该巡视点还在,能找到对应测点信息
-                    if (Objects.nonNull(tStdDevicemete)) {
-                        Map<String, Object> params = new HashMap<>();
-                        params.put("value", threadMap.get("value"));
-                        params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
-                        params.put("meteKind", tStdDevicemete.getMeteKind());
-                        params.put("alarmState", tStdDevicemete.getAlarmState());
-                        params.put("stateZero", tStdDevicemete.getStateZero());
-                        params.put("stateOne", tStdDevicemete.getStateOne());
-                        params.put("alarmLevel", tStdDevicemete.getAlarmLevel());
-                        params.put("highLimit1", tStdDevicemete.getHighLimit1());
-                        params.put("lowLimit1", tStdDevicemete.getLowLimit1());
-                        params.put("highLimit2", tStdDevicemete.getHighLimit2());
-                        params.put("lowLimit2", tStdDevicemete.getLowLimit2());
-                        params.put("highLimit3", tStdDevicemete.getHighLimit3());
-                        params.put("lowLimit3", tStdDevicemete.getLowLimit3());
-                        params.put("highLimit4", tStdDevicemete.getHighLimit4());
-                        params.put("lowLimit4", tStdDevicemete.getLowLimit4());
-                        log.info("params的值是===" + params);
+                        //该巡视点还在,能找到对应测点信息
+                        if (Objects.nonNull(tStdDevicemete)) {
+                            Map<String, Object> params = new HashMap<>();
+                            params.put("value", threadMap.get("value"));
+                            params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
+                            params.put("meteKind", tStdDevicemete.getMeteKind());
+                            params.put("alarmState", tStdDevicemete.getAlarmState());
+                            params.put("stateZero", tStdDevicemete.getStateZero());
+                            params.put("stateOne", tStdDevicemete.getStateOne());
+                            params.put("alarmLevel", tStdDevicemete.getAlarmLevel());
+                            params.put("highLimit1", tStdDevicemete.getHighLimit1());
+                            params.put("lowLimit1", tStdDevicemete.getLowLimit1());
+                            params.put("highLimit2", tStdDevicemete.getHighLimit2());
+                            params.put("lowLimit2", tStdDevicemete.getLowLimit2());
+                            params.put("highLimit3", tStdDevicemete.getHighLimit3());
+                            params.put("lowLimit3", tStdDevicemete.getLowLimit3());
+                            params.put("highLimit4", tStdDevicemete.getHighLimit4());
+                            params.put("lowLimit4", tStdDevicemete.getLowLimit4());
+//                            log.info("params的值是===" + params);
 
-                        Result result = sendPostRequest(Constant.WARN_JUDGE, params);
-                        Map<String, Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
-                        log.info("object转map的东西===" + map);
-                        Boolean isWarN = (Boolean) map.get("isWarn");
-                        String outRange = null;
-                        if (Objects.nonNull(map.get("outRange"))) {
-                            outRange = map.get("outRange").toString();
-                        }
+                            Result result = sendPostRequest(Constant.WARN_JUDGE, params);
+                            Map<String, Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
+                            log.info("object转map的东西===" + map);
+                            Boolean isWarN = (Boolean) map.get("isWarn");
+                            String outRange = null;
+                            if (Objects.nonNull(map.get("outRange"))) {
+                                outRange = map.get("outRange").toString();
+                            }
 
-                        //组装告警基本信息
-                        TWarnInfo warnInfo = new TWarnInfo();
-                        warnInfo.setWarnTime(new Date());
-                        warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
-                        warnInfo.setCunstomId(tStdDevicemete.getCustomId());
-                        warnInfo.setInstanceId(instanceId);
-                        warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
-                        warnInfo.setConfMode(276);//未核查
+                            //组装告警基本信息
+                            TWarnInfo warnInfo = new TWarnInfo();
+                            warnInfo.setWarnTime(new Date());
+                            warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
+                            warnInfo.setCunstomId(tStdDevicemete.getCustomId());
+                            warnInfo.setInstanceId(instanceId);
+                            warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
+                            warnInfo.setConfMode(276);//未核查
                         /*warnInfo.setConfMode(275);//已核查
                         warnInfo.setDealType(286);//属实
                         warnInfo.setDealInfo("程序正常，告警属实");*/
-                        Integer warnFlag = Integer.valueOf(StaticContextAccessor.getBean(RobotService.class).selectDictCodeByNote("其他","defect_model"));
-                        warnInfo.setDefectModel(warnFlag);
-                        warnInfo.setAlarmSource(282);//主辅设备
-                        warnInfo.setImagePath(threadMap.get("relativePath"));
-                        warnInfo.setValue(threadMap.get("value"));
-                        warnInfo.setTaskId(threadMap.get("taskCode"));
-                        log.info("warnInfo=="+warnInfo);
+                            Integer warnFlag = Integer.valueOf(StaticContextAccessor.getBean(RobotService.class).selectDictCodeByNote("其他", "defect_model"));
+                            warnInfo.setDefectModel(warnFlag);
+                            warnInfo.setAlarmSource(282);//主辅设备
+                            warnInfo.setImagePath(threadMap.get("relativePath"));
+                            warnInfo.setValue(threadMap.get("value"));
+                            warnInfo.setTaskId(threadMap.get("taskCode"));
+//                            log.info("warnInfo==" + warnInfo);
 
-                        //判断该点是否产生告警以及告警信息
-                        if (Boolean.TRUE.equals(isWarN)){//触发告警
-                            warnInfo.setWarnName(map.get("warnName").toString());
-                            warnInfo.setWarnLevel(Integer.valueOf(map.get("warnLevel").toString()));
-                            warnInfo.setWarnContent(map.get("warnContent").toString());
-                            warnInfo.setOutRange(outRange);
+                            //判断该点是否产生告警以及告警信息
+                            if (Boolean.TRUE.equals(isWarN)) {//触发告警
+                                warnInfo.setWarnName(map.get("warnName").toString());
+                                warnInfo.setWarnLevel(Integer.valueOf(map.get("warnLevel").toString()));
+                                warnInfo.setWarnContent(map.get("warnContent").toString());
+                                warnInfo.setOutRange(outRange);
 //                            warnInfo.setDealTime(new Date());
 //                            warnInfo.setDealPersonId(userId);
-                            log.info("要插库的告警数据是==="+warnInfo);
-                            StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
+                                log.info("要插库的告警数据是===" + warnInfo);
+                                StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
 
-                            // webSocket通知前端刷新告警统计数量
-                            Map<String, Object> jasonMaps = new HashMap<>();
-                            jasonMaps.put("type", "newAlarm");
-                            jasonMaps.put("alarmName", warnInfo.getWarnName());
-                            jasonMaps.put("alarmTime", warnInfo.getWarnTime());
-                            jasonMaps.put("alarmContent", warnInfo.getWarnContent());
-                            String jsons = JSON.toJSONString(jasonMaps);
-                            log.info("告警生成-前端推送：" + jsons);
-                            Constant.postUrl(webSocketUrl,jsons);
+                                // webSocket通知前端刷新告警统计数量
+                                Map<String, Object> jasonMaps = new HashMap<>();
+                                jasonMaps.put("type", "newAlarm");
+                                jasonMaps.put("alarmName", warnInfo.getWarnName());
+                                jasonMaps.put("alarmTime", warnInfo.getWarnTime());
+                                jasonMaps.put("alarmContent", warnInfo.getWarnContent());
+                                String jsons = JSON.toJSONString(jasonMaps);
+                                log.info("告警生成-前端推送：" + jsons);
+                                Constant.postUrl(webSocketUrl, jsons);
+                            }
                         }
                     }
                 }
             }
-
             return;
         } catch (Exception e) {
             e.printStackTrace();
