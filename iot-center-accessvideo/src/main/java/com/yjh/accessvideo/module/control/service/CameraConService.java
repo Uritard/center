@@ -34,6 +34,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -1807,7 +1809,7 @@ public class CameraConService {
                 for (int i=0;i<arr.size();i++)
                 {
                     arrss[i]=Double.parseDouble(arr.get(i));
-                     log.info("Double arrss[i]="+arrss[i]);
+                   //  log.info("Double arrss[i]="+arrss[i]);
                 }
                 Double max=arrss[0];
                 for (int i=0;i<arrss.length;i++){
@@ -1874,9 +1876,10 @@ public class CameraConService {
             log.info("x>:"+x);
             log.info("y>:"+y);
         }
-
+        Lock lock=new ReentrantLock();
         String list="00.00";
         try {
+             lock.lock();
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum()+32);
             log.info("通道号："+cameraConInfo.getChannelNum());
@@ -1941,7 +1944,7 @@ public class CameraConService {
                                             l &= 0xffffff;
                                             l |= ((long) byTempData[3] << 24);
                                              arr[i]=Float.intBitsToFloat(l);
-                                            log.info("Float.intBitsToFloat(l):"+Float.intBitsToFloat(l));
+                                           // log.info("Float.intBitsToFloat(l):"+Float.intBitsToFloat(l));
                                             //list = String.valueOf(l);
                                         }
                                     }
@@ -2002,6 +2005,7 @@ public class CameraConService {
             log.info("系统异常"+iErr);
         }finally {
             hCNetSDK.NET_DVR_Logout(lUserIDLong);
+           lock.unlock();
            // hCNetSDK.NET_DVR_Cleanup();
         }
         return list;
