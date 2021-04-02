@@ -83,53 +83,54 @@ public class CameraConController {
     @RequestMapping(value = "/stopProcess", method = RequestMethod.POST)
     public void stopProcess(){
 
-        //获取所有视频流信息
-        //发送请求获取所有STREAM
-        log.info("关闭流接口回调：");
-        String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
-        JSONObject jsonList = new JSONObject();
         try {
+            //获取所有视频流信息
+            //发送请求获取所有STREAM
+            log.info("关闭流接口回调：");
+            String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
+            JSONObject jsonList = new JSONObject();
+
             Thread.sleep(1000*70);//SRS服务器有延迟，大概50-60秒 才更新管理数据
             jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
-        } catch (Exception e) {e.getMessage();}
+            
+            assert jsonList != null;
+            List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
+            int streamListSize = streamsJsonObjectList.size();
+            for (int i = 0; i < streamListSize; i++) {
+                String streambeanStr = streamsJsonObjectList.get(i);
+                JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
+                //解析每一个stream，循环比对，找到页面传递的设备ID对应的流，并判断是否需要关闭
+                String publish = streambeanJson.getString("publish");
+                JSONObject publishjson = JSONObject.parseObject(publish);
+                Integer clients = streambeanJson.getInteger("clients"); //观看人数
+                //符合无人观看的条件
+                String cid = publishjson.getString("cid");
+                log.info("cid："+cid+Objects.isNull(cid));
 
-        assert jsonList != null;
-        List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
-        int streamListSize = streamsJsonObjectList.size();
-        for (int i = 0; i < streamListSize; i++) {
-            String streambeanStr = streamsJsonObjectList.get(i);
-            JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
-            //解析每一个stream，循环比对，找到页面传递的设备ID对应的流，并判断是否需要关闭
-            String publish = streambeanJson.getString("publish");
-            JSONObject publishjson = JSONObject.parseObject(publish);
-            Integer clients = streambeanJson.getInteger("clients"); //观看人数
-            //符合无人观看的条件
-            String cid = publishjson.getString("cid");
-            log.info("cid："+cid+Objects.isNull(cid));
-
-            if (StringUtils.isEmpty(cid)) {
-                String videoFlowId = streambeanJson.getString("id");
-                redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
-                Constant.mapsForCamera.remove(videoFlowId);
-                redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
-                Constant.mapsForHistory.remove(videoFlowId);
-                log.info("关闭空链接：");
-            } else {
-                if(clients<=2){
-                    //踢掉
-                    log.info("关闭流开始");
-                    String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
-                    try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
+                if (StringUtils.isEmpty(cid)) {
                     String videoFlowId = streambeanJson.getString("id");
                     redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
                     Constant.mapsForCamera.remove(videoFlowId);
                     redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
                     Constant.mapsForHistory.remove(videoFlowId);
-                    log.info("关闭流："+delteUrl);
+                    log.info("关闭空链接：");
+                } else {
+                    if(clients<=2){
+                        //踢掉
+                        log.info("关闭流开始");
+                        String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
+                        try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
+                        String videoFlowId = streambeanJson.getString("id");
+                        redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
+                        Constant.mapsForCamera.remove(videoFlowId);
+                        redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
+                        Constant.mapsForHistory.remove(videoFlowId);
+                        log.info("关闭流："+delteUrl);
+                    }
                 }
-            }
 
-        }
+            }
+        } catch (Exception e) {e.getMessage();}
 
     }
 
