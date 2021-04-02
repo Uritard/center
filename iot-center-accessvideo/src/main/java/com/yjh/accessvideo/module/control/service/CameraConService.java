@@ -250,14 +250,8 @@ public class CameraConService {
                     int cameraPort = cameraConInfo.getPort();
                     int iChanNum = cameraConInfo.getCameraNum();
                     int cameraType = cameraConInfo.getCameraType();
-                    int livePath;
-                    if (Objects.nonNull(Constant.maps.get("livePath"))) {
-                        livePath = Constant.maps.get("livePath") + 1;
-                        Constant.maps.put("livePath", livePath);
-                    } else {
-                        livePath = 123;
-                        Constant.maps.put("livePath", 123);
-                    }
+                    int livePath = Constant.maps.get("livePath") + 1;
+                    Constant.maps.put("livePath", livePath);
                     log.info("Constant.maps: " + Constant.maps);
                     log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + livePath);
                     String transUrl = "";
