@@ -714,13 +714,13 @@
 
     <select id="selectByCameraId"   resultType="com.yjh.platform.module.task.entity.TCruiseDataResult">
         select a.cruise_data_id,a.result_pic,a.fir_name,a.fir_date,d.camera_id  from  t_cruise_data_result a
-      LEFT JOIN t_cruise_task_result_detail b  on a.cruise_result_id=b.cruise_result_id
+            LEFT JOIN t_cruise_task_result_detail b  on a.cruise_result_id=b.cruise_result_id
 			LEFT JOIN t_cruise_point_instance  c     on  b.instance_id  =c.instance_id
 			LEFT JOIN  t_camera_preset d             on  c.cruise_id=d.preset_id
 			 where 1=1
         <if test="cameraId!=null  and cameraId!=''"> and  d.camera_id =  #{cameraId,jdbcType=BIGINT} </if>
-        <if test="firName !=null and firName !=''">and a.fir_name like concat('%',#{firName, jdbcType=VARCHAR},'%') </if>
-        <if test="startDate != null and startDate != '' " ><if test="startDate != null and startDate != ''">and a.fir_date between #{startDate,jdbcType= TIMESTAMP} and #{startDate,jdbcType=TIMESTAMP}</if></if>
+        <if test="firName !=null and firName !=''">  and  a.fir_name =  #{firName, jdbcType=VARCHAR} </if>
+        <if test="startDate != null and startDate != '' " ><if test="endDate != null and endDate != ''">and a.fir_date between STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s') and STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')</if></if>
     </select>
 
 </mapper>

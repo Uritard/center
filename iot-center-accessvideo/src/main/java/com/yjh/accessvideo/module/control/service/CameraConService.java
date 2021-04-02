@@ -1543,8 +1543,8 @@ public class CameraConService {
         int re = 1;
         log.info("开启可视对讲");
         try {
-            String logpath="/home/yjh_iot_center/iot-center-accessvideo-1.0.0/logs/";
-            hCNetSDK.NET_DVR_SetLogToFile(3,logpath,false);
+            String logpath="/home/yjh/yjh_iot_center/iot-center-accessvideo-1.0.0/logs";
+
             log.info("开启可视对讲videoIntercomId：" + videoIntercomId);
             String url = SERVICE_URL + "?videoIntercomId=" + videoIntercomId;
             String services = HttpClientUtils.getInstance().getUrl(url, null);
@@ -1563,6 +1563,7 @@ public class CameraConService {
                 log.info("语音对讲初始化失败");
             }*/
             log.info("语音对讲开始登录。。。。。");
+            hCNetSDK.NET_DVR_SetLogToFile(3,logpath,false);
             m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
             System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
             m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
