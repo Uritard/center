@@ -99,79 +99,70 @@ public class SysUserService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> userLogin(HttpServletRequest request, Map<String, String> userMap) throws ParseException, IOException {
         Map<String, Object> mapResult = new HashMap<>();
-        if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
-            String userName = null;
-            String password = null;
-            Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
-            Map<String, String> lockTimes = redisTemplate.opsForHash().entries("t_sys_param:lockTime");
-            Map<String, String> loginNum = redisTemplate.opsForHash().entries("t_sys_param:loginErrorNum");
-            String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
-            String isDecode = enmap.get("content");
-            if ("true".equals(isDecode)) {
-                userName = Demo.decrypt(userMap.get("userName"));
-                password = Demo.decrypt(userMap.get("password"));
-                // String verfiCode = userMap.get("verfiCode");
-            } else {
-                userName = userMap.get("userName");
-                password = userMap.get("password");
-            }
-            String replayAvoid = userMap.get("replayAvoid");
-            SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
-            if (Objects.equals(null, sysUserLogin)) {
-                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "6");
-                params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-                params.set("title", "登录");
-                params.set("state", 2);
-                params.set("userId", "");
-                params.set("userName", userName);
-                params.set("requestOrigin", request.getRequestURL());
-                params.set("requestPath", request.getRequestURI());
-                params.set("requestMethod", request.getMethod());
-                params.set("content", "用户名或密码错误登录失败");
-                LogsAspect logsAspect = new LogsAspect();
-                logsAspect.post(params);
-                mapResult.put("info", ResultCodeEnum.CODE10101.getName());
-                mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
-                return mapResult;
-            }
-            SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
-            if (!Objects.equals(null, sysUserLogin) && Demo.decryptDB(sysUserBackUp.getPassword()).equals(password) && userName.equals(sysUserLogin.getUserName())) {
-                if ("true".equals(isLogin)) {
-                    Map<String, String> appKeymap = redisTemplate.opsForHash().entries("user:" + sysUserLogin.getUserId());
-                    if (appKeymap.size() != 0) {
-                        Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("user:" + sysUserLogin.getUserId(), "expireTime")));
-                        int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
-                        if (System.currentTimeMillis() - expireTime < 60000 * logoutTime) {
-                            throw new BusinessException(500, "用户已登录");
+        String number = (String) redisTemplate.opsForValue().get("number");
+        String replayAvoid=userMap.get("replayAvoid");
+        redisTemplate.delete("number");
+        if(!number.equals(replayAvoid)){
+            throw new BusinessException(500, "验证码错误");
+        }else {
+            if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
+                String userName = null;
+                String password = null;
+                Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+                Map<String, String> lockTimes = redisTemplate.opsForHash().entries("t_sys_param:lockTime");
+                Map<String, String> loginNum = redisTemplate.opsForHash().entries("t_sys_param:loginErrorNum");
+                String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
+                String isDecode = enmap.get("content");
+                if ("true".equals(isDecode)) {
+                    userName = Demo.decrypt(userMap.get("userName"));
+                    password = Demo.decrypt(userMap.get("password"));
+                } else {
+                    userName = userMap.get("userName");
+                    password = userMap.get("password");
+                }
+                SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
+                if (Objects.equals(null, sysUserLogin)) {
+                    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                    params.set("logType", "6");
+                    params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                    params.set("title", "登录");
+                    params.set("state", 2);
+                    params.set("userId", "");
+                    params.set("userName", userName);
+                    params.set("requestOrigin", request.getRequestURL());
+                    params.set("requestPath", request.getRequestURI());
+                    params.set("requestMethod", request.getMethod());
+                    params.set("content", "用户名或密码错误登录失败");
+                    LogsAspect logsAspect = new LogsAspect();
+                    logsAspect.post(params);
+                    mapResult.put("info", ResultCodeEnum.CODE10101.getName());
+                    mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
+                    return mapResult;
+                }
+                SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
+                if (!Objects.equals(null, sysUserLogin) && Demo.decryptDB(sysUserBackUp.getPassword()).equals(password) && userName.equals(sysUserLogin.getUserName())) {
+                    if ("true".equals(isLogin)) {
+                        Map<String, String> appKeymap = redisTemplate.opsForHash().entries("user:" + sysUserLogin.getUserId());
+                        if (appKeymap.size() != 0) {
+                            Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("user:" + sysUserLogin.getUserId(), "expireTime")));
+                            int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
+                            if (System.currentTimeMillis() - expireTime < 60000 * logoutTime) {
+                                throw new BusinessException(500, "用户已登录");
+                            }
                         }
-                    }
 
-                }
-                if (!sysUserLogin.getPassword().equals(sysUserBackUp.getPassword())) {
-                    SysUser sysUsers = new SysUser();
-                    sysUsers.setPassword(sysUserBackUp.getPassword());
-                    sysUsers.setUserId(sysUserLogin.getUserId());
-                    sysUserDao.update(sysUsers);
-                }
-                String userAvoid = Constant.userInfo.get(String.valueOf(sysUserLogin.getUserId()));
-                if (!replayAvoid.equals(userAvoid)) {
-                    Constant.userInfo.put(String.valueOf(sysUserLogin.getUserId()), replayAvoid);
+                    }
+                    if (!sysUserLogin.getPassword().equals(sysUserBackUp.getPassword())) {
+                        SysUser sysUsers = new SysUser();
+                        sysUsers.setPassword(sysUserBackUp.getPassword());
+                        sysUsers.setUserId(sysUserLogin.getUserId());
+                        sysUserDao.update(sysUsers);
+                    }
+                    // String userAvoid = Constant.userInfo.get(String.valueOf(sysUserLogin.getUserId()));
+//                if (!replayAvoid.equals(userAvoid)) {
+//                    Constant.userInfo.put(String.valueOf(sysUserLogin.getUserId()), replayAvoid);
                     String appKey = getRandomNickname(10);
                     sysUserLogin.setAppkey(appKey);
-//                    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-//                    params.set("logType", "6");
-//                    params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-//                    params.set("title", "登录");
-//                    params.set("state", 1);
-//                    params.set("userId", sysUserLogin.getUserId());
-//                    params.set("userName", userName);
-//                    params.set("requestOrigin", request.getRequestURL());
-//                    params.set("requestPath", request.getRequestURI());
-//                    params.set("requestMethod", request.getMethod());
-//                    params.set("content", "用户登录");
-//                    LogsAspect logsAspect = new LogsAspect();
-//                    logsAspect.post(params);
                     String userIds = String.valueOf(sysUserLogin.getUserId());
                     String keys = Constant.account_lock_time.replace("userAccountID", userIds);
                     //系统当前时间
@@ -208,9 +199,9 @@ public class SysUserService {
                             mapResult.put("info", ResultCodeEnum.CODE10102.getName());
                             return mapResult;
                         } else {
-                            if (yxTime >= sysUserLogin.getInvalidTime()-1&&yxTime<sysUserLogin.getInvalidTime()) {
+                            if (yxTime >= sysUserLogin.getInvalidTime() - 1 && yxTime < sysUserLogin.getInvalidTime()) {
                                 mapResult.put("pwdExpirationTip", "密码还有一天即将到期，请及时更换密码！");
-                            }else if(yxTime>=sysUserLogin.getInvalidTime()){
+                            } else if (yxTime >= sysUserLogin.getInvalidTime()) {
                                 MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                                 param.set("logType", "6");
                                 param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
@@ -291,9 +282,9 @@ public class SysUserService {
                         return mapResult;
                     }
                     if (sysUserLogin.getState() == 1) {
-                        if (yxTime >= sysUserLogin.getInvalidTime()-1&&yxTime<sysUserLogin.getInvalidTime()) {
+                        if (yxTime >= sysUserLogin.getInvalidTime() - 1 && yxTime < sysUserLogin.getInvalidTime()) {
                             mapResult.put("pwdExpirationTip", "密码还有一天即将到期，请及时更换密码！");
-                        }else if(yxTime>=sysUserLogin.getInvalidTime()){
+                        } else if (yxTime >= sysUserLogin.getInvalidTime()) {
                             MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                             param.set("logType", "6");
                             param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
@@ -353,124 +344,105 @@ public class SysUserService {
                         LogsAspect logsAspect = new LogsAspect();
                         logsAspect.post(params);
                     }
+//                } else {
+//                    throw new BusinessException(500, "用户已登录");
+//                }
                 } else {
-                    throw new BusinessException(500, "用户已登录");
+                    //登陆错误判断用户是否存在
+                    List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userName);
+                    SysUser sysUser = sysUserList.get(0);
+                    String userId = String.valueOf(sysUser.getUserId());
+                    String key = Constant.account_lock_time.replace("userAccountID", userId);
+                    Integer num = (Integer) redisTemplate.opsForValue().get(key);
+                    if (num == null) { //第一次访问错误
+                        redisTemplate.opsForValue().set(key, 1);
+                        num = 1;
+                    } else if (num + 1 == Integer.valueOf(loginNum.get("content"))) {//超过10次账户锁定
+                        SysUserSelect sysUserSelect = new SysUserSelect();
+                        BeanUtils.copyProperties(sysUserList.get(0), sysUserSelect);
+                        redisTemplate.opsForValue().set("lockUser" + sysUserList.get(0).getUserId(), sysUserSelect);
+                        //    if (!userId.equals("10001")) { //admin用户不可锁定
+                        SysUser user = new SysUser();
+                        user.setState(2);
+                        Date date = new Date();
+                        user.setLockTime(date);
+                        user.setUserId(sysUserList.get(0).getUserId());
+                        sysUserDao.update(user);
+                        // }
+                        redisTemplate.opsForValue().increment(key, 1);
+                        num = num + 1;
+                        MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                        param.set("logType", "6");
+                        param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                        param.set("title", "登录");
+                        param.set("state", 2);
+                        param.set("userId", sysUserLogin.getUserId());
+                        param.set("userName", userName);
+                        param.set("requestOrigin", request.getRequestURL());
+                        param.set("requestPath", request.getRequestURI());
+                        param.set("requestMethod", request.getMethod());
+                        param.set("content", "账户已被锁定！");
+                        LogsAspect logsAspects = new LogsAspect();
+                        logsAspects.post(param);
+                        mapResult.put("errorCount", "账户已被锁定！");
+                        mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
+                        mapResult.put("info", ResultCodeEnum.CODE10102.getName());
+                        return mapResult;
+                    } else if (num + 1 > Integer.valueOf(loginNum.get("content"))) {
+                        SysUser user = new SysUser();
+                        user.setState(2);
+                        Date date = new Date();
+                        user.setLockTime(date);
+                        user.setUserId(sysUserList.get(0).getUserId());
+                        sysUserDao.update(user);
+                        redisTemplate.opsForValue().increment(key, 1);
+                        num = num + 1;
+                        MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                        param.set("logType", "6");
+                        param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                        param.set("title", "登录");
+                        param.set("state", 2);
+                        param.set("userId", sysUserLogin.getUserId());
+                        param.set("userName", userName);
+                        param.set("requestOrigin", request.getRequestURL());
+                        param.set("requestPath", request.getRequestURI());
+                        param.set("requestMethod", request.getMethod());
+                        param.set("content", "账户已被锁定！");
+                        LogsAspect logsAspects = new LogsAspect();
+                        logsAspects.post(param);
+                        mapResult.put("errorCount", "账户已被锁定！");
+                        mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
+                        mapResult.put("info", ResultCodeEnum.CODE10102.getName());
+                        return mapResult;
+                    } else {
+                        redisTemplate.opsForValue().increment(key, 1);
+                        num = num + 1;
+                    }
+                    MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                    params.set("logType", "6");
+                    params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                    params.set("title", "登录");
+                    params.set("state", 2);
+                    params.set("userId", sysUserList.get(0).getUserId());
+                    params.set("userName", userName);
+                    params.set("requestOrigin", request.getRequestURL());
+                    params.set("requestPath", request.getRequestURI());
+                    params.set("requestMethod", request.getMethod());
+                    params.set("content", "用户名或密码错误登录失败");
+                    LogsAspect logsAspect = new LogsAspect();
+                    logsAspect.post(params);
+                    mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
+                    mapResult.put("info", ResultCodeEnum.CODE10101.getName());
+                    mapResult.put("errorCount", "已输入错误" + String.valueOf(num) + "次！");
+                    return mapResult;
+
                 }
             } else {
-                //登陆错误判断用户是否存在
-                List<SysUser> sysUserList = sysUserDao.selectByUserNameTotal(userName);
-//                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-//                params.set("logType", "6");
-//                params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-//                params.set("title", "登录");
-//                params.set("state", 2);
-//                params.set("userId", sysUserList.get(0).getUserId());
-//                params.set("userName", userName);
-//                params.set("requestOrigin", request.getRequestURL());
-//                params.set("requestPath", request.getRequestURI());
-//                params.set("requestMethod", request.getMethod());
-//                params.set("content", "用户名或密码错误登录失败");
-//                LogsAspect logsAspect = new LogsAspect();
-//                logsAspect.post(params);
-//                if (sysUserList.size() == 0) {
-//                    mapResult.put("info", ResultCodeEnum.CODE10101.getName());
-//                    mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
-////                        result.setData(mapResult);
-//                    return mapResult;
-//                }
-                SysUser sysUser = sysUserList.get(0);
-                String userId = String.valueOf(sysUser.getUserId());
-                String key = Constant.account_lock_time.replace("userAccountID", userId);
-                Integer num = (Integer) redisTemplate.opsForValue().get(key);
-                if (num == null) { //第一次访问错误
-                    redisTemplate.opsForValue().set(key, 1);
-                    num = 1;
-                } else if (num + 1 == Integer.valueOf(loginNum.get("content"))) {//超过10次账户锁定
-                    SysUserSelect sysUserSelect = new SysUserSelect();
-                    BeanUtils.copyProperties(sysUserList.get(0), sysUserSelect);
-                    redisTemplate.opsForValue().set("lockUser" + sysUserList.get(0).getUserId(), sysUserSelect);
-                    //    if (!userId.equals("10001")) { //admin用户不可锁定
-                    SysUser user = new SysUser();
-                    user.setState(2);
-                    Date date = new Date();
-                    user.setLockTime(date);
-                    user.setUserId(sysUserList.get(0).getUserId());
-                    sysUserDao.update(user);
-                    // }
-                    redisTemplate.opsForValue().increment(key, 1);
-                    num = num + 1;
-                    MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-                    param.set("logType", "6");
-                    param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-                    param.set("title", "登录");
-                    param.set("state", 2);
-                    param.set("userId", sysUserLogin.getUserId());
-                    param.set("userName", userName);
-                    param.set("requestOrigin", request.getRequestURL());
-                    param.set("requestPath", request.getRequestURI());
-                    param.set("requestMethod", request.getMethod());
-                    param.set("content", "账户已被锁定！");
-                    LogsAspect logsAspects = new LogsAspect();
-                    logsAspects.post(param);
-                    mapResult.put("errorCount", "账户已被锁定！");
-                    mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
-                    mapResult.put("info", ResultCodeEnum.CODE10102.getName());
-                    return mapResult;
-                } else if (num + 1 > Integer.valueOf(loginNum.get("content"))) {
-                    SysUser user = new SysUser();
-                    user.setState(2);
-                    Date date = new Date();
-                    user.setLockTime(date);
-                    user.setUserId(sysUserList.get(0).getUserId());
-                    sysUserDao.update(user);
-                    redisTemplate.opsForValue().increment(key, 1);
-                    num = num + 1;
-                    MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
-                    param.set("logType", "6");
-                    param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-                    param.set("title", "登录");
-                    param.set("state", 2);
-                    param.set("userId", sysUserLogin.getUserId());
-                    param.set("userName", userName);
-                    param.set("requestOrigin", request.getRequestURL());
-                    param.set("requestPath", request.getRequestURI());
-                    param.set("requestMethod", request.getMethod());
-                    param.set("content", "账户已被锁定！");
-                    LogsAspect logsAspects = new LogsAspect();
-                    logsAspects.post(param);
-                    mapResult.put("errorCount", "账户已被锁定！");
-                    mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
-                    mapResult.put("info", ResultCodeEnum.CODE10102.getName());
-                    return mapResult;
-                } else {
-                    redisTemplate.opsForValue().increment(key, 1);
-                    num = num + 1;
-                }
-                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "6");
-                params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-                params.set("title", "登录");
-                params.set("state", 2);
-                params.set("userId", sysUserList.get(0).getUserId());
-                params.set("userName", userName);
-                params.set("requestOrigin", request.getRequestURL());
-                params.set("requestPath", request.getRequestURI());
-                params.set("requestMethod", request.getMethod());
-                params.set("content", "用户名或密码错误登录失败");
-                LogsAspect logsAspect = new LogsAspect();
-                logsAspect.post(params);
-                mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
-                mapResult.put("info", ResultCodeEnum.CODE10101.getName());
-                mapResult.put("errorCount", "已输入错误" + String.valueOf(num) + "次！");
+                mapResult.put("code", ResultCodeEnum.CODE10103.getCode());
+                mapResult.put("info", ResultCodeEnum.CODE10103.getName());
                 return mapResult;
-
             }
-        } else {
-            mapResult.put("code", ResultCodeEnum.CODE10103.getCode());
-            mapResult.put("info", ResultCodeEnum.CODE10103.getName());
-            return mapResult;
         }
-
         return mapResult;
     }
 

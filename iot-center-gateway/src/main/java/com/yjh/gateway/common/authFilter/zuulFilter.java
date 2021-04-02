@@ -146,9 +146,9 @@ public class zuulFilter extends ZuulFilter {
                                     !url.contains("/tVoiceDevice/v1/selectByPage") && !url.contains("/homePage/v1/warnInfo")
                             ) {
                                 redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
-                            }
-                            if ("true".equals(isLogin)) {
-                                redisTemplate.opsForHash().put("user:" + userId, "expireTime", String.valueOf(System.currentTimeMillis()));
+                                if ("true".equals(isLogin)) {
+                                    redisTemplate.opsForHash().put("user:" + userId, "expireTime", String.valueOf(System.currentTimeMillis()));
+                                }
                             }
                         }
                     }
@@ -167,7 +167,9 @@ public class zuulFilter extends ZuulFilter {
                 if ("POST".equals(request.getMethod().toUpperCase()) || "PUT".equals(request.getMethod().toUpperCase())) {
                     if ("true".equals(isIp)) {
                         String origin = request.getHeader("Origin") != null ? request.getHeader("Origin") : "";
-                        if (!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':')))) {
+                        String referer = request.getHeader("Referer") != null ? request.getHeader("Referer") : "";
+                        String number=referer.substring(0, referer.indexOf(":"));
+                        if (!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':')))||!IpUtil.getLocalIp().equals(referer.substring(number.length()+3, referer.lastIndexOf(':')))) {
                             log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
                             ctx.setSendZuulResponse(false);
                             ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);

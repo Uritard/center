@@ -554,4 +554,18 @@ public class SysUserController {
         return result;
     }
 
+    @ApiOperation(value = "用户登出网关调用")
+    @RequestMapping(value = "/randomNumbers", method = RequestMethod.GET)
+    public Result randomNumbers() {
+        Result result = new Result();
+        try {
+            String random = String.valueOf(System.currentTimeMillis());
+            redisTemplate.opsForValue().set("number",random);
+            result.setData(random);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("生成验证码失败:", e);
+        }
+        return result;
+    }
 }
