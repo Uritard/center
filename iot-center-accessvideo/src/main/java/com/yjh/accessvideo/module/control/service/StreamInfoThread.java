@@ -38,7 +38,7 @@ public class StreamInfoThread implements Runnable {
         String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
         JSONObject jsonList = new JSONObject();
         try {
-            Thread.sleep(10000);
+            Thread.sleep(4000);
             jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
         } catch (Exception e) {e.getMessage();}
         assert jsonList != null;
@@ -52,7 +52,6 @@ public class StreamInfoThread implements Runnable {
             String videoFlowId = streambeanJson.getString("id");
             String publish = streambeanJson.getString("publish");
             JSONObject publishjson = JSONObject.parseObject(publish);
-            log.info("realName: {}, livePathMatch: {}, cid: {}", name, Objects.equals(name, String.valueOf(livePath)), publishjson.getString("cid"));
             if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
@@ -60,5 +59,6 @@ public class StreamInfoThread implements Runnable {
                 log.info("realReturnMap: " + returnMap);
             }
         }
+        log.info("realMapsForCamera: " + Constant.mapsForCamera);
     }
 }

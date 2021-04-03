@@ -107,7 +107,7 @@ public class CameraConController {
                 Integer clients = streambeanJson.getInteger("clients"); //观看人数
                 //符合无人观看的条件
                 String cid = publishjson.getString("cid");
-                log.info("cid：{},cid is empty: {}", cid, StringUtils.isEmpty(cid));
+                log.info("name: {}, cid：{},cid is empty: {}", streambeanJson.getString("name"), cid, StringUtils.isEmpty(cid));
 
                 if (StringUtils.isEmpty(cid)) {
                     String videoFlowId = streambeanJson.getString("id");
