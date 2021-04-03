@@ -41,7 +41,8 @@ public class StreamStopThread implements Runnable {
             JSONObject publishjson = JSONObject.parseObject(publish);
             Integer clients = streambeanJson.getInteger("clients"); //观看人数
             String cid = publishjson.getString("cid");
-            log.info("name: {}, cid：{},cid is empty: {}", streambeanJson.getString("name"), cid, StringUtils.isEmpty(cid));
+            String livePath = streambeanJson.getString("name");
+            log.info("name: {}, cid：{}, clients: {}", livePath, cid, clients);
 
             if (StringUtils.isNotEmpty(cid) && clients<=2) {
                 //踢掉
@@ -54,11 +55,8 @@ public class StreamStopThread implements Runnable {
                 redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
                 Constant.mapsForHistory.remove(videoFlowId);
                 log.info("关闭流："+delteUrl);
-            } else { log.info("流为空或有人正在看。。。"); }
-            String livePath = streambeanJson.getString("name");
-            log.info("livePath: " + livePath);
+            } else { log.info("{}流为空或有人正在看。。。", livePath); }
             String url = "ps -ef | grep ffmpeg | grep '" + livePath + "' | grep -v 'grep'";
-            log.info("stopUrl: " + url);
             try {
                 Process processForId = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
                 processForId.waitFor();
