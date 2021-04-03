@@ -50,8 +50,10 @@ public class StreamInfoThread implements Runnable {
             //livePath
             String name = streambeanJson.getString("name");
             String videoFlowId = streambeanJson.getString("id");
-            log.info("realName: {}, livePathMatch: {}, cid: {}", name, Objects.equals(name, String.valueOf(livePath)), streambeanJson.getString("cid"));
-            if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(streambeanJson.getString("cid"))) {
+            String publish = streambeanJson.getString("publish");
+            JSONObject publishjson = JSONObject.parseObject(publish);
+            log.info("realName: {}, livePathMatch: {}, cid: {}", name, Objects.equals(name, String.valueOf(livePath)), publishjson.getString("cid"));
+            if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
                 redisTemplate.opsForHash().putAll("cameraRealFlow:" + cameraId, returnMap);

@@ -258,7 +258,7 @@ public class CameraConService {
 
                 try {
                     Runtime.getRuntime().exec(transUrl);
-                    Thread.sleep(2000);
+                    Thread.sleep(3000);
                 } catch (Exception e) { e.getMessage(); }
 
                 log.info("transUrl: " + transUrl);
