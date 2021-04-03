@@ -36,6 +36,7 @@ public class StreamStopThread implements Runnable {
         for (int i = 0; i < streamListSize; i++) {
             String streambeanStr = streamsJsonObjectList.get(i);
             JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
+            String videoFlowId = streambeanJson.getString("id");
             String publish = streambeanJson.getString("publish");
             JSONObject publishjson = JSONObject.parseObject(publish);
             Integer clients = streambeanJson.getInteger("clients"); //观看人数
@@ -45,14 +46,13 @@ public class StreamStopThread implements Runnable {
             if (StringUtils.isNotEmpty(cid) && clients<=2) {
                 //踢掉
                 String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
-                String videoFlowId = streambeanJson.getString("id");
                 Constant.mapsForCamera.remove(videoFlowId);
                 Constant.mapsForHistory.remove(videoFlowId);
-                log.info("关闭流-->name: {}, cid：{}, clients: {}", livePath, cid, clients);
+                log.info("关闭流-->id: {}, cid：{}, clients: {}", videoFlowId, cid, clients);
                 redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
                 redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
                 try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
-            } else { log.info("{}流为空或有人正在看。。。", livePath); }
+            } else { log.info("{}流为空或有人正在看。。。", videoFlowId); }
             String url = "ps -ef | grep ffmpeg | grep '" + livePath + "' | grep -v 'grep'";
             try {
                 Process processForId = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
