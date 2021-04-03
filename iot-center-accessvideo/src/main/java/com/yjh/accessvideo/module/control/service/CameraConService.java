@@ -284,7 +284,7 @@ public class CameraConService {
 
         if (Constant.mapsForCamera.size()>0) {
             for (String key:Constant.mapsForCamera.keySet()) {
-                if (Objects.equals(Constant.mapsForCamera.get(key), String.valueOf(robotId))) {
+                if (Objects.equals(Constant.mapsForCamera.get(key), String.valueOf(robotId)+":inferad") || Objects.equals(Constant.mapsForCamera.get(key), String.valueOf(robotId)+":light")) {
                     Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + String.valueOf(robotId) + ":light");
                     Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + String.valueOf(robotId) + ":inferad");
                     returnMapList.add(robotLightFlowMap);
