@@ -58,6 +58,7 @@ public interface TRobotInfoDao {
     String selectDictCodeByNote(@Param(value = "dictNote")String dictNote,
                                 @Param(value = "colName")String colName);
     String selectStatusByRobotCode(@Param(value = "robotCode") String robotCode);
+    Integer selectIsUnionTask(@Param(value = "unionId") String unionId);
     List<Long> selectInstanceForTaskGoOn(@Param(value = "taskId") String taskId);
     String selectInspectionCode(@Param(value = "instanceId") Long instanceId);
     TCruiseResult selectTaskResultId(@Param(value = "taskId") String taskId);

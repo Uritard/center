@@ -158,10 +158,11 @@ public class RobotController {
     @ApiOperation(value = "巡视主机向机器人下发联动任务指令接口")
     @RequestMapping(value = "/linkTaskIssued", method = RequestMethod.POST)
     @Logs(title = "给机器人下发联动任务",content = "根据用户传递的参数给机器人下发联动任务指令",logType = 5)
-    public Result feignRobotLinkTaskIssued(@RequestBody Map<String,Object> resMap){
+    public Result feignRobotLinkTaskIssued(@RequestBody Map<String, List<RobotTaskInstanceInfo>> ItemMap){
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotLinkTaskIssued(resMap));
+            robotService.feignRobotLinkTaskIssued(ItemMap);
+            result.setData(1);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -195,7 +196,6 @@ public class RobotController {
         try {
             result.setData(robotService.methodTest1(taskId));
 //            XMLBaseModel model = getXmlMessage("D:/testform/task_model_E200.xml");
-//            XMLBaseModel model = getXmlMessage("D:/testform/device_model_E200.xml");
 //            List<Map<String,Object>> modelMapList = model.getItems();
 //            log.info("taskModelItemsMap是："+modelMapList);
 //            XMLBaseModel xmlBaseModel = new XMLBaseModel().setSendCode("Client01");
@@ -207,10 +207,5 @@ public class RobotController {
             log.error("测试接口调用错误:", e);
         }
         return result;
-    }
-    public static XMLBaseModel getXmlMessage(String filePathAndName) throws DocumentException {
-        SAXReader reader = new SAXReader();
-        Document document = reader.read(new File(filePathAndName));
-        return PlatformXMLUtil.readStringXmlOut(document);
     }
 }

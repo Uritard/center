@@ -399,6 +399,9 @@ public class TWarnInfoService{
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
         if (defectModel.equals(warnFlag)){//告警信息
             tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(Long.valueOf(warnId));
+            if (Objects.nonNull(tWarnInfoDetail.getDeviceCode())){
+                tWarnInfoDetail.setCameraId(Long.valueOf(tWarnInfoDetail.getDeviceCode()));
+            }
         }else {//缺陷信息
 //            tWarnInfoDetail = tDefectInfoDao.selectWarnPopUp(warnId);
             Map<String, String> defectMap = redisTemplate.opsForHash().entries("defectInfo:"+warnId);

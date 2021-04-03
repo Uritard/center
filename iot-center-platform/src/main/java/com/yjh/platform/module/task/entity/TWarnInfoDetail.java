@@ -94,4 +94,6 @@ public class TWarnInfoDetail implements Serializable {
     private String defectModelName;
     @ApiModelProperty(value = "部位名称")
     private String customName;
+    @ApiModelProperty(value = "设备编码")
+    private String deviceCode;
 }

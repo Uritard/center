@@ -50,7 +50,7 @@ public class IsWarnAfterCruiseThread implements Runnable{
             TCruiseTask tCruiseTask = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(threadMap.get("taskCode"));
             log.info("taskId是: "+threadMap.get("taskCode")+"的任务数据tCruiseTask是: "+tCruiseTask);
 
-            if (Objects.isNull(tCruiseTask.getTaskType()) && tCruiseTask.getTaskType() != 271) {
+            if (Objects.isNull(tCruiseTask.getTaskType())) {
                 for (String key : robotInfoKeys) {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
                     if (threadMap.get("robotCode").equals(redisInfoMap.get("robotCode"))
@@ -106,6 +106,8 @@ public class IsWarnAfterCruiseThread implements Runnable{
                             warnInfo.setImagePath(threadMap.get("relativePath"));
                             warnInfo.setValue(threadMap.get("value"));
                             warnInfo.setTaskId(threadMap.get("taskCode"));
+                            Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(threadMap.get("robotCode"));
+                            warnInfo.setDeviceCode(robotId.toString());
 //                            log.info("warnInfo==" + warnInfo);
 
                             //判断该点是否产生告警以及告警信息
@@ -128,6 +130,28 @@ public class IsWarnAfterCruiseThread implements Runnable{
                                 String jsons = JSON.toJSONString(jasonMaps);
                                 log.info("告警生成-前端推送：" + jsons);
                                 Constant.postUrl(webSocketUrl, jsons);
+
+                                //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
+                                String alarmNote = tStdDevicemete.getAlarmNote();
+                                Integer alarmLevel = tStdDevicemete.getAlarmLevel();
+                                Integer warnLevel = warnInfo.getWarnLevel();
+                                log.info("该测点是否配置了告警提示是===" + alarmNote);
+                                log.info("该测点告警推送配置的告警等级是===" + alarmLevel);
+                                log.info("产生的该条告警等级是===" + warnLevel);
+                                boolean one = (Objects.nonNull(alarmNote) && "1".equals(alarmNote));
+                                boolean two = (Objects.nonNull(alarmLevel) && (warnLevel.compareTo(alarmLevel) == 0 || warnLevel > alarmLevel));
+                                log.info("一层判断" + one + "二层判断"+two);
+
+                                if (Boolean.TRUE.equals(one) && Boolean.TRUE.equals(two)) {
+                                    //webSocket通知前端调用查询告警弹框的接口
+                                    Map<String, Object> jasonMaps2 = new HashMap<>();
+                                    jasonMaps2.put("type", "alarmPopUp");
+                                    jasonMaps2.put("warnId", warnInfo.getWarnId());
+                                    jasonMaps2.put("defectModel", warnInfo.getDefectModel());
+                                    String json = JSON.toJSONString(jasonMaps2);
+                                    log.info("配置弹窗-发送给前端的消息：" + json);
+                                    Constant.postUrl(webSocketUrl,json);
+                                }
                             }
                         }
                     }

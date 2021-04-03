@@ -139,9 +139,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         for(Map.Entry<Object,RobotServerHandler> vo : robotServerHandlerMap.entrySet()){
             log.info("当前的robotServerHandlerMap的key为"+vo.getKey());
-            String robotCodeFlag = vo.getKey().toString();
-            robotServerHandlerMap.remove(robotCodeFlag);
-            String robotCode = robotCodeFlag.substring(0,robotCodeFlag.length()-13);
+            String robotCode = vo.getKey().toString();
+            robotServerHandlerMap.remove(robotCode);
+//            String robotCode = robotCodeFlag.substring(0,robotCodeFlag.length()-13);
 
             robotService.updateRobotInfo(robotCode,"离线");
             Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
@@ -313,6 +313,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 log.info("连接可能断了，等待重连.....");
             } else {
                 doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
+//                PacketDealThread packetDealThread  = new PacketDealThread(xmlRes,sendSessionId,receiveSessionId,heartNum,flag2,this,isThreadStart,redisTemplate);
+//                TaskExecutePool.getInstance().execute(packetDealThread);
                 log.info("+++++++++++++++++解包完成+++++++++++++++++");
             }
     }
@@ -370,12 +372,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     byte[] registerProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, registerXmlString);
                     sendHeartBeat(registerProtocol,xmlBaseModel.getSendCode());
 
-                    long timeFlag = System.currentTimeMillis();
-                    if (Objects.nonNull(robotServerHandlerMap.get(xmlBaseModel.getSendCode()+timeFlag))) {
-                        robotServerHandlerMap.get(xmlBaseModel.getSendCode()+timeFlag).ctx.close();
+                    if (Objects.nonNull(robotServerHandlerMap.get(xmlBaseModel.getSendCode()))) {
+                        robotServerHandlerMap.get(xmlBaseModel.getSendCode()).ctx.close();
                     }
 
-                    robotServerHandlerMap.put(xmlBaseModel.getSendCode()+timeFlag, this);
+                    robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
                     //Start heatBreakDealThread
                     HeartBreakDealThread dataDealThread = new HeartBreakDealThread(this, xmlBaseModel.getSendCode(),redisTemplate,isThreadStart,sendSessionId,receiveSessionId);
                     Thread thread = new Thread(dataDealThread);
@@ -1095,12 +1096,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         log.info("mapsAfterRemoved: " + maps);
 
-        for(Map.Entry<Object,RobotServerHandler> vo : robotServerHandlerMap.entrySet()) {
+        /*for(Map.Entry<Object,RobotServerHandler> vo : robotServerHandlerMap.entrySet()) {
             log.info("当前的robotServerHandlerMap的key为" + vo.getKey());
             String robotCodeFlag = vo.getKey().toString();
             String timeFlag = robotCodeFlag.replace(robotCode,"");
-            robotServerHandlerMap.remove(robotCode+timeFlag);
-        }
+            robotServerHandlerMap.remove(robotCode);
+        }*/
+        robotServerHandlerMap.remove(robotCode);
+
         log.info("channel.isActive(): " + channel.isActive());
         log.info("此时的packet====="+Packet);
     }

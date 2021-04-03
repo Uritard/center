@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author tt
@@ -155,33 +156,36 @@ public class TUnionTaskService{
     //联动弹窗--监测数据
     @Transactional(rollbackFor = Exception.class)
     public List<LinkageMonitorData> linkageMonitorData(String taskId) throws InterruptedException{
-        Thread.sleep(1000);
+        TimeUnit.MILLISECONDS.sleep(1000);
         //根据任务Id查询相关内容
         List<LinkageMonitorData> linkageMonitorDataList = TUnionTaskAttrDao.selectDeviceInfo(taskId);
 
         for (LinkageMonitorData lmd : linkageMonitorDataList){
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + lmd.getInstanceId());
-            if ("246".equals(redisInfoMap.get("cruiseResult"))
-                    || "247".equals(redisInfoMap.get("cruiseResult"))){
-                log.info("redisInfoMap==="+redisInfoMap);
-                lmd.setPresetId(Long.valueOf(redisInfoMap.get("cruiseId")));
-                lmd.setEndTime(redisInfoMap.get("endTime"));
-                lmd.setStartTime(redisInfoMap.get("startTime"));
-                if (Objects.nonNull(redisInfoMap.get("cameraId")) || !"".equals(redisInfoMap.get("cameraId"))){
-                    lmd.setCameraId(Long.valueOf(redisInfoMap.get("cameraId")));
-                }else {
-                    lmd.setCameraId(Long.valueOf(redisInfoMap.get("robotId")));
+            if (!redisInfoMap.isEmpty()){
+                if (Objects.nonNull(redisInfoMap.get("cruiseResult")) &&
+                        ("246".equals(redisInfoMap.get("cruiseResult")) || "247".equals(redisInfoMap.get("cruiseResult")))){
+                    log.info("redisInfoMap==="+redisInfoMap);
+                    lmd.setPresetId(Long.valueOf(redisInfoMap.get("cruiseId")));
+                    lmd.setEndTime(redisInfoMap.get("endTime"));
+                    lmd.setStartTime(redisInfoMap.get("startTime"));
+                    if (Objects.nonNull(redisInfoMap.get("cameraId")) || !"".equals(redisInfoMap.get("cameraId"))){
+                        lmd.setCameraId(Long.valueOf(redisInfoMap.get("cameraId")));
+                    }else {
+                        lmd.setCameraId(Long.valueOf(redisInfoMap.get("robotId")));
+                    }
+                    Integer cruiseResult = Integer.valueOf(redisInfoMap.get("cruiseResult"));
+                    String taskName = TUnionTaskAttrDao.selectTaskName(taskId);
+                    String CruiseResultName = TUnionTaskAttrDao.selectCruiseResultName(cruiseResult);
+                    lmd.setTaskName(taskName);
+                    lmd.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
+                    lmd.setCruiseResult(cruiseResult);
+                    lmd.setCruiseResultName(CruiseResultName);
+                    lmd.setResultNum(redisInfoMap.get("resultNum"));
+                    lmd.setPicpath(redisInfoMap.get("picpath"));
                 }
-                Integer cruiseResult = Integer.valueOf(redisInfoMap.get("cruiseResult"));
-                String taskName = TUnionTaskAttrDao.selectTaskName(taskId);
-                String CruiseResultName = TUnionTaskAttrDao.selectCruiseResultName(cruiseResult);
-                lmd.setTaskName(taskName);
-                lmd.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
-                lmd.setCruiseResult(cruiseResult);
-                lmd.setCruiseResultName(CruiseResultName);
-                lmd.setResultNum(redisInfoMap.get("resultNum"));
-                lmd.setPicpath(redisInfoMap.get("picpath"));
             }
+
         }
         return linkageMonitorDataList;
     }

@@ -395,6 +395,10 @@
         WHERE 1 = 1
         <if test="robotCode != null and robotCode !=''">and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
     </select>
+    <select id="selectIsUnionTask" resultType="java.lang.Integer">
+        select COUNT(1) FROM t_union_task a where 1 = 1
+        <if test="unionId != null and unionId !=''">and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
+    </select>
     <select id="selectInstanceForTaskGoOn" parameterType="java.lang.String" resultType="java.lang.Long">
         select b.instance_id
         from t_cruise_result a,t_cruise_task_result_detail b

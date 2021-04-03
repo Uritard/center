@@ -61,7 +61,7 @@ public class ReportManageService {
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(list,startTime,endTime);
         for (TCruiseDataResultDetail tcdr : tCDRDList){
             String relativePath = tcdr.getPicPath();
-            if (Objects.nonNull(relativePath) || !"".equals(relativePath)){
+            if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
                 relativePath = relativePath.replace(relativeImgMap.get("content"),absoluteImgMap.get("content"));
             }
             tcdr.setPicPath(relativePath);

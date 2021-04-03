@@ -815,7 +815,8 @@
             f.dict_note as alarm_source_name,
             a.defect_model,
             m.dict_note as defect_model_name,
-            b.custom_name
+            b.custom_name,
+            a.device_code
         FROM t_warn_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
         LEFT JOIN t_std_devicemete d on a.std_mete_id = d.device_mete_id

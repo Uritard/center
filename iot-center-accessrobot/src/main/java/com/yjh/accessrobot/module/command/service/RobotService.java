@@ -263,7 +263,7 @@ public class RobotService {
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
-        log.info("获得的tRobotInfo是：" + tRobotInfo);
+//        log.info("获得的tRobotInfo是：" + tRobotInfo);
         tRobotInfoDao.update(tRobotInfo);
 
         //设备模型文件
@@ -496,7 +496,6 @@ public class RobotService {
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
             log.info("生成的机器人下发检修区域指令xml是<start>" + xmlString + "<end>");
             RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-
         }
 
 //        String code = Constant.robotResultMap.get("Code");
@@ -512,152 +511,223 @@ public class RobotService {
         log.info("传来的ItemMap是==" + ItemMap);
 
         List<RobotTaskInstanceInfo> rTIIList = ItemMap.get("robotTaskInfoList");
-        List<Map<String, String>> redisInfoList = new ArrayList<>();
         log.info("rTIIList是===" + rTIIList);
+
         for (RobotTaskInstanceInfo rTII : rTIIList) {
             String robotStatus = tRobotInfoDao.selectStatusByRobotCode(rTII.getRobotCode());
             if (robotStatus.equals("离线")){
                 log.info("该机器人处于离线状态,没有成功将任务下发到机器人,巡视结果数据默认......");
             }else{
-                Map<String,Object> mapRes1 = robotTaskDragonService(rTII.getRobotCode(),"1","6","");//控制权获得
-                if ("200".equals(mapRes1.get("code").toString())){
-                    Map<String,Object> mapRes2 = robotTaskDragonService(rTII.getRobotCode(),"1","5","1");//任务模式
-                    if ("200".equals(mapRes2.get("code").toString())){
-                        log.info("任务这才真正的下发到机器人,开始构建任务相关信息......");
-                        //巡视类型
-                        Integer planType = null;
-                        switch (rTII.getCruiseType()) {
-                            case 213://全面
-                                planType = 1;
-                                break;
-                            case 214://例行
-                                planType = 2;
-                                break;
-                            case 215://熄灯
-                                planType = 3;
-                                break;
-                            case 216://特殊
-                                planType = 4;
-                                break;
-                            case 217://专项
-                                planType = 3;
-                                break;
-                            case 218://自定义
-                                planType = 3;
-                                break;
-                            default:
-                                break;
-                        }
-                        //根据instanceIdList查询inspectionCodeList
-                        StringJoiner str = new StringJoiner(",");
-                        List<Long> instanceIdList = rTII.getInstanceList();
-                        log.info("instanceIdList是===" + instanceIdList);
+                Integer unionNum = tRobotInfoDao.selectIsUnionTask(rTII.getTaskId());
+                log.info("unionNum===="+unionNum);
 
-                        //将instanceIdList放缓存，以备后续使用
-                        Map<String, Object> instanceListMap = new HashMap<>();
-                        instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
-                        instanceListMap.put("taskId", rTII.getTaskId());
-                        redisTemplate.opsForHash().putAll("RobotTaskStatus:" + rTII.getRobotCode() + ":" + rTII.getTaskId(), instanceListMap);
-
-                        for (Long instanceId : instanceIdList) {
-                            String inspectionCode = tRobotInfoDao.selectInspectionCode(instanceId);
-                            str.add(inspectionCode);
-
-                            Map<String, String> redisInfoMap = new HashMap<>();
-                            redisInfoMap.put("robotCode", rTII.getRobotCode());
-                            redisInfoMap.put("instanceId", instanceId + "");
-                            redisInfoMap.put("inspectionCode", inspectionCode);
-                            redisInfoMap.put("cruiseTime", sdf.format(new Date()));
-                            redisInfoMap.put("taskId", rTII.getTaskId());
-                            redisInfoList.add(redisInfoMap);
-                        }
-
-                        log.info("redisInfoList是===" + redisInfoList);
-                        //放数据到缓存
-                        for (int i = 0; i < redisInfoList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
-                                    + ":" + redisInfoList.get(i).get("taskId") + ":" +redisInfoList.get(i).get("instanceId"), redisInfoList.get(i));
-                        }
-
-                        String deviceIdList = str.toString();
-                        log.info("deviceIdList是==" + deviceIdList);
-                        //组装任务下发的item
-                        List<Map<String, Object>> mapList = new ArrayList<>();
-                        Map<String, Object> map = new HashMap<>();
-                        map.put("type", planType);
-                        map.put("task_code", rTII.getTaskId());
-                        map.put("task_name", rTII.getTaskName());
-                        map.put("priority", rTII.getPriority());
-                        map.put("device_level", rTII.getDeviceLevel());
-                        map.put("device_list", deviceIdList);
-                        map.put("fixed_start_time", sdf.format(new Date()));
-                        map.put("cycle_month", "");//周期（月）
-                        map.put("cycle_week", "");//周期（周）
-                        map.put("cycle_execute_time", "");//周期（执行时间）
-                        map.put("cycle_start_time", "");//周期开始时间
-                        map.put("cycle_end_time", "");//周期开始时间
-                        map.put("interval_number", "");//间隔（数量）
-                        map.put("interval_type", "");//间隔（类型）
-                        map.put("interval_execute_time", "");//间隔（执行时间）
-                        map.put("interval_start_time", "");//间隔开始时间
-                        map.put("interval_end_time", "");//间隔结束时间
-                        map.put("invalid_start_time", "");//不可用开始时间
-                        map.put("invalid_end_time", "");//不可用结束时间
-                        map.put("isenable", "");//是否可用
-                        map.put("creator", "");//编制人
-                        map.put("create_time", "");//编制时间
-                        mapList.add(map);
-                        log.info("任务下发的item是：" + mapList);
-                        String sendCode = tRobotInfoDao.selectContent("PlatformServer");
-
-                        XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                                .setType("101")
-                                .setSendCode(sendCode)
-                                .setReceiveCode(rTII.getRobotCode())
-                                .setCode("省检018")
-                                .setTime(sdf.format(new Date()))
-                                .setCommand("1")
-                                .setItems(mapList);
-                        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
-                        log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
-                        RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).sendHeartBeat(generateByteOrder(xmlString, rTII.getRobotCode()), rTII.getRobotCode());
-                    }else if ("209".equals(mapRes1.get("code"))){
-                        log.info("机器人不在线");
-                    }else if("500".equals(mapRes1.get("code"))){
-                        log.info("机器人任务模式切换失败");
-                    }
-                }else if ("209".equals(mapRes1.get("code"))){
-                    log.info("机器人不在线");
-                }else if("500".equals(mapRes1.get("code"))){
-                    log.info("机器人控制权获得失败");
+                if (unionNum == 0 ){
+                    log.info("这是正常的任务！！！！！！！！！！！！！");
+                    feignRobotNormalTaskIssued(ItemMap);
+                }else {
+                    log.info("这是联动任务！！！！！！！！！！！！！");
+                    feignRobotLinkTaskIssued(ItemMap);
                 }
             }
         }
     }
     @Transactional(rollbackFor = Exception.class)
-    public int feignRobotLinkTaskIssued(Map<String,Object> resMap){
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        Map<String,Object> map = new HashMap<>();
-        map.put("task_code",resMap.get("taskCode"));
-        map.put("task_name",resMap.get("taskName"));
-        map.put("priority",4);
-        map.put("device_level",3);
-        map.put("device_list",resMap.get("device_list"));
-        mapList.add(map);
-        XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setType("102")
-                .setSendCode(resMap.get("sendCode").toString())
-                .setReceiveCode(resMap.get("receiveCode").toString())
-                .setCode(resMap.get("taskCode").toString())
-                .setTime(sdf.format(new Date()))
-                .setCommand("1")
-                .setItems(mapList);
-        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
-        log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
+    public void feignRobotNormalTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) throws Exception{
+        List<RobotTaskInstanceInfo> rTIIList = ItemMap.get("robotTaskInfoList");
+        List<Map<String, String>> redisInfoList = new ArrayList<>();
 
-        RobotServerHandler.getRobotServerHandlerMap().get(resMap.get("receiveCode").toString())
-                .sendHeartBeat(generateByteOrder(xmlString,resMap.get("receiveCode").toString()), resMap.get("receiveCode").toString());
-        return 1;
+        for (RobotTaskInstanceInfo rTII : rTIIList) {
+            Map<String, Object> mapRes1 = robotTaskDragonService(rTII.getRobotCode(), "1", "6", "");//控制权获得
+            if ("200".equals(mapRes1.get("code").toString())) {
+                Map<String, Object> mapRes2 = robotTaskDragonService(rTII.getRobotCode(), "1", "5", "1");//任务模式
+                if ("200".equals(mapRes2.get("code").toString())) {
+                    log.info("任务这才真正的下发到机器人,开始构建任务相关信息......");
+                    //巡视类型
+                    Integer planType = null;
+                    switch (rTII.getCruiseType()) {
+                        case 213://全面
+                            planType = 1;
+                            break;
+                        case 214://例行
+                            planType = 2;
+                            break;
+                        case 215://熄灯
+                            planType = 3;
+                            break;
+                        case 216://特殊
+                            planType = 4;
+                            break;
+                        case 217://专项
+                            planType = 3;
+                            break;
+                        case 218://自定义
+                            planType = 3;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    StringJoiner str = new StringJoiner(",");
+                    List<Long> instanceIdList = rTII.getInstanceList();
+                    log.info("instanceIdList是===" + instanceIdList);
+
+                    //将instanceIdList放缓存，以备后续使用
+                    Map<String, Object> instanceListMap = new HashMap<>();
+                    instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
+                    instanceListMap.put("taskId", rTII.getTaskId());
+                    redisTemplate.opsForHash().putAll("RobotTaskStatus:" + rTII.getRobotCode() + ":" + rTII.getTaskId(), instanceListMap);
+
+                    //根据instanceIdList查询inspectionCodeList
+                    for (Long instanceId : instanceIdList) {
+                        String inspectionCode = tRobotInfoDao.selectInspectionCode(instanceId);
+                        str.add(inspectionCode);
+
+                        Map<String, String> redisInfoMap = new HashMap<>();
+                        redisInfoMap.put("robotCode", rTII.getRobotCode());
+                        redisInfoMap.put("instanceId", instanceId + "");
+                        redisInfoMap.put("inspectionCode", inspectionCode);
+                        redisInfoMap.put("cruiseTime", sdf.format(new Date()));
+                        redisInfoMap.put("taskId", rTII.getTaskId());
+                        redisInfoList.add(redisInfoMap);
+                    }
+                    log.info("redisInfoList是===" + redisInfoList);
+
+                    //放数据到缓存
+                    for (int i = 0; i < redisInfoList.size(); i++) {
+                        redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
+                                + ":" + redisInfoList.get(i).get("taskId") + ":" + redisInfoList.get(i).get("instanceId"), redisInfoList.get(i));
+                    }
+
+                    String deviceIdList = str.toString();
+                    log.info("deviceIdList是==" + deviceIdList);
+                    //组装任务下发的item
+                    List<Map<String, Object>> mapList = new ArrayList<>();
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("type", planType);
+                    map.put("task_code", rTII.getTaskId());
+                    map.put("task_name", rTII.getTaskName());
+                    map.put("priority", rTII.getPriority());
+                    map.put("device_level", rTII.getDeviceLevel());
+                    map.put("device_list", deviceIdList);
+                    map.put("fixed_start_time", sdf.format(new Date()));
+                    map.put("cycle_month", "");
+                    map.put("cycle_week", "");
+                    map.put("cycle_execute_time", "");
+                    map.put("cycle_start_time", "");
+                    map.put("cycle_end_time", "");
+                    map.put("interval_number", "");
+                    map.put("interval_type", "");
+                    map.put("interval_execute_time", "");
+                    map.put("interval_start_time", "");
+                    map.put("interval_end_time", "");
+                    map.put("invalid_start_time", "");
+                    map.put("invalid_end_time", "");
+                    map.put("isenable", "");
+                    map.put("creator", "");
+                    map.put("create_time", "");
+                    mapList.add(map);
+                    log.info("任务下发的item是：" + mapList);
+                    String sendCode = tRobotInfoDao.selectContent("PlatformServer");
+
+                    XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                            .setType("101")
+                            .setSendCode(sendCode)
+                            .setReceiveCode(rTII.getRobotCode())
+                            .setCode("省检018")
+                            .setTime(sdf.format(new Date()))
+                            .setCommand("1")
+                            .setItems(mapList);
+                    String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+                    log.info("生成的机器人下发任务的xml是<start>" + xmlString + "<end>");
+                    RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).sendHeartBeat(generateByteOrder(xmlString, rTII.getRobotCode()), rTII.getRobotCode());
+                } else if ("209".equals(mapRes1.get("code"))) {
+                    log.info("机器人不在线");
+                } else if ("500".equals(mapRes1.get("code"))) {
+                    log.info("机器人任务模式切换失败");
+                }
+            } else if ("209".equals(mapRes1.get("code"))) {
+                log.info("机器人不在线");
+            } else if ("500".equals(mapRes1.get("code"))) {
+                log.info("机器人控制权获得失败");
+            }
+        }
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public void feignRobotLinkTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) throws Exception{
+        List<RobotTaskInstanceInfo> rTIIList = ItemMap.get("robotTaskInfoList");
+        List<Map<String, String>> redisInfoList = new ArrayList<>();
+        for (RobotTaskInstanceInfo rTII : rTIIList) {
+            Map<String, Object> mapRes1 = robotTaskDragonService(rTII.getRobotCode(), "1", "6", "");//控制权获得
+            if ("200".equals(mapRes1.get("code").toString())) {
+                Map<String, Object> mapRes2 = robotTaskDragonService(rTII.getRobotCode(), "1", "5", "1");//任务模式
+                if ("200".equals(mapRes2.get("code").toString())) {
+                    log.info("任务这才真正的下发到机器人,开始构建任务相关信息......");
+
+                    StringJoiner str = new StringJoiner(",");
+                    List<Long> instanceIdList = rTII.getInstanceList();
+                    log.info("instanceIdList是===" + instanceIdList);
+
+                    //将instanceIdList放缓存，以备后续使用
+                    Map<String, Object> instanceListMap = new HashMap<>();
+                    instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
+                    instanceListMap.put("taskId", rTII.getTaskId());
+                    redisTemplate.opsForHash().putAll("RobotTaskStatus:" + rTII.getRobotCode() + ":" + rTII.getTaskId(), instanceListMap);
+
+                    //根据instanceIdList查询inspectionCodeList
+                    for (Long instanceId : instanceIdList) {
+                        String inspectionCode = tRobotInfoDao.selectInspectionCode(instanceId);
+                        str.add(inspectionCode);
+
+                        Map<String, String> redisInfoMap = new HashMap<>();
+                        redisInfoMap.put("robotCode", rTII.getRobotCode());
+                        redisInfoMap.put("instanceId", instanceId + "");
+                        redisInfoMap.put("inspectionCode", inspectionCode);
+                        redisInfoMap.put("cruiseTime", sdf.format(new Date()));
+                        redisInfoMap.put("taskId", rTII.getTaskId());
+                        redisInfoList.add(redisInfoMap);
+                    }
+                    log.info("redisInfoList是===" + redisInfoList);
+
+                    //放数据到缓存
+                    for (int i = 0; i < redisInfoList.size(); i++) {
+                        redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
+                                + ":" + redisInfoList.get(i).get("taskId") + ":" + redisInfoList.get(i).get("instanceId"), redisInfoList.get(i));
+                    }
+
+                    String deviceIdList = str.toString();
+                    log.info("deviceIdList是==" + deviceIdList);
+
+                    List<Map<String, Object>> mapList = new ArrayList<>();
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("task_code", rTII.getTaskId());
+                    map.put("task_name", rTII.getTaskName());
+                    map.put("priority", 4);
+                    map.put("device_level", 3);
+                    map.put("device_list", deviceIdList);
+                    mapList.add(map);
+                    String sendCode = tRobotInfoDao.selectContent("PlatformServer");
+                    XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                            .setType("102")
+                            .setSendCode(sendCode)
+                            .setReceiveCode(rTII.getRobotCode())
+                            .setCode("省检018")
+                            .setTime(sdf.format(new Date()))
+                            .setCommand("1")
+                            .setItems(mapList);
+                    String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+                    log.info("生成的机器人下发联动任务的xml是<start>" + xmlString + "<end>");
+                    RobotServerHandler.getRobotServerHandlerMap().get(rTII.getRobotCode()).sendHeartBeat(generateByteOrder(xmlString, rTII.getRobotCode()), rTII.getRobotCode());
+                }else if ("209".equals(mapRes1.get("code"))) {
+                    log.info("机器人不在线");
+                } else if ("500".equals(mapRes1.get("code"))) {
+                    log.info("机器人任务模式切换失败");
+                }
+            } else if ("209".equals(mapRes1.get("code"))) {
+                log.info("机器人不在线");
+            } else if ("500".equals(mapRes1.get("code"))) {
+                log.info("机器人控制权获得失败");
+            }
+        }
     }
     @Transactional(rollbackFor = Exception.class)
     public int feignRobotTaskControl(Map<String, Object> robotTaskControlMap) throws Exception {
@@ -1228,14 +1298,8 @@ public class RobotService {
     public TStdDeviceMete selectDeviceMete(Long deviceMeteId){
         return this.tRobotInfoDao.selectDeviceMete(deviceMeteId);
     }
-    public int methodTest1(String taskId)throws Exception{
-        Map<String, Object> jasonMap = new HashMap<>();
-        jasonMap.put("type", "finishedOneInstance");
-        jasonMap.put("taskId", taskId);
-        String json = JSON.toJSONString(jasonMap);
-        log.info("发送给前端的消息：" + json);
-        Constant.postUrl(json,webSocketUrl);
-        return 1;
+    public Integer methodTest1(String taskId){
+        return tRobotInfoDao.selectIsUnionTask(taskId);
     }
     public int robotTaskIntoDB(List<Map<String, Object>> taskModelMapList, XMLBaseModel xmlBaseModel) {
         List<TCruiseTask> tCruiseTaskList = new ArrayList<>();
@@ -1466,7 +1530,7 @@ public class RobotService {
     }*/
     //机器人任务一条龙服务
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> robotTaskDragonService(String robotCode, String type, String command, String value) throws Exception{
+    public Map<String, Object> robotTaskDragonService(String robotCode, String type, String command, String value)throws InterruptedException {
         List<Map<String, Object>> Item = new LinkedList<>();
         Map scmap = new HashMap();
 
@@ -1494,8 +1558,7 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
         RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-        Thread.sleep(1000);
-//        String code = Constant.robotResultMap.get("Code");
+        TimeUnit.MILLISECONDS.sleep(1000);
         String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
 
         scmap.put("code", code);
