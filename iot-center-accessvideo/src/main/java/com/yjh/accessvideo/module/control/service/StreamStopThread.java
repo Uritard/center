@@ -32,29 +32,31 @@ public class StreamStopThread implements Runnable {
 
     @Override
     public void run() {
-        //解析每一个stream，循环比对，找到页面传递的设备ID对应的流，并判断是否需要关闭
-        for (int i = 0; i < streamListSize; i++) {
-            String streambeanStr = streamsJsonObjectList.get(i);
-            JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
-            String videoFlowId = streambeanJson.getString("id");
-            String publish = streambeanJson.getString("publish");
-            JSONObject publishjson = JSONObject.parseObject(publish);
-            Integer clients = streambeanJson.getInteger("clients"); //观看人数
-            String cid = publishjson.getString("cid");
-            String livePath = streambeanJson.getString("name");
+        try {
+            //解析每一个stream，循环比对，找到页面传递的设备ID对应的流，并判断是否需要关闭
+            for (int i = 0; i < streamListSize; i++) {
+                String streambeanStr = streamsJsonObjectList.get(i);
+                JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
+                String videoFlowId = streambeanJson.getString("id");
+                String publish = streambeanJson.getString("publish");
+                JSONObject publishjson = JSONObject.parseObject(publish);
+                Integer clients = streambeanJson.getInteger("clients"); //观看人数
+                String cid = publishjson.getString("cid");
+                String livePath = streambeanJson.getString("name");
 
-            if (StringUtils.isNotEmpty(cid) && clients<=1) {
-                //踢掉
-                String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
-                Constant.mapsForCamera.remove(videoFlowId);
-                Constant.mapsForHistory.remove(videoFlowId);
-                log.info("关闭流-->id: {}, cid：{}, clients: {}", videoFlowId, cid, clients);
-                redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
-                redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
-                try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
-            } else { log.info("{}流为空或有人正在看。。。", videoFlowId); }
-            String url = "ps -ef | grep ffmpeg | grep '" + livePath + "' | grep -v 'grep'";
-            try {
+                if (StringUtils.isNotEmpty(cid) && clients<=1) {
+                    //踢掉
+                    String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
+                    Constant.mapsForCamera.remove(videoFlowId);
+                    Constant.mapsForHistory.remove(videoFlowId);
+                    log.info("关闭流-->id: {}, cid：{}, clients: {}", videoFlowId, cid, clients);
+                    redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
+                    redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
+                    log.info("清除缓存数据");
+                    try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
+                } else { log.info("{}流为空或有人正在看。。。", videoFlowId); }
+                String url = "ps -ef | grep ffmpeg | grep '" + livePath + "' | grep -v 'grep'";
+
                 Process processForId = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
                 processForId.waitFor();
                 BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
@@ -66,13 +68,12 @@ public class StreamStopThread implements Runnable {
                 Integer processNum = Integer.parseInt(dataBackForId.substring(9, 15).replace(" ", ""));
                 String urlStop = "kill -9 " + processNum;
                 Runtime.getRuntime().exec(urlStop);
-            } catch (Exception e) {
-                Constant.mapsForCamera.clear();
-                Constant.mapsForHistory.clear();
-                log.info("停流异常，清空所有流。。。");
-                e.getMessage();
             }
-
+        } catch (Exception e) {
+            Constant.mapsForCamera.clear();
+            Constant.mapsForHistory.clear();
+            log.info("停流异常，清空所有流。。。");
+            e.getMessage();
         }
         log.info("Constant.mapsForCamera: {}, Constant.mapsForHistory: {}", Constant.mapsForCamera, Constant.mapsForHistory);
     }
