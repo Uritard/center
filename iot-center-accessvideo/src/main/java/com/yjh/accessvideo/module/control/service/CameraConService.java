@@ -349,11 +349,11 @@ public class CameraConService {
 
         String inferadIp = robotConInfo.getLnferadIp();
         Integer inferadPort = robotConInfo.getInferadPort();
-        livePath = Constant.maps.get("livePath") + 1;
-        Constant.maps.put("livePath", livePath);
+        int livePath2 = livePath + 1;
+        Constant.maps.put("livePath", livePath2);
         log.info("Constant.maps: " + Constant.maps);
-        log.info("robotInferadInfo: " + " " + inferadIp + " " + inferadPort + " " + livePath);
-        String transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, livePath);
+        log.info("robotInferadInfo: " + " " + inferadIp + " " + inferadPort + " " + livePath2);
+        String transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, livePath2);
         try {
             Runtime.getRuntime().exec(transUrlinferad);
             Thread.sleep(3000);
@@ -366,10 +366,10 @@ public class CameraConService {
         returnInferadMap.put("inferad", String.valueOf(robotId));
         returnInferadMap.put("rtmpUrlInferad", rtmpUrlInferad);
         if (videoHttps == 1) {
-            String flvsUrlInferad = "https://" + hostIp + ":8088/live/" + livePath + ".flv";
+            String flvsUrlInferad = "https://" + hostIp + ":8088/live/" + livePath2 + ".flv";
             returnInferadMap.put("flvUrlInferad", flvsUrlInferad);
         } else {
-            String flvUrlInferad = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
+            String flvUrlInferad = "http://" + hostIp + ":10080/live/" + livePath2 + ".flv";
             returnInferadMap.put("flvUrlInferad", flvUrlInferad);
         }
 
@@ -386,7 +386,7 @@ public class CameraConService {
             String videoFlowId = streambeanJson.getString("id");
             String publish = streambeanJson.getString("publish");
             JSONObject publishjson = JSONObject.parseObject(publish);
-            if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+            if (Objects.equals(name, String.valueOf(livePath2)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnInferadMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":inferad");
                 redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":inferad", returnInferadMap);
