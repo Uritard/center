@@ -19,6 +19,7 @@ import redis.clients.jedis.ScanResult;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author YC
@@ -132,6 +133,7 @@ public class CruiseResultDealThread implements Runnable{
                 Set<String> cruiseKey = redisScan("t_cruise_task_result:" + taskId);
                 if (robotInfoKeys.size() == cruiseKey.size()){
                     cState = 240;
+                    TimeUnit.SECONDS.sleep(2);
                 }
                 tCruiseResult.setCState(cState);
                 tCruiseResult.setExecuteTime(sdf.parse(tCruiseTaskResultMap.get("createtime")));
@@ -437,6 +439,7 @@ public class CruiseResultDealThread implements Runnable{
                         jasonMap.put("type", "lastOneInstance");
                         jasonMap.put("taskId",taskId);
                         String json = JSON.toJSONString(jasonMap);
+                        log.info("最后一个点-前端推送：" + json);
                         Constant.postUrl(webSocketUrl,json);
 
                     }else{

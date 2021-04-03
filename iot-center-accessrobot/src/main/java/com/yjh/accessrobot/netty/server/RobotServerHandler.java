@@ -727,8 +727,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
                     String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
 //改进版的,客户端未完善,开始
-/*                    //可见光结果和红外fir
-                    String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
+                    //可见光结果、红外fir、音频wav
                     String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
                     String sArray[] = ftpFilePath.split("/");
                     String ftpFileName = sArray[sArray.length - 1];
@@ -736,8 +735,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("temporaryFilePath==="+temporaryFilePath);
 
                     //红外原图
-                    if (xmlBaseModel.getItems().get(0).containsKey("红外的原图")){
-                        String ftpInfraredOriginPath = xmlBaseModel.getItems().get(0).get("红外的原图").toString();//红外原图
+                    if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")){
+                        String ftpInfraredOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();//红外原图
                         String sArray2[] = ftpInfraredOriginPath.split("/");
                         String ftpInfraredOriginName = sArray2[sArray2.length - 1];//红外原图名称
                         String temporaryInfraredOriginPath = filePathMap.get(redisValue) + "/" +ftpInfraredOriginPath;
@@ -746,8 +745,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }
                     String ftpOriginPath = null;
                     //可见光原图、音频和红外结果
-                    if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")){
-                        ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();//可见光原图、红外结果
+                    if (xmlBaseModel.getItems().get(0).containsKey("origin_file_result_path")){
+                        ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_result_path").toString();//可见光原图、红外结果
                     }else {
                         ftpOriginPath = xmlBaseModel.getItems().get(0).get("file_path").toString();//可见光原图、音频
                     }
@@ -756,6 +755,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     String temporaryOriginPath = filePathMap.get(redisValue) + "/" +ftpOriginPath;
                     log.info("temporaryOriginPath==="+temporaryOriginPath);
 
+                    String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
                     if ("1".equals(fileType)){//红外
                         copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "Infrared");//拷贝巡视结果图
                         copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "FIR");//拷贝fir
@@ -770,13 +770,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "Audio");//拷贝巡视结果图
                         cruiseResultMap.put("relativePath",developRelativeUrl + "Audio" + "/" +ftpFileName);
                         cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
-                    }*/
+                    }
 //改进版的,客户端未完善,结束
 
                     /*
                      * 新版的图片处理
                      * */
-                    String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
+                    /*String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
                     String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
                     String sArray[] = ftpFilePath.split("/");
                     String ftpFileName = sArray[sArray.length - 1];//巡视结果文件名称
@@ -808,7 +808,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "Audio");//拷贝巡视结果图
                         cruiseResultMap.put("relativePath",developRelativeUrl + "Audio" + "/" +ftpFileName);
                         cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
-                    }
+                    }*/
 
                     log.info("机器人巡视结果数据是："+cruiseResultMap);
 

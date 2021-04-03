@@ -58,7 +58,6 @@ public class IsWarnAfterCruiseThread implements Runnable{
                             && threadMap.get("deviceId").equals(redisInfoMap.get("inspectionCode"))) {
                         Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
                         TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);
-//                        log.info("tStdDeviceMete===" + tStdDevicemete);
 
                         //该巡视点还在,能找到对应测点信息
                         if (Objects.nonNull(tStdDevicemete)) {
@@ -78,7 +77,6 @@ public class IsWarnAfterCruiseThread implements Runnable{
                             params.put("lowLimit3", tStdDevicemete.getLowLimit3());
                             params.put("highLimit4", tStdDevicemete.getHighLimit4());
                             params.put("lowLimit4", tStdDevicemete.getLowLimit4());
-//                            log.info("params的值是===" + params);
 
                             Result result = sendPostRequest(Constant.WARN_JUDGE, params);
                             Map<String, Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
@@ -108,7 +106,6 @@ public class IsWarnAfterCruiseThread implements Runnable{
                             warnInfo.setTaskId(threadMap.get("taskCode"));
                             Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(threadMap.get("robotCode"));
                             warnInfo.setDeviceCode(robotId.toString());
-//                            log.info("warnInfo==" + warnInfo);
 
                             //判断该点是否产生告警以及告警信息
                             if (Boolean.TRUE.equals(isWarN)) {//触发告警
@@ -116,8 +113,6 @@ public class IsWarnAfterCruiseThread implements Runnable{
                                 warnInfo.setWarnLevel(Integer.valueOf(map.get("warnLevel").toString()));
                                 warnInfo.setWarnContent(map.get("warnContent").toString());
                                 warnInfo.setOutRange(outRange);
-//                            warnInfo.setDealTime(new Date());
-//                            warnInfo.setDealPersonId(userId);
                                 log.info("要插库的告警数据是===" + warnInfo);
                                 StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
 
@@ -149,7 +144,7 @@ public class IsWarnAfterCruiseThread implements Runnable{
                                     jasonMaps2.put("warnId", warnInfo.getWarnId());
                                     jasonMaps2.put("defectModel", warnInfo.getDefectModel());
                                     String json = JSON.toJSONString(jasonMaps2);
-                                    log.info("配置弹窗-发送给前端的消息：" + json);
+                                    log.info("告警弹窗-前端推送：" + json);
                                     Constant.postUrl(webSocketUrl,json);
                                 }
                             }

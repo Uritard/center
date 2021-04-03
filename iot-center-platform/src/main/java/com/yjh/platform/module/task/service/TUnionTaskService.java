@@ -169,7 +169,7 @@ public class TUnionTaskService{
                     lmd.setPresetId(Long.valueOf(redisInfoMap.get("cruiseId")));
                     lmd.setEndTime(redisInfoMap.get("endTime"));
                     lmd.setStartTime(redisInfoMap.get("startTime"));
-                    if (Objects.nonNull(redisInfoMap.get("cameraId")) || !"".equals(redisInfoMap.get("cameraId"))){
+                    if (Objects.nonNull(redisInfoMap.get("cameraId")) && !"".equals(redisInfoMap.get("cameraId"))){
                         lmd.setCameraId(Long.valueOf(redisInfoMap.get("cameraId")));
                     }else {
                         lmd.setCameraId(Long.valueOf(redisInfoMap.get("robotId")));

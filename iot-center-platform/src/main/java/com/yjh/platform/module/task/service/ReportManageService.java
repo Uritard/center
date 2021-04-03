@@ -193,6 +193,8 @@ public class ReportManageService {
     }
     @Transactional(rollbackFor = Exception.class)
     public String cruiseReportGenerate(String taskId){
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         ReportData recordData = new ReportData();
         //1.总体情况
         TaskVO taskVO = new TaskVO();
@@ -210,6 +212,13 @@ public class ReportManageService {
         recordData.setCpTypeItems(cpTypeItems);
         //3.明细-所选设备的所有测点巡检结果详情
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
+        for (TCruiseDataResultDetail tcdr : tCDRDList){
+            String relativePath = tcdr.getPicPath();
+            if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
+                relativePath = relativePath.replace(relativeImgMap.get("content"),absoluteImgMap.get("content"));
+            }
+            tcdr.setPicPath(relativePath);
+        }
         recordData.setTCDRDList(tCDRDList);
 
         /*String taskName = recordData.getTaskVO().getTaskName();

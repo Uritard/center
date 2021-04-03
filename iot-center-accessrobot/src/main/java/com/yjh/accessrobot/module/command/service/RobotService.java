@@ -58,8 +58,6 @@ public class RobotService {
     private TRobotRegionDao tRobotRegionDao;
     @Resource
     private SysUserDao sysUserDao;
-    @Value("${other.webSocketUrl}")
-    private String webSocketUrl;
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password) throws Exception{
@@ -123,9 +121,8 @@ public class RobotService {
                     .setType(type)
                     .setCommand(command)
                     .setItems(Item);
-            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
             log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
-            //根据不同的机器人对应不同的管道发送指令
 
             Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":61");
             String robotPattern = robotStatusMap.get("value");
@@ -136,11 +133,11 @@ public class RobotService {
                 return scmap;
             }else{
                 RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-                if ("21".equals(type) && "7".equals(command) //抓图
-                        || "21".equals(type) && "10".equals(command)//停止录像
-                        || "22".equals(type) && "7".equals(command)){
-                    TimeUnit.SECONDS.sleep(5);
-                }
+//                if ("21".equals(type) && "7".equals(command) //抓图
+//                        || "21".equals(type) && "10".equals(command)//停止录像
+//                        || "22".equals(type) && "7".equals(command)){
+//                    TimeUnit.SECONDS.sleep(5);
+//                }
                 String filePath = null;
                 if (Objects.nonNull(RobotServerHandler.getRobotResultMap().get("Item"))){
                     String ftpFilePath = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).get("file_path").toString();
@@ -183,16 +180,6 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
         log.info("生成的机器人模型同步调用xml是<start>" + xmlString + "<end>");
         RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString,robotCode),robotCode);
-        /*Constant.flag = 0;
-        RobotServerHandler sendId = RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
-        log.info("sendId是<start>" + sendId + "<end>");
-        if (sendId != null) {
-            sendId.sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-        }
-        Thread.sleep(500);
-        if (Constant.flag == 1) {
-            res = true;
-        }*/
         return true;
     }
 
@@ -236,7 +223,6 @@ public class RobotService {
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
 
-        //机器人模型文件
         String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
         log.info("图片路径为：" + picPath);
         /*
@@ -252,7 +238,6 @@ public class RobotService {
         }
         try {
             String url = "cp " + picPath + " " + developMap;
-//            log.info("url是===" + url);
             Runtime.getRuntime().exec(url);
         } catch (Exception e) {
             e.getMessage();
@@ -263,7 +248,6 @@ public class RobotService {
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
-//        log.info("获得的tRobotInfo是：" + tRobotInfo);
         tRobotInfoDao.update(tRobotInfo);
 
         //设备模型文件
@@ -1452,11 +1436,6 @@ public class RobotService {
     }
     public TStdDeviceMete selectDeviceMeteInfo(Long instanceId){
         return tRobotInfoDao.selectDeviceMeteInfo(instanceId);
-    }
-    public int sendWebSocket(String json) throws Exception{
-        log.info("发送给前端的消息：" + json);
-        Constant.postUrl(json,webSocketUrl);
-        return 1;
     }
     /*public int robotDeviceIntoDB(List<Map<String, Object>> deviceMapList, XMLBaseModel xmlBaseModel){
         List<TRobotRegion> tRobotRegionList = new ArrayList<>();
