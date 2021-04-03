@@ -176,6 +176,7 @@ public class CameraConService {
             //livePath
             String name = streambeanJson.getString("name");
             String videoFlowId = streambeanJson.getString("id");
+            log.info("realName: " + name);
             if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(streambeanJson.getString("cid"))) {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
@@ -287,6 +288,7 @@ public class CameraConService {
                     //livePath
                     String name = streambeanJson.getString("name");
                     String videoFlowId = streambeanJson.getString("id");
+                    log.info("realName: " + name);
                     if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(streambeanJson.getString("cid"))) {
                         returnMap.put("videoFlowId", videoFlowId);
                         Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
