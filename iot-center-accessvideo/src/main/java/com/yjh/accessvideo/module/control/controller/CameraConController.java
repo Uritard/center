@@ -25,7 +25,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -128,6 +130,23 @@ public class CameraConController {
                         log.info("关闭流："+delteUrl);
                     }
                 }
+                String livePath = streambeanJson.getString("name");
+                log.info("livePath: " + livePath);
+                String url = "ps -ef | grep ffmpeg | grep '" + livePath + "' | grep -v 'grep'";
+                log.info("stopUrl: " + url);
+                try {
+                    Process processForId = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
+                    processForId.waitFor();
+                    BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
+                    String lineForId = null;
+                    StringBuilder dataBackForId = new StringBuilder();
+                    while ((lineForId = readerForId.readLine()) != null) {
+                        dataBackForId.append(lineForId).append('\n');
+                    }
+                    Integer processNum = Integer.parseInt(dataBackForId.substring(9, 15).replace(" ", ""));
+                    String urlStop = "kill -9 " + processNum;
+                    Runtime.getRuntime().exec(urlStop);
+                } catch (Exception e) { e.getMessage(); }
 
             }
             log.info("Constant.mapsForCamera: {}, Constant.mapsForHistory: {}", Constant.mapsForCamera, Constant.mapsForHistory);
