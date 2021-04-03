@@ -258,7 +258,7 @@ public class CameraConService {
 
                 try {
                     Runtime.getRuntime().exec(transUrl);
-                    Thread.sleep(5000);
+                    Thread.sleep(2000);
                 } catch (Exception e) { e.getMessage(); }
 
                 log.info("transUrl: " + transUrl);
@@ -275,27 +275,11 @@ public class CameraConService {
                     String flvUrl = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
                     returnMap.put("flvUrl", flvUrl);
                 }
+                StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, livePath, cameraId, returnMap, redisTemplate);
+                Thread thread = new Thread(streamInfoThread);
+                thread.setDaemon(true);
+                thread.start();
 
-                String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
-                JSONObject jsonList = new JSONObject();
-                try { jsonList = HttpClientUtils.sendGet(getInfoUrl, null); } catch (Exception e) {e.getMessage();}
-                assert jsonList != null;
-                List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
-                int streamListSize = streamsJsonObjectList.size();
-                for (int i = 0; i < streamListSize; i++) {
-                    String streambeanStr = streamsJsonObjectList.get(i);
-                    JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
-                    //livePath
-                    String name = streambeanJson.getString("name");
-                    String videoFlowId = streambeanJson.getString("id");
-                    log.info("realName: {}, livePathMatch: {}, cid: {}", name, Objects.equals(name, String.valueOf(livePath)), streambeanJson.getString("cid"));
-                    if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(streambeanJson.getString("cid"))) {
-                        returnMap.put("videoFlowId", videoFlowId);
-                        Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
-                        redisTemplate.opsForHash().putAll("cameraRealFlow:" + cameraId, returnMap);
-                        log.info("realReturnMap: " + returnMap);
-                    }
-                }
                 returnMapList.add(returnMap);
             }
         }
