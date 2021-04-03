@@ -342,8 +342,8 @@ public class CameraConService {
             if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnLightMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":light");
-                redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":light", returnLightMap);
                 log.info("robotReturnLightMap: " + returnLightMap);
+                redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":light", returnLightMap);
             }
         }
 
@@ -389,8 +389,8 @@ public class CameraConService {
             if (Objects.equals(name, String.valueOf(livePath2)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnInferadMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":inferad");
-                redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":inferad", returnInferadMap);
                 log.info("robotReturnInferadMap: " + returnInferadMap);
+                redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":inferad", returnInferadMap);
             }
         }
 
@@ -521,10 +521,10 @@ public class CameraConService {
             if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForHistory.put(videoFlowId, String.valueOf(cameraId));
+                log.info("historyMapsForCamera: " + Constant.mapsForHistory);
                 redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + cameraId, returnMap);
             }
         }
-        log.info("historyMapsForCamera: " + Constant.mapsForHistory);
         log.info("historyReturnMap: " + returnMap);
         return returnMap;
     }

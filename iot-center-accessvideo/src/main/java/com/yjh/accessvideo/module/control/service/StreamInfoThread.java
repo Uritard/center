@@ -55,8 +55,8 @@ public class StreamInfoThread implements Runnable {
             if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
-                redisTemplate.opsForHash().putAll("cameraRealFlow:" + cameraId, returnMap);
                 log.info("realReturnMap: " + returnMap);
+                redisTemplate.opsForHash().putAll("cameraRealFlow:" + cameraId, returnMap);
             }
         }
         log.info("realMapsForCamera: " + Constant.mapsForCamera);

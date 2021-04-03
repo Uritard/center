@@ -52,9 +52,7 @@ public class StreamStopThread implements Runnable {
                 log.info("关闭流：{}", livePath);
                 redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
                 redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
-                log.info("关闭中。。。");
                 try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
-                log.info("关闭完成");
             } else { log.info("{}流为空或有人正在看。。。", livePath); }
             String url = "ps -ef | grep ffmpeg | grep '" + livePath + "' | grep -v 'grep'";
             try {
