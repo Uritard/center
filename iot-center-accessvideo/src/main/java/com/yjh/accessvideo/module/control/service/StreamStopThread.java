@@ -41,7 +41,6 @@ public class StreamStopThread implements Runnable {
             Integer clients = streambeanJson.getInteger("clients"); //观看人数
             String cid = publishjson.getString("cid");
             String livePath = streambeanJson.getString("name");
-            log.info("name: {}, cid：{}, clients: {}", livePath, cid, clients);
 
             if (StringUtils.isNotEmpty(cid) && clients<=2) {
                 //踢掉
@@ -49,7 +48,7 @@ public class StreamStopThread implements Runnable {
                 String videoFlowId = streambeanJson.getString("id");
                 Constant.mapsForCamera.remove(videoFlowId);
                 Constant.mapsForHistory.remove(videoFlowId);
-                log.info("关闭流：{}", livePath);
+                log.info("关闭流-->name: {}, cid：{}, clients: {}", livePath, cid, clients);
                 redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
                 redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
                 try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
