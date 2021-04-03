@@ -11,6 +11,8 @@ import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.entity.TemperatureInfo;
 import com.yjh.accessvideo.module.control.service.CameraConService;
+import com.yjh.accessvideo.module.control.service.StreamInfoThread;
+import com.yjh.accessvideo.module.control.service.StreamStopThread;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -94,62 +96,14 @@ public class CameraConController {
             //SRS服务器有延迟，大概50-60秒 才更新管理数据
 //            Thread.sleep(1000*70);
             jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
-            
             assert jsonList != null;
+
             List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
             int streamListSize = streamsJsonObjectList.size();
-            for (int i = 0; i < streamListSize; i++) {
-                String streambeanStr = streamsJsonObjectList.get(i);
-                JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
-                //解析每一个stream，循环比对，找到页面传递的设备ID对应的流，并判断是否需要关闭
-                String publish = streambeanJson.getString("publish");
-                JSONObject publishjson = JSONObject.parseObject(publish);
-                Integer clients = streambeanJson.getInteger("clients"); //观看人数
-                //符合无人观看的条件
-                String cid = publishjson.getString("cid");
-                log.info("name: {}, cid：{},cid is empty: {}", streambeanJson.getString("name"), cid, StringUtils.isEmpty(cid));
-
-                if (StringUtils.isEmpty(cid)) {
-                    String videoFlowId = streambeanJson.getString("id");
-                    redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
-                    Constant.mapsForCamera.remove(videoFlowId);
-                    redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
-                    Constant.mapsForHistory.remove(videoFlowId);
-                    log.info("关闭空链接：");
-                } else {
-                    if(clients<=2){
-                        //踢掉
-                        log.info("关闭流开始");
-                        String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
-                        try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
-                        String videoFlowId = streambeanJson.getString("id");
-                        redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
-                        Constant.mapsForCamera.remove(videoFlowId);
-                        redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
-                        Constant.mapsForHistory.remove(videoFlowId);
-                        log.info("关闭流："+delteUrl);
-                    }
-                }
-                String livePath = streambeanJson.getString("name");
-                log.info("livePath: " + livePath);
-                String url = "ps -ef | grep ffmpeg | grep '" + livePath + "' | grep -v 'grep'";
-                log.info("stopUrl: " + url);
-                try {
-                    Process processForId = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
-                    processForId.waitFor();
-                    BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
-                    String lineForId = null;
-                    StringBuilder dataBackForId = new StringBuilder();
-                    while ((lineForId = readerForId.readLine()) != null) {
-                        dataBackForId.append(lineForId).append('\n');
-                    }
-                    Integer processNum = Integer.parseInt(dataBackForId.substring(9, 15).replace(" ", ""));
-                    String urlStop = "kill -9 " + processNum;
-                    Runtime.getRuntime().exec(urlStop);
-                } catch (Exception e) { e.getMessage(); }
-
-            }
-            log.info("Constant.mapsForCamera: {}, Constant.mapsForHistory: {}", Constant.mapsForCamera, Constant.mapsForHistory);
+            StreamStopThread streamStopThread = new StreamStopThread(streamListSize, streamsJsonObjectList, srsStopUrl, redisTemplate);
+            Thread thread = new Thread(streamStopThread);
+            thread.setDaemon(true);
+            thread.start();
         } catch (Exception e) {e.getMessage();}
 
     }
