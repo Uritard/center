@@ -50,10 +50,8 @@ public class StreamStopThread implements Runnable {
                     Constant.mapsForCamera.remove(videoFlowId);
                     Constant.mapsForHistory.remove(videoFlowId);
                     log.info("关闭流-->id: {}, cid：{}, clients: {}", videoFlowId, cid, clients);
-                    redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
-                    redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
-                    log.info("清除缓存数据");
-                    try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
+                    HttpClientUtils.httpDelete(delteUrl,null);
+                    log.info("停流成功");
                 } else { log.info("{}流为空或有人正在看。。。", videoFlowId); }
                 String url = "ps -ef | grep ffmpeg | grep '" + livePath + "' | grep -v 'grep'";
 
