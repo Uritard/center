@@ -180,10 +180,10 @@ public class CameraConService {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
                 redisTemplate.opsForHash().putAll("cameraRealFlow:" + cameraId, returnMap);
-                log.info("mapsForCamera: " + Constant.mapsForCamera);
                 log.info("returnMap: " + returnMap);
             }
         }
+        log.info("realMapsForCamera: " + Constant.mapsForCamera);
         return returnMap;
     }
 
@@ -291,14 +291,14 @@ public class CameraConService {
                         returnMap.put("videoFlowId", videoFlowId);
                         Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
                         redisTemplate.opsForHash().putAll("cameraRealFlow:" + cameraId, returnMap);
-                        log.info("mapsForCamera: " + Constant.mapsForCamera);
-                        log.info("returnMap: " + returnMap);
+                        log.info("realReturnMap: " + returnMap);
                     }
                 }
                 returnMapList.add(returnMap);
             }
         }
-        log.info("returnMapList: " + returnMapList);
+        log.info("realMapsForCamera: " + Constant.mapsForCamera);
+        log.info("realReturnMapList: " + returnMapList);
         return returnMapList;
     }
 
@@ -316,12 +316,12 @@ public class CameraConService {
 
         int livePath = Constant.maps.get("livePath") + 1;
         Constant.maps.put("livePath", livePath);
-        log.info("Constant.maps: " + Constant.maps);
+        log.info("Constant.maps: {}", Constant.maps);
         // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/Channels/10%s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
-        log.info("lightInfo: " + lightUsername + " " + lightPassword + " " + lightIp + " " + lightPort + " " + livePath);
+        log.info("robotLightInfo: " + lightUsername + " " + lightPassword + " " + lightIp + " " + lightPort + " " + livePath);
         String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, livePath);
         try { Runtime.getRuntime().exec(transUrlLight); } catch (Exception e) {e.getMessage();}
-        log.info("transUrlLight: " + transUrlLight);
+        log.info("robotTransUrlLight: {}", transUrlLight);
         String[] rtmpUrls = transUrlLight.split("rtmp");
         String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
 
@@ -355,6 +355,7 @@ public class CameraConService {
                 returnLightMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":light");
                 redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":light", returnLightMap);
+                log.info("robotReturnLightMap: " + returnLightMap);
             }
         }
 
@@ -363,10 +364,10 @@ public class CameraConService {
         livePath = Constant.maps.get("livePath") + 1;
         Constant.maps.put("livePath", livePath);
         log.info("Constant.maps: " + Constant.maps);
-        log.info("inferadInfo: " + " " + inferadIp + " " + inferadPort + " " + livePath);
+        log.info("robotInferadInfo: " + " " + inferadIp + " " + inferadPort + " " + livePath);
         String transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, livePath);
         try { Runtime.getRuntime().exec(transUrlinferad); } catch (Exception e) {e.getMessage();}
-        log.info("transUrlinferad: " + transUrlinferad);
+        log.info("robotTransUrlinferad: " + transUrlinferad);
         String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
         String rtmpUrlInferad = "rtmp" + rtmpUrlsInferad[rtmpUrlsInferad.length - 1];
 
@@ -396,15 +397,17 @@ public class CameraConService {
             String name = streambeanJson.getString("name");
             String videoFlowId = streambeanJson.getString("id");
             if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(streambeanJson.getString("cid"))) {
-                returnLightMap.put("videoFlowId", videoFlowId);
+                returnInferadMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":inferad");
-                redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":inferad", returnLightMap);
+                redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":inferad", returnInferadMap);
+                log.info("robotReturnInferadMap: " + returnInferadMap);
             }
         }
-        log.info("mapsForRobot: " + Constant.mapsForCamera);
+
         returnMapList.add(returnLightMap);
         returnMapList.add(returnInferadMap);
-        log.info("returnMapList: " + returnMapList);
+        log.info("mapsForRobot: " + Constant.mapsForCamera);
+        log.info("robotReturnMapList: " + returnMapList);
         return returnMapList;
     }
 
@@ -481,7 +484,7 @@ public class CameraConService {
         log.info("userName: " + userName + ",password: " + password + ",cameraIp: " + cameraIp + ",cameraPort: " + cameraPort
                 + ",iChanNum: " + iChanNum + ",starttime: " + starttime + ",endtime: " + endtime + ",historyPath: " + livePath);
         String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1, starttime, endtime, livePath);
-        log.info("transUrl: " + transUrl);
+        log.info("historyTransUrl: " + transUrl);
         try { Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl}); } catch (Exception e) { e.getMessage(); }
         String[] rtmpUrls = transUrl.split("rtmp");
         String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
@@ -515,10 +518,10 @@ public class CameraConService {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForHistory.put(videoFlowId, String.valueOf(cameraId));
                 redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + cameraId, returnMap);
-                log.info("mapsForCamera: " + Constant.mapsForHistory);
-                log.info("returnMap: " + returnMap);
             }
         }
+        log.info("historyMapsForCamera: " + Constant.mapsForHistory);
+        log.info("historyReturnMap: " + returnMap);
         return returnMap;
     }
 

@@ -130,6 +130,7 @@ public class CameraConController {
                 }
 
             }
+            log.info("Constant.mapsForCamera: {}, Constant.mapsForHistory: {}", Constant.mapsForCamera, Constant.mapsForHistory);
         } catch (Exception e) {e.getMessage();}
 
     }
