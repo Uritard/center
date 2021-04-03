@@ -407,6 +407,7 @@ public class CameraConService {
         String urlStop = null;
         String livePath;
         String rtmpUrlCamera = Constant.mapsForCamera.get(String.valueOf(robotId + ":light"));
+        assert rtmpUrlCamera != null;
         String[] rtmpUrlCameras = rtmpUrlCamera.split("/");
         livePath = rtmpUrlCameras[rtmpUrlCameras.length - 1];
 

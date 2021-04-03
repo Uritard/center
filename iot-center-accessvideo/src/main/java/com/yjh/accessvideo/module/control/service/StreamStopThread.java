@@ -48,11 +48,12 @@ public class StreamStopThread implements Runnable {
                 //踢掉
                 String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
                 String videoFlowId = streambeanJson.getString("id");
-                redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
                 Constant.mapsForCamera.remove(videoFlowId);
-                redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
                 Constant.mapsForHistory.remove(videoFlowId);
                 log.info("关闭流：{}", livePath);
+                redisTemplate.opsForHash().delete("cameraRealFlow:" + Constant.mapsForCamera.get(videoFlowId));
+                redisTemplate.opsForHash().delete("cameraHistoryFlow:" + Constant.mapsForHistory.get(videoFlowId));
+                log.info("关闭中。。。");
                 try { HttpClientUtils.httpDelete(delteUrl,null); } catch (Exception e) {e.getMessage();}
                 log.info("关闭完成");
             } else { log.info("{}流为空或有人正在看。。。", livePath); }
