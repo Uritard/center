@@ -32,7 +32,6 @@ public class StreamStopThread implements Runnable {
 
     @Override
     public void run() {
-        log.info("streamsJsonObjectList: {}", streamsJsonObjectList);
         //解析每一个stream，循环比对，找到页面传递的设备ID对应的流，并判断是否需要关闭
         for (int i = 0; i < streamListSize; i++) {
             String streambeanStr = streamsJsonObjectList.get(i);

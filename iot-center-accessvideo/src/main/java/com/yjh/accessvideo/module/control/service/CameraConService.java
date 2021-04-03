@@ -404,10 +404,12 @@ public class CameraConService {
     //@Logs(title = "机器人停止播放", code = "robotStopPlay", content = "机器人相机停止播放")
     @Transactional(rollbackFor = Exception.class)
     public String robotStopRealPlay(Long robotId) {
-        String urlStop = null;
+        String urlStop = "";
         String livePath;
         String rtmpUrlCamera = Constant.mapsForCamera.get(String.valueOf(robotId + ":light"));
-        assert rtmpUrlCamera != null;
+        if (Objects.isNull(rtmpUrlCamera)) {
+            return urlStop;
+        }
         String[] rtmpUrlCameras = rtmpUrlCamera.split("/");
         livePath = rtmpUrlCameras[rtmpUrlCameras.length - 1];
 
