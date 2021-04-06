@@ -456,12 +456,14 @@ public class TCruiseDataResultController {
 
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
-        Page page = PageHelper.startPage(pageNum, pageSize,true, null, true);
+        Page page= PageHelper.startPage(pageNum, pageSize,true, null, true); ;
         try {
             List<FirAndPicInfo> list = tCruiseDataResultService.selectByCameraId(cameraId,startDate,endDate,fileName);
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
-            result.setData(resultMap);
+            if(list!=null) {
+                resultMap.put("count", page.getTotal());
+                resultMap.put("list", list);
+                result.setData(resultMap);
+            }
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("cameraId查询：", e);

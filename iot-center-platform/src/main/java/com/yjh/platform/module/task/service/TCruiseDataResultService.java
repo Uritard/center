@@ -295,7 +295,12 @@ public class TCruiseDataResultService {
                 f.setPicPath(arr[0] + "//" + arr[1] + "/" + arr[2] + "/resultImg" + "/" + t.getFirName() + ".jpg");
                 f.setFirPath(t.getResultPic());
                 f.setFirName(t.getFirName());
-                f.setDateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(t.getFirDate()));
+                if (t.getFirDate()!=null){
+                    f.setDateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(t.getFirDate()));
+                }
+                else {
+                    f.setDateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                }
                 listFir.add(f);
             }
         }

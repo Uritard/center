@@ -1804,25 +1804,8 @@ public class CameraConService {
                     }
                     index++;
                 }
-                Double  [] arrss=new Double[arr.size()];
-                for (int i=0;i<arr.size();i++)
-                {
-                    arrss[i]=Double.parseDouble(arr.get(i));
-                   //  log.info("Double arrss[i]="+arrss[i]);
-                }
-               // Double max=arrss[0];
-                Arrays.sort(arrss);
-                Double max =arrss[arrss.length-1];
-               /* for (int i=0;i<arrss.length;i++){
-                   // log.info(String.valueOf(arrss[i]));
-                    //4.把获取到的数据一次和temp进行比较，并将最大的值赋值给temp
-                    if(arrss[i]>max){
-                        max=arrss[i];
-                    }
-                    log.info("max="+max);
-                }*/
                 //转换保留后两位小数
-                temperature= new DecimalFormat("0.00").format(max);
+                temperature= new DecimalFormat("0.00").format(Double.parseDouble(Collections.max(arr)));
                 log.info("框测temperature转换保留后两位小数"+temperature);
             }else {
                 while ((line = reade.readLine()) != null) {
