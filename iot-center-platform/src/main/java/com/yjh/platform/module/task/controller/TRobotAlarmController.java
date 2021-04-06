@@ -58,7 +58,9 @@ public class TRobotAlarmController {
           //  Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
             if (userId != 10001) {
                 if (tRobotAlarm.getAlarmState()!=null) {
-                    throw new JurisdictionException();
+                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                    return result;
+                  //  throw new JurisdictionException();
                 }
             }
             result.setData(tRobotAlarmService.insert(tRobotAlarm));
@@ -99,7 +101,9 @@ public class TRobotAlarmController {
             if (userId != 10001) {
                 TRobotAlarm list = tRobotAlarmService.selectByPrimaryId(tRobotAlarm.getRobotAlarmId());
                 if (list.getAlarmState()!=tRobotAlarm.getAlarmState()) {
-                    throw new JurisdictionException();
+                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                    return result;
+                  //  throw new JurisdictionException();
                 }
             }
             result.setData(tRobotAlarmService.update(tRobotAlarm));
@@ -190,7 +194,9 @@ public class TRobotAlarmController {
             if (userId != 10001) {
                 for (TRobotAlarm e : list) {
                     if (e.getAlarmState()!=null) {
-                        throw new JurisdictionException();
+                        result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                        return result;
+                       // throw new JurisdictionException();
                     }
                 }
             }

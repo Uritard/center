@@ -63,7 +63,9 @@ public class TStdMeteController {
                 if (tStdMete.getLowLimit1() != null || tStdMete.getLowLimit2() != null || tStdMete.getLowLimit3() != null || tStdMete.getLowLimit4() != null
                         || tStdMete.getHighLimit1() != null || tStdMete.getHighLimit2() != null || tStdMete.getHighLimit3() != null || tStdMete.getHighLimit4() != null
                        ) {
-                    throw new JurisdictionException();
+                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                    return result;
+                   // throw new JurisdictionException();
                 }
             }
             result.setData(tStdMeteService.add(tStdMete));
@@ -106,7 +108,9 @@ public class TStdMeteController {
                 if (tStdMete.getLowLimit1() != list.getLowLimit1() || tStdMete.getLowLimit2() != list.getLowLimit2() || tStdMete.getLowLimit3() != list.getLowLimit3() || tStdMete.getLowLimit4() != list.getLowLimit4()
                         || tStdMete.getHighLimit1() != list.getHighLimit1() || tStdMete.getHighLimit2() != list.getHighLimit2()  || tStdMete.getHighLimit3() != list.getHighLimit3()  || tStdMete.getHighLimit4() != list.getHighLimit4()
                         ) {
-                    throw new JurisdictionException();
+                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                    return result;
+                   // throw new JurisdictionException();
                 }
             }
             result.setData(tStdMeteService.update(tStdMete));
@@ -217,7 +221,9 @@ public class TStdMeteController {
                     if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
                             || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
                            ) {
-                        throw new JurisdictionException();
+                        result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                        return result;
+                       // throw new JurisdictionException();
                     }
                 }
             }

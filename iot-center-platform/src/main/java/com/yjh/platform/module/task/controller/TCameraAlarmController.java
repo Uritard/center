@@ -60,7 +60,9 @@ public class TCameraAlarmController {
            // Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
             if (userId != 10001) {
                 if (tCameraAlarm.getAlarmState() != null) {
-                    throw new JurisdictionException();
+                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                    return result;
+                   // throw new JurisdictionException();
                 }
             }
             result.setData(tCameraAlarmService.insert(tCameraAlarm));
@@ -101,7 +103,9 @@ public class TCameraAlarmController {
             if (userId != 10001) {
                 TCameraAlarm list = tCameraAlarmService.selectByPrimaryId(tCameraAlarm.getCameraAlarmId());
                 if (list.getAlarmState() != tCameraAlarm.getAlarmState()) {
-                    throw new JurisdictionException();
+                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                    return result;
+                   // throw new JurisdictionException();
                 }
             }
             result.setData(tCameraAlarmService.update(tCameraAlarm));
@@ -191,7 +195,9 @@ public class TCameraAlarmController {
             if (userId != 10001) {
                 for (TCameraAlarm e : list) {
                     if (e.getAlarmState() != null) {
-                        throw new JurisdictionException();
+                        result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                        return result;
+                        //throw new JurisdictionException();
                     }
                 }
             }

@@ -71,7 +71,9 @@ public class TStdDevicemeteController {
                 if (tStdDeviceMeteDetail.getLowLimit1() != null || tStdDeviceMeteDetail.getLowLimit2() != null || tStdDeviceMeteDetail.getLowLimit3() != null || tStdDeviceMeteDetail.getLowLimit4() != null
                         || tStdDeviceMeteDetail.getHighLimit1() != null || tStdDeviceMeteDetail.getHighLimit2() != null || tStdDeviceMeteDetail.getHighLimit3() != null || tStdDeviceMeteDetail.getHighLimit4() != null
                         || tStdDeviceMeteDetail.getAlarmState() != null) {
-                    throw new JurisdictionException();
+                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                    return result;
+                  //  throw new JurisdictionException();
                 }
             }
             result.setData(tStdDevicemeteService.add(tStdDeviceMeteDetail));
@@ -114,7 +116,8 @@ public class TStdDevicemeteController {
                 if (tStdDeviceMeteDetail.getLowLimit1() != tStdDeviceMete.getLowLimit1() || tStdDeviceMeteDetail.getLowLimit2() != tStdDeviceMete.getLowLimit2() || tStdDeviceMeteDetail.getLowLimit3() != tStdDeviceMete.getLowLimit3() || tStdDeviceMeteDetail.getLowLimit4() != tStdDeviceMete.getLowLimit4()
                         || tStdDeviceMeteDetail.getHighLimit1() != tStdDeviceMete.getHighLimit1() || tStdDeviceMeteDetail.getHighLimit2() != tStdDeviceMete.getHighLimit2()  || tStdDeviceMeteDetail.getHighLimit3() != tStdDeviceMete.getHighLimit3()  || tStdDeviceMeteDetail.getHighLimit4() != tStdDeviceMete.getHighLimit4()
                         || tStdDeviceMeteDetail.getAlarmState() != tStdDeviceMete.getAlarmState()) {
-                    throw new JurisdictionException();
+                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                    return result;
                 }
             }
             result.setData(tStdDevicemeteService.update(tStdDeviceMeteDetail));
@@ -225,7 +228,8 @@ public class TStdDevicemeteController {
                     if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
                             || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
                             || e.getAlarmState() != null) {
-                        throw new JurisdictionException();
+                        result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                        return result;
                     }
                 }
             }
@@ -265,7 +269,8 @@ public class TStdDevicemeteController {
                     if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
                             || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
                             || e.getAlarmState() != null) {
-                        throw new JurisdictionException();
+                        result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                        return result;
                     }
                 }
             }

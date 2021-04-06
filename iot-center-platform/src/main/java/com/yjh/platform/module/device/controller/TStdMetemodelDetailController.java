@@ -62,7 +62,9 @@ public class TStdMetemodelDetailController {
                 if (tStdMeteModelDetail.getLowLimit1() != null || tStdMeteModelDetail.getLowLimit2() != null || tStdMeteModelDetail.getLowLimit3() != null || tStdMeteModelDetail.getLowLimit4() != null
                         || tStdMeteModelDetail.getHighLimit1() != null || tStdMeteModelDetail.getHighLimit2() != null || tStdMeteModelDetail.getHighLimit3() != null || tStdMeteModelDetail.getHighLimit4() != null
                         || tStdMeteModelDetail.getAlarmState() != null) {
-                    throw new JurisdictionException();
+                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                    return result;
+                   // throw new JurisdictionException();
                 }
             }
             result.setData(tStdMetemodelDetailService.add(tStdMeteModelDetail));
@@ -107,7 +109,9 @@ public class TStdMetemodelDetailController {
                 if (tStdMeteModelDetail.getLowLimit1() != list.getLowLimit1() || tStdMeteModelDetail.getLowLimit2() != list.getLowLimit2() || tStdMeteModelDetail.getLowLimit3() != list.getLowLimit3() || tStdMeteModelDetail.getLowLimit4() != list.getLowLimit4()
                         || tStdMeteModelDetail.getHighLimit1() != list.getHighLimit1() || tStdMeteModelDetail.getHighLimit2() != list.getHighLimit2() || tStdMeteModelDetail.getHighLimit3() != list.getHighLimit3() || tStdMeteModelDetail.getHighLimit4() != list.getHighLimit4()
                         || tStdMeteModelDetail.getAlarmState() != list.getAlarmState()) {
-                    throw new JurisdictionException();
+                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                    return result;
+                  //  throw new JurisdictionException();
                 }
             }
             result.setData(tStdMetemodelDetailService.update(tStdMeteModelDetail));
@@ -211,7 +215,9 @@ public class TStdMetemodelDetailController {
                     if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
                             || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
                             || e.getAlarmState() != null) {
-                        throw new JurisdictionException();
+                        result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
+                        return result;
+                       // throw new JurisdictionException();
                     }
                 }
             }
