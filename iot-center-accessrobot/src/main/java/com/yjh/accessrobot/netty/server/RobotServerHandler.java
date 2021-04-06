@@ -74,6 +74,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
     public static String Packet2 = "";
+    public static long sendRobotSessionId = -1L;
 
 
     public void setWebSocketUrl(String webSocketUrl) {
@@ -207,6 +208,22 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         Packet2 = Packet.replace(""," ");
         byte[] packetByte = PlatformPacketUtil.HexString2Bytes(Packet2);
+
+        /*byte[] sendSessionIdByte = new byte[8];
+        System.arraycopy(packetByte, 2, sendSessionIdByte, 0, 8);
+        long sendRobotNewSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);//发送会话序列号
+        log.info("本身的发送会话序列号为=="+sendRobotSessionId+"新来的发送会话序列号==="+sendRobotNewSessionId);
+        byte[] xmlByteLengthByte = new byte[8];
+        System.arraycopy(packetByte,19,xmlByteLengthByte,0,4);
+        long xmlByteLength = PlatformPacketUtil.bytesToLong(xmlByteLengthByte);//xml的字节长度
+        log.info("xml的字节长度==="+xmlByteLength);
+        if (sendRobotSessionId + 1 == sendRobotNewSessionId){
+            //是新的包
+            sendRobotSessionId = sendRobotNewSessionId;
+            int headNum = appearNumber(Packet,"eb90");
+            openPackage(Packet,headNum);
+        }*/
+
         String body = new String(packetByte, StandardCharsets.UTF_8);
         log.info("Packet2="+body);
         String temporaryBody2 = body.replace("\"UTF-8\"","\'UTF-8\'");//临时
@@ -278,7 +295,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 String body1 = socketMessageHex.substring(46,socketMessageHex.length()-4);
                 onePacketString = PlatformPacketUtil.toStringHex(body1);
                 log.info("准备解析的xml=="+onePacketString);
-//                Packet = "";
                 Packet = Packet.replace(socketMessageHex,"");
                 stringToXml(onePacket,onePacketString);
                 return;

@@ -1554,5 +1554,11 @@ public class RobotService {
     public List<Long> selectInstanceForTaskGoOn(String taskId){
         return tRobotInfoDao.selectInstanceForTaskGoOn(taskId);
     }
+    public int deleteInstanceId(List<Long> instanceIdList){
+        for (Long instanceId : instanceIdList){
+            tRobotInfoDao.deleteInstanceId(instanceId);
+        }
+        return 1;
+    }
 }
 

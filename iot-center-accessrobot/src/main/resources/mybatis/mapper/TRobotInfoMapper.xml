@@ -405,6 +405,11 @@
         where a.task_result_id = b.task_result_id
         AND a.task_id = #{taskId,jdbcType=VARCHAR}
     </select>
+    <delete id="deleteInstanceId" >
+        delete from t_cruise_point_instance
+                where instance_id = #{instanceId, jdbcType=BIGINT}
+                limit 1
+    </delete>
     <!--根据instanceId查询inspectionCode-->
     <select id="selectInspectionCode" parameterType="java.lang.Long" resultType="java.lang.String">
         SELECT

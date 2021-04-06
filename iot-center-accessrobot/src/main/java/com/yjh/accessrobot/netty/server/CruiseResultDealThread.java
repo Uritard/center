@@ -67,6 +67,7 @@ public class CruiseResultDealThread implements Runnable{
                 Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:"+cruiseResultMap.get("robotCode")+ ":" +taskId);
                 Map<String,String> tCruiseTaskResultMap = new HashMap<>();
                 String str = null;
+                List<Long> instanceIdList = new ArrayList<>();
                 //遍历在下任务时提前组装好的巡检点信息
                 for (String key : robotInfoKeys) {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
@@ -74,6 +75,7 @@ public class CruiseResultDealThread implements Runnable{
                             && cruiseResultMap.get("taskCode").equals(redisInfoMap.get("taskId"))
                             &&cruiseResultMap.get("deviceId").equals(redisInfoMap.get("inspectionCode"))) {
                         String instanceId = redisInfoMap.get("instanceId");
+                        instanceIdList.add(Long.valueOf(instanceId));
 
                         str = "t_cruise_task_result:" + tCruiseTask.getTaskId() + ":" + instanceId;
 
@@ -134,11 +136,16 @@ public class CruiseResultDealThread implements Runnable{
                 if (robotInfoKeys.size() == cruiseKey.size()){
                     cState = 240;
                     TimeUnit.SECONDS.sleep(2);
+                    //本体任务做完，将构造的巡视点数据删除
+                    log.info("本体做完的点==="+instanceIdList);
+                    StaticContextAccessor.getBean(RobotService.class).deleteInstanceId(instanceIdList);
                 }
                 tCruiseResult.setCState(cState);
                 tCruiseResult.setExecuteTime(sdf.parse(tCruiseTaskResultMap.get("createtime")));
                 log.info("tCruiseResult的内容是==="+tCruiseResult);
                 StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+
+
             }
             /*
             * 巡视主机下发给机器人的任务
@@ -394,10 +401,16 @@ public class CruiseResultDealThread implements Runnable{
                     log.info("tCTRDList的内容是===" + tCTRDList+",大小size是: "+tCTRDList.size());
                     log.info("tCDRList的内容是===" + tCDRList+",大小size是: "+tCDRList.size());
 
-                    int res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);
-                    int res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);
-                    StaticContextAccessor.getBean(RobotService.class).otherServer(cruiseResultIdList);
-                    log.info("准备传其他服务的cruiseResultIdList==="+cruiseResultIdList);
+                    int res1 = 0;
+                    int res2 = 0;
+                    if (tCTRDList != null && !tCTRDList.isEmpty()){
+                        res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);
+                    }
+                    if (tCDRList != null && !tCDRList.isEmpty()){
+                        res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);
+                        log.info("准备传其他服务的cruiseResultIdList==="+cruiseResultIdList);
+                        StaticContextAccessor.getBean(RobotService.class).otherServer(cruiseResultIdList);
+                    }
                     log.info("插tCTRD的条数: "+res1+",插tCDR的条数: "+res2);
 
                     //将公共类的instanceIdList清空

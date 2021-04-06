@@ -41,7 +41,7 @@ public class Constant {
     public static int registerCount = 1;
 
 
-    public static long sendSessionId = 0L;//发送会话序列号
+    public static long sendSessionId = 0L;//巡视主机发送会话序列号
 
     public static Map<String, List<Long>> flagMap = new HashMap<>();
 
