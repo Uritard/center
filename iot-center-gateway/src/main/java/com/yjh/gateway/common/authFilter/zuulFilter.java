@@ -169,11 +169,14 @@ public class zuulFilter extends ZuulFilter {
                         String origin = request.getHeader("Origin") != null ? request.getHeader("Origin") : "";
                         String referer = request.getHeader("Referer") != null ? request.getHeader("Referer") : "";
                         String number=referer.substring(0, referer.indexOf(":"));
+                        String ym="yjh.biandian.com";
                         if (!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':')))||!IpUtil.getLocalIp().equals(referer.substring(number.length()+3, referer.lastIndexOf(':')))) {
-                            log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
-                            ctx.setSendZuulResponse(false);
-                            ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                            return false;
+                          if(!ym.equals(origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':')))||!ym.equals(referer.substring(number.length()+3, referer.lastIndexOf(':')))) {
+                              log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
+                              ctx.setSendZuulResponse(false);
+                              ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                              return false;
+                          }
                         }
                     }
                     String contentType = request.getContentType();
