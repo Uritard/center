@@ -22,6 +22,7 @@ import com.yjh.platform.common.Constant;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
@@ -239,14 +240,23 @@ public class TCruiseTaskResultService {
                     cruiseInspectResult.setVideoInfo(videoInfo);
 
                 } else if (Objects.nonNull(resultMap.get("robotId"))) {
-                    HashMap<String, Long> robot = new HashMap<>();
-                    robot.put("robotId", tRobotInfoDao.selectRobotScreen(Long.valueOf(resultMap.get("instanceId").toString())));
-                    Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
-                    log.info("robot-VideoINfo:"+result);
-                    List<Map<String, String>> robotVideoInfo=(List<Map<String, String>>)result.getData();
-                    videoInfo.putAll(robotVideoInfo.get(0));
-                    videoInfo.put("cameraId", null);
-                    cruiseInspectResult.setVideoInfo(videoInfo);
+                    //机器人历史视频流Map（更新后保存60s，若未取到则重新请求流接口）
+                    Map<String,String> robotVideoHistory=(Map<String,String>)redisTemplate.opsForValue().get("robotLight:"+resultMap.get("robotId").toString());
+                    log.info("robotVideoHistory"+robotVideoHistory);
+                    if(Objects.isNull(robotVideoHistory)) {
+                        HashMap<String, Long> robot = new HashMap<>();
+                        robot.put("robotId", tRobotInfoDao.selectRobotScreen(Long.valueOf(resultMap.get("instanceId").toString())));
+                        Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+                        log.info("robot-VideoINfo:" + result);
+                        List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
+                        videoInfo.putAll(robotVideoInfo.get(0));
+                        videoInfo.put("cameraId", null);
+                        cruiseInspectResult.setVideoInfo(videoInfo);
+                        redisTemplate.opsForValue().set("robotLight:" + robot.get("robotId").toString(), robotVideoInfo.get(0), 1, TimeUnit.MINUTES);
+                    }else {
+                        cruiseInspectResult.setVideoInfo(robotVideoHistory);
+                    }
+
                 } else {
 
                 }

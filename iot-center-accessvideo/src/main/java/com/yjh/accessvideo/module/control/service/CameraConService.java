@@ -1431,7 +1431,9 @@ public class CameraConService {
                 log.info("转到预置点失败错误码" + iErr);
             }
 
-            Thread.sleep(10000);
+            Long waitTime=(Long)redisTemplate.opsForHash().get("t_sys_param:waitTime","content");
+            log.info("waitTime:----------"+waitTime);
+            Thread.sleep(waitTime);
 
             HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
             m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
