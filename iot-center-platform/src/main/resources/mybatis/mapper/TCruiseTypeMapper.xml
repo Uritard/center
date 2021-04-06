@@ -177,7 +177,7 @@
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
         LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
-        where 1 = 1
+        where 1 = 1 and b.device_mete_id is not null
         ORDER BY b.device_id, b.custom_id
     </select>
 
@@ -209,6 +209,7 @@
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
         where a.algorithm_id = (select algorithm_id from t_algorithm_info where analyse_type = 9)
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+				 and b.device_mete_id is not null
         ORDER BY b.device_id, b.custom_id
     </select>
     <select id="selectByMeterTypeByOil" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
@@ -239,6 +240,7 @@
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
         where a.meter_type in (417,411)
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+				 and b.device_mete_id is not null
         ORDER BY b.device_id, b.custom_id
     </select>
     <select id="selectByMeterTypeByArrester" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
@@ -269,6 +271,7 @@
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
         where a.meter_type = 412
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+				 and b.device_mete_id is not null
         ORDER BY b.device_id, b.custom_id
     </select>
     <select id="selectByMeterTypeBySF6" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
@@ -299,6 +302,7 @@
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
         where a.meter_type = 414
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+				 and b.device_mete_id is not null
         ORDER BY b.device_id, b.custom_id
     </select>
     <select id="selectByMeterTypeByYY" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
@@ -329,6 +333,7 @@
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
         where a.meter_type = 415
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+				 and b.device_mete_id is not null
         ORDER BY b.device_id, b.custom_id
     </select>
     <select id="selectByAnalyseByWg" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
@@ -359,6 +364,7 @@
         LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
         where a.algorithm_id in (select algorithm_id from t_algorithm_info where analyse_type in(8,7,6,5) )
 				and a.device_mete_id in (select device_mete_id from t_cruise_point_instance )
+				 and b.device_mete_id is not null
         ORDER BY b.device_id, b.custom_id
     </select>
     <update id="tagsDeleted" >
