@@ -1348,16 +1348,18 @@ public class CameraConService {
 //                                  log.info("行数：" + i +"列数：" + j + "温度数据：" +   Float.intBitsToFloat(l) );
                         }
                     }
-                    //获取最大温度值
+                    Arrays.parallelSort(arr);
+                    float max  = arr[arr.length - 1];
+                    /*//获取最大温度值
                     float max = arr[0];
                     for (int i = 0; i < arr.length; i++) {
                         //4.把获取到的数据一次和temp进行比较，并将最大的值赋值给temp
                         if (arr[i] > max) {
                             max = arr[i];
                         }
-                    }
+                    }*/
                     //转换保留后两位小数
-                    list.add(new DecimalFormat("##0.00").format(max) + "℃");
+                    list.add( new DecimalFormat("##0.00").format(max)+ "℃");
 
                 } else {
                     list = null;
