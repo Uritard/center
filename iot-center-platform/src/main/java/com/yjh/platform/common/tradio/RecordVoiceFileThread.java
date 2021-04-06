@@ -2,6 +2,11 @@ package com.yjh.platform.common.tradio;
 
 import com.sun.jna.Pointer;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.module.device.entity.TVoiceDevice;
+import com.yjh.platform.module.device.entity.VoiceDeviceAllInfo;
+import com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail;
+import com.yjh.platform.module.device.entity.VoiceDeviceInfoDetail;
+import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.File;
@@ -32,9 +37,10 @@ public class RecordVoiceFileThread implements Runnable {
     private volatile boolean isThreadStart;
     private String voiceName;
     private static TradioLibrary sdk_= TradioLibrary.INSTANCE;
+    private TVoiceDeviceService tVoiceDeviceService;
 
     public RecordVoiceFileThread(RedisTemplate redisTemplate, Integer port, Long voiceDeviceId, String channelNum,
-                                 String ftpUrl, String owner, String ownerCode, boolean isThreadStart) {
+                                 String ftpUrl, String owner, String ownerCode, boolean isThreadStart, TVoiceDeviceService tVoiceDeviceService) {
         this.port = port;
         this.voiceDeviceId = voiceDeviceId;
         this.ftpUrl = ftpUrl;
@@ -48,6 +54,7 @@ public class RecordVoiceFileThread implements Runnable {
         this.channelNumList = channelNum.split(",");
         this.voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
                 +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter))+"_";
+        this.tVoiceDeviceService=tVoiceDeviceService;
     }
 
     @Override
@@ -71,7 +78,15 @@ public class RecordVoiceFileThread implements Runnable {
                 if (sdk_.NET_TRADIO_Login(hdForData, ftpUrl, port, owner, ownerCode, dev) != 0) {
                     log.info("注册失败");
                     isThreadStart = false;
-                } else { Constant.voiceMap.put("voiceDeviceId", 0); }
+                    VoiceDeviceAllInfoDetail tVoiceDevice = tVoiceDeviceService.selectByPrimaryId(voiceDeviceId);
+                    tVoiceDevice.setState("离线");
+                    tVoiceDeviceService.update(tVoiceDevice);
+                } else {
+                    Constant.voiceMap.put("voiceDeviceId", 0);
+                    VoiceDeviceAllInfoDetail tVoiceDevice = tVoiceDeviceService.selectByPrimaryId(voiceDeviceId);
+                    tVoiceDevice.setState("在线");
+                    tVoiceDeviceService.update(tVoiceDevice);
+                }
             }
 
             while (isThreadStart){

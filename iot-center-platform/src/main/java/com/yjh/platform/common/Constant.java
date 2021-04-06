@@ -118,26 +118,26 @@ public class Constant {
     public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {
         //将websocket信息写入redis
         String json= JSON.toJSONString(map);
-        WebSocketServer.sendMsg(json);
+        //WebSocketServer.sendMsg(json);
        // String.valueOf(map);
         if("logError".equals(map.get("type")) || "newTask".equals(map.get("type")) || "newLinkage".equals(map.get("type"))
                 || "newAlarm".equals(map.get("type"))  || "alarmPopUp".equals(map.get("type"))  || "linkagePopUp".equals(map.get("type"))){
             redisTemplate.opsForValue().set(map.get("type"),String.valueOf(map),5, TimeUnit.MINUTES);
         }
 
-//        CloseableHttpClient client = HttpClients.createDefault();
-//        String result = "";
-//        try {
-//            URI uri = new URIBuilder(url).setParameter("json", json).build();
-//            HttpPost httpGet = new HttpPost(uri);
-//            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
-//            httpGet.setHeader("Accept", "application/json");
-//            CloseableHttpResponse response = client.execute(httpGet);
-//            HttpEntity entity = response.getEntity();
-//            result = EntityUtils.toString(entity, "UTF-8");
-//        } catch (Exception e) {e.getMessage();}
-//        return result;
-        return "666";
+        CloseableHttpClient client = HttpClients.createDefault();
+        String result = "";
+        try {
+            URI uri = new URIBuilder(url).setParameter("json", json).build();
+            HttpPost httpGet = new HttpPost(uri);
+            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
+            httpGet.setHeader("Accept", "application/json");
+            CloseableHttpResponse response = client.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+        } catch (Exception e) {e.getMessage();}
+        return result;
+        //return "666";
     }
 
     public static ConcurrentHashMap<String,Integer> taskStateMap=new ConcurrentHashMap<>();
