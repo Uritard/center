@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class StreamStopThread implements Runnable {
 
@@ -55,7 +56,7 @@ public class StreamStopThread implements Runnable {
                     HttpClientUtils.httpDelete(delteUrl,null);
                     log.info("停流成功");
                 } else { log.info("{}流为空或有人正在看。。。", videoFlowId); }
-                String url = "ps -ef | grep ffmpeg | grep '" + livePath + "' | grep -v 'grep'";
+                String url = "ps -ef | grep ffmpeg | grep '/" + livePath + "' | grep -v 'grep'";
 
                 Process processForId = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
                 processForId.waitFor();
@@ -65,9 +66,12 @@ public class StreamStopThread implements Runnable {
                 while ((lineForId = readerForId.readLine()) != null) {
                     dataBackForId.append(lineForId).append('\n');
                 }
-                Integer processNum = Integer.parseInt(dataBackForId.substring(9, 15).replace(" ", ""));
-                String urlStop = "kill -9 " + processNum;
-                Runtime.getRuntime().exec(urlStop);
+                log.info("流进程："+dataBackForId);
+                if (dataBackForId.length()>0) {
+                    Integer processNum = Integer.parseInt(dataBackForId.substring(9, 15).replace(" ", ""));
+                    String urlStop = "kill -9 " + processNum;
+                    Runtime.getRuntime().exec(urlStop);
+                }
             }
         } catch (Exception e) {
             Constant.mapsForCamera.clear();
