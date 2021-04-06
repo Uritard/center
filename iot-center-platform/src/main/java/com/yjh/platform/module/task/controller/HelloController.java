@@ -45,6 +45,7 @@ import redis.clients.jedis.ScanResult;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -218,7 +219,7 @@ public class HelloController {
     @ApiOperation("说hello")
     @PostMapping("/admin")
     @ResponseBody
-    public Result sayHello(@RequestParam(value = "filePath") String filePath, @RequestParam String testString)  throws ParseException {
+    public Result sayHello(@RequestParam(value = "filePath") String filePath, @RequestParam String testString) {
         Result result = new Result();
         ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
         tStdMetemodelDetailDao.selectForDictNote(resultHandler);
@@ -254,8 +255,6 @@ public class HelloController {
 
 
 
-
-
 //        Date date=new SimpleDateFormat("yyyyMMddhhmmssSSS").parse(testString);
 //        String time=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
 //        Date date1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(time);
@@ -267,6 +266,18 @@ public class HelloController {
         return result;
     }
 
+//    @ApiOperation("红外测温")
+//    @GetMapping("/hotData")
+//    public String thermalDataRevise(@RequestParam String value){
+//
+//        Double longValue=Double.valueOf(value);
+//        Double  longRevise=(longValue/10);
+//        String[] stringRevise=longRevise.toString().split("\\.");
+//        Double  finalValue=longValue-Long.valueOf(stringRevise[0]);
+//
+//        return finalValue.toString();
+//
+//    }
 
     @Autowired
     TCruiseResultDao tCruiseResultDao;
