@@ -313,8 +313,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                 log.info("连接可能断了，等待重连.....");
             } else {
                 doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
-//                PacketDealThread packetDealThread  = new PacketDealThread(xmlRes,sendSessionId,receiveSessionId,heartNum,flag2,this,isThreadStart,redisTemplate);
-//                TaskExecutePool.getInstance().execute(packetDealThread);
                 log.info("+++++++++++++++++解包完成+++++++++++++++++");
             }
     }

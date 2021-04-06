@@ -21,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Map;
 
 /**
  * @Description
@@ -63,6 +64,8 @@ public class AccessRobotApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
         Constant.robotCode = robotCode;
+        Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
+        String websocketUrl = webSocketUrlMap.get("content");
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);
         nettyServer.start(address, serverName, redisTemplate, sysLogsService,robotService,websocketUrl);

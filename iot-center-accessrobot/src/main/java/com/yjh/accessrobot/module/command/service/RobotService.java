@@ -394,14 +394,14 @@ public class RobotService {
             log.info("-------------这是刚发命令的响应"+receiveSessionId+"-------------");
             if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
                 RobotServerHandler.getRobotResultMap().put("Item",null);
-                return RobotServerHandler.getRobotResultMap();
             }else{
                 RobotServerHandler.getRobotResultMap().put("Item",xmlBaseModel.getItems().get(0));
             }
+            log.info("组成的robotResultMap是==="+RobotServerHandler.getRobotResultMap());
+            return RobotServerHandler.getRobotResultMap();
         }else{
             log.info("-------------这不是刚发命令的响应"+receiveSessionId+"-------------");
         }
-        log.info("组成的robotResultMap是==="+RobotServerHandler.getRobotResultMap());
 
         Map<String,Object> res = new HashMap<>();
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
