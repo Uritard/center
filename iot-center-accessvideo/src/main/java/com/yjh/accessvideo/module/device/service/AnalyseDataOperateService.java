@@ -706,18 +706,18 @@ public class AnalyseDataOperateService {
     }
 
 
-    /**
-     * 红外温度补偿
-     * @param value
-     * @return
-     */
-    public String thermalDataRevise(String value){
-        Double longValue=Double.valueOf(value);
-        Double  longRevise=(longValue/10);
-        String[] stringRevise=longRevise.toString().split("\\.");
-        Double  finalValue=longValue-Long.valueOf(stringRevise[0]);
-
-        return finalValue.toString();
-    }
+//    /**
+//     * 红外温度补偿
+//     * @param value
+//     * @return
+//     */
+//    public String thermalDataRevise(String value){
+//        Double longValue=Double.valueOf(value);
+//        Double  longRevise=(longValue/10);
+//        String[] stringRevise=longRevise.toString().split("\\.");
+//        Double  finalValue=longValue-Long.valueOf(stringRevise[0]);
+//
+//        return finalValue.toString();
+//    }
 }
 

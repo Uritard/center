@@ -232,7 +232,6 @@ public class DataDealThread implements Runnable {
                                         //  JsonObject中存在 firDocPath 则放入缓存中
                                         if(Objects.nonNull(jsonObjectResult.get("firDocPath"))){
                                             if(!(jsonObjectResult.get("firDocPath").toString().equals(""))){
-                                                alarmValue=analyseDataOperateService.thermalDataRevise(alarmValue);
                                                 String firDocPath=jsonObjectResult.get("firDocPath").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content").toString());
                                                 cruiseResultMap.put("firDocPath",firDocPath);
                                                 File file=new File(firDocPath);
