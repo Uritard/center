@@ -290,7 +290,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "任务继续")
     @RequestMapping(value = "/taskGoOn", method = RequestMethod.GET)
-    @Logs(title = "任务恢复",content = "任务恢复",logType = 13)
+    @Logs(title = "任务恢复",content = "任务恢复",logType = 12)
     public Result taskGoOn(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
