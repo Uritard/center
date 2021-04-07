@@ -717,7 +717,7 @@
             LEFT JOIN t_cruise_task_result_detail b  on a.cruise_result_id=b.cruise_result_id
 			LEFT JOIN t_cruise_point_instance  c     on  b.instance_id  =c.instance_id
 			LEFT JOIN  t_camera_preset d             on  c.cruise_id=d.preset_id
-			 where 1=1 and  a.result_pic !=''
+			 where 1=1 and  a.result_pic !='' and a.fir_name !='f'
         <if test="cameraId!=null  and cameraId!=''"> and  d.camera_id =  #{cameraId,jdbcType=BIGINT} </if>
         <if test="firName != null and firName != '' ">and a.fir_name LIKE CONCAT('%',#{firName, jdbcType=VARCHAR},'%')</if>
         <if test="startDate != null and startDate != '' " ><if test="endDate != null and endDate != ''">and a.fir_date between STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s') and STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')</if></if>

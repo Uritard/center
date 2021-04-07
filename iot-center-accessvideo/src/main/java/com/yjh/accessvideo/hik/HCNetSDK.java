@@ -3718,6 +3718,37 @@ EMAIL参数结构
         public   NET_VCA_POLYGON  struPoint;
 
     }
+    public static class NET_DVR_THERMOMETRY_PRESETINFO extends Structure
+    {
+        public int         dwSize;//结构体大小
+        public short        wPresetNo;//0-保留
+        public byte[]        byRes = new byte[2];
+        public NET_DVR_THERMOMETRY_PRESETINFO_PARAM[]  struPresetInfo =  new NET_DVR_THERMOMETRY_PRESETINFO_PARAM[40];
+    }
+
+    public static class NET_DVR_THERMOMETRY_PRESETINFO_PARAM extends Structure
+    {
+        public byte    byEnabled;  //是否使能：0- 否，1- 是
+        public byte    byRuleID;//规则ID 0-表示无效，从1开始 （list内部判断数据有效性）
+        public short    wDistance;//距离(m)[0, 10000]
+        public float   fEmissivity;//发射率(发射率 精确到小数点后两位)[0.01, 1.00](即：物体向外辐射能量的本领)
+        public byte     byDistanceUnit;//距离单位: 0-米（m），1-英尺（feet）,2-厘米(centimeter)
+        public byte[] byRes = new byte[2];
+        public byte    byReflectiveEnabled;//反射温度使能：0- 否，1- 是
+        public float   fReflectiveTemperature;//反射温度 精确到小数后2位
+        public byte[]    szRuleName = new byte[NAME_LEN/*32*/];//规则名称
+        public byte[]    byRes1 = new byte[63];
+        public byte    byRuleCalibType;//规则标定类型 0-点，1-框，2-线
+        public NET_VCA_POINT struPoint;//点测温坐标（当规则标定类型为"点"的时候生效）
+        public NET_VCA_POLYGON struRegion;//区域、线（当规则标定类型为"框"或者"线"的时候生效）
+    }
+    public static class NET_DVR_THERMOMETRY_COND extends Structure
+    {
+        public int        dwSize;//结构体大小
+        public int        dwChannel;
+        public short        wPresetNo;//0-保留
+        public byte[]   byRes = new byte[62];
+    }
 
     //多边形结构体。
     public static class NET_VCA_POLYGON extends Structure
@@ -4525,6 +4556,7 @@ EMAIL参数结构
 
     //tt: 获取设备的配置信息。lUserID 设备注册后获取的ID，dwCommand 设备配置命令
     boolean  NET_DVR_SetSTDConfig(NativeLong lUserID, int dwCommand, NET_DVR_STD_CONFIG lpConfigParam);
+    boolean NET_DVR_GetSTDConfig(NativeLong lUserID,int dwCommand,NET_DVR_STD_CONFIG lpOutConfigParam);
 
     public static interface FRemoteConfigCallback extends StdCallLibrary.StdCallCallback {
         public void invoke(int dwType, Pointer lpBuffer, int dwBufLen, Pointer pUserData);
