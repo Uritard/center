@@ -65,13 +65,13 @@ public class AnalysisDataOperateController {
                         warnLevel=alarmLevel;
                         if(analyseDataOperateService.warnJudgementTelesignaling(value,stateZero,stateOne,alarmState)==1){
                             isWarn=true;
-                            warnName=stdDeviceMeteName+"状态异常";
+                            warnName=stdDeviceMeteName;
                             switch (alarmState){
                                 case 0:
-                                    warnContent="主设备告警"+":"+stdDeviceMeteName+"-"+stateZero+"状态告警";
+                                    warnContent=stdDeviceMeteName+":"+stateZero+"--"+"状态"+analyseDataOperateService.selectDictNote(warnLevel.toString(), "alarm_level");
                                     break;
                                 case 1:
-                                    warnContent="主设备告警"+":"+stdDeviceMeteName+"-"+stateOne+"状态告警";
+                                    warnContent=stdDeviceMeteName+":"+stateOne+"--"+"状态"+analyseDataOperateService.selectDictNote(warnLevel.toString(), "alarm_level");
                             }
                             warnTime=new Date();
                         }
@@ -90,7 +90,7 @@ public class AnalysisDataOperateController {
                                 switch (level) {
                                     case 1:
                                         warnLevel = Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_level", "预警"));
-                                        warnContent = "主设备告警" + ":" + stdDeviceMeteName + "-" + "预警";
+                                        warnContent =stdDeviceMeteName+":"+value+ "--" + "预警";
                                         if (resultValueMeter >= highLimit1) {
                                             outRange = String.valueOf(resultValueMeter - highLimit1);
                                         } else {
@@ -99,7 +99,7 @@ public class AnalysisDataOperateController {
                                         break;
                                     case 2:
                                         warnLevel = Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
-                                        warnContent = "主设备告警" + ":" + stdDeviceMeteName + "-" + "一般告警";
+                                        warnContent =stdDeviceMeteName +":"+value+ "--" + "一般告警";
                                         if (resultValueMeter >= highLimit2) {
                                             outRange = String.valueOf(resultValueMeter - highLimit2);
                                         } else {
@@ -108,7 +108,7 @@ public class AnalysisDataOperateController {
                                         break;
                                     case 3:
                                         warnLevel = Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_level", "严重告警"));
-                                        warnContent = "主设备告警" + ":" + stdDeviceMeteName + "-" + "严重告警";
+                                        warnContent = stdDeviceMeteName +":"+value+ "-" + "严重告警";
                                         if (resultValueMeter >= highLimit3) {
                                             outRange = String.valueOf(resultValueMeter - highLimit3);
                                         } else {
@@ -117,7 +117,7 @@ public class AnalysisDataOperateController {
                                         break;
                                     case 4:
                                         warnLevel = Integer.valueOf(analyseDataOperateService.selectDictCode("alarm_level", "危急告警"));
-                                        warnContent = "主设备告警" + ":" + stdDeviceMeteName + "-" + "危急告警";
+                                        warnContent =stdDeviceMeteName +":"+value+ "-" + "危急告警";
                                         if (resultValueMeter >= highLimit4) {
                                             outRange = String.valueOf(resultValueMeter - highLimit4);
                                         } else {
