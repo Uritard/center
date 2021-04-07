@@ -1317,6 +1317,7 @@ public class CameraConService {
             //log.info("lUserIDLong:返回值"+lUserIDLong);
             lUserIDLong = new NativeLong(lUserID);// new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
             log.info("lUserIDLong" + lUserIDLong);
+            //getSetconfig(lUserIDLong);
             HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
             m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
             m_strJpegWithAppenData.dwChannel = 1;
@@ -1440,7 +1441,7 @@ public class CameraConService {
             }catch (Exception e){
                 log.error("error----"+e);
             }
-
+            //       getSetconfig(lUserIDLong);
             HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
             m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
             m_strJpegWithAppenData.dwChannel = 1;
@@ -1981,6 +1982,66 @@ public class CameraConService {
         //}
         return list;
     }
+
+    public void getSetconfig(NativeLong lUserID)
+    {
+        HCNetSDK.NET_DVR_THERMOMETRY_PRESETINFO m_struThermometryInfo = new HCNetSDK.NET_DVR_THERMOMETRY_PRESETINFO();
+        m_struThermometryInfo.dwSize = m_struThermometryInfo.size();
+        HCNetSDK.NET_DVR_THERMOMETRY_COND m_struThermometryCond = new HCNetSDK.NET_DVR_THERMOMETRY_COND();
+        m_struThermometryCond.dwSize = m_struThermometryCond.size();
+        //通道号
+        m_struThermometryCond.dwChannel = 2;
+        m_struThermometryCond.write();
+        HCNetSDK.NET_DVR_STD_CONFIG struCfg = new HCNetSDK.NET_DVR_STD_CONFIG();
+        struCfg.lpCondBuffer = m_struThermometryCond.getPointer();
+        struCfg.dwCondSize = m_struThermometryCond.size();
+        HCNetSDK.BYTE_ARRAY m_szStatusBuf = new HCNetSDK.BYTE_ARRAY(4096 * 4);
+        struCfg.lpStatusBuffer = m_szStatusBuf.getPointer();
+        struCfg.dwStatusSize = 4096 * 4;
+        struCfg.byDataType=0;
+        boolean bRet = hCNetSDK.NET_DVR_GetSTDConfig(lUserID, 6701, struCfg);
+        if (bRet)
+        {
+           int  nErr= hCNetSDK.NET_DVR_GetLastError();
+            log.info("NET_DVR_GetSTDConfig 信息：" + nErr );
+        }
+        else
+        {
+            log.info("NET_DVR_GetSTDConfig  success" );
+        }
+        m_struThermometryInfo.dwSize = m_struThermometryInfo.size();
+       // m_struThermometryInfo.wPresetNo = 1;
+        m_struThermometryInfo.struPresetInfo[0] = new HCNetSDK.NET_DVR_THERMOMETRY_PRESETINFO_PARAM();
+        m_struThermometryInfo.struPresetInfo[0].byEnabled = 1;
+        m_struThermometryInfo.struPresetInfo[0].byRuleID = 1;
+       // 距离，单位：米(m)，取值范围：[0,10000]
+        m_struThermometryInfo.struPresetInfo[0].wDistance = 2;
+        //发射率(即物体向外辐射能量的本领，精确到小数点后两位)，取值范围：[0.01, 1.00]
+        //该值对于不支持规则框以及预置点的设备使用
+        m_struThermometryInfo.struPresetInfo[0].fEmissivity = (float)0.98;
+        m_struThermometryInfo.struPresetInfo[0].byReflectiveEnabled = 0;
+        //反射温度 精确到小数后一位
+        m_struThermometryInfo.struPresetInfo[0].fReflectiveTemperature = 20;
+        //距离单位: 0- 米(m)，1- 英尺(feet)，2-厘米（cm）
+        m_struThermometryInfo.struPresetInfo[0].byDistanceUnit = 0;
+        m_struThermometryInfo.write();
+        struCfg.lpInBuffer =  m_struThermometryInfo.getPointer();
+        struCfg.dwInSize = m_struThermometryInfo.size();
+
+
+        boolean m = hCNetSDK.NET_DVR_SetSTDConfig(lUserID, 6701, struCfg);
+        if (bRet == false)
+        {
+           int nErr= hCNetSDK.NET_DVR_GetLastError();
+            log.info("NET_DVR_SET_THERMOMETRY_PRESETINFO 信息：" + nErr );
+        }
+        else
+        {
+            log.info("NET_DVR_SET_THERMOMETRY_PRESETINFO success" );
+        }
+    }
+
+
 
 }
 
