@@ -34,11 +34,13 @@ public class PacketDataHandler {
     private ChanResultService chanResultService;
     private TDiagnosePlanDao tDiagnosePlanDao;
     private RedisTemplate redisTemplate;
+    private int dataKey;
 
-    public PacketDataHandler(ChanResultService chanResultService,TDiagnosePlanDao tDiagnosePlanDao,RedisTemplate redisTemplate) {
+    public PacketDataHandler(ChanResultService chanResultService,TDiagnosePlanDao tDiagnosePlanDao,RedisTemplate redisTemplate,int dataKey) {
         this.chanResultService = chanResultService;
         this.tDiagnosePlanDao=tDiagnosePlanDao;
         this.redisTemplate=redisTemplate;
+        this.dataKey=dataKey;
     }
 
     public void analysisChanResult(String chanResult){
@@ -48,7 +50,7 @@ public class PacketDataHandler {
             log.info("index"+chanResult.indexOf("<?"));
             //xml转实体
             // TODO: 2021/2/7   index:报文开始处理位置--会出现波动--后期修改
-            ChanResult chanResult1=ChanResultXML.unPackingXMl(chanResult.substring(137));
+            ChanResult chanResult1=ChanResultXML.unPackingXMl(chanResult.substring(dataKey));
             log.info("对象:"+chanResult1);
             //获取监测点ID
             Set<String>keys=redisScan("diagnosePlan");

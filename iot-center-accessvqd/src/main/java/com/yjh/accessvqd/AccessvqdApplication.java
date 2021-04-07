@@ -5,6 +5,7 @@ import com.yjh.accessvqd.module.diagnose.service.ChanResultService;
 import com.yjh.accessvqd.netty.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -39,6 +40,10 @@ public class AccessvqdApplication implements CommandLineRunner {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    //诊断结果报文分隔范围
+    @Value("${dataKey}")
+    private int dataKey;
+
     private NettyServer nettyServer = new NettyServer();
 
     public static void main(String[] args) {
@@ -50,7 +55,7 @@ public class AccessvqdApplication implements CommandLineRunner {
         String url = getLocalIp();
         InetSocketAddress address = new InetSocketAddress(url, 18725);
         log.info("accessVqd is running, url is : " + url);
-        nettyServer.start(address, chanResultService, redisTemplate, tDiagnosePlanDao);
+        nettyServer.start(address, chanResultService, redisTemplate, tDiagnosePlanDao,dataKey);
 //        SocketServerListenHandler socketServerListenHandler=new SocketServerListenHandler(18725,chanResultService,tDiagnosePlanDao,redisTemplate);
 //        socketServerListenHandler.listenClientConnect();
 //        log.info("socket服务开启------------------------");

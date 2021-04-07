@@ -37,6 +37,9 @@ public class VqdServerHandler extends ChannelInboundHandlerAdapter {
 
     public void setRedisTemplate(RedisTemplate redisTemplate) { this.redisTemplate = redisTemplate; }
 
+    private int dataKey;
+    public void setDataKey(int dataKey){this.dataKey=dataKey;}
+
     public ChannelHandlerContext getCtx() {
         return ctx;
     }
@@ -108,7 +111,7 @@ public class VqdServerHandler extends ChannelInboundHandlerAdapter {
             String diagnoseResultMsg=new String(bytes,"UTF-8");
             log.info("VQD-result------"+diagnoseResultMsg);
             if(diagnoseResultMsg.contains("</ChanResult>")){
-                PacketDataHandler packetDataHandler=new PacketDataHandler(chanResultService,tDiagnosePlanDao,redisTemplate);
+                PacketDataHandler packetDataHandler=new PacketDataHandler(chanResultService,tDiagnosePlanDao,redisTemplate,dataKey);
                 packetDataHandler.analysisChanResult(diagnoseResultMsg);
             }
         }catch (Exception e){
