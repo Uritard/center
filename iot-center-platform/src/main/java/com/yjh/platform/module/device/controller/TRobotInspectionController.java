@@ -185,7 +185,11 @@ public class TRobotInspectionController {
             Map<String,Object> map = tRobotInspectionService.selectRobotTaskProgress(robotId);
             String taskId = map.get("taskId").toString();
             List<RobotTaskMessage> list =tRobotInspectionService.selectRobotTaskMessage(taskId,robotId);
-            resultMap.put("taskInfo",list);
+            if(list != null && list.size()>0){
+                resultMap.put("taskInfo",list);
+            }else {
+                resultMap.put("taskInfo","");
+            }
 
             if(list != null){
 //                if("100".equals(map.get("taskProgress")) ){
