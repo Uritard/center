@@ -152,6 +152,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         log.info("channel.isActive(): " + channel.isActive());
         log.info("此时的packet====="+Packet);
+        Packet = "";
+        Constant.registerCount = 1;
 
         //1.判断是否为注册连接，是注册连接带strChannelID，不是则是空,无须修改状态 2.可以改为若strChannelID为空，则不可注册
         if (strRobotCode == null || strRobotCode.equals("")) {
@@ -209,15 +211,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         Packet2 = Packet.replace(""," ");
         byte[] packetByte = PlatformPacketUtil.HexString2Bytes(Packet2);
 
-        /*byte[] sendSessionIdByte = new byte[8];
-        System.arraycopy(packetByte, 2, sendSessionIdByte, 0, 8);
-        long sendRobotNewSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);//发送会话序列号
-        log.info("本身的发送会话序列号为=="+sendRobotSessionId+"新来的发送会话序列号==="+sendRobotNewSessionId);
-        byte[] xmlByteLengthByte = new byte[8];
-        System.arraycopy(packetByte,19,xmlByteLengthByte,0,4);
-        long xmlByteLength = PlatformPacketUtil.bytesToLong(xmlByteLengthByte);//xml的字节长度
-        log.info("xml的字节长度==="+xmlByteLength);
-        if (sendRobotSessionId + 1 == sendRobotNewSessionId){
+        /*if (sendRobotSessionId + 1 == sendRobotNewSessionId){
             //是新的包
             sendRobotSessionId = sendRobotNewSessionId;
             int headNum = appearNumber(Packet,"eb90");
@@ -234,6 +228,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             openPackage(Packet,headNum);
         }
 
+        /*int headNum = appearNumber(Packet,"eb90");
+        openPackage(Packet,headNum);*/
 
 //        lookByte(bytes);//看指令
         /*String body = new String(bytes, StandardCharsets.UTF_8);
@@ -280,10 +276,27 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     public void openPackage (String socketMessageHex,int headNum) throws Exception{
         String onePacketString = null;
         String residueString = null;
-        if(socketMessageHex.startsWith("eb90") && headNum >= 2) {
+
+        Packet2 = socketMessageHex.replace(""," ");
+        byte[] packetByte = PlatformPacketUtil.HexString2Bytes(Packet2);
+
+        byte[] sendSessionIdByte = new byte[8];
+        System.arraycopy(packetByte, 2, sendSessionIdByte, 0, 8);
+        long sendRobotNewSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);//发送会话序列号
+        log.info("本身的发送会话序列号为=="+sendRobotSessionId+"新来的发送会话序列号==="+sendRobotNewSessionId);
+
+        byte[] xmlByteLengthByte = new byte[4];
+        System.arraycopy(packetByte,19,xmlByteLengthByte,0,4);
+        int xmlByteLength = PlatformPacketUtil.bytesToInt1(xmlByteLengthByte,0);//xml的字节长度
+        log.info("xml的字节长度==="+xmlByteLength);
+
+        if(socketMessageHex.startsWith("eb90")
+                && headNum >= 2
+                /*&& Long.valueOf(sendRobotNewSessionId).equals(Long.valueOf(sendRobotSessionId + 1))
+                && xmlByteLength > 0*/) {
             //有至少一个完整的包
             int limitNum = socketMessageHex.indexOf("eb90", socketMessageHex.indexOf("eb90") + 1) + 3;//一个包的长度-1
-
+//            sendRobotSessionId = sendRobotNewSessionId;
             if(socketMessageHex.length()-limitNum == 1){
                 byte[] onePacket = PlatformPacketUtil.HexString2Bytes(socketMessageHex);
                 StringBuilder Str2 = new StringBuilder();
@@ -1120,5 +1133,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         log.info("channel.isActive(): " + channel.isActive());
         log.info("此时的packet====="+Packet);
+        Constant.registerCount = 1;
     }
 }

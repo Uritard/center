@@ -369,6 +369,15 @@ public class TCruiseResultService{
             }
             log.info("准备更改的的东西是==="+cruiseManualReview);
             tCruiseResultDao.manualReview(cruiseManualReview);
+
+            //查询该巡检点审核后的相关信息
+            AfterManualReviewInfo afterManualReviewInfo = tCruiseResultDao.selectJudgeCondition(res.getCruiseDataId());
+            //若该点生成告警,则核查为属实
+            if (afterManualReviewInfo.getIsWarn() == 1) {
+                Long warnId = tCruiseResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
+                tCruiseResultDao.updateWarnInfo3(warnId,userId,date);
+                sendWebSocket(warnId);
+            }
         }
         //自动生成巡视报告
         String reportFilePath = reportManageService.cruiseReportGenerate(taskId);

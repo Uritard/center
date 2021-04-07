@@ -33,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 /**
@@ -841,16 +842,19 @@ public class RobotService {
                             .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
                             .setEvaluationState(257)
                             .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
-                            .setIsWarn(0)
+                            .setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")))
                             .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
                     if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                         tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
                     } else {
                         tCruiseDataResult.setCruiseAbnormal(null);
                     }
-                    if (redisInfoMap.containsKey("resultPic")){
+                    if (!"null".equals(redisInfoMap.get("resultPic"))) {
                         tCruiseDataResult.setResultPic(redisInfoMap.get("resultPic"));
+                    } else {
+                        tCruiseDataResult.setResultPic(null);
                     }
+                    tCruiseDataResult.setFirName("f");
                     tCDRList.add(tCruiseDataResult);
 
                     if ("null".equals(redisInfoMap.get("cruiseAbnormal"))) {

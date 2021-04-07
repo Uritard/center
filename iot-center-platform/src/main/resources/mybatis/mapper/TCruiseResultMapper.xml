@@ -644,6 +644,17 @@
         a.task_id = #{taskId, jdbcType=VARCHAR}
         and a.instance_id = #{instanceId,jdbcType = BIGINT}
     </update>
+    <update id="updateWarnInfo3">
+        UPDATE t_warn_info a <set>
+        a.conf_mode = 275,
+        a.deal_type = 286,
+        a.deal_info = "程序正常，告警属实",
+        <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
+        a.deal_time = #{dealTime, jdbcType=TIMESTAMP}
+    </set>
+        WHERE
+        a.warn_id = #{warnId, jdbcType=BIGINT}
+    </update>
     <update id="updateIsWarn" parameterType="java.lang.Long">
         UPDATE t_cruise_data_result a <set>
         a.is_warn = 1

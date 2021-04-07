@@ -363,7 +363,7 @@ public class CruiseResultDealThread implements Runnable{
     //待完善                             .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
                                         .setEvaluationState(257)
                                         .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
-                                        .setIsWarn(0)
+                                        .setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")))
                                         .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
                                 if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                                     tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
@@ -375,9 +375,12 @@ public class CruiseResultDealThread implements Runnable{
                                 }else {
                                     tCruiseDataResult.setRemark(null);
                                 }
-                                if (redisInfoMap.containsKey("resultPic")){
+                                if (!"null".equals(redisInfoMap.get("resultPic"))) {
                                     tCruiseDataResult.setResultPic(redisInfoMap.get("resultPic"));
+                                } else {
+                                    tCruiseDataResult.setResultPic(null);
                                 }
+                                tCruiseDataResult.setFirName("f");
                                 tCDRList.add(tCruiseDataResult);
                             }
                         }
