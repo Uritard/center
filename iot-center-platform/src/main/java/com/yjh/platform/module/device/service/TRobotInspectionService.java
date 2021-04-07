@@ -99,10 +99,10 @@ public class TRobotInspectionService{
         //获取此机器人的巡视点
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
         Map<String,Object> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode+":"+taskId);
-        Map<String,Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":61");
+        Map<String,Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
         //String taskId = (String)mapForRobotInstance.get("taskId");
         String robotState =(String) mapForRobotState.get("value");
-        if( !"1".equals(robotState)){
+        if( !"2".equals(robotState)){
             //机器人未在做任务
             Map<String,String> jasonMap=new HashMap<>();
             jasonMap.put("type","noTask");
