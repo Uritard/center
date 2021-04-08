@@ -478,7 +478,7 @@ public class HelloController {
     @ApiOperation(value = "异常日志测试")
     @RequestMapping(value = "/testErrorLog", method = RequestMethod.GET)
     @Logs(title = "日志测试",content = "异常日志",logType = 2)
-    public Result testErrorLog() throws Exception{
+    public Result testErrorLog() {
         Result result = new Result();
         Map<String, Object> map = new HashMap<>();
         JSONObject jsonObject = new JSONObject();
