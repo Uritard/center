@@ -27,6 +27,7 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.omg.CORBA.Request;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -478,12 +479,10 @@ public class HelloController {
     @ApiOperation(value = "异常日志测试")
     @RequestMapping(value = "/testErrorLog", method = RequestMethod.GET)
     @Logs(title = "日志测试",content = "异常日志",logType = 2)
-    public Result testErrorLog() {
+    public Result testErrorLog(HttpServletRequest request) {
         Result result = new Result();
-        Map<String, Object> map = new HashMap<>();
         JSONObject jsonObject = new JSONObject();
-        String temTestString = String.valueOf(map.get("test"));
-        if (Objects.isNull(temTestString)) { throw new BusinessException("is null"); }
+        String temTestString = String.valueOf(request.getParameter("username"));
         jsonObject.put("test", temTestString);
         result.setData(jsonObject);
         return result;
