@@ -88,66 +88,34 @@ public class LogsAspect {
                 params.set("requestMethod", request.getMethod());
                 result = joinPoint.proceed();
                 post(params);
-                return result;
             } catch (BusinessException e) {
                 log.info("Exception.... ");
                 params.set("state", 2);
-                params.set("content", content.toString() + "；错误信息：" + e.getMessage());
+//                params.set("content", content.toString() + "；错误信息：" + e.getMessage());
                 post(params);
                 throw e;
             } catch (Throwable e) {
                 log.info("Error.... ");
-                params.set("content", content.toString() + "；异常信息：" + e.getMessage());
+//                params.set("content", content.toString() + "；异常信息：" + e.getMessage());
                 params.set("state", 3);
                 post(params);
                 throw e;
             }
         }
-
-//        if (annotation != null) {
-//            try {
-//                params.set("logType", annotation.logType());
-//                params.set("ip", ip);
-//                params.set("title", annotation.title());
-//                params.set("state", 1);
-//                content.append(annotation.content());
-//                params.set("userId", userId);
-//                params.set("userName", userName);
-//                params.set("requestOrigin", request.getRequestURL());
-//                params.set("requestPath", request.getRequestURI());
-//                params.set("requestMethod", request.getMethod());
-//            } catch (Exception e) { log.error(e.getMessage(), e); }
-//            try {
-//                // 记录操作日志...谁..在什么时间..做了什么事情..
-//                result = joinPoint.proceed();
-//                params.set("content", content.toString());
-//                post(params);
-//                return result;
-//            } catch (BusinessException e) {
-//                params.set("state", 2);
-//                params.set("content", content.toString() + "；错误信息：" + e.getMessage());
-//                post(params);
-//                throw e;
-//            } catch (Throwable e) {
-//                params.set("content", content.toString() + "；异常信息：" + e.getMessage());
-//                params.set("state", 3);
-//                post(params);
-//                throw e;
-//            }
+        return result;
+//        try {
+//            return joinPoint.proceed();
+//        } catch (Throwable e) {
+//            params.set("logType", annotation.logType());
+//            params.set("ip", ip);
+//            params.set("title", "内部接口错误");
+//            params.set("state", 3);
+//            params.set("content", "异常信息: " + e.getMessage() + "\n" + getStackMsg(e));
+//            params.set("userId", userId);
+//            params.set("userName", userName);
+//            post(params);
+//            throw e;
 //        }
-        try {
-            return joinPoint.proceed();
-        } catch (Throwable e) {
-            params.set("logType", annotation.logType());
-            params.set("ip", ip);
-            params.set("title", "内部接口错误");
-            params.set("state", 3);
-            params.set("content", "异常信息: " + e.getMessage() + "\n" + getStackMsg(e));
-            params.set("userId", userId);
-            params.set("userName", userName);
-            post(params);
-            throw e;
-        }
     }
 
     public void post(MultiValueMap<String, Object> params) {
