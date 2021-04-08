@@ -479,11 +479,11 @@ public class HelloController {
     @ApiOperation(value = "异常日志测试")
     @RequestMapping(value = "/testErrorLog", method = RequestMethod.GET)
     @Logs(title = "日志测试",content = "异常日志",logType = 2)
-    public Result testErrorLog(HttpServletRequest request) {
+    public Result testErrorLog(@RequestParam(value = "filePath", required = false) String username) {
         Result result = new Result();
         JSONObject jsonObject = new JSONObject();
-        String temTestString = String.valueOf(request.getParameter("username"));
-        jsonObject.put("test", temTestString);
+        jsonObject.put("test", username);
+        log.info("username: "+username);
         result.setData(jsonObject);
         return result;
     }
