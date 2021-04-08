@@ -345,6 +345,13 @@ public class CheckTaskAreJob extends QuartzJobBean {
         tCruiseResult.setTaskWait(0);
         tCruiseResultDao.update(tCruiseResult);
 
+        Map<String,String> jsonMap2=new HashMap<>();
+        jsonMap2.put("type","taskAre");
+        jsonMap2.put("taskId",taskId);
+        String jsonForTaskAre2= JSON.toJSONString(jsonMap2);
+        log.info("任务超期的消息：   "+jsonForTaskAre2);
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap2);
+
         //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
         //任务状态
 
