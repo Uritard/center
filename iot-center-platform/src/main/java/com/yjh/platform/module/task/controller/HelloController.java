@@ -481,8 +481,11 @@ public class HelloController {
     public Result testErrorLog() throws Exception{
         Result result = new Result();
         Map<String, Object> map = new HashMap<>();
+        JSONObject jsonObject = new JSONObject();
         String temTestString = String.valueOf(map.get("test"));
-        result.setData(temTestString);
+        if (Objects.isNull(temTestString)) { throw new BusinessException("is null"); }
+        jsonObject.put("test", temTestString);
+        result.setData(jsonObject);
         return result;
     }
 }
