@@ -118,7 +118,7 @@ public class TRobotInspectionService{
         }
         instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
         String[] instanceIdList = instanceList.split(", ");
-        List<TCruisePointAttr> nameList =  tRobotInspectionDao.selectRobotTaskMessage(instanceIdList);
+        //List<TCruisePointAttr> nameList =  tRobotInspectionDao.selectRobotTaskMessage(instanceIdList);
         for (String item:instanceIdList) {
             //获取任务数据
             Map<String,String> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+":"+item);
@@ -272,6 +272,15 @@ public class TRobotInspectionService{
 //                   Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
 //                   log.info("发送给前端的消息-停止调接口：   "+json);
                    return reMap;
+               }
+               if(mapForRobotInstance != null && mapForRobotInstance.size() > 0){
+                   if("1".equals(mapForRobotInstance.get("taskState"))){
+                       reMap.put("taskProgress",0);
+                       reMap.put("taskName","");
+                       reMap.put("startTime","");
+                       reMap.put("taskState","");
+                       return reMap;
+                   }
                }
                //String taskId = (String)mapForRobotInstance.get("taskId");
                String instanceList = (String)mapForRobotInstance.get("instanceIdList");
