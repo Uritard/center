@@ -42,7 +42,7 @@ public class AccessvqdApplication implements CommandLineRunner {
 
     //诊断结果报文分隔范围
     @Value("${dataKey}")
-    private int dataKey;
+    private String dataKey;
 
     private NettyServer nettyServer = new NettyServer();
 

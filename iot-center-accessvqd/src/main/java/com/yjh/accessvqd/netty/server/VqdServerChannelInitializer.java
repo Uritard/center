@@ -23,9 +23,9 @@ public class VqdServerChannelInitializer extends ChannelInitializer<SocketChanne
     private RedisTemplate redisTemplate;
     private ChanResultService chanResultService;
     private TDiagnosePlanDao tDiagnosePlanDao;
-    private int dataKey;
+    private String dataKey;
 
-    public VqdServerChannelInitializer(ChanResultService chanResultService, RedisTemplate redisTemplate, TDiagnosePlanDao tDiagnosePlanDao,int dataKey) {
+    public VqdServerChannelInitializer(ChanResultService chanResultService, RedisTemplate redisTemplate, TDiagnosePlanDao tDiagnosePlanDao,String dataKey) {
         this.redisTemplate = redisTemplate;
         this.chanResultService = chanResultService;
         this.tDiagnosePlanDao = tDiagnosePlanDao;

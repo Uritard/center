@@ -20,7 +20,7 @@ import java.net.InetSocketAddress;
 @lombok.extern.slf4j.Slf4j
 public class NettyServer {
 
-    public void start(InetSocketAddress address, ChanResultService chanResultService, RedisTemplate redisTemplate, TDiagnosePlanDao tDiagnosePlanDao,int dataKey){
+    public void start(InetSocketAddress address, ChanResultService chanResultService, RedisTemplate redisTemplate, TDiagnosePlanDao tDiagnosePlanDao,String dataKey){
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {

@@ -433,9 +433,10 @@ public class DataDealThread implements Runnable {
                                                     log.info("------------------------------------------------------------");
                                                     analyseDataOperateService.insertWarnInfo(tWarnInfo);
 
-                                                    // TODO: 2021/3/22 最新告警信息获取
+                                                    // TODO:最新告警信息获取
                                                     Map<String,String> currentWarnInfo=new HashMap<>();
                                                     currentWarnInfo.put("warnId",analyseDataOperateService.selectCurrentWarn().toString());
+                                                    currentWarnInfo.put("defectModel","450");
                                                     currentWarnInfo.put("isPop","false");
 
                                                     {
@@ -513,6 +514,7 @@ public class DataDealThread implements Runnable {
                                                         }
                                                     }
 
+                                                    //最近一条告警信息 入缓存
                                                     redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3, TimeUnit.MINUTES);
                                                     log.info("currentWarnInfo666"+currentWarnInfo);
 
@@ -656,6 +658,13 @@ public class DataDealThread implements Runnable {
                                         defectInfos.add(tDefectInfo);
 
 
+                                        //缺陷弹框PlanB-推送-单缺陷
+                                        Map<String,String> currentWarnInfo=new HashMap<>();
+                                        currentWarnInfo.put("warnId",analyseDataOperateService.selectCurrentDefect().toString());
+                                        currentWarnInfo.put("defectModel",defectMap.get("defectType").toString());
+                                        currentWarnInfo.put("isPop","false");
+
+
                                         // webSocket通知显示缺陷信息(单条推送)
                                         Map<String, Object> jasonMaps = new HashMap<>();
                                         jasonMaps.put("type", "newAlarm");
@@ -674,6 +683,7 @@ public class DataDealThread implements Runnable {
                                         if (alarmNote != null && "1".equals(alarmNote)) {
                                             if (defectLevel == 133) {//危急
                                                 //webSocket通知前端调用查询告警弹框的接口
+                                                currentWarnInfo.put("isPop","true");
                                                 Map<String, Object> jasonMaps2 = new HashMap<>();
                                                 jasonMaps2.put("type", "alarmPopUp");
                                                 jasonMaps2.put("warnId", redisFlag);
@@ -683,6 +693,10 @@ public class DataDealThread implements Runnable {
                                                 postUrl(syncWebsocketUrl,json);
                                             }
                                         }
+
+                                        //最近一条缺陷信息-入缓存
+                                        redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3, TimeUnit.MINUTES);
+                                        log.info("currentWarnInfo666"+currentWarnInfo);
 
                                     } else if (resultArr.length > 1) {
                                         log.info("--------____--------多元缺陷");
@@ -729,6 +743,14 @@ public class DataDealThread implements Runnable {
                                             defectInfos.add(tDefectInfo);
 
 
+                                            //缺陷弹框PlanB-推送-多缺陷
+                                            Map<String,String> currentWarnInfo=new HashMap<>();
+                                            currentWarnInfo.put("warnId",analyseDataOperateService.selectCurrentWarn().toString());
+                                            currentWarnInfo.put("defectModel",defectMap.get("defectType").toString());
+                                            currentWarnInfo.put("isPop","false");
+
+
+
                                             //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
                                             String alarmNote = tStdDevicemete.getAlarmNote();
                                             log.info("该测点是否配置了告警提示是===" + alarmNote);
@@ -737,6 +759,7 @@ public class DataDealThread implements Runnable {
                                             if (alarmNote != null && "1".equals(alarmNote)) {
                                                 if (defectLevel == 133) {//危急
                                                     //webSocket通知前端调用查询告警弹框的接口
+                                                    currentWarnInfo.put("isPop","true");
                                                     Map<String, Object> jasonMaps2 = new HashMap<>();
                                                     jasonMaps2.put("type", "alarmPopUp");
                                                     jasonMaps2.put("warnId", redisFlag);
@@ -747,10 +770,14 @@ public class DataDealThread implements Runnable {
                                                 }
                                             }
 
+                                            redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3, TimeUnit.MINUTES);
+                                            log.info("currentWarnInfo666"+currentWarnInfo);
+
 
                                             defectNames = defectNames + resultArr[i] + " ";
 
                                         }
+
 
                                         // webSocket通知显示缺陷信息(多条推送)
                                         Map<String, Object> jasonMaps = new HashMap<>();
