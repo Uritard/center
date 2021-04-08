@@ -475,4 +475,14 @@ public class HelloController {
         result.setData("此系统是： "+System.getProperty("os.name")+"; ip是:"+ InetAddress.getLocalHost().getHostAddress());
         return result;
     }
+    @ApiOperation(value = "异常日志测试")
+    @RequestMapping(value = "/testErrorLog", method = RequestMethod.GET)
+    @Logs(title = "日志测试",content = "异常日志",logType = 2)
+    public Result testErrorLog() throws Exception{
+        Result result = new Result();
+        Map<String, Object> map = new HashMap<>();
+        String temTestString = String.valueOf(map.get("test"));
+        result.setData(temTestString);
+        return result;
+    }
 }
