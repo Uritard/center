@@ -481,10 +481,9 @@ public class HelloController {
     @Logs(title = "日志测试",content = "异常日志",logType = 2)
     public Result testErrorLog(@RequestParam(value = "filePath", required = false) String username) {
         Result result = new Result();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("test", username);
-        log.info("username: "+username);
-        result.setData(jsonObject);
+        String s = null;
+        try{ s = s.replace("a",""); }catch (Exception e){ throw new NullPointerException(); }
+        result.setData(s);
         return result;
     }
 }
