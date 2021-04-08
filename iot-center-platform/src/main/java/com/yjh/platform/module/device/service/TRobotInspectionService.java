@@ -104,12 +104,12 @@ public class TRobotInspectionService{
         String robotState =(String) mapForRobotState.get("value");
         if( !"2".equals(robotState)){
             //机器人未在做任务
-            Map<String,String> jasonMap=new HashMap<>();
-            jasonMap.put("type","noTask");
-            //jasonMap.put("taskId",tCruiseTask.getTaskId());
-            String json= JSON.toJSONString(jasonMap);
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
-            log.info("发送给前端的消息-停止调接口：   "+json);
+//            Map<String,String> jasonMap=new HashMap<>();
+//            jasonMap.put("type","noTask");
+//            //jasonMap.put("taskId",tCruiseTask.getTaskId());
+//            String json= JSON.toJSONString(jasonMap);
+//            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
+//            log.info("发送给前端的消息-停止调接口：   "+json);
             return  null;
         }
         String instanceList = (String)mapForRobotInstance.get("instanceIdList");
@@ -211,18 +211,18 @@ public class TRobotInspectionService{
             if(! "2".equals(mapForRobotState.get("value"))){
                 re.put("cruiseMapPath","");//巡视路径地图路径
             }
-            if("2".equals(mapForRobotState.get("value"))){
-                try{
-                    Map<String,String> jasonMap=new HashMap<>();
-                    jasonMap.put("type","newTask");
-                    //jasonMap.put("taskId",tCruiseTask.getTaskId());
-                    String json= JSON.toJSONString(jasonMap);
-                    log.info("发送给前端的消息-停止调接口：   "+json);
-                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
-                }catch (Exception e){
-                    log.error("发送websocket错误"+e);
-                }
-            }
+//            if("2".equals(mapForRobotState.get("value"))){
+//                try{
+//                    Map<String,String> jasonMap=new HashMap<>();
+//                    jasonMap.put("type","newTask");
+//                    //jasonMap.put("taskId",tCruiseTask.getTaskId());
+//                    String json= JSON.toJSONString(jasonMap);
+//                    log.info("发送给前端的消息-停止调接口：   "+json);
+//                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
+//                }catch (Exception e){
+//                    log.error("发送websocket错误"+e);
+//                }
+//            }
         }else {
             re.put("robotState","");//机器人状态
         }
@@ -265,12 +265,12 @@ public class TRobotInspectionService{
                    reMap.put("startTime","");
                    reMap.put("taskState","");
 
-                   Map<String,String> jasonMap=new HashMap<>();
-                   jasonMap.put("type","noTask");
-                   //jasonMap.put("taskId",tCruiseTask.getTaskId());
-                   String json= JSON.toJSONString(jasonMap);
-                   Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
-                   log.info("发送给前端的消息-停止调接口：   "+json);
+//                   Map<String,String> jasonMap=new HashMap<>();
+//                   jasonMap.put("type","noTask");
+//                   //jasonMap.put("taskId",tCruiseTask.getTaskId());
+//                   String json= JSON.toJSONString(jasonMap);
+//                   Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
+//                   log.info("发送给前端的消息-停止调接口：   "+json);
                    return reMap;
                }
                //String taskId = (String)mapForRobotInstance.get("taskId");
@@ -338,12 +338,12 @@ public class TRobotInspectionService{
             reMap.put("taskState","");
             reMap.put("taskId","");
 
-            Map<String,String> jasonMap=new HashMap<>();
-            jasonMap.put("type","noTask");
-            //jasonMap.put("taskId",tCruiseTask.getTaskId());
-            String json= JSON.toJSONString(jasonMap);
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
-            log.info("发送给前端的消息-停止调接口：   "+json);
+//            Map<String,String> jasonMap=new HashMap<>();
+//            jasonMap.put("type","noTask");
+//            //jasonMap.put("taskId",tCruiseTask.getTaskId());
+//            String json= JSON.toJSONString(jasonMap);
+//            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
+//            log.info("发送给前端的消息-停止调接口：   "+json);
         }
 
         return reMap;
