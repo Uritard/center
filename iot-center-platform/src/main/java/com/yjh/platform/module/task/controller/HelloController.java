@@ -27,7 +27,6 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.omg.CORBA.Request;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -256,6 +255,8 @@ public class HelloController {
 //        }
 
 
+        log.info("length:---"+testString.length());
+        result.setData(unpacking(testString));
 
 //        Date date=new SimpleDateFormat("yyyyMMddhhmmssSSS").parse(testString);
 //        String time=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
@@ -268,18 +269,20 @@ public class HelloController {
         return result;
     }
 
-//    @ApiOperation("红外测温")
-//    @GetMapping("/hotData")
-//    public String thermalDataRevise(@RequestParam String value){
-//
-//        Double longValue=Double.valueOf(value);
-//        Double  longRevise=(longValue/10);
-//        String[] stringRevise=longRevise.toString().split("\\.");
-//        Double  finalValue=longValue-Long.valueOf(stringRevise[0]);
-//
-//        return finalValue.toString();
-//
-//    }
+    public String unpacking(String msg){
+        String finalMsg=null;
+        if(msg.contains("</snapshotURL>") && msg.contains("</ChanResult>") && msg.length()<200){  //拆小包
+            String aPacket=redisTemplate.opsForHash().get("videoQualityDiagnoseResult","A-packet").toString();
+            redisTemplate.delete("videoQualityDiagnoseResult");
+            finalMsg=aPacket.concat(msg);
+        }else if(msg.contains("xml") && msg.contains("</ChanResult>")){  //整包
+            return msg;
+        } else {                 //拆大包
+            redisTemplate.opsForHash().put("videoQualityDiagnoseResult","A-packet",msg);
+        }
+
+        return finalMsg;
+    }
 
     @Autowired
     TCruiseResultDao tCruiseResultDao;

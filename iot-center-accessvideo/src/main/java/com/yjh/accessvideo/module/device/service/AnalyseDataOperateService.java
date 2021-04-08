@@ -705,6 +705,11 @@ public class AnalyseDataOperateService {
         return analyseDataOperateDao.selectCurrentWarn();
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public Long selectCurrentDefect(){
+        return analyseDataOperateDao.selectCurrentDefect();
+    }
+
 
 //    /**
 //     * 红外温度补偿

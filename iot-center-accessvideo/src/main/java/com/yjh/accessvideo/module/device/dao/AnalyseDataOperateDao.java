@@ -69,4 +69,6 @@ public interface AnalyseDataOperateDao {
     String selectPresetImgByCruise(@Param(value = "instanceId")Long instanceId);
     //查看当前最新的一条告警信息
     Long selectCurrentWarn();
+    //查看当前最新的一条缺陷信息
+    Long selectCurrentDefect();
 }

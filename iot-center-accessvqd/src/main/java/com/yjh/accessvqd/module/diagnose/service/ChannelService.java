@@ -141,7 +141,7 @@ public class ChannelService {
             String result=HttpClientUtils.getInstance().putUrl(channelURl+"/"+channel.getId(), ChannelsXML.generateChannelXML(channel));
             status= ResponseXML.unPackingXMl(result);
         }catch (Exception e){
-            log.error("新增失败"+e);
+            log.error("新增/修改失败"+e);
         }
         return status;
     }

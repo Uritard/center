@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.yjh.accessvqd.common.Constant.maps;
 
@@ -37,8 +38,8 @@ public class VqdServerHandler extends ChannelInboundHandlerAdapter {
 
     public void setRedisTemplate(RedisTemplate redisTemplate) { this.redisTemplate = redisTemplate; }
 
-    private int dataKey;
-    public void setDataKey(int dataKey){this.dataKey=dataKey;}
+    private String dataKey;
+    public void setDataKey(String dataKey){this.dataKey=dataKey;}
 
     public ChannelHandlerContext getCtx() {
         return ctx;
@@ -110,9 +111,10 @@ public class VqdServerHandler extends ChannelInboundHandlerAdapter {
         try{
             String diagnoseResultMsg=new String(bytes,"UTF-8");
             log.info("VQD-result------"+diagnoseResultMsg);
-            if(diagnoseResultMsg.contains("</ChanResult>")){
-                PacketDataHandler packetDataHandler=new PacketDataHandler(chanResultService,tDiagnosePlanDao,redisTemplate,dataKey);
-                packetDataHandler.analysisChanResult(diagnoseResultMsg);
+            String finalResult=unpacking(diagnoseResultMsg);
+            if(Objects.nonNull(finalResult)) {
+                    PacketDataHandler packetDataHandler = new PacketDataHandler(chanResultService, tDiagnosePlanDao, redisTemplate, dataKey);
+                    packetDataHandler.analysisChanResult(finalResult);
             }
         }catch (Exception e){
             log.error("结果接收失败-"+e);
@@ -141,5 +143,21 @@ public class VqdServerHandler extends ChannelInboundHandlerAdapter {
         if (byteBuf.refCnt() >= 1) {
             ReferenceCountUtil.release(ctx);
         }
+    }
+
+
+    public String unpacking(String msg){
+        String finalMsg=null;
+        if(msg.contains("</snapshotURL>") && msg.contains("</ChanResult>") && msg.length()<200){  //拆小包
+            String aPacket=redisTemplate.opsForHash().get("videoQualityDiagnoseResult","A-packet").toString();
+            redisTemplate.delete("videoQualityDiagnoseResult");
+            finalMsg=aPacket.concat(msg);
+        }else if(msg.contains("xml") && msg.contains("</ChanResult>")){  //整包
+            return msg;
+        } else {                 //拆大包
+            redisTemplate.opsForHash().put("videoQualityDiagnoseResult","A-packet",msg);
+        }
+
+        return finalMsg;
     }
 }

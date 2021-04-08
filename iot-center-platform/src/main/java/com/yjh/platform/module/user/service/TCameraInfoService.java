@@ -52,38 +52,38 @@ public class TCameraInfoService {
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCameraInfo tCameraInfo) {
         //摄像头新增前先新增诊断监测点
-        TCameraRecorderByDict recorder=tCameraRecorderDao.selectByPrimaryId(tCameraInfo.getRecordId());
-        Channel channel=new Channel();
-        try {
-            diagnosePointStandardThreshold(channel);
-            channel.setId(RandomStringUtils.randomAlphanumeric(12));
-            channel.setIp(recorder.getRecordIp());
-            channel.setPort(recorder.getHttpPort().toString());
-            channel.setUserName(recorder.getIdentityManager());
-            channel.setUserPwd(recorder.getIdentityCode());
-            Integer realChannelNum=tCameraInfo.getChannelNum()+32;
-            channel.setChanIndex(realChannelNum.toString());
-            channel.setProtocol("0");
-            switch (tCameraInfo.getIsControl()){
-                case 0:
-                    channel.setDevType("1");
-                    break;
-                case 1:
-                    channel.setDevType("0");
-                    break;
-                default:
-                    break;
-            }
-            channel.setDevBrand("0");
-
-         Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
-
-            log.info("channel:"+channel);
-        }catch (Exception e){
-            log.error("监测点新增失败："+e);
-            return 0;
-        }
-
+//        TCameraRecorderByDict recorder=tCameraRecorderDao.selectByPrimaryId(tCameraInfo.getRecordId());
+//        Channel channel=new Channel();
+//        try {
+//            diagnosePointStandardThreshold(channel);
+//            channel.setId(RandomStringUtils.randomAlphanumeric(12));
+//            channel.setIp(recorder.getRecordIp());
+//            channel.setPort(recorder.getHttpPort().toString());
+//            channel.setUserName(recorder.getIdentityManager());
+//            channel.setUserPwd(recorder.getIdentityCode());
+//            Integer realChannelNum=tCameraInfo.getChannelNum()+32;
+//            channel.setChanIndex(realChannelNum.toString());
+//            channel.setProtocol("0");
+//            switch (tCameraInfo.getIsControl()){
+//                case 0:
+//                    channel.setDevType("1");
+//                    break;
+//                case 1:
+//                    channel.setDevType("0");
+//                    break;
+//                default:
+//                    break;
+//            }
+//            channel.setDevBrand("0");
+//
+//         Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
+//
+//            log.info("channel:"+channel);
+//        }catch (Exception e){
+//            log.error("监测点新增失败："+e);
+//            return 0;
+//        }
+        Channel channel=acrossAddMonitor(tCameraInfo);
         tCameraInfo.setMonitorId(channel.getId());
         this.tCameraInfoDao.insert(tCameraInfo);
         return this.intoRedis();
@@ -135,41 +135,48 @@ public class TCameraInfoService {
         TCameraRecorderByDict recorder=tCameraRecorderDao.selectByPrimaryId(tCameraInfo.getRecordId());
         try {
             log.info("channelId----------:"+tCameraInfo.getMonitorId());
-            Result result=Constant.otherServerGet(tCameraInfo.getMonitorId(),Constant.DIAGNOSE_CHANNEL_GET);
+            Result result=Constant.otherServerGet(tCameraInfo.getMonitorId(),Constant.DIAGNOSE_CHANNEL_GET);  //获取已存在的监测点信息
             log.info("result------------:"+result.getMessage());
             Map<String,String> channels=(Map<String,String>)result.getData();
             log.info("channels-----"+channels);
-            Channel channel=new Channel();
-            channel.setId(channels.get("id"));
-            channel.setCheckFlag(channels.get("checkFlag"));
-            channel.setSignalPoint(channels.get("signalPoint"));
-            channel.setBlurPoint(channels.get("blurPoint"));
-            channel.setContrastPoint(channels.get("contrastPoint"));
-            channel.setBrightPoint(channels.get("brightPoint"));
-            channel.setDarkPoint(channels.get("darkPoint"));
-            channel.setChromaPoint(channels.get("chromaPoint"));
-            channel.setMonoPoint(channels.get("monoPoint"));
-            channel.setNoisePoint(channels.get("noisePoint"));
-            channel.setStreakPoint(channels.get("streakPoint"));
-            channel.setFreezePoint(channels.get("freezePoint"));
-            channel.setShakePoint(channels.get("shakePoint"));
-            channel.setFlashPoint(channels.get("flashPoint"));
-            channel.setScenePoint(channels.get("scenePoint"));
-            channel.setCoverPoint(channels.get("coverPoint"));
-            channel.setPtzPoint(channels.get("ptzPoint"));
-            channel.setStreamType(channels.get("streamType"));
-            channel.setProtocol(channels.get("protocol"));
-            channel.setDevType(channels.get("devType"));
-            channel.setDevBrand(channels.get("devBrand"));
-            channel.setIp(recorder.getRecordIp());
-            channel.setPort(recorder.getHttpPort().toString());
-            channel.setUserName(recorder.getIdentityManager());
-            channel.setUserPwd(recorder.getIdentityCode());
-            Integer realChannelNum=tCameraInfo.getChannelNum()+32;
-            channel.setChanIndex(realChannelNum.toString());
 
-            Result result1=Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
-            log.info("re========:"+result1.getData());
+            if(Objects.nonNull(channels.get("id"))) {     //该相机监测点已存在时：--修改监测点
+                Channel channel = new Channel();
+                channel.setId(channels.get("id"));
+                channel.setCheckFlag(channels.get("checkFlag"));
+                channel.setSignalPoint(channels.get("signalPoint"));
+                channel.setBlurPoint(channels.get("blurPoint"));
+                channel.setContrastPoint(channels.get("contrastPoint"));
+                channel.setBrightPoint(channels.get("brightPoint"));
+                channel.setDarkPoint(channels.get("darkPoint"));
+                channel.setChromaPoint(channels.get("chromaPoint"));
+                channel.setMonoPoint(channels.get("monoPoint"));
+                channel.setNoisePoint(channels.get("noisePoint"));
+                channel.setStreakPoint(channels.get("streakPoint"));
+                channel.setFreezePoint(channels.get("freezePoint"));
+                channel.setShakePoint(channels.get("shakePoint"));
+                channel.setFlashPoint(channels.get("flashPoint"));
+                channel.setScenePoint(channels.get("scenePoint"));
+                channel.setCoverPoint(channels.get("coverPoint"));
+                channel.setPtzPoint(channels.get("ptzPoint"));
+                channel.setStreamType(channels.get("streamType"));
+                channel.setProtocol(channels.get("protocol"));
+                channel.setDevType(channels.get("devType"));
+                channel.setDevBrand(channels.get("devBrand"));
+                channel.setIp(recorder.getRecordIp());
+                channel.setPort(recorder.getHttpPort().toString());
+                channel.setUserName(recorder.getIdentityManager());
+                channel.setUserPwd(recorder.getIdentityCode());
+                Integer realChannelNum = tCameraInfo.getChannelNum() + 32;
+                channel.setChanIndex(realChannelNum.toString());
+
+
+                Result result1 = Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
+                log.info("re========:" + result1.getData());
+            }else {   //相机监测点不存在时（相机监测点新增失败）：--新增监测点
+                Channel channel=acrossAddMonitor(tCameraInfo);
+                tCameraInfo.setMonitorId(channel.getId());
+            }
         }catch (Exception e){
             log.error("监测点修改失败："+e);
             return 0;
@@ -456,6 +463,44 @@ public class TCameraInfoService {
     public String selectPmsIdById(Long cameraId) {
         return tCameraInfoDao.selectPmsIdById(cameraId);
     }
+
+    //跨服新增监测点
+    @Transactional(rollbackFor = Exception.class)
+    public Channel acrossAddMonitor(TCameraInfo tCameraInfo){
+        TCameraRecorderByDict recorder=tCameraRecorderDao.selectByPrimaryId(tCameraInfo.getRecordId());
+        Channel channel=new Channel();
+        try {
+            diagnosePointStandardThreshold(channel);
+            channel.setId(RandomStringUtils.randomAlphanumeric(12));
+            channel.setIp(recorder.getRecordIp());
+            channel.setPort(recorder.getHttpPort().toString());
+            channel.setUserName(recorder.getIdentityManager());
+            channel.setUserPwd(recorder.getIdentityCode());
+            Integer realChannelNum = tCameraInfo.getChannelNum() + 32;
+            channel.setChanIndex(realChannelNum.toString());
+            channel.setProtocol("0");
+            switch (tCameraInfo.getIsControl()) {
+                case 0:
+                    channel.setDevType("1");
+                    break;
+                case 1:
+                    channel.setDevType("0");
+                    break;
+                default:
+                    break;
+            }
+            channel.setDevBrand("0");
+
+            Constant.otherServerEntity(channel, Constant.DIAGNOSE_CHANNEL_OPERATE);
+
+            log.info("channel:" + channel);
+        }catch (Exception e){
+            log.error("监测点新增失败"+e);
+        }
+
+        return channel;
+    }
+
 }
 
 

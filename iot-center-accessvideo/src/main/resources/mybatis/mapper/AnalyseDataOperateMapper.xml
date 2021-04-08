@@ -939,4 +939,14 @@
         Limit 1
     </select>
 
+    <select id="selectCurrentDefect" resultType="java.lang.Long">
+         SELECT
+            defect_id
+        FROM
+           t_defect_info
+        GROUP BY
+           defect_time DESC
+        Limit 1
+    </select>
+
 </mapper>
