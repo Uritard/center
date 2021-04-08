@@ -482,7 +482,8 @@ public class HelloController {
     public Result testErrorLog(@RequestParam(value = "filePath", required = false) String username) {
         Result result = new Result();
         String s = null;
-        try{ s = s.replace("a",""); }catch (Exception e){ throw new NullPointerException(); }
+        if (Objects.isNull(s)) throw new BusinessException(111, "is null....");
+//        try{ s = s.replace("a",""); }catch (Exception e){ throw new NullPointerException(); }
         result.setData(s);
         return result;
     }
