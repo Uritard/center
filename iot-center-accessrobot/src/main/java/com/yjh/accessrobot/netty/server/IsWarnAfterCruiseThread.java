@@ -116,9 +116,9 @@ public class IsWarnAfterCruiseThread implements Runnable{
                                 log.info("要插库的告警数据是===" + warnInfo);
                                 StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
 
-                                Map<String,String> redisWarnInfoMap = new HashMap<>();
+                                /*Map<String,String> redisWarnInfoMap = new HashMap<>();
                                 redisWarnInfoMap.put("isWarn","1");
-                                redisTemplate.opsForHash().putAll("t_cruise_task_result:" + threadMap.get("taskCode") + ":" + instanceId,redisWarnInfoMap);
+                                redisTemplate.opsForHash().putAll("t_cruise_task_result:" + threadMap.get("taskCode") + ":" + instanceId,redisWarnInfoMap);*/
 
                                 // webSocket通知前端刷新告警统计数量
                                 Map<String, Object> jasonMaps = new HashMap<>();

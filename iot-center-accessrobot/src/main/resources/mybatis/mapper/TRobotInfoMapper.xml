@@ -977,12 +977,17 @@
                 #{taskId, jdbcType=VARCHAR}
         )
     </insert>
-    <update id="updateIsWarn" parameterType="java.lang.Long">
+    <select id="selectIsWarn" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM t_warn_info a where 1 = 1
+        <if test="instanceId != null ">and a.instance_id = #{instanceId,jdbcType=BIGINT}</if>
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=VARCHAR}</if>
+    </select>
+    <update id="updateIsWarn" parameterType="java.lang.String">
         UPDATE t_cruise_data_result a <set>
         a.is_warn = 1
     </set>
         WHERE
-        a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+        a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR}
     </update>
     <select id="selectIsRobotTask" resultType="java.lang.Long">
         select a.robot_id from t_cruise_task a where 1 = 1

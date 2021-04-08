@@ -142,7 +142,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             log.info("当前的robotServerHandlerMap的key为"+vo.getKey());
             String robotCode = vo.getKey().toString();
             robotServerHandlerMap.remove(robotCode);
-//            String robotCode = robotCodeFlag.substring(0,robotCodeFlag.length()-13);
 
             robotService.updateRobotInfo(robotCode,"离线");
             Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
@@ -447,6 +446,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         List<Map<String,Object>> deviceMap = deviceModel.getItems();
                         XMLBaseModel robotModel = getXmlMessage(filePathMap.get(redisValue) + "/" +robotFile);
                         List<Map<String,Object>> robotMap = robotModel.getItems();
+                        log.info("deviceMap==="+deviceMap+",robotMap==="+robotMap);
                         robotService.robotFileIntoDB(deviceMap,robotMap,xmlBaseModel);
 
                         robotService.upToCruise(xmlBaseModel);//国网要求
@@ -753,7 +753,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     cruiseResultMap.put("valid",xmlBaseModel.getItems().get(0).get("valid").toString());
                     String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
                     String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
-//改进版的,客户端未完善,开始
                     //可见光结果、红外fir、音频wav
                     String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
                     String sArray[] = ftpFilePath.split("/");
@@ -798,8 +797,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         cruiseResultMap.put("relativePath",developRelativeUrl + "Audio" + "/" +ftpFileName);
                         cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
                     }
-//改进版的,客户端未完善,结束
-
                     /*
                      * 新版的图片处理
                      * */
@@ -839,9 +836,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                     log.info("机器人巡视结果数据是："+cruiseResultMap);
 
-                    //Start CruiseResultDealThread
-                    CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate,webSocketUrl);
-                    TaskExecutePool.getInstance().execute(cruiseResultDealThread);
                     //判断结果是否产生告警,只判断红外和可见光
                     Map<String, String> cResultMap = new HashMap<>();
                     cResultMap.put("robotCode",xmlBaseModel.getSendCode());
@@ -855,6 +849,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }
                     IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap,redisTemplate,webSocketUrl);
                     TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
+                    //Start CruiseResultDealThread
+                    CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate,webSocketUrl);
+                    TaskExecutePool.getInstance().execute(cruiseResultDealThread);
 
                     String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
                     byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);

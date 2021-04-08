@@ -179,7 +179,7 @@ public class RobotService {
                 .setType("61")
                 .setCommand("1");
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
-        log.info("生成的机器人模型同步调用xml是<start>" + xmlString + "<end>");
+//        log.info("生成的机器人模型同步调用xml是<start>" + xmlString + "<end>");
         RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString,robotCode),robotCode);
         return true;
     }
@@ -225,13 +225,14 @@ public class RobotService {
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
 
         String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
-        log.info("图片路径为：" + picPath);
+//        log.info("图片路径为：" + picPath);
         /*
          * 将ftp图copy到开发环境
          * */
         String splitArray[] = picPath.split("/");
         String fileName = splitArray[splitArray.length - 1];
         String developMap = absoluteImgMap.get("content") + "/Map";
+//        log.info("developMap==="+developMap);
         File f = new File(developMap);
         if (!f.exists()) {
             f.setWritable(true, false);
@@ -244,11 +245,12 @@ public class RobotService {
             e.getMessage();
         }
         String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
-
+//        log.info("developRelativeUrl===="+developRelativeUrl);
         Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
+//        log.info("tRobotInfo==="+tRobotInfo);
         tRobotInfoDao.update(tRobotInfo);
 
         //设备模型文件
@@ -307,11 +309,11 @@ public class RobotService {
             tr4.setUpRegionId(deviceMap.get("main_device_id").toString());
             tRobotRegionList.add(tr4);
         }
-        log.info("获得的deviceList是：" + deviceList);
+//        log.info("获得的deviceList是：" + deviceList);
 
         //对机器人测点数据进行相应的处理
         List<String> nowList = tRobotInspectionDao.selectAllByRobotId(robotId);//该机器人现有的巡检点
-        log.info("机器人现有的deviceList是：" + nowList);
+//        log.info("机器人现有的deviceList是：" + nowList);
 
         List<TRobotInspection> addList = new ArrayList<>();
         for (TRobotInspection str : deviceList) {
@@ -325,9 +327,9 @@ public class RobotService {
         log.info("准备要删除的inspectionCodeList是===" + nowList);
         if (nowList != null && !nowList.isEmpty()) {
             List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowList);
-            log.info("这些inspectionCode对应的inspectionIdList是==" + inspectionIdList);
+//            log.info("这些inspectionCode对应的inspectionIdList是==" + inspectionIdList);
             List<Long> instanceIdList = tRobotInspectionDao.selectInstanceIdList(inspectionIdList);
-            log.info("这些inspectionId对应的instanceIdList是==" + instanceIdList);
+//            log.info("这些inspectionId对应的instanceIdList是==" + instanceIdList);
 
             int res1 = tRobotInspectionDao.batchDeleteTRobotInspection(inspectionIdList); //删库TRI
             int res2 = tRobotInspectionDao.batchDeleteTCruisePointInstance(instanceIdList);//删库TCPI
@@ -348,7 +350,7 @@ public class RobotService {
         }
 
         //机器人区域层级
-        log.info("获得的tRobotRegionList是："+tRobotRegionList);
+//        log.info("获得的tRobotRegionList是："+tRobotRegionList);
         List<TRobotRegion> lst = tRobotRegionList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(
                 () -> new TreeSet<>(Comparator.comparing(o -> o.getRegionId() + "#" + o.getRegionName() + "#" + o.getUpRegionId()))),
                 ArrayList::new));
@@ -1435,8 +1437,11 @@ public class RobotService {
     public int insertWarn(TWarnInfo warnInfo){
         return tRobotInfoDao.insertWarn(warnInfo);
     }
-    public int updateIsWarn(Long cruiseDataId){
-        return tRobotInfoDao.updateIsWarn(cruiseDataId);
+    public int selectIsWarn(Long instanceId,String taskId){
+        return tRobotInfoDao.selectIsWarn(instanceId,taskId);
+    }
+    public int updateIsWarn(String cruiseResultId){
+        return tRobotInfoDao.updateIsWarn(cruiseResultId);
     }
     public TStdDeviceMete selectDeviceMeteInfo(Long instanceId){
         return tRobotInfoDao.selectDeviceMeteInfo(instanceId);

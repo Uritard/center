@@ -345,6 +345,8 @@
         q.low_limit3,
         q.low_limit4,
         q.mete_kind,
+        q.meter_type,
+        q.mete_type,
         m.dict_note as mete_kind_name,
         e.cruise_id as preset_id,
         k.camera_id,

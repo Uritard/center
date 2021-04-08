@@ -94,7 +94,7 @@ public class RobotController {
     }
     @ApiOperation(value = "发送任务指令接口")
     @RequestMapping(value = "/taskIssued", method = RequestMethod.POST)
-    @Logs(title = "机器人下发任务",content = "根据用户传递的参数给机器人下发任务",logType = 5)
+    @Logs(title = "机器人下发任务",content = "根据用户传递的参数给机器人下发任务",logType = 10)
     public Result feignRobotTaskIssued(@RequestBody Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
         Result result = new Result();
         try {
@@ -109,7 +109,7 @@ public class RobotController {
     }
     @ApiOperation(value = "发送任务控制指令接口")
     @RequestMapping(value = "/taskControl", method = RequestMethod.POST)
-    @Logs(title = "机器人任务控制",content = "根据用户传递的参数给机器人发送任务控制指令",logType = 5)
+    @Logs(title = "机器人任务控制",content = "根据用户传递的参数给机器人发送任务控制指令",logType = 11)
     public Result feignRobotTaskControl(@RequestBody Map<String, Object> robotTaskControlMap) {
         Result result = new Result();
         try {
