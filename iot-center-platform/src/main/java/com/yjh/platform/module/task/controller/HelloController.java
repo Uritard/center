@@ -45,6 +45,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.InetAddress;
@@ -483,6 +484,7 @@ public class HelloController {
         Result result = new Result();
         String s = null;
 //        if (Objects.isNull(s)) throw new BusinessException(111, "is null....");
+        try{ s = s.replace("a",""); }catch (Exception e){ throw new ClassCastException(); }
         try{ s = s.replace("a",""); }catch (Exception e){ throw new NullPointerException(); }
         result.setData(s);
         return result;

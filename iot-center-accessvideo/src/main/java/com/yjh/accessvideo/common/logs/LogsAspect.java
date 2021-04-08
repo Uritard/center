@@ -87,14 +87,18 @@ public class LogsAspect {
                 result = joinPoint.proceed();
                 post(params);
             } catch (BusinessException e) {
+//                String s = null;
+//                if (Objects.isNull(s)) throw new BusinessException(111, "is null....");
                 log.info("Exception.... ");
-                params.set("state", 2);
+                params.set("state", e.getCode());
 //                params.set("content", content.toString() + "；错误信息：" + e.getMessage());
                 post(params);
                 throw e;
             } catch (Throwable e) {
+//                try{ s = s.replace("a",""); }catch (Exception e){ throw new ClassCastException(); }
+//                try{ s = s.replace("a",""); }catch (Exception e){ throw new NullPointerException(); }
                 log.info("Error.... ");
-//                params.set("content", content.toString() + "；异常信息：" + e.getMessage());
+                params.set("content", content.toString() + "；异常信息：" + e.getMessage());
                 params.set("state", 3);
                 post(params);
                 throw e;
