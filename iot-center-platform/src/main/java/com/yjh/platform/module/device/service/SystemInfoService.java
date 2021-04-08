@@ -101,18 +101,19 @@ public class SystemInfoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object>  getDeskOnUse(HttpServletRequest request) throws Exception {
+    public Map<String,Object>  getDeskOnUse(HttpServletRequest request,Long userId) throws Exception {
         Map<String,Object> deskOnUse=systemInfoUtil.getDeskOnUse();
         Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:DiskFreeMin");
         Double diskFreeMin=Double.parseDouble(map.get("content"));
         if(Double.parseDouble(deskOnUse.get("use").toString())/Double.parseDouble(deskOnUse.get("all").toString())*100>(100-diskFreeMin)){
+            String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
             MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
             param.set("logType", "5");
             param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
             param.set("title", "磁盘最小空闲报警");
             param.set("state", 1);
-            param.set("userId", "");
-            param.set("userName", "");
+            param.set("userId", userId);
+            param.set("userName", userName);
             param.set("requestOrigin", request.getRequestURL());
             param.set("requestPath", request.getRequestURI());
             param.set("requestMethod", request.getMethod());

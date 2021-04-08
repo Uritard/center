@@ -33,6 +33,8 @@ public class SystemInfoController {
 
     @Autowired
     private SystemInfoService systemInfoService;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(SystemInfoController.class);
 
@@ -43,9 +45,20 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取内存信息")
     @RequestMapping(value = "/getMemory", method = RequestMethod.GET)
-    public Result getMemory() {
+    public Result getMemory(HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId=Long.valueOf(request.getHeader("userId"));
+            String secureVerify=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify","content"));
+            String[] secures=secureVerify.split(",");
+            for(String memory:secures){
+                if(memory.equals("MemoryFreeMin")){
+                    if(userId!=10001){
+                        result.setCode(209,"当前用户无权限查看内存信息");
+                        return result;
+                    }
+                }
+            }
             result.setData(systemInfoService.getMemory());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -58,9 +71,20 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取cpu信息")
     @RequestMapping(value = "/getCPU", method = RequestMethod.GET)
-    public Result getCPU() {
+    public Result getCPU(HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId=Long.valueOf(request.getHeader("userId"));
+            String secureVerify=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify","content"));
+            String[] secures=secureVerify.split(",");
+            for(String memory:secures){
+                if(memory.equals("cpuFreeMin")){
+                    if(userId!=10001){
+                        result.setCode(209,"当前用户无权限查看CPU信息");
+                        return result;
+                    }
+                }
+            }
             result.setData(systemInfoService.getCPU());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -73,9 +97,20 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取磁盘信息")
     @RequestMapping(value = "/getDisk", method = RequestMethod.GET)
-    public Result getDisk() {
+    public Result getDisk(HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId=Long.valueOf(request.getHeader("userId"));
+            String secureVerify=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify","content"));
+            String[] secures=secureVerify.split(",");
+            for(String memory:secures){
+                if(memory.equals("DiskFreeMin")){
+                    if(userId!=10001){
+                        result.setCode(209,"当前用户无权限查看磁盘信息");
+                        return result;
+                    }
+                }
+            }
             result.setData(systemInfoService.getSwap());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -88,9 +123,20 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取cpu利用率")
     @RequestMapping(value = "/getCpuOnUse", method = RequestMethod.GET)
-    public Result getCpuOnUse() {
+    public Result getCpuOnUse(HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId=Long.valueOf(request.getHeader("userId"));
+            String secureVerify=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify","content"));
+            String[] secures=secureVerify.split(",");
+            for(String memory:secures){
+                if(memory.equals("cpuFreeMin")){
+                    if(userId!=10001){
+                        result.setCode(209,"当前用户无权限查看CPU信息");
+                        return result;
+                    }
+                }
+            }
             result.setData(systemInfoService.getCpuOnUse());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -106,7 +152,18 @@ public class SystemInfoController {
     public Result getDiskOnUse(HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(systemInfoService.getDeskOnUse(request));
+            Long userId=Long.valueOf(request.getHeader("userId"));
+            String secureVerify=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify","content"));
+            String[] secures=secureVerify.split(",");
+            for(String memory:secures){
+                if(memory.equals("DiskFreeMin")){
+                    if(userId!=10001){
+                        result.setCode(209,"当前用户无权限查看磁盘信息");
+                        return result;
+                    }
+                }
+            }
+            result.setData(systemInfoService.getDeskOnUse(request,userId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
