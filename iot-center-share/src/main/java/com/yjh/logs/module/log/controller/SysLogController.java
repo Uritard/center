@@ -26,6 +26,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +60,11 @@ public class SysLogController {
     private final SysLogService sysLogService;
     @Resource
     private RedisTemplate redisTemplate;
+
+
+    @Value("${spring.websocket.send.url}")
+    private String WEBSOCKET_SEND_URL;
+
     private Logger log = LoggerFactory.getLogger(SysLogController.class);
 
     public SysLogController(SysLogService sysOperateLogService) {
@@ -68,9 +74,9 @@ public class SysLogController {
 
     //请求webSocket发送方法
     public String postUrl(String json) throws IOException, URISyntaxException {
-        String url = redisTemplate.opsForHash().get("t_sys_param:webSocketUrl", "content").toString();
+      //  String url = redisTemplate.opsForHash().get("t_sys_param:webSocketUrl", "content").toString();
         CloseableHttpClient client = HttpClients.createDefault();
-        URI uri = new URIBuilder(url).setParameter("json", json).build();
+        URI uri = new URIBuilder(WEBSOCKET_SEND_URL).setParameter("json", json).build();
         HttpPost httpPost = new HttpPost(uri);
         httpPost.addHeader("Content-type", "application/json;charset=utf-8");
         httpPost.setHeader("Accept", "application/json");

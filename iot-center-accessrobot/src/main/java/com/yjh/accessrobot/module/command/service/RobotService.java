@@ -8,6 +8,7 @@ import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.commons.logs.LogsAspect;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
@@ -26,8 +27,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -61,40 +65,53 @@ public class RobotService {
     private SysUserDao sysUserDao;
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password) throws Exception{
+    public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password, HttpServletRequest request) throws Exception{
         Map scmap = new HashMap();
+        String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
         if (command.equals("1") && type.equals("1")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
             if (zcz.get("code") != null) {
                 return zcz;
             }
         } else if (command.equals("3") && type.equals("1")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
             if (zcz.get("code") != null) {
                 return zcz;
             }
         } else if (command.equals("5") && type.equals("1")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
             if (zcz.get("code") != null) {
                 return zcz;
             }
         } else if (command.equals("6") && type.equals("1")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
             if (zcz.get("code") != null) {
                 return zcz;
             }
         } else if (command.equals("9") && type.equals("3")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
             if (zcz.get("code") != null) {
                 return zcz;
             }
         } else if (command.equals("8") && type.equals("22")) {
-            Map<String, Object> zcz = this.booleanZcz(key, userId, password);
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
             if (zcz.get("code") != null) {
                 return zcz;
             }
         }
-
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.set("logType", "5");
+        params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+        params.set("title", "控制机器人");
+        params.set("state", 2);
+        params.set("userId", userId);
+        params.set("userName",userName);
+        params.set("requestOrigin", request.getRequestURL());
+        params.set("requestPath", request.getRequestURI());
+        params.set("requestMethod", request.getMethod());
+        params.set("content", "根据用户传递的参数控制机器人");
+        LogsAspect logsAspect = new LogsAspect();
+        logsAspect.post(params);
         List<Map<String, Object>> Item = new LinkedList<>();
         Map<String, Object> map = new HashMap<>();
         if (!"".equals(value) || null != value) {
@@ -971,35 +988,111 @@ public class RobotService {
         return this.tRobotInfoDao.insertTCruiseTaskResult(tCruiseTaskResult);
     }
 
-    public Map<String, Object> booleanZcz(String key, Long userId, String password) throws  Exception{
+    public Map<String, Object> booleanZcz(String key, Long userId, String password,HttpServletRequest request) throws  Exception{
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(userId);
         Map map = new HashMap();
         String keys = Constant.map.get(String.valueOf(userId));
         if (StringUtils.isEmpty(key) && keys == null && StringUtils.isEmpty(password)) {
             String random = String.valueOf((int) (Math.random() * 1000000000 + 1));
             Constant.map.put(String.valueOf(userId), random);
+            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+            params.set("logType", "5");
+            params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+            params.set("title", "控制机器人");
+            params.set("state", 1);
+            params.set("userId", userId);
+            params.set("userName", sysUserCurrent.getUserName());
+            params.set("requestOrigin", request.getRequestURL());
+            params.set("requestPath", request.getRequestURI());
+            params.set("requestMethod", request.getMethod());
+            params.set("content", "获取密钥");
+            LogsAspect logsAspect = new LogsAspect();
+            logsAspect.post(params);
             map.put("code", 1);
             map.put("result", random);
             return map;
         } else if (StringUtils.isEmpty(key) && StringUtils.isEmpty(password) && keys != null) {
+            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+            params.set("logType", "5");
+            params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+            params.set("title", "控制机器人");
+            params.set("state", 1);
+            params.set("userId", userId);
+            params.set("userName", sysUserCurrent.getUserName());
+            params.set("requestOrigin", request.getRequestURL());
+            params.set("requestPath", request.getRequestURI());
+            params.set("requestMethod", request.getMethod());
+            params.set("content", "获取密钥");
+            LogsAspect logsAspect = new LogsAspect();
+            logsAspect.post(params);
             map.put("code", 1);
             map.put("result", keys);
             return map;
         } else if (StringUtils.isEmpty(key) && StringUtils.isNoneBlank(password) && keys == null) {
+            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+            params.set("logType", "5");
+            params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+            params.set("title", "控制机器人");
+            params.set("state", 2);
+            params.set("userId", userId);
+            params.set("userName", sysUserCurrent.getUserName());
+            params.set("requestOrigin", request.getRequestURL());
+            params.set("requestPath", request.getRequestURI());
+            params.set("requestMethod", request.getMethod());
+            params.set("content", "未输入密钥");
+            LogsAspect logsAspect = new LogsAspect();
+            logsAspect.post(params);
             map.put("code", 2);
             map.put("result", "请输入密钥");
             return map;
         } else if (keys == null && StringUtils.isNoneBlank(key) && StringUtils.isNoneBlank(password)) {
+            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+            params.set("logType", "5");
+            params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+            params.set("title", "控制机器人");
+            params.set("state", 2);
+            params.set("userId", userId);
+            params.set("userName", sysUserCurrent.getUserName());
+            params.set("requestOrigin", request.getRequestURL());
+            params.set("requestPath", request.getRequestURI());
+            params.set("requestMethod", request.getMethod());
+            params.set("content", "密钥已过期");
+            LogsAspect logsAspect = new LogsAspect();
+            logsAspect.post(params);
             map.put("code", 2);
             map.put("result", "密钥已过期");
             return map;
         } else if (!key.equals(keys)) {
-            log.info("key==========================================="+key);
-            log.info("keys==========================================="+keys);
+            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+            params.set("logType", "5");
+            params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+            params.set("title", "控制机器人");
+            params.set("state", 2);
+            params.set("userId", userId);
+            params.set("userName", sysUserCurrent.getUserName());
+            params.set("requestOrigin", request.getRequestURL());
+            params.set("requestPath", request.getRequestURI());
+            params.set("requestMethod", request.getMethod());
+            params.set("content", "密钥错误");
+            LogsAspect logsAspect = new LogsAspect();
+            logsAspect.post(params);
             map.put("code", 2);
             map.put("result", "密钥不正确,请重新输入");
             return map;
         } else if (!Demo.decryptDB(sysUserCurrent.getPassword()).equals(password)) {
+            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+            params.set("logType", "5");
+            params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+            params.set("title", "控制机器人");
+            params.set("state", 2);
+            params.set("userId", userId);
+            params.set("userName", sysUserCurrent.getUserName());
+            params.set("requestOrigin", request.getRequestURL());
+            params.set("requestPath", request.getRequestURI());
+            params.set("requestMethod", request.getMethod());
+            params.set("content", "密码错误");
+            LogsAspect logsAspect = new LogsAspect();
+            logsAspect.post(params);
             map.put("code", 2);
             map.put("result", "用户密码错误，请重新输入");
             return map;

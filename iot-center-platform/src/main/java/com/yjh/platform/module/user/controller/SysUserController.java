@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.controller;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.smUtil.Demo;
@@ -20,6 +21,8 @@ import java.util.*;
 
 import io.swagger.annotations.*;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +68,7 @@ public class SysUserController {
     @ApiOperation(value = "系统用户表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增系统用户数据", content = "根据用户传递的参数新增系统用户数据", logType = 2)
-    public Result insert(@RequestBody SysUser sysUser) {
+    public Result insert(@RequestBody SysUser sysUser,HttpServletRequest request) {
         Result result = new Result();
         try {
             Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
@@ -74,7 +77,7 @@ public class SysUserController {
                 sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
                 sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             }
-            result.setData(sysUserService.insert(sysUser));
+            result.setData(sysUserService.insert(sysUser,request));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -87,14 +90,14 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除系统用户数据", content = "根据用户传递的参数删除系统用户数据", logType = 4)
-    public Result delete(@RequestParam(value = "userId", required = true) Long userId) {
+   // @Logs(title = "删除系统用户数据", content = "根据用户传递的参数删除系统用户数据", logType = 4)
+    public Result delete(@RequestParam(value = "userId", required = true) Long userId,HttpServletRequest request) {
         Result result = new Result();
         try {
             if (userId == 10001) {
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此用户为系统管理员,无法删除");
             }
-            result.setData(sysUserService.deleteByPrimaryId(userId));
+            result.setData(sysUserService.deleteByPrimaryId(userId,request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除用户异常:", e);
@@ -108,7 +111,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改系统用户数据", content = "根据用户传递的参数修改系统用户数据", logType = 3)
+   // @Logs(title = "修改系统用户数据", content = "根据用户传递的参数修改系统用户数据", logType = 3)
     public Result update(@RequestBody SysUser sysUser, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -372,8 +375,8 @@ public class SysUserController {
 
     @ApiOperation(value = "添加用户")
     @RequestMapping(value = "/addUser", method = RequestMethod.POST)
-    @Logs(title = "新增用户", content = "根据用户传递的参数新增数据", logType = 2)
-    public Result insertUser(@Validated @RequestBody SysUser sysUser) {
+  //  @Logs(title = "新增用户", content = "根据用户传递的参数新增数据", logType = 2)
+    public Result insertUser(@Validated @RequestBody SysUser sysUser,HttpServletRequest request) {
 
         Result result = new Result();
         try {
@@ -388,19 +391,23 @@ public class SysUserController {
                 sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
             }
             if (sysUser.getUserName().contains("admin") || sysUser.getUserName().contains("administrator")) {
+                sendPost(request);
                 result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                 return result;
             } else if (sysUser.getPassword().contains("admin") || sysUser.getPassword().contains("administrator")) {
+                sendPost(request);
                 result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                 return result;
             } else if (sysUser.getPassword().contains(sysUser.getUserName())) {
+                sendPost(request);
                 result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                 return result;
             } else if (!sysUser.getPassword().matches(PW_PATTERN)) {
+                sendPost(request);
                 result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                 return result;
             } else {
-                sysUserService.insert(sysUser);
+                sysUserService.insert(sysUser,request);
                 sysUserService.insertIntoRedis();
                 result.setData(sysUser);
             }
@@ -442,12 +449,51 @@ public class SysUserController {
                 mapCache.put("errorInputTimes", "0");
                 String key = Constant.account_lock_times.replace("userAccountID", locked);
                 redisTemplate.opsForHash().putAll(key, mapCache);
+                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                params.set("logType", "5");
+                params.set("ip", httpServletRequest.getHeader("HTTP_X_FORWARDED_FOR"));
+                params.set("title", "用户帐号解锁");
+                params.set("state", 1);
+                params.set("userId", userId);
+                params.set("userName", sysUserCurrent.getUserName());
+                params.set("requestOrigin", httpServletRequest.getRequestURL());
+                params.set("requestPath", httpServletRequest.getRequestURI());
+                params.set("requestMethod", httpServletRequest.getMethod());
+                params.set("content", "用户帐号解锁");
+                LogsAspect logsAspect = new LogsAspect();
+                logsAspect.post(params);
             } else if (!password.equals(Demo.decryptDB(sysUserCurrent.getPassword()))) {
+                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                params.set("logType", "5");
+                params.set("ip", httpServletRequest.getHeader("HTTP_X_FORWARDED_FOR"));
+                params.set("title", "用户帐号解锁");
+                params.set("state", 2);
+                params.set("userId", userId);
+                params.set("userName", sysUserCurrent.getUserName());
+                params.set("requestOrigin", httpServletRequest.getRequestURL());
+                params.set("requestPath", httpServletRequest.getRequestURI());
+                params.set("requestMethod", httpServletRequest.getMethod());
+                params.set("content", "用户帐号解锁密码错误");
+                LogsAspect logsAspect = new LogsAspect();
+                logsAspect.post(params);
                 Map<String, Object> mapResult = new HashMap<>();
                 mapResult.put("code", ResultCodeEnum.CODE10106.getCode());
                 mapResult.put("info", ResultCodeEnum.CODE10106.getName());
                 result.setData(mapResult);
             } else if (sysUserCurrent.getRoleId() != 1234) {
+                MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+                params.set("logType", "5");
+                params.set("ip", httpServletRequest.getHeader("HTTP_X_FORWARDED_FOR"));
+                params.set("title", "用户帐号解锁");
+                params.set("state", 2);
+                params.set("userId", userId);
+                params.set("userName", sysUserCurrent.getUserName());
+                params.set("requestOrigin", httpServletRequest.getRequestURL());
+                params.set("requestPath", httpServletRequest.getRequestURI());
+                params.set("requestMethod", httpServletRequest.getMethod());
+                params.set("content", "当前用户不是管理员,无法进行解锁业务");
+                LogsAspect logsAspect = new LogsAspect();
+                logsAspect.post(params);
                 Map<String, Object> mapResult = new HashMap<>();
                 mapResult.put("code", ResultCodeEnum.CODE10008.getCode());
                 mapResult.put("info", ResultCodeEnum.CODE10008.getName());
@@ -526,6 +572,25 @@ public class SysUserController {
         }
         return val;
     }
+
+    private void sendPost(HttpServletRequest request){
+        Long userIds = Long.valueOf(request.getHeader("userId"));
+        String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.set("logType", "2");
+        params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+        params.set("title", "新增用户");
+        params.set("state", 2);
+        params.set("userId", userIds);
+        params.set("userName", userName);
+        params.set("requestOrigin", request.getRequestURL());
+        params.set("requestPath", request.getRequestURI());
+        params.set("requestMethod", request.getMethod());
+        params.set("content", "用户新增失败");
+        LogsAspect logsAspect = new LogsAspect();
+        logsAspect.post(params);
+    }
+
 
     @ApiOperation(value = "账号锁定用户信息")
     @RequestMapping(value = "/lockUserInfo", method = RequestMethod.GET)

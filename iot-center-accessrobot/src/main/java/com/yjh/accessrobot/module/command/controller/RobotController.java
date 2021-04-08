@@ -49,7 +49,7 @@ public class RobotController {
 
     @ApiOperation(value = "发送控制指令接口")
     @RequestMapping(value = "/command", method = RequestMethod.GET)
-    @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5)
+   // @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5)
     public Result feignRobotControl(HttpServletRequest request,
                                     @RequestParam(value = "robotCode") String robotCode,
                                     @RequestParam(value = "type") String type,
@@ -61,14 +61,12 @@ public class RobotController {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
-//            Long userId = 10001l;
-
             Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode =map.get("content");
             if("true".equals(isDecode)) {
                 password= Demo.decrypt(password);
             }
-            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password));
+            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password,request));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
