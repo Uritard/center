@@ -55,7 +55,11 @@ public class StreamStopThread implements Runnable {
                     log.info("关闭流-->id: {}, cid：{}, clients: {}", videoFlowId, cid, clients);
                     HttpClientUtils.httpDelete(delteUrl,null);
                     log.info("停流成功");
-                } else { log.info("{}流为空或有人正在看。。。", videoFlowId); }
+                } else {
+                    log.info("{}流为空或有人正在看。。。", videoFlowId);
+                    Constant.mapsForCamera.remove(videoFlowId);
+                    Constant.mapsForHistory.remove(videoFlowId);
+                }
                 String url = "ps -ef | grep ffmpeg | grep '/" + livePath + "' | grep -v 'grep'";
 
                 Process processForId = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
