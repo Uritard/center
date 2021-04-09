@@ -106,7 +106,7 @@ public class SysUserService {
         params.set("requestOrigin", request.getRequestURL());
         params.set("requestPath", request.getRequestURI());
         params.set("requestMethod", request.getMethod());
-        params.set("content", userNames+"用户删除了"+userName+"用户");
+        params.set("content", userName+"用户删除了"+userNames+"用户");
         LogsAspect logsAspect = new LogsAspect();
         logsAspect.post(params);
         return this.sysUserDao.deleteByPrimaryId(userId);
