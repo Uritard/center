@@ -102,16 +102,16 @@ public class TRobotInspectionService{
         Map<String,Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
         //String taskId = (String)mapForRobotInstance.get("taskId");
         String robotState =(String) mapForRobotState.get("value");
-//        if( !"2".equals(robotState)){
-//            //机器人未在做任务
-////            Map<String,String> jasonMap=new HashMap<>();
-////            jasonMap.put("type","noTask");
-////            //jasonMap.put("taskId",tCruiseTask.getTaskId());
-////            String json= JSON.toJSONString(jasonMap);
-////            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
-////            log.info("发送给前端的消息-停止调接口：   "+json);
-//            return  null;
-//        }
+        if( "4".equals(robotState)){
+            //机器人未在做任务
+//            Map<String,String> jasonMap=new HashMap<>();
+//            jasonMap.put("type","noTask");
+//            //jasonMap.put("taskId",tCruiseTask.getTaskId());
+//            String json= JSON.toJSONString(jasonMap);
+//            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
+//            log.info("发送给前端的消息-停止调接口：   "+json);
+            return  null;
+        }
         String instanceList = (String)mapForRobotInstance.get("instanceIdList");
         if(instanceList == null){
             return null;
