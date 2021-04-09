@@ -103,7 +103,7 @@ public class RobotService {
         params.set("logType", "5");
         params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
         params.set("title", "控制机器人");
-        params.set("state", 2);
+        params.set("state", 1);
         params.set("userId", userId);
         params.set("userName",userName);
         params.set("requestOrigin", request.getRequestURL());
