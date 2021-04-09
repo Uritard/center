@@ -472,7 +472,7 @@ public class RunAtNowTask implements Runnable{
                                 .setCreatetime(new Date())
                                 .setIsWarn(0)
                                 .setCruiseResult(Integer.valueOf(tCruiseTaskResultDetailMap.get("cruiseResult").toString()))
-                                .setCruiseAbnormal(Integer.valueOf(tCruiseTaskResultDetailMap.get("cruiseAbnormal").toString()))
+                                //.setCruiseAbnormal(Integer.valueOf(tCruiseTaskResultDetailMap.get("cruiseAbnormal").toString()))
                                 .setRemark(null);
                         //tCruiseDataResultDao.insert(tCruiseDataResult);
                         TCDRList.add(tCruiseDataResult);
