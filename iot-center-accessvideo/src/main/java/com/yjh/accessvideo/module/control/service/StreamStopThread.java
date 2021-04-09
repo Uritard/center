@@ -35,7 +35,7 @@ public class StreamStopThread implements Runnable {
     public void run() {
         try {
             //减少IO
-            Thread.sleep(20000);
+//            Thread.sleep(20000);
             //解析每一个stream，循环比对，找到页面传递的设备ID对应的流，并判断是否需要关闭
             for (int i = 0; i < streamListSize; i++) {
                 String streambeanStr = streamsJsonObjectList.get(i);
@@ -57,8 +57,12 @@ public class StreamStopThread implements Runnable {
                     log.info("停流成功");
                 } else if (StringUtils.isEmpty(cid)) {
                     log.info("{}流为空", videoFlowId);
-                    Constant.mapsForCamera.remove(videoFlowId);
-                    Constant.mapsForHistory.remove(videoFlowId);
+                    for (String key:Constant.mapsForCamera.keySet()) {
+                        if (Objects.equals(Constant.mapsForCamera.get(key), livePath)) { Constant.mapsForCamera.remove(videoFlowId); }
+                    }
+                    for (String key:Constant.mapsForHistory.keySet()) {
+                        if (Objects.equals(Constant.mapsForHistory.get(key), livePath)) { Constant.mapsForHistory.remove(videoFlowId); }
+                    }
                 } else if (clients>1){ log.info("{}流有人在看", videoFlowId); }
                 String url = "ps -ef | grep ffmpeg | grep '/" + livePath + "' | grep -v 'grep'";
 
