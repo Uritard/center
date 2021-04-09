@@ -58,12 +58,17 @@ public class StreamStopThread implements Runnable {
                 } else if (StringUtils.isEmpty(cid)) {
                     log.info("{}流为空", videoFlowId);
                     for (String key:Constant.mapsForCamera.keySet()) {
-                        log.info(key+" "+livePath);
-                        if (Objects.equals(Constant.mapsForCamera.get(key), livePath)) { Constant.mapsForCamera.remove(key); }
+                        log.info(Constant.mapsForCamera.get(key)+" "+livePath);
+                        if (Objects.equals(Constant.mapsForCamera.get(key), livePath)) {
+                            log.info("匹配1");
+                            Constant.mapsForCamera.remove(key);
+                        }
                     }
                     for (String key:Constant.mapsForHistory.keySet()) {
-                        log.info(key+" "+livePath);
-                        if (Objects.equals(Constant.mapsForHistory.get(key), livePath)) { Constant.mapsForHistory.remove(key); }
+                        log.info(Constant.mapsForHistory.get(key)+" "+livePath);
+                        if (Objects.equals(Constant.mapsForHistory.get(key), livePath)) {
+                            log.info("匹配2");
+                            Constant.mapsForHistory.remove(key); }
                     }
                 } else if (clients>1){ log.info("{}流有人在看", videoFlowId); }
                 String url = "ps -ef | grep ffmpeg | grep '/" + livePath + "' | grep -v 'grep'";
