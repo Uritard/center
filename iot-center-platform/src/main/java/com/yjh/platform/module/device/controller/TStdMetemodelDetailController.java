@@ -56,17 +56,6 @@ public class TStdMetemodelDetailController {
     public Result add(@Validated @RequestBody TStdMeteModelDetail tStdMeteModelDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Integer userId = Integer.valueOf(request.getHeader("userId"));
-           // Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (userId != 10001) {
-                if (tStdMeteModelDetail.getLowLimit1() != null || tStdMeteModelDetail.getLowLimit2() != null || tStdMeteModelDetail.getLowLimit3() != null || tStdMeteModelDetail.getLowLimit4() != null
-                        || tStdMeteModelDetail.getHighLimit1() != null || tStdMeteModelDetail.getHighLimit2() != null || tStdMeteModelDetail.getHighLimit3() != null || tStdMeteModelDetail.getHighLimit4() != null
-                        || tStdMeteModelDetail.getAlarmState() != null) {
-                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
-                    return result;
-                   // throw new JurisdictionException();
-                }
-            }
             result.setData(tStdMetemodelDetailService.add(tStdMeteModelDetail));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -101,19 +90,7 @@ public class TStdMetemodelDetailController {
     public Result update(@RequestBody TStdMeteModelDetail tStdMeteModelDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Integer userId = Integer.valueOf(request.getHeader("userId"));
-           // Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (userId != 10001) {
-                List<TStdMeteModelDetail> tStdMete = tStdMetemodelDetailService.selectByPrimaryId(tStdMeteModelDetail.getModelId());
-                TStdMeteModelDetail list = tStdMete.get(0);
-                if (tStdMeteModelDetail.getLowLimit1() != list.getLowLimit1() || tStdMeteModelDetail.getLowLimit2() != list.getLowLimit2() || tStdMeteModelDetail.getLowLimit3() != list.getLowLimit3() || tStdMeteModelDetail.getLowLimit4() != list.getLowLimit4()
-                        || tStdMeteModelDetail.getHighLimit1() != list.getHighLimit1() || tStdMeteModelDetail.getHighLimit2() != list.getHighLimit2() || tStdMeteModelDetail.getHighLimit3() != list.getHighLimit3() || tStdMeteModelDetail.getHighLimit4() != list.getHighLimit4()
-                        || tStdMeteModelDetail.getAlarmState() != list.getAlarmState()) {
-                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
-                    return result;
-                  //  throw new JurisdictionException();
-                }
-            }
+
             result.setData(tStdMetemodelDetailService.update(tStdMeteModelDetail));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -208,19 +185,6 @@ public class TStdMetemodelDetailController {
     public Result batchAdd(@RequestBody List<TStdMeteModelDetail> list, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Integer userId = Integer.valueOf(request.getHeader("userId"));
-           // Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (userId != 10001) {
-                for (TStdMeteModelDetail e : list) {
-                    if (e.getLowLimit1() != null || e.getLowLimit2() != null || e.getLowLimit3() != null || e.getLowLimit4() != null
-                            || e.getHighLimit1() != null || e.getHighLimit2() != null || e.getHighLimit3() != null || e.getHighLimit4() != null
-                            || e.getAlarmState() != null) {
-                        result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
-                        return result;
-                       // throw new JurisdictionException();
-                    }
-                }
-            }
             result.setData(tStdMetemodelDetailService.batchAdd(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

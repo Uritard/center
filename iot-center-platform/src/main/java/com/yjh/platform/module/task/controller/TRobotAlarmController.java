@@ -54,15 +54,6 @@ public class TRobotAlarmController {
     public Result insert(@Validated @RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Integer userId = Integer.valueOf(request.getHeader("userId"));
-          //  Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (userId != 10001) {
-                if (tRobotAlarm.getAlarmState()!=null) {
-                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
-                    return result;
-                  //  throw new JurisdictionException();
-                }
-            }
             result.setData(tRobotAlarmService.insert(tRobotAlarm));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -96,16 +87,6 @@ public class TRobotAlarmController {
     public Result update(@RequestBody TRobotAlarm tRobotAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Integer userId = Integer.valueOf(request.getHeader("userId"));
-          //  Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (userId != 10001) {
-                TRobotAlarm list = tRobotAlarmService.selectByPrimaryId(tRobotAlarm.getRobotAlarmId());
-                if (list.getAlarmState()!=tRobotAlarm.getAlarmState()) {
-                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
-                    return result;
-                  //  throw new JurisdictionException();
-                }
-            }
             result.setData(tRobotAlarmService.update(tRobotAlarm));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -189,17 +170,6 @@ public class TRobotAlarmController {
     public Result batchInsert( @RequestBody List<TRobotAlarm> list, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Integer userId = Integer.valueOf(request.getHeader("userId"));
-            //Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (userId != 10001) {
-                for (TRobotAlarm e : list) {
-                    if (e.getAlarmState()!=null) {
-                        result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
-                        return result;
-                       // throw new JurisdictionException();
-                    }
-                }
-            }
         result.setData(tRobotAlarmService.batchInsert(list));
         } catch (Exception e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

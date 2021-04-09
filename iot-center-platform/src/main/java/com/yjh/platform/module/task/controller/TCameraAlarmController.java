@@ -56,15 +56,6 @@ public class TCameraAlarmController {
     public Result insert(@Validated @RequestBody TCameraAlarm tCameraAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Integer userId = Integer.valueOf(request.getHeader("userId"));
-           // Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (userId != 10001) {
-                if (tCameraAlarm.getAlarmState() != null) {
-                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
-                    return result;
-                   // throw new JurisdictionException();
-                }
-            }
             result.setData(tCameraAlarmService.insert(tCameraAlarm));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -98,16 +89,6 @@ public class TCameraAlarmController {
     public Result update(@RequestBody TCameraAlarm tCameraAlarm, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Integer userId = Integer.valueOf(request.getHeader("userId"));
-          //  Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (userId != 10001) {
-                TCameraAlarm list = tCameraAlarmService.selectByPrimaryId(tCameraAlarm.getCameraAlarmId());
-                if (list.getAlarmState() != tCameraAlarm.getAlarmState()) {
-                    result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
-                    return result;
-                   // throw new JurisdictionException();
-                }
-            }
             result.setData(tCameraAlarmService.update(tCameraAlarm));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -190,17 +171,6 @@ public class TCameraAlarmController {
     public Result batchInsert(@RequestBody List<TCameraAlarm> list, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Integer userId = Integer.valueOf(request.getHeader("userId"));
-           // Integer roleId = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "roleId")));
-            if (userId != 10001) {
-                for (TCameraAlarm e : list) {
-                    if (e.getAlarmState() != null) {
-                        result.setCode(ResultCodeEnum.CODE10109.getCode(), ResultCodeEnum.CODE10109.getName());
-                        return result;
-                        //throw new JurisdictionException();
-                    }
-                }
-            }
             result.setData(tCameraAlarmService.batchInsert(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
