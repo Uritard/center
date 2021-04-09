@@ -424,7 +424,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户帐号解锁")
     @RequestMapping(value = "/unlockUserAccount", method = RequestMethod.PUT)
-    @Logs(title = "用户帐号解锁", content = "用户账号解锁", logType = 5)
+   // @Logs(title = "用户帐号解锁", content = "用户账号解锁", logType = 5)
     public Result unlockUserAccount(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
         try {
