@@ -72,10 +72,9 @@ public class LogsAspect {
         ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         log.info("ttIp: "+ip);
         Object result = null;
-
         if (annotation != null) {
             try {
-                // 记录操作日志...谁..在什么时间..做了什么事情..
+//                serviceId = logsConfig.getName();
                 params.set("logType", annotation.logType());
                 params.set("ip", ip);
                 params.set("title", annotation.title());
@@ -86,20 +85,21 @@ public class LogsAspect {
                 params.set("requestOrigin", request.getRequestURL());
                 params.set("requestPath", request.getRequestURI());
                 params.set("requestMethod", request.getMethod());
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+            try {
+                // 记录操作日志...谁..在什么时间..做了什么事情..
                 result = joinPoint.proceed();
+                params.set("content", content.toString());
                 post(params);
+                return result;
             } catch (BusinessException e) {
-//                String s = null;
-//                if (Objects.isNull(s)) throw new BusinessException(111, "is null....");
-                log.info("Exception.... ");
-                params.set("state", e.getCode());
-//                params.set("content", content.toString() + "；错误信息：" + e.getMessage());
+                params.set("state", 2);
+                params.set("content", content.toString() + "；错误信息：" + e.getMessage());
                 post(params);
                 throw e;
             } catch (Throwable e) {
-//                try{ s = s.replace("a",""); }catch (Exception e){ throw new ClassCastException(); }
-//                try{ s = s.replace("a",""); }catch (Exception e){ throw new NullPointerException(); }
-                log.info("Error.... ");
                 params.set("content", content.toString() + "；异常信息：" + e.getMessage());
                 params.set("state", 3);
                 post(params);
@@ -109,6 +109,7 @@ public class LogsAspect {
         try {
             return joinPoint.proceed();
         } catch (Throwable e) {
+            serviceId = logsConfig.getName();
             params.set("logType", annotation.logType());
             params.set("ip", ip);
             params.set("title", "内部接口错误");
