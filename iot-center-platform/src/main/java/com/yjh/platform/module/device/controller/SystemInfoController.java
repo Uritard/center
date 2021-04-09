@@ -54,7 +54,7 @@ public class SystemInfoController {
             for(String memory:secures){
                 if(memory.equals("MemoryFreeMin")){
                     if(userId!=10001){
-                        result.setCode(209,"当前用户无权限查看内存信息");
+                        result.setCode(200,"");
                         return result;
                     }
                 }
@@ -80,7 +80,7 @@ public class SystemInfoController {
             for(String memory:secures){
                 if(memory.equals("cpuFreeMin")){
                     if(userId!=10001){
-                        result.setCode(209,"当前用户无权限查看CPU信息");
+                        result.setCode(200,"");
                         return result;
                     }
                 }
@@ -106,7 +106,7 @@ public class SystemInfoController {
             for(String memory:secures){
                 if(memory.equals("DiskFreeMin")){
                     if(userId!=10001){
-                        result.setCode(209,"当前用户无权限查看磁盘信息");
+                        result.setCode(200,"");
                         return result;
                     }
                 }
@@ -132,7 +132,7 @@ public class SystemInfoController {
             for(String memory:secures){
                 if(memory.equals("cpuFreeMin")){
                     if(userId!=10001){
-                        result.setCode(209,"当前用户无权限查看CPU信息");
+                        result.setCode(200,"");
                         return result;
                     }
                 }
@@ -158,7 +158,7 @@ public class SystemInfoController {
             for(String memory:secures){
                 if(memory.equals("DiskFreeMin")){
                     if(userId!=10001){
-                        result.setCode(209,"当前用户无权限查看磁盘信息");
+                        result.setCode(200,"");
                         return result;
                     }
                 }
