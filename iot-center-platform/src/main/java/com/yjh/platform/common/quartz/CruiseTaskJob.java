@@ -361,13 +361,17 @@ public class CruiseTaskJob extends QuartzJobBean {
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                     if(228 == item.getCruiseType()){//机器人离线
                         TRobotInfo tRobotInfo = tRobotInspectionDao.selectRobot(item.getRobotId());
-                        if("离线".equals(tRobotInfo.getRobotStatus())){
+                        Map<String,String> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:"+tRobotInfo.getRobotCode()+":41");
+                        if("离线".equals(tRobotInfo.getRobotStatus()) || "4".equals(mapForRobotState.get("value"))){
                             //机器人离线了 直接有结果
                             tCruiseTaskResultDetailMap.put("cruiseTime", simpleDateFormat.format(new Date()));
                             tCruiseTaskResultDetailMap.put("cruiseTaskTime", simpleDateFormat.format(new Date()));
                             tCruiseTaskResultDetailMap.put("endTime", simpleDateFormat.format(new Date()));
                             tCruiseTaskResultDetailMap.put("cruiseStatus", "253");//未执行
                             tCruiseTaskResultDetailMap.put("resultNum", "机器人离线,未执行");
+                            if("4".equals(mapForRobotState.get("value"))){
+                                tCruiseTaskResultDetailMap.put("resultNum", "机器人处于检修状态,未执行");
+                            }
                             tCruiseTaskResultDetailMap.put("cruiseResult", "247");//异常
                             //tCruiseTaskResultDetailMap.put("cruiseAbnormal", "250");//异常告警
                             tCruiseTaskResultDetailMap.put("evaluationState", "257");//未审核
@@ -400,7 +404,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     .setCreatetime(new Date())
                                     .setIsWarn(0)
                                     .setCruiseResult(Integer.valueOf(tCruiseTaskResultDetailMap.get("cruiseResult").toString()))
-                                    .setCruiseAbnormal(Integer.valueOf(tCruiseTaskResultDetailMap.get("cruiseAbnormal").toString()))
+                                    //.setCruiseAbnormal(Integer.valueOf(tCruiseTaskResultDetailMap.get("cruiseAbnormal").toString()))
                                     .setRemark(null);
                             //tCruiseDataResultDao.insert(tCruiseDataResult);
                             TCDRList.add(tCruiseDataResult);
@@ -458,6 +462,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                             }
                         }
+                        //机器人维
                     }
                     //一次循环 一个巡检点
                     if (229 == item.getCruiseType() || 230 == item.getCruiseType()) {//视频 红外
