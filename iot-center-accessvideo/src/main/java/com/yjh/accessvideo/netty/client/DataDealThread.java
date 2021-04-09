@@ -109,7 +109,7 @@ public class DataDealThread implements Runnable {
     public void run() {
         String remoteAdds = ctx.channel().remoteAddress().toString();
         int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));//Port:13668-表计识别,Port:13669-缺陷识别
-        String usefulBody = analyseDataOperateService.nonUnpacking(body);//反拆包解析
+        String usefulBody ="unPacking";//反拆包解析
 //        String bodyTemp=body.replaceAll("\\S+","");
 //        String usefulBody=bodyTemp.replaceAll("\\{.*?\\}\\{","{");
         if (usefulBody != "") {

@@ -229,60 +229,15 @@ public class HelloController {
         result.setData(map);
         Long beginTime=System.currentTimeMillis();
 
-//        Map<String,List<Analysis>> analysisInfo=new HashMap<>();
-//        List<Analysis> analysisList=new ArrayList<>();
-//        Analysis analysis=new Analysis();
-//        analysis.setTaskId("110001");
-//        analysis.setInstanceId(Long.valueOf("910009"));
-//        analysis.setPicModelPath("/home/yjh/iot-picture/model-picture/sync/Template/BigImg/21000000017" +
-//                " ");
-//        analysis.setAnalyseType("9");
-//        analysis.setPicPath("/home/yjh_iot_center/iot-picture/resultImg/20210325020936977.jpg");
-//        analysis.setCsvPath("https://192.168.9.40:443/imgs/infrared/20210325020936977.data");
-//        analysis.setDataPath("https://192.168.9.40:443/imgs/infrared/20210325020936977.data");
-//        analysis.setIsAi(1);
-//
-//        analysisList.add(analysis);
-//        analysisInfo.put("list",analysisList);
-//        try {
-//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-//            if (null != serviceRestTemplate) {
-//                String str=serviceRestTemplate.postForObject(ALGORITHM_URL, analysisInfo, String.class);
-//                result.setData(str);
-//            }
-//        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
-//        }
-
 
         log.info("length:---"+testString.length());
-        result.setData(unpacking(testString));
-
-//        Date date=new SimpleDateFormat("yyyyMMddhhmmssSSS").parse(testString);
-//        String time=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-//        Date date1=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(time);
-//        result.setData(time);
-//        log.info("data"+date);
-//        log.info("data1"+date1);
 
 
         return result;
     }
 
-    public String unpacking(String msg){
-        String finalMsg=null;
-        if(msg.contains("</snapshotURL>") && msg.contains("</ChanResult>") && msg.length()<200){  //拆小包
-            String aPacket=redisTemplate.opsForHash().get("videoQualityDiagnoseResult","A-packet").toString();
-            redisTemplate.delete("videoQualityDiagnoseResult");
-            finalMsg=aPacket.concat(msg);
-        }else if(msg.contains("xml") && msg.contains("</ChanResult>")){  //整包
-            return msg;
-        } else {                 //拆大包
-            redisTemplate.opsForHash().put("videoQualityDiagnoseResult","A-packet",msg);
-        }
 
-        return finalMsg;
-    }
+
 
     @Autowired
     TCruiseResultDao tCruiseResultDao;

@@ -339,7 +339,7 @@ public class AnalyseDataOperateService {
         if (body.matches("\\{\"msgData.*?\"2\"}") || body.matches("\\{\"msgType.*?}}}}")) { //数据结果整包
             log.info("整包数据...");
             usefulBody = body;
-        } else if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?") || body.matches("}")) {  //结果半包
+        } else if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?")) {  //结果半包
             if (body.contains("\"msgType\":\"4\"")) { //注册消息
 
             } else if (body.contains("\"msgType\":\"6\"")) {  //结束消息
@@ -355,7 +355,7 @@ public class AnalyseDataOperateService {
 
             }
 
-        } else if (body.matches(".*?\"2\"}") || body.matches(".*?}}}}")) {   //数据结果（下半包）
+        } else if (body.matches(".*?\"2\"}") || body.matches(".*?}")) {   //数据结果（下半包）
             redisTemplate.opsForHash().put("algoResponse", "B", body);
             log.info("获取下半包数据");
             if (Objects.nonNull(redisTemplate.opsForHash().get("algoResponse","A"))){
@@ -369,6 +369,7 @@ public class AnalyseDataOperateService {
         return usefulBody;
 
     }
+
 
 
     /**
