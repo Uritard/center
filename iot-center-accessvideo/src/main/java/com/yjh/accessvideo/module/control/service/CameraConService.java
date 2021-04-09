@@ -142,16 +142,13 @@ public class CameraConService {
         int iChanNum = cameraConInfo.getCameraNum();
         int cameraType = cameraConInfo.getCameraType();
 
-        int livePath = Constant.maps.get("livePath") + 1;
-        Constant.maps.put("livePath", livePath);
-
         log.info("Constant.maps: " + Constant.maps);
-        log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + livePath);
+        log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + cameraId);
         String transUrl = "";
         if (cameraType == 205) {
-            transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, livePath);
+            transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
         } else if (cameraType == 206) {
-            transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, livePath);
+            transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, cameraId);
         }
         try { Runtime.getRuntime().exec(transUrl); } catch (Exception e) { e.getMessage(); }
         log.info("transUrl: " + transUrl);
@@ -159,14 +156,14 @@ public class CameraConService {
         String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
         returnMap.put("rtmpUrl", rtmpUrl);
         if (videoHttps == 1) {
-            String flvsUrl = "https://" + hostIp + ":8088/live/" + livePath + ".flv";
+            String flvsUrl = "https://" + hostIp + ":8088/live/" + cameraId + ".flv";
             returnMap.put("flvUrl", flvsUrl);
         } else {
-            String flvUrl = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
+            String flvUrl = "http://" + hostIp + ":10080/live/" + cameraId + ".flv";
             returnMap.put("flvUrl", flvUrl);
         }
 
-        StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, livePath, cameraId, returnMap, redisTemplate);
+        StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, Integer.parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
         Thread thread = new Thread(streamInfoThread);
         thread.setDaemon(true);
         thread.start();
@@ -238,15 +235,12 @@ public class CameraConService {
                 int cameraPort = cameraConInfo.getPort();
                 int iChanNum = cameraConInfo.getCameraNum();
                 int cameraType = cameraConInfo.getCameraType();
-                int livePath = Constant.maps.get("livePath") + 1;
-                Constant.maps.put("livePath", livePath);
-                log.info("Constant.maps: " + Constant.maps);
-                log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + livePath);
+                log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + cameraId);
                 String transUrl = "";
                 if (cameraType == 205) {
-                    transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, livePath);
+                    transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
                 } else if (cameraType == 206) {
-                    transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, livePath);
+                    transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, cameraId);
                 }
 
                 try { Runtime.getRuntime().exec(transUrl); } catch (Exception e) { e.getMessage(); }
@@ -259,13 +253,13 @@ public class CameraConService {
                 returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
                 returnMap.put("rtmpUrl", rtmpUrl);
                 if (videoHttps == 1) {
-                    String flvsUrl = "https://" + hostIp + ":8088/live/" + livePath + ".flv";
+                    String flvsUrl = "https://" + hostIp + ":8088/live/" + cameraId + ".flv";
                     returnMap.put("flvUrl", flvsUrl);
                 } else {
-                    String flvUrl = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
+                    String flvUrl = "http://" + hostIp + ":10080/live/" + cameraId + ".flv";
                     returnMap.put("flvUrl", flvUrl);
                 }
-                StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, livePath, cameraId, returnMap, redisTemplate);
+                StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, Integer.parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
                 Thread thread = new Thread(streamInfoThread);
                 thread.setDaemon(true);
                 thread.start();
@@ -300,12 +294,9 @@ public class CameraConService {
         String lightUsername = robotConInfo.getIdentityManager();
         String lightPassword = robotConInfo.getIdentityCode();
 
-        int livePath = Constant.maps.get("livePath") + 1;
-        Constant.maps.put("livePath", livePath);
-        log.info("Constant.maps: {}", Constant.maps);
         // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/Channels/10%s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
-        log.info("robotLightInfo: " + lightUsername + " " + lightPassword + " " + lightIp + " " + lightPort + " " + livePath);
-        String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, livePath);
+        log.info("robotLightInfo: " + lightUsername + " " + lightPassword + " " + lightIp + " " + lightPort + " " + robotId);
+        String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, robotId);
         try {
             Runtime.getRuntime().exec(transUrlLight);
             Thread.sleep(3000);
@@ -318,10 +309,10 @@ public class CameraConService {
         returnLightMap.put("light", String.valueOf(robotId));
         returnLightMap.put("rtmpUrl", rtmpUrl);
         if (videoHttps == 1) {
-            String flvsUrl = "https://" + hostIp + ":8088/live/" + livePath + ".flv";
+            String flvsUrl = "https://" + hostIp + ":8088/live/" + robotId + ".flv";
             returnLightMap.put("flvUrl", flvsUrl);
         } else {
-            String flvUrl = "http://" + hostIp + ":10080/live/" + livePath + ".flv";
+            String flvUrl = "http://" + hostIp + ":10080/live/" + robotId + ".flv";
             returnLightMap.put("flvUrl", flvUrl);
         }
 
@@ -339,7 +330,7 @@ public class CameraConService {
             String videoFlowId = streambeanJson.getString("id");
             String publish = streambeanJson.getString("publish");
             JSONObject publishjson = JSONObject.parseObject(publish);
-            if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+            if (Objects.equals(name, String.valueOf(robotId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnLightMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":light");
                 log.info("robotReturnLightMap: " + returnLightMap);
@@ -349,7 +340,7 @@ public class CameraConService {
 
         String inferadIp = robotConInfo.getLnferadIp();
         Integer inferadPort = robotConInfo.getInferadPort();
-        int livePath2 = livePath + 1;
+        int livePath2 = Integer.parseInt(String.valueOf(robotId + robotId));
         Constant.maps.put("livePath", livePath2);
         log.info("Constant.maps: " + Constant.maps);
         log.info("robotInferadInfo: " + " " + inferadIp + " " + inferadPort + " " + livePath2);
@@ -473,9 +464,6 @@ public class CameraConService {
         String password = cameraConInfo.getIdentityCode();
         int cameraPort = cameraConInfo.getRtspPort();
         int iChanNum = cameraConInfo.getChannelNum();
-        int livePath = Constant.maps.get("livePath") + 1;
-        Constant.maps.put("livePath", livePath);
-        log.info("Constant.maps: " + Constant.maps);
 
         String startTimeTem = startTime.replace("-", "").replace(":", "").replace(" ", "T") + " ";
         String stopTimeTem = stopTime.replace("-", "").replace(":", "").replace(" ", "T") + " ";
@@ -484,8 +472,8 @@ public class CameraConService {
         ///usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/tracks/%s0%s?starttime=%s&endtime=%s -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
         //rtsp://admin:hik12345@192.168.33.2:554/Streaming/tracks/101?starttime=20201111T095500Z&endtime=20201111T100005Z
         log.info("userName: " + userName + ",password: " + password + ",cameraIp: " + cameraIp + ",cameraPort: " + cameraPort
-                + ",iChanNum: " + iChanNum + ",starttime: " + starttime + ",endtime: " + endtime + ",historyPath: " + livePath);
-        String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1, starttime, endtime, livePath);
+                + ",iChanNum: " + iChanNum + ",starttime: " + starttime + ",endtime: " + endtime + ",historyPath: " + cameraId);
+        String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1, starttime, endtime, cameraId);
         log.info("historyTransUrl: " + transUrl);
         try {
             Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
@@ -497,10 +485,10 @@ public class CameraConService {
         returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
         returnMap.put("rtmpUrl", rtmpUrl);
         if (videoHttps == 1) {
-            String flvsUrl = "https://" + hostIp + ":8088/history/" + livePath + ".flv";
+            String flvsUrl = "https://" + hostIp + ":8088/history/" + cameraId + ".flv";
             returnMap.put("flvUrl", flvsUrl);
         } else {
-            String flvUrl = "http://" + hostIp + ":10080/history/" + livePath + ".flv";
+            String flvUrl = "http://" + hostIp + ":10080/history/" + cameraId + ".flv";
             returnMap.put("flvUrl", flvUrl);
         }
 
@@ -518,7 +506,7 @@ public class CameraConService {
             String videoFlowId = streambeanJson.getString("id");
             String publish = streambeanJson.getString("publish");
             JSONObject publishjson = JSONObject.parseObject(publish);
-            if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+            if (Objects.equals(name, String.valueOf(cameraId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForHistory.put(videoFlowId, String.valueOf(cameraId));
                 log.info("historyMapsForCamera: " + Constant.mapsForHistory);
