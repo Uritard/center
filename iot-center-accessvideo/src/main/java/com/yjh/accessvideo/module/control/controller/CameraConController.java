@@ -100,10 +100,16 @@ public class CameraConController {
 
             List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
             int streamListSize = streamsJsonObjectList.size();
-            StreamStopThread streamStopThread = new StreamStopThread(streamListSize, streamsJsonObjectList, srsStopUrl, redisTemplate);
-            Thread thread = new Thread(streamStopThread);
-            thread.setDaemon(true);
-            thread.start();
+            log.info("streamListSize：{}", streamListSize);
+            if (streamListSize==0) {
+                Constant.mapsForCamera.clear();
+                Constant.mapsForHistory.clear();
+            } else {
+                StreamStopThread streamStopThread = new StreamStopThread(streamListSize, streamsJsonObjectList, srsStopUrl, redisTemplate);
+                Thread thread = new Thread(streamStopThread);
+                thread.setDaemon(true);
+                thread.start();
+            }
         } catch (Exception e) {e.getMessage();}
 
     }
