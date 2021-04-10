@@ -144,6 +144,7 @@ public class RecordVoiceFileThread implements Runnable {
 //                } catch (InterruptedException e) { e.getMessage(); }
 //                sdk_.NET_TRADIO_Clear();
 //                if (sdk_.NET_TRADIO_Logout(0) == 0) { log.info("设备注销失败"); }
+                isThreadStart = Constant.voiceDeviceState.get(ftpUrl);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

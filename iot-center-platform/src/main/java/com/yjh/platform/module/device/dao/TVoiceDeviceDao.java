@@ -33,6 +33,7 @@ public interface TVoiceDeviceDao {
     List<VoiceDevice> selectAll(@Param(value = "voiceDeviceName") String voiceDeviceName);
     VoiceDeviceInfoDetail selectVoiceInfo(@Param(value = "voiceDeviceId") Long voiceDeviceId);
     List<VoiceDeviceAllInfo>selectVoiceDeviceInfo();
+    VoiceDeviceAllInfo selectById(@Param(value = "voiceDeviceId") Long voiceDeviceId);
     int addConf(VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail);
     int updateConf(VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail);
     int deleteConf(@Param(value = "configId") Long configId);

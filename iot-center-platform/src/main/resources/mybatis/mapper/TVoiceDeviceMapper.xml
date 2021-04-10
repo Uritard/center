@@ -252,4 +252,14 @@
                 where config_id = #{configId, jdbcType=BIGINT}
     </delete>
 
+    <select id="selectById" resultType="com.yjh.platform.module.device.entity.VoiceDeviceAllInfo">
+         SELECT
+            a.*,
+            b.*
+        FROM
+            t_voice_device a
+	left join t_voice_config b on a.config_id = b.config_id
+	where  a.voice_device_id =#{voiceDeviceId}
+    </select>
+
 </mapper>

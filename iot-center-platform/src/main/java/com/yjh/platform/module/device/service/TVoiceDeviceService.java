@@ -2,7 +2,9 @@ package com.yjh.platform.module.device.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.tradio.RecordVoiceFileThread;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -58,12 +60,22 @@ public class TVoiceDeviceService{
             return -1;
         }
         this.tVoiceDeviceDao.addConf(tVoiceDevice);
-        return this.tVoiceDeviceDao.add(tVoiceDevice);
+        this.tVoiceDeviceDao.add(tVoiceDevice);
+        VoiceDeviceAllInfo voiceDeviceAllInfo = tVoiceDeviceDao.selectById(tVoiceDevice.getVoiceDeviceId());
+        Constant.voiceDeviceState.put(tVoiceDevice.getFtpUrl(),true);
+        RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
+                voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
+                voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true,this);
+        Thread thread = new Thread(recordVoiceFileThread);
+        thread.setDaemon(true);
+        thread.start();
+        return 1;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long voiceDeviceId) {
         VoiceDeviceAllInfoDetail voiceDeviceInfoDetail = this.tVoiceDeviceDao.selectByPrimaryId(voiceDeviceId);
+        Constant.voiceDeviceState.put(voiceDeviceInfoDetail.getFtpUrl(),false);
         this.tVoiceDeviceDao.deleteConf(voiceDeviceInfoDetail.getConfigId());
         return this.tVoiceDeviceDao.deleteByPrimaryId(voiceDeviceId);
     }
@@ -78,7 +90,20 @@ public class TVoiceDeviceService{
             return -1;
         }
         this.tVoiceDeviceDao.updateConf(tVoiceDevice);
-        return this.tVoiceDeviceDao.update(tVoiceDevice);
+        VoiceDeviceAllInfo voiceDeviceAllInfo = tVoiceDeviceDao.selectById(tVoiceDevice.getVoiceDeviceId());
+        this.tVoiceDeviceDao.update(tVoiceDevice);
+        if(!voiceDeviceAllInfo.getFtpUrl().equals(tVoiceDevice.getFtpUrl())){
+            //修改了ip
+            Constant.voiceDeviceState.put(voiceDeviceAllInfo.getFtpUrl(),false);
+             voiceDeviceAllInfo = tVoiceDeviceDao.selectById(tVoiceDevice.getVoiceDeviceId());
+            RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
+                    voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
+                    voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true,this);
+            Thread thread = new Thread(recordVoiceFileThread);
+            thread.setDaemon(true);
+            thread.start();
+        }
+        return 1;
     }
 
     @Transactional(rollbackFor = Exception.class)
