@@ -316,6 +316,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Constant.receiveSessionId = sendSessionId;
         //解析的xml文件
         if ("251".equals(xmlBaseModel.getType())) {//系统消息
             if ("4".equals(xmlBaseModel.getCommand())) {//响应注册
@@ -628,7 +629,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
         for (byte byteitem : bytes) {
             Str.append(String.format("%02x ", byteitem));
         }
-        //log.info("commandSendToRobot:" + Str + " : " + strRobotCode);
+        log.info("commandSendToRobot:" + Str + " : " );
         ctx.pipeline().writeAndFlush(byteBuf);
         log.info("发送成功");
         if (byteBuf.refCnt() >= 1) {
@@ -671,7 +672,8 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     .setType("251")
                     .setCommand("2");
             String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
-            byte[] send = PlatformPacketUtil.createPacket(Constant.sendSessionId,0L,true,xml);
+            Constant.sendSessionId = Constant.sendSessionId + 1L;//刷新sendSessionId
+            byte[] send = PlatformPacketUtil.createPacket(Constant.sendSessionId,Constant.receiveSessionId,true,xml);
             send(send);
         } catch (Exception e) {
             e.printStackTrace();

@@ -210,22 +210,33 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         Packet2 = Packet.replace(""," ");
         byte[] packetByte = PlatformPacketUtil.HexString2Bytes(Packet2);
 
-        /*if (sendRobotSessionId + 1 == sendRobotNewSessionId){
-            //是新的包
-            sendRobotSessionId = sendRobotNewSessionId;
-            int headNum = appearNumber(Packet,"eb90");
-            openPackage(Packet,headNum);
-        }*/
+        byte[] xmlByteLengthByte = new byte[4];
+        System.arraycopy(packetByte,19,xmlByteLengthByte,0,4);
+        int xmlByteLength = PlatformPacketUtil.bytesToInt1(xmlByteLengthByte,0);//xml的字节长度
+        log.info("xml的字节长度==="+xmlByteLength);
 
-        String body = new String(packetByte, StandardCharsets.UTF_8);
-        log.info("Packet2="+body);
-        String temporaryBody2 = body.replace("\"UTF-8\"","\'UTF-8\'");//临时
-        String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
-        boolean res = handlingMethod(bytes,finalBody);
-        if (res){
-            int headNum = appearNumber(Packet,"eb90");
-            openPackage(Packet,headNum);
+        byte[] xmlByte = new byte[xmlByteLength];
+        System.arraycopy(packetByte,23,xmlByte,0,(int)xmlByteLength);
+        StringBuilder Str2 = new StringBuilder();
+        for (byte byteItem : xmlByte) {
+            Str2.append(String.format("%02x ", byteItem));
         }
+        String xmlContent = Str2.toString().replace(" ","");//xml内容
+        String onePacket= Packet.substring(0,(4+16+16+2+8+xmlContent.length()+4));
+        log.info("onePacket==="+onePacket);
+
+        int headNum = appearNumber(onePacket,"eb90");
+        openPackage(onePacket,headNum);
+
+//        String body = new String(packetByte, StandardCharsets.UTF_8);
+//        log.info("Packet2="+body);
+//        String temporaryBody2 = body.replace("\"UTF-8\"","\'UTF-8\'");//临时
+//        String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
+//        boolean res = handlingMethod(bytes,finalBody);
+//        if (res){
+//            int headNum = appearNumber(Packet,"eb90");
+//            openPackage(Packet,headNum);
+//        }
 
         /*int headNum = appearNumber(Packet,"eb90");
         openPackage(Packet,headNum);*/
@@ -1103,6 +1114,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     * 和客户端断开连接
     * */
     public void removeLink(String robotCode){
+        log.info("+++++++++++++++++断连开始+++++++++++++++++");
         log.info("准备断连的是=="+ctx.channel().id());
         isThreadStart = false;
         Channel channel = ctx.channel();

@@ -75,7 +75,7 @@ public class CruiseResultDealThread implements Runnable{
                             && cruiseResultMap.get("taskCode").equals(redisInfoMap.get("taskId"))
                             &&cruiseResultMap.get("deviceId").equals(redisInfoMap.get("inspectionCode"))) {
                         String instanceId = redisInfoMap.get("instanceId");
-                        instanceIdList.add(Long.valueOf(instanceId));
+//                        instanceIdList.add(Long.valueOf(instanceId));
 
                         str = "t_cruise_task_result:" + tCruiseTask.getTaskId() + ":" + instanceId;
 
@@ -141,8 +141,8 @@ public class CruiseResultDealThread implements Runnable{
                     cState = 240;
                     TimeUnit.SECONDS.sleep(2);
                     //本体任务做完，将构造的巡视点数据删除
-                    log.info("本体做完的点==="+instanceIdList);
-                    StaticContextAccessor.getBean(RobotService.class).deleteInstanceId(instanceIdList);
+                    /*log.info("本体做完的点==="+instanceIdList);
+                    StaticContextAccessor.getBean(RobotService.class).deleteInstanceId(instanceIdList);*/
                 }
                 tCruiseResult.setCState(cState);
                 tCruiseResult.setExecuteTime(sdf.parse(tCruiseTaskResultMap.get("createtime")));

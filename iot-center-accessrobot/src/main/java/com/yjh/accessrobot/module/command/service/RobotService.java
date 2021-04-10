@@ -19,7 +19,6 @@ import com.yjh.accessrobot.module.command.dao.TRobotRegionDao;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +62,8 @@ public class RobotService {
     private TRobotRegionDao tRobotRegionDao;
     @Resource
     private SysUserDao sysUserDao;
+    @Value("${other.webSocketUrl}")
+    private String webSocketUrl;
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password, HttpServletRequest request) throws Exception{
@@ -124,6 +125,12 @@ public class RobotService {
 
         String sendCode = tRobotInfoDao.selectContent("PlatformServer");
 
+        if ("".equals(robotCode)){
+            log.info("没有设置机器人编码,你在给谁下指令？？？？？？");
+            scmap.put("code", 3);
+            scmap.put("result", "当前不存在机器人编码,请先添加");
+            return scmap;
+        }
         String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
         if (robotStatus.equals("离线")){
             log.info("该机器人处于离线状态,没有成功将控制指令下发到机器人......");
@@ -518,19 +525,25 @@ public class RobotService {
         log.info("rTIIList是===" + rTIIList);
 
         for (RobotTaskInstanceInfo rTII : rTIIList) {
-            String robotStatus = tRobotInfoDao.selectStatusByRobotCode(rTII.getRobotCode());
-            if (robotStatus.equals("离线")){
+            String robotOnlineStatus = tRobotInfoDao.selectStatusByRobotCode(rTII.getRobotCode());
+            if (robotOnlineStatus.equals("离线")){
                 log.info("该机器人处于离线状态,没有成功将任务下发到机器人,巡视结果数据默认......");
             }else{
-                Integer unionNum = tRobotInfoDao.selectIsUnionTask(rTII.getTaskId());
-                log.info("unionNum===="+unionNum);
-
-                if (unionNum == 0 ){
-                    log.info("这是正常的任务！！！！！！！！！！！！！");
-                    feignRobotNormalTaskIssued(ItemMap);
+                Map<String,String> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:"+rTII.getRobotCode()+":41");
+                String robotStatus = mapForRobotState.get("value");
+                if ("4".equals(robotStatus)){
+                    log.info("该机器人处于检修状态,没有成功将任务下发到机器,巡视结果数据默认......");
                 }else {
-                    log.info("这是联动任务！！！！！！！！！！！！！");
-                    feignRobotLinkTaskIssued(ItemMap);
+                    Integer unionNum = tRobotInfoDao.selectIsUnionTask(rTII.getTaskId());
+                    log.info("unionNum===="+unionNum);
+
+                    if (unionNum == 0 ){
+                        log.info("这是正常的任务！！！！！！！！！！！！！");
+                        feignRobotNormalTaskIssued(ItemMap);
+                    }else {
+                        log.info("这是联动任务！！！！！！！！！！！！！");
+                        feignRobotLinkTaskIssued(ItemMap);
+                    }
                 }
             }
         }

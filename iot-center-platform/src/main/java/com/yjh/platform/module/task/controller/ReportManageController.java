@@ -41,7 +41,7 @@ public class ReportManageController {
 
     @ApiOperation(value = "生成报表")
     @GetMapping(value = "/reportGenerate")
-    @Logs(title = "生成报表",content = "生成报表",logType = 5)
+    @Logs(title = "生成报表",content = "生成报表",logType = 2)
     public Result reportGenerate(@RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                                  @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                                  @RequestParam(value="deviceIds")String deviceIds,
@@ -61,7 +61,7 @@ public class ReportManageController {
     }
     @ApiOperation(value = "下载报表")
     @GetMapping(value = "/reportDownload")
-    @Logs(title = "下载报表",content = "下载报表",logType = 5)
+    @Logs(title = "下载报表",content = "下载报表",logType = 9)
     public Result reportDownload(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
         try {

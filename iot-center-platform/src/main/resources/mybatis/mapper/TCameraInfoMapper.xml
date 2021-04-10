@@ -165,8 +165,12 @@
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
-        select <include refid="Base_Column_List"></include>
+        select <include refid="tongTong"></include>
         from t_camera_info a
+        left JOIN t_dict_business b on a.vendor_id = b.dict_code and b.col_name = 'camera_vendor'
+        LEFT JOIN t_dict_business d on a.camera_type = d.dict_code and d.col_name = 'camera_type'
+        LEFT JOIN t_dict_business e on a.camera_model = e.dict_code and e.col_name = 'camera_model'
+        LEFT JOIN t_std_region f on a.up_region_id = f.region_id
         where 1 = 1
         and a.camera_id = #{cameraId}
     </select>
