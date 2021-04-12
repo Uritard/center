@@ -11,10 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.swing.text.StyledEditorKit;
 import java.util.*;
 
+/**
+ * 算法结果分析功能集
+ */
 @Service
 public class AnalyseDataOperateService {
     @Autowired
@@ -328,7 +329,7 @@ public class AnalyseDataOperateService {
 
     /**
      * -------算法服务报文反拆包-------
-     * @param body 算法服务返回的报文消息体
+     * @param body 算法服务返回的报文消息体（信息不完整的消息报文）
      * @return  完整的合并拆包信息的结果报文
      */
     //反拆包

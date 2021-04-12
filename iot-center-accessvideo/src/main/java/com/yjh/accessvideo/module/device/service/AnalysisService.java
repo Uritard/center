@@ -93,6 +93,11 @@ public class AnalysisService {
     }catch (Exception e){
         log.error("表计识别算法异常："+e);
         log.error("exceptionDetails:"+e.getStackTrace()[0]);
+
+        redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseResult","247");//异常
+        redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseAbnormal","251");//算法超时
+        redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseStatus","252");//已执行
+//        redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"","");
     }
 }
         log.info("analysisList.get(0).getInstanceId():"+analysisList.get(0).getInstanceId());
