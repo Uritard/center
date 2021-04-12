@@ -205,39 +205,36 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         Packet = Packet + Str.toString().replace(" ","");
         log.info("allPacket:"+Packet);
-
+        //拆包2.0
         Packet2 = Packet.replace(""," ");
         byte[] packetByte = PlatformPacketUtil.HexString2Bytes(Packet2);
-
         byte[] xmlByteLengthByte = new byte[4];
         System.arraycopy(packetByte,19,xmlByteLengthByte,0,4);
         int xmlByteLength = PlatformPacketUtil.bytesToInt1(xmlByteLengthByte,0);//xml的字节长度
-//        log.info("xml的字节长度==="+xmlByteLength);
-
-        /*byte[] xmlByte = new byte[xmlByteLength];
-        System.arraycopy(packetByte,23,xmlByte,0,(int)xmlByteLength);
-        StringBuilder Str2 = new StringBuilder();
-        for (byte byteItem : xmlByte) {
-            Str2.append(String.format("%02x ", byteItem));
+        int onePacketLength = 4 + 16 + 16 + 2 + 8 + xmlByteLength * 2 + 4;
+        if (Packet.length() >= onePacketLength){
+            String onePacket= Packet.substring(0,onePacketLength);
+            log.info("onePacket==="+onePacket);
+            int headNum = appearNumber(onePacket,"eb90");
+            openPackage(onePacket,headNum);
         }
-        String xmlContent = Str2.toString().replace(" ","");//xml内容*/
-        String onePacket= Packet.substring(0,(4 + 16 + 16 + 2 + 8 + xmlByteLength * 2 + 4));
-        log.info("onePacket==="+onePacket);
 
-        int headNum = appearNumber(onePacket,"eb90");
-        openPackage(onePacket,headNum);
+        //拆包3.0
+//        Packet2 = Packet.replace(""," ");
+//        openPackage2(Packet2);
 
-//        String body = new String(packetByte, StandardCharsets.UTF_8);
-//        log.info("Packet2="+body);
-//        String temporaryBody2 = body.replace("\"UTF-8\"","\'UTF-8\'");//临时
-//        String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
-//        boolean res = handlingMethod(bytes,finalBody);
-//        if (res){
-//            int headNum = appearNumber(Packet,"eb90");
-//            openPackage(Packet,headNum);
-//        }
+        //拆包1.1
+        /*String body = new String(packetByte, StandardCharsets.UTF_8);
+        log.info("Packet2="+body);
+        String temporaryBody2 = body.replace("\"UTF-8\"","\'UTF-8\'");//临时
+        String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
+        boolean res = handlingMethod(bytes,finalBody);
+        if (res){
+            int headNum = appearNumber(Packet,"eb90");
+            openPackage(Packet,headNum);
+        }*/
 
-//        lookByte(bytes);//看指令
+        //拆包1.0
         /*String body = new String(bytes, StandardCharsets.UTF_8);
         log.info("机器人发来的内容="+body);
 
@@ -258,7 +255,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         ReferenceCountUtil.release(byteBuf);
     }
     /*
-     *拆包工具
+     *拆包工具1.0
      * */
     private boolean handlingMethod(byte[] bytes,String parameter)throws Exception {
         String xmlTemp = null;
@@ -277,7 +274,59 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
        return false;
     }
     /*
-     * 拆包工具2
+    * 拆包工具3.0
+    * */
+    public void openPackage2(String socketMessageHex) throws Exception{
+        String onePacketString = null;
+        String residueString = null;
+        byte[] packetByte = PlatformPacketUtil.HexString2Bytes(socketMessageHex);
+
+        byte[] sendSessionIdByte = new byte[8];
+        System.arraycopy(packetByte, 2, sendSessionIdByte, 0, 8);
+        long sendRobotNewSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);
+        log.info("本身的发送会话序列号为=="+sendRobotSessionId+"新来的发送会话序列号==="+sendRobotNewSessionId);
+
+        byte[] xmlByteLengthByte = new byte[4];
+        System.arraycopy(packetByte,19,xmlByteLengthByte,0,4);
+        int xmlByteLength = PlatformPacketUtil.bytesToInt1(xmlByteLengthByte,0);//xml的字节长度
+
+        int onePacketLength = 4 + 16 + 16 + 2 + 8 + xmlByteLength * 2 + 4;
+
+        if (Packet.length() == onePacketLength){
+            String onePacket= Packet.substring(0,onePacketLength);
+            log.info("一个完整的包==="+onePacket);
+
+            byte[] onePacketByte = PlatformPacketUtil.HexString2Bytes(onePacket);
+            StringBuilder Str2 = new StringBuilder();
+            for (byte byteItem : onePacketByte) {
+                Str2.append(String.format("%02x ", byteItem));
+            }
+            log.info("一个完整的包,准备解析的字节数组="+Str2);
+
+            String body1 = onePacket.substring(46,onePacket.length()-4);
+            onePacketString = PlatformPacketUtil.toStringHex(body1);
+            log.info("准备解析的xml=="+onePacketString);
+            Packet = Packet.replace(onePacket,"");
+            stringToXml(onePacketByte,onePacketString);
+            return;
+        }else if (Packet.length() > onePacketLength ){
+            log.info("大于一个完整的包==="+socketMessageHex);
+            onePacketString = socketMessageHex.substring(0,onePacketLength);
+            residueString = socketMessageHex.replace(onePacketString,"");//除去一个完整包剩余的内容
+            openPackage2(onePacketString);
+
+            byte[] residuePacket = PlatformPacketUtil.HexString2Bytes(residueString);
+            StringBuilder Str2 = new StringBuilder();
+            for (byte byteItem : residuePacket) {
+                Str2.append(String.format("%02x ", byteItem));
+            }
+            log.info("除去一个完整包剩余的字节数组="+Str2);
+            Packet = residueString;
+            openPackage2(residueString);
+        }
+    }
+    /*
+     * 拆包工具2.0
      * */
     public void openPackage (String socketMessageHex,int headNum) throws Exception{
         String onePacketString = null;
