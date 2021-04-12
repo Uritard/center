@@ -631,6 +631,10 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public boolean PresetAction(Long presetId, Long cameraId, int presetCmd) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
+        if(cameraConInfo == null){
+            //摄像机id和预置位Id不正确
+            throw new BusinessException("无此摄像机或摄像机预置位不正确");
+        }
         int iChanNum = cameraConInfo.getChannelNum() + 32;
         int iPreset = cameraConInfo.getPresetNum();
 
