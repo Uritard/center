@@ -59,7 +59,7 @@ public class SystemInfoController {
                     }
                 }
             }
-            result.setData(systemInfoService.getMemory());
+            result.setData(systemInfoService.getMemory(request,userId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -137,7 +137,7 @@ public class SystemInfoController {
                     }
                 }
             }
-            result.setData(systemInfoService.getCpuOnUse());
+            result.setData(systemInfoService.getCpuOnUse(request,userId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

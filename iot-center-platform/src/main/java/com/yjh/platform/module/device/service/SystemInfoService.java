@@ -48,11 +48,25 @@ public class SystemInfoService {
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,String> getMemory() throws Exception {
+    public Map<String,String> getMemory(HttpServletRequest request,Long userId) throws Exception {
         Map<String,String> menUsage=systemInfoUtil.getMemUsage();
         Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:MemoryFreeMin");
         Double cpuFreeMin=Double.parseDouble(map.get("content"));
         if(Double.parseDouble(menUsage.get("free"))/Double.parseDouble(menUsage.get("total"))*100<cpuFreeMin){
+            String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
+            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+            param.set("logType", "5");
+            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+            param.set("title", "内存最小空闲报警");
+            param.set("state", 1);
+            param.set("userId", userId);
+            param.set("userName", userName);
+            param.set("requestOrigin", request.getRequestURL());
+            param.set("requestPath", request.getRequestURI());
+            param.set("requestMethod", request.getMethod());
+            param.set("content", "内存最小空闲报警");
+            LogsAspect logsAspects = new LogsAspect();
+            logsAspects.post(param);
             menUsage.put("code","01");
         }else{
             menUsage.put("code","02");
@@ -86,13 +100,27 @@ public class SystemInfoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public  Map<String,Object> getCpuOnUse() throws Exception {
+    public  Map<String,Object> getCpuOnUse(HttpServletRequest request,Long userId) throws Exception {
         Map<String,Object> cpuOnUsemap=new HashMap<>();
         Double cpuOnUse=systemInfoUtil.getCpuOnUse();
         cpuOnUsemap.put("use",cpuOnUse);
         Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:cpuFreeMin");
         Double cpuFreeMin=Double.parseDouble(map.get("content"));
         if((100-cpuOnUse)<cpuFreeMin){
+            String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
+            MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+            param.set("logType", "5");
+            param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+            param.set("title", "cpu最小空闲报警");
+            param.set("state", 1);
+            param.set("userId", userId);
+            param.set("userName", userName);
+            param.set("requestOrigin", request.getRequestURL());
+            param.set("requestPath", request.getRequestURI());
+            param.set("requestMethod", request.getMethod());
+            param.set("content", "cpu最小空闲报警");
+            LogsAspect logsAspects = new LogsAspect();
+            logsAspects.post(param);
             cpuOnUsemap.put("code","01");
         }else{
             cpuOnUsemap.put("code","02");
