@@ -376,4 +376,47 @@
         WHERE
             camera_id = #{cameraId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectByCameraId" parameterType="java.lang.Long" resultType="java.util.HashMap">
+        select a.camera_id as id,
+                a.camera_name as name,
+                a.camera_ip as ip,
+                a.`port`,
+                a.camera_manager as userName,
+                a.camera_code as password,
+                a.vendor_id as vendorId,
+                b.dict_note as vendorName
+        from t_camera_info a
+        left JOIN t_dict_business b on a.vendor_id = b.dict_code and b.col_name = 'camera_vendor'
+        where 1 = 1
+        and a.camera_id = #{cameraId}
+    </select>
+    <select id="selectByRobotIdByLight" parameterType="java.lang.Long" resultType="java.util.HashMap">
+        SELECT a.robot_id as id,
+            a.robot_name as name,
+            a.light_ip as ip,
+            a.light_port as port,
+            a.identity_manager as userName,
+            a.identity_code as password,
+            a.robot_factory as vendorId,
+            b.dict_note as vendorName
+            from t_robot_info a
+            left join t_dict_business b on a.robot_factory = b.dict_code and b.col_name = 'robot_factory'
+        where 1 = 1
+        and a.robot_id = #{robotId}
+    </select>
+    <select id="selectByRobotIdByInferad" parameterType="java.lang.Long" resultType="java.util.HashMap">
+        SELECT a.robot_id as id,
+            a.robot_name as name,
+            a.lnferad_IP as ip,
+            a.light_port as port,
+            a.identity_manager as userName,
+            a.identity_code as password,
+            a.robot_factory as vendorId,
+            b.dict_note as vendorName
+            from t_robot_info a
+            left join t_dict_business b on a.robot_factory = b.dict_code and b.col_name = 'robot_factory'
+        where 1 = 1
+        and a.robot_id = #{robotId}
+    </select>
 </mapper>

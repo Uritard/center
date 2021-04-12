@@ -8,6 +8,7 @@ import com.yjh.platform.module.user.entity.TCamreaPresetTree;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -78,4 +79,7 @@ public interface TCameraInfoDao {
     String selectPmsIdById(@Param(value = "cameraId") Long cameraId);
     //相机ID查询视频诊断监测点ID
     String selectMonitorId(@Param(value = "cameraId")Long cameraId);
+    HashMap<String,Object> selectByCameraId(@Param(value = "cameraId")Long cameraId);
+    HashMap<String,Object> selectByRobotIdByLight(@Param(value = "robotId")Long robotId);
+    HashMap<String,Object> selectByRobotIdByInferad(@Param(value = "robotId")Long robotId);
 }

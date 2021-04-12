@@ -501,6 +501,22 @@ public class TCameraInfoService {
         return channel;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public HashMap<String,Object> selectByCameraIdOrRobotId(Long id,Integer type){
+        if(id > 40000){
+            return tCameraInfoDao.selectByCameraId(id);
+        }
+        if(id <40000 && id > 8000){
+            if(type == 1){//可见光
+                return tCameraInfoDao.selectByRobotIdByLight(id);
+            }
+            if(type == 2){//红外
+                return tCameraInfoDao.selectByRobotIdByInferad(id);
+            }
+        }
+        return null;
+    }
+
 }
 
 
