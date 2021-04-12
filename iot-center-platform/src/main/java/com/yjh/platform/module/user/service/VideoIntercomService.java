@@ -64,7 +64,7 @@ public class VideoIntercomService {
    {
        List<VideoIntercom> lists=new ArrayList<>();
        List<VideoIntercom> list =videoIntercomDao.selectByPage(cameraName,regionIdList);
-     /* try {
+      try {
 
           for (VideoIntercom t:list)
           {
@@ -105,8 +105,8 @@ public class VideoIntercomService {
       {
           e.getMessage();
       }
-      return lists;*/
+      return lists;
 
-      return videoIntercomDao.selectByPage(cameraName,regionIdList);
+      //return videoIntercomDao.selectByPage(cameraName,regionIdList);
    }
 }
