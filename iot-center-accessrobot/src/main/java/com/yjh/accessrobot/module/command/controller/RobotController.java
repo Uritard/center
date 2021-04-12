@@ -93,17 +93,17 @@ public class RobotController {
     @ApiOperation(value = "发送任务指令接口")
     @RequestMapping(value = "/taskIssued", method = RequestMethod.POST)
     @Logs(title = "机器人下发任务",content = "根据用户传递的参数给机器人下发任务",logType = 10)
-    public Result feignRobotTaskIssued(@RequestBody Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
-        Result result = new Result();
+    public void feignRobotTaskIssued(@RequestBody Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
+//        Result result = new Result();
         try {
             robotService.feignRobotTaskIssued(robotTaskInfoMap);
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+//        } catch (BusinessException b) {
+//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("发送任务接口调用错误:", e);
         }
-        return result;
+//        return result;
     }
     @ApiOperation(value = "发送任务控制指令接口")
     @RequestMapping(value = "/taskControl", method = RequestMethod.POST)
