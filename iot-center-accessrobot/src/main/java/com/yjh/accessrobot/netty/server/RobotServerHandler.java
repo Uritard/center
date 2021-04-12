@@ -197,7 +197,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         byteBuf.readBytes(bytes);
         log.info("OnlineSize: " + maps.size());
 
-
         StringBuilder Str = new StringBuilder();
         for (byte byteItem : bytes) {
             Str.append(String.format("%02x ", byteItem));
@@ -205,7 +204,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         log.info("机器人发送的的指令是<start>" + Str + "<end>");
 
         Packet = Packet + Str.toString().replace(" ","");
-        log.info("Packet:"+Packet);
+        log.info("allPacket:"+Packet);
 
         Packet2 = Packet.replace(""," ");
         byte[] packetByte = PlatformPacketUtil.HexString2Bytes(Packet2);
@@ -213,16 +212,16 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         byte[] xmlByteLengthByte = new byte[4];
         System.arraycopy(packetByte,19,xmlByteLengthByte,0,4);
         int xmlByteLength = PlatformPacketUtil.bytesToInt1(xmlByteLengthByte,0);//xml的字节长度
-        log.info("xml的字节长度==="+xmlByteLength);
+//        log.info("xml的字节长度==="+xmlByteLength);
 
-        byte[] xmlByte = new byte[xmlByteLength];
+        /*byte[] xmlByte = new byte[xmlByteLength];
         System.arraycopy(packetByte,23,xmlByte,0,(int)xmlByteLength);
         StringBuilder Str2 = new StringBuilder();
         for (byte byteItem : xmlByte) {
             Str2.append(String.format("%02x ", byteItem));
         }
-        String xmlContent = Str2.toString().replace(" ","");//xml内容
-        String onePacket= Packet.substring(0,(4+16+16+2+8+xmlContent.length()+4));
+        String xmlContent = Str2.toString().replace(" ","");//xml内容*/
+        String onePacket= Packet.substring(0,(4 + 16 + 16 + 2 + 8 + xmlByteLength * 2 + 4));
         log.info("onePacket==="+onePacket);
 
         int headNum = appearNumber(onePacket,"eb90");
@@ -237,9 +236,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 //            int headNum = appearNumber(Packet,"eb90");
 //            openPackage(Packet,headNum);
 //        }
-
-        /*int headNum = appearNumber(Packet,"eb90");
-        openPackage(Packet,headNum);*/
 
 //        lookByte(bytes);//看指令
         /*String body = new String(bytes, StandardCharsets.UTF_8);
@@ -292,18 +288,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         byte[] sendSessionIdByte = new byte[8];
         System.arraycopy(packetByte, 2, sendSessionIdByte, 0, 8);
-        long sendRobotNewSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);//发送会话序列号
+        long sendRobotNewSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);
         log.info("本身的发送会话序列号为=="+sendRobotSessionId+"新来的发送会话序列号==="+sendRobotNewSessionId);
-
-        byte[] xmlByteLengthByte = new byte[4];
-        System.arraycopy(packetByte,19,xmlByteLengthByte,0,4);
-        int xmlByteLength = PlatformPacketUtil.bytesToInt1(xmlByteLengthByte,0);//xml的字节长度
-        log.info("xml的字节长度==="+xmlByteLength);
 
         if(socketMessageHex.startsWith("eb90")
                 && headNum >= 2
-                /*&& Long.valueOf(sendRobotNewSessionId).equals(Long.valueOf(sendRobotSessionId + 1))
-                && xmlByteLength > 0*/) {
+                /*&& Long.valueOf(sendRobotNewSessionId).equals(Long.valueOf(sendRobotSessionId + 1))*/) {
             //有至少一个完整的包
             int limitNum = socketMessageHex.indexOf("eb90", socketMessageHex.indexOf("eb90") + 1) + 3;//一个包的长度-1
 //            sendRobotSessionId = sendRobotNewSessionId;
@@ -341,7 +331,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     public void stringToXml(byte[] bytes,String xmlContext)throws Exception{
             Document document = DocumentHelper.parseText(xmlContext);//String转XML
             XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);//解析xml
-//            log.info("解析出来的xml是：" + xmlRes);
             byte[] sendSessionIdByte = new byte[8];
             byte[] receiveSessionIdByte = new byte[8];
             System.arraycopy(bytes, 2, sendSessionIdByte, 0, 8);
@@ -422,7 +411,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 //心跳指令(发送响应)
                 case "2512":
-                    log.info("巡视主机收到心跳指令了");
+                    log.info("+++++++++++++++++巡视主机收到心跳指令了+++++++++++++++++");
                     heartNum = 0;
                     String robotCode = xmlBaseModel.getSendCode();
                     if (allRobotCodeMap.containsValue(robotCode)){
@@ -480,7 +469,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             switch (xmlBaseModel.getType()){
                 //机器人状态数据(接收并发送响应)
                 case "1":
-                    log.info("巡视主机收到机器人状态数据了");
+                    log.info("+++++++++++++++++巡视主机收到机器人状态数据了+++++++++++++++++");
                     //Deal with robot status data
                     List<Map<String,String>> robotStatusList = new ArrayList<>();
                     xmlBaseModel.getItems().forEach(res->{
@@ -509,7 +498,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 //机器人运行数据(接收并发送响应)
                 case "2":
-                    log.info("巡视主机收到机器人运行数据了");
+                    log.info("+++++++++++++++++巡视主机收到机器人运行数据了+++++++++++++++++");
                     //Deal with robot operation data
                     List<Map<String,String>> robotOperationList = new ArrayList<>();
                     xmlBaseModel.getItems().forEach(res->{
@@ -537,7 +526,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 //机器人坐标(接收并发送响应)
                 case "3":
-                    log.info("巡视主机收到机器人坐标数据了");
+                    log.info("+++++++++++++++++巡视主机收到机器人坐标数据了+++++++++++++++++");
                     //Deal with robot coordinates data
                     List<Map<String,String>> robotCoordinateList = new ArrayList<>();
                     xmlBaseModel.getItems().forEach(res-> {
@@ -562,7 +551,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 //机器人巡视路线(接收并发送响应)
                 case "4":
-                    log.info("巡视主机收到机器人巡视路线数据了");
+                    log.info("+++++++++++++++++巡视主机收到机器人巡视路线数据了+++++++++++++++++");
                     //Deal with robot cruise road data
                     List<Map<String,String>> robotRoadList = new ArrayList<>();
                     xmlBaseModel.getItems().forEach(res-> {
@@ -592,7 +581,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                         try {
                             String url = "cp " + temporaryPath + " " + developAbsoluteUrl;
-//                            log.info("url是==="+url);
                             Runtime.getRuntime().exec(url);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -619,7 +607,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 //机器人异常告警数据(接收并发送响应)
                 case "5":
-                    log.info("巡视主机收到机器人异常告警数据了");
+                    log.info("+++++++++++++++++巡视主机收到机器人异常告警数据了+++++++++++++++++");
                     //Deal with robot alarm data
                     Map<String, String> robotAlarmMap = new HashMap<>();
                     robotAlarmMap.put("robotName",xmlBaseModel.getItems().get(0).get("robot_name").toString());
@@ -643,7 +631,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 //微气象数据(接收并发送响应)
                 case "21":
-                    log.info("巡视主机收到微气象数据了");
+                    log.info("+++++++++++++++++巡视主机收到微气象数据了+++++++++++++++++");
                     //Deal with robot micro climate data
                     List<Map<String,String>> weatherList = new ArrayList<>();
                     Map<String,String> info = new HashMap<>();
@@ -703,7 +691,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 //任务状态数据(接收并发送响应)
                 case "41":
-                    log.info("巡视主机收到任务状态数据了");
+                    log.info("+++++++++++++++++巡视主机收到任务状态数据了+++++++++++++++++");
                     //Deal with robot task status data
                         Map<String, Object> taskStatusMap = new HashMap<>();
                         taskStatusMap.put("taskPatrolled_id", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
@@ -712,8 +700,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         taskStatusMap.put("taskState", xmlBaseModel.getItems().get(0).get("task_state").toString());
                         taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time"));
                         String startTime =  xmlBaseModel.getItems().get(0).get("start_time").toString();
-                        Date startDate = sdf.parse(startTime);
-                        taskStatusMap.put("startTime", sdf.format(startDate));
+                        taskStatusMap.put("startTime", sdf.format(sdf.parse(startTime)));
                         taskStatusMap.put("taskProgress", xmlBaseModel.getItems().get(0).get("task_progress").toString());
                         taskStatusMap.put("taskEstimatedTime", xmlBaseModel.getItems().get(0).get("task_estimated_time").toString());
                         taskStatusMap.put("description", xmlBaseModel.getItems().get(0).get("description").toString());
@@ -728,11 +715,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             Constant.postUrl(webSocketUrl,json);
                         }
 
-                    //先读缓存，进行修改
                     Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode()
                             +":"+xmlBaseModel.getItems().get(0).get("task_code").toString());
                     taskStatusMap.put("instanceList",listMap.get("instanceIdList"));
-                    //再将taskStatusMap放进缓存
                     redisTemplate.opsForHash().putAll("RobotTaskStatus:"+xmlBaseModel.getSendCode()
                             +":"+xmlBaseModel.getItems().get(0).get("task_code").toString(), taskStatusMap);
 
@@ -745,7 +730,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 //巡视结果
                 case "61":
-                    log.info("巡视主机收到巡视结果了");
+                    log.info("+++++++++++++++++巡视主机收到巡视结果了+++++++++++++++++");
                     //Deal with robot task result data
                     Map<String, String> cruiseResultMap = new HashMap<>();
                     cruiseResultMap.put("robotCode",xmlBaseModel.getSendCode());
@@ -916,7 +901,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         try {
             String url = "cp " + source + " "+aim;
-//            log.info("url是==="+url);
             Runtime.getRuntime().exec(url);
         }catch (Exception e){
             e.getMessage();
@@ -992,7 +976,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         send(ctx, heartProtocol,robotCode);
         flag2 ++;
         log.info("成功收到心跳flag2的值==="+flag2);
-        if (flag2 > 3){
+        //为了等待客户端和服务端连接稳定,收到三次以上再修改
+        if (flag2 > 2){
             robotService.updateRobotInfo(robotCode,"在线");
             robotStatusMap.put("value","0");//正常
             redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
