@@ -101,6 +101,9 @@ public class CameraConService {
     @Value("${realtime.video.definition}")
     private String videoDefinition;
 
+    @Value("${cvs.video.temperature}")
+    private int temperatures;
+
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     private static PlayCtrl playCtrl = PlayCtrl.INSTANCE;
     private NativeLong m_lRealPlayHandle = new NativeLong(-1);// playhandle
@@ -1022,9 +1025,9 @@ public class CameraConService {
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
            /* if (hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化成功开始注册登录：");*/
-                String login = registerNVR(cameraConInfo.getRecordId());
-                if (!login.isEmpty()) {
-                    log.info("登录成功：" + login);
+               // String login = registerNVR(cameraConInfo.getRecordId());
+                /*if (!login.isEmpty()) {*/
+                   // log.info("登录成功：" + login);
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     //生成文件名
                     String fileName = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").format(new Date()) + ".mp4";
@@ -1102,7 +1105,7 @@ public class CameraConService {
                                             Runtime.getRuntime().exec(url);
                                             log.info("nPos.getValue!:>>>" + nPos.getValue());
                                             judge = savePath + fileName;
-                                            hCNetSDK.NET_DVR_Logout(m_lLoadHandle);
+                                           // hCNetSDK.NET_DVR_Logout(m_lLoadHandle);
                                            // hCNetSDK.NET_DVR_Cleanup();
                                             break;
                                         }
@@ -1126,13 +1129,13 @@ public class CameraConService {
                         log.info("get file by time  NET_DVR_FindFile返回, error rr: " + rr);
                     }
 
-                } else {
+               /* } else {
                     iErr = hCNetSDK.NET_DVR_GetLastError();
                     log.info("登录 接口获取到：iErr" + iErr);
                     log.info("视频登录失败！！！");
                     judge = null;
 
-                }
+                }*/
          /* } else {
                 iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.info("调用NET_DVR_Init 接口获取到：" + iErr);
@@ -1142,6 +1145,7 @@ public class CameraConService {
         } catch (Exception e) {
             iErr = hCNetSDK.NET_DVR_GetLastError();
             log.info("获取视频方发异常：");
+            log.info(e.getMessage());
             judge = null;
         }
         return judge;
@@ -1163,9 +1167,9 @@ public class CameraConService {
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
          /*  if (hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化成功开始注册登录：");*/
-                String login = registerNVR(cameraConInfo.getRecordId());
-                if (!login.isEmpty()) {
-                    log.info("登录成功：" + login);
+               // String login = registerNVR(cameraConInfo.getRecordId());
+               // if (!login.isEmpty()) {
+                  //  log.info("登录成功：" + login);
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
                     log.info("lUserIDLong获取到：" + lUserIDLong);
@@ -1242,7 +1246,7 @@ public class CameraConService {
                                 }
                             }
                             //释放资源
-                            hCNetSDK.NET_DVR_Logout(lUserIDLong);
+                            //hCNetSDK.NET_DVR_Logout(lUserIDLong);
                            // hCNetSDK.NET_DVR_Cleanup();
                         } else {
                             list = null;
@@ -1255,7 +1259,7 @@ public class CameraConService {
                         int iErr = hCNetSDK.NET_DVR_GetLastError();
                         log.info("文件不存在:" + iErr);
                     }
-                }
+              //  }
            // }
         } catch (Exception e) {
             list = null;
@@ -1308,12 +1312,12 @@ public class CameraConService {
             //getSetconfig(lUserIDLong);
             HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
             m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
-            m_strJpegWithAppenData.dwChannel = 1;
+            m_strJpegWithAppenData.dwChannel = 2;
             HCNetSDK.BYTE_ARRAY ptrJpegByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 * 1024);
             HCNetSDK.BYTE_ARRAY ptrP2PDataByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 * 1024);
             m_strJpegWithAppenData.pJpegPicBuff = ptrJpegByte.getPointer();
             m_strJpegWithAppenData.pP2PDataBuff = ptrP2PDataByte.getPointer();
-            log.info("m_strJpegWithAppenData的值:" + m_strJpegWithAppenData.toString());
+           // log.info("m_strJpegWithAppenData的值:" + m_strJpegWithAppenData.toString());
             boolean bRet = hCNetSDK.NET_DVR_CaptureJPEGPicture_WithAppendData(lUserIDLong, 2, m_strJpegWithAppenData);
             log.info("bRet返回值：" + bRet);
             if (bRet) {
@@ -1488,8 +1492,10 @@ public class CameraConService {
                     log.info("hotFircsv地址：" + path);
                     byte[] byTempData = new byte[4];
                     FileWriter fos = new FileWriter(path);
-                    for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicWidth; i++) {
-                        for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++) {
+                    for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicWidth; i++)
+                    {
+                        for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++)
+                        {
                             ByteBuffer buffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i - 1) * (j - 1) * 4, 4);
                             buffers.get(byTempData);
                             int l;
@@ -1541,7 +1547,7 @@ public class CameraConService {
         int re = 1;
         log.info("开启可视对讲");
         try {
-            String logpath="/home/yjh/yjh_iot_center/iot-center-accessvideo-1.0.0/logs";
+            String logpath="/home/yjh/iot-center-accessvideo-1.0.0/logs";
 
             log.info("开启可视对讲videoIntercomId：" + videoIntercomId);
             String url = SERVICE_URL + "?videoIntercomId=" + videoIntercomId;
@@ -1574,7 +1580,23 @@ public class CameraConService {
             log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
             lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
             log.info("NET_DVR_Login_V40:返回值" + lUserID);
+
+
+
             HCNetSDK.FVoiceDataCallBack_V30 fVoiceDataCallBack = null;
+            HCNetSDK.NET_DVR_COMPRESSION_AUDIO lpCompressAudio = new HCNetSDK.NET_DVR_COMPRESSION_AUDIO();
+            boolean net_DVR_GetCurrentAudioCompress = hCNetSDK.NET_DVR_GetCurrentAudioCompress(lUserID, lpCompressAudio);
+            log.info("net_DVR_GetCurrentAudioCompress:"+net_DVR_GetCurrentAudioCompress);
+            byte byAudioEncType = lpCompressAudio.byAudioEncType;
+            byte byAudioSamplingRate = lpCompressAudio.byAudioSamplingRate;
+            byte byAudioBitRate = lpCompressAudio.byAudioBitRate;
+            byte bySupport = lpCompressAudio.bySupport;
+            log.info("音频编码类型=" + byAudioEncType + "  音频采样率=" + byAudioSamplingRate + "    音频码率=" + byAudioBitRate + "   bySupport=" + bySupport);
+
+
+
+
+
             if (mVoiceTalkHandle.longValue() < 0) {
                 int mVoiceTalkHandle = hCNetSDK.NET_DVR_StartVoiceCom_V30(lUserID, 1, false, fVoiceDataCallBack, null);
                 log.info("mVoiceTalkHandle:返回值" + mVoiceTalkHandle);
@@ -1584,13 +1606,13 @@ public class CameraConService {
                     log.info("NET_DVR_StartVoiceCom_V30 mVoiceTalkHandle   --->" + iErr);
                 } else {
                     re = 1;
-                    log.info("NET_DVR_StartVoiceCom_V30 SUCC");
-                    hCNetSDK.NET_DVR_SetVoiceComClientVolume(new NativeLong(mVoiceTalkHandle), (short) 80);
+                    log.info("NET_DVR_StartVoiceCom_V30 SUCC 内部");
+                   // hCNetSDK.NET_DVR_SetVoiceComClientVolume(new NativeLong(mVoiceTalkHandle), (short) 0xffff);
 
                 }
             } else {
                 re = 1;
-                hCNetSDK.NET_DVR_SetVoiceComClientVolume(mVoiceTalkHandle, (short) 80);
+              //  hCNetSDK.NET_DVR_SetVoiceComClientVolume(mVoiceTalkHandle, (short) 0xffff);
                 log.info("NET_DVR_StartVoiceCom_V30 SUCC:开启对讲");
             }
         } catch (Exception e) {
@@ -1626,6 +1648,7 @@ public class CameraConService {
                 }
 
                 mVoiceTalkHandle = new NativeLong(-1);
+                log.info("关闭后的mVoiceTalkHandle值："+mVoiceTalkHandle);
             }
 
         } catch (Exception e) {
@@ -1740,6 +1763,7 @@ public class CameraConService {
         log.info(path);
         log.info(points);
         String arrs[]=points.split(",");
+        log.info("arrs[]："+arrs.length);
 
 
         int x1=0;
@@ -1750,17 +1774,35 @@ public class CameraConService {
             col=Integer.parseInt(arrs[1]);
             x1=Integer.parseInt(arrs[2]);
             y1=Integer.parseInt(arrs[3]);
-            log.info("arrs[]："+arrs.length);
             log.info("points"+arrs[0]);
             log.info("points"+arrs[1]);
             log.info("points"+arrs[2]);
             log.info("points"+arrs[3]);
         }else {
-            row=Integer.parseInt(arrs[0]);
+
+            row= Integer.parseInt(arrs[0]);
+            if (Integer.parseInt(arrs[0])-temperatures<0)
+            {
+                row=1;
+            }else{
+                row= Integer.parseInt(arrs[0])-temperatures;
+            }
+            x1=Integer.parseInt(arrs[0])+temperatures;
+
+
             col=Integer.parseInt(arrs[1]);
-            log.info("arrs[]："+arrs.length);
-            log.info("points"+arrs[0]);
-            log.info("points"+arrs[1]);
+            if (Integer.parseInt(arrs[1])-temperatures<0)
+            {
+                col=1;
+            }else{
+                col= Integer.parseInt(arrs[1])-temperatures;
+            }
+            y1=Integer.parseInt(arrs[1])+temperatures;
+
+            log.info("row"+row);
+            log.info("x1"+x1);
+            log.info("col"+col);
+            log.info("y1"+y1);
         }
         File file= new File(path);
         String fileName = file.getName();
@@ -1778,17 +1820,17 @@ public class CameraConService {
             String line = null;
             int index=0;
             List<String > arr =new ArrayList<>();
-            if (arrs.length>2){
+           // if (arrs.length>2){
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
                     String item[] = line.split(",");
                     if (index >= row-1&&index<=x1-1) {
                         for (int i=0;i<=item.length;i++)
                         {
-                            if(col<=i&&i<=y1)
+                            if(col-1<=i&&i<=y1-1)
                             {
                                 //log.info("框测温度值:" + item[col - 1]);
-                                arr.add(item[col - 1]) ;
+                                arr.add(item[col - 1]);
                                // log.info("框测温度值:"+arr.get(index));
                             }
                         }
@@ -1798,20 +1840,19 @@ public class CameraConService {
                 //转换保留后两位小数
                 temperature= new DecimalFormat("0.00").format(Double.parseDouble(Collections.max(arr)));
                 log.info("框测temperature转换保留后两位小数"+temperature);
-            }else {
+          /**}else {
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
                     String item[] = line.split(",");
                     if (index == row - 1) {
                         if (item.length >= col - 1) {
-                            //log.info("温度值:" + item[col - 1]);
                                 temperature = new DecimalFormat("0.00").format(Double.parseDouble(item[col - 1]));
                                 log.info("温度值转换后的:" + temperature);
                         }
                     }
                     index++;
                 }
-            }
+            }*/
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1971,6 +2012,10 @@ public class CameraConService {
         return list;
     }
 
+    /**
+     * 设置发射率和距离
+     * @param lUserID
+     */
     public void getSetconfig(NativeLong lUserID)
     {
         HCNetSDK.NET_DVR_THERMOMETRY_PRESETINFO m_struThermometryInfo = new HCNetSDK.NET_DVR_THERMOMETRY_PRESETINFO();
@@ -2009,7 +2054,7 @@ public class CameraConService {
         m_struThermometryInfo.struPresetInfo[0].fEmissivity = (float)0.98;
         m_struThermometryInfo.struPresetInfo[0].byReflectiveEnabled = 0;
         //反射温度 精确到小数后一位
-        m_struThermometryInfo.struPresetInfo[0].fReflectiveTemperature = 20;
+        //m_struThermometryInfo.struPresetInfo[0].fReflectiveTemperature = 20;
         //距离单位: 0- 米(m)，1- 英尺(feet)，2-厘米（cm）
         m_struThermometryInfo.struPresetInfo[0].byDistanceUnit = 0;
         m_struThermometryInfo.write();
@@ -2018,7 +2063,7 @@ public class CameraConService {
 
 
         boolean m = hCNetSDK.NET_DVR_SetSTDConfig(lUserID, 6701, struCfg);
-        if (bRet == false)
+        if (m == false)
         {
            int nErr= hCNetSDK.NET_DVR_GetLastError();
             log.info("NET_DVR_SET_THERMOMETRY_PRESETINFO 信息：" + nErr );

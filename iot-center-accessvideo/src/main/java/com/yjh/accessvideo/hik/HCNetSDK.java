@@ -3491,8 +3491,13 @@ EMAIL参数结构
     //语音对讲参数
     public static class NET_DVR_COMPRESSION_AUDIO extends Structure
     {
-        public byte  byAudioEncType;   //音频编码类型 0-G722; 1-G711
-        public byte[] byres= new byte [7];//这里保留音频的压缩参数
+        public byte byAudioEncType; // 音频编码类型 0- G722，1- G711_U，2- G711_A，5- MP2L2，6- G726，7- AAC，8-
+        // PCM，9-G722，10-G723，11-G729
+        public byte byAudioSamplingRate;// 音频采样率：0- 默认，1- 16kHZ，2- 32kHZ，3- 48kHZ，4- 44.1kHZ，5- 8kHZ
+        public byte byAudioBitRate;// 音频码率
+        public byte[] byres = new byte[4];// 这里保留音频的压缩参数
+        public byte bySupport; // Mp2l2前4个字节的含义表示后面内容音频数据长度
+
     }
 
     //用于接收报警信息的缓存区
@@ -4485,6 +4490,7 @@ EMAIL参数结构
     NativeLong NET_DVR_StartVoiceCom_MR(NativeLong lUserID, FVoiceDataCallBack_MR fVoiceDataCallBack, int dwUser);
     NativeLong NET_DVR_StartVoiceCom_MR_V30(NativeLong lUserID, int dwVoiceChan, FVoiceDataCallBack_MR_V30 fVoiceDataCallBack, Pointer pUser);
     boolean  NET_DVR_VoiceComSendData(NativeLong lVoiceComHandle, String pSendBuf, int dwBufSize);
+    boolean NET_DVR_GetCurrentAudioCompress(int lUserID, NET_DVR_COMPRESSION_AUDIO lpCompressAudio);
 
     //语音广播
     boolean  NET_DVR_ClientAudioStart();
