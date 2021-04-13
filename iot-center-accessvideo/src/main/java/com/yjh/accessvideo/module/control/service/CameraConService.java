@@ -1768,8 +1768,8 @@ public class CameraConService {
         String temperature = "0.00";
 
         if (arrs.length==4) {
-            row = Integer.parseInt(arrs[0]);
-            column = Integer.parseInt(arrs[1]);
+            column = Integer.parseInt(arrs[0]);
+            row = Integer.parseInt(arrs[1])+1;
             xPlus = Integer.parseInt(arrs[2]);
             yPlus = Integer.parseInt(arrs[3]);
             try {
@@ -1779,14 +1779,14 @@ public class CameraConService {
                 InputStreamReader reader=new InputStreamReader(stream,"GBK");
                 BufferedReader reade=new BufferedReader(reader);
                 String line = null;
-                int rowIndex=0;
+                int rowIndex=1;
                 List<String > arr =new ArrayList<>();
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
                     String item[] = line.split(",");
-                    if (rowIndex>=row-1 && rowIndex<=row+xPlus) {
+                    if (row<=rowIndex && rowIndex<=row+yPlus) {
                         for (int i=0;i<=item.length;i++) {
-                            if(column-1<=i && i<=column+yPlus) { arr.add(item[column - 1]); }
+                            if(column-1<=i && i<=column+xPlus) { arr.add(item[i-1]); }
                         }
                     }
                     rowIndex++;
@@ -1797,8 +1797,8 @@ public class CameraConService {
             } catch (Exception e) { e.getMessage(); }
             return temperature;
         } else {
-            row = Integer.parseInt(arrs[0])+1;
-            column = Integer.parseInt(arrs[1]);
+            column = Integer.parseInt(arrs[0]);
+            row = Integer.parseInt(arrs[1])+1;
             try {
                 URL url = new URL(path);
                 URLConnection connection = url.openConnection();
@@ -1806,16 +1806,18 @@ public class CameraConService {
                 InputStreamReader reader=new InputStreamReader(stream,"GBK");
                 BufferedReader reade=new BufferedReader(reader);
                 String line = null;
-                List<String > arr =new ArrayList<>();
                 int rowIndex = 0;
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
                     String item[] = line.split(",");
-                    if (row==rowIndex) { arr.add(item[column-1]); }
+                    if (row==rowIndex) {
+                        temperature = item[column-1];
+                        break;
+                    }
                     rowIndex++;
                 }
                 //转换保留后两位小数
-                temperature= new DecimalFormat("0.00").format(Double.parseDouble(Collections.max(arr)));
+                temperature= new DecimalFormat("0.00").format(Double.parseDouble(temperature));
                 log.info("点测temperature转换保留后两位小数"+temperature);
             } catch (Exception e) { e.getMessage(); }
             return temperature;
