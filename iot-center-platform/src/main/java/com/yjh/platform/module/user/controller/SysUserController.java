@@ -409,7 +409,7 @@ public class SysUserController {
             } else {
                 sysUserService.insert(sysUser,request);
                 sysUserService.insertIntoRedis();
-                result.setData(sysUser);
+              //  result.setData(sysUser);
             }
         } catch (Exception e) {
             if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_username") != -1) {
