@@ -1777,30 +1777,18 @@ public class CameraConService {
                 BufferedReader reade=new BufferedReader(reader);
                 String line = null;
                 int rowIndex=1;
-                float[] arr =new float[yPlus];
+                List<String > arr =new ArrayList<>();
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
                     String item[] = line.split(",");
                     if (row<=rowIndex && rowIndex<=row+yPlus) {
-                        float[] arrColumn =new float[xPlus];
-                        int arrColumnIndex = 0;
-                        for (int i=0;i<=item.length;i++) {
-                            if(column-1<=i && i<=column+xPlus) {
-                                arrColumn[arrColumnIndex] = Float.parseFloat(item[i-1]);
-                                arrColumnIndex++;
-                            }
-                        }
-                        float maxColumn = arrColumn[0];
-                        for (int i = 0; i < arr.length; i++) { if (arrColumn[i]>maxColumn) maxColumn = arrColumn[i]; }
-                        arr[rowIndex-1] = maxColumn;
+                        for (int i=0;i<=item.length;i++) { if(column-1<=i && i<=column+xPlus) arr.add(item[i-1]); }
                     } else if (rowIndex>row+yPlus) { break; }
                     rowIndex++;
                 }
-                log.info("arr: "+arr.toString());
-                float max = arr[0];
-                for (int i = 0; i < arr.length; i++) { if (arr[i]>max) max = arr[i]; }
+                log.info("arr: "+arr);
                 //转换保留后两位小数
-                temperature= String.format("%.2f", max);
+                temperature= new DecimalFormat("0.00").format(Double.parseDouble(Collections.max(arr)));
                 log.info("框测temperature转换保留后两位小数"+temperature);
             } catch (Exception e) { e.getMessage(); }
             return temperature;
