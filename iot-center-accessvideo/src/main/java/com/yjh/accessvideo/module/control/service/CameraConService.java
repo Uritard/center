@@ -9,6 +9,7 @@ import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
+import com.yjh.accessvideo.commons.utils.ByteUtil;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
@@ -1494,21 +1495,14 @@ public class CameraConService {
                 if (m_strJpegWithAppenData.dwP2PDataLen > 0) {
                     String path = hotFir + newName + ".csv";
                     log.info("hotFircsv地址：" + path);
-                    byte[] byTempData = new byte[4];
                     FileWriter fos = new FileWriter(path);
+                    log.info("dwJpegPicHeight: "+m_strJpegWithAppenData.dwJpegPicHeight+", dwJpegPicWidth: "+m_strJpegWithAppenData.dwJpegPicWidth);
+                    //height 512 width 640
                     for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicHeight; i++) {
                         for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicWidth; j++) {
-                            ByteBuffer buffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i - 1) * (j - 1) * 4, 4);
-                            buffers.get(byTempData);
-                            int l;
-                            l = byTempData[0];
-                            l &= 0xff;
-                            l |= ((long) byTempData[1] << 8);
-                            l &= 0xffff;
-                            l |= ((long) byTempData[2] << 16);
-                            l &= 0xffffff;
-                            l |= ((long) byTempData[3] << 24);
-                            fos.write(String.valueOf(Float.intBitsToFloat(l)));
+                            byte[] sourceData = m_strJpegWithAppenData.pP2PDataBuff.getByteArray((i - 1)*m_strJpegWithAppenData.dwJpegPicWidth*4 + (j - 1)*4, 4);
+                            int ss = sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
+                            fos.write(String.valueOf(Float.intBitsToFloat(ss)));
                             fos.write(",");
                         }
                         fos.append('\n');
@@ -1766,7 +1760,6 @@ public class CameraConService {
         log.info(points);
         String arrs[]=points.split(",");
         log.info("arrs[]："+arrs.length);
-
 
         int x1=0;
         int y1=0;
