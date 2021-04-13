@@ -192,4 +192,8 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "退出再重放记录")
     @TableField(value = "exit_putInto_record", updateStrategy = FieldStrategy.IGNORED)
     private String exitPutIntoRecord;
+
+    private Long recordId;
+
+    private Integer channelNum;
 }

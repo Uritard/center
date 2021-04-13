@@ -77,7 +77,9 @@
             defect_record,
             repair_record,
             exit_putInto_record,
-            remarks
+            remarks,
+            record_id,
+            channel_num
         )values(
                 #{robotCode, jdbcType=VARCHAR},
                 #{robotName, jdbcType=VARCHAR},
@@ -110,7 +112,9 @@
                 #{defectRecord, jdbcType=VARCHAR},
                 #{repairRecord, jdbcType=VARCHAR},
                 #{exitPutIntoRecord, jdbcType=VARCHAR},
-                #{remarks, jdbcType=VARCHAR}
+                #{remarks, jdbcType=VARCHAR},
+                #{recordId, jdbcType=BIGINT},
+                #{channelNum, jdbcType=INTEGER}
         )
     </insert>
 
@@ -164,6 +168,8 @@
         <if test="repairRecord != null ">a.repair_record = #{repairRecord},</if>
         <if test="exitPutIntoRecord != null ">a.exit_putInto_record = #{exitPutIntoRecord},</if>
         <if test="remarks != null ">a.remarks = #{remarks},</if>
+        <if test="recordId != null ">a.record_id = #{recordId},</if>
+        <if test="channelNum != null ">a.channel_num = #{channelNum},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>
@@ -202,7 +208,9 @@
         a.defect_record,
         a.repair_record,
         a.exit_putInto_record,
-        a.remarks
+        a.remarks,
+        a.record_id,
+        a.channel_num
         from t_robot_info a
         where 1 = 1
             and a.robot_id = #{robotId, jdbcType=BIGINT}
@@ -243,7 +251,9 @@
         a.defect_record,
         a.repair_record,
         a.exit_putInto_record,
-        a.remarks
+        a.remarks,
+        a.record_id,
+        a.channel_num
         from t_robot_info a
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
@@ -320,7 +330,9 @@
         a.defect_record,
         a.repair_record,
         a.exit_putInto_record,
-        a.remarks
+        a.remarks,
+        a.record_id,
+        a.channel_num
         from t_robot_info a
         LEFT JOIN t_dict_business d ON a.robot_type=d.dict_code and d.col_name = 'robot_type'
         LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code and b.col_name = 'robot_factory'
@@ -377,7 +389,9 @@
             defect_record,
             repair_record,
             exit_putInto_record,
-            remarks
+            remarks,
+        record_id,
+        channel_num
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
             (
@@ -412,7 +426,9 @@
                 #{TRobotInfo.defectRecord, jdbcType=VARCHAR},
                 #{TRobotInfo.repairRecord, jdbcType=VARCHAR},
                 #{TRobotInfo.exitPutIntoRecord, jdbcType=VARCHAR},
-                #{TRobotInfo.remarks, jdbcType=VARCHAR}
+                #{TRobotInfo.remarks, jdbcType=VARCHAR},
+                #{TRobotInfo.recordId, jdbcType=BIGINT},
+                #{TRobotInfo.channelNum, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

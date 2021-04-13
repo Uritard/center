@@ -386,9 +386,11 @@
                 a.camera_code as cameraCode,
                 a.vendor_id as vendorId,
                 a.channel_num as channelNum,
-                b.dict_note as vendorName
+                b.dict_note as vendorName,
+        c.record_ip
         from t_camera_info a
         left JOIN t_dict_business b on a.vendor_id = b.dict_code and b.col_name = 'camera_vendor'
+		left join t_camera_recorder c on a.record_id = c.record_id
         where 1 = 1
         and a.camera_id = #{cameraId}
     </select>
@@ -400,9 +402,12 @@
             a.identity_manager as cameraManager,
             a.identity_code as cameraCode,
             a.robot_factory as vendorId,
-            b.dict_note as vendorName
+            a.channel_num as channelNum,,
+            b.dict_note as vendorName,
+            c.record_ip as recordIp
             from t_robot_info a
             left join t_dict_business b on a.robot_factory = b.dict_code and b.col_name = 'robot_factory'
+            left join t_camera_recorder c on a.record_id = c.record_id
         where 1 = 1
         and a.robot_id = #{robotId}
     </select>
@@ -411,12 +416,15 @@
             a.robot_name as name,
             a.lnferad_IP as ip,
             a.light_port as port,
+            a.channel_num as channelNum,
             a.identity_manager as cameraManager,
             a.identity_code as cameraCode,
             a.robot_factory as vendorId,
-            b.dict_note as vendorName
+            b.dict_note as vendorName,
+            c.record_ip as recordIp
             from t_robot_info a
             left join t_dict_business b on a.robot_factory = b.dict_code and b.col_name = 'robot_factory'
+            left join t_camera_recorder c on a.record_id = c.record_id
         where 1 = 1
         and a.robot_id = #{robotId}
     </select>
