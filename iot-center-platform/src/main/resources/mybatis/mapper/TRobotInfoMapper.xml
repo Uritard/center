@@ -79,7 +79,8 @@
             exit_putInto_record,
             remarks,
             record_id,
-            channel_num
+            channel_num_light,
+            channel_num_inferad
         )values(
                 #{robotCode, jdbcType=VARCHAR},
                 #{robotName, jdbcType=VARCHAR},
@@ -114,7 +115,8 @@
                 #{exitPutIntoRecord, jdbcType=VARCHAR},
                 #{remarks, jdbcType=VARCHAR},
                 #{recordId, jdbcType=BIGINT},
-                #{channelNum, jdbcType=INTEGER}
+                #{channelNumLight, jdbcType=INTEGER}
+                #{channelNumInferad, jdbcType=INTEGER}
         )
     </insert>
 
@@ -169,7 +171,8 @@
         <if test="exitPutIntoRecord != null ">a.exit_putInto_record = #{exitPutIntoRecord},</if>
         <if test="remarks != null ">a.remarks = #{remarks},</if>
         <if test="recordId != null ">a.record_id = #{recordId},</if>
-        <if test="channelNum != null ">a.channel_num = #{channelNum},</if>
+        <if test="channelNumLight != null ">a.channel_num_light = #{channelNumLight},</if>
+        <if test="channelNumInferad != null ">a.channel_num_inferad = #{channelNumInferad},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>
@@ -210,7 +213,8 @@
         a.exit_putInto_record,
         a.remarks,
         a.record_id,
-        a.channel_num
+        a.channel_num_light,
+        a.channel_num_inferad
         from t_robot_info a
         where 1 = 1
             and a.robot_id = #{robotId, jdbcType=BIGINT}
@@ -253,7 +257,8 @@
         a.exit_putInto_record,
         a.remarks,
         a.record_id,
-        a.channel_num
+        a.channel_num_light,
+        a.channel_num_inferad
         from t_robot_info a
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
@@ -332,7 +337,8 @@
         a.exit_putInto_record,
         a.remarks,
         a.record_id,
-        a.channel_num,
+        a.channel_num_light,
+        a.channel_num_inferad,
         g.record_name
         from t_robot_info a
         LEFT JOIN t_dict_business d ON a.robot_type=d.dict_code and d.col_name = 'robot_type'
@@ -393,7 +399,8 @@
             exit_putInto_record,
             remarks,
         record_id,
-        channel_num
+        channel_num_light,
+        channel_num_inferad
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
             (
@@ -430,7 +437,8 @@
                 #{TRobotInfo.exitPutIntoRecord, jdbcType=VARCHAR},
                 #{TRobotInfo.remarks, jdbcType=VARCHAR},
                 #{TRobotInfo.recordId, jdbcType=BIGINT},
-                #{TRobotInfo.channelNum, jdbcType=INTEGER}
+                #{TRobotInfo.channelNumLight, jdbcType=INTEGER}
+                #{TRobotInfo.channelNumInferad, jdbcType=INTEGER}
             )
         </foreach>
     </insert>

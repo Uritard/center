@@ -195,5 +195,6 @@ public class TRobotInfo implements Serializable {
 
     private Long recordId;
 
-    private Integer channelNum;
+    private Integer channelNumLight;
+    private Integer channelNumInferad;
 }
