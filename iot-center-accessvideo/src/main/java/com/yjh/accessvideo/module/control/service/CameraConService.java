@@ -1753,107 +1753,73 @@ public class CameraConService {
      * @param path
      * @return
      */
-    public  String lineTemperature(String path,String points)
-    {
-        int row, col;
-        log.info(path);
-        log.info(points);
-        String arrs[]=points.split(",");
+    public  String lineTemperature(String path,String points) {
+
+        int row, column, xPlus, yPlus;
+        String arrs[] = points.split(",");
         log.info("arrs[]："+arrs.length);
 
-        int x1=0;
-        int y1=0;
-        if (arrs.length>2)
-        {
-            row=Integer.parseInt(arrs[0]);
-            col=Integer.parseInt(arrs[1]);
-            x1=Integer.parseInt(arrs[2]);
-            y1=Integer.parseInt(arrs[3]);
-            log.info("points"+arrs[0]);
-            log.info("points"+arrs[1]);
-            log.info("points"+arrs[2]);
-            log.info("points"+arrs[3]);
-        }else {
-
-            row= Integer.parseInt(arrs[0]);
-            if (Integer.parseInt(arrs[0])-temperatures<0)
-            {
-                row=1;
-            }else{
-                row= Integer.parseInt(arrs[0])-temperatures;
-            }
-            x1=Integer.parseInt(arrs[0])+temperatures;
-
-
-            col=Integer.parseInt(arrs[1]);
-            if (Integer.parseInt(arrs[1])-temperatures<0)
-            {
-                col=1;
-            }else{
-                col= Integer.parseInt(arrs[1])-temperatures;
-            }
-            y1=Integer.parseInt(arrs[1])+temperatures;
-
-            log.info("row"+row);
-            log.info("x1"+x1);
-            log.info("col"+col);
-            log.info("y1"+y1);
-        }
         File file= new File(path);
         String fileName = file.getName();
         log.info(fileName);
         fileName=fileName.substring(0,fileName.lastIndexOf("."));
         path= hotFirShow+fileName+".csv";
         log.info("cvs path:"+path);
-        String temperature="0.00";
-        try {
-            URL url = new URL(path);
-            URLConnection connection = url.openConnection();
-            InputStream stream = connection.getInputStream();
-            InputStreamReader reader=new InputStreamReader(stream,"GBK");
-            BufferedReader reade=new BufferedReader(reader);
-            String line = null;
-            int index=0;
-            List<String > arr =new ArrayList<>();
-           // if (arrs.length>2){
+        String temperature = "0.00";
+
+        if (arrs.length==4) {
+            row = Integer.parseInt(arrs[0]);
+            column = Integer.parseInt(arrs[1]);
+            xPlus = Integer.parseInt(arrs[2]);
+            yPlus = Integer.parseInt(arrs[3]);
+            try {
+                URL url = new URL(path);
+                URLConnection connection = url.openConnection();
+                InputStream stream = connection.getInputStream();
+                InputStreamReader reader=new InputStreamReader(stream,"GBK");
+                BufferedReader reade=new BufferedReader(reader);
+                String line = null;
+                int rowIndex=0;
+                List<String > arr =new ArrayList<>();
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
                     String item[] = line.split(",");
-                    if (index >= row-1&&index<=x1-1) {
-                        for (int i=0;i<=item.length;i++)
-                        {
-                            if(col-1<=i&&i<=y1-1)
-                            {
-                                //log.info("框测温度值:" + item[col - 1]);
-                                arr.add(item[col - 1]);
-                               // log.info("框测温度值:"+arr.get(index));
-                            }
+                    if (rowIndex>=row-1 && rowIndex<=row+xPlus) {
+                        for (int i=0;i<=item.length;i++) {
+                            if(column-1<=i && i<=column+yPlus) { arr.add(item[column - 1]); }
                         }
                     }
-                    index++;
+                    rowIndex++;
                 }
                 //转换保留后两位小数
                 temperature= new DecimalFormat("0.00").format(Double.parseDouble(Collections.max(arr)));
                 log.info("框测temperature转换保留后两位小数"+temperature);
-          /**}else {
+            } catch (Exception e) { e.getMessage(); }
+            return temperature;
+        } else {
+            row = Integer.parseInt(arrs[0])+1;
+            column = Integer.parseInt(arrs[1]);
+            try {
+                URL url = new URL(path);
+                URLConnection connection = url.openConnection();
+                InputStream stream = connection.getInputStream();
+                InputStreamReader reader=new InputStreamReader(stream,"GBK");
+                BufferedReader reade=new BufferedReader(reader);
+                String line = null;
+                List<String > arr =new ArrayList<>();
+                int rowIndex = 0;
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
                     String item[] = line.split(",");
-                    if (index == row - 1) {
-                        if (item.length >= col - 1) {
-                                temperature = new DecimalFormat("0.00").format(Double.parseDouble(item[col - 1]));
-                                log.info("温度值转换后的:" + temperature);
-                        }
-                    }
-                    index++;
+                    if (row==rowIndex) { arr.add(item[column-1]); }
+                    rowIndex++;
                 }
-            }*/
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.info("Exception"+e.getMessage());
+                //转换保留后两位小数
+                temperature= new DecimalFormat("0.00").format(Double.parseDouble(Collections.max(arr)));
+                log.info("点测temperature转换保留后两位小数"+temperature);
+            } catch (Exception e) { e.getMessage(); }
+            return temperature;
         }
-        return temperature;
     }
 
 
