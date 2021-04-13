@@ -1777,12 +1777,14 @@ public class CameraConService {
                 BufferedReader reade=new BufferedReader(reader);
                 String line = null;
                 int rowIndex=1;
-                List<String > arr =new ArrayList<>();
+                List<String> arr =new ArrayList<>();
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
                     String item[] = line.split(",");
                     if (row<=rowIndex && rowIndex<=row+yPlus) {
-                        for (int i=0;i<=item.length;i++) { if(column-1<=i && i<=column+xPlus) arr.add(item[i-1]); }
+                        List<String> arrColumn =new ArrayList<>();
+                        for (int i=0;i<=item.length;i++) { if(column-1<=i && i<=column+xPlus) arrColumn.add(item[i-1]); }
+                        arr.add(Collections.max(arrColumn));
                     } else if (rowIndex>row+yPlus) { break; }
                     rowIndex++;
                 }
