@@ -1777,20 +1777,20 @@ public class CameraConService {
                 BufferedReader reade=new BufferedReader(reader);
                 String line = null;
                 int rowIndex=1;
-                List<String> arr =new ArrayList<>();
+                List<Double> arr =new ArrayList<>();
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
                     String item[] = line.split(",");
                     if (row<=rowIndex && rowIndex<=row+yPlus) {
-                        List<String> arrColumn =new ArrayList<>();
-                        for (int i=0;i<=item.length;i++) { if(column-1<=i && i<=column+xPlus) arrColumn.add(item[i-1]); }
+                        List<Double> arrColumn =new ArrayList<>();
+                        for (int i=0;i<=item.length;i++) { if(column-1<=i && i<=column+xPlus) arrColumn.add(Double.parseDouble(item[i-1])); }
                         arr.add(Collections.max(arrColumn));
                     } else if (rowIndex>row+yPlus) { break; }
                     rowIndex++;
                 }
                 log.info("arr: "+arr);
                 //转换保留后两位小数
-                temperature= new DecimalFormat("0.00").format(Double.parseDouble(Collections.max(arr)));
+                temperature= new DecimalFormat("0.00").format(Collections.max(arr));
                 log.info("框测temperature转换保留后两位小数"+temperature);
             } catch (Exception e) { e.getMessage(); }
             return temperature;
