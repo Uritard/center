@@ -1,7 +1,12 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
+import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.dao.TCameraGroupDao;
 
@@ -23,6 +28,8 @@ public class TCameraGroupService{
     private TCameraGroupDao tCameraGroupDao;
     @Autowired
     private TCameraInfoDao tCameraInfoDao;
+    @Autowired
+    private TCameraScreenDao tCameraScreenDao;
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TCameraGroup tCameraGroup) {
@@ -48,6 +55,18 @@ public class TCameraGroupService{
         TCameraGroup tCameraGroup = this.tCameraGroupDao.selectByPrimaryId(groupId);
         List<Camera> list = new ArrayList<>();
         boolean flag = false;
+        //获取状态
+        Map<String,String> map = new HashMap<>();
+        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
+        for(Long recordId:recordIdList){
+            HashMap<String, Object> recordIdMap = new HashMap<>();
+            recordIdMap.put("recordId",recordId );
+            Result re = cameraStates(recordIdMap);
+            if(re == null){
+                continue;
+            }
+            map.putAll((Map<String,String>)re.getData());
+        }
         if(tCameraGroup.getCameraIds() != null && !"".equals(tCameraGroup.getCameraIds())) {
             String[] cameraList = tCameraGroup.getCameraIds().split(",");
             for (String item : cameraList) {
@@ -60,7 +79,10 @@ public class TCameraGroupService{
                 Camera camera = new Camera();
                 camera.setCameraId(item);
                 camera.setCameraName(tCameraInfo.getCameraName());
-                list.add(camera);
+                if("1".equals(map.get(item.toString()))){
+                    list.add(camera);
+                }
+                //list.add(camera);
             }
         }
         TCameraGroupDetail tCameraGroupDetail =new TCameraGroupDetail();
@@ -73,6 +95,18 @@ public class TCameraGroupService{
             tCameraGroupDao.update(tCameraGroup);
         }
         return tCameraGroupDetail;
+    }
+    private static Result cameraStates(HashMap map) {
+        Result re = null;
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                re =  serviceRestTemplate.getForObject(Constant.CAMERA_STATES, Result.class,map);
+            }
+        } catch (Exception e) {
+
+        }
+        return re;
     }
 
     @Transactional(rollbackFor = Exception.class)
