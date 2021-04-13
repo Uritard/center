@@ -1496,10 +1496,8 @@ public class CameraConService {
                     log.info("hotFircsv地址：" + path);
                     byte[] byTempData = new byte[4];
                     FileWriter fos = new FileWriter(path);
-                    for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicWidth; i++)
-                    {
-                        for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++)
-                        {
+                    for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicHeight; i++) {
+                        for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicWidth; j++) {
                             ByteBuffer buffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i - 1) * (j - 1) * 4, 4);
                             buffers.get(byTempData);
                             int l;
