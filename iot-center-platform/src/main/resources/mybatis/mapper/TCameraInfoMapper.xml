@@ -402,7 +402,7 @@
             a.identity_manager as cameraManager,
             a.identity_code as cameraCode,
             a.robot_factory as vendorId,
-            a.channel_num as channelNum,,
+            a.channel_num as channelNum,
             b.dict_note as vendorName,
             c.record_ip as recordIp
             from t_robot_info a
