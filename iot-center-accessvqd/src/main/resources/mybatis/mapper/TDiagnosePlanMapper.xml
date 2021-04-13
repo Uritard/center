@@ -116,8 +116,8 @@
         from t_diagnose_plan a
         LEFT JOIN sys_user b ON a.user_id = b.user_id
         where 1 = 1
-        ORDER BY a.start_time
         <if test="planName != null and planName != ''">and a.plan_name like concat ('%',#{planName, jdbcType=VARCHAR},'%')</if>
+        ORDER BY a.start_time
     </select>
 
     <select id="selectByPlanId" parameterType="java.lang.String" resultType="com.yjh.accessvqd.module.diagnose.entity.Plans">
