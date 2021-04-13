@@ -171,6 +171,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         //channel在线处理，都会触发这个方法
         log.info("channelActive----->" + ctx);
+        log.info("Client "+ctx.channel().remoteAddress() + " connected");
         this.ctx = ctx;
         maps.put(ctx.channel().id().toString(), ctx);
         log.info("mapsAfterAdded: " + maps);
@@ -252,7 +253,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         String finalBody = temporaryBody2.replace("\"1.0\"","\'1.0\'");//最终的body
 
         handlingMethod(bytes,finalBody);*/
-        ReferenceCountUtil.release(byteBuf);
+        ReferenceCountUtil.release(byteBuf);//引用计数器及时申请释放不再引用的对象
     }
     /*
      *拆包工具1.0
