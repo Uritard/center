@@ -1757,11 +1757,8 @@ public class CameraConService {
 
         int row, column, xPlus, yPlus;
         String arrs[] = points.split(",");
-        log.info("arrs[]："+arrs.length);
-
         File file= new File(path);
         String fileName = file.getName();
-        log.info(fileName);
         fileName=fileName.substring(0,fileName.lastIndexOf("."));
         path= hotFirShow+fileName+".csv";
         log.info("cvs path:"+path);
@@ -1786,11 +1783,15 @@ public class CameraConService {
                     String item[] = line.split(",");
                     if (row<=rowIndex && rowIndex<=row+yPlus) {
                         for (int i=0;i<=item.length;i++) {
-                            if(column-1<=i && i<=column+xPlus) { arr.add(item[i-1]); }
+                            if(column-1<=i && i<=column+xPlus) {
+                                log.info("item[i-1]: "+item[i-1]);
+                                arr.add(item[i-1]);
+                            }
                         }
-                    }
+                    } else if (rowIndex>row+yPlus) { break; }
                     rowIndex++;
                 }
+                log.info("arr: "+arr);
                 //转换保留后两位小数
                 temperature= new DecimalFormat("0.00").format(Double.parseDouble(Collections.max(arr)));
                 log.info("框测temperature转换保留后两位小数"+temperature);
