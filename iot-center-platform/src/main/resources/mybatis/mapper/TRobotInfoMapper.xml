@@ -332,13 +332,15 @@
         a.exit_putInto_record,
         a.remarks,
         a.record_id,
-        a.channel_num
+        a.channel_num,
+        g.record_name
         from t_robot_info a
         LEFT JOIN t_dict_business d ON a.robot_type=d.dict_code and d.col_name = 'robot_type'
         LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code and b.col_name = 'robot_factory'
         LEFT JOIN t_dict_business c ON a.is_use=c.dict_code and c.col_name = 'robot_use'
         LEFT JOIN t_dict_business e ON a.robot_position = e.dict_code  and e.col_name = 'robot_position'
         LEFT JOIN t_std_region f ON f.region_id = a.up_region_id
+        left join t_camera_recorder g on a.record_id = g.record_id
         where 1 = 1
         <if test="robotName != null and robotName != '' ">and a.robot_name  LIKE CONCAT('%',#{robotName, jdbcType=VARCHAR},'%')</if>
         <if test="robotType != -1"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
