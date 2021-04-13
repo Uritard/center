@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.handler.JurisdictionException;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.module.device.entity.MeteInfo;
 import com.yjh.platform.module.device.entity.TStdMeteDetail;
 import com.yjh.platform.module.device.service.TStdMeteService;
@@ -13,6 +14,8 @@ import java.util.List;
 
 import io.swagger.annotations.*;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,14 +165,45 @@ public class TStdMeteController {
 
     @ApiOperation(value = "分页查询，名称模糊查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询系统测点",content = "根据用户传递的参数查询系统测点",logType = 1)
+   // @Logs(title = "查询系统测点",content = "根据用户传递的参数查询系统测点",logType = 1)
     public Result selectByPage(@RequestParam(value = "deviceType", required = false) Integer deviceType,
                                @RequestParam(value = "meteName", required = false) String meteName,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
+        Long userIds = Long.valueOf(request.getHeader("userId"));
+        String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
         try {
+            if(pageSize==0){
+                MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                param.set("logType", "9");
+                param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                param.set("title", "导出");
+                param.set("state", 1);
+                param.set("userId", userIds);
+                param.set("userName", userName);
+                param.set("requestOrigin", request.getRequestURL());
+                param.set("requestPath", request.getRequestURI());
+                param.set("requestMethod", request.getMethod());
+                param.set("content", "系统测点导出");
+                LogsAspect logsAspects = new LogsAspect();
+                logsAspects.post(param);
+            }else{
+                MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                param.set("logType", "1");
+                param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                param.set("title", "查询系统测点");
+                param.set("state", 1);
+                param.set("userId", userIds);
+                param.set("userName", userName);
+                param.set("requestOrigin", request.getRequestURL());
+                param.set("requestPath", request.getRequestURI());
+                param.set("requestMethod", request.getMethod());
+                param.set("content", "根据用户传递的参数查询系统测点");
+                LogsAspect logsAspects = new LogsAspect();
+                logsAspects.post(param);
+            }
             if (deviceType != null && deviceType == -1) {
                 deviceType = null;
             }

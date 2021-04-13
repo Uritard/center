@@ -441,6 +441,7 @@ public class SysUserController {
                 password = map.get("password");
                 locked = map.get("lockedUserId");
             }
+            String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+Long.valueOf(locked),"userName"));
             if (sysUserCurrent.getRoleId() == 1234 && password.equals(Demo.decryptDB(sysUserCurrent.getPassword()))) {
                 result.setData(this.sysUserService.unlockUserAccount(map));
                 Map<String, Object> mapCache = new HashMap<>();
@@ -459,7 +460,7 @@ public class SysUserController {
                 params.set("requestOrigin", httpServletRequest.getRequestURL());
                 params.set("requestPath", httpServletRequest.getRequestURI());
                 params.set("requestMethod", httpServletRequest.getMethod());
-                params.set("content", "用户帐号解锁");
+                params.set("content", sysUserCurrent.getUserName()+"用户解锁了"+userName+"用户");
                 LogsAspect logsAspect = new LogsAspect();
                 logsAspect.post(params);
             } else if (!password.equals(Demo.decryptDB(sysUserCurrent.getPassword()))) {
@@ -473,7 +474,7 @@ public class SysUserController {
                 params.set("requestOrigin", httpServletRequest.getRequestURL());
                 params.set("requestPath", httpServletRequest.getRequestURI());
                 params.set("requestMethod", httpServletRequest.getMethod());
-                params.set("content", "用户帐号解锁密码错误");
+                params.set("content", sysUserCurrent.getUserName()+"用户解锁"+userName+"用户帐号解锁密码错误");
                 LogsAspect logsAspect = new LogsAspect();
                 logsAspect.post(params);
                 Map<String, Object> mapResult = new HashMap<>();

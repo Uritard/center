@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -15,9 +16,14 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -40,6 +46,8 @@ public class TCruiseDataResultController {
     private TStdDeviceService tStdDeviceService;
     @Autowired
     private TStdRegionService tStdRegionService;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     public TCruiseDataResultController(TCruiseDataResultService tCruiseDataResultService) {
         this.tCruiseDataResultService = tCruiseDataResultService;
@@ -257,19 +265,50 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "巡视报表")
     @GetMapping(value = "/selectCruiseDataReport")
-    @Logs(title = "巡视报表",content = "根据用户传递的参数查询巡视报表",logType = 1)
+  //  @Logs(title = "巡视报表",content = "根据用户传递的参数查询巡视报表",logType = 1)
     public Result selectCruiseDataReport(@RequestParam(value = "cType", required = false) Integer cType,
-                                        @RequestParam(value = "meteType", required = false) String meteType,
-                                        @RequestParam(value = "meterType", required = false) Integer meterType,
-                                        @RequestParam(value = "regionId", required = false) Long regionId,
-                                        @RequestParam(value = "instanceName", required = false) String instanceName,
-                                        @RequestParam(value = "endTime", required = false) String endTime,
-                                        @RequestParam(value = "startTime", required = false) String startTime,
-                                        @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                        @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                                         @RequestParam(value = "meteType", required = false) String meteType,
+                                         @RequestParam(value = "meterType", required = false) Integer meterType,
+                                         @RequestParam(value = "regionId", required = false) Long regionId,
+                                         @RequestParam(value = "instanceName", required = false) String instanceName,
+                                         @RequestParam(value = "endTime", required = false) String endTime,
+                                         @RequestParam(value = "startTime", required = false) String startTime,
+                                         @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                         @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize, HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
+        Long userIds = Long.valueOf(request.getHeader("userId"));
+        String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
         try {
+            if(pageSize==0){
+                MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                param.set("logType", "9");
+                param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                param.set("title", "导出");
+                param.set("state", 1);
+                param.set("userId", userIds);
+                param.set("userName", userName);
+                param.set("requestOrigin", request.getRequestURL());
+                param.set("requestPath", request.getRequestURI());
+                param.set("requestMethod", request.getMethod());
+                param.set("content", "巡视报表导出");
+                LogsAspect logsAspects = new LogsAspect();
+                logsAspects.post(param);
+            }else{
+                MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                param.set("logType", "1");
+                param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                param.set("title", "巡视报表");
+                param.set("state", 1);
+                param.set("userId", userIds);
+                param.set("userName", userName);
+                param.set("requestOrigin", request.getRequestURL());
+                param.set("requestPath", request.getRequestURI());
+                param.set("requestMethod", request.getMethod());
+                param.set("content", "根据用户传递的参数查询巡视报表");
+                LogsAspect logsAspects = new LogsAspect();
+                logsAspects.post(param);
+            }
             if (Objects.isNull(startTime) || "".equals(startTime)){
                 startTime = null;
             }
@@ -393,7 +432,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "测点巡检时间记录表维护")
     @PostMapping(value = "/updateCruiseAnalyze")
-    @Logs(title = "测点巡检时间记录表维护",content = "测点巡检时间记录表维护",logType = 2)
+   // @Logs(title = "测点巡检时间记录表维护",content = "测点巡检时间记录表维护",logType = 2)
     public Result updateCruiseAnalyze(@RequestBody List<String> cruiseResultIdList) {
         Result result = new Result();
         try {

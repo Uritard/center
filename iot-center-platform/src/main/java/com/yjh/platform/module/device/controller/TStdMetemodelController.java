@@ -302,7 +302,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "导入模板")
     @RequestMapping(value = "upload",method = RequestMethod.POST)
-    @Logs(title = "导入模板",content = "导入模板",logType = 8)
+    @Logs(title = "导入模板",content = "导入标准点位库",logType = 8)
     public Result upload (@RequestParam(value="file", required=false) MultipartFile file) {
         Result result =new Result();
         try {

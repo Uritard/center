@@ -963,7 +963,7 @@ public class TCruiseTaskService {
             MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
             params.set("logType", "2");
             params.set("ip", iP);
-            params.set("title", "巡视审核");
+            params.set("title", "任务下发");
             params.set("state", 2);
             params.set("userId",  Long.valueOf(userId));
             params.set("userName", sysUser.getUserName());
