@@ -435,10 +435,10 @@ public class SysUserController {
             String password = null;
             String locked = null;
             if ("true".equals(isDecode)) {
-                password = Demo.decrypt(map.get("password"));
+                password = Demo.decrypt(map.get("pCode"));
                 locked = Demo.decrypt(map.get("lockedUserId"));
             } else {
-                password = map.get("password");
+                password = map.get("pCode");
                 locked = map.get("lockedUserId");
             }
             String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+Long.valueOf(locked),"userName"));
@@ -523,11 +523,11 @@ public class SysUserController {
             Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode = enmap.get("content");
             if ("true".equals(isDecode)) {
-                oldPassword = Demo.decrypt(map.get("oldPassword"));
-                newPassword = Demo.decrypt(map.get("newPassword"));
+                oldPassword = Demo.decrypt(map.get("oldPCode"));
+                newPassword = Demo.decrypt(map.get("newPCode"));
             } else {
-                oldPassword = map.get("oldPassword");
-                newPassword = map.get("newPassword");
+                oldPassword = map.get("oldPCode");
+                newPassword = map.get("newPCode");
             }
             String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
             if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(oldPassword)) {

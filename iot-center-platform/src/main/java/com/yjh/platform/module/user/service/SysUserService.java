@@ -151,7 +151,7 @@ public class SysUserService {
         if(!number.equals(replayAvoid)){
             throw new BusinessException(500, "验证码错误");
         }else {
-            if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("password"))) {
+            if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("pCode"))) {
                 String userName = null;
                 String password = null;
                 Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
@@ -161,10 +161,10 @@ public class SysUserService {
                 String isDecode = enmap.get("content");
                 if ("true".equals(isDecode)) {
                     userName = Demo.decrypt(userMap.get("userName"));
-                    password = Demo.decrypt(userMap.get("password"));
+                    password = Demo.decrypt(userMap.get("pCode"));
                 } else {
                     userName = userMap.get("userName");
-                    password = userMap.get("password");
+                    password = userMap.get("pCode");
                 }
                 SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
                 if (Objects.equals(null, sysUserLogin)) {
@@ -691,11 +691,11 @@ public class SysUserService {
         Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
         String isDecode = enmap.get("content");
         if ("true".equals(isDecode)) {
-            linkedHashMap.put("password", Demo.decrypt(map.get("newPassword")));
-            sysUser.setPassword(Demo.encryption(Demo.decrypt(map.get("newPassword"))));
+            linkedHashMap.put("password", Demo.decrypt(map.get("newPCode")));
+            sysUser.setPassword(Demo.encryption(Demo.decrypt(map.get("newPCode"))));
         } else {
-            linkedHashMap.put("password", map.get("newPassword"));
-            sysUser.setPassword(Demo.encryption(map.get("newPassword")));
+            linkedHashMap.put("password", map.get("newPCode"));
+            sysUser.setPassword(Demo.encryption(map.get("newPCode")));
         }
         sysUser.setUserId(userId);
         Date date = new Date();
