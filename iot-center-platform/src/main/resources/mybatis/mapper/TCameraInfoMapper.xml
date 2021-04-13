@@ -387,7 +387,7 @@
                 a.vendor_id as vendorId,
                 a.channel_num as channelNum,
                 b.dict_note as vendorName,
-        c.record_ip
+        c.record_ip as recordIp
         from t_camera_info a
         left JOIN t_dict_business b on a.vendor_id = b.dict_code and b.col_name = 'camera_vendor'
 		left join t_camera_recorder c on a.record_id = c.record_id
