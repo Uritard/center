@@ -10,6 +10,7 @@ import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.dao.TRobotAlarmDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,8 @@ public class TWarnInfoService{
     private TRobotAlarmDao tRobotAlarmDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
 
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoService.class);
@@ -399,9 +402,15 @@ public class TWarnInfoService{
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
         if (defectModel.equals(warnFlag)){//告警信息
             tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(Long.valueOf(warnId));
-            if (Objects.nonNull(tWarnInfoDetail.getDeviceCode())){
+            if (Objects.nonNull(tWarnInfoDetail.getDeviceCode()) && Objects.nonNull(tWarnInfoDetail.getDeviceCode())){
                 tWarnInfoDetail.setCameraId(Long.valueOf(tWarnInfoDetail.getDeviceCode()));
                 tWarnInfoDetail.setDeviceType(0);
+                String runningCameraFlag = tRobotInfoDao.selectRobotRunningCamera(Long.valueOf(tWarnInfoDetail.getDeviceCode()),tWarnInfoDetail.getInstanceId());
+                if(Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")){
+                    tWarnInfoDetail.setVideoCameraType("2");
+                }else{
+                    tWarnInfoDetail.setVideoCameraType("1");
+                }
             }else {
                 tWarnInfoDetail.setDeviceType(1);
             }
