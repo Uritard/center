@@ -416,7 +416,7 @@ public class TWarnInfoController {
 
     @ApiOperation(value = "告警信息计数统计(未核查)")
     @GetMapping(value = "/warnCountsNonIdentify")
-    @Logs(title = "告警信息计数统计",content = "统计未核查的告警",logType = 1)
+   // @Logs(title = "告警信息计数统计",content = "统计未核查的告警",logType = 1)
     public Result warnCountsNonIdentify(){
         Result result=new Result();
         Map<String,Integer> countResult=new HashMap<>();

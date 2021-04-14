@@ -231,12 +231,13 @@ public class SysLogController {
                 new Thread(() -> {
                     try {
                         postUrl(json);
-                        String err = "错误日志";
-                        redisTemplate.opsForValue().set("errorLog", err, 5, TimeUnit.MINUTES);
                         // Result result1 = restTemplate.getForObject(Constant.WEB_SCOKET, Result.class, json);
                     } catch (Exception e) {
                         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
                         log.error("发送失败：" + e);
+                    }
+                    if(state==3){
+                        redisTemplate.opsForValue().set("errorLog", content, 5, TimeUnit.MINUTES);
                     }
                     String mathRandom = String.valueOf(random.nextInt(50)) + "000";
                     long mathLong = Long.valueOf(mathRandom);
@@ -405,19 +406,37 @@ public class SysLogController {
 
     @ApiOperation(value = "是否返回错误日志")
     @RequestMapping(value = "/errLog", method = RequestMethod.GET)
-    public Result errLog() {
+    public Result errLog(HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
             Map map=new HashMap();
-            String errorLog = (String) redisTemplate.opsForValue().get("errorLog");
-            if (StringUtils.isNotBlank(errorLog)) {
-                redisTemplate.delete("errorLog");
-                map.put("code",0);
-                result.setData(map);
-            } else {
+            Integer roleId=(Integer) redisTemplate.opsForHash().get("userInfo:"+userId,"roleId");
+            if(roleId==1234||roleId==1236){
+                String errorLog = (String) redisTemplate.opsForValue().get("errorLog");
+                if (StringUtils.isNotBlank(errorLog)) {
+                    map.put("content",errorLog);
+                    redisTemplate.delete("errorLog");
+                    map.put("code",0);
+                    result.setData(map);
+                }else{
+                    map.put("code",1);
+                    result.setData(map);
+                }
+            }else{
                 map.put("code",1);
                 result.setData(map);
             }
+//            String errorLog = (String) redisTemplate.opsForValue().get("errorLog");
+//            if (StringUtils.isNotBlank(errorLog)) {
+//                map.put("state",errorLog);
+//                redisTemplate.delete("errorLog");
+//                map.put("code",0);
+//                result.setData(map);
+//            } else {
+//                map.put("code",1);
+//                result.setData(map);
+//            }
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("日志统计失败：" + e);
