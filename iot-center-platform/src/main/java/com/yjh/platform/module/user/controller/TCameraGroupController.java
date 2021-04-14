@@ -96,7 +96,8 @@ public class TCameraGroupController {
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
     @Logs(title = "查询相机分组信息",content = "根据用户传递的参数查询相机分组信息",logType = 1)
-    public Result selectByPrimaryId(@RequestParam(value = "groupId", required = true) Long groupId) {
+    public Result selectByPrimaryId(@RequestParam(value = "groupId", required = true) Long groupId,
+                                    @RequestParam(value = "state", required = false) Integer state) {
         Result result = new Result();
         try {
             if(groupId == null || "".equals(groupId)){
@@ -104,7 +105,8 @@ public class TCameraGroupController {
             }else if(groupId == -1){
                 result.setData(new ArrayList<>());
             }else {
-                TCameraGroupDetail tCameraGroupDetail = tCameraGroupService.selectByPrimaryId(groupId);
+                if(state == null){ state = 0;}
+                TCameraGroupDetail tCameraGroupDetail = tCameraGroupService.selectByPrimaryId(groupId,state);
                 result.setData(tCameraGroupDetail);
             }
 

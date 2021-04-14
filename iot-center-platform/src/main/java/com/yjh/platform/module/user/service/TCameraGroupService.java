@@ -51,7 +51,7 @@ public class TCameraGroupService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public TCameraGroupDetail selectByPrimaryId(Long groupId) {
+    public TCameraGroupDetail selectByPrimaryId(Long groupId,Integer state) {
         TCameraGroup tCameraGroup = this.tCameraGroupDao.selectByPrimaryId(groupId);
         List<Camera> list = new ArrayList<>();
         boolean flag = false;
@@ -79,10 +79,16 @@ public class TCameraGroupService{
                 Camera camera = new Camera();
                 camera.setCameraId(item);
                 camera.setCameraName(tCameraInfo.getCameraName());
-                if("1".equals(map.get(item.toString()))){
+                if(state == 1){
+                    //只查在线的
+                    if("1".equals(map.get(item.toString()))){
+                        list.add(camera);
+                    }
+                }else {
+                    //全查
                     list.add(camera);
                 }
-                //list.add(camera);
+
             }
         }
         TCameraGroupDetail tCameraGroupDetail =new TCameraGroupDetail();
@@ -161,7 +167,7 @@ public class TCameraGroupService{
         List<TCameraGroup> all = tCameraGroupDao.selectAll();
         List<TCameraGroupDetail> re = new ArrayList<>();
         for (TCameraGroup item: all) {
-            TCameraGroupDetail tCameraGroupDetail = this.selectByPrimaryId(item.getGroupId());
+            TCameraGroupDetail tCameraGroupDetail = this.selectByPrimaryId(item.getGroupId(),0);
             re.add(tCameraGroupDetail);
         }
         return re;
