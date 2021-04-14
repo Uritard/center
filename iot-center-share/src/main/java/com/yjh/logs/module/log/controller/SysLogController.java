@@ -411,7 +411,7 @@ public class SysLogController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             Map map=new HashMap();
-            Integer roleId=(Integer) redisTemplate.opsForHash().get("userInfo:"+userId,"roleId");
+            Integer roleId=Integer.valueOf((String) redisTemplate.opsForHash().get("userInfo:"+userId,"roleId"));
             if(roleId==1234||roleId==1236){
                 String errorLog = (String) redisTemplate.opsForValue().get("errorLog");
                 if (StringUtils.isNotBlank(errorLog)) {
