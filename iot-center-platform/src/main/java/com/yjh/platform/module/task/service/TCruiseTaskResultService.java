@@ -205,6 +205,13 @@ public class TCruiseTaskResultService {
 
                 Map<String, String> videoInfo = new HashMap<>();
                 log.info("redis-cameraId-------:"+resultMap.get("cameraId"));
+                switch (resultMap.get("cruiseType").toString()){
+                    case "230":
+                        videoInfo.put("videoCameraType","2");
+                        break;
+                    default:
+                        videoInfo.put("videoCameraType","1");
+                }
                 if (Objects.nonNull(resultMap.get("cameraId")) && !(resultMap.get("cameraId").toString().equals(""))) {
                     if (redisTemplate.opsForHash().entries("cruiseVideo:" + taskId + (cruiseInspectResult.getInstanceId()).toString()).size() == 0) {
                         HashMap<String, Long> camera = new HashMap<>();
@@ -250,7 +257,7 @@ public class TCruiseTaskResultService {
                         log.info("robot-VideoINfo:" + result);
                         List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
                         videoInfo.putAll(robotVideoInfo.get(0));
-                        videoInfo.put("cameraId", null);
+                        videoInfo.put("cameraId", robot.get("robotId").toString());
                         cruiseInspectResult.setVideoInfo(videoInfo);
                         redisTemplate.opsForValue().set("robotLight:" + robot.get("robotId").toString(), robotVideoInfo.get(0), 1, TimeUnit.MINUTES);
                     }else {

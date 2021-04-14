@@ -712,6 +712,6 @@ public class AnalyseDataOperateService {
         return analyseDataOperateDao.selectCurrentDefect();
     }
 
-    
+
 }
 
