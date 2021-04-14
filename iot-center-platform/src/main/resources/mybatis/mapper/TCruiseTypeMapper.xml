@@ -338,7 +338,7 @@
     </select>
     <select id="selectByAnalyseByWg" resultType="com.yjh.platform.module.task.entity.TCruiseTypeDetail">
         select
-        "326" as sub_type,
+        "327" as sub_type,
         b.instance_id,
         (CASE
         WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
