@@ -55,13 +55,14 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
         //channel.pipeline().addLast("ipFilter", filter);
         //ip过滤
 
+        //SocketChannel建立连接后的管道
         RobotServerHandler robotServerHandler = new RobotServerHandler();
         robotServerHandler.setServerName(serverName);
         robotServerHandler.setRedisTemplate(redisTemplate);
         robotServerHandler.setSysLogsService(sysLogsService);
         robotServerHandler.setRobotService(robotService);
         robotServerHandler.setWebSocketUrl(websocketUrl);
-        channel.pipeline().addLast(robotServerHandler);
+        channel.pipeline().addLast(robotServerHandler);//3.配置通信数据的处理逻辑,可以addLast多个
 
     }
 
