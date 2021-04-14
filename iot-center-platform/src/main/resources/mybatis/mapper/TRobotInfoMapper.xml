@@ -115,7 +115,7 @@
                 #{exitPutIntoRecord, jdbcType=VARCHAR},
                 #{remarks, jdbcType=VARCHAR},
                 #{recordId, jdbcType=BIGINT},
-                #{channelNumLight, jdbcType=INTEGER}
+                #{channelNumLight, jdbcType=INTEGER},
                 #{channelNumInferad, jdbcType=INTEGER}
         )
     </insert>
