@@ -348,7 +348,7 @@ public class TCruiseTaskController {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
-            int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getPCode(),request);
+            int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getpCode(),request);
             if(i == 1){
 //                TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
 //                tCruiseTaskAdd.setTaskId(taskId);

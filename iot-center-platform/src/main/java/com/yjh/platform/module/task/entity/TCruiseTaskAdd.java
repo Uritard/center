@@ -85,6 +85,14 @@ public class TCruiseTaskAdd implements Serializable {
     @ApiModelProperty(value = "定时时间类型（1.周，2.日）")
     private Long periodId;
 
+    public String getpCode() {
+        return pCode;
+    }
+
+    public void setpCode(String pCode) {
+        this.pCode = pCode;
+    }
+
     private String pCode;
 
     private String deviceList;
