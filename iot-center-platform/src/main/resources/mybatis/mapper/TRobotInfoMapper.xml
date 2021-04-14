@@ -519,4 +519,15 @@
         LEFT JOIN  t_cruise_point_instance a on a.cruise_id = b.inspection_id
         where b.robot_id = #{robotId, jdbcType=BIGINT}
     </select>
+
+    <select id="selectRobotRunningCamera" resultType="java.lang.String">
+        SELECT
+        b.save_type_list
+    FROM
+        t_cruise_point_instance a
+    LEFT JOIN t_robot_inspection b ON a.cruise_id = b.inspection_id
+    WHERE
+        a.instance_id = #{instanceId,jdbcType=BIGINT}
+    AND b.robot_id = #{robotId,jdbcType=BIGINT}
+    </select>
 </mapper>

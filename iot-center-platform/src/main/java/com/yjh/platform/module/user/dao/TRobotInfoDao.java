@@ -87,4 +87,6 @@ public interface TRobotInfoDao {
     List<String> selectAllRobotCode2();
     String selectRobotCodeById(@Param(value = "robotId")Long robotId);
     List<Long>selectHaveIns(@Param(value = "robotId") Long robotId);
+
+    String selectRobotRunningCamera(@Param(value = "robotId")Long robotId,@Param(value = "instanceId")Long instanceId);
 }
