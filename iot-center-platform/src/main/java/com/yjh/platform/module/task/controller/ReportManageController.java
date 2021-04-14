@@ -175,7 +175,7 @@ public class ReportManageController {
     }
     @ApiOperation(value = "下载巡视报告")
     @GetMapping(value = "/downLoadCruiseReport")
-    @Logs(title = "下载巡视报告",content = "下载巡视报告",logType = 5)
+    @Logs(title = "下载巡视报告",content = "下载巡视报告",logType = 9)
     public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {

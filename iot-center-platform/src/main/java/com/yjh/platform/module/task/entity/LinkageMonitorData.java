@@ -76,4 +76,7 @@ public class LinkageMonitorData {
     @ApiModelProperty(value = "巡检结果照片")
     private String picpath;
 
+    @ApiModelProperty(value = "联动设备类型-0机器人,1摄像机")
+    private Integer deviceType;
+
 }

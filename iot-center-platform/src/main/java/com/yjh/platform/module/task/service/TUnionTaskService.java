@@ -171,8 +171,10 @@ public class TUnionTaskService{
                     lmd.setStartTime(redisInfoMap.get("startTime"));
                     if (Objects.nonNull(redisInfoMap.get("cameraId")) && !"".equals(redisInfoMap.get("cameraId"))){
                         lmd.setCameraId(Long.valueOf(redisInfoMap.get("cameraId")));
+                        lmd.setDeviceType(1);
                     }else {
                         lmd.setCameraId(Long.valueOf(redisInfoMap.get("robotId")));
+                        lmd.setDeviceType(0);
                     }
                     Integer cruiseResult = Integer.valueOf(redisInfoMap.get("cruiseResult"));
                     String taskName = TUnionTaskAttrDao.selectTaskName(taskId);

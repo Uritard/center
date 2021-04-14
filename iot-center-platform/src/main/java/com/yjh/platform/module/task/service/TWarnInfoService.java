@@ -401,6 +401,9 @@ public class TWarnInfoService{
             tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(Long.valueOf(warnId));
             if (Objects.nonNull(tWarnInfoDetail.getDeviceCode())){
                 tWarnInfoDetail.setCameraId(Long.valueOf(tWarnInfoDetail.getDeviceCode()));
+                tWarnInfoDetail.setDeviceType(0);
+            }else {
+                tWarnInfoDetail.setDeviceType(1);
             }
         }else {//缺陷信息
 //            tWarnInfoDetail = tDefectInfoDao.selectWarnPopUp(warnId);
@@ -430,6 +433,7 @@ public class TWarnInfoService{
             tWarnInfoDetail.setDefectModel(Integer.valueOf(defectMap.get("defectType")));
             tWarnInfoDetail.setDefectModelName(defectModelName);
             tWarnInfoDetail.setCustomName(nameMap.get("custom_name"));
+            tWarnInfoDetail.setDeviceType(1);
 
         }
         return tWarnInfoDetail;
