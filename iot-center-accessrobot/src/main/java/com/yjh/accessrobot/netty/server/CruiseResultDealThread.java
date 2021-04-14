@@ -289,7 +289,22 @@ public class CruiseResultDealThread implements Runnable{
                         Constant.postUrl(webSocketUrl,json);
 
                     }
+
+                    if ("null".equals(redisInfoMap.get("cruiseAbnormal"))){
+                        normal = normal + 1;
+                        log.info("这次变化的normal是==="+normal);
+                    }else if ("249".equals(redisInfoMap.get("cruiseAbnormal"))){
+                        abnormal = abnormal + 1;
+                        log.info("这次变化的abnormal是==="+abnormal);
+                    }
                 }
+                log.info("准备更新的abnormal是：" + abnormal + ",准备更新的normal是: "+normal);
+
+                Map<String, String> mapForAbnormal = new HashMap<>();
+                mapForAbnormal.put("abnormal", abnormal.toString());
+                mapForAbnormal.put("normal", normal.toString());
+                //更新异常点缓存的数据
+                redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
 
                 //统计机器人返回任务结果的大小
                 List<String> resultList = new ArrayList<>();
@@ -393,21 +408,21 @@ public class CruiseResultDealThread implements Runnable{
                             }
                         }
 
-                        if ("null".equals(redisInfoMap.get("cruiseAbnormal"))){
+                        /*if ("null".equals(redisInfoMap.get("cruiseAbnormal"))){
                             normal = normal + 1;
                             log.info("这次变化的normal是==="+normal);
                         }else if ("249".equals(redisInfoMap.get("cruiseAbnormal"))){
                             abnormal = abnormal + 1;
                             log.info("这次变化的abnormal是==="+abnormal);
-                        }
+                        }*/
                     }
-                    log.info("准备更新的abnormal是：" + abnormal + ",准备更新的normal是: "+normal);
+                    /*log.info("准备更新的abnormal是：" + abnormal + ",准备更新的normal是: "+normal);
 
                     Map<String, String> mapForAbnormal = new HashMap<>();
                     mapForAbnormal.put("abnormal", abnormal.toString());
                     mapForAbnormal.put("normal", normal.toString());
                     //更新异常点缓存的数据
-                    redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
+                    redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);*/
 
                     log.info("tCTRDList的内容是===" + tCTRDList+",大小size是: "+tCTRDList.size());
                     log.info("tCDRList的内容是===" + tCDRList+",大小size是: "+tCDRList.size());

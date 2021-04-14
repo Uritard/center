@@ -83,6 +83,8 @@ public interface TRobotInfoDao {
     int insertTCruiseResult(TCruiseResult tCruiseResult);
     int batchInsertTask(List<TCruiseTask> list);
     int insertWarn(TWarnInfo warnInfo);
+    Long selectWarnId(@Param(value = "taskId")String taskId,
+                      @Param(value = "instanceId")Long instanceId);
     int selectIsWarn(@Param(value = "instanceId")Long instanceId,@Param(value = "taskId")String taskId);
     int updateIsWarn(@Param(value = "cruiseResultId")String cruiseResultId);
     TStdDeviceMete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);

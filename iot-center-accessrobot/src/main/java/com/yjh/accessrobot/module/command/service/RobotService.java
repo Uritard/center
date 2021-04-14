@@ -1537,6 +1537,9 @@ public class RobotService {
     public int insertWarn(TWarnInfo warnInfo){
         return tRobotInfoDao.insertWarn(warnInfo);
     }
+    public Long selectWarnId(String taskId,Long instanceId){
+        return tRobotInfoDao.selectWarnId(taskId,instanceId);
+    }
     public int selectIsWarn(Long instanceId,String taskId){
         return tRobotInfoDao.selectIsWarn(instanceId,taskId);
     }

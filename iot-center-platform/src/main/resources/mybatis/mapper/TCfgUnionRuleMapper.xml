@@ -70,8 +70,8 @@
         <if test="description != null ">a.description = #{description},</if>
         <if test="inputParam != null ">a.input_param = #{inputParam},</if>
         a.update_time =CURRENT_TIMESTAMP(),
-        <if test="cameraId != null ">a.camera_id = #{cameraId, jdbcType=BIGINT},</if>
-        <if test="presetId != null ">a.preset_id = #{presetId, jdbcType=BIGINT},</if>
+        a.camera_id = #{cameraId, jdbcType=BIGINT},
+        a.preset_id = #{presetId, jdbcType=BIGINT}
 
     </set>
             where a.rule_id = #{ruleId, jdbcType=BIGINT}

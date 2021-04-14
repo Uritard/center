@@ -21,6 +21,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author YC
@@ -114,11 +115,37 @@ public class IsWarnAfterCruiseThread implements Runnable{
                                 warnInfo.setWarnContent(map.get("warnContent").toString());
                                 warnInfo.setOutRange(outRange);
                                 log.info("要插库的告警数据是===" + warnInfo);
-                                StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
 
                                 /*Map<String,String> redisWarnInfoMap = new HashMap<>();
                                 redisWarnInfoMap.put("isWarn","1");
                                 redisTemplate.opsForHash().putAll("t_cruise_task_result:" + threadMap.get("taskCode") + ":" + instanceId,redisWarnInfoMap);*/
+
+                                String warnName = "warnInfo:" + threadMap.get("taskCode") + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                Map<String,Object> warnMap = new HashMap<>();
+                                warnMap.put("deviceId", warnInfo.getDeviceId());
+                                warnMap.put("customId",warnInfo.getCunstomId() );
+                                warnMap.put("instanceId",warnInfo.getInstanceId());
+                                warnMap.put("stdMeteId", warnInfo.getStdMeteId());
+                                warnMap.put("taskId", warnInfo.getTaskId());
+                                warnMap.put("value", warnInfo.getValue());
+                                warnMap.put("imagePath", warnInfo.getImagePath());
+                                warnMap.put("confMode", "276");
+                                warnMap.put("alarmSource", warnInfo.getAlarmSource());
+                                warnMap.put("defectModel", warnInfo.getDefectModel());
+                                warnMap.put("warnLevel",warnInfo.getWarnLevel());
+                                warnMap.put("warnName", warnInfo.getWarnName());
+                                warnMap.put("warnTime",warnInfo.getWarnTime());
+                                warnMap.put("warnContent",warnInfo.getWarnContent());
+                                warnMap.put("outRange",warnInfo.getOutRange());
+                                redisTemplate.opsForHash().putAll(warnName, warnMap);
+
+                                StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
+                                Long warnId = StaticContextAccessor.getBean(RobotService.class).selectWarnId(warnInfo.getTaskId(),warnInfo.getInstanceId());
+
+                                Map<String,String> currentWarnInfo=new HashMap<>();
+                                currentWarnInfo.put("warnId",warnId.toString());
+                                currentWarnInfo.put("defectModel","450");
+                                currentWarnInfo.put("isPop","false");
 
                                 // webSocket通知前端刷新告警统计数量
                                 Map<String, Object> jasonMaps = new HashMap<>();
@@ -149,8 +176,12 @@ public class IsWarnAfterCruiseThread implements Runnable{
                                     jasonMaps2.put("defectModel", warnInfo.getDefectModel());
                                     String json = JSON.toJSONString(jasonMaps2);
                                     log.info("告警弹窗-前端推送：" + json);
+                                    currentWarnInfo.put("isPop","true");
                                     Constant.postUrl(webSocketUrl,json);
                                 }
+
+                                redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3, TimeUnit.MINUTES);
+
                             }
                         }
                     }
