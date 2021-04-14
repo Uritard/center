@@ -250,6 +250,14 @@ public class SysUser implements Serializable {
         this.pageSize = pageSize;
     }
 
+    public String getpCode() {
+        return pCode;
+    }
+
+    public void setpCode(String pCode) {
+        this.pCode = pCode;
+    }
+
     //  @Length(max = 20,message = "userName长度必须小于等于20")
     @ApiModelProperty(value = "用户名")
     private String userName;
@@ -349,6 +357,7 @@ public class SysUser implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lockTime;
 
+    private String pCode;
 
     private Integer pageNum = 1;
 

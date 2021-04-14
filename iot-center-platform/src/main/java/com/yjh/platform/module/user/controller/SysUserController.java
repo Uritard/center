@@ -115,6 +115,7 @@ public class SysUserController {
     public Result update(@RequestBody SysUser sysUser, HttpServletRequest request) {
         Result result = new Result();
         try {
+//            sysUser.setPassword(sysUser.getpCode());
             result.setData(sysUserService.update(sysUser, request));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -382,6 +383,7 @@ public class SysUserController {
         try {
             Long creatorId = userManager.getCreatorId();
             sysUser.setCreatorId(creatorId);
+            sysUser.setPassword(sysUser.getpCode());
             // sysUser.setPassword("Yjh@123!");
             Map<String, String> map = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode = map.get("content");
