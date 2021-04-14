@@ -519,21 +519,22 @@ public class CameraConController {
         return result;
 
     }
-    @ApiOperation(value = "获取全屏最大温度值")
-    @RequestMapping(value = "/getTemperature", method = RequestMethod.GET)
-    public Result getTemperature(@RequestParam(value = "cameraId",required = false) Long cameraId)
-    {
-        Result result = new Result();
-        List<String> list=cameraConService.getTemperature(cameraId);
-        if (list.size()>0)
-        {
-            result.setData(list);
-        }else {
-            result.setData("获取温度失败");
-        }
-
-        return result;
-    }
+//    @ApiOperation(value = "获取全屏最大温度值")
+//    @RequestMapping(value = "/getTemperature", method = RequestMethod.GET)
+//    @Deprecated
+//    public Result getTemperature(@RequestParam(value = "cameraId",required = false) Long cameraId)
+//    {
+//        Result result = new Result();
+//        List<String> list=cameraConService.getTemperature(cameraId);
+//        if (list.size()>0)
+//        {
+//            result.setData(list);
+//        }else {
+//            result.setData("获取温度失败");
+//        }
+//
+//        return result;
+//    }
 
     @ApiOperation(value = "获取文件")
     @RequestMapping(value = "/givePicFir", method = RequestMethod.GET)
