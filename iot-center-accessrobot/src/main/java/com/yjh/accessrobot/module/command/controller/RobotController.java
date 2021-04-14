@@ -56,7 +56,7 @@ public class RobotController {
                                     @RequestParam(value = "command") String command,
                                     @RequestParam(value = "value",required = false) String value,
                                     @RequestParam(value = "key",required = false) String key,
-                                    @RequestParam(value = "password",required = false) String password,
+                                    @RequestParam(value = "pCode",required = false) String password,
                                     @RequestParam(value = "direction",required = false) String direction) {
         Result result = new Result();
         try {
