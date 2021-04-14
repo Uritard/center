@@ -345,7 +345,7 @@ public class SysLogController {
                                @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                @RequestParam(value = "sortFlag", required = false) int sortFlag,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -370,6 +370,10 @@ public class SysLogController {
                 resultMap.put("list", list);
                 result.setData(resultMap);
             }
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userNames=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
+            String iP=request.getHeader("HTTP_X_FORWARDED_FOR");
+            this.insert("1",iP,"日志数据",1,"根据用户传递的参数查询日志数据",userId,userNames,String.valueOf(request.getRequestURL()),request.getRequestURI(),request.getMethod());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
