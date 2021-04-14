@@ -631,11 +631,9 @@ public class CameraConController {
     {
         log.info(temperatureInfo.toString());
         Result result = new Result();
-       if (temperatureInfo.getPicPath()!=null&&temperatureInfo.getPicPath()!="")
-       {
+       if (temperatureInfo.getPicPath()!=null&&temperatureInfo.getPicPath()!="") {
            result.setData(cameraConService.lineTemperature(temperatureInfo.getPicPath(),temperatureInfo.getPoints()));
-       }
-       else{
+       } else {
            result.setData(cameraConService.getlineTemperature(temperatureInfo.getCameraId(),temperatureInfo.getPoints()));
        }
         return result;

@@ -115,9 +115,6 @@ public class CameraConService {
     private NativeLong m_lPort = new NativeLong(-1);
     FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
 
-
-    private Map<String,String> equs=new HashMap<String,String>();
-
     private int lUserID = -1;//用户句柄
     private NativeLong mVoiceTalkHandle = new NativeLong(-1);//对讲句柄
     //设备登录信息
@@ -1831,146 +1828,94 @@ public class CameraConService {
      */
     public String getlineTemperature(long cameraId,String points)
     {
-        String arrs[]=points.split(",");
-        int x;
-        int y;
-        int x1=0;
-        int y1=0;
-        String list = "00.00";
-            log.info("cameraId>:" + cameraId);
-            if (arrs.length > 2) {
-                x = Integer.parseInt(arrs[0]);
-                y = Integer.parseInt(arrs[1]);
-                x1 = Integer.parseInt(arrs[2]);
-                y1 = Integer.parseInt(arrs[3]);
-                log.info("x>:" + x);
-                log.info("y>:" + y);
-                log.info("x1>:" + x1);
-                log.info("y1>:" + y1);
+        int row=0, column=0, xPlus=0, yPlus=0;
+        String arrs[] = points.split(",");
+        String temperature = "0.00";
 
-            } else {
-                x = Integer.parseInt(arrs[0]);
-                y = Integer.parseInt(arrs[1]);
-                log.info("x>:" + x);
-                log.info("y>:" + y);
-            }
-            try {
-                CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-                cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
-                log.info("通道号：" + cameraConInfo.getChannelNum());
-                log.info("getRecordId:" + cameraConInfo.getRecordId());
-                String userName = cameraConInfo.getCameraManager();
-                log.info("userName" + userName);
-                String password = cameraConInfo.getCameraCode();
-                log.info("password" + password);
-                String cameraIp = cameraConInfo.getCameraIp();
-                log.info("cameraIp" + cameraIp);
-                String port = cameraConInfo.getInfreadPort().toString();
-                log.info("port:>>>" + port);
-                log.info("开始登录。。。。。");
-                m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
-                System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
-                m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
-                System.arraycopy(userName.getBytes(), 0, m_strLoginInfo.sUserName, 0, userName.length());
-                m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
-                System.arraycopy(password.getBytes(), 0, m_strLoginInfo.sPassword, 0, password.length());
-                m_strLoginInfo.wPort = Short.parseShort(port);
-                m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
-                m_strLoginInfo.write();
-                log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
-                lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
-                log.info("NET_DVR_Login_V40:返回值" + lUserID);
-                //log.info("lUserIDLong:返回值"+lUserIDLong);
-                lUserIDLong = new NativeLong(lUserID);// new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
-                log.info("lUserIDLong" + lUserIDLong);
-                // maplUserIDLong.put("maplUserIDLong",)
-                HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
-                m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
-                m_strJpegWithAppenData.dwChannel = 1;
-                HCNetSDK.BYTE_ARRAY ptrJpegByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 * 1024);
-                HCNetSDK.BYTE_ARRAY ptrP2PDataByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 * 1024);
-                m_strJpegWithAppenData.pJpegPicBuff = ptrJpegByte.getPointer();
-                m_strJpegWithAppenData.pP2PDataBuff = ptrP2PDataByte.getPointer();
-                log.info("m_strJpegWithAppenData的值:" + m_strJpegWithAppenData.toString());
-                boolean bRet = hCNetSDK.NET_DVR_CaptureJPEGPicture_WithAppendData(lUserIDLong, 2, m_strJpegWithAppenData);
-                log.info("bRet返回值：" + bRet);
-                if (bRet) {
-                    if (m_strJpegWithAppenData.dwP2PDataLen > 0) {
-                        byte[] byTempData = new byte[4];
-                        float[] arr = new float[m_strJpegWithAppenData.dwP2PDataLen];
-                        if (arrs.length > 2) {
-                            for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicWidth; i++) {
-                                if (i >= x && i <= x1) {
-                                    for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++) {
-                                        if (y <= j && j <= y1) {
-                                            ByteBuffer TempDatabuffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i - 1) * (j - 1) * 4, 4);
-                                            TempDatabuffers.get(byTempData);
-                                            int l;
-                                            l = byTempData[0];
-                                            l &= 0xff;
-                                            l |= ((long) byTempData[1] << 8);
-                                            l &= 0xffff;
-                                            l |= ((long) byTempData[2] << 16);
-                                            l &= 0xffffff;
-                                            l |= ((long) byTempData[3] << 24);
-                                            arr[i] = Float.intBitsToFloat(l);
-                                            // log.info("Float.intBitsToFloat(l):"+Float.intBitsToFloat(l));
-                                            //list = String.valueOf(l);
-                                        }
-                                    }
-                                }
+        log.info("cameraId: " + cameraId);
+        if (arrs.length==4) {
+            column = Integer.parseInt(arrs[0]);
+            row = Integer.parseInt(arrs[1])+1;
+            xPlus = Integer.parseInt(arrs[2]);
+            yPlus = Integer.parseInt(arrs[3]);
+        } else {
+            column = Integer.parseInt(arrs[0]);
+            row = Integer.parseInt(arrs[1])+1;
+        }
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+            String userName = cameraConInfo.getCameraManager();
+            String password = cameraConInfo.getCameraCode();
+            String cameraIp = cameraConInfo.getCameraIp();
+            String port = cameraConInfo.getInfreadPort().toString();
+            log.info("通道号：" + cameraConInfo.getChannelNum() + "recordId:" + cameraConInfo.getRecordId() + "userName:" + userName + "password:" + password + "cameraIp:" + cameraIp + "port:" + port);
+            m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+            System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
+            m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+            System.arraycopy(userName.getBytes(), 0, m_strLoginInfo.sUserName, 0, userName.length());
+            m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+            System.arraycopy(password.getBytes(), 0, m_strLoginInfo.sPassword, 0, password.length());
+            m_strLoginInfo.wPort = Short.parseShort(port);
+            m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
+            m_strLoginInfo.write();
+            lUserIDLong = new NativeLong(hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo));// new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            log.info("lUserIDLong" + lUserIDLong);
+            HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
+            m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
+            m_strJpegWithAppenData.dwChannel = 1;
+            HCNetSDK.BYTE_ARRAY ptrJpegByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 * 1024);
+            HCNetSDK.BYTE_ARRAY ptrP2PDataByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 * 1024);
+            m_strJpegWithAppenData.pJpegPicBuff = ptrJpegByte.getPointer();
+            m_strJpegWithAppenData.pP2PDataBuff = ptrP2PDataByte.getPointer();
+            boolean bRet = hCNetSDK.NET_DVR_CaptureJPEGPicture_WithAppendData(lUserIDLong, 2, m_strJpegWithAppenData);
+            log.info("bRet返回值：" + bRet);
+            if (bRet && m_strJpegWithAppenData.dwP2PDataLen>0) {
+                float[] arr = new float[m_strJpegWithAppenData.dwP2PDataLen];
+                if (arrs.length == 4) {
+                    for (int i=1; i<=m_strJpegWithAppenData.dwJpegPicHeight; i++) {
+                        if (row<=i && i<=row+yPlus) {
+                            for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicWidth; j++) {
+                                if(column-1<=j && j<=column+xPlus) {
+                                    byte[] sourceData = m_strJpegWithAppenData.pP2PDataBuff.getByteArray((i - 1)*m_strJpegWithAppenData.dwJpegPicWidth*4 + (j - 1)*4, 4);
+                                    int ss = sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
+                                    arr[i] = Float.intBitsToFloat(ss);
+                                } else if (j>column+xPlus) { break; }
                             }
-
-                            //获取最大温度值
-                            float max = arr[0];
-                            Arrays.sort(arr);
-                            max = arr[arr.length - 1];
-                            list = new DecimalFormat("##0.00").format(max);
-                            equs.put("arrlist", list);
-                            log.info("list框测" + list);
-                        } else {
-                            for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicWidth; i++) {
-                                if (i == x) {
-                                    for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++) {
-                                        if (y == j) {
-                                            ByteBuffer TempDatabuffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i - 1) * (j - 1) * 4, 4);
-                                            TempDatabuffers.get(byTempData);
-                                            int l;
-                                            l = byTempData[0];
-                                            l &= 0xff;
-                                            l |= ((long) byTempData[1] << 8);
-                                            l &= 0xffff;
-                                            l |= ((long) byTempData[2] << 16);
-                                            l &= 0xffffff;
-                                            l |= ((long) byTempData[3] << 24);
-                                            // arr[i]=Float.intBitsToFloat(l);
-                                            list = new DecimalFormat("##0.00").format(Float.intBitsToFloat(l));
-                                            // list = String.valueOf(l);
-                                            log.info("list点测数据" + list);
-                                        }
-                                    }
+                        } else if (i>row){ break; }
+                    }
+                    //获取最大温度值
+                    Arrays.sort(arr);
+                    float max = arr[arr.length - 1];
+                    temperature = new DecimalFormat("##0.00").format(max);
+                    log.info("框测数据: " + temperature);
+                } else {
+                    for (int i=1; i<=m_strJpegWithAppenData.dwJpegPicWidth; i++) {
+                        if (i == row) {
+                            for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++) {
+                                if (j == column) {
+                                    byte[] sourceData = m_strJpegWithAppenData.pP2PDataBuff.getByteArray((i - 1)*m_strJpegWithAppenData.dwJpegPicWidth*4 + (j - 1)*4, 4);
+                                    int ss = sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
+                                    temperature = new DecimalFormat("##0.00").format(Float.intBitsToFloat(ss));
+                                    log.info("点测数据: " + temperature);
+                                    break;
                                 }
                             }
                         }
-                    } else {
-                        list = null;
-                        int iErr = hCNetSDK.NET_DVR_GetLastError();
-                        log.info("温度不存在" + iErr);
                     }
-
-                } else {
-                    int iErr = hCNetSDK.NET_DVR_GetLastError();
-                    log.info("温度获取失败错误码" + iErr);
                 }
-
-            } catch (Exception e) {
+            } else {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
-                log.info("系统异常" + iErr);
-            } finally {
-                hCNetSDK.NET_DVR_Logout(lUserIDLong);
+                log.info("温度获取失败错误码" + iErr);
             }
-        //}
-        return list;
+
+        } catch (Exception e) {
+            int iErr = hCNetSDK.NET_DVR_GetLastError();
+            log.info("系统异常" + iErr);
+        } finally {
+            hCNetSDK.NET_DVR_Logout(lUserIDLong);
+        }
+        return temperature;
     }
 
     /**
