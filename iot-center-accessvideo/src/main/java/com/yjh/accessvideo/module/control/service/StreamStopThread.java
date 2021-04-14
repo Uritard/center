@@ -47,13 +47,13 @@ public class StreamStopThread implements Runnable {
                 String cid = publishjson.getString("cid");
                 String livePath = streambeanJson.getString("name");
 
-                if (StringUtils.isNotEmpty(cid) && clients<1) {
+                if (StringUtils.isNotEmpty(cid) && clients<2) {
                     //踢掉
                     String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
-                    Constant.mapsForCamera.remove(videoFlowId);
-                    Constant.mapsForHistory.remove(videoFlowId);
                     log.info("关闭流-->id: {}, cid：{}, clients: {}", videoFlowId, cid, clients);
                     HttpClientUtils.httpDelete(delteUrl,null);
+                    Constant.mapsForCamera.remove(videoFlowId);
+                    Constant.mapsForHistory.remove(videoFlowId);
                     log.info("停流成功");
                 } else if (StringUtils.isEmpty(cid)) {
                     log.info("{}流为空", videoFlowId);

@@ -450,15 +450,15 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> startPlayBack(Long cameraId, String startTime, String stopTime) {
         Map<String, Object> returnMap = new HashMap<>();
-        if (Constant.mapsForHistory.size()>0) {
-            for (String key:Constant.mapsForHistory.keySet()) {
-                if (Objects.equals(Constant.mapsForHistory.get(key), String.valueOf(cameraId))) {
-                    Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + cameraId);
-                    cameraFlowMap.put("cameraId", String.valueOf(cameraId));
-                    return cameraFlowMap;
-                }
-            }
-        }
+//        if (Constant.mapsForHistory.size()>0) {
+//            for (String key:Constant.mapsForHistory.keySet()) {
+//                if (Objects.equals(Constant.mapsForHistory.get(key), String.valueOf(cameraId))) {
+//                    Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + cameraId);
+//                    cameraFlowMap.put("cameraId", String.valueOf(cameraId));
+//                    return cameraFlowMap;
+//                }
+//            }
+//        }
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
         String userName = cameraConInfo.getIdentityManager();
         String cameraIp = cameraConInfo.getRecordIp();
