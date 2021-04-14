@@ -98,5 +98,7 @@ public class TWarnInfoDetail implements Serializable {
     private String deviceCode;
     @ApiModelProperty(value = "告警设备类型-0机器人,1摄像机")
     private Integer deviceType;
+    @ApiModelProperty(value = "若是机器人，1可见光2红外")
+    private String videoCameraType;
 
 }
