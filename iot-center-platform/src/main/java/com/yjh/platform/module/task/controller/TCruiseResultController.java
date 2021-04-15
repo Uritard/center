@@ -3,7 +3,7 @@ package com.yjh.platform.module.task.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.common.logs.LogsRecord;
+//import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -160,13 +160,13 @@ public class TCruiseResultController {
 
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
-        LogsRecord logsRecord=new LogsRecord();
+        //LogsRecord logsRecord=new LogsRecord();
         try {
-            if(pageSize==0){
-                logsRecord.LogsSend(request,"9","导出","巡检任务结果数据导出");
-            }else{
-                logsRecord.LogsSend(request,"1","查询巡检任务结果数据","根据用户传递的参数分页查询巡检任务结果信息");
-            }
+//            if(pageSize==0){
+//                logsRecord.LogsSend(request,"9","导出","巡检任务结果数据导出");
+//            }else{
+//                logsRecord.LogsSend(request,"1","查询巡检任务结果数据","根据用户传递的参数分页查询巡检任务结果信息");
+//            }
             if (Objects.isNull(startDate) || "".equals(startDate)){
                 startDate = null;
             }
@@ -267,13 +267,13 @@ public class TCruiseResultController {
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
-        LogsRecord logsRecord=new LogsRecord();
+       // LogsRecord logsRecord=new LogsRecord();
         try {
-            if(pageSize==0){
-                logsRecord.LogsSend(request,"9","导出","巡视结果任务详情导出");
-            }else{
-                logsRecord.LogsSend(request,"1","巡视结果任务详情查询","根据用户传递的参数查询巡视结果任务详情");
-            }
+//            if(pageSize==0){
+//                logsRecord.LogsSend(request,"9","导出","巡视结果任务详情导出");
+//            }else{
+//                logsRecord.LogsSend(request,"1","巡视结果任务详情查询","根据用户传递的参数查询巡视结果任务详情");
+//            }
             if (Objects.isNull(startTime) || "".equals(startTime)){
                 startTime = null;
             }

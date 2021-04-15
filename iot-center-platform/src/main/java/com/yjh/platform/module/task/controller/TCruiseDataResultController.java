@@ -4,7 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsAspect;
-import com.yjh.platform.common.logs.LogsRecord;
+//import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -353,13 +353,13 @@ public class TCruiseDataResultController {
                                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
-        LogsRecord logsRecord=new LogsRecord();
+      //  LogsRecord logsRecord=new LogsRecord();
         try {
-            if(pageSize==0){
-                logsRecord.LogsSend(request,"9","导出","巡检点结果列表导出");
-            }else{
-                logsRecord.LogsSend(request,"1","巡检点结果列表","根据用户传递的参数查询巡检点结果信息");
-            }
+//            if(pageSize==0){
+//                logsRecord.LogsSend(request,"9","导出","巡检点结果列表导出");
+//            }else{
+//                logsRecord.LogsSend(request,"1","巡检点结果列表","根据用户传递的参数查询巡检点结果信息");
+//            }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             if (Objects.isNull(startTime) || "".equals(startTime)){
                 startTime = null;
