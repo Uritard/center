@@ -88,5 +88,6 @@ public interface TRobotInfoDao {
     String selectRobotCodeById(@Param(value = "robotId")Long robotId);
     List<Long>selectHaveIns(@Param(value = "robotId") Long robotId);
 
+    //查询当前机器人执行当前巡视点时使用的有效工作摄像头类型
     String selectRobotRunningCamera(@Param(value = "robotId")Long robotId,@Param(value = "instanceId")Long instanceId);
 }

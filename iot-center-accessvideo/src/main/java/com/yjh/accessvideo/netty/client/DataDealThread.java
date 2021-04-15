@@ -385,6 +385,9 @@ public class DataDealThread implements Runnable {
                                                                     warnMap.put("outRange", String.valueOf(tStdDevicemeteM.getLowLimit4() - resultValueMeter));
                                                                 }
                                                                 break;
+
+                                                            default:
+                                                                break;
                                                         }
 
                                                         redisTemplate.opsForHash().putAll(warnName, warnMap);
@@ -807,6 +810,8 @@ public class DataDealThread implements Runnable {
                                     cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
                                 }
 
+                                break;
+                            default:
                                 break;
                         }
                     } catch (Exception e) {

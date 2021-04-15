@@ -142,20 +142,20 @@ public class ChanResultService {
                 detail.setResolving(detail.getWidth() + "*" + detail.getHeight());
                 checkItemsOperate(detail);
                 //获取回放视频地址
-                HashMap map=new HashMap();
-                calendar.setTime(detail.getCheckTime());
-                calendar.set(Calendar.MINUTE,calendar.get(Calendar.MINUTE)-1);
-                map.put("cameraId",detail.getCameraId());
-                map.put("startTime",calendar.getTime());
-                calendar.set(Calendar.MINUTE,calendar.get(Calendar.MINUTE)+3);
-                map.put("stopTime",calendar.getTime());
-                log.info("视频诊断视频Map----"+map);
-                String str=Constant.START_PLAY_BACK.replaceAll("iot-center-accessvideo", InetAddress.getLocalHost().getHostAddress()+":"+"18715");
-                log.info("url"+str);
-                Result result = Constant.otherServer(map, str);
-                Map<String, Object> videoInfo = (Map<String, Object>) result.getData();
-                detail.setRtmpUrl(videoInfo.get("rtmpUrl").toString());
-                detail.setFlvUrl(videoInfo.get("flvUrl").toString());
+//                HashMap map=new HashMap();
+//                calendar.setTime(detail.getCheckTime());
+//                calendar.set(Calendar.MINUTE,calendar.get(Calendar.MINUTE)-1);
+//                map.put("cameraId",detail.getCameraId());
+//                map.put("startTime",calendar.getTime());
+//                calendar.set(Calendar.MINUTE,calendar.get(Calendar.MINUTE)+3);
+//                map.put("stopTime",calendar.getTime());
+//                log.info("视频诊断视频Map----"+map);
+//                String str=Constant.START_PLAY_BACK.replaceAll("iot-center-accessvideo", InetAddress.getLocalHost().getHostAddress()+":"+"18715");
+//                log.info("url"+str);
+//                Result result = Constant.otherServer(map, str);
+//                Map<String, Object> videoInfo = (Map<String, Object>) result.getData();
+//                detail.setRtmpUrl(videoInfo.get("rtmpUrl").toString());
+//                detail.setFlvUrl(videoInfo.get("flvUrl").toString());
                 switch (detail.getDevType()) {
                     case "0":
                         detail.setDevType("枪机");

@@ -52,12 +52,18 @@ public class AnalysisDataOperateController {
 
         Result result=new Result();
         try{
-            Boolean isWarn=false;//是否告警
-            Integer warnLevel=0;//告警级别
-            String warnName=null;//告警名称
-            String warnContent=null;//告警内容
-            String outRange=null;//超越浮动值
-            Date warnTime=null;//告警时间
+            //是否告警
+            Boolean isWarn=false;
+            //告警级别
+            Integer warnLevel=0;
+            //告警名称
+            String warnName=null;
+            //告警内容
+            String warnContent=null;
+            //超越浮动值
+            String outRange=null;
+            //告警时间
+            Date warnTime=null;
             int flag=analyseDataOperateService.warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
             if(flag==1){
                 switch (meteKind){

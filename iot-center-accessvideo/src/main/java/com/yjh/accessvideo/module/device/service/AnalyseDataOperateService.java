@@ -276,12 +276,6 @@ public class AnalyseDataOperateService {
                    }
                 }
                 break;
-//            case "1":
-//            case "2":
-//                resultNum=resultValue;
-//                cruiseResultFinal=cruiseResultTem;
-//                abnormalTypeFinal=abnormalTypeTem;
-//                break;
         }
 
         handleResultMap.put("resultNum",resultNum);

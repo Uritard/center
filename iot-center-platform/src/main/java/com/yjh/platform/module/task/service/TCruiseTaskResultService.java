@@ -159,6 +159,7 @@ public class TCruiseTaskResultService {
         List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskId(taskId);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (CruiseInspectResult cruiseInspectResult : cruiseInspectResults) {
+            log.info("-----------------------+++++++++++++++++===============:"+cruiseInspectResult);
             List<TStdDevice> tStdDevice = stdDeviceDao.selectByPrimaryId(cruiseInspectResult.getDeviceId());
             if (tStdDevice.size()==0) {
                 cruiseInspectResult.setDeviceName("");
