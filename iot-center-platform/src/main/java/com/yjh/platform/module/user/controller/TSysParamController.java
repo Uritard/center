@@ -125,6 +125,12 @@ public class TSysParamController {
                     }
                 }
             }
+            if(tSysParam.getParamCode().equals("secureVerify")){
+                if(userId!=10001){
+                    result.setCode(209, "当前用户无权限修改安全参数配置");
+                    return result;
+                }
+            }
             result.setData(tSysParamService.update(tSysParam));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());

@@ -540,7 +540,7 @@ public class SysUserController {
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else if (newPassword.contains(sysUserCurrent.getUserName())) {
-                    result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
+                    result.setCode(ResultCodeEnum.CODE20017.getCode(), "密码不能包含用户名");
                     return result;
                 } else if (!newPassword.matches(PW_PATTERN)) {
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
@@ -564,6 +564,59 @@ public class SysUserController {
         return result;
     }
 
+
+    @ApiOperation(value = "用户修改密码")
+    @RequestMapping(value = "/loginChangePassword", method = RequestMethod.PUT)
+    @Logs(title = "用户修改密码", content = "用户修改密码", logType = 3)
+    public Result loginChangePassword(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
+        Result result = new Result();
+        try {
+           // Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
+            Long userId=Long.valueOf(map.get("userId"));
+            SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
+            String oldPassword = null;
+            String newPassword = null;
+            Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
+            String isDecode = enmap.get("content");
+            if ("true".equals(isDecode)) {
+                oldPassword = Demo.decrypt(map.get("oldPCode"));
+                newPassword = Demo.decrypt(map.get("newPCode"));
+            } else {
+                oldPassword = map.get("oldPCode");
+                newPassword = map.get("newPCode");
+            }
+            String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
+            if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(oldPassword)) {
+                if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(newPassword)) {
+                    result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
+                    return result;
+                } else if (newPassword.contains("admin") || newPassword.contains("administrator")) {
+                    result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
+                    return result;
+                } else if (newPassword.contains(sysUserCurrent.getUserName())) {
+                    result.setCode(ResultCodeEnum.CODE20017.getCode(), "密码不能包含用户名");
+                    return result;
+                } else if (!newPassword.matches(PW_PATTERN)) {
+                    result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
+                    return result;
+                } else {
+                    result.setData(sysUserService.changePassword(userId, map, sysUserCurrent.getUserName(), httpServletRequest));
+                }
+            } else {
+                Map<String, Object> mapResult = new HashMap<>();
+                mapResult.put("code", ResultCodeEnum.CODE10106.getCode());
+                mapResult.put("info", ResultCodeEnum.CODE10106.getName());
+                result.setData(mapResult);
+            }
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("用户修改密码异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("用户修改密码错误:", e);
+        }
+        return result;
+    }
     /**
      * java生成随机数字10位数
      */
@@ -597,6 +650,7 @@ public class SysUserController {
 
     @ApiOperation(value = "账号锁定用户信息")
     @RequestMapping(value = "/lockUserInfo", method = RequestMethod.GET)
+    @Logs(title = "账号锁定用户信息查询", content = "账号锁定用户信息查询", logType = 1)
     public Result lockUserInfo() {
         Result result = new Result();
         try {
@@ -619,6 +673,7 @@ public class SysUserController {
 
     @ApiOperation(value = "账号密码到期用户信息")
     @RequestMapping(value = "/passUserInfo", method = RequestMethod.GET)
+    @Logs(title = "账号密码到期用户信息查询", content = "账号密码到期用户信息查询", logType = 1)
     public Result passUserInfo() {
         Result result = new Result();
         try {

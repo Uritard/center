@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 //import com.yjh.platform.common.logs.LogsRecord;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -36,6 +37,8 @@ public class TWarnInfoController {
 
     @Autowired
     private final TWarnInfoService tWarnInfoService;
+    @Autowired
+    private LogsRecord logsRecord;
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoController.class);
 
@@ -220,13 +223,12 @@ public class TWarnInfoController {
                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
-      //  LogsRecord logsRecord=new LogsRecord();
         try {
-//            if(pageSize==0){
-//                logsRecord.LogsSend(request,"9","导出","告警确认导出");
-//            }else{
-//                logsRecord.LogsSend(request,"1","告警确认查询","根据用户传递的参数进行告警确认");
-//            }
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","导出","告警确认导出");
+            }else{
+                logsRecord.LogsSend(request,"1","告警确认查询","根据用户传递的参数进行告警确认");
+            }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<TWarnInfoDetail> list = tWarnInfoService.WarnConfirm(warnLevel, confMode,startTime,endTime,deviceName,defectType,meteName);
             resultMap.put("count", page.getTotal());

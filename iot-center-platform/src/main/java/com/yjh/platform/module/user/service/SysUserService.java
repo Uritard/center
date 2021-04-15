@@ -289,6 +289,7 @@ public class SysUserService {
                                 mapResult.put("errorCount", "密码超期登录失败，请联系管理员处理！");
                                 mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
                                 mapResult.put("info", ResultCodeEnum.CODE10108.getName());
+                                mapResult.put("userId",sysUserLogin.getUserId());
                                 return mapResult;
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -384,6 +385,7 @@ public class SysUserService {
                             mapResult.put("errorCount", "密码超期登录失败，请联系管理员处理！");
                             mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
                             mapResult.put("info", ResultCodeEnum.CODE10108.getName());
+                            mapResult.put("userId",sysUserLogin.getUserId());
                             return mapResult;
                         }
                         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
