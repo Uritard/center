@@ -8,6 +8,7 @@ import org.springframework.util.MultiValueMap;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+@Component
 public class LogsRecord {
 
     @Resource
