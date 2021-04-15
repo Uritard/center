@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.controller;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -145,7 +146,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "分页查询--巡视结果任务查询")
     @GetMapping(value = "/selectTaskByPage")
-    @Logs(title = "查询巡检任务结果数据",content = "根据用户传递的参数分页查询巡检任务结果信息",logType = 1)
+   // @Logs(title = "查询巡检任务结果数据",content = "根据用户传递的参数分页查询巡检任务结果信息",logType = 1)
     public Result selectTaskByPage(@RequestParam(value = "taskName", required = false) String taskName,
                                    @RequestParam(value = "cState", required = false) Integer cState,
                                    @RequestParam(value = "cType", required = false) Integer cType,
@@ -155,11 +156,17 @@ public class TCruiseResultController {
                                    @RequestParam(value = "endDate",required = false) String endDate,
                                    @RequestParam(value = "meteType", required = false) Integer meteType,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                   @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                                   @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
 
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
+        LogsRecord logsRecord=new LogsRecord();
         try {
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","导出","巡检任务结果数据导出");
+            }else{
+                logsRecord.LogsSend(request,"1","查询巡检任务结果数据","根据用户传递的参数分页查询巡检任务结果信息");
+            }
             if (Objects.isNull(startDate) || "".equals(startDate)){
                 startDate = null;
             }
@@ -248,7 +255,7 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "分页查询--巡视结果任务详情查询")
     @GetMapping(value = "/selectCruiseByPage")
-    @Logs(title = "巡视结果任务详情查询",content = "根据用户传递的参数查询巡视结果任务详情",logType = 1)
+   // @Logs(title = "巡视结果任务详情查询",content = "根据用户传递的参数查询巡视结果任务详情",logType = 1)
     public Result selectCruiseByPage(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
@@ -257,10 +264,16 @@ public class TCruiseResultController {
                                      @RequestParam(value = "endTime",required = false) String endTime,
                                      @RequestParam(value = "regionId",required = false) Long regionId,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                     @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                                     @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
+        LogsRecord logsRecord=new LogsRecord();
         try {
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","导出","巡视结果任务详情导出");
+            }else{
+                logsRecord.LogsSend(request,"1","巡视结果任务详情查询","根据用户传递的参数查询巡视结果任务详情");
+            }
             if (Objects.isNull(startTime) || "".equals(startTime)){
                 startTime = null;
             }
