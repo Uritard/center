@@ -20,6 +20,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -121,26 +122,30 @@ public class IsWarnAfterCruiseThread implements Runnable{
                                 redisTemplate.opsForHash().putAll("t_cruise_task_result:" + threadMap.get("taskCode") + ":" + instanceId,redisWarnInfoMap);*/
 
                                 String warnName = "warnInfo:" + threadMap.get("taskCode") + String.valueOf(UUID.randomUUID()).replace("-", "");
-                                Map<String,Object> warnMap = new HashMap<>();
-                                warnMap.put("deviceId", warnInfo.getDeviceId());
+                                Map<String,String> warnMap = new HashMap<>();
+                                warnMap.put("deviceId", warnInfo.getDeviceId().toString());
                                 warnMap.put("customId",warnInfo.getCunstomId() );
-                                warnMap.put("instanceId",warnInfo.getInstanceId());
-                                warnMap.put("stdMeteId", warnInfo.getStdMeteId());
+                                warnMap.put("instanceId",warnInfo.getInstanceId().toString());
+                                warnMap.put("stdMeteId", warnInfo.getStdMeteId().toString());
                                 warnMap.put("taskId", warnInfo.getTaskId());
                                 warnMap.put("value", warnInfo.getValue());
                                 warnMap.put("imagePath", warnInfo.getImagePath());
                                 warnMap.put("confMode", "276");
-                                warnMap.put("alarmSource", warnInfo.getAlarmSource());
-                                warnMap.put("defectModel", warnInfo.getDefectModel());
-                                warnMap.put("warnLevel",warnInfo.getWarnLevel());
+                                warnMap.put("alarmSource", warnInfo.getAlarmSource().toString());
+                                warnMap.put("defectModel", warnInfo.getDefectModel().toString());
+                                warnMap.put("warnLevel",warnInfo.getWarnLevel().toString());
                                 warnMap.put("warnName", warnInfo.getWarnName());
-                                warnMap.put("warnTime",warnInfo.getWarnTime());
+                                warnMap.put("warnTime",new SimpleDateFormat().format(warnInfo.getWarnTime()));
                                 warnMap.put("warnContent",warnInfo.getWarnContent());
-                                warnMap.put("outRange",warnInfo.getOutRange());
+                                if (Objects.nonNull(warnInfo.getOutRange())){
+                                    warnMap.put("outRange",warnInfo.getOutRange());
+                                }
+                                log.info("warnMap==="+warnMap);
                                 redisTemplate.opsForHash().putAll(warnName, warnMap);
 
                                 StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
                                 Long warnId = StaticContextAccessor.getBean(RobotService.class).selectWarnId(warnInfo.getTaskId(),warnInfo.getInstanceId());
+                                log.info("warnId==="+warnId);
 
                                 Map<String,String> currentWarnInfo=new HashMap<>();
                                 currentWarnInfo.put("warnId",warnId.toString());
@@ -189,7 +194,7 @@ public class IsWarnAfterCruiseThread implements Runnable{
             }
             return;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
     public Result sendPostRequest(String url, Map<String,Object> params) {

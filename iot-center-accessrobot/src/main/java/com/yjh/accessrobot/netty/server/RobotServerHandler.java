@@ -409,535 +409,545 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
 
 
-        if ("251".equals(xmlBaseModel.getType())){
-            switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
-                //注册指令(发送响应)
-                case "2511":
-                    log.info("巡视主机收到注册指令了,这是第"+Constant.registerCount+"次");
-                    Constant.registerCount++;
-                    List<Map<String, Object>> itemsList = new ArrayList<>();
-                    Map<String, Object> items = new HashMap<>();
-                    String code = "";
-                    if (allRobotCodeMap.containsValue(xmlBaseModel.getSendCode())){
-                        code = "200";//success
-                        log.info("缓存有,可以注册");
-                    }else {
-                        List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
-                        if (robotCodeList.contains(xmlBaseModel.getSendCode())){
-                            code = "200";
-                            log.info("缓存无，表中有，可以注册");
+        try {
+            if ("251".equals(xmlBaseModel.getType())){
+                switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
+                    //注册指令(发送响应)
+                    case "2511":
+                        log.info("巡视主机收到注册指令了,这是第"+Constant.registerCount+"次");
+                        Constant.registerCount++;
+                        List<Map<String, Object>> itemsList = new ArrayList<>();
+                        Map<String, Object> items = new HashMap<>();
+                        String code = "";
+                        if (allRobotCodeMap.containsValue(xmlBaseModel.getSendCode())){
+                            code = "200";//success
+                            log.info("缓存有,可以注册");
                         }else {
-                            code = "400";//refuse
-                            log.info("缓存无，表中无，不可以注册");
+                            List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
+                            if (robotCodeList.contains(xmlBaseModel.getSendCode())){
+                                code = "200";
+                                log.info("缓存无，表中有，可以注册");
+                            }else {
+                                code = "400";//refuse
+                                log.info("缓存无，表中无，不可以注册");
+                            }
                         }
-                    }
-                    items.put("heart_beat_interval", heartbeatIntervalMap.get(redisValue));//心跳间隔
-                    items.put("robot_run_interval", runDataIntervalMap.get(redisValue));//机器人运行数据间隔
-                    items.put("weather_interval", weatherDataIntervalMap.get(redisValue));//微气象数据间隔
-                    itemsList.add(items);
+                        items.put("heart_beat_interval", heartbeatIntervalMap.get(redisValue));//心跳间隔
+                        items.put("robot_run_interval", runDataIntervalMap.get(redisValue));//机器人运行数据间隔
+                        items.put("weather_interval", weatherDataIntervalMap.get(redisValue));//微气象数据间隔
+                        itemsList.add(items);
 
-                    XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
-                            .setSendCode(platformServerMap.get(redisValue))
-                            .setReceiveCode(xmlBaseModel.getSendCode())
-                            .setType("251")
-                            .setCode(code)
-                            .setCommand("4")
-                            .setTime(sdf.format(new Date()))
-                            .setItems(itemsList);
-                    String registerXmlString = PlatformXMLUtil.generateXml(xmlBaseModelTemp);//生成xml
-                    byte[] registerProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, registerXmlString);
-                    sendHeartBeat(registerProtocol,xmlBaseModel.getSendCode());
+                        XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
+                                .setSendCode(platformServerMap.get(redisValue))
+                                .setReceiveCode(xmlBaseModel.getSendCode())
+                                .setType("251")
+                                .setCode(code)
+                                .setCommand("4")
+                                .setTime(sdf.format(new Date()))
+                                .setItems(itemsList);
+                        String registerXmlString = PlatformXMLUtil.generateXml(xmlBaseModelTemp);//生成xml
+                        byte[] registerProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, registerXmlString);
+                        sendHeartBeat(registerProtocol,xmlBaseModel.getSendCode());
 
-                    if (Objects.nonNull(robotServerHandlerMap.get(xmlBaseModel.getSendCode()))) {
-                        robotServerHandlerMap.get(xmlBaseModel.getSendCode()).ctx.close();
-                    }
+                        if (Objects.nonNull(robotServerHandlerMap.get(xmlBaseModel.getSendCode()))) {
+                            robotServerHandlerMap.get(xmlBaseModel.getSendCode()).ctx.close();
+                        }
 
-                    robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
-                    //Start heatBreakDealThread
-                    HeartBreakDealThread dataDealThread = new HeartBreakDealThread(this, xmlBaseModel.getSendCode(),redisTemplate,isThreadStart,sendSessionId,receiveSessionId);
-                    Thread thread = new Thread(dataDealThread);
-                    thread.setDaemon(true);
-                    thread.start();
-                    break;
-                //心跳指令(发送响应)
-                case "2512":
-                    log.info("+++++++++++++++++巡视主机收到心跳指令了+++++++++++++++++");
-                    heartNum = 0;
-                    String robotCode = xmlBaseModel.getSendCode();
-                    if (allRobotCodeMap.containsValue(robotCode)){
-                        log.info("缓存有,发送心跳响应");
-                        Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
-                        heartBeatSuccessAfter(robotCode,sendSessionId,robotStatusMap);
-                    }else {
-                        List<String> robotCodeList = robotService.selectAllRobotCode();
-                        if (robotCodeList.contains(robotCode)){
-                            log.info("缓存无,表中有,发送心跳相应");
+                        robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
+                        //Start heatBreakDealThread
+                        HeartBreakDealThread dataDealThread = new HeartBreakDealThread(this, xmlBaseModel.getSendCode(),redisTemplate,isThreadStart,sendSessionId,receiveSessionId);
+                        Thread thread = new Thread(dataDealThread);
+                        thread.setDaemon(true);
+                        thread.start();
+                        break;
+                    //心跳指令(发送响应)
+                    case "2512":
+                        log.info("+++++++++++++++++巡视主机收到心跳指令了+++++++++++++++++");
+                        heartNum = 0;
+                        String robotCode = xmlBaseModel.getSendCode();
+                        if (allRobotCodeMap.containsValue(robotCode)){
+                            log.info("缓存有,发送心跳响应");
                             Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
                             heartBeatSuccessAfter(robotCode,sendSessionId,robotStatusMap);
                         }else {
-                            log.info("缓存无,表中无,断开连接");
-                            Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
-                            heartBeatFailAfter(robotCode,robotStatusMap);
-                        }
-                    }
-                    break;
-                //模型同步指令and任务控制指令(接收响应)
-                case "2514":
-                    if (xmlBaseModel.getItems().get(0).size() == 1) {
-                        //Deal with task control
-                        String taskId = xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString();
-                        log.info("机器人收到任务控制指令了,这是机器人响应的巡视任务执行Id==="+taskId);
-                    }else if (xmlBaseModel.getItems().get(0).size() == 2){
-                        log.info("机器人收到模型指令了,这是机器人的响应");
-                        //Deal with synchronous model
-                        String deviceFile = xmlBaseModel.getItems().get(0).get("device_file_path").toString();
-                        String robotFile = xmlBaseModel.getItems().get(0).get("robot_file_path").toString();
-                        XMLBaseModel deviceModel = getXmlMessage(filePathMap.get(redisValue) + "/" +deviceFile);
-                        List<Map<String,Object>> deviceMap = deviceModel.getItems();
-                        XMLBaseModel robotModel = getXmlMessage(filePathMap.get(redisValue) + "/" +robotFile);
-                        List<Map<String,Object>> robotMap = robotModel.getItems();
-                        log.info("deviceMap==="+deviceMap+",robotMap==="+robotMap);
-                        robotService.robotFileIntoDB(deviceMap,robotMap,xmlBaseModel);
-
-                        robotService.upToCruise(xmlBaseModel);//国网要求
-                    }else if (xmlBaseModel.getItems().get(0).size() == 0){
-                        log.info("机器人收到检修区域指令了,这是机器人的响应");
-                        //Deal with the maintenance area was issued successfully
-                        robotService.receivingResponse(xmlBaseModel,receiveSessionId);
-                    }
-                    break;
-                //任务下发指令and控制指令(接收响应)
-                case "2513":
-                    log.info("机器人收到下发任务指令/控制指令了,这是机器人的响应");
-                    //Deal with task issue/control
-                    robotService.receivingResponse(xmlBaseModel,receiveSessionId);
-                    break;
-                default:
-                    break;
-            }
-        }else {
-            switch (xmlBaseModel.getType()){
-                //机器人状态数据(接收并发送响应)
-                case "1":
-                    log.info("+++++++++++++++++巡视主机收到机器人状态数据了+++++++++++++++++");
-                    //Deal with robot status data
-                    List<Map<String,String>> robotStatusList = new ArrayList<>();
-                    xmlBaseModel.getItems().forEach(res->{
-                        Map<String, String> robotStatusMap = new HashMap<>();
-                        robotStatusMap.put("robotName",res.get("robot_name").toString());
-                        robotStatusMap.put("robotCode",xmlBaseModel.getSendCode());
-                        robotStatusMap.put("time",res.get("time").toString());
-                        robotStatusMap.put("type",res.get("type").toString());
-                        robotStatusMap.put("value",res.get("value").toString());
-                        robotStatusMap.put("valueUnit",res.get("value_unit").toString());
-                        robotStatusMap.put("unit",res.get("unit").toString());
-                        robotStatusList.add(robotStatusMap);
-
-                        robotService.upToCruise(xmlBaseModel);//国网要求
-                    });
-                    log.info("机器人状态数据是："+robotStatusList);
-                    //放缓存
-                    for (int i = 0; i < robotStatusList.size(); i++) {
-                        redisTemplate.opsForHash().putAll("RobotStatus:"+xmlBaseModel.getSendCode()+":"+ robotStatusList.get(i).get("type"), robotStatusList.get(i));
-                    }
-                    String statusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                    byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, statusXmlString);
-                    send(ctx, statusProtocol,xmlBaseModel.getSendCode());
-                    log.info("巡视主机给机器人响应了");
-
-                    break;
-                //机器人运行数据(接收并发送响应)
-                case "2":
-                    log.info("+++++++++++++++++巡视主机收到机器人运行数据了+++++++++++++++++");
-                    //Deal with robot operation data
-                    List<Map<String,String>> robotOperationList = new ArrayList<>();
-                    xmlBaseModel.getItems().forEach(res->{
-                        Map<String,String> robotOperationMap = new HashMap<>();
-                        robotOperationMap.put("robotName",res.get("robot_name").toString());
-                        robotOperationMap.put("robotCode",res.get("robot_code").toString());
-                        robotOperationMap.put("time",res.get("time").toString());
-                        robotOperationMap.put("type",res.get("type").toString());
-                        robotOperationMap.put("value",res.get("value").toString());
-                        robotOperationMap.put("valueUnit",res.get("value_unit").toString());
-                        robotOperationMap.put("unit",res.get("unit").toString());
-                        robotOperationList.add(robotOperationMap);
-
-                    });
-                    //放缓存
-                    for (int i = 0; i < robotOperationList.size(); i++) {
-                        redisTemplate.opsForHash().putAll("RobotOperation:"+xmlBaseModel.getSendCode()+":"+ robotOperationList.get(i).get("type"), robotOperationList.get(i));
-                    }
-                    String operationXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                    byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, operationXmlString);
-                    send(ctx, operationProtocol,xmlBaseModel.getSendCode());
-                    log.info("巡视主机给机器人响应了");
-                    robotService.upToCruise(xmlBaseModel);//国网要求
-
-                    break;
-                //机器人坐标(接收并发送响应)
-                case "3":
-                    log.info("+++++++++++++++++巡视主机收到机器人坐标数据了+++++++++++++++++");
-                    //Deal with robot coordinates data
-                    List<Map<String,String>> robotCoordinateList = new ArrayList<>();
-                    xmlBaseModel.getItems().forEach(res-> {
-                        Map<String, String> robotCoordinateMap = new HashMap<>();
-                        robotCoordinateMap.put("robotName", res.get("robot_name").toString());
-                        robotCoordinateMap.put("filePath", res.get("file_path").toString());
-                        robotCoordinateMap.put("robotCode", xmlBaseModel.getSendCode());
-                        robotCoordinateMap.put("time",res.get("time").toString());
-                        robotCoordinateMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
-                        robotCoordinateMap.put("coordinateGeography", res.get("coordinate_geography").toString());
-                        robotCoordinateList.add(robotCoordinateMap);
-                    });
-                    //放缓存
-                    for (int i = 0; i < robotCoordinateList.size(); i++) {
-                        redisTemplate.opsForHash().putAll("RobotCoordinate:"+xmlBaseModel.getSendCode(), robotCoordinateList.get(i));
-                    }
-                    String coordinateXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                    byte[] coordinateProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, coordinateXmlString);
-                    send(ctx, coordinateProtocol,xmlBaseModel.getSendCode());
-                    log.info("巡视主机给机器人响应了");
-                    robotService.upToCruise(xmlBaseModel);//国网要求
-                    break;
-                //机器人巡视路线(接收并发送响应)
-                case "4":
-                    log.info("+++++++++++++++++巡视主机收到机器人巡视路线数据了+++++++++++++++++");
-                    //Deal with robot cruise road data
-                    List<Map<String,String>> robotRoadList = new ArrayList<>();
-                    xmlBaseModel.getItems().forEach(res-> {
-                        Map<String, String> robotRoadMap = new HashMap<>();
-                        robotRoadMap.put("robotName", res.get("robot_name").toString());
-                        String filePath = res.get("file_path").toString();
-                        String splitArray[] = filePath.split("/");
-                        String fileName = splitArray[splitArray.length - 1];
-                        log.info("巡检路线图片名称=="+fileName);
-                        String taskId = splitArray[splitArray.length - 3];
-                        /*
-                        将ftp服务器上的文件复制到开发环境
-                        * */
-                        String temporaryPath = filePathMap.get(redisValue) + "/" +filePath;//文件在ftp服务器上的绝对路径
-                        log.info("temporaryPath是==="+temporaryPath);
-
-                        //开发环境图片相对路径文件目录
-                        String developRelativeUrl =  relativeImgMap.get(redisValue) +  "/"+ todayTime+ "/"+ taskId + "/Road";
-                        //开发环境图片绝对路径文件目录
-                        String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime+ "/"+taskId + "/Road";
-                        log.info("developAbsoluteUrl是==="+developAbsoluteUrl);
-                        File f=new File(developAbsoluteUrl);
-                        if (!f.exists()){
-                            f.setWritable(true, false);
-                            f.mkdirs();
-                        }
-
-                        try {
-                            String url = "cp " + temporaryPath + " " + developAbsoluteUrl;
-                            Runtime.getRuntime().exec(url);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        robotRoadMap.put("relativePath",developRelativeUrl + "/" +fileName);//相对路径
-                        robotRoadMap.put("absolutePath",developAbsoluteUrl + "/"+fileName);//绝对路径
-                        robotRoadMap.put("robotCode", xmlBaseModel.getSendCode());
-                        robotRoadMap.put("time",res.get("time").toString());
-                        robotRoadMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
-                        robotRoadMap.put("coordinateGeography", res.get("coordinate_geography").toString());
-                        robotRoadList.add(robotRoadMap);
-                    });
-                    //放缓存
-                    for (int i = 0; i < robotRoadList.size(); i++) {
-                        redisTemplate.opsForHash().putAll("RobotRoad:"+xmlBaseModel.getSendCode(), robotRoadList.get(i));
-                    }
-                    String roadXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                    byte[] roadProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, roadXmlString);
-                    send(ctx, roadProtocol,xmlBaseModel.getSendCode());
-                    log.info("巡视主机给机器人响应了");
-
-                    robotService.upToCruise(xmlBaseModel);//国网要求
-                    break;
-                //机器人异常告警数据(接收并发送响应)
-                case "5":
-                    log.info("+++++++++++++++++巡视主机收到机器人异常告警数据了+++++++++++++++++");
-                    //Deal with robot alarm data
-                    Map<String, String> robotAlarmMap = new HashMap<>();
-                    robotAlarmMap.put("robotName",xmlBaseModel.getItems().get(0).get("robot_name").toString());
-                    robotAlarmMap.put("robotCode",xmlBaseModel.getSendCode());
-                    robotAlarmMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
-                    robotAlarmMap.put("content",xmlBaseModel.getItems().get(0).get(redisValue).toString());
-
-                    //Start alarmResultDealThread
-                    AlarmResultDealThread alarmResultDealThread = new AlarmResultDealThread(robotAlarmMap,isThreadStart,this);
-                    TaskExecutePool.getInstance().execute(alarmResultDealThread);
-
-                    String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                    byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
-                    send(ctx, alarmProtocol,xmlBaseModel.getSendCode());
-                    log.info("巡视主机给机器人响应了");
-
-
-                    //xmlBaseModel.setType("62");
-                    robotService.upToCruise(xmlBaseModel);//国网要求
-
-                    break;
-                //微气象数据(接收并发送响应)
-                case "21":
-                    log.info("+++++++++++++++++巡视主机收到微气象数据了+++++++++++++++++");
-                    //Deal with robot micro climate data
-                    List<Map<String,String>> weatherList = new ArrayList<>();
-                    Map<String,String> info = new HashMap<>();
-                    DecimalFormat decimalFormat = new DecimalFormat("#0.0");
-                    xmlBaseModel.getItems().forEach(res-> {
-                        Map<String, String> weatherMap = new HashMap<>();
-                        weatherMap.put("robotName", res.get("robot_name").toString());
-                        weatherMap.put("robotCode", xmlBaseModel.getSendCode());
-                        weatherMap.put("time", res.get("time").toString());
-                        weatherMap.put("type", res.get("type").toString());
-                        weatherMap.put("value", res.get("value").toString());
-                        weatherMap.put("valueUnit", res.get("value_unit").toString());
-                        weatherMap.put("unit", res.get("unit").toString());
-                        weatherList.add(weatherMap);
-                        //1=温度 2=湿度 3=风速 4=大气压  5=降雨量 6=风向
-                        if("1".equals(weatherMap.get("type"))){
-                            info.put("temperature",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
-                            info.put("temperatureUnit","℃");
-                        }
-                        if("2".equals(weatherMap.get("type"))){
-                            info.put("humidity",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
-                            info.put("humidityUnit","%");
-                        }
-                        if("3".equals(weatherMap.get("type"))){
-                            info.put("windSpeed",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
-                            info.put("windSpeedUnit","m/s");
-                        }
-                        if("4".equals(weatherMap.get("type"))){
-                            info.put("airPressure",decimalFormat.format(Double.valueOf(weatherMap.get("value"))/10).toString());
-                            info.put("airPressureUnit","kPa");
-                        }
-                        if("5".equals(weatherMap.get("type"))){
-                            info.put("precipitation",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
-                            info.put("precipitationUnit","mm");
-                        }
-                        if("6".equals(weatherMap.get("type"))){
-                            if("".equals(weatherMap.get("value")) || null==weatherMap.get("value")){
-                                info.put("windDirection","--");
+                            List<String> robotCodeList = robotService.selectAllRobotCode();
+                            if (robotCodeList.contains(robotCode)){
+                                log.info("缓存无,表中有,发送心跳相应");
+                                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
+                                heartBeatSuccessAfter(robotCode,sendSessionId,robotStatusMap);
                             }else {
-                                info.put("windDirection",weatherMap.get("value").toString());
+                                log.info("缓存无,表中无,断开连接");
+                                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
+                                heartBeatFailAfter(robotCode,robotStatusMap);
+                            }
+                        }
+                        break;
+                    //模型同步指令and任务控制指令(接收响应)
+                    case "2514":
+                        if (xmlBaseModel.getItems().get(0).size() == 1) {
+                            //Deal with task control
+                            String taskId = xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString();
+                            log.info("机器人收到任务控制指令了,这是机器人响应的巡视任务执行Id==="+taskId);
+                        }else if (xmlBaseModel.getItems().get(0).size() == 2){
+                            log.info("机器人收到模型指令了,这是机器人的响应");
+                            //Deal with synchronous model
+                            String deviceFile = xmlBaseModel.getItems().get(0).get("device_file_path").toString();
+                            String robotFile = xmlBaseModel.getItems().get(0).get("robot_file_path").toString();
+                            XMLBaseModel deviceModel = getXmlMessage(filePathMap.get(redisValue) + "/" +deviceFile);
+                            List<Map<String,Object>> deviceMap = deviceModel.getItems();
+                            XMLBaseModel robotModel = getXmlMessage(filePathMap.get(redisValue) + "/" +robotFile);
+                            List<Map<String,Object>> robotMap = robotModel.getItems();
+                            log.info("deviceMap==="+deviceMap+",robotMap==="+robotMap);
+                            robotService.robotFileIntoDB(deviceMap,robotMap,xmlBaseModel);
+
+                            robotService.upToCruise(xmlBaseModel);//国网要求
+                        }else if (xmlBaseModel.getItems().get(0).size() == 0){
+                            log.info("机器人收到检修区域指令了,这是机器人的响应");
+                            //Deal with the maintenance area was issued successfully
+                            robotService.receivingResponse(xmlBaseModel,receiveSessionId);
+                        }
+                        break;
+                    //任务下发指令and控制指令(接收响应)
+                    case "2513":
+                        log.info("机器人收到下发任务指令/控制指令了,这是机器人的响应");
+                        //Deal with task issue/control
+                        robotService.receivingResponse(xmlBaseModel,receiveSessionId);
+                        break;
+                    default:
+                        break;
+                }
+            }else {
+                switch (xmlBaseModel.getType()){
+                    //机器人状态数据(接收并发送响应)
+                    case "1":
+                        log.info("+++++++++++++++++巡视主机收到机器人状态数据了+++++++++++++++++");
+                        //Deal with robot status data
+                        List<Map<String,String>> robotStatusList = new ArrayList<>();
+                        xmlBaseModel.getItems().forEach(res->{
+                            Map<String, String> robotStatusMap = new HashMap<>();
+                            robotStatusMap.put("robotName",res.get("robot_name").toString());
+                            robotStatusMap.put("robotCode",xmlBaseModel.getSendCode());
+                            robotStatusMap.put("time",res.get("time").toString());
+                            robotStatusMap.put("type",res.get("type").toString());
+                            robotStatusMap.put("value",res.get("value").toString());
+                            robotStatusMap.put("valueUnit",res.get("value_unit").toString());
+                            robotStatusMap.put("unit",res.get("unit").toString());
+                            robotStatusList.add(robotStatusMap);
+
+                            robotService.upToCruise(xmlBaseModel);//国网要求
+                        });
+                        log.info("机器人状态数据是："+robotStatusList);
+                        //放缓存
+                        for (int i = 0; i < robotStatusList.size(); i++) {
+                            redisTemplate.opsForHash().putAll("RobotStatus:"+xmlBaseModel.getSendCode()+":"+ robotStatusList.get(i).get("type"), robotStatusList.get(i));
+                        }
+                        String statusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, statusXmlString);
+                        send(ctx, statusProtocol,xmlBaseModel.getSendCode());
+                        log.info("巡视主机给机器人响应了");
+
+                        break;
+                    //机器人运行数据(接收并发送响应)
+                    case "2":
+                        log.info("+++++++++++++++++巡视主机收到机器人运行数据了+++++++++++++++++");
+                        //Deal with robot operation data
+                        List<Map<String,String>> robotOperationList = new ArrayList<>();
+                        xmlBaseModel.getItems().forEach(res->{
+                            Map<String,String> robotOperationMap = new HashMap<>();
+                            robotOperationMap.put("robotName",res.get("robot_name").toString());
+                            robotOperationMap.put("robotCode",res.get("robot_code").toString());
+                            robotOperationMap.put("time",res.get("time").toString());
+                            robotOperationMap.put("type",res.get("type").toString());
+                            robotOperationMap.put("value",res.get("value").toString());
+                            robotOperationMap.put("valueUnit",res.get("value_unit").toString());
+                            robotOperationMap.put("unit",res.get("unit").toString());
+                            robotOperationList.add(robotOperationMap);
+
+                        });
+                        //放缓存
+                        for (int i = 0; i < robotOperationList.size(); i++) {
+                            redisTemplate.opsForHash().putAll("RobotOperation:"+xmlBaseModel.getSendCode()+":"+ robotOperationList.get(i).get("type"), robotOperationList.get(i));
+                        }
+                        String operationXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, operationXmlString);
+                        send(ctx, operationProtocol,xmlBaseModel.getSendCode());
+                        log.info("巡视主机给机器人响应了");
+                        robotService.upToCruise(xmlBaseModel);//国网要求
+
+                        break;
+                    //机器人坐标(接收并发送响应)
+                    case "3":
+                        log.info("+++++++++++++++++巡视主机收到机器人坐标数据了+++++++++++++++++");
+                        //Deal with robot coordinates data
+                        List<Map<String,String>> robotCoordinateList = new ArrayList<>();
+                        xmlBaseModel.getItems().forEach(res-> {
+                            Map<String, String> robotCoordinateMap = new HashMap<>();
+                            robotCoordinateMap.put("robotName", res.get("robot_name").toString());
+                            robotCoordinateMap.put("filePath", res.get("file_path").toString());
+                            robotCoordinateMap.put("robotCode", xmlBaseModel.getSendCode());
+                            robotCoordinateMap.put("time",res.get("time").toString());
+                            robotCoordinateMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
+                            robotCoordinateMap.put("coordinateGeography", res.get("coordinate_geography").toString());
+                            robotCoordinateList.add(robotCoordinateMap);
+                        });
+                        //放缓存
+                        for (int i = 0; i < robotCoordinateList.size(); i++) {
+                            redisTemplate.opsForHash().putAll("RobotCoordinate:"+xmlBaseModel.getSendCode(), robotCoordinateList.get(i));
+                        }
+                        String coordinateXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        byte[] coordinateProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, coordinateXmlString);
+                        send(ctx, coordinateProtocol,xmlBaseModel.getSendCode());
+                        log.info("巡视主机给机器人响应了");
+                        robotService.upToCruise(xmlBaseModel);//国网要求
+                        break;
+                    //机器人巡视路线(接收并发送响应)
+                    case "4":
+                        log.info("+++++++++++++++++巡视主机收到机器人巡视路线数据了+++++++++++++++++");
+                        //Deal with robot cruise road data
+                        List<Map<String,String>> robotRoadList = new ArrayList<>();
+                        xmlBaseModel.getItems().forEach(res-> {
+                            Map<String, String> robotRoadMap = new HashMap<>();
+                            robotRoadMap.put("robotName", res.get("robot_name").toString());
+                            String filePath = res.get("file_path").toString();
+                            String splitArray[] = filePath.split("/");
+                            String fileName = splitArray[splitArray.length - 1];
+                            log.info("巡检路线图片名称=="+fileName);
+                            String taskId = splitArray[splitArray.length - 3];
+                            /*
+                            将ftp服务器上的文件复制到开发环境
+                            * */
+                            String temporaryPath = filePathMap.get(redisValue) + "/" +filePath;//文件在ftp服务器上的绝对路径
+                            log.info("temporaryPath是==="+temporaryPath);
+
+                            //开发环境图片相对路径文件目录
+                            String developRelativeUrl =  relativeImgMap.get(redisValue) +  "/"+ todayTime+ "/"+ taskId + "/Road";
+                            //开发环境图片绝对路径文件目录
+                            String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime+ "/"+taskId + "/Road";
+                            log.info("developAbsoluteUrl是==="+developAbsoluteUrl);
+                            File f=new File(developAbsoluteUrl);
+                            if (!f.exists()){
+                                f.setWritable(true, false);
+                                f.mkdirs();
                             }
 
-                            //info.put("precipitationUnit","mm");
+                            try {
+                                String url = "cp " + temporaryPath + " " + developAbsoluteUrl;
+                                Runtime.getRuntime().exec(url);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                            robotRoadMap.put("relativePath",developRelativeUrl + "/" +fileName);//相对路径
+                            robotRoadMap.put("absolutePath",developAbsoluteUrl + "/"+fileName);//绝对路径
+                            robotRoadMap.put("robotCode", xmlBaseModel.getSendCode());
+                            robotRoadMap.put("time",res.get("time").toString());
+                            robotRoadMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
+                            robotRoadMap.put("coordinateGeography", res.get("coordinate_geography").toString());
+                            robotRoadList.add(robotRoadMap);
+                        });
+                        //放缓存
+                        for (int i = 0; i < robotRoadList.size(); i++) {
+                            redisTemplate.opsForHash().putAll("RobotRoad:"+xmlBaseModel.getSendCode(), robotRoadList.get(i));
                         }
-                    });
-                    //放缓存
-                    for (int i = 0; i < weatherList.size(); i++) {
-                        redisTemplate.opsForHash().putAll("RobotWeather:"+xmlBaseModel.getSendCode()+":"+ weatherList.get(i).get("type"), weatherList.get(i));
+                        String roadXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        byte[] roadProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, roadXmlString);
+                        send(ctx, roadProtocol,xmlBaseModel.getSendCode());
+                        log.info("巡视主机给机器人响应了");
+
+                        robotService.upToCruise(xmlBaseModel);//国网要求
+                        break;
+                    //机器人异常告警数据(接收并发送响应)
+                    case "5":
+                        log.info("+++++++++++++++++巡视主机收到机器人异常告警数据了+++++++++++++++++");
+                        //Deal with robot alarm data
+                        Map<String, String> robotAlarmMap = new HashMap<>();
+                        robotAlarmMap.put("robotName",xmlBaseModel.getItems().get(0).get("robot_name").toString());
+                        robotAlarmMap.put("robotCode",xmlBaseModel.getSendCode());
+                        robotAlarmMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
+                        robotAlarmMap.put("content",xmlBaseModel.getItems().get(0).get(redisValue).toString());
+
+                        //Start alarmResultDealThread
+                        AlarmResultDealThread alarmResultDealThread = new AlarmResultDealThread(robotAlarmMap,isThreadStart,this);
+                        TaskExecutePool.getInstance().execute(alarmResultDealThread);
+
+                        String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
+                        send(ctx, alarmProtocol,xmlBaseModel.getSendCode());
+                        log.info("巡视主机给机器人响应了");
+
+
+                        //xmlBaseModel.setType("62");
+                        robotService.upToCruise(xmlBaseModel);//国网要求
+
+                        break;
+                    //微气象数据(接收并发送响应)
+                    case "21":
+                        log.info("+++++++++++++++++巡视主机收到微气象数据了+++++++++++++++++");
+                        //Deal with robot micro climate data
+                        List<Map<String,String>> weatherList = new ArrayList<>();
+                        Map<String,String> info = new HashMap<>();
+                        DecimalFormat decimalFormat = new DecimalFormat("#0.0");
+                        xmlBaseModel.getItems().forEach(res-> {
+                            Map<String, String> weatherMap = new HashMap<>();
+                            weatherMap.put("robotName", res.get("robot_name").toString());
+                            weatherMap.put("robotCode", xmlBaseModel.getSendCode());
+                            weatherMap.put("time", res.get("time").toString());
+                            weatherMap.put("type", res.get("type").toString());
+                            weatherMap.put("value", res.get("value").toString());
+                            weatherMap.put("valueUnit", res.get("value_unit").toString());
+                            weatherMap.put("unit", res.get("unit").toString());
+                            weatherList.add(weatherMap);
+                            //1=温度 2=湿度 3=风速 4=大气压  5=降雨量 6=风向
+                            if("1".equals(weatherMap.get("type"))){
+                                info.put("temperature",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                                info.put("temperatureUnit","℃");
+                            }
+                            if("2".equals(weatherMap.get("type"))){
+                                info.put("humidity",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                                info.put("humidityUnit","%");
+                            }
+                            if("3".equals(weatherMap.get("type"))){
+                                info.put("windSpeed",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                                info.put("windSpeedUnit","m/s");
+                            }
+                            if("4".equals(weatherMap.get("type"))){
+                                info.put("airPressure",decimalFormat.format(Double.valueOf(weatherMap.get("value"))/10).toString());
+                                info.put("airPressureUnit","kPa");
+                            }
+                            if("5".equals(weatherMap.get("type"))){
+                                info.put("precipitation",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                                info.put("precipitationUnit","mm");
+                            }
+                            if("6".equals(weatherMap.get("type"))){
+                                if("".equals(weatherMap.get("value")) || null==weatherMap.get("value")){
+                                    info.put("windDirection","--");
+                                }else {
+                                    info.put("windDirection",weatherMap.get("value").toString());
+                                }
+
+                                //info.put("precipitationUnit","mm");
+                            }
+                        });
+                        //放缓存
+                        for (int i = 0; i < weatherList.size(); i++) {
+                            redisTemplate.opsForHash().putAll("RobotWeather:"+xmlBaseModel.getSendCode()+":"+ weatherList.get(i).get("type"), weatherList.get(i));
+                        }
+                        Constant.weatherServer(info,Constant.WEATHER_URL);
+                        String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, weatherXmlString);
+                        send(ctx, weatherProtocol,xmlBaseModel.getSendCode());
+                        log.info("巡视主机给机器人响应了");
+
+                        //robotService.upToCruise(xmlBaseModel);//国网要求
+                        break;
+                    //任务状态数据(接收并发送响应)
+                    case "41":
+                        log.info("+++++++++++++++++巡视主机收到任务状态数据了+++++++++++++++++");
+                        //Deal with robot task status data
+                            Map<String, Object> taskStatusMap = new HashMap<>();
+                            taskStatusMap.put("taskPatrolled_id", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
+                            taskStatusMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
+                            taskStatusMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
+                            taskStatusMap.put("taskState", xmlBaseModel.getItems().get(0).get("task_state").toString());
+                            taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time"));
+                            String startTime =  xmlBaseModel.getItems().get(0).get("start_time").toString();
+                            taskStatusMap.put("startTime", sdf.format(sdf.parse(startTime)));
+                            taskStatusMap.put("taskProgress", xmlBaseModel.getItems().get(0).get("task_progress").toString());
+                            taskStatusMap.put("taskEstimatedTime", xmlBaseModel.getItems().get(0).get("task_estimated_time").toString());
+                            taskStatusMap.put("description", xmlBaseModel.getItems().get(0).get("description").toString());
+
+                            //判断任务是否属于机器人本体任务
+                            Long robotId = robotService.selectIsRobotTask(xmlBaseModel.getItems().get(0).get("task_code").toString());
+                            if (Objects.nonNull(robotId)){
+                                Map<String,String> jasonMap=new HashMap<>();
+                                jasonMap.put("type","newTask");
+                                jasonMap.put("taskId",xmlBaseModel.getItems().get(0).get("task_code").toString());
+                                String json= JSON.toJSONString(jasonMap);
+                                Constant.postUrl(webSocketUrl,json);
+                            }
+
+                        Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode()
+                                +":"+xmlBaseModel.getItems().get(0).get("task_code").toString());
+                        taskStatusMap.put("instanceList",listMap.get("instanceIdList"));
+                        log.info("taskStatusMap=="+taskStatusMap);
+                        redisTemplate.opsForHash().putAll("RobotTaskStatus:"+xmlBaseModel.getSendCode()
+                                +":"+xmlBaseModel.getItems().get(0).get("task_code").toString(), taskStatusMap);
+
+                        String taskStatusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, taskStatusXmlString);
+                        send(ctx, taskStatusProtocol,xmlBaseModel.getSendCode());
+                        log.info("巡视主机给机器人响应了");
+
+                        robotService.upToCruise(xmlBaseModel);//国网要求
+                        break;
+                    //巡视结果
+                    case "61":
+                        log.info("+++++++++++++++++巡视主机收到巡视结果了+++++++++++++++++");
+                        //Deal with robot task result data
+                        Map<String, String> cruiseResultMap = new HashMap<>();
+                        cruiseResultMap.put("robotCode",xmlBaseModel.getSendCode());
+                        cruiseResultMap.put("taskName",xmlBaseModel.getItems().get(0).get("task_name").toString());
+                        cruiseResultMap.put("taskCode",xmlBaseModel.getItems().get(0).get("task_code").toString());
+                        cruiseResultMap.put("deviceName",xmlBaseModel.getItems().get(0).get("device_name").toString());
+                        cruiseResultMap.put("deviceId",xmlBaseModel.getItems().get(0).get("device_id").toString());
+                        cruiseResultMap.put("value",xmlBaseModel.getItems().get(0).get("value").toString());
+                        cruiseResultMap.put("valueUnit",xmlBaseModel.getItems().get(0).get("value_unit").toString());
+                        cruiseResultMap.put("unit",xmlBaseModel.getItems().get(0).get("unit").toString());
+                        cruiseResultMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
+                        cruiseResultMap.put("recognitionType",xmlBaseModel.getItems().get(0).get("recognition_type").toString());
+                        cruiseResultMap.put("fileType",xmlBaseModel.getItems().get(0).get("file_type").toString());
+                        cruiseResultMap.put("rectangle",xmlBaseModel.getItems().get(0).get("rectangle").toString());
+                        cruiseResultMap.put("taskPatrolledId",xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
+                        if (Objects.nonNull(xmlBaseModel.getItems().get(0).get("valid"))){
+                            cruiseResultMap.put("valid",xmlBaseModel.getItems().get(0).get("valid").toString());
+                        }
+                        String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+                        String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+                        //可见光结果、红外fir、音频wav
+                        String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                        String sArray[] = ftpFilePath.split("/");
+                        String ftpFileName = sArray[sArray.length - 1];
+                        String temporaryFilePath = filePathMap.get(redisValue) + "/" +ftpFilePath;
+                        log.info("temporaryFilePath==="+temporaryFilePath);
+
+                        //红外原图
+                        if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")){
+                            String ftpInfraredOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();//红外原图
+                            String sArray2[] = ftpInfraredOriginPath.split("/");
+                            String ftpInfraredOriginName = sArray2[sArray2.length - 1];//红外原图名称
+                            String temporaryInfraredOriginPath = filePathMap.get(redisValue) + "/" +ftpInfraredOriginPath;
+                            copyFileToDevelop(temporaryInfraredOriginPath,developAbsoluteUrl + "InfraredOrigin");//拷贝原图
+                            cruiseResultMap.put("absolutePath",developAbsoluteUrl + "InfraredOrigin" + "/" + ftpInfraredOriginName);
+                        }
+                        String ftpOriginPath = null;
+                        //可见光原图、音频和红外结果
+                        if (xmlBaseModel.getItems().get(0).containsKey("origin_file_result_path")){
+                            ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_result_path").toString();//可见光原图、红外结果
+                        }else {
+                            ftpOriginPath = xmlBaseModel.getItems().get(0).get("file_path").toString();//可见光原图、音频
+                        }
+                        String sArray2[] = ftpOriginPath.split("/");
+                        String ftpOriginName = sArray2[sArray2.length - 1];//原图文件名称
+                        String temporaryOriginPath = filePathMap.get(redisValue) + "/" +ftpOriginPath;
+                        log.info("temporaryOriginPath==="+temporaryOriginPath);
+
+                        String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
+                        if ("1".equals(fileType)){//红外
+                            copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "Infrared");//拷贝巡视结果图
+                            copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "FIR");//拷贝fir
+                            cruiseResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);
+                            cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" +ftpFileName);
+                        }else if ("2".equals(fileType)){//可见光
+                            copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "CCD");//拷贝巡视结果图
+                            copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "BigImg");//拷贝原图
+                            cruiseResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);
+                            cruiseResultMap.put("absolutePath",developAbsoluteUrl+ "BigImg" + "/"+ ftpOriginName);
+                        }else if ("3".equals(fileType)){//音频
+                            copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "Audio");//拷贝巡视结果图
+                            cruiseResultMap.put("relativePath",developRelativeUrl + "Audio" + "/" +ftpFileName);
+                            cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
+                        }
+                        /*
+                         * 新版的图片处理
+                         * */
+                        /*String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
+                        String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                        String sArray[] = ftpFilePath.split("/");
+                        String ftpFileName = sArray[sArray.length - 1];//巡视结果文件名称
+                        String temporaryFilePath = filePathMap.get(redisValue) + "/" +ftpFilePath;
+
+                        String ftpOriginPath = null;
+                        if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")){
+                            ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();
+                        }else {
+                            ftpOriginPath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                        }
+                        String sArray2[] = ftpOriginPath.split("/");
+                        String ftpOriginName = sArray2[sArray2.length - 1];//原图文件名称
+                        String temporaryOriginPath = filePathMap.get(redisValue) + "/" +ftpOriginPath;
+                        log.info("temporaryOriginPath==="+temporaryOriginPath);
+
+                        if ("1".equals(fileType)){//红外
+                            copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "Infrared");//拷贝原图
+                            copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "FIR");//拷贝巡视结果图
+                            cruiseResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);
+                            cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Infrared" + "/" + ftpOriginName);
+                            cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" +ftpFileName);
+                        }else if ("2".equals(fileType)){//可见光
+                            copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "CCD");//拷贝巡视结果图
+                            copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "BigImg");//拷贝原图
+                            cruiseResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);
+                            cruiseResultMap.put("absolutePath",developAbsoluteUrl+ "BigImg" + "/"+ ftpOriginName);
+                        }else if ("3".equals(fileType)){//音频
+                            copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "Audio");//拷贝巡视结果图
+                            cruiseResultMap.put("relativePath",developRelativeUrl + "Audio" + "/" +ftpFileName);
+                            cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
+                        }*/
+
+                        log.info("机器人巡视结果数据是："+cruiseResultMap);
+
+                        //判断结果是否产生告警,只判断红外和可见光
+                        Map<String, String> cResultMap = new HashMap<>();
+                        cResultMap.put("robotCode",xmlBaseModel.getSendCode());
+                        cResultMap.put("taskCode",xmlBaseModel.getItems().get(0).get("task_code").toString());
+                        cResultMap.put("deviceId",xmlBaseModel.getItems().get(0).get("device_id").toString());
+                        cResultMap.put("value",xmlBaseModel.getItems().get(0).get("value").toString());
+                        if ("1".equals(fileType)){
+                            cResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);//相对路径
+                        }else if ( "2".equals(fileType)){
+                            cResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);//相对路径
+                        }
+                        IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap,redisTemplate,webSocketUrl);
+                        TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
+                        //Start CruiseResultDealThread
+                        CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate,webSocketUrl);
+                        TaskExecutePool.getInstance().execute(cruiseResultDealThread);
+
+                        String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
+                        send(ctx, cruiseResultProtocol,xmlBaseModel.getSendCode());
+                        log.info("巡视主机给机器人响应了");
+
+                    {
+                        //巡视点结果上报站端
+                        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("Robot_SPAndIN_Info:"+xmlBaseModel.getSendCode()+":"+xmlBaseModel.getCode());
+                        String instanceId = redisInfoMap.get("instanceId");
+                        Map<String,String> mapForGet = redisTemplate.opsForHash().entries("t_cruise_task_result:"+xmlBaseModel.getCode() + ":" + instanceId);
+                        xmlBaseModel.getItems().get(0).put("material_id",mapForGet.get("realCode"));
+                        xmlBaseModel.getItems().get(0).put("data_type",mapForGet.get("0x02"));
+                        xmlBaseModel.getItems().get(0).put("patroldevice_code",instanceId);
+                        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+    //                    xmlBaseModel.getItems().get(0).put("taskPatrolledId",mapForGet.get("taskId")+"_"+simpleDateFormat2.format(mapForGet.get("cruiseTime")));
+                        xmlBaseModel.getItems().get(0).remove("robot_code");
+                        List<XMLBaseModel> list = new ArrayList<>();
+                        list.add(xmlBaseModel);
+                        Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+                        cruiseResult.put("list",list);
+                        log.info("信息上报：-"+cruiseResult);
+                        //Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                     }
-                    Constant.weatherServer(info,Constant.WEATHER_URL);
-                    String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                    byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, weatherXmlString);
-                    send(ctx, weatherProtocol,xmlBaseModel.getSendCode());
-                    log.info("巡视主机给机器人响应了");
-
-                    //robotService.upToCruise(xmlBaseModel);//国网要求
-                    break;
-                //任务状态数据(接收并发送响应)
-                case "41":
-                    log.info("+++++++++++++++++巡视主机收到任务状态数据了+++++++++++++++++");
-                    //Deal with robot task status data
-                        Map<String, Object> taskStatusMap = new HashMap<>();
-                        taskStatusMap.put("taskPatrolled_id", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
-                        taskStatusMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
-                        taskStatusMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
-                        taskStatusMap.put("taskState", xmlBaseModel.getItems().get(0).get("task_state").toString());
-                        taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time"));
-                        String startTime =  xmlBaseModel.getItems().get(0).get("start_time").toString();
-                        taskStatusMap.put("startTime", sdf.format(sdf.parse(startTime)));
-                        taskStatusMap.put("taskProgress", xmlBaseModel.getItems().get(0).get("task_progress").toString());
-                        taskStatusMap.put("taskEstimatedTime", xmlBaseModel.getItems().get(0).get("task_estimated_time").toString());
-                        taskStatusMap.put("description", xmlBaseModel.getItems().get(0).get("description").toString());
-
-                        //判断任务是否属于机器人本体任务
-                        Long robotId = robotService.selectIsRobotTask(xmlBaseModel.getItems().get(0).get("task_code").toString());
-                        if (Objects.nonNull(robotId)){
-                            Map<String,String> jasonMap=new HashMap<>();
-                            jasonMap.put("type","newTask");
-                            jasonMap.put("taskId",xmlBaseModel.getItems().get(0).get("task_code").toString());
-                            String json= JSON.toJSONString(jasonMap);
-                            Constant.postUrl(webSocketUrl,json);
-                        }
-
-                    Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode()
-                            +":"+xmlBaseModel.getItems().get(0).get("task_code").toString());
-                    taskStatusMap.put("instanceList",listMap.get("instanceIdList"));
-                    redisTemplate.opsForHash().putAll("RobotTaskStatus:"+xmlBaseModel.getSendCode()
-                            +":"+xmlBaseModel.getItems().get(0).get("task_code").toString(), taskStatusMap);
-
-                    String taskStatusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                    byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, taskStatusXmlString);
-                    send(ctx, taskStatusProtocol,xmlBaseModel.getSendCode());
-                    log.info("巡视主机给机器人响应了");
 
                     robotService.upToCruise(xmlBaseModel);//国网要求
-                    break;
-                //巡视结果
-                case "61":
-                    log.info("+++++++++++++++++巡视主机收到巡视结果了+++++++++++++++++");
-                    //Deal with robot task result data
-                    Map<String, String> cruiseResultMap = new HashMap<>();
-                    cruiseResultMap.put("robotCode",xmlBaseModel.getSendCode());
-                    cruiseResultMap.put("taskName",xmlBaseModel.getItems().get(0).get("task_name").toString());
-                    cruiseResultMap.put("taskCode",xmlBaseModel.getItems().get(0).get("task_code").toString());
-                    cruiseResultMap.put("deviceName",xmlBaseModel.getItems().get(0).get("device_name").toString());
-                    cruiseResultMap.put("deviceId",xmlBaseModel.getItems().get(0).get("device_id").toString());
-                    cruiseResultMap.put("value",xmlBaseModel.getItems().get(0).get("value").toString());
-                    cruiseResultMap.put("valueUnit",xmlBaseModel.getItems().get(0).get("value_unit").toString());
-                    cruiseResultMap.put("unit",xmlBaseModel.getItems().get(0).get("unit").toString());
-                    cruiseResultMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
-                    cruiseResultMap.put("recognitionType",xmlBaseModel.getItems().get(0).get("recognition_type").toString());
-                    cruiseResultMap.put("fileType",xmlBaseModel.getItems().get(0).get("file_type").toString());
-                    cruiseResultMap.put("rectangle",xmlBaseModel.getItems().get(0).get("rectangle").toString());
-                    cruiseResultMap.put("taskPatrolledId",xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
-                    cruiseResultMap.put("valid",xmlBaseModel.getItems().get(0).get("valid").toString());
-                    String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
-                    String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
-                    //可见光结果、红外fir、音频wav
-                    String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
-                    String sArray[] = ftpFilePath.split("/");
-                    String ftpFileName = sArray[sArray.length - 1];
-                    String temporaryFilePath = filePathMap.get(redisValue) + "/" +ftpFilePath;
-                    log.info("temporaryFilePath==="+temporaryFilePath);
-
-                    //红外原图
-                    if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")){
-                        String ftpInfraredOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();//红外原图
-                        String sArray2[] = ftpInfraredOriginPath.split("/");
-                        String ftpInfraredOriginName = sArray2[sArray2.length - 1];//红外原图名称
-                        String temporaryInfraredOriginPath = filePathMap.get(redisValue) + "/" +ftpInfraredOriginPath;
-                        copyFileToDevelop(temporaryInfraredOriginPath,developAbsoluteUrl + "InfraredOrigin");//拷贝原图
-                        cruiseResultMap.put("absolutePath",developAbsoluteUrl + "InfraredOrigin" + "/" + ftpInfraredOriginName);
-                    }
-                    String ftpOriginPath = null;
-                    //可见光原图、音频和红外结果
-                    if (xmlBaseModel.getItems().get(0).containsKey("origin_file_result_path")){
-                        ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_result_path").toString();//可见光原图、红外结果
-                    }else {
-                        ftpOriginPath = xmlBaseModel.getItems().get(0).get("file_path").toString();//可见光原图、音频
-                    }
-                    String sArray2[] = ftpOriginPath.split("/");
-                    String ftpOriginName = sArray2[sArray2.length - 1];//原图文件名称
-                    String temporaryOriginPath = filePathMap.get(redisValue) + "/" +ftpOriginPath;
-                    log.info("temporaryOriginPath==="+temporaryOriginPath);
-
-                    String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
-                    if ("1".equals(fileType)){//红外
-                        copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "Infrared");//拷贝巡视结果图
-                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "FIR");//拷贝fir
-                        cruiseResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);
-                        cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" +ftpFileName);
-                    }else if ("2".equals(fileType)){//可见光
-                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "CCD");//拷贝巡视结果图
-                        copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "BigImg");//拷贝原图
-                        cruiseResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);
-                        cruiseResultMap.put("absolutePath",developAbsoluteUrl+ "BigImg" + "/"+ ftpOriginName);
-                    }else if ("3".equals(fileType)){//音频
-                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "Audio");//拷贝巡视结果图
-                        cruiseResultMap.put("relativePath",developRelativeUrl + "Audio" + "/" +ftpFileName);
-                        cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
-                    }
-                    /*
-                     * 新版的图片处理
-                     * */
-                    /*String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
-                    String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
-                    String sArray[] = ftpFilePath.split("/");
-                    String ftpFileName = sArray[sArray.length - 1];//巡视结果文件名称
-                    String temporaryFilePath = filePathMap.get(redisValue) + "/" +ftpFilePath;
-
-                    String ftpOriginPath = null;
-                    if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")){
-                        ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();
-                    }else {
-                        ftpOriginPath = xmlBaseModel.getItems().get(0).get("file_path").toString();
-                    }
-                    String sArray2[] = ftpOriginPath.split("/");
-                    String ftpOriginName = sArray2[sArray2.length - 1];//原图文件名称
-                    String temporaryOriginPath = filePathMap.get(redisValue) + "/" +ftpOriginPath;
-                    log.info("temporaryOriginPath==="+temporaryOriginPath);
-
-                    if ("1".equals(fileType)){//红外
-                        copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "Infrared");//拷贝原图
-                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "FIR");//拷贝巡视结果图
-                        cruiseResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);
-                        cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Infrared" + "/" + ftpOriginName);
-                        cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" +ftpFileName);
-                    }else if ("2".equals(fileType)){//可见光
-                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "CCD");//拷贝巡视结果图
-                        copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "BigImg");//拷贝原图
-                        cruiseResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);
-                        cruiseResultMap.put("absolutePath",developAbsoluteUrl+ "BigImg" + "/"+ ftpOriginName);
-                    }else if ("3".equals(fileType)){//音频
-                        copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "Audio");//拷贝巡视结果图
-                        cruiseResultMap.put("relativePath",developRelativeUrl + "Audio" + "/" +ftpFileName);
-                        cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
-                    }*/
-
-                    log.info("机器人巡视结果数据是："+cruiseResultMap);
-
-                    //判断结果是否产生告警,只判断红外和可见光
-                    Map<String, String> cResultMap = new HashMap<>();
-                    cResultMap.put("robotCode",xmlBaseModel.getSendCode());
-                    cResultMap.put("taskCode",xmlBaseModel.getItems().get(0).get("task_code").toString());
-                    cResultMap.put("deviceId",xmlBaseModel.getItems().get(0).get("device_id").toString());
-                    cResultMap.put("value",xmlBaseModel.getItems().get(0).get("value").toString());
-                    if ("1".equals(fileType)){
-                        cResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);//相对路径
-                    }else if ( "2".equals(fileType)){
-                        cResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);//相对路径
-                    }
-                    IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap,redisTemplate,webSocketUrl);
-                    TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
-                    //Start CruiseResultDealThread
-                    CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate,webSocketUrl);
-                    TaskExecutePool.getInstance().execute(cruiseResultDealThread);
-
-                    String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                    byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
-                    send(ctx, cruiseResultProtocol,xmlBaseModel.getSendCode());
-                    log.info("巡视主机给机器人响应了");
-
-                {
-                    //巡视点结果上报站端
-                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("Robot_SPAndIN_Info:"+xmlBaseModel.getSendCode()+":"+xmlBaseModel.getCode());
-                    String instanceId = redisInfoMap.get("instanceId");
-                    Map<String,String> mapForGet = redisTemplate.opsForHash().entries("t_cruise_task_result:"+xmlBaseModel.getCode() + ":" + instanceId);
-                    xmlBaseModel.getItems().get(0).put("material_id",mapForGet.get("realCode"));
-                    xmlBaseModel.getItems().get(0).put("data_type",mapForGet.get("0x02"));
-                    xmlBaseModel.getItems().get(0).put("patroldevice_code",instanceId);
-                    SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-//                    xmlBaseModel.getItems().get(0).put("taskPatrolledId",mapForGet.get("taskId")+"_"+simpleDateFormat2.format(mapForGet.get("cruiseTime")));
-                    xmlBaseModel.getItems().get(0).remove("robot_code");
-                    List<XMLBaseModel> list = new ArrayList<>();
-                    list.add(xmlBaseModel);
-                    Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
-                    cruiseResult.put("list",list);
-                    log.info("信息上报：-"+cruiseResult);
-                    //Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+                        break;
+                    case "71":
+                        log.info("巡视主机收到机器人站端的任务了");
+                        //Deal with robot task data
+                        String taskFile = xmlBaseModel.getItems().get(0).get("task_file_path").toString();
+                        XMLBaseModel taskModel = getXmlMessage(filePathMap.get(redisValue) + "/" +taskFile);
+                        List<Map<String,Object>> taskModelMapList = taskModel.getItems();
+                        log.info("taskModelItemsMap是："+taskModelMapList);
+                        robotService.robotTaskIntoDB(taskModelMapList,xmlBaseModel);
+                        break;
+                    default:
+                        break;
                 }
-
-                robotService.upToCruise(xmlBaseModel);//国网要求
-                    break;
-                case "71":
-                    log.info("巡视主机收到机器人站端的任务了");
-                    //Deal with robot task data
-                    String taskFile = xmlBaseModel.getItems().get(0).get("task_file_path").toString();
-                    XMLBaseModel taskModel = getXmlMessage(filePathMap.get(redisValue) + "/" +taskFile);
-                    List<Map<String,Object>> taskModelMapList = taskModel.getItems();
-                    log.info("taskModelItemsMap是："+taskModelMapList);
-                    robotService.robotTaskIntoDB(taskModelMapList,xmlBaseModel);
-                    break;
-                default:
-                    break;
-
             }
+        }catch (Exception e){
+            log.error("处理机器人响应消息错误:"+e.getMessage());
+            String taskStatusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(false,xmlBaseModel.getSendCode()));
+            byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, taskStatusXmlString);
+            send(ctx, taskStatusProtocol,xmlBaseModel.getSendCode());
+            log.info("巡视主机给机器人响应了");
         }
     }
     /*

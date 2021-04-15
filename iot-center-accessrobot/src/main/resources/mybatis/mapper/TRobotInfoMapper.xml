@@ -992,7 +992,8 @@
     </select>
     <update id="updateIsWarn" parameterType="java.lang.String">
         UPDATE t_cruise_data_result a <set>
-        a.is_warn = 1
+        a.is_warn = 1,
+        a.cruise_result  = 247
     </set>
         WHERE
         a.cruise_result_id = #{cruiseResultId, jdbcType=VARCHAR}
