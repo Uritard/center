@@ -25,10 +25,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -146,5 +143,14 @@ public class Constant {
     public static ConcurrentHashMap<String,Integer> taskStateMap=new ConcurrentHashMap<>();
 
     public static Map<String,Boolean> voiceDeviceState = new HashMap<>();
-
+    /**
+     * 用户角色
+     */
+    public static final Map<String, String> YHJS = new HashMap<String, String>() {
+        {
+            put("1234", "管理员");
+            put("1235", "业务员");
+            put("1236", "审计员");
+        }
+    };
 }

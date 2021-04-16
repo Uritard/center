@@ -58,9 +58,9 @@ public class SysUserService {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Transactional(rollbackFor = Exception.class)
-    public int insert(SysUser sysUser,HttpServletRequest request) throws IOException {
+    public int insert(SysUser sysUser, HttpServletRequest request) throws IOException {
         Long userIds = Long.valueOf(request.getHeader("userId"));
-        String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
+        String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userIds, "userName"));
         Map map = new LinkedHashMap<>();
         Date date = new Date();
         sysUser.setCreateTime(date);
@@ -83,17 +83,17 @@ public class SysUserService {
         params.set("requestOrigin", request.getRequestURL());
         params.set("requestPath", request.getRequestURI());
         params.set("requestMethod", request.getMethod());
-        params.set("content", userName+"用户新增了"+sysUser.getUserName()+"用户");
+        params.set("content", userName + "用户新增了" + sysUser.getUserName() + "用户");
         LogsAspect logsAspect = new LogsAspect();
         logsAspect.post(params);
         return total;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(Long userId,HttpServletRequest request) {
+    public int deleteByPrimaryId(Long userId, HttpServletRequest request) {
         Long userIds = Long.valueOf(request.getHeader("userId"));
-        String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
-        String userNames=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
+        String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userIds, "userName"));
+        String userNames = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
         redisTemplate.delete("userInfo:" + userId);
         this.SysUserBackUpDao.deleteByPrimaryId(userId);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
@@ -106,24 +106,30 @@ public class SysUserService {
         params.set("requestOrigin", request.getRequestURL());
         params.set("requestPath", request.getRequestURI());
         params.set("requestMethod", request.getMethod());
-        params.set("content", userName+"用户删除了"+userNames+"用户");
+        params.set("content", userName + "用户删除了" + userNames + "用户");
         LogsAspect logsAspect = new LogsAspect();
         logsAspect.post(params);
         return this.sysUserDao.deleteByPrimaryId(userId);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int update(SysUser sysUser,HttpServletRequest request) throws IOException {
+    public int update(SysUser sysUser, HttpServletRequest request) throws IOException {
         Long userId = Long.valueOf(request.getHeader("userId"));
-        String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
+        String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(sysUser.getUserId());
+        StringBuilder sb = new StringBuilder();
         Long roleId = sysUser.getRoleId();
         if (roleId != null) {
             redisTemplate.opsForHash().put("userInfo:" + sysUser.getUserId(), "roleId", String.valueOf(sysUser.getRoleId()));
         }
-        if(sysUserCurrent.getInvalidTime()!=sysUser.getInvalidTime()){
+        if (sysUserCurrent.getInvalidTime() != sysUser.getInvalidTime()) {
             Date date = new Date();
             sysUser.setUpdateTime(date);
+        }
+        if (roleId != sysUserCurrent.getRoleId()) {
+            sb.append(userName + "用户修改了" + sysUserCurrent.getUserName() + "用户信息(" + Constant.YHJS.get(String.valueOf(roleId)) + "修改为" + Constant.YHJS.get(String.valueOf(sysUserCurrent.getRoleId())) + ")");
+        } else {
+            sb.append(userName + "用户修改了" + sysUserCurrent.getUserName() + "用户信息");
         }
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.set("logType", "3");
@@ -135,7 +141,7 @@ public class SysUserService {
         params.set("requestOrigin", request.getRequestURL());
         params.set("requestPath", request.getRequestURI());
         params.set("requestMethod", request.getMethod());
-        params.set("content", userName+"用户修改了"+sysUserCurrent.getUserName()+"用户信息");
+        params.set("content", sb.toString());
         LogsAspect logsAspect = new LogsAspect();
         logsAspect.post(params);
         return this.sysUserDao.update(sysUser);
@@ -146,11 +152,11 @@ public class SysUserService {
     public Map<String, Object> userLogin(HttpServletRequest request, Map<String, String> userMap) throws ParseException, IOException {
         Map<String, Object> mapResult = new HashMap<>();
         String number = (String) redisTemplate.opsForValue().get("number");
-        String replayAvoid=userMap.get("replayAvoid");
+        String replayAvoid = userMap.get("replayAvoid");
         redisTemplate.delete("number");
-        if(!number.equals(replayAvoid)){
+        if (!number.equals(replayAvoid)) {
             throw new BusinessException(500, "验证码错误");
-        }else {
+        } else {
             if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("pCode"))) {
                 String userName = null;
                 String password = null;
@@ -271,10 +277,10 @@ public class SysUserService {
                                 param.set("requestOrigin", request.getRequestURL());
                                 param.set("requestPath", request.getRequestURI());
                                 param.set("requestMethod", request.getMethod());
-                                param.set("content", userName+"账户密码超期登录失败，请联系管理员处理！");
+                                param.set("content", userName + "账户密码超期登录失败，请联系管理员处理！");
                                 LogsAspect logsAspects = new LogsAspect();
                                 logsAspects.post(param);
-                                param= new LinkedMultiValueMap<>();
+                                param = new LinkedMultiValueMap<>();
                                 param.set("logType", "6");
                                 param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                                 param.set("title", "登录");
@@ -289,7 +295,7 @@ public class SysUserService {
                                 mapResult.put("errorCount", "密码超期登录失败，请联系管理员处理！");
                                 mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
                                 mapResult.put("info", ResultCodeEnum.CODE10108.getName());
-                                mapResult.put("userId",sysUserLogin.getUserId());
+                                mapResult.put("userId", sysUserLogin.getUserId());
                                 return mapResult;
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -367,10 +373,10 @@ public class SysUserService {
                             param.set("requestOrigin", request.getRequestURL());
                             param.set("requestPath", request.getRequestURI());
                             param.set("requestMethod", request.getMethod());
-                            param.set("content",userName+ "账户密码超期登录失败，请联系管理员处理！");
+                            param.set("content", userName + "账户密码超期登录失败，请联系管理员处理！");
                             LogsAspect logsAspects = new LogsAspect();
                             logsAspects.post(param);
-                            param= new LinkedMultiValueMap<>();
+                            param = new LinkedMultiValueMap<>();
                             param.set("logType", "6");
                             param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                             param.set("title", "登录");
@@ -385,7 +391,7 @@ public class SysUserService {
                             mapResult.put("errorCount", "密码超期登录失败，请联系管理员处理！");
                             mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
                             mapResult.put("info", ResultCodeEnum.CODE10108.getName());
-                            mapResult.put("userId",sysUserLogin.getUserId());
+                            mapResult.put("userId", sysUserLogin.getUserId());
                             return mapResult;
                         }
                         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -466,10 +472,10 @@ public class SysUserService {
                         param.set("requestOrigin", request.getRequestURL());
                         param.set("requestPath", request.getRequestURI());
                         param.set("requestMethod", request.getMethod());
-                        param.set("content",userName+ "账户已被锁定！");
+                        param.set("content", userName + "账户已被锁定！");
                         LogsAspect logsAspects = new LogsAspect();
                         logsAspects.post(param);
-                        param= new LinkedMultiValueMap<>();
+                        param = new LinkedMultiValueMap<>();
                         param.set("logType", "6");
                         param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                         param.set("title", "登录");
@@ -504,10 +510,10 @@ public class SysUserService {
                         param.set("requestOrigin", request.getRequestURL());
                         param.set("requestPath", request.getRequestURI());
                         param.set("requestMethod", request.getMethod());
-                        param.set("content", userName+"账户已被锁定！");
+                        param.set("content", userName + "账户已被锁定！");
                         LogsAspect logsAspects = new LogsAspect();
                         logsAspects.post(param);
-                        param= new LinkedMultiValueMap<>();
+                        param = new LinkedMultiValueMap<>();
                         param.set("logType", "6");
                         param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
                         param.set("title", "登录");
@@ -642,7 +648,7 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int userLogoutGateWay(String userId, String token,String ip,String userName) {
+    public int userLogoutGateWay(String userId, String token, String ip, String userName) {
         SysUser sysUserParams = new SysUser();
         sysUserParams.setLastLogin(new Date());
         long userIdLong = Long.valueOf(userId);
@@ -656,15 +662,14 @@ public class SysUserService {
         params.set("state", 2);
         params.set("userId", userId);
         params.set("userName", userName);
-        params.set("requestOrigin","");
+        params.set("requestOrigin", "");
         params.set("requestPath", "");
-        params.set("requestMethod","");
+        params.set("requestMethod", "");
         params.set("content", "用户登出");
         LogsAspect logsAspect = new LogsAspect();
         logsAspect.post(params);
         return this.sysUserDao.update(sysUserParams);
     }
-
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -675,10 +680,10 @@ public class SysUserService {
         String isDecode = maps.get("content");
         if ("true".equals(isDecode)) {
             sysUserLocked.setUserId(Long.valueOf(Demo.decrypt(map.get("lockedUserId"))));
-            redisTemplate.delete("account_lock_time:"+Long.valueOf(Demo.decrypt(map.get("lockedUserId"))));
+            redisTemplate.delete("account_lock_time:" + Long.valueOf(Demo.decrypt(map.get("lockedUserId"))));
         } else {
             sysUserLocked.setUserId(Long.valueOf(map.get("lockedUserId")));
-            redisTemplate.delete("account_lock_time:"+Long.valueOf(map.get("lockedUserId")));
+            redisTemplate.delete("account_lock_time:" + Long.valueOf(map.get("lockedUserId")));
         }
         Date date = new Date();
         sysUserLocked.setUpdateTime(date);
@@ -686,7 +691,7 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int changePassword(Long userId, Map<String, String> map, String userName,HttpServletRequest request) throws IOException {
+    public int changePassword(Long userId, Map<String, String> map, String userName, HttpServletRequest request) throws IOException {
         Map linkedHashMap = new LinkedHashMap<>();
         linkedHashMap.put("userName", userName);
         SysUser sysUser = new SysUser();
