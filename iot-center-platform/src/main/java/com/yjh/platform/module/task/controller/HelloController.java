@@ -220,7 +220,7 @@ public class HelloController {
     @ApiOperation("说hello")
     @PostMapping("/admin")
     @ResponseBody
-    public Result sayHello(@RequestParam(value = "filePath") String filePath, @RequestParam String testString) {
+    public Result sayHello(@RequestParam(value = "filePath") String filePath, @RequestParam String formerString,@RequestParam String latterString) {
         Result result = new Result();
         ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
         tStdMetemodelDetailDao.selectForDictNote(resultHandler);
@@ -229,16 +229,15 @@ public class HelloController {
         result.setData(map);
         Long beginTime=System.currentTimeMillis();
 
-
-        log.info("length:---"+testString.length());
-
+//        if("0".equals(filePath)){
+//            redisTemplate.opsForList().rightPush("VQD-Test",formerString);
+//        }else {
+//            result.setData(redisTemplate.opsForList().index("VQD-Test",0).toString().concat(latterString));
+//            redisTemplate.opsForList().leftPop("VQD-Test");
+//        }
 
         return result;
     }
-
-
-
-
     @Autowired
     TCruiseResultDao tCruiseResultDao;
     @Autowired

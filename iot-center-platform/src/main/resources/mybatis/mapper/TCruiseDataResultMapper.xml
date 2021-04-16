@@ -474,7 +474,8 @@
         LEFT JOIN t_dict_business z ON f.cruise_result=z.dict_code AND z.col_name="cruise_result"
         LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
         LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name="meter_type"
-        WHERE 1 = 1
+        WHERE
+        f.result_num IS NOT NULL
         <if test="deviceMeteId != null">and a.device_mete_id= #{deviceMeteId,jdbcType=BIGINT}</if>
         <if test="startTime != null and startTime != '' " ><if test="endTime != null and endTime !=''">and e.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
         <if test="cType != -1 ">and g.c_type = #{cType, jdbcType=INTEGER}</if>
@@ -617,7 +618,8 @@
         LEFT JOIN t_dict_business i ON g.c_type = i.dict_code AND i.col_name = "plan_type"
         LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
         LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name="meter_type"
-        WHERE 1 = 1
+        WHERE
+        f.result_num IS NOT NULL
         <if test="deviceMeteId != null " > and a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}</if>
         <if test="startTime != null and startTime != '' " ><if test="endTime != null and endTime != ''">and e.cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
         <if test="cruiseType != -1 " >and b.cruise_type=#{cruiseType,jdbcType=INTEGER}</if>

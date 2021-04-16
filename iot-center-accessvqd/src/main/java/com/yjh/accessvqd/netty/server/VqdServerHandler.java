@@ -148,14 +148,34 @@ public class VqdServerHandler extends ChannelInboundHandlerAdapter {
 
     public String unpacking(String msg){
         String finalMsg=null;
-        if(msg.contains("</snapshotURL>") && msg.contains("</ChanResult>") && msg.length()<200){  //拆小包
-            String aPacket=redisTemplate.opsForHash().get("videoQualityDiagnoseResult","A-packet").toString();
-            redisTemplate.delete("videoQualityDiagnoseResult");
-            finalMsg=aPacket.concat(msg);
+        if(msg.contains("</snapshotURL>") && msg.contains("</ChanResult>") && msg.length()<200){
+            //拆小包
+            if(redisTemplate.opsForList().size("videoQualityDiagnoseResult-A") !=0) {  //大包在小包前
+                try {
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.error("大包在小包前-拆包失败："+e);
+                }
+                finalMsg = redisTemplate.opsForList().index("videoQualityDiagnoseResult-A", 0).toString().concat(msg);
+                redisTemplate.opsForList().leftPop("videoQualityDiagnoseResult-A");
+            }else {                                                                       //小包在大包前
+                redisTemplate.opsForList().rightPush("videoQualityDiagnoseResult-B",msg);
+            }
         }else if(msg.contains("xml") && msg.contains("</ChanResult>")){  //整包
             return msg;
-        } else {                 //拆大包
-            redisTemplate.opsForHash().put("videoQualityDiagnoseResult","A-packet",msg);
+        } else {
+            //拆大包
+            if(redisTemplate.opsForList().size("videoQualityDiagnoseResult-B") !=0){
+                try {
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.error("小包在大包前-拆包失败："+e);
+                }//小包在大包前
+                finalMsg=msg.concat(redisTemplate.opsForList().index("videoQualityDiagnoseResult-B",0).toString());
+                redisTemplate.opsForList().leftPop("videoQualityDiagnoseResult-B");
+            }else {                                                                          //大包在小包前
+                redisTemplate.opsForList().rightPush("videoQualityDiagnoseResult-A",msg);
+            }
         }
 
         return finalMsg;
