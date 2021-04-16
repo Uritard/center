@@ -129,41 +129,41 @@ public class SysLogController {
                     }
 
                 }
-                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogResult");
-                if (mapForParam != null && mapForParam.size() > 0) {
-                    String noLogResult = mapForParam.get("content");//日志结果  成功
-                    if (noLogResult != null) {
-                        //1：成功 2：失败
-                        if ("成功".equals(noLogResult)) {
-                            if (state == 1) {
-                                result.setData("此条日志无需入库，原因：日志结果");
-                                return result;
-                            }
-                        }
-                        if ("失败".equals(noLogResult)) {
-                            if (state == 2) {
-                                result.setData("此条日志无需入库，原因：日志结果");
-                                return result;
-                            }
-                        }
-                    }
-                }
-                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogTitle");
-                if (mapForParam != null && mapForParam.size() > 0) {
-                    String noLogTitle = mapForParam.get("content");//日志标题  多个标题以，隔开  用户登录，用户登出
-                    if (noLogTitle != null) {
-                        //精确匹配
-                        String[] resultList = noLogTitle.split("-");
-                        if (resultList.length > 0) {
-                            for (String item : resultList) {
-                                if (item.equals(title)) {
-                                    result.setData("此条日志无需入库，原因：日志标题");
-                                    return result;
-                                }
-                            }
-                        }
-                    }
-                }
+//                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogResult");
+//                if (mapForParam != null && mapForParam.size() > 0) {
+//                    String noLogResult = mapForParam.get("content");//日志结果  成功
+//                    if (noLogResult != null) {
+//                        //1：成功 2：失败
+//                        if ("成功".equals(noLogResult)) {
+//                            if (state == 1) {
+//                                result.setData("此条日志无需入库，原因：日志结果");
+//                                return result;
+//                            }
+//                        }
+//                        if ("失败".equals(noLogResult)) {
+//                            if (state == 2) {
+//                                result.setData("此条日志无需入库，原因：日志结果");
+//                                return result;
+//                            }
+//                        }
+//                    }
+//                }
+//                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogTitle");
+//                if (mapForParam != null && mapForParam.size() > 0) {
+//                    String noLogTitle = mapForParam.get("content");//日志标题  多个标题以，隔开  用户登录，用户登出
+//                    if (noLogTitle != null) {
+//                        //精确匹配
+//                        String[] resultList = noLogTitle.split("-");
+//                        if (resultList.length > 0) {
+//                            for (String item : resultList) {
+//                                if (item.equals(title)) {
+//                                    result.setData("此条日志无需入库，原因：日志标题");
+//                                    return result;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
                 mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogType");
                 if (mapForParam != null && mapForParam.size() > 0) {
                     String noLogType = mapForParam.get("content");//日志类型
@@ -181,21 +181,21 @@ public class SysLogController {
                         }
                     }
                 }
-                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogUserIdentity");
-                if (mapForParam != null && mapForParam.size() > 0) {
-                    String noLogUserIdentity = mapForParam.get("content");//用户身份
-                    if (noLogUserIdentity != null) {
-                        String[] userList = noLogUserIdentity.split("-");
-                        if (userList.length > 0) {
-                            for (String item : userList) {
-                                if (item.equals(userName)) {
-                                    result.setData("此条日志无需入库，原因：用户身份");
-                                    return result;
-                                }
-                            }
-                        }
-                    }
-                }
+//                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogUserIdentity");
+//                if (mapForParam != null && mapForParam.size() > 0) {
+//                    String noLogUserIdentity = mapForParam.get("content");//用户身份
+//                    if (noLogUserIdentity != null) {
+//                        String[] userList = noLogUserIdentity.split("-");
+//                        if (userList.length > 0) {
+//                            for (String item : userList) {
+//                                if (item.equals(userName)) {
+//                                    result.setData("此条日志无需入库，原因：用户身份");
+//                                    return result;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
             }
             SysLog sysLog = new SysLog();
             sysLog.setLogType(logType);
