@@ -116,6 +116,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         ctx.close().sync();
         ctx.flush();
         log.info("Connection is Removed."+ctx.channel().id());
+        log.info(ctx.channel().remoteAddress()+" Successful remove");
     }
 
     @Override
@@ -149,6 +150,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
             flag2 = 0;
         }
+
+        /*for (Object key : robotServerHandlerMap.keySet()){
+            if (this.equals(robotServerHandlerMap.get(key))){
+                log.info("当前的存在的=="+key);
+            }
+        }*/
         log.info("channel.isActive(): " + channel.isActive());
         log.info("此时的packet====="+Packet);
         Packet = "";
