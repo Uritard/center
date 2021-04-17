@@ -184,97 +184,97 @@ public class TRobotInfoService{
 
                     TRobotInfo tRobotInfo = new TRobotInfo()
                             .setRobotId(robotId);
-                    if (map.containsKey("robotName")) {
+                    if (map.containsKey("robotName") && (!"".equals(map.get("robotName")))) {
                         tRobotInfo.setRobotName(map.get("robotName").toString());
                     }
-                    if (map.containsKey("robotStatus")) {
+                    if (map.containsKey("robotStatus") && (!"".equals(map.get("robotStatus")))) {
                         tRobotInfo.setRobotStatus(map.get("robotStatus").toString());
                     }
-                    if (map.containsKey("robotType")) {
+                    if (map.containsKey("robotType") && (!"".equals(map.get("robotType")))) {
                         Integer robotType = Integer.valueOf(tRobotInfoDao.selectDictCode("robot_type",map.get("robotType").toString()));
                         tRobotInfo.setRobotType(robotType);
                     }
-                    if (map.containsKey("robotIp")) {
+                    if (map.containsKey("robotIp") && (!"".equals(map.get("robotIp")))) {
                         tRobotInfo.setRobotIp(map.get("robotIp").toString());
                     }
-                    if (map.containsKey("robotPort")) {
+                    if (map.containsKey("robotPort") && (!"".equals(map.get("robotPort")))) {
                         tRobotInfo.setRobotPort(Integer.valueOf(map.get("robotPort").toString()));
                     }
-                    if (map.containsKey("lightIp")) {
+                    if (map.containsKey("lightIp") && (!"".equals(map.get("lightIp")))) {
                         tRobotInfo.setLightIp(map.get("lightIp").toString());
                     }
-                    if (map.containsKey("lightPort")) {
+                    if (map.containsKey("lightPort") && (!"".equals(map.get("lightPort")))) {
                         tRobotInfo.setLightPort(map.get("lightPort").toString());
                     }
-                    if (map.containsKey("identityManager")) {
+                    if (map.containsKey("identityManager") && (!"".equals(map.get("identityManager")))) {
                         tRobotInfo.setIdentityManager(map.get("identityManager").toString());
                     }
-                    if (map.containsKey("identityCode")) {
+                    if (map.containsKey("identityCode") && (!"".equals(map.get("identityCode")))) {
                         tRobotInfo.setIdentityCode(map.get("identityCode").toString());
                     }
-                    if (map.containsKey("lnferadIP")) {
+                    if (map.containsKey("lnferadIP") && (!"".equals(map.get("lnferadIP")))) {
                         tRobotInfo.setLnferadIp(map.get("lnferadIP").toString());
                     }
-                    if (map.containsKey("InferadPort")) {
+                    if (map.containsKey("InferadPort") && (!"".equals(map.get("InferadPort")))) {
                         tRobotInfo.setInferadPort(Integer.valueOf(map.get("InferadPort").toString()));
                     }
-                    if (map.containsKey("InferadUsername")) {
+                    if (map.containsKey("InferadUsername") && (!"".equals(map.get("InferadUsername")))) {
                         tRobotInfo.setInferadUsername(map.get("InferadUsername").toString());
                     }
-                    if (map.containsKey("InferadPassword")) {
+                    if (map.containsKey("InferadPassword") && (!"".equals(map.get("InferadPassword")))) {
                         tRobotInfo.setInferadPassword(map.get("InferadPassword").toString());
                     }
-                    if (map.containsKey("photePath")) {
+                    if (map.containsKey("photePath") && (!"".equals(map.get("photePath")))) {
                         tRobotInfo.setPhotePath(map.get("photePath").toString());
                     }
                     tRobotInfo.setUpdateBy(userName);
                     tRobotInfo.setUpdateDate(new Date());
-                    if (map.containsKey("robotFactory")) {
+                    if (map.containsKey("robotFactory") && (!"".equals(map.get("robotFactory")))) {
                         String robotFactory = tRobotInfoDao.selectDictCode("robot_factory",map.get("robotFactory").toString());
                         tRobotInfo.setRobotFactory(robotFactory);
                     }
-                    if (map.containsKey("isUse")) {
+                    if (map.containsKey("isUse") && (!"".equals(map.get("isUse")))) {
                         String isUse = tRobotInfoDao.selectDictCode("robot_use",map.get("isUse").toString());
                         tRobotInfo.setIsUse(isUse);
                     }
-                    if (map.containsKey("commissionDate")) {
+                    if (map.containsKey("commissionDate") && (!"".equals(map.get("commissionDate")))) {
                         tRobotInfo.setCommissionDate(sf.parse(map.get("commissionDate").toString()));
                     }
-                    if (map.containsKey("robotSource")) {
+                    if (map.containsKey("robotSource") && (!"".equals(map.get("robotSource")))) {
                         tRobotInfo.setRobotSource(map.get("robotSource").toString());
                     }
-                    if (map.containsKey("address")) {
+                    if (map.containsKey("address") && (!"".equals(map.get("address")))) {
                         tRobotInfo.setAddress(map.get("address").toString());
                     }
-                    if (map.containsKey("buildingUser")) {
+                    if (map.containsKey("buildingUser") && (!"".equals(map.get("buildingUser")))) {
                         tRobotInfo.setBuildingUser(map.get("buildingUser").toString());
                     }
-                    if (map.containsKey("robotPosition")) {
+                    if (map.containsKey("robotPosition") && (!"".equals(map.get("robotPosition")))) {
                         String robotPosition = tRobotInfoDao.selectDictCode("robot_position",map.get("robotPosition").toString());
                         tRobotInfo.setRobotPosition(robotPosition);
                     }
-                    if (map.containsKey("appearanceNumber")) {
+                    if (map.containsKey("appearanceNumber") && (!"".equals(map.get("appearanceNumber")))) {
                         tRobotInfo.setAppearanceNumber(map.get("appearanceNumber").toString());
                     }
-                    if (map.containsKey("buildingUser")) {
+                    if (map.containsKey("buildingUser") && (!"".equals(map.get("buildingUser")))) {
                         tRobotInfo.setDefectRecord(map.get("buildingUser").toString());
                     }
-                    if (map.containsKey("repairRecord")) {
+                    if (map.containsKey("repairRecord") && (!"".equals(map.get("repairRecord")))) {
                         tRobotInfo.setRepairRecord(map.get("repairRecord").toString());
                     }
-                    if (map.containsKey("exitPutIntoRecord")) {
+                    if (map.containsKey("exitPutIntoRecord") && (!"".equals(map.get("exitPutIntoRecord")))) {
                         tRobotInfo.setExitPutIntoRecord(map.get("exitPutIntoRecord").toString());
                     }
-                    if (map.containsKey("remarks")) {
+                    if (map.containsKey("remarks") && (!"".equals(map.get("remarks")))) {
                         tRobotInfo.setRemarks(map.get("remarks").toString());
                     }
-                    if (map.containsKey("defectRecord")) {
+                    if (map.containsKey("defectRecord") && (!"".equals(map.get("defectRecord")))) {
                         tRobotInfo.setDefectRecord(map.get("defectRecord").toString());
                     }
-                    if (map.containsKey("repairRecord")) {
+                    if (map.containsKey("repairRecord") && (!"".equals(map.get("repairRecord")))) {
                         tRobotInfo.setRepairRecord(map.get("repairRecord").toString());
                     }
-                    if (map.containsKey("exitPutIntoRecord")) {
+                    if (map.containsKey("exitPutIntoRecord") && (!"".equals(map.get("exitPutIntoRecord")))) {
                         tRobotInfo.setExitPutIntoRecord(map.get("exitPutIntoRecord").toString());
                     }
                     log.info("tRobotInfo信息是==="+tRobotInfo);

@@ -57,8 +57,7 @@ public class RobotController {
                                     @RequestParam(value = "value",required = false) String value,
                                     @RequestParam(value = "key",required = false) String key,
                                     @RequestParam(value = "pCode",required = false) String password,
-                                    @RequestParam(value = "direction",required = false) String direction,
-                                    @RequestParam(value = "content",required = false) String content) {
+                                    @RequestParam(value = "direction",required = false) String direction) {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
@@ -67,7 +66,7 @@ public class RobotController {
             if("true".equals(isDecode)) {
                 password= Demo.decrypt(password);
             }
-            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password,request,content));
+            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password,request));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -190,10 +189,12 @@ public class RobotController {
     /*用完就删*/
     @ApiOperation(value = "方法测试")
     @PostMapping(value = "/methodTest")
-    public Result methodTest(@RequestParam(value = "taskId",required = false) String taskId){
+    public Result methodTest(@RequestParam(value = "type") String type,
+                             @RequestParam(value = "command") String command,
+                             @RequestParam(value = "value",required = false) String value){
         Result result = new Result();
         try {
-            result.setData(robotService.methodTest1(taskId));
+            result.setData(robotService.selectContentByCommand(type,command,value));
 //            XMLBaseModel model = getXmlMessage("D:/testform/task_model_E200.xml");
 //            List<Map<String,Object>> modelMapList = model.getItems();
 //            log.info("taskModelItemsMap是："+modelMapList);
