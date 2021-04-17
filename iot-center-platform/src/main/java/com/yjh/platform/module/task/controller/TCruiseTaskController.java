@@ -348,6 +348,12 @@ public class TCruiseTaskController {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1234".equals(userRole)){
+                //权限不够；
+                throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getpCode(),request);
             if(i == 1){
 //                TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();

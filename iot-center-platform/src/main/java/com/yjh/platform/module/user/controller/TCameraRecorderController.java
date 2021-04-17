@@ -46,7 +46,7 @@ public class TCameraRecorderController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增录像服务器信息",content = "根据用户传递的参数新增录像服务器信息",logType = 2)
+    @Logs(title = "新增录像服务器信息",content = "根据用户传递的参数新增录像服务器信息",logType = 2,authority = "1234")
     public Result insert( @Validated @RequestBody TCameraRecorder tCameraRecorder) {
 
         Result result = new Result();
@@ -69,7 +69,7 @@ public class TCameraRecorderController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除录像服务器信息",content = "根据用户传递的参数删除录像服务器信息",logType = 4)
+    @Logs(title = "删除录像服务器信息",content = "根据用户传递的参数删除录像服务器信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "recordId", required = true) Long recordId) {
         Result result = new Result();
         try {
@@ -91,7 +91,7 @@ public class TCameraRecorderController {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/deleteSelectedRecord", method = RequestMethod.DELETE)
-    @Logs(title = "批量删除录像服务器信息",content = "根据用户传递的参数批量删除录像服务器信息",logType = 4)
+    @Logs(title = "批量删除录像服务器信息",content = "根据用户传递的参数批量删除录像服务器信息",logType = 4,authority = "1234")
     public Result deleteSelectedRecord(@RequestParam(value = "recordIds", required = true) String recordIds) {
         Result result = new Result();
         try {
@@ -114,7 +114,7 @@ public class TCameraRecorderController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改录像服务器信息",content = "根据用户传递的参数修改录像服务器信息",logType = 3)
+    @Logs(title = "修改录像服务器信息",content = "根据用户传递的参数修改录像服务器信息",logType = 3,authority = "1234")
     public Result update(@RequestBody TCameraRecorder tCameraRecorder) {
         Result result = new Result();
         try {
@@ -139,7 +139,7 @@ public class TCameraRecorderController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询录像服务器信息",content = "根据用户传递的参数查询录像服务器信息",logType = 1)
+    @Logs(title = "查询录像服务器信息",content = "根据用户传递的参数查询录像服务器信息",logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "recordId", required = true) Long recordId) {
         Result result = new Result();
         try {
@@ -188,7 +188,7 @@ public class TCameraRecorderController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询录像服务器信息",content = "根据用户传递的参数分页查询录像服务器信息",logType = 1)
+    @Logs(title = "查询录像服务器信息",content = "根据用户传递的参数分页查询录像服务器信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "aliasName", required = false) String aliasName,
                                @RequestParam(value = "unit", required = false) String unit,
                                @RequestParam(value = "vendorId", required = false) Integer vendorId,
@@ -212,7 +212,7 @@ public class TCameraRecorderController {
     }
     @ApiOperation(value = "从PMS系统同步录像机信息")
     @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
-    @Logs(title = "从PMS系统同步录像机信息",content = "从pms系统同步录像服务器信息",logType = 5)
+    @Logs(title = "从PMS系统同步录像机信息",content = "从pms系统同步录像服务器信息",logType = 5,authority = "1234")
     public Result synchronizeFromPMS(@RequestParam(value = "pmsId") String pmsId) {
         Result result = new Result();
         try {

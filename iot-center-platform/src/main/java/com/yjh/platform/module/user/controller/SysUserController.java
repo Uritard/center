@@ -67,7 +67,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增系统用户数据", content = "根据用户传递的参数新增系统用户数据", logType = 2)
+    @Logs(title = "新增系统用户数据", content = "根据用户传递的参数新增系统用户数据", logType = 2,authority = "1234")
     public Result insert(@RequestBody SysUser sysUser,HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -230,7 +230,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询系统用户数据", content = "根据用户传递的参数分页查询系统用户信息", logType = 1)
+    @Logs(title = "查询系统用户数据", content = "根据用户传递的参数分页查询系统用户信息", logType = 1,authority = "1234")
     public Result selectByPage(@RequestBody SysUser sysUser
     ) {
         Result result = new Result();

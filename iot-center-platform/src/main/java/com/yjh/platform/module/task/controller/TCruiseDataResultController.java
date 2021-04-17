@@ -282,6 +282,12 @@ public class TCruiseDataResultController {
         Long userIds = Long.valueOf(request.getHeader("userId"));
         String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
         try {
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userIds).get("roleId"));
+            if(!"1234".equals(userRole)){
+                //权限不够；
+                throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             if(pageSize==0){
                 MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                 param.set("logType", "9");
@@ -334,6 +340,9 @@ public class TCruiseDataResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalyzeInfoList);
             result.setData(resultMap);
+        }catch (BusinessException e) {
+            result.setMessage(10008, "用户无权限");
+            //log.error("日志统计失败：" + e);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡视报表失败描述：", e);

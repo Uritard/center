@@ -51,7 +51,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
-    @Logs(title = "新增机器人信息",content = "根据用户传递的参数新增机器人信息",logType = 2)
+    @Logs(title = "新增机器人信息",content = "根据用户传递的参数新增机器人信息",logType = 2,authority = "1234")
     public Result insert(HttpServletRequest request, @Validated @RequestBody  TRobotInfo tRobotInfo) {
 
         Result result = new Result();
@@ -86,7 +86,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/delete")
-    @Logs(title = "删除机器人信息",content = "根据用户传递的参数删除机器人信息",logType = 4)
+    @Logs(title = "删除机器人信息",content = "根据用户传递的参数删除机器人信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "robotId", required = true) Long robotId) {
         Result result = new Result();
         try {
@@ -109,7 +109,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "更新")
     @PutMapping(value = "/update")
-    @Logs(title = "修改机器人信息",content = "根据用户传递的参数修改机器人信息",logType = 3)
+    @Logs(title = "修改机器人信息",content = "根据用户传递的参数修改机器人信息",logType = 3,authority = "1234")
     public Result update(HttpServletRequest request, @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
@@ -133,7 +133,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "主键查询")
     @GetMapping(value = "/selectByPrimaryId")
-    @Logs(title = "查询机器人信息",content = "根据用户传递的参数查询机器人信息",logType = 1)
+    @Logs(title = "查询机器人信息",content = "根据用户传递的参数查询机器人信息",logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "robotId", required = true) Long robotId) {
         Result result = new Result();
         try {
@@ -200,7 +200,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "分页模糊查询")
     @GetMapping(value = "/selectByPage")
-    @Logs(title = "查询机器人信息",content = "根据用户传递的参数分页查询机器人信息",logType = 1)
+    @Logs(title = "查询机器人信息",content = "根据用户传递的参数分页查询机器人信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "robotName", required = false) String robotName,
                                 @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                                @RequestParam(value = "buildingUser", required = false) String buildingUser,
@@ -229,7 +229,7 @@ public class TRobotInfoController {
     }
     @ApiOperation(value = "从PMS系统同步机器人信息")
     @GetMapping(value = "/synchronizeFromPMS")
-    @Logs(title = "从PMS系统同步机器人信息",content = "从pms系统同步机器人信息",logType = 5)
+    @Logs(title = "从PMS系统同步机器人信息",content = "从pms系统同步机器人信息",logType = 5,authority = "1234")
     public Result synchronizeFromPMS(@RequestParam(value = "robotCode") String robotCode,HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -258,7 +258,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "查询所有机器人巡检点信息树")
     @GetMapping(value = "/selectInspectionTree")
-    @Logs(title = "查询所有机器人巡检点信息树",content = "根据用户传递的参数查询机器人巡检点树",logType = 1)
+    @Logs(title = "查询所有机器人巡检点信息树",content = "根据用户传递的参数查询机器人巡检点树",logType = 1,authority = "1234")
     public Result selectInspectionTree() {
         Result result = new Result();
         try {
@@ -295,7 +295,7 @@ public class TRobotInfoController {
     }
     @ApiOperation(value = "从PMS系统同步机器人台账信息2")
     @GetMapping(value = "/synchronizeFromPMS2")
-    @Logs(title = "从PMS系统同步机器人台账信息",content = "从pms系统同步机器人台账信息",logType = 5)
+    @Logs(title = "从PMS系统同步机器人台账信息",content = "从pms系统同步机器人台账信息",logType = 5,authority = "1234")
     public Result synchronizeFromPMS2() {
         Result result = new Result();
         try {

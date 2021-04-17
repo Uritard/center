@@ -78,7 +78,7 @@ public class RobotController {
     }
     @ApiOperation(value = "发送模型同步指令接口")
     @RequestMapping(value = "/fileTransfer", method = RequestMethod.GET)
-    @Logs(title = "模型同步",content = "根据用户传递的参数给机器人发送模型同步指令",logType = 5)
+    @Logs(title = "模型同步",content = "根据用户传递的参数给机器人发送模型同步指令",logType = 5,authority = "1234")
     public Result feignRobotTransfer(@RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {

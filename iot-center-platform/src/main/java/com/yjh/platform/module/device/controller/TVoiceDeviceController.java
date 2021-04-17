@@ -44,7 +44,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增声纹设备数据", content = "根据用户传递的参数新增声纹设备数据", logType = 2)
+    @Logs(title = "新增声纹设备数据", content = "根据用户传递的参数新增声纹设备数据", logType = 2,authority = "1234")
     public Result add(@Validated @RequestBody VoiceDeviceAllInfoDetail tVoiceDevice) {
         Result result = new Result();
         try {
@@ -68,7 +68,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除声纹设备数据", content = "根据用户传递的参数删除声纹设备数据", logType = 4)
+    @Logs(title = "删除声纹设备数据", content = "根据用户传递的参数删除声纹设备数据", logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "voiceDeviceId", required = true) Long voiceDeviceId) {
         Result result = new Result();
         try {
@@ -85,7 +85,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改声纹设备数据", content = "根据用户传递的参数修改声纹设备数据", logType = 3)
+    @Logs(title = "修改声纹设备数据", content = "根据用户传递的参数修改声纹设备数据", logType = 3,authority = "1234")
     public Result update(@RequestBody VoiceDeviceAllInfoDetail tVoiceDevice) {
         Result result = new Result();
         try {
@@ -107,7 +107,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询声纹设备数据", content = "根据用户传递的参数查询声纹设备", logType = 1)
+    @Logs(title = "查询声纹设备数据", content = "根据用户传递的参数查询声纹设备", logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "voiceDeviceId", required = true) Long voiceDeviceId) {
         Result result = new Result();
         try {
@@ -142,7 +142,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询声纹设备数据", content = "根据用户传递的参数分页查询声纹设备", logType = 1)
+    @Logs(title = "查询声纹设备数据", content = "根据用户传递的参数分页查询声纹设备", logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName,
                                @RequestParam(value = "deviceType", required = false) String deviceType,
                                @RequestParam(value = "upRegionId", required = false) Long upRegionId,
@@ -193,7 +193,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "查询音频设备树")
     @RequestMapping(value = "/selectVoiceDeviceTree", method = RequestMethod.GET)
-    @Logs(title = "查询音频设备树", content = "音频设备树查询", logType = 1,authority = "1235")
+    @Logs(title = "查询音频设备树", content = "音频设备树查询", logType = 1)
     public Result selectVoiceDeviceTree(@RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName) {
         Result result = new Result();
         try {
@@ -236,7 +236,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "从PMS系统同步音频设备信息")
     @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
-    @Logs(title = "从PMS系统同步音频设备信息",content = "从pms系统同步音频设备信息",logType = 5)
+    @Logs(title = "从PMS系统同步音频设备信息",content = "从pms系统同步音频设备信息",logType = 5,authority = "1234")
     public Result synchronizeFromPMS(@RequestParam(value = "pmsId",required = false) String pmsId,
                                      @RequestParam(value = "voiceDeviceId",required = false) Long voiceDeviceId) {
         Result result = new Result();
@@ -251,6 +251,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "频率分析")
     @RequestMapping(value = "/frequencyAnalyse", method = RequestMethod.GET)
+    @Logs(title = "频率分析",content = "频率分析",logType = 5,authority = "1235")
     public Result frequencyAnalyse(@RequestParam(value = "frequencyPath") String frequencyPath) {
         Result result = new Result();
         try {

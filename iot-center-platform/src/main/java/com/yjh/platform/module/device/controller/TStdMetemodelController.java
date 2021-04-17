@@ -45,7 +45,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增系统测点模版",content = "根据用户传递的参数新增系统测点模版",logType = 2)
+    @Logs(title = "新增系统测点模版",content = "根据用户传递的参数新增系统测点模版",logType = 2,authority = "1234")
     public Result add(@Validated @RequestBody TStdMeteModel tStdMeteModel) {
         Result result = new Result();
         try {
@@ -61,7 +61,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除系统测点模版",content = "根据用户传递的参数删除系统测点模版",logType = 4)
+    @Logs(title = "删除系统测点模版",content = "根据用户传递的参数删除系统测点模版",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "modelId") Long modelId) {
         Result result = new Result();
         try {
@@ -78,7 +78,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改系统测点模版",content = "根据用户传递的参数修改系统测点模版",logType = 3)
+    @Logs(title = "修改系统测点模版",content = "根据用户传递的参数修改系统测点模版",logType = 3,authority = "1234")
     public Result update(@RequestBody TStdMeteModel tStdMeteModel) {
         Result result = new Result();
         try {
@@ -95,7 +95,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询系统测点模版",content = "根据用户传递的参数查询系统测点模版",logType = 1)
+    @Logs(title = "查询系统测点模版",content = "根据用户传递的参数查询系统测点模版",logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "modelId") Long modelId) {
         Result result = new Result();
         try {
@@ -128,7 +128,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询系统测点模版",content = "根据用户传递的参数分页查询系统测点模版",logType = 1)
+    @Logs(title = "查询系统测点模版",content = "根据用户传递的参数分页查询系统测点模版",logType = 1,authority = "1234")
     public Result selectByPage(@RequestBody TStdMeteModel tStdMeteModel
                               ) {
         Result result = new Result();
@@ -211,7 +211,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "查询设备类型-模板树")
     @RequestMapping(value = "/selectDeviceTypeModelTree",method = RequestMethod.GET)
-    @Logs(title = "查询设备类型-模板树",content = "查询设备类型模板树",logType = 1)
+    @Logs(title = "查询设备类型-模板树",content = "查询设备类型模板树",logType = 1,authority = "1234")
     public Result selectDeviceTypeModelTree(@RequestParam(value = "deviceType",required = false)String deviceType){
         Result result=new Result();
         try{
@@ -264,7 +264,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "修改当前模板信息")
     @RequestMapping(value = "updateModel",method = RequestMethod.PUT)
-    @Logs(title = "修改当前模板信息",content = "根据用户传递的参数修改数据",logType = 3)
+    @Logs(title = "修改当前模板信息",content = "根据用户传递的参数修改数据",logType = 3,authority = "1234")
     public Result updateModel (@RequestBody ModelCreator modelCreator){
         Result result =new Result();
         try {
@@ -284,7 +284,7 @@ public class TStdMetemodelController {
 
     @ApiOperation(value = "下载模板")
     @RequestMapping(value = "download",method = RequestMethod.GET)
-    @Logs(title = "下载模板",content = "下载模板",logType = 9)
+    @Logs(title = "下载模板",content = "下载模板",logType = 9,authority = "1234")
     public Result download () {
         Result result =new Result();
         try {

@@ -61,7 +61,7 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增标准设备测点",content = "根据用户传递的参数新增标准设备测点",logType = 2)
+    @Logs(title = "新增标准设备测点",content = "根据用户传递的参数新增标准设备测点",logType = 2,authority = "1234")
     public Result add(@Validated @RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail, HttpServletRequest request)  {
         Result result = new Result();
         try {
@@ -77,7 +77,7 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除标准设备测点",content = "根据用户传递的参数删除标准设备测点",logType = 4)
+    @Logs(title = "删除标准设备测点",content = "根据用户传递的参数删除标准设备测点",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "deviceMeteId") Long deviceMeteId) {
         Result result = new Result();
         try {
@@ -94,7 +94,7 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改标准设备测点",content = "根据用户传递的参数修改标准设备测点",logType = 3)
+    @Logs(title = "修改标准设备测点",content = "根据用户传递的参数修改标准设备测点",logType = 3,authority = "1234")
     public Result update(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -171,7 +171,7 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询标准设备测点",content = "根据用户传递的参数查询标准设备测点",logType = 1)
+    @Logs(title = "查询标准设备测点",content = "根据用户传递的参数查询标准设备测点",logType = 1,authority = "1234")
     public Result selectByPage(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail
                               ) {
         Result result = new Result();

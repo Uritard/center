@@ -55,7 +55,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
-    @Logs(title = "新增新增预置位信息",content = "根据用户传递的参数新增预置位信息",logType = 2)
+    @Logs(title = "新增新增预置位信息",content = "根据用户传递的参数新增预置位信息",logType = 2,authority = "1234")
     public Result insert( @Validated @RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
@@ -102,7 +102,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/delete")
-    @Logs(title = "删除新增预置位信息",content = "根据用户传递的参数删除预置位信息",logType = 4)
+    @Logs(title = "删除新增预置位信息",content = "根据用户传递的参数删除预置位信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
         try {
@@ -149,7 +149,7 @@ public class TCameraPresetController {
     }
     @ApiOperation(value = "批量删除")
     @DeleteMapping(value = "/deleteSelectedPreset")
-    @Logs(title = "批量删除新增预置位信息",content = "根据用户传递的参数批量删除预置位信息",logType = 4)
+    @Logs(title = "批量删除新增预置位信息",content = "根据用户传递的参数批量删除预置位信息",logType = 4,authority = "1234")
     public Result deleteSelectedPreset(@RequestParam(value = "presetIds") String presetIds) {
         Result result = new Result();
         try {
@@ -187,7 +187,7 @@ public class TCameraPresetController {
     }
     @ApiOperation(value = "更新")
     @PutMapping(value = "/update")
-    @Logs(title = "修改新增预置位信息",content = "根据用户传递的参数修改预置位信息",logType = 3)
+    @Logs(title = "修改新增预置位信息",content = "根据用户传递的参数修改预置位信息",logType = 3,authority = "1234")
     public Result update(@RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
@@ -285,7 +285,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "分页查询")
     @PostMapping(value = "/selectByPage")
-    @Logs(title = "查询预置位信息",content = "根据用户传递的参数分页查询预置位信息",logType = 1)
+    @Logs(title = "查询预置位信息",content = "根据用户传递的参数分页查询预置位信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestBody TCameraPreset tCameraPreset
                                ) {
         Result result = new Result();

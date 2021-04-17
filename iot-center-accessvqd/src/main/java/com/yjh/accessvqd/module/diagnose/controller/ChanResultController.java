@@ -15,9 +15,11 @@ import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import com.yjh.accessvqd.module.diagnose.service.ChanResultService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -32,6 +34,8 @@ public class ChanResultController {
     private Logger log = LoggerFactory.getLogger(ChanResultController.class);
     @Autowired
     private final ChanResultService chanResultService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public ChanResultController(ChanResultService chanResultService) {
         this.chanResultService = chanResultService;
@@ -39,9 +43,18 @@ public class ChanResultController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result insert(@RequestBody ChanResult chanResult) {
+    public Result insert(@RequestBody ChanResult chanResult,
+                         HttpServletRequest request ) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(chanResultService.insert(chanResult));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -54,9 +67,18 @@ public class ChanResultController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    public Result delete(@RequestParam(value = "diagnoseResultId", required = true) Long diagnoseResultId) {
+    public Result delete(@RequestParam(value = "diagnoseResultId", required = true) Long diagnoseResultId,
+                         HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(chanResultService.deleteByPrimaryId(diagnoseResultId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
@@ -70,9 +92,18 @@ public class ChanResultController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody ChanResult chanResult) {
+    public Result update(@RequestBody ChanResult chanResult,
+                         HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(chanResultService.update(chanResult));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -86,9 +117,18 @@ public class ChanResultController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    public Result selectByPrimaryId(@RequestParam(value = "diagnoseResultId", required = true) Long diagnoseResultId) {
+    public Result selectByPrimaryId(@RequestParam(value = "diagnoseResultId", required = true) Long diagnoseResultId,
+                                    HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             ChanResult chanResult = chanResultService.selectByPrimaryId(diagnoseResultId);
             result.setData(chanResult);
         } catch (Exception e) {
@@ -137,11 +177,20 @@ public class ChanResultController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     public Result selectByPage(@RequestBody ChanResult chanResult,
+                               HttpServletRequest request,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
         Result result = new Result();
         Map<String,Object> resultMap = new HashMap<>();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             Page page = PageHelper.startPage(pageNum, pageSize);
             List<ChanResult> list = chanResultService.selectByPage(chanResult);
             resultMap.put("count", page.getTotal());
@@ -156,7 +205,8 @@ public class ChanResultController {
 
     @ApiOperation(value = "批量插入")
     @RequestMapping(value = "/batchInsert", method = RequestMethod.POST)
-    public Result batchInsert(@RequestBody List<ChanResult> list) {
+    public Result batchInsert(@RequestBody List<ChanResult> list,
+                              HttpServletRequest request) {
         Result result = new Result();
         try {
             result.setData(chanResultService.batchInsert(list));
@@ -170,9 +220,17 @@ public class ChanResultController {
 
     @ApiOperation(value = "获取任务信息List")
     @RequestMapping(value = "/findQueryPlan",method = RequestMethod.GET)
-    public Result findQueryPlan(){
+    public Result findQueryPlan(HttpServletRequest request){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(chanResultService.findQueryItems(0));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -183,9 +241,17 @@ public class ChanResultController {
 
     @ApiOperation(value = "获取监测点信息List")
     @RequestMapping(value = "/findQueryChannel",method = RequestMethod.GET)
-    public Result findQueryChannel(){
+    public Result findQueryChannel(HttpServletRequest request){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(chanResultService.findQueryItems(1));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -199,6 +265,7 @@ public class ChanResultController {
     public Result selectDiagnoseResultByPage(@RequestParam(value = "pointId",required = false)String pointId,
                                              @RequestParam(value = "startTime",required = false)String startTime,
                                              @RequestParam(value = "endTime",required = false)String endTime,
+                                             HttpServletRequest request,
                                              @RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId,
                                              @RequestParam(value = "status",required = false)String status,
                                              @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -206,6 +273,14 @@ public class ChanResultController {
         Result result = new Result();
         Map<String,Object> resultMap = new HashMap<>();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             Page page = PageHelper.startPage(pageNum, pageSize);
             SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date startDate=null;
@@ -236,9 +311,18 @@ public class ChanResultController {
     @ApiOperation(value = "故障点数统计")
     @RequestMapping(value = "/faultCount", method = RequestMethod.GET)
     public Result faultCount(@RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId,
-                             @RequestParam(value = "channelId",required = false)String channelId) {
+                             @RequestParam(value = "channelId",required = false)String channelId,
+                             HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(chanResultService.faultCounts(diagnosePlanId, channelId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -251,9 +335,18 @@ public class ChanResultController {
     @ApiOperation(value = "监测点状态点数统计")
     @RequestMapping(value = "/channelStatusCount", method = RequestMethod.GET)
     public Result channelStatusCount(@RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId,
-                                     @RequestParam(value = "channelId",required = false)String channelId) {
+                                     @RequestParam(value = "channelId",required = false)String channelId,
+                                     HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(chanResultService.statusTypeChannel(diagnosePlanId, channelId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -265,9 +358,17 @@ public class ChanResultController {
 
     @ApiOperation(value = "故障信息树")
     @RequestMapping(value = "/faultInfoTree", method = RequestMethod.GET)
-    public Result faultInfoTree() {
+    public Result faultInfoTree(HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(chanResultService.faultTree());
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -280,9 +381,18 @@ public class ChanResultController {
     @RequestMapping(value = "/staticalAnalysis", method = RequestMethod.GET)
     public Result staticalAnalysis(@RequestParam (value = "checked")String checked,
                                    @RequestParam(value = "startTime",required = false)String startTime,
-                                   @RequestParam(value = "endTime",required = false)String endTime) {
+                                   @RequestParam(value = "endTime",required = false)String endTime,
+                                   HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(chanResultService.staticalAnalysis(checked, startTime, endTime));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -294,10 +404,18 @@ public class ChanResultController {
 
     @ApiOperation(value = "诊断测试----")
     @RequestMapping(value = "/diagnoseTest",method = RequestMethod.GET)
-    public  Result diagnoseTest(@RequestParam(value = "param")String param){
+    public  Result diagnoseTest(@RequestParam(value = "param")String param,
+                                HttpServletRequest request){
         Result result =new Result();
 
-        try {
+        try {Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             ChanResult chan=chanResultService.selectByPrimaryId(Long.valueOf(param));
             Integer c=null;
             c.toString();

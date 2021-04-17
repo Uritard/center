@@ -88,7 +88,7 @@ public class TSysParamController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改系统参数", content = "根据用户传递的参数修改系统参数", logType = 3)
+    @Logs(title = "修改系统参数", content = "根据用户传递的参数修改系统参数", logType = 3,authority = "1234")
     public Result update(@RequestBody TSysParam tSysParam, HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -180,7 +180,7 @@ public class TSysParamController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询系统参数", content = "根据用户传递的参数分页查询系统参数", logType = 1)
+    @Logs(title = "查询系统参数", content = "根据用户传递的参数分页查询系统参数", logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "paramId", required = false) Integer paramId,
                                @RequestParam(value = "paramCode", required = false) String paramCode,
                                @RequestParam(value = "paramType", required = false) String paramType,

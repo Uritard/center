@@ -49,7 +49,7 @@ public class TCfgUnionRuleController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增联动规则数据",content = "根据用户传递的参数新增联动规则数据",logType = 2)
+    @Logs(title = "新增联动规则数据",content = "根据用户传递的参数新增联动规则数据",logType = 2,authority = "1234")
     public Result add(@Validated @RequestBody TCfgUnionRule tCfgUnionRule) {
         Result result = new Result();
         try {
@@ -65,7 +65,7 @@ public class TCfgUnionRuleController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除联动规则数据",content = "根据用户传递的参数删除联动规则数据",logType = 4)
+    @Logs(title = "删除联动规则数据",content = "根据用户传递的参数删除联动规则数据",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "ruleId", required = true) Long ruleId) {
         Result result = new Result();
         try {
@@ -82,7 +82,7 @@ public class TCfgUnionRuleController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改联动规则数据",content = "根据用户传递的参数修改联动规则数据",logType = 3 )
+    @Logs(title = "修改联动规则数据",content = "根据用户传递的参数修改联动规则数据",logType = 3,authority = "1234" )
     public Result update(@RequestBody TCfgUnionRule tCfgUnionRule) {
         Result result = new Result();
         try {
@@ -99,7 +99,7 @@ public class TCfgUnionRuleController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询联动规则数据",content = "根据用户传递的参数查询联动规则信息",logType = 1)
+    @Logs(title = "查询联动规则数据",content = "根据用户传递的参数查询联动规则信息",logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "ruleId", required = true) Long ruleId) {
         Result result = new Result();
         try {
@@ -140,7 +140,7 @@ public class TCfgUnionRuleController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询联动规则数据",content = "根据用户传递的参数分页查询联动规则信息",logType = 1)
+    @Logs(title = "查询联动规则数据",content = "根据用户传递的参数分页查询联动规则信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "ruleName", required = false) String ruleName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -206,7 +206,7 @@ public class TCfgUnionRuleController {
 
     @ApiOperation(value = "查询预案信息")
     @RequestMapping(value = "/selectForTCPlan", method = RequestMethod.GET)
-    @Logs(title = "查询预案信息",content = "查询预案信息",logType = 1)
+    @Logs(title = "查询预案信息",content = "查询预案信息",logType = 1,authority = "1234")
     public Result selectForTCPlan(@RequestParam(value = "planName", required = false) String planName,
                                   @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                   @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {

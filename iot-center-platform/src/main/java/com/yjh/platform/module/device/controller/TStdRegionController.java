@@ -48,7 +48,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "新增区域")
     @RequestMapping(value = "/addRegion", method = RequestMethod.POST)
-    @Logs(title = "新增区域",content = "根据用户传递的参数新增标准区域数据",logType = 2)
+    @Logs(title = "新增区域",content = "根据用户传递的参数新增标准区域数据",logType = 2,authority = "1234")
     public Result insert(@Validated @RequestBody TStdRegion tStdRegion) {
         Result result = new Result();
         try {
@@ -64,7 +64,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除区域",content = "根据用户传递的参数删除标准区域数据",logType = 4)
+    @Logs(title = "删除区域",content = "根据用户传递的参数删除标准区域数据",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "regionId", required = true) Long regionId) {
         Result result = new Result();
         try {
@@ -86,7 +86,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改区域",content = "根据用户传递的参数修改标准区域",logType = 3)
+    @Logs(title = "修改区域",content = "根据用户传递的参数修改标准区域",logType = 3,authority = "1234")
     public Result update(@RequestBody TStdRegion tStdRegion) {
         Result result = new Result();
         try {
@@ -161,7 +161,7 @@ public class TStdRegionController {
 
     @ApiOperation(value = "根据区域名称模糊查询区域树")
     @RequestMapping(value = "/selectRegTreeByName", method = RequestMethod.GET)
-    @Logs(title = "根据区域名称模糊查询区域树",content = "根据用区域名称模糊查询区域树",logType = 1)
+    @Logs(title = "根据区域名称模糊查询区域树",content = "根据用区域名称模糊查询区域树",logType = 1,authority = "1234")
     public Result selectRegTreeByRegName(@RequestParam(value = "regionName", required = false) String regionName) {
         Result result = new Result();
         try {

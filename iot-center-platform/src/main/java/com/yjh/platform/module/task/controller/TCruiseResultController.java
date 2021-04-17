@@ -192,7 +192,10 @@ public class TCruiseResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-        } catch (Exception e) {
+        } catch (BusinessException e) {
+            result.setMessage(10008, "用户无权限");
+            //log.error("日志统计失败：" + e);
+        }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
@@ -299,6 +302,9 @@ public class TCruiseResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
+        }catch (BusinessException e) {
+            result.setMessage(10008, "用户无权限");
+            //log.error("日志统计失败：" + e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

@@ -161,7 +161,7 @@ public class TStdMetemodelDetailController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询系统测点模版详细数据",content = "根据用户传递的参数查询系统测点模版详细信息",logType = 1)
+    @Logs(title = "查询系统测点模版详细数据",content = "根据用户传递的参数查询系统测点模版详细信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestBody TStdMeteModelDetail tStdMeteModelDetail
                               ) {
         Result result = new Result();

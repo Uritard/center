@@ -130,7 +130,7 @@ public class TCfgDeviceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询设备数据",content = "根据用户传递的参数分页查询设备信息",logType = 1)
+    @Logs(title = "查询设备数据",content = "根据用户传递的参数分页查询设备信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestBody TCfgDeviceDetail tCfgDeviceDetail
                               ) {
         Result result = new Result();

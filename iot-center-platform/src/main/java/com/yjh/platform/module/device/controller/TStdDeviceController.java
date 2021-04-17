@@ -66,7 +66,7 @@ public class TStdDeviceController {
 
     @ApiOperation(value = "插入设备及属性")
     @RequestMapping(value = "/addAll", method = RequestMethod.POST)
-    @Logs(title = "新增设备和属性",content = "根据用户传递的参数新增设备和属性",logType = 2)
+    @Logs(title = "新增设备和属性",content = "根据用户传递的参数新增设备和属性",logType = 2,authority = "1234")
     public Result addALL(@RequestBody TStdDeviceDetail tStdDeviceDetail) {
         Result result = new Result();
         try {
@@ -100,7 +100,7 @@ public class TStdDeviceController {
 
     @ApiOperation(value = "删除设备及属性")
     @RequestMapping(value = "/deleteAll", method = RequestMethod.DELETE)
-    @Logs(title = "删除标准化设备",content = "根据用户传递的参数删除设备及属性",logType = 4)
+    @Logs(title = "删除标准化设备",content = "根据用户传递的参数删除设备及属性",logType = 4,authority = "1234")
     public Result deleteAll(@RequestParam(value = "deviceId", required = true) Long deviceId) {
         Result result = new Result();
         try {
@@ -140,7 +140,7 @@ public class TStdDeviceController {
 
     @ApiOperation(value = "更新设备及属性")
     @RequestMapping(value = "/updateAll", method = RequestMethod.PUT)
-    @Logs(title = "修改标准化设备",content = "根据用户传递的参数修改标准化设备",logType = 3)
+    @Logs(title = "修改标准化设备",content = "根据用户传递的参数修改标准化设备",logType = 3,authority = "1234")
     public Result updateAll(@RequestBody TStdDeviceDetail tStdDeviceDetail) {
         Result result = new Result();
         try {
@@ -172,7 +172,7 @@ public class TStdDeviceController {
 
     @ApiOperation(value = "主键查询设备及属性")
     @RequestMapping(value = "/selectByPrimaryIdAll", method = RequestMethod.GET)
-    @Logs(title = "查询标准化设备",content = "根据用户传递的参数查询标准化设备",logType = 1)
+    @Logs(title = "查询标准化设备",content = "根据用户传递的参数查询标准化设备",logType = 1,authority = "1234")
     public Result selectByPrimaryIdAll(@RequestParam(value = "deviceId", required = true) Long deviceId) {
         Result result = new Result();
         try {
@@ -218,7 +218,7 @@ public class TStdDeviceController {
 
     @ApiOperation(value = "查询设备及属性")
     @RequestMapping(value = "/selectAll", method = RequestMethod.GET)
-    @Logs(title = "查询标准化设备",content = "根据用户传递的参数查询标准化设备",logType = 1)
+    @Logs(title = "查询标准化设备",content = "根据用户传递的参数查询标准化设备",logType = 1,authority = "1234")
     public Result selectAll(@RequestParam(value = "deviceId", required = false) Long deviceId,
                             @RequestParam(value = "customId", required = false) String customId,
                             @RequestParam(value = "deviceCode", required = false) String deviceCode,
@@ -289,7 +289,7 @@ public class TStdDeviceController {
 
     @ApiOperation(value = "分页查询设备及属性")
     @RequestMapping(value = "/selectByPageAll", method = RequestMethod.POST)
-    @Logs(title = "查询标准化设备",content = "根据用户传递的参数查询标准化设备",logType = 1)
+    @Logs(title = "查询标准化设备",content = "根据用户传递的参数查询标准化设备",logType = 1,authority = "1234")
     public Result selectByPageAll(@RequestBody TStdDeviceDetail tStdDeviceDetail
                               ) {
         Result result = new Result();

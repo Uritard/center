@@ -96,7 +96,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询预案",content = "根据用户传递的参数查询巡检预案属性信息",logType = 1)
+    @Logs(title = "查询预案",content = "根据用户传递的参数查询巡检预案属性信息",logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
@@ -111,7 +111,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "查询预案")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询预案",content = "根据用户传递的参数查询巡检预案属性信息",logType = 1)
+    @Logs(title = "查询预案",content = "根据用户传递的参数查询巡检预案属性信息",logType = 1,authority = "1234")
     public Result select(@RequestParam(value = "planId", required = false) Long planId,
                             @RequestParam(value = "planName", required = false) String planName,
                             @RequestParam(value = "type", required = false) Integer type,
@@ -131,7 +131,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询预案",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1)
+    @Logs(title = "查询预案",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestBody TCruisePlan tCruisePlan
                                 ) {
         Result result = new Result();
@@ -151,7 +151,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPlanPage", method = RequestMethod.POST)
-    @Logs(title = "查询预案",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1 ,authority = "1235")
+    @Logs(title = "查询预案",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1)
     public Result selectByPlanPage(@RequestBody TCruisePlan tCruisePlan
     ) {
         Result result = new Result();
@@ -214,7 +214,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "查询预案详情")
     @RequestMapping(value = "/selectPlanDetail", method = RequestMethod.GET)
-    @Logs(title = "查询预案详情",content = "查询预案详情",logType = 1,authority = "1235")
+    @Logs(title = "查询预案详情",content = "查询预案详情",logType = 1)
     public Result selectPlanDetail(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {

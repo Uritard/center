@@ -47,7 +47,7 @@ public class TDictBusinessController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增业务字典信息",content = "根据用户传递的参数新增业务字典信息",logType = 2)
+    @Logs(title = "新增业务字典信息",content = "根据用户传递的参数新增业务字典信息",logType = 2,authority = "1234")
     public Result insert( @Validated @RequestBody TDictBusiness tDictBusiness) {
 
         Result result = new Result();
@@ -68,7 +68,7 @@ public class TDictBusinessController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除业务字典信息",content = "根据用户传递的参数删除业务字典信息",logType = 4)
+    @Logs(title = "删除业务字典信息",content = "根据用户传递的参数删除业务字典信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "dictId", required = true) Integer dictId) {
         Result result = new Result();
         try {
@@ -85,7 +85,7 @@ public class TDictBusinessController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改业务字典信息",content = "根据用户传递的参数修改业务字典信息",logType = 3)
+    @Logs(title = "修改业务字典信息",content = "根据用户传递的参数修改业务字典信息",logType = 3,authority = "1234")
     public Result update(@RequestBody TDictBusiness tDictBusiness) {
         Result result = new Result();
         try {
@@ -106,7 +106,7 @@ public class TDictBusinessController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询业务字典信息",content = "根据用户传递的参数查询业务字典信息",logType = 1)
+    @Logs(title = "查询业务字典信息",content = "根据用户传递的参数查询业务字典信息",logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "dictId", required = true) Integer dictId) {
         Result result = new Result();
         try {
@@ -142,7 +142,7 @@ public class TDictBusinessController {
 
     @ApiOperation(value = "分页查询，根据dictNote模糊查找")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询业务字典信息",content = "根据用户传递的参数分页查询业务字典信息",logType = 1)
+    @Logs(title = "查询业务字典信息",content = "根据用户传递的参数分页查询业务字典信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestBody TDictBusiness tDictBusiness
                               ) {
         Result result = new Result();

@@ -1,5 +1,6 @@
 package com.yjh.platform.common.logs;
 
+import com.yjh.platform.common.result.BusinessException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -16,6 +17,12 @@ public class LogsRecord {
 
     public void LogsSend(HttpServletRequest request,String type,String title,String content){
         Long userIds = Long.valueOf(request.getHeader("userId"));
+        String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userIds).get("roleId"));
+        if(!"1234".equals(userRole)){
+            //权限不够；
+            throw new BusinessException(10008,"用户无权限");
+            //return -1;
+        }
         String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
         MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
         param.set("logType", type);

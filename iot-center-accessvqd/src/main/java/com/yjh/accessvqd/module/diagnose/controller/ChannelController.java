@@ -14,10 +14,12 @@ import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.bind.annotation.*;
 import com.yjh.accessvqd.module.diagnose.entity.TestList;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 
 
@@ -34,12 +36,22 @@ public class ChannelController {
 
     @Autowired
     private ChannelService channelService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @ApiOperation(value = "密码加密")
     @RequestMapping(value = "/userPwdEncrypt",method = RequestMethod.GET)
-    public Result userPwdEncrypt(@RequestParam String pass){
+    public Result userPwdEncrypt(@RequestParam String pass, HttpServletRequest request){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
            result.setData(channelService.userPwdEncrypt(pass));
         }catch (Exception e){
             log.error("加密失败："+e);
@@ -49,9 +61,17 @@ public class ChannelController {
 
     @ApiOperation(value = "数据服务器配置操作-查询")
     @RequestMapping(value = "/dataServers",method = RequestMethod.GET)
-    public  Result dataServers(){
+    public  Result dataServers(HttpServletRequest request){
         Result result=new Result();
         try{
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(channelService.dataServerConfig());
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -62,9 +82,18 @@ public class ChannelController {
 
     @ApiOperation(value ="新增数据服务器")
     @RequestMapping(value = "/addDataServers",method = RequestMethod.POST)
-    public Result addDataServers(@RequestBody DataServer dataServer){
+    public Result addDataServers(@RequestBody DataServer dataServer,
+                                 HttpServletRequest request ){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(channelService.addDataServer(dataServer));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -75,9 +104,18 @@ public class ChannelController {
 
     @ApiOperation(value = "修改数据服务器")
     @RequestMapping(value = "/updateDataServers",method = RequestMethod.PUT)
-    public Result update(@RequestBody DataServer dataServer){
+    public Result update(@RequestBody DataServer dataServer,
+                         HttpServletRequest request ){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(channelService.updateDataServer(dataServer));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -88,9 +126,18 @@ public class ChannelController {
 
     @ApiOperation(value = "删除数据服务器")
     @RequestMapping(value = "deleteDataServers",method = RequestMethod.DELETE)
-    public Result deleteDataServers(@RequestParam String serverId){
+    public Result deleteDataServers(@RequestParam String serverId,
+                                    HttpServletRequest request ){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(channelService.deleteDateServer(serverId));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -101,9 +148,17 @@ public class ChannelController {
 
     @ApiOperation(value = "查询监测点列表")
     @RequestMapping(value = "channelListInfo",method = RequestMethod.GET)
-    public Result channelListInfo(){
+    public Result channelListInfo(HttpServletRequest request ){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(channelService.channelInfo());
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -114,9 +169,18 @@ public class ChannelController {
 
     @ApiOperation(value = "查询单个监测点信息")
     @RequestMapping(value = "getChannel",method = RequestMethod.GET)
-    public Result getChannel(@RequestParam String channelId){
+    public Result getChannel(@RequestParam String channelId,
+                             HttpServletRequest request ){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(channelService.getChannel(channelId));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -127,9 +191,18 @@ public class ChannelController {
 
     @ApiOperation(value = "新增&修改单个监测点")
     @RequestMapping(value = "updateChannel",method = RequestMethod.POST)
-    public Result updateChannel(@RequestBody Channel channel){
+    public Result updateChannel(@RequestBody Channel channel,
+                                HttpServletRequest request ){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(channelService.addChannel(channel));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -140,9 +213,18 @@ public class ChannelController {
 
     @ApiOperation(value = "删除单个监测点")
     @RequestMapping(value = "/deleteChannel",method = RequestMethod.DELETE)
-    public Result deleteChannel(@RequestParam String channelId){
+    public Result deleteChannel(@RequestParam String channelId,
+                                HttpServletRequest request ){
         Result result=new Result();
         try{
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(channelService.deleteChannel(channelId));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());

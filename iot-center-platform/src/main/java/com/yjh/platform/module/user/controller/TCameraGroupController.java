@@ -44,7 +44,7 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增相机分组信息",content = "根据用户传递的参数新增相机分组信息",logType = 2)
+    @Logs(title = "新增相机分组信息",content = "根据用户传递的参数新增相机分组信息",logType = 2,authority = "1234")
     public Result add( @Validated @RequestBody TCameraGroup tCameraGroup) {
 
         Result result = new Result();
@@ -61,7 +61,7 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除相机分组信息",content = "根据用户传递的参数删除相机分组信息",logType = 4)
+    @Logs(title = "删除相机分组信息",content = "根据用户传递的参数删除相机分组信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "groupId", required = true) Long groupId) {
         Result result = new Result();
         try {
@@ -78,7 +78,7 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改相机分组信息",content = "根据用户传递的参数修改相机分组信息",logType = 3)
+    @Logs(title = "修改相机分组信息",content = "根据用户传递的参数修改相机分组信息",logType = 3,authority = "1234")
     public Result update(@RequestBody TCameraGroup tCameraGroup) {
         Result result = new Result();
         try {
@@ -95,7 +95,7 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询相机分组信息",content = "根据用户传递的参数查询相机分组信息",logType = 1,authority = "1235")
+    @Logs(title = "查询相机分组信息",content = "根据用户传递的参数查询相机分组信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "groupId", required = true) Long groupId,
                                     @RequestParam(value = "state", required = false) Integer state) {
         Result result = new Result();
@@ -137,7 +137,7 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询相机分组信息",content = "根据用户传递的参数分页查询相机分组信息",logType = 1)
+    @Logs(title = "查询相机分组信息",content = "根据用户传递的参数分页查询相机分组信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestBody TCameraGroup tCameraGroup
                                 ) {
         Result result = new Result();
@@ -189,7 +189,7 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "获取分组树")
     @RequestMapping(value = "/groupTree", method = RequestMethod.GET)
-    @Logs(title = "获取分组树",content = "查询相机分组树",logType = 1,authority = "1235")
+    @Logs(title = "获取分组树",content = "查询相机分组树",logType = 1)
     public Result groupTree() {
         Result result = new Result();
         try {

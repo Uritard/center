@@ -43,7 +43,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增算法信息",content = "根据用户传递的参数新增算法信息",logType = 2)
+    @Logs(title = "新增算法信息",content = "根据用户传递的参数新增算法信息",logType = 2,authority = "1234")
     public Result insert( @Validated @RequestBody TAlgorithmInfo tAlgorithmInfo) {
 
         Result result = new Result();
@@ -65,7 +65,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除算法信息",content = "根据用户传递的参数删除算法信息",logType = 4)
+    @Logs(title = "删除算法信息",content = "根据用户传递的参数删除算法信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "algorithmId", required = true) Long algorithmId) {
         Result result = new Result();
         try {
@@ -88,7 +88,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改算法信息",content = "根据用户传递的参数修改算法信息",logType = 3)
+    @Logs(title = "修改算法信息",content = "根据用户传递的参数修改算法信息",logType = 3,authority = "1234")
     public Result update(@RequestBody TAlgorithmInfo tAlgorithmInfo) {
         Result result = new Result();
         try {
@@ -105,7 +105,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询算法信息",content = "根据用户传递的参数查询算法信息",logType = 1)
+    @Logs(title = "查询算法信息",content = "根据用户传递的参数查询算法信息",logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "algorithmId", required = true) Long algorithmId) {
         Result result = new Result();
         try {
@@ -120,7 +120,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询算法信息",content = "根据用户传递的参数查询算法信息",logType = 1)
+    @Logs(title = "查询算法信息",content = "根据用户传递的参数查询算法信息",logType = 1,authority = "1234")
     public Result select(@RequestParam(value = "algorithmId", required = false) Long algorithmId,
                             @RequestParam(value = "algorithmName", required = false) String algorithmName,
                             @RequestParam(value = "aliasName", required = false) String aliasName,
@@ -142,7 +142,7 @@ public class TAlgorithmInfoController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询算法信息",content = "根据用户传递的参数对应查询算法信息",logType = 1)
+    @Logs(title = "查询算法信息",content = "根据用户传递的参数对应查询算法信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestBody TAlgorithmInfo tAlgorithmInfo
                                ) {
         Result result = new Result();

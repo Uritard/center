@@ -42,7 +42,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "新增组织机构")
     @RequestMapping(value = "/addOrg", method = RequestMethod.POST)
-    @Logs(title = "新增组织机构",content = "根据用户传递的参数新增组织机构数据",logType = 2)
+    @Logs(title = "新增组织机构",content = "根据用户传递的参数新增组织机构数据",logType = 2,authority = "1234")
     public Result insert(@Validated @RequestBody   SysOrg sysOrg) {
 
         Result result = new Result();
@@ -67,7 +67,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除组织机构",content = "根据用户传递的参数删除组织机构数据",logType = 4)
+    @Logs(title = "删除组织机构",content = "根据用户传递的参数删除组织机构数据",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "orgId", required = true) Long orgId) {
         Result result = new Result();
         try {
@@ -90,7 +90,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改组织机构",content = "根据用户传递的参数修改组织机构数据",logType = 3)
+    @Logs(title = "修改组织机构",content = "根据用户传递的参数修改组织机构数据",logType = 3,authority = "1234")
     public Result update(@RequestBody SysOrg sysOrg) {
         Result result = new Result();
         try {
@@ -169,7 +169,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "组织机构树查询")
     @RequestMapping(value = "/selectOrgTree", method = RequestMethod.GET)
-    @Logs(title = "组织机构树查询",content = "查询组织区域树",logType = 1)
+    @Logs(title = "组织机构树查询",content = "查询组织区域树",logType = 1,authority = "1234")
     public Result selectOrgTree() {
         Result result = new Result();
         try {
@@ -183,7 +183,7 @@ public class SysOrgController {
 
     @ApiOperation(value = "根据组织机构名称模糊查询")
     @RequestMapping(value = "/selectOrgTreeByName", method = RequestMethod.GET)
-    @Logs(title = "根据组织机构名称模糊查询",content = "根据用户传递的参数查询组织区域树",logType = 1)
+    @Logs(title = "根据组织机构名称模糊查询",content = "根据用户传递的参数查询组织区域树",logType = 1,authority = "1234")
     public Result selectOrgTreeByName(@RequestParam(value = "orgName", required = false) String orgName) {
         Result result = new Result();
         try {

@@ -45,10 +45,19 @@ public class PlansController {
     @RequestMapping(value = "/diagnosePlanInfo", method = RequestMethod.GET)
     public Result diagnosePlanInfo(@RequestParam(value = "planName",required = false) String planName,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
+                                   @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize,
+                                   HttpServletRequest request ) {
         Result result = new Result();
         Map<String,Object> resultMap = new HashMap<>();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             Page page = PageHelper.startPage(pageNum, pageSize);
             List<Plans> list = plansService.getPlanList(planName);
             resultMap.put("count", page.getTotal());
@@ -63,9 +72,18 @@ public class PlansController {
 
     @ApiOperation(value = "诊断任务Id查询")
     @RequestMapping(value = "/selectByPlanId", method = RequestMethod.GET)
-    public Result selectByPlanId(@RequestParam(value = "diagnosePlanId")String diagnosePlanId) {
+    public Result selectByPlanId(@RequestParam(value = "diagnosePlanId")String diagnosePlanId,
+                                 HttpServletRequest request ) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(plansService.selectByPlanId(diagnosePlanId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -79,6 +97,14 @@ public class PlansController {
     public Result diagnosePlanExecute(HttpServletRequest request, @RequestBody Plans plans) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             plans.setUserId(Long.valueOf(request.getHeader("userId").toString()));
             String status=plansService.diagnosePlanUpAdd(plans);
             if(status.equals("failed")){
@@ -97,9 +123,17 @@ public class PlansController {
 
     @ApiOperation(value = "任务删除")
     @RequestMapping(value = "/diagnosePlanDelete", method = RequestMethod.DELETE)
-    public Result diagnosePlanDelete(@RequestParam List<String> planIds) {
+    public Result diagnosePlanDelete(@RequestParam List<String> planIds,HttpServletRequest request ) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(plansService.diagnosePlanDelete(planIds));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -111,9 +145,17 @@ public class PlansController {
 
     @ApiModelProperty(value = "最后一次任务单")
     @RequestMapping(value = "/theLastPlanInfo",method = RequestMethod.GET)
-    public Result theLastPlanInfo(){
+    public Result theLastPlanInfo(HttpServletRequest request ){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
            result.setData(plansService.selectTheLastPlan());
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -124,10 +166,18 @@ public class PlansController {
 
     @ApiOperation(value = "接口测试")
     @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public Result test(@RequestParam String time) {
+    public Result test(@RequestParam String time,HttpServletRequest request ) {
 
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(RandomStringUtils.randomAlphanumeric(15));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -139,9 +189,17 @@ public class PlansController {
 
     @ApiOperation(value = "查询NVR-channel树")
     @RequestMapping(value = "/selectNVRChannelTree",method = RequestMethod.GET)
-    public Result selectNVRChannelTree(@RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId){
+    public Result selectNVRChannelTree(@RequestParam(value = "diagnosePlanId",required = false)String diagnosePlanId,HttpServletRequest request ){
         Result result=new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1235".equals(userRole)){
+                //权限不够；
+                result.setCode(10008,"用户无权限");
+                //throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(plansService.selectNVRChannelTree(diagnosePlanId));
         }catch (Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

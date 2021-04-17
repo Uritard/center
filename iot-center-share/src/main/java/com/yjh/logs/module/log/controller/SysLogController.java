@@ -350,7 +350,13 @@ public class SysLogController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
-
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1236".equals(userRole)){
+                //权限不够；
+                throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             String isDecode = enmap.get("content");
             if ("true".equals(isDecode)) {
                 userName = Demo.decrypt(userName);
@@ -370,7 +376,7 @@ public class SysLogController {
                 resultMap.put("list", list);
                 result.setData(resultMap);
             }
-            Long userId = Long.valueOf(request.getHeader("userId"));
+            //Long userId = Long.valueOf(request.getHeader("userId"));
             String userNames=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
             String iP=request.getHeader("HTTP_X_FORWARDED_FOR");
             this.insert("1",iP,"日志数据",1,"根据用户传递的参数查询日志数据",userId,userNames,String.valueOf(request.getRequestURL()),request.getRequestURI(),request.getMethod());
@@ -396,11 +402,21 @@ public class SysLogController {
 
     @ApiOperation(value = "日志统计")
     @RequestMapping(value = "/logAnalyze", method = RequestMethod.GET)
-    public Result logAnalyze() {
+    public Result logAnalyze(HttpServletRequest request) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+            if(!"1236".equals(userRole)){
+                //权限不够；
+                throw new BusinessException(10008,"用户无权限");
+                //return -1;
+            }
             result.setData(sysLogService.logAnalyze());
-        } catch (Exception e) {
+        } catch (BusinessException e) {
+            result.setMessage(10008, "用户无权限");
+            //log.error("日志统计失败：" + e);
+        }catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("日志统计失败：" + e);
         }

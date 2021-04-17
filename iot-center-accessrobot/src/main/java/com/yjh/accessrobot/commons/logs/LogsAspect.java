@@ -59,7 +59,7 @@ public class LogsAspect {
         Logs annotation = signature.getMethod().getAnnotation(Logs.class);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         StringBuilder content = new StringBuilder("");
-        String userId = "99999", userName = null, serviceId = null, ip = null;
+        String userId = "99999", userName = null, serviceId = null, ip = null,userRole=null;
         HttpServletRequest request = null;
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
@@ -68,11 +68,23 @@ public class LogsAspect {
             if (Objects.nonNull(request.getHeader("userId")) && !Objects.equals(request.getHeader("userId"), "undefined")) {
                 userId = request.getHeader("userId");
                 userName = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("userName"));
+                userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
             } else { userName = "admin"; }
         }
         ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         Object result = null;
         if (annotation != null) {
+            try{
+                if(!"".equals(annotation.authority()) ){
+                    if(! userRole.equals(annotation.authority())){
+                        //todo
+                        return null;
+                    }
+                }
+
+            }catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
             try {
 //                serviceId = logsConfig.getName();
                 params.set("logType", annotation.logType());

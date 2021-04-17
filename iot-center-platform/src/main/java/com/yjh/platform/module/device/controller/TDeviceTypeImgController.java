@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.entity.TDeviceTypeImg;
 import java.util.HashMap;
@@ -182,6 +183,7 @@ public class TDeviceTypeImgController {
 
     @ApiOperation(value = "查询设备类型和图片")
     @RequestMapping(value = "/selectDeviceTypeAndImg", method = RequestMethod.GET)
+    @Logs(title = "查询设备类型和图片",content = "查询设备类型和图片",logType = 1,authority = "1234")
     public Result selectDeviceTypeAndImg() {
         Result result = new Result();
         try {

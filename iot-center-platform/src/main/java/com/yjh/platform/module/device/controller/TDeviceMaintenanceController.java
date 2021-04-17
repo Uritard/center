@@ -46,7 +46,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "插入设备检修区域",content = "根据用户传递的参数新增设备检修区域",logType = 2)
+    @Logs(title = "插入设备检修区域",content = "根据用户传递的参数新增设备检修区域",logType = 2,authority = "1234")
     public Result add(@Validated @RequestBody TDeviceMaintenance tDeviceMaintenance) {
         Result result = new Result();
         try {
@@ -79,7 +79,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "更新设备检修区域",content = "根据用户传递的参数修改设备检修区域",logType = 3)
+    @Logs(title = "更新设备检修区域",content = "根据用户传递的参数修改设备检修区域",logType = 3,authority = "1234")
     public Result update(@RequestBody TDeviceMaintenance tDeviceMaintenance) {
         Result result = new Result();
         try {
@@ -96,7 +96,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询设备检修区域",content = "根据用户传递的参数查询设备检修区域",logType = 1)
+    @Logs(title = "查询设备检修区域",content = "根据用户传递的参数查询设备检修区域",logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "maintenanceId", required = true) Long maintenanceId) {
         Result result = new Result();
         try {
@@ -132,7 +132,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询设备检修区域",content = "根据用户传递的参数查询设备检修区域",logType = 1)
+    @Logs(title = "查询设备检修区域",content = "根据用户传递的参数查询设备检修区域",logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "maintenanceName", required = false) String maintenanceName,
                                @RequestParam(value = "effectiveState", required = false) Integer effectiveState,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -185,7 +185,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "查询设备")
     @RequestMapping(value = "/selectDevice", method = RequestMethod.GET)
-    @Logs(title = "查询设备",content = "根据用户传递的参数查询设备",logType = 1)
+    @Logs(title = "查询设备",content = "根据用户传递的参数查询设备",logType = 1,authority = "1234")
     public Result selectDevice(@RequestParam(value = "deviceIds", required = true) String deviceIds) {
         Result result = new Result();
         try {
@@ -200,7 +200,7 @@ public class TDeviceMaintenanceController {
 
     @ApiOperation(value = "查询设备下的巡视点")
     @RequestMapping(value = "/selectInstance", method = RequestMethod.GET)
-    @Logs(title = "查询设备下的巡视点",content = "根据用户传递的参数查询巡视点",logType = 1)
+    @Logs(title = "查询设备下的巡视点",content = "根据用户传递的参数查询巡视点",logType = 1,authority = "1234")
     public Result selectInstance(@RequestParam(value = "deviceId", required = true)Long deviceId) {
         Result result = new Result();
         try {

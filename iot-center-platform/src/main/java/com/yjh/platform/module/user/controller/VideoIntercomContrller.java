@@ -38,7 +38,7 @@ public class VideoIntercomContrller {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增可视对讲信息",content = "根据用户传递的参数新增可视信息",logType = 2)
+    @Logs(title = "新增可视对讲信息",content = "根据用户传递的参数新增可视信息",logType = 2,authority = "1234")
     public Result insert(@Validated @RequestBody VideoIntercom videoIntercom) {
         Result result = new Result();
         try {
@@ -58,7 +58,7 @@ public class VideoIntercomContrller {
     }
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除信息",content = "根据用户传递的参数删除信息",logType = 4)
+    @Logs(title = "删除信息",content = "根据用户传递的参数删除信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "videoIntercomId", required = true) Long videoIntercomId) {
         Result result = new Result();
         try {
@@ -78,7 +78,7 @@ public class VideoIntercomContrller {
 
     @ApiOperation(value = "批量删除")
     @RequestMapping(value = "/deleteVideoIntercom", method = RequestMethod.DELETE)
-    @Logs(title = "批量删除信息",content = "根据用户传递的参数批量删除信息",logType = 4)
+    @Logs(title = "批量删除信息",content = "根据用户传递的参数批量删除信息",logType = 4,authority = "1234")
     public Result deleteVideoIntercom(@RequestParam(value = "videoIntercomIdS", required = true) String videoIntercomIdS) {
         Result result = new Result();
         try {
@@ -98,7 +98,7 @@ public class VideoIntercomContrller {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改信息",content = "根据用户传递的参数修改信息",logType = 3)
+    @Logs(title = "修改信息",content = "根据用户传递的参数修改信息",logType = 3,authority = "1234")
     public Result update(@RequestBody VideoIntercom videoIntercom) {
         Result result = new Result();
         try {
@@ -135,7 +135,7 @@ public class VideoIntercomContrller {
 
     @ApiOperation(value = "根据间隔id查询所有信息")
     @RequestMapping(value = "/selectByRegionId", method = RequestMethod.GET)
-    @Logs(title = "查询信息",content = "根据用户传递的参数查询信息",logType = 1)
+    @Logs(title = "查询信息",content = "根据用户传递的参数查询信息",logType = 1,authority = "1234")
     public Result selectByRegionId(@RequestParam(value = "regionId", required = false) Long regionId,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                    @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -158,7 +158,7 @@ public class VideoIntercomContrller {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询信息",content = "根据用户传递的参数分页查询信息",logType = 1,authority = "1235")
+    @Logs(title = "查询信息",content = "根据用户传递的参数分页查询信息",logType = 1)
     public Result selectByPage(@RequestParam(value = "cameraName", required = false) String cameraName,
                                @RequestParam(value = "regionId", required = false) Long regionId,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,

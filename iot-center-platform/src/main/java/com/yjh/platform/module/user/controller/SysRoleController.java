@@ -110,7 +110,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询角色数据",content = "根据用户传递的参数查询角色信息",logType = 1)
+    @Logs(title = "查询角色数据",content = "根据用户传递的参数查询角色信息",logType = 1,authority = "1234")
     public Result select(@RequestParam(value = "roleId", required = false) Long roleId,
                             @RequestParam(value = "roleName", required = false) String roleName,
                             @RequestParam(value = "createTime", required = false) Date createTime,
@@ -148,7 +148,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "根据角色ID查询关联的菜单信息")
     @RequestMapping(value = "/selectRelationMenu", method = RequestMethod.GET)
-    @Logs(title = "根据角色ID查询关联的菜单信息",content = "根据用户传递的参数查询角色关联的菜单信息",logType = 1)
+    @Logs(title = "根据角色ID查询关联的菜单信息",content = "根据用户传递的参数查询角色关联的菜单信息",logType = 1,authority = "1234")
     public Result selectRelationMenu(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
@@ -208,7 +208,7 @@ public class SysRoleController {
 
     @ApiOperation(value = "根据角色ID查询关联的权限信息")
     @RequestMapping(value = "/selectRelationAuthor", method = RequestMethod.GET)
-    @Logs(title = "根据角色ID查询关联的权限信息",content = "根据用户传递的参数查询角色关联的权限信息",logType = 1)
+    @Logs(title = "根据角色ID查询关联的权限信息",content = "根据用户传递的参数查询角色关联的权限信息",logType = 1,authority = "1234")
     public Result selectRelationAuthor(@RequestParam(value = "roleId", required = true) Long roleId) {
         Result result = new Result();
         try {
