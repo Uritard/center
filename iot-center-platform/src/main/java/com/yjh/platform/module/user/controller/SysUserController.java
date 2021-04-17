@@ -729,8 +729,8 @@ public class SysUserController {
             mapAppKey.put("pubk", pubk);
             mapAppKey.put("prik", prik);
             redisTemplate.opsForHash().putAll("pubk:" + nums, mapAppKey);
-            mapAppKey.put("pubk",pubk);
-            mapAppKey.put("identifier",random);
+            mapPubk.put("pubk",pubk);
+            mapPubk.put("identifier",random);
             result.setData(mapPubk);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
