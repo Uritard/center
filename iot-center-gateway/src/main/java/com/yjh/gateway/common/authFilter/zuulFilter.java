@@ -273,7 +273,7 @@ public class zuulFilter extends ZuulFilter {
             HttpServletRequest request = ctx.getRequest();
             String signStr = request.getHeader("signStr") != null ? request.getHeader("signStr") : "";
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
-            if (StringUtils.isNoneBlank(signStr)) {
+          //  if (StringUtils.isNoneBlank(signStr)) {
                 boolean status = Demo.verify(webcode, signStr);
                 if (!status) {
                     log.error("签名验证结果 - " + status);
@@ -281,7 +281,7 @@ public class zuulFilter extends ZuulFilter {
                     ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
                     return false;
                 }
-            }
+           // }
         }
         return true;
 

@@ -202,11 +202,11 @@ public class SysUser implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public Date getInvalidTime() {
+    public Integer getInvalidTime() {
         return invalidTime;
     }
 
-    public void setInvalidTime(Date invalidTime) {
+    public void setInvalidTime(Integer invalidTime) {
         this.invalidTime = invalidTime;
     }
 
@@ -284,8 +284,8 @@ public class SysUser implements Serializable {
     private Date updateTime;
 
     @ApiModelProperty(value = "失效时间",example = "2018-10-01 12:18:48")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date invalidTime;
+  //  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Integer invalidTime;
     @ApiModelProperty(value = "最后登录时间",example = "2018-10-01 12:18:48")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastLogin;

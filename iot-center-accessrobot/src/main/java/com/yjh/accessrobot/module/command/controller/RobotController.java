@@ -57,7 +57,8 @@ public class RobotController {
                                     @RequestParam(value = "value",required = false) String value,
                                     @RequestParam(value = "key",required = false) String key,
                                     @RequestParam(value = "pCode",required = false) String password,
-                                    @RequestParam(value = "direction",required = false) String direction) {
+                                    @RequestParam(value = "direction",required = false) String direction,
+                                    @RequestParam(value = "content",required = false) String content) {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
@@ -66,7 +67,7 @@ public class RobotController {
             if("true".equals(isDecode)) {
                 password= Demo.decrypt(password);
             }
-            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password,request));
+            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password,request,content));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

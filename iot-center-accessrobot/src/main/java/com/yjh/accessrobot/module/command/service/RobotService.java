@@ -66,7 +66,7 @@ public class RobotService {
     private String webSocketUrl;
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password, HttpServletRequest request) throws Exception{
+    public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password, HttpServletRequest request,String content) throws Exception{
         Map scmap = new HashMap();
         String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
         if (command.equals("1") && type.equals("1")) {
@@ -111,8 +111,8 @@ public class RobotService {
         params.set("requestPath", request.getRequestURI());
         params.set("requestMethod", request.getMethod());
         String operationContent = selectContentByCommand(type,command,value);
-        params.set("content",operationContent);
-//        params.set("content", content);
+      //  params.set("content",operationContent);
+        params.set("content", content);
         LogsAspect logsAspect = new LogsAspect();
         logsAspect.post(params);
         List<Map<String, Object>> Item = new LinkedList<>();

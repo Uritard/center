@@ -25,7 +25,7 @@
         <result column="user_status" jdbcType="INTEGER" property="userStatus" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-        <result column="invalid_time" jdbcType="TIMESTAMP" property="invalidTime" />
+        <result column="invalid_time" jdbcType="INTEGER" property="invalidTime" />
         <result column="last_login" jdbcType="TIMESTAMP" property="lastLogin" />
     </resultMap>
 

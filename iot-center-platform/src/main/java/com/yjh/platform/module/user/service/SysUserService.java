@@ -139,7 +139,7 @@ public class SysUserService {
             sysUser.setUpdateTime(date);
         }
         if (roleId != sysUserCurrent.getRoleId()) {
-            sb.append(userName + "用户修改了" + sysUserCurrent.getUserName() + "用户信息(" + Constant.YHJS.get(String.valueOf(roleId)) + "修改为" + Constant.YHJS.get(String.valueOf(sysUserCurrent.getRoleId())) + ")");
+            sb.append(userName + "用户修改了" + sysUserCurrent.getUserName() + "用户信息(" + Constant.YHJS.get(String.valueOf(sysUserCurrent.getRoleId())) + "修改为" + Constant.YHJS.get(String.valueOf(roleId)) + ")");
         } else {
             sb.append(userName + "用户修改了" + sysUserCurrent.getUserName() + "用户信息");
         }
