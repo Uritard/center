@@ -730,7 +730,7 @@ public class SysUserController {
             mapAppKey.put("prik", prik);
             redisTemplate.opsForHash().putAll("pubk:" + nums, mapAppKey);
             mapPubk.put("pubk",pubk);
-            mapPubk.put("identifier",random);
+            mapPubk.put("identifier",nums);
             result.setData(mapPubk);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
