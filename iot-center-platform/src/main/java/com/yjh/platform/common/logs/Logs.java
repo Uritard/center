@@ -18,4 +18,6 @@ public @interface Logs {
     //日志类型
     int logType() default 1;
 
+    String authority() default "";
+
 }

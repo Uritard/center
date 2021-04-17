@@ -253,7 +253,7 @@ public class TCameraInfoController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询相机信息",content = "根据用户传递的参数分页查询相机信息",logType = 1)
+    @Logs(title = "查询相机信息",content = "根据用户传递的参数分页查询相机信息",logType = 1,authority = "1234")
     public Result selectByPage(@RequestParam(value = "aliasName", required = false) String aliasName,
                                 @RequestParam(value = "unit", required = false) String unit,
                                @RequestParam(value = "address", required = false) String address,
