@@ -230,7 +230,7 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "巡视结果分析--测点查询2")
     @GetMapping(value = "/selectCruiseResultAnalyze")
-    @Logs(title = "查询测点信息",content = "查询测点信息",logType = 1)
+    @Logs(title = "查询测点信息",content = "查询测点信息",logType = 1,authority = "1235")
     public Result selectCruiseResultAnalyze(@RequestParam(value = "regionId", required = false) Long regionId,
                                          @RequestParam(value = "deviceType", required = false) Integer deviceType,
                                          @RequestParam(value = "meteType", required = false) String meteType,
@@ -413,7 +413,7 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "获取折线图元素信息")
     @GetMapping(value = "/selectBrokenLine")
-    @Logs(title = "获取折线图元素信息",content = "根据用户传递的参数获取折线图信息",logType = 1)
+    @Logs(title = "获取折线图元素信息",content = "根据用户传递的参数获取折线图信息",logType = 1,authority = "1235")
     public Result selectBrokenLine(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                    @RequestParam(value = "cType", required = false) Integer cType,
                                    @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,

@@ -177,7 +177,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "机器人任务数据")
     @RequestMapping(value = "/selectRobotTaskMessage", method = RequestMethod.GET)
-    @Logs(title = "机器人任务数据",content = "根据用户传递的参数查询机器人任务数据",logType = 1)
+    @Logs(title = "机器人任务数据",content = "根据用户传递的参数查询机器人任务数据",logType = 1,authority = "1235")
     public Result selectRobotTaskMessage(@RequestParam(value = "robotId") Long robotId){
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
@@ -231,7 +231,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询机器人状态信息")
     @RequestMapping(value = "/selectRobotStatus", method = RequestMethod.GET)
-    @Logs(title = "查询机器人状态信息",content = "根据用户传递的参数查询机器人状态信息",logType = 1)
+    @Logs(title = "查询机器人状态信息",content = "根据用户传递的参数查询机器人状态信息",logType = 1,authority = "1235")
     public Result selectRobotStatus(@RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {
@@ -245,7 +245,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询机器人树")
     @RequestMapping(value = "/robotTree", method = RequestMethod.GET)
-    @Logs(title = "查询机器人树",content = "根据用户传递的参数查询机器人树",logType = 1)
+    @Logs(title = "查询机器人树",content = "根据用户传递的参数查询机器人树",logType = 1,authority = "1235")
     public Result robotTree() {
         Result result = new Result();
         try {

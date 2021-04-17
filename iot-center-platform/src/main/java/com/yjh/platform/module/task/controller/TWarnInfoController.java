@@ -185,7 +185,7 @@ public class TWarnInfoController {
     }
     @ApiOperation(value = "查询所有告警")
     @GetMapping(value = "/selectWarnByPage")
-    @Logs(title = "查询所有告警",content = "根据用户传递的参数查询所有告警",logType = 1)
+    @Logs(title = "查询所有告警",content = "根据用户传递的参数查询所有告警",logType = 1,authority = "1235")
     public Result selectWarnByPage(@RequestParam(value = "warnLevel", required = false) Integer warnLevel,
                                    @RequestParam(value = "confMode", required = false) Integer confMode,
                                    @RequestParam(value = "alarmSource", required = false) Integer alarmSource,
@@ -264,7 +264,7 @@ public class TWarnInfoController {
 
     @ApiOperation(value = "根据告警来源统计告警个数")
     @GetMapping(value = "/countByAlarmSource")
-    @Logs(title = "根据告警来源统计告警个数",content = "根据告警来源统计告警个数",logType = 1)
+    @Logs(title = "根据告警来源统计告警个数",content = "根据告警来源统计告警个数",logType = 1,authority = "1235")
     public Result countByAlarmSource(){
         Result result = new Result();
         try {
@@ -292,7 +292,7 @@ public class TWarnInfoController {
     }
     @ApiOperation(value = "根据设备类型统计告警和缺陷个数-近一月")
     @GetMapping(value = "/countAlarmByDeviceType")
-    @Logs(title = "根据设备类型统计告警个数",content = "根据设备类型统计告警和缺陷个数",logType = 1)
+    @Logs(title = "根据设备类型统计告警个数",content = "根据设备类型统计告警和缺陷个数",logType = 1,authority = "1235")
     public Result countAlarmByDeviceType(){
         Result result = new Result();
         try {
@@ -320,7 +320,7 @@ public class TWarnInfoController {
     }
     @ApiOperation(value = "统计近一月的机器人本体告警个数-折线图")
     @GetMapping(value = "/countWarnOnMonth")
-    @Logs(title = "根据时间统计告警个数",content = "统计近一个月的机器人本体告警",logType = 1)
+    @Logs(title = "根据时间统计告警个数",content = "统计近一个月的机器人本体告警",logType = 1,authority = "1235")
     public Result countWarnOnMonth(){
         Result result = new Result();
         try {
@@ -334,7 +334,7 @@ public class TWarnInfoController {
     }
     @ApiOperation(value = "统计近一月的所有告警和缺陷个数-折线图")
     @GetMapping(value = "/countWarnAndDefectOnMonth")
-    @Logs(title = "根据设备类型统计告警个数",content = "统计近一个月的所有告警和缺陷",logType = 1)
+    @Logs(title = "根据设备类型统计告警个数",content = "统计近一个月的所有告警和缺陷",logType = 1,authority = "1235")
     public Result countWarnAndDefectOnMonth(){
         Result result = new Result();
         try {
@@ -362,7 +362,7 @@ public class TWarnInfoController {
     }
     @ApiOperation(value = "根据告警和缺陷处理状态统计告警个数-近一月")
     @GetMapping(value = "/countWarnDefectConfMode")
-    @Logs(title = "根据告警处理状态统计告警个数",content = "根据告警和缺陷处理状态统计告警个数",logType = 1)
+    @Logs(title = "根据告警处理状态统计告警个数",content = "根据告警和缺陷处理状态统计告警个数",logType = 1,authority = "1235")
     public Result countWarnDefectConfMode(){
         Result result = new Result();
         try {
@@ -407,7 +407,7 @@ public class TWarnInfoController {
     }
     @ApiOperation(value = "告警核查")
     @PutMapping(value = "/alarmAndDefectProcess")
-    @Logs(title = "告警核查",content = "告警核查",logType = 5)
+    @Logs(title = "告警核查",content = "告警核查",logType = 5,authority = "1235")
     public Result alarmAndDefectProcess(@RequestBody AlarmAndDefectProcess alarmAndDefectProcess, HttpServletRequest request){
         Result result = new Result();
         String userId = request.getHeader("userId");

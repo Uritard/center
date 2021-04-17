@@ -173,7 +173,7 @@ public class TUnionTaskController {
     }
     @ApiOperation(value = "查看联动历史记录")
     @RequestMapping(value = "/selectHistory", method = RequestMethod.GET)
-    @Logs(title = "查看联动历史记录",content = "根据用户传递的参数查询联动历史记录",logType = 1)
+    @Logs(title = "查看联动历史记录",content = "根据用户传递的参数查询联动历史记录",logType = 1,authority = "1235")
     public Result selectHistory(@RequestParam(value = "ruleName", required = false) String ruleName,
                                 @RequestParam(value = "endDate", required = false) String endDate,
                                 @RequestParam(value = "startDate", required = false) String startDate,
@@ -206,7 +206,7 @@ public class TUnionTaskController {
     }
     @ApiOperation(value = "联动历史记录统计")
     @RequestMapping(value = "/historyStatistical", method = RequestMethod.GET)
-    @Logs(title = "联动历史记录统计",content = "根据用户传递的参数统计联动历史记录",logType = 1)
+    @Logs(title = "联动历史记录统计",content = "根据用户传递的参数统计联动历史记录",logType = 1,authority = "1235")
     public Result historyStatistical(@RequestParam(value = "dateMarked")String dateMarked) {
         Result result = new Result();
         try {

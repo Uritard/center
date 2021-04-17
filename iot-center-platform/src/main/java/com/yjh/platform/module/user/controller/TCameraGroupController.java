@@ -95,7 +95,7 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询相机分组信息",content = "根据用户传递的参数查询相机分组信息",logType = 1)
+    @Logs(title = "查询相机分组信息",content = "根据用户传递的参数查询相机分组信息",logType = 1,authority = "1235")
     public Result selectByPrimaryId(@RequestParam(value = "groupId", required = true) Long groupId,
                                     @RequestParam(value = "state", required = false) Integer state) {
         Result result = new Result();
@@ -189,7 +189,7 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "获取分组树")
     @RequestMapping(value = "/groupTree", method = RequestMethod.GET)
-    @Logs(title = "获取分组树",content = "查询相机分组树",logType = 1)
+    @Logs(title = "获取分组树",content = "查询相机分组树",logType = 1,authority = "1235")
     public Result groupTree() {
         Result result = new Result();
         try {

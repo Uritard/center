@@ -237,7 +237,7 @@ public class TCruiseTaskController {
     //任务统计
     @ApiOperation(value = "任务统计")
     @RequestMapping(value = "/taskCount", method = RequestMethod.GET)
-    @Logs(title = "查询巡检任务",content = "根据用户传递的参数统计任务",logType = 1)
+    @Logs(title = "查询巡检任务",content = "根据用户传递的参数统计任务",logType = 1,authority = "1235")
     public Result taskCount(@RequestParam(value = "taskDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date taskStartDate){
         Result result = new Result();
         try {
@@ -273,7 +273,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "任务暂停")
     @RequestMapping(value = "/taskPause", method = RequestMethod.GET)
-    @Logs(title = "任务暂停",content = "任务暂停",logType = 11)
+    @Logs(title = "任务暂停",content = "任务暂停",logType = 11,authority = "1235")
     public Result taskPause(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
@@ -290,7 +290,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "任务继续")
     @RequestMapping(value = "/taskGoOn", method = RequestMethod.GET)
-    @Logs(title = "任务恢复",content = "任务恢复",logType = 12)
+    @Logs(title = "任务恢复",content = "任务恢复",logType = 12,authority = "1235")
     public Result taskGoOn(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
@@ -307,7 +307,7 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "任务终止")
     @RequestMapping(value = "/taskShutDown", method = RequestMethod.GET)
-    @Logs(title = "任务终止",content = "任务终止",logType = 13)
+    @Logs(title = "任务终止",content = "任务终止",logType = 13,authority = "1235")
     public Result taskShutDown(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
@@ -325,7 +325,7 @@ public class TCruiseTaskController {
     //任务统计
     @ApiOperation(value = "任务查询")
     @RequestMapping(value = "/taskCountByCondition", method = RequestMethod.GET)
-    @Logs(title = "任务查询",content = "根据用户传递的参数查询任务",logType = 1)
+    @Logs(title = "任务查询",content = "根据用户传递的参数查询任务",logType = 1,authority = "1235")
     public Result taskCountByCondition(@RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startTime,
                                        @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                                        @RequestParam(value = "taskState", required = false)  String taskState,

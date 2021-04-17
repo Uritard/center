@@ -229,12 +229,31 @@ public class HelloController {
         result.setData(map);
         Long beginTime=System.currentTimeMillis();
 
-//        if("0".equals(filePath)){
-//            redisTemplate.opsForList().rightPush("VQD-Test",formerString);
-//        }else {
-//            result.setData(redisTemplate.opsForList().index("VQD-Test",0).toString().concat(latterString));
-//            redisTemplate.opsForList().leftPop("VQD-Test");
-//        }
+        Map<String,List<Analysis>> analysisInfo=new HashMap<>();
+        List<Analysis> analysisList=new ArrayList<>();
+
+
+        Analysis analysis=new Analysis();
+        analysis.setTaskId("110001");
+        analysis.setInstanceId(Long.valueOf("910009"));
+        analysis.setPicModelPath("/home/yjh/iot-picture/model-picture/sync/Template/BigImg/21000000238");
+        analysis.setAnalyseType("9");
+        analysis.setPicPath("/home/yjh_iot_center/iot-picture/resultImg/20210325020936977.jpg");
+        analysis.setCsvPath("http://192.168.9.40:10086/imgs/infrared/20210325020936977.data");
+        analysis.setDataPath("http://192.168.9.40:10086/imgs/infrared/20210325020936977.data");
+        analysis.setIsAi(1);
+
+        analysisList.add(analysis);
+        analysisInfo.put("list",analysisList);
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                String str=serviceRestTemplate.postForObject(ALGORITHM_URL, analysisInfo, String.class);
+                result.setData(str);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
         return result;
     }

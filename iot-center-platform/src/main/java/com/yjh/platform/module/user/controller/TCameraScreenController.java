@@ -78,7 +78,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改分屏配置信息",content = "根据用户传递的参数修改分屏配置信息",logType = 3)
+    @Logs(title = "修改分屏配置信息",content = "根据用户传递的参数修改分屏配置信息",logType = 3,authority = "1235")
     public Result update(HttpServletRequest request,@RequestBody TCameraScreen tCameraScreen) {
         Result result = new Result();
         try {
@@ -96,7 +96,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询分屏配置信息",logType = 1)
+    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询分屏配置信息",logType = 1,authority = "1235")
     public Result selectByPrimaryId(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -180,7 +180,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "摄像机状态树")
     @RequestMapping(value = "/cameraStateTree", method = RequestMethod.GET)
-    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1)
+    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1,authority = "1235")
     public Result cameraStateTree(@RequestParam(value = "cameraName",required = false) String cameraName,
                                   @RequestParam(value = "flag",required = false) Integer flag) {
         Result result = new Result();
@@ -211,7 +211,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "红外摄像机状态树")
     @RequestMapping(value = "/infraredCameraStateTree", method = RequestMethod.GET)
-    @Logs(title = "查询红外摄像机状态树信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1)
+    @Logs(title = "查询红外摄像机状态树信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1,authority = "1235")
     public Result infraredCameraStateTree(@RequestParam(value = "cameraName",required = false) String cameraName,
                                             @RequestParam(value = "flag",required = false) Integer flag) {
         Result result = new Result();

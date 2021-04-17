@@ -201,7 +201,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "巡视任务结果统计")
     @GetMapping(value = "/taskStatistical")
-    @Logs(title = "巡视任务结果统计",content = "根据用户传递的参数统计巡视任务结果",logType = 1)
+    @Logs(title = "巡视任务结果统计",content = "根据用户传递的参数统计巡视任务结果",logType = 1,authority = "1235")
     public Result taskStatistical() {
         Result result = new Result();
         try {
@@ -243,7 +243,7 @@ public class TCruiseResultController {
     }
     @ApiOperation(value = "巡视点结果统计--根据异常分类统计")
     @GetMapping(value = "/cruiseStatisticalByAbnormal")
-    @Logs(title = "根据异常分类统计",content = "根据用户传递的参数根据异常的分类进行统计",logType = 1)
+    @Logs(title = "根据异常分类统计",content = "根据用户传递的参数根据异常的分类进行统计",logType = 1,authority = "1235")
     public Result cruiseStatisticalByAbnormal() {
         Result result = new Result();
         try {
@@ -308,7 +308,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "人工复核")
     @PutMapping(value = "/manualReview")
-    @Logs(title = "人工复核",content = "人工复核",logType = 5)
+    @Logs(title = "人工复核",content = "人工复核",logType = 5,authority = "1235")
     public Result manualReview(@RequestBody CruiseManualReview cruiseManualReview,HttpServletRequest request) {
 
         String userId = request.getHeader("userId");
@@ -339,7 +339,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "A-查询正在执行的任务")
     @GetMapping(value = "/selectTaskIsRunning")
-    @Logs(title = "查询正在执行的任务",content = "根据用户传递的参数查询正在执行的任务",logType = 1)
+    @Logs(title = "查询正在执行的任务",content = "根据用户传递的参数查询正在执行的任务",logType = 1,authority = "1235")
     public Result selectTaskIsRunning(){
         Result result=new Result();
         try{

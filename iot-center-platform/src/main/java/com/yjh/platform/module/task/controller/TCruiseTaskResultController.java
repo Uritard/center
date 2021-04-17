@@ -169,7 +169,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-获取当前任务下的巡检点的执行信息")
     @RequestMapping(value = "/selectCurrentCruiseTaskResult",method = RequestMethod.GET)
-    @Logs(title = "获取当前任务下的巡检点的执行信息",content = "根据用户传递的参数获取当前任务下巡检点的执行信息",logType = 1)
+    @Logs(title = "获取当前任务下的巡检点的执行信息",content = "根据用户传递的参数获取当前任务下巡检点的执行信息",logType = 1,authority = "1235")
     public Result selectCurrentCruiseTaskResult(@RequestParam String taskId){
         Result result=new Result();
         try {
@@ -202,7 +202,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-获取当前执行任务的实时告警信息")
     @RequestMapping(value = "/selectRealTimeWarnInfo",method = RequestMethod.GET)
-    @Logs(title = "获取当前执行任务的实时告警信息",content = "根据用户传递的参数获取当前执行任务的实时告警信息",logType = 1)
+    @Logs(title = "获取当前执行任务的实时告警信息",content = "根据用户传递的参数获取当前执行任务的实时告警信息",logType = 1,authority = "1235")
     public Result selectRealTimeWarnInfo(@RequestParam String taskId){
         Result result=new Result();
         try {
@@ -217,7 +217,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-获取巡检任务进度")
     @RequestMapping(value = "/selectCruiseAdvance",method = RequestMethod.GET)
-    @Logs(title = "获取巡检任务进度",content = "根据用户传递的参数获取巡视任务进度",logType = 1)
+    @Logs(title = "获取巡检任务进度",content = "根据用户传递的参数获取巡视任务进度",logType = 1,authority = "1235")
     public Result selectCruiseAdvance(@RequestParam String taskId){
         Result result=new Result();
        try{
@@ -244,7 +244,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "C-查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数、运行时间")
     @RequestMapping(value = "selectCruiseStatusCount",method = RequestMethod.GET)
-    @Logs(title = "查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数、运行时间",content = "根据用户传递的参数查询当前任务异常巡视点、为巡视巡视点、已巡视巡视点",logType = 1)
+    @Logs(title = "查询当前任务异常巡检点、未巡视巡检点、已巡视巡检点个数、运行时间",content = "根据用户传递的参数查询当前任务异常巡视点、为巡视巡视点、已巡视巡视点",logType = 1,authority = "1235")
     public Result selectCruiseStatusCount(@RequestParam String taskId){
         Result result=new Result();
         try{

@@ -43,7 +43,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "新增预案")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增预案",content = "根据用户传递的参数新增巡检预案属性数据",logType = 2)
+    @Logs(title = "新增预案",content = "根据用户传递的参数新增巡检预案属性数据",logType = 2,authority = "1235")
     public Result insert(@RequestBody Map<String, Object> map) {
         Result result = new Result();
         try {
@@ -62,7 +62,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-    @Logs(title = "删除预案",content = "根据用户传递的参数删除巡检预案属性数据",logType = 4)
+    @Logs(title = "删除预案",content = "根据用户传递的参数删除巡检预案属性数据",logType = 4,authority = "1235")
     public Result delete(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
@@ -79,7 +79,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    @Logs(title = "修改预案",content = "根据用户传递的参数修改巡检预案属性数据",logType = 3)
+    @Logs(title = "修改预案",content = "根据用户传递的参数修改巡检预案属性数据",logType = 3,authority = "1235")
     public Result update(@RequestBody Map<String, Object> planDetailMap) {
         Result result = new Result();
         try {
@@ -151,7 +151,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPlanPage", method = RequestMethod.POST)
-    @Logs(title = "查询预案",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1)
+    @Logs(title = "查询预案",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1 ,authority = "1235")
     public Result selectByPlanPage(@RequestBody TCruisePlan tCruisePlan
     ) {
         Result result = new Result();
@@ -185,7 +185,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "查询标准设备下挂巡检点")
     @RequestMapping(value = "/findInstances", method = RequestMethod.GET)
-    @Logs(title = "查询预案",content = "查询标准设备下的巡检点 ",logType = 1)
+    @Logs(title = "查询预案",content = "查询标准设备下的巡检点 ",logType = 1 ,authority = "1235")
     public Result findInstances(@RequestParam(value = "deviceIds", required = false) String deviceIds,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -214,7 +214,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "查询预案详情")
     @RequestMapping(value = "/selectPlanDetail", method = RequestMethod.GET)
-    @Logs(title = "查询预案详情",content = "查询预案详情",logType = 1)
+    @Logs(title = "查询预案详情",content = "查询预案详情",logType = 1,authority = "1235")
     public Result selectPlanDetail(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {

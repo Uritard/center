@@ -433,7 +433,7 @@
     </insert>
 
     <select id="selectTaskIsRunning" resultType="com.yjh.platform.module.task.entity.TaskSimpleInfo">
-         SELECT
+        SELECT
         d.task_id,
         d.task_name,
         d.type,

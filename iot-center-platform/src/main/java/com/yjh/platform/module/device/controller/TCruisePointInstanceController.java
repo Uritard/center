@@ -254,7 +254,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "C-查询各种巡检类型下的巡检点数量")
     @RequestMapping(value = "/selectCruiseCountByType",method = RequestMethod.GET)
-    @Logs(title = "查询巡检类型下的巡检点数量",content = "查询巡检类型下的巡检点数量",logType = 1)
+    @Logs(title = "查询巡检类型下的巡检点数量",content = "查询巡检类型下的巡检点数量",logType = 1,authority = "1235")
     public Result selectCruiseCountByType(@RequestParam String taskId){
         Result result=new Result();
         try {

@@ -41,7 +41,7 @@ public class ReportManageController {
 
     @ApiOperation(value = "生成报表")
     @GetMapping(value = "/reportGenerate")
-    @Logs(title = "生成报表",content = "生成报表",logType = 2)
+    @Logs(title = "生成报表",content = "生成报表",logType = 2,authority = "1235")
     public Result reportGenerate(@RequestParam(value = "startTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")Date startTime,
                                  @RequestParam(value = "endTime", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime,
                                  @RequestParam(value="deviceIds")String deviceIds,
@@ -108,7 +108,7 @@ public class ReportManageController {
 //    }
     @ApiOperation(value = "查询报表生成记录")
     @GetMapping(value = "/reportSelect")
-    @Logs(title = "查询报表生成记录",content = "根据用户传递的参数查询报表生成记录",logType = 1)
+    @Logs(title = "查询报表生成记录",content = "根据用户传递的参数查询报表生成记录",logType = 1,authority = "1235")
     public Result reportSelect(@RequestParam(value = "reportName", required = false) String reportName,
                                @RequestParam(value = "startTime", required = false) String startTime,
                                @RequestParam(value = "endTime", required = false) String endTime,
@@ -175,7 +175,7 @@ public class ReportManageController {
     }
     @ApiOperation(value = "下载巡视报告")
     @GetMapping(value = "/downLoadCruiseReport")
-    @Logs(title = "下载巡视报告",content = "下载巡视报告",logType = 9)
+    @Logs(title = "下载巡视报告",content = "下载巡视报告",logType = 9,authority = "1235")
     public Result downLoadCruiseReport(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
