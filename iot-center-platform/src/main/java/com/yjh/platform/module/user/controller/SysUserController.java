@@ -718,14 +718,17 @@ public class SysUserController {
         Result result = new Result();
         try {
             Map mapPubk=new HashMap();
-            String random = String.valueOf(System.currentTimeMillis());
+            Long random =System.currentTimeMillis();
+            Long num = new Date().getTime();
+            Double d = Math.random()*num;
+            Long nums=random+d.longValue();
             Map map=Demo.createKey();
             String pubk=String.valueOf(map.get("pubk"));
             String prik=String.valueOf(map.get("prik"));
             Map<String, Object> mapAppKey = new HashMap<>();
             mapAppKey.put("pubk", pubk);
             mapAppKey.put("prik", prik);
-            redisTemplate.opsForHash().putAll("pubk:" + random, mapAppKey);
+            redisTemplate.opsForHash().putAll("pubk:" + nums, mapAppKey);
             mapAppKey.put("pubk",pubk);
             mapAppKey.put("identifier",random);
             result.setData(mapPubk);

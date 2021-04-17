@@ -85,7 +85,7 @@ public class zuulFilter extends ZuulFilter {
             String url = request.getRequestURI();
             log.info("tt-url: " + IPUtil.getRemoteIP(request));
             ctx.getZuulRequestHeaders().put("HTTP_X_FORWARDED_FOR", IPUtil.getRemoteIP(request));
-            if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")) {
+            if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                 String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
                 if (StringUtils.isNoneBlank(userId)) {
