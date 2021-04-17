@@ -89,6 +89,8 @@ public class TCruiseTaskService {
     private SysUserDao sysUserDao;
     @Autowired
     private TAlgorithmConfBakDao tAlgorithmConfBakDao;
+    @Autowired
+    private Demo demo;
 
     //模板图片路径
     private String picModelPath;
@@ -925,7 +927,7 @@ public class TCruiseTaskService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public int taskConfirmation(String userId, String password, HttpServletRequest request) throws Exception {
+    public int taskConfirmation(String userId, String password, HttpServletRequest request,String identifier) throws Exception {
         //return 1;
         //todo 密码的解密
         String iP=request.getHeader("HTTP_X_FORWARDED_FOR");
@@ -939,7 +941,7 @@ public class TCruiseTaskService {
         //}
         }else {
             //全要解密
-            password = Demo.decrypt(password);
+            password = demo.decryptIdentifier(password,identifier);
             sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
         }
         //password = Demo.decrypt(password);

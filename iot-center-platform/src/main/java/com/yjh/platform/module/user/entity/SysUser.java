@@ -258,6 +258,14 @@ public class SysUser implements Serializable {
         this.pCode = pCode;
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
     //  @Length(max = 20,message = "userName长度必须小于等于20")
     @ApiModelProperty(value = "用户名")
     private String userName;
@@ -362,4 +370,6 @@ public class SysUser implements Serializable {
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
+
+    private String identifier;
 }

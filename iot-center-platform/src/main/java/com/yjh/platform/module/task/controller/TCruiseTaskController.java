@@ -354,7 +354,7 @@ public class TCruiseTaskController {
                 throw new BusinessException(10008,"用户无权限");
                 //return -1;
             }
-            int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getpCode(),request);
+            int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getpCode(),request,tCruiseTaskAdd.getIdentifier());
             if(i == 1){
 //                TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
 //                tCruiseTaskAdd.setTaskId(taskId);

@@ -43,6 +43,8 @@ import javax.servlet.http.HttpServletRequest;
 public class SysUserService {
     @Autowired
     private SysUserDao sysUserDao;
+    @Autowired
+    private Demo demo;
     @Resource
     private RedisTemplate redisTemplate;
 
@@ -178,8 +180,8 @@ public class SysUserService {
                 String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
                 String isDecode = enmap.get("content");
                 if ("true".equals(isDecode)) {
-                    userName = Demo.decrypt(userMap.get("userName"));
-                    password = Demo.decrypt(userMap.get("pCode"));
+                    userName = demo.decryptIdentifier(userMap.get("userName"),userMap.get("identifier"));
+                    password = demo.decryptIdentifier(userMap.get("pCode"),userMap.get("identifier"));
                 } else {
                     userName = userMap.get("userName");
                     password = userMap.get("pCode");
@@ -691,8 +693,8 @@ public class SysUserService {
         Map<String, String> maps = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
         String isDecode = maps.get("content");
         if ("true".equals(isDecode)) {
-            sysUserLocked.setUserId(Long.valueOf(Demo.decrypt(map.get("lockedUserId"))));
-            redisTemplate.delete("account_lock_time:" + Long.valueOf(Demo.decrypt(map.get("lockedUserId"))));
+            sysUserLocked.setUserId(Long.valueOf(demo.decryptIdentifier(map.get("lockedUserId"),map.get("identifier"))));
+            redisTemplate.delete("account_lock_time:" + Long.valueOf(demo.decryptIdentifier(map.get("lockedUserId"),map.get("identifier"))));
         } else {
             sysUserLocked.setUserId(Long.valueOf(map.get("lockedUserId")));
             redisTemplate.delete("account_lock_time:" + Long.valueOf(map.get("lockedUserId")));
@@ -710,8 +712,8 @@ public class SysUserService {
         Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
         String isDecode = enmap.get("content");
         if ("true".equals(isDecode)) {
-            linkedHashMap.put("password", Demo.decrypt(map.get("newPCode")));
-            sysUser.setPassword(Demo.encryption(Demo.decrypt(map.get("newPCode"))));
+            linkedHashMap.put("password", demo.decryptIdentifier(map.get("oldPCode"),map.get("identifier")));
+            sysUser.setPassword(Demo.encryption(demo.decryptIdentifier(map.get("newPCode"),map.get("identifier"))));
         } else {
             linkedHashMap.put("password", map.get("newPCode"));
             sysUser.setPassword(Demo.encryption(map.get("newPCode")));

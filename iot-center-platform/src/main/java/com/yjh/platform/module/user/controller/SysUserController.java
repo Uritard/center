@@ -58,6 +58,8 @@ public class SysUserController {
     private SysUserDao sysUserDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private Demo demo;
     private Logger log = LoggerFactory.getLogger(SysUserController.class);
 
 
@@ -389,8 +391,10 @@ public class SysUserController {
             String isDecode = map.get("content");
             String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
             if ("true".equals(isDecode)) {
-                sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
-                sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
+//                sysUser.setUserName(Demo.decrypt(sysUser.getUserName()));
+//                sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
+                sysUser.setUserName(demo.decryptIdentifier(sysUser.getUserName(),sysUser.getIdentifier()));
+                sysUser.setPassword(demo.decryptIdentifier(sysUser.getPassword(),sysUser.getIdentifier()));
             }
             if (sysUser.getUserName().contains("admin") || sysUser.getUserName().contains("administrator")) {
                 sendPost(request);
@@ -437,8 +441,10 @@ public class SysUserController {
             String password = null;
             String locked = null;
             if ("true".equals(isDecode)) {
-                password = Demo.decrypt(map.get("pCode"));
-                locked = Demo.decrypt(map.get("lockedUserId"));
+//                password = Demo.decrypt(map.get("pCode"));
+//                locked = Demo.decrypt(map.get("lockedUserId"));
+                password = demo.decryptIdentifier(map.get("pCode"),map.get("identifier"));
+                locked =  demo.decryptIdentifier(map.get("lockedUserId"),map.get("identifier"));
             } else {
                 password = map.get("pCode");
                 locked = map.get("lockedUserId");
@@ -525,8 +531,10 @@ public class SysUserController {
             Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode = enmap.get("content");
             if ("true".equals(isDecode)) {
-                oldPassword = Demo.decrypt(map.get("oldPCode"));
-                newPassword = Demo.decrypt(map.get("newPCode"));
+//                oldPassword = Demo.decrypt(map.get("oldPCode"));
+//                newPassword = Demo.decrypt(map.get("newPCode"));
+                oldPassword = demo.decryptIdentifier(map.get("oldPCode"),map.get("identifier"));
+                newPassword = demo.decryptIdentifier(map.get("newPCode"),map.get("identifier"));
             } else {
                 oldPassword = map.get("oldPCode");
                 newPassword = map.get("newPCode");
@@ -579,8 +587,10 @@ public class SysUserController {
             Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode = enmap.get("content");
             if ("true".equals(isDecode)) {
-                oldPassword = Demo.decrypt(map.get("oldPCode"));
-                newPassword = Demo.decrypt(map.get("newPCode"));
+                //  oldPassword = Demo.decrypt(map.get("oldPCode"));
+//                newPassword = Demo.decrypt(map.get("newPCode"));
+                oldPassword = demo.decryptIdentifier(map.get("oldPCode"),map.get("identifier"));
+                newPassword = demo.decryptIdentifier(map.get("newPCode"),map.get("identifier"));
             } else {
                 oldPassword = map.get("oldPCode");
                 newPassword = map.get("newPCode");
@@ -700,4 +710,30 @@ public class SysUserController {
         }
         return result;
     }
+
+
+    @ApiOperation(value = "获取公钥")
+    @RequestMapping(value = "/getPubk", method = RequestMethod.GET)
+    public Result getPubk() {
+        Result result = new Result();
+        try {
+            Map mapPubk=new HashMap();
+            String random = String.valueOf(System.currentTimeMillis());
+            Map map=Demo.createKey();
+            String pubk=String.valueOf(map.get("pubk"));
+            String prik=String.valueOf(map.get("prik"));
+            Map<String, Object> mapAppKey = new HashMap<>();
+            mapAppKey.put("pubk", pubk);
+            mapAppKey.put("prik", prik);
+            redisTemplate.opsForHash().putAll("pubk:" + random, mapAppKey);
+            mapAppKey.put("pubk",pubk);
+            mapAppKey.put("identifier",random);
+            result.setData(mapPubk);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("获取公钥失败:", e);
+        }
+        return result;
+    }
+
 }

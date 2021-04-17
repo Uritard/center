@@ -97,4 +97,6 @@ public class TCruiseTaskAdd implements Serializable {
 
     private String deviceList;
 
+    private String identifier;
+
 }

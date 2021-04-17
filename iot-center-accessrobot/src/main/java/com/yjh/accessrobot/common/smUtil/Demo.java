@@ -7,13 +7,17 @@ import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigInteger;
 
 /**
  * @Description: TODO(国密SM2签名验签 / SM3报文摘要)
  */
+@Component
 public class Demo {
 
     // 国密规范测试用户ID
@@ -22,7 +26,8 @@ public class Demo {
     private static final String prik = "00AFB685CF8993EF80FF9B6F8DD92486710C719AB3820B9D48A13A12ED9FD6CFE1";
     //国密规范测试公钥
     private static final String pubk ="048B2E251938FC25FC30F55A485F0FD91376B63CB4BCC863A11A59E59ACC6C802F628E48EA8FA63960956ED5BD817910AF5388E3D0D01379C0830FD789C7ECF47F";
-
+    @Resource
+    private RedisTemplate redisTemplate;
 
 //    public static void main(String[] arg) {
 //        String msg = "123456789";//原始数据
@@ -157,6 +162,20 @@ public class Demo {
 //    }
 
 
+//    /**
+//     * 解密前端密码
+//     *
+//     * @param pCode 前端密码
+//     * @return 密码
+//     * @throws Exception 异常
+//     */
+//    public static String decrypt(String pCode) throws IOException {
+//        if(StringUtils.isNoneBlank(pCode)){
+//            return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte("04" + pCode)));
+//        }else {
+//            return  "";
+//        }
+//    }
     /**
      * 解密前端密码
      *
@@ -164,14 +183,14 @@ public class Demo {
      * @return 密码
      * @throws Exception 异常
      */
-    public static String decrypt(String pCode) throws IOException {
+    public String decryptIdentifier(String pCode,String identifier) throws IOException {
         if(StringUtils.isNoneBlank(pCode)){
-            return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte("04" + pCode)));
+            String priks = String.valueOf(redisTemplate.opsForHash().get("pubk:" + identifier, "prik"));
+            return new String(SM2Utils.decrypt(Util.hexToByte(priks), Util.hexToByte("04" + pCode)));
         }else {
             return  "";
         }
     }
-
     /**
      * 解密后端密码
      *

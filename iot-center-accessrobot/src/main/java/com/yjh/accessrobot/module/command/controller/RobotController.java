@@ -42,6 +42,8 @@ public class RobotController {
     private final RobotService robotService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private Demo demo;
 
     private Logger log = LoggerFactory.getLogger(RobotController.class);
 
@@ -58,14 +60,15 @@ public class RobotController {
                                     @RequestParam(value = "key",required = false) String key,
                                     @RequestParam(value = "pCode",required = false) String password,
                                     @RequestParam(value = "direction",required = false) String direction,
-                                    @RequestParam(value = "content",required = false) String content) {
+                                    @RequestParam(value = "content",required = false) String content,
+                                    @RequestParam(value = "identifier",required = false) String identifier) {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode =map.get("content");
             if("true".equals(isDecode)) {
-                password= Demo.decrypt(password);
+                password= demo.decryptIdentifier(password,identifier);
             }
             result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password,request,content));
         } catch (BusinessException b) {
