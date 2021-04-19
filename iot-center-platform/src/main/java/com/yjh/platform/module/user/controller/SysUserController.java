@@ -395,6 +395,7 @@ public class SysUserController {
 //                sysUser.setPassword(Demo.decrypt(sysUser.getPassword()));
                 sysUser.setUserName(demo.decryptIdentifier(sysUser.getUserName(),sysUser.getIdentifier()));
                 sysUser.setPassword(demo.decryptIdentifier(sysUser.getPassword(),sysUser.getIdentifier()));
+                redisTemplate.delete("pubk:" + sysUser.getIdentifier());
             }
             if (sysUser.getUserName().contains("admin") || sysUser.getUserName().contains("administrator")) {
                 sendPost(request);

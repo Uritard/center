@@ -144,8 +144,8 @@ public class Demo {
         ECPoint publicKey = ecpub.getQ();
         map.put("pubk",Util.byteToHex(publicKey.getEncoded()));
         map.put("prik",Util.byteToHex(privateKey.toByteArray()));
-        System.out.println("公钥: " + Util.byteToHex(publicKey.getEncoded()));
-        System.out.println("私钥: " + Util.byteToHex(privateKey.toByteArray()));
+//        System.out.println("公钥: " + Util.byteToHex(publicKey.getEncoded()));
+//        System.out.println("私钥: " + Util.byteToHex(privateKey.toByteArray()));
         return map;
     }
     /**

@@ -69,6 +69,7 @@ public class RobotController {
             String isDecode =map.get("content");
             if("true".equals(isDecode)) {
                 password= demo.decryptIdentifier(password,identifier);
+                redisTemplate.delete("pubk:" + identifier);
             }
             result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password,request,content));
         } catch (BusinessException b) {

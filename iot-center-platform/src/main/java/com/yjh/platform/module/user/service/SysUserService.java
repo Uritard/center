@@ -182,6 +182,7 @@ public class SysUserService {
                 if ("true".equals(isDecode)) {
                     userName = demo.decryptIdentifier(userMap.get("userName"),userMap.get("identifier"));
                     password = demo.decryptIdentifier(userMap.get("pCode"),userMap.get("identifier"));
+                    redisTemplate.delete("pubk:" + userMap.get("identifier"));
                 } else {
                     userName = userMap.get("userName");
                     password = userMap.get("pCode");
@@ -695,6 +696,7 @@ public class SysUserService {
         if ("true".equals(isDecode)) {
             sysUserLocked.setUserId(Long.valueOf(demo.decryptIdentifier(map.get("lockedUserId"),map.get("identifier"))));
             redisTemplate.delete("account_lock_time:" + Long.valueOf(demo.decryptIdentifier(map.get("lockedUserId"),map.get("identifier"))));
+            redisTemplate.delete("pubk:" + map.get("identifier"));
         } else {
             sysUserLocked.setUserId(Long.valueOf(map.get("lockedUserId")));
             redisTemplate.delete("account_lock_time:" + Long.valueOf(map.get("lockedUserId")));
@@ -714,6 +716,7 @@ public class SysUserService {
         if ("true".equals(isDecode)) {
             linkedHashMap.put("password", demo.decryptIdentifier(map.get("oldPCode"),map.get("identifier")));
             sysUser.setPassword(Demo.encryption(demo.decryptIdentifier(map.get("newPCode"),map.get("identifier"))));
+            redisTemplate.delete("pubk:" + map.get("identifier"));
         } else {
             linkedHashMap.put("password", map.get("newPCode"));
             sysUser.setPassword(Demo.encryption(map.get("newPCode")));

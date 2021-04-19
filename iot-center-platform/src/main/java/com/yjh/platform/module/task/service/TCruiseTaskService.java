@@ -943,6 +943,7 @@ public class TCruiseTaskService {
             //全要解密
             password = demo.decryptIdentifier(password,identifier);
             sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
+            redisTemplate.delete("pubk:"+identifier);
         }
         //password = Demo.decrypt(password);
         //sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
