@@ -213,4 +213,18 @@ public class RobotController {
         }
         return result;
     }
+
+    @ApiOperation(value = "上传至ftps服务器去")
+    @RequestMapping(value = "/uploadFile", method = RequestMethod.GET)
+    public Result uploadFile() {
+        Result result = new Result();
+        try {
+            robotService.uploadFile("D:\\code\\qhTest\\66666\\task_file.xml","a/b/c/task_file.xml");
+            result.setData(66);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
 }

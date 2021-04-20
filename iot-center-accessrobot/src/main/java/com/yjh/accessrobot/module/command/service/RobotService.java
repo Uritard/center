@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.smUtil.Demo;
+import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
@@ -64,6 +65,16 @@ public class RobotService {
     private SysUserDao sysUserDao;
     @Value("${other.webSocketUrl}")
     private String webSocketUrl;
+    @Value("${netty.server.url}")
+    private String serverUrl;
+    @Value("${netty.server.ftps.port}")
+    private String ftpsPort;
+    @Value("${netty.server.ftps.username}")
+    private String ftpsUserName;
+    @Value("${netty.server.ftps.password}")
+    private String ftpsPassWord;
+    @Value("${netty.server.ftps.keypw}")
+    private String key;
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password, HttpServletRequest request,String content) throws Exception{
@@ -1674,29 +1685,36 @@ public class RobotService {
         }
         return 1;
     }
-    public String selectContentByCommand(String type, String command, String value){
-        if ("1".equals(type)){
-            switch (command){
-                case "1":return "机器人远方复位";
-                case "2":return "机器人系统自检";
-                case "3":return "机器人一键返航";
-                case "4":return "机器人手动充电";
+    public String selectContentByCommand(String type, String command, String value) {
+        if ("1".equals(type)) {
+            switch (command) {
+                case "1":
+                    return "机器人远方复位";
+                case "2":
+                    return "机器人系统自检";
+                case "3":
+                    return "机器人一键返航";
+                case "4":
+                    return "机器人手动充电";
                 case "5":
-                    if ("1".equals(value)){
+                    if ("1".equals(value)) {
                         return "机器人控制模式切换为任务模式";
-                    }else if ("2".equals(value)){
+                    } else if ("2".equals(value)) {
                         return "机器人控制模式切换为紧急定位模式";
-                    }else if ("3".equals(value)){
+                    } else if ("3".equals(value)) {
                         return "机器人控制模式切换为后台遥控模式";
-                    }else if ("4".equals(value)){
+                    } else if ("4".equals(value)) {
                         return "机器人控制模式切换为手持遥控模式";
                     }
                     break;
-                case "6":return "机器人控制权获得";
-                case "7":return "机器人控制权释放";
-                default:break;
+                case "6":
+                    return "机器人控制权获得";
+                case "7":
+                    return "机器人控制权释放";
+                default:
+                    break;
             }
-        }else if ("2".equals(type)){
+        } else if ("2".equals(type)) {
             switch (command) {
                 case "1":
                     return "机器人前进";
@@ -1707,9 +1725,9 @@ public class RobotService {
                 case "4":
                     return "机器人右转";
                 case "5":
-                    if ("1".equals(value)){
+                    if ("1".equals(value)) {
                         return "机器人左转弯";
-                    }else if ("2".equals(value)){
+                    } else if ("2".equals(value)) {
                         return "机器人右转弯";
                     }
                     break;
@@ -1718,80 +1736,123 @@ public class RobotService {
                 default:
                     break;
             }
-        }else if ("3".equals(type)){
-            switch (command){
-                case "1":return "机器人云台上仰";
-                case "2":return "机器人云台下俯";
-                case "3":return "机器人云台左转";
-                case "4":return "机器人云台右转";
-                case "5":return "机器人云台上升";
-                case "6":return "机器人云台下降";
-                case "7":return "机器人云台预置位调用";
-                case "8":return "机器人云台停止";
-                case "9":return "机器人云台复位";
-                case "10":return "机器人云台预置位新增";
-                case "11":return "机器人云台预置位修改";
-                case "12":return "机器人云台预置位删除";
-                default:break;
-            }
-        }else if ("4".equals(type)){
-            switch (command){
+        } else if ("3".equals(type)) {
+            switch (command) {
                 case "1":
-                    if ("1".equals(value)){
+                    return "机器人云台上仰";
+                case "2":
+                    return "机器人云台下俯";
+                case "3":
+                    return "机器人云台左转";
+                case "4":
+                    return "机器人云台右转";
+                case "5":
+                    return "机器人云台上升";
+                case "6":
+                    return "机器人云台下降";
+                case "7":
+                    return "机器人云台预置位调用";
+                case "8":
+                    return "机器人云台停止";
+                case "9":
+                    return "机器人云台复位";
+                case "10":
+                    return "机器人云台预置位新增";
+                case "11":
+                    return "机器人云台预置位修改";
+                case "12":
+                    return "机器人云台预置位删除";
+                default:
+                    break;
+            }
+        } else if ("4".equals(type)) {
+            switch (command) {
+                case "1":
+                    if ("1".equals(value)) {
                         return "打开机器人红外电源";
-                    }else if ("2".equals(value)) {
+                    } else if ("2".equals(value)) {
                         return "关闭机器人红外电源";
                     }
                     break;
                 case "2":
-                    if ("1".equals(value)){
+                    if ("1".equals(value)) {
                         return "打开机器人雨刷";
-                    }else if ("2".equals(value)){
+                    } else if ("2".equals(value)) {
                         return "关闭机器人雨刷";
                     }
                     break;
                 case "3":
-                    if ("1".equals(value)){
+                    if ("1".equals(value)) {
                         return "打开机器人超声";
-                    }else if ("2".equals(value)){
+                    } else if ("2".equals(value)) {
                         return "关闭机器人超声";
                     }
                     break;
                 case "4":
-                    if ("1".equals(value)){
+                    if ("1".equals(value)) {
                         return "打开机器人红外射灯";
-                    }else if ("2".equals(value)){
+                    } else if ("2".equals(value)) {
                         return "关闭机器人红外射灯";
                     }
                     break;
-                default:break;
+                default:
+                    break;
             }
-        }else if ("21".equals(type)){
-            switch (command){
-                case "1":return "机器人可见光摄像机镜头拉近";
-                case "2":return "机器人可见光摄像机镜头拉远";
-                case "3":return "机器人可见光摄像机镜头拉焦停止";
-                case "4":return "机器人可见光摄像机焦距增加";
-                case "5":return "机器人可见光摄像机焦距减少";
-                case "6":return "机器人可见光摄像机自动聚焦";
-                case "7":return "机器人可见光摄像机抓图";
-                case "8":return "机器人可见光摄像机重启";
-                case "9":return "机器人可见光摄像机启动录像";
-                case "10":return "机器人可见光摄像机停止录像";
-                case "11":return "机器人可见光摄像机倍率值设置";
-                case "12":return "机器人可见光摄像机聚焦值设置";
-                default:break;
+        } else if ("21".equals(type)) {
+            switch (command) {
+                case "1":
+                    return "机器人可见光摄像机镜头拉近";
+                case "2":
+                    return "机器人可见光摄像机镜头拉远";
+                case "3":
+                    return "机器人可见光摄像机镜头拉焦停止";
+                case "4":
+                    return "机器人可见光摄像机焦距增加";
+                case "5":
+                    return "机器人可见光摄像机焦距减少";
+                case "6":
+                    return "机器人可见光摄像机自动聚焦";
+                case "7":
+                    return "机器人可见光摄像机抓图";
+                case "8":
+                    return "机器人可见光摄像机重启";
+                case "9":
+                    return "机器人可见光摄像机启动录像";
+                case "10":
+                    return "机器人可见光摄像机停止录像";
+                case "11":
+                    return "机器人可见光摄像机倍率值设置";
+                case "12":
+                    return "机器人可见光摄像机聚焦值设置";
+                default:
+                    break;
             }
-        }else if ("22".equals(type)){
-            switch (command){
-                case "5":return "机器人红外热像仪设定焦距值";
-                case "6":return "机器人红外热像仪自动聚焦";
-                case "7":return "机器人红外热像仪抓图";
-                case "8":return "机器人红外热像仪重启";
-                default:break;
+        } else if ("22".equals(type)) {
+            switch (command) {
+                case "5":
+                    return "机器人红外热像仪设定焦距值";
+                case "6":
+                    return "机器人红外热像仪自动聚焦";
+                case "7":
+                    return "机器人红外热像仪抓图";
+                case "8":
+                    return "机器人红外热像仪重启";
+                default:
+                    break;
             }
         }
         return "";
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void uploadFile(String localPath,String targetName) throws Exception{
+        try {
+            FtpsUtil.putFile(localPath,targetName,
+                    serverUrl,Integer.valueOf(ftpsPort),key,ftpsUserName,ftpsPassWord );
+        } catch (Exception e) {
+            log.error("上传至ftps错误 "+e);
+        }
+
     }
 }
 
