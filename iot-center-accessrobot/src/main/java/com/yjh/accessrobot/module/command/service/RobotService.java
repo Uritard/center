@@ -29,16 +29,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
+
+import static com.yjh.accessrobot.netty.server.RobotServerHandler.getXmlMessage;
+import static org.apache.catalina.startup.ExpandWar.deleteDir;
 
 /**
  * @author tt
@@ -257,6 +262,15 @@ public class RobotService {
     }
     @Transactional(rollbackFor = Exception.class)
     public int robotFileIntoDB(List<Map<String, Object>> deviceMapList, List<Map<String, Object>> robotMap, XMLBaseModel xmlBaseModel) {
+        Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
+        //机器人模型信息
+        robotModelIntoDB(robotMap,robotId);
+        //设备点位模型文件
+        deviceModelIntoDB(deviceMapList,robotId);
+        return 1;
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public int robotModelIntoDB( List<Map<String, Object>> robotMap,Long robotId){
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
@@ -283,14 +297,15 @@ public class RobotService {
         }
         String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
 //        log.info("developRelativeUrl===="+developRelativeUrl);
-        Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
 //        log.info("tRobotInfo==="+tRobotInfo);
         tRobotInfoDao.update(tRobotInfo);
-
-        //设备模型文件
+        return 1;
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public int deviceModelIntoDB(List<Map<String, Object>> deviceMapList,Long robotId){
         List<TRobotInspection> deviceList = new ArrayList<>();
         List<TRobotRegion> tRobotRegionList = new ArrayList<>();
         for (Map<String, Object> deviceMap : deviceMapList) {
@@ -424,7 +439,6 @@ public class RobotService {
         }
         return 1;
     }
-
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> receivingResponse(XMLBaseModel xmlBaseModel,long receiveSessionId) {
         RobotServerHandler.getRobotResultMap().put("Code",xmlBaseModel.getCode());
@@ -1843,6 +1857,7 @@ public class RobotService {
         }
         return "";
     }
+<<<<<<< Updated upstream
 
     @Transactional(rollbackFor = Exception.class)
     public void uploadFile(String localPath,String targetName) throws Exception{
@@ -1853,6 +1868,38 @@ public class RobotService {
             log.error("上传至ftps错误 "+e);
         }
 
+=======
+   public Result upload(MultipartFile file,Long robotId){
+       Result result = new Result();
+       try{
+           if(file == null){
+               result.setCode(209,"文件错误，文件为null");
+               return result;
+           }
+           String pathName = excelDataImport(file);
+           XMLBaseModel robotModel = getXmlMessage(pathName);//解析xml文件
+           List<Map<String,Object>> robotMap = robotModel.getItems();
+           robotModelIntoDB(robotMap,robotId);//机器人模型信息入库
+       }catch (Exception e){
+           log.info(e.getMessage());
+       }
+        return result;
+   }
+    private String excelDataImport(MultipartFile file) {
+        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+        String path = (String) mapForPicModelPath.get("content");
+        String fileName = "copy-robotModel.xml";
+        // 将上传文件写入
+        try {
+            deleteDir(new File(path +"/"+ fileName));
+            file.transferTo(new File(path +"/"+ fileName));
+        }catch (NullPointerException e) {
+            e.getMessage();
+        } catch (IOException e) {
+            e.getMessage();
+        }
+        return path +"/"+ fileName;
+>>>>>>> Stashed changes
     }
 }
 

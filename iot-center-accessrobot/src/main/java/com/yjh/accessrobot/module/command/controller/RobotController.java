@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -213,6 +214,7 @@ public class RobotController {
         }
         return result;
     }
+<<<<<<< Updated upstream
 
     @ApiOperation(value = "上传至ftps服务器去")
     @RequestMapping(value = "/uploadFile", method = RequestMethod.GET)
@@ -227,4 +229,39 @@ public class RobotController {
         }
         return result;
     }
+=======
+    @ApiOperation(value = "离线情况同步机器人模型信息-上传文件")
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    @Logs(title = "导入模型文件",content = "导入模型文件",logType = 8)
+    public Result upload(@RequestParam(value="file", required=false) MultipartFile file,
+                         @RequestParam(value="robotId", required=false) Long robotId){
+        Result result = new Result();
+        try {
+            robotService.upload(file,robotId);
+            result.setData(1);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("离线情况同步机器人模型文件-上传文件接口发生错误:", e);
+        }
+        return result;
+    }
+    /*@ApiOperation(value = "离线情况同步机器人模型文件-下载模板")
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    @Logs(title = "下载模板",content = "下载模板",logType = 9)
+    public Result download(){
+        Result result = new Result();
+        try {
+            robotService.download();
+            result.setData(1);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("离线情况同步机器人模型文件-下载模板接口发生错误:", e);
+        }
+        return result;
+    }*/
+>>>>>>> Stashed changes
 }

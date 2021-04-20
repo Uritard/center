@@ -151,11 +151,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             flag2 = 0;
         }
 
-        /*for (Object key : robotServerHandlerMap.keySet()){
+        for (Object key : robotServerHandlerMap.keySet()){
             if (this.equals(robotServerHandlerMap.get(key))){
-                log.info("当前的存在的=="+key);
+                log.info("当前建立连接的机器人=="+key.toString());
             }
-        }*/
+        }
         log.info("channel.isActive(): " + channel.isActive());
         log.info("此时的packet====="+Packet);
         Packet = "";
