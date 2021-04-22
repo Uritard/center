@@ -235,7 +235,6 @@ public class RobotController {
         Result result = new Result();
         try {
             robotService.upLoadRobotModel(file,robotCode);
-            result.setData(1);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -244,7 +243,7 @@ public class RobotController {
         }
         return result;
     }
-    @ApiOperation(value = "离线情况同步机器人模型文件-上传文件")
+    @ApiOperation(value = "离线情况同步机器人设备文件-上传文件")
     @RequestMapping(value = "/upLoadRobotDevice", method = RequestMethod.POST)
     @Logs(title = "导入文件",content = "导入机器人设备点位文件",logType = 8)
     public Result upLoadRobotDevice(@RequestParam(value="file", required=false) MultipartFile file,
@@ -252,12 +251,11 @@ public class RobotController {
         Result result = new Result();
         try {
             robotService.upLoadRobotDevice(file,robotCode);
-            result.setData(1);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("离线情况同步机器人模型文件-下载模板接口发生错误:", e);
+            log.error("离线情况同步机器人模型信息-上传文件接口发生错误:", e);
         }
         return result;
     }

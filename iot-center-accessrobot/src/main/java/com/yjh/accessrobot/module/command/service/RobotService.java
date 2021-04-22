@@ -301,8 +301,8 @@ public class RobotService {
                 .setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
 //        log.info("tRobotInfo==="+tRobotInfo);
-        tRobotInfoDao.update(tRobotInfo);
-        return 1;
+        int res = tRobotInfoDao.update(tRobotInfo);
+        return res;
     }
     @Transactional(rollbackFor = Exception.class)
     public int deviceModelIntoDB(List<Map<String, Object>> deviceMapList,Long robotId){
@@ -1873,6 +1873,7 @@ public class RobotService {
         try{
             if(file == null){
                 result.setCode(209,"文件错误，文件为null");
+                result.setData(0);
                 return result;
             }
             String fileName = "copy-robotModel.xml";
@@ -1880,7 +1881,8 @@ public class RobotService {
             XMLBaseModel robotModel = getXmlMessage(pathName);//解析xml文件
             List<Map<String,Object>> robotMap = robotModel.getItems();
             Long robotId = selectRobotIdByCode(robotCode);
-            robotModelIntoDB(robotMap,robotId);//机器人模型信息入库
+            int res = robotModelIntoDB(robotMap,robotId);//机器人模型信息入库
+            result.setData(res);
         }catch (Exception e){
             log.info(e.getMessage());
         }
@@ -1891,16 +1893,19 @@ public class RobotService {
         try{
             if(file == null){
                 result.setCode(209,"文件错误，文件为null");
+                result.setData(0);
                 return result;
             }
             String fileName = "copy-robotDevice.xml";
             String pathName = excelDataImport(file,fileName);
-            XMLBaseModel robotModel = getXmlMessage(pathName);//解析xml文件
-            List<Map<String,Object>> robotMap = robotModel.getItems();
+            XMLBaseModel robotDevice = getXmlMessage(pathName);//解析xml文件
+            List<Map<String,Object>> deviceMap = robotDevice.getItems();
             Long robotId = selectRobotIdByCode(robotCode);
-            robotModelIntoDB(robotMap,robotId);//机器人设备点位入库
+            int res = deviceModelIntoDB(deviceMap,robotId);//机器人设备点位入库
+            result.setData(res);
         }catch (Exception e){
             log.info(e.getMessage());
+
         }
         return result;
     }
