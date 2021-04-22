@@ -41,6 +41,7 @@ public class Constant {
     public static List<ConcurrentHashMap<String,Object>> taskMap = new LinkedList<>();
 
     public static final String CAMERA_STATES = "http://iot-center-accessvideo/camera/v1/getCameraStatus?recordId={recordId}";
+    public static final String Recorder_STATES = "http://iot-center-accessvideo/camera/v1/registerNVR?recordId={recordId}";
 
     public static Map<String, Object> confirmImmediatelyMap = new HashMap<>();
 
@@ -118,7 +119,7 @@ public class Constant {
         //将websocket信息写入redis
         String json= JSON.toJSONString(map);
         //WebSocketServer.sendMsg(json);
-       // String.valueOf(map);
+        // String.valueOf(map);
         if("logError".equals(map.get("type")) || "newTask".equals(map.get("type")) || "newLinkage".equals(map.get("type"))
                 || "newAlarm".equals(map.get("type"))  || "alarmPopUp".equals(map.get("type"))  || "linkagePopUp".equals(map.get("type"))){
             redisTemplate.opsForValue().set(map.get("type"),String.valueOf(map),5, TimeUnit.MINUTES);

@@ -79,7 +79,7 @@ public class PlatformApplication  implements CommandLineRunner {
             for (VoiceDeviceAllInfo voiceDeviceAllInfo:voiceDeviceAllInfoList) {
                 RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
                         voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
-                        voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true,tVoiceDeviceService);
+                        voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true, tVoiceDeviceService);
                 Thread thread = new Thread(recordVoiceFileThread);
                 thread.setDaemon(true);
                 thread.start();

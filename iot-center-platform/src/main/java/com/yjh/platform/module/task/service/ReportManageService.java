@@ -42,6 +42,12 @@ public class ReportManageService {
     public int reportGenerate(Date startTime,Date endTime,String deviceIdList,String reportName,String reportType) {
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        Map<String, String> relativeImgMap1 = redisTemplate.opsForHash().entries("t_sys_param:meterResultRealImg");
+        Map<String, String> absoluteImgMap1 = redisTemplate.opsForHash().entries("t_sys_param:meterResultImg");
+        Map<String, String> relativeImgMap2 = redisTemplate.opsForHash().entries("t_sys_param:judgeResultRealImg");
+        Map<String, String> absoluteImgMap2 = redisTemplate.opsForHash().entries("t_sys_param:judgeResultImg");
+        Map<String, String> relativeImgMap3 = redisTemplate.opsForHash().entries("t_sys_param:defectResultRealImg");
+        Map<String, String> absoluteImgMap3 = redisTemplate.opsForHash().entries("t_sys_param:defectResultImg");
         List<String> list = Arrays.asList(deviceIdList.split(","));
         //巡检记录报表对象
         ReportData recordData = new ReportData();
@@ -61,8 +67,22 @@ public class ReportManageService {
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(list,startTime,endTime);
         for (TCruiseDataResultDetail tcdr : tCDRDList){
             String relativePath = tcdr.getPicPath();
-            if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
-                relativePath = relativePath.replace(relativeImgMap.get("content"),absoluteImgMap.get("content"));
+            if (!"228".equals(tcdr.getCruiseType().toString())){
+                if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
+                    String aaa[] =  relativePath.split("/");
+                    String type = aaa[5];
+                    if ("defect".equals(type)){//缺陷
+                        relativePath = relativePath.replace(relativeImgMap3.get("content"),absoluteImgMap3.get("content"));
+                    }else if ("meter".equals(type)){//表計
+                        relativePath = relativePath.replace(relativeImgMap1.get("content"),absoluteImgMap1.get("content"));
+                    }else if ("panbie".equals(type)){//判別
+                        relativePath = relativePath.replace(relativeImgMap2.get("content"),absoluteImgMap2.get("content"));
+                    }
+                }
+            }else {
+                if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
+                    relativePath = relativePath.replace(relativeImgMap.get("content"),absoluteImgMap.get("content"));
+                }
             }
             tcdr.setPicPath(relativePath);
         }
@@ -187,7 +207,7 @@ public class ReportManageService {
         log.info("删除后文件的个数："+count2);
         int res = 0;
         if (count - 1 == count2){
-             res = reportManageDao.reportDelete(reportId);
+            res = reportManageDao.reportDelete(reportId);
         }
         return res;
     }
@@ -195,6 +215,13 @@ public class ReportManageService {
     public String cruiseReportGenerate(String taskId){
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        Map<String, String> relativeImgMap1 = redisTemplate.opsForHash().entries("t_sys_param:meterResultRealImg");
+        Map<String, String> absoluteImgMap1 = redisTemplate.opsForHash().entries("t_sys_param:meterResultImg");
+        Map<String, String> relativeImgMap2 = redisTemplate.opsForHash().entries("t_sys_param:judgeResultRealImg");
+        Map<String, String> absoluteImgMap2 = redisTemplate.opsForHash().entries("t_sys_param:judgeResultImg");
+        Map<String, String> relativeImgMap3 = redisTemplate.opsForHash().entries("t_sys_param:defectResultRealImg");
+        Map<String, String> absoluteImgMap3 = redisTemplate.opsForHash().entries("t_sys_param:defectResultImg");
+
         ReportData recordData = new ReportData();
         //1.总体情况
         TaskVO taskVO = new TaskVO();
@@ -214,9 +241,29 @@ public class ReportManageService {
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
         for (TCruiseDataResultDetail tcdr : tCDRDList){
             String relativePath = tcdr.getPicPath();
-            if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
-                relativePath = relativePath.replace(relativeImgMap.get("content"),absoluteImgMap.get("content"));
+            if (!"228".equals(tcdr.getCruiseType().toString())){
+                if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
+                    String aaa[] =  relativePath.split("/");
+                    String type = aaa[5];
+                    if ("defect".equals(type)){//缺陷
+                        relativePath = relativePath.replace(relativeImgMap3.get("content"),absoluteImgMap3.get("content"));
+                    }else if ("meter".equals(type)){//表計
+                        relativePath = relativePath.replace(relativeImgMap1.get("content"),absoluteImgMap1.get("content"));
+                    }else if ("panbie".equals(type)){//判別
+                        relativePath = relativePath.replace(relativeImgMap2.get("content"),absoluteImgMap2.get("content"));
+                    }
+                }
+            }else {
+                if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
+                    relativePath = relativePath.replace(relativeImgMap.get("content"),absoluteImgMap.get("content"));
+                }
             }
+
+            //相對路勁轉絕對路徑
+            /*String fName = relativePath.trim();
+            String fileName = fName.substring(fName.lastIndexOf("/") + 1);
+            log.info("fileName==="+fileName);*/
+
             tcdr.setPicPath(relativePath);
         }
         recordData.setTCDRDList(tCDRDList);
@@ -350,8 +397,8 @@ public class ReportManageService {
         return fileRelativePath;
     }
     /*
-    *转UTF-8
-    * */
+     *转UTF-8
+     * */
     public String toUTF8(String s) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < s.length(); i++) {

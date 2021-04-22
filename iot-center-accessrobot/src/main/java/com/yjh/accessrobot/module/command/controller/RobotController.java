@@ -52,7 +52,7 @@ public class RobotController {
 
     @ApiOperation(value = "发送控制指令接口")
     @RequestMapping(value = "/command", method = RequestMethod.GET)
-   // @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5)
+    // @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5)
     public Result feignRobotControl(HttpServletRequest request,
                                     @RequestParam(value = "robotCode") String robotCode,
                                     @RequestParam(value = "type") String type,
@@ -214,8 +214,6 @@ public class RobotController {
         }
         return result;
     }
-<<<<<<< Updated upstream
-
     @ApiOperation(value = "上传至ftps服务器去")
     @RequestMapping(value = "/uploadFile", method = RequestMethod.GET)
     public Result uploadFile() {
@@ -229,15 +227,14 @@ public class RobotController {
         }
         return result;
     }
-=======
     @ApiOperation(value = "离线情况同步机器人模型信息-上传文件")
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    @Logs(title = "导入模型文件",content = "导入模型文件",logType = 8)
-    public Result upload(@RequestParam(value="file", required=false) MultipartFile file,
-                         @RequestParam(value="robotId", required=false) Long robotId){
+    @RequestMapping(value = "/upLoadRobotModel", method = RequestMethod.POST)
+    @Logs(title = "导入文件",content = "导入机器人模型信息文件",logType = 8)
+    public Result upLoadRobotModel(@RequestParam(value="file", required=false) MultipartFile file,
+                                   @RequestParam(value="robotCode", required=false) String robotCode){
         Result result = new Result();
         try {
-            robotService.upload(file,robotId);
+            robotService.upLoadRobotModel(file,robotCode);
             result.setData(1);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -247,13 +244,14 @@ public class RobotController {
         }
         return result;
     }
-    /*@ApiOperation(value = "离线情况同步机器人模型文件-下载模板")
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    @Logs(title = "下载模板",content = "下载模板",logType = 9)
-    public Result download(){
+    @ApiOperation(value = "离线情况同步机器人模型文件-上传文件")
+    @RequestMapping(value = "/upLoadRobotDevice", method = RequestMethod.POST)
+    @Logs(title = "导入文件",content = "导入机器人设备点位文件",logType = 8)
+    public Result upLoadRobotDevice(@RequestParam(value="file", required=false) MultipartFile file,
+                                    @RequestParam(value="robotCode", required=false) String robotCode){
         Result result = new Result();
         try {
-            robotService.download();
+            robotService.upLoadRobotDevice(file,robotCode);
             result.setData(1);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -262,6 +260,5 @@ public class RobotController {
             log.error("离线情况同步机器人模型文件-下载模板接口发生错误:", e);
         }
         return result;
-    }*/
->>>>>>> Stashed changes
+    }
 }

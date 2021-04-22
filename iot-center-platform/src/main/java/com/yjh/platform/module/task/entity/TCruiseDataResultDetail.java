@@ -44,4 +44,5 @@ public class TCruiseDataResultDetail implements Serializable {
     private String identifyResultName;
     @ApiModelProperty(value = "审核状态")
     private String evaluationStateName;
+    private Integer cruiseType;
 }

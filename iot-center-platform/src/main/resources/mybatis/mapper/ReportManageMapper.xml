@@ -85,7 +85,8 @@
             y.real_code,
             f.person_check,
             f.identify_result,
-            z.dict_note as identify_result_name
+            z.dict_note as identify_result_name,
+            f.cruise_type
         from t_cruise_result q
         LEFT JOIN t_cruise_task_result_detail e on q.task_result_id = e.task_result_id
         LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
@@ -104,14 +105,14 @@
 
     <select id="reportSelect" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TReportInfo">
         SELECT
-            a.report_id,
-            a.report_name,
-            a.report_type,
-            a.generate_date,
-            a.report_env_id,
-            a.remarks
+        a.report_id,
+        a.report_name,
+        a.report_type,
+        a.generate_date,
+        a.report_env_id,
+        a.remarks
         FROM
-         t_report_info a
+        t_report_info a
         WHERE 1 = 1
         <if test="reportName != null and reportName != ''"> and a.report_name like concat ('%',#{reportName,jdbcType=VARCHAR},'%')</if>
         <if test="startTime != null and startTime != ''">
@@ -146,10 +147,10 @@
     <select id="selectDetail" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
         <include refid="TongYong"></include>
         where 1 = 1
-         and a.device_id in
-            <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
-                #{deviceIds, jdbcType=BIGINT}
-            </foreach>
+        and a.device_id in
+        <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
+            #{deviceIds, jdbcType=BIGINT}
+        </foreach>
 
         <if test="startTime != null " ><if test="endTime != null">and cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
         ORDER by cruise_time
@@ -166,7 +167,7 @@
         SELECT COUNT(device_mete_id or null) as mete_num
         from
         (
-            <include refid="TongYong"></include>
+        <include refid="TongYong"></include>
         where 1 = 1
         and a.device_id in
         <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
@@ -180,7 +181,7 @@
         SELECT COUNT(evaluation_state = 257 or null) as abnormal_num
         from
         (
-            <include refid="TongYong"></include>
+        <include refid="TongYong"></include>
         where 1 = 1
         and a.device_id in
         <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
@@ -190,28 +191,28 @@
     </select>
     <select id="selectMeteType" resultType="com.yjh.platform.module.task.entity.CheckPointType">
         SELECT
-            dict_note as meteType,
-            (SELECT COUNT(*)
-                from
-                (
-                    <include refid="TongYong"></include>
-                    where 1 = 1
-                    and a.device_id in
-                    <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
-                        #{deviceIds, jdbcType=BIGINT}
-                    </foreach>
-                    <if test="startTime != null " ><if test="endTime != null">and cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
-                    GROUP BY device_mete_id
-                ) big_table
-                where mete_type = dict_code
-            ) as meteNum,
-            0 as regular_num
+        dict_note as meteType,
+        (SELECT COUNT(*)
+        from
+        (
+        <include refid="TongYong"></include>
+        where 1 = 1
+        and a.device_id in
+        <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
+            #{deviceIds, jdbcType=BIGINT}
+        </foreach>
+        <if test="startTime != null " ><if test="endTime != null">and cruise_time between #{startTime,jdbcType=TIMESTAMP} and #{endTime,jdbcType=TIMESTAMP}</if></if>
+        GROUP BY device_mete_id
+        ) big_table
+        where mete_type = dict_code
+        ) as meteNum,
+        0 as regular_num
         from t_dict_business
         where dict_code IN
         (
-            select dict_code
-            from t_dict_business
-            where col_name = 'mete_type'
+        select dict_code
+        from t_dict_business
+        where col_name = 'mete_type'
         )
         ORDER BY dict_code
     </select>
@@ -248,36 +249,36 @@
         SELECT COUNT(device_mete_id or null) as mete_num
         from
         (
-            <include refid="TongYong2"></include>
-            where 1 = 1
-            <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <include refid="TongYong2"></include>
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
         )big_table
     </select>
     <select id="selectAbnormalNumByTask" resultType="java.lang.Integer">
         SELECT COUNT(evaluation_state = 257 or null) as abnormal_num
         from
         (
-            <include refid="TongYong2"></include>
-            where 1 = 1
-            <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <include refid="TongYong2"></include>
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
         )big_table
     </select>
     <select id="selectTaskNameAndTime" resultType="com.yjh.platform.module.task.entity.TaskVO">
         SELECT
-            a.task_name,
-            a.start_time as cruise_date,
-            b.region_name as station_name
+        a.task_name,
+        a.start_time as cruise_date,
+        b.region_name as station_name
         from
-            t_cruise_task a,t_std_region b
+        t_cruise_task a,t_std_region b
         where 1 = 1
         and b.up_region_id = -1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
     <select id="selectReviewTaskFlag" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT
-            a.remark
+        a.remark
         FROM
-            t_cruise_result a
+        t_cruise_result a
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>

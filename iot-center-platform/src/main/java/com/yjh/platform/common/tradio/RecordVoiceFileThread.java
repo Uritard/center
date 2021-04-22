@@ -122,15 +122,15 @@ public class RecordVoiceFileThread implements Runnable {
                     String timeAfterTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime));
                     String urlAACToWAV1 = "ffmpeg -y -i "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+"01.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
                             voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName + "01.wav";
-                    String urlAACToWAV2 = "ffmpeg -y -i "+voicePath+"/"+voiceDeviceId+"/2/"+timeAfterTem+"/"+voiceName+"02.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
-                            voicePath+"/"+voiceDeviceId+"/2/"+timeAfterTem+"/"+voiceName + "02.wav";
+//                    String urlAACToWAV2 = "ffmpeg -y -i "+voicePath+"/"+voiceDeviceId+"/2/"+timeAfterTem+"/"+voiceName+"02.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
+//                            voicePath+"/"+voiceDeviceId+"/2/"+timeAfterTem+"/"+voiceName + "02.wav";
                     log.info("urlAACToWAV: "+urlAACToWAV1);
                     try {
                         Runtime.getRuntime().exec(urlAACToWAV1);
-                        Runtime.getRuntime().exec(urlAACToWAV2);
+//                        Runtime.getRuntime().exec(urlAACToWAV2);
                         Thread.sleep(2000);
                         Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+"01.aac");
-                        Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/2/"+timeAfterTem+"/"+voiceName+"02.aac");
+//                        Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/2/"+timeAfterTem+"/"+voiceName+"02.aac");
                     } catch (IOException e) { e.getMessage(); }
                     dateTime = System.currentTimeMillis();
                     dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
@@ -144,10 +144,16 @@ public class RecordVoiceFileThread implements Runnable {
 //                } catch (InterruptedException e) { e.getMessage(); }
 //                sdk_.NET_TRADIO_Clear();
 //                if (sdk_.NET_TRADIO_Logout(0) == 0) { log.info("设备注销失败"); }
-                isThreadStart = Constant.voiceDeviceState.get(ftpUrl);
+
+//                try {
+//                    isThreadStart = Constant.voiceDeviceState.get(ftpUrl);
+//                } catch (Exception e) { e.getMessage(); }
+//                sdk_.NET_TRADIO_Clear();
+//                if (sdk_.NET_TRADIO_Logout(0) == 0) { log.info("设备注销失败"); }
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            isThreadStart = false;
         }
     }
 }

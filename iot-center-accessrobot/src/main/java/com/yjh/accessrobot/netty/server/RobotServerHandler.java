@@ -279,11 +279,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         if (matcher.find()) {
             return true;
         }
-       return false;
+        return false;
     }
     /*
-    * 拆包工具3.0
-    * */
+     * 拆包工具3.0
+     * */
     public void openPackage2(String socketMessageHex) throws Exception{
         String onePacketString = null;
         String residueString = null;
@@ -350,7 +350,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         if(socketMessageHex.startsWith("eb90")
                 && headNum >= 2
-                /*&& Long.valueOf(sendRobotNewSessionId).equals(Long.valueOf(sendRobotSessionId + 1))*/) {
+            /*&& Long.valueOf(sendRobotNewSessionId).equals(Long.valueOf(sendRobotSessionId + 1))*/) {
             //有至少一个完整的包
             int limitNum = socketMessageHex.indexOf("eb90", socketMessageHex.indexOf("eb90") + 1) + 3;//一个包的长度-1
 //            sendRobotSessionId = sendRobotNewSessionId;
@@ -386,33 +386,33 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
     public void stringToXml(byte[] bytes,String xmlContext)throws Exception{
-            Document document = DocumentHelper.parseText(xmlContext);//String转XML
-            XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);//解析xml
-            byte[] sendSessionIdByte = new byte[8];
-            byte[] receiveSessionIdByte = new byte[8];
-            System.arraycopy(bytes, 2, sendSessionIdByte, 0, 8);
-            System.arraycopy(bytes, 10, receiveSessionIdByte, 0, 8);
-            long sendSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);//发送会话序列号
-            long receiveSessionId = PlatformPacketUtil.bytesToLong(receiveSessionIdByte);//接收会话序列号
-            if (xmlRes.getSendCode() == null) {
-                log.info("连接可能断了，等待重连.....");
-            } else {
-                doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
-                log.info("+++++++++++++++++解包完成+++++++++++++++++");
-            }
+        Document document = DocumentHelper.parseText(xmlContext);//String转XML
+        XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);//解析xml
+        byte[] sendSessionIdByte = new byte[8];
+        byte[] receiveSessionIdByte = new byte[8];
+        System.arraycopy(bytes, 2, sendSessionIdByte, 0, 8);
+        System.arraycopy(bytes, 10, receiveSessionIdByte, 0, 8);
+        long sendSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);//发送会话序列号
+        long receiveSessionId = PlatformPacketUtil.bytesToLong(receiveSessionIdByte);//接收会话序列号
+        if (xmlRes.getSendCode() == null) {
+            log.info("连接可能断了，等待重连.....");
+        } else {
+            doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
+            log.info("+++++++++++++++++解包完成+++++++++++++++++");
+        }
     }
     /*
-    * 分析解析后的xml,进行响应处理
-    * */
+     * 分析解析后的xml,进行响应处理
+     * */
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception  {
         log.info("robotServerHandlerMap==="+robotServerHandlerMap);
-         Map<String, String> platformServerMap = redisTemplate.opsForHash().entries("t_sys_param:PlatformServer");
-         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
-         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
-         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
-         Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
-         Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
-         Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
+        Map<String, String> platformServerMap = redisTemplate.opsForHash().entries("t_sys_param:PlatformServer");
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+        Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
+        Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
+        Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
         Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
 
 
@@ -507,6 +507,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             log.info("deviceMap==="+deviceMap+",robotMap==="+robotMap);
                             robotService.robotFileIntoDB(deviceMap,robotMap,xmlBaseModel);
 
+                            robotService.uploadFile(deviceFile,deviceFile);//设备模型
+                            robotService.uploadFile(robotFile,robotFile);//机器人模型
                             robotService.upToCruise(xmlBaseModel);//国网要求
                         }else if (xmlBaseModel.getItems().get(0).size() == 0){
                             log.info("机器人收到检修区域指令了,这是机器人的响应");
@@ -591,6 +593,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             Map<String, String> robotCoordinateMap = new HashMap<>();
                             robotCoordinateMap.put("robotName", res.get("robot_name").toString());
                             robotCoordinateMap.put("filePath", res.get("file_path").toString());
+                            robotService.uploadFile(res.get("file_path").toString(),res.get("file_path").toString());
                             robotCoordinateMap.put("robotCode", xmlBaseModel.getSendCode());
                             robotCoordinateMap.put("time",res.get("time").toString());
                             robotCoordinateMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
@@ -616,6 +619,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             Map<String, String> robotRoadMap = new HashMap<>();
                             robotRoadMap.put("robotName", res.get("robot_name").toString());
                             String filePath = res.get("file_path").toString();
+                            robotService.uploadFile(filePath,filePath);
                             String splitArray[] = filePath.split("/");
                             String fileName = splitArray[splitArray.length - 1];
                             log.info("巡检路线图片名称=="+fileName);
@@ -751,27 +755,27 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     case "41":
                         log.info("+++++++++++++++++巡视主机收到任务状态数据了+++++++++++++++++");
                         //Deal with robot task status data
-                            Map<String, Object> taskStatusMap = new HashMap<>();
-                            taskStatusMap.put("taskPatrolled_id", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
-                            taskStatusMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
-                            taskStatusMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
-                            taskStatusMap.put("taskState", xmlBaseModel.getItems().get(0).get("task_state").toString());
-                            taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time"));
-                            String startTime =  xmlBaseModel.getItems().get(0).get("start_time").toString();
-                            taskStatusMap.put("startTime", sdf.format(sdf.parse(startTime)));
-                            taskStatusMap.put("taskProgress", xmlBaseModel.getItems().get(0).get("task_progress").toString());
-                            taskStatusMap.put("taskEstimatedTime", xmlBaseModel.getItems().get(0).get("task_estimated_time").toString());
-                            taskStatusMap.put("description", xmlBaseModel.getItems().get(0).get("description").toString());
+                        Map<String, Object> taskStatusMap = new HashMap<>();
+                        taskStatusMap.put("taskPatrolled_id", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
+                        taskStatusMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
+                        taskStatusMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
+                        taskStatusMap.put("taskState", xmlBaseModel.getItems().get(0).get("task_state").toString());
+                        taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time"));
+                        String startTime =  xmlBaseModel.getItems().get(0).get("start_time").toString();
+                        taskStatusMap.put("startTime", sdf.format(sdf.parse(startTime)));
+                        taskStatusMap.put("taskProgress", xmlBaseModel.getItems().get(0).get("task_progress").toString());
+                        taskStatusMap.put("taskEstimatedTime", xmlBaseModel.getItems().get(0).get("task_estimated_time").toString());
+                        taskStatusMap.put("description", xmlBaseModel.getItems().get(0).get("description").toString());
 
-                            //判断任务是否属于机器人本体任务
-                            Long robotId = robotService.selectIsRobotTask(xmlBaseModel.getItems().get(0).get("task_code").toString());
-                            if (Objects.nonNull(robotId)){
-                                Map<String,String> jasonMap=new HashMap<>();
-                                jasonMap.put("type","newTask");
-                                jasonMap.put("taskId",xmlBaseModel.getItems().get(0).get("task_code").toString());
-                                String json= JSON.toJSONString(jasonMap);
-                                Constant.postUrl(webSocketUrl,json);
-                            }
+                        //判断任务是否属于机器人本体任务
+                        Long robotId = robotService.selectIsRobotTask(xmlBaseModel.getItems().get(0).get("task_code").toString());
+                        if (Objects.nonNull(robotId)){
+                            Map<String,String> jasonMap=new HashMap<>();
+                            jasonMap.put("type","newTask");
+                            jasonMap.put("taskId",xmlBaseModel.getItems().get(0).get("task_code").toString());
+                            String json= JSON.toJSONString(jasonMap);
+                            Constant.postUrl(webSocketUrl,json);
+                        }
 
                         Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode()
                                 +":"+xmlBaseModel.getItems().get(0).get("task_code").toString());
@@ -812,6 +816,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
                         //可见光结果、红外fir、音频wav
                         String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+                        robotService.uploadFile(ftpFilePath,ftpFilePath);
                         String sArray[] = ftpFilePath.split("/");
                         String ftpFileName = sArray[sArray.length - 1];
                         String temporaryFilePath = filePathMap.get(redisValue) + "/" +ftpFilePath;
@@ -924,7 +929,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         xmlBaseModel.getItems().get(0).put("data_type",mapForGet.get("0x02"));
                         xmlBaseModel.getItems().get(0).put("patroldevice_code",instanceId);
                         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-    //                    xmlBaseModel.getItems().get(0).put("taskPatrolledId",mapForGet.get("taskId")+"_"+simpleDateFormat2.format(mapForGet.get("cruiseTime")));
+                        //                    xmlBaseModel.getItems().get(0).put("taskPatrolledId",mapForGet.get("taskId")+"_"+simpleDateFormat2.format(mapForGet.get("cruiseTime")));
                         xmlBaseModel.getItems().get(0).remove("robot_code");
                         List<XMLBaseModel> list = new ArrayList<>();
                         list.add(xmlBaseModel);
@@ -935,7 +940,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     }
 
                     robotService.upToCruise(xmlBaseModel);//国网要求
-                        break;
+                    break;
                     case "71":
                         log.info("巡视主机收到机器人站端的任务了");
                         //Deal with robot task data
@@ -974,8 +979,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
     /*
-    * 查询缓存中所有机器人编码
-    * */
+     * 查询缓存中所有机器人编码
+     * */
     private List<String> nowRobotCode(){
         Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
 
@@ -989,8 +994,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         return allRobotCodeList;
     }
     /*
-    * 快速创建command=3 的消息体
-    * */
+     * 快速创建command=3 的消息体
+     * */
     private XMLBaseModel sendMessageForCommandThree(boolean flag,String sendCode){
         XMLBaseModel xmlBaseModelEmpty = new XMLBaseModel();
         xmlBaseModelEmpty.setCommand("3");
@@ -1002,16 +1007,16 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         return xmlBaseModelEmpty;
     }
     /*
-    * 通过文件路径解析XML
-    * */
+     * 通过文件路径解析XML
+     * */
     public static XMLBaseModel getXmlMessage(String filePathAndName) throws DocumentException {
         SAXReader reader = new SAXReader();
         Document document = reader.read(new File(filePathAndName));
         return PlatformXMLUtil.readStringXmlOut(document);
     }
     /*
-    * 接收到心跳后续判断
-    * */
+     * 接收到心跳后续判断
+     * */
     void procSend(String robotCode, Map<String, String> robotStatusMap,long sendSessionId,long receiveSessionId ) {
         heartNum ++;
         log.info("heartNum==="+heartNum+"      "+ctx.channel().id());
@@ -1052,8 +1057,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
     /*
-    * 没有收到心跳指令,removeLink && updateRobotStatus
-    * */
+     * 没有收到心跳指令,removeLink && updateRobotStatus
+     * */
     void heartBeatFailAfter(String robotCode,Map<String, String> robotStatusMap){
         removeLink(robotCode);
         log.info("没有收到心跳flag2的值==="+flag2);
@@ -1063,8 +1068,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         flag2 = 0;
     }
     /*
-    * 3、2、1走你
-    * */
+     * 3、2、1走你
+     * */
     private void send(ChannelHandlerContext ctx, byte[] bytes,String strRobotCode) {
         ByteBuf byteBuf = ctx.alloc().buffer();
         byteBuf.writeBytes(bytes);
@@ -1080,8 +1085,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
     /*
-    * 准备发送指令
-    * */
+     * 准备发送指令
+     * */
     public void sendHeartBeat (byte[] protocolBytes,String robotCode) {
         send(ctx,protocolBytes,robotCode);
     }
@@ -1163,8 +1168,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         log.info("结束标志符号指令是<start>" + endStr + "<end>");
     }
     /*
-    * 和客户端断开连接
-    * */
+     * 和客户端断开连接
+     * */
     public void removeLink(String robotCode){
         log.info("+++++++++++++++++断连开始+++++++++++++++++");
         log.info("准备断连的是=="+ctx.channel().id());

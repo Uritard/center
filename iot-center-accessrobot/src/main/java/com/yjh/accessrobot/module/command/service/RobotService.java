@@ -127,7 +127,7 @@ public class RobotService {
         params.set("requestPath", request.getRequestURI());
         params.set("requestMethod", request.getMethod());
         String operationContent = selectContentByCommand(type,command,value);
-      //  params.set("content",operationContent);
+        //  params.set("content",operationContent);
         params.set("content", content);
         LogsAspect logsAspect = new LogsAspect();
         logsAspect.post(params);
@@ -227,8 +227,8 @@ public class RobotService {
     }
 
     /*
-    * 生成发送byte指令，附带测试
-    * */
+     * 生成发送byte指令，附带测试
+     * */
     public byte[] generateByteOrder(String xmlString, String robotCode) {
         long sendSessionId = Constant.sendSessionId;
         RobotServerHandler sendId = RobotServerHandler.getRobotServerHandlerMap().get(robotCode);
@@ -941,7 +941,7 @@ public class RobotService {
             log.info("不用放");
             Constant.flagMap.put(taskId, instancedList);
         }
-        
+
         int res1 = 0;
         int res2 = 0;
         if (tCTRDList != null && !tCTRDList.isEmpty())
@@ -1337,8 +1337,8 @@ public class RobotService {
         return dictCode;
     }
     /*
-    * 机器人巡视结果交给算法,分析后再处理
-    * */
+     * 机器人巡视结果交给算法,分析后再处理
+     * */
     public List<AlgorithmDeviceMete> AnalyzeAfterRobot(Analysis analysisItem,String inspectionCode){
         List<AlgorithmDeviceMete> algorithmDeviceMeteList = tRobotInfoDao.selectAlgorithm(inspectionCode);
 
@@ -1389,8 +1389,8 @@ public class RobotService {
         }
     }
     /*
-    * 若修改机器人编码或删除机器人断开在线的机器人连接
-    * */
+     * 若修改机器人编码或删除机器人断开在线的机器人连接
+     * */
     public String removeLink(String robotCode,Long robotId){
         RobotServerHandler.getRobotServerHandlerMap().get(robotCode).removeLink(robotCode);
         /*TRobotInfo tRobotInfo = new TRobotInfo()
@@ -1423,8 +1423,8 @@ public class RobotService {
         for (Map<String, Object> taskModelMap : taskModelMapList) {
 //            String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
             /*
-            * 构建t_cruise_task
-            * */
+             * 构建t_cruise_task
+             * */
             TCruiseTask tCruiseTask = new TCruiseTask();
             tCruiseTask.setTaskId(taskModelMap.get("task_code").toString());
             tCruiseTask.setTaskCode(taskModelMap.get("task_code").toString());
@@ -1473,8 +1473,8 @@ public class RobotService {
             log.info("tCruiseTaskList==="+tCruiseTaskList);
 
             /*
-            * 该任务下包含的点位
-            * */
+             * 该任务下包含的点位
+             * */
             String inspectionIdString = taskModelMap.get("device_list").toString();
             String inspectionIds[] = inspectionIdString.split(",");
             List<String> inspectionIdList = new ArrayList<>();
@@ -1857,38 +1857,56 @@ public class RobotService {
         }
         return "";
     }
-<<<<<<< Updated upstream
 
     @Transactional(rollbackFor = Exception.class)
-    public void uploadFile(String localPath,String targetName) throws Exception{
+    public void uploadFile(String localPath,String targetName) {
         try {
-            FtpsUtil.putFile(localPath,targetName,
-                    serverUrl,Integer.valueOf(ftpsPort),key,ftpsUserName,ftpsPassWord );
+            FtpsUtil.putFile(localPath, targetName,
+                    serverUrl, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
         } catch (Exception e) {
-            log.error("上传至ftps错误 "+e);
+            log.error("上传至ftps错误 " + e);
         }
+    }
 
-=======
-   public Result upload(MultipartFile file,Long robotId){
-       Result result = new Result();
-       try{
-           if(file == null){
-               result.setCode(209,"文件错误，文件为null");
-               return result;
-           }
-           String pathName = excelDataImport(file);
-           XMLBaseModel robotModel = getXmlMessage(pathName);//解析xml文件
-           List<Map<String,Object>> robotMap = robotModel.getItems();
-           robotModelIntoDB(robotMap,robotId);//机器人模型信息入库
-       }catch (Exception e){
-           log.info(e.getMessage());
-       }
+    public Result upLoadRobotModel(MultipartFile file,String robotCode){
+        Result result = new Result();
+        try{
+            if(file == null){
+                result.setCode(209,"文件错误，文件为null");
+                return result;
+            }
+            String fileName = "copy-robotModel.xml";
+            String pathName = excelDataImport(file,fileName);
+            XMLBaseModel robotModel = getXmlMessage(pathName);//解析xml文件
+            List<Map<String,Object>> robotMap = robotModel.getItems();
+            Long robotId = selectRobotIdByCode(robotCode);
+            robotModelIntoDB(robotMap,robotId);//机器人模型信息入库
+        }catch (Exception e){
+            log.info(e.getMessage());
+        }
         return result;
-   }
-    private String excelDataImport(MultipartFile file) {
+    }
+    public Result upLoadRobotDevice(MultipartFile file,String robotCode){
+        Result result = new Result();
+        try{
+            if(file == null){
+                result.setCode(209,"文件错误，文件为null");
+                return result;
+            }
+            String fileName = "copy-robotDevice.xml";
+            String pathName = excelDataImport(file,fileName);
+            XMLBaseModel robotModel = getXmlMessage(pathName);//解析xml文件
+            List<Map<String,Object>> robotMap = robotModel.getItems();
+            Long robotId = selectRobotIdByCode(robotCode);
+            robotModelIntoDB(robotMap,robotId);//机器人设备点位入库
+        }catch (Exception e){
+            log.info(e.getMessage());
+        }
+        return result;
+    }
+    private String excelDataImport(MultipartFile file,String fileName) {
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
         String path = (String) mapForPicModelPath.get("content");
-        String fileName = "copy-robotModel.xml";
         // 将上传文件写入
         try {
             deleteDir(new File(path +"/"+ fileName));
@@ -1899,7 +1917,6 @@ public class RobotService {
             e.getMessage();
         }
         return path +"/"+ fileName;
->>>>>>> Stashed changes
     }
 }
 
