@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mchange.v1.util.ArrayUtils;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsAspect;
@@ -21,6 +22,7 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.*;
@@ -29,6 +31,7 @@ import io.swagger.models.auth.In;
 import lombok.Data;
 import lombok.NonNull;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.quartz.CronExpression;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
@@ -91,6 +94,7 @@ public class TCruiseTaskService {
     private TAlgorithmConfBakDao tAlgorithmConfBakDao;
     @Autowired
     private Demo demo;
+    private RunAtNowTask runAtNowTask;
 
     //模板图片路径
     private String picModelPath;
@@ -105,11 +109,12 @@ public class TCruiseTaskService {
     //算法接口
     private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
+    private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
 
     private Logger log = LoggerFactory.getLogger(TCruiseTaskService.class);
 
     @Transactional(rollbackFor = Exception.class)
-    public String insert(TCruiseTask tCruiseTask) {
+    public String insert(TCruiseTask tCruiseTask,TCruiseTaskAdd tCruiseTaskAdd) {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date startTime = null;
         try {
@@ -171,8 +176,135 @@ public class TCruiseTaskService {
 //                && tCruiseTask.getIfRun() == 173)
 //            Constant.confirmImmediatelyMap.remove(tCruiseTask.getTaskId());
 
+
+        /*
+         * 新版的机器人任务下发
+         * */
+        List<Long> instanceIdList = tCruisePlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());//所有点
+        List<TCruisePointInstanceNameDetail> instancesList = new ArrayList<>();
+        instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
+
+        List<Long> robotCruiseList = new ArrayList<>();//找出机器人做任务的巡检点
+        List<Long> robotInstanceList = new ArrayList<>();
+        for (TCruisePointInstance item : instancesList) {
+            if (228 == item.getCruiseType()) {
+                robotCruiseList.add(item.getCruiseId());
+                robotInstanceList.add(item.getInstanceId());
+            }
+        }
+        log.info("robotCruiseList   :" +robotCruiseList);
+        List<Long> robotTaskInstanceList = new ArrayList<>();
+        if(robotCruiseList.size() > 0) {
+            List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
+            List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+            log.info("robotCode   :" + robotCode);
+            for (String item : robotCode) {
+                RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
+                robotTaskInfo.setCruiseType(tCruiseTask.getType());
+                robotTaskInfo.setTaskId(tCruiseTask.getTaskId());
+                robotTaskInfo.setPriority(4);//优先级 暂定4
+                robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
+                robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
+                robotTaskInfo.setInstanceList(robotTaskInstanceList);
+                robotTaskInfo.setIfRun(tCruiseTaskAdd.getIfRun().toString());
+                robotTaskInfo.setRobotCode(item);
+                switch (tCruiseTaskAdd.getIfRun().toString()){
+                    case "172"://周期和间隔任务
+                        if (!"".equals(tCruiseTaskAdd.getDayOfMonth())){//周期：月
+                            String temp[] = tCruiseTaskAdd.getHour().split(",");
+                            if (temp.length > 1){
+                                log.info("这种不支持A接口的方式......球球你别发了");
+                                return "啥也不是";
+                            }else{
+                                robotTaskInfo.setCycleMonth(tCruiseTaskAdd.getDayOfMonth());
+                                String cycleExecuteTime = null;
+                                if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 12){
+                                    cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
+                                }else {
+                                    cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";
+                                }
+                                robotTaskInfo.setCycleExecuteTime(cycleExecuteTime);
+                                robotTaskInfo.setCycleStartTime(format.format(new Date()));
+                                robotTaskInfo.setCycleEndTime(tCruiseTaskAdd.getEndTime());
+                            }
+                        }else {
+                            if (!"".equals(tCruiseTaskAdd.getDayOfWeek())){//周期：周
+                                String temp2[] = tCruiseTaskAdd.getHour().split(",");
+                                if (temp2.length > 1){
+                                    log.info("这种不支持A接口的方式......球球你别发了");
+                                    return "啥也不是";
+                                }else {
+                                    String temp[] = tCruiseTaskAdd.getDayOfWeek().split(",");
+                                    String dayOfWeekTemp[] =new String[temp.length];
+                                    for (int i = 0; i < temp.length; i++) {
+                                        dayOfWeekTemp[i] = Integer.valueOf(temp[i]) - 1 + "";
+                                    }
+                                    String dayOfWeek = StringUtils.join(Arrays.asList(dayOfWeekTemp), ",");
+                                    robotTaskInfo.setCycleWeek(dayOfWeek);
+                                    String cycleExecuteTime = null;
+                                    if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 12){
+                                        cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
+                                    }else {
+                                        cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";
+                                    }
+                                    robotTaskInfo.setCycleExecuteTime(cycleExecuteTime);
+                                    robotTaskInfo.setCycleStartTime(format.format(new Date()));
+                                    robotTaskInfo.setCycleEndTime(tCruiseTaskAdd.getEndTime());
+                                }
+                            }else{//周期：天（间隔）
+                                String temp2[] = tCruiseTaskAdd.getHour().split(",");
+                                if (temp2.length > 1){
+                                    log.info("这种不支持A接口的方式......球球你别发了");
+                                    return "啥也不是";
+                                }else {
+                                    String temp[] = tCruiseTaskAdd.getDayOfWeek().split(",");
+                                    String hourTemp[] =new String[temp.length-1];
+//                                    for (int i = 0; i < temp.length-1 ; i++) {
+//                                        hourTemp[i] = Integer.valueOf(temp[i+1]) - Integer.valueOf(temp[i]) + "";
+//                                    }
+//                                    for (int i = 0; i < hourTemp.length-1; i++) {
+//                                        if (hourTemp[i].equals(hourTemp[i+1]))  {
+                                    robotTaskInfo.setIntervalNumber("1");
+                                    robotTaskInfo.setIntervalType("2");
+                                    String cycleExecuteTime = null;
+                                    if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 12){
+                                        cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
+                                    }else {
+                                        cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";
+                                    }
+                                    robotTaskInfo.setIntervalExecuteTime(cycleExecuteTime);
+                                    robotTaskInfo.setIntervalStartTime(format.format(new Date()));
+                                    robotTaskInfo.setIntervalEndTime(tCruiseTaskAdd.getEndTime());
+//                                        }else {
+//                                            log.info("这种不支持A接口的方式......球球你别发了");
+//                                            return "啥也不是";
+//                                        }
+//                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case "173"://立即任务
+                        robotTaskInfo.setFixedStartTime(format.format(new Date()));
+                        break;
+                    case "174": //定时任务
+                        robotTaskInfo.setFixedStartTime(format.format(tCruiseTaskAdd.getStartTime()));
+                        break;
+                    default:
+                        break;
+                }
+                robotTaskInfoList.add(robotTaskInfo);
+            }
+            Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>();
+            robotTaskInfoMap.put("robotTaskInfoList", robotTaskInfoList);
+
+            log.info("robotTaskInfoMap   :" + robotTaskInfoMap);
+            //让机器人做任务
+            robotTask(robotTaskInfoMap);
+        }
         this.tCruiseTaskDao.insert(tCruiseTask);
         this.tCruiseTaskAttrDao.batchInsert(tCruiseTaskAttrList);
+
         //开启定时任务
         QuartzTask quartzTask = new QuartzTask();
         quartzTask.setJobName(tCruiseTask.getTaskName());
@@ -229,7 +361,16 @@ public class TCruiseTaskService {
 
         return tCruiseTask.getTaskId();
     }
-
+    public void robotTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String taskId, String startTime) {
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
@@ -938,7 +1079,7 @@ public class TCruiseTaskService {
         if(!flag) {
             //需要自己解密数据库password
             sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
-        //}
+            //}
         }else {
             //全要解密
             password = demo.decryptIdentifier(password,identifier);

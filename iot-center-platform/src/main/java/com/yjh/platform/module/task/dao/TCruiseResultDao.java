@@ -66,7 +66,7 @@ public interface TCruiseResultDao {
                        @Param(value = "dealPersonId")String dealPersonId,
                        @Param(value = "dealTime")Date dealTime);
     int updateWarnInfo2(@Param(value = "taskId")String taskId,
-                       @Param(value = "instanceId")Long instanceId,
+                        @Param(value = "instanceId")Long instanceId,
                         @Param(value = "dealPersonId")String dealPersonId,
                         @Param(value = "dealTime")Date dealTime);
     int updateWarnInfo3(@Param(value = "warnId")Long warnId,
@@ -81,6 +81,9 @@ public interface TCruiseResultDao {
     String selectOnSunday();
     String selectLastMonday();
     String selectLastSunday();
+    String selectNextMonday();
+    String selectNextSunday();
+
     List<StatisticalTools> taskStatistical(@Param(value = "colName1")String colName1,
                                            @Param(value = "start")String start,
                                            @Param(value = "end")String end);

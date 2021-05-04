@@ -543,6 +543,8 @@ public class AnalyseDataOperateService {
         String resultValue=resultValueOrigin.replaceAll(","," ");
         log.info("----缺陷识别结果解析---resultValue:" + resultValue);
         String defectValue = "";
+        //算法设备识别专用
+        String defectRealValue="1";
         List<String> flags=new ArrayList<>();
         String value = resultValue;
         String finalValue = value.replaceAll("[0-9]", "");
@@ -677,12 +679,20 @@ public class AnalyseDataOperateService {
                     defectValue="图像有差异";
                     flags.add("1");
                     break;
-                default:
+                case "":
                     defectValue=defectValue+"";
+                    break;
+                default:
+                    defectRealValue=resultValue;
+                    flags.add("1");
+                    break;
             }
         }
 
         if(flags.contains("1")){
+            if(!(defectRealValue.equals("1"))){
+                return defectRealValue+"device";
+            }
             return defectValue;
         }else {
             return "null";

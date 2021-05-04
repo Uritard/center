@@ -820,7 +820,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         String sArray[] = ftpFilePath.split("/");
                         String ftpFileName = sArray[sArray.length - 1];
                         String temporaryFilePath = filePathMap.get(redisValue) + "/" +ftpFilePath;
-                        log.info("temporaryFilePath==="+temporaryFilePath);
+//                        log.info("temporaryFilePath==="+temporaryFilePath);
 
                         //红外原图
                         if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")){
@@ -841,7 +841,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         String sArray2[] = ftpOriginPath.split("/");
                         String ftpOriginName = sArray2[sArray2.length - 1];//原图文件名称
                         String temporaryOriginPath = filePathMap.get(redisValue) + "/" +ftpOriginPath;
-                        log.info("temporaryOriginPath==="+temporaryOriginPath);
+//                        log.info("temporaryOriginPath==="+temporaryOriginPath);
 
                         String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
                         if ("1".equals(fileType)){//红外

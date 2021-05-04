@@ -42,12 +42,19 @@ import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
+import ws.schild.jave.AudioAttributes;
+import ws.schild.jave.Encoder;
+import ws.schild.jave.EncodingAttributes;
+import ws.schild.jave.MultimediaObject;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -98,20 +105,20 @@ public class HelloController {
 //        jasonMap.put("type","noTask");
 //        //jasonMap.put("taskId",tCruiseTask.getTaskId());
 //        String json= JSON.toJSONString(jasonMap);
-        Map<String,String> jsonMap=new HashMap<>();
-        jsonMap.put("type","taskAre");
-        jsonMap.put("taskId","taskId");
-        String jsonForTaskAre= JSON.toJSONString(jsonMap);
-        log.info("任务超期的消息：   "+jsonForTaskAre);
-        //Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap);
+            Map<String,String> jsonMap=new HashMap<>();
+            jsonMap.put("type","taskAre");
+            jsonMap.put("taskId","taskId");
+            String jsonForTaskAre= JSON.toJSONString(jsonMap);
+            log.info("任务超期的消息：   "+jsonForTaskAre);
+            //Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap);
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonMap);
 
-        // webSocket通知前端调用巡视监控的接口
-        Map<String,String> jasonMapOnFinished=new HashMap<>();
-        jasonMapOnFinished.put("type","finishedOneInstance");
-        jasonMapOnFinished.put("taskId","tCruiseTask.getTaskId()");
-        String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
-        log.info("发送给前端的消息："+jsonMessage);
+            // webSocket通知前端调用巡视监控的接口
+            Map<String,String> jasonMapOnFinished=new HashMap<>();
+            jasonMapOnFinished.put("type","finishedOneInstance");
+            jasonMapOnFinished.put("taskId","tCruiseTask.getTaskId()");
+            String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
+            log.info("发送给前端的消息："+jsonMessage);
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
         }catch (Exception e){
             System.out.println("发送websocket出错");
@@ -465,4 +472,53 @@ public class HelloController {
         result.setData(s);
         return result;
     }
+
+
+
+    @ApiOperation(value = "音频文件转换")
+    @RequestMapping(value = "/video", method = RequestMethod.GET)
+    public Result video(@RequestParam(value = "aPath", required = false) String aPath,
+                        @RequestParam(value = "bPath", required = false) String bPath) {
+        Result result = new Result();
+        wavTomp3(aPath, bPath);
+        return result;
+    }
+    public static boolean wavTomp3(String inPath, String outFile) {
+        MultimediaObject file = new MultimediaObject(new File(inPath));
+        try {
+            execute(file, outFile);
+            return true;
+        } catch (Exception e) {
+//            log.error("音频转码失败", e);
+
+        }
+        return false;
+    }
+
+    /**
+     * 执行
+     * @param source 要转码的音频文件
+     * @param desFileName 转码后保存的文件路径
+     * @return
+     * @throws Exception
+     */
+    public static File execute(MultimediaObject source, String desFileName) throws Exception {
+        File target = new File(desFileName);
+        AudioAttributes audio = new AudioAttributes();
+        audio.setCodec("libmp3lame");
+        audio.setBitRate(new Integer(36000));
+        audio.setChannels(new Integer(2));
+        audio.setSamplingRate(new Integer(44100));
+        EncodingAttributes attrs = new EncodingAttributes();
+        attrs.setFormat("mp3");
+        attrs.setAudioAttributes(audio);
+        Encoder encoder = new Encoder();
+        encoder.encode(source, target, attrs);
+        return target;
+    }
+
+
+
+
+
 }

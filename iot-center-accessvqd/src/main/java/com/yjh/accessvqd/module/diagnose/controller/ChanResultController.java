@@ -49,12 +49,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(chanResultService.insert(chanResult));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -73,12 +73,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(chanResultService.deleteByPrimaryId(diagnoseResultId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
@@ -98,12 +98,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(chanResultService.update(chanResult));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -123,12 +123,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             ChanResult chanResult = chanResultService.selectByPrimaryId(diagnoseResultId);
             result.setData(chanResult);
         } catch (Exception e) {
@@ -185,12 +185,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             Page page = PageHelper.startPage(pageNum, pageSize);
             List<ChanResult> list = chanResultService.selectByPage(chanResult);
             resultMap.put("count", page.getTotal());
@@ -225,12 +225,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(chanResultService.findQueryItems(0));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -246,12 +246,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(chanResultService.findQueryItems(1));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -275,12 +275,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             Page page = PageHelper.startPage(pageNum, pageSize);
             SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date startDate=null;
@@ -317,12 +317,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(chanResultService.faultCounts(diagnosePlanId, channelId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -341,12 +341,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(chanResultService.statusTypeChannel(diagnosePlanId, channelId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -363,12 +363,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(chanResultService.faultTree());
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -387,12 +387,12 @@ public class ChanResultController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(chanResultService.staticalAnalysis(checked, startTime, endTime));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -410,12 +410,12 @@ public class ChanResultController {
 
         try {Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             ChanResult chan=chanResultService.selectByPrimaryId(Long.valueOf(param));
             Integer c=null;
             c.toString();

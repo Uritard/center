@@ -164,7 +164,7 @@ public class TCruiseDataResultController {
     @PostMapping(value = "/selectByPage")
     @Logs(title = "巡检点结果数据",content = "根据用户传递的参数分页查询巡检点结果数据",logType = 1)
     public Result selectByPage(@RequestBody TCruiseDataResult tCruiseDataResult
-                              ) {
+    ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -232,12 +232,12 @@ public class TCruiseDataResultController {
     @GetMapping(value = "/selectCruiseResultAnalyze")
     @Logs(title = "查询测点信息",content = "查询测点信息",logType = 1,authority = "1235")
     public Result selectCruiseResultAnalyze(@RequestParam(value = "regionId", required = false) Long regionId,
-                                         @RequestParam(value = "deviceType", required = false) Integer deviceType,
-                                         @RequestParam(value = "meteType", required = false) String meteType,
-                                         @RequestParam(value = "meterType", required = false) Integer meterType,
-                                         @RequestParam(value = "cruiseRes", required = false) Integer cruiseRes,
-                                         @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                         @RequestParam(value = "pageSize", required = false, defaultValue = "6") int pageSize) {
+                                            @RequestParam(value = "deviceType", required = false) Integer deviceType,
+                                            @RequestParam(value = "meteType", required = false) String meteType,
+                                            @RequestParam(value = "meterType", required = false) Integer meterType,
+                                            @RequestParam(value = "cruiseRes", required = false) Integer cruiseRes,
+                                            @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                            @RequestParam(value = "pageSize", required = false, defaultValue = "6") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -267,7 +267,7 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "巡视报表")
     @GetMapping(value = "/selectCruiseDataReport")
-  //  @Logs(title = "巡视报表",content = "根据用户传递的参数查询巡视报表",logType = 1)
+    //  @Logs(title = "巡视报表",content = "根据用户传递的参数查询巡视报表",logType = 1)
     public Result selectCruiseDataReport(@RequestParam(value = "cType", required = false) Integer cType,
                                          @RequestParam(value = "meteType", required = false) String meteType,
                                          @RequestParam(value = "meterType", required = false) Integer meterType,
@@ -283,11 +283,11 @@ public class TCruiseDataResultController {
         String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
         try {
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userIds).get("roleId"));
-            if(!"1234".equals(userRole)){
-                //权限不够；
-                throw new BusinessException(10008,"用户无权限");
-                //return -1;
-            }
+//            if(!"1234".equals(userRole)){
+//                //权限不够；
+//                throw new BusinessException(10008,"用户无权限");
+//                //return -1;
+//            }
             if(pageSize==0){
                 MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                 param.set("logType", "9");
@@ -351,16 +351,16 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "巡视结果分析--巡检点结果列表")
     @GetMapping(value = "/selectCruiseDataResultByList2")
-   // @Logs(title = "巡检点结果列表",content = "根据用户传递的参数查询巡检点结果信息",logType = 1)
+    // @Logs(title = "巡检点结果列表",content = "根据用户传递的参数查询巡检点结果信息",logType = 1)
     public Result selectCruiseDataResultByList2(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
-                                               @RequestParam(value = "cType", required = false) Integer cType,
-                                               @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
+                                                @RequestParam(value = "cType", required = false) Integer cType,
+                                                @RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
                                                 @RequestParam(value = "meteType", required = false) String meteType,
                                                 @RequestParam(value = "meterType", required = false) Integer meterType,
                                                 @RequestParam(value = "endTime", required = false) String endTime,
-                                               @RequestParam(value = "startTime", required = false) String startTime,
-                                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
+                                                @RequestParam(value = "startTime", required = false) String startTime,
+                                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -448,7 +448,7 @@ public class TCruiseDataResultController {
 
     @ApiOperation(value = "测点巡检时间记录表维护")
     @PostMapping(value = "/updateCruiseAnalyze")
-   // @Logs(title = "测点巡检时间记录表维护",content = "测点巡检时间记录表维护",logType = 2)
+    // @Logs(title = "测点巡检时间记录表维护",content = "测点巡检时间记录表维护",logType = 2)
     public Result updateCruiseAnalyze(@RequestBody List<String> cruiseResultIdList) {
         Result result = new Result();
         try {
@@ -467,7 +467,7 @@ public class TCruiseDataResultController {
     public Result QueryDifferentiateResult(@RequestParam String taskId){
         Result result=new Result();
         try {
-           result.setData(tCruiseDataResultService.QueryDifferentiateResult(taskId));
+            result.setData(tCruiseDataResultService.QueryDifferentiateResult(taskId));
         }catch (Exception e){
             log.error("查询失败"+e);
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());

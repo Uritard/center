@@ -652,7 +652,7 @@ public class RobotService {
                 redisInfoMap.put("taskId", rTII.getTaskId());
                 redisInfoList.add(redisInfoMap);
             }
-            log.info("redisInfoList是===" + redisInfoList);
+//            log.info("redisInfoList是===" + redisInfoList);
 
             //放数据到缓存
             for (int i = 0; i < redisInfoList.size(); i++) {
@@ -661,7 +661,7 @@ public class RobotService {
             }
 
             String deviceIdList = str.toString();
-            log.info("deviceIdList是==" + deviceIdList);
+//            log.info("deviceIdList是==" + deviceIdList);
             //组装任务下发的item
             List<Map<String, Object>> mapList = new ArrayList<>();
             Map<String, Object> map = new HashMap<>();
@@ -671,7 +671,22 @@ public class RobotService {
             map.put("priority", rTII.getPriority());
             map.put("device_level", rTII.getDeviceLevel());
             map.put("device_list", deviceIdList);
-            map.put("fixed_start_time", sdf.format(new Date()));
+
+            if ("172".equals(rTII.getIfRun())){//周期
+                map.put("cycle_month", Objects.nonNull(rTII.getCycleMonth())?rTII.getCycleMonth():"");
+                map.put("cycle_week", Objects.nonNull(rTII.getCycleWeek())?rTII.getCycleWeek():"");
+                map.put("cycle_execute_time", Objects.nonNull(rTII.getCycleExecuteTime())?rTII.getCycleExecuteTime():"");
+                map.put("cycle_start_time", Objects.nonNull(rTII.getCycleStartTime())?rTII.getCycleStartTime():"");
+                map.put("cycle_end_time", Objects.nonNull(rTII.getCycleEndTime())?rTII.getCycleEndTime():"");
+                map.put("interval_number",Objects.nonNull(rTII.getIntervalNumber())?rTII.getIntervalNumber():"");
+                map.put("interval_type", Objects.nonNull(rTII.getIntervalType())?rTII.getIntervalType():"");
+                map.put("interval_execute_time", Objects.nonNull(rTII.getIntervalExecuteTime())?rTII.getIntervalExecuteTime():"");
+                map.put("interval_start_time",Objects.nonNull(rTII.getIntervalStartTime())?rTII.getIntervalStartTime():"");
+                map.put("interval_end_time", Objects.nonNull(rTII.getIntervalEndTime())?rTII.getIntervalEndTime():"");
+            }else{//定期和立即
+                map.put("fixed_start_time", rTII.getFixedStartTime());
+            }
+            /*map.put("fixed_start_time", sdf.format(new Date()));
             map.put("cycle_month", "");
             map.put("cycle_week", "");
             map.put("cycle_execute_time", "");
@@ -681,14 +696,14 @@ public class RobotService {
             map.put("interval_type", "");
             map.put("interval_execute_time", "");
             map.put("interval_start_time", "");
-            map.put("interval_end_time", "");
+            map.put("interval_end_time", "");*/
             map.put("invalid_start_time", "");
             map.put("invalid_end_time", "");
             map.put("isenable", "");
             map.put("creator", "");
             map.put("create_time", "");
             mapList.add(map);
-            log.info("任务下发的item是：" + mapList);
+//            log.info("任务下发的item是：" + mapList);
             String sendCode = tRobotInfoDao.selectContent("PlatformServer");
 
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
@@ -910,13 +925,13 @@ public class RobotService {
                     tCruiseDataResult.setFirName("f");
                     tCDRList.add(tCruiseDataResult);
 
-                    if ("null".equals(redisInfoMap.get("cruiseAbnormal"))) {
+                    /*if ("null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                         normal = normal + 1;
                         log.info("这次变化的normal是===" + normal);
                     } else if ("250".equals(redisInfoMap.get("cruiseAbnormal"))) {
                         abnormal = abnormal + 1;
                         log.info("这次变化的abnormal是===" + abnormal);
-                    }
+                    }*/
                 }
             }
         }
@@ -950,7 +965,10 @@ public class RobotService {
         }
         if (tCDRList != null && !tCDRList.isEmpty()){
             res2 = batchInsertCruiseDataResult(tCDRList);
-            otherServer(cruiseResultIdList);
+            try {
+                StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_FINISH, cruiseResultIdList, Result.class);
+            } catch (Exception e) {e.getMessage();}
+//            otherServer(cruiseResultIdList);
         }
         log.info("插tCTRD的条数: "+res1+",插tCDR的条数: "+res2);
 
@@ -1861,7 +1879,8 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public void uploadFile(String localPath,String targetName) {
         try {
-            FtpsUtil.putFile(localPath, targetName,
+            if("".equals(localPath)) {return;}
+            FtpsUtil.putFile("/home/yjh_iot_center/ftps"+"/"+localPath, targetName,
                     serverUrl, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
         } catch (Exception e) {
             log.error("上传至ftps错误 " + e);

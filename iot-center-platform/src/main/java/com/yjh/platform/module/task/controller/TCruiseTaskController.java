@@ -92,7 +92,12 @@ public class TCruiseTaskController {
                     TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
                     tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
                     tCruiseTask.setType(tCruisePlanCount.getType());
-                    result.setData(tCruiseTaskService.insert(tCruiseTask));
+                    String res = tCruiseTaskService.insert(tCruiseTask,tCruiseTaskAdd);
+                    if ("啥也不是".equals(res)){
+                        result.setCode(209,"任务间隔过短,机器人暂不支持");
+                    }else {
+                        result.setData(res);
+                    }
                 } else {
                     result.setData(ResultCodeEnum.CODE10005.getName());
                     return result;
@@ -111,10 +116,13 @@ public class TCruiseTaskController {
                 if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("",tCruiseTaskAdd.getStartTime())) {
                     tCruiseTask.setStartTime(tCruiseTaskAdd.getStartTime());
                 } else { tCruiseTask.setStartTime(new Date()); }
-                result.setData(tCruiseTaskService.insert(tCruiseTask));
+                String res = tCruiseTaskService.insert(tCruiseTask,tCruiseTaskAdd);
+                if ("啥也不是".equals(res)){
+                    result.setCode(209,"任务间隔过短,机器人暂不支持");
+                }else {
+                    result.setData(res);
+                }
             }
-
-
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -204,7 +212,7 @@ public class TCruiseTaskController {
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询巡检任务",content = "根据用户传递的参数分页查询巡检任务信息",logType = 1)
     public Result selectByPage(@RequestBody TCruiseTask tCruiseTask
-                             ) {
+    ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -254,8 +262,8 @@ public class TCruiseTaskController {
     @RequestMapping(value = "/selectPointStatus", method = RequestMethod.POST)
     @Logs(title = "查询任务巡检点状态信息",content = "根据用户传递的参数查询任务巡检点状态信息",logType = 1)
     public Result selectPointStatus(@RequestParam(value = "taskId", required = false) String taskId,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                    @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -349,11 +357,11 @@ public class TCruiseTaskController {
         try {
             String userId = request.getHeader("userId");
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1234".equals(userRole)){
-                //权限不够；
-                throw new BusinessException(10008,"用户无权限");
-                //return -1;
-            }
+//            if(!"1234".equals(userRole)){
+//                //权限不够；
+//                throw new BusinessException(10008,"用户无权限");
+//                //return -1;
+//            }
             int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getpCode(),request,tCruiseTaskAdd.getIdentifier());
             if(i == 1){
 //                TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();

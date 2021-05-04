@@ -569,9 +569,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                             TCTRDList.add(tCruiseTaskResultDetail);
                             cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
-                             tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                             str = "t_cruise_task_result:"+tCruiseTask.getTaskId() +":"+ item.getInstanceId();
-                             tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                            tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                            str = "t_cruise_task_result:"+tCruiseTask.getTaskId() +":"+ item.getInstanceId();
+                            tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                             tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                             tCruiseTaskResultDetailMap.put("taskId",tCruiseTask.getTaskId());
                             tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
@@ -631,10 +631,10 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 tCruiseDataResult.setOrigpic(absPath);
 
                                 tCruiseTaskResultDetail.setCruiseStatus(253);
-                                 tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                                 str = "t_cruise_task_result:"+tCruiseTask.getTaskId() +":"+ item.getInstanceId();
+                                tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                                str = "t_cruise_task_result:"+tCruiseTask.getTaskId() +":"+ item.getInstanceId();
 
-                                 tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                                tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                                 tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                                 tCruiseTaskResultDetailMap.put("taskId",tCruiseTask.getTaskId());
                                 tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
@@ -749,9 +749,9 @@ public class CruiseTaskJob extends QuartzJobBean {
                                 TCTRDList.add(tCruiseTaskResultDetail);
                                 cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
-                                 tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
-                                 str = "t_cruise_task_result:"+tCruiseTask.getTaskId() +":"+ item.getInstanceId();
-                                 tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                                tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                                str = "t_cruise_task_result:"+tCruiseTask.getTaskId() +":"+ item.getInstanceId();
+                                tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                                 tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                                 tCruiseTaskResultDetailMap.put("taskId",tCruiseTask.getTaskId());
                                 tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
@@ -1047,14 +1047,14 @@ public class CruiseTaskJob extends QuartzJobBean {
 
     //让机器人做任务
     private void robotTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
+//        try {
+//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+//            if (null != serviceRestTemplate) {
+//                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
+//            }
+//        } catch (Exception e) {
+//            log.error(e.getMessage(), e);
+//        }
     }
 
     //红外相机抓图

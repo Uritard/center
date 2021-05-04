@@ -7,6 +7,7 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,8 +61,8 @@ public class CruiseResultDealThread implements Runnable{
             TCruiseResult tCruiseResult = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
             log.info("taskResultId是==="+tCruiseResult.getTaskResultId());
             /*
-            * 机器人本体任务,不存结果,只做展示
-            * */
+             * 机器人本体任务,不存结果,只做展示
+             * */
             if (Objects.nonNull(tCruiseTask.getTaskType()) && tCruiseTask.getTaskType() == 271){
 
                 Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:"+cruiseResultMap.get("robotCode")+ ":" +taskId);
@@ -152,8 +153,8 @@ public class CruiseResultDealThread implements Runnable{
 
             }
             /*
-            * 巡视主机下发给机器人的任务
-            * */
+             * 巡视主机下发给机器人的任务
+             * */
             else {
                 List<TCruiseDataResult> tCDRList = new ArrayList<>();
                 List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();
@@ -387,9 +388,9 @@ public class CruiseResultDealThread implements Runnable{
                                         .setResultNum(redisInfoMap.get("resultNum"))
                                         .setModifyNum(redisInfoMap.get("modifyNum"))
                                         .setPicpath(redisInfoMap.get("picpath"))
-    //待完善                             .setPicPathAnl(redisInfoMap.get("picPathAnl"))
+                                        //待完善                             .setPicPathAnl(redisInfoMap.get("picPathAnl"))
                                         .setOrigpic(redisInfoMap.get("origpic"))
-    //待完善                             .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
+                                        //待完善                             .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
                                         .setEvaluationState(257)
                                         .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
                                         .setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")))
@@ -427,7 +428,10 @@ public class CruiseResultDealThread implements Runnable{
                     if (tCDRList != null && !tCDRList.isEmpty()){
                         res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);
                         log.info("准备传其他服务的cruiseResultIdList==="+cruiseResultIdList);
-                        StaticContextAccessor.getBean(RobotService.class).otherServer(cruiseResultIdList);
+//                        StaticContextAccessor.getBean(RobotService.class).otherServer(cruiseResultIdList);
+                        try {
+                            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_FINISH, cruiseResultIdList, Result.class);
+                        } catch (Exception e) {e.getMessage();}
                     }
                     log.info("插tCTRD的条数: "+res1+",插tCDR的条数: "+res2);
 

@@ -99,4 +99,6 @@ public class TCruiseTaskAdd implements Serializable {
 
     private String identifier;
 
+    private String endTime;
+
 }

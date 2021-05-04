@@ -118,30 +118,30 @@ public class TWarnInfoController {
     @GetMapping(value = "/select")
     @Logs(title = "查询告警信息数据",content = "根据用户传递的参数查询告警信息",logType = 1)
     public Result select(@RequestParam(value = "warnId", required = false) Long warnId,
-                            @RequestParam(value = "warnLevel", required = false) Integer warnLevel,
-                            @RequestParam(value = "warnTime", required = false) Date warnTime,
-                            @RequestParam(value = "warnType", required = false) Integer warnType,
-                            @RequestParam(value = "warnName", required = false) String warnName,
-                            @RequestParam(value = "warnContent", required = false) String warnContent,
-                            @RequestParam(value = "deviceId", required = false) Long deviceId,
-                            @RequestParam(value = "cunstomId", required = false) String cunstomId,
-                            @RequestParam(value = "instanceId", required = false) Long instanceId,
-                            @RequestParam(value = "stdMeteId", required = false) Long stdMeteId,
-                            @RequestParam(value = "confMode", required = false) Integer confMode,
-                            @RequestParam(value = "isWarn", required = false) Integer isWarn,
-                            @RequestParam(value = "dealType", required = false) Integer dealType,
-                            @RequestParam(value = "dealInfo", required = false) String dealInfo,
-                            @RequestParam(value = "dealPersonId", required = false) String dealPersonId,
-                            @RequestParam(value = "dealTime", required = false) Date dealTime,
-                            @RequestParam(value = "defectModel", required = false) Integer defectModel,
-                            @RequestParam(value = "alarmSource", required = false) Integer alarmSource,
-                            @RequestParam(value = "warnSubtype", required = false) Integer warnSubtype,
-                            @RequestParam(value = "deviceCode", required = false) String deviceCode,
-                            @RequestParam(value = "imagePath", required = false) String imagePath,
-                            @RequestParam(value = "videoPath", required = false) String videoPath,
-                            @RequestParam(value = "value", required = false) String value,
-                            @RequestParam(value = "outRange", required = false) String outRange,
-                            @RequestParam(value = "taskId", required = false) String taskId) {
+                         @RequestParam(value = "warnLevel", required = false) Integer warnLevel,
+                         @RequestParam(value = "warnTime", required = false) Date warnTime,
+                         @RequestParam(value = "warnType", required = false) Integer warnType,
+                         @RequestParam(value = "warnName", required = false) String warnName,
+                         @RequestParam(value = "warnContent", required = false) String warnContent,
+                         @RequestParam(value = "deviceId", required = false) Long deviceId,
+                         @RequestParam(value = "cunstomId", required = false) String cunstomId,
+                         @RequestParam(value = "instanceId", required = false) Long instanceId,
+                         @RequestParam(value = "stdMeteId", required = false) Long stdMeteId,
+                         @RequestParam(value = "confMode", required = false) Integer confMode,
+                         @RequestParam(value = "isWarn", required = false) Integer isWarn,
+                         @RequestParam(value = "dealType", required = false) Integer dealType,
+                         @RequestParam(value = "dealInfo", required = false) String dealInfo,
+                         @RequestParam(value = "dealPersonId", required = false) String dealPersonId,
+                         @RequestParam(value = "dealTime", required = false) Date dealTime,
+                         @RequestParam(value = "defectModel", required = false) Integer defectModel,
+                         @RequestParam(value = "alarmSource", required = false) Integer alarmSource,
+                         @RequestParam(value = "warnSubtype", required = false) Integer warnSubtype,
+                         @RequestParam(value = "deviceCode", required = false) String deviceCode,
+                         @RequestParam(value = "imagePath", required = false) String imagePath,
+                         @RequestParam(value = "videoPath", required = false) String videoPath,
+                         @RequestParam(value = "value", required = false) String value,
+                         @RequestParam(value = "outRange", required = false) String outRange,
+                         @RequestParam(value = "taskId", required = false) String taskId) {
         Result result = new Result();
         try {
             List<TWarnInfo> list = tWarnInfoService.select(warnId, warnLevel, warnTime, warnType, warnName, warnContent, deviceId, cunstomId, instanceId, stdMeteId, confMode, isWarn, dealType, dealInfo, dealPersonId, dealTime, defectModel, alarmSource, warnSubtype, deviceCode, imagePath, videoPath, value, outRange, taskId);
@@ -157,7 +157,7 @@ public class TWarnInfoController {
     @PostMapping(value = "/selectByPage")
     @Logs(title = "查询告警信息数据",content = "根据用户传递的参数分页查询告警信息",logType = 1)
     public Result selectByPage(@RequestBody TWarnInfo tWarnInfo
-                               ) {
+    ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -179,10 +179,10 @@ public class TWarnInfoController {
     public Result batchInsert(@RequestBody List<TWarnInfo> list) {
         Result result = new Result();
         try {
-        result.setData(tWarnInfoService.batchInsert(list));
+            result.setData(tWarnInfoService.batchInsert(list));
         } catch (Exception e) {
-        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-        log.error("批量插入失败描述：" + e);
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败描述：" + e);
         }
         return result;
     }
@@ -431,18 +431,18 @@ public class TWarnInfoController {
 
     @ApiOperation(value = "告警信息计数统计(未核查)")
     @GetMapping(value = "/warnCountsNonIdentify")
-   // @Logs(title = "告警信息计数统计",content = "统计未核查的告警",logType = 1)
+    // @Logs(title = "告警信息计数统计",content = "统计未核查的告警",logType = 1)
     public Result warnCountsNonIdentify(HttpServletRequest request){
         Result result=new Result();
         Map<String,Integer> countResult=new HashMap<>();
         try{
             String userId = request.getHeader("userId");
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1234".equals(userRole)){
-                //权限不够；
-                throw new BusinessException(10008,"用户无权限");
-                //return -1;
-            }
+//            if(!"1234".equals(userRole)){
+//                //权限不够；
+//                throw new BusinessException(10008,"用户无权限");
+//                //return -1;
+//            }
             countResult.put("count",tWarnInfoService.warnCountsNonIdentify());
             result.setData(countResult);
         }catch (Exception e){

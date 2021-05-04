@@ -52,12 +52,12 @@ public class PlansController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             Page page = PageHelper.startPage(pageNum, pageSize);
             List<Plans> list = plansService.getPlanList(planName);
             resultMap.put("count", page.getTotal());
@@ -78,12 +78,12 @@ public class PlansController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(plansService.selectByPlanId(diagnosePlanId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -99,12 +99,12 @@ public class PlansController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             plans.setUserId(Long.valueOf(request.getHeader("userId").toString()));
             String status=plansService.diagnosePlanUpAdd(plans);
             if(status.equals("failed")){
@@ -128,12 +128,12 @@ public class PlansController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(plansService.diagnosePlanDelete(planIds));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -150,12 +150,12 @@ public class PlansController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
            result.setData(plansService.selectTheLastPlan());
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -172,12 +172,12 @@ public class PlansController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(RandomStringUtils.randomAlphanumeric(15));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -194,12 +194,12 @@ public class PlansController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(plansService.selectNVRChannelTree(diagnosePlanId));
         }catch (Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

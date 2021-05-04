@@ -352,11 +352,11 @@ public class SysLogController {
             Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1236".equals(userRole)){
+            /*if(!"1236".equals(userRole)){
                 //权限不够；
                 throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             String isDecode = enmap.get("content");
             if ("true".equals(isDecode)) {
                 userName = Demo.decrypt(userName);
@@ -407,11 +407,11 @@ public class SysLogController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1236".equals(userRole)){
+            /*if(!"1236".equals(userRole)){
                 //权限不够；
                 throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(sysLogService.logAnalyze());
         } catch (BusinessException e) {
             result.setMessage(10008, "用户无权限");

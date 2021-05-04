@@ -31,9 +31,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
-* @author lqh
-* @since 2020-12-01
-*/
+ * @author lqh
+ * @since 2020-12-01
+ */
 @Service
 public class TVoiceDeviceService{
 
@@ -95,7 +95,7 @@ public class TVoiceDeviceService{
         if(!voiceDeviceAllInfo.getFtpUrl().equals(tVoiceDevice.getFtpUrl())){
             //修改了ip
             Constant.voiceDeviceState.put(voiceDeviceAllInfo.getFtpUrl(),false);
-             voiceDeviceAllInfo = tVoiceDeviceDao.selectById(tVoiceDevice.getVoiceDeviceId());
+            voiceDeviceAllInfo = tVoiceDeviceDao.selectById(tVoiceDevice.getVoiceDeviceId());
             RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
                     voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
                     voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true,this);
@@ -143,11 +143,11 @@ public class TVoiceDeviceService{
 
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String voiceDeviceId) {
-    List<String> list1= Arrays.asList(voiceDeviceId.split(","));
-    for(String item:list1){
-        this.deleteByPrimaryId(Long.valueOf(item));
-    }
-    return 1;
+        List<String> list1= Arrays.asList(voiceDeviceId.split(","));
+        for(String item:list1){
+            this.deleteByPrimaryId(Long.valueOf(item));
+        }
+        return 1;
     }
 
 
@@ -326,6 +326,7 @@ public class TVoiceDeviceService{
         String absPath = tSysParamDao.selectByParamType("absVoicePath").getContent();
         String realPath = tSysParamDao.selectByParamType("relativeVoicePath").getContent();
 
+
         String[] getId = voicePath.replaceAll(realPath,"").split("/");
         if(getId != null && getId.length>2){
             if("".equals(getId[0])){
@@ -335,6 +336,7 @@ public class TVoiceDeviceService{
             }
         }
         voicePath = voicePath.replaceAll(realPath,absPath);
+        //voicePath = "D:/qh/bianyaqi-yinpin1";
         MultimediaObject multimediaObject = new MultimediaObject(new File(voicePath));
         MultimediaInfo info = multimediaObject.getInfo();
         Long playTime = info.getDuration();
@@ -390,22 +392,22 @@ public class TVoiceDeviceService{
         }
         DecimalFormat df1 = new DecimalFormat("#####0.000");
         try{
-        for(int j = 0;j < timeList.size();j=j+2){
-            Map<String,String> map = new HashMap<>();
-            map.put("startTime",simpleDateFormat.format(timeList.get(j)*hm- TimeZone.getDefault().getRawOffset()));
-            map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
-            if(timeList.get(j+1) == (DBList.size()-1)){
-                //整个文件满足
-                map.put("endTime",simpleDateFormat.format(second- TimeZone.getDefault().getRawOffset()));
-                map.put("time",String.valueOf(second/1000F));
-            } else {
+            for(int j = 0;j < timeList.size();j=j+2){
+                Map<String,String> map = new HashMap<>();
+                map.put("startTime",simpleDateFormat.format(timeList.get(j)*hm- TimeZone.getDefault().getRawOffset()));
                 map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
-                map.put("time",df1.format(((timeList.get(j+1)-timeList.get(j))*hm)/1000F));
-            }
+                if(timeList.get(j+1) == (DBList.size()-1)){
+                    //整个文件满足
+                    map.put("endTime",simpleDateFormat.format(second- TimeZone.getDefault().getRawOffset()));
+                    map.put("time",String.valueOf(second/1000F));
+                } else {
+                    map.put("endTime",simpleDateFormat.format(timeList.get(j+1)*hm- TimeZone.getDefault().getRawOffset()));
+                    map.put("time",df1.format(((timeList.get(j+1)-timeList.get(j))*hm)/1000F));
+                }
 
-            map.put("result",findBig(DBList,timeList.get(j),timeList.get(j+1)).toString());
-            reList.add(map);
-        }
+                map.put("result",findBig(DBList,timeList.get(j),timeList.get(j+1)).toString());
+                reList.add(map);
+            }
         }catch (Exception e){
             log.info("时间转化错误："+e);
         }
@@ -556,14 +558,14 @@ public class TVoiceDeviceService{
             List<Attribute> attributes = stu.attributes();
 
             for (Attribute attribute : attributes) {
-                    Iterator iterator1 = stu.elementIterator();
-                    while (iterator1.hasNext()) {
-                        Element stuChild = (Element) iterator1.next();
-                        map.put(stuChild.getName(), stuChild.getStringValue());
-                    }
-                    if (map.containsKey("voiceDeviceName")) {
-                        voiceDeviceAllInfoDetail.setVoiceDeviceName(map.get("voiceDeviceName"));
-                    }
+                Iterator iterator1 = stu.elementIterator();
+                while (iterator1.hasNext()) {
+                    Element stuChild = (Element) iterator1.next();
+                    map.put(stuChild.getName(), stuChild.getStringValue());
+                }
+                if (map.containsKey("voiceDeviceName")) {
+                    voiceDeviceAllInfoDetail.setVoiceDeviceName(map.get("voiceDeviceName"));
+                }
                 if (map.containsKey("stdDeviceId")) {
                     voiceDeviceAllInfoDetail.setStdDeviceId(Long.valueOf(map.get("stdDeviceId")));
                 }

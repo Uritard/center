@@ -123,17 +123,17 @@
     </update>
     <select id="selectJudgeCondition" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.AfterManualReviewInfo">
         select
-            a.is_warn,
-            b.instance_id,
-            b.task_result_id,
-            d.task_id,
-            a.identify_result,
-            a.person_check,
-            a.picpath
+        a.is_warn,
+        b.instance_id,
+        b.task_result_id,
+        d.task_id,
+        a.identify_result,
+        a.person_check,
+        a.picpath
         FROM
-            t_cruise_data_result a,
-            t_cruise_task_result_detail b,
-            t_cruise_result d
+        t_cruise_data_result a,
+        t_cruise_task_result_detail b,
+        t_cruise_result d
         WHERE 1 = 1
         AND	a.cruise_result_id = b.cruise_result_id
         AND b.task_result_id = d.task_result_id
@@ -451,21 +451,30 @@
         ORDER BY d.start_time DESC
 </select>
 
-    <select id="selectOnMonday" resultType="java.lang.String">
-        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-1)
-    </select>
-
-    <select id="selectOnSunday" resultType="java.lang.String">
-        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-7)
-    </select>
-
     <select id="selectLastMonday" resultType="java.lang.String">
-        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')+6)
+        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')+13)
     </select>
 
     <select id="selectLastSunday" resultType="java.lang.String">
+        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')+7)
+    </select>
+
+    <select id="selectOnMonday" resultType="java.lang.String">
+        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')+6)
+    </select>
+
+    <select id="selectOnSunday" resultType="java.lang.String">
         SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w'))
     </select>
+
+    <select id="selectNextMonday" resultType="java.lang.String">
+        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-1)
+    </select>
+
+    <select id="selectNextSunday" resultType="java.lang.String">
+        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-7)
+    </select>
+
 
     <!--巡视任务结果统计-->
     <select id="taskStatistical"  resultType="com.yjh.platform.module.task.entity.StatisticalTools">
@@ -575,13 +584,13 @@
 
     <select id="selectCruiseDataResult" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCruiseDataResult">
         SELECT
-                d.cruise_data_id,
-                d.cruise_result,
-                d.result_num
+        d.cruise_data_id,
+        d.cruise_result,
+        d.result_num
         FROM
-            t_cruise_result a,
-            t_cruise_task_result_detail b,
-            t_cruise_data_result d
+        t_cruise_result a,
+        t_cruise_task_result_detail b,
+        t_cruise_data_result d
         WHERE 1 = 1
         <if test="taskId != null ">and a.task_id = #{taskId,jdbcType=VARCHAR}</if>
         and a.task_result_id = b.task_result_id
@@ -622,8 +631,8 @@
         <if test="warnName != null">a.warn_name = #{warnName},</if>
         <if test="warnLevel != null">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
         <if test="warnContent != null ">a.warn_content = #{warnContent},</if>
-         a.conf_mode = 275,
-         a.deal_type = 286,
+        a.conf_mode = 275,
+        a.deal_type = 286,
         a.deal_info = "程序正常，告警属实",
         <if test="outRange != null ">a.out_range = #{outRange},</if>
         <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
@@ -641,7 +650,7 @@
         a.deal_info = "程序异常，告警误报",
         <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId},</if>
         a.deal_time = #{dealTime, jdbcType=TIMESTAMP}
-        </set>
+    </set>
         WHERE
         a.task_id = #{taskId, jdbcType=VARCHAR}
         and a.instance_id = #{instanceId,jdbcType = BIGINT}
@@ -660,7 +669,7 @@
     <update id="updateIsWarn" parameterType="java.lang.Long">
         UPDATE t_cruise_data_result a <set>
         a.is_warn = 1
-        </set>
+    </set>
         WHERE
         a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
     </update>

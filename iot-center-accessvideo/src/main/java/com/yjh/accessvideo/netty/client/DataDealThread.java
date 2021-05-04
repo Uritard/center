@@ -609,7 +609,7 @@ public class DataDealThread implements Runnable {
                                 }
 
                                 // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形
-                                if (resultValue != "null") {
+                                if (resultValue != "null" && !(resultValue.contains("device"))) {
                                     //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
                                     Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "缺陷异常", resultValue);
                                     cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
@@ -805,7 +805,11 @@ public class DataDealThread implements Runnable {
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
 //                                    tNormal++;
                                     Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", "--");
-                                    cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                    if(resultValue.contains("device")){
+                                        cruiseResultMap.put("resultNum",resultValue.replaceAll("device",""));
+                                    }else {
+                                        cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                    }
                                     cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
                                     cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
                                 }

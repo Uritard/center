@@ -97,11 +97,11 @@ public class SysUserService {
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userIds, "userName"));
         String userNames = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
         String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-        if(!"1234".equals(userRole)){
+        /*if(!"1234".equals(userRole)){
             //权限不够；
             throw new BusinessException(10008,"用户无权限");
             //return -1;
-        }
+        }*/
         redisTemplate.delete("userInfo:" + userId);
         this.SysUserBackUpDao.deleteByPrimaryId(userId);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
@@ -125,11 +125,11 @@ public class SysUserService {
         Long userId = Long.valueOf(request.getHeader("userId"));
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
         String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-        if(!"1234".equals(userRole)){
+        /*if(!"1234".equals(userRole)){
             //权限不够；
             throw new BusinessException(10008,"用户无权限");
             //return -1;
-        }
+        }*/
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(sysUser.getUserId());
         StringBuilder sb = new StringBuilder();
         Long roleId = sysUser.getRoleId();

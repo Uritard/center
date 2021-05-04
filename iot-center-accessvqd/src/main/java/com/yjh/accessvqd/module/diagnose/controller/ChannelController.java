@@ -46,12 +46,12 @@ public class ChannelController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
            result.setData(channelService.userPwdEncrypt(pass));
         }catch (Exception e){
             log.error("加密失败："+e);
@@ -66,12 +66,12 @@ public class ChannelController {
         try{
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(channelService.dataServerConfig());
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -88,12 +88,12 @@ public class ChannelController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(channelService.addDataServer(dataServer));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -110,12 +110,12 @@ public class ChannelController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(channelService.updateDataServer(dataServer));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -132,12 +132,12 @@ public class ChannelController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(channelService.deleteDateServer(serverId));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -153,12 +153,12 @@ public class ChannelController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(channelService.channelInfo());
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -175,12 +175,12 @@ public class ChannelController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(channelService.getChannel(channelId));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -197,12 +197,12 @@ public class ChannelController {
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(channelService.addChannel(channel));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
@@ -219,12 +219,12 @@ public class ChannelController {
         try{
             Long userId = Long.valueOf(request.getHeader("userId"));
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(!"1235".equals(userRole)){
+            /*if(!"1235".equals(userRole)){
                 //权限不够；
                 result.setCode(10008,"用户无权限");
                 //throw new BusinessException(10008,"用户无权限");
                 //return -1;
-            }
+            }*/
             result.setData(channelService.deleteChannel(channelId));
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());

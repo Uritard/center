@@ -165,7 +165,7 @@ public class TStdMeteController {
 
     @ApiOperation(value = "分页查询，名称模糊查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-   // @Logs(title = "查询系统测点",content = "根据用户传递的参数查询系统测点",logType = 1)
+    // @Logs(title = "查询系统测点",content = "根据用户传递的参数查询系统测点",logType = 1)
     public Result selectByPage(@RequestParam(value = "deviceType", required = false) Integer deviceType,
                                @RequestParam(value = "meteName", required = false) String meteName,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
@@ -176,11 +176,11 @@ public class TStdMeteController {
         String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
         try {
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userIds).get("roleId"));
-            if(!"1234".equals(userRole)){
-                //权限不够；
-                throw new BusinessException(10008,"用户无权限");
-                //return -1;
-            }
+//            if(!"1234".equals(userRole)){
+//                //权限不够；
+//                throw new BusinessException(10008,"用户无权限");
+//                //return -1;
+//            }
             if(pageSize==0){
                 MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                 param.set("logType", "9");
