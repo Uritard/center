@@ -519,8 +519,8 @@
             record_time,
             mete_kind,
             region_id,
-            mete_comment,
             mete_value,
+            mete_comment,
             last_mete_value
         )values(
                 #{meteId, jdbcType=BIGINT},

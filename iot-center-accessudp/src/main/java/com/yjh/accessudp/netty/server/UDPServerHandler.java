@@ -197,7 +197,8 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 tCfgDataCurrent.setMeteId(Long.valueOf(meteId));
                 tCfgDataCurrent.setDeviceId(Long.valueOf(tCfgMeteService.selectByMeteId(meteId.toString())));
                 tCfgDataCurrent.setMeteKind(meteKind);
-                tCfgDataCurrent.setRecordTime(sdf.parse(time));
+                //tCfgDataCurrent.setRecordTime(sdf.parse(time));
+                tCfgDataCurrent.setRecordTime(new Date());
                 tCfgDataCurrent.setMeteComment(value);
                 tCfgDataCurrent.setMeteValue(commit);
                 tCfgMeteService.insertTCfgDataCurrent(tCfgDataCurrent);
