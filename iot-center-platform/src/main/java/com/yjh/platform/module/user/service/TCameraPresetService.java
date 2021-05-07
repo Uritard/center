@@ -165,7 +165,7 @@ public class TCameraPresetService {
         if(cameraIdList != null && cameraIdList.size()>0){
             //删除zipPath下的所有文件
             try {
-                String cmd= "rm -rf "+zipPath;
+                String cmd= "rm -rf "+zipPath+"/*";
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
                 log.error("复制文件错误："+e);
