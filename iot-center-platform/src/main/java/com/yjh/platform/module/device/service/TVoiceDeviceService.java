@@ -2,16 +2,17 @@ package com.yjh.platform.module.device.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sun.jna.Pointer;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.tradio.RecordVoiceFileThread;
+import com.yjh.platform.common.tradio.NET_TRADIO_DEVICEINFO;
+import com.yjh.platform.common.tradio.TradioLibrary;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.user.dao.TSysParamDao;
-import com.yjh.platform.module.user.entity.TCameraInfo;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -20,12 +21,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ws.schild.jave.MultimediaInfo;
 import ws.schild.jave.MultimediaObject;
 
 import java.io.File;
+import java.nio.LongBuffer;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -59,7 +62,7 @@ public class TVoiceDeviceService{
         }else {
             return -1;
         }
-        tVoiceDevice.setState("0");
+        tVoiceDevice.setState("未知");
         this.tVoiceDeviceDao.addConf(tVoiceDevice);
         return this.tVoiceDeviceDao.add(tVoiceDevice);
     }
@@ -80,6 +83,7 @@ public class TVoiceDeviceService{
         }else {
             return -1;
         }
+        tVoiceDevice.setState("未知");
         this.tVoiceDeviceDao.updateConf(tVoiceDevice);
         return this.tVoiceDeviceDao.update(tVoiceDevice);
     }
@@ -128,6 +132,67 @@ public class TVoiceDeviceService{
         return 1;
     }
 
+    private static TradioLibrary sdk_= TradioLibrary.INSTANCE;
+    @Transactional(rollbackFor = Exception.class)
+    public Result startRecord(Long voiceDeviceId) {
+        Result result = new Result();
+        VoiceDeviceAllInfo voiceDeviceAllInfo = tVoiceDeviceDao.selectById(voiceDeviceId);
+
+        long hdForData = 0l;
+        if (Objects.isNull(Constant.voiceMap.get(voiceDeviceId))) {
+            if (sdk_.NET_TRADIO_Init() != 0) {
+                log.info("SDK初始化失败");
+            }
+
+            LongBuffer hd = LongBuffer.allocate(1);
+            if(sdk_.NET_TRADIO_CreateDevice(hd) != 0) {
+                log.info("创建设备失败");
+            }
+            hdForData = hd.get();
+
+            NET_TRADIO_DEVICEINFO dev = new NET_TRADIO_DEVICEINFO();
+            int logId = sdk_.NET_TRADIO_Login(hdForData, voiceDeviceAllInfo.getFtpUrl(), voiceDeviceAllInfo.getPort(), voiceDeviceAllInfo.getOwner(),
+                    voiceDeviceAllInfo.getOwnerCode(), dev);
+            if ( logId < 0) {
+                log.info("注册失败");
+                VoiceDeviceAllInfoDetail tVoiceDevice = selectByPrimaryId(voiceDeviceId);
+                tVoiceDevice.setState("离线");
+                update(tVoiceDevice);
+            } else {
+                Constant.voiceMap.put(voiceDeviceId, logId);
+                VoiceDeviceAllInfoDetail tVoiceDevice = selectByPrimaryId(voiceDeviceId);
+                tVoiceDevice.setState("在线");
+                update(tVoiceDevice);
+            }
+        }
+
+        sdk_.NET_TRADIO_SetRtpCallback(hdForData, new TradioLibrary.PRtpCallback() {
+            @Override
+            @Async
+            public void apply(Pointer data, int len, int channel, int db, int sample_rate, long dev) {
+
+                byte[] sourceData = data.getByteArray(0,len);
+                StringBuilder StrArrayTem = new StringBuilder();
+                for (int i = 0; i < len; i++) { StrArrayTem.append(String.format("%02x ", sourceData[i])); }
+                log.info("receiveOriginalDataArray:" + StrArrayTem);
+            }
+        }, 0);
+        return result;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Result stopRecord(Long voiceDeviceId) {
+        Result result = new Result();
+        int logId = Integer.parseInt(String.valueOf(Constant.voiceMap.get(voiceDeviceId)));
+        if (sdk_.NET_TRADIO_Logout(logId) != 0) {
+            System.out.println("设备注销成功");
+        } else {
+            System.out.println("设备注销失败");
+        }
+
+        sdk_.NET_TRADIO_Clear();
+        return result;
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public List<VoiceDevice> selectVoiceDeviceTree(String voiceDeviceName) {

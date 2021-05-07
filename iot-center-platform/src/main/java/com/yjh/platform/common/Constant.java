@@ -55,7 +55,7 @@ public class Constant {
 
     public static Map<String,Object> weatherInfo = new HashMap<>();
 
-    public static Map<String,Object> voiceMap = new HashMap<>();
+    public static Map<Long,Object> voiceMap = new HashMap<>();
 
     public static final String account_lock_time = "account_lock_time:userAccountID";
 

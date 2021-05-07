@@ -1,14 +1,9 @@
 package com.yjh.platform;
 
-import com.rabbitmq.client.AMQP;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.common.tradio.RecordVoiceFileThread;
-import com.yjh.platform.module.device.entity.TDeviceTypeImg;
-import com.yjh.platform.module.device.entity.VoiceDeviceAllInfo;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
-import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TSysParamService;
@@ -28,18 +23,15 @@ import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
-
-
-
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 @SpringBootApplication(scanBasePackages = {"com.yjh.platform", "com.yjh.platform.common.logs"})
 @EnableDiscoveryClient
 @ComponentScan(nameGenerator = AnnotationBeanNameGenerator.class,basePackages = "com.yjh")
 @EnableFeignClients
+@EnableAsync   //开启异步
 public class PlatformApplication  implements CommandLineRunner {
 
     @Autowired

@@ -75,14 +75,15 @@ public class RecordVoiceFileThread implements Runnable {
                 hdForData = hd.get();
 
                 NET_TRADIO_DEVICEINFO dev = new NET_TRADIO_DEVICEINFO();
-                if (sdk_.NET_TRADIO_Login(hdForData, ftpUrl, port, owner, ownerCode, dev) != 0) {
+                int id = sdk_.NET_TRADIO_Login(hdForData, ftpUrl, port, owner, ownerCode, dev);
+                if (id < 0) {
                     log.info("注册失败");
                     isThreadStart = false;
                     VoiceDeviceAllInfoDetail tVoiceDevice = tVoiceDeviceService.selectByPrimaryId(voiceDeviceId);
                     tVoiceDevice.setState("离线");
                     tVoiceDeviceService.update(tVoiceDevice);
                 } else {
-                    Constant.voiceMap.put("voiceDeviceId", 0);
+                    Constant.voiceMap.put(voiceDeviceId, 0);
                     VoiceDeviceAllInfoDetail tVoiceDevice = tVoiceDeviceService.selectByPrimaryId(voiceDeviceId);
                     tVoiceDevice.setState("在线");
                     tVoiceDeviceService.update(tVoiceDevice);
