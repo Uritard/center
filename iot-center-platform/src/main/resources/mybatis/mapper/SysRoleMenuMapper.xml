@@ -124,4 +124,15 @@
         <if test="roleId != null and roleId != ''"> a.role_id = #{roleId, jdbcType=BIGINT}</if>
     </select>
 
+    <select id="selectOtherRoleHave" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.MenuForHave">
+        SELECT
+                a.role_id,
+                a.role_name,
+                b.menu_code,
+                c.menu_name
+        from  sys_role a
+        left join sys_role_menu b on a.role_id = b.role_id
+        left join sys_menu c on b.menu_code = c.menu_code
+        WHERE a.role_id != #{roleId, jdbcType=BIGINT}
+    </select>
 </mapper>

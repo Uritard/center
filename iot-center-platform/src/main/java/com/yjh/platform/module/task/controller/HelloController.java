@@ -25,6 +25,8 @@ import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TWarnInfoService;
+import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.service.TCameraPresetService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.quartz.CronExpression;
@@ -75,8 +77,9 @@ public class HelloController {
     @Autowired
     TStdMetemodelDetailDao tStdMetemodelDetailDao;
     @Autowired
-
     TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
+    private TCameraPresetService tCameraPresetService;
 
     @Value("http://192.168.33.241:800/PSIA/Custom/SelfExt/AS/VQDDiagnose/queryStatus")
     private String URL;
@@ -519,6 +522,17 @@ public class HelloController {
 
 
 
-
+    @ApiOperation(value = "下载预置位图片")
+    @GetMapping(value = "/download")
+    public Result download(@RequestParam(value = "cameraIdList", required = false) List<Long> cameraIdList) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraPresetService.download(cameraIdList));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询预置位树失败：" + e);
+        }
+        return result;
+    }
 
 }

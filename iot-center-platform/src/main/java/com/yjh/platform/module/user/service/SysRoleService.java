@@ -256,10 +256,24 @@ public class SysRoleService{
     @Transactional(rollbackFor = Exception.class)
     public int updateRoleMenuRight(Map<String, Object> req) {
         Long roleId = Long.valueOf(String.valueOf(req.get("roleId")));
-        sysRoleMenuDao.deleteByRoleId(roleId);
         List<String> listStringChecked = (List<String>) req.get("checked");
         List<String> listStringHalfChecked = (List<String>) req.get("halfChecked");
-
+        {
+            //判断角色互斥
+            List<String> listThisHave = new ArrayList<>();
+            listThisHave.addAll(listStringChecked);
+            listThisHave.addAll(listStringHalfChecked);
+            List<MenuForHave> listOtherHave= sysRoleMenuDao.selectOtherRoleHave(roleId);
+            if(listThisHave != null && listThisHave.size()>0){
+                for(MenuForHave item: listOtherHave){
+                    if(listThisHave.contains(item.getMenuCode())){
+                        //本次设置的权限与其他角色的权限重复
+                        throw new BusinessException(209,"菜单："+item.getMenuName()+"与其他角色重复");
+                    }
+                }
+            }
+        }
+        sysRoleMenuDao.deleteByRoleId(roleId);
         List<SysRoleMenu> sysRoleMenuList = new ArrayList<>();
         if (listStringChecked.size()>0) {
             for (String menuCodeChecked:listStringChecked) {

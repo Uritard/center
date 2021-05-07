@@ -2,19 +2,21 @@ package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.user.controller.TCameraPresetController;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.*;
 import org.apache.poi.ss.formula.functions.T;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
 /**
 * @author yc
@@ -29,6 +31,10 @@ public class TCameraPresetService {
     private TCameraInfoDao tCameraInfoDao;
     @Autowired
     private TAlgorithmConfDao tAlgorithmConfDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    private Logger log = LoggerFactory.getLogger(TCameraPresetService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCameraPreset tCameraPreset) {
@@ -146,6 +152,50 @@ public class TCameraPresetService {
             flag=true;
         }
         return flag;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String download(List<Long> cameraIdList){
+        Map<String,String> mapForPreset = redisTemplate.opsForHash().entries("t_sys_param:presetImgPath");
+        String picPath = mapForPreset.get("content");///home/yjh_iot_center/iot-picture/presets
+        Map<String,String> mapForZip = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
+        String zipPath = mapForZip.get("content");///home/yjh_iot_center/iot-picture/zip
+        Map<String,String> mapForZipReal = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
+        String zipPathReal = mapForZipReal.get("content");//http://192.168.9.40:10086/imgs/zip
+        if(cameraIdList != null && cameraIdList.size()>0){
+            //删除zipPath下的所有文件
+            try {
+                String cmd= "rm -rf "+zipPath;
+                Runtime.getRuntime().exec(cmd);
+            } catch (IOException e) {
+                log.error("复制文件错误："+e);
+            }
+            for(Long cameraId: cameraIdList){
+                //找到这个cameraId下的所有预置位
+                List<Long>presetList = tCameraPresetDao.selectForThisPreset(cameraId);
+                if(presetList!=null && presetList.size()>0){
+                    for(Long presetId:presetList){
+                        try {
+                        //将所有的文件移动到一个文件内
+                        String url = "cp " + picPath+"/"+presetId + " " + zipPath+"/zip/"+cameraId+"/";
+                        Runtime.getRuntime().exec(url);
+                        } catch (IOException e) {
+                            log.error("复制文件错误："+e);
+                        }
+                    }
+
+                }
+            }
+            //压缩
+            try {
+                String zipCmd= "zip -r "+zipPath+"/zip.zip "+zipPath+"/*";
+                Runtime.getRuntime().exec(zipCmd);
+            } catch (IOException e) {
+                log.error("复制文件错误："+e);
+            }
+            return zipPathReal+"/zip.zip";
+        }
+        return "fail";
     }
 }
 

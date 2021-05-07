@@ -46,4 +46,5 @@ public interface TCameraPresetDao {
     int deleteInstance(@Param(value = "list")List<Long> list);
     int deletePlanInstance(@Param(value = "list")List<Long> list);
     int deletePointInstance(@Param(value = "list")List<Long> list);
+    List<Long>selectForThisPreset(@Param(value = "cameraId")Long cameraId);
 }

@@ -307,4 +307,11 @@
             #{instanceId, jdbcType=BIGINT}
         </foreach>
     </delete>
+    <select id="selectForThisPreset" resultType="java.lang.Long">
+        SELECT
+	     preset_id
+       FROM
+	    t_camera_preset
+       WHERE camera_id=#{cameraId, jdbcType=BIGINT}
+    </select>
 </mapper>

@@ -242,7 +242,9 @@ public class SysRoleController {
         Result result = new Result();
         try {
             result.setData(sysRoleService.updateRoleMenuRight(req));
-        } catch (Exception e) {
+        } catch (BusinessException e) {
+            result.setCode(209,e.getMessage());
+        }catch (Exception e) {
             if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_sys_role_name") != -1) {
                 result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), "业务描述");
             } else {

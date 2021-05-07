@@ -1,6 +1,8 @@
 package com.yjh.platform.module.user.dao;
 
 import java.util.List;
+
+import com.yjh.platform.module.user.entity.MenuForHave;
 import com.yjh.platform.module.user.entity.SysRoleMenu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -27,4 +29,5 @@ public interface SysRoleMenuDao {
 
     int batchInsert(@Param("list") List<SysRoleMenu> list);
     List<String> selectByRoleId(@Param(value = "roleId") Long roleId);
+    List<MenuForHave> selectOtherRoleHave(@Param(value = "roleId") Long roleId);
 }
