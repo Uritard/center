@@ -143,7 +143,6 @@ public class Constant {
 
     public static ConcurrentHashMap<String,Integer> taskStateMap=new ConcurrentHashMap<>();
 
-    public static Map<String,Boolean> voiceDeviceState = new HashMap<>();
     /**
      * 用户角色
      */

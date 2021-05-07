@@ -59,23 +59,14 @@ public class TVoiceDeviceService{
         }else {
             return -1;
         }
+        tVoiceDevice.setState("0");
         this.tVoiceDeviceDao.addConf(tVoiceDevice);
-        this.tVoiceDeviceDao.add(tVoiceDevice);
-        VoiceDeviceAllInfo voiceDeviceAllInfo = tVoiceDeviceDao.selectById(tVoiceDevice.getVoiceDeviceId());
-        Constant.voiceDeviceState.put(tVoiceDevice.getFtpUrl(),true);
-        RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
-                voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
-                voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true,this);
-        Thread thread = new Thread(recordVoiceFileThread);
-        thread.setDaemon(true);
-        thread.start();
-        return 1;
+        return this.tVoiceDeviceDao.add(tVoiceDevice);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long voiceDeviceId) {
         VoiceDeviceAllInfoDetail voiceDeviceInfoDetail = this.tVoiceDeviceDao.selectByPrimaryId(voiceDeviceId);
-        Constant.voiceDeviceState.put(voiceDeviceInfoDetail.getFtpUrl(),false);
         this.tVoiceDeviceDao.deleteConf(voiceDeviceInfoDetail.getConfigId());
         return this.tVoiceDeviceDao.deleteByPrimaryId(voiceDeviceId);
     }
@@ -90,20 +81,7 @@ public class TVoiceDeviceService{
             return -1;
         }
         this.tVoiceDeviceDao.updateConf(tVoiceDevice);
-        VoiceDeviceAllInfo voiceDeviceAllInfo = tVoiceDeviceDao.selectById(tVoiceDevice.getVoiceDeviceId());
-        this.tVoiceDeviceDao.update(tVoiceDevice);
-        if(!voiceDeviceAllInfo.getFtpUrl().equals(tVoiceDevice.getFtpUrl())){
-            //修改了ip
-            Constant.voiceDeviceState.put(voiceDeviceAllInfo.getFtpUrl(),false);
-            voiceDeviceAllInfo = tVoiceDeviceDao.selectById(tVoiceDevice.getVoiceDeviceId());
-            RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
-                    voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
-                    voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true,this);
-            Thread thread = new Thread(recordVoiceFileThread);
-            thread.setDaemon(true);
-            thread.start();
-        }
-        return 1;
+        return this.tVoiceDeviceDao.update(tVoiceDevice);
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -74,17 +74,17 @@ public class PlatformApplication  implements CommandLineRunner {
         Constant.redisTemplate = redisTemplate;
         tDeviceTypeImgService.findPic();//本地启动把此行注掉
         //Start RecordVoiceFileThread
-        List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();
-        if (voiceDeviceAllInfoList.size()>0) {
-            for (VoiceDeviceAllInfo voiceDeviceAllInfo:voiceDeviceAllInfoList) {
-                RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
-                        voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
-                        voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true, tVoiceDeviceService);
-                Thread thread = new Thread(recordVoiceFileThread);
-                thread.setDaemon(true);
-                thread.start();
-            }
-        }
+//        List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();
+//        if (voiceDeviceAllInfoList.size()>0) {
+//            for (VoiceDeviceAllInfo voiceDeviceAllInfo:voiceDeviceAllInfoList) {
+//                RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
+//                        voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
+//                        voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true, tVoiceDeviceService);
+//                Thread thread = new Thread(recordVoiceFileThread);
+//                thread.setDaemon(true);
+//                thread.start();
+//            }
+//        }
     }
 
     @Bean
