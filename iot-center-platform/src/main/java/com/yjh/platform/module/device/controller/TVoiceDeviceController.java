@@ -278,7 +278,7 @@ public class TVoiceDeviceController {
     }
 
     @ApiOperation(value = "关闭拾音器")
-    @RequestMapping(value = "/startRecord", method = RequestMethod.GET)
+    @RequestMapping(value = "/stopRecord", method = RequestMethod.GET)
     @Logs(title = "关闭拾音器",content = "拾音器停止录音",logType = 5,authority = "1235")
     public Result stopRecord(@RequestParam(value = "voiceDeviceId", required = false) Long voiceDeviceId) {
         Result result = new Result();
