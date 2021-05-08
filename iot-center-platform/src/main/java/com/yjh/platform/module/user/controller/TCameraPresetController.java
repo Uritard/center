@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -345,6 +346,19 @@ public class TCameraPresetController {
         Result result = new Result();
         try {
             result.setData(tCameraPresetService.download(cameraIdList));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询预置位树失败：" + e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "上传标定图片")
+    @GetMapping(value = "/download")
+    @Logs(title = "上传标定图片",content = "上传标定图片",logType = 8)
+    public Result download(@RequestParam(value="file", required=false) MultipartFile file) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraPresetService.upload(file));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询预置位树失败：" + e);
