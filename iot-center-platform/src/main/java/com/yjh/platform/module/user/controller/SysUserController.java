@@ -775,7 +775,7 @@ public class SysUserController {
             Map<String, Object> mapAppKey = new HashMap<>();
             mapAppKey.put("pubk", pubk);
             mapAppKey.put("prik", prik);
-            redisTemplate.opsForValue().set("pubk:",mapAppKey,10, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set("pubk:"+nums,mapAppKey,10, TimeUnit.SECONDS);
             //redisTemplate.opsForHash().putAll("pubk:" + nums, mapAppKey);
             mapPubk.put("pubk",pubk);
             mapPubk.put("identifier",nums);
