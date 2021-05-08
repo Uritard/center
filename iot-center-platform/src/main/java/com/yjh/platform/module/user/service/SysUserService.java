@@ -125,30 +125,30 @@ public class SysUserService {
         Long userId = Long.valueOf(request.getHeader("userId"));
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
         String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-        /*if(!"1234".equals(userRole)){
-            //权限不够；
-            throw new BusinessException(10008,"用户无权限");
-            //return -1;
-        }*/
+//        if(Constant.apiPermissions) {
+//            if (!"1234".equals(userRole)) {
+//                //权限不够；
+//                throw new BusinessException(10008, "用户无权限");
+//                //return -1;
+//            }
+//        }
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(sysUser.getUserId());
         StringBuilder sb = new StringBuilder();
         Long roleId = sysUser.getRoleId();
         if (roleId != null) {
             redisTemplate.opsForHash().put("userInfo:" + sysUser.getUserId(), "roleId", String.valueOf(sysUser.getRoleId()));
         }
-        if (sysUserCurrent.getInvalidTime() != sysUser.getInvalidTime()) {
-            Date date = new Date();
-            sysUser.setUpdateTime(date);
-        }
-        if (roleId != sysUserCurrent.getRoleId()) {
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        if (!roleId.equals(sysUserCurrent.getRoleId())) {
+            params.set("logType", "22");
+            params.set("title", "权限修改");
             sb.append(userName + "用户修改了" + sysUserCurrent.getUserName() + "用户信息(" + Constant.YHJS.get(String.valueOf(sysUserCurrent.getRoleId())) + "修改为" + Constant.YHJS.get(String.valueOf(roleId)) + ")");
         } else {
+            params.set("logType", "18");
+            params.set("title", "用户修改信息");
             sb.append(userName + "用户修改了" + sysUserCurrent.getUserName() + "用户信息");
         }
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.set("logType", "3");
         params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-        params.set("title", "修改系统用户数据");
         params.set("state", 1);
         params.set("userId", userId);
         params.set("userName", userName);
@@ -178,6 +178,8 @@ public class SysUserService {
                 Map<String, String> lockTimes = redisTemplate.opsForHash().entries("t_sys_param:lockTime");
                 Map<String, String> loginNum = redisTemplate.opsForHash().entries("t_sys_param:loginErrorNum");
                 String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
+                Map<String, String> uKeymap = redisTemplate.opsForHash().entries("t_sys_param:isUkey");
+                String isUkey = uKeymap.get("content");
                 String isDecode = enmap.get("content");
                 if ("true".equals(isDecode)) {
                     userName = demo.decryptIdentifier(userMap.get("userName"),userMap.get("identifier"));
@@ -207,6 +209,17 @@ public class SysUserService {
                     return mapResult;
                 }
                 SysUserBackUp sysUserBackUp = SysUserBackUpDao.selectByVerfiCode(sysUserLogin.getUserId());
+                if("true".equals(isUkey)){
+                    try {
+                        String ukeyId = request.getHeader("ukeyId") != null ? request.getHeader("ukeyId") : "";
+                        String xlh = Constant.UKEY_XLH.get(String.valueOf(sysUserLogin.getUserId()));
+                        if (!xlh.equals(ukeyId.substring(0, 16))) {
+                            throw new BusinessException(500, "当前用户与此ukey不匹配");
+                        }
+                    }catch (Exception e){
+                        throw new BusinessException(500, "当前用户与此ukey不匹配");
+                    }
+                }
                 if (!Objects.equals(null, sysUserLogin) && Demo.decryptDB(sysUserBackUp.getPassword()).equals(password) && userName.equals(sysUserLogin.getUserName())) {
                     if ("true".equals(isLogin)) {
                         Map<String, String> appKeymap = redisTemplate.opsForHash().entries("user:" + sysUserLogin.getUserId());

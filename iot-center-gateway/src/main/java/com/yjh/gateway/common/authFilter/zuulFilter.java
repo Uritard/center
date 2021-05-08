@@ -271,17 +271,40 @@ public class zuulFilter extends ZuulFilter {
         if ("true".equals(isUkey)) {
             RequestContext ctx = RequestContext.getCurrentContext();
             HttpServletRequest request = ctx.getRequest();
+            String url = request.getRequestURI();
+            // log.info(url);
             String signStr = request.getHeader("signStr") != null ? request.getHeader("signStr") : "";
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
-          //  if (StringUtils.isNoneBlank(signStr)) {
-                boolean status = Demo.verify(webcode, signStr);
+//            if (StringUtils.isNoneBlank(signStr)) {
+//                boolean status = Demo.verify(webcode, signStr);
+//                if (!status) {
+//                    log.error("签名验证结果 - " + status);
+//                    ctx.setSendZuulResponse(false);
+//                    ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
+//                    return false;
+//                }
+            if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")) {
+                String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
+                String ukeyId = request.getHeader("ukeyId") != null ? request.getHeader("ukeyId") : "";
+                String xlh=Constant.UKEY_XLH.get(userId);
+                if(!xlh.equals(ukeyId.substring(0,16))){
+                    log.error("序列号篡改------------------------ ");
+                    ctx.setSendZuulResponse(false);
+                    ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
+                    return false;
+                }
+                String pub=Constant.UKEY_GY.get(userId);
+                boolean status = Demo.verify(webcode, signStr,pub);
                 if (!status) {
                     log.error("签名验证结果 - " + status);
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
                     return false;
                 }
-           // }
+
+
+            }
+            // }
         }
         return true;
 

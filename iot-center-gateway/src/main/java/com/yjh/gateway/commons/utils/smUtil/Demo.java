@@ -50,12 +50,6 @@ public class Demo {
      */
     public static String sign(String summaryString) {
         String prikS = new String(Base64.encode(Util.hexToByte(prik)));
-        System.out.println("prikS: " + prikS);
-        System.out.println("");
-
-        System.out.println("ID: " + Util.getHexString(userId.getBytes()));
-        System.out.println("");
-        System.out.println("签名: ");
         byte[] sign = null; //摘要签名
         try {
             sign = SM2Utils.sign(userId.getBytes(), Base64.decode(prikS.getBytes()), Util.hexToByte(summaryString));
@@ -72,11 +66,11 @@ public class Demo {
      *
      * @return
      */
-    public static boolean verify(String summary, String sign) {
+    public static boolean verify(String summary, String sign,String pub) {
         boolean vs = false; //验签结果
         try {
             vs = SM2Utils.verifySign(userId.getBytes(),  Util.hexToByte(pub), summary.getBytes(), Base64.decode(sign));
-           // vs = SM2Utils.verifySign(userId.getBytes(), Base64.decode(pubkS.getBytes()), Util.hexToByte(summary), Util.hexToByte(sign));
+            // vs = SM2Utils.verifySign(userId.getBytes(), Base64.decode(pubkS.getBytes()), Util.hexToByte(summary), Util.hexToByte(sign));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -96,8 +90,6 @@ public class Demo {
         BigInteger privateKey = ecpriv.getD();
         ECPoint publicKey = ecpub.getQ();
 
-        System.out.println("公钥: " + Util.byteToHex(publicKey.getEncoded()));
-        System.out.println("私钥: " + Util.byteToHex(privateKey.toByteArray()));
     }
 
 }

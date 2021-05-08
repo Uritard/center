@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Description: TODO(国密SM2签名验签 / SM3报文摘要)
@@ -185,7 +187,9 @@ public class Demo {
      */
     public String decryptIdentifier(String pCode,String identifier) throws IOException {
         if(StringUtils.isNoneBlank(pCode)){
-            String priks = String.valueOf(redisTemplate.opsForHash().get("pubk:" + identifier, "prik"));
+            Map map=(HashMap)redisTemplate.opsForValue().get("pubk:" + identifier);
+            String priks = String.valueOf(map.get("prik"));
+          //  String priks = String.valueOf(redisTemplate.opsForHash().get("pubk:" + identifier, "prik"));
             return new String(SM2Utils.decrypt(Util.hexToByte(priks), Util.hexToByte("04" + pCode)));
         }else {
             return  "";

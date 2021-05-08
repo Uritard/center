@@ -153,4 +153,23 @@ public class Constant {
             put("1236", "审计员");
         }
     };
+    /**
+     * ukey序列号
+     */
+    public static final Map<String, String> UKEY_XLH = new HashMap<String, String>() {
+        {
+            put("10001", "A99B4B794F101786");
+            put("10004", "2735428C3E687671");
+        }
+    };
+    /**
+     * ukey公钥
+     */
+    public static final Map<String, String> UKEY_GY = new HashMap<String, String>() {
+        {
+            put("10001", "04deeafe50247551be7bbf7658402db06b9fb5490471a3dca87b2e6c68b54bcc61a9529d8ba5877da05cff226433799b4ad65953db2d00af7262bcaaa3442544a2");
+            put("10004", "0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0");
+        }
+    };
+    public static Boolean apiPermissions=true;
 }

@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import io.swagger.annotations.*;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -521,7 +522,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户修改密码")
     @RequestMapping(value = "/changePassword", method = RequestMethod.PUT)
-    @Logs(title = "用户修改密码", content = "用户修改密码", logType = 3)
+    //@Logs(title = "用户修改密码", content = "用户修改密码", logType = 19)
     public Result changePassword(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
         try {
@@ -543,15 +544,19 @@ public class SysUserController {
             String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
             if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(oldPassword)) {
                 if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(newPassword)) {
+                    sendPostPassword(httpServletRequest,"修改密码失败,新密码与老密码重复",null);
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else if (newPassword.contains("admin") || newPassword.contains("administrator")) {
+                    sendPostPassword(httpServletRequest,"修改密码失败,密码包含敏感字段",null);
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else if (newPassword.contains(sysUserCurrent.getUserName())) {
+                    sendPostPassword(httpServletRequest,"修改密码失败,密码不能包含用户名",null);
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), "密码不能包含用户名");
                     return result;
                 } else if (!newPassword.matches(PW_PATTERN)) {
+                    sendPostPassword(httpServletRequest,"修改密码失败,参数规则不匹配",null);
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else {
@@ -562,6 +567,7 @@ public class SysUserController {
                 mapResult.put("code", ResultCodeEnum.CODE10106.getCode());
                 mapResult.put("info", ResultCodeEnum.CODE10106.getName());
                 result.setData(mapResult);
+                sendPostPassword(httpServletRequest,"修改密码失败,密码错误",null);
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -576,12 +582,24 @@ public class SysUserController {
 
     @ApiOperation(value = "用户修改密码")
     @RequestMapping(value = "/loginChangePassword", method = RequestMethod.PUT)
-    @Logs(title = "用户修改密码", content = "用户修改密码", logType = 3)
+    //  @Logs(title = "用户修改密码", content = "用户修改密码", logType = 19)
     public Result loginChangePassword(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
         try {
-           // Long userId = Long.valueOf(httpServletRequest.getHeader("userId"));
+            Map<String, String> uKeymap = redisTemplate.opsForHash().entries("t_sys_param:isUkey");
+            String isUkey = uKeymap.get("content");
             Long userId=Long.valueOf(map.get("userId"));
+            if("true".equals(isUkey)){
+                try {
+                    String ukeyId = httpServletRequest.getHeader("ukeyId") != null ? httpServletRequest.getHeader("ukeyId") : "";
+                    String xlh = Constant.UKEY_XLH.get(String.valueOf(userId));
+                    if (!xlh.equals(ukeyId.substring(0, 16))) {
+                        throw new BusinessException(500, "当前用户与此ukey不匹配");
+                    }
+                }catch (Exception e){
+                    throw new BusinessException(500, "当前用户与此ukey不匹配");
+                }
+            }
             SysUser sysUserCurrent = sysUserService.selectByPrimaryId(userId);
             String oldPassword = null;
             String newPassword = null;
@@ -599,15 +617,19 @@ public class SysUserController {
             String PW_PATTERN = "^(?![A-Za-z0-9]+$)(?![A-Za-z\\W]+$)(?![0-9\\W]+$)[a-zA-Z0-9\\W]{8,}$";
             if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(oldPassword)) {
                 if (Demo.decryptDB(sysUserCurrent.getPassword()).equals(newPassword)) {
+                    sendPostPassword(httpServletRequest,"修改密码失败,新密码与老密码重复",userId);
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else if (newPassword.contains("admin") || newPassword.contains("administrator")) {
+                    sendPostPassword(httpServletRequest,"修改密码失败,密码包含敏感字段",userId);
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else if (newPassword.contains(sysUserCurrent.getUserName())) {
+                    sendPostPassword(httpServletRequest,"修改密码失败,密码不能包含用户名",userId);
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), "密码不能包含用户名");
                     return result;
                 } else if (!newPassword.matches(PW_PATTERN)) {
+                    sendPostPassword(httpServletRequest,"修改密码失败,参数规则不匹配",userId);
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else {
@@ -618,6 +640,7 @@ public class SysUserController {
                 mapResult.put("code", ResultCodeEnum.CODE10106.getCode());
                 mapResult.put("info", ResultCodeEnum.CODE10106.getName());
                 result.setData(mapResult);
+                sendPostPassword(httpServletRequest,"修改密码失败,密码错误",userId);
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -658,6 +681,29 @@ public class SysUserController {
         logsAspect.post(params);
     }
 
+    private void sendPostPassword(HttpServletRequest request,String content,Long userId){
+        Long userIds=null;
+        if(userId!=null){
+            userIds=userId;
+        }else{
+            userIds = Long.valueOf(request.getHeader("userId"));
+        }
+        // Long userIds = Long.valueOf(request.getHeader("userId"));
+        String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.set("logType", "19");
+        params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+        params.set("title", "用户修改密码");
+        params.set("state", 2);
+        params.set("userId", userIds);
+        params.set("userName", userName);
+        params.set("requestOrigin", request.getRequestURL());
+        params.set("requestPath", request.getRequestURI());
+        params.set("requestMethod", request.getMethod());
+        params.set("content", content);
+        LogsAspect logsAspect = new LogsAspect();
+        logsAspect.post(params);
+    }
 
     @ApiOperation(value = "账号锁定用户信息")
     @RequestMapping(value = "/lockUserInfo", method = RequestMethod.GET)
@@ -729,7 +775,8 @@ public class SysUserController {
             Map<String, Object> mapAppKey = new HashMap<>();
             mapAppKey.put("pubk", pubk);
             mapAppKey.put("prik", prik);
-            redisTemplate.opsForHash().putAll("pubk:" + nums, mapAppKey);
+            redisTemplate.opsForValue().set("pubk:",mapAppKey,10, TimeUnit.SECONDS);
+            //redisTemplate.opsForHash().putAll("pubk:" + nums, mapAppKey);
             mapPubk.put("pubk",pubk);
             mapPubk.put("identifier",nums);
             result.setData(mapPubk);
