@@ -79,12 +79,62 @@ public class zuulFilter extends ZuulFilter {
         String isUkey = uKeymap.get("content");
         Map<String, String> ipmap = redisTemplate.opsForHash().entries("t_sys_param:isIp");
         String isIp = ipmap.get("content");
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletRequest request = ctx.getRequest();
+        String url = request.getRequestURI();
+        log.info("tt-url: " + IPUtil.getRemoteIP(request));
+        ctx.getZuulRequestHeaders().put("HTTP_X_FORWARDED_FOR", IPUtil.getRemoteIP(request));
+        if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")) {
+            String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
+            String token = request.getHeader("token") != null ? request.getHeader("token") : "";
+            if (StringUtils.isNoneBlank(token)) {
+                Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + userId + ":" + token);
+                String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
+                if (appKeymap.size() == 0) {
+                    log.error("用户未登陆===================================================================================");
+                    ctx.setSendZuulResponse(false);
+                    ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
+                    return false;
+                } else {
+                    Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "expireTime")));
+                    int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
+                    if (System.currentTimeMillis() - expireTime > 60000 * logoutTime) {
+                        log.error("token已失效===========================================================================");
+                        String userName = String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
+                        this.postUrl(token, IPUtil.getRemoteIP(request), userId, userName);
+                        ctx.setSendZuulResponse(false);
+                        ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
+                        return false;
+                    } else {
+                        if (!url.contains("/sysLog/v1/errLog") && !url.contains("/tWarnInfo/v1/warnCountsNonIdentify") &&
+                                !url.contains("/homePage/v1/getWeatherInfo") && !url.contains("/tUnionTask/v1/linkageMonitorData") &&
+                                !url.contains("/homePage/v1/taskOnExecute") && !url.contains("/homePage/v1/countByAlarmLevel") &&
+                                !url.contains("/tRobotInspection/v1/selectRobotTaskMessage") && !url.contains("/tRobotInspection/v1/selectRobotStatus") &&
+                                !url.contains("/systemInfo/v1/getDiskOnUse") && !url.contains("/systemInfo/v1/getCpuOnUse") &&
+                                !url.contains("/systemInfo/v1/getDisk") && !url.contains("/systemInfo/v1/getCPU") &&
+                                !url.contains("/systemInfo/v1/getMemory") && !url.contains("/tCameraScreen/v1/cameraStateTree") &&
+                                !url.contains("/tCruiseTaskResult/v1/selectCruiseAdvance") && !url.contains("/tCruiseTaskResult/v1/selectCurrentCruiseTaskResult") &&
+                                !url.contains("/tCruiseTaskResult/v1/selectRealTimeWarnInfo") && !url.contains("/tCruisePointInstance/v1/selectCruiseCountByType") &&
+                                !url.contains("/tCruiseTaskResult/v1/selectCruiseStatusCount") && !url.contains("/tCameraScreen/v1/selectCameraTreeWithRobot") &&
+                                !url.contains("/tCameraInfo/v1/selectByPage") && !url.contains("/tCameraRecorder/v1/selectByPage") &&
+                                !url.contains("/tRobotInfo/v1/selectByPage") && !url.contains("/videoIntercom/v1/selectByPage") &&
+                                !url.contains("/tVoiceDevice/v1/selectByPage") && !url.contains("/homePage/v1/warnInfo")
+                        ) {
+                            redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
+                            if ("true".equals(isLogin)) {
+                                redisTemplate.opsForHash().put("user:" + userId, "expireTime", String.valueOf(System.currentTimeMillis()));
+                            }
+                        }
+                    }
+                }
+            } else {
+                log.error("无token========================================================================================");
+                ctx.setSendZuulResponse(false);
+                ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
+                return false;
+            }
+        }
         if ("true".equals(isDecode)) {
-            RequestContext ctx = RequestContext.getCurrentContext();
-            HttpServletRequest request = ctx.getRequest();
-            String url = request.getRequestURI();
-            log.info("tt-url: " + IPUtil.getRemoteIP(request));
-            ctx.getZuulRequestHeaders().put("HTTP_X_FORWARDED_FOR", IPUtil.getRemoteIP(request));
             if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                 String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
@@ -106,59 +156,6 @@ public class zuulFilter extends ZuulFilter {
                     ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
                     return false;
                 }
-                String token = request.getHeader("token") != null ? request.getHeader("token") : "";
-                if (StringUtils.isNoneBlank(token)) {
-                    Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + userId + ":" + token);
-                    String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
-                    if (appKeymap.size() == 0) {
-                        log.error("用户未登陆===================================================================================");
-                        ctx.setSendZuulResponse(false);
-                        ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
-                        return false;
-                    } else {
-                        Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "expireTime")));
-                        int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
-                        if (System.currentTimeMillis() - expireTime > 60000 * logoutTime) {
-                            log.error("token已失效===========================================================================");
-                            String userName = String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
-                            this.postUrl(token, IPUtil.getRemoteIP(request), userId, userName);
-//                            log.error("token已失效===========================================================================");
-//                            redisTemplate.delete("appKey:" + userId + ":" + token);
-//                            if ("true".equals(isLogin)) {
-//                                redisTemplate.delete("user:" + userId);
-//                            }
-                            ctx.setSendZuulResponse(false);
-                            ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
-                            return false;
-                        } else {
-                            if (!url.contains("/sysLog/v1/errLog") && !url.contains("/tWarnInfo/v1/warnCountsNonIdentify") &&
-                                    !url.contains("/homePage/v1/getWeatherInfo") && !url.contains("/tUnionTask/v1/linkageMonitorData") &&
-                                    !url.contains("/homePage/v1/taskOnExecute") && !url.contains("/homePage/v1/countByAlarmLevel") &&
-                                    !url.contains("/tRobotInspection/v1/selectRobotTaskMessage") && !url.contains("/tRobotInspection/v1/selectRobotStatus") &&
-                                    !url.contains("/systemInfo/v1/getDiskOnUse") && !url.contains("/systemInfo/v1/getCpuOnUse") &&
-                                    !url.contains("/systemInfo/v1/getDisk") && !url.contains("/systemInfo/v1/getCPU") &&
-                                    !url.contains("/systemInfo/v1/getMemory") && !url.contains("/tCameraScreen/v1/cameraStateTree") &&
-                                    !url.contains("/tCruiseTaskResult/v1/selectCruiseAdvance") && !url.contains("/tCruiseTaskResult/v1/selectCurrentCruiseTaskResult") &&
-                                    !url.contains("/tCruiseTaskResult/v1/selectRealTimeWarnInfo") && !url.contains("/tCruisePointInstance/v1/selectCruiseCountByType") &&
-                                    !url.contains("/tCruiseTaskResult/v1/selectCruiseStatusCount") && !url.contains("/tCameraScreen/v1/selectCameraTreeWithRobot") &&
-                                    !url.contains("/tCameraInfo/v1/selectByPage") && !url.contains("/tCameraRecorder/v1/selectByPage") &&
-                                    !url.contains("/tRobotInfo/v1/selectByPage") && !url.contains("/videoIntercom/v1/selectByPage") &&
-                                    !url.contains("/tVoiceDevice/v1/selectByPage") && !url.contains("/homePage/v1/warnInfo")
-                            ) {
-                                redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
-                                if ("true".equals(isLogin)) {
-                                    redisTemplate.opsForHash().put("user:" + userId, "expireTime", String.valueOf(System.currentTimeMillis()));
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    log.error("无token========================================================================================");
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
-                    return false;
-                }
-
             }
             MyRequestWrapper requestWrapper = null;
             MultipartHttpServletRequest multipartHttpServletRequest = null;
@@ -269,20 +266,8 @@ public class zuulFilter extends ZuulFilter {
             }
         }
         if ("true".equals(isUkey)) {
-            RequestContext ctx = RequestContext.getCurrentContext();
-            HttpServletRequest request = ctx.getRequest();
-            String url = request.getRequestURI();
-            // log.info(url);
             String signStr = request.getHeader("signStr") != null ? request.getHeader("signStr") : "";
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
-//            if (StringUtils.isNoneBlank(signStr)) {
-//                boolean status = Demo.verify(webcode, signStr);
-//                if (!status) {
-//                    log.error("签名验证结果 - " + status);
-//                    ctx.setSendZuulResponse(false);
-//                    ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
-//                    return false;
-//                }
             if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                 String ukeyId = request.getHeader("ukeyId") != null ? request.getHeader("ukeyId") : "";
@@ -301,10 +286,7 @@ public class zuulFilter extends ZuulFilter {
                     ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
                     return false;
                 }
-
-
             }
-            // }
         }
         return true;
 
