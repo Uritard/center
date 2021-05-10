@@ -14,9 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import static org.apache.catalina.startup.ExpandWar.deleteDir;
 
 /**
 * @author yc
@@ -160,25 +165,41 @@ public class TCameraPresetService {
         String picPath = mapForPreset.get("content");///home/yjh_iot_center/iot-picture/presets
         Map<String,String> mapForZip = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
         String zipPath = mapForZip.get("content");///home/yjh_iot_center/iot-picture/zip
-        Map<String,String> mapForZipReal = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
+        Map<String,String> mapForZipReal = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
         String zipPathReal = mapForZipReal.get("content");//http://192.168.9.40:10086/imgs/zip
         if(cameraIdList != null && cameraIdList.size()>0){
             //删除zipPath下的所有文件
             try {
                 String cmd= "rm -rf "+zipPath+"/*";
-                Runtime.getRuntime().exec(cmd);
+                String[] cmds = new String[]{"sh","-c",cmd};
+                Runtime.getRuntime().exec(cmds);
+                log.info("linux命令："+cmd);
+                //Runtime.getRuntime().exec(cmd);
+                cmd = "mkdir "+zipPath+"/picture";
+                log.info("linux命令："+cmd);
+                cmds = new String[]{"sh","-c",cmd};
+                Runtime.getRuntime().exec(cmds);
             } catch (IOException e) {
                 log.error("复制文件错误："+e);
             }
+
             for(Long cameraId: cameraIdList){
                 //找到这个cameraId下的所有预置位
                 List<Long>presetList = tCameraPresetDao.selectForThisPreset(cameraId);
                 if(presetList!=null && presetList.size()>0){
+                    try {
+                    String mk = "mkdir "+zipPath+"/picture/"+cameraId;
+                    String[] cmds = new String[]{"sh","-c",mk};
+                    Runtime.getRuntime().exec(cmds);
+                    } catch (IOException e) {
+                        log.error("复制文件错误："+e);
+                    }
                     for(Long presetId:presetList){
                         try {
                         //将所有的文件移动到一个文件内
-                        String url = "cp " + picPath+"/"+presetId + " " + zipPath+"/zip/"+cameraId+"/";
-                        Runtime.getRuntime().exec(url);
+                        String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/"+cameraId+"/";
+                        String[] cmds = new String[]{"sh","-c",url};
+                        Runtime.getRuntime().exec(cmds);
                         } catch (IOException e) {
                             log.error("复制文件错误："+e);
                         }
@@ -188,14 +209,52 @@ public class TCameraPresetService {
             }
             //压缩
             try {
-                String zipCmd= "zip -r "+zipPath+"/zip.zip "+zipPath+"/*";
-                Runtime.getRuntime().exec(zipCmd);
-            } catch (IOException e) {
+                log.info("开始压缩");
+//                String[] cmds = new String[]{
+//                        "cd "+zipPath +,
+//                        "zip -r picture.zip picture/*"
+//                };
+                //String zipCmd= "cd "+zipPath+" && "+"zip -r picture.zip picture/*";
+                //String zipCmd= "zip -r -qj "+zipPath+"/picture.zip "+zipPath+"/picture/*";
+                String zipCmd= "cd "+zipPath+" && zip -r picture.zip picture/*";
+
+                //Runtime.getRuntime().exec(zipCmd);
+                log.info("linux命令："+zipCmd);
+                String[] cmds = new String[]{"sh","-c",zipCmd};
+                Runtime.getRuntime().exec(cmds);
+//                zipCmd= "zip -r zip.zip zip/*";
+//                Runtime.getRuntime().exec(cmds);
+            } catch (Exception e) {
                 log.error("复制文件错误："+e);
             }
-            return zipPathReal+"/zip.zip";
+            return zipPathReal+"/picture.zip";
         }
         return "fail";
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int upload(MultipartFile file) {
+        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
+        String path = (String) mapForPicModelPath.get("content");
+        String fileName = "copyZip.zip";
+        // 将上传文件写入
+        try {
+            deleteDir(new File(path +"/"+ fileName));
+            file.transferTo(new File(path +"/"+ fileName));
+            //解压 unzip -o xxx.zip -d /home/yjh_iot_center/iot-  覆盖原有文件
+            String cmd= "unzip -o "+path+"/copyZip.zip"+" -d"+path+"";
+            String[] cmds = new String[]{"sh","-c",cmd};
+            log.info("linux命令："+cmd);
+            Runtime.getRuntime().exec(cmds);
+        }catch (NullPointerException e) {
+            e.getMessage();
+        } catch (IOException e) {
+            e.getMessage();
+        }
+        return 1;
+    }
+
+
+
 }
 

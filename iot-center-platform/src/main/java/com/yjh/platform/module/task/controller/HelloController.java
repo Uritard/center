@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
@@ -528,6 +529,19 @@ public class HelloController {
         Result result = new Result();
         try {
             result.setData(tCameraPresetService.download(cameraIdList));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询预置位树失败：" + e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "上传预置位图片")
+    @GetMapping(value = "/upload")
+    public Result upload(@RequestParam(value="file", required=false) MultipartFile file) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraPresetService.upload(file));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询预置位树失败：" + e);
