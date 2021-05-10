@@ -194,6 +194,7 @@ public class SystemInfoService {
     //获取NVR容量
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> getNVRInfo() {
+        String nvrFreeMin=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:nvrFreeMin","content"));
         List<TCameraRecorderDetail> list = tCameraRecorderDao.selectIdAndName();
         List<Map<String,String>> reList = new ArrayList<>();
         for (TCameraRecorderDetail item:list) {
@@ -211,7 +212,9 @@ public class SystemInfoService {
                 Integer other = all - use;
                 map.put("use",other.toString());
                 map.put("recorderName",item.getRecordName());
+                map.put("nvrFreeMin",nvrFreeMin);
             }else {
+                map.put("nvrFreeMin",nvrFreeMin);
                 map.put("recorderId",item.getRecordId().toString());
                 map.put("recorderName",item.getRecordName());
                 map.put("freeTotal","0");
