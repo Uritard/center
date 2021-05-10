@@ -353,9 +353,9 @@ public class TCameraPresetController {
         return result;
     }
     @ApiOperation(value = "上传标定图片")
-    @GetMapping(value = "/download")
+    @GetMapping(value = "/upload")
     @Logs(title = "上传标定图片",content = "上传标定图片",logType = 8)
-    public Result download(@RequestParam(value="file", required=false) MultipartFile file) {
+    public Result upload(@RequestParam(value="file", required=false) MultipartFile file) {
         Result result = new Result();
         try {
             result.setData(tCameraPresetService.upload(file));
