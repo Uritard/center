@@ -265,16 +265,5 @@ public class SM3 {
         return tmp;
     }
 
-    /*private static void print(int[] arr)
-    {
-        for (int i = 0; i < arr.length; i++)
-        {
-            System.out.print(Integer.toHexString(arr[i]) + " ");
-            if ((i + 1) % 16 == 0)
-            {
-                System.out.println();
-            }
-        }
-        System.out.println();
-    }*/
+
 }

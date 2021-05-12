@@ -120,15 +120,7 @@ public class SM2 {
 				ECPublicKeyParameters ecpub = (ECPublicKeyParameters) keypair.getPublic();
 				k = ecpriv.getD();
 				kp = ecpub.getQ();
-				
-				// 国密规范测试 随机数k
-//				String kS = "6CB28D99385C175C94F94E934817663FC176D925DD72B727260DBAAE1FB2F96F";
-//		        k = new BigInteger(kS, 16);
-//		        kp = this.ecc_point_g.multiply(k);
-				
-//		        System.out.println("计算曲线点X1: " + kp.getX().toBigInteger().toString(16));
-//				System.out.println("计算曲线点Y1: " + kp.getY().toBigInteger().toString(16));
-//				System.out.println("");
+
 
 				// r
 				r = e.add(kp.getX().toBigInteger());
@@ -157,16 +149,11 @@ public class SM2 {
             return;
         } else {
             ECPoint x1y1 = ecc_point_g.multiply(sm2Result.s);
-//            System.out.println("计算曲线点X0: " + x1y1.getX().toBigInteger().toString(16));
-//			System.out.println("计算曲线点Y0: " + x1y1.getY().toBigInteger().toString(16));
-//			System.out.println("");
+
 			
             x1y1 = x1y1.add(userKey.multiply(t));
-//            System.out.println("计算曲线点X1: " + x1y1.getX().toBigInteger().toString(16));
-//			System.out.println("计算曲线点Y1: " + x1y1.getY().toBigInteger().toString(16));
-//			System.out.println("");
+
             sm2Result.R = e.add(x1y1.getX().toBigInteger()).mod(ecc_n);
-//            System.out.println("R: " + sm2Result.R.toString(16));
             return;
         }
     }

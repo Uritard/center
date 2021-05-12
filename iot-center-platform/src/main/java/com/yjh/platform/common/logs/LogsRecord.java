@@ -38,4 +38,20 @@ public class LogsRecord {
         LogsAspect logsAspects = new LogsAspect();
         logsAspects.post(param);
     }
+
+    public void LoginLogsSend(HttpServletRequest request,String type,String title,String content,String userName,String userIds,Integer state){
+        MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+        param.set("logType", type);
+        param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+        param.set("title", title);
+        param.set("state", state);
+        param.set("userId", userIds);
+        param.set("userName", userName);
+        param.set("requestOrigin", request.getRequestURL());
+        param.set("requestPath", request.getRequestURI());
+        param.set("requestMethod", request.getMethod());
+        param.set("content", content);
+        LogsAspect logsAspects = new LogsAspect();
+        logsAspects.post(param);
+    }
 }

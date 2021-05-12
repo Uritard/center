@@ -31,44 +31,6 @@ public class Demo {
     @Resource
     private RedisTemplate redisTemplate;
 
-//    public static void main(String[] arg) {
-//        String msg = "123456789";//原始数据
-//        System.out.println("原始数据：" + msg);
-//        String summaryString = summary(String.valueOf(msg));
-//        System.out.println("摘要：" + summaryString);
-//        String signString = sign(summaryString);
-//        System.out.println("摘要签名：" + signString);
-//        boolean status = verify(summaryString, signString);
-//        System.out.println("验签结果：" + status);
-//
-//        System.out.println("加密: ");
-//        byte[] cipherText = null;
-//        try {
-//            cipherText = SM2Utils.encrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(pubk))).getBytes()), String.valueOf(msg).getBytes());
-//        } catch (IllegalArgumentException e1) {
-//            // TODO 自动生成的 catch 块
-//            e1.printStackTrace();
-//        } catch (IOException e1) {
-//            // TODO 自动生成的 catch 块
-//            e1.printStackTrace();
-//        }
-//        System.out.println(new String(Base64.encode(cipherText)));
-//        System.out.println("");
-//
-//        System.out.println("解密: ");
-//        String res = null;
-//        try {
-//            res = new String(SM2Utils.decrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(prik))).getBytes()), cipherText));
-//        } catch (IllegalArgumentException e) {
-//            // TODO 自动生成的 catch 块
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            // TODO 自动生成的 catch 块
-//            e.printStackTrace();
-//        }
-//        System.out.println(res);
-//
-//    }
 
     /**
      * 摘要
@@ -92,12 +54,6 @@ public class Demo {
      */
     public static String sign(String summaryString) {
         String prikS = new String(Base64.encode(Util.hexToByte(prik)));
-        System.out.println("prikS: " + prikS);
-        System.out.println("");
-
-        System.out.println("ID: " + Util.getHexString(userId.getBytes()));
-        System.out.println("");
-        System.out.println("签名: ");
         byte[] sign = null; //摘要签名
         try {
             sign = SM2Utils.sign(userId.getBytes(), Base64.decode(prikS.getBytes()), Util.hexToByte(summaryString));
@@ -116,10 +72,6 @@ public class Demo {
      */
     public static boolean verify(String summary, String sign) {
         String pubkS = new String(Base64.encode(Util.hexToByte(pubk)));
-        System.out.println("pubkS: " + pubkS);
-        System.out.println("");
-
-        System.out.println("验签 ");
         boolean vs = false; //验签结果
         try {
             vs = SM2Utils.verifySign(userId.getBytes(), Base64.decode(pubkS.getBytes()), Util.hexToByte(summary), Util.hexToByte(sign));
@@ -141,43 +93,8 @@ public class Demo {
         ECPublicKeyParameters ecpub = (ECPublicKeyParameters) key.getPublic();
         BigInteger privateKey = ecpriv.getD();
         ECPoint publicKey = ecpub.getQ();
-
-        System.out.println("公钥: " + Util.byteToHex(publicKey.getEncoded()));
-        System.out.println("私钥: " + Util.byteToHex(privateKey.toByteArray()));
     }
-    /**
-     * 加密
-     */
-//    public static  String encryption(String msg) throws IOException {
-//      return   new String(Base64.encode(SM2Utils.encrypt(Base64.decode(new String(Base64.encode(Util.hexToByte(pubk))).getBytes()), msg.getBytes())));
-//    }
 
-    /**
-     * 解密
-     */
-//    public  static  String decrypt(String msg) throws IOException {
-//        if (StringUtils.isNotBlank(msg)) {
-//            return new String(SM2Utils.decrypt(org.bouncycastle.util.encoders.Base64.decode(new String(org.bouncycastle.util.encoders.Base64.encode(Util.hexToByte(prik))).getBytes()), Base64.decode(msg.getBytes())));
-//        }else {
-//            return  msg;
-//        }
-//    }
-
-
-//    /**
-//     * 解密前端密码
-//     *
-//     * @param pCode 前端密码
-//     * @return 密码
-//     * @throws Exception 异常
-//     */
-//    public static String decrypt(String pCode) throws IOException {
-//        if(StringUtils.isNoneBlank(pCode)){
-//            return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte("04" + pCode)));
-//        }else {
-//            return  "";
-//        }
-//    }
     /**
      * 解密前端密码
      *
@@ -189,7 +106,6 @@ public class Demo {
         if(StringUtils.isNoneBlank(pCode)){
             Map map=(HashMap)redisTemplate.opsForValue().get("pubk:" + identifier);
             String priks = String.valueOf(map.get("prik"));
-          //  String priks = String.valueOf(redisTemplate.opsForHash().get("pubk:" + identifier, "prik"));
             return new String(SM2Utils.decrypt(Util.hexToByte(priks), Util.hexToByte("04" + pCode)));
         }else {
             return  "";

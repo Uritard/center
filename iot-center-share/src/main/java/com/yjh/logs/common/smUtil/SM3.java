@@ -63,37 +63,10 @@ public class SM3 {
         g = V[6];
         h = V[7];
 
-        /*System.out.println("IV: ");
-        System.out.print(Integer.toHexString(a)+" ");
-        System.out.print(Integer.toHexString(b)+" ");
-        System.out.print(Integer.toHexString(c)+" ");
-        System.out.print(Integer.toHexString(d)+" ");
-        System.out.print(Integer.toHexString(e)+" ");
-        System.out.print(Integer.toHexString(f)+" ");
-        System.out.print(Integer.toHexString(g)+" ");
-        System.out.print(Integer.toHexString(h)+" ");
-        System.out.println("");
-        System.out.println("");
-
-        System.out.println("填充后的消息: ");
-        for(int i=0; i<B.length; i++)
-        {
-            System.out.print(Integer.toHexString(B[i])+" ");
-        }
-        System.out.println("");
-        System.out.println("");*/
-
         int[][] arr = expand(B);
         int[] w = arr[0];
         int[] w1 = arr[1];
 
-        /*System.out.println("扩展后的消息： ");
-        System.out.println("W0W1...W67");
-        print(w);
-        System.out.println("");
-        System.out.println("W'0W'1...W'67");
-        print(w1);
-        System.out.println("迭代压缩中间值: ");*/
 
         for (int j = 0; j < 64; j++){
             ss1 = (bitCycleLeft(a, 12) + e + bitCycleLeft(Tj[j], j));
@@ -110,18 +83,8 @@ public class SM3 {
             f = e;
             e = P0(tt2);
 
-            /*System.out.print(j+" ");
-            System.out.print(Integer.toHexString(a)+" ");
-            System.out.print(Integer.toHexString(b)+" ");
-            System.out.print(Integer.toHexString(c)+" ");
-            System.out.print(Integer.toHexString(d)+" ");
-            System.out.print(Integer.toHexString(e)+" ");
-            System.out.print(Integer.toHexString(f)+" ");
-            System.out.print(Integer.toHexString(g)+" ");
-            System.out.print(Integer.toHexString(h)+" ");
-            System.out.println("");*/
+
         }
-//      System.out.println("");
 
         int[] out = new int[8];
         out[0] = a ^ V[0];
@@ -298,16 +261,4 @@ public class SM3 {
         return tmp;
     }
 
-    /*private static void print(int[] arr)
-    {
-        for (int i = 0; i < arr.length; i++)
-        {
-            System.out.print(Integer.toHexString(arr[i]) + " ");
-            if ((i + 1) % 16 == 0)
-            {
-                System.out.println();
-            }
-        }
-        System.out.println();
-    }*/
 }

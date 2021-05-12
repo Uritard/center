@@ -133,9 +133,7 @@ public class Util {
 			if (hex.length() == 1) {
 				hex = '0' + hex;
 			}
-			System.out.print("0x" + hex.toUpperCase() + ",");
 		}
-		System.out.println("");
 	}
 	
 	/**
