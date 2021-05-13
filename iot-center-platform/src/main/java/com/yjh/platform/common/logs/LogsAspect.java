@@ -1,7 +1,9 @@
 package com.yjh.platform.common.logs;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.IPUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -74,17 +76,23 @@ public class LogsAspect {
         log.info("ttIp: "+ip);
         Object result = null;
         if (annotation != null) {
-//            try{
-//                if(!"".equals(annotation.authority()) ){
-//                    if(! userRole.equals(annotation.authority())){
-//                        //todo
-//                        return null;
-//                    }
-//                }
-//
-//            }catch (Exception e) {
-//                log.error(e.getMessage(), e);
-//            }
+            if(Constant.apiPermissions){
+                try{
+                    if(!"".equals(annotation.authority()) ){
+                        if(! userRole.equals(annotation.authority())){
+                            //todo
+                            Result re= new Result();
+                            re.setCode(209,"此用户无权限");
+                            return re;
+                        }
+                    }
+
+                }catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+
+
             try {
 //                serviceId = logsConfig.getName();
                 params.set("logType", annotation.logType());

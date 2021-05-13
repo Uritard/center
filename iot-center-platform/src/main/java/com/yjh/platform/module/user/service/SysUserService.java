@@ -88,11 +88,13 @@ public class SysUserService {
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userIds, "userName"));
         String userNames = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
         String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
-        /*if(!"1234".equals(userRole)){
-            //权限不够；
-            throw new BusinessException(10008,"用户无权限");
-            //return -1;
-        }*/
+        if(Constant.apiPermissions) {
+            if (!"1234".equals(userRole)) {
+                //权限不够；
+                throw new BusinessException(10008, "用户无权限");
+                //return -1;
+            }
+        }
         redisTemplate.delete("userInfo:" + userId);
         this.SysUserBackUpDao.deleteByPrimaryId(userId);
         logsRecord.LoginLogsSend(request, "4", "删除系统用户数据", userName + "用户删除了" + userNames + "用户", userName, String.valueOf(userId), 1);
@@ -104,13 +106,13 @@ public class SysUserService {
         Long userId = Long.valueOf(request.getHeader("userId"));
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
         String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
-//        if(Constant.apiPermissions) {
-//            if (!"1234".equals(userRole)) {
-//                //权限不够；
-//                throw new BusinessException(10008, "用户无权限");
-//                //return -1;
-//            }
-//        }
+        if(Constant.apiPermissions) {
+            if (!"1234".equals(userRole)) {
+                //权限不够；
+                throw new BusinessException(10008, "用户无权限");
+                //return -1;
+            }
+        }
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(sysUser.getUserId());
         Long roleId = sysUser.getRoleId();
         if (roleId != null) {

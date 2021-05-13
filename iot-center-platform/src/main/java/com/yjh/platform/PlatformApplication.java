@@ -48,6 +48,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private TDeviceTypeImgService tDeviceTypeImgService;
     @Value("${spring.websocket.send.url}")
     private String url;
+    @Value("${spring.interface.api}")
+    private String interfaceApi;
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
@@ -64,6 +66,7 @@ public class PlatformApplication  implements CommandLineRunner {
         sysUserService.insertIntoRedis();
         Constant.WEBSOCKET_URL = url;
         Constant.redisTemplate = redisTemplate;
+        Constant.apiPermissions= Boolean.valueOf(interfaceApi);
         tDeviceTypeImgService.findPic();//本地启动把此行注掉
         //Start RecordVoiceFileThread
 //        List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();
