@@ -68,8 +68,8 @@ public class TUnionTaskService{
         return this.tUnionTaskDao.batchInsert(list);
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<TUnionTaskExpand> selectHistory(String ruleName,Date endDateTemp,Date startDateTemp) {
-        List<TUnionTaskExpand> tUnionTaskList  = tUnionTaskDao.selectHistory(ruleName,endDateTemp,startDateTemp);
+    public List<TUnionTaskExpand> selectHistory(String ruleName,String startDate,String endDate) {
+        List<TUnionTaskExpand> tUnionTaskList  = tUnionTaskDao.selectHistory(ruleName,startDate,endDate);
         log.info("tUnionTaskList是："+tUnionTaskList);
         for (TUnionTaskExpand tUnionTaskExpand:tUnionTaskList)
         {

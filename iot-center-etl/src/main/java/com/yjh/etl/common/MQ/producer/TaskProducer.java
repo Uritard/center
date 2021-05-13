@@ -34,7 +34,7 @@ public class TaskProducer {
 
 	  /**
 	   * 任务消息入队
-	 * @throws TimeoutException
+	 * @throws TimeoutExceptionselectHistory
 	 * @throws IOException
 	   */
 	  public String produceTask(JSONObject jobj, String routeKey) throws IOException, TimeoutException{

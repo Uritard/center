@@ -518,6 +518,148 @@ public class CameraConService {
         return returnMap;
     }
 
+    //机器人相机-视频回放
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String,Object>> startRobotPlayBack(Long robotId,String startTime,String stopTime){
+
+        //定义返回结果集与可见光、红外历史流地址容器
+        List<Map<String,Object>> robotHistoryList=new ArrayList<>();
+        Map<String,Object> lightReturnMap=new HashMap<>();
+        Map<String,Object> infraredReturnMap=new HashMap<>();
+
+        //判断是否已存在历史视频流
+        if (Constant.mapsForHistory.size()>0) {
+            for (String key:Constant.mapsForHistory.keySet()) {
+                if (Objects.equals(Constant.mapsForHistory.get(key), String.valueOf(robotId)+":inferad") || Objects.equals(Constant.mapsForCamera.get(key), String.valueOf(robotId)+":light")) {
+                    Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + String.valueOf(robotId) + ":light");
+                    Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + String.valueOf(robotId) + ":inferad");
+                    robotHistoryList.add(robotLightFlowMap);
+                    robotHistoryList.add(robotInferadFlowMap);
+                }
+            }
+            if (robotHistoryList.size()>0) { return robotHistoryList; }
+        }
+
+
+        //开始时间 与 结束时间 格式化
+        String startTimeTem = startTime.replace("-", "").replace(":", "").replace(" ", "T") + " ";
+        String stopTimeTem = stopTime.replace("-", "").replace(":", "").replace(" ", "T") + " ";
+        String starttime = startTimeTem.replace(" ", "Z");
+        String endtime = stopTimeTem.replace(" ", "Z");
+
+        //获取机器人基本信息
+        RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
+
+        //开启可见光历史流
+        String userName=robotConInfo.getIdentityManager();
+        String password=robotConInfo.getIdentityCode();
+        String ipLight=robotConInfo.getLightIp();
+        String portLigh=robotConInfo.getLightPort();
+        String lightNum=robotConInfo.getNumLight();
+
+        log.info("userName: " + userName + ",password: " + password + ",cameraIp: " + ipLight + ",cameraPort: " + portLigh
+                + ",iChanNum: " + lightNum + ",starttime: " + starttime + ",endtime: " + endtime + ",historyPath: " + robotId);
+        String transUrl = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, robotId);
+
+        log.info("historyTransUrl: " + transUrl);
+        try {
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
+            Thread.sleep(3000);
+        } catch (Exception e) { e.getMessage(); }
+        String[] rtmpUrls = transUrl.split("rtmp");
+        String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
+
+        lightReturnMap.put("robotId", String.valueOf(robotId));
+        lightReturnMap.put("rtmpUrl", rtmpUrl);
+        if (videoHttps == 1) {
+            String flvsUrl = "https://" + hostIp + ":8088/history/" + robotId + ".flv";
+            lightReturnMap.put("flvUrl", flvsUrl);
+        } else {
+            String flvUrl = "http://" + hostIp + ":10080/history/" + robotId + ".flv";
+            lightReturnMap.put("flvUrl", flvUrl);
+        }
+
+        String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
+        JSONObject jsonList = new JSONObject();
+        try { jsonList = HttpClientUtils.sendGet(getInfoUrl, null); } catch (Exception e) {e.getMessage();}
+        assert jsonList != null;
+        List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
+        int streamListSize = streamsJsonObjectList.size();
+        for (int i = 0; i < streamListSize; i++) {
+            String streambeanStr = streamsJsonObjectList.get(i);
+            JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
+            //livePath
+            String name = streambeanJson.getString("name");
+            String videoFlowId = streambeanJson.getString("id");
+            String publish = streambeanJson.getString("publish");
+            JSONObject publishjson = JSONObject.parseObject(publish);
+            if (Objects.equals(name, String.valueOf(robotId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+                lightReturnMap.put("videoFlowId", videoFlowId);
+                Constant.mapsForHistory.put(videoFlowId, String.valueOf(robotId)+":light");
+                log.info("historyMapsForCamera: " + Constant.mapsForHistory);
+                redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + robotId+":light", lightReturnMap);
+                robotHistoryList.add(lightReturnMap);
+            }
+        }
+
+        //开启红外历史流
+
+        userName=robotConInfo.getInferadUsername();
+        password=robotConInfo.getInferadPassword();
+        String infraredIp=robotConInfo.getLnferadIp();
+        String infraredPort=Objects.nonNull(robotConInfo.getInferadPort())?robotConInfo.getInferadPort().toString():null;
+        String infraredNum=robotConInfo.getNumInferad();
+
+        log.info("userName: " + userName + ",password: " + password + ",cameraIp: " + infraredIp + ",cameraPort: " + infraredPort
+                + ",iChanNum: " + infraredNum + ",starttime: " + starttime + ",endtime: " + endtime + ",historyPath: " + robotId);
+        String transUrlIn = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, robotId);
+
+        log.info("historyTransUrl: " + transUrlIn);
+        try {
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrlIn});
+            Thread.sleep(3000);
+        } catch (Exception e) { e.getMessage(); }
+        String[] rtmpUrlsIn = transUrlIn.split("rtmp");
+        String rtmpUrlIn = "rtmp" + rtmpUrlsIn[rtmpUrlsIn.length - 1];
+
+        lightReturnMap.put("robotId", String.valueOf(robotId));
+        lightReturnMap.put("rtmpUrl", rtmpUrlIn);
+        if (videoHttps == 1) {
+            String flvsUrl = "https://" + hostIp + ":8088/history/" + robotId + ".flv";
+            lightReturnMap.put("flvUrl", flvsUrl);
+        } else {
+            String flvUrl = "http://" + hostIp + ":10080/history/" + robotId + ".flv";
+            lightReturnMap.put("flvUrl", flvUrl);
+        }
+
+        String getInfoUrlIn="http://"+srsStopUrl+":8082/api/v1/streams/";
+        JSONObject jsonListIn = new JSONObject();
+        try { jsonListIn = HttpClientUtils.sendGet(getInfoUrlIn, null); } catch (Exception e) {e.getMessage();}
+        assert jsonListIn != null;
+        List<String> streamsJsonObjectListIn = JSONArray.parseArray(jsonListIn.getString("streams"),String.class);
+        int streamListSizeIn = streamsJsonObjectListIn.size();
+        for (int i = 0; i < streamListSizeIn; i++) {
+            String streambeanStr = streamsJsonObjectListIn.get(i);
+            JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
+            //livePath
+            String name = streambeanJson.getString("name");
+            String videoFlowId = streambeanJson.getString("id");
+            String publish = streambeanJson.getString("publish");
+            JSONObject publishjson = JSONObject.parseObject(publish);
+            if (Objects.equals(name, String.valueOf(robotId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+                lightReturnMap.put("videoFlowId", videoFlowId);
+                Constant.mapsForHistory.put(videoFlowId, String.valueOf(robotId)+":inferad");
+                log.info("historyMapsForCamera: " + Constant.mapsForHistory);
+                redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + robotId+":inferad", lightReturnMap);
+                robotHistoryList.add(infraredReturnMap);
+            }
+        }
+
+        log.info("robotHistoryList:"+robotHistoryList);
+        log.info("historyMapsForRobot"+Constant.mapsForHistory);
+        return robotHistoryList;
+    }
+
     //@Logs(title = "云台控制", code = "cameraControl")
     @Transactional(rollbackFor = Exception.class)
     public Object pTZControl(int dwPTZCommand, Long cameraId, int dStop, int speed) {

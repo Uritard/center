@@ -59,6 +59,9 @@ public class RobotConInfo implements Serializable {
     @ApiModelProperty(value = "可见光密码")
     private String identityCode;
 
+    @ApiModelProperty(value = "可见光通道号")
+    private String numLight;
+
     @TableField("lnferad_IP")
     @ApiModelProperty(value = "红外IP")
     private String lnferadIp;
@@ -75,6 +78,9 @@ public class RobotConInfo implements Serializable {
     @ApiModelProperty(value = "红外密码")
     private String inferadPassword;
 
+    @ApiModelProperty(value = "红外通道号")
+    private String numInferad;
+
     @ApiModelProperty(value = "照片路径")
     private String photePath;
 
@@ -85,7 +91,7 @@ public class RobotConInfo implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createDate;
 
-     @ApiModelProperty(value = "修改时间")
+    @ApiModelProperty(value = "修改时间")
     private String updateBy;
 
     @ApiModelProperty(value = "修改日期",example = "2018-10-01 12:18:48")

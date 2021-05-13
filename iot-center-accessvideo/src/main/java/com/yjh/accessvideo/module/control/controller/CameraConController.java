@@ -211,6 +211,22 @@ public class CameraConController {
         }
         return result;
     }
+    @ApiOperation(value = "机器人相机-视频回放")
+    @RequestMapping(value = "/startPlayBack", method = RequestMethod.GET)
+    public Result startRobotPlayBack(@RequestParam(value = "robotId") Long robotId,
+                                @RequestParam(value = "startTime") String startTime,
+                                @RequestParam(value = "stopTime") String stopTime) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.startRobotPlayBack(robotId, startTime, stopTime));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("机器人相机-视频回放失败:", e);
+        }
+        return result;
+    }
 
 //    TILT_UP 21 云台上仰 TILT_DOWN 22 云台下俯 PAN_LEFT 23 云台左转 PAN_RIGHT 24 云台右转
 //    11 焦距变大(倍率变大) 12 焦距变小(倍率变小) 25 云台上仰和左转 26 云台上仰和右转 27 云台下俯和左转 28 云台下俯和右转 29 云台左右自动扫描

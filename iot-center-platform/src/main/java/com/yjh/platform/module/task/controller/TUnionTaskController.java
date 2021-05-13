@@ -180,20 +180,20 @@ public class TUnionTaskController {
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        /*SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date endDateTemp = new Date();
-        Date startDateTemp = new Date();
+        Date startDateTemp = new Date();*/
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            if (("".equals(endDate) && "".equals(startDate)) || (endDate == null && startDate == null) ) {
+            /*if (("".equals(endDate) && "".equals(startDate)) || (endDate == null && startDate == null) ) {
                 endDateTemp = null;
                 startDateTemp = null;
             } else {
                 endDateTemp = simpleDateFormat.parse(endDate);
                 startDateTemp = simpleDateFormat.parse(startDate);
-            }
-            List<TUnionTaskExpand> list = tUnionTaskService.selectHistory(ruleName,endDateTemp,startDateTemp);
+            }*/
+            List<TUnionTaskExpand> list = tUnionTaskService.selectHistory(ruleName,startDate,endDate);
 
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);

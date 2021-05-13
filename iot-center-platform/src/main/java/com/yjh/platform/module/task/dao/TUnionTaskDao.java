@@ -36,8 +36,8 @@ public interface TUnionTaskDao {
     int batchInsert(List<TUnionTask> list);
 
     List<TUnionTaskExpand> selectHistory(@Param(value = "ruleName")String  ruleName,
-                                         @Param(value = "endDateTemp")Date endDateTemp,
-                                         @Param(value = "startDateTemp")Date startDateTemp);
+                                         @Param(value = "startDateTemp")String startDateTemp,
+                                         @Param(value = "endDateTemp")String endDateTemp);
     //    int insertRecord(TUnionTask tUnionTask);
     List<TUnionTaskDetail> selectUnionDetail(@Param(value = "ruleId")Long  ruleId);
     int insertRecordDetail(List<TUnionTaskAttr> tUnionTaskAttrList);

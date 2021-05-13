@@ -31,6 +31,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -39,7 +40,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import static com.yjh.accessrobot.netty.server.RobotServerHandler.getXmlMessage;
@@ -176,11 +176,7 @@ public class RobotService {
                 return scmap;
             }else{
                 RobotServerHandler.getRobotServerHandlerMap().get(robotCode).sendHeartBeat(generateByteOrder(xmlString, robotCode), robotCode);
-//                if ("21".equals(type) && "7".equals(command) //抓图
-//                        || "21".equals(type) && "10".equals(command)//停止录像
-//                        || "22".equals(type) && "7".equals(command)){
-//                    TimeUnit.SECONDS.sleep(5);
-//                }
+
                 String filePath = null;
                 if (Objects.nonNull(RobotServerHandler.getRobotResultMap().get("Item"))){
                     String ftpFilePath = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).get("file_path").toString();
@@ -564,20 +560,20 @@ public class RobotService {
                     return;
                 }else {
                     /*Integer unionNum = tRobotInfoDao.selectIsUnionTask(rTII.getTaskId());
-                    log.info("unionNum===="+unionNum);*/
-                    Integer unionNum = null;
+                    log.info("unionNum===="+unionNum);
+                    Integer unionNum = 0;
                     String unionTaskStatus = rTII.getUnionTaskStatus();
                     if (!"".equals(unionTaskStatus) || Objects.nonNull(unionTaskStatus)){
                         unionNum = 1;
                     }else {
                         unionNum = 0;
                     }
-
+                    log.info("unionNum==="+unionNum);*/
                     Map<String, Object> mapRes1 = robotTaskDragonService(rTII.getRobotCode(), "1", "6", "");//控制权获得
                     if ("200".equals(mapRes1.get("code").toString())) {
                         Map<String, Object> mapRes2 = robotTaskDragonService(rTII.getRobotCode(), "1", "5", "1");//任务模式
                         if ("200".equals(mapRes2.get("code").toString())) {
-                            if (unionNum == 0 ){
+                            if (Objects.isNull(rTII.getUnionTaskStatus())){
                                 log.info("这是正常的任务！！！！！！！！！！！！！");
                                 feignRobotNormalTaskIssued(ItemMap);
                                 return;
@@ -704,17 +700,6 @@ public class RobotService {
                 map.put("interval_start_time","");
                 map.put("interval_end_time","");
             }
-            /*map.put("fixed_start_time", sdf.format(new Date()));
-            map.put("cycle_month", "");
-            map.put("cycle_week", "");
-            map.put("cycle_execute_time", "");
-            map.put("cycle_start_time", "");
-            map.put("cycle_end_time", "");
-            map.put("interval_number", "");
-            map.put("interval_type", "");
-            map.put("interval_execute_time", "");
-            map.put("interval_start_time", "");
-            map.put("interval_end_time", "");*/
             map.put("invalid_start_time", "");
             map.put("invalid_end_time", "");
             map.put("isenable", "");
