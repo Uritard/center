@@ -18,6 +18,7 @@ public class BaseTaskClient {
     private static ConnectionFactory factory = null;
 
     public synchronized Connection getConnection(boolean autoRecovery) throws IOException, TimeoutException {
+        //连接工厂
         if (factory == null) {
             log.warn("Rabbit MQ Parameter: host({}), port({}), name({}), pass({})", host, port, name, password);
             factory = new ConnectionFactory();
@@ -28,6 +29,7 @@ public class BaseTaskClient {
         }
 
         factory.setAutomaticRecoveryEnabled(autoRecovery);
+        //与RabbitMQ服务器建立连接
         Connection connection = factory.newConnection();
         return connection;
     }

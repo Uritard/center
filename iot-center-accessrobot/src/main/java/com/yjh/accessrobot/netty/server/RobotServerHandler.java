@@ -395,7 +395,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         long sendSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);//发送会话序列号
         long receiveSessionId = PlatformPacketUtil.bytesToLong(receiveSessionIdByte);//接收会话序列号
         if (xmlRes.getSendCode() == null) {
-            log.info("连接可能断了，等待重连.....");
+            log.info("客户端"+ctx.channel().remoteAddress()+ "与服务端连接可能断了，等待重连.....");
         } else {
             doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
             log.info("+++++++++++++++++解包完成+++++++++++++++++");
@@ -493,8 +493,24 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     case "2514":
                         if (xmlBaseModel.getItems().get(0).size() == 1) {
                             //Deal with task control
-                            String taskId = xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString();
-                            log.info("机器人收到任务控制指令了,这是机器人响应的巡视任务执行Id==="+taskId);
+
+                            if (xmlBaseModel.getItems().get(0).containsKey("task_patrolled_id")){
+                                String taskId = xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString();
+                                log.info("机器人收到任务控制指令了,这是机器人响应的巡视任务执行Id==="+taskId);
+                            }else if (xmlBaseModel.getItems().get(0).containsKey("error_code")){
+                                switch (xmlBaseModel.getItems().get(0).get("error_code").toString()){
+                                    case "0":
+                                        log.info("成功");break;
+                                    case "1":
+                                        log.info("机器人异常");break;
+                                    case "2":
+                                        log.info("无权限（或高优先级任务存在");break;
+                                    case "3":
+                                        log.info("其它异常");break;
+                                    default:break;
+                                }
+                            }
+
                         }else if (xmlBaseModel.getItems().get(0).size() == 2){
                             log.info("机器人收到模型指令了,这是机器人的响应");
                             //Deal with synchronous model

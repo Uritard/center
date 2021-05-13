@@ -74,17 +74,17 @@ public class LogsAspect {
         ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         Object result = null;
         if (annotation != null) {
-            try{
-                if(!"".equals(annotation.authority()) ){
-                    if(! userRole.equals(annotation.authority())){
-                        //todo
-                        return null;
-                    }
-                }
-
-            }catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
+//            try{
+//                if(!"".equals(annotation.authority()) ){
+//                    if(! userRole.equals(annotation.authority())){
+//                        //todo
+//                        return null;
+//                    }
+//                }
+//
+//            }catch (Exception e) {
+//                log.error(e.getMessage(), e);
+//            }
             try {
 //                serviceId = logsConfig.getName();
                 params.set("logType", annotation.logType());

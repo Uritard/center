@@ -51,7 +51,8 @@
 		y.real_code,
 		f.person_check,
 		f.identify_result,
-		z.dict_note as identify_result_name
+		z.dict_note as identify_result_name,
+		f.cruise_type
 		FROM t_std_device a
 		LEFT JOIN t_std_devicemete b on a.device_id = b.device_id and a.custom_id = b.custom_id
 		LEFT JOIN t_cruise_point_instance d on b.device_mete_id = d.device_mete_id

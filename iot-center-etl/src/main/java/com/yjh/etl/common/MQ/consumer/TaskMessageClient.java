@@ -103,6 +103,9 @@ public class TaskMessageClient extends BaseTaskClient {
             logger.info("handleRecoverOk: consumer - {}", consumerTag);
         }
 
+        /*
+        * 收到消息后用来处理消息的回调对象
+        * */
         @Override
         public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
                                    byte[] body) throws IOException {
@@ -114,7 +117,7 @@ public class TaskMessageClient extends BaseTaskClient {
             } catch (Exception e) {
                 logger.error("doWork in handleDelivery error", e);
             } finally {
-                getChannel().basicAck(envelope.getDeliveryTag(), false);
+                getChannel().basicAck(envelope.getDeliveryTag(), false);//消费者挂掉,发送一个消息确认(回执)
             }
         }
     }
@@ -127,11 +130,11 @@ public class TaskMessageClient extends BaseTaskClient {
         void start() throws Exception {
             if (started.compareAndSet(false, true)) {
                 Connection connection = getConnection(true);
-                final Channel channel = connection.createChannel();
+                final Channel channel = connection.createChannel();//建立信道
                 channel.queueDeclare(TASK_QUEUE_NAME, true, false, false, null);
-                // 每次从队列中获取数量
+                // 每次从队列中获取数量,在返回确认回执前,不要向消费者发送新消息,而是把消息发给下一个空闲的消费者
                 channel.basicQos(1);
-                channel.basicConsume(TASK_QUEUE_NAME, false/*非自动应答*/, new TaskMessageConsumer(channel));
+                channel.basicConsume(TASK_QUEUE_NAME, false/*非自动应答,手动应答*/, new TaskMessageConsumer(channel));
                 logger.warn("MqClient started");
             }
         }

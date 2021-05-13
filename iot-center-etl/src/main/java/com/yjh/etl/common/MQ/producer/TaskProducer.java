@@ -43,12 +43,32 @@ public class TaskProducer {
 		  String message = jobj.toJSONString();
 		 try {
 			connection = producer.getConnection();
-			channel = connection.createChannel();
+			channel = connection.createChannel();//建立信道
 			log.info("TaskProducer 任务上传 消息入队  "+message);
 	        if ("robotinfo".equals(routeKey)) {
-				//channel.queueDeclare(robotInfo, durable, false, false, null);
+	        	/*
+	        	*声明队列,会在RabbitMQ中创建一个队列.如果已经创建过,就不能再使用其他参数来创建
+	        	*
+				*参数含义：
+				*	队列名称
+				*	队列持久化,true表示RabbitMQ重启后队列仍存在
+				*	排他独有,true表示限制仅当前连接可用
+				*	当最后一个消费者断开后,是否删除队列
+				* 	其他参数
+				* */
+				//channel.queueDeclare(robotInfo, durable, false, false, null);//队列持久化
 				//channel.exchangeDeclare(route ,rmqType, true, false, false, null);
-	        	channel.basicPublish(route, robotInfo, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes()); }
+				/*
+				* 发布消息,把消息向默认交换机发送,默认交换机隐含与所有队列绑定,routing key即为队列名称（第二个参数）
+				*
+				* 参数含义：
+				* 	交换机名称
+				* 	对于默认交换机,路由键就是目标队列名称
+				* 	其他参数,例如头信息
+				* 	消息内容byte[]数组
+				* */
+	        	channel.basicPublish(route, robotInfo, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes());//消息持久化
+	        }
 	        if ("robotstate".equals(routeKey)) {
 				//channel.exchangeDeclare(route ,rmqType, true, false, false, null);
 	        	channel.basicPublish(route, robotState, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes());

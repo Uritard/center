@@ -189,10 +189,13 @@ public class HomePageController {
             log.info("天气信息"+map);
             //Map mapa = JSON.parseObject(map);
             Map mapa = map;
-            Double sp = Double.valueOf(map.get("windSpeed"));
-            if(sp!= null && 0==sp){
-                map.put("windDirection","--");
+            if(map.get("windSpeed") != null){
+                Double sp = Double.valueOf(map.get("windSpeed"));
+                if(sp!= null && 0==sp){
+                    mapa.put("windDirection","--");
+                }
             }
+
 //            Integer temp1 = Integer.valueOf(mapa.get("windDirection").toString());
 //            String windDirection="";
 //            if(temp1 == 0 || temp1 ==360){
@@ -238,12 +241,14 @@ public class HomePageController {
     public Result getWeatherInfo()  {
         Result result = new Result();
         try {
-            if(Constant.weatherInfo == null || Constant.weatherInfo.size() ==0){
-                Map<String,String> map  = redisTemplate.opsForHash().entries("weatherInfoForLastValue");
-                result.setData(map);
-            }else {
-                result.setData(Constant.weatherInfo);
-            }
+//            if(Constant.weatherInfo == null || Constant.weatherInfo.size() ==0){
+//                Map<String,String> map  = redisTemplate.opsForHash().entries("weatherInfoForLastValue");
+//                result.setData(map);
+//            }else {
+//                result.setData(Constant.weatherInfo);
+//            }
+            Map<String,String> map  = redisTemplate.opsForHash().entries("weatherInfoForLastValue");
+            result.setData(map);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

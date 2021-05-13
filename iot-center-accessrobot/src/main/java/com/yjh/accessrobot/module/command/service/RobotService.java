@@ -563,8 +563,15 @@ public class RobotService {
                     log.info("该机器人处于检修状态,没有成功将任务下发到机器,巡视结果数据默认......");
                     return;
                 }else {
-                    Integer unionNum = tRobotInfoDao.selectIsUnionTask(rTII.getTaskId());
-                    log.info("unionNum===="+unionNum);
+                    /*Integer unionNum = tRobotInfoDao.selectIsUnionTask(rTII.getTaskId());
+                    log.info("unionNum===="+unionNum);*/
+                    Integer unionNum = null;
+                    String unionTaskStatus = rTII.getUnionTaskStatus();
+                    if (!"".equals(unionTaskStatus) || Objects.nonNull(unionTaskStatus)){
+                        unionNum = 1;
+                    }else {
+                        unionNum = 0;
+                    }
 
                     Map<String, Object> mapRes1 = robotTaskDragonService(rTII.getRobotCode(), "1", "6", "");//控制权获得
                     if ("200".equals(mapRes1.get("code").toString())) {
@@ -683,8 +690,19 @@ public class RobotService {
                 map.put("interval_execute_time", Objects.nonNull(rTII.getIntervalExecuteTime())?rTII.getIntervalExecuteTime():"");
                 map.put("interval_start_time",Objects.nonNull(rTII.getIntervalStartTime())?rTII.getIntervalStartTime():"");
                 map.put("interval_end_time", Objects.nonNull(rTII.getIntervalEndTime())?rTII.getIntervalEndTime():"");
+                map.put("fixed_start_time", "");
             }else{//定期和立即
                 map.put("fixed_start_time", rTII.getFixedStartTime());
+                map.put("cycle_month", "");
+                map.put("cycle_week", "");
+                map.put("cycle_execute_time","");
+                map.put("cycle_start_time", "");
+                map.put("cycle_end_time","");
+                map.put("interval_number","");
+                map.put("interval_type","");
+                map.put("interval_execute_time","");
+                map.put("interval_start_time","");
+                map.put("interval_end_time","");
             }
             /*map.put("fixed_start_time", sdf.format(new Date()));
             map.put("cycle_month", "");

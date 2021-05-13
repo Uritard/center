@@ -18,6 +18,7 @@ public class BaseProducer {
 	private static ConnectionFactory factory = null;
 
 	public Connection getConnection() throws IOException, TimeoutException {
+		//创建连接工厂,并设置连接信息
 		if (factory == null) {
 			factory = new ConnectionFactory();
 			factory.setHost(host);
@@ -26,6 +27,7 @@ public class BaseProducer {
 			factory.setPort(Integer.parseInt(port));
 			factory.setVirtualHost(vhost);
 		}
+		//与RabbitMQ服务器建立连接
 		Connection connection = factory.newConnection();
 		return connection;
 	}

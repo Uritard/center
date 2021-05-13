@@ -270,8 +270,8 @@
     <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand" resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
         select distinct <include refid="TongYong"></include>
         FROM t_cruise_result a
-        LEFT JOIN t_dict_business d ON a.c_type = d.dict_code
-        LEFT JOIN t_dict_business e ON a.c_state = e.dict_code
+        LEFT JOIN t_dict_business d ON a.c_type = d.dict_code and d.col_name = 'plan_type'
+        LEFT JOIN t_dict_business e ON a.c_state = e.dict_code and e.col_name='task_state'
         LEFT JOIN t_cruise_task_result f ON a.task_result_id = f.task_result_id
         LEFT JOIN t_cruise_task_result_detail g ON f.task_result_id = g.task_result_id
         <if test="deviceType != -1">
@@ -298,7 +298,7 @@
 
         <if test="meteType != -1 ">and k.mete_type = #{meteType, jdbcType=VARCHAR}</if>
 
-        and a.c_state != 239 and a.c_state != 241 and e.col_name='task_state'
+        and a.c_state != 239 and a.c_state != 241
         GROUP BY task_result_id
         order by a.execute_time desc
     </select>
