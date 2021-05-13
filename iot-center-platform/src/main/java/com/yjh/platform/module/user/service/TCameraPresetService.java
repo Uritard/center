@@ -225,9 +225,11 @@ public class TCameraPresetService {
                 Runtime.getRuntime().exec(cmds);
 //                zipCmd= "zip -r zip.zip zip/*";
 //                Runtime.getRuntime().exec(cmds);
+                Thread.sleep(100);
             } catch (Exception e) {
                 log.error("复制文件错误："+e);
             }
+
             return zipPathReal+"/picture.zip";
         }
         return "fail";

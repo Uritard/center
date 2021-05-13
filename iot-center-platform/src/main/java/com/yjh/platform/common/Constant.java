@@ -171,5 +171,5 @@ public class Constant {
             put("10004", "0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0");
         }
     };
-    public static Boolean apiPermissions=true;
+    public static Boolean apiPermissions=false;
 }

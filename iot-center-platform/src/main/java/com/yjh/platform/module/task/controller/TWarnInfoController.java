@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 //import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.LogsRecord;
@@ -438,11 +439,13 @@ public class TWarnInfoController {
         try{
             String userId = request.getHeader("userId");
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-//            if(!"1234".equals(userRole)){
-//                //权限不够；
-//                throw new BusinessException(10008,"用户无权限");
-//                //return -1;
-//            }
+            if(Constant.apiPermissions) {
+                if (!"1235".equals(userRole)) {
+                    //权限不够；
+                    throw new BusinessException(10008, "用户无权限");
+                    //return -1;
+                }
+            }
             countResult.put("count",tWarnInfoService.warnCountsNonIdentify());
             result.setData(countResult);
         }catch (Exception e){

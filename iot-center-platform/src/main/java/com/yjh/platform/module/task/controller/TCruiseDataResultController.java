@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.LogsRecord;
@@ -283,11 +284,13 @@ public class TCruiseDataResultController {
         String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
         try {
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userIds).get("roleId"));
-//            if(!"1234".equals(userRole)){
-//                //权限不够；
-//                throw new BusinessException(10008,"用户无权限");
-//                //return -1;
-//            }
+            if(Constant.apiPermissions) {
+                if (!"1235".equals(userRole)) {
+                    //权限不够；
+                    throw new BusinessException(10008, "用户无权限");
+                    //return -1;
+                }
+            }
             if(pageSize==0){
                 MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                 param.set("logType", "9");

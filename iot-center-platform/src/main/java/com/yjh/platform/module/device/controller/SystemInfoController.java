@@ -51,9 +51,10 @@ public class SystemInfoController {
             Long userId=Long.valueOf(request.getHeader("userId"));
             String secureVerify=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify","content"));
             String[] secures=secureVerify.split(",");
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
                 if(memory.equals("MemoryFreeMin")){
-                    if(userId!=10001){
+                    if("1234".equals(userRole)){
                         result.setCode(200,"");
                         return result;
                     }
@@ -77,9 +78,10 @@ public class SystemInfoController {
             Long userId=Long.valueOf(request.getHeader("userId"));
             String secureVerify=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify","content"));
             String[] secures=secureVerify.split(",");
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
                 if(memory.equals("cpuFreeMin")){
-                    if(userId!=10001){
+                    if("1234".equals(userRole)){
                         result.setCode(200,"");
                         return result;
                     }
@@ -103,9 +105,10 @@ public class SystemInfoController {
             Long userId=Long.valueOf(request.getHeader("userId"));
             String secureVerify=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify","content"));
             String[] secures=secureVerify.split(",");
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
                 if(memory.equals("DiskFreeMin")){
-                    if(userId!=10001){
+                    if("1234".equals(userRole)){
                         result.setCode(200,"");
                         return result;
                     }
@@ -129,9 +132,10 @@ public class SystemInfoController {
             Long userId=Long.valueOf(request.getHeader("userId"));
             String secureVerify=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify","content"));
             String[] secures=secureVerify.split(",");
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
                 if(memory.equals("cpuFreeMin")){
-                    if(userId!=10001){
+                    if("1234".equals(userRole)){
                         result.setCode(200,"");
                         return result;
                     }
@@ -155,9 +159,10 @@ public class SystemInfoController {
             Long userId=Long.valueOf(request.getHeader("userId"));
             String secureVerify=String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify","content"));
             String[] secures=secureVerify.split(",");
+            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
                 if(memory.equals("DiskFreeMin")){
-                    if(userId!=10001){
+                    if("1234".equals(userRole)){
                         result.setCode(200,"");
                         return result;
                     }
