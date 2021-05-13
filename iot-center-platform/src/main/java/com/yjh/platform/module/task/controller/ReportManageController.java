@@ -75,7 +75,7 @@ public class ReportManageController {
         }
         return result;
     }
-//    @ApiOperation(value = "查询报表生成记录")
+    //    @ApiOperation(value = "查询报表生成记录")
 //    @RequestMapping(value = "/reportSelect", method = RequestMethod.GET)
 //    public Result reportSelect(@RequestParam(value = "reportName", required = false) String reportName,
 //                               @RequestParam(value = "startTime", required = false)String startTime,
@@ -143,7 +143,7 @@ public class ReportManageController {
         }
         return result;
     }
-//    @ApiOperation(value = "批量删除报表")
+    //    @ApiOperation(value = "批量删除报表")
 //    @RequestMapping(value = "/reportBatchDelete", method = RequestMethod.DELETE)
 //    public Result reportBatchDelete(@RequestBody List<TReportInfo> fileNameList) {
 //        Result result = new Result();

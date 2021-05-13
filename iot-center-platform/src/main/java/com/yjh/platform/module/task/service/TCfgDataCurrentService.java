@@ -206,12 +206,12 @@ public class TCfgDataCurrentService {
         //联动规则一次匹配
         Set<TCfgUnionRule> rules = new HashSet<>();
 
-           cLogger.info("开始");
-            List<TCfgUnionRule> unionrules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteMap);
-            for (TCfgUnionRule rule : unionrules) {
-                cLogger.info(rule.getInputParam());
-                rules.add(rule);
-            }
+        cLogger.info("开始");
+        List<TCfgUnionRule> unionrules = tCfgUnionRuleDao.selectUnionRuleByMeteId(meteMap);
+        for (TCfgUnionRule rule : unionrules) {
+            cLogger.info(rule.getInputParam());
+            rules.add(rule);
+        }
         cLogger.info("结束");
         cLogger.info("规则："+rules);
 
@@ -303,6 +303,7 @@ public class TCfgDataCurrentService {
             tCruiseTaskAdd.setIfRun(173);
             tCruiseTaskAdd.setStartTime(new Date());
             tCruiseTaskAdd.setTaskType(218);
+            tCruiseTaskAdd.setUnionTaskStatus("1");
             Result result=tCruiseTaskController.insert(tCruiseTaskAdd);
             String taskId=result.getData().toString();//联动任务ID
             cLogger.info("联动开始执行");
