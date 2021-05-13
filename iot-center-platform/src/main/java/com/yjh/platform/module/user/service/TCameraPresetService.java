@@ -167,6 +167,10 @@ public class TCameraPresetService {
         String zipPath = mapForZip.get("content");///home/yjh_iot_center/iot-picture/zip
         Map<String,String> mapForZipReal = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
         String zipPathReal = mapForZipReal.get("content");//http://192.168.9.40:10086/imgs/zip
+
+        if(cameraIdList == null){
+            cameraIdList = tCameraPresetDao.selectCameraIdList();
+        }
         if(cameraIdList != null && cameraIdList.size()>0){
             //删除zipPath下的所有文件
             try {
@@ -225,7 +229,7 @@ public class TCameraPresetService {
                 Runtime.getRuntime().exec(cmds);
 //                zipCmd= "zip -r zip.zip zip/*";
 //                Runtime.getRuntime().exec(cmds);
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (Exception e) {
                 log.error("复制文件错误："+e);
             }
