@@ -187,17 +187,18 @@ public class TCameraPresetService {
                 //找到这个cameraId下的所有预置位
                 List<Long>presetList = tCameraPresetDao.selectForThisPreset(cameraId);
                 if(presetList!=null && presetList.size()>0){
-                    try {
-                    String mk = "mkdir "+zipPath+"/picture/"+cameraId;
-                    String[] cmds = new String[]{"sh","-c",mk};
-                    Runtime.getRuntime().exec(cmds);
-                    } catch (IOException e) {
-                        log.error("复制文件错误："+e);
-                    }
+//                    try {
+//                    String mk = "mkdir "+zipPath+"/picture/"+cameraId;
+//                    String[] cmds = new String[]{"sh","-c",mk};
+//                    Runtime.getRuntime().exec(cmds);
+//                    } catch (IOException e) {
+//                        log.error("复制文件错误："+e);
+//                    }
                     for(Long presetId:presetList){
                         try {
                         //将所有的文件移动到一个文件内
-                        String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/"+cameraId+"/";
+                        //String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/"+cameraId+"/";
+                        String url = "cp -r " + picPath+"/"+presetId + " " + zipPath+"/picture/";
                         String[] cmds = new String[]{"sh","-c",url};
                         Runtime.getRuntime().exec(cmds);
                         } catch (IOException e) {
@@ -234,18 +235,35 @@ public class TCameraPresetService {
 
     @Transactional(rollbackFor = Exception.class)
     public int upload(MultipartFile file) {
-        Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
-        String path = (String) mapForPicModelPath.get("content");
+        Map<String,String> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
+        String path =  mapForPicModelPath.get("content");///home/yjh_iot_center/iot-picture/zip
+
+        Map<String,String> mapForModelPath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
+        //String modelPath =  mapForModelPath.get("content");///home/yjh/iot-picture/model-picture/sync/Template/BigImg
+        String modelPath =  "/home/yjh_iot_center/iot-picture/zip";///home/yjh/iot-picture/model-picture/sync/Template/BigImg
+
         String fileName = "copyZip.zip";
         // 将上传文件写入
         try {
             deleteDir(new File(path +"/"+ fileName));
             file.transferTo(new File(path +"/"+ fileName));
             //解压 unzip -o xxx.zip -d /home/yjh_iot_center/iot-  覆盖原有文件
-            String cmd= "unzip -o "+path+"/copyZip.zip"+" -d"+path+"";
+            String cmd= "unzip -o "+path+"/copyZip.zip"+" -d"+path;
             String[] cmds = new String[]{"sh","-c",cmd};
             log.info("linux命令："+cmd);
             Runtime.getRuntime().exec(cmds);
+            //解压到zip目录下 再将相关文件复制到对应目录下  /home/yjh/iot-picture/model-picture/sync/Template/BigImg  /预置位
+            File zipFile = new File(path+"/copyZip");
+            File[] zipFileList = zipFile.listFiles();
+            if(zipFileList != null && zipFileList.length>0){
+                for(File item:zipFileList){
+                    if(item.isDirectory()){
+                        String url = "cp -rf " + path+"/copyZip/"+item.getName()+" "+modelPath+"/"+item.getName();
+                        String[] cpCmd = new String[]{"sh","-c",url};
+                        Runtime.getRuntime().exec(cpCmd);
+                    }
+                }
+            }
         }catch (NullPointerException e) {
             e.getMessage();
         } catch (IOException e) {
