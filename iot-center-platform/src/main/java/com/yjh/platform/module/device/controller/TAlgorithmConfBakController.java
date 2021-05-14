@@ -75,7 +75,7 @@ public class TAlgorithmConfBakController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "更新算法配置数据",content = "根据用户传递的参数更新算法配置数据",logType = 3)
-    public Result update(@RequestBody TAlgorithmConfBak tAlgorithmConfBak) {
+    public Result update(@Validated @RequestBody TAlgorithmConfBak tAlgorithmConfBak) {
         Result result = new Result();
         try {
             result.setData(tAlgorithmConfBakService.update(tAlgorithmConfBak));

@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * @author lqh
@@ -23,12 +24,15 @@ public class TDeviceTypeImg implements Serializable {
     @ApiModelProperty(value = "类型")
     private String typeId;
 
+    @Length(max = 255,message = "图片绝对路径长度必须小于等于255")
     @ApiModelProperty(value = "图片绝对路径")
     private String picAbsPath;
 
+    @Length(max = 255,message = "图片相对路径长度必须小于等于255")
     @ApiModelProperty(value = "图片相对路径")
     private String picRealPath;
 
+    @Length(max = 255,message = "描述长度必须小于等于255")
     @ApiModelProperty(value = "描述")
     private String remake;
 

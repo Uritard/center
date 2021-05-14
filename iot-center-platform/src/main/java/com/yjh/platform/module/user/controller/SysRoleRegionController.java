@@ -77,7 +77,7 @@ public class SysRoleRegionController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改角色和机器人关联数据",content = "根据用户传递的参数修改角色和机器人关联数据",logType = 3)
-    public Result update(@RequestBody SysRoleRegion sysRoleRegion) {
+    public Result update(@Validated @RequestBody SysRoleRegion sysRoleRegion) {
         Result result = new Result();
         try {
             result.setData(sysRoleRegionService.update(sysRoleRegion));

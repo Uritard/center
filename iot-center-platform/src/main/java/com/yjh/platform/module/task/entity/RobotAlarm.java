@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * @author czh
@@ -31,6 +32,7 @@ public class RobotAlarm implements Serializable {
     @TableField(value = "robot_alarm_id",updateStrategy = FieldStrategy.IGNORED)
     private Long robotAlarmId;
 
+    @Length(max = 32,message = "站所id长度必须小于等于32")
     @ApiModelProperty(value = "站所id")
     @TableField(value = "station_id",updateStrategy = FieldStrategy.IGNORED)
     private String stationId;
@@ -41,6 +43,7 @@ public class RobotAlarm implements Serializable {
     @ApiModelProperty(value = "1普通告警，2严重告警，3紧急告警，4致命告警")
     private Integer alarmLevel;
 
+    @Length(max = 256,message = "告警具体信息长度必须小于等于256")
     @ApiModelProperty(value = "告警具体信息")
      @TableField(value = "alarm_info",updateStrategy = FieldStrategy.IGNORED)
     private String alarmInfo;
@@ -51,6 +54,7 @@ public class RobotAlarm implements Serializable {
     @ApiModelProperty(value = "处理方式：0自动，1手动")
     private Integer dealType;
 
+    @Length(max = 256,message = "处理信息长度必须小于等于256")
     @ApiModelProperty(value = "处理信息")
      @TableField(value = "deal_info",updateStrategy = FieldStrategy.IGNORED)
     private String dealInfo;
@@ -63,10 +67,12 @@ public class RobotAlarm implements Serializable {
      @TableField(value = "deal_person_name",updateStrategy = FieldStrategy.IGNORED)
     private String dealPersonName;
 
+    @Length(max = 100,message = "机器人告警时坐标X长度必须小于等于100")
     @ApiModelProperty(value = "机器人告警时坐标X")
      @TableField(value = "position_station_num",updateStrategy = FieldStrategy.IGNORED)
     private String positionStationNum;
 
+    @Length(max = 100,message = "机器人告警时坐标Y长度必须小于等于100")
     @ApiModelProperty(value = "机器人告警时坐标Y")
      @TableField(value = "position_offset",updateStrategy = FieldStrategy.IGNORED)
     private String positionOffset;

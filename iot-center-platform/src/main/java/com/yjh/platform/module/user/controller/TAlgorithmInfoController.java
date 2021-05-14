@@ -89,7 +89,7 @@ public class TAlgorithmInfoController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改算法信息",content = "根据用户传递的参数修改算法信息",logType = 3,authority = "1234")
-    public Result update(@RequestBody TAlgorithmInfo tAlgorithmInfo) {
+    public Result update(@Validated @RequestBody TAlgorithmInfo tAlgorithmInfo) {
         Result result = new Result();
         try {
             result.setData(tAlgorithmInfoService.update(tAlgorithmInfo));

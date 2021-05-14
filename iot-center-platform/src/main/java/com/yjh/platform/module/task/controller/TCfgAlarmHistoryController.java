@@ -78,7 +78,7 @@ public class TCfgAlarmHistoryController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改历史告警数据",content = "根据用户传递的参数修改历史告警数据",logType = 3)
-    public Result update(@RequestBody TCfgAlarmHistory tCfgAlarmHistory) {
+    public Result update(@Validated @RequestBody TCfgAlarmHistory tCfgAlarmHistory) {
         Result result = new Result();
         try {
             result.setData(tCfgAlarmHistoryService.update(tCfgAlarmHistory));

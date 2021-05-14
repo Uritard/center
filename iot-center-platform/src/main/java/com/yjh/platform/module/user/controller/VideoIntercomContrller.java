@@ -99,7 +99,7 @@ public class VideoIntercomContrller {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改信息",content = "根据用户传递的参数修改信息",logType = 3,authority = "1234")
-    public Result update(@RequestBody VideoIntercom videoIntercom) {
+    public Result update(@Validated @RequestBody VideoIntercom videoIntercom) {
         Result result = new Result();
         try {
             int re = videoIntercomService.update(videoIntercom);

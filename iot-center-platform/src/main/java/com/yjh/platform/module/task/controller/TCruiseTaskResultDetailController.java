@@ -75,7 +75,7 @@ public class TCruiseTaskResultDetailController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改任务点状态详细数据",content = "根据用户传递的参数修改任务点状态详细数据",logType = 3)
-    public Result update(@RequestBody TCruiseTaskResultDetail tCruiseTaskResultDetail) {
+    public Result update(@Validated @RequestBody TCruiseTaskResultDetail tCruiseTaskResultDetail) {
         Result result = new Result();
         try {
             result.setData(tCruiseTaskResultDetailService.update(tCruiseTaskResultDetail));

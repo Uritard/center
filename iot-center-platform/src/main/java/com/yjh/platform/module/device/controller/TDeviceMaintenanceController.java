@@ -80,7 +80,7 @@ public class TDeviceMaintenanceController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "更新设备检修区域",content = "根据用户传递的参数修改设备检修区域",logType = 3,authority = "1234")
-    public Result update(@RequestBody TDeviceMaintenance tDeviceMaintenance) {
+    public Result update(@Validated @RequestBody TDeviceMaintenance tDeviceMaintenance) {
         Result result = new Result();
         try {
             result.setData(tDeviceMaintenanceService.update(tDeviceMaintenance));

@@ -75,7 +75,7 @@ public class TStdDeviceAttrController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改标准化设备参数",content = "根据用户传递的参数修改标准化设备参数",logType = 3)
-    public Result update(@RequestBody TStdDeviceAttr tStdDeviceAttr) {
+    public Result update(@Validated @RequestBody TStdDeviceAttr tStdDeviceAttr) {
         Result result = new Result();
         try {
             result.setData(tStdDeviceAttrService.update(tStdDeviceAttr));

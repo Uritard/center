@@ -86,7 +86,7 @@ public class TWarnInfoController {
     @ApiOperation(value = "更新")
     @PutMapping(value = "/update")
     @Logs(title = "修改告警信息数据",content = "根据用户传递的参数修改告警信息数据",logType = 3)
-    public Result update(@RequestBody TWarnInfo tWarnInfo) {
+    public Result update(@Validated @RequestBody TWarnInfo tWarnInfo) {
         Result result = new Result();
         try {
             result.setData(tWarnInfoService.update(tWarnInfo));

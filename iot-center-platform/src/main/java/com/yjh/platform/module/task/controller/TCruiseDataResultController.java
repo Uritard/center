@@ -92,7 +92,7 @@ public class TCruiseDataResultController {
     @ApiOperation(value = "更新")
     @PutMapping(value = "/update")
     @Logs(title = "巡检点结果数据",content = "根据用户传递的参数修改巡检点结果数据",logType = 3)
-    public Result update(@RequestBody TCruiseDataResult tCruiseDataResult) {
+    public Result update(@Validated @RequestBody TCruiseDataResult tCruiseDataResult) {
         Result result = new Result();
         try {
             result.setData(tCruiseDataResultService.update(tCruiseDataResult));

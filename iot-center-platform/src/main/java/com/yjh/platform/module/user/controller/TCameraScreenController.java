@@ -79,7 +79,7 @@ public class TCameraScreenController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改分屏配置信息",content = "根据用户传递的参数修改分屏配置信息",logType = 3,authority = "1235")
-    public Result update(HttpServletRequest request,@RequestBody TCameraScreen tCameraScreen) {
+    public Result update(HttpServletRequest request,@Validated @RequestBody TCameraScreen tCameraScreen) {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");

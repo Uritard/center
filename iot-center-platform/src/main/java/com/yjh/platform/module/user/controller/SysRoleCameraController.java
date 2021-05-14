@@ -79,7 +79,7 @@ public class SysRoleCameraController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改角色和摄像机关联数据",content = "根据用户传递的参数修改角色和摄像机关联数据",logType = 3)
-    public Result update(@RequestBody SysRoleCamera sysRoleCamera) {
+    public Result update(@Validated @RequestBody SysRoleCamera sysRoleCamera) {
         Result result = new Result();
         try {
             result.setData(sysRoleCameraService.update(sysRoleCamera));

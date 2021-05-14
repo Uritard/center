@@ -75,7 +75,7 @@ public class RobotAlarmController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改机器人本体告警数据",content = "根据用户传递的参数修改机器人本体告警数据",logType = 3)
-    public Result update(@RequestBody RobotAlarm robotAlarm) {
+    public Result update(@Validated @RequestBody RobotAlarm robotAlarm) {
         Result result = new Result();
         try {
             result.setData(robotAlarmService.update(robotAlarm));

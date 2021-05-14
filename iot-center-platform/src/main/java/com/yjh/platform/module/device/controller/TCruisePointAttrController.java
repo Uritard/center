@@ -75,7 +75,7 @@ public class TCruisePointAttrController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "更新巡检点数据",content = "根据用户传递的参数修改巡检点数据",logType = 3)
-    public Result update(@RequestBody TCruisePointAttr tCruisePointAttr) {
+    public Result update(@Validated @RequestBody TCruisePointAttr tCruisePointAttr) {
         Result result = new Result();
         try {
             result.setData(tCruisePointAttrService.update(tCruisePointAttr));
