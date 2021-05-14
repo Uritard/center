@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.user.entity.OrgInfo;
 import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.dao.SysOrgDao;
@@ -42,12 +43,21 @@ public class SysOrgService{
         if(list != null && list.size() > 1){
            return -1;
         }
+        List<Long> listUser= sysOrgDao.selectUserId(orgId);
+        if(listUser != null && listUser.size() > 0){
+            return -1;
+        }
         return this.sysOrgDao.deleteByPrimaryId(orgId);
 
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int update(SysOrg sysOrg) {
+        //查询编码
+        List<SysOrg> list = sysOrgDao.selectIsIn(sysOrg);
+        if(list != null && list.size()>0){
+            throw new BusinessException(209,"区域编码与其他区域重复");
+        }
         return this.sysOrgDao.update(sysOrg);
     }
 

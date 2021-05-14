@@ -182,4 +182,11 @@
         )
     </delete>
 
+    <select id="selectUserId" resultType="java.lang.Long">
+        select user_id from sys_user where org_id = #{orgId,jdbcType=BIGINT};
+    </select>
+
+    <select id="selectIsIn" resultType="com.yjh.platform.module.user.entity.SysOrg">
+        select * from sys_user where org_id != #{orgId,jdbcType=BIGINT} and org_code = #{orgCode,jdbcType=VARCHAR};
+    </select>
 </mapper>

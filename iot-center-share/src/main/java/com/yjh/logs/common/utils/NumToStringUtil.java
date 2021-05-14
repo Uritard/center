@@ -6,54 +6,75 @@ package com.yjh.logs.common.utils;
  */
 public class NumToStringUtil {
     public static String findType(String str){
-//        if("保存".equals(str)){
-//            return "0";
-//        }
+        if("保存".equals(str)){
+            return "0";
+        }
         if("查询".equals(str)){
             return "1";
         }
-//        if("新增".equals(str)){
-//            return "2";
-//        }
-//        if("修改".equals(str)){
-//            return "3";
-//        }
-//        if("删除".equals(str)){
-//            return "4";
-//        }
-//        if("确认".equals(str)){
-//            return "5";
-//        }
+        if("新增".equals(str)){
+            return "2";
+        }
+        if("修改".equals(str)){
+            return "3";
+        }
+        if("删除".equals(str)){
+            return "4";
+        }
+        if("确认".equals(str)){
+            return "5";
+        }
 //        if("登录".equals(str)){
 //            return "6";
 //        }
 //        if("登出".equals(str)){
 //            return "7";
 //        }
-//        if("导入".equals(str)){
-//            return "8";
-//        }
-//        if("导出".equals(str)){
-//            return "9";
-//        }
-//        if("任务下发".equals(str)){
-//            return "10";
-//        }
-//        if("任务暂停".equals(str)){
-//            return "11";
-//        }
-//        if("任务恢复".equals(str)){
-//            return "12";
-//        }
-//        if("任务终止".equals(str)){
-//            return "13";
-//        }
+        if("导入".equals(str)){
+            return "8";
+        }
+        if("导出".equals(str)){
+            return "9";
+        }
+        if("任务下发".equals(str)){
+            return "10";
+        }
+        if("任务暂停".equals(str)){
+            return "11";
+        }
+        if("任务恢复".equals(str)){
+            return "12";
+        }
+        if("任务终止".equals(str)){
+            return "13";
+        }
         if("检索".equals(str)){
             return "15";
         }
         if("预览".equals(str)){
             return "16";
         }
+//        if("用户新增".equals(str)){
+//            return "17";
+//        }
+        if("用户修改信息".equals(str)){
+            return "18";
+        }
+//        if("用户密码修改".equals(str)){
+//            return "19";
+//        }
+//        if("用户锁定".equals(str)){
+//            return "20";
+//        }
+//        if("用户解锁".equals(str)){
+//            return "21";
+//        }
+//        if("用户权限修改".equals(str)){
+//            return "22";
+//        }
+//        if("用户删除".equals(str)){
+//            return "23";
+//        }
 
 
 
@@ -109,6 +130,27 @@ public class NumToStringUtil {
         }
         if("16".equals(str)){
             return "预览";
+        }
+        if("17".equals(str)){
+            return "用户新增";
+        }
+        if("18".equals(str)){
+            return "用户修改信息";
+        }
+        if("19".equals(str)){
+            return "密码修改";
+        }
+        if("20".equals(str)){
+            return "用户锁定";
+        }
+        if("21".equals(str)){
+            return "用户解锁";
+        }
+        if("22".equals(str)){
+            return "权限修改";
+        }
+        if("23".equals(str)){
+            return "删除用户";
         }
         return null;
     }

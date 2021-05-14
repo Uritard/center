@@ -113,14 +113,30 @@ public class SysLogController {
                         } else {
                             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             try {
-                                Date start = simpleDateFormat.parse(timeList[0]);
-                                Date end = simpleDateFormat.parse(timeList[1]);
-                                Date now = new Date();
-                                if (start.getTime() <= now.getTime() && end.getTime() >= now.getTime()) {
-                                    //满足日期格式
-                                    result.setData("此条日志无需入库，原因：日志时间");
-                                    return result;
+                                //String isIn = NumToStringUtil.findType(logType);
+                                if("0".equals(logType) || "1".equals(logType)|| "2".equals(logType)
+                                        || "3".equals(logType)
+                                        || "4".equals(logType)
+                                        || "5".equals(logType)
+                                        || "8".equals(logType)
+                                        || "9".equals(logType)
+                                        || "10".equals(logType)
+                                        || "11".equals(logType)
+                                        || "12".equals(logType)
+                                        || "13".equals(logType)
+                                        || "15".equals(logType)
+                                        || "18".equals(logType)
+                                        || "16".equals(logType)){
+                                    Date start = simpleDateFormat.parse(timeList[0]);
+                                    Date end = simpleDateFormat.parse(timeList[1]);
+                                    Date now = new Date();
+                                    if (start.getTime() <= now.getTime() && end.getTime() >= now.getTime()) {
+                                        //满足日期格式
+                                        result.setData("此条日志无需入库，原因：日志时间");
+                                        return result;
+                                    }
                                 }
+
                             } catch (ParseException e) {
                                 log.error("日期格式错误" + e);
                             }

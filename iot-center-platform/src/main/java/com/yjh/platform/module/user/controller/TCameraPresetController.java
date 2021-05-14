@@ -353,7 +353,7 @@ public class TCameraPresetController {
         return result;
     }
     @ApiOperation(value = "上传标定图片")
-    @GetMapping(value = "/upload")
+    @PostMapping(value = "/upload")
     @Logs(title = "上传标定图片",content = "上传标定图片",logType = 8)
     public Result upload(@RequestParam(value="file", required=false) MultipartFile file) {
         Result result = new Result();
