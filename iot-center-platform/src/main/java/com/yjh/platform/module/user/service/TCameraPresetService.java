@@ -171,6 +171,9 @@ public class TCameraPresetService {
         if(cameraIdList == null){
             cameraIdList = tCameraPresetDao.selectCameraIdList();
         }
+        if(cameraIdList != null && cameraIdList.size()==0){
+            cameraIdList = tCameraPresetDao.selectCameraIdList();
+        }
         if(cameraIdList != null && cameraIdList.size()>0){
             //删除zipPath下的所有文件
             try {
@@ -210,6 +213,10 @@ public class TCameraPresetService {
                         }
                     }
 
+                }else {
+                    if(cameraIdList.size() == 1){
+                        return "fail";
+                    }
                 }
             }
             //压缩
