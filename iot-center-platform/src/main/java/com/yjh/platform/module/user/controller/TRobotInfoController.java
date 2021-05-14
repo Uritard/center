@@ -110,7 +110,7 @@ public class TRobotInfoController {
     @ApiOperation(value = "更新")
     @PutMapping(value = "/update")
     @Logs(title = "修改机器人信息",content = "根据用户传递的参数修改机器人信息",logType = 3,authority = "1234")
-    public Result update(HttpServletRequest request, @RequestBody TRobotInfo tRobotInfo) {
+    public Result update(HttpServletRequest request,@Validated @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
             String robotCode = tRobotInfoService.selectRobotCodeById(tRobotInfo.getRobotId());

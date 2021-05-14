@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
@@ -40,7 +41,7 @@ public class TDeviceTypeImgController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public Result add(@RequestBody TDeviceTypeImg tDeviceTypeImg) {
+    public Result add(@Validated  @RequestBody TDeviceTypeImg tDeviceTypeImg) {
         Result result = new Result();
         try {
             result.setData(tDeviceTypeImgService.add(tDeviceTypeImg));
@@ -71,7 +72,7 @@ public class TDeviceTypeImgController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-    public Result update(@RequestBody TDeviceTypeImg tDeviceTypeImg) {
+    public Result update( @Validated @RequestBody TDeviceTypeImg tDeviceTypeImg) {
         Result result = new Result();
         try {
             result.setData(tDeviceTypeImgService.update(tDeviceTypeImg));

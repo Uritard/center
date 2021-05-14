@@ -89,7 +89,7 @@ public class TSysParamController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改系统参数", content = "根据用户传递的参数修改系统参数", logType = 3,authority = "1234")
-    public Result update(@RequestBody TSysParam tSysParam, HttpServletRequest request) {
+    public Result update(@Validated @RequestBody TSysParam tSysParam, HttpServletRequest request) {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));

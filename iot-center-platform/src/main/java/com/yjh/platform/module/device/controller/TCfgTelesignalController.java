@@ -75,7 +75,7 @@ public class TCfgTelesignalController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "更新遥信数据",content = "根据用户传递的参数修改遥信数据",logType = 3)
-    public Result update(@RequestBody TCfgTelesignal tCfgTelesignal) {
+    public Result update(@Validated @RequestBody TCfgTelesignal tCfgTelesignal) {
         Result result = new Result();
         try {
             result.setData(tCfgTelesignalService.update(tCfgTelesignal));

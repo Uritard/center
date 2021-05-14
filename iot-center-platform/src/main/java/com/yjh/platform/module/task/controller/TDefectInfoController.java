@@ -77,7 +77,7 @@ public class TDefectInfoController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改陷信息数据",content = "根据用户传递的参数修改缺陷信息数据",logType = 3)
-    public Result update(@RequestBody TDefectInfo tDefectInfo) {
+    public Result update(@Validated @RequestBody TDefectInfo tDefectInfo) {
         Result result = new Result();
         try {
             result.setData(tDefectInfoService.update(tDefectInfo));

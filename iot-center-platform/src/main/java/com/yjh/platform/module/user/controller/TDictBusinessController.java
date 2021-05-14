@@ -86,7 +86,7 @@ public class TDictBusinessController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改业务字典信息",content = "根据用户传递的参数修改业务字典信息",logType = 3,authority = "1234")
-    public Result update(@RequestBody TDictBusiness tDictBusiness) {
+    public Result update(@Validated @RequestBody TDictBusiness tDictBusiness) {
         Result result = new Result();
         try {
             result.setData(tDictBusinessService.update(tDictBusiness));

@@ -91,7 +91,7 @@ public class TStdMeteController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改系统测点",content = "根据用户传递的参数修改系统测点",logType = 3,authority = "1234")
-    public Result update(@RequestBody TStdMete tStdMete, HttpServletRequest request) {
+    public Result update(@Validated @RequestBody TStdMete tStdMete, HttpServletRequest request) {
         Result result = new Result();
         try {
             result.setData(tStdMeteService.update(tStdMete));

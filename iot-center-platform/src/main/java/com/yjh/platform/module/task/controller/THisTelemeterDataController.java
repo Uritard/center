@@ -79,7 +79,7 @@ public class THisTelemeterDataController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改遥测历史数据",content = "根据用户传递的参数修改遥测历史数据",logType = 3)
-    public Result update(@RequestBody THisTelemeterData tHisTelemeterData) {
+    public Result update(@Validated @RequestBody THisTelemeterData tHisTelemeterData) {
         Result result = new Result();
         try {
             result.setData(tHisTelemeterDataService.update(tHisTelemeterData));

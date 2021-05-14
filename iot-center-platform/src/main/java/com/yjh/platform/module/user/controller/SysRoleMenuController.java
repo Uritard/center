@@ -93,7 +93,7 @@ public class SysRoleMenuController {
     @ApiOperation(value = "角色菜单表更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改角色菜单数据",content = "根据用户传递的参数修改角色菜单数据",logType = 3)
-    public Result update(@RequestBody SysRoleMenu sysRoleMenu) {
+    public Result update(@Validated @RequestBody SysRoleMenu sysRoleMenu) {
         Result result = new Result();
         try {
             result.setData(sysRoleMenuService.update(sysRoleMenu));

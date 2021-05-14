@@ -79,7 +79,7 @@ public class SysRoleDeviceController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改角色和设备关联数据",content = "根据用户传递的参数修改角色和设备关联数据",logType = 3)
-    public Result update(@RequestBody SysRoleDevice sysRoleDevice) {
+    public Result update(@Validated @RequestBody SysRoleDevice sysRoleDevice) {
         Result result = new Result();
         try {
             result.setData(sysRoleDeviceService.update(sysRoleDevice));

@@ -78,7 +78,7 @@ public class TCfgDataCurrentController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改实时数据",content = "根据用户传递的参数修改实时数据",logType = 3)
-    public Result update(@RequestBody TCfgDataCurrent tCfgDataCurrent) {
+    public Result update(@Validated @RequestBody TCfgDataCurrent tCfgDataCurrent) {
         Result result = new Result();
         try {
             result.setData(tCfgDataCurrentService.update(tCfgDataCurrent));

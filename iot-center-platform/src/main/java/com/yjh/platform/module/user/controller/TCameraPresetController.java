@@ -189,7 +189,7 @@ public class TCameraPresetController {
     @ApiOperation(value = "更新")
     @PutMapping(value = "/update")
     @Logs(title = "修改新增预置位信息",content = "根据用户传递的参数修改预置位信息",logType = 3,authority = "1234")
-    public Result update(@RequestBody TCameraPreset tCameraPreset) {
+    public Result update(@Validated @RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
             result.setData(tCameraPresetService.update(tCameraPreset));

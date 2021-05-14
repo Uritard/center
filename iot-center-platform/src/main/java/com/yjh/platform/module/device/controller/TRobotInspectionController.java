@@ -85,7 +85,7 @@ public class TRobotInspectionController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "更新机器人巡检点信息",content = "根据用户传递的参数修改机器人巡检点信息",logType = 3)
-    public Result update(@RequestBody TRobotInspection tRobotInspection) {
+    public Result update(@Validated @RequestBody TRobotInspection tRobotInspection) {
         Result result = new Result();
         try {
             result.setData(tRobotInspectionService.update(tRobotInspection));

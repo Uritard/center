@@ -76,7 +76,7 @@ public class TCfgMeteController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "更新系统测点数据",content = "根据用户传递的参数更新系统测点数据",logType = 3)
-    public Result update(@RequestBody TCfgMete tCfgMete) {
+    public Result update(@Validated @RequestBody TCfgMete tCfgMete) {
         Result result = new Result();
         try {
             result.setData(tCfgMeteService.update(tCfgMete));

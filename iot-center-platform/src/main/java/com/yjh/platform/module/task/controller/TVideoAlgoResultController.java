@@ -75,7 +75,7 @@ public class TVideoAlgoResultController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "修改视频轮训任务结果",content = "根据用户传递的参数修改视频轮训任务结果数据",logType = 3)
-    public Result update(@RequestBody TVideoAlgoResult tVideoAlgoResult) {
+    public Result update(@Validated @RequestBody TVideoAlgoResult tVideoAlgoResult) {
         Result result = new Result();
         try {
             result.setData(tVideoAlgoResultService.update(tVideoAlgoResult));

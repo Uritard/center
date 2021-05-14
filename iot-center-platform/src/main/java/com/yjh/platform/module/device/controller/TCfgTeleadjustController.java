@@ -75,7 +75,7 @@ public class TCfgTeleadjustController {
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Logs(title = "更新遥调数据",content = "根据用户传递的参数修改遥调数据",logType = 3)
-    public Result update(@RequestBody TCfgTeleadjust tCfgTeleadjust) {
+    public Result update(@Validated @RequestBody TCfgTeleadjust tCfgTeleadjust) {
         Result result = new Result();
         try {
             result.setData(tCfgTeleadjustService.update(tCfgTeleadjust));
