@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 
@@ -24,6 +25,22 @@ public class TAlgorithmInfoService{
     public int insert(TAlgorithmInfo tAlgorithmInfo) {
         return this.tAlgorithmInfoDao.insert(tAlgorithmInfo);
     }
+    public boolean judgeAnalyseType(String analyseType) {
+        boolean flag = false;
+        List<TAlgorithmInfo> tAlgorithmInfoList = this.tAlgorithmInfoDao.select(null, null,null,null,null, analyseType, null,null);
+        if (tAlgorithmInfoList.size()>0) {
+            flag=true;
+        }
+        return flag;
+    }
+    public boolean judgeDefectType(Integer defectType) {
+        boolean flag = false;
+        List<TAlgorithmInfo> tAlgorithmInfoList = this.tAlgorithmInfoDao.select(null, null,null,null,null, null, null,defectType);
+        if (tAlgorithmInfoList.size()>0) {
+            flag=true;
+        }
+        return flag;
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long algorithmId) {
@@ -47,11 +64,11 @@ public class TAlgorithmInfoService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TAlgorithmInfo> select(Long algorithmId, String algorithmName, String aliasName, String describel, String algorithmCode, String analyseType,Integer isAi) {
+    public List<TAlgorithmInfo> select(Long algorithmId, String algorithmName, String aliasName, String describel, String algorithmCode, String analyseType,Integer isAi,Integer defectType) {
         if("-1".equals(analyseType)){
             analyseType = null;
         }
-        List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.select(algorithmId, algorithmName, aliasName, describel, algorithmCode, analyseType,isAi);
+        List<TAlgorithmInfo> tAlgorithmInfoList = tAlgorithmInfoDao.select(algorithmId, algorithmName, aliasName, describel, algorithmCode, analyseType,isAi,defectType);
         return tAlgorithmInfoList;
     }
 

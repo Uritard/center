@@ -48,7 +48,13 @@ public class TAlgorithmInfoController {
 
         Result result = new Result();
         try {
-            result.setData(tAlgorithmInfoService.insert(tAlgorithmInfo));
+            if (!"398".equals(tAlgorithmInfo.getAnalyseType()) && tAlgorithmInfoService.judgeAnalyseType(tAlgorithmInfo.getAnalyseType())
+            || ("398".equals(tAlgorithmInfo.getAnalyseType()) && tAlgorithmInfoService.judgeDefectType(tAlgorithmInfo.getDefectType()))){
+                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "已存在该分析类型对应的算法");
+                return result;
+            }else {
+                result.setData(tAlgorithmInfoService.insert(tAlgorithmInfo));
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -127,11 +133,12 @@ public class TAlgorithmInfoController {
                             @RequestParam(value = "describel", required = false) String describel,
                             @RequestParam(value = "algorithmCode", required = false) String algorithmCode,
                             @RequestParam(value = "analyseType", required = false) String analyseType,
-                            @RequestParam(value = "isAi", required = false) Integer isAi) {
+                            @RequestParam(value = "isAi", required = false) Integer isAi,
+                            @RequestParam(value = "defectType", required = false) Integer defectType) {
         Result result = new Result();
         try {
             List<TAlgorithmInfo> list = tAlgorithmInfoService.
-                    select(algorithmId, algorithmName, aliasName, describel, algorithmCode, analyseType,isAi);
+                    select(algorithmId, algorithmName, aliasName, describel, algorithmCode, analyseType,isAi,defectType);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

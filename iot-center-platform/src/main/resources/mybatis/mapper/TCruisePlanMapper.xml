@@ -182,7 +182,9 @@
         where 1 = 1 AND a.device_id IN
         <foreach collection="deviceIdList" item="deviceId" index="no" open="(" separator="," close=")">
             #{deviceId, jdbcType=BIGINT}
-        </foreach> GROUP BY a.instance_id ORDER BY a.device_id, a.custom_id
+        </foreach>
+         GROUP BY a.instance_id
+         ORDER BY a.instance_id desc,a.device_id, a.custom_id
     </select>
 
     <select id="selectCruiseType" resultType="com.yjh.platform.module.user.entity.TDictBusiness">

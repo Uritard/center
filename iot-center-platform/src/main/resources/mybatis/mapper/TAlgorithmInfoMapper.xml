@@ -88,7 +88,8 @@
         a.describel,
         a.algorithm_code,
         a.analyse_type,
-        a.is_ai
+        a.is_ai,
+        a.defect_type
         from t_algorithm_info a
         where 1 = 1
         <if test="algorithmId != null and algorithmId != ''"> and a.algorithm_id = #{algorithmId, jdbcType=BIGINT}</if>
@@ -98,6 +99,7 @@
         <if test="algorithmCode != null"> and a.algorithm_code = #{algorithmCode, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''"> and a.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
         <if test="isAi != null"> and a.is_ai = #{isAi, jdbcType=INTEGER}</if>
+        <if test="defectType != null"> and a.defect_type = #{defectType, jdbcType=INTEGER}</if>
     </select>
 
     <resultMap id="algorithmInfoMap" type="java.util.HashMap">

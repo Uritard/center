@@ -229,7 +229,9 @@
         from t_union_task a
         where 1 = 1
         <if test="ruleName != null and ruleName != ''"> and a.rule_name like concat('%',#{ruleName, jdbcType=VARCHAR},'%')</if>
-        <if test="startDateTemp != null and endDateTemp != null"> and a.triggering_time between #{startDateTemp, jdbcType=TIMESTAMP} and #{endDateTemp,jdbcType=TIMESTAMP}</if>
+        <if test="startDateTemp != '' and endDateTemp != ''"> and a.triggering_time
+            between #{startDateTemp, jdbcType=TIMESTAMP} and #{endDateTemp,jdbcType=TIMESTAMP}
+        </if>
         order by create_time DESC
     </select>
 

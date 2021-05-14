@@ -24,7 +24,8 @@ public interface TAlgorithmInfoDao {
                                 @Param(value = "describel") String describel,
                                 @Param(value = "algorithmCode") String algorithmCode,
                                 @Param(value = "analyseType") String analyseType,
-                                @Param(value = "isAi") Integer isAi);
+                                @Param(value = "isAi") Integer isAi,
+                                @Param(value = "defectType") Integer defectType);
     List<TAlgorithmInfo> selectByPage(TAlgorithmInfo tAlgorithmInfo);
 
     int batchInsert(List<TAlgorithmInfo> list);
