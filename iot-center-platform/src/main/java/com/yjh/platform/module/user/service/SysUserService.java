@@ -217,7 +217,7 @@ public class SysUserService {
                             logsRecord.LoginLogsSend(request, "6", "登录", "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 2);
                          //   mapResult.put("errorCount", "账户已被锁定！");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
-                            mapResult.put("info", "账户已被锁定，剩余锁定时间"+surplusTime+"分钟");
+                            mapResult.put("info", "账户已被锁定，剩余锁定时间"+(lockTimeOne-surplusTime)+"分钟");
                             return mapResult;
                         } else {
                             if (yxTime >= sysUserLogin.getInvalidTime() - 1 && yxTime < sysUserLogin.getInvalidTime()) {
@@ -332,7 +332,7 @@ public class SysUserService {
                             long surplusTime=(lockTime/60+1)!=(lockTimeOne+1)?(lockTime/60+1):lockTimeOne;
                           //  mapResult.put("errorCount", "账户也被锁定，剩余锁定时间"+surplusTime+"分钟");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
-                            mapResult.put("info", "账户已被锁定，剩余锁定时间"+surplusTime+"分钟");
+                            mapResult.put("info", "账户已被锁定，剩余锁定时间"+(lockTimeOne-surplusTime)+"分钟");
                             return mapResult;
                         }else{
                             SysUser user = new SysUser();
