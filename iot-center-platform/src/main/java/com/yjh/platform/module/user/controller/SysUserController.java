@@ -115,7 +115,7 @@ public class SysUserController {
     @ApiOperation(value = "系统用户表更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
    // @Logs(title = "修改系统用户数据", content = "根据用户传递的参数修改系统用户数据", logType = 3)
-    public Result update(@RequestBody SysUser sysUser, HttpServletRequest request) {
+    public Result update(@Validated @RequestBody SysUser sysUser, HttpServletRequest request) {
         Result result = new Result();
         try {
 //            sysUser.setPassword(sysUser.getpCode());
