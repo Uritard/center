@@ -187,6 +187,6 @@
     </select>
 
     <select id="selectIsIn" resultType="com.yjh.platform.module.user.entity.SysOrg">
-        select * from sys_user where org_id != #{orgId,jdbcType=BIGINT} and org_code = #{orgCode,jdbcType=VARCHAR};
+        select * from sys_org where org_id != #{orgId,jdbcType=BIGINT} and org_code = #{orgCode,jdbcType=VARCHAR};
     </select>
 </mapper>
