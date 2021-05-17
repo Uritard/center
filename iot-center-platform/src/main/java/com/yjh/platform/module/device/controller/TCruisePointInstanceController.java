@@ -268,7 +268,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "查询测点关连的摄像机")
     @RequestMapping(value = "/selectCameraByDeviceMeteId",method = RequestMethod.GET)
-    @Logs(title = "查询测点关连的摄像机",content = "查询测点关连的摄像机",logType = 1,authority = "1235")
+    @Logs(title = "查询测点关连的摄像机",content = "查询测点关连的摄像机",logType = 1,authority = "1234")
     public Result selectCameraByDeviceMeteId(@RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId){
         Result result=new Result();
         try {

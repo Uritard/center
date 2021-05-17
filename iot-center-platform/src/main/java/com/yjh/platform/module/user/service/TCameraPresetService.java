@@ -225,12 +225,19 @@ public class TCameraPresetService {
             }
             //压缩
             try {
+                Thread.sleep(1000);
                 log.info("开始压缩");
-                String zipCmd= "cd "+zipPath+" && zip -r -y picture.zip . -i picture/*";
+                String zipCmd= "cd "+zipPath+" && zip -r -y picture.zip picture/*";
                 log.info("linux命令："+zipCmd);
                 String[] cmds = new String[]{"sh","-c",zipCmd};
-                Runtime.getRuntime().exec(cmds);
-//
+                Process p = Runtime.getRuntime().exec(cmds);
+                BufferedReader in = null;
+                in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String str = null;
+                while ((str = in.readLine()) != null) {
+                    log.info("结果："+str);
+                }
+                in.close();
 //                {
 //                    Runtime run = Runtime.getRuntime();
 //                    File wd = new File("/bin");
