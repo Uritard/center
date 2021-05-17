@@ -45,7 +45,7 @@ public class SysOrgService{
         }
         List<Long> listUser= sysOrgDao.selectUserId(orgId);
         if(listUser != null && listUser.size() > 0){
-            return -1;
+            return -2;
         }
         return this.sysOrgDao.deleteByPrimaryId(orgId);
 

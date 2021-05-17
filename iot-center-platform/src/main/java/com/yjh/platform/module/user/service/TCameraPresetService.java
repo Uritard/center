@@ -236,7 +236,7 @@ public class TCameraPresetService {
                 Runtime.getRuntime().exec(cmds);
 //                zipCmd= "zip -r zip.zip zip/*";
 //                Runtime.getRuntime().exec(cmds);
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             } catch (Exception e) {
                 log.error("复制文件错误："+e);
             }
@@ -251,9 +251,9 @@ public class TCameraPresetService {
         Map<String,String> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
         String path =  mapForPicModelPath.get("content");///home/yjh_iot_center/iot-picture/zip
 
-        Map<String,String> mapForModelPath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
-        //String modelPath =  mapForModelPath.get("content");///home/yjh/iot-picture/model-picture/sync/Template/BigImg
-        String modelPath =  "/home/yjh_iot_center/iot-picture/zip";///home/yjh/iot-picture/model-picture/sync/Template/BigImg
+        Map<String,String> mapForModelPath  = redisTemplate.opsForHash().entries("t_sys_param:zipTargetPath");
+        String modelPath =  mapForModelPath.get("content");///home/yjh/iot-picture/model-picture/sync/Template/BigImg
+        //String modelPath =  "/home/yjh_iot_center/iot-picture/zip";///home/yjh/iot-picture/model-picture/sync/Template/BigImg
 
         String fileName = "copyZip.zip";
         // 将上传文件写入

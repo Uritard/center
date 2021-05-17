@@ -73,8 +73,10 @@ public class SysOrgController {
         try {
             int re  = sysOrgService.deleteByPrimaryId(orgId);
             if(re == -1){
-                result.setCode(209,"此组织下存在子组织或此组织下存在用户");
-            }else {
+                result.setCode(209,"此组织下存在子组织");
+            }else if(re == -2){
+                result.setCode(209,"此组织下存在用户");
+            }else{
                 result.setData(re);
             }
 
