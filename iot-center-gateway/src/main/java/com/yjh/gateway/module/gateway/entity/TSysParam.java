@@ -52,7 +52,7 @@ public class TSysParam implements Serializable {
     @TableField(value = "content",updateStrategy = FieldStrategy.IGNORED)
     private String content;
 
-    @Length(max = 128,message = "remark长度必须小于等于128")
+    @Length(max = 255,message = "remark长度必须小于等于255")
     @ApiModelProperty(value = "描述")
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
