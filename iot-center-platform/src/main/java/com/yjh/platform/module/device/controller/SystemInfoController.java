@@ -54,9 +54,11 @@ public class SystemInfoController {
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
                 if(memory.equals("MemoryFreeMin")){
-                    if("1234".equals(userRole)){
-                        result.setCode(200,"");
-                        return result;
+                    if(Constant.apiPermissions) {
+                        if ("1234".equals(userRole)) {
+                            result.setCode(200, "");
+                            return result;
+                        }
                     }
                 }
             }
@@ -81,9 +83,11 @@ public class SystemInfoController {
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
                 if(memory.equals("cpuFreeMin")){
-                    if("1234".equals(userRole)){
-                        result.setCode(200,"");
-                        return result;
+                    if(Constant.apiPermissions) {
+                        if ("1234".equals(userRole)) {
+                            result.setCode(200, "");
+                            return result;
+                        }
                     }
                 }
             }
@@ -107,9 +111,9 @@ public class SystemInfoController {
             String[] secures=secureVerify.split(",");
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
-                if(memory.equals("DiskFreeMin")){
-                    if("1234".equals(userRole)){
-                        result.setCode(200,"");
+                if(Constant.apiPermissions) {
+                    if ("1234".equals(userRole)) {
+                        result.setCode(200, "");
                         return result;
                     }
                 }
@@ -135,9 +139,11 @@ public class SystemInfoController {
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
                 if(memory.equals("cpuFreeMin")){
-                    if("1234".equals(userRole)){
-                        result.setCode(200,"");
-                        return result;
+                    if(Constant.apiPermissions) {
+                        if ("1234".equals(userRole)) {
+                            result.setCode(200, "");
+                            return result;
+                        }
                     }
                 }
             }
@@ -162,9 +168,11 @@ public class SystemInfoController {
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
                 if(memory.equals("DiskFreeMin")){
-                    if("1234".equals(userRole)){
-                        result.setCode(200,"");
-                        return result;
+                    if(Constant.apiPermissions) {
+                        if ("1234".equals(userRole)) {
+                            result.setCode(200, "");
+                            return result;
+                        }
                     }
                 }
             }
