@@ -55,7 +55,7 @@ public class SystemInfoController {
             for(String memory:secures){
                 if(memory.equals("MemoryFreeMin")){
                     if(Constant.apiPermissions) {
-                        if ("1234".equals(userRole)) {
+                        if (!"1234".equals(userRole)) {
                             result.setCode(200, "");
                             return result;
                         }
@@ -84,7 +84,7 @@ public class SystemInfoController {
             for(String memory:secures){
                 if(memory.equals("cpuFreeMin")){
                     if(Constant.apiPermissions) {
-                        if ("1234".equals(userRole)) {
+                        if (!"1234".equals(userRole)) {
                             result.setCode(200, "");
                             return result;
                         }
@@ -112,7 +112,7 @@ public class SystemInfoController {
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
                 if(Constant.apiPermissions) {
-                    if ("1234".equals(userRole)) {
+                    if (!"1234".equals(userRole)) {
                         result.setCode(200, "");
                         return result;
                     }
@@ -140,7 +140,7 @@ public class SystemInfoController {
             for(String memory:secures){
                 if(memory.equals("cpuFreeMin")){
                     if(Constant.apiPermissions) {
-                        if ("1234".equals(userRole)) {
+                        if (!"1234".equals(userRole)) {
                             result.setCode(200, "");
                             return result;
                         }
@@ -169,7 +169,7 @@ public class SystemInfoController {
             for(String memory:secures){
                 if(memory.equals("DiskFreeMin")){
                     if(Constant.apiPermissions) {
-                        if ("1234".equals(userRole)) {
+                        if (!"1234".equals(userRole)) {
                             result.setCode(200, "");
                             return result;
                         }
