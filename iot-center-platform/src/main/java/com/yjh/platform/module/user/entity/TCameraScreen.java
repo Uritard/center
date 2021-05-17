@@ -30,13 +30,14 @@ public class TCameraScreen implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
-
-    @Length(max = 200,message = "cameraIds长度必须小于等于200")
     @TableField(value = "user_id",updateStrategy = FieldStrategy.IGNORED)
     private Long userId;
+
     @Length(max = 50,message = "screenNum长度必须小于等于50")
     @TableField(value = "screen_num",updateStrategy = FieldStrategy.IGNORED)
     private String screenNum;
+
+    @Length(max = 200,message = "cameraIds长度必须小于等于200")
     @TableField(value = "camera_ids",updateStrategy = FieldStrategy.IGNORED)
     private String cameraIds;
 
