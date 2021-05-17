@@ -51,7 +51,7 @@ public class TDictBusiness implements Serializable {
     @ApiModelProperty(value = "上级字典ID")
     private Integer upDict;
 
-    @Length(max = 128,message = "remark长度必须小于等于128")
+    @Length(max = 255,message = "remark长度必须小于等于255")
     @ApiModelProperty(value = "描述")
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
