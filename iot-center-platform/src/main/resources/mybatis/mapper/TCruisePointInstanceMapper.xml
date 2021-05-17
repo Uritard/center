@@ -531,6 +531,7 @@
         from t_cruise_point_instance a
         where 1=1
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
+        <if test="cruiseType != null and cruiseType != ''"> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
     </select>
 
     <select id="selectInstanceId"  parameterType="com.yjh.platform.module.device.entity.TCruisePointInstanceDetail" resultType="java.lang.Long">
@@ -616,5 +617,27 @@
         t_device_maintenance a
         WHERE
         a.maintenance_start &lt;= #{time,jdbcType=TIMESTAMP} AND a.maintenance_stop &gt;=#{time,jdbcType=TIMESTAMP}
+    </select>
+
+    <select id="selectCameraByDeviceMeteId" resultType="java.util.HashMap">
+       SELECT
+        c.camera_id as cameraId,
+        c.preset_id as presetId,
+        d.channel_num as channelNum
+        FROM
+        t_std_devicemete a,t_cruise_point_instance b,t_camera_preset c,t_camera_info d
+        where a.device_mete_id = b.device_mete_id and b.cruise_id = c.preset_id and c.camera_id = d.camera_id
+        and a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+    </select>
+    <select id="selectRobotByDeviceMeteId" resultType="java.util.HashMap">
+        SELECT
+        e.robot_id as robotId,
+        f.robot_code as robotCode,
+        f.channel_num_light as channelNumLight,
+        f.channel_num_inferad as channelNumInferad
+        FROM
+        t_std_devicemete a,t_cruise_point_instance b,t_robot_inspection e,t_robot_info f
+        where a.device_mete_id = b.device_mete_id and b.cruise_id = e.inspection_id and e.robot_id = f.robot_id
+        and a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
 </mapper>

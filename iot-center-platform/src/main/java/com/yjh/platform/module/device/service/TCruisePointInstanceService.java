@@ -446,4 +446,14 @@ public class TCruisePointInstanceService{
     public List<CruiseCountOfType> selectCruiseCountByType(String taskId){
         return this.tCruisePointInstanceDao.selectCruiseCountByType(taskId);
     }
+    @Transactional(rollbackFor = Exception.class)
+    public Map<Object,Object> selectCameraByDeviceMeteId(Long deviceMeteId){
+        List<Map<Object,Object>> cameraList = tCruisePointInstanceDao.selectCameraByDeviceMeteId(deviceMeteId);
+        Map<Object,Object> reMap = new HashMap<>();
+        reMap.put("cameraType",cameraList);
+        List<Map<Object,Object>> robotList = tCruisePointInstanceDao.selectRobotByDeviceMeteId(deviceMeteId);
+        reMap.put("robotType",robotList);
+        return reMap;
+    }
+
 }
