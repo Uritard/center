@@ -266,5 +266,19 @@ public class TCruisePointInstanceController {
         return result;
     }
 
+    @ApiOperation(value = "查询测点关连的摄像机")
+    @RequestMapping(value = "/selectCameraByDeviceMeteId",method = RequestMethod.GET)
+    @Logs(title = "查询测点关连的摄像机",content = "查询测点关连的摄像机",logType = 1,authority = "1235")
+    public Result selectCameraByDeviceMeteId(@RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId){
+        Result result=new Result();
+        try {
+            result.setData(tCruisePointInstanceService.selectCameraByDeviceMeteId(deviceMeteId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("巡检点实例查询失败描述：", e);
+        }
+        return result;
+    }
+
 
 }

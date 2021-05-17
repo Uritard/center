@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
@@ -80,4 +81,6 @@ public interface TCruisePointInstanceDao {
 
     List<TCruisePointInstanceAttr> batchSelectInstanceAttr(@Param(value = "list")List<Long> list);
     List<Long> selectTimeIsIn(@Param(value = "time") Date time);
+    List<Map<Object,Object>>selectCameraByDeviceMeteId(@Param(value = "deviceMeteId")Long deviceMeteId);
+    List<Map<Object,Object>>selectRobotByDeviceMeteId(@Param(value = "deviceMeteId")Long deviceMeteId);
 }
