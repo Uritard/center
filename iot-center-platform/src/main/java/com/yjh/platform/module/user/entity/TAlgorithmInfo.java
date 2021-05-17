@@ -56,6 +56,7 @@ public class TAlgorithmInfo implements Serializable {
     private Integer isAi;
 
     private Integer defectType;
+    private String defectTypeName;
 
     private Integer defectLevel;
 
