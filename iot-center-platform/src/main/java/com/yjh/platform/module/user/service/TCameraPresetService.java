@@ -182,6 +182,10 @@ public class TCameraPresetService {
                 Runtime.getRuntime().exec(cmds);
                 log.info("linux命令："+cmd);
                 //Runtime.getRuntime().exec(cmd);
+                cmd = "mkdir "+zipPath;
+                log.info("linux命令："+cmd);
+                cmds = new String[]{"sh","-c",cmd};
+                Runtime.getRuntime().exec(cmds);
                 cmd = "mkdir "+zipPath+"/picture";
                 log.info("linux命令："+cmd);
                 cmds = new String[]{"sh","-c",cmd};
@@ -222,20 +226,32 @@ public class TCameraPresetService {
             //压缩
             try {
                 log.info("开始压缩");
-//                String[] cmds = new String[]{
-//                        "cd "+zipPath +,
-//                        "zip -r picture.zip picture/*"
-//                };
-                //String zipCmd= "cd "+zipPath+" && "+"zip -r picture.zip picture/*";
-                //String zipCmd= "zip -r -qj "+zipPath+"/picture.zip "+zipPath+"/picture/*";
-                String zipCmd= "cd "+zipPath+" && zip -r picture.zip picture/*";
-
-                //Runtime.getRuntime().exec(zipCmd);
+                String zipCmd= "cd "+zipPath+" && zip -r -y picture.zip . -i picture/*";
                 log.info("linux命令："+zipCmd);
                 String[] cmds = new String[]{"sh","-c",zipCmd};
                 Runtime.getRuntime().exec(cmds);
-//                zipCmd= "zip -r zip.zip zip/*";
-//                Runtime.getRuntime().exec(cmds);
+//
+//                {
+//                    Runtime run = Runtime.getRuntime();
+//                    File wd = new File("/bin");
+//                    Process proc = run.exec("/bin/bash", null, wd);
+//                    BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+//                    PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(proc.getOutputStream())), true);
+//                    out.println("cd " + zipPath);
+//                    out.println("pwd");
+//                    out.println("zip -r -y picture.zip . -i picture/*");
+//                    out.println("exit");
+//                    String line;
+//                    StringBuilder sb = new StringBuilder();
+//                    while ((line = in.readLine()) != null) {
+//                        sb.append(line).append("\r\n");
+//                        log.info("结果"+sb);
+//                    }
+//                    proc.waitFor();
+//                    in.close();
+//                    out.close();
+//                    proc.destroy();
+//                }
                 Thread.sleep(2000);
             } catch (Exception e) {
                 log.error("复制文件错误："+e);
