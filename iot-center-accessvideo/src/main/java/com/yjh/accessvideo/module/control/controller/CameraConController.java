@@ -346,7 +346,7 @@ public class CameraConController {
         Result result = new Result();
         try {
             cameraConService.isCameraControlled(cameraId);
-            result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET));
+            result.setData(cameraConService.presetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -362,7 +362,7 @@ public class CameraConController {
                                @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET));
+            result.setData(cameraConService.presetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -379,7 +379,7 @@ public class CameraConController {
         Result result = new Result();
         try {
             cameraConService.isCameraControlled(cameraId);
-            result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.SET_PRESET));
+            result.setData(cameraConService.presetAction(presetId, cameraId, HCNetSDK.SET_PRESET));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -401,7 +401,7 @@ public class CameraConController {
             String cmd = "rm -rf "+capturePresetPath+"/"+presetId;
             log.info("删除语句"+cmd);
             Runtime.getRuntime().exec(cmd);
-            result.setData(cameraConService.PresetAction(presetId, cameraId, HCNetSDK.CLE_PRESET));
+            result.setData(cameraConService.presetAction(presetId, cameraId, HCNetSDK.CLE_PRESET));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

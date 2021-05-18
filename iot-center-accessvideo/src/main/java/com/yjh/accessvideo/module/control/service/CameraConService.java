@@ -49,9 +49,9 @@ public class CameraConService {
     @Autowired
     private CameraConDao cameraConDao;
 
-
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
+
     @Value("${nvr.rtmp.video}")
     private String UrlTem;
 
@@ -79,10 +79,8 @@ public class CameraConService {
     @Value("${nvr.capture.hotPicshow}")
     private String hotPicshow;//红外图片路径对外
 
-
     @Value("${nvr.capture.hotFir}")
     private String hotFir;//红外csv和fir文件路径
-
 
     @Value("${nvr.capture.hotFirShow}")
     private String hotFirShow;//红外csv和fir文件路径对外
@@ -156,13 +154,7 @@ public class CameraConService {
         String[] rtmpUrls = transUrl.split("rtmp");
         String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
         returnMap.put("rtmpUrl", rtmpUrl);
-        if (videoHttps == 1) {
-            String flvsUrl = "https://" + hostIp + ":8088/live/" + cameraId + ".flv";
-            returnMap.put("flvUrl", flvsUrl);
-        } else {
-            String flvUrl = "http://" + hostIp + ":10080/live/" + cameraId + ".flv";
-            returnMap.put("flvUrl", flvUrl);
-        }
+        isHttps(videoHttps, cameraId, returnMap);
 
         StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, Integer.parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
         Thread thread = new Thread(streamInfoThread);
@@ -253,13 +245,7 @@ public class CameraConService {
                 Map<String, Object> returnMap = new HashMap<>();
                 returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
                 returnMap.put("rtmpUrl", rtmpUrl);
-                if (videoHttps == 1) {
-                    String flvsUrl = "https://" + hostIp + ":8088/live/" + cameraId + ".flv";
-                    returnMap.put("flvUrl", flvsUrl);
-                } else {
-                    String flvUrl = "http://" + hostIp + ":10080/live/" + cameraId + ".flv";
-                    returnMap.put("flvUrl", flvUrl);
-                }
+                isHttps(videoHttps, cameraId, returnMap);
                 StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, Integer.parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
                 Thread thread = new Thread(streamInfoThread);
                 thread.setDaemon(true);
@@ -309,13 +295,7 @@ public class CameraConService {
         Map<String, Object> returnLightMap = new HashMap<>();
         returnLightMap.put("light", String.valueOf(robotId));
         returnLightMap.put("rtmpUrl", rtmpUrl);
-        if (videoHttps == 1) {
-            String flvsUrl = "https://" + hostIp + ":8088/live/" + robotId + ".flv";
-            returnLightMap.put("flvUrl", flvsUrl);
-        } else {
-            String flvUrl = "http://" + hostIp + ":10080/live/" + robotId + ".flv";
-            returnLightMap.put("flvUrl", flvUrl);
-        }
+        isHttps(videoHttps, robotId, returnLightMap);
 
         String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
         JSONObject jsonList = new JSONObject();
@@ -485,13 +465,7 @@ public class CameraConService {
 
         returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
         returnMap.put("rtmpUrl", rtmpUrl);
-        if (videoHttps == 1) {
-            String flvsUrl = "https://" + hostIp + ":8088/history/" + cameraId + ".flv";
-            returnMap.put("flvUrl", flvsUrl);
-        } else {
-            String flvUrl = "http://" + hostIp + ":10080/history/" + cameraId + ".flv";
-            returnMap.put("flvUrl", flvUrl);
-        }
+        isHttps(videoHttps, cameraId, returnMap);
 
         String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
         JSONObject jsonList = new JSONObject();
@@ -571,13 +545,7 @@ public class CameraConService {
 
         lightReturnMap.put("robotId", String.valueOf(robotId));
         lightReturnMap.put("rtmpUrl", rtmpUrl);
-        if (videoHttps == 1) {
-            String flvsUrl = "https://" + hostIp + ":8088/history/" + robotId + ".flv";
-            lightReturnMap.put("flvUrl", flvsUrl);
-        } else {
-            String flvUrl = "http://" + hostIp + ":10080/history/" + robotId + ".flv";
-            lightReturnMap.put("flvUrl", flvUrl);
-        }
+        isHttps(videoHttps, robotId, lightReturnMap);
 
         String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
         JSONObject jsonList = new JSONObject();
@@ -769,7 +737,7 @@ public class CameraConService {
 
     //@Logs(title = "预置点调用", code = "presetAction")
     @Transactional(rollbackFor = Exception.class)
-    public boolean PresetAction(Long presetId, Long cameraId, int presetCmd) {
+    public boolean presetAction(Long presetId, Long cameraId, int presetCmd) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
         if(cameraConInfo == null){
             //摄像机id和预置位Id不正确
@@ -1397,7 +1365,6 @@ public class CameraConService {
                             int iErr = hCNetSDK.NET_DVR_GetLastError();
                             log.info("查找下一个文件是失败iErr:" + iErr);
                         }
-
                     } else {
                         list = null;
                         int iErr = hCNetSDK.NET_DVR_GetLastError();
@@ -1518,7 +1485,6 @@ public class CameraConService {
 //        }
 //        return list;
 //    }
-
 
     /**
      * 获取测温数据和图片
@@ -1655,12 +1621,10 @@ public class CameraConService {
                     int iErr = hCNetSDK.NET_DVR_GetLastError();
                     log.info("csv获取失败错误码" + iErr);
                 }
-
             } else {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.info("红外温感文件获取接口调用失败" + iErr);
             }
-
         } catch (Exception e) {
             int iErr = hCNetSDK.NET_DVR_GetLastError();
             log.info("系统异常" + iErr);
@@ -1670,7 +1634,6 @@ public class CameraConService {
         }
         return map;
     }
-
 
     /**
      * 语音对讲开始
@@ -1716,8 +1679,6 @@ public class CameraConService {
             lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
             log.info("NET_DVR_Login_V40:返回值" + lUserID);
 
-
-
             HCNetSDK.FVoiceDataCallBack_V30 fVoiceDataCallBack = null;
             HCNetSDK.NET_DVR_COMPRESSION_AUDIO lpCompressAudio = new HCNetSDK.NET_DVR_COMPRESSION_AUDIO();
             boolean net_DVR_GetCurrentAudioCompress = hCNetSDK.NET_DVR_GetCurrentAudioCompress(lUserID, lpCompressAudio);
@@ -1727,10 +1688,6 @@ public class CameraConService {
             byte byAudioBitRate = lpCompressAudio.byAudioBitRate;
             byte bySupport = lpCompressAudio.bySupport;
             log.info("音频编码类型=" + byAudioEncType + "  音频采样率=" + byAudioSamplingRate + "    音频码率=" + byAudioBitRate + "   bySupport=" + bySupport);
-
-
-
-
 
             if (mVoiceTalkHandle.longValue() < 0) {
                 int mVoiceTalkHandle = hCNetSDK.NET_DVR_StartVoiceCom_V30(lUserID, 1, false, fVoiceDataCallBack, null);
@@ -1743,7 +1700,6 @@ public class CameraConService {
                     re = 1;
                     log.info("NET_DVR_StartVoiceCom_V30 SUCC 内部");
                    // hCNetSDK.NET_DVR_SetVoiceComClientVolume(new NativeLong(mVoiceTalkHandle), (short) 0xffff);
-
                 }
             } else {
                 re = 1;
@@ -1756,7 +1712,6 @@ public class CameraConService {
             e.printStackTrace();
             log.info("NET_DVR_StartVoiceCom_V30 Exception" + iErr);
             log.info("NET_DVR_StartVoiceCom_V30 ....." + e.getMessage());
-
         } finally {
             hCNetSDK.NET_DVR_Logout(lUserID);
             //hCNetSDK.NET_DVR_Cleanup();
@@ -1767,7 +1722,6 @@ public class CameraConService {
     /**
      * 语音对讲结束
      */
-
     public void stopVoiceTalk() {
         try {
             if (mVoiceTalkHandle.longValue() >= 0) {
@@ -1792,7 +1746,6 @@ public class CameraConService {
             log.info("NET_DVR_StopRemoteConfig Exception " + e.getMessage());
         }
     }
-
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> startVideoRealPlay(Long videoIntercomId) {
@@ -1873,8 +1826,6 @@ public class CameraConService {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.info("获取可视状态 错误 " + iErr);
             }
-
-
         } catch (Exception e) {
             re = 1;
             int iErr = hCNetSDK.NET_DVR_GetLastError();
@@ -1885,6 +1836,7 @@ public class CameraConService {
         }
         return re;
     }
+
     /**
      * 获取cvs上某行某列的值
      * @param
@@ -1960,8 +1912,6 @@ public class CameraConService {
             return temperature;
         }
     }
-
-
 
     /**
      * 获取行列区域画面最高温度
@@ -2135,7 +2085,14 @@ public class CameraConService {
         }
     }
 
-
+    private void isHttps(Integer videoHttps, Long id, Map<String, Object> returnMap) {
+        if (videoHttps == 1) {
+            String flvsUrl = "https://" + hostIp + ":8088/live/" + id + ".flv";
+            returnMap.put("flvUrl", flvsUrl);
+        } else {
+            String flvUrl = "http://" + hostIp + ":10080/live/" + id + ".flv";
+            returnMap.put("flvUrl", flvUrl);
+        }
+    }
 
 }
-
