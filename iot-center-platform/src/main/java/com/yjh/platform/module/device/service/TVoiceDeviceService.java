@@ -6,6 +6,7 @@ import com.sun.jna.Pointer;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.tradio.NET_TRADIO_DEVICEINFO;
+import com.yjh.platform.common.tradio.RecordVoiceFileTestThread;
 import com.yjh.platform.common.tradio.TradioLibrary;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
@@ -133,6 +134,7 @@ public class TVoiceDeviceService{
     }
 
     private static TradioLibrary sdk_= TradioLibrary.INSTANCE;
+
     @Transactional(rollbackFor = Exception.class)
     public Result startRecord(Long voiceDeviceId) {
         Result result = new Result();
@@ -142,55 +144,62 @@ public class TVoiceDeviceService{
         if (Objects.isNull(Constant.voiceMap.get(voiceDeviceId))) {
             if (sdk_.NET_TRADIO_Init() != 0) {
                 log.info("SDK初始化失败");
+                Constant.isThreadStart = false;
             }
 
             LongBuffer hd = LongBuffer.allocate(1);
             if(sdk_.NET_TRADIO_CreateDevice(hd) != 0) {
                 log.info("创建设备失败");
+                Constant.isThreadStart = false;
             }
             hdForData = hd.get();
 
             NET_TRADIO_DEVICEINFO dev = new NET_TRADIO_DEVICEINFO();
             int logId = sdk_.NET_TRADIO_Login(hdForData, voiceDeviceAllInfo.getFtpUrl(), voiceDeviceAllInfo.getPort(), voiceDeviceAllInfo.getOwner(),
                     voiceDeviceAllInfo.getOwnerCode(), dev);
-            if ( logId < 0) {
+            if (logId != 0) {
                 log.info("注册失败");
                 VoiceDeviceAllInfoDetail tVoiceDevice = selectByPrimaryId(voiceDeviceId);
                 tVoiceDevice.setState("离线");
                 update(tVoiceDevice);
+                Constant.isThreadStart = false;
             } else {
-                Constant.voiceMap.put(voiceDeviceId, logId);
+                Constant.voiceMap.put(voiceDeviceId, hdForData);
                 VoiceDeviceAllInfoDetail tVoiceDevice = selectByPrimaryId(voiceDeviceId);
                 tVoiceDevice.setState("在线");
                 update(tVoiceDevice);
+                Constant.isThreadStart = true;
             }
+            RecordVoiceFileTestThread recordVoiceFileTestThread = new RecordVoiceFileTestThread(redisTemplate, voiceDeviceId, hdForData);
+            Thread thread = new Thread(recordVoiceFileTestThread);
+            thread.setDaemon(true);
+            thread.start();
         }
 
-        sdk_.NET_TRADIO_SetRtpCallback(hdForData, new TradioLibrary.PRtpCallback() {
-            @Override
-            @Async
-            public void apply(Pointer data, int len, int channel, int db, int sample_rate, long dev) {
-
-                byte[] sourceData = data.getByteArray(0,len);
-                StringBuilder StrArrayTem = new StringBuilder();
-                for (int i = 0; i < len; i++) { StrArrayTem.append(String.format("%02x ", sourceData[i])); }
-                log.info("receiveOriginalDataArray:" + StrArrayTem);
-            }
-        }, 0);
+//        sdk_.NET_TRADIO_SetRtpCallback(hdForData, new TradioLibrary.PRtpCallback() {
+//            @Override
+//            @Async
+//            public void apply(Pointer data, int len, int channel, int db, int sample_rate, long dev) {
+//
+//                byte[] sourceData = data.getByteArray(0,len);
+//                StringBuilder StrArrayTem = new StringBuilder();
+//                for (int i = 0; i < len; i++) { StrArrayTem.append(String.format("%02x ", sourceData[i])); }
+//                log.info("receiveOriginalDataArray:" + StrArrayTem);
+//            }
+//        }, 0);
         return result;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Result stopRecord(Long voiceDeviceId) {
         Result result = new Result();
-        int logId = Integer.parseInt(String.valueOf(Constant.voiceMap.get(voiceDeviceId)));
-        if (sdk_.NET_TRADIO_Logout(logId) != 0) {
-            System.out.println("设备注销成功");
-        } else {
-            System.out.println("设备注销失败");
+        Constant.isThreadStart = false;
+        if (Objects.nonNull(Constant.voiceMap.get(voiceDeviceId))) {
+            long hdForData = (long) Constant.voiceMap.get(voiceDeviceId);
+            if (sdk_.NET_TRADIO_Logout(hdForData) == 0) { log.info("设备注销成功"); } else { log.info("设备注销失败"); }
+            sdk_.NET_TRADIO_Clear();
+            Constant.voiceMap.remove(voiceDeviceId);
         }
-
-        sdk_.NET_TRADIO_Clear();
         return result;
     }
 

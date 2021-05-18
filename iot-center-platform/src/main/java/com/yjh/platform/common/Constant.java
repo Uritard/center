@@ -56,6 +56,7 @@ public class Constant {
     public static Map<String,Object> weatherInfo = new HashMap<>();
 
     public static Map<Long,Object> voiceMap = new HashMap<>();
+    public static volatile boolean isThreadStart;
 
     public static final String account_lock_time = "account_lock_time:userAccountID";
 

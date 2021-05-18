@@ -101,43 +101,34 @@ public class RecordVoiceFileThread implements Runnable {
 //                        for (int i = 0; i < len; i++) { StrArrayTem.append(String.format("%02x ", sourceData[i])); }
 //                        log.info("receiveOriginalDataArray:" + StrArrayTem);
                         String timeTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime));
-                        for (String channelNumTem:channelNumList) {
-                            Integer channelNumTerm = Integer.parseInt(channelNumTem)-1;
-                            if (channel == channelNumTerm) {
-                                try {
-                                    File file = new File(voicePath+"/"+voiceDeviceId+"/"+channelNumTem+"/"+timeTem);
-                                    if (!file.exists()) { file.mkdirs(); }
-                                    File tempWav = new File(file, voiceName + "0" + Integer.parseInt(channelNumTem) +".aac");
-                                    if (!tempWav.exists()) try { tempWav.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
-                                    FileOutputStream fos = new FileOutputStream(tempWav, true);
-                                    fos.write(sourceData, 0, sourceData.length);
-                                    fos.flush();
-                                    fos.close();
-                                } catch (Exception e) { e.getMessage(); }
-                            }
-                        }
+//                        try {
+//                            File file = new File(voicePath+"/"+voiceDeviceId+"/"+timeTem);
+//                            if (!file.exists()) { file.mkdirs(); }
+//                            File tempWav = new File(file, voiceName +".aac");
+//                            if (!tempWav.exists()) try { tempWav.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
+//                            FileOutputStream fos = new FileOutputStream(tempWav, true);
+//                            fos.write(sourceData, 0, sourceData.length);
+//                            fos.flush();
+//                            fos.close();
+//                        } catch (Exception e) { e.getMessage(); }
                     }
                 }, 0);
 
-                if (System.currentTimeMillis() >dateTimeAfter+1000) {
-                    String timeAfterTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime));
-                    String urlAACToWAV1 = "ffmpeg -y -i "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+"01.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
-                            voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName + "01.wav";
-//                    String urlAACToWAV2 = "ffmpeg -y -i "+voicePath+"/"+voiceDeviceId+"/2/"+timeAfterTem+"/"+voiceName+"02.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
-//                            voicePath+"/"+voiceDeviceId+"/2/"+timeAfterTem+"/"+voiceName + "02.wav";
-                    log.info("urlAACToWAV: "+urlAACToWAV1);
-                    try {
-                        Runtime.getRuntime().exec(urlAACToWAV1);
-//                        Runtime.getRuntime().exec(urlAACToWAV2);
-                        Thread.sleep(2000);
-                        Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+"01.aac");
-//                        Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/2/"+timeAfterTem+"/"+voiceName+"02.aac");
-                    } catch (IOException e) { e.getMessage(); }
-                    dateTime = System.currentTimeMillis();
-                    dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
-                    voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
-                            +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter))+"_";
-                }
+//                if (System.currentTimeMillis() >dateTimeAfter+1000) {
+//                    String timeAfterTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime));
+//                    String urlAACToWAV1 = "ffmpeg -y -i "+voicePath+"/"+voiceDeviceId+"/"+timeAfterTem+"/"+voiceName+"01.aac -acodec pcm_s16le -ac 2 -ar 32000 " +
+//                            voicePath+"/"+voiceDeviceId+"/"+timeAfterTem+"/"+voiceName + ".wav";
+//                    log.info("urlAACToWAV: "+urlAACToWAV1);
+//                    try {
+//                        Runtime.getRuntime().exec(urlAACToWAV1);
+//                        Thread.sleep(2000);
+//                        Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/"+timeAfterTem+"/"+voiceName+".aac");
+//                    } catch (IOException e) { e.getMessage(); }
+//                    dateTime = System.currentTimeMillis();
+//                    dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
+//                    voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
+//                            +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter))+"_";
+//                }
 
 //                try {
 //                    log.info("INThreadId; "+ Thread.currentThread().getId()+", isThreadStart: "+isThreadStart);
