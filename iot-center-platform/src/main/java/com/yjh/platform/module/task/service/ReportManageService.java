@@ -329,73 +329,7 @@ public class ReportManageService {
     public List<TCruiseDataResultDetail> test(String taskId){
         return reportManageDao.selectTaskResult(taskId);
     }
-    @Transactional(rollbackFor = Exception.class)
-    public String cruiseResultAnalyseReporter(Long deviceMeteId){
 
-        ResultAnalyseReport resultAnalyseReport=new ResultAnalyseReport();
-        DeviceBaseReport deviceBaseReport=tStdDeviceDao.selectDeviceBase(deviceMeteId);
-        DeviceMeteBaseReport deviceMeteBaseReport=tStdDeviceDao.selectDeviceMeteBase(deviceMeteId);
-        List<CruiseResultDetailReport> cruiseResultDetailReports=new ArrayList<>();
-        List<CruiseResultAnalInfo> cruiseResultAnalInfos=tCruiseDataResultDao.selectCruiseDataResultByList(-1,-1,deviceMeteId,null,null);
-        for(CruiseResultAnalInfo cruiseTem:cruiseResultAnalInfos){
-            CruiseResultDetailReport cruiseResultDetailReport=new CruiseResultDetailReport();
-            cruiseResultDetailReport.setCruiseName(cruiseTem.getCruiseName());
-            cruiseResultDetailReport.setCruiseTypeName(cruiseTem.getCruiseTypeName());
-            cruiseResultDetailReport.setResultNum(cruiseTem.getResultNum());
-            cruiseResultDetailReport.setEndTime(cruiseTem.getEndTime());
-            cruiseResultDetailReport.setIdentifyResultName(cruiseTem.getIdentifyResultName());
-            cruiseResultDetailReport.setCTypeName(cruiseTem.getCTypeName());
-            cruiseResultDetailReport.setPicPath(cruiseTem.getPicPath());
-            cruiseResultDetailReports.add(cruiseResultDetailReport);
-        }
-
-        resultAnalyseReport.setDeviceBaseR(deviceBaseReport);
-        resultAnalyseReport.setDeivceMeteBaseR(deviceMeteBaseReport);
-        resultAnalyseReport.setCRDR(cruiseResultDetailReports);
-
-
-        String deviceMeteName=deviceMeteBaseReport.getDeviceMeteName();
-        String cruiseDate = dateTimeUtil.format(cruiseResultDetailReports.get(0).getEndTime());
-        String reportName =  deviceMeteName+ "_" +dateTimeUtil.changeTime2(cruiseDate) + ".xlsx";//报表名称
-
-
-        String finalFileName = null;
-        try {
-            finalFileName = new String(reportName.getBytes("UTF-8"),"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        //从缓存中获取系统参数
-        Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
-        String reportPath = redisMap.get("content");
-        log.info("reportPath:"+reportPath);
-
-        File temporaryFile = new File(reportPath);
-        String reportPath2 = null;
-        if (!temporaryFile.exists() && !temporaryFile.isDirectory())
-        {
-            temporaryFile.mkdir();
-            reportPath2 = reportPath+"/"+finalFileName;
-            log.info("不存在，创建的文件绝对路径是==="+reportPath2);
-            File file = new File(reportPath2);
-//            ContentData contentData = ReportDataRepo.getData(resultAnalyseReport);
-//            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-//                    contentData.getElements(), file);
-        }else {
-            reportPath2 = reportPath+"/"+finalFileName;
-            log.info("存在，该文件绝对路径是==="+reportPath2);
-            File file = new File(reportPath2);
-//            ContentData contentData = ReportDataRepo.getData(resultAnalyseReport);
-//            ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
-//                    contentData.getElements(), file);
-        }
-        //从缓存中获取系统参数
-        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
-        String fileRelativePath = map.get("content") + "/" + finalFileName;
-        log.info("该文件相对路径是==="+fileRelativePath);
-        return fileRelativePath;
-    }
     /*
      *转UTF-8
      * */

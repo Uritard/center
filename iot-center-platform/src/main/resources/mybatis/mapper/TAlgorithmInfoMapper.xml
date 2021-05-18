@@ -115,7 +115,7 @@
         <result property="defectLevel" column="defect_level"/>
         <result property="defectLevelName" column="defect_level_name"/>
     </resultMap>
-    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo" resultMap="algorithmInfoMap">
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TAlgorithmInfo" resultType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
         select
         a.algorithm_id,
         a.algorithm_name,

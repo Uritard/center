@@ -193,7 +193,7 @@ public class ReportManageController {
         }
         return result;
     }
-    @ApiOperation(value = "测试方法，用完就删")
+    /*@ApiOperation(value = "测试方法，用完就删")
     @GetMapping(value = "/xixixi")
     public Result test(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
@@ -206,9 +206,9 @@ public class ReportManageController {
             log.error("测试方法发生错误:", e);
         }
         return result;
-    }
+    }*/
 
-    @ApiOperation(value = "巡视结果分析报表生成")
+   /* @ApiOperation(value = "巡视结果分析报表生成")
     @GetMapping(value = "/cruiseResultAnalyseReporter")
     @Logs(title = "巡视结果分析报表生成",content = "巡视结果分析报表生成",logType = 5)
     public Result cruiseResultAnalyseReporter(@RequestParam(value = "deviceMeteId")Long deviceMeteId){
@@ -221,5 +221,5 @@ public class ReportManageController {
             log.error("报表生成失败：",e);
         }
         return result;
-    }
+    }*/
 }

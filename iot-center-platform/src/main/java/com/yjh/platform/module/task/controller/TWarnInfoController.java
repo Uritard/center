@@ -100,7 +100,7 @@ public class TWarnInfoController {
         return result;
     }
 
-    @ApiOperation(value = "")
+    @ApiOperation(value = "主键查询")
     @GetMapping(value = "/selectByPrimaryId")
     @Logs(title = "查询告警信息数据",content = "根据用户传递的参数查询告警信息",logType = 1)
     public Result selectByPrimaryId(@RequestParam(value = "warnId", required = true) Long warnId) {
