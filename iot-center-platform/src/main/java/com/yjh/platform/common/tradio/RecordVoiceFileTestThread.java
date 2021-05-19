@@ -87,7 +87,7 @@ public class RecordVoiceFileTestThread implements Runnable {
                         Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+".aac");
                     } catch (IOException e) { e.getMessage(); }
                     dateTime = System.currentTimeMillis();
-                    dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
+                    dateTimeAfter = dateTime+voiceFileRecordTime*66*1000;
                     voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
                             +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter))+"_";
                 }

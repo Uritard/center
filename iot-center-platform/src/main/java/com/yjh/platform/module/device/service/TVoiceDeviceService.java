@@ -237,7 +237,7 @@ public class TVoiceDeviceService{
                 thread.start();
                 result.setMessage("开启成功！");
             }
-        }
+        } else { result.setMessage("已开启");}
         return result;
     }
 
