@@ -51,8 +51,8 @@ public class StreamInfoThread implements Runnable {
             String name = streambeanJson.getString("name");
             String videoFlowId = streambeanJson.getString("id");
             String publish = streambeanJson.getString("publish");
-            JSONObject publishjson = JSONObject.parseObject(publish);
-            if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+            JSONObject publishJson = JSONObject.parseObject(publish);
+            if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishJson.getString("cid"))) {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(videoFlowId, String.valueOf(cameraId));
                 log.info("realReturnMap: " + returnMap);

@@ -138,8 +138,9 @@ public class CameraConService {
         String password = cameraConInfo.getCameraCode();
         String cameraIp = cameraConInfo.getCameraIp();
         int cameraPort = cameraConInfo.getPort();
-        int iChanNum = cameraConInfo.getCameraNum();
+        int iChanNum = 1;
         int cameraType = cameraConInfo.getCameraType();
+        if (cameraType==206) { iChanNum = 2; }
 
         log.info("Constant.maps: " + Constant.maps);
         log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + cameraId);
@@ -226,8 +227,10 @@ public class CameraConService {
                 String password = cameraConInfo.getCameraCode();
                 String cameraIp = cameraConInfo.getCameraIp();
                 int cameraPort = cameraConInfo.getPort();
-                int iChanNum = cameraConInfo.getCameraNum();
+                int iChanNum = 1;
                 int cameraType = cameraConInfo.getCameraType();
+                if (cameraType==206) { iChanNum = 2; }
+
                 log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + cameraId);
                 String transUrl = "";
                 if (cameraType == 205) {
