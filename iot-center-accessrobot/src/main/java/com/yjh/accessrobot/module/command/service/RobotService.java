@@ -80,6 +80,8 @@ public class RobotService {
     private String ftpsPassWord;
     @Value("${netty.server.ftps.keypw}")
     private String key;
+    @Value("${netty.server.ftps.local.path}")
+    private String ftpsLoaclPath;
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password, HttpServletRequest request,String content) throws Exception{
@@ -1883,7 +1885,7 @@ public class RobotService {
     public void uploadFile(String localPath,String targetName) {
         try {
             if("".equals(localPath)) {return;}
-            FtpsUtil.putFile("/home/yjh_iot_center/ftps"+"/"+localPath, targetName,
+            FtpsUtil.putFile(ftpsLoaclPath+"/"+localPath, targetName,
                     serverUrl, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
         } catch (Exception e) {
             log.error("上传至ftps错误 " + e);

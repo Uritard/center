@@ -320,4 +320,14 @@
        FROM
 	    t_camera_info
     </select>
+    <select id="selectCameraHavePreset" resultType="java.lang.Long">
+        SELECT
+	     preset_id
+       FROM
+	    t_camera_preset
+       WHERE camera_id in <foreach collection="list" item="cameraId" separator=",">
+        #{cameraId, jdbcType=BIGINT}
+    </foreach>
+        )
+    </select>
 </mapper>

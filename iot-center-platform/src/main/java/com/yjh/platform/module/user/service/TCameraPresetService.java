@@ -175,6 +175,14 @@ public class TCameraPresetService {
             cameraIdList = tCameraPresetDao.selectCameraIdList();
         }
         if(cameraIdList != null && cameraIdList.size()>0){
+
+            List<Long> cameraHavePresetList = tCameraPresetDao.selectCameraHavePreset(cameraIdList);
+            if(cameraHavePresetList == null){
+                return "fail";
+            }
+            if(cameraHavePresetList.size() == 0 ){
+                return "fail";
+            }
             //删除zipPath下的所有文件
             try {
                 String cmd= "rm -rf "+zipPath+"/*";
