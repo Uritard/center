@@ -1,16 +1,12 @@
 package com.yjh.accessvideo.common;
 
-import com.yjh.accessvideo.common.logs.SpringBeanUtils;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
-import com.yjh.accessvideo.module.device.entity.XMLBaseModel;
 import io.netty.bootstrap.Bootstrap;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Constant {

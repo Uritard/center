@@ -38,7 +38,7 @@ public class RecordVoiceFileTestThread implements Runnable {
         this.voiceDeviceId = voiceDeviceId;
         this.voiceFileRecordTime = Integer.parseInt(redisTemplate.opsForHash().entries("t_sys_param:voiceFileRecordTime").get("content").toString());
         this.dateTime = System.currentTimeMillis();
-        this.dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;
+        this.dateTimeAfter = dateTime+voiceFileRecordTime*66*1000;
         this.voicePath = redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content").toString();
         this.voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
                 +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter))+"_";
@@ -48,10 +48,9 @@ public class RecordVoiceFileTestThread implements Runnable {
     public void run() {
         try {
             while (isThreadStart){
-                log.info("Thread is " + Thread.currentThread().getName() + Thread.currentThread().getId());
                 if (!Constant.isThreadStart) {
                     isThreadStart = false;
-                    log.info("Thread stop success!");
+                    log.info("stop thread is {}, {}", Thread.currentThread().getName(), Thread.currentThread().getId());
                 }
                 sdk_.NET_TRADIO_SetRtpCallback(hdForData, new TradioLibrary.PRtpCallback() {
                     @Override
@@ -64,7 +63,7 @@ public class RecordVoiceFileTestThread implements Runnable {
 //                        log.info("receiveOriginalDataArray:" + StrArrayTem);
                         String timeTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime));
                         try {
-                            File file = new File(voicePath+"/"+voiceDeviceId+"/"+timeTem);
+                            File file = new File(voicePath+"/"+voiceDeviceId+"/1/"+timeTem);
                             if (!file.exists()) { file.mkdirs(); }
                             File tempWav = new File(file, voiceName +".aac");
                             if (!tempWav.exists()) try { tempWav.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
@@ -77,15 +76,15 @@ public class RecordVoiceFileTestThread implements Runnable {
                 }, 0);
                 Thread.sleep(10000);
 
-                if (System.currentTimeMillis() >dateTimeAfter) {
+                if (System.currentTimeMillis()>dateTimeAfter) {
                     String timeAfterTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime));
-                    String urlAACToWAV = "ffmpeg -y -i "+voicePath+"/"+voiceDeviceId+"/"+timeAfterTem+"/"+voiceName+".aac -acodec pcm_s16le -ac 2 -ar 32000 " +
-                            voicePath+"/"+voiceDeviceId+"/"+timeAfterTem+"/"+voiceName + ".wav";
+                    String urlAACToWAV = "ffmpeg -y -i "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+".aac -acodec pcm_s16le -ac 2 -ar 32000 " +
+                            voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName + ".wav";
                     log.info("urlAACToWAV: "+urlAACToWAV);
                     try {
                         Runtime.getRuntime().exec(urlAACToWAV);
                         Thread.sleep(2000);
-                        Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/"+timeAfterTem+"/"+voiceName+".aac");
+                        Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+".aac");
                     } catch (IOException e) { e.getMessage(); }
                     dateTime = System.currentTimeMillis();
                     dateTimeAfter = dateTime+voiceFileRecordTime*60*1000;

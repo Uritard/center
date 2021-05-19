@@ -1,5 +1,6 @@
 package com.yjh.platform;
 
+import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
@@ -8,6 +9,7 @@ import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TSysParamService;
 import org.apache.catalina.connector.Connector;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -22,10 +24,22 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
 import org.springframework.web.client.RestTemplate;
+import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.MultiKeyCommands;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @SpringBootApplication(scanBasePackages = {"com.yjh.platform", "com.yjh.platform.common.logs"})
 @EnableDiscoveryClient
@@ -68,18 +82,25 @@ public class PlatformApplication  implements CommandLineRunner {
         Constant.redisTemplate = redisTemplate;
         Constant.apiPermissions= Boolean.valueOf(interfaceApi);
         tDeviceTypeImgService.findPic();//本地启动把此行注掉
-        //Start RecordVoiceFileThread
-//        List<VoiceDeviceAllInfo> voiceDeviceAllInfoList = tVoiceDeviceService.selectVoiceDeviceInfo();
-//        if (voiceDeviceAllInfoList.size()>0) {
-//            for (VoiceDeviceAllInfo voiceDeviceAllInfo:voiceDeviceAllInfoList) {
-//                RecordVoiceFileThread recordVoiceFileThread = new RecordVoiceFileThread(redisTemplate, voiceDeviceAllInfo.getPort(),
-//                        voiceDeviceAllInfo.getVoiceDeviceId(), voiceDeviceAllInfo.getChannelNum(), voiceDeviceAllInfo.getFtpUrl(),
-//                        voiceDeviceAllInfo.getOwner(), voiceDeviceAllInfo.getOwnerCode(), true, tVoiceDeviceService);
-//                Thread thread = new Thread(recordVoiceFileThread);
-//                thread.setDaemon(true);
-//                thread.start();
-//            }
-//        }
+        //开机自动将所有拾音器开启状态转为关闭
+        Set voiceKeys = redisScan("is_record_open_state:*");
+        List voiceList = redisTemplate.executePipelined(
+                new SessionCallback<Object>() {
+                    @Override
+                    public <K, V> Object execute(RedisOperations<K, V> redisOperations) throws DataAccessException {
+                        for (Object key : voiceKeys) {
+                            redisTemplate.opsForHash().entries(key);
+                        }
+                        return null;
+                    }});
+        if (voiceList.size()>0) {
+            int voiceListLen = voiceList.size();
+            for (int i=0; i<voiceListLen; i++) {
+                Map deviceMap = (Map) voiceList.get(i);
+                deviceMap.replace("openState", "关闭");
+                redisTemplate.opsForHash().putAll("is_record_open_state:"+deviceMap.get("voiceDeviceId"), deviceMap);
+            }
+        }
     }
 
     @Bean
@@ -103,5 +124,30 @@ public class PlatformApplication  implements CommandLineRunner {
     @Bean(name = "serviceRestTemplate")
     RestTemplate serviceRestTemplate() {
         return new ServiceRestTemplate();
+    }
+
+    public Set<String> redisScan(String key) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
+
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+
+            ScanParams scanParams = new ScanParams();
+            scanParams.match("*" + key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            return keys;
+        });
     }
 }

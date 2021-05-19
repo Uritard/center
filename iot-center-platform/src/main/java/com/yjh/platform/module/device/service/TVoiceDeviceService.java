@@ -9,6 +9,7 @@ import com.yjh.platform.common.tradio.NET_TRADIO_DEVICEINFO;
 import com.yjh.platform.common.tradio.RecordVoiceFileTestThread;
 import com.yjh.platform.common.tradio.TradioLibrary;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
+import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
@@ -78,6 +79,7 @@ public class TVoiceDeviceService{
     public int deleteByPrimaryId(Long voiceDeviceId) {
         VoiceDeviceAllInfoDetail voiceDeviceInfoDetail = this.tVoiceDeviceDao.selectByPrimaryId(voiceDeviceId);
         this.tVoiceDeviceDao.deleteConf(voiceDeviceInfoDetail.getConfigId());
+        redisTemplate.opsForHash().delete("is_record_open_state:"+voiceDeviceId, "openState", "voiceDeviceId");
         return this.tVoiceDeviceDao.deleteByPrimaryId(voiceDeviceId);
     }
 
@@ -181,12 +183,22 @@ public class TVoiceDeviceService{
             if (sdk_.NET_TRADIO_Init() != 0) {
                 log.info("SDK初始化失败");
                 Constant.isThreadStart = false;
+                Map<String, Object> openStateMap = new HashMap<String, Object>();
+                openStateMap.put("openState", "关闭");
+                openStateMap.put("voiceDeviceId", voiceDeviceId);
+                redisTemplate.opsForHash().putAll("is_record_open_state:"+voiceDeviceId, openStateMap);
+                result.setMessage("开启失败！");
             }
 
             LongBuffer hd = LongBuffer.allocate(1);
             if(sdk_.NET_TRADIO_CreateDevice(hd) != 0) {
                 log.info("创建设备失败");
                 Constant.isThreadStart = false;
+                Map<String, Object> openStateMap = new HashMap<String, Object>();
+                openStateMap.put("openState", "关闭");
+                openStateMap.put("voiceDeviceId", voiceDeviceId);
+                redisTemplate.opsForHash().putAll("is_record_open_state:"+voiceDeviceId, openStateMap);
+                result.setMessage("开启失败！");
             }
             hdForData = hd.get();
 
@@ -199,30 +211,28 @@ public class TVoiceDeviceService{
                 tVoiceDevice.setState("离线");
                 update(tVoiceDevice);
                 Constant.isThreadStart = false;
+                Map<String, Object> openStateMap = new HashMap<String, Object>();
+                openStateMap.put("openState", "关闭");
+                openStateMap.put("voiceDeviceId", voiceDeviceId);
+                redisTemplate.opsForHash().putAll("is_record_open_state:"+voiceDeviceId, openStateMap);
+                result.setMessage("开启失败！");
             } else {
                 Constant.voiceMap.put(voiceDeviceId, hdForData);
                 VoiceDeviceAllInfoDetail tVoiceDevice = selectByPrimaryId(voiceDeviceId);
                 tVoiceDevice.setState("在线");
                 update(tVoiceDevice);
                 Constant.isThreadStart = true;
+                Map<String, Object> openStateMap = new HashMap<String, Object>();
+                openStateMap.put("openState", "开启");
+                openStateMap.put("voiceDeviceId", voiceDeviceId);
+                redisTemplate.opsForHash().putAll("is_record_open_state:"+voiceDeviceId, openStateMap);
+                RecordVoiceFileTestThread recordVoiceFileTestThread = new RecordVoiceFileTestThread(redisTemplate, voiceDeviceId, hdForData);
+                Thread thread = new Thread(recordVoiceFileTestThread);
+                thread.setDaemon(true);
+                thread.start();
+                result.setMessage("开启成功！");
             }
-            RecordVoiceFileTestThread recordVoiceFileTestThread = new RecordVoiceFileTestThread(redisTemplate, voiceDeviceId, hdForData);
-            Thread thread = new Thread(recordVoiceFileTestThread);
-            thread.setDaemon(true);
-            thread.start();
         }
-
-//        sdk_.NET_TRADIO_SetRtpCallback(hdForData, new TradioLibrary.PRtpCallback() {
-//            @Override
-//            @Async
-//            public void apply(Pointer data, int len, int channel, int db, int sample_rate, long dev) {
-//
-//                byte[] sourceData = data.getByteArray(0,len);
-//                StringBuilder StrArrayTem = new StringBuilder();
-//                for (int i = 0; i < len; i++) { StrArrayTem.append(String.format("%02x ", sourceData[i])); }
-//                log.info("receiveOriginalDataArray:" + StrArrayTem);
-//            }
-//        }, 0);
         return result;
     }
 
@@ -236,6 +246,10 @@ public class TVoiceDeviceService{
             sdk_.NET_TRADIO_Clear();
             Constant.voiceMap.remove(voiceDeviceId);
         }
+        Map<String, Object> openStateMap = new HashMap<String, Object>();
+        openStateMap.put("openState", "关闭");
+        openStateMap.put("voiceDeviceId", voiceDeviceId);
+        redisTemplate.opsForHash().putAll("is_record_open_state:"+voiceDeviceId, openStateMap);
         return result;
     }
 
