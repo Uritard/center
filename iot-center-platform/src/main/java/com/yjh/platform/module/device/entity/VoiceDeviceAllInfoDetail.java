@@ -89,6 +89,16 @@ public class VoiceDeviceAllInfoDetail{
 
     private String pmsId;
 
+    public String getOpenState() {
+        return openState;
+    }
+
+    public void setOpenState(String openState) {
+        this.openState = openState;
+    }
+
+    private String openState;
+
     public String getState() {
         return state;
     }

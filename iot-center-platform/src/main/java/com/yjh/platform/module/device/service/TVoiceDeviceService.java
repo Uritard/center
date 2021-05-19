@@ -29,6 +29,7 @@ import ws.schild.jave.MultimediaInfo;
 import ws.schild.jave.MultimediaObject;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.nio.LongBuffer;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -63,7 +64,12 @@ public class TVoiceDeviceService{
         }else {
             return -1;
         }
-        tVoiceDevice.setState("未知");
+        //tVoiceDevice.setState("未知");
+        if(ping(tVoiceDevice.getFtpUrl())){
+            tVoiceDevice.setState("在线");
+        }else {
+            tVoiceDevice.setState("离线");
+        }
         this.tVoiceDeviceDao.addConf(tVoiceDevice);
         return this.tVoiceDeviceDao.add(tVoiceDevice);
     }
@@ -84,7 +90,12 @@ public class TVoiceDeviceService{
         }else {
             return -1;
         }
-        tVoiceDevice.setState("未知");
+        //tVoiceDevice.setState("未知");
+        if(ping(tVoiceDevice.getFtpUrl())){
+             tVoiceDevice.setState("在线");
+        }else {
+             tVoiceDevice.setState("离线");
+        }
         this.tVoiceDeviceDao.updateConf(tVoiceDevice);
         return this.tVoiceDeviceDao.update(tVoiceDevice);
     }
@@ -113,10 +124,35 @@ public class TVoiceDeviceService{
         }
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         List<VoiceDeviceAllInfoDetail> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(voiceDeviceName,deviceType,list,upRegionId);
+        for(VoiceDeviceAllInfoDetail item:tVoiceDeviceList){
+//            if(ping(item.getFtpUrl())){
+//                item.setState("在线");
+//            }else {
+//                item.setState("离线");
+//            }
+            Map<String,String> isOpen = redisTemplate.opsForHash().entries("is_record_open_state:"+item.getVoiceDeviceId());
+            if(isOpen != null && isOpen.size()>0){
+                item.setOpenState(isOpen.get("openState"));
+            }else {
+                item.setOpenState("关闭");
+            }
+        }
         resultMap.put("count", page.getTotal());
         resultMap.put("list", tVoiceDeviceList);
         result.setData(resultMap);
         return result;
+    }
+
+    public boolean ping(String ipAddress) {
+        try {
+            int timeOut = 3000;  //超时应该在3钞以上
+            boolean status = InetAddress.getByName(ipAddress).isReachable(timeOut);
+            // 当返回值是true时，说明host是可用的，false则不可。
+            return status;
+        }catch (Exception e){
+            log.error("获取状态失败："+e);
+        }
+        return false;
     }
 
     @Transactional(rollbackFor = Exception.class)
