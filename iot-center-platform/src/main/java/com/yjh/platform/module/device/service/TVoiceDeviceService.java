@@ -186,7 +186,7 @@ public class TVoiceDeviceService{
                 Constant.isThreadStart = false;
                 Map<String, Object> openStateMap = new HashMap<String, Object>();
                 openStateMap.put("openState", "关闭");
-                openStateMap.put("voiceDeviceId", voiceDeviceId);
+                openStateMap.put("voiceDeviceId", String.valueOf(voiceDeviceId));
                 String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
                 redisTemplate.opsForHash().putAll(recordKey, openStateMap);
                 result.setMessage("开启失败！");
@@ -198,7 +198,7 @@ public class TVoiceDeviceService{
                 Constant.isThreadStart = false;
                 Map<String, Object> openStateMap = new HashMap<String, Object>();
                 openStateMap.put("openState", "关闭");
-                openStateMap.put("voiceDeviceId", voiceDeviceId);
+                openStateMap.put("voiceDeviceId", String.valueOf(voiceDeviceId));
                 String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
                 redisTemplate.opsForHash().putAll(recordKey, openStateMap);
                 result.setMessage("开启失败！");
@@ -216,7 +216,7 @@ public class TVoiceDeviceService{
                 Constant.isThreadStart = false;
                 Map<String, Object> openStateMap = new HashMap<String, Object>();
                 openStateMap.put("openState", "关闭");
-                openStateMap.put("voiceDeviceId", voiceDeviceId);
+                openStateMap.put("voiceDeviceId", String.valueOf(voiceDeviceId));
                 String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
                 redisTemplate.opsForHash().putAll(recordKey, openStateMap);
                 result.setMessage("开启失败！");
@@ -228,7 +228,7 @@ public class TVoiceDeviceService{
                 Constant.isThreadStart = true;
                 Map<String, Object> openStateMap = new HashMap<String, Object>();
                 openStateMap.put("openState", "开启");
-                openStateMap.put("voiceDeviceId", voiceDeviceId);
+                openStateMap.put("voiceDeviceId", String.valueOf(voiceDeviceId));
                 String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
                 redisTemplate.opsForHash().putAll(recordKey, openStateMap);
                 RecordVoiceFileTestThread recordVoiceFileTestThread = new RecordVoiceFileTestThread(redisTemplate, voiceDeviceId, hdForData);
@@ -253,7 +253,7 @@ public class TVoiceDeviceService{
         }
         Map<String, Object> openStateMap = new HashMap<String, Object>();
         openStateMap.put("openState", "关闭");
-        openStateMap.put("voiceDeviceId", voiceDeviceId);
+        openStateMap.put("voiceDeviceId", String.valueOf(voiceDeviceId));
         String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
         redisTemplate.opsForHash().putAll(recordKey, openStateMap);
         return result;
