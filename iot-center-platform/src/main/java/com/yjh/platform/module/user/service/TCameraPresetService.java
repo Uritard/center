@@ -302,8 +302,16 @@ public class TCameraPresetService {
             if(zipFileList != null && zipFileList.length>0){
                 for(File item:zipFileList){
                     if(item.isDirectory()){
+                        {
+                            //不覆盖原有的文件
+                            File targetFile = new File(modelPath+"/"+item.getName());
+                            if(targetFile.exists()){
+                                continue;
+                            }
+                        }
                         String url = "cp -rf " + path+"/copyZip/"+item.getName()+" "+modelPath+"/"+item.getName();
                         String[] cpCmd = new String[]{"sh","-c",url};
+                        log.info("linux复制命令："+url);
                         Runtime.getRuntime().exec(cpCmd);
                     }
                 }

@@ -333,7 +333,7 @@ public class TCameraInfoController {
         return result;
     }
 
-    @ApiOperation(value = "主键查询")
+    @ApiOperation(value = "查询相机或者机器人相机信息")
     @RequestMapping(value = "/selectByCameraIdOrRobotId", method = RequestMethod.GET)
     @Logs(title = "查询相机或者机器人相机信息",content = "根据用户传递的参数查询相机信息",logType = 1)
     public Result selectByCameraIdOrRobotId(@RequestParam(value = "cameraId", required = true) Long cameraId,
