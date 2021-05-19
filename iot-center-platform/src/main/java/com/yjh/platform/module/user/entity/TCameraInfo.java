@@ -93,21 +93,21 @@ public class TCameraInfo implements Serializable {
     @ApiModelProperty(value = "是否可控(0-可控球机，1-不可控枪机)")
     private Integer isControl;
 
-    @Length(max = 38,message = "cameraIp长度必须小于等于128")
+    @Length(max = 38,message = "摄像机ip长度必须小于等于38")
     @ApiModelProperty(value = "摄像机ip")
     @TableField(value = "camera_ip",updateStrategy = FieldStrategy.IGNORED)
     private String cameraIp;
 
-    @Length(max = 32,message = "address长度必须小于等于128")
+    @Length(max = 32,message = "安装位置长度必须小于等于32")
     @ApiModelProperty(value = "安装地址")
      @TableField(value = "address",updateStrategy = FieldStrategy.IGNORED)
     private String address;
 
-    @Length(max = 32,message = "latitude长度必须小于等于128")
+    @Length(max = 32,message = "纬度长度必须小于等于32")
     @ApiModelProperty(value = "纬度")
     private String latitude;
 
-    @Length(max = 32,message = "longitude长度必须小于等于128")
+    @Length(max = 32,message = "经度长度必须小于等于32")
     @ApiModelProperty(value = "经度")
     private String longitude;
 
