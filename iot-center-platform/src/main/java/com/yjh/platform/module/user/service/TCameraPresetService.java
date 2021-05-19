@@ -292,7 +292,7 @@ public class TCameraPresetService {
             deleteDir(new File(path +"/"+ fileName));
             file.transferTo(new File(path +"/"+ fileName));
             //解压 unzip -o xxx.zip -d /home/yjh_iot_center/iot-  覆盖原有文件
-            String cmd= "unzip -o "+path+"/copyZip.zip"+" -d"+path;
+            String cmd= "unzip -o "+path+"/copyZip.zip"+" -d"+path+"/copyZip";
             String[] cmds = new String[]{"sh","-c",cmd};
             log.info("linux命令："+cmd);
             Runtime.getRuntime().exec(cmds);
@@ -309,7 +309,7 @@ public class TCameraPresetService {
                                 continue;
                             }
                         }
-                        String url = "cp -rf " + path+"/copyZip/"+item.getName()+" "+modelPath+"/"+item.getName();
+                        String url = "cp -rf " + path+"/copyZip/picture/"+item.getName()+" "+modelPath+"/"+item.getName();
                         String[] cpCmd = new String[]{"sh","-c",url};
                         log.info("linux复制命令："+url);
                         Runtime.getRuntime().exec(cpCmd);
