@@ -86,6 +86,7 @@ public interface TStdDevicemeteDao {
     List<Long> selectByDevId(@Param(value = "deviceId")Long deviceId);
 
     List<Long> selectHave(@Param(value = "deviceMeteId")Long deviceMeteId);
+    List<Long> selectHaveInstanceId(@Param(value = "deviceId")Long deviceId);
 
 
 

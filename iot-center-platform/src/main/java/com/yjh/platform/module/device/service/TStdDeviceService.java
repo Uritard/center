@@ -153,7 +153,7 @@ public class TStdDeviceService{
 
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryIdALL(Long deviceId) {
-        List<Long> devList = tStdDevicemeteDao.selectByDevId(deviceId);
+        List<Long> devList = tStdDevicemeteDao.selectHaveInstanceId(deviceId);
         {//设备下存在测点
             if(devList != null && devList.size()>0){
              return -1;

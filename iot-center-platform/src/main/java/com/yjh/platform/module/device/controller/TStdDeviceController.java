@@ -106,7 +106,7 @@ public class TStdDeviceController {
         try {
             int re  = tStdDeviceService.deleteByPrimaryIdALL(deviceId);
             if(re == -1){
-                result.setCode(209,"此设备下存在测点");
+                result.setCode(209,"设备下有测点已关联巡视设备");
             }else {
                 result.setData(re);
             }
@@ -415,7 +415,7 @@ public class TStdDeviceController {
         try{
             int re  = tStdDeviceService.batchDelete(deviceIds);
             if(re == -1){
-                result.setCode(209,"设备下存在巡视点");
+                result.setCode(209,"设备下有测点已关联巡视设备");
             }else {
                 result.setData(re);
             }
