@@ -172,24 +172,30 @@
         LEFT JOIN t_dict_business e on a.camera_model = e.dict_code and e.col_name = 'camera_model'
         LEFT JOIN t_std_region f on a.up_region_id = f.region_id
         where 1 = 1
-        and a.camera_id = #{cameraId}
+        <if test="cameraId != null ">and a.camera_id = #{cameraId}></if>
     </select>
     <!--根据摄像机名称查询信息-->
     <select id="selectByCameraName" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
         select<include refid="tongTong"></include>
-        from t_camera_info a,t_dict_business b,t_std_region c
-        where 1 = 1 and a.camera_name  like concat('%',#{cameraName, jdbcType=VARCHAR},'%')
-        and b.dict_code=a.vendor_id and c.region_id = a.up_region_id
-
+        from t_camera_info a
+        left JOIN t_dict_business b on a.vendor_id = b.dict_code and b.col_name = 'camera_vendor'
+        LEFT JOIN t_dict_business d on a.camera_type = d.dict_code and d.col_name = 'camera_type'
+        LEFT JOIN t_dict_business e on a.camera_model = e.dict_code and e.col_name = 'camera_model'
+        LEFT JOIN t_std_region f on a.up_region_id = f.region_id
+        where 1 = 1
+        <if test="cameraName != null and cameraName != '' ">and a.camera_name  like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
 
     </select>
     <!--根据间隔id查询所有摄像机信息-->
     <select id="selectByRegionId" parameterType="com.yjh.platform.module.device.entity.TStdRegion" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
         select<include refid="tongTong"></include>
-        from t_camera_info a,t_dict_business b,t_std_region c
+        from t_camera_info a
+        left JOIN t_dict_business b on a.vendor_id = b.dict_code and b.col_name = 'camera_vendor'
+        LEFT JOIN t_dict_business d on a.camera_type = d.dict_code and d.col_name = 'camera_type'
+        LEFT JOIN t_dict_business e on a.camera_model = e.dict_code and e.col_name = 'camera_model'
+        LEFT JOIN t_std_region f on a.up_region_id = f.region_id
         where 1 = 1
-        and a.up_region_id = #{regionId, jdbcType=BIGINT}
-        and b.dict_code=a.vendor_id and c.region_id = a.up_region_id
+        <if test="regionId != null ">and  a.up_region_id = #{regionId, jdbcType=BIGINT}</if>
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">

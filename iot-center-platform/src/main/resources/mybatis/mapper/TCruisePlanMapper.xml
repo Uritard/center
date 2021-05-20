@@ -168,7 +168,8 @@
             WHEN ISNULL(d.inspection_name) THEN CONCAT(j.mete_name,'/',f.preset_name)
             WHEN ISNULL(f.preset_name) THEN CONCAT(j.mete_name,'/',d.inspection_name)
             END) AS instance_name,e.robot_name,
-          g.camera_name,h.camera_name AS inferad_name,i.dict_note AS cruise_type_name,a.identify_type FROM t_cruise_point_instance a
+          g.camera_name,h.camera_name AS inferad_name,i.dict_note AS cruise_type_name,a.identify_type
+          FROM t_cruise_point_instance a
                 LEFT JOIN t_std_device b ON a.device_id = b.device_id AND a.custom_id = b.custom_id
                 LEFT JOIN t_cruise_point_attr c ON a.instance_id = c.instance_id
                 LEFT JOIN t_robot_inspection d ON d.inspection_id = a.cruise_id

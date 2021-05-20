@@ -196,7 +196,7 @@ public class TCruiseDataResultController {
     }
 
 
-    @ApiOperation(value = "巡视结果分析--测点查询")
+    /*@ApiOperation(value = "巡视结果分析--测点查询")
     @GetMapping(value = "/selectCruiseResultAnal")
     @Logs(title = "查询测点信息",content = "查询测点信息",logType = 1)
     public Result selectCruiseResultAnal(@RequestParam(value = "deviceId", required = false) Long deviceId,
@@ -228,7 +228,7 @@ public class TCruiseDataResultController {
             log.error("巡视结果分析--测点查询失败描述：", e);
         }
         return result;
-    }
+    }*/
     @ApiOperation(value = "巡视结果分析--测点查询2")
     @GetMapping(value = "/selectCruiseResultAnalyze")
     @Logs(title = "查询测点信息",content = "查询测点信息",logType = 1,authority = "1235")
@@ -281,6 +281,8 @@ public class TCruiseDataResultController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         Long userIds = Long.valueOf(request.getHeader("userId"));
+//        Long userIds = 10011l;
+
         String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
         try {
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userIds).get("roleId"));
@@ -389,7 +391,7 @@ public class TCruiseDataResultController {
         }
         return result;
     }
-    @ApiOperation(value = "巡视结果分析--巡检点结果列表")
+    /*@ApiOperation(value = "巡视结果分析--巡检点结果列表")
     @GetMapping(value = "/selectCruiseDataResultByList")
     @Logs(title = "巡检点结果列表",content = "根据用户传递的参数查询巡检点结果信息",logType = 1)
     public Result selectCruiseDataResultByList(@RequestParam(value = "cruiseType", required = false) Integer cruiseType,
@@ -422,7 +424,7 @@ public class TCruiseDataResultController {
             log.error("巡视结果分析--巡检点结果列表失败描述：", e);
         }
         return result;
-    }
+    }*/
     @ApiOperation(value = "获取折线图元素信息")
     @GetMapping(value = "/selectBrokenLine")
     @Logs(title = "获取折线图元素信息",content = "根据用户传递的参数获取折线图信息",logType = 1,authority = "1235")

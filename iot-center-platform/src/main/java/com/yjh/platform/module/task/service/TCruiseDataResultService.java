@@ -291,7 +291,7 @@ public class TCruiseDataResultService {
                 File file = new File(t.getResultPic());
                 FirAndPicInfo f = new FirAndPicInfo();
                 f.setCruiseDataId(t.getCruiseDataId());
-                String[] arr = file.getParent().split("/");
+                String[] arr = file.getParent().split("\\/");
                 f.setPicPath(arr[0] + "//" + arr[1] + "/" + arr[2] + "/resultImg" + "/" + t.getFirName() + ".jpg");
                 f.setFirPath(t.getResultPic());
                 f.setFirName(t.getFirName());

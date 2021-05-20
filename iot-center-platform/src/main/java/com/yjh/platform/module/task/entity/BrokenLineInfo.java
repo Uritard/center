@@ -40,12 +40,12 @@ public class BrokenLineInfo implements Serializable {
 
     @ApiModelProperty(value = "识别类型")
     private String meteType;
-    @ApiModelProperty(value = "任务类型--字典表")
+    @ApiModelProperty(value = "识别类型--字典表")
     private String meteTypeName;
 
     @ApiModelProperty(value = "表计类型")
     private Integer meterType;
-    @ApiModelProperty(value = "任务类型--字典表")
+    @ApiModelProperty(value = "表计类型--字典表")
     private String meterTypeName;
 
 

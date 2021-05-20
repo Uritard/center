@@ -388,7 +388,7 @@
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        ORDER BY a.instance_id desc,a.device_id, a.custom_id
+        ORDER BY b.instance_id asc,b.device_id, n.custom_id
     </select>
 
     <insert id="batchInsert">
