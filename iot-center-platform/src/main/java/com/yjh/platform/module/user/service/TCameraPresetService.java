@@ -297,7 +297,7 @@ public class TCameraPresetService {
             log.info("linux命令："+cmd);
             Runtime.getRuntime().exec(cmds);
             //解压到zip目录下 再将相关文件复制到对应目录下  /home/yjh/iot-picture/model-picture/sync/Template/BigImg  /预置位
-            File zipFile = new File(path+"/copyZip");
+            File zipFile = new File(path+"/copyZip/picture");
             File[] zipFileList = zipFile.listFiles();
             if(zipFileList != null && zipFileList.length>0){
                 for(File item:zipFileList){

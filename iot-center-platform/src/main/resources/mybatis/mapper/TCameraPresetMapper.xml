@@ -328,6 +328,5 @@
        WHERE camera_id in <foreach collection="list" item="cameraId" separator=",">
         #{cameraId, jdbcType=BIGINT}
     </foreach>
-        )
     </select>
 </mapper>
