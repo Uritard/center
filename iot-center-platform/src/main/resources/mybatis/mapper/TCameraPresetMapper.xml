@@ -325,7 +325,7 @@
 	     preset_id
        FROM
 	    t_camera_preset
-       WHERE camera_id in <foreach collection="list" item="cameraId" separator=",">
+       WHERE camera_id in <foreach collection="list" item="cameraId" open="(" separator="," close=")">
         #{cameraId, jdbcType=BIGINT}
     </foreach>
     </select>
