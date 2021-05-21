@@ -176,6 +176,7 @@ public class TStdDevicemeteController {
                               ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
+        long start = System.currentTimeMillis();
         try {
             List<Long> upRegionIds = tStdRegionDao.selectRegionIds(tStdDeviceMeteDetail.getUpRegionId());
             if (upRegionIds.size() == 0) {
@@ -190,6 +191,8 @@ public class TStdDevicemeteController {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("标准设备测点分页查询失败描述：", e);
         }
+        long end = System.currentTimeMillis();
+        log.info("时间："+(end-start)/1000);
         return result;
     }
 

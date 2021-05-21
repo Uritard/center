@@ -342,10 +342,11 @@ public class TCameraPresetController {
     @ApiOperation(value = "下载预置位图片")
     @GetMapping(value = "/download")
     @Logs(title = "下载预置位图片",content = "下载摄像机下预置位的图片",logType = 9)
-    public Result download(@RequestParam(value = "cameraIdList", required = false) List<Long> cameraIdList) {
+    public Result download(@RequestParam(value = "cameraIdList", required = false) List<Long> cameraIdList,
+                           @RequestParam(value = "presetIdList", required = false) List<Long> presetIdList) {
         Result result = new Result();
         try {
-            result.setData(tCameraPresetService.download(cameraIdList));
+            result.setData(tCameraPresetService.download(cameraIdList,presetIdList));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询预置位树失败：" + e);

@@ -160,7 +160,7 @@ public class TCameraPresetService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String download(List<Long> cameraIdList){
+    public String download(List<Long> cameraIdList,List<Long> presetList){
         Map<String,String> mapForPreset = redisTemplate.opsForHash().entries("t_sys_param:presetImgPath");
         String picPath = mapForPreset.get("content");///home/yjh_iot_center/iot-picture/presets
         Map<String,String> mapForZip = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
@@ -204,7 +204,9 @@ public class TCameraPresetService {
 
             for(Long cameraId: cameraIdList){
                 //找到这个cameraId下的所有预置位
-                List<Long>presetList = tCameraPresetDao.selectForThisPreset(cameraId);
+                if(presetList == null ){
+                    presetList = tCameraPresetDao.selectForThisPreset(cameraId);
+                }
                 if(presetList!=null && presetList.size()>0){
 //                    try {
 //                    String mk = "mkdir "+zipPath+"/picture/"+cameraId;
