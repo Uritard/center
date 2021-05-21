@@ -192,7 +192,7 @@ public class TStdDevicemeteController {
             log.error("标准设备测点分页查询失败描述：", e);
         }
         long end = System.currentTimeMillis();
-        log.info("时间："+(end-start)/1000);
+        log.info("时间3："+(end-start)/1000);
         return result;
     }
 
