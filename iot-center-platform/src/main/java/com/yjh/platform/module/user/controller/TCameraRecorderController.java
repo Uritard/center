@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -213,13 +214,18 @@ public class TCameraRecorderController {
     @ApiOperation(value = "从PMS系统同步录像机信息")
     @RequestMapping(value = "/synchronizeFromPMS", method = RequestMethod.GET)
     @Logs(title = "从PMS系统同步录像机信息",content = "从pms系统同步录像服务器信息",logType = 5,authority = "1234")
-    public Result synchronizeFromPMS(@RequestParam(value = "pmsId") String pmsId) {
+    public Result synchronizeFromPMS(@RequestParam(value = "pmsId",required = false) String pmsId) {
         Result result = new Result();
         try {
             result.setData(tCameraRecorderService.synchronizeFromPMS(pmsId));
         } catch (Exception e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("从PMS系统同步录像机信息失败描述：" + e);
+            if (!StringUtils.hasLength(pmsId)){
+                result.setCode(209,"PMS编码为空,请先添加PMS编码");
+                result.setData(false);
+            }else {
+                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+                log.error("从PMS系统同步录像机信息失败描述：" + e);
+            }
         }
         return result;
     }

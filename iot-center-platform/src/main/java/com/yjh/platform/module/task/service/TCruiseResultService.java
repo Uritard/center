@@ -296,7 +296,8 @@ public class TCruiseResultService{
         String weekEnd = tCruiseResultDao.selectOnSunday() + " 23:59:59";//本周日的日期
         String lastWeekStart = tCruiseResultDao.selectLastMonday() + " 00:00:00";//上周一的日期
         String lastWeekend = tCruiseResultDao.selectLastSunday()+ " 23:59:59";//上周日的日期
-
+        log.info("本周一："+weekStart+",本周日："+weekEnd+",上周一："+lastWeekStart+",上周日："+lastWeekend);
+        
         String colName1 = "plan_type";
 
         List<StatisticalResult> taskStatisticalList = new ArrayList<>();

@@ -276,11 +276,6 @@ public class TCruiseTaskService {
                                     robotTaskInfo.setIntervalExecuteTime(cycleExecuteTime);
                                     robotTaskInfo.setIntervalStartTime(format.format(new Date()));
                                     robotTaskInfo.setIntervalEndTime(tCruiseTaskAdd.getEndTime());
-//                                        }else {
-//                                            log.info("这种不支持A接口的方式......球球你别发了");
-//                                            return "啥也不是";
-//                                        }
-//                                    }
                                 }
                             }
                         }

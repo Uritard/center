@@ -452,26 +452,18 @@
 </select>
 
     <select id="selectLastMonday" resultType="java.lang.String">
-        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')+13)
-    </select>
-
-    <select id="selectLastSunday" resultType="java.lang.String">
-        SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')+7)
-    </select>
-
-    <select id="selectOnMonday" resultType="java.lang.String">
         SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')+6)
     </select>
 
-    <select id="selectOnSunday" resultType="java.lang.String">
+    <select id="selectLastSunday" resultType="java.lang.String">
         SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w'))
     </select>
 
-    <select id="selectNextMonday" resultType="java.lang.String">
+    <select id="selectOnMonday" resultType="java.lang.String">
         SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-1)
     </select>
 
-    <select id="selectNextSunday" resultType="java.lang.String">
+    <select id="selectOnSunday" resultType="java.lang.String">
         SELECT SUBDATE(CURDATE(),DATE_FORMAT(CURDATE(),'%w')-7)
     </select>
 
