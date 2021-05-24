@@ -212,14 +212,9 @@ public class TCameraPresetService {
                 if(presetList == null ){
                     presetList = tCameraPresetDao.selectForThisPreset(cameraId);
                 }
+                log.info("cameraId: "+cameraId);
+                log.info("presetList: "+presetList);
                 if(presetList!=null && presetList.size()>0){
-//                    try {
-//                    String mk = "mkdir "+zipPath+"/picture/"+cameraId;
-//                    String[] cmds = new String[]{"sh","-c",mk};
-//                    Runtime.getRuntime().exec(cmds);
-//                    } catch (IOException e) {
-//                        log.error("复制文件错误："+e);
-//                    }
                     for(Long presetId:presetList){
                         try {
                         //将所有的文件移动到一个文件内
@@ -231,13 +226,13 @@ public class TCameraPresetService {
                             log.error("复制文件错误："+e);
                         }
                     }
-                    presetList =null;
 
                 }else {
                     if(cameraIdList.size() == 1){
                         return "fail";
                     }
                 }
+                presetList =null;
             }
             //压缩
             try {
@@ -254,27 +249,6 @@ public class TCameraPresetService {
                     log.info("结果："+str);
                 }
                 in.close();
-//                {
-//                    Runtime run = Runtime.getRuntime();
-//                    File wd = new File("/bin");
-//                    Process proc = run.exec("/bin/bash", null, wd);
-//                    BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-//                    PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(proc.getOutputStream())), true);
-//                    out.println("cd " + zipPath);
-//                    out.println("pwd");
-//                    out.println("zip -r -y picture.zip . -i picture/*");
-//                    out.println("exit");
-//                    String line;
-//                    StringBuilder sb = new StringBuilder();
-//                    while ((line = in.readLine()) != null) {
-//                        sb.append(line).append("\r\n");
-//                        log.info("结果"+sb);
-//                    }
-//                    proc.waitFor();
-//                    in.close();
-//                    out.close();
-//                    proc.destroy();
-//                }
                 Thread.sleep(2000);
             } catch (Exception e) {
                 log.error("复制文件错误："+e);
