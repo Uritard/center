@@ -231,6 +231,7 @@ public class TCameraPresetService {
                             log.error("复制文件错误："+e);
                         }
                     }
+                    presetList =null;
 
                 }else {
                     if(cameraIdList.size() == 1){
