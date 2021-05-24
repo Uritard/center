@@ -303,6 +303,7 @@ public class TCameraPresetService {
             String[] cmds = new String[]{"sh","-c",cmd};
             log.info("linux命令："+cmd);
             Runtime.getRuntime().exec(cmds);
+            Thread.sleep(1000);
             //解压到zip目录下 再将相关文件复制到对应目录下  /home/yjh/iot-picture/model-picture/sync/Template/BigImg  /预置位
             File zipFile = new File(path+"/copyZip/picture");
             File[] zipFileList = zipFile.listFiles();
@@ -312,8 +313,8 @@ public class TCameraPresetService {
                         {
                             //不覆盖原有的文件
                             File targetFile = new File(modelPath+"/"+item.getName());
+                            log.info("文件："+modelPath+"/"+item.getName()+" 结果："+ targetFile.exists());
                             if(targetFile.exists()){
-                                log.info("文件："+modelPath+"/"+item.getName()+" 结果："+ targetFile.exists());
                                 continue;
                             }
                         }
@@ -326,7 +327,7 @@ public class TCameraPresetService {
             }
         }catch (NullPointerException e) {
             e.getMessage();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.getMessage();
         }
         return 1;
