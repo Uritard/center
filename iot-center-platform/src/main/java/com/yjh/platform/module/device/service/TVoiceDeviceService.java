@@ -190,6 +190,7 @@ public class TVoiceDeviceService{
                 String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
                 redisTemplate.opsForHash().putAll(recordKey, openStateMap);
                 result.setMessage("开启失败！");
+                result.setData("fail");
             }
 
             LongBuffer hd = LongBuffer.allocate(1);
@@ -202,6 +203,7 @@ public class TVoiceDeviceService{
                 String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
                 redisTemplate.opsForHash().putAll(recordKey, openStateMap);
                 result.setMessage("开启失败！");
+                result.setData("fail");
             }
             hdForData = hd.get();
 
@@ -220,6 +222,7 @@ public class TVoiceDeviceService{
                 String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
                 redisTemplate.opsForHash().putAll(recordKey, openStateMap);
                 result.setMessage("开启失败！");
+                result.setData("fail");
             } else {
                 Constant.voiceMap.put(voiceDeviceId, hdForData);
                 VoiceDeviceAllInfoDetail tVoiceDevice = selectByPrimaryId(voiceDeviceId);
@@ -236,6 +239,7 @@ public class TVoiceDeviceService{
                 thread.setDaemon(true);
                 thread.start();
                 result.setMessage("开启成功！");
+                result.setData("ok");
             }
         } else { result.setMessage("已开启");}
         return result;
