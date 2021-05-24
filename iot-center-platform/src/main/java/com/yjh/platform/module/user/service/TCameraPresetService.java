@@ -308,6 +308,7 @@ public class TCameraPresetService {
                             //不覆盖原有的文件
                             File targetFile = new File(modelPath+"/"+item.getName());
                             if(targetFile.exists()){
+                                log.info("文件："+modelPath+"/"+item.getName()+" 结果："+ targetFile.exists());
                                 continue;
                             }
                         }
