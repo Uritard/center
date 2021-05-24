@@ -548,5 +548,18 @@ public class HelloController {
         }
         return result;
     }
+    @ApiOperation(value = "main")
+    @GetMapping(value = "/main")
+    public Result main() {
+        Result result = new Result();
+        try {
+            result.setData(tCameraPresetService.main());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询预置位树失败：" + e);
+        }
+        return result;
+    }
+
 
 }

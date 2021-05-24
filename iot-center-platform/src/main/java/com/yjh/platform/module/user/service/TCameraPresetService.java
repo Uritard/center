@@ -2,6 +2,9 @@ package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.TCruisePointAttr;
+import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
+import com.yjh.platform.module.task.entity.TCruisePlanAttr;
 import com.yjh.platform.module.user.controller.TCameraPresetController;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
@@ -38,6 +41,8 @@ public class TCameraPresetService {
     private TAlgorithmConfDao tAlgorithmConfDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TCruisePlanAttrDao tCruisePlanAttrDao;
 
     private Logger log = LoggerFactory.getLogger(TCameraPresetService.class);
 
@@ -327,7 +332,38 @@ public class TCameraPresetService {
         return 1;
     }
 
+    public int main() {
+        for (int i = 0; i < 10; i++) {
+            new insetData().start();
+        }
+        return 1;
+    }
 
+    public  class insetData extends Thread{
+        public void run(){
+            synchronized (insetData.class){
+                List<TCruisePlanAttr> list = new ArrayList<>();
+                Long instanceID = tCruisePlanAttrDao.SELZUIHOU();
+                if (Objects.nonNull(instanceID)){
+                    for (int i = instanceID.intValue()+1; i < instanceID.intValue()+1000; i++) {
+                        TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
+                        tCruisePlanAttr.setPlanId(1l);
+                        tCruisePlanAttr.setInstanceId(Long.valueOf(String.valueOf(i)));
+                        list.add(tCruisePlanAttr);
+                    }
+                }else {
+                    for (int i = 0; i < 10; i++) {
+                        TCruisePlanAttr tCruisePlanAttr = new TCruisePlanAttr();
+                        tCruisePlanAttr.setPlanId(1l);
+                        tCruisePlanAttr.setInstanceId(Long.valueOf(String.valueOf(i)));
+                        list.add(tCruisePlanAttr);
+                    }
+                }
+                tCruisePlanAttrDao.batchInsert(list);
+            }
+
+        }
+    }
 
 }
 

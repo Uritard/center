@@ -37,4 +37,6 @@ public interface TCruisePlanAttrDao {
     int batchInsert(@Param(value = "tCruisePlanAttrList") List<TCruisePlanAttr> tCruisePlanAttrList);
     int deleteByInstanceId(@Param(value = "list") List<Long> list);
     List<Long> selectByPlanId(@Param(value = "planId") Long planId);
+
+    Long SELZUIHOU();
 }
