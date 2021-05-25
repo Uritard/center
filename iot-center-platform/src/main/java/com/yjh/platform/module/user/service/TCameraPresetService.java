@@ -1,17 +1,7 @@
 package com.yjh.platform.module.user.service;
 
-import com.yjh.platform.common.logs.Logs;
-<<<<<<< Updated upstream
 import com.yjh.platform.common.result.Result;
-=======
-import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
->>>>>>> Stashed changes
 import com.yjh.platform.module.device.entity.AreaInfo;
-import com.yjh.platform.module.device.entity.TCruisePointAttr;
-import com.yjh.platform.module.device.entity.TCruisePointInstance;
-import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
-import com.yjh.platform.module.task.entity.TCruisePlanAttr;
-import com.yjh.platform.module.user.controller.TCameraPresetController;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;

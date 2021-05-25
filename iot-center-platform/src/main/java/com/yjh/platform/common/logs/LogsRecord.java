@@ -17,8 +17,8 @@ public class LogsRecord {
     private  RedisTemplate redisTemplate;
 
     public void LogsSend(HttpServletRequest request,String type,String title,String content){
-//        Long userIds = Long.valueOf(request.getHeader("userId"));
-        Long userIds = 10011L;
+        Long userIds = Long.valueOf(request.getHeader("userId"));
+//        Long userIds = 10011L;
 
         String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userIds).get("roleId"));
         if(Constant.apiPermissions) {

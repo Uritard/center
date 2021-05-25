@@ -53,7 +53,7 @@ public class TCameraRecorderController {
         Result result = new Result();
         try {
             List<String> selectAllPMSIdList = tCameraRecorderService.selectAllPMSId();
-            if (selectAllPMSIdList.contains(tCameraRecorder.getPmsId())) {
+            if (StringUtils.hasLength(tCameraRecorder.getPmsId()) &&  selectAllPMSIdList.contains(tCameraRecorder.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
                 result.setData(tCameraRecorderService.insert(tCameraRecorder));
