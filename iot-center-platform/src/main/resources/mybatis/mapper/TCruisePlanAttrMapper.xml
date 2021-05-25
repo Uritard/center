@@ -249,10 +249,4 @@
         where 1 = 1
         and a.plan_id = #{planId, jdbcType=BIGINT}
     </select>
-
-    <select id="SELZUIHOU" resultType="java.lang.Long">
-        select a.instance_id from t_cruise_plan_attr a order by a.plan_id DESC limit 1
-    </select>
-
-
 </mapper>

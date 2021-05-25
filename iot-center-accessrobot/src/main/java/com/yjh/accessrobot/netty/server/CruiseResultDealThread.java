@@ -150,7 +150,6 @@ public class CruiseResultDealThread implements Runnable{
                 log.info("tCruiseResult的内容是==="+tCruiseResult);
                 StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
 
-
             }
             /*
              * 巡视主机下发给机器人的任务

@@ -151,12 +151,15 @@ public class TCruiseTaskResultService {
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectCruiseTaskResult(String taskId) throws ParseException {
         //最终结果集容器
+        log.info("开始时间=="+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(System.currentTimeMillis())));
         List<Map<String, Object>> completeResult = new ArrayList<>();
         Map<String, Object> resultsMap = new HashMap<>();
 
         CruiseInspectResult inspectResult = new CruiseInspectResult();
 
         List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskId(taskId);
+        log.info("时间节点2=="+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(System.currentTimeMillis())));
+
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (CruiseInspectResult cruiseInspectResult : cruiseInspectResults) {
             log.info("-----------------------+++++++++++++++++===============:" + cruiseInspectResult);
@@ -169,13 +172,12 @@ public class TCruiseTaskResultService {
             cruiseInspectResult.setInstanceName(tCruisePointInstanceDao.selectInstanceName(cruiseInspectResult.getInstanceId()));
             cruiseInspectResult.setCruiseResultName("--");
             cruiseInspectResult.setEndTime(null);
-            //log.info("离谱");
             Set<String> cruiseKeys = redisScan("t_cruise_task_result:" + taskId);
             String key = "t_cruise_task_result:" + taskId + ":" + cruiseInspectResult.getInstanceId().toString();
 
-//            for (String key : cruiseKeys) {
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);
             log.info("------------------MAP-----------------" + resultsMap.size());
+            log.info("时间节点3=="+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(System.currentTimeMillis())));
 
             if (resultMap.size() != 0) {
                 //log.info("---___---:" + resultMap);
@@ -213,6 +215,7 @@ public class TCruiseTaskResultService {
                     default:
                         videoInfo.put("videoCameraType", "1");
                 }
+
                 log.info("---------------------First-------------------------");
                 log.info(videoInfo.get("videoCameraType") + "------------------");
                 if (Objects.nonNull(resultMap.get("cameraId")) && !(resultMap.get("cameraId").toString().equals(""))) {
@@ -262,7 +265,7 @@ public class TCruiseTaskResultService {
                     Map<String, String> robotVideoHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotLight:" + resultMap.get("robotId").toString());
                     //机器人红外-历史视频流
                     Map<String, String> robotInfraredHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotInfrared:" + resultMap.get("robotId").toString());
-                    log.info("robotVideoHistory" + robotVideoHistory);
+                    log.info("robotVideoHistory：" + robotVideoHistory);
                     HashMap<String, Long> robot = new HashMap<>();
                     robot.put("robotId", tRobotInfoDao.selectRobotScreen(Long.valueOf(resultMap.get("instanceId").toString())));
                     switch (videoInfo.get("videoCameraType")) {
@@ -374,9 +377,10 @@ public class TCruiseTaskResultService {
         resultsMap.put("list", cruiseInspectResults);
 
         log.info("currentItem!!!!!!!!!!!!!" + inspectResult);
-        log.info("list!!!!!!!!!!!!!!!!!!" + cruiseInspectResults);
+//        log.info("list!!!!!!!!!!!!!!!!!!" + cruiseInspectResults);
 
         completeResult.add(resultsMap);
+        log.info("结束时间=="+new SimpleDateFormat("yyyyMMddHHmmss").format(new Date(System.currentTimeMillis())));
         return completeResult;
     }
 

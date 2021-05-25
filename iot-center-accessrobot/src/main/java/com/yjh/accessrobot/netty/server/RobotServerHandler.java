@@ -914,7 +914,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                         log.info("机器人巡视结果数据是："+cruiseResultMap);
 
-                        //判断结果是否产生告警,只判断红外和可见光
+                        //Start AlarmResultDealThread只判断红外和可见光
                         Map<String, String> cResultMap = new HashMap<>();
                         cResultMap.put("robotCode",xmlBaseModel.getSendCode());
                         cResultMap.put("taskCode",xmlBaseModel.getItems().get(0).get("task_code").toString());
