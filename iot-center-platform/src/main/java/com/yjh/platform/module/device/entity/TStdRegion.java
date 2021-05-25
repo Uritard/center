@@ -51,7 +51,7 @@ public class TStdRegion implements Serializable {
     @TableField(value = "up_region_ids",updateStrategy = FieldStrategy.IGNORED)
     private String upRegionIds;
 
-    @Length(max = 10,message = "upRegionIds长度必须小于等于10")
+    @Length(max = 10,message = "regionCode长度必须小于等于10")
     @ApiModelProperty(value = "类型区域，标准测点区域类型：100；E机器人区域类型：101；相机区域类型：102")
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String regionCode;
