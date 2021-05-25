@@ -8,8 +8,6 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
-import com.yjh.accessvideo.commons.result.Result;
-import com.yjh.accessvideo.commons.utils.ByteUtil;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
@@ -100,16 +98,13 @@ public class CameraConService {
     @Value("${realtime.video.definition}")
     private String videoDefinition;
 
-    @Value("${cvs.video.temperature}")
-    private int temperatures;
-
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     private static PlayCtrl playCtrl = PlayCtrl.INSTANCE;
     private NativeLong m_lRealPlayHandle = new NativeLong(-1);// playhandle
-    private NativeLong m_minsOne = new NativeLong(-1);
+//    private NativeLong m_minsOne = new NativeLong(-1);
+//    private HCNetSDK.NET_DVR_PREVIEWINFO dvr_previewinfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
     private NativeLong lUserIDLong = new NativeLong(-1);
     private HCNetSDK.NET_DVR_CLIENTINFO m_sClientInfo = new HCNetSDK.NET_DVR_CLIENTINFO();    // play structure
-    private HCNetSDK.NET_DVR_PREVIEWINFO dvr_previewinfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
     private NativeLong m_lPort = new NativeLong(-1);
     FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
 
@@ -125,12 +120,10 @@ public class CameraConService {
 
         Map<String, Object> returnMap = new HashMap<>();
         if (Constant.mapsForCamera.size()>0) {
-            for (String key:Constant.mapsForCamera.keySet()) {
-                if (Objects.equals(Constant.mapsForCamera.get(key), String.valueOf(cameraId))) {
-                    Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + cameraId);
-                    cameraFlowMap.put("cameraId", String.valueOf(cameraId));
-                    return cameraFlowMap;
-                }
+            if (Objects.nonNull(Constant.mapsForCamera.get(String.valueOf(cameraId)))) {
+                Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + cameraId);
+                cameraFlowMap.put("cameraId", String.valueOf(cameraId));
+                return cameraFlowMap;
             }
         }
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
@@ -142,8 +135,9 @@ public class CameraConService {
         int cameraType = cameraConInfo.getCameraType();
         if (cameraType==206) { iChanNum = 2; }
 
-        log.info("Constant.maps: " + Constant.maps);
-        log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + cameraId);
+        log.info("Constant.maps: {}", Constant.maps);
+        log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{}, cameraId:{}"
+                , userName, password, cameraIp, cameraPort, iChanNum, cameraType, cameraId);
         String transUrl = "";
         if (cameraType == 205) {
             transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
@@ -151,7 +145,7 @@ public class CameraConService {
             transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, cameraId);
         }
         try { Runtime.getRuntime().exec(transUrl); } catch (Exception e) { e.getMessage(); }
-        log.info("transUrl: " + transUrl);
+        log.info("transUrl: {}", transUrl);
         String[] rtmpUrls = transUrl.split("rtmp");
         String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
         returnMap.put("rtmpUrl", rtmpUrl);
@@ -201,24 +195,22 @@ public class CameraConService {
     //@Logs(title = "相机批量播放", code = "cameraPlay", content = "相机批量播放")
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> batchStartRealPlay(String cameraIds) {
-        log.info("cameraIds: " + cameraIds);
+        log.info("cameraIds: {}", cameraIds);
         List<Map<String, Object>> returnMapList = new ArrayList<>();
         if (Objects.isNull(cameraIds) || cameraIds.length() == 0) return returnMapList;
         List<Long> list = new ArrayList<>();
         String[] cameraIdArry = cameraIds.split(",");
         for (String aCameraIdArry : cameraIdArry) { if (!Objects.equals(aCameraIdArry, "")) list.add(Long.valueOf(aCameraIdArry)); }
-        log.info("list: " + list);
+        log.info("list: {}", list);
         int returnMapListSize = 0;
         for (Long cameraId:list) {
             int returnMapListSizeTem = returnMapListSize;
             if (Constant.mapsForCamera.size()>0) {
-                for (String key:Constant.mapsForCamera.keySet()) {
-                    if (Objects.equals(Constant.mapsForCamera.get(key), String.valueOf(cameraId))) {
-                        Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + cameraId);
-                        cameraFlowMap.put("cameraId", String.valueOf(cameraId));
-                        returnMapList.add(cameraFlowMap);
-                        returnMapListSize=returnMapListSize+1;
-                    }
+                if (Objects.nonNull(Constant.mapsForCamera.get(String.valueOf(cameraId)))) {
+                    Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + cameraId);
+                    cameraFlowMap.put("cameraId", String.valueOf(cameraId));
+                    returnMapList.add(cameraFlowMap);
+                    returnMapListSize=returnMapListSize+1;
                 }
             }
             if (returnMapListSizeTem==returnMapListSize) {
@@ -231,7 +223,8 @@ public class CameraConService {
                 int cameraType = cameraConInfo.getCameraType();
                 if (cameraType==206) { iChanNum = 2; }
 
-                log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + cameraType + " " + cameraId);
+                log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{}, cameraId:{}"
+                        , userName, password, cameraIp, cameraPort, iChanNum, cameraType, cameraId);
                 String transUrl = "";
                 if (cameraType == 205) {
                     transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
@@ -241,7 +234,7 @@ public class CameraConService {
 
                 try { Runtime.getRuntime().exec(transUrl); } catch (Exception e) { e.getMessage(); }
 
-                log.info("transUrl: " + transUrl);
+                log.info("transUrl: {}", transUrl);
                 String[] rtmpUrls = transUrl.split("rtmp");
                 String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
 
@@ -257,7 +250,7 @@ public class CameraConService {
                 returnMapList.add(returnMap);
             }
         }
-        log.info("realReturnMapList: " + returnMapList);
+        log.info("realReturnMapList: {}", returnMapList);
         return returnMapList;
     }
 
@@ -267,13 +260,13 @@ public class CameraConService {
         List<Map<String, Object>> returnMapList = new ArrayList<>();
 
         if (Constant.mapsForCamera.size()>0) {
-            for (String key:Constant.mapsForCamera.keySet()) {
-                if (Objects.equals(Constant.mapsForCamera.get(key), String.valueOf(robotId)+":inferad") || Objects.equals(Constant.mapsForCamera.get(key), String.valueOf(robotId)+":light")) {
-                    Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + String.valueOf(robotId) + ":light");
-                    Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + String.valueOf(robotId) + ":inferad");
-                    returnMapList.add(robotLightFlowMap);
-                    returnMapList.add(robotInferadFlowMap);
-                }
+            if (Objects.nonNull(Constant.mapsForCamera.get(String.valueOf(robotId)+":light"))) {
+                Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + String.valueOf(robotId) + ":light");
+                returnMapList.add(robotLightFlowMap);
+            }
+            if (Objects.nonNull(Constant.mapsForCamera.get(String.valueOf(robotId)+":inferad"))) {
+                Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + String.valueOf(robotId) + ":inferad");
+                returnMapList.add(robotInferadFlowMap);
             }
             if (returnMapList.size()>0) { return returnMapList; }
         }
@@ -285,7 +278,7 @@ public class CameraConService {
         String lightPassword = robotConInfo.getIdentityCode();
 
         // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/Channels/10%s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
-        log.info("robotLightInfo: " + lightUsername + " " + lightPassword + " " + lightIp + " " + lightPort + " " + robotId);
+        log.info("robotLightInfo: {}, {}, {}, {}, {}", lightUsername, lightPassword, lightIp, lightPort, robotId);
         String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, robotId);
         try {
             Runtime.getRuntime().exec(transUrlLight);
@@ -316,7 +309,7 @@ public class CameraConService {
             JSONObject publishjson = JSONObject.parseObject(publish);
             if (Objects.equals(name, String.valueOf(robotId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnLightMap.put("videoFlowId", videoFlowId);
-                Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":light");
+                Constant.mapsForCamera.put(String.valueOf(robotId) + ":light", videoFlowId);
                 log.info("robotReturnLightMap: " + returnLightMap);
                 redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":light", returnLightMap);
             }
@@ -326,14 +319,14 @@ public class CameraConService {
         Integer inferadPort = robotConInfo.getInferadPort();
         int livePath2 = Integer.parseInt(String.valueOf(robotId + robotId));
         Constant.maps.put("livePath", livePath2);
-        log.info("Constant.maps: " + Constant.maps);
-        log.info("robotInferadInfo: " + " " + inferadIp + " " + inferadPort + " " + livePath2);
+        log.info("Constant.maps: {}", Constant.maps);
+        log.info("robotInferadInfo: {}, {}, {}", inferadIp, inferadPort, livePath2);
         String transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, livePath2);
         try {
             Runtime.getRuntime().exec(transUrlinferad);
             Thread.sleep(3000);
         } catch (Exception e) {e.getMessage();}
-        log.info("robotTransUrlinferad: " + transUrlinferad);
+        log.info("robotTransUrlinferad: {}", transUrlinferad);
         String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
         String rtmpUrlInferad = "rtmp" + rtmpUrlsInferad[rtmpUrlsInferad.length - 1];
 
@@ -363,16 +356,16 @@ public class CameraConService {
             JSONObject publishjson = JSONObject.parseObject(publish);
             if (Objects.equals(name, String.valueOf(livePath2)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 returnInferadMap.put("videoFlowId", videoFlowId);
-                Constant.mapsForCamera.put(videoFlowId, String.valueOf(robotId) + ":inferad");
-                log.info("robotReturnInferadMap: " + returnInferadMap);
+                Constant.mapsForCamera.put(String.valueOf(robotId) + ":inferad", videoFlowId);
+                log.info("robotReturnInferadMap: {}", returnInferadMap);
                 redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":inferad", returnInferadMap);
             }
         }
 
         returnMapList.add(returnLightMap);
         returnMapList.add(returnInferadMap);
-        log.info("mapsForRobot: " + Constant.mapsForCamera);
-        log.info("robotReturnMapList: " + returnMapList);
+        log.info("mapsForRobot: {}", Constant.mapsForCamera);
+        log.info("robotReturnMapList: {}", returnMapList);
         return returnMapList;
     }
 
@@ -456,10 +449,10 @@ public class CameraConService {
             String endtime = stopTimeTem.replace(" ", "Z");
             ///usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/tracks/%s0%s?starttime=%s&endtime=%s -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
             //rtsp://admin:hik12345@192.168.33.2:554/Streaming/tracks/101?starttime=20201111T095500Z&endtime=20201111T100005Z
-            log.info("userName: " + userName + ",password: " + password + ",cameraIp: " + cameraIp + ",cameraPort: " + cameraPort
-                    + ",iChanNum: " + iChanNum + ",starttime: " + starttime + ",endtime: " + endtime + ",historyPath: " + cameraId);
+            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}"
+                    , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId);
             String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1, starttime, endtime, cameraId);
-            log.info("historyTransUrl: " + transUrl);
+            log.info("historyTransUrl: {}", transUrl);
             try {
                 Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
                 Thread.sleep(3000);
@@ -488,11 +481,11 @@ public class CameraConService {
                 if (Objects.equals(name, String.valueOf(cameraId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                     returnMap.put("videoFlowId", videoFlowId);
                     Constant.mapsForHistory.put(videoFlowId, String.valueOf(cameraId));
-                    log.info("historyMapsForCamera: " + Constant.mapsForHistory);
+                    log.info("historyMapsForCamera: {}", Constant.mapsForHistory);
                     redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + cameraId, returnMap);
                 }
             }
-            log.info("historyReturnMap: " + returnMap);
+            log.info("historyReturnMap: {}", returnMap);
         } catch (Exception e) { e.getMessage(); }
         return returnMap;
     }
@@ -507,17 +500,17 @@ public class CameraConService {
         Map<String,Object> infraredReturnMap=new HashMap<>();
 
         //判断是否已存在历史视频流
-        if (Constant.mapsForHistory.size()>0) {
-            for (String key:Constant.mapsForHistory.keySet()) {
-                if (Objects.equals(Constant.mapsForHistory.get(key), String.valueOf(robotId)+":inferad") || Objects.equals(Constant.mapsForCamera.get(key), String.valueOf(robotId)+":light")) {
-                    Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + String.valueOf(robotId) + ":light");
-                    Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + String.valueOf(robotId) + ":inferad");
-                    robotHistoryList.add(robotLightFlowMap);
-                    robotHistoryList.add(robotInferadFlowMap);
-                }
-            }
-            if (robotHistoryList.size()>0) { return robotHistoryList; }
-        }
+//        if (Constant.mapsForHistory.size()>0) {
+//            for (String key:Constant.mapsForHistory.keySet()) {
+//                if (Objects.equals(Constant.mapsForHistory.get(key), String.valueOf(robotId)+":inferad") || Objects.equals(Constant.mapsForCamera.get(key), String.valueOf(robotId)+":light")) {
+//                    Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + String.valueOf(robotId) + ":light");
+//                    Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + String.valueOf(robotId) + ":inferad");
+//                    robotHistoryList.add(robotLightFlowMap);
+//                    robotHistoryList.add(robotInferadFlowMap);
+//                }
+//            }
+//            if (robotHistoryList.size()>0) { return robotHistoryList; }
+//        }
 
 
         //开始时间 与 结束时间 格式化
@@ -536,11 +529,11 @@ public class CameraConService {
         String portLigh=robotConInfo.getLightPort();
         String lightNum=robotConInfo.getNumLight();
 
-        log.info("userName: " + userName + ",password: " + password + ",cameraIp: " + ipLight + ",cameraPort: " + portLigh
-                + ",iChanNum: " + lightNum + ",starttime: " + starttime + ",endtime: " + endtime + ",historyPath: " + robotId);
+        log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}"
+                , userName, password, ipLight, portLigh, lightNum, starttime, endtime, robotId);
         String transUrl = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, robotId);
 
-        log.info("historyTransUrl: " + transUrl);
+        log.info("historyTransUrl: {}", transUrl);
         try {
             Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
             Thread.sleep(3000);
@@ -569,7 +562,7 @@ public class CameraConService {
             if (Objects.equals(name, String.valueOf(robotId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 lightReturnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForHistory.put(videoFlowId, String.valueOf(robotId)+":light");
-                log.info("historyMapsForCamera: " + Constant.mapsForHistory);
+                log.info("historyMapsForCamera: {}", Constant.mapsForHistory);
                 redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + robotId+":light", lightReturnMap);
                 robotHistoryList.add(lightReturnMap);
             }
@@ -583,11 +576,11 @@ public class CameraConService {
         String infraredPort=Objects.nonNull(robotConInfo.getInferadPort())?robotConInfo.getInferadPort().toString():null;
         String infraredNum=robotConInfo.getNumInferad();
 
-        log.info("userName: " + userName + ",password: " + password + ",cameraIp: " + infraredIp + ",cameraPort: " + infraredPort
-                + ",iChanNum: " + infraredNum + ",starttime: " + starttime + ",endtime: " + endtime + ",historyPath: " + robotId);
+        log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}"
+                , userName, password, infraredIp, infraredPort, infraredNum, starttime, endtime, robotId);
         String transUrlIn = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, robotId);
 
-        log.info("historyTransUrl: " + transUrlIn);
+        log.info("historyTransUrl: {}", transUrlIn);
         try {
             Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrlIn});
             Thread.sleep(3000);
@@ -622,14 +615,14 @@ public class CameraConService {
             if (Objects.equals(name, String.valueOf(robotId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 lightReturnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForHistory.put(videoFlowId, String.valueOf(robotId)+":inferad");
-                log.info("historyMapsForCamera: " + Constant.mapsForHistory);
+                log.info("historyMapsForCamera: {}", Constant.mapsForHistory);
                 redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + robotId+":inferad", lightReturnMap);
                 robotHistoryList.add(infraredReturnMap);
             }
         }
 
-        log.info("robotHistoryList:"+robotHistoryList);
-        log.info("historyMapsForRobot"+Constant.mapsForHistory);
+        log.info("robotHistoryList:{}", robotHistoryList);
+        log.info("historyMapsForRobot:{}", Constant.mapsForHistory);
         return robotHistoryList;
     }
 
@@ -995,8 +988,7 @@ public class CameraConService {
     //    judge is camera controlled. by tt. 1-不可控
 //    @Logs(title = "获取相机当前控制状态", code = "isCameraControlled", content = "获取相机当前控制状态")
     @Transactional(rollbackFor = Exception.class)
-    public Result isCameraControlled(Long cameraId) {
-        Result result = new Result();
+    public void isCameraControlled(Long cameraId) {
         Map<String, Object> camreaStatusMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
         log.info("camreaStatusMap: " + camreaStatusMap);
         log.info("camreaStatusMapState: " + camreaStatusMap.get("state"));
@@ -1007,7 +999,6 @@ public class CameraConService {
                 throw new BusinessException("相机不可控！");
             }
         }
-        return result;
     }
 
 //    @Logs(title = "获取到视频存入指定文件中 保存为Mp4格式文件", code = "getDVRConfig", content = "获取到实时视频存入指定文件中 保存为Mp4格式文")
@@ -1752,6 +1743,9 @@ public class CameraConService {
         }
     }
 
+    /**
+     * 语音对讲视频
+     */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> startVideoRealPlay(Long videoIntercomId) {
         Map<String, Object> returnMap = new HashMap<>();
@@ -2032,8 +2026,8 @@ public class CameraConService {
      * 设置发射率和距离
      * @param lUserID
      */
-    public void getSetconfig(NativeLong lUserID)
-    {
+    public void getSetconfig(NativeLong lUserID) {
+
         HCNetSDK.NET_DVR_THERMOMETRY_PRESETINFO m_struThermometryInfo = new HCNetSDK.NET_DVR_THERMOMETRY_PRESETINFO();
         m_struThermometryInfo.dwSize = m_struThermometryInfo.size();
         HCNetSDK.NET_DVR_THERMOMETRY_COND m_struThermometryCond = new HCNetSDK.NET_DVR_THERMOMETRY_COND();
@@ -2049,13 +2043,10 @@ public class CameraConService {
         struCfg.dwStatusSize = 4096 * 4;
         struCfg.byDataType=0;
         boolean bRet = hCNetSDK.NET_DVR_GetSTDConfig(lUserID, 6701, struCfg);
-        if (bRet)
-        {
+        if (bRet) {
            int  nErr= hCNetSDK.NET_DVR_GetLastError();
-            log.info("NET_DVR_GetSTDConfig 信息：" + nErr );
-        }
-        else
-        {
+           log.info("NET_DVR_GetSTDConfig 信息：" + nErr );
+        } else {
             log.info("NET_DVR_GetSTDConfig  success" );
         }
         m_struThermometryInfo.dwSize = m_struThermometryInfo.size();
