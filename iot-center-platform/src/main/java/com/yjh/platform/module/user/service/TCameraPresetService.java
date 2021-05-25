@@ -164,6 +164,22 @@ public class TCameraPresetService {
         }
         return flag;
     }
+    private   long getFileSize(File f){long size = 0;
+        //取得文件夹大小
+        try {
+            File flist[] = f.listFiles();
+            for (int i = 0; i < flist.length; i++) {
+                if (flist[i].isDirectory()) {
+                    size = size + getFileSize(flist[i]);
+                } else {
+                    size = size + flist[i].length();
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return size;
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public Result download(List<Long> cameraIdList, List<Long> presetList){
@@ -182,11 +198,12 @@ public class TCameraPresetService {
             if(mapForZipSize != null && mapForZipSize.size()>0){
                     zipFileSize= mapForZipSize.get("content");
             }
-            //picPath ="D:\\压缩包\\picture";
+            //picPath ="D:\\code\\qhTest\\presets";
             File file = new File(picPath);
             if(file.exists()){
-                long size = file.length()/1024;
-                log.info("采集文件大小："+size+"kb");
+                long size = getFileSize(file)/(1024*1024);
+//                log.info("file.length():"+size);
+                log.info("采集文件大小："+size+"M");
                 if(size > Long.valueOf(zipFileSize)){
                     result.setCode(209,"采集文件大于"+zipFileSize+"M，禁止下载");
                     return result;
@@ -299,32 +316,32 @@ public class TCameraPresetService {
             deleteDir(new File(path +"/"+ fileName));
             file.transferTo(new File(path +"/"+ fileName));
             //解压 unzip -o xxx.zip -d /home/yjh_iot_center/iot-  覆盖原有文件
-            String cmd= "unzip -o "+path+"/copyZip.zip"+" -d"+path+"/copyZip";
+            String cmd= "unzip -o "+path+"/copyZip.zip"+" -d "+modelPath;
             String[] cmds = new String[]{"sh","-c",cmd};
             log.info("linux命令："+cmd);
             Runtime.getRuntime().exec(cmds);
-            Thread.sleep(1000);
-            //解压到zip目录下 再将相关文件复制到对应目录下  /home/yjh/iot-picture/model-picture/sync/Template/BigImg  /预置位
-            File zipFile = new File(path+"/copyZip/picture");
-            File[] zipFileList = zipFile.listFiles();
-            if(zipFileList != null && zipFileList.length>0){
-                for(File item:zipFileList){
-                    if(item.isDirectory()){
-                        {
-                            //不覆盖原有的文件
-                            File targetFile = new File(modelPath+"/"+item.getName());
-                            log.info("文件："+modelPath+"/"+item.getName()+" 结果："+ targetFile.exists());
-                            if(targetFile.exists()){
-                                continue;
-                            }
-                        }
-                        String url = "cp -rf " + path+"/copyZip/picture/"+item.getName()+" "+modelPath+"/"+item.getName();
-                        String[] cpCmd = new String[]{"sh","-c",url};
-                        log.info("linux复制命令："+url);
-                        Runtime.getRuntime().exec(cpCmd);
-                    }
-                }
-            }
+//            Thread.sleep(1000);
+//            //解压到zip目录下 再将相关文件复制到对应目录下  /home/yjh/iot-picture/model-picture/sync/Template/BigImg  /预置位
+//            File zipFile = new File(path+"/copyZip/picture");
+//            File[] zipFileList = zipFile.listFiles();
+//            if(zipFileList != null && zipFileList.length>0){
+//                for(File item:zipFileList){
+//                    if(item.isDirectory()){
+//                        {
+//                            //不覆盖原有的文件
+//                            File targetFile = new File(modelPath+"/"+item.getName());
+//                            log.info("文件："+modelPath+"/"+item.getName()+" 结果："+ targetFile.exists());
+//                            if(targetFile.exists()){
+//                                continue;
+//                            }
+//                        }
+//                        String url = "cp -rf " + path+"/copyZip/picture/"+item.getName()+" "+modelPath+"/"+item.getName();
+//                        String[] cpCmd = new String[]{"sh","-c",url};
+//                        log.info("linux复制命令："+url);
+//                        Runtime.getRuntime().exec(cpCmd);
+//                    }
+//                }
+//            }
         }catch (NullPointerException e) {
             e.getMessage();
         } catch (Exception e) {
