@@ -185,7 +185,7 @@ public class TCameraPresetService {
             //picPath ="D:\\压缩包\\picture";
             File file = new File(picPath);
             if(file.exists()){
-                long size = file.lastModified()/1024;
+                long size = file.length()/1024;
                 log.info("采集文件大小："+size+"kb");
                 if(size > Long.valueOf(zipFileSize)){
                     result.setCode(209,"采集文件大于"+zipFileSize+"M，禁止下载");
