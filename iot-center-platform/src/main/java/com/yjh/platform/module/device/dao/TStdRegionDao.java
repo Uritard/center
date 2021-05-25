@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.user.entity.SysOrg;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -41,4 +42,5 @@ public interface TStdRegionDao {
     //根据上层ID查询子层区域ID
     List<Long> selectRegionByUpId(List<Long> upRegionIds);
     List<Long>selectDevice(@Param(value = "list") List<Long> list);
+    List<TStdRegion> selectIsIn(TStdRegion tStdRegion);
 }

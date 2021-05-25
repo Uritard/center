@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCruisePointAttr;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
@@ -165,7 +166,8 @@ public class TCameraPresetService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String download(List<Long> cameraIdList,List<Long> presetList){
+    public Result download(List<Long> cameraIdList, List<Long> presetList){
+        Result result =new Result();
         Map<String,String> mapForPreset = redisTemplate.opsForHash().entries("t_sys_param:presetImgPath");
         String picPath = mapForPreset.get("content");///home/yjh_iot_center/iot-picture/presets
         Map<String,String> mapForZip = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
@@ -173,6 +175,25 @@ public class TCameraPresetService {
         Map<String,String> mapForZipReal = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
         String zipPathReal = mapForZipReal.get("content");//http://192.168.9.40:10086/imgs/zip
 
+        {
+            //判断文件大小
+            Map<String,String> mapForZipSize = redisTemplate.opsForHash().entries("t_sys_param:zipFileSize");
+            String zipFileSize = "20";
+            if(mapForZipSize != null && mapForZipSize.size()>0){
+                    zipFileSize= mapForZipSize.get("content");
+            }
+            //picPath ="D:\\压缩包\\picture";
+            File file = new File(picPath);
+            if(file.exists()){
+                long size = file.lastModified()/1024;
+                log.info("采集文件大小："+size+"kb");
+                if(size > Long.valueOf(zipFileSize)){
+                    result.setCode(209,"采集文件大于"+zipFileSize+"M，禁止下载");
+                    return result;
+                }
+            }
+        }
+        
         if(cameraIdList == null){
             cameraIdList = tCameraPresetDao.selectCameraIdList();
         }
@@ -183,10 +204,12 @@ public class TCameraPresetService {
 
             List<Long> cameraHavePresetList = tCameraPresetDao.selectCameraHavePreset(cameraIdList);
             if(cameraHavePresetList == null){
-                return "fail";
+                result.setCode(209,"fail");
+                return result;
             }
             if(cameraHavePresetList.size() == 0 ){
-                return "fail";
+                result.setCode(209,"fail");
+                return result;
             }
             //删除zipPath下的所有文件
             try {
@@ -229,7 +252,8 @@ public class TCameraPresetService {
 
                 }else {
                     if(cameraIdList.size() == 1){
-                        return "fail";
+                        result.setCode(209,"fail");
+                        return result;
                     }
                 }
                 presetList =null;
@@ -253,10 +277,11 @@ public class TCameraPresetService {
             } catch (Exception e) {
                 log.error("复制文件错误："+e);
             }
-
-            return zipPathReal+"/picture.zip";
+           result.setData(zipPathReal+"/picture.zip");
+            return result;
         }
-        return "fail";
+        result.setCode(209,"fail");
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -346,7 +346,7 @@ public class TCameraPresetController {
                            @RequestParam(value = "presetIdList", required = false) List<Long> presetIdList) {
         Result result = new Result();
         try {
-            result.setData(tCameraPresetService.download(cameraIdList,presetIdList));
+            result=tCameraPresetService.download(cameraIdList,presetIdList);
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询预置位树失败：" + e);
