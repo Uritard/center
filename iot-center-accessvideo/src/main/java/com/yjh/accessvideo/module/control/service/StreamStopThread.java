@@ -47,26 +47,26 @@ public class StreamStopThread implements Runnable {
                 String cid = publishjson.getString("cid");
                 String livePath = streambeanJson.getString("name");
 
-                if (StringUtils.isNotEmpty(cid) && clients<2) {
+                if (StringUtils.isNotEmpty(cid) && clients<1) {
                     //踢掉
-                    String delteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
+                    String deleteUrl="http://"+srsStopUrl+":8082/api/v1/clients/"+cid;
                     log.info("关闭流-->id: {}, cid：{}, clients: {}", videoFlowId, cid, clients);
-                    HttpClientUtils.httpDelete(delteUrl,null);
-                    Constant.mapsForCamera.remove(videoFlowId);
-                    Constant.mapsForHistory.remove(videoFlowId);
+                    HttpClientUtils.httpDelete(deleteUrl,null);
+                    Constant.mapsForCamera.remove(livePath);
+                    Constant.mapsForHistory.remove(livePath);
                     log.info("停流成功");
                 } else if (StringUtils.isEmpty(cid)) {
-                    log.info("{}流为空", videoFlowId);
+                    log.info("{}流为空", livePath);
                     for (String key:Constant.mapsForCamera.keySet()) {
-                        if (Objects.equals(Constant.mapsForCamera.get(key), livePath)) {
-                            log.info("{}匹配1{}", Constant.mapsForCamera.get(key), livePath);
+                        if (Objects.equals(key, livePath)) {
+                            log.info("{}匹配1{}", key, livePath);
                             Constant.mapsForCamera.remove(key);
                         }
                     }
                     for (String key:Constant.mapsForHistory.keySet()) {
                         log.info(Constant.mapsForHistory.get(key)+" "+livePath);
-                        if (Objects.equals(Constant.mapsForHistory.get(key), livePath)) {
-                            log.info("{}匹配2{}", Constant.mapsForCamera.get(key), livePath);
+                        if (Objects.equals(key, livePath)) {
+                            log.info("{}匹配2{}", key, livePath);
                             Constant.mapsForHistory.remove(key); }
                     }
                 } else if (clients>1){ log.info("{}流有人在看", videoFlowId); }
@@ -87,8 +87,8 @@ public class StreamStopThread implements Runnable {
                     Runtime.getRuntime().exec(urlStop);
                 }
                 if (dataBackForId.length() ==0) {
-                    Constant.mapsForCamera.remove(videoFlowId);
-                    Constant.mapsForHistory.remove(videoFlowId);
+                    Constant.mapsForCamera.remove(livePath);
+                    Constant.mapsForHistory.remove(livePath);
                 }
             }
         } catch (Exception e) {

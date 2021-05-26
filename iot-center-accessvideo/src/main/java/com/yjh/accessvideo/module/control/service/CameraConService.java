@@ -122,8 +122,10 @@ public class CameraConService {
         if (Constant.mapsForCamera.size()>0) {
             if (Objects.nonNull(Constant.mapsForCamera.get(String.valueOf(cameraId)))) {
                 Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + cameraId);
-                cameraFlowMap.put("cameraId", String.valueOf(cameraId));
-                return cameraFlowMap;
+                if (cameraFlowMap.size()>0) {
+                    cameraFlowMap.put("cameraId", String.valueOf(cameraId));
+                    return cameraFlowMap;
+                }
             }
         }
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
@@ -208,9 +210,11 @@ public class CameraConService {
             if (Constant.mapsForCamera.size()>0) {
                 if (Objects.nonNull(Constant.mapsForCamera.get(String.valueOf(cameraId)))) {
                     Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + cameraId);
-                    cameraFlowMap.put("cameraId", String.valueOf(cameraId));
-                    returnMapList.add(cameraFlowMap);
-                    returnMapListSize=returnMapListSize+1;
+                    if (cameraFlowMap.size()>0) {
+                        cameraFlowMap.put("cameraId", String.valueOf(cameraId));
+                        returnMapList.add(cameraFlowMap);
+                        returnMapListSize=returnMapListSize+1;
+                    }
                 }
             }
             if (returnMapListSizeTem==returnMapListSize) {
@@ -262,11 +266,11 @@ public class CameraConService {
         if (Constant.mapsForCamera.size()>0) {
             if (Objects.nonNull(Constant.mapsForCamera.get(String.valueOf(robotId)+":light"))) {
                 Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + String.valueOf(robotId) + ":light");
-                returnMapList.add(robotLightFlowMap);
+                if (robotLightFlowMap.size()>0) returnMapList.add(robotLightFlowMap);
             }
             if (Objects.nonNull(Constant.mapsForCamera.get(String.valueOf(robotId)+":inferad"))) {
                 Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + String.valueOf(robotId) + ":inferad");
-                returnMapList.add(robotInferadFlowMap);
+                if (robotInferadFlowMap.size()>0) returnMapList.add(robotInferadFlowMap);
             }
             if (returnMapList.size()>0) { return returnMapList; }
         }
