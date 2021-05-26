@@ -923,8 +923,7 @@ public class CameraConService {
     public String registerNVR(Long recordId) {
 
         RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
-        if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId))))
-            lUserID = Constant.maps.get(String.valueOf(recordId));
+        lUserID = Constant.maps.get(String.valueOf(recordId));
         log.info("lUserID: " + lUserID);
 
         if (lUserID > -1) {
@@ -956,6 +955,7 @@ public class CameraConService {
             return recorderConInfo.getRecordName() + " register fail, error code:" + hCNetSDK.NET_DVR_GetLastError();
         } else {
             Constant.maps.put(String.valueOf(recordId), lUserID);
+            lUserID = -1;
             log.info("Constant.maps: " + Constant.maps);
             log.info("NVR " + recorderConInfo.getRecordName() + " register success.");
             return "NVR " + recorderConInfo.getRecordName() + " register success.";
