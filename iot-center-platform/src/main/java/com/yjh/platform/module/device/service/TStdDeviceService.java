@@ -314,16 +314,12 @@ public class TStdDeviceService{
         return tStdDeviceList;
     }
 
-
+    public List<Long> selectForPage(TStdDeviceDetail tStdDeviceDetail){
+        return tStdDeviceDao.selectForPage( tStdDeviceDetail);
+    }
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceDetail> selectByPageAll(TStdDeviceDetail tStdDeviceDetail, List<Long> upRegionIds) {
-        if(upRegionIds.size() != 0){
-            tStdDeviceDetail.setUpRegionIds(upRegionIds);
-        }else {
-            upRegionIds.add(tStdDeviceDetail.getUpRegionId());
-            tStdDeviceDetail.setUpRegionIds(upRegionIds);
-        }
-        return this.tStdDeviceDao.selectByPageAll(tStdDeviceDetail);
+    public List<TStdDeviceDetail> selectByPageAll(TStdDeviceDetail tStdDeviceDetail,List<Long>listForPage) {
+        return this.tStdDeviceDao.selectByPageAll(tStdDeviceDetail.getDeviceName(),tStdDeviceDetail.getDeviceType(),tStdDeviceDetail.getRealCode(),tStdDeviceDetail.getUpRegionId(),tStdDeviceDetail.getUpRegionIds(),listForPage,tStdDeviceDetail.getPageSize());
     }
 
     @Transactional(rollbackFor = Exception.class)

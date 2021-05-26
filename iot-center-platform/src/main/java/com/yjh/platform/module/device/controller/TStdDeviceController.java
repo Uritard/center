@@ -298,8 +298,16 @@ public class TStdDeviceController {
 //            List<Long> upRegionIds = tStdRegionDao.selectRegionIds(tStdDeviceDetail.getUpRegionId());
             List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tStdDeviceDetail.getUpRegionId());
             log.info("upRegionIds:"+upRegionIds);
+            if(upRegionIds.size() != 0){
+                tStdDeviceDetail.setUpRegionIds(upRegionIds);
+            }else {
+                upRegionIds.add(tStdDeviceDetail.getUpRegionId());
+                tStdDeviceDetail.setUpRegionIds(upRegionIds);
+            }
             Page page = PageHelper.startPage(tStdDeviceDetail.getPageNum()!=null?tStdDeviceDetail.getPageNum():1, tStdDeviceDetail.getPageSize()!=null?tStdDeviceDetail.getPageSize():0,true,null,true);
-            List<TStdDeviceDetail> list = tStdDeviceService.selectByPageAll(tStdDeviceDetail, upRegionIds);
+            List<Long>listForPage = tStdDeviceService.selectForPage( tStdDeviceDetail);
+
+            List<TStdDeviceDetail> list = tStdDeviceService.selectByPageAll(tStdDeviceDetail,listForPage);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
