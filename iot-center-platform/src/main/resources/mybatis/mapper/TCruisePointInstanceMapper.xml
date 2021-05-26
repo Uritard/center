@@ -215,9 +215,16 @@
     <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
     <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
     </select>
-    <select id="selectCruisePointByPage"  resultType="com.yjh.platform.module.device.entity.TStdDeviceMeteForPointDetail">
+<!--    a.device_mete_id,-->
+<!--    a.device_id,-->
+<!--    a.custom_id,-->
+<!--    a.mete_name,-->
+    <select id="selectCruisePointByPage"  parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" resultType="com.yjh.platform.module.device.entity.TCruisePointByPageDetail">
     SELECT
-	a.*,
+    a.device_mete_id,
+    a.device_id,
+    a.custom_id,
+    a.mete_name,
 	b.cruise_type as cruiseType,
 	b.cruise_id as cruiseId,
 	c.dict_note as cruiseTypeName,
@@ -230,10 +237,13 @@
         left join t_std_device d on a.device_id = d.device_id and a.custom_id = d.custom_id
         left join t_dict_business e on a.custom_id = e.dict_code
 	where 1=1
-    and a.device_mete_id in
-    <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")"  >
+    <if test="meteName != null and meteName != ''">and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
+    <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+    <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
+    <if test="pageSize != 0">  and a.device_mete_id in
+        <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")"  >
             #{deviceMeteId,jdbcType=BIGINT}
-    </foreach>
+        </foreach></if>
     order by a.device_id,a.custom_id,device_mete_id
     </select>
 

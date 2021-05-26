@@ -178,12 +178,14 @@ public class TStdDevicemeteController {
         Map<String, Object> resultMap = new HashMap<>();
         long start = System.currentTimeMillis();
         try {
-            List<Long> upRegionIds = tStdRegionDao.selectRegionIds(tStdDeviceMeteDetail.getUpRegionId());
-            if (upRegionIds.size() == 0) {
-                upRegionIds.add(tStdDeviceMeteDetail.getUpRegionId());
-            }
+//            List<Long> upRegionIds = tStdRegionDao.selectRegionIds(tStdDeviceMeteDetail.getUpRegionId());
+//            if (upRegionIds.size() == 0) {
+//                upRegionIds.add(tStdDeviceMeteDetail.getUpRegionId());
+//            }
             Page page = PageHelper.startPage(tStdDeviceMeteDetail.getPageNum()!=null?tStdDeviceMeteDetail.getPageNum():1, tStdDeviceMeteDetail.getPageSize()!=null?tStdDeviceMeteDetail.getPageSize():0, true, null, true);
-            List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail);
+            List<Long> listForPage=tStdDevicemeteService.selectForPage(tStdDeviceMeteDetail);
+
+            List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,listForPage);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

@@ -93,7 +93,7 @@ public class TCruisePointInstanceService{
         return tCruisePointInstanceList;
     }
 
-    private void getConForCruisePoint(Integer length,TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem,List<TStdDeviceMeteForPointDetail> listAll){
+    private void getConForCruisePoint(Integer length,TCruisePointByPageDetail tStdDeviceMeteForPointDetailItem,List<TCruisePointByPageDetail> listAll){
         //机器人
         if("228".equals(tStdDeviceMeteForPointDetailItem.getCruiseType())) {
             listAll.get(length).getRobotType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
@@ -143,7 +143,43 @@ public class TCruisePointInstanceService{
         }
         return i;
     }
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
+//    public Result selectCruisePointByPage2(TStdDeviceMete tStdDeviceMete,int pageNum,@RequestParam(value = "pageSize",required = false,defaultValue = "0") int pageSize) {
+//        Result result = new Result();
+//        Map<String, Object> resultMap = new HashMap<>();
+//        try {
+//            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+//            List<Long> listForPage = tCruisePointInstanceDao.selectForCruiseByPage(tStdDeviceMete);
+//            resultMap.put("count", page.getTotal());
+//            List<TStdDeviceMeteForPointDetail> listAll = new LinkedList<>();
+//            if(listForPage != null && listForPage.size()!=0) {
+//                List<TStdDeviceMeteForPointDetail> list = tCruisePointInstanceDao.selectCruisePointByPage(tStdDeviceMete);
+//                listAll.add(list.get(0));
+//                if (list.get(0).getCruiseType() != null) {
+//                    getConForCruisePoint(0, list.get(0), listAll);
+//                }
+//                list.remove(0);
+//                int size = 0;
+//                for (TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem : list) {
+//                    int length = isIn(listAll,tStdDeviceMeteForPointDetailItem.getDeviceMeteId());
+//                    if (length != -1) {
+//                        getConForCruisePoint(length, tStdDeviceMeteForPointDetailItem, listAll);
+//                    } else {
+//                        listAll.add(tStdDeviceMeteForPointDetailItem);
+//                        getConForCruisePoint(listAll.size()-1, tStdDeviceMeteForPointDetailItem, listAll);
+//                    }
+//                    size++;
+//                }
+//            }
+//            resultMap.put("list", listAll);
+//            result.setData(resultMap);
+//        }catch (Exception e) {
+//            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+//            log.error("巡检点实例分页查询失败描述：", e);
+//        }
+//        return result;
+//    }
+
     public Result selectCruisePointByPage(TStdDeviceMete tStdDeviceMete,int pageNum,@RequestParam(value = "pageSize",required = false,defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
@@ -151,27 +187,32 @@ public class TCruisePointInstanceService{
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
             List<Long> listForPage = tCruisePointInstanceDao.selectForCruiseByPage(tStdDeviceMete);
             resultMap.put("count", page.getTotal());
-            List<TStdDeviceMeteForPointDetail> listAll = new LinkedList<>();
+            List<TCruisePointByPageDetail> listAll = new LinkedList<>();
             if(listForPage != null && listForPage.size()!=0) {
-                List<TStdDeviceMeteForPointDetail> list = tCruisePointInstanceDao.selectCruisePointByPage(listForPage);
-                listAll.add(list.get(0));
-                if (list.get(0).getCruiseType() != null) {
-                    getConForCruisePoint(0, list.get(0), listAll);
-                }
-                list.remove(0);
-                int size = 0;
-                for (TStdDeviceMeteForPointDetail tStdDeviceMeteForPointDetailItem : list) {
-                    int length = isIn(listAll,tStdDeviceMeteForPointDetailItem.getDeviceMeteId());
-                    if (length != -1) {
-                        getConForCruisePoint(length, tStdDeviceMeteForPointDetailItem, listAll);
-                    } else {
-                        listAll.add(tStdDeviceMeteForPointDetailItem);
-                        getConForCruisePoint(listAll.size()-1, tStdDeviceMeteForPointDetailItem, listAll);
+                List<TCruisePointByPageDetail> list = tCruisePointInstanceDao.selectCruisePointByPage(tStdDeviceMete.getMeteName(),tStdDeviceMete.getDeviceId(),
+                        tStdDeviceMete.getCustomId(),tStdDeviceMete.getPageSize(),listForPage);
+                if(list != null && list.size()>1){
+                    if(list.get(0).getDeviceMeteId() != list.get(1).getDeviceMeteId()){
+                        listAll.add(list.get(0));
+                        getConForCruisePoint(0, list.get(0), listAll);
+                    }else {
+                        getConForCruisePoint(0, list.get(0), listAll);
                     }
-                    size++;
+                    for(int i=1;i<list.size();i++){
+                        if(list.get(i).getDeviceMeteId() == list.get(i-1).getDeviceMeteId()){
+                            getConForCruisePoint(listAll.size()-1, list.get(i), listAll);
+                        }else {
+                            listAll.add(list.get(i));
+                            getConForCruisePoint(listAll.size()-1, list.get(i), listAll);
+                        }
+                    }
+                }else if(list.size()==1){
+                        listAll.add(list.get(0));
+                    getConForCruisePoint(0, list.get(0), listAll);
                 }
             }
             resultMap.put("list", listAll);
+            //log.info("listAll"+listAll.get(100));
             result.setData(resultMap);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

@@ -194,9 +194,12 @@ public class TStdDevicemeteService{
         return tStdDeviceMeteList;
     }
 
-    //告警规则未定
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+    public List<Long> selectForPage(TStdDeviceMeteDetail tStdDeviceMeteDetail){
+        return tStdDevicemeteDao.selectForPage(tStdDeviceMeteDetail);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail,List<Long> listForPage) {
 //        if(tStdDeviceMeteDetail.getDeviceId() == null) {
 //            if (ids.size() != 0) {
 //                tStdDeviceMeteDetail.setIds(ids);
@@ -211,7 +214,8 @@ public class TStdDevicemeteService{
 //            tStdDeviceMeteDetail.setIds(ids);
 //            tStdDeviceMeteDetail.setUpRegionId(Long.valueOf(1));
 //        }
-        return tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail);
+        return tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail.getMeteName(),tStdDeviceMeteDetail.getDeviceId(),
+                tStdDeviceMeteDetail.getPageSize(),listForPage);
     }
 
     @Transactional(rollbackFor = Exception.class)
