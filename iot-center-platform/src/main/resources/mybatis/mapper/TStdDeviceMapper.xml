@@ -383,6 +383,21 @@
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
 
+    <select id="selectForPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="java.lang.Long">
+        select a.device_id
+        from t_std_device a
+        where 1=1
+        <if test="deviceName != null and deviceName != ''"> and a.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') </if>
+        <if test="deviceType != null and deviceType!=-1"> and a.device_type like concat('%', #{deviceType, jdbcType=INTEGER},'%')</if>
+        <if test="realCode != null and realCode != ''"> and b.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
+        <if test="upRegionId != null and upRegionId != '' and upRegionId != -1">
+            and a.up_region_id in
+            <foreach collection="upRegionIds" item="upRegionIds"  separator="," open="(" close=")"  >
+                #{upRegionIds,jdbcType=BIGINT}
+            </foreach></if>
+        group by a.device_id
+        order by a.device_id desc
+    </select>
 
     <select id="selectByPageAll" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
@@ -409,41 +424,13 @@
         <foreach collection="upRegionIds" item="upRegionIds"  separator="," open="(" close=")"  >
             #{upRegionIds,jdbcType=BIGINT}
         </foreach></if>
-        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
-        <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') </if>
-        <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
         <if test="deviceType != null and deviceType!=-1"> and a.device_type like concat('%', #{deviceType, jdbcType=INTEGER},'%')</if>
-        <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
-        <if test="modelId != null and modelId != ''"> and a.model_id = #{modelId, jdbcType=BIGINT}</if>
-        <if test="regionPath != null and regionPath != ''"> and a.region_path = #{regionPath, jdbcType=VARCHAR}</if>
-        <if test="upRegionName != null and upRegionName != ''"> and a.up_region_name = #{upRegionName, jdbcType=VARCHAR}</if>
-        <if test="customName != null and customName != ''"> and a.custom_name = #{customName, jdbcType=VARCHAR}</if>
-        <if test="customType != null "> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
-        <if test="status != null "> and a.status = #{status, jdbcType=INTEGER}</if>
-        <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
-        <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
-        <if test="deviceModel != null "> and b.device_model = #{deviceModel, jdbcType=INTEGER}</if>
-        <if test="pmsType != null and pmsType != ''"> and b.pms_type = #{pmsType, jdbcType=VARCHAR}</if>
-        <if test="pmsId != null and pmsId != ''"> and b.pms_id = #{pmsId, jdbcType=VARCHAR}</if>
-        <if test="deviceVendor != null and deviceVendor != ''"> and b.device_vendor = #{deviceVendor, jdbcType=VARCHAR}</if>
-        <if test="productionDate != null"> and b.production_date = #{productionDate, jdbcType=TIMESTAMP}</if>
-        <if test="usedTime != null "> and b.used_time = #{usedTime, jdbcType=TIMESTAMP}</if>
-        <if test="disableDate != null "> and b.disable_date = #{disableDate, jdbcType=TIMESTAMP}</if>
-        <if test="lastMaintenance != null "> and b.last_maintenance = #{lastMaintenance, jdbcType=TIMESTAMP}</if>
-        <if test="maintenanceCount != null and maintenanceCount != ''"> and b.maintenance_count = #{maintenanceCount, jdbcType=VARCHAR}</if>
-        <if test="organization != null and organization != ''"> and b.organization = #{organization, jdbcType=VARCHAR}</if>
-        <if test="department != null and department != ''"> and b.department = #{department, jdbcType=VARCHAR}</if>
-        <if test="responsiblePerson != null and responsiblePerson != ''"> and b.responsible_person = #{responsiblePerson, jdbcType=VARCHAR}</if>
-        <if test="latitude != null and latitude != ''"> and b.latitude = #{latitude, jdbcType=VARCHAR}</if>
-        <if test="longitude != null and longitude != ''"> and b.longitude = #{longitude, jdbcType=VARCHAR}</if>
-        <if test="ip != null and ip != ''"> and b.ip = #{ip, jdbcType=VARCHAR}</if>
-        <if test="port != null "> and b.port = #{port, jdbcType=INTEGER}</if>
-        <if test="voltageLevel != null and voltageLevel != ''"> and b.voltage_level = #{voltageLevel, jdbcType=VARCHAR}</if>
-        <if test="sequencePoint != null and sequencePoint != ''"> and b.sequence_point = #{sequencePoint, jdbcType=VARCHAR}</if>
         <if test="realCode != null and realCode != ''"> and b.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
-        <if test="address != null and address != ''"> and b.address = #{address, jdbcType=VARCHAR}</if>
+        <if test="pageSize != 0">  and a.device_id in
+            <foreach collection="list" item="deviceId"  separator="," open="(" close=")"  >
+                #{deviceId,jdbcType=BIGINT}
+            </foreach></if>
          group by a.device_id
          order by a.device_id desc
 

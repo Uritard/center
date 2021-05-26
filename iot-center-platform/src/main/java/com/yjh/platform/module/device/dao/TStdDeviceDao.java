@@ -77,8 +77,14 @@ public interface TStdDeviceDao {
                             @Param(value = "realCode") String realCode,
                             @Param(value = "address") String address);
     TStdDeviceDetail selectByPrimaryIdAll(@Param(value = "deviceId") Long deviceId);
-    List<TStdDeviceDetail> selectByPageAll(TStdDeviceDetail tStdDeviceDetail);
-
+    List<TStdDeviceDetail> selectByPageAll(@Param(value = "deviceName") String deviceName,
+                                           @Param(value = "deviceType") Integer deviceType,
+                                           @Param(value = "realCode") String realCode,
+                                           @Param(value = "upRegionId") Long upRegionId,
+                                           @Param(value = "upRegionIds") List<Long> upRegionIds,
+                                           @Param(value = "list") List<Long> list,
+                                           @Param(value = "pageSize") Integer pageSize);
+    List<Long>selectForPage(TStdDeviceDetail tStdDeviceDetail);
 
     TStdRegion selectRegionById(@Param(value = "deviceId") Long deviceId);
     List<AreaInfo> selectDevTreeCustom();
