@@ -9,6 +9,7 @@ import com.yjh.platform.module.device.service.TStdDevicemeteService;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -184,8 +185,10 @@ public class TStdDevicemeteController {
 //            }
             Page page = PageHelper.startPage(tStdDeviceMeteDetail.getPageNum()!=null?tStdDeviceMeteDetail.getPageNum():1, tStdDeviceMeteDetail.getPageSize()!=null?tStdDeviceMeteDetail.getPageSize():0, true, null, true);
             List<Long> listForPage=tStdDevicemeteService.selectForPage(tStdDeviceMeteDetail);
-
-            List<TStdDeviceMeteDetail> list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,listForPage);
+            List<TStdDeviceMeteDetail> list = new ArrayList<>();
+            if(listForPage != null &&listForPage.size()>0){
+                list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,listForPage);
+            }
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

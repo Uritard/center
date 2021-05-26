@@ -386,6 +386,7 @@
     <select id="selectForPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="java.lang.Long">
         select a.device_id
         from t_std_device a
+        left join t_std_device_attr b on a.device_id = b.device_id
         where 1=1
         <if test="deviceName != null and deviceName != ''"> and a.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') </if>
         <if test="deviceType != null and deviceType!=-1"> and a.device_type like concat('%', #{deviceType, jdbcType=INTEGER},'%')</if>
@@ -399,7 +400,7 @@
         order by a.device_id desc
     </select>
 
-    <select id="selectByPageAll" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
+    <select id="selectByPageAll"  resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
         <include refid="All"/>,
         e.dict_note as deviceModelName,
