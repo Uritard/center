@@ -56,7 +56,7 @@ public class SysOrgService{
         //查询编码
         List<SysOrg> list = sysOrgDao.selectIsIn(sysOrg);
         if(list != null && list.size()>0){
-            throw new BusinessException(209,"编码与其他组织重复");
+            throw new BusinessException(209,"组织机构编码重复");
         }
         return this.sysOrgDao.update(sysOrg);
     }

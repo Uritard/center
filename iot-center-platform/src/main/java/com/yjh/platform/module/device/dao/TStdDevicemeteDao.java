@@ -56,7 +56,11 @@ public interface TStdDevicemeteDao {
                                 @Param(value = "meterType") Integer meterType,
                                 @Param(value = "appearanceType") Integer appearanceType
                                 );
-    List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
+    List<TStdDeviceMeteDetail> selectByPage(@Param(value = "meteName") String meteName,
+                                            @Param(value = "deviceId") Long deviceId,
+                                            @Param(value = "pageSize") Integer pageSize,
+                                            @Param(value = "list") List<Long> list
+    );
 
     List<Long> selectDeviceMeteByDeviceCustom(@Param("deviceId")Long deviceId,@Param("customId")String customId);
     int batchAdd(List<TStdDeviceMete> list);
@@ -87,7 +91,7 @@ public interface TStdDevicemeteDao {
 
     List<Long> selectHave(@Param(value = "deviceMeteId")Long deviceMeteId);
     List<Long> selectHaveInstanceId(@Param(value = "deviceId")Long deviceId);
-
+    List<Long>selectForPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
 
 
 }

@@ -165,8 +165,11 @@ public class TCruisePointInstanceController {
     @RequestMapping(value = "/selectCruisePointByPage", method = RequestMethod.POST)
     @Logs(title = "查询巡检点数据",content = "根据用户传递的参数查询巡检点数据",logType = 1,authority = "1234")
     public Result selectCruisePointByPage(@RequestBody TStdDeviceMete tStdDeviceMete
+
     ) {
-        return tCruisePointInstanceService.selectCruisePointByPage(tStdDeviceMete,tStdDeviceMete.getPageNum()!=null?tStdDeviceMete.getPageNum():1, tStdDeviceMete.getPageSize()!=null?tStdDeviceMete.getPageSize():0);
+        Result result = tCruisePointInstanceService.selectCruisePointByPage(tStdDeviceMete,tStdDeviceMete.getPageNum()!=null?tStdDeviceMete.getPageNum():1, tStdDeviceMete.getPageSize()!=null?tStdDeviceMete.getPageSize():0);
+        log.info("666666");
+        return result;
     }
 
     @ApiOperation(value = "告警联动分页查询")
