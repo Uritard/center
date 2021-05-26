@@ -10,9 +10,9 @@ import com.yjh.platform.module.device.entity.TStdDeviceDetail;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.entity.TStdDevice;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
+
+import java.util.*;
+
 import io.swagger.annotations.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
-import java.util.Map;
 
 import com.yjh.platform.common.result.ResultCodeEnum;
 import org.slf4j.Logger;
@@ -306,8 +305,10 @@ public class TStdDeviceController {
             }
             Page page = PageHelper.startPage(tStdDeviceDetail.getPageNum()!=null?tStdDeviceDetail.getPageNum():1, tStdDeviceDetail.getPageSize()!=null?tStdDeviceDetail.getPageSize():0,true,null,true);
             List<Long>listForPage = tStdDeviceService.selectForPage( tStdDeviceDetail);
-
-            List<TStdDeviceDetail> list = tStdDeviceService.selectByPageAll(tStdDeviceDetail,listForPage);
+            List<TStdDeviceDetail> list=new ArrayList<>();
+            if(listForPage !=null && listForPage.size()>0){
+                list = tStdDeviceService.selectByPageAll(tStdDeviceDetail,listForPage);
+            }
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
