@@ -51,6 +51,7 @@ public class TAlgorithmInfo implements Serializable {
     @Length(max = 11, message = "analyseType长度必须小于等于11")
     @TableField(value = "analyse_type", updateStrategy = FieldStrategy.IGNORED)
     private String analyseType;
+    private String analyseTypeName;
 
     @Max(value = 9)
     private Integer isAi;

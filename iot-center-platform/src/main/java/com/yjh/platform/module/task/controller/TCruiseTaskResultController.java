@@ -173,6 +173,21 @@ public class TCruiseTaskResultController {
     public Result selectCurrentCruiseTaskResult(@RequestParam String taskId){
         Result result=new Result();
         try {
+            result.setData(tCruiseTaskResultService.selectCruiseTaskResultYC(taskId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+
+        return result;
+
+    }
+    @ApiOperation(value = "A-获取当前任务下的巡检点的执行信息")
+    @RequestMapping(value = "/selectCurrentCruiseTaskResultZH",method = RequestMethod.GET)
+    @Logs(title = "获取当前任务下的巡检点的执行信息",content = "根据用户传递的参数获取当前任务下巡检点的执行信息",logType = 1,authority = "1235")
+    public Result selectCurrentCruiseTaskResultZH(@RequestParam String taskId){
+        Result result=new Result();
+        try {
             result.setData(tCruiseTaskResultService.selectCruiseTaskResult(taskId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

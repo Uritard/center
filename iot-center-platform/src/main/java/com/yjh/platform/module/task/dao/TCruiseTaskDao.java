@@ -44,7 +44,8 @@ public interface TCruiseTaskDao {
     List<TCruiseTaskCount> afterTaskCount(HashMap<String,Object> map);
 
     List<CruiseInspectResult> selectCruiseInspectByTaskId(@Param(value = "taskId")String taskId);
-    
+    List<CruiseInspectResult> selectCruiseInspectByTaskIdYC(@Param(value = "taskId")String taskId);
+
     List<WarnStatistical> selectForSevenDay();//近七天
 
     List<WarnStatistical> selectForMonth();//近一个月

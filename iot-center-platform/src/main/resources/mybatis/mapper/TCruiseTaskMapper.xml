@@ -446,6 +446,53 @@ select *from (
         WHERE
             a.task_id = #{taskId,jdbcType=VARCHAR}
     </select>
+    <select id="selectCruiseInspectByTaskIdYC" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.CruiseInspectResult">
+        SELECT
+            n.device_id as'deviceId',
+            m.device_name,
+            n.instance_id as 'instanceId',
+            n.cruise_type as 'cruiseType',
+            n.unit,
+            (
+                CASE
+                WHEN ISNULL(b.mete_name)
+                AND ISNULL(c.inspection_id)
+                AND ISNULL(d.preset_name) THEN
+                    ''
+                WHEN ISNULL(b.mete_name)
+                AND ISNULL(c.inspection_name) THEN
+                    d.preset_name
+                WHEN ISNULL(b.mete_name)
+                AND ISNULL(d.preset_img) THEN
+                    c.inspection_name
+                WHEN ISNULL(c.inspection_name)
+                AND ISNULL(d.preset_name) THEN
+                    b.mete_name
+                WHEN ISNULL(c.inspection_name) THEN
+                    CONCAT(
+                        b.mete_name,
+                        ' /',
+                        d.preset_name
+                    )
+                WHEN ISNULL(d.preset_name) THEN
+                    CONCAT(
+                        b.mete_name,
+                        ' /',
+                        c.inspection_name
+                    )
+                END
+            ) AS instanceName
+        FROM
+            t_cruise_task a
+        LEFT JOIN t_cruise_plan_attr k ON a.plan_id = k.plan_id
+        LEFT JOIN t_cruise_point_instance n ON k.instance_id = n.instance_id
+        LEFT JOIN t_std_device m on m.device_id = n.device_id
+        LEFT JOIN t_std_devicemete b ON n.device_mete_id = b.device_mete_id
+        LEFT JOIN t_robot_inspection c ON n.cruise_id = c.inspection_id
+        LEFT JOIN t_camera_preset d ON n.cruise_id = d.preset_id
+        WHERE
+            a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
 
     <select id="selectForSevenDay" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
         SELECT

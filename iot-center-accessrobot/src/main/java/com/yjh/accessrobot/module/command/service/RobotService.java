@@ -450,9 +450,9 @@ public class RobotService {
                 RobotServerHandler.getRobotResultMap().put("Item",xmlBaseModel.getItems().get(0));
             }
             log.info("组成的robotResultMap是==="+RobotServerHandler.getRobotResultMap());
-            return RobotServerHandler.getRobotResultMap();
         }else{
             log.info("-------------这不是刚发命令的响应"+receiveSessionId+"-------------");
+            return RobotServerHandler.getRobotResultMap();
         }
 
         Map<String,Object> res = new HashMap<>();
