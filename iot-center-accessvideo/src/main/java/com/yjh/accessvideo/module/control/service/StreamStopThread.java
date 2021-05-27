@@ -59,14 +59,14 @@ public class StreamStopThread implements Runnable {
                     log.info("{}流为空", livePath);
                     for (String key:Constant.mapsForCamera.keySet()) {
                         if (Objects.equals(key, livePath)) {
-                            log.info("{}匹配1{}", key, livePath);
+                            log.info("{}实时匹配{}", key, livePath);
                             Constant.mapsForCamera.remove(key);
                         }
                     }
                     for (String key:Constant.mapsForHistory.keySet()) {
                         log.info(Constant.mapsForHistory.get(key)+" "+livePath);
                         if (Objects.equals(key, livePath)) {
-                            log.info("{}匹配2{}", key, livePath);
+                            log.info("{}历史匹配{}", key, livePath);
                             Constant.mapsForHistory.remove(key); }
                     }
                 } else if (clients>1){ log.info("{}流有人在看", videoFlowId); }
