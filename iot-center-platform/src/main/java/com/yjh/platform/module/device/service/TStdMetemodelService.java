@@ -490,6 +490,7 @@ public class TStdMetemodelService {
     private String excelDataImport(MultipartFile file) {
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
         String path = (String) mapForPicModelPath.get("content");
+        //path = "D:\\code\\qhTest";
         String fileName = "copy-meteModel.xlsx";
         // 将上传文件写入
         try {
@@ -553,26 +554,30 @@ public class TStdMetemodelService {
                     return result;
                 }
                 Cell cell = row.getCell(1);
-                //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if (checkString(item)) {
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (2) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                if(cell != null) {
+                    //设置单元格类型
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (2) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setDeviceType(Integer.valueOf(nameMap.get(item)));
                 }
-                tStdMete.setDeviceType(Integer.valueOf(nameMap.get(item)));
 
                 cell = row.getCell(2);
-                //设置单元格类型
-                cell.setCellType(CellType.STRING);
-                item = cell.getStringCellValue();
-                if (checkString(item)) {
-                    errMsg.append("第" + (i + 1) + "行," + "第" + (3) + "列含有特殊字符<br>");
-                    result.setMessage(errMsg.toString());
-                    return result;
+                if(cell != null) {
+                    //设置单元格类型
+                    cell.setCellType(CellType.STRING);
+                    item = cell.getStringCellValue();
+                    if (checkString(item)) {
+                        errMsg.append("第" + (i + 1) + "行," + "第" + (3) + "列含有特殊字符<br>");
+                        result.setMessage(errMsg.toString());
+                        return result;
+                    }
+                    tStdMete.setMeteType(nameMap.get(item).toString());
                 }
-                tStdMete.setMeteType(nameMap.get(item).toString());
 
                 cell = row.getCell(3);
                 if (cell != null) {
@@ -978,7 +983,7 @@ public class TStdMetemodelService {
                     wb.close();
                 }
             } catch (Exception e) {
-                e.getMessage();
+                log.error(e.getMessage());;
             }
         }
         return result;
