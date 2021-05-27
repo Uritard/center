@@ -57,6 +57,22 @@ public class TAlgorithmInfoService{
     public int update(TAlgorithmInfo tAlgorithmInfo) {
         return this.tAlgorithmInfoDao.update(tAlgorithmInfo);
     }
+    @Transactional(rollbackFor = Exception.class)
+    public List<String> selectAllAnalyseType() {
+        return tAlgorithmInfoDao.selectAllAnalyseType();
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public List<Integer> selectAllDefectType() {
+        return tAlgorithmInfoDao.selectAllDefectType();
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public String selectAnalyseById(Long algorithmId) {
+        return tAlgorithmInfoDao.selectAnalyseById(algorithmId);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public Integer selectDefectById(Long algorithmId) {
+        return tAlgorithmInfoDao.selectDefectById(algorithmId);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public TAlgorithmInfo selectByPrimaryId(Long algorithmId) {

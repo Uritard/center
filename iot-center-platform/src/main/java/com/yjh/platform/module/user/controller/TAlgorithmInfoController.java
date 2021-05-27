@@ -53,6 +53,11 @@ public class TAlgorithmInfoController {
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "已存在该分析类型对应的算法");
                 return result;
             }else {
+                if (0 == tAlgorithmInfo.getIsAi()){
+                    tAlgorithmInfo.setAnalyseType("398");
+                }else {
+                    tAlgorithmInfo.setDefectType(450);
+                }
                 result.setData(tAlgorithmInfoService.insert(tAlgorithmInfo));
             }
         } catch (BusinessException b) {
@@ -98,7 +103,25 @@ public class TAlgorithmInfoController {
     public Result update(@Validated @RequestBody TAlgorithmInfo tAlgorithmInfo) {
         Result result = new Result();
         try {
-            result.setData(tAlgorithmInfoService.update(tAlgorithmInfo));
+            if (1 == tAlgorithmInfo.getIsAi()){
+                String analyseType = tAlgorithmInfoService.selectAnalyseById(tAlgorithmInfo.getAlgorithmId());
+                List<String> allAnalyseTypeList = tAlgorithmInfoService.selectAllAnalyseType();
+                if (!tAlgorithmInfo.getAnalyseType().equals(analyseType) && allAnalyseTypeList.contains(tAlgorithmInfo.getAnalyseType())) {
+                    result.setMessage(209, "已存在该分析类型对应的算法");
+                }else {
+                    tAlgorithmInfo.setDefectType(450);
+                    result.setData(tAlgorithmInfoService.update(tAlgorithmInfo));
+                }
+            }else if (0 == tAlgorithmInfo.getIsAi()){
+                Integer defectType = tAlgorithmInfoService.selectDefectById(tAlgorithmInfo.getAlgorithmId());
+                List<Integer> allDefectTypeList = tAlgorithmInfoService.selectAllDefectType();
+                if (!tAlgorithmInfo.getDefectType().equals(defectType) && allDefectTypeList.contains(tAlgorithmInfo.getDefectType())) {
+                    result.setMessage(209, "已存在该分析类型对应的算法");
+                }else {
+                    tAlgorithmInfo.setAnalyseType("398");
+                    result.setData(tAlgorithmInfoService.update(tAlgorithmInfo));
+                }
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新算法异常:", e);

@@ -63,6 +63,19 @@
             where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
     </update>
 
+    <select id="selectAllAnalyseType" resultType="java.lang.String">
+        SELECT a.analyse_type FROM t_algorithm_info a where a.is_ai = 1
+    </select>
+    <select id="selectAllDefectType" resultType="java.lang.Integer">
+        SELECT a.defect_type FROM t_algorithm_info a where a.is_ai = 0
+    </select>
+    <select id="selectAnalyseById" resultType="java.lang.String">
+        SELECT a.analyse_type FROM t_algorithm_info a where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
+    </select>
+    <select id="selectDefectById" resultType="java.lang.Integer">
+        SELECT a.defect_type FROM t_algorithm_info a where a.algorithm_id = #{algorithmId, jdbcType=BIGINT}
+    </select>
+
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TAlgorithmInfo">
         select
         a.algorithm_id,

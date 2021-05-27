@@ -17,6 +17,10 @@ public interface TAlgorithmInfoDao {
     int insert(TAlgorithmInfo tAlgorithmInfo);
     int deleteByPrimaryId(@Param(value = "algorithmId") Long algorithmId);
     int update(TAlgorithmInfo tAlgorithmInfo);
+    List<String> selectAllAnalyseType();
+    List<Integer> selectAllDefectType();
+    String selectAnalyseById(Long algorithmId);
+    Integer selectDefectById(Long algorithmId);
     TAlgorithmInfo selectByPrimaryId(@Param(value = "algorithmId") Long algorithmId);
     List<TAlgorithmInfo> select(@Param(value = "algorithmId") Long algorithmId,
                                 @Param(value = "algorithmName") String algorithmName,

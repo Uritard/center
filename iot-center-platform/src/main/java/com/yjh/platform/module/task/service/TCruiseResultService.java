@@ -227,14 +227,15 @@ public class TCruiseResultService{
         }
 //        insert QrDecode as device's real code. by tt.
         TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
-        String analyseType = tCruiseResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
-        if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
-            TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
-            tStdDeviceAttr.setDeviceId(tCruisePointInstance.getDeviceId());
-            tStdDeviceAttr.setRealCode(cruiseManualReview.getPersonCheck());
-            tStdDeviceAttrDao.update(tStdDeviceAttr);
+        if (Objects.nonNull(tCruisePointInstance)){
+            String analyseType = tCruiseResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
+            if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
+                TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
+                tStdDeviceAttr.setDeviceId(tCruisePointInstance.getDeviceId());
+                tStdDeviceAttr.setRealCode(cruiseManualReview.getPersonCheck());
+                tStdDeviceAttrDao.update(tStdDeviceAttr);
+            }
         }
-
         return result1+result2;
     }
     public Result sendPostRequest(String url, Map<String,Object> params) {
