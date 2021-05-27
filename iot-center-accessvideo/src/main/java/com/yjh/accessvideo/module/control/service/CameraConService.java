@@ -420,9 +420,7 @@ public class CameraConService {
             String urlStopRobot = "kill -9 " + processNumRobot;
 //            Runtime.getRuntime().exec(urlStopRobot);
 //            Constant.mapsForRobot.remove(String.valueOf(robotId + ":inferad"));
-        } catch (Exception e) {
-            e.getMessage();
-        }
+        } catch (Exception e) { e.getMessage(); }
         return "stop " + robotId + " preview success!";
     }
 
@@ -466,7 +464,7 @@ public class CameraConService {
 
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
             returnMap.put("rtmpUrl", rtmpUrl);
-            isHttps(videoHttps, cameraId, returnMap);
+            isHttpsHistory(videoHttps, cameraId, returnMap);
 
             String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
             JSONObject jsonList = new JSONObject();
@@ -484,7 +482,7 @@ public class CameraConService {
                 JSONObject publishjson = JSONObject.parseObject(publish);
                 if (Objects.equals(name, String.valueOf(cameraId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                     returnMap.put("videoFlowId", videoFlowId);
-                    Constant.mapsForHistory.put(videoFlowId, String.valueOf(cameraId));
+                    Constant.mapsForHistory.put(name, videoFlowId);
                     log.info("historyMapsForCamera: {}", Constant.mapsForHistory);
                     redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + cameraId, returnMap);
                 }
@@ -565,7 +563,7 @@ public class CameraConService {
             JSONObject publishjson = JSONObject.parseObject(publish);
             if (Objects.equals(name, String.valueOf(robotId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 lightReturnMap.put("videoFlowId", videoFlowId);
-                Constant.mapsForHistory.put(videoFlowId, String.valueOf(robotId)+":light");
+                Constant.mapsForHistory.put(String.valueOf(robotId)+":light", videoFlowId);
                 log.info("historyMapsForCamera: {}", Constant.mapsForHistory);
                 redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + robotId+":light", lightReturnMap);
                 robotHistoryList.add(lightReturnMap);
@@ -618,7 +616,7 @@ public class CameraConService {
             JSONObject publishjson = JSONObject.parseObject(publish);
             if (Objects.equals(name, String.valueOf(robotId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
                 lightReturnMap.put("videoFlowId", videoFlowId);
-                Constant.mapsForHistory.put(videoFlowId, String.valueOf(robotId)+":inferad");
+                Constant.mapsForHistory.put(String.valueOf(robotId)+":inferad", videoFlowId);
                 log.info("historyMapsForCamera: {}", Constant.mapsForHistory);
                 redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + robotId+":inferad", lightReturnMap);
                 robotHistoryList.add(infraredReturnMap);
@@ -2027,6 +2025,36 @@ public class CameraConService {
     }
 
     /**
+     * 实时视频是否为https
+     * @param videoHttps
+     */
+    private void isHttps(Integer videoHttps, Long id, Map<String, Object> returnMap) {
+        if (videoHttps == 1) {
+            String flvsUrl = "https://" + hostIp + ":8088/live/" + id + ".flv";
+            returnMap.put("flvUrl", flvsUrl);
+        } else {
+            String flvUrl = "http://" + hostIp + ":10080/live/" + id + ".flv";
+            returnMap.put("flvUrl", flvUrl);
+        }
+    }
+
+    /**
+     * 历史视频是否为https
+     * @param videoHttps
+     */
+    private void isHttpsHistory(Integer videoHttps, Long id, Map<String, Object> returnMap) {
+        String flvsUrl = "";
+        String flvUrl = "";
+        if (videoHttps == 1) {
+            flvsUrl = "https://" + hostIp + ":8088/history/" + id + ".flv";
+            returnMap.put("flvUrl", flvsUrl);
+        } else {
+            flvUrl = "http://" + hostIp + ":10080/history/" + id + ".flv";
+            returnMap.put("flvUrl", flvUrl);
+        }
+    }
+
+    /**
      * 设置发射率和距离
      * @param lUserID
      */
@@ -2082,16 +2110,6 @@ public class CameraConService {
         else
         {
             log.info("NET_DVR_SET_THERMOMETRY_PRESETINFO success" );
-        }
-    }
-
-    private void isHttps(Integer videoHttps, Long id, Map<String, Object> returnMap) {
-        if (videoHttps == 1) {
-            String flvsUrl = "https://" + hostIp + ":8088/live/" + id + ".flv";
-            returnMap.put("flvUrl", flvsUrl);
-        } else {
-            String flvUrl = "http://" + hostIp + ":10080/live/" + id + ".flv";
-            returnMap.put("flvUrl", flvUrl);
         }
     }
 

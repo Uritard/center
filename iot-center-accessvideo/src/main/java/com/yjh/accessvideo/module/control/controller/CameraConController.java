@@ -92,10 +92,9 @@ public class CameraConController {
             //发送请求获取所有STREAM
             log.info("关闭流接口回调：");
             String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
-            JSONObject jsonList = new JSONObject();
             //SRS服务器有延迟，大概50-60秒 才更新管理数据
 //            Thread.sleep(1000*70);
-            jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
+            JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
             assert jsonList != null;
 
             List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
