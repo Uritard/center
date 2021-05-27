@@ -558,6 +558,7 @@ public class SysUserService {
         BeanUtils.copyProperties(sysUser, sysUserBackUp);
         sysUserBackUp.setVerfiCode(Demo.summary(linkedHashMap.toString()));
         SysUserBackUpDao.update(sysUserBackUp);
+        logsRecord.LoginLogsSend(request, "19", "用户修改密码",  "用户修改密码", userName, String.valueOf(userId), 1);
         return this.sysUserDao.update(sysUser);
     }
 
