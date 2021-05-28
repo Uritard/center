@@ -300,6 +300,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseDataResult.setResultNum("设备检修中");
                             tCruiseDataResult.setEvaluationState(257);
                             tCruiseDataResult.setIsWarn(0);
+                            tCruiseDataResult.setPicpath("--");
                             //tCruiseDataResultDao.insert(tCruiseDataResult);
                             TCDRList.add(tCruiseDataResult);
                             tCruiseTaskResultDetail.setCruiseStatus(255);
@@ -368,6 +369,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseTaskResultDetailMap.put("cruiseTaskTime", simpleDateFormat.format(new Date()));
                             tCruiseTaskResultDetailMap.put("endTime", simpleDateFormat.format(new Date()));
                             tCruiseTaskResultDetailMap.put("cruiseStatus", "253");//未执行
+                            tCruiseTaskResultDetailMap.put("picpath", "--");
                             tCruiseTaskResultDetailMap.put("resultNum", "机器人离线,未执行");
                             if("4".equals(mapForRobotState.get("value"))){
                                 tCruiseTaskResultDetailMap.put("resultNum", "机器人处于检修状态,未执行");
@@ -557,6 +559,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseDataResult.setCruiseResult(247);
                             tCruiseDataResult.setCruiseAbnormal(248);
                             tCruiseDataResult.setResultNum("抓图失败");
+                            tCruiseDataResult.setPicpath("--");
                             tCruiseDataResult.setEvaluationState(257);
                             tCruiseDataResult.setIsWarn(0);
                             //tCruiseDataResultDao.insert(tCruiseDataResult);

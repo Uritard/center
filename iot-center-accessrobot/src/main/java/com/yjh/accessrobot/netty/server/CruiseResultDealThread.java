@@ -215,7 +215,9 @@ public class CruiseResultDealThread implements Runnable{
                             }
                         }
                         tCruiseTaskResultMap.put("picpath",cruiseResultMap.get("relativePath"));
-                        tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
+                        if (cruiseResultMap.containsKey("absolutePath")){
+                            tCruiseTaskResultMap.put("origpic",cruiseResultMap.get("absolutePath"));
+                        }
                         tCruiseTaskResultMap.put("evaluationState","257");
                         tCruiseTaskResultMap.put("createtime",cruiseResultMap.get("time"));
                         tCruiseTaskResultMap.put("isWarn","0");
@@ -387,9 +389,9 @@ public class CruiseResultDealThread implements Runnable{
                                         .setResultNum(redisInfoMap.get("resultNum"))
                                         .setModifyNum(redisInfoMap.get("modifyNum"))
                                         .setPicpath(redisInfoMap.get("picpath"))
-                                        //待完善                             .setPicPathAnl(redisInfoMap.get("picPathAnl"))
+                                        //待完善.setPicPathAnl(redisInfoMap.get("picPathAnl"))
                                         .setOrigpic(redisInfoMap.get("origpic"))
-                                        //待完善                             .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
+                                        //待完善.setOrigPicAnl(redisInfoMap.get("origPicAnl"))
                                         .setEvaluationState(257)
                                         .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
                                         .setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")))

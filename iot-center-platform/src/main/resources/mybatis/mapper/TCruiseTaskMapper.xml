@@ -452,6 +452,7 @@ select *from (
             m.device_name,
             n.instance_id as 'instanceId',
             n.cruise_type as 'cruiseType',
+            e.dict_note as 'cruiseTypeName',
             n.unit,
             (
                 CASE
@@ -486,6 +487,7 @@ select *from (
             t_cruise_task a
         LEFT JOIN t_cruise_plan_attr k ON a.plan_id = k.plan_id
         LEFT JOIN t_cruise_point_instance n ON k.instance_id = n.instance_id
+        LEFT JOIN t_dict_business e ON n.cruise_type=e.dict_code AND e.col_name='cruise_type'
         LEFT JOIN t_std_device m on m.device_id = n.device_id
         LEFT JOIN t_std_devicemete b ON n.device_mete_id = b.device_mete_id
         LEFT JOIN t_robot_inspection c ON n.cruise_id = c.inspection_id

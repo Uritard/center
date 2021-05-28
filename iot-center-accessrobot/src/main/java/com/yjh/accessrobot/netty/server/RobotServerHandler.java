@@ -228,8 +228,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
 
         //拆包3.0
-//        Packet2 = Packet.replace(""," ");
-//        openPackage2(Packet2);
+        /*Packet2 = Packet.replace(""," ");
+        openPackage2(Packet2);*/
 
         //拆包1.1
         /*String body = new String(packetByte, StandardCharsets.UTF_8);
@@ -341,12 +341,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         String residueString = null;
 
         Packet2 = socketMessageHex.replace(""," ");
-        byte[] packetByte = PlatformPacketUtil.HexString2Bytes(Packet2);
 
+        /*byte[] packetByte = PlatformPacketUtil.HexString2Bytes(Packet2);
         byte[] sendSessionIdByte = new byte[8];
         System.arraycopy(packetByte, 2, sendSessionIdByte, 0, 8);
         long sendRobotNewSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);
-        log.info("本身的发送会话序列号为=="+sendRobotSessionId+"新来的发送会话序列号==="+sendRobotNewSessionId);
+        log.info("本身的发送会话序列号为=="+sendRobotSessionId+"新来的发送会话序列号==="+sendRobotNewSessionId);*/
 
         if(socketMessageHex.startsWith("eb90")
                 && headNum >= 2
@@ -786,6 +786,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         //判断任务是否属于机器人本体任务
                         Long robotId = robotService.selectIsRobotTask(xmlBaseModel.getItems().get(0).get("task_code").toString());
                         if (Objects.nonNull(robotId)){
+                            log.info("机器人本体任务状态");
                             Map<String,String> jasonMap=new HashMap<>();
                             jasonMap.put("type","newTask");
                             jasonMap.put("taskId",xmlBaseModel.getItems().get(0).get("task_code").toString());
@@ -995,21 +996,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
     /*
-     * 查询缓存中所有机器人编码
-     * */
-    private List<String> nowRobotCode(){
-        Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
-
-        Iterator<String> iterator = allRobotCodeMap.keySet().iterator();
-        List<String> allRobotCodeList = new ArrayList<>();
-        while(iterator.hasNext()){
-            String key=iterator.next();
-            String value = allRobotCodeMap.get(key);
-            allRobotCodeList.add(value);
-        }
-        return allRobotCodeList;
-    }
-    /*
      * 快速创建command=3 的消息体
      * */
     private XMLBaseModel sendMessageForCommandThree(boolean flag,String sendCode){
@@ -1039,24 +1025,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         if (heartNum > 3){
             heartBeatFailAfter(robotCode,robotStatusMap);
         }
-        /*Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
-
-        if (allRobotCodeMap.containsValue(robotCode)){
-            log.info("缓存有,发送心跳响应");
-            heartBeatSuccessAfter(robotCode,sendSessionId,receiveSessionId);
-        }else {
-            List<String> robotCodeList = robotService.selectAllRobotCode();
-            if (robotCodeList.contains(robotCode)){
-                log.info("缓存无,表中有,发送心跳相应");
-                heartBeatSuccessAfter(robotCode,sendSessionId,receiveSessionId);
-            }else {
-                log.info("缓存无,表中无,断开连接");
-                heartBeatFailAfter(robotCode,robotStatusMap);
-            }
-        }*/
     }
     /*
-     * 成功收到心跳指令,sendHeartResponse && updateRobotStatus
+     * 成功收到心跳指令,发送响应并更新机器人状态
      * */
     void heartBeatSuccessAfter(String robotCode,long sendSessionId,Map<String, String> robotStatusMap){
         String heartXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,robotCode));
@@ -1064,8 +1035,9 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         send(ctx, heartProtocol,robotCode);
         flag2 ++;
         log.info("成功收到心跳flag2的值==="+flag2);
+
         //为了等待客户端和服务端连接稳定,收到三次以上再修改
-        if (flag2 > 2){
+        if (flag2 > 2 && !robotServerHandlerMap.isEmpty()){
             robotService.updateRobotInfo(robotCode,"在线");
             robotStatusMap.put("value","0");//正常
             redisTemplate.opsForHash().putAll("RobotStatus:"+robotCode+":2",robotStatusMap);//update robot Network Status
@@ -1089,13 +1061,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     private void send(ChannelHandlerContext ctx, byte[] bytes,String strRobotCode) {
         ByteBuf byteBuf = ctx.alloc().buffer();
         byteBuf.writeBytes(bytes);
-        StringBuilder sendToRobotStr = new StringBuilder();
+        /*StringBuilder sendToRobotStr = new StringBuilder();
         for (byte byteItem : bytes) {
             sendToRobotStr.append(String.format("%02x ", byteItem));
         }
-        log.info("commandSendToRobot:" + sendToRobotStr + " : " + strRobotCode);
+        log.info("commandSendToRobot:" + sendToRobotStr + " : " + strRobotCode);*/
         ctx.pipeline().writeAndFlush(byteBuf);
-        log.info("commandSendToRobotSuccess");
+        log.info("commandSendTo "+strRobotCode+" Success");
         if (byteBuf.refCnt() >= 1) {
             ReferenceCountUtil.release(ctx);
         }
@@ -1204,13 +1176,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             log.error("clientDisconnect: " + e.getMessage());
         }
         log.info("mapsAfterRemoved: " + maps);
-
-        /*for(Map.Entry<Object,RobotServerHandler> vo : robotServerHandlerMap.entrySet()) {
-            log.info("当前的robotServerHandlerMap的key为" + vo.getKey());
-            String robotCodeFlag = vo.getKey().toString();
-            String timeFlag = robotCodeFlag.replace(robotCode,"");
-            robotServerHandlerMap.remove(robotCode);
-        }*/
         robotServerHandlerMap.remove(robotCode);
 
         log.info("channel.isActive(): " + channel.isActive());

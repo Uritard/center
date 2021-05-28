@@ -132,7 +132,7 @@ public class TCameraInfoController {
         try {
             String pmsId = tCameraInfoService.selectPmsIdById(tCameraInfo.getCameraId());
             List<String> allPmsIdList = tCameraInfoService.selectAllPMSId();
-            if (!tCameraInfo.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraInfo.getPmsId())) {
+            if (StringUtils.hasLength(tCameraInfo.getPmsId()) && !tCameraInfo.getPmsId().equals(pmsId) && allPmsIdList.contains(tCameraInfo.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
                 int state = tCameraInfoService.update(tCameraInfo);
