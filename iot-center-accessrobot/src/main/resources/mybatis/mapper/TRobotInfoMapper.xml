@@ -1003,4 +1003,21 @@
         select a.robot_id from t_cruise_task a where 1 = 1
         <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=VARCHAR}</if>
     </select>
+    <select id="HasStandTaskIsFinish" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT
+            a.task_id
+        FROM
+            t_cruise_task a
+        LEFT JOIN t_cruise_result b on a.task_id = b.task_id
+        WHERE 1 = 1
+        <if test="robotId != null and robotId != ''">and a.robot_id = #{robotId,jdbcType=BIGINT}</if>
+        and b.c_state = 239
+    </select>
+    <update id="updateStandTaskStatus">
+        UPDATE t_cruise_result a <set>
+        a.c_state = 243
+    </set>
+        WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+    </update>
 </mapper>

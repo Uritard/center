@@ -3,6 +3,7 @@ package com.yjh.accessrobot.netty.server;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author YC
@@ -34,14 +35,15 @@ public class HeartBreakDealThread implements Runnable {
             while (isThreadStart){
 
                 Map<String, String> heartbeatIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:heartbeatInterval");
-                long sleepTime = Long.valueOf(heartbeatIntervalMap.get("content")) * 1000;
+                long sleepTime = Long.valueOf(heartbeatIntervalMap.get("content"));
                 Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
                 Thread.sleep(sleepTime);
-                log.info("Thread wait "+sleepTime+" ms......");
+                TimeUnit.SECONDS.sleep(Long.valueOf(heartbeatIntervalMap.get("content")));
+                log.info("Thread wait "+sleepTime+" s......");
                 robotServerHandler.procSend(robotCode, robotStatusMap,sendSessionId,receiveSessionId);
                 if (!robotServerHandler.getIsThreadStart()) isThreadStart = false;
 //                log.info("isThreadStart: "+isThreadStart+", threadId: "+Thread.currentThread().getId()+",id: "+robotServerHandler.getCtx().channel().id());
-                log.info("isThreadStart: "+isThreadStart+", threadId: "+Thread.currentThread().getId());
+//                log.info("isThreadStart: "+isThreadStart+", threadId: "+Thread.currentThread().getId());
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

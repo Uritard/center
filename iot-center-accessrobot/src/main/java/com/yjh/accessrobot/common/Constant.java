@@ -85,6 +85,7 @@ public class Constant {
     }
     //请求webSocket发送方法
     public static String postUrl(String url, String json) throws IOException, URISyntaxException {
+        System.out.println("webSocketUrl="+url+",json="+json);
         CloseableHttpClient client = HttpClients.createDefault();
         URI uri = new URIBuilder(url).setParameter("json", json).build();
         HttpPost httpPost = new HttpPost(uri);

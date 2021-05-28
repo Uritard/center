@@ -1925,5 +1925,14 @@ public class RobotService {
         }
         return path +"/"+ fileName;
     }
+    public List<String> HasStandTaskIsFinish(String robotCode){
+        Long robotId = selectRobotIdByCode(robotCode);
+        List<String> taskIdList = tRobotInfoDao.HasStandTaskIsFinish(robotId);
+        log.info("站端在巡视主机显示未完成的任务=="+taskIdList);
+        for (String taskId : taskIdList){
+            tRobotInfoDao.updateStandTaskStatus(taskId);
+        }
+        return taskIdList;
+    }
 }
 

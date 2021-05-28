@@ -466,6 +466,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         Thread thread = new Thread(dataDealThread);
                         thread.setDaemon(true);
                         thread.start();
+                        //判断巡视主机端有无未完成的站端任务
+                        robotService.HasStandTaskIsFinish(xmlBaseModel.getSendCode());
                         break;
                     //心跳指令(发送响应)
                     case "2512":
@@ -786,7 +788,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         //判断任务是否属于机器人本体任务
                         Long robotId = robotService.selectIsRobotTask(xmlBaseModel.getItems().get(0).get("task_code").toString());
                         if (Objects.nonNull(robotId)){
-                            log.info("机器人本体任务状态");
                             Map<String,String> jasonMap=new HashMap<>();
                             jasonMap.put("type","newTask");
                             jasonMap.put("taskId",xmlBaseModel.getItems().get(0).get("task_code").toString());
@@ -1067,7 +1068,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         }
         log.info("commandSendToRobot:" + sendToRobotStr + " : " + strRobotCode);*/
         ctx.pipeline().writeAndFlush(byteBuf);
-        log.info("commandSendTo "+strRobotCode+" Success");
+        log.info("command Send To ++++++"+strRobotCode+"++++++ Success");
         if (byteBuf.refCnt() >= 1) {
             ReferenceCountUtil.release(ctx);
         }

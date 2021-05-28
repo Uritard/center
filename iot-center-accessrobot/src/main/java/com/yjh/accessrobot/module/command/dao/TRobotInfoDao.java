@@ -89,4 +89,7 @@ public interface TRobotInfoDao {
     int updateIsWarn(@Param(value = "cruiseResultId")String cruiseResultId);
     TStdDeviceMete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
     Long selectIsRobotTask(@Param(value = "taskId")String taskId);
+    List<String> HasStandTaskIsFinish(@Param(value = "robotId")Long robotId);
+    int updateStandTaskStatus(@Param(value = "taskId")String taskId);
+
 }
