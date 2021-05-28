@@ -876,7 +876,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
                         Integer all = Integer.valueOf(mapForGet.get("all"));
                         int re = abnormal+normal;
-                        if(re == all){
+                        if(re == all || re > all){
                             //所有点都做完了
                             tCruiseTaskResult.setTaskAbnormal(taskAbnormal);
                             tCruiseTaskResult.setCruiseTaskTime(simpleDateFormat.parse(mapForGet.get("taskStart")));
@@ -1086,16 +1086,7 @@ public class CruiseTaskJob extends QuartzJobBean {
         item.put("task_code",tCruiseTask.getTaskCode());
         item.put("task_state",state);
         item.put("plan_start_time",tCruiseTask.getStartTime());
-        if(tCruiseTask.getIfRun() == 172){
-            try{
-                CronExpression expression = new CronExpression(tCruiseTask.getDateType());
-                item.put("start_time",expression.getNextValidTimeAfter(new Date()));
-            }catch (Exception e){
-                log.info("上报出错"+e.getMessage());
-            }
-        }else {
-            item.put("start_time",tCruiseTask.getStartTime());
-        }
+        item.put("start_time",tCruiseTask.getStartTime());
         item.put("task_progress","0%");
         Integer i =0;
         Map<String,String> mapForGet = redisTemplate.opsForHash().entries("countForAbnormal:"+tCruiseTask.getTaskId());
