@@ -136,7 +136,7 @@
         <if test="recordName != null ">a.record_name = #{recordName},</if>
         <if test="recorderModel != null ">a.recorder_model = #{recorderModel, jdbcType=INTEGER},</if>
         <if test="recorderType != null ">a.recorder_type = #{recorderType},</if>
-        <if test="vendorId != null ">a.vendor_id = #{vendorId, jdbcType=INTEGER},</if>
+        a.vendor_id = #{vendorId, jdbcType=INTEGER},
         <if test="pmsId != null  ">a.pms_id = #{pmsId},</if>
         <if test="aliasName != null">a.alias_name = #{aliasName},</if>
         <if test="recordIp != null">a.record_ip = #{recordIp},</if>
