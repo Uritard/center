@@ -461,7 +461,7 @@ public class SysUserController {
                 String key = Constant.account_lock_times.replace("userAccountID", locked);
                 redisTemplate.opsForHash().putAll(key, mapCache);
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "5");
+                params.set("logType", "21");
                 params.set("ip", httpServletRequest.getHeader("HTTP_X_FORWARDED_FOR"));
                 params.set("title", "用户帐号解锁");
                 params.set("state", 1);
@@ -475,7 +475,7 @@ public class SysUserController {
                 logsAspect.post(params);
             } else if (!password.equals(Demo.decryptDB(sysUserCurrent.getPassword()))) {
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "5");
+                params.set("logType", "21");
                 params.set("ip", httpServletRequest.getHeader("HTTP_X_FORWARDED_FOR"));
                 params.set("title", "用户帐号解锁");
                 params.set("state", 2);
@@ -493,7 +493,7 @@ public class SysUserController {
                 result.setData(mapResult);
             } else if (sysUserCurrent.getRoleId() != 1234) {
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-                params.set("logType", "5");
+                params.set("logType", "21");
                 params.set("ip", httpServletRequest.getHeader("HTTP_X_FORWARDED_FOR"));
                 params.set("title", "用户帐号解锁");
                 params.set("state", 2);
