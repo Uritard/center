@@ -327,9 +327,9 @@ public class RobotService {
             if (!"".equals(deviceMap.get("phase").toString())){
                 tRobotInspection.setPhase(deviceMap.get("phase").toString());
             }
-            /*if (!"".equals(deviceMap.get("device_info").toString())){
+            if (!"".equals(deviceMap.get("device_info").toString())){
                 tRobotInspection.setDeviceInfo(deviceMap.get("device_info").toString());
-            }*/
+            }
             deviceList.add(tRobotInspection);
 
             //机器人区域层级
@@ -417,8 +417,8 @@ public class RobotService {
                 addRobotRegionList.add(str);
             }
         }
-        log.info("最后要插库的list是=="+addRobotRegionList);
-        log.info("准备要删除的list是=="+nowRobotRegionList);
+        log.info("最后要插库的regionList是=="+addRobotRegionList);
+        log.info("准备要删除的regionList是=="+nowRobotRegionList);
         if (nowRobotRegionList != null && nowRobotRegionList.size() > 0){
             int res = tRobotRegionDao.batchDelete(nowRobotRegionList);
             log.info("TRR删除条数=="+res);
@@ -502,7 +502,6 @@ public class RobotService {
 
         return res;
     }
-
     @Transactional(rollbackFor = Exception.class)
     public String deviceMaintenanceIssued(Map<String,Object> resMap) {
         log.info("其他服务传来的map是==="+resMap);
@@ -561,16 +560,6 @@ public class RobotService {
                     log.info("该机器人处于检修状态,没有成功将任务下发到机器,巡视结果数据默认......");
                     return;
                 }else {
-                    /*Integer unionNum = tRobotInfoDao.selectIsUnionTask(rTII.getTaskId());
-                    log.info("unionNum===="+unionNum);
-                    Integer unionNum = 0;
-                    String unionTaskStatus = rTII.getUnionTaskStatus();
-                    if (!"".equals(unionTaskStatus) || Objects.nonNull(unionTaskStatus)){
-                        unionNum = 1;
-                    }else {
-                        unionNum = 0;
-                    }
-                    log.info("unionNum==="+unionNum);*/
                     Map<String, Object> mapRes1 = robotTaskDragonService(rTII.getRobotCode(), "1", "6", "");//控制权获得
                     if ("200".equals(mapRes1.get("code").toString())) {
                         Map<String, Object> mapRes2 = robotTaskDragonService(rTII.getRobotCode(), "1", "5", "1");//任务模式
@@ -827,7 +816,6 @@ public class RobotService {
         }
         return 1;
     }
-
     @Transactional(rollbackFor = Exception.class)
     public void insertForPause(String robotCode, String taskId, Integer taskStatus) throws Exception {
         //统计巡视主机下发给机器人的巡检点大小
@@ -1000,7 +988,6 @@ public class RobotService {
         log.info("更新TCR的条数====" + res);
 
     }
-
     @Transactional(rollbackFor = Exception.class)
     public Result otherServer(List<String > cruiseResultIdList) {
         return Constant.otherServerList(cruiseResultIdList,Constant.TASK_FINISH);
@@ -1009,42 +996,34 @@ public class RobotService {
     public TCruiseResult selectTaskResultId(String taskId) {
         return tRobotInfoDao.selectTaskResultId(taskId);
     }
-
     @Transactional(rollbackFor = Exception.class)
     public TCruiseTask selectTCruiseTask(String taskId) {
         return tRobotInfoDao.selectTCruiseTask(taskId);
     }
-
     @Transactional(rollbackFor = Exception.class)
     public Long selectRobotIdByCode(String robotCode) {
         return tRobotInfoDao.selectRobotIdByCode(robotCode);
     }
-
     @Transactional(rollbackFor = Exception.class)
     public int insertRobotAlarm(TRobotAlarm tRobotAlarm) {
         return this.tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
     }
-
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseDataResult(List<TCruiseDataResult> tCruiseDataResultList) {
         return this.tRobotInfoDao.batchInsertCruiseDataResult(tCruiseDataResultList);
     }
-
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail> tCruiseTaskResultDetailList) {
         return this.tRobotInfoDao.batchInsertCruiseTaskResultDetail(tCruiseTaskResultDetailList);
     }
-
     @Transactional(rollbackFor = Exception.class)
     public int updateTCruiseResult(TCruiseResult tCruiseResult) {
         return this.tRobotInfoDao.updateTCruiseResult(tCruiseResult);
     }
-
     @Transactional(rollbackFor = Exception.class)
     public int insertTCruiseTaskResult(TCruiseTaskResult tCruiseTaskResult) {
         return this.tRobotInfoDao.insertTCruiseTaskResult(tCruiseTaskResult);
     }
-
     public Map<String, Object> booleanZcz(String key, Long userId, String password,HttpServletRequest request) throws  Exception{
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(userId);
         Map map = new HashMap();
@@ -1156,8 +1135,6 @@ public class RobotService {
         }
         return map;
     }
-
-
     @Transactional(rollbackFor = Exception.class)
     public String upSystemCommand(XMLBaseModel xmlBaseModel){
 
@@ -1170,7 +1147,6 @@ public class RobotService {
         RobotServerHandler.getRobotServerHandlerMap().get(Constant.robotCode).sendHeartBeat( generateByteOrder(xmlString,Constant.robotCode),Constant.robotCode);
         return "success";
     }
-
     @Transactional(rollbackFor = Exception.class)
     public String upToCruise(XMLBaseModel xmlBaseModel){
         Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();
@@ -1180,7 +1156,6 @@ public class RobotService {
         robotTaskStates(robotMap);
         return "success";
     }
-
     public Result robotTaskStates(Map<String,List<XMLBaseModel>> robotMap) {
         Result re = new Result();
         re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.SEND_ROBOT_URL, robotMap, Result.class);
@@ -1254,8 +1229,11 @@ public class RobotService {
                 case "5":
                     dictNote = "液压表";
                     break;
-                case "7":
+                case "6":
                     dictNote = "开关动作次数表";
+                    break;
+                case "7":
+                    dictNote = "油温表";
                     break;
                 case "8":
                     dictNote = "档位表";
