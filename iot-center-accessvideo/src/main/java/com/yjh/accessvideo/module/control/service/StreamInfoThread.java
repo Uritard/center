@@ -16,6 +16,7 @@ import java.util.Objects;
 
 public class StreamInfoThread implements Runnable {
 
+    private static final Logger log = LoggerFactory.getLogger(StreamInfoThread.class);
 
     private String srsStopUrl = "";
     private int livePath;
@@ -31,8 +32,6 @@ public class StreamInfoThread implements Runnable {
         this.redisTemplate = redisTemplate;
     }
 
-    private static final Logger log = LoggerFactory.getLogger(StreamInfoThread.class);
-
     @Override
     public void run() {
         String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
@@ -43,22 +42,20 @@ public class StreamInfoThread implements Runnable {
         } catch (Exception e) {e.getMessage();}
         assert jsonList != null;
         List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
-        int streamListSize = streamsJsonObjectList.size();
-        for (int i = 0; i < streamListSize; i++) {
-            String streambeanStr = streamsJsonObjectList.get(i);
-            JSONObject streambeanJson = JSONObject.parseObject(streambeanStr);
+        for (String streamStr:streamsJsonObjectList) {
+            JSONObject streamJson = JSONObject.parseObject(streamStr);
             //livePath-cameraId
-            String name = streambeanJson.getString("name");
-            String videoFlowId = streambeanJson.getString("id");
-            String publish = streambeanJson.getString("publish");
+            String name = streamJson.getString("name");
+            String videoFlowId = streamJson.getString("id");
+            String publish = streamJson.getString("publish");
             JSONObject publishJson = JSONObject.parseObject(publish);
             if (Objects.equals(name, String.valueOf(livePath)) && StringUtils.isNotEmpty(publishJson.getString("cid"))) {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(String.valueOf(cameraId), videoFlowId);
-                log.info("realReturnMap: " + returnMap);
+                log.info("realReturnMap:{}", returnMap);
                 redisTemplate.opsForHash().putAll("cameraRealFlow:" + cameraId, returnMap);
             }
         }
-        log.info("realMapsForCamera: " + Constant.mapsForCamera);
+        log.info("mapsForCamera:{}", Constant.mapsForCamera);
     }
 }
