@@ -490,7 +490,7 @@ public class TStdMetemodelService {
     private String excelDataImport(MultipartFile file) {
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
         String path = (String) mapForPicModelPath.get("content");
-        //path = "D:\\code\\qhTest";
+        //path = "D:/code/qhTest";
         String fileName = "copy-meteModel.xlsx";
         // 将上传文件写入
         try {
@@ -973,7 +973,7 @@ public class TStdMetemodelService {
             return result;
         }catch (Exception e){
             result.setCode(209,"导入文件失败");
-            log.error(e.getMessage());
+            log.error("导入文件失败"+e);
         }finally {
             try {
                 if (in != null) {
@@ -992,7 +992,6 @@ public class TStdMetemodelService {
     private boolean isIn(List<TStdMete> meteList,TStdMete tStdMete){
         for (TStdMete item:meteList) {
             if(item.getDeviceType().equals(tStdMete.getDeviceType())
-            && item.getMeteType().equals(tStdMete.getMeteType())
             && item.getMeteName().equals(tStdMete.getMeteName())){
                 return true;
             }
@@ -1000,7 +999,7 @@ public class TStdMetemodelService {
         return false;
     }
     private boolean checkString(String str){
-        Pattern pattern1 = Pattern.compile(".*[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？\\\\]+.*");
+        Pattern pattern1 = Pattern.compile(".*[`~!@#$%^&*+=|{}':;',\\[\\]<>?~！@#￥%……&*——+|{}【】‘；：”“’。，、？\\\\]+.*");
         Matcher matcher1 = pattern1.matcher(str);
         if (matcher1.find()) {
             return true;
