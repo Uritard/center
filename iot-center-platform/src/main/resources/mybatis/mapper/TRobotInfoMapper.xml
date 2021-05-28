@@ -141,7 +141,7 @@
         <if test="robotCode != null "> a.robot_code = #{robotCode},</if>
         <if test="robotName != null ">a.robot_name = #{robotName},</if>
         <if test="robotStatus != null ">a.robot_status = #{robotStatus},</if>
-        <if test="robotType != null ">a.robot_type = #{robotType, jdbcType=INTEGER},</if>
+        a.robot_type = #{robotType, jdbcType=INTEGER},
         <if test="robotIp != null ">a.robot_ip = #{robotIp},</if>
         a.robot_port = #{robotPort, jdbcType=INTEGER},
         <if test="lightIp != null ">a.light_ip = #{lightIp},</if>
@@ -157,11 +157,11 @@
         <if test="createDate != null">a.create_date = #{createDate, jdbcType=TIMESTAMP},</if>
         <if test="updateBy != null ">a.update_by = #{updateBy},</if>
         <if test="updateDate != null">a.update_date = #{updateDate, jdbcType=TIMESTAMP},</if>
-        <if test="robotFactory != null ">a.robot_factory = #{robotFactory},</if>
+        a.robot_factory = #{robotFactory},
         <if test="isUse != null ">a.is_use = #{isUse},</if>
         a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},
         <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
-        <if test="robotPosition != null">a.robot_position = #{robotPosition},</if>
+        a.robot_position = #{robotPosition},
         <if test="robotSource != null ">a.robot_source = #{robotSource},</if>
         <if test="address != null ">a.address = #{address},</if>
         <if test="buildingUser != null ">a.building_user = #{buildingUser},</if>

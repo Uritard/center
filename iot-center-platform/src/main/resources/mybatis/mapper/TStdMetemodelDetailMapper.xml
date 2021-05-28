@@ -115,11 +115,11 @@
         update t_std_metemodel_detail a <set>
         <if test="modelId != null ">a.model_id = #{modelId},</if>
         <if test="meteId != null ">a.mete_id = #{meteId},</if>
-        <if test="customType != null">a.custom_id = #{customType},</if>
+        a.custom_id = #{customType},
         <if test="meteName != null ">a.mete_name = #{meteName},</if>
-        <if test="meteType != null ">a.mete_type = #{meteType},</if>
-        <if test="meteKind != null"> a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
-        <if test="analyseType != null"> a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
+        a.mete_type = #{meteType},
+         a.mete_kind = #{meteKind, jdbcType=INTEGER},
+         a.analyse_type = #{analyseType, jdbcType=INTEGER},
         <if test="unit != null ">a.unit = #{unit},</if>
         a.alarm_note = #{alarmNote},
         <if test="alarmExplain != null ">a.alarm_explain = #{alarmExplain},</if>

@@ -92,7 +92,7 @@
         a.device_model = #{deviceModel, jdbcType=INTEGER},
         <if test="pmsType != null ">a.pms_type = #{pmsType},</if>
         <if test="pmsId != null ">a.pms_id = #{pmsId},</if>
-        <if test="deviceVendor != null ">a.device_vendor = #{deviceVendor},</if>
+        a.device_vendor = #{deviceVendor},
         <if test="productionDate != null ">a.production_date = #{productionDate, jdbcType=TIMESTAMP},</if>
         <if test="usedTime != null ">a.used_time = #{usedTime, jdbcType=TIMESTAMP},</if>
         <if test="disableDate != null ">a.disable_date = #{disableDate, jdbcType=TIMESTAMP},</if>
@@ -105,7 +105,7 @@
         <if test="longitude != null">a.longitude = #{longitude},</if>
         <if test="ip != null ">a.ip = #{ip, jdbcType=VARCHAR},</if>
         a.port = #{port, jdbcType=INTEGER},
-        <if test="voltageLevel != null">a.voltage_level = #{voltageLevel},</if>
+        a.voltage_level = #{voltageLevel},
         <if test="sequencePoint != null ">a.sequence_point = #{sequencePoint},</if>
         a.real_code = #{realCode},
         <if test="address != null">a.address = #{address},</if>

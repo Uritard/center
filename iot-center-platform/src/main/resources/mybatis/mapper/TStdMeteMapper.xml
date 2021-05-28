@@ -118,13 +118,13 @@
         update t_std_mete a <set>
         <if test="stdMeteId != null ">a.std_mete_id = #{stdMeteId},</if>
         <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
-        <if test="meteType != null">a.mete_type = #{meteType},</if>
-        <if test="meteKind != null ">a.mete_kind = #{meteKind},</if>
+        a.mete_type = #{meteType},
+        a.mete_kind = #{meteKind},
         <if test="meteName != null ">a.mete_name = #{meteName},</if>
         <if test="alarmNote != null ">a.alarm_note = #{alarmNote},</if>
         <if test="alarmExplain != null">a.alarm_explain = #{alarmExplain},</if>
-        <if test="alarmType != null ">a.alarm_type = #{alarmType},</if>
-        <if test="analyseType != null ">a.analyse_type = #{analyseType, jdbcType=INTEGER},</if>
+        a.alarm_type = #{alarmType},
+        a.analyse_type = #{analyseType, jdbcType=INTEGER},
         <if test="unit != null">a.unit = #{unit},</if>
         a.up_effect = #{upEffect},
         a.down_effect = #{downEffect},

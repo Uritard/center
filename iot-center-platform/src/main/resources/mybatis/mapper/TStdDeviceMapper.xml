@@ -122,7 +122,7 @@
         <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
         <if test="deviceName != null">a.device_name = #{deviceName},</if>
         <if test="aliasName != null ">a.alias_name = #{aliasName},</if>
-        <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
+        a.device_type = #{deviceType, jdbcType=INTEGER},
         <if test="positionType != null ">a.position_type = #{positionType},</if>
         <if test="modelId != null ">a.model_id = #{modelId},</if>
         <if test="regionPath != null">a.region_path = #{regionPath},</if>
@@ -182,7 +182,7 @@
         a.create_time
         from t_std_device a
         where 1 = 1
-            and a.device_id = #{deviceId, jdbcType=BIGINT}
+        and a.device_id = #{deviceId, jdbcType=BIGINT}
     </select>
 
     <select id="selectByPrimaryIdAll" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">

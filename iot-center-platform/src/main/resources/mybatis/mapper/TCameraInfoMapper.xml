@@ -145,7 +145,7 @@
            <if test="smsId != null">a.sms_id = #{smsId, jdbcType=INTEGER},</if>
            <if test="rmsId != null">a.rms_id = #{rmsId, jdbcType=INTEGER},</if>
            <if test="monitorId != null ">a.monitor_id = #{monitorId, jdbcType=VARCHAR},</if>
-           <if test="vendorId != null ">a.vendor_id = #{vendorId, jdbcType=VARCHAR},</if>
+           a.vendor_id = #{vendorId, jdbcType=VARCHAR},
            <if test="streamType != null">a.stream_type = #{streamType, jdbcType=INTEGER},</if>
            <if test="protocolType != null">a.protocol_type = #{protocolType, jdbcType=INTEGER},</if>
            <if test="cameraIp != null ">a.camera_ip = #{cameraIp},</if>
