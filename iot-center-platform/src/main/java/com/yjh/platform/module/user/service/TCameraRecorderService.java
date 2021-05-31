@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -142,85 +143,89 @@ public class TCameraRecorderService {
 
         Iterator iterator = rootElement.elementIterator();
         Map<String,Object> map = new HashMap<>();
-        while (iterator.hasNext()) {
-            Element stu = (Element) iterator.next();
-            List<Attribute> attributes = stu.attributes();
+        try {
+            while (iterator.hasNext()) {
+                Element stu = (Element) iterator.next();
+                List<Attribute> attributes = stu.attributes();
 
-            for (Attribute attribute : attributes) {
-                if (pmsId.equals(attribute.getValue())) {
-                    Iterator iterator1 = stu.elementIterator();
-                    while (iterator1.hasNext()) {
-                        Element stuChild = (Element) iterator1.next();
-                        map.put(stuChild.getName(), stuChild.getStringValue());
-                    }
+                for (Attribute attribute : attributes) {
+                    if (pmsId.equals(attribute.getValue())) {
+                        Iterator iterator1 = stu.elementIterator();
+                        while (iterator1.hasNext()) {
+                            Element stuChild = (Element) iterator1.next();
+                            map.put(stuChild.getName(), stuChild.getStringValue());
+                        }
 
-                    TCameraRecorder tCameraRecorder = new TCameraRecorder()
-                            .setRecordId(recorderId);
-                    if (map.containsKey("recordName") && (!"".equals(map.get("recordName")))) {
-                        tCameraRecorder.setRecordName(map.get("recordName").toString());
+                        TCameraRecorder tCameraRecorder = new TCameraRecorder()
+                                .setRecordId(recorderId);
+                        if (map.containsKey("recordName") && (!"".equals(map.get("recordName")))) {
+                            tCameraRecorder.setRecordName(map.get("recordName").toString());
+                        }
+                        if (map.containsKey("recorderModel") && (!"".equals(map.get("recorderModel")))) {
+                            Integer recorderModel = Integer.valueOf(tRobotInfoDao.selectDictCode("recorder_model",map.get("recorderModel").toString()));
+                            tCameraRecorder.setRecorderModel(recorderModel);
+                        }
+                        if (map.containsKey("recorderType") && (!"".equals(map.get("recorderType")))) {
+                            String recorderType = tRobotInfoDao.selectDictCode("recorder_type",map.get("recorderType").toString());
+                            tCameraRecorder.setRecorderType(recorderType);
+                        }
+                        if (map.containsKey("vendorId") && (!"".equals(map.get("vendorId")))) {
+                            Integer vendorId = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_vendor",map.get("vendorId").toString()));
+                            tCameraRecorder.setVendorId(vendorId);
+                        }
+                        if (map.containsKey("aliasName") && (!"".equals(map.get("aliasName")))) {
+                            tCameraRecorder.setAliasName(map.get("aliasName").toString());
+                        }
+                        if (map.containsKey("recordIp") && (!"".equals(map.get("recordIp")))) {
+                            tCameraRecorder.setRecordIp(map.get("recordIp").toString());
+                        }
+                        if (map.containsKey("protocol") && (!"".equals(map.get("protocol")))) {
+                            String protocol = tRobotInfoDao.selectDictCode("protocol_type",map.get("protocol").toString());
+                            tCameraRecorder.setProtocol(protocol);
+                        }
+                        if (map.containsKey("httpPort") && (!"".equals(map.get("httpPort")))) {
+                            tCameraRecorder.setHttpPort(Integer.valueOf(map.get("httpPort").toString()));
+                        }
+                        if (map.containsKey("transPort") && (!"".equals(map.get("transPort")))) {
+                            tCameraRecorder.setTransPort(Integer.valueOf(map.get("transPort").toString()));
+                        }
+                        if (map.containsKey("rtspPort") && (!"".equals(map.get("rtspPort")))) {
+                            tCameraRecorder.setRtspPort(Integer.valueOf(map.get("rtspPort").toString()));
+                        }
+                        if (map.containsKey("identityManager") && (!"".equals(map.get("identityManager")))) {
+                            tCameraRecorder.setIdentityManager(map.get("identityManager").toString());
+                        }
+                        if (map.containsKey("identityCode") && (!"".equals(map.get("identityCode")))) {
+                            tCameraRecorder.setIdentityCode(map.get("identityCode").toString());
+                        }
+                        if (map.containsKey("protocolUrl") && (!"".equals(map.get("protocolUrl")))) {
+                            tCameraRecorder.setProtocolUrl(map.get("protocolUrl").toString());
+                        }
+                        if (map.containsKey("maxChannel") && (!"".equals(map.get("maxChannel")))) {
+                            tCameraRecorder.setMaxChannel(Integer.valueOf(map.get("maxChannel").toString()));
+                        }
+                        if (map.containsKey("hddSize") && (!"".equals(map.get("hddSize")))) {
+                            tCameraRecorder.setHddSize(Integer.valueOf(map.get("hddSize").toString()));
+                        }
+                        if (map.containsKey("bufferDay") && (!"".equals(map.get("bufferDay")))) {
+                            tCameraRecorder.setBufferDay(Integer.valueOf(map.get("bufferDay").toString()));
+                        }
+                        if (map.containsKey("timeLong") && (!"".equals(map.get("timeLong")))) {
+                            tCameraRecorder.setTimeLong(Integer.valueOf(map.get("timeLong").toString()));
+                        }
+                        if (map.containsKey("unit") && (!"".equals(map.get("unit")))) {
+                            tCameraRecorder.setUnit(map.get("unit").toString());
+                        }
+                        log.info("tCameraRecorder==="+tCameraRecorder);
+                        tCameraRecorderDao.update(tCameraRecorder);
                     }
-                    if (map.containsKey("recorderModel") && (!"".equals(map.get("recorderModel")))) {
-                        Integer recorderModel = Integer.valueOf(tRobotInfoDao.selectDictCode("recorder_model",map.get("recorderModel").toString()));
-                        tCameraRecorder.setRecorderModel(recorderModel);
-                    }
-                    if (map.containsKey("recorderType") && (!"".equals(map.get("recorderType")))) {
-                        String recorderType = tRobotInfoDao.selectDictCode("recorder_type",map.get("recorderType").toString());
-                        tCameraRecorder.setRecorderType(recorderType);
-                    }
-                    if (map.containsKey("vendorId") && (!"".equals(map.get("vendorId")))) {
-                        Integer vendorId = Integer.valueOf(tRobotInfoDao.selectDictCode("camera_vendor",map.get("vendorId").toString()));
-                        tCameraRecorder.setVendorId(vendorId);
-                    }
-                    if (map.containsKey("aliasName") && (!"".equals(map.get("aliasName")))) {
-                        tCameraRecorder.setAliasName(map.get("aliasName").toString());
-                    }
-                    if (map.containsKey("recordIp") && (!"".equals(map.get("recordIp")))) {
-                        tCameraRecorder.setRecordIp(map.get("recordIp").toString());
-                    }
-                    if (map.containsKey("protocol") && (!"".equals(map.get("protocol")))) {
-                        String protocol = tRobotInfoDao.selectDictCode("protocol_type",map.get("protocol").toString());
-                        tCameraRecorder.setProtocol(protocol);
-                    }
-                    if (map.containsKey("httpPort") && (!"".equals(map.get("httpPort")))) {
-                        tCameraRecorder.setHttpPort(Integer.valueOf(map.get("httpPort").toString()));
-                    }
-                    if (map.containsKey("transPort") && (!"".equals(map.get("transPort")))) {
-                        tCameraRecorder.setTransPort(Integer.valueOf(map.get("transPort").toString()));
-                    }
-                    if (map.containsKey("rtspPort") && (!"".equals(map.get("rtspPort")))) {
-                        tCameraRecorder.setRtspPort(Integer.valueOf(map.get("rtspPort").toString()));
-                    }
-                    if (map.containsKey("identityManager") && (!"".equals(map.get("identityManager")))) {
-                        tCameraRecorder.setIdentityManager(map.get("identityManager").toString());
-                    }
-                    if (map.containsKey("identityCode") && (!"".equals(map.get("identityCode")))) {
-                        tCameraRecorder.setIdentityCode(map.get("identityCode").toString());
-                    }
-                    if (map.containsKey("protocolUrl") && (!"".equals(map.get("protocolUrl")))) {
-                        tCameraRecorder.setProtocolUrl(map.get("protocolUrl").toString());
-                    }
-                    if (map.containsKey("maxChannel") && (!"".equals(map.get("maxChannel")))) {
-                        tCameraRecorder.setMaxChannel(Integer.valueOf(map.get("maxChannel").toString()));
-                    }
-                    if (map.containsKey("hddSize") && (!"".equals(map.get("hddSize")))) {
-                        tCameraRecorder.setHddSize(Integer.valueOf(map.get("hddSize").toString()));
-                    }
-                    if (map.containsKey("bufferDay") && (!"".equals(map.get("bufferDay")))) {
-                        tCameraRecorder.setBufferDay(Integer.valueOf(map.get("bufferDay").toString()));
-                    }
-                    if (map.containsKey("timeLong") && (!"".equals(map.get("timeLong")))) {
-                        tCameraRecorder.setTimeLong(Integer.valueOf(map.get("timeLong").toString()));
-                    }
-                    if (map.containsKey("unit") && (!"".equals(map.get("unit")))) {
-                        tCameraRecorder.setUnit(map.get("unit").toString());
-                    }
-                    log.info("tCameraRecorder==="+tCameraRecorder);
-                    tCameraRecorderDao.update(tCameraRecorder);
-                    return true;
                 }
             }
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return false;
         }
-        return false;
+        return true;
     }
     @Transactional(rollbackFor = Exception.class)
     public List<TCameraRecorderDetail> selectIdAndName(){
