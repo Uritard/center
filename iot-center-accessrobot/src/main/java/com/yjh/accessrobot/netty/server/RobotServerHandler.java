@@ -1,6 +1,8 @@
 package com.yjh.accessrobot.netty.server;
 
+import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -21,7 +23,12 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.SAXReader;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.MultiKeyCommands;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -417,26 +424,28 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
         Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
 
-
         try {
-            if ("251".equals(xmlBaseModel.getType())){
-                switch (xmlBaseModel.getType()+xmlBaseModel.getCommand()){
+            if ("251".equals(xmlBaseModel.getType())) {
+                switch (xmlBaseModel.getType() + xmlBaseModel.getCommand()) {
                     //注册指令(发送响应)
                     case "2511":
-                        log.info("巡视主机收到注册指令了,这是第"+Constant.registerCount+"次");
+
+                        log.info("巡视主机收到注册指令了,这是第" + Constant.registerCount + "次");
                         Constant.registerCount++;
                         List<Map<String, Object>> itemsList = new ArrayList<>();
                         Map<String, Object> items = new HashMap<>();
                         String code = "";
-                        if (allRobotCodeMap.containsValue(xmlBaseModel.getSendCode())){
+                        if (allRobotCodeMap.containsValue(xmlBaseModel.getSendCode())) {
                             code = "200";//success
                             log.info("缓存有,可以注册");
-                        }else {
+                            Constant.registerFlag = 1;
+                        } else {
                             List<String> robotCodeList = StaticContextAccessor.getBean(RobotService.class).selectAllRobotCode();
-                            if (robotCodeList.contains(xmlBaseModel.getSendCode())){
+                            if (robotCodeList.contains(xmlBaseModel.getSendCode())) {
                                 code = "200";
                                 log.info("缓存无，表中有，可以注册");
-                            }else {
+                                Constant.registerFlag = 1;
+                            } else {
                                 code = "400";//refuse
                                 log.info("缓存无，表中无，不可以注册");
                             }
@@ -456,7 +465,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                                 .setItems(itemsList);
                         String registerXmlString = PlatformXMLUtil.generateXml(xmlBaseModelTemp);//生成xml
                         byte[] registerProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, registerXmlString);
-                        sendHeartBeat(registerProtocol,xmlBaseModel.getSendCode());
+                        sendHeartBeat(registerProtocol, xmlBaseModel.getSendCode());
 
                         if (Objects.nonNull(robotServerHandlerMap.get(xmlBaseModel.getSendCode()))) {
                             robotServerHandlerMap.get(xmlBaseModel.getSendCode()).ctx.close();
@@ -464,7 +473,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                         robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
                         //Start heatBreakDealThread
-                        HeartBreakDealThread dataDealThread = new HeartBreakDealThread(this, xmlBaseModel.getSendCode(),redisTemplate,isThreadStart,sendSessionId,receiveSessionId);
+                        HeartBreakDealThread dataDealThread = new HeartBreakDealThread(this, xmlBaseModel.getSendCode(), redisTemplate, isThreadStart, sendSessionId, receiveSessionId);
                         Thread thread = new Thread(dataDealThread);
                         thread.setDaemon(true);
                         thread.start();
@@ -476,20 +485,20 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         log.info("+++++++++++++++++巡视主机收到心跳指令了+++++++++++++++++");
                         heartNum = 0;
                         String robotCode = xmlBaseModel.getSendCode();
-                        if (allRobotCodeMap.containsValue(robotCode)){
+                        if (Constant.registerFlag == 1 && allRobotCodeMap.containsValue(robotCode)) {
                             log.info("缓存有,发送心跳响应");
-                            Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
-                            heartBeatSuccessAfter(robotCode,sendSessionId,robotStatusMap);
-                        }else {
+                            Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":2");
+                            heartBeatSuccessAfter(robotCode, sendSessionId, robotStatusMap);
+                        } else {
                             List<String> robotCodeList = robotService.selectAllRobotCode();
-                            if (robotCodeList.contains(robotCode)){
+                            if (Constant.registerFlag == 1 && robotCodeList.contains(robotCode)) {
                                 log.info("缓存无,表中有,发送心跳相应");
-                                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
-                                heartBeatSuccessAfter(robotCode,sendSessionId,robotStatusMap);
-                            }else {
+                                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":2");
+                                heartBeatSuccessAfter(robotCode, sendSessionId, robotStatusMap);
+                            } else {
                                 log.info("缓存无,表中无,断开连接");
-                                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
-                                heartBeatFailAfter(robotCode,robotStatusMap);
+                                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":2");
+                                heartBeatFailAfter(robotCode, robotStatusMap);
                             }
                         }
                         break;
@@ -498,81 +507,86 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         if (xmlBaseModel.getItems().get(0).size() == 1) {
                             //Deal with task control
 
-                            if (xmlBaseModel.getItems().get(0).containsKey("task_patrolled_id")){
+                            if (xmlBaseModel.getItems().get(0).containsKey("task_patrolled_id")) {
                                 String taskId = xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString();
-                                log.info("机器人收到任务控制指令了,这是机器人响应的巡视任务执行Id==="+taskId);
-                            }else if (xmlBaseModel.getItems().get(0).containsKey("error_code")){
-                                switch (xmlBaseModel.getItems().get(0).get("error_code").toString()){
+                                log.info("机器人收到任务控制指令了,这是机器人响应的巡视任务执行Id===" + taskId);
+                            } else if (xmlBaseModel.getItems().get(0).containsKey("error_code")) {
+                                switch (xmlBaseModel.getItems().get(0).get("error_code").toString()) {
                                     case "0":
-                                        log.info("成功");break;
+                                        log.info("成功");
+                                        break;
                                     case "1":
-                                        log.info("机器人异常");break;
+                                        log.info("机器人异常");
+                                        break;
                                     case "2":
-                                        log.info("无权限（或高优先级任务存在");break;
+                                        log.info("无权限（或高优先级任务存在");
+                                        break;
                                     case "3":
-                                        log.info("其它异常");break;
-                                    default:break;
+                                        log.info("其它异常");
+                                        break;
+                                    default:
+                                        break;
                                 }
                             }
 
-                        }else if (xmlBaseModel.getItems().get(0).size() == 2){
+                        } else if (xmlBaseModel.getItems().get(0).size() == 2) {
                             log.info("机器人收到模型指令了,这是机器人的响应");
                             //Deal with synchronous model
                             String deviceFile = xmlBaseModel.getItems().get(0).get("device_file_path").toString();
                             String robotFile = xmlBaseModel.getItems().get(0).get("robot_file_path").toString();
-                            XMLBaseModel deviceModel = getXmlMessage(filePathMap.get(redisValue) + "/" +deviceFile);
-                            List<Map<String,Object>> deviceMap = deviceModel.getItems();
-                            XMLBaseModel robotModel = getXmlMessage(filePathMap.get(redisValue) + "/" +robotFile);
-                            List<Map<String,Object>> robotMap = robotModel.getItems();
-                            log.info("deviceMap==="+deviceMap+",robotMap==="+robotMap);
-                            robotService.robotFileIntoDB(deviceMap,robotMap,xmlBaseModel);
+                            XMLBaseModel deviceModel = getXmlMessage(filePathMap.get(redisValue) + "/" + deviceFile);
+                            List<Map<String, Object>> deviceMap = deviceModel.getItems();
+                            XMLBaseModel robotModel = getXmlMessage(filePathMap.get(redisValue) + "/" + robotFile);
+                            List<Map<String, Object>> robotMap = robotModel.getItems();
+                            log.info("deviceMap===" + deviceMap + ",robotMap===" + robotMap);
+                            robotService.robotFileIntoDB(deviceMap, robotMap, xmlBaseModel);
 
-                            robotService.uploadFile(deviceFile,deviceFile);//设备模型
-                            robotService.uploadFile(robotFile,robotFile);//机器人模型
+                            robotService.uploadFile(deviceFile, deviceFile);//设备模型
+                            robotService.uploadFile(robotFile, robotFile);//机器人模型
                             robotService.upToCruise(xmlBaseModel);//国网要求
-                        }else if (xmlBaseModel.getItems().get(0).size() == 0){
+                        } else if (xmlBaseModel.getItems().get(0).size() == 0) {
                             log.info("机器人收到检修区域指令了,这是机器人的响应");
                             //Deal with the maintenance area was issued successfully
-                            robotService.receivingResponse(xmlBaseModel,receiveSessionId);
+                            robotService.receivingResponse(xmlBaseModel, receiveSessionId);
                         }
                         break;
                     //任务下发指令and控制指令(接收响应)
                     case "2513":
                         log.info("机器人收到下发任务指令/控制指令了,这是机器人的响应");
                         //Deal with task issue/control
-                        robotService.receivingResponse(xmlBaseModel,receiveSessionId);
+                        robotService.receivingResponse(xmlBaseModel, receiveSessionId);
                         break;
                     default:
                         break;
                 }
-            }else {
-                switch (xmlBaseModel.getType()){
+            } else {
+                switch (xmlBaseModel.getType()) {
                     //机器人状态数据(接收并发送响应)
                     case "1":
                         log.info("+++++++++++++++++巡视主机收到机器人状态数据了+++++++++++++++++");
                         //Deal with robot status data
-                        List<Map<String,String>> robotStatusList = new ArrayList<>();
-                        xmlBaseModel.getItems().forEach(res->{
+                        List<Map<String, String>> robotStatusList = new ArrayList<>();
+                        xmlBaseModel.getItems().forEach(res -> {
                             Map<String, String> robotStatusMap = new HashMap<>();
-                            robotStatusMap.put("robotName",res.get("robot_name").toString());
-                            robotStatusMap.put("robotCode",xmlBaseModel.getSendCode());
-                            robotStatusMap.put("time",res.get("time").toString());
-                            robotStatusMap.put("type",res.get("type").toString());
-                            robotStatusMap.put("value",res.get("value").toString());
-                            robotStatusMap.put("valueUnit",res.get("value_unit").toString());
-                            robotStatusMap.put("unit",res.get("unit").toString());
+                            robotStatusMap.put("robotName", res.get("robot_name").toString());
+                            robotStatusMap.put("robotCode", xmlBaseModel.getSendCode());
+                            robotStatusMap.put("time", res.get("time").toString());
+                            robotStatusMap.put("type", res.get("type").toString());
+                            robotStatusMap.put("value", res.get("value").toString());
+                            robotStatusMap.put("valueUnit", res.get("value_unit").toString());
+                            robotStatusMap.put("unit", res.get("unit").toString());
                             robotStatusList.add(robotStatusMap);
 
                             robotService.upToCruise(xmlBaseModel);//国网要求
                         });
-                        log.info("机器人状态数据是："+robotStatusList);
+                        log.info("机器人状态数据是：" + robotStatusList);
                         //放缓存
                         for (int i = 0; i < robotStatusList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("RobotStatus:"+xmlBaseModel.getSendCode()+":"+ robotStatusList.get(i).get("type"), robotStatusList.get(i));
+                            redisTemplate.opsForHash().putAll("RobotStatus:" + xmlBaseModel.getSendCode() + ":" + robotStatusList.get(i).get("type"), robotStatusList.get(i));
                         }
-                        String statusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                        byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, statusXmlString);
-                        send(ctx, statusProtocol,xmlBaseModel.getSendCode());
+                        String statusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
+                        byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
+                        send(ctx, statusProtocol, xmlBaseModel.getSendCode());
                         log.info("巡视主机给机器人响应了");
 
                         break;
@@ -580,26 +594,26 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     case "2":
                         log.info("+++++++++++++++++巡视主机收到机器人运行数据了+++++++++++++++++");
                         //Deal with robot operation data
-                        List<Map<String,String>> robotOperationList = new ArrayList<>();
-                        xmlBaseModel.getItems().forEach(res->{
-                            Map<String,String> robotOperationMap = new HashMap<>();
-                            robotOperationMap.put("robotName",res.get("robot_name").toString());
-                            robotOperationMap.put("robotCode",res.get("robot_code").toString());
-                            robotOperationMap.put("time",res.get("time").toString());
-                            robotOperationMap.put("type",res.get("type").toString());
-                            robotOperationMap.put("value",res.get("value").toString());
-                            robotOperationMap.put("valueUnit",res.get("value_unit").toString());
-                            robotOperationMap.put("unit",res.get("unit").toString());
+                        List<Map<String, String>> robotOperationList = new ArrayList<>();
+                        xmlBaseModel.getItems().forEach(res -> {
+                            Map<String, String> robotOperationMap = new HashMap<>();
+                            robotOperationMap.put("robotName", res.get("robot_name").toString());
+                            robotOperationMap.put("robotCode", res.get("robot_code").toString());
+                            robotOperationMap.put("time", res.get("time").toString());
+                            robotOperationMap.put("type", res.get("type").toString());
+                            robotOperationMap.put("value", res.get("value").toString());
+                            robotOperationMap.put("valueUnit", res.get("value_unit").toString());
+                            robotOperationMap.put("unit", res.get("unit").toString());
                             robotOperationList.add(robotOperationMap);
 
                         });
                         //放缓存
                         for (int i = 0; i < robotOperationList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("RobotOperation:"+xmlBaseModel.getSendCode()+":"+ robotOperationList.get(i).get("type"), robotOperationList.get(i));
+                            redisTemplate.opsForHash().putAll("RobotOperation:" + xmlBaseModel.getSendCode() + ":" + robotOperationList.get(i).get("type"), robotOperationList.get(i));
                         }
-                        String operationXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, operationXmlString);
-                        send(ctx, operationProtocol,xmlBaseModel.getSendCode());
+                        String operationXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
+                        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+                        send(ctx, operationProtocol, xmlBaseModel.getSendCode());
                         log.info("巡视主机给机器人响应了");
                         robotService.upToCruise(xmlBaseModel);//国网要求
 
@@ -608,25 +622,25 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     case "3":
                         log.info("+++++++++++++++++巡视主机收到机器人坐标数据了+++++++++++++++++");
                         //Deal with robot coordinates data
-                        List<Map<String,String>> robotCoordinateList = new ArrayList<>();
-                        xmlBaseModel.getItems().forEach(res-> {
+                        List<Map<String, String>> robotCoordinateList = new ArrayList<>();
+                        xmlBaseModel.getItems().forEach(res -> {
                             Map<String, String> robotCoordinateMap = new HashMap<>();
                             robotCoordinateMap.put("robotName", res.get("robot_name").toString());
                             robotCoordinateMap.put("filePath", res.get("file_path").toString());
-                            robotService.uploadFile(res.get("file_path").toString(),res.get("file_path").toString());
+                            robotService.uploadFile(res.get("file_path").toString(), res.get("file_path").toString());
                             robotCoordinateMap.put("robotCode", xmlBaseModel.getSendCode());
-                            robotCoordinateMap.put("time",res.get("time").toString());
+                            robotCoordinateMap.put("time", res.get("time").toString());
                             robotCoordinateMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
                             robotCoordinateMap.put("coordinateGeography", res.get("coordinate_geography").toString());
                             robotCoordinateList.add(robotCoordinateMap);
                         });
                         //放缓存
                         for (int i = 0; i < robotCoordinateList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("RobotCoordinate:"+xmlBaseModel.getSendCode(), robotCoordinateList.get(i));
+                            redisTemplate.opsForHash().putAll("RobotCoordinate:" + xmlBaseModel.getSendCode(), robotCoordinateList.get(i));
                         }
-                        String coordinateXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        String coordinateXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
                         byte[] coordinateProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, coordinateXmlString);
-                        send(ctx, coordinateProtocol,xmlBaseModel.getSendCode());
+                        send(ctx, coordinateProtocol, xmlBaseModel.getSendCode());
                         log.info("巡视主机给机器人响应了");
                         robotService.upToCruise(xmlBaseModel);//国网要求
                         break;
@@ -634,29 +648,29 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     case "4":
                         log.info("+++++++++++++++++巡视主机收到机器人巡视路线数据了+++++++++++++++++");
                         //Deal with robot cruise road data
-                        List<Map<String,String>> robotRoadList = new ArrayList<>();
-                        xmlBaseModel.getItems().forEach(res-> {
+                        List<Map<String, String>> robotRoadList = new ArrayList<>();
+                        xmlBaseModel.getItems().forEach(res -> {
                             Map<String, String> robotRoadMap = new HashMap<>();
                             robotRoadMap.put("robotName", res.get("robot_name").toString());
                             String filePath = res.get("file_path").toString();
-                            robotService.uploadFile(filePath,filePath);
+                            robotService.uploadFile(filePath, filePath);
                             String splitArray[] = filePath.split("/");
                             String fileName = splitArray[splitArray.length - 1];
-                            log.info("巡检路线图片名称=="+fileName);
+                            log.info("巡检路线图片名称==" + fileName);
                             String taskId = splitArray[splitArray.length - 3];
                             /*
                             将ftp服务器上的文件复制到开发环境
                             * */
-                            String temporaryPath = filePathMap.get(redisValue) + "/" +filePath;//文件在ftp服务器上的绝对路径
-                            log.info("temporaryPath是==="+temporaryPath);
+                            String temporaryPath = filePathMap.get(redisValue) + "/" + filePath;//文件在ftp服务器上的绝对路径
+                            log.info("temporaryPath是===" + temporaryPath);
 
                             //开发环境图片相对路径文件目录
-                            String developRelativeUrl =  relativeImgMap.get(redisValue) +  "/"+ todayTime+ "/"+ taskId + "/Road";
+                            String developRelativeUrl = relativeImgMap.get(redisValue) + "/" + todayTime + "/" + taskId + "/Road";
                             //开发环境图片绝对路径文件目录
-                            String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime+ "/"+taskId + "/Road";
-                            log.info("developAbsoluteUrl是==="+developAbsoluteUrl);
-                            File f=new File(developAbsoluteUrl);
-                            if (!f.exists()){
+                            String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/" + todayTime + "/" + taskId + "/Road";
+                            log.info("developAbsoluteUrl是===" + developAbsoluteUrl);
+                            File f = new File(developAbsoluteUrl);
+                            if (!f.exists()) {
                                 f.setWritable(true, false);
                                 f.mkdirs();
                             }
@@ -668,21 +682,21 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                                 e.printStackTrace();
                             }
 
-                            robotRoadMap.put("relativePath",developRelativeUrl + "/" +fileName);//相对路径
-                            robotRoadMap.put("absolutePath",developAbsoluteUrl + "/"+fileName);//绝对路径
+                            robotRoadMap.put("relativePath", developRelativeUrl + "/" + fileName);//相对路径
+                            robotRoadMap.put("absolutePath", developAbsoluteUrl + "/" + fileName);//绝对路径
                             robotRoadMap.put("robotCode", xmlBaseModel.getSendCode());
-                            robotRoadMap.put("time",res.get("time").toString());
+                            robotRoadMap.put("time", res.get("time").toString());
                             robotRoadMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
                             robotRoadMap.put("coordinateGeography", res.get("coordinate_geography").toString());
                             robotRoadList.add(robotRoadMap);
                         });
                         //放缓存
                         for (int i = 0; i < robotRoadList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("RobotRoad:"+xmlBaseModel.getSendCode(), robotRoadList.get(i));
+                            redisTemplate.opsForHash().putAll("RobotRoad:" + xmlBaseModel.getSendCode(), robotRoadList.get(i));
                         }
-                        String roadXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        String roadXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
                         byte[] roadProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, roadXmlString);
-                        send(ctx, roadProtocol,xmlBaseModel.getSendCode());
+                        send(ctx, roadProtocol, xmlBaseModel.getSendCode());
                         log.info("巡视主机给机器人响应了");
 
                         robotService.upToCruise(xmlBaseModel);//国网要求
@@ -692,18 +706,18 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         log.info("+++++++++++++++++巡视主机收到机器人异常告警数据了+++++++++++++++++");
                         //Deal with robot alarm data
                         Map<String, String> robotAlarmMap = new HashMap<>();
-                        robotAlarmMap.put("robotName",xmlBaseModel.getItems().get(0).get("robot_name").toString());
-                        robotAlarmMap.put("robotCode",xmlBaseModel.getSendCode());
-                        robotAlarmMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
-                        robotAlarmMap.put("content",xmlBaseModel.getItems().get(0).get(redisValue).toString());
+                        robotAlarmMap.put("robotName", xmlBaseModel.getItems().get(0).get("robot_name").toString());
+                        robotAlarmMap.put("robotCode", xmlBaseModel.getSendCode());
+                        robotAlarmMap.put("time", xmlBaseModel.getItems().get(0).get("time").toString());
+                        robotAlarmMap.put("content", xmlBaseModel.getItems().get(0).get(redisValue).toString());
 
                         //Start alarmResultDealThread
-                        AlarmResultDealThread alarmResultDealThread = new AlarmResultDealThread(robotAlarmMap,isThreadStart,this);
+                        AlarmResultDealThread alarmResultDealThread = new AlarmResultDealThread(robotAlarmMap, isThreadStart, this);
                         TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
-                        String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
                         byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
-                        send(ctx, alarmProtocol,xmlBaseModel.getSendCode());
+                        send(ctx, alarmProtocol, xmlBaseModel.getSendCode());
                         log.info("巡视主机给机器人响应了");
 
 
@@ -715,10 +729,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     case "21":
                         log.info("+++++++++++++++++巡视主机收到微气象数据了+++++++++++++++++");
                         //Deal with robot micro climate data
-                        List<Map<String,String>> weatherList = new ArrayList<>();
-                        Map<String,String> info = new HashMap<>();
+                        List<Map<String, String>> weatherList = new ArrayList<>();
+                        Map<String, String> info = new HashMap<>();
                         DecimalFormat decimalFormat = new DecimalFormat("#0.0");
-                        xmlBaseModel.getItems().forEach(res-> {
+                        xmlBaseModel.getItems().forEach(res -> {
                             Map<String, String> weatherMap = new HashMap<>();
                             weatherMap.put("robotName", res.get("robot_name").toString());
                             weatherMap.put("robotCode", xmlBaseModel.getSendCode());
@@ -729,31 +743,31 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             weatherMap.put("unit", res.get("unit").toString());
                             weatherList.add(weatherMap);
                             //1=温度 2=湿度 3=风速 4=大气压  5=降雨量 6=风向
-                            if("1".equals(weatherMap.get("type"))){
-                                info.put("temperature",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
-                                info.put("temperatureUnit","℃");
+                            if ("1".equals(weatherMap.get("type"))) {
+                                info.put("temperature", decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                                info.put("temperatureUnit", "℃");
                             }
-                            if("2".equals(weatherMap.get("type"))){
-                                info.put("humidity",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
-                                info.put("humidityUnit","%");
+                            if ("2".equals(weatherMap.get("type"))) {
+                                info.put("humidity", decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                                info.put("humidityUnit", "%");
                             }
-                            if("3".equals(weatherMap.get("type"))){
-                                info.put("windSpeed",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
-                                info.put("windSpeedUnit","m/s");
+                            if ("3".equals(weatherMap.get("type"))) {
+                                info.put("windSpeed", decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                                info.put("windSpeedUnit", "m/s");
                             }
-                            if("4".equals(weatherMap.get("type"))){
-                                info.put("airPressure",decimalFormat.format(Double.valueOf(weatherMap.get("value"))/10).toString());
-                                info.put("airPressureUnit","kPa");
+                            if ("4".equals(weatherMap.get("type"))) {
+                                info.put("airPressure", decimalFormat.format(Double.valueOf(weatherMap.get("value")) / 10).toString());
+                                info.put("airPressureUnit", "kPa");
                             }
-                            if("5".equals(weatherMap.get("type"))){
-                                info.put("precipitation",decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
-                                info.put("precipitationUnit","mm");
+                            if ("5".equals(weatherMap.get("type"))) {
+                                info.put("precipitation", decimalFormat.format(Double.valueOf(weatherMap.get("value"))).toString());
+                                info.put("precipitationUnit", "mm");
                             }
-                            if("6".equals(weatherMap.get("type"))){
-                                if("".equals(weatherMap.get("value")) || null==weatherMap.get("value")){
-                                    info.put("windDirection","--");
-                                }else {
-                                    info.put("windDirection",weatherMap.get("value").toString());
+                            if ("6".equals(weatherMap.get("type"))) {
+                                if ("".equals(weatherMap.get("value")) || null == weatherMap.get("value")) {
+                                    info.put("windDirection", "--");
+                                } else {
+                                    info.put("windDirection", weatherMap.get("value").toString());
                                 }
 
                                 //info.put("precipitationUnit","mm");
@@ -761,12 +775,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         });
                         //放缓存
                         for (int i = 0; i < weatherList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("RobotWeather:"+xmlBaseModel.getSendCode()+":"+ weatherList.get(i).get("type"), weatherList.get(i));
+                            redisTemplate.opsForHash().putAll("RobotWeather:" + xmlBaseModel.getSendCode() + ":" + weatherList.get(i).get("type"), weatherList.get(i));
                         }
-                        Constant.weatherServer(info,Constant.WEATHER_URL);
-                        String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                        byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, weatherXmlString);
-                        send(ctx, weatherProtocol,xmlBaseModel.getSendCode());
+                        Constant.weatherServer(info, Constant.WEATHER_URL);
+                        String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
+                        byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);
+                        send(ctx, weatherProtocol, xmlBaseModel.getSendCode());
                         log.info("巡视主机给机器人响应了");
 
                         //robotService.upToCruise(xmlBaseModel);//国网要求
@@ -781,7 +795,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         taskStatusMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
                         taskStatusMap.put("taskState", xmlBaseModel.getItems().get(0).get("task_state").toString());
                         taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time"));
-                        String startTime =  xmlBaseModel.getItems().get(0).get("start_time").toString();
+                        String startTime = xmlBaseModel.getItems().get(0).get("start_time").toString();
                         taskStatusMap.put("startTime", sdf.format(sdf.parse(startTime)));
                         taskStatusMap.put("taskProgress", xmlBaseModel.getItems().get(0).get("task_progress").toString());
                         taskStatusMap.put("taskEstimatedTime", xmlBaseModel.getItems().get(0).get("task_estimated_time").toString());
@@ -789,71 +803,104 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                         //判断任务是否属于机器人本体任务
                         Long robotId = robotService.selectIsRobotTask(xmlBaseModel.getItems().get(0).get("task_code").toString());
-                        if (Objects.nonNull(robotId)){
-                            Map<String,String> jasonMap=new HashMap<>();
-                            jasonMap.put("type","newTask");
-                            jasonMap.put("taskId",xmlBaseModel.getItems().get(0).get("task_code").toString());
-                            String json= JSON.toJSONString(jasonMap);
-                            Constant.postUrl(webSocketUrl,json);
+                        if (Objects.nonNull(robotId)) {
+                            Map<String, String> jasonMap = new HashMap<>();
+                            jasonMap.put("type", "newTask");
+                            jasonMap.put("taskId", xmlBaseModel.getItems().get(0).get("task_code").toString());
+                            String json = JSON.toJSONString(jasonMap);
+                            Constant.postUrl(webSocketUrl, json);
                         }
 
-                        Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode()
-                                +":"+xmlBaseModel.getItems().get(0).get("task_code").toString());
-                        taskStatusMap.put("instanceList",listMap.get("instanceIdList"));
-                        log.info("taskStatusMap=="+taskStatusMap);
-                        redisTemplate.opsForHash().putAll("RobotTaskStatus:"+xmlBaseModel.getSendCode()
-                                +":"+xmlBaseModel.getItems().get(0).get("task_code").toString(), taskStatusMap);
+                        Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + xmlBaseModel.getSendCode()
+                                + ":" + xmlBaseModel.getItems().get(0).get("task_code").toString());
+                        taskStatusMap.put("instanceList", listMap.get("instanceIdList"));
+                        log.info("taskStatusMap==" + taskStatusMap);
+                        redisTemplate.opsForHash().putAll("RobotTaskStatus:" + xmlBaseModel.getSendCode()
+                                + ":" + xmlBaseModel.getItems().get(0).get("task_code").toString(), taskStatusMap);
 
-                        String taskStatusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
-                        byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, taskStatusXmlString);
-                        send(ctx, taskStatusProtocol,xmlBaseModel.getSendCode());
+                        String taskStatusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
+                        byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, taskStatusXmlString);
+                        send(ctx, taskStatusProtocol, xmlBaseModel.getSendCode());
                         log.info("巡视主机给机器人响应了");
 
                         //任务没做,没有完成,并且进度为100%的处理
-                        if ("1".equals(xmlBaseModel.getItems().get(0).get("taskState").toString())){
-                            String taskId =  xmlBaseModel.getItems().get(0).get("task_code").toString();
+                        if ("1".equals(xmlBaseModel.getItems().get(0).get("task_state").toString())) {
+                            String taskId = xmlBaseModel.getItems().get(0).get("task_code").toString();
 
-                            List<Long> instanceIDList = Constant.flagMap.get(taskId);
-                            if (instanceIDList == null || instanceIDList.isEmpty()){
+                            //统计机器人返回任务结果的大小
+                            List<String> resultList = new ArrayList<>();
+                            Set<String> cruiseKey = redisScan("t_cruise_task_result:" + taskId);
+                            for (String key : cruiseKey) {
+                                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+                                if (redisInfoMap.get("cruiseResult").equals("246") || redisInfoMap.get("cruiseResult").equals("247")) {
+                                    resultList.add(redisInfoMap.get("instanceId"));
+                                }
+                            }
+                            log.info("机器人返回任务结果的大小====" + resultList.size());
 
-                                TCruiseResult tCruiseResult = robotService.selectTaskResultId(taskId);
+                            //统计巡视主机下发给机器人的巡检点大小
+                            Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:" + xmlBaseModel.getSendCode() + ":" + taskId);
+                            String instanceList = redisInfoMap2.get("instanceIdList");
+                            instanceList = instanceList.replaceAll("\\[", "").replaceAll("]", "");
+                            String[] instanceIdArray = instanceList.split(", ");
+                            List<String> allInstanceIdList = new ArrayList<>();
+                            for (String i : instanceIdArray) {
+                                allInstanceIdList.add(i);
+                            }
+                            log.info("巡视主机下发给机器人的巡检点大小====" + allInstanceIdList.size());
+                            TCruiseResult tCruiseResult = robotService.selectTaskResultId(taskId);
+
+                            //读异常点缓存表巡检点
+                            String strForCountAbnormal = "countForAbnormal:" + taskId;
+                            Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
+
+                            Integer totalCheckPoint = Integer.valueOf(abnormalCount.get("all").toString());
+                            Integer abnormalCheckPoint = Integer.valueOf(abnormalCount.get("abnormal").toString()) ;
+                            Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString()) ;
+                            log.info("总检测点数是==="+totalCheckPoint+",异常点数是==="+abnormalCheckPoint+",正常点数是===" + normalCheckPoint);
+
+                            Integer abnormal = abnormalCheckPoint;
+                            Integer normal = normalCheckPoint;
+
+                            if (resultList.size() == 0) {
 
                                 List<TCruiseDataResult> tCDRList = new ArrayList<>();
                                 List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();
                                 List<String> cruiseResultIdList = new ArrayList<>();
 
-                                //读异常点缓存表巡检点
-                                String strForCountAbnormal = "countForAbnormal:" + taskId;
-                                Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                                List<Long> instanceIDList = Constant.flagMap.get(taskId);//已经做过的点
+                                log.info("已经做过的巡视点====" + instanceIDList);
 
-                                Integer totalCheckPoint = Integer.valueOf(abnormalCount.get("all").toString());
-                                Integer abnormalCheckPoint = Integer.valueOf(abnormalCount.get("abnormal").toString()) ;
-                                Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString()) ;
-                                log.info("总检测点数是==="+totalCheckPoint+",异常点数是==="+abnormalCheckPoint+",正常点数是===" + normalCheckPoint);
-
-                                Integer abnormal = abnormalCheckPoint;
-                                Integer normal = normalCheckPoint;
-
-                                //统计巡视主机下发给机器人的巡检点大小
-                                Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode()+":"+taskId);
-                                String instanceList = redisInfoMap2.get("instanceIdList");
-                                instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
-                                String[] instanceIdArray = instanceList.split(", ");
-                                List<String> allInstanceIdList = new ArrayList<>();
-                                for (String i : instanceIdArray){
-                                    allInstanceIdList.add(i);
+                                //删除已经做过的点
+                                if (instanceIDList != null && !instanceIDList.isEmpty()){
+                                    for (Long instanceId : instanceIDList){
+                                        allInstanceIdList.remove(instanceId.toString());
+                                    }
                                 }
+                                log.info("删除已经做过的巡视点后==="+allInstanceIdList);
+
+                                List<Long> isFinishedInstanceList = StaticContextAccessor.getBean(RobotService.class).selectInstanceForTaskGoOn(taskId);//已经入库的点
+                                log.info("已经入库的巡视点==="+isFinishedInstanceList);
+
+                                //删除已经入库的点
+                                if (isFinishedInstanceList != null && !isFinishedInstanceList.isEmpty()) {
+                                    for (Long instanceIdInTable : isFinishedInstanceList) {
+                                        allInstanceIdList.remove(instanceIdInTable.toString());
+                                    }
+                                }
+                                log.info("删除已经入库的巡视点后==="+allInstanceIdList);
+                                log.info("准备遍历的点是==="+allInstanceIdList);
 
                                 for (String instanceId : allInstanceIdList) {
                                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
-                                    if (!redisInfoMap.get("resultNum").equals("设备检修中")){
+                                    if (!redisInfoMap.get("resultNum").equals("设备检修中")) {
                                         TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
                                         tCruiseTaskResultDetail.setCruiseResultId(redisInfoMap.get("cruiseResultId"));
                                         tCruiseTaskResultDetail.setTaskResultId(redisInfoMap.get("taskResultId"));
                                         tCruiseTaskResultDetail.setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")));
                                         tCruiseTaskResultDetail.setInstanceName(redisInfoMap.get("instanceName"));
                                         tCruiseTaskResultDetail.setCruiseTime(new Date());
-                                        tCruiseTaskResultDetail.setCruiseTime(sdf.parse(redisInfoMap.get("cruiseTime")));
+                                        tCruiseTaskResultDetail.setCruiseTime(new Date());
                                         tCruiseTaskResultDetail.setEndTime(new Date());
                                         tCruiseTaskResultDetail.setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")));
                                         tCruiseTaskResultDetail.setDeviceName(redisInfoMap.get("deviceName"));
@@ -868,18 +915,25 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                                         tCruiseDataResult.setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")));
                                         tCruiseDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
                                         tCruiseDataResult.setCruiseType(228);
-                                        tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
+                                        if ("null".equals(redisInfoMap.get("resultNum"))){
+                                            tCruiseDataResult.setResultNum("异常终止");
+                                        }else {
+                                            tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
+                                        }
                                         tCruiseDataResult.setModifyNum(redisInfoMap.get("modifyNum"));
                                         tCruiseDataResult.setPicpath("--");
                                         tCruiseDataResult.setOrigpic("--");
                                         tCruiseDataResult.setEvaluationState(257);
                                         tCruiseDataResult.setCreatetime(new Date());
-                                        tCruiseDataResult.setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")));
-                                        if ("null".equals(redisInfoMap.get("cruiseResult"))){
+                                        tCruiseDataResult.setIsWarn(0);
+                                        if ("null".equals(redisInfoMap.get("cruiseResult"))) {
                                             abnormal = abnormal + 1;
                                             tCruiseDataResult.setCruiseResult(247);
+                                            log.info("这次变化的abnormal是==="+abnormal);
                                         }
-                                        tCruiseDataResult.setCruiseAbnormal(249);
+                                        if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
+                                            tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
+                                        }
                                         tCruiseDataResult.setRemark(null);
                                         tCruiseDataResult.setResultPic(null);
                                         tCruiseDataResult.setFirName("f");
@@ -887,27 +941,37 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                                     }
                                 }
 
-                                log.info("tCTRDList的内容是===" + tCTRDList+",大小size是: "+tCTRDList.size());
-                                log.info("tCDRList的内容是===" + tCDRList+",大小size是: "+tCDRList.size());
+                                log.info("tCTRDList的内容是===" + tCTRDList + ",大小size是: " + tCTRDList.size());
+                                log.info("tCDRList的内容是===" + tCDRList + ",大小size是: " + tCDRList.size());
 
                                 int res1 = 0;
                                 int res2 = 0;
-                                if (tCTRDList != null && !tCTRDList.isEmpty()){
+                                if (tCTRDList != null && !tCTRDList.isEmpty()) {
                                     res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);
                                 }
-                                if (tCDRList != null && !tCDRList.isEmpty()){
+                                if (tCDRList != null && !tCDRList.isEmpty()) {
                                     res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);
-                                    log.info("准备传其他服务的cruiseResultIdList==="+cruiseResultIdList);
+                                    log.info("准备传其他服务的cruiseResultIdList===" + cruiseResultIdList);
                                     try {
                                         StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_FINISH, cruiseResultIdList, Result.class);
-                                    } catch (Exception e) {e.getMessage();}
+                                    } catch (Exception e) {
+                                        e.getMessage();
+                                    }
                                 }
-                                log.info("插tCTRD的条数: "+res1+",插tCDR的条数: "+res2);
+                                log.info("插tCTRD的条数: " + res1 + ",插tCDR的条数: " + res2);
+
+                                log.info("准备更新的abnormal是：" + abnormal + ",准备更新的normal是: "+normal);
+
+                                Map<String, String> mapForAbnormal = new HashMap<>();
+                                mapForAbnormal.put("abnormal", abnormal.toString());
+                                mapForAbnormal.put("normal", normal.toString());
+                                //更新异常点缓存的数据
+                                redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
 
                                 /*
                                 判断缓存中的异常点，如果机器人任务是最后执行，则更新缓存并更新表
                                 */
-                                if (abnormal + normal == totalCheckPoint){
+                                if (abnormal + normal == totalCheckPoint) {
                                     log.info("机器人巡检点是最后一个点");
                                     Thread.sleep(15000);
 
@@ -918,46 +982,245 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                                             .setTaskAbnormal(abnormal)
                                             .setCruiseTaskTime(new Date())
                                             .setTaskResultId(tCruiseResult.getTaskResultId());
-                                    log.info("tCruiseTaskResult的内容是==="+tCruiseTaskResult);
+                                    log.info("tCruiseTaskResult的内容是===" + tCruiseTaskResult);
                                     StaticContextAccessor.getBean(RobotService.class).insertTCruiseTaskResult(tCruiseTaskResult);
 
                                     Integer taskWait = totalCheckPoint - normal - abnormal;
-                                    log.info("taskWait的值是=="+ taskWait);
+                                    log.info("taskWait的值是==" + taskWait);
                                     tCruiseResult.setTaskWait(taskWait);
                                     tCruiseResult.setCState(243);
                                     tCruiseResult.setTaskCode(taskId);
                                     tCruiseResult.setCreateTime(new Date());
-                                    log.info("tCruiseResult的内容是==="+tCruiseResult);
+                                    log.info("tCruiseResult的内容是===" + tCruiseResult);
                                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
 
                                     // webSocket通知前端调用巡视监控的接口（任务完成）
                                     Map<String, Object> jasonMap = new HashMap<>();
                                     jasonMap.put("type", "lastOneInstance");
-                                    jasonMap.put("taskId",taskId);
+                                    jasonMap.put("taskId", taskId);
                                     String json = JSON.toJSONString(jasonMap);
                                     log.info("最后一个点-前端推送：" + json);
-                                    Constant.postUrl(webSocketUrl,json);
+                                    Constant.postUrl(webSocketUrl, json);
 
-                                    for (TCruiseTaskResultDetail tctrd : tCTRDList){
-                                        int resNum = StaticContextAccessor.getBean(RobotService.class).selectIsWarn(tctrd.getInstanceId(),taskId);
-                                        if (resNum > 0){
+                                    for (TCruiseTaskResultDetail tctrd : tCTRDList) {
+                                        int resNum = StaticContextAccessor.getBean(RobotService.class).selectIsWarn(tctrd.getInstanceId(), taskId);
+                                        if (resNum > 0) {
                                             StaticContextAccessor.getBean(RobotService.class).updateIsWarn(tctrd.getCruiseResultId());
                                         }
                                     }
 
-                                }else{
+                                } else {
                                     log.info("机器人巡检点不是最后一个点");
                                     Integer taskWait = totalCheckPoint - normal - abnormal;
-                                    log.info("taskWait的值是=="+ taskWait);
+                                    log.info("taskWait的值是==" + taskWait);
                                     tCruiseResult.setTaskWait(taskWait);
                                     tCruiseResult.setCState(239);
                                     tCruiseResult.setTaskCode(taskId);
-                                    log.info("tCruiseResult的内容是==="+tCruiseResult);
+                                    log.info("tCruiseResult的内容是===" + tCruiseResult);
+                                    StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+                                }
+                            } else if (resultList.size() < allInstanceIdList.size() ){
+                                List<TCruiseDataResult> tCDRList = new ArrayList<>();
+                                List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();
+                                List<String> cruiseResultIdList = new ArrayList<>();
+
+                                List<Long> instanceIDList = Constant.flagMap.get(taskId);//已经做过的点
+                                log.info("已经做过的巡视点====" + instanceIDList);
+
+                                //删除已经做过的点
+                                if (instanceIDList != null && !instanceIDList.isEmpty()) {
+                                    for (Long instanceId : instanceIDList) {
+                                        allInstanceIdList.remove(instanceId.toString());
+                                    }
+                                }
+                                log.info("删除已经做过的巡视点后===" + allInstanceIdList);
+
+                                List<Long> isFinishedInstanceList = StaticContextAccessor.getBean(RobotService.class).selectInstanceForTaskGoOn(taskId);//已经入库的点
+                                log.info("已经入库的巡视点===" + isFinishedInstanceList);
+
+                                //删除已经入库的点
+                                if (isFinishedInstanceList != null && !isFinishedInstanceList.isEmpty()) {
+                                    for (Long instanceIdInTable : isFinishedInstanceList) {
+                                        allInstanceIdList.remove(instanceIdInTable.toString());
+                                    }
+                                }
+                                log.info("删除已经入库的巡视点后===" + allInstanceIdList);
+                                log.info("准备遍历的点是===" + allInstanceIdList);
+
+                                for (String instanceId : allInstanceIdList) {
+                                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
+                                    //缓存中该巡检点有结果
+                                    if (!redisInfoMap.get("resultNum").equals("设备检修中")) {
+                                        TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
+                                        tCruiseTaskResultDetail.setCruiseResultId(redisInfoMap.get("cruiseResultId"));
+                                        tCruiseTaskResultDetail.setTaskResultId(redisInfoMap.get("taskResultId"));
+                                        tCruiseTaskResultDetail.setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")));
+                                        tCruiseTaskResultDetail.setInstanceName(redisInfoMap.get("instanceName"));
+                                        if ("null".equals(redisInfoMap.get("cruiseTime"))) {
+                                            tCruiseTaskResultDetail.setCruiseTime(new Date());
+                                        } else {
+                                            tCruiseTaskResultDetail.setCruiseTime(sdf.parse(redisInfoMap.get("cruiseTime")));
+                                        }
+                                        if ("null".equals(redisInfoMap.get("endTime"))) {
+                                            tCruiseTaskResultDetail.setEndTime(new Date());
+                                        } else {
+                                            tCruiseTaskResultDetail.setEndTime(sdf.parse(redisInfoMap.get("endTime")));
+                                        }
+                                        tCruiseTaskResultDetail.setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")));
+                                        tCruiseTaskResultDetail.setDeviceName(redisInfoMap.get("deviceName"));
+                                        tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(redisInfoMap.get("cruiseStatus")));
+                                        tCruiseTaskResultDetail.setRemark(redisInfoMap.get("remark"));
+                                        tCTRDList.add(tCruiseTaskResultDetail);
+
+                                        cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
+
+                                        TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
+                                        tCruiseDataResult.setCruiseResultId(redisInfoMap.get("cruiseResultId"));
+                                        tCruiseDataResult.setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")));
+                                        tCruiseDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
+                                        tCruiseDataResult.setCruiseType(228);
+                                        if ("null".equals(redisInfoMap.get("resultNum"))){
+                                            tCruiseDataResult.setResultNum("异常终止");
+                                        }else {
+                                            tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
+                                        }
+                                        tCruiseDataResult.setModifyNum(redisInfoMap.get("modifyNum"));
+                                        if ("null".equals(redisInfoMap.get("picpath"))) {
+                                            tCruiseDataResult.setPicpath("--");
+                                        } else {
+                                            tCruiseDataResult.setPicpath(redisInfoMap.get("picpath"));
+                                        }
+                                        if ("null".equals(redisInfoMap.get("origpic"))) {
+                                            tCruiseDataResult.setOrigpic("--");
+                                        } else {
+                                            tCruiseDataResult.setOrigpic(redisInfoMap.get("origpic"));
+                                        }
+                                        tCruiseDataResult.setEvaluationState(257);
+                                        if ("null".equals(redisInfoMap.get("cruiseTime"))) {
+                                            tCruiseDataResult.setCreatetime(new Date());
+                                        } else {
+                                            tCruiseDataResult.setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")));
+                                        }
+                                        tCruiseDataResult.setIsWarn(0);
+                                        if ("null".equals(redisInfoMap.get("cruiseResult"))) {
+                                            abnormal = abnormal + 1;
+                                            tCruiseDataResult.setCruiseResult(247);
+                                            log.info("这次变化的abnormal是==="+abnormal);
+                                        } else if ("246".equals(redisInfoMap.get("cruiseResult"))) {
+                                            tCruiseDataResult.setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
+                                        } else if ("247".equals(redisInfoMap.get("cruiseResult"))) {
+                                            abnormal = abnormal + 1;
+                                            tCruiseDataResult.setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
+                                            log.info("这次变化的abnormal是==="+abnormal);
+                                        }
+                                        if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
+                                            tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
+                                        }
+                                        if (!"null".equals(redisInfoMap.get("remark"))) {
+                                            tCruiseDataResult.setRemark(redisInfoMap.get("remark"));
+                                        } else {
+                                            tCruiseDataResult.setRemark(null);
+                                        }
+                                        if (!"null".equals(redisInfoMap.get("resultPic"))) {
+                                            tCruiseDataResult.setResultPic(redisInfoMap.get("resultPic"));
+                                        } else {
+                                            tCruiseDataResult.setResultPic(null);
+                                        }
+                                        tCruiseDataResult.setFirName("f");
+                                        tCDRList.add(tCruiseDataResult);
+                                    }
+                                }
+
+                                log.info("准备更新的abnormal是：" + abnormal + ",准备更新的normal是: "+normal);
+
+                                Map<String, String> mapForAbnormal = new HashMap<>();
+                                mapForAbnormal.put("abnormal", abnormal.toString());
+                                mapForAbnormal.put("normal", normal.toString());
+                                //更新异常点缓存的数据
+                                redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
+
+                                log.info("tCTRDList的内容是===" + tCTRDList + ",大小size是: " + tCTRDList.size());
+                                log.info("tCDRList的内容是===" + tCDRList + ",大小size是: " + tCDRList.size());
+
+                                int res1 = 0;
+                                int res2 = 0;
+                                if (tCTRDList != null && !tCTRDList.isEmpty()) {
+                                    res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);
+                                }
+                                if (tCDRList != null && !tCDRList.isEmpty()) {
+                                    res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);
+                                    log.info("准备传其他服务的cruiseResultIdList===" + cruiseResultIdList);
+                                    try {
+                                        StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_FINISH, cruiseResultIdList, Result.class);
+                                    } catch (Exception e) {
+                                        e.getMessage();
+                                    }
+                                }
+                                log.info("插tCTRD的条数: " + res1 + ",插tCDR的条数: " + res2);
+
+                                //将公共类的instanceIdList清空
+                                if (Constant.flagMap.get(taskId) != null && !Constant.flagMap.get(taskId).isEmpty()) {
+                                    log.info("进来了？？？");
+                                    for (Long instancedId : Constant.flagMap.get(taskId)) {
+                                        allInstanceIdList.remove(instancedId.toString());
+                                    }
+                                }
+
+
+                                /*
+                                判断缓存中的异常点，如果机器人任务是最后执行，则更新缓存并更新表
+                                */
+                                if (abnormal + normal == totalCheckPoint) {
+                                    log.info("机器人巡检点是最后一个点");
+                                    Thread.sleep(15000);
+
+                                    TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult()
+                                            .setTaskId(taskId)
+                                            .setTaskName(xmlBaseModel.getItems().get(0).get("task_name").toString())
+                                            .setTaskAlarm(0)
+                                            .setTaskAbnormal(abnormal)
+                                            .setCruiseTaskTime(new Date())
+                                            .setTaskResultId(tCruiseResult.getTaskResultId());
+                                    log.info("tCruiseTaskResult的内容是===" + tCruiseTaskResult);
+                                    StaticContextAccessor.getBean(RobotService.class).insertTCruiseTaskResult(tCruiseTaskResult);
+
+                                    Integer taskWait = totalCheckPoint - normal - abnormal;
+                                    log.info("taskWait的值是==" + taskWait);
+                                    tCruiseResult.setTaskWait(taskWait);
+                                    tCruiseResult.setCState(243);
+                                    tCruiseResult.setTaskCode(taskId);
+                                    tCruiseResult.setCreateTime(new Date());
+                                    log.info("tCruiseResult的内容是===" + tCruiseResult);
+                                    StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+
+                                    // webSocket通知前端调用巡视监控的接口（任务完成）
+                                    Map<String, Object> jasonMap = new HashMap<>();
+                                    jasonMap.put("type", "lastOneInstance");
+                                    jasonMap.put("taskId", taskId);
+                                    String json = JSON.toJSONString(jasonMap);
+                                    log.info("最后一个点-前端推送：" + json);
+                                    Constant.postUrl(webSocketUrl, json);
+
+                                    for (TCruiseTaskResultDetail tctrd : tCTRDList) {
+                                        int resNum = StaticContextAccessor.getBean(RobotService.class).selectIsWarn(tctrd.getInstanceId(), taskId);
+                                        if (resNum > 0) {
+                                            StaticContextAccessor.getBean(RobotService.class).updateIsWarn(tctrd.getCruiseResultId());
+                                        }
+                                    }
+
+                                } else {
+                                    log.info("机器人巡检点不是最后一个点");
+                                    Integer taskWait = totalCheckPoint - normal - abnormal;
+                                    log.info("taskWait的值是==" + taskWait);
+                                    tCruiseResult.setTaskWait(taskWait);
+                                    tCruiseResult.setCState(239);
+                                    tCruiseResult.setTaskCode(taskId);
+                                    log.info("tCruiseResult的内容是===" + tCruiseResult);
                                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
                                 }
                             }
-                        }
 
+                        }
 
 
                         robotService.upToCruise(xmlBaseModel);//国网要求
@@ -967,68 +1230,68 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         log.info("+++++++++++++++++巡视主机收到巡视结果了+++++++++++++++++");
                         //Deal with robot task result data
                         Map<String, String> cruiseResultMap = new HashMap<>();
-                        cruiseResultMap.put("robotCode",xmlBaseModel.getSendCode());
-                        cruiseResultMap.put("taskName",xmlBaseModel.getItems().get(0).get("task_name").toString());
-                        cruiseResultMap.put("taskCode",xmlBaseModel.getItems().get(0).get("task_code").toString());
-                        cruiseResultMap.put("deviceName",xmlBaseModel.getItems().get(0).get("device_name").toString());
-                        cruiseResultMap.put("deviceId",xmlBaseModel.getItems().get(0).get("device_id").toString());
-                        cruiseResultMap.put("value",xmlBaseModel.getItems().get(0).get("value").toString());
-                        cruiseResultMap.put("valueUnit",xmlBaseModel.getItems().get(0).get("value_unit").toString());
-                        cruiseResultMap.put("unit",xmlBaseModel.getItems().get(0).get("unit").toString());
-                        cruiseResultMap.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
-                        cruiseResultMap.put("recognitionType",xmlBaseModel.getItems().get(0).get("recognition_type").toString());
-                        cruiseResultMap.put("fileType",xmlBaseModel.getItems().get(0).get("file_type").toString());
-                        cruiseResultMap.put("rectangle",xmlBaseModel.getItems().get(0).get("rectangle").toString());
-                        cruiseResultMap.put("taskPatrolledId",xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
-                        if (Objects.nonNull(xmlBaseModel.getItems().get(0).get("valid"))){
-                            cruiseResultMap.put("valid",xmlBaseModel.getItems().get(0).get("valid").toString());
+                        cruiseResultMap.put("robotCode", xmlBaseModel.getSendCode());
+                        cruiseResultMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
+                        cruiseResultMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
+                        cruiseResultMap.put("deviceName", xmlBaseModel.getItems().get(0).get("device_name").toString());
+                        cruiseResultMap.put("deviceId", xmlBaseModel.getItems().get(0).get("device_id").toString());
+                        cruiseResultMap.put("value", xmlBaseModel.getItems().get(0).get("value").toString());
+                        cruiseResultMap.put("valueUnit", xmlBaseModel.getItems().get(0).get("value_unit").toString());
+                        cruiseResultMap.put("unit", xmlBaseModel.getItems().get(0).get("unit").toString());
+                        cruiseResultMap.put("time", xmlBaseModel.getItems().get(0).get("time").toString());
+                        cruiseResultMap.put("recognitionType", xmlBaseModel.getItems().get(0).get("recognition_type").toString());
+                        cruiseResultMap.put("fileType", xmlBaseModel.getItems().get(0).get("file_type").toString());
+                        cruiseResultMap.put("rectangle", xmlBaseModel.getItems().get(0).get("rectangle").toString());
+                        cruiseResultMap.put("taskPatrolledId", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
+                        if (Objects.nonNull(xmlBaseModel.getItems().get(0).get("valid"))) {
+                            cruiseResultMap.put("valid", xmlBaseModel.getItems().get(0).get("valid").toString());
                         }
-                        String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
-                        String developRelativeUrl = relativeImgMap.get(redisValue)+ "/"+ todayTime  + "/"+ xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+                        String developAbsoluteUrl = absoluteImgMap.get(redisValue) + "/" + todayTime + "/" + xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+                        String developRelativeUrl = relativeImgMap.get(redisValue) + "/" + todayTime + "/" + xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
                         //可见光结果、红外fir、音频wav
                         String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
-                        robotService.uploadFile(ftpFilePath,ftpFilePath);
+                        robotService.uploadFile(ftpFilePath, ftpFilePath);
                         String sArray[] = ftpFilePath.split("/");
                         String ftpFileName = sArray[sArray.length - 1];
-                        String temporaryFilePath = filePathMap.get(redisValue) + "/" +ftpFilePath;
+                        String temporaryFilePath = filePathMap.get(redisValue) + "/" + ftpFilePath;
 //                        log.info("temporaryFilePath==="+temporaryFilePath);
 
                         //红外原图
-                        if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")){
+                        if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")) {
                             String ftpInfraredOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();//红外原图
                             String sArray2[] = ftpInfraredOriginPath.split("/");
                             String ftpInfraredOriginName = sArray2[sArray2.length - 1];//红外原图名称
-                            String temporaryInfraredOriginPath = filePathMap.get(redisValue) + "/" +ftpInfraredOriginPath;
-                            copyFileToDevelop(temporaryInfraredOriginPath,developAbsoluteUrl + "InfraredOrigin");//拷贝原图
-                            cruiseResultMap.put("absolutePath",developAbsoluteUrl + "InfraredOrigin" + "/" + ftpInfraredOriginName);
+                            String temporaryInfraredOriginPath = filePathMap.get(redisValue) + "/" + ftpInfraredOriginPath;
+                            copyFileToDevelop(temporaryInfraredOriginPath, developAbsoluteUrl + "InfraredOrigin");//拷贝原图
+                            cruiseResultMap.put("absolutePath", developAbsoluteUrl + "InfraredOrigin" + "/" + ftpInfraredOriginName);
                         }
                         String ftpOriginPath = null;
                         //可见光原图、音频和红外结果
-                        if (xmlBaseModel.getItems().get(0).containsKey("origin_file_result_path")){
+                        if (xmlBaseModel.getItems().get(0).containsKey("origin_file_result_path")) {
                             ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_result_path").toString();//可见光原图、红外结果
-                        }else {
+                        } else {
                             ftpOriginPath = xmlBaseModel.getItems().get(0).get("file_path").toString();//可见光原图、音频
                         }
                         String sArray2[] = ftpOriginPath.split("/");
                         String ftpOriginName = sArray2[sArray2.length - 1];//原图文件名称
-                        String temporaryOriginPath = filePathMap.get(redisValue) + "/" +ftpOriginPath;
+                        String temporaryOriginPath = filePathMap.get(redisValue) + "/" + ftpOriginPath;
 //                        log.info("temporaryOriginPath==="+temporaryOriginPath);
 
                         String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
-                        if ("1".equals(fileType)){//红外
-                            copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "Infrared");//拷贝巡视结果图
-                            copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "FIR");//拷贝fir
-                            cruiseResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);
-                            cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" +ftpFileName);
-                        }else if ("2".equals(fileType)){//可见光
-                            copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "CCD");//拷贝巡视结果图
-                            copyFileToDevelop(temporaryOriginPath,developAbsoluteUrl + "BigImg");//拷贝原图
-                            cruiseResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);
-                            cruiseResultMap.put("absolutePath",developAbsoluteUrl+ "BigImg" + "/"+ ftpOriginName);
-                        }else if ("3".equals(fileType)){//音频
-                            copyFileToDevelop(temporaryFilePath,developAbsoluteUrl + "Audio");//拷贝巡视结果图
-                            cruiseResultMap.put("relativePath",developRelativeUrl + "Audio" + "/" +ftpFileName);
-                            cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
+                        if ("1".equals(fileType)) {//红外
+                            copyFileToDevelop(temporaryOriginPath, developAbsoluteUrl + "Infrared");//拷贝巡视结果图
+                            copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "FIR");//拷贝fir
+                            cruiseResultMap.put("relativePath", developRelativeUrl + "Infrared" + "/" + ftpOriginName);
+                            cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" + ftpFileName);
+                        } else if ("2".equals(fileType)) {//可见光
+                            copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "CCD");//拷贝巡视结果图
+                            copyFileToDevelop(temporaryOriginPath, developAbsoluteUrl + "BigImg");//拷贝原图
+                            cruiseResultMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);
+                            cruiseResultMap.put("absolutePath", developAbsoluteUrl + "BigImg" + "/" + ftpOriginName);
+                        } else if ("3".equals(fileType)) {//音频
+                            copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Audio");//拷贝巡视结果图
+                            cruiseResultMap.put("relativePath", developRelativeUrl + "Audio" + "/" + ftpFileName);
+                            cruiseResultMap.put("absolutePath", developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
                         }
                         /*
                          * 新版的图片处理
@@ -1067,46 +1330,46 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
                         }*/
 
-                        log.info("机器人巡视结果数据是："+cruiseResultMap);
+                        log.info("机器人巡视结果数据是：" + cruiseResultMap);
 
                         //Start AlarmResultDealThread只判断红外和可见光
                         Map<String, String> cResultMap = new HashMap<>();
-                        cResultMap.put("robotCode",xmlBaseModel.getSendCode());
-                        cResultMap.put("taskCode",xmlBaseModel.getItems().get(0).get("task_code").toString());
-                        cResultMap.put("deviceId",xmlBaseModel.getItems().get(0).get("device_id").toString());
-                        cResultMap.put("value",xmlBaseModel.getItems().get(0).get("value").toString());
-                        if ("1".equals(fileType)){
-                            cResultMap.put("relativePath",developRelativeUrl + "Infrared" + "/" + ftpOriginName);//相对路径
-                        }else if ( "2".equals(fileType)){
-                            cResultMap.put("relativePath",developRelativeUrl + "CCD" + "/" + ftpFileName);//相对路径
+                        cResultMap.put("robotCode", xmlBaseModel.getSendCode());
+                        cResultMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
+                        cResultMap.put("deviceId", xmlBaseModel.getItems().get(0).get("device_id").toString());
+                        cResultMap.put("value", xmlBaseModel.getItems().get(0).get("value").toString());
+                        if ("1".equals(fileType)) {
+                            cResultMap.put("relativePath", developRelativeUrl + "Infrared" + "/" + ftpOriginName);//相对路径
+                        } else if ("2".equals(fileType)) {
+                            cResultMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);//相对路径
                         }
-                        IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap,redisTemplate,webSocketUrl);
+                        IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(cResultMap, redisTemplate, webSocketUrl);
                         TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
                         //Start CruiseResultDealThread
-                        CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap,redisTemplate,webSocketUrl);
+                        CruiseResultDealThread cruiseResultDealThread = new CruiseResultDealThread(cruiseResultMap, redisTemplate, webSocketUrl);
                         TaskExecutePool.getInstance().execute(cruiseResultDealThread);
 
-                        String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true,xmlBaseModel.getSendCode()));
+                        String cruiseResultXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
                         byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
-                        send(ctx, cruiseResultProtocol,xmlBaseModel.getSendCode());
+                        send(ctx, cruiseResultProtocol, xmlBaseModel.getSendCode());
                         log.info("巡视主机给机器人响应了");
 
                     {
                         //巡视点结果上报站端
-                        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("Robot_SPAndIN_Info:"+xmlBaseModel.getSendCode()+":"+xmlBaseModel.getCode());
+                        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("Robot_SPAndIN_Info:" + xmlBaseModel.getSendCode() + ":" + xmlBaseModel.getCode());
                         String instanceId = redisInfoMap.get("instanceId");
-                        Map<String,String> mapForGet = redisTemplate.opsForHash().entries("t_cruise_task_result:"+xmlBaseModel.getCode() + ":" + instanceId);
-                        xmlBaseModel.getItems().get(0).put("material_id",mapForGet.get("realCode"));
-                        xmlBaseModel.getItems().get(0).put("data_type",mapForGet.get("0x02"));
-                        xmlBaseModel.getItems().get(0).put("patroldevice_code",instanceId);
+                        Map<String, String> mapForGet = redisTemplate.opsForHash().entries("t_cruise_task_result:" + xmlBaseModel.getCode() + ":" + instanceId);
+                        xmlBaseModel.getItems().get(0).put("material_id", mapForGet.get("realCode"));
+                        xmlBaseModel.getItems().get(0).put("data_type", mapForGet.get("0x02"));
+                        xmlBaseModel.getItems().get(0).put("patroldevice_code", instanceId);
                         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
                         //                    xmlBaseModel.getItems().get(0).put("taskPatrolledId",mapForGet.get("taskId")+"_"+simpleDateFormat2.format(mapForGet.get("cruiseTime")));
                         xmlBaseModel.getItems().get(0).remove("robot_code");
                         List<XMLBaseModel> list = new ArrayList<>();
                         list.add(xmlBaseModel);
-                        Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
-                        cruiseResult.put("list",list);
-                        log.info("信息上报：-"+cruiseResult);
+                        Map<String, List<XMLBaseModel>> cruiseResult = new HashMap<>();
+                        cruiseResult.put("list", list);
+                        log.info("信息上报：-" + cruiseResult);
                         //Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                     }
 
@@ -1116,10 +1379,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         log.info("巡视主机收到机器人站端的任务了");
                         //Deal with robot task data
                         String taskFile = xmlBaseModel.getItems().get(0).get("task_file_path").toString();
-                        XMLBaseModel taskModel = getXmlMessage(filePathMap.get(redisValue) + "/" +taskFile);
-                        List<Map<String,Object>> taskModelMapList = taskModel.getItems();
-                        log.info("taskModelItemsMap是："+taskModelMapList);
-                        robotService.robotTaskIntoDB(taskModelMapList,xmlBaseModel);
+                        XMLBaseModel taskModel = getXmlMessage(filePathMap.get(redisValue) + "/" + taskFile);
+                        List<Map<String, Object>> taskModelMapList = taskModel.getItems();
+                        log.info("taskModelItemsMap是：" + taskModelMapList);
+                        robotService.robotTaskIntoDB(taskModelMapList, xmlBaseModel);
                         break;
                     default:
                         break;
@@ -1335,5 +1598,30 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         log.info("channel.isActive(): " + channel.isActive());
         log.info("此时的packet====="+Packet);
         Constant.registerCount = 1;
+    }
+    //Redis数据库批量查询Key值游标
+    public Set<String> redisScan(String key) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
+
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+
+            ScanParams scanParams = new ScanParams();
+            scanParams.match("*" + key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            return keys;
+        });
     }
 }

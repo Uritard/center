@@ -39,6 +39,7 @@ public class Constant {
     public static int flag = 0;
     public static String Packet = "";
     public static int registerCount = 1;
+    public static  Integer registerFlag = 0;
 
 
     public static long sendSessionId = 0L;//巡视主机发送会话序列号
