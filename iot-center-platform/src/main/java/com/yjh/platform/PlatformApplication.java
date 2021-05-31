@@ -54,8 +54,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private TCameraInfoService tCameraInfoService;
     @Autowired
     private SysUserService sysUserService;
-    @Autowired
-    private TVoiceDeviceService tVoiceDeviceService;
+//    @Autowired
+//    private TVoiceDeviceService tVoiceDeviceService;
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired

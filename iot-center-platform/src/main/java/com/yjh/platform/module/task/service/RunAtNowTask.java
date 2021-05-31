@@ -729,6 +729,7 @@ public class RunAtNowTask implements Runnable{
                                 }
                             }
                             tCruiseTaskResultDetailMap.put("recognitionMode",recognitionMode.toString());
+                            log.info("recognitionMode: {}", recognitionMode);
                             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
                             //抓图成功 算法分析
                             if(redisTemplate.hasKey("analysisList:"+taskId)) {
