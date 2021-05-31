@@ -132,7 +132,7 @@ public class NumToStringUtil {
             return "预览";
         }
         if("17".equals(str)){
-            return "用户新增";
+            return "新增用户";
         }
         if("18".equals(str)){
             return "用户修改信息";

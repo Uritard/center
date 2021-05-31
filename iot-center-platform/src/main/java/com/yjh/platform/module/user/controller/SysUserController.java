@@ -463,7 +463,7 @@ public class SysUserController {
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                 params.set("logType", "21");
                 params.set("ip", httpServletRequest.getHeader("HTTP_X_FORWARDED_FOR"));
-                params.set("title", "用户帐号解锁");
+                params.set("title", "用户解锁");
                 params.set("state", 1);
                 params.set("userId", userId);
                 params.set("userName", sysUserCurrent.getUserName());
@@ -477,7 +477,7 @@ public class SysUserController {
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                 params.set("logType", "21");
                 params.set("ip", httpServletRequest.getHeader("HTTP_X_FORWARDED_FOR"));
-                params.set("title", "用户帐号解锁");
+                params.set("title", "用户解锁");
                 params.set("state", 2);
                 params.set("userId", userId);
                 params.set("userName", sysUserCurrent.getUserName());
@@ -495,7 +495,7 @@ public class SysUserController {
                 MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
                 params.set("logType", "21");
                 params.set("ip", httpServletRequest.getHeader("HTTP_X_FORWARDED_FOR"));
-                params.set("title", "用户帐号解锁");
+                params.set("title", "用户解锁");
                 params.set("state", 2);
                 params.set("userId", userId);
                 params.set("userName", sysUserCurrent.getUserName());
