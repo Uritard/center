@@ -343,13 +343,13 @@ public class CruiseResultDealThread implements Runnable{
                     //任务完成的处理
                     log.info("Task Finished......");
                     taskIsFinishedDeal(allInstanceIdList,resultList,taskId,totalCheckPoint,abnormal,normal,tCruiseTaskResultMap,tCruiseResult);
-                }else {
+                }/*else {
                     //任务没有完成但是进度为100%的处理
                     if ("1".equals(listMap.get("taskState"))){
                         log.info("Task Finished......but have error");
                         taskIsNotFinishedDeal(allInstanceIdList,resultList,taskId,totalCheckPoint,abnormal,normal,tCruiseTaskResultMap,tCruiseResult);
                     }
-                }
+                }*/
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
