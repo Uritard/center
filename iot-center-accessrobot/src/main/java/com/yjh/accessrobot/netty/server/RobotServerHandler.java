@@ -5,7 +5,9 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
-import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.service.SysLogsService;
 import com.yjh.accessrobot.thread.TaskExecutePool;
@@ -806,6 +808,157 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId,false, taskStatusXmlString);
                         send(ctx, taskStatusProtocol,xmlBaseModel.getSendCode());
                         log.info("巡视主机给机器人响应了");
+
+                        //任务没做,没有完成,并且进度为100%的处理
+                        if ("1".equals(xmlBaseModel.getItems().get(0).get("taskState").toString())){
+                            String taskId =  xmlBaseModel.getItems().get(0).get("task_code").toString();
+
+                            List<Long> instanceIDList = Constant.flagMap.get(taskId);
+                            if (instanceIDList == null || instanceIDList.isEmpty()){
+
+                                TCruiseResult tCruiseResult = robotService.selectTaskResultId(taskId);
+
+                                List<TCruiseDataResult> tCDRList = new ArrayList<>();
+                                List<TCruiseTaskResultDetail> tCTRDList = new ArrayList<>();
+                                List<String> cruiseResultIdList = new ArrayList<>();
+
+                                //读异常点缓存表巡检点
+                                String strForCountAbnormal = "countForAbnormal:" + taskId;
+                                Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
+
+                                Integer totalCheckPoint = Integer.valueOf(abnormalCount.get("all").toString());
+                                Integer abnormalCheckPoint = Integer.valueOf(abnormalCount.get("abnormal").toString()) ;
+                                Integer normalCheckPoint = Integer.valueOf(abnormalCount.get("normal").toString()) ;
+                                log.info("总检测点数是==="+totalCheckPoint+",异常点数是==="+abnormalCheckPoint+",正常点数是===" + normalCheckPoint);
+
+                                Integer abnormal = abnormalCheckPoint;
+                                Integer normal = normalCheckPoint;
+
+                                //统计巡视主机下发给机器人的巡检点大小
+                                Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:"+xmlBaseModel.getSendCode()+":"+taskId);
+                                String instanceList = redisInfoMap2.get("instanceIdList");
+                                instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
+                                String[] instanceIdArray = instanceList.split(", ");
+                                List<String> allInstanceIdList = new ArrayList<>();
+                                for (String i : instanceIdArray){
+                                    allInstanceIdList.add(i);
+                                }
+
+                                for (String instanceId : allInstanceIdList) {
+                                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
+                                    if (!redisInfoMap.get("resultNum").equals("设备检修中")){
+                                        TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
+                                        tCruiseTaskResultDetail.setCruiseResultId(redisInfoMap.get("cruiseResultId"));
+                                        tCruiseTaskResultDetail.setTaskResultId(redisInfoMap.get("taskResultId"));
+                                        tCruiseTaskResultDetail.setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")));
+                                        tCruiseTaskResultDetail.setInstanceName(redisInfoMap.get("instanceName"));
+                                        tCruiseTaskResultDetail.setCruiseTime(new Date());
+                                        tCruiseTaskResultDetail.setCruiseTime(sdf.parse(redisInfoMap.get("cruiseTime")));
+                                        tCruiseTaskResultDetail.setEndTime(new Date());
+                                        tCruiseTaskResultDetail.setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")));
+                                        tCruiseTaskResultDetail.setDeviceName(redisInfoMap.get("deviceName"));
+                                        tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(redisInfoMap.get("cruiseStatus")));
+                                        tCruiseTaskResultDetail.setRemark(redisInfoMap.get("remark"));
+                                        tCTRDList.add(tCruiseTaskResultDetail);
+
+                                        cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
+
+                                        TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
+                                        tCruiseDataResult.setCruiseResultId(redisInfoMap.get("cruiseResultId"));
+                                        tCruiseDataResult.setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")));
+                                        tCruiseDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
+                                        tCruiseDataResult.setCruiseType(228);
+                                        tCruiseDataResult.setResultNum(redisInfoMap.get("resultNum"));
+                                        tCruiseDataResult.setModifyNum(redisInfoMap.get("modifyNum"));
+                                        tCruiseDataResult.setPicpath("--");
+                                        tCruiseDataResult.setOrigpic("--");
+                                        tCruiseDataResult.setEvaluationState(257);
+                                        tCruiseDataResult.setCreatetime(new Date());
+                                        tCruiseDataResult.setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")));
+                                        if ("null".equals(redisInfoMap.get("cruiseResult"))){
+                                            abnormal = abnormal + 1;
+                                            tCruiseDataResult.setCruiseResult(247);
+                                        }
+                                        tCruiseDataResult.setCruiseAbnormal(249);
+                                        tCruiseDataResult.setRemark(null);
+                                        tCruiseDataResult.setResultPic(null);
+                                        tCruiseDataResult.setFirName("f");
+                                        tCDRList.add(tCruiseDataResult);
+                                    }
+                                }
+
+                                log.info("tCTRDList的内容是===" + tCTRDList+",大小size是: "+tCTRDList.size());
+                                log.info("tCDRList的内容是===" + tCDRList+",大小size是: "+tCDRList.size());
+
+                                int res1 = 0;
+                                int res2 = 0;
+                                if (tCTRDList != null && !tCTRDList.isEmpty()){
+                                    res1 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseTaskResultDetail(tCTRDList);
+                                }
+                                if (tCDRList != null && !tCDRList.isEmpty()){
+                                    res2 = StaticContextAccessor.getBean(RobotService.class).batchInsertCruiseDataResult(tCDRList);
+                                    log.info("准备传其他服务的cruiseResultIdList==="+cruiseResultIdList);
+                                    try {
+                                        StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_FINISH, cruiseResultIdList, Result.class);
+                                    } catch (Exception e) {e.getMessage();}
+                                }
+                                log.info("插tCTRD的条数: "+res1+",插tCDR的条数: "+res2);
+
+                                /*
+                                判断缓存中的异常点，如果机器人任务是最后执行，则更新缓存并更新表
+                                */
+                                if (abnormal + normal == totalCheckPoint){
+                                    log.info("机器人巡检点是最后一个点");
+                                    Thread.sleep(15000);
+
+                                    TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult()
+                                            .setTaskId(taskId)
+                                            .setTaskName(xmlBaseModel.getItems().get(0).get("task_name").toString())
+                                            .setTaskAlarm(0)
+                                            .setTaskAbnormal(abnormal)
+                                            .setCruiseTaskTime(new Date())
+                                            .setTaskResultId(tCruiseResult.getTaskResultId());
+                                    log.info("tCruiseTaskResult的内容是==="+tCruiseTaskResult);
+                                    StaticContextAccessor.getBean(RobotService.class).insertTCruiseTaskResult(tCruiseTaskResult);
+
+                                    Integer taskWait = totalCheckPoint - normal - abnormal;
+                                    log.info("taskWait的值是=="+ taskWait);
+                                    tCruiseResult.setTaskWait(taskWait);
+                                    tCruiseResult.setCState(243);
+                                    tCruiseResult.setTaskCode(taskId);
+                                    tCruiseResult.setCreateTime(new Date());
+                                    log.info("tCruiseResult的内容是==="+tCruiseResult);
+                                    StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+
+                                    // webSocket通知前端调用巡视监控的接口（任务完成）
+                                    Map<String, Object> jasonMap = new HashMap<>();
+                                    jasonMap.put("type", "lastOneInstance");
+                                    jasonMap.put("taskId",taskId);
+                                    String json = JSON.toJSONString(jasonMap);
+                                    log.info("最后一个点-前端推送：" + json);
+                                    Constant.postUrl(webSocketUrl,json);
+
+                                    for (TCruiseTaskResultDetail tctrd : tCTRDList){
+                                        int resNum = StaticContextAccessor.getBean(RobotService.class).selectIsWarn(tctrd.getInstanceId(),taskId);
+                                        if (resNum > 0){
+                                            StaticContextAccessor.getBean(RobotService.class).updateIsWarn(tctrd.getCruiseResultId());
+                                        }
+                                    }
+
+                                }else{
+                                    log.info("机器人巡检点不是最后一个点");
+                                    Integer taskWait = totalCheckPoint - normal - abnormal;
+                                    log.info("taskWait的值是=="+ taskWait);
+                                    tCruiseResult.setTaskWait(taskWait);
+                                    tCruiseResult.setCState(239);
+                                    tCruiseResult.setTaskCode(taskId);
+                                    log.info("tCruiseResult的内容是==="+tCruiseResult);
+                                    StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+                                }
+                            }
+                        }
+
+
 
                         robotService.upToCruise(xmlBaseModel);//国网要求
                         break;

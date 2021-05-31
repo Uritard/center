@@ -209,7 +209,7 @@ public class CruiseResultDealThread implements Runnable{
                                 log.info("这次变化的normal是==="+normal);
                             }else {
                                 tCruiseTaskResultMap.put("cruiseResult","247");
-                                tCruiseTaskResultMap.put("cruiseAbnormal","249");//异常告警
+                                tCruiseTaskResultMap.put("cruiseAbnormal","249");//数据异常
                                 abnormal = abnormal + 1;
                                 log.info("这次变化的abnormal是==="+abnormal);
                             }
@@ -356,7 +356,7 @@ public class CruiseResultDealThread implements Runnable{
         }
     }
     /*
-    * 任务完成并且进度为100%的处理
+    * 任务所有点做完,完成,并且进度为100%的处理
     * */
     public void taskIsFinishedDeal(List<String> allInstanceIdList,
                                    List<String> resultList,
@@ -528,7 +528,7 @@ public class CruiseResultDealThread implements Runnable{
         }
     }
     /*
-    * 任务没有完成并且进度为100%的处理
+    * 任务做了一些,但是没有完成,并且进度为100%的处理
     * */
     public void taskIsNotFinishedDeal(List<String> allInstanceIdList,
                                    List<String> resultList,
@@ -619,9 +619,12 @@ public class CruiseResultDealThread implements Runnable{
                 }
                 tCruiseDataResult.setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")));
                 if ("null".equals(redisInfoMap.get("cruiseResult"))){
+                    abnormal = abnormal + 1;
+                    tCruiseDataResult.setCruiseResult(247);
+                }else if ("246".equals(redisInfoMap.get("cruiseResult"))){
                     normal = normal + 1;
-                    tCruiseDataResult.setCruiseResult(246);
-                }else{
+                    tCruiseDataResult.setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
+                }else if ("247".equals(redisInfoMap.get("cruiseResult"))){
                     abnormal = abnormal + 1;
                     tCruiseDataResult.setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
                 }
