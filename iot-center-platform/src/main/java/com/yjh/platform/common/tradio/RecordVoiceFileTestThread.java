@@ -2,18 +2,14 @@ package com.yjh.platform.common.tradio;
 
 import com.sun.jna.Pointer;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail;
-import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.LongBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * @author tt

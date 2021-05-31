@@ -531,8 +531,8 @@ public class SysUserService {
             sysUserLocked.setUserId(Long.valueOf(map.get("lockedUserId")));
             redisTemplate.delete("account_lock_time:" + Long.valueOf(map.get("lockedUserId")));
         }
-        Date date = new Date();
-        sysUserLocked.setUpdateTime(date);
+//        Date date = new Date();
+//        sysUserLocked.setUpdateTime(date);
         return this.sysUserDao.update(sysUserLocked);
     }
 
