@@ -1010,7 +1010,7 @@ public class RunAtNowTask implements Runnable{
             Integer normal = Integer.valueOf(mapForGet.get("normal")) +taskNormal;
             Integer all = Integer.valueOf(mapForGet.get("all"));
             int re = abnormal+normal;
-            if(re == all){
+            if(re == all|| re > all){
                 //所有点都做完了
                 mapForAbnormal.put("abnormal",abnormal.toString());
                 mapForAbnormal.put("normal",normal.toString());

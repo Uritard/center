@@ -688,8 +688,7 @@ public class TCruiseTaskService {
     @Transactional(rollbackFor = Exception.class)
     public int taskGoOn(String taskId) throws Exception {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
-        if (tCruiseResult.getCState() == 240) {
-
+        if (tCruiseResult.getCState() == 240 || tCruiseResult.getCState() == 239) {
             return 1;
         }
         if(Constant.taskStateMap.get(taskId) != null && Constant.taskStateMap.get(taskId) == 1){
