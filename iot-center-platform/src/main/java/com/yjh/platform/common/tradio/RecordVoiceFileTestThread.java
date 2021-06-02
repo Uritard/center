@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -84,8 +85,10 @@ public class RecordVoiceFileTestThread implements Runnable {
                     } catch (IOException e) { e.getMessage(); }
                     dateTime = System.currentTimeMillis();
                     dateTimeAfter = dateTime+voiceFileRecordTime*66*1000;
+                    Calendar nowTime = Calendar.getInstance();
+                    nowTime.add(Calendar.MINUTE, voiceFileRecordTime);
                     voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
-                            +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter))+"_";
+                            +new SimpleDateFormat("yyyyMMdd_HHmm").format(nowTime.getTime());
                 }
             }
         } catch (Exception e) {

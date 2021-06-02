@@ -833,7 +833,7 @@ public class CameraConService {
     public String registerNVR(Long recordId) {
 
         RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
-        lUserID = Constant.maps.get(String.valueOf(recordId));
+        if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) lUserID = Constant.maps.get(String.valueOf(recordId));
 
         if (lUserID > -1) {
             //NVR log out first...

@@ -96,7 +96,35 @@ public class StreamStopThread implements Runnable {
             Constant.mapsForHistory.clear();
             log.info("停流异常，清空所有流。。。");
             e.getMessage();
+        } finally {
+            try { Thread.sleep(10000); } catch (InterruptedException e) { e.printStackTrace(); }
+            killProcess();
         }
         log.info("Constant.mapsForCamera: {}, Constant.mapsForHistory: {}", Constant.mapsForCamera, Constant.mapsForHistory);
+    }
+
+    private void killProcess() {
+        try {
+            if (Constant.mapsForCamera.size()==0 && Constant.mapsForHistory.size()==0) {
+                String url = "ps -ef | grep ffmpeg | grep -v 'grep'";
+
+                Process processForId = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
+                processForId.waitFor();
+                Thread.sleep(1000);
+                BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
+                String lineForId = null;
+                StringBuilder dataBackForId = new StringBuilder();
+                while ((lineForId = readerForId.readLine()) != null) {
+                    dataBackForId.append(lineForId).append('\n');
+                }
+                log.info("流进程："+dataBackForId);
+                if (dataBackForId.length()>0) {
+                    Integer processNum = Integer.parseInt(dataBackForId.substring(9, 15).replace(" ", ""));
+                    String urlStop = "kill -9 " + processNum;
+                    Runtime.getRuntime().exec(urlStop);
+                    killProcess();
+                }
+            }
+        } catch (Exception e) { e.getMessage(); }
     }
 }
