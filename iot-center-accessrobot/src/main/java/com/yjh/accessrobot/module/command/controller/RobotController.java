@@ -195,12 +195,12 @@ public class RobotController {
     /*用完就删*/
     @ApiOperation(value = "方法测试")
     @PostMapping(value = "/methodTest")
-    public Result methodTest(@RequestParam(value = "type") String type,
-                             @RequestParam(value = "command") String command,
+    public Result methodTest(@RequestParam(value = "type",required = false) String type,
+                             @RequestParam(value = "command",required = false) String command,
                              @RequestParam(value = "value",required = false) String value){
         Result result = new Result();
         try {
-            result.setData(robotService.selectContentByCommand(type,command,value));
+            result.setData(robotService.deleteRedis());
 //            XMLBaseModel model = getXmlMessage("D:/testform/task_model_E200.xml");
 //            List<Map<String,Object>> modelMapList = model.getItems();
 //            log.info("taskModelItemsMap是："+modelMapList);

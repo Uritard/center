@@ -97,7 +97,7 @@ public class TWarnInfoService{
         map.put("endTime", endTime);
         map.put("deviceName", deviceName);
         map.put("meteName", meteName);
-        return tWarnInfoDao.selectAllWarn(map);
+        return tWarnInfoDao.selectRobotAlarm(map);
     }
     @Transactional(rollbackFor = Exception.class)
     public List<TWarnInfoDetail> WarnConfirm(Integer warnLevel, Integer confMode, String startTime, String endTime, String deviceName,Integer defectType,String meteName) {

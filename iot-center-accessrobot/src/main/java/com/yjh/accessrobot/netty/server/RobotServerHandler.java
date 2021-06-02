@@ -414,7 +414,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
      * 分析解析后的xml,进行响应处理
      * */
     private void doProcessMessage(XMLBaseModel xmlBaseModel,long sendSessionId,long receiveSessionId) throws Exception  {
-        log.info("robotServerHandlerMap==="+robotServerHandlerMap);
+        log.info("+++此时+++的robotServerHandlerMap==="+robotServerHandlerMap+",总注册"+Constant.registerCount+"次");
         Map<String, String> platformServerMap = redisTemplate.opsForHash().entries("t_sys_param:PlatformServer");
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
@@ -468,10 +468,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         sendHeartBeat(registerProtocol, xmlBaseModel.getSendCode());
 
                         if (Objects.nonNull(robotServerHandlerMap.get(xmlBaseModel.getSendCode()))) {
+                            log.info("-----同一连接有多个通道,关闭多余的-----");
                             robotServerHandlerMap.get(xmlBaseModel.getSendCode()).ctx.close();
                         }
 
                         robotServerHandlerMap.put(xmlBaseModel.getSendCode(), this);
+                        log.info("+++之后+++的robotServerHandlerMap==="+robotServerHandlerMap);
+
                         //Start heatBreakDealThread
                         HeartBreakDealThread dataDealThread = new HeartBreakDealThread(this, xmlBaseModel.getSendCode(), redisTemplate, isThreadStart, sendSessionId, receiveSessionId);
                         Thread thread = new Thread(dataDealThread);

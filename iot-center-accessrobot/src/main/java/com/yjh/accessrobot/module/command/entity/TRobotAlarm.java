@@ -73,5 +73,7 @@ public class TRobotAlarm implements Serializable {
 
     private Date endTime;
 
+    @ApiModelProperty(value = "机器人名称")
+    private String robotName;
 
 }

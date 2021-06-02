@@ -38,10 +38,13 @@ public class AlarmResultDealThread implements Runnable{
 
             //根据code获取id
             Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(robotAlarmMap.get("robotCode"));
+            String robotName = StaticContextAccessor.getBean(RobotService.class).selectRobotNameByCode(robotAlarmMap.get("robotCode"));
+
             log.info("该robotCode的robotId是==="+robotId);
             if (Objects.nonNull(robotId)){
                 TRobotAlarm tRobotAlarm = new TRobotAlarm()
                         .setRobotId(robotId)
+                        .setRobotName(robotName)
                         .setAlarmName(robotAlarmMap.get("content"))
                         .setAlarmLevel(133)
                         .setAlarmInfo(robotAlarmMap.get("content"))

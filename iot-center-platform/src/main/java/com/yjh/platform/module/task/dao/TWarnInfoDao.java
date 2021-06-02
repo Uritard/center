@@ -52,6 +52,7 @@ public interface TWarnInfoDao {
 
     int batchInsert(List<TWarnInfo> list);
     List<TWarnInfoDetail> selectAllWarn(HashMap<String,Object> map);
+    List<TWarnInfoDetail> selectRobotAlarm(HashMap<String,Object> map);
     List<TWarnInfoDetail> WarnConfirm(HashMap<String,Object> map);
     Map<String, Integer> countByAlarmSource();
     List<TJContentInfoDetail>  countByDeviceType(@Param(value = "startTime")String startTime,

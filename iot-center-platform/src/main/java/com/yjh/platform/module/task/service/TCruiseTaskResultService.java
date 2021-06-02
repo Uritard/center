@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
@@ -445,7 +444,7 @@ public class TCruiseTaskResultService {
                 log.info("redis-robotId==:" + resultMap.get("robotId"));
 
                 //拉机器人的红外和可见光的视频流
-                if (Objects.nonNull(resultMap.get("robotId"))) {
+                if (!"".equals(resultMap.get("robotId").toString())) {
                     //判断当前机器人巡视点的采集设备为 红外或可见光
                     String runningCameraFlag = tRobotInfoDao.selectRobotRunningCamera(Long.valueOf(resultMap.get("robotId").toString()), Long.valueOf(resultMap.get("instanceId").toString()));
                     if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) {

@@ -21,6 +21,7 @@ public interface TRobotAlarmDao {
     List<TRobotAlarm> select(@Param(value = "robotAlarmId") Long robotAlarmId,
                                 @Param(value = "alarmName") String alarmName,
                                 @Param(value = "robotId") Long robotId,
+                                @Param(value = "robotName") String robotName,
                                 @Param(value = "stationId") String stationId,
                                 @Param(value = "alarmType") Integer alarmType,
                                 @Param(value = "alarmLevel") Integer alarmLevel,

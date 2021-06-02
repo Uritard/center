@@ -119,6 +119,7 @@ public class TRobotAlarmController {
     public Result select(@RequestParam(value = "robotAlarmId", required = false) Long robotAlarmId,
                             @RequestParam(value = "alarmName", required = false) String alarmName,
                             @RequestParam(value = "robotId", required = false) Long robotId,
+                            @RequestParam(value = "robotName", required = false) String robotName,
                             @RequestParam(value = "stationId", required = false) String stationId,
                             @RequestParam(value = "alarmType", required = false) Integer alarmType,
                             @RequestParam(value = "alarmLevel", required = false) Integer alarmLevel,
@@ -135,7 +136,7 @@ public class TRobotAlarmController {
                             @RequestParam(value = "endTime", required = false) Date endTime) {
         Result result = new Result();
         try {
-            List<TRobotAlarm> list = tRobotAlarmService.select(robotAlarmId, alarmName, robotId, stationId, alarmType, alarmLevel, alarmInfo, alarmTime, dealType, dealInfo, dealPersonId, dealTime, positionStationNum, positionOffset, alarmState, createTime, endTime);
+            List<TRobotAlarm> list = tRobotAlarmService.select(robotAlarmId, alarmName, robotId, robotName,stationId, alarmType, alarmLevel, alarmInfo, alarmTime, dealType, dealInfo, dealPersonId, dealTime, positionStationNum, positionOffset, alarmState, createTime, endTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

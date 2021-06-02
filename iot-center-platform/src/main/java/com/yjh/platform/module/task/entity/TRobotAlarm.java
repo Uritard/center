@@ -110,4 +110,8 @@ public class TRobotAlarm implements Serializable {
 
     private Integer pageSize = 0;
 
+    @ApiModelProperty(value = "站所id")
+    @TableField(value = "robotName",updateStrategy = FieldStrategy.IGNORED)
+    private String robotName;
+
 }

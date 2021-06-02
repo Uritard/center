@@ -274,7 +274,7 @@ public class RobotService {
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
 
         String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
-//        log.info("图片路径为：" + picPath);
+        log.info("图片路径为：" + picPath);
         /*
          * 将ftp图copy到开发环境
          * */
@@ -298,7 +298,7 @@ public class RobotService {
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setPhotePath(developRelativeUrl);
-//        log.info("tRobotInfo==="+tRobotInfo);
+        log.info("tRobotInfo==="+tRobotInfo);
         int res = tRobotInfoDao.update(tRobotInfo);
         return res;
     }
@@ -1003,6 +1003,10 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public Long selectRobotIdByCode(String robotCode) {
         return tRobotInfoDao.selectRobotIdByCode(robotCode);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public String selectRobotNameByCode(String robotCode) {
+        return tRobotInfoDao.selectRobotNameByCode(robotCode);
     }
     @Transactional(rollbackFor = Exception.class)
     public int insertRobotAlarm(TRobotAlarm tRobotAlarm) {
@@ -1857,6 +1861,11 @@ public class RobotService {
             }
         }
         return "";
+    }
+
+    public int deleteRedis(){
+        redisTemplate.delete("AllRobotCode");
+        return 1;
     }
 
     @Transactional(rollbackFor = Exception.class)

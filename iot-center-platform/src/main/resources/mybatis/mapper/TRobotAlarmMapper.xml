@@ -34,6 +34,7 @@
             robot_alarm_id,
             alarm_name,
             robot_id,
+            robot_name,
             station_id,
             alarm_type,
             alarm_level,
@@ -52,6 +53,7 @@
                 #{robotAlarmId, jdbcType=BIGINT},
                 #{alarmName, jdbcType=VARCHAR},
                 #{robotId, jdbcType=BIGINT},
+                #{robotName, jdbcType=VARCHAR},
                 #{stationId, jdbcType=VARCHAR},
                 #{alarmType, jdbcType=INTEGER},
                 #{alarmLevel, jdbcType=INTEGER},
@@ -79,6 +81,7 @@
         <if test="robotAlarmId != null">a.robot_alarm_id = #{robotAlarmId},</if>
         <if test="alarmName != null">a.alarm_name = #{alarmName},</if>
         <if test="robotId != null">a.robot_id = #{robotId},</if>
+        <if test="robotName != null">a.robot_name = #{robotName},</if>
         <if test="stationId != null ">a.station_id = #{stationId},</if>
         <if test="alarmType != null ">a.alarm_type = #{alarmType, jdbcType=INTEGER},</if>
         <if test="alarmLevel != null ">a.alarm_level = #{alarmLevel, jdbcType=INTEGER},</if>
@@ -102,6 +105,7 @@
         a.robot_alarm_id,
         a.alarm_name,
         a.robot_id,
+        a.robot_name,
         a.station_id,
         a.alarm_type,
         a.alarm_level,
@@ -127,6 +131,7 @@
         a.robot_alarm_id,
         a.alarm_name,
         a.robot_id,
+        a.robot_name,
         a.station_id,
         a.alarm_type,
         a.alarm_level,
@@ -146,6 +151,7 @@
         <if test="robotAlarmId != null and robotAlarmId != ''"> and a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT}</if>
         <if test="alarmName != null and alarmName != ''"> and a.alarm_name = #{alarmName, jdbcType=VARCHAR}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
         <if test="alarmType != null "> and a.alarm_type = #{alarmType, jdbcType=INTEGER}</if>
         <if test="alarmLevel != null "> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
@@ -167,6 +173,7 @@
         a.robot_alarm_id,
         a.alarm_name,
         a.robot_id,
+        a.robot_name,
         a.station_id,
         a.alarm_type,
         a.alarm_level,
@@ -186,6 +193,7 @@
         <if test="robotAlarmId != null and robotAlarmId != ''"> and a.robot_alarm_id = #{robotAlarmId, jdbcType=BIGINT}</if>
         <if test="alarmName != null and alarmName != ''"> and a.alarm_name = #{alarmName, jdbcType=VARCHAR}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
         <if test="alarmType != null "> and a.alarm_type = #{alarmType, jdbcType=INTEGER}</if>
         <if test="alarmLevel != null "> and a.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
@@ -207,6 +215,7 @@
             robot_alarm_id,
             alarm_name,
             robot_id,
+            robot_name,
             station_id,
             alarm_type,
             alarm_level,
@@ -227,6 +236,7 @@
                 #{TRobotAlarm.robotAlarmId, jdbcType=BIGINT},
                 #{TRobotAlarm.alarmName, jdbcType=VARCHAR},
                 #{TRobotAlarm.robotId, jdbcType=BIGINT},
+                #{TRobotAlarm.robotName, jdbcType=VARCHAR},
                 #{TRobotAlarm.stationId, jdbcType=VARCHAR},
                 #{TRobotAlarm.alarmType, jdbcType=INTEGER},
                 #{TRobotAlarm.alarmLevel, jdbcType=INTEGER},
