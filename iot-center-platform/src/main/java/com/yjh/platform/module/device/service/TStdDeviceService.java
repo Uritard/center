@@ -160,9 +160,8 @@ public class TStdDeviceService{
             }
         }
         tStdDeviceAttrDao.deleteByPrimaryId(deviceId);//删除属性
-        for (Long item: devList) {
-            tStdDevicemeteService.deleteByPrimaryId(item);
-        }
+        tStdDevicemeteService.deleteByDevId(deviceId);//删除测点
+
         tDeviceMaintenanceDao.deleteByDeviceId(deviceId);
         return this.tStdDeviceDao.deleteByPrimaryId(deviceId);//删除设备
     }
