@@ -493,12 +493,7 @@
         <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
         <if test="meteName != null and meteName != ''"> and  mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
         <if test="startTime != null and endTime != null"> and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="alarmSource != null">
-            AND (CASE
-            WHEN #{alarmSource, jdbcType=INTEGER} = 888 THEN alarm_source = 888
-            WHEN #{alarmSource, jdbcType=INTEGER} = 279 THEN alarm_source = 279
-            WHEN #{alarmSource, jdbcType=INTEGER} != 279 and #{alarmSource, jdbcType=INTEGER} != 888 THEN alarm_source != 888 and alarm_source != 279
-            END)</if>
+
         ORDER BY alarm_time DESC
     </select>
     <!--告警确认-->
