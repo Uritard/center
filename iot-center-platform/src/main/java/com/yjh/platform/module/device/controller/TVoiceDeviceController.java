@@ -213,7 +213,9 @@ public class TVoiceDeviceController {
         Result result = new Result();
         try {
             result.setData(tVoiceDeviceService.voiceAnalyse(voicePath));
-        } catch (Exception e) {
+        } catch (BusinessException e){
+            result.setCode(209,"读取文件失败，音频文件异常");
+        }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }
@@ -256,7 +258,9 @@ public class TVoiceDeviceController {
         Result result = new Result();
         try {
             result.setData(tVoiceDeviceService.frequencyAnalyse(frequencyPath));
-        } catch (Exception e) {
+        } catch (BusinessException e){
+            result.setCode(209,"读取文件失败，音频文件异常");
+        }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
         }

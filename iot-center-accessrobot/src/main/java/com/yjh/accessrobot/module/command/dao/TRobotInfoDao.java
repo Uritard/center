@@ -53,6 +53,7 @@ public interface TRobotInfoDao {
     String selectContent(@Param(value = "paramCode")String paramCode);
     List<String> selectOnline();
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
+    String selectRobotNameByCode(@Param(value = "robotCode") String robotCode);
     String selectDictCode(@Param(value = "colName")String colName,
                           @Param(value = "dictNote")String dictNote);
     String selectDictCodeByNote(@Param(value = "dictNote")String dictNote,

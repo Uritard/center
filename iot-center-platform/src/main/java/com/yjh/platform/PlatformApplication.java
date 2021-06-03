@@ -75,6 +75,7 @@ public class PlatformApplication  implements CommandLineRunner {
 //        quartzTask.setJobName("PlatformScheduler");
 //        quartzTask.setJobGroup("Platform");
 //        jobManager.addJob(quartzTask);
+        redisTemplate.delete("AllRobotCode");
         tSysParamService.insertIntoRedis();
         tCameraInfoService.intoRedis();
         sysUserService.insertIntoRedis();

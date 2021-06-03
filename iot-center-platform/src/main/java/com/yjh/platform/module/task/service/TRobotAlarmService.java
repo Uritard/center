@@ -41,8 +41,8 @@ public class TRobotAlarmService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotAlarm> select(Long robotAlarmId, String alarmName, Long robotId, String stationId, Integer alarmType, Integer alarmLevel, String alarmInfo, Date alarmTime, Integer dealType, String dealInfo, String dealPersonId, Date dealTime, String positionStationNum, String positionOffset, Integer alarmState, Date createTime, Date endTime) {
-        List<TRobotAlarm> tRobotAlarmList = tRobotAlarmDao.select(robotAlarmId, alarmName, robotId, stationId, alarmType, alarmLevel, alarmInfo, alarmTime, dealType, dealInfo, dealPersonId, dealTime, positionStationNum, positionOffset, alarmState, createTime, endTime);
+    public List<TRobotAlarm> select(Long robotAlarmId, String alarmName, Long robotId,String robotName, String stationId, Integer alarmType, Integer alarmLevel, String alarmInfo, Date alarmTime, Integer dealType, String dealInfo, String dealPersonId, Date dealTime, String positionStationNum, String positionOffset, Integer alarmState, Date createTime, Date endTime) {
+        List<TRobotAlarm> tRobotAlarmList = tRobotAlarmDao.select(robotAlarmId, alarmName, robotId, robotName,stationId, alarmType, alarmLevel, alarmInfo, alarmTime, dealType, dealInfo, dealPersonId, dealTime, positionStationNum, positionOffset, alarmState, createTime, endTime);
         return tRobotAlarmList;
     }
 

@@ -459,6 +459,43 @@
             END)</if>
         ORDER BY alarm_time DESC
     </select>
+    <!--机器人本体告警-->
+    <select id="selectRobotAlarm" parameterType="java.util.HashMap" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
+        SELECT
+        f.robot_alarm_id AS warn_id,
+        f.alarm_time,
+        f.alarm_name AS warn_content,
+        f.robot_id AS deviceId,
+        f.robot_name AS device_name,
+        f.alarm_level,
+        c.dict_note AS alarm_level_name,
+        f.alarm_state AS conf_mode,
+        e.dict_note AS conf_mode_name,
+        279 AS alarm_source,
+        '机器人' AS alarm_source_name,
+        f.deal_info,
+        f.deal_type,
+        h.dict_note as deal_type_name,
+        f.deal_person_id,
+        k.user_name as deal_person_name,
+        f.deal_time,
+        1 as defect_model,
+        f.robot_id as real_code
+        FROM
+        t_robot_alarm f
+        LEFT JOIN t_dict_business c ON f.alarm_level = c.dict_code
+        LEFT JOIN t_dict_business e ON f.alarm_state = e.dict_code
+        LEFT JOIN t_dict_business h on f.deal_type = h.dict_code
+        LEFT JOIN sys_user k ON k.user_id = f.deal_person_id
+        where 1 = 1
+        <if test="warnLevel != null"> and alarm_level = #{warnLevel, jdbcType=INTEGER}</if>
+        <if test="confMode != null"> and conf_mode = #{confMode, jdbcType=INTEGER}</if>
+        <if test="deviceName != null and deviceName != ''"> and device_name like concat("%",#{deviceName, jdbcType=VARCHAR},"%")</if>
+        <if test="meteName != null and meteName != ''"> and  mete_name like concat("%",#{meteName, jdbcType=VARCHAR},"%")</if>
+        <if test="startTime != null and endTime != null"> and alarm_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+
+        ORDER BY alarm_time DESC
+    </select>
     <!--告警确认-->
     <select id="WarnConfirm" parameterType="java.util.Map" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         SELECT * FROM (

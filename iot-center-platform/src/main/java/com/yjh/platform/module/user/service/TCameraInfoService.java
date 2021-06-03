@@ -124,9 +124,13 @@ public class TCameraInfoService {
             Map<String,String> channelMap=new HashMap<>();
             channelMap.put("channelId", tCameraInfoDao.selectMonitorId(Long.valueOf(item)));
             if(Objects.nonNull(channelMap.get("channelId"))) {
-                Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
+                try {
+                    Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
+                }catch (Exception e){
+                    log.error("调用vqd服务异常"+e);
+                    return -2;
+                }
             }
-
         }
         int i = this.tCameraInfoDao.deleteSelectedCamera(list);
         this.intoRedis();

@@ -112,7 +112,9 @@ public class TCameraInfoController {
             int re = tCameraInfoService.deleteSelectedCamera(cameraIds);
             if(re == -1){
                 result.setCode(209,"摄像机下存在预置位");
-            }else{
+            }else if(re == -2){
+                result.setCode(209,"诊断服务异常，删除失败");
+            }else {
                 result.setData(re);
             }
             //result.setData(tCameraInfoService.deleteSelectedCamera(cameraIds));
