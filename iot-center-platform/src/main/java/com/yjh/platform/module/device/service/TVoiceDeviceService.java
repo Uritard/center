@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sun.jna.Pointer;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.tradio.NET_TRADIO_DEVICEINFO;
 import com.yjh.platform.common.tradio.RecordVoiceFileTestThread;
@@ -467,8 +468,13 @@ public class TVoiceDeviceService{
     private List<Map<String,String>> voiceAnalyse(String voicePath,Integer second,VoiceDeviceInfoDetail voiceDeviceInfoDetail){
         log.info("文件："+voicePath);
         List<Map<String,String>> reList = new ArrayList<>();
-        VoiceAnalyseUtil voiceAnalyseUtil = new VoiceAnalyseUtil(voicePath);
-        List<Integer> DBList = voiceAnalyseUtil.analyticalDecibels();
+        List<Integer> DBList = null;
+        try {
+            VoiceAnalyseUtil voiceAnalyseUtil = new VoiceAnalyseUtil(voicePath);
+            DBList = voiceAnalyseUtil.analyticalDecibelsPl();
+        }catch (Exception e){
+            throw new BusinessException(209,"音频文件读取异常");
+        }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss.SSS");
         log.info("分贝数组："+DBList);
         //每一段的毫秒数；
@@ -566,8 +572,13 @@ public class TVoiceDeviceService{
     private List<Map<String,String>> voiceAnalyses(String voicePath,Integer second,VoiceDeviceInfoDetail voiceDeviceInfoDetail){
         log.info("文件："+voicePath);
         List<Map<String,String>> reList = new ArrayList<>();
-        VoiceAnalyseUtil voiceAnalyseUtil = new VoiceAnalyseUtil(voicePath);
-        List<Integer> DBList = voiceAnalyseUtil.analyticalDecibelsPl();
+        List<Integer> DBList = null;
+        try {
+            VoiceAnalyseUtil voiceAnalyseUtil = new VoiceAnalyseUtil(voicePath);
+             DBList = voiceAnalyseUtil.analyticalDecibelsPl();
+        }catch (Exception e){
+            throw new BusinessException(209,"音频文件读取异常");
+        }
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss.SSS");
         log.info("频率数组："+DBList);
         //每一段的毫秒数；
