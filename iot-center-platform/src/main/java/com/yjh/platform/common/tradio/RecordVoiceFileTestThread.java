@@ -29,6 +29,7 @@ public class RecordVoiceFileTestThread implements Runnable {
     private long dateTime;
     private long dateTimeAfter;
     private Integer voiceFileRecordTime;
+    private RedisTemplate redisTemplate;
 
     public RecordVoiceFileTestThread(RedisTemplate redisTemplate, Long voiceDeviceId, long hdForData) {
         this.hdForData = hdForData;
@@ -36,6 +37,7 @@ public class RecordVoiceFileTestThread implements Runnable {
         this.voiceFileRecordTime = Integer.parseInt(redisTemplate.opsForHash().entries("t_sys_param:voiceFileRecordTime").get("content").toString());
         this.dateTime = System.currentTimeMillis();
         this.dateTimeAfter = dateTime+voiceFileRecordTime*66*1000;
+        this.redisTemplate = redisTemplate;
         this.voicePath = redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content").toString();
         this.voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
                 +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter))+"_";
@@ -84,11 +86,12 @@ public class RecordVoiceFileTestThread implements Runnable {
                         Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+".aac");
                     } catch (IOException e) { e.getMessage(); }
                     dateTime = System.currentTimeMillis();
-                    dateTimeAfter = dateTime+voiceFileRecordTime*66*1000;
                     Calendar nowTime = Calendar.getInstance();
                     nowTime.add(Calendar.MINUTE, voiceFileRecordTime);
                     voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
                             +new SimpleDateFormat("yyyyMMdd_HHmm").format(nowTime.getTime());
+                    voiceFileRecordTime = Integer.parseInt(redisTemplate.opsForHash().entries("t_sys_param:voiceFileRecordTime").get("content").toString());
+                    dateTimeAfter = dateTime+voiceFileRecordTime*66*1000;
                 }
             }
         } catch (Exception e) {
