@@ -29,6 +29,14 @@ import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +64,11 @@ import javax.sound.sampled.AudioInputStream;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -370,18 +381,19 @@ public class HelloController {
 
 
 
-    @ApiOperation(value = "联动webSocket测试")
+    @ApiOperation(value = "联动弹框webSocket测试")
     @RequestMapping(value = "/linkWebSocket", method = RequestMethod.POST)
-    public Result linkWebSocket(@RequestParam String taskId) {
+    public Result linkWebSocket() {
         Result result = new Result();
         try {
             Map<String, String> jasonMaps2 = new HashMap<>();
             jasonMaps2.put("type", "linkagePopUp");
-            jasonMaps2.put("unionId", taskId);
+            jasonMaps2.put("unionId", "231313");
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
             try{
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMaps2);
+                String url = "http://192.168.9.40:18711/tCruiseTask/v1/syncWebsocket";
+                postUrl(url,json);
             }catch (Exception e){
                 System.out.println("发送websocket出错");
             }
@@ -392,7 +404,42 @@ public class HelloController {
         }
         return result;
     }
-
+    @ApiOperation(value = "告警弹框webSocket测试")
+    @RequestMapping(value = "/warnWebSocket", method = RequestMethod.POST)
+    public Result warnWebSocket() {
+        Result result = new Result();
+        try {
+            Map<String, Object> jasonMaps2 = new HashMap<>();
+            jasonMaps2.put("type", "alarmPopUp");
+            jasonMaps2.put("warnId", 51000000022l);
+            jasonMaps2.put("defectModel", 450);
+            String json = JSON.toJSONString(jasonMaps2);
+            log.info("发送给前端的消息：" + json);
+            try{
+                String url = "http://192.168.9.40:18711/tCruiseTask/v1/syncWebsocket";
+                postUrl(url,json);
+            }catch (Exception e){
+                System.out.println("发送websocket出错");
+            }
+//            result.setData(tCfgDataCurrentService.batchInsert(list));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("批量插入失败：" + e);
+        }
+        return result;
+    }
+    public static String postUrl(String url, String json) throws IOException, URISyntaxException {
+        System.out.println("webSocketUrl="+url+",json="+json);
+        CloseableHttpClient client = HttpClients.createDefault();
+        URI uri = new URIBuilder(url).setParameter("json", json).build();
+        HttpPost httpPost = new HttpPost(uri);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
+        CloseableHttpResponse response = client.execute(httpPost);
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, "UTF-8");
+    }
 
     //表记分析
     private void analysis(Map<String, List<Analysis>> analysisMap) {

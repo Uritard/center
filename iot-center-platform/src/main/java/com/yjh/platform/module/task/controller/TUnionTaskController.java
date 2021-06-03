@@ -225,7 +225,7 @@ public class TUnionTaskController {
     }
     @ApiOperation(value = "联动弹框--联动信息")
     @RequestMapping(value = "/linkageInformation",method = RequestMethod.GET)
-    @Logs(title = "联动弹框",content = "联动弹窗滚动联动信息",logType = 5)
+    @Logs(title = "联动弹框",content = "联动弹窗滚动联动信息",logType = 1,authority = "1235")
     public Result linkageInformation(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
         try {
@@ -240,7 +240,7 @@ public class TUnionTaskController {
     }
     @ApiOperation(value = "联动弹框--监测数据")
     @RequestMapping(value = "/linkageMonitorData",method = RequestMethod.GET)
-    @Logs(title = "联动弹框",content = "联动弹窗滚动检测数据信息",logType = 5)
+    @Logs(title = "联动弹框",content = "联动弹窗滚动检测数据信息",logType = 1,authority = "1235")
     public Result linkageMonitorData(@RequestParam(value = "taskId", required = true) String taskId) {
         Result result = new Result();
         try {
