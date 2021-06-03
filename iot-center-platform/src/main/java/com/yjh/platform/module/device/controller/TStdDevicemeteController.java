@@ -99,7 +99,13 @@ public class TStdDevicemeteController {
     public Result update(@Validated @RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail, HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(tStdDevicemeteService.update(tStdDeviceMeteDetail));
+            int i = tStdDevicemeteService.update(tStdDeviceMeteDetail);
+            if (i==0) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("code", "10102");
+                map.put("info", "判别算法不能和表计或者缺陷同时选择！");
+                result.setData(map);
+            } else { result.setData(i); }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("标准设备测点更新异常:", e);

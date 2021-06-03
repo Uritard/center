@@ -129,11 +129,11 @@ public class TStdDevicemeteService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String update(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
+    public int update(TStdDeviceMeteDetail tStdDeviceMeteDetail) {
         //修改测点配置的算法
         if ((Objects.nonNull(tStdDeviceMeteDetail.getAnalyseType())
                 || Objects.equals("on",tStdDeviceMeteDetail.getIsAi())) && Objects.equals("on", tStdDeviceMeteDetail.getIsJudge())) {
-            return "判别算法不能和表计算法或者缺陷算法同时选中！";
+            return 0;
         }
         //配置算法
         if(tStdDeviceMeteDetail.getAnalyseType() != null){
@@ -183,7 +183,7 @@ public class TStdDevicemeteService{
             }
 
         }
-        return String.valueOf(this.tStdDevicemeteDao.update(tStdDeviceMeteDetail));
+        return this.tStdDevicemeteDao.update(tStdDeviceMeteDetail);
     }
 
     @Transactional(rollbackFor = Exception.class)
