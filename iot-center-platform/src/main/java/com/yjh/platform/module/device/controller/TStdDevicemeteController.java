@@ -101,7 +101,7 @@ public class TStdDevicemeteController {
         try {
             int i = tStdDevicemeteService.update(tStdDeviceMeteDetail);
             if (i==0) {
-                result.setMessage("判别算法不能和表计或者缺陷同时选择！");
+                result.setMessage("AI判别不能和识别算法或者AI缺陷同时选择！");
                 result.setCode(10102);
             } else { result.setData(i); }
         } catch (BusinessException e) {

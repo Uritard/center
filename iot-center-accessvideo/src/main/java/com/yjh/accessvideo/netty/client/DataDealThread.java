@@ -356,7 +356,7 @@ public class DataDealThread implements Runnable {
                                                                 break;
                                                             case 2:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
-                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + cruiseResultMap.get("resultNum") + "--" + "一般");
+                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + cruiseResultMap.get("resultNum") + "--" + "一般告警");
                                                                 alarm_level = "2";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit2()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit2()));
@@ -366,7 +366,7 @@ public class DataDealThread implements Runnable {
                                                                 break;
                                                             case 3:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "严重告警"));
-                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + cruiseResultMap.get("resultNum") + "--" + "严重");
+                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + cruiseResultMap.get("resultNum") + "--" + "严重告警");
                                                                 alarm_level = "3";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit3()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit3()));
@@ -377,7 +377,7 @@ public class DataDealThread implements Runnable {
 
                                                             case 4:
                                                                 warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "危急告警"));
-                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + cruiseResultMap.get("resultNum") + "--" + "危急");
+                                                                warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + cruiseResultMap.get("resultNum") + "--" + "危急告警");
                                                                 alarm_level = "4";
                                                                 if (resultValueMeter >= tStdDevicemeteM.getHighLimit4()) {
                                                                     warnMap.put("outRange", String.valueOf(resultValueMeter - tStdDevicemeteM.getHighLimit4()));
