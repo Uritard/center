@@ -214,7 +214,11 @@ public class TCruisePointInstanceController {
     public Result instanceUnionUpdate(@RequestBody TCruisePointInstanceDetail tCruisePointInstanceDetail){
         Result result = new Result();
         try{
-            result.setData(tCruisePointInstanceService.instanceUpdate(tCruisePointInstanceDetail));
+            int i = tCruisePointInstanceService.instanceUpdate(tCruisePointInstanceDetail);
+            if (i==-2) {
+                result.setMessage("巡视点已经绑定了任务无法删除！");
+                result.setCode(10102);
+            } else {result.setData(i);}
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡检点关联配置失败描述：", e);

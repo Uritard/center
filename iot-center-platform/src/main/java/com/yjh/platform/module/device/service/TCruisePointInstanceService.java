@@ -332,6 +332,20 @@ public class TCruisePointInstanceService{
         List<Long> cruiseIdList = tCruisePointInstanceDao.selectCruiseId(tCruisePointInstanceDetail);//已经有了的巡检点
         Integer cruiseType = tCruisePointInstanceDetail.getCruiseType();
         int result = -1;
+        //删除关联表的巡检实例
+        if(cruiseIdList != null && cruiseIdList.size()>0){
+            List<Long> instanceIdList = tCruisePointInstanceDao.selectInstanceId(cruiseIdList,tCruisePointInstanceDetail.getDeviceMeteId());
+            List<TCruisePointInstance> instanceList = tCruiseTaskAttrDao.batchSelect(instanceIdList);
+            if (instanceList.size()>0) {
+                result = -3;
+                return result;
+            }
+            tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
+            //tCruisePointAttrDao.deleteByInstanceId(instanceIdList);
+            tCruisePlanAttrDao.deleteByInstanceId(instanceIdList);
+            //tCruiseTaskAttrDao.deleteByInstanceId(instanceIdList);
+            tCruiseTypeDao.deleteForInstanceId(instanceIdList);
+        }
         //巡检点配置
         if (tCruisePointInstanceDetail.getIds().size()!=0){
             for (Long id:tCruisePointInstanceDetail.getIds()) {
@@ -415,15 +429,6 @@ public class TCruisePointInstanceService{
                 }
 
             }
-        }
-        //删除关联表的巡检实例
-        if(cruiseIdList != null && cruiseIdList.size()>0){
-            List<Long> instanceIdList = tCruisePointInstanceDao.selectInstanceId(cruiseIdList,tCruisePointInstanceDetail.getDeviceMeteId());
-            tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
-            //tCruisePointAttrDao.deleteByInstanceId(instanceIdList);
-            tCruisePlanAttrDao.deleteByInstanceId(instanceIdList);
-            //tCruiseTaskAttrDao.deleteByInstanceId(instanceIdList);
-            tCruiseTypeDao.deleteForInstanceId(instanceIdList);
         }
         return result;
     }
