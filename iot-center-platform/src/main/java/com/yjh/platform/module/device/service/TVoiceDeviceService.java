@@ -354,7 +354,8 @@ public class TVoiceDeviceService{
                                                 List<File> voiceFileList = getFileSort(path);
                                                 if(voiceFileList != null && voiceFileList.size()>0) {
                                                     for (int k = 0; k < voiceFileList.size(); k++) {
-                                                        if (voiceFileList.get(k).isFile() && voiceFileList.get(k).getName().contains(".wav")) {//音频文件
+//                                                        if (voiceFileList.get(k).isFile() && voiceFileList.get(k).getName().contains(".wav")) {//音频文件
+                                                            if (voiceFileList.get(k).isFile()) {//音频文件
                                                             VoiceDevice voiceFile = new VoiceDevice();
                                                             voiceFile.setUpId(date.getId());
                                                             voiceFile.setUpName(date.getLabel());
