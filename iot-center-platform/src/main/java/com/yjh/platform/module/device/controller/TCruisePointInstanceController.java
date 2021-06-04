@@ -215,7 +215,7 @@ public class TCruisePointInstanceController {
         Result result = new Result();
         try{
             int i = tCruisePointInstanceService.instanceUpdate(tCruisePointInstanceDetail);
-            if (i==-2) {
+            if (i==-3) {
                 result.setMessage("巡视点已经绑定了任务无法删除！");
                 result.setCode(10102);
             } else {result.setData(i);}
