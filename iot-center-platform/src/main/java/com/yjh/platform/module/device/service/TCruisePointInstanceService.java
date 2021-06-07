@@ -430,7 +430,7 @@ public class TCruisePointInstanceService{
                 //插入信息关联表
                 TCruisePointInfo tCruisePointInfo = new TCruisePointInfo();
                 tCruisePointInfo.setInstanceId(tCruisePointInstance.getInstanceId());
-                tCruisePointInfo.setInstanceId(tCruisePointInstance.getDeviceMeteId());
+                tCruisePointInfo.setDeviceMeteId(tCruisePointInstance.getDeviceMeteId());
                 tCruisePointInstanceDao.insertInstanceInfo(tCruisePointInfo);
 
             }
