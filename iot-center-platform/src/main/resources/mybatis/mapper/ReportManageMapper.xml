@@ -37,7 +37,7 @@
 		e.device_id,
 		e.device_name,
 		b.device_mete_id,
-		d.instance_id,
+		h.instance_id,
 		e.instance_name,
 		b.mete_type,
 		q.dict_note as mete_type_name,
@@ -55,8 +55,7 @@
 		f.cruise_type
 		FROM t_cruise_data_result f
         LEFT JOIN t_cruise_task_result_detail e on e.cruise_result_id = f.cruise_result_id
-        LEFT JOIN t_cruise_point_instance d on e.instance_id = d.instance_id
-        LEFT JOIN t_cruise_point_info h on h.instance_id = d.instance_id
+        LEFT JOIN t_cruise_point_info h on h.instance_id = e.instance_id
         LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id
         LEFT JOIN t_std_device a on a.device_id = b.device_id and a.custom_id = b.custom_id
         LEFT JOIN t_std_device_attr y on y.device_id = b.device_id
@@ -92,8 +91,7 @@
         from t_cruise_result q
         LEFT JOIN t_cruise_task_result_detail e on q.task_result_id = e.task_result_id
         LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
-        LEFT JOIN t_cruise_point_instance d on e.instance_id = d.instance_id
-        LEFT JOIN t_cruise_point_info h on h.instance_id = d.instance_id
+        LEFT JOIN t_cruise_point_info h on h.instance_id = e.instance_id
         LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id
         LEFT JOIN t_std_device_attr y on y.device_id = e.device_id
         LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result and g.col_name = 'cruise_result'

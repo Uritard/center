@@ -1945,7 +1945,6 @@ public class RobotService {
                     String taskStart = redisInfoMap3.get("taskStart");//开始时间
                     String overDay = redisInfoMap3.get("overDay");//超期时间
                     try {
-
                         String overDayTime = sdf.format(new Date(sdf.parse(taskStart).getTime() + Long.parseLong(overDay)  * 60 * 60 * 1000));
                         log.info("开始时间=="+taskStart+",超期后的时间=="+overDayTime);
                         if (sdf.parse(overDayTime).getTime() < new Date().getTime()){
@@ -1956,7 +1955,6 @@ public class RobotService {
                     }catch (Exception e){
                         e.getMessage();
                     }
-
             }
         }
         return taskIdList;

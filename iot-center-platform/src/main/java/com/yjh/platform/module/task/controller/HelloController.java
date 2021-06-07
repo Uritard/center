@@ -388,7 +388,7 @@ public class HelloController {
         try {
             Map<String, String> jasonMaps2 = new HashMap<>();
             jasonMaps2.put("type", "linkagePopUp");
-            jasonMaps2.put("unionId", "231313");
+            jasonMaps2.put("unionId", "f849a7ba959148a98cd7111abdb81b12");
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
             try{
