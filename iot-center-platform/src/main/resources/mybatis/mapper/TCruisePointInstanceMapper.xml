@@ -81,12 +81,12 @@
 
     <insert id="insertInstanceInfo" useGeneratedKeys="true" keyProperty="instanceId" parameterType="com.yjh.platform.module.device.entity.TCruisePointInfo">
         insert into t_cruise_point_info(
+        instance_id,
         device_mete_id,
-        station_id,
         remark
         )values(
+        #{instanceId, jdbcType=BIGINT},
         #{deviceMeteId, jdbcType=BIGINT},
-        #{stationId, jdbcType=VARCHAR},
         #{remark, jdbcType=VARCHAR}
         )
     </insert>
