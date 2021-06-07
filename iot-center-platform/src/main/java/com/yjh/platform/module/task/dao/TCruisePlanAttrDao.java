@@ -32,6 +32,7 @@ public interface TCruisePlanAttrDao {
                                  @Param(value = "createTime") Date createTime,
                                  @Param(value = "updateTime") Date updateTime,
                                  @Param(value = "subType") Integer subType);
+    List<Long> batchSelectAttr(@Param("instanceList") List<Long> instanceList);
     List<TCruisePlanAttr> selectByPage(TCruisePlanAttr tCruisePlanAttr);
 
     int batchInsert(@Param(value = "tCruisePlanAttrList") List<TCruisePlanAttr> tCruisePlanAttrList);

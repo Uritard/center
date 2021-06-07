@@ -60,6 +60,19 @@
         )
     </insert>
 
+    <select id="batchSelectAttr" parameterType="java.util.List" resultType="java.lang.Long">
+        select
+        a.instance_id
+        from t_cruise_plan_attr a
+        WHERE 1 = 1
+        <if test="instanceList != null and instanceList.size() > 0">
+            AND instance_id IN
+            <foreach collection="instanceList" separator="," open="(" close=")" item="instanceId">
+                #{instanceId, jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
         delete from t_cruise_plan_attr
                 where plan_id = #{planId, jdbcType=BIGINT}

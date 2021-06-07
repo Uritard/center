@@ -335,8 +335,9 @@ public class TCruisePointInstanceService{
         //删除关联表的巡检实例
         if(cruiseIdList != null && cruiseIdList.size()>0){
             List<Long> instanceIdList = tCruisePointInstanceDao.selectInstanceId(cruiseIdList,tCruisePointInstanceDetail.getDeviceMeteId());
-            List<TCruisePointInstance> instanceList = tCruiseTaskAttrDao.batchSelect(instanceIdList);
-            if (instanceList.size()>0) {
+//            List<TCruisePointInstance> instanceList = tCruiseTaskAttrDao.batchSelect(instanceIdList);
+            List<Long> instancePlanList = tCruisePlanAttrDao.batchSelectAttr(instanceIdList);
+            if (instancePlanList.size()>0) {
                 result = -3;
                 return result;
             }
