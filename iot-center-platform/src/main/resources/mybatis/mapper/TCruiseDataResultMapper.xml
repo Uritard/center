@@ -506,7 +506,8 @@
         FROM t_cruise_task_result_detail e
         LEFT JOIN t_cruise_data_result f ON e.cruise_result_id = f.cruise_result_id
         LEFT JOIN t_cruise_point_instance b ON b.instance_id = e.instance_id
-        LEFT JOIN t_std_devicemete a on a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_cruise_point_info w on w.instance_id = b.instance_id
+        LEFT JOIN t_std_devicemete a on a.device_mete_id = w.device_mete_id
         LEFT JOIN t_cruise_result g ON e.task_result_id = g.task_result_id
         LEFT JOIN t_dict_business h ON b.cruise_type = h.dict_code AND h.col_name = "cruise_type"
         LEFT JOIN t_dict_business i ON g.c_type = i.dict_code AND i.col_name = "plan_type"

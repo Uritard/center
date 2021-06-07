@@ -91,6 +91,6 @@ public interface TRobotInfoDao {
     TStdDeviceMete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
     Long selectIsRobotTask(@Param(value = "taskId")String taskId);
     List<String> HasStandTaskIsFinish(@Param(value = "robotId")Long robotId);
-    int updateStandTaskStatus(@Param(value = "taskId")String taskId);
+    int updateStandTaskStatus(@Param(value = "taskId")String taskId,@Param(value = "state")Integer state);
 
 }

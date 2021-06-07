@@ -38,7 +38,7 @@ public class Constant {
     public static AtomicInteger heartNum = new AtomicInteger(0);
     public static int flag = 0;
     public static String Packet = "";
-    public static int registerCount = 1;
+    public static int registerCount = 0;
     public static  Integer registerFlag = 0;
 
 

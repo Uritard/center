@@ -168,7 +168,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         log.info("channel.isActive(): " + channel.isActive());
         log.info("此时的packet====="+Packet);
         Packet = "";
-        Constant.registerCount = 1;
+        Constant.registerCount = 0;
 
         //1.判断是否为注册连接，是注册连接带strChannelID，不是则是空,无须修改状态 2.可以改为若strChannelID为空，则不可注册
         if (strRobotCode == null || strRobotCode.equals("")) {
@@ -423,6 +423,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         Map<String, String> runDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:runDataInterval");
         Map<String, String> weatherDataIntervalMap = redisTemplate.opsForHash().entries("t_sys_param:weatherDataInterval");
         Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
+        String status = StaticContextAccessor.getBean(RobotService.class).selectStatusByRobotCode(xmlBaseModel.getSendCode());
 
         try {
             if ("251".equals(xmlBaseModel.getType())) {
@@ -430,8 +431,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                     //注册指令(发送响应)
                     case "2511":
 
-                        log.info("巡视主机收到注册指令了,这是第" + Constant.registerCount + "次");
-                        Constant.registerCount++;
+                        log.info("巡视主机收到注册指令了,这是第" + (Constant.registerCount++) + "次");
                         List<Map<String, Object>> itemsList = new ArrayList<>();
                         Map<String, Object> items = new HashMap<>();
                         String code = "";
@@ -481,7 +481,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         thread.setDaemon(true);
                         thread.start();
                         //判断巡视主机端有无未完成的站端任务
-                        robotService.HasStandTaskIsFinish(xmlBaseModel.getSendCode());
+                        try{
+                            robotService.HasStandTaskIsFinish(xmlBaseModel.getSendCode());
+                        }catch (Exception e){
+                            log.error(e.getMessage());
+                        }
                         break;
                     //心跳指令(发送响应)
                     case "2512":
@@ -583,10 +587,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             robotService.upToCruise(xmlBaseModel);//国网要求
                         });
                         log.info("机器人状态数据是：" + robotStatusList);
-                        //放缓存
-                        for (int i = 0; i < robotStatusList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("RobotStatus:" + xmlBaseModel.getSendCode() + ":" + robotStatusList.get(i).get("type"), robotStatusList.get(i));
+
+                        if ("在线".equals(status)){
+                            //放缓存
+                            for (int i = 0; i < robotStatusList.size(); i++) {
+                                redisTemplate.opsForHash().putAll("RobotStatus:" + xmlBaseModel.getSendCode() + ":" + robotStatusList.get(i).get("type"), robotStatusList.get(i));
+                            }
                         }
+
                         String statusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
                         byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
                         send(ctx, statusProtocol, xmlBaseModel.getSendCode());
@@ -610,10 +618,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             robotOperationList.add(robotOperationMap);
 
                         });
-                        //放缓存
-                        for (int i = 0; i < robotOperationList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("RobotOperation:" + xmlBaseModel.getSendCode() + ":" + robotOperationList.get(i).get("type"), robotOperationList.get(i));
+
+                        if ("在线".equals(status)) {
+                            //放缓存
+                            for (int i = 0; i < robotOperationList.size(); i++) {
+                                redisTemplate.opsForHash().putAll("RobotOperation:" + xmlBaseModel.getSendCode() + ":" + robotOperationList.get(i).get("type"), robotOperationList.get(i));
+                            }
                         }
+
                         String operationXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
                         byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
                         send(ctx, operationProtocol, xmlBaseModel.getSendCode());
@@ -637,10 +649,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             robotCoordinateMap.put("coordinateGeography", res.get("coordinate_geography").toString());
                             robotCoordinateList.add(robotCoordinateMap);
                         });
-                        //放缓存
-                        for (int i = 0; i < robotCoordinateList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("RobotCoordinate:" + xmlBaseModel.getSendCode(), robotCoordinateList.get(i));
+
+                        if ("在线".equals(status)) {
+                            //放缓存
+                            for (int i = 0; i < robotCoordinateList.size(); i++) {
+                                redisTemplate.opsForHash().putAll("RobotCoordinate:" + xmlBaseModel.getSendCode(), robotCoordinateList.get(i));
+                            }
                         }
+
                         String coordinateXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
                         byte[] coordinateProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, coordinateXmlString);
                         send(ctx, coordinateProtocol, xmlBaseModel.getSendCode());
@@ -693,10 +709,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             robotRoadMap.put("coordinateGeography", res.get("coordinate_geography").toString());
                             robotRoadList.add(robotRoadMap);
                         });
-                        //放缓存
-                        for (int i = 0; i < robotRoadList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("RobotRoad:" + xmlBaseModel.getSendCode(), robotRoadList.get(i));
+
+                        if ("在线".equals(status)) {
+                            //放缓存
+                            for (int i = 0; i < robotRoadList.size(); i++) {
+                                redisTemplate.opsForHash().putAll("RobotRoad:" + xmlBaseModel.getSendCode(), robotRoadList.get(i));
+                            }
                         }
+
                         String roadXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
                         byte[] roadProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, roadXmlString);
                         send(ctx, roadProtocol, xmlBaseModel.getSendCode());
@@ -776,10 +796,14 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                                 //info.put("precipitationUnit","mm");
                             }
                         });
-                        //放缓存
-                        for (int i = 0; i < weatherList.size(); i++) {
-                            redisTemplate.opsForHash().putAll("RobotWeather:" + xmlBaseModel.getSendCode() + ":" + weatherList.get(i).get("type"), weatherList.get(i));
+
+                        if ("在线".equals(status)) {
+                            //放缓存
+                            for (int i = 0; i < weatherList.size(); i++) {
+                                redisTemplate.opsForHash().putAll("RobotWeather:" + xmlBaseModel.getSendCode() + ":" + weatherList.get(i).get("type"), weatherList.get(i));
+                            }
                         }
+
                         Constant.weatherServer(info, Constant.WEATHER_URL);
                         String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
                         byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);
@@ -812,6 +836,15 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             jasonMap.put("taskId", xmlBaseModel.getItems().get(0).get("task_code").toString());
                             String json = JSON.toJSONString(jasonMap);
                             Constant.postUrl(webSocketUrl, json);
+
+                            //以备后面做任务超时使用
+                            Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+                            Float tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
+                            Map<String,String> mapForAbnormal = new HashMap<>();
+                            mapForAbnormal.put("taskStart",taskStatusMap.get("startTime").toString());
+                            mapForAbnormal.put("overDay",tasksAreTime.toString());
+                            String strForCountAbnormal = "countForAbnormal:"+taskStatusMap.get("taskCode").toString();
+                            redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
                         }
 
                         Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + xmlBaseModel.getSendCode()
@@ -1600,7 +1633,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         log.info("channel.isActive(): " + channel.isActive());
         log.info("此时的packet====="+Packet);
-        Constant.registerCount = 1;
+        Constant.registerCount = 0;
     }
     //Redis数据库批量查询Key值游标
     public Set<String> redisScan(String key) {

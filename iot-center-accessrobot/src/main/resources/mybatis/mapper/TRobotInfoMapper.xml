@@ -471,7 +471,8 @@
             position_offset,
             alarm_state,
             create_time,
-            end_time
+            end_time,
+            robot_name
         )values(
                 #{robotAlarmId, jdbcType=BIGINT},
                 #{alarmName, jdbcType=VARCHAR},
@@ -489,7 +490,8 @@
                 #{positionOffset, jdbcType=VARCHAR},
                 #{alarmState, jdbcType=INTEGER},
                 #{createTime, jdbcType=TIMESTAMP},
-                #{endTime, jdbcType=TIMESTAMP}
+                #{endTime, jdbcType=TIMESTAMP},
+                #{robotName,jdbcType=VARCHAR}
         )
     </insert>
     <!--TCTRD信息批量入库-->
@@ -1021,7 +1023,7 @@
     </select>
     <update id="updateStandTaskStatus">
         UPDATE t_cruise_result a <set>
-        a.c_state = 243
+        a.c_state = #{state,jdbcType=INTEGER}
     </set>
         WHERE
         a.task_id = #{taskId,jdbcType=VARCHAR}

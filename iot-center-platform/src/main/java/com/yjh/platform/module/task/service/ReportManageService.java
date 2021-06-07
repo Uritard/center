@@ -68,7 +68,7 @@ public class ReportManageService {
         for (TCruiseDataResultDetail tcdr : tCDRDList){
             String relativePath = tcdr.getPicPath();
             if (!"228".equals(tcdr.getCruiseType().toString())){
-                if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
+                if (Objects.nonNull(relativePath) && !"null".equals(relativePath) && !"--".equals(relativePath)){
                     String aaa[] =  relativePath.split("/");
                     String type = aaa[5];
                     if ("defect".equals(type)){//缺陷
@@ -242,7 +242,7 @@ public class ReportManageService {
         for (TCruiseDataResultDetail tcdr : tCDRDList){
             String relativePath = tcdr.getPicPath();
             if (!"228".equals(tcdr.getCruiseType().toString())){
-                if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
+                if (Objects.nonNull(relativePath) && !"null".equals(relativePath) && !"--".equals(relativePath)){
                     String aaa[] =  relativePath.split("/");
                     String type = aaa[5];
                     if ("defect".equals(type)){//缺陷

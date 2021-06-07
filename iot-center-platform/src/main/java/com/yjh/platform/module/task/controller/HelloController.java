@@ -392,7 +392,7 @@ public class HelloController {
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
             try{
-                String url = "http://192.168.9.40:18711/tCruiseTask/v1/syncWebsocket";
+                String url = "http://192.168.9.40:18701/route/syncWebsocket";
                 postUrl(url,json);
             }catch (Exception e){
                 System.out.println("发送websocket出错");
@@ -416,7 +416,7 @@ public class HelloController {
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
             try{
-                String url = "http://192.168.9.40:18711/tCruiseTask/v1/syncWebsocket";
+                String url = "http://192.168.9.40:18701/route/syncWebsocket";
                 postUrl(url,json);
             }catch (Exception e){
                 System.out.println("发送websocket出错");

@@ -34,7 +34,7 @@
         select
 		e.cruise_result_id,
 		f.cruise_data_id,
-		a.device_id,
+		e.device_id,
 		e.device_name,
 		b.device_mete_id,
 		d.instance_id,
@@ -53,15 +53,16 @@
 		f.identify_result,
 		z.dict_note as identify_result_name,
 		f.cruise_type
-		FROM t_std_device a
-		LEFT JOIN t_std_devicemete b on a.device_id = b.device_id and a.custom_id = b.custom_id
-		LEFT JOIN t_cruise_point_instance d on b.device_mete_id = d.device_mete_id
-		LEFT JOIN t_cruise_task_result_detail e on e.instance_id = d.instance_id
-		LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
-		LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result
-		LEFT JOIN t_dict_business p on p.dict_code = f.evaluation_state
-        LEFT JOIN t_dict_business q on q.dict_code = b.mete_type
+		FROM t_cruise_data_result f
+        LEFT JOIN t_cruise_task_result_detail e on e.cruise_result_id = f.cruise_result_id
+        LEFT JOIN t_cruise_point_instance d on e.instance_id = d.instance_id
+        LEFT JOIN t_cruise_point_info h on h.instance_id = d.instance_id
+        LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id
+        LEFT JOIN t_std_device a on a.device_id = b.device_id and a.custom_id = b.custom_id
         LEFT JOIN t_std_device_attr y on y.device_id = b.device_id
+        LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result AND g.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business p on p.dict_code = f.evaluation_state and p.col_name = 'evaluation_state'
+        LEFT JOIN t_dict_business q on q.dict_code = b.mete_type and q.col_name = 'mete_type'
         LEFT JOIN t_dict_business z on z.dict_code = f.identify_result and z.col_name = 'identify_result'
     </sql>
     <sql id="TongYong2">
@@ -92,11 +93,12 @@
         LEFT JOIN t_cruise_task_result_detail e on q.task_result_id = e.task_result_id
         LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
         LEFT JOIN t_cruise_point_instance d on e.instance_id = d.instance_id
+        LEFT JOIN t_cruise_point_info h on h.instance_id = d.instance_id
+        LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id
         LEFT JOIN t_std_device_attr y on y.device_id = e.device_id
-        LEFT JOIN t_std_devicemete b on b.device_mete_id = d.device_mete_id
-        LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result
-        LEFT JOIN t_dict_business w on w.dict_code = b.mete_type
-        LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state
+        LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result and g.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business w on w.dict_code = b.mete_type and w.col_name = 'mete_type'
+        LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state and x.col_name = 'evaluation_state'
         LEFT JOIN t_dict_business z on z.dict_code = f.identify_result and z.col_name = 'identify_result'
     </sql>
     <delete id="reportDelete" parameterType="java.lang.String">
@@ -148,7 +150,7 @@
     <select id="selectDetail" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
         <include refid="TongYong"></include>
         where 1 = 1
-        and a.device_id in
+        and e.device_id in
         <foreach collection="list" item="deviceIds" open="(" separator="," close=")">
             #{deviceIds, jdbcType=BIGINT}
         </foreach>
