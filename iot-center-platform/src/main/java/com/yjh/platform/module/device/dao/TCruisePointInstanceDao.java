@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 public interface TCruisePointInstanceDao {
 
     int insert(TCruisePointInstance tCruisePointInstance);
+    int insertInstanceInfo(TCruisePointInfo tCruisePointInfo);
     int deleteByPrimaryId(@Param(value = "instanceId") Long instanceId);
     int deleteByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
     int deleteByDeviceId(@Param(value = "deviceId") Long deviceId);

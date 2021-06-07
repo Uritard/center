@@ -427,6 +427,11 @@ public class TCruisePointInstanceService{
                     tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
                     //tCruisePointAttrDao.add(tCruisePointAttr);
                 }
+                //插入信息关联表
+                TCruisePointInfo tCruisePointInfo = new TCruisePointInfo();
+                tCruisePointInfo.setInstanceId(tCruisePointInstance.getInstanceId());
+                tCruisePointInfo.setInstanceId(tCruisePointInstance.getDeviceMeteId());
+                tCruisePointInstanceDao.insertInstanceInfo(tCruisePointInfo);
 
             }
         }
