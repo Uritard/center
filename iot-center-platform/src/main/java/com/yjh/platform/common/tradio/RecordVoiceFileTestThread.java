@@ -40,7 +40,7 @@ public class RecordVoiceFileTestThread implements Runnable {
         this.redisTemplate = redisTemplate;
         this.voicePath = redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content").toString();
         this.voiceName = voiceDeviceId +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
-                +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter))+"_";
+                +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter));
     }
 
     @Override
@@ -70,7 +70,10 @@ public class RecordVoiceFileTestThread implements Runnable {
                             fos.write(sourceData, 0, sourceData.length);
                             fos.flush();
                             fos.close();
-                        } catch (Exception e) { e.getMessage(); }
+                        } catch (Exception e) {
+                            isThreadStart = false;
+                            log.error(e.getMessage(), e);
+                        }
                     }
                 }, 0);
                 Thread.sleep(10000);
@@ -80,11 +83,9 @@ public class RecordVoiceFileTestThread implements Runnable {
                     String urlAACToWAV = "ffmpeg -y -i "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+".aac -acodec pcm_s16le -ac 2 -ar 32000 " +
                             voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName + ".wav";
                     log.info("urlAACToWAV: "+urlAACToWAV);
-                    try {
-                        Runtime.getRuntime().exec(urlAACToWAV);
-                        Thread.sleep(2000);
-                        Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+".aac");
-                    } catch (IOException e) { e.getMessage(); }
+                    Runtime.getRuntime().exec(urlAACToWAV);
+                    Thread.sleep(2000);
+                    Runtime.getRuntime().exec("rm -rf "+voicePath+"/"+voiceDeviceId+"/1/"+timeAfterTem+"/"+voiceName+".aac");
                     dateTime = System.currentTimeMillis();
                     Calendar nowTime = Calendar.getInstance();
                     nowTime.add(Calendar.MINUTE, voiceFileRecordTime);
@@ -95,8 +96,8 @@ public class RecordVoiceFileTestThread implements Runnable {
                 }
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
             isThreadStart = false;
+            log.error(e.getMessage(), e);
         }
     }
 }
