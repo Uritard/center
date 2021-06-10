@@ -48,9 +48,12 @@ public class TStdRegionService{
 
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdRegion tStdRegion) {
-        List<TStdRegion> list = tStdRegionDao.selectIsIn(tStdRegion);
-        if(list != null && list.size()>0){
-            throw new BusinessException(209,"编码与其他厂站区域重复");
+        String regionCode = tStdRegion.getRegionCode();
+        if (!Objects.equals("", regionCode) && Objects.nonNull(regionCode)) {
+            List<TStdRegion> list = tStdRegionDao.selectIsIn(tStdRegion);
+            if(list != null && list.size()>0){
+                throw new BusinessException(209,"编码与其他厂站区域重复");
+            }
         }
         return this.tStdRegionDao.update(tStdRegion);
     }
