@@ -396,7 +396,7 @@ public class RunAtNowTask implements Runnable{
 
                         tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
                         tCruiseTaskResultDetailMap.put("cruiseTime",cruiseTime);
-                        TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(item.getCruiseId());
+//                        TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(item.getCruiseId());
                         if(item.getCruiseType() != 228){
                             tCruiseTaskResultDetailMap.put("cameraId",item.getCruiseId().toString());
                             tCruiseTaskResultDetailMap.put("robotId","");
@@ -532,7 +532,7 @@ public class RunAtNowTask implements Runnable{
                             list.add(xmlBaseModel);
                             Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                             cruiseResult.put("list",list);
-                            log.info("信息上报：-"+cruiseResult);
+//                            log.info("信息上报：-"+cruiseResult);
                             Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                         }
                     }

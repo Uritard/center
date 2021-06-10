@@ -441,7 +441,7 @@ public class TCruiseTaskResultService {
 //                    log.info("robotVideoHistory：" + robotVideoHistory + ",robotInfraredHistory：" + robotInfraredHistory + ",videoCameraType==" +videoInfo.get("videoCameraType"));
                     HashMap<String, Long> robot = new HashMap<>();
                     robot.put("robotId", Long.valueOf(resultMap.get("robotId").toString()));
-                    
+
                     switch (videoInfo.get("videoCameraType")) {
                         case "1":
                             if (Objects.isNull(robotVideoHistory)) {
