@@ -169,7 +169,7 @@ public class TCruiseTaskResultController {
 
     @ApiOperation(value = "A-获取当前任务下的巡检点的执行信息")
     @RequestMapping(value = "/selectCurrentCruiseTaskResult",method = RequestMethod.GET)
-    @Logs(title = "获取当前任务下的巡检点的执行信息",content = "根据用户传递的参数获取当前任务下巡检点的执行信息",logType = 1,authority = "1235")
+//    @Logs(title = "获取当前任务下的巡检点的执行信息",content = "根据用户传递的参数获取当前任务下巡检点的执行信息",logType = 1,authority = "1235")
     public Result selectCurrentCruiseTaskResult(@RequestParam String taskId){
         Result result=new Result();
         try {

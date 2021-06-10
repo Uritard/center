@@ -27,6 +27,7 @@ import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.task.entity.CruiseInspectResult;
+import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -389,82 +390,62 @@ public class TCruiseTaskResultService {
     public List<Map<String, Object>> selectCruiseTaskResultYC(String taskId) throws ParseException {
         //最终结果集容器
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        log.info("开始时间=="+sdf.format(new Date(System.currentTimeMillis())));
+        long startTime = System.currentTimeMillis();
 
         List<Map<String, Object>> completeResult = new ArrayList<>();
         Map<String, Object> resultsMap = new HashMap<>();
         CruiseInspectResult inspectResult = new CruiseInspectResult();
 
         List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskIdYC(taskId);
+        List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null, "", "cruise_data_state", "", null, null, null);
+        HashMap<String, String> tDictMap = new HashMap<>();
+        for (TDictBusiness tDictBusiness:tDictBusinessList) tDictMap.put(tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
 
-        for (CruiseInspectResult cruiseInspectResult : cruiseInspectResults) {
-//            log.info("-----------------------+++++++++++++++++===============:" + cruiseInspectResult);
-
+        for (CruiseInspectResult cruiseInspectResult:cruiseInspectResults) {
             cruiseInspectResult.setCruiseResultName("--");
             cruiseInspectResult.setEndTime(null);
             String key = "t_cruise_task_result:" + taskId + ":" + cruiseInspectResult.getInstanceId().toString();
-
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);
-
-//            log.info("------------------MAP-----------------" + resultMap.size());
-
-            if (resultMap.size() != 0) {
+            if (resultMap.size()>0) {
                 //从redis拿数据
-                cruiseInspectResult.setCruiseStatus(tDictBusinessDao.selectDictNoteByDictCode(resultMap.get("cruiseStatus").toString()));
+                cruiseInspectResult.setCruiseStatus(tDictMap.get(resultMap.get("cruiseStatus").toString()));
                 if (resultMap.get("resultNum").toString().equals("") || resultMap.get("resultNum").toString().equals("null")) {
                     cruiseInspectResult.setCruiseResultName("--");
-                } else {
-                    cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString());
-                }
+                } else { cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString()); }
                 if (resultMap.get("cruiseTime").equals("null") || resultMap.get("cruiseTime").toString().equals("")) {
                     cruiseInspectResult.setEndTime(null);
-                } else {
-                    cruiseInspectResult.setEndTime(sdf.parse(resultMap.get("cruiseTime").toString()));
-                }
+                } else { cruiseInspectResult.setEndTime(sdf.parse(resultMap.get("cruiseTime").toString())); }
                 if (Objects.nonNull(resultMap.get("isWarn"))) {
                     if (resultMap.get("isWarn").toString().equals("1")) {
                         cruiseInspectResult.setIsWarn("有");
-                    } else {
-                        cruiseInspectResult.setIsWarn("无");
-                    }
+                    } else { cruiseInspectResult.setIsWarn("无"); }
                 }
                 if (Objects.nonNull(resultMap.get("picpath"))) {
                     cruiseInspectResult.setImagePath(resultMap.get("picpath").toString());
-                } else {
-                    cruiseInspectResult.setImagePath("null");
-                }
-
+                } else { cruiseInspectResult.setImagePath("null"); }
                 Map<String, String> videoInfo = new HashMap<>();
                 if("230".equals(resultMap.get("cruiseType").toString())) {
-                   videoInfo.put("videoCameraType", "2");
-                }else {
-                   videoInfo.put("videoCameraType", "1");
-                }
-
-                log.info("redis-robotId==:" + resultMap.get("robotId"));
-
+                    videoInfo.put("videoCameraType", "2");
+                }else { videoInfo.put("videoCameraType", "1"); }
+//                log.info("redis-robotId==:" + resultMap.get("robotId"));
                 //拉机器人的红外和可见光的视频流
                 if (!"".equals(resultMap.get("robotId").toString())) {
                     //判断当前机器人巡视点的采集设备为 红外或可见光
-                    String runningCameraFlag = tRobotInfoDao.selectRobotRunningCamera(Long.valueOf(resultMap.get("robotId").toString()), Long.valueOf(resultMap.get("instanceId").toString()));
-                    if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) {
-                        videoInfo.put("videoCameraType", "2");
-                    }
-
+//                    String runningCameraFlag = tRobotInfoDao.selectRobotRunningCamera(Long.valueOf(resultMap.get("robotId").toString()), Long.valueOf(resultMap.get("instanceId").toString()));
+                    String runningCameraFlag = cruiseInspectResult.getSaveTypeList();
+                    if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) videoInfo.put("videoCameraType", "2");
                     //机器人历史视频流Map（更新后保存60s，若未取到则重新请求流接口）
                     //机器人可见光-历史视频流
                     Map<String, String> robotVideoHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotLight:" + resultMap.get("robotId").toString());
                     //机器人红外-历史视频流
                     Map<String, String> robotInfraredHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotInfrared:" + resultMap.get("robotId").toString());
-                    log.info("robotVideoHistory：" + robotVideoHistory + ",robotInfraredHistory：" + robotInfraredHistory + ",videoCameraType==" +videoInfo.get("videoCameraType"));
-
+//                    log.info("robotVideoHistory：" + robotVideoHistory + ",robotInfraredHistory：" + robotInfraredHistory + ",videoCameraType==" +videoInfo.get("videoCameraType"));
                     HashMap<String, Long> robot = new HashMap<>();
-                    robot.put("robotId", tRobotInfoDao.selectRobotScreen(Long.valueOf(resultMap.get("instanceId").toString())));
+                    robot.put("robotId", Long.valueOf(resultMap.get("robotId").toString()));
 
-                    try {
-                        switch (videoInfo.get("videoCameraType")) {
-                            case "1":
-                                if (Objects.isNull(robotVideoHistory)) {
+                    switch (videoInfo.get("videoCameraType")) {
+                        case "1":
+                            if (Objects.isNull(robotVideoHistory)) {
                                     Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
                                     log.info("robot-VideoINfo:" + result.getData());
                                     if (Objects.nonNull(result)) {
@@ -474,15 +455,13 @@ public class TCruiseTaskResultService {
                                         videoInfo.put("flvUrl", null);
                                         videoInfo.put("rtmpUrl", null);
                                     }
-                                    videoInfo.put("cameraId", robot.get("robotId").toString());
-                                    cruiseInspectResult.setVideoInfo(videoInfo);
-                                    redisTemplate.opsForValue().set("robotLight:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
-                                } else {
-                                    cruiseInspectResult.setVideoInfo(robotVideoHistory);
-                                }
-                                break;
-                            case "2":
-                                if (Objects.isNull(robotInfraredHistory)) {
+                                videoInfo.put("cameraId", robot.get("robotId").toString());
+                                cruiseInspectResult.setVideoInfo(videoInfo);
+                                redisTemplate.opsForValue().set("robotLight:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
+                            } else { cruiseInspectResult.setVideoInfo(robotVideoHistory); }
+                            break;
+                        case "2":
+                            if (Objects.isNull(robotInfraredHistory)) {
                                     Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
                                     log.info("robot-VideoINfo:" + result.getData());
                                     if(Objects.nonNull(result)) {
@@ -493,16 +472,11 @@ public class TCruiseTaskResultService {
                                         videoInfo.put("flvUrl", null);
                                         videoInfo.put("rtmpUrl", null);
                                     }
-                                    videoInfo.put("cameraId", robot.get("robotId").toString());
-                                    cruiseInspectResult.setVideoInfo(videoInfo);
-                                    redisTemplate.opsForValue().set("robotInfrared:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
-                                } else {
-                                    cruiseInspectResult.setVideoInfo(robotInfraredHistory);
-                                }
-                                break;
-                        }
-                    }catch (Exception e){
-                        e.getMessage();
+                                videoInfo.put("cameraId", robot.get("robotId").toString());
+                                cruiseInspectResult.setVideoInfo(videoInfo);
+                                redisTemplate.opsForValue().set("robotInfrared:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
+                            } else { cruiseInspectResult.setVideoInfo(robotInfraredHistory); }
+                            break;
                     }
                 }
                 inspectResult = cruiseInspectResult;
@@ -511,16 +485,10 @@ public class TCruiseTaskResultService {
 
         //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
         Integer index = cruiseInspectResults.indexOf(inspectResult);
-        if (index == -1) {
-            index = 0;
-        }
+        if (index == -1) index = 0;
         resultsMap.put("index", index);
         resultsMap.put("list", cruiseInspectResults);
-
-        log.info("currentItem!!!!!!!!!!!!!" + inspectResult);
-
         completeResult.add(resultsMap);
-        log.info("结束时间=="+sdf.format(new Date(System.currentTimeMillis())));
         return completeResult;
     }
     @Transactional(rollbackFor = Exception.class)

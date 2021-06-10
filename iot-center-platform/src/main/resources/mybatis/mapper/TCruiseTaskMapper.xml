@@ -451,6 +451,7 @@ select *from (
             n.device_id as'deviceId',
             m.device_name,
             n.instance_id as 'instanceId',
+            c.save_type_list,
             n.cruise_type as 'cruiseType',
             e.dict_note as 'cruiseTypeName',
             n.unit,
