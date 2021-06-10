@@ -837,14 +837,20 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             String json = JSON.toJSONString(jasonMap);
                             Constant.postUrl(webSocketUrl, json);
 
-                            //以备后面做任务超时使用
+                            StandTaskDealThread standTaskDealThread = new StandTaskDealThread(
+                                    redisTemplate,taskStatusMap.get("taskCode").toString(),xmlBaseModel.getSendCode());
+                            Thread thread = new Thread(standTaskDealThread);
+                            thread.setDaemon(true);
+                            thread.start();
+
+                            /*//以备后面做任务超时使用
                             Map<String,Object> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
                             Float tasksAreTime = Float.valueOf((String) mapForTaskAreTime.get("content"));
                             Map<String,String> mapForAbnormal = new HashMap<>();
                             mapForAbnormal.put("taskStart",taskStatusMap.get("startTime").toString());
                             mapForAbnormal.put("overDay",tasksAreTime.toString());
                             String strForCountAbnormal = "countForAbnormal:"+taskStatusMap.get("taskCode").toString();
-                            redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+                            redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);*/
                         }
 
                         Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + xmlBaseModel.getSendCode()
@@ -860,8 +866,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         log.info("巡视主机给机器人响应了");
 
                         //任务没做,没有完成,并且进度为100%的处理
-                        if ("1".equals(xmlBaseModel.getItems().get(0).get("task_state").toString())) {
-                            String taskId = xmlBaseModel.getItems().get(0).get("task_code").toString();
+                        if ("1".equals(taskStatusMap.get("task_state").toString())) {
+                            String taskId = taskStatusMap.get("task_code").toString();
 
                             //统计机器人返回任务结果的大小
                             List<String> resultList = new ArrayList<>();
@@ -1255,9 +1261,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                                     StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
                                 }
                             }
-
                         }
-
 
                         robotService.upToCruise(xmlBaseModel);//国网要求
                         break;
