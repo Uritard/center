@@ -390,7 +390,6 @@ public class TCruiseTaskResultService {
     public List<Map<String, Object>> selectCruiseTaskResultYC(String taskId) throws ParseException {
         //最终结果集容器
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        long startTime = System.currentTimeMillis();
 
         List<Map<String, Object>> completeResult = new ArrayList<>();
         Map<String, Object> resultsMap = new HashMap<>();
@@ -401,6 +400,7 @@ public class TCruiseTaskResultService {
         HashMap<String, String> tDictMap = new HashMap<>();
         for (TDictBusiness tDictBusiness:tDictBusinessList) tDictMap.put(tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
 
+        long during = 0l;
         for (CruiseInspectResult cruiseInspectResult:cruiseInspectResults) {
             cruiseInspectResult.setCruiseResultName("--");
             cruiseInspectResult.setEndTime(null);
@@ -443,6 +443,7 @@ public class TCruiseTaskResultService {
                     HashMap<String, Long> robot = new HashMap<>();
                     robot.put("robotId", Long.valueOf(resultMap.get("robotId").toString()));
 
+                    long startTime = System.currentTimeMillis();
                     switch (videoInfo.get("videoCameraType")) {
                         case "1":
                             if (Objects.isNull(robotVideoHistory)) {
@@ -476,10 +477,13 @@ public class TCruiseTaskResultService {
                             } else { cruiseInspectResult.setVideoInfo(robotInfraredHistory); }
                             break;
                     }
+                    long endTime = System.currentTimeMillis()-startTime;
+                    during = during+endTime;
                 }
                 inspectResult = cruiseInspectResult;
             }
         }
+        log.info("请求时间：", during);
 
         //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
         Integer index = cruiseInspectResults.indexOf(inspectResult);
