@@ -449,7 +449,7 @@ public class TCruiseTaskResultService {
                             if (Objects.isNull(robotVideoHistory)) {
                                 Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
                                 List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
-                                if (Objects.nonNull(robotVideoInfo)) {
+                                if (robotVideoInfo.size()>1) {
                                     videoInfo.putAll(robotVideoInfo.get(0));
                                 }else {
                                     videoInfo.put("flvUrl", null);
@@ -464,7 +464,7 @@ public class TCruiseTaskResultService {
                             if (Objects.isNull(robotInfraredHistory)) {
                                 Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
                                 List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
-                                if(Objects.nonNull(robotVideoInfo)) {
+                                if(robotVideoInfo.size()>2) {
                                     videoInfo.put("flvUrl", robotVideoInfo.get(1).get("flvUrlInferad"));
                                     videoInfo.put("rtmpUrl", robotVideoInfo.get(1).get("rtmpUrlInferad"));
                                 }else {
