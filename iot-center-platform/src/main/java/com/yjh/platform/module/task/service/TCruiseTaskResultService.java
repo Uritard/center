@@ -660,9 +660,9 @@ public class TCruiseTaskResultService {
         }
 
 
-        log.info("Set测点数量---------" + deviceMete.size());
-        log.info("List测点数量--------" + deviceMeteIds.size());
-        log.info("redisSet长度-------" + keyResult.size());
+//        log.info("Set测点数量---------" + deviceMete.size());
+//        log.info("List测点数量--------" + deviceMeteIds.size());
+//        log.info("redisSet长度-------" + keyResult.size());
 //        for(String keys:keyResult){
 //            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(keys);
 //            deviceMete.add(Long.valueOf(resultMap.get("device_mete_id").toString()));
@@ -720,10 +720,7 @@ public class TCruiseTaskResultService {
             cruiseResultCounter.setRunningTime(Long.valueOf("0"));
         }
 
-
-        log.info("总点数：" + deviceMete.size());
-        log.info("已执行点数：" + deviceMeteComp.size());
-
+        log.info("总点数：" + deviceMete.size()+", 已执行点数：" + deviceMeteComp.size());
 
         return cruiseResultCounter;
     }
