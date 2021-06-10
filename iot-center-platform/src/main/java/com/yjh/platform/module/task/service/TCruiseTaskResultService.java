@@ -447,14 +447,14 @@ public class TCruiseTaskResultService {
                     switch (videoInfo.get("videoCameraType")) {
                         case "1":
                             if (Objects.isNull(robotVideoHistory)) {
-//                                Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
-//                                List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
-//                                if (Objects.nonNull(robotVideoInfo)) {
-//                                    videoInfo.putAll(robotVideoInfo.get(0));
-//                                }else {
-//                                    videoInfo.put("flvUrl", null);
-//                                    videoInfo.put("rtmpUrl", null);
-//                                }
+                                Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+                                List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
+                                if (Objects.nonNull(robotVideoInfo)) {
+                                    videoInfo.putAll(robotVideoInfo.get(0));
+                                }else {
+                                    videoInfo.put("flvUrl", null);
+                                    videoInfo.put("rtmpUrl", null);
+                                }
                                 videoInfo.put("cameraId", robot.get("robotId").toString());
                                 cruiseInspectResult.setVideoInfo(videoInfo);
                                 redisTemplate.opsForValue().set("robotLight:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
@@ -462,15 +462,15 @@ public class TCruiseTaskResultService {
                             break;
                         case "2":
                             if (Objects.isNull(robotInfraredHistory)) {
-//                                Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
-//                                List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
-//                                if(Objects.nonNull(robotVideoInfo)) {
-//                                    videoInfo.put("flvUrl", robotVideoInfo.get(1).get("flvUrlInferad"));
-//                                    videoInfo.put("rtmpUrl", robotVideoInfo.get(1).get("rtmpUrlInferad"));
-//                                }else {
-//                                    videoInfo.put("flvUrl", null);
-//                                    videoInfo.put("rtmpUrl", null);
-//                                }
+                                Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+                                List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
+                                if(Objects.nonNull(robotVideoInfo)) {
+                                    videoInfo.put("flvUrl", robotVideoInfo.get(1).get("flvUrlInferad"));
+                                    videoInfo.put("rtmpUrl", robotVideoInfo.get(1).get("rtmpUrlInferad"));
+                                }else {
+                                    videoInfo.put("flvUrl", null);
+                                    videoInfo.put("rtmpUrl", null);
+                                }
                                 videoInfo.put("cameraId", robot.get("robotId").toString());
                                 cruiseInspectResult.setVideoInfo(videoInfo);
                                 redisTemplate.opsForValue().set("robotInfrared:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
@@ -483,7 +483,7 @@ public class TCruiseTaskResultService {
                 inspectResult = cruiseInspectResult;
             }
         }
-        log.info("请求时间：", during);
+        log.info("请求时间：{}", during);
 
         //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
         Integer index = cruiseInspectResults.indexOf(inspectResult);
