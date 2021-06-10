@@ -497,7 +497,7 @@ public class RunAtNowTask implements Runnable{
                         jasonMapOnFinished.put("type","finishedOneInstance");
                         jasonMapOnFinished.put("taskId",taskId);
                         String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
-                        log.info("发送给前端的消息："+jsonMessage);
+//                        log.info("发送给前端的消息："+jsonMessage);
                         Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
 
                         {
