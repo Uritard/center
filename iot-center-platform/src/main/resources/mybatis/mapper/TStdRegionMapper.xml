@@ -253,6 +253,7 @@
     </select>
 
     <select id="selectIsIn" resultType="com.yjh.platform.module.device.entity.TStdRegion">
-        select * from t_std_region where region_id != #{ regionId,jdbcType=BIGINT} and region_code = #{regionCode,jdbcType=VARCHAR};
+        select * from t_std_region where region_id != #{ regionId,jdbcType=BIGINT}
+        <if test="regionCode != null and regionCode != ''"> AND region_code = #{regionCode,jdbcType=VARCHAR}</if>
     </select>
 </mapper>
