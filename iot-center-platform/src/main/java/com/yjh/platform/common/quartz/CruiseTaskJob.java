@@ -421,12 +421,13 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseResult.setTaskWait(taskWait);
                             tCruiseResultDao.update(tCruiseResult);
                             // webSocket通知前端调用巡视监控的接口
-                            Map<String,String> jasonMapOnFinished=new HashMap<>();
-                            jasonMapOnFinished.put("type","finishedOneInstance");
-                            jasonMapOnFinished.put("taskId",taskId);
-                            String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
-                            log.info("发送给前端的消息："+jsonMessage);
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
+//                            Map<String,String> jasonMapOnFinished=new HashMap<>();
+//                            jasonMapOnFinished.put("type","finishedOneInstance");
+//                            jasonMapOnFinished.put("taskId",taskId);
+//                            String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
+//                            log.info("发送给前端的消息："+jsonMessage);
+//                            Thread.sleep(5000);
+//                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
 
                             {
                                 //巡视点结果上报站端
