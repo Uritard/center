@@ -46,9 +46,9 @@ public class StandTaskDealThread implements Runnable {
             log.error(e.getMessage(), e);
         }
     }
-    /*public static void main(String[] args) throws Exception{
-        *//*String sta = "2021-06-10 15:35:35";
-        log.info("开始时间=="+sta);*//*
+    public static void main(String[] args) throws Exception{
+       /*String sta = "2021-06-10 15:35:35";
+        log.info("开始时间=="+sta);*/
         Float tasksAreTime = 0.0125f;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //        Date taskStartTime = sdf.parse(sta);
@@ -58,10 +58,14 @@ public class StandTaskDealThread implements Runnable {
         log.info("taskStartTimes==="+taskStartTimes);
         Float temp = tasksAreTime * 60F * 60F * 1000F;
         log.info("temp=="+temp);
-        Thread.sleep(temp.longValue());
+//        Thread.sleep(temp.longValue());
         Long endTime = taskStartTimes + temp.longValue();
         log.info("endTime=="+endTime);
         String s =sdf.format(endTime);
         log.info("结束时间=="+s);
-    }*/
+
+        String remoteAdds = "192.168.10.12:12";
+        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));
+        log.info("re=="+remotePort);
+    }
 }
