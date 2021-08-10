@@ -1,33 +1,30 @@
 package com.yjh.platform.module.user.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
-import com.yjh.platform.module.user.service.TSysParamService;
 import com.yjh.platform.module.user.entity.TSysParam;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import io.swagger.annotations.*;
+import com.yjh.platform.module.user.service.TSysParamService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
-
-import java.util.Map;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.result.BusinessException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**

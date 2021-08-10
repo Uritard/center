@@ -40,7 +40,7 @@ public class HeartBreakDealThread implements Runnable {
                 Thread.sleep(sleepTime);
                 TimeUnit.SECONDS.sleep(Long.valueOf(heartbeatIntervalMap.get("content")));
                 log.info("Thread wait "+sleepTime+" s......");
-                robotServerHandler.procSend(robotCode, robotStatusMap,sendSessionId,receiveSessionId);
+                robotServerHandler.procSend(robotCode, robotStatusMap);
                 if (!robotServerHandler.getIsThreadStart()) isThreadStart = false;
 //                log.info("isThreadStart: "+isThreadStart+", threadId: "+Thread.currentThread().getId()+",id: "+robotServerHandler.getCtx().channel().id());
 //                log.info("isThreadStart: "+isThreadStart+", threadId: "+Thread.currentThread().getId());

@@ -31,7 +31,6 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -169,6 +168,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         log.info("此时的packet====="+Packet);
         Packet = "";
         Constant.registerCount = 0;
+        Constant.registerFlag = 0;
 
         //1.判断是否为注册连接，是注册连接带strChannelID，不是则是空,无须修改状态 2.可以改为若strChannelID为空，则不可注册
         if (strRobotCode == null || strRobotCode.equals("")) {
@@ -595,10 +595,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             }
                         }
 
-                        String statusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
-                        byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
-                        send(ctx, statusProtocol, xmlBaseModel.getSendCode());
-                        log.info("巡视主机给机器人响应了");
+                        if (Constant.registerFlag == 1){
+                            String statusXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
+                            byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
+                            send(ctx, statusProtocol, xmlBaseModel.getSendCode());
+                            log.info("巡视主机给机器人响应了");
+                        }
 
                         break;
                     //机器人运行数据(接收并发送响应)
@@ -626,11 +628,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             }
                         }
 
-                        String operationXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
-                        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
-                        send(ctx, operationProtocol, xmlBaseModel.getSendCode());
-                        log.info("巡视主机给机器人响应了");
-                        robotService.upToCruise(xmlBaseModel);//国网要求
+                        if (Constant.registerFlag == 1) {
+                            String operationXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
+                            byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+                            send(ctx, operationProtocol, xmlBaseModel.getSendCode());
+                            log.info("巡视主机给机器人响应了");
+                            robotService.upToCruise(xmlBaseModel);//国网要求
+                        }
 
                         break;
                     //机器人坐标(接收并发送响应)
@@ -657,11 +661,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             }
                         }
 
-                        String coordinateXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
-                        byte[] coordinateProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, coordinateXmlString);
-                        send(ctx, coordinateProtocol, xmlBaseModel.getSendCode());
-                        log.info("巡视主机给机器人响应了");
-                        robotService.upToCruise(xmlBaseModel);//国网要求
+                        if (Constant.registerFlag == 1) {
+                            String coordinateXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
+                            byte[] coordinateProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, coordinateXmlString);
+                            send(ctx, coordinateProtocol, xmlBaseModel.getSendCode());
+                            log.info("巡视主机给机器人响应了");
+                            robotService.upToCruise(xmlBaseModel);//国网要求
+                        }
                         break;
                     //机器人巡视路线(接收并发送响应)
                     case "4":
@@ -738,10 +744,12 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         AlarmResultDealThread alarmResultDealThread = new AlarmResultDealThread(robotAlarmMap, isThreadStart, this);
                         TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
-                        String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
-                        byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
-                        send(ctx, alarmProtocol, xmlBaseModel.getSendCode());
-                        log.info("巡视主机给机器人响应了");
+                        if (Constant.registerFlag == 1) {
+                            String alarmXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
+                            byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
+                            send(ctx, alarmProtocol, xmlBaseModel.getSendCode());
+                            log.info("巡视主机给机器人响应了");
+                        }
 
 
                         //xmlBaseModel.setType("62");
@@ -804,12 +812,13 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                             }
                         }
 
-                        Constant.weatherServer(info, Constant.WEATHER_URL);
-                        String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
-                        byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);
-                        send(ctx, weatherProtocol, xmlBaseModel.getSendCode());
-                        log.info("巡视主机给机器人响应了");
-
+                        if (Constant.registerFlag == 1) {
+                            Constant.weatherServer(info, Constant.WEATHER_URL);
+                            String weatherXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
+                            byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);
+                            send(ctx, weatherProtocol, xmlBaseModel.getSendCode());
+                            log.info("巡视主机给机器人响应了");
+                        }
                         //robotService.upToCruise(xmlBaseModel);//国网要求
                         break;
                     //任务状态数据(接收并发送响应)
@@ -1423,6 +1432,11 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         List<Map<String, Object>> taskModelMapList = taskModel.getItems();
                         log.info("taskModelItemsMap是：" + taskModelMapList);
                         robotService.robotTaskIntoDB(taskModelMapList, xmlBaseModel);
+
+                        String taskIntoDBXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(true, xmlBaseModel.getSendCode()));
+                        byte[] taskIntoDBProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, taskIntoDBXmlString);
+                        send(ctx, taskIntoDBProtocol, xmlBaseModel.getSendCode());
+                        log.info("巡视主机给机器人响应了");
                         break;
                     default:
                         break;
@@ -1476,7 +1490,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
     /*
      * 接收到心跳后续判断
      * */
-    void procSend(String robotCode, Map<String, String> robotStatusMap,long sendSessionId,long receiveSessionId ) {
+    void procSend(String robotCode, Map<String, String> robotStatusMap) {
         heartNum ++;
         log.info("heartNum==="+heartNum+"      "+ctx.channel().id());
         if (heartNum > 3){
@@ -1638,6 +1652,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         log.info("channel.isActive(): " + channel.isActive());
         log.info("此时的packet====="+Packet);
         Constant.registerCount = 0;
+        Constant.registerFlag = 0;
+
     }
     //Redis数据库批量查询Key值游标
     public Set<String> redisScan(String key) {

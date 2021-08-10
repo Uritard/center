@@ -1,30 +1,28 @@
 package com.yjh.platform.module.device.controller;
 
-import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
-//import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceDetail;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.TStdDeviceService;
-import com.yjh.platform.module.device.entity.TStdDevice;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-import io.swagger.annotations.*;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.mysql.jdbc.StringUtils;
+//import com.yjh.platform.module.device.dao.TStdRegionDao;
 
 
 /**
@@ -439,4 +437,22 @@ public class TStdDeviceController {
     }
 
 
+    public static void main(String[] args) {
+        List<Map<String,String>> li = new ArrayList<>();
+        Map<String,String> m = new HashMap<>();
+        m.put("a","1");
+        m.put("b","2");
+        m.put("c","3");
+        li.add(m);
+
+        Map<String,String> w = new HashMap<>();
+        w.put("a","1");
+
+        if (li.contains(w)){
+            System.out.println("脑阔");
+        }else {
+            System.out.println("meiyou ");
+        }
+
+    }
 }
