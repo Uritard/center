@@ -392,7 +392,6 @@ public class TStdDeviceController {
         }
         return result;
     }
-
     @ApiOperation(value = "根据设备ID和部位ID修改设备的模板ID")
     @RequestMapping(value = "/updateModelIdByDevCus",method = RequestMethod.PUT)
     @Logs(title = "修改设备的模板",content = "根据用户传递的参数修改设备的模板",logType = 3)
@@ -434,25 +433,5 @@ public class TStdDeviceController {
             log.error("删除设备错误:", e);
         }
         return result;
-    }
-
-
-    public static void main(String[] args) {
-        List<Map<String,String>> li = new ArrayList<>();
-        Map<String,String> m = new HashMap<>();
-        m.put("a","1");
-        m.put("b","2");
-        m.put("c","3");
-        li.add(m);
-
-        Map<String,String> w = new HashMap<>();
-        w.put("a","1");
-
-        if (li.contains(w)){
-            System.out.println("脑阔");
-        }else {
-            System.out.println("meiyou ");
-        }
-
     }
 }

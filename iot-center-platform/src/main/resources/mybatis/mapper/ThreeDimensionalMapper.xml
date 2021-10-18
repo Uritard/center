@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.ThreeDimensionalDao">
+
+    <select id="searchAndLocationFocus" resultType="java.lang.String">
+        SELECT a.model_name FROM three_dimensional_relevancy a
+        WHERE 1 = 1
+        <if test="deviceName != null and deviceName != ''">and a.name = #{deviceName,jdbcType=VARCHAR}</if>
+        <if test="deviceType != null ">and a.device_type = #{deviceType,jdbcType=INTEGER}</if>
+    </select>
+
+    <select id="viewPointInformation" resultType="com.yjh.platform.module.user.entity.AlarmAndMeteInfo">
+        select
+            a.device_id,
+            a.device_name,
+            n.device_mete_id,
+            f.cruise_type,
+            f.result_num,
+            g.dict_note as cruise_type_name,
+            n.instance_id,
+            j.task_id,
+            h.warn_id,
+            h.warn_level as alarm_level,
+            k.dict_note as alarm_level_name,
+            (
+                CASE
+                WHEN ISNULL(b.mete_name)
+                AND ISNULL(c.inspection_id)
+                AND ISNULL(d.preset_name) THEN
+                        ''
+                WHEN ISNULL(b.mete_name)
+                AND ISNULL(c.inspection_name) THEN
+                        d.preset_name
+                WHEN ISNULL(b.mete_name)
+                AND ISNULL(d.preset_img) THEN
+                        c.inspection_name
+                WHEN ISNULL(c.inspection_name)
+                AND ISNULL(d.preset_name) THEN
+                        b.mete_name
+                WHEN ISNULL(c.inspection_name) THEN
+                        CONCAT(
+                                b.mete_name,
+                                ' /',
+                                d.preset_name
+                        )
+                WHEN ISNULL(d.preset_name) THEN
+                        CONCAT(
+                                b.mete_name,
+                                ' /',
+                                c.inspection_name
+                        )
+                END
+            ) AS instanceName
+            from
+                t_std_device a
+            LEFT JOIN	t_cruise_point_instance n on a.device_id = n.device_id
+            LEFT JOIN t_std_devicemete b ON n.device_mete_id = b.device_mete_id
+            LEFT JOIN t_robot_inspection c ON n.cruise_id = c.inspection_id
+            LEFT JOIN t_camera_preset d ON n.cruise_id = d.preset_id
+            LEFT JOIN t_cruise_task_result_detail e on n.instance_id = e.instance_id
+            LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
+            LEFT JOIN t_dict_business g on g.dict_code = f.cruise_type and g.col_name = 'cruise_type'
+            LEFT JOIN t_cruise_task_result j on j.task_result_id = e.task_result_id
+            LEFT JOIN t_warn_info h on h.task_id = j.task_id and h.instance_id = n.instance_id
+            LEFT JOIN t_dict_business k on k.dict_code = h.warn_level and k.col_name = 'alarm_level'
+            where a.device_id =
+            (SELECT id from three_dimensional_relevancy where model_name = #{modelName,jdbcType=VARCHAR})
+            GROUP BY instance_id
+    </select>
+
+    <select id="selectDeviceIdByModelName" resultType="java.lang.Long">
+        SELECT id from three_dimensional_relevancy
+        where 1 = 1
+        <if test="modelName != null and modelName != ''">and model_name = #{modelName,jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectCameraByDeviceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.CameraUnionDevice">
+        SELECT
+            a.device_id,
+            a.device_name,
+            b.device_mete_id,
+            d.instance_id,
+            d.cruise_id,
+            e.camera_id,
+            f.camera_name,
+            f.record_id
+        FROM
+            t_std_device a,
+            t_std_devicemete b,
+            t_cruise_point_instance d,
+            t_camera_preset e,
+            t_camera_info f
+        WHERE 1 = 1
+        and a.device_id = b.device_id
+        and a.custom_id = b.custom_id
+        and b.device_id = #{deviceId,jdbcType = BIGINT}
+        and b.device_mete_id = d.device_mete_id
+        and d.cruise_id = e.preset_id
+        and e.camera_id = f.camera_id
+    </select>
+    <select id="statisticsAlarmInfo" resultType="com.yjh.platform.module.task.entity.StatisticalTools">
+        SELECT
+            IFNULL(d.count, 0) AS count,
+            b.dict_code,
+            b.dict_note
+        FROM
+            t_dict_business b
+        LEFT JOIN (
+            SELECT
+                a.alarm_level,
+                count(a.alarm_level) AS count
+            FROM
+                (
+                    SELECT
+                        warn_level AS alarm_level,
+                        warn_id
+                    FROM
+                        t_warn_info
+                    UNION ALL
+                        (
+                            SELECT
+                                defect_level,
+                                defect_id
+                            FROM
+                                t_defect_info
+                        )
+                ) a
+            GROUP BY
+                a.alarm_level
+        ) d ON d.alarm_level = b.dict_code
+        WHERE
+            b.col_name = 'alarm_level'
+    </select>
+    <select id="selectAllModelName" resultType="java.lang.String">
+        SELECT a.model_name FROM three_dimensional_relevancy a
+    </select>
+    <select id="selectAllName" resultType="java.lang.String">
+        SELECT a.name FROM three_dimensional_relevancy a
+    </select>
+
+
+</mapper>

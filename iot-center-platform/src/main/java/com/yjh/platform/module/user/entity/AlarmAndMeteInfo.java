@@ -1,0 +1,45 @@
+package com.yjh.platform.module.user.entity;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+
+/**
+ * @author YChen
+ * @date 2021/8/11
+ */
+@Data
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@ApiModel(value = "AlarmAndMeteInfo对象", description = "三维告警测点信息实体类")
+public class AlarmAndMeteInfo implements Serializable {
+
+    @ApiModelProperty(value = "告警Id")
+    private Long warnId;
+    @ApiModelProperty(value = "设备Id")
+    private Long deviceId;
+    @ApiModelProperty(value = "测点Id")
+    private Long deviceMeteId;
+    @ApiModelProperty(value = "巡检点Id")
+    private Long instanceId;
+    @ApiModelProperty(value = "任务Id")
+    private String taskId;
+    @ApiModelProperty(value = "设备名称")
+    private String deviceName;
+    @ApiModelProperty(value = "巡检点名称")
+    private String instanceName;
+    @ApiModelProperty(value = "巡检结果")
+    private String resultNum;
+    @ApiModelProperty(value = "告警等级")
+    private Integer alarmLevel;
+    @ApiModelProperty(value = "告警等级-字典表")
+    private String alarmLevelName;
+    @ApiModelProperty(value = "数据来源")
+    private Long cruiseType;
+    @ApiModelProperty(value = "数据来源-字典表")
+    private String cruiseTypeName;
+}

@@ -23,8 +23,10 @@ public class PlatformXMLUtil {
 
         try {
 //            doc = DocumentHelper.parseText(xml); // 将字符串转为XML
-            Element rootElt = doc.getRootElement(); // 获取根节点
-            List<Element> list = rootElt.elements();// 获取根节点下所有节点
+            // 获取根节点
+            Element rootElt = doc.getRootElement();
+            // 获取根节点下所有节点
+            List<Element> list = rootElt.elements();
 
             if (rootElt.getName().equals("Device_Model") || rootElt.getName().equals("Robot_Model") || rootElt.getName().equals("Task_Model")) {
                 for (Element element : list) {
@@ -42,7 +44,8 @@ public class PlatformXMLUtil {
                 }
                 xmlBaseModel.setItems(itemsList);
             } else if (rootElt.getName().equals("Robot")) {
-                for (Element element : list) { // 遍历节点
+                // 遍历节点
+                for (Element element : list) {
                     if (element.getName().equals("SendCode")) {
                         xmlBaseModel.setSendCode(element.getText());
                     }
@@ -68,7 +71,8 @@ public class PlatformXMLUtil {
                                 List<Attribute> attributes = item.attributes();
                                 Map<String, Object> map = new HashMap<String, Object>();
                                 for (Attribute defaultAttribute : attributes) {
-                                    map.put(defaultAttribute.getName(), defaultAttribute.getValue());// 节点的属性name为map的key，value为map的value
+                                    // 节点的属性name为map的key，value为map的value
+                                    map.put(defaultAttribute.getName(), defaultAttribute.getValue());
                                 }
                                 itemsList.add(map);
                             }
@@ -93,26 +97,38 @@ public class PlatformXMLUtil {
         }
         return xmlBaseModel;
     }
-    //生成xml
+    /**
+     * 根据模型生成xml文件
+     * @param xmlBaseModel 模型
+     * @return String
+     */
     public static String generateXml(XMLBaseModel xmlBaseModel){
         Document document = DocumentHelper.createDocument();
-        Element rss = document.addElement("Robot");//根节点
-        Element childNode1 = rss.addElement("SendCode");//生成子节点（必有）
-        childNode1.setText(xmlBaseModel.getSendCode());//子节点内容
+        //根节点
+        Element rss = document.addElement("Robot");
+        //生成子节点（必有）
+        Element childNode1 = rss.addElement("SendCode");
+        //子节点内容
+        childNode1.setText(xmlBaseModel.getSendCode());
 
-        Element childNode2 = rss.addElement("ReceiveCode");//必有
+        //必有
+        Element childNode2 = rss.addElement("ReceiveCode");
         childNode2.setText(xmlBaseModel.getReceiveCode());
 
-        Element childNode3 = rss.addElement("Type");//必有
+        //必有
+        Element childNode3 = rss.addElement("Type");
         childNode3.setText(xmlBaseModel.getType());
 
-        Element childNode4 = rss.addElement("Code");//非必有
+        //非必有
+        Element childNode4 = rss.addElement("Code");
         if (StringUtils.isNotEmpty(xmlBaseModel.getCode())){ childNode4.setText(xmlBaseModel.getCode()); }
 
-        Element childNode5 = rss.addElement("Time");//必有
+        //必有
+        Element childNode5 = rss.addElement("Time");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         childNode5.setText(sdf.format(new Date()));
-        Element childNode6= rss.addElement("Items");//非必有
+        //非必有
+        Element childNode6= rss.addElement("Items");
         if(xmlBaseModel.getItems()!=null && xmlBaseModel.getItems().size()>0) {
             List<Map<String,Object>> itemsList = xmlBaseModel.getItems();
             for(Map<String, Object> item : itemsList) {
@@ -122,7 +138,8 @@ public class PlatformXMLUtil {
                 }
             }
         }
-        Element childNode7 = rss.addElement("Command");//必有
+        //必有
+        Element childNode7 = rss.addElement("Command");
         childNode7.setText(xmlBaseModel.getCommand());
         String xmlString = document.asXML();
 
