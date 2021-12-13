@@ -1,7 +1,6 @@
 package com.yjh.accessrobot.netty.server;
 
 import com.yjh.accessrobot.module.command.service.RobotService;
-import com.yjh.accessrobot.module.device.service.SysLogsService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.AdaptiveRecvByteBufAllocator;
@@ -20,7 +19,7 @@ import java.net.InetSocketAddress;
 @lombok.extern.slf4j.Slf4j
 public class NettyServer {
 
-    public void start(InetSocketAddress address, String serverName, RedisTemplate redisTemplate, SysLogsService sysLogsService, RobotService robotService,String websocketUrl){
+    public void start(InetSocketAddress address, RedisTemplate redisTemplate, RobotService robotService,String websocketUrl){
         //1.创建两个事件组,boss用于处理请求的accept事件,work用于请求的read和write事件
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -32,7 +31,7 @@ public class NettyServer {
             //指定NIO的模式,NioServerSocketChannel对应TCP,NioDatagramChannel对应UDP
             .channel(NioServerSocketChannel.class)
             .localAddress(address)
-            .childHandler(new RobotServerChannelInitializer(serverName, redisTemplate, sysLogsService,robotService,websocketUrl))
+            .childHandler(new RobotServerChannelInitializer( redisTemplate, robotService,websocketUrl))
             //指定此套接口排队的最大连接个数(缓冲区)
             .option(ChannelOption.SO_BACKLOG, 2048)
             //保持连接生命，不因空闲而断开

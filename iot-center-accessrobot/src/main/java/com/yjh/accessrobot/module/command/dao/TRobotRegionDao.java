@@ -28,11 +28,12 @@ public interface TRobotRegionDao {
                               @Param(value = "regionType") Integer regionType,
                               @Param(value = "stationId") String stationId,
                               @Param(value = "state") Integer state,
+                              @Param(value = "robotId") Long robotId,
                               @Param(value = "createTime") Date createTime);
     List<TRobotRegion> selectByPage(TRobotRegion tRobotRegion);
 
     int batchInsert(List<TRobotRegion> list);
-    List<String> selectAllRobotRegion();
+    List<String> selectAllByRobotId(@Param(value = "robotId") Long robotId);
     int batchDelete(List<String> list);
     Map<String,Object> selectInspectionId(@Param(value = "inspectionId")Long inspectionId);
 }

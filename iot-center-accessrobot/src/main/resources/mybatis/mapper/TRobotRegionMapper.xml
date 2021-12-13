@@ -13,12 +13,13 @@
         <result column="region_type" jdbcType="INTEGER" property="regionType" />
         <result column="station_id" jdbcType="VARCHAR" property="stationId" />
         <result column="state" jdbcType="INTEGER" property="state" />
+        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        region_id, region_name, sort, device_type, up_region_id, up_region_ids, region_type, station_id, state, create_time
+        region_id, region_name, sort, device_type, up_region_id, up_region_ids, region_type, station_id, state,robot_id, create_time
     </sql>
 
 
@@ -33,6 +34,7 @@
             region_type,
             station_id,
             state,
+            robot_id,
             create_time
         )values(
                 #{regionId, jdbcType=VARCHAR},
@@ -44,6 +46,7 @@
                 #{regionType, jdbcType=INTEGER},
                 #{stationId, jdbcType=VARCHAR},
                 #{state, jdbcType=INTEGER},
+                #{robotId, jdbcType=BIGINT},
                 #{createTime, jdbcType=TIMESTAMP}
         )
     </insert>
@@ -64,6 +67,7 @@
         <if test="regionType != null ">a.region_type = #{regionType},</if>
         <if test="stationId != null ">a.station_id = #{stationId},</if>
         <if test="state != null ">a.state = #{state},</if>
+        <if test="robotId != null ">a.robot_id = #{robotId},</if>
         <if test="createTime != null ">a.create_time = #{createTime},</if>
     </set>
             where a.region_id = #{regionId, jdbcType=VARCHAR}
@@ -80,6 +84,7 @@
         a.region_type,
         a.station_id,
         a.state,
+        a.robot_id,
         a.create_time
         from t_robot_region a
         where 1 = 1
@@ -98,6 +103,7 @@
         a.region_type,
         a.station_id,
         a.state,
+        a.robot_id,
         a.create_time
         from t_robot_region a
         where 1 = 1
@@ -110,6 +116,7 @@
         <if test="regionType != null "> and a.region_type = #{regionType, jdbcType=INTEGER}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
         <if test="state != null "> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="robotId != null "> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
 
@@ -124,6 +131,7 @@
         a.region_type,
         a.station_id,
         a.state,
+        a.robot_id,
         a.create_time
         from t_robot_region a
         where 1 = 1
@@ -136,6 +144,7 @@
         <if test="regionType != null "> and a.region_type = #{regionType, jdbcType=INTEGER}</if>
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
         <if test="state != null "> and a.state = #{state, jdbcType=INTEGER}</if>
+        <if test="robotId != null "> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
     </select>
 
@@ -150,6 +159,7 @@
             region_type,
             station_id,
             state,
+            robot_id,
             create_time
         )values
         <foreach collection="list" item="TRobotRegion" separator=",">
@@ -163,14 +173,17 @@
                 #{TRobotRegion.regionType, jdbcType=INTEGER},
                 #{TRobotRegion.stationId, jdbcType=VARCHAR},
                 #{TRobotRegion.state, jdbcType=INTEGER},
+                #{TRobotRegion.robotId, jdbcType=BIGINT},
                 #{TRobotRegion.createTime, jdbcType=TIMESTAMP}
             )
         </foreach>
     </insert>
-    <select id="selectAllRobotRegion" resultType="java.lang.String">
+    <select id="selectAllByRobotId" resultType="java.lang.String">
         SELECT
             a.region_id
         FROM t_robot_region a
+        WHERE 1 = 1
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
     </select>
     <delete id="batchDelete">
         DELETE

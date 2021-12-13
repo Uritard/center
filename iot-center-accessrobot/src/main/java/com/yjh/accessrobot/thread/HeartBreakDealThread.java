@@ -1,5 +1,6 @@
-package com.yjh.accessrobot.netty.server;
+package com.yjh.accessrobot.thread;
 
+import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Map;
@@ -16,17 +17,13 @@ public class HeartBreakDealThread implements Runnable {
     private String robotCode;
     private RedisTemplate redisTemplate;
     private volatile boolean isThreadStart;
-    private long sendSessionId;
-    private long receiveSessionId;
 
 
-    public HeartBreakDealThread(RobotServerHandler robotServerHandler, String robotCode,RedisTemplate redisTemplate,boolean isThreadStart,long sendSessionId,long receiveSessionId) {
+    public HeartBreakDealThread(RobotServerHandler robotServerHandler, String robotCode,RedisTemplate redisTemplate,boolean isThreadStart) {
         this.robotServerHandler = robotServerHandler;
         this.robotCode = robotCode;
         this.redisTemplate = redisTemplate;
         this.isThreadStart = isThreadStart;
-        this.sendSessionId = sendSessionId;
-        this.receiveSessionId = receiveSessionId;
     }
 
     @Override
@@ -41,9 +38,9 @@ public class HeartBreakDealThread implements Runnable {
                 TimeUnit.SECONDS.sleep(Long.valueOf(heartbeatIntervalMap.get("content")));
                 log.info("Thread wait "+sleepTime+" s......");
                 robotServerHandler.procSend(robotCode, robotStatusMap);
-                if (!robotServerHandler.getIsThreadStart()) isThreadStart = false;
-//                log.info("isThreadStart: "+isThreadStart+", threadId: "+Thread.currentThread().getId()+",id: "+robotServerHandler.getCtx().channel().id());
-//                log.info("isThreadStart: "+isThreadStart+", threadId: "+Thread.currentThread().getId());
+                if (!robotServerHandler.getIsThreadStart()) {
+                    isThreadStart = false;
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

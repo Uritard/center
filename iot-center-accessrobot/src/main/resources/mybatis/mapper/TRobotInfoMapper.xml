@@ -410,6 +410,7 @@
         from t_cruise_result a,t_cruise_task_result_detail b
         where a.task_result_id = b.task_result_id
         AND a.task_id = #{taskId,jdbcType=VARCHAR}
+        and b.cruise_status = 252
     </select>
     <delete id="deleteInstanceId" >
         delete from t_cruise_point_instance

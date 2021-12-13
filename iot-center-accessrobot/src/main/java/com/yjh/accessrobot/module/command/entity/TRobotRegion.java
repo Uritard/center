@@ -49,6 +49,9 @@ public class TRobotRegion implements Serializable {
     @ApiModelProperty(value = "0:非当前变电站 1：当前变电站")
     private Integer state;
 
+    @ApiModelProperty(value = "机器人id")
+    private Long robotId;
+
     private Date createTime;
 
     private Integer pageNum = 1;

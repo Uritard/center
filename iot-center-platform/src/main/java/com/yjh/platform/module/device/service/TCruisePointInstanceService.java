@@ -5,29 +5,27 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
-import com.yjh.platform.module.device.dao.*;
+import com.yjh.platform.module.device.dao.TCruisePointAttrDao;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.*;
-
-import java.util.*;
-
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
-import com.yjh.platform.module.task.entity.TCruisePlan;
-import com.yjh.platform.module.task.entity.TCruisePlanAttr;
-import com.yjh.platform.module.task.entity.TCruiseTaskAttr;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
-import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
-import com.yjh.platform.module.user.entity.TDictBusiness;
-import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -196,6 +194,7 @@ public class TCruisePointInstanceService{
                         listAll.add(list.get(0));
                         getConForCruisePoint(0, list.get(0), listAll);
                     }else {
+                        listAll.add(list.get(0));
                         getConForCruisePoint(0, list.get(0), listAll);
                     }
                     for(int i=1;i<list.size();i++){
@@ -357,7 +356,8 @@ public class TCruisePointInstanceService{
                             }
                         }
                         if(cruiseType == 228){//机器人
-                            TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
+//                            TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
+                            TRobotInspectionTmp tRobotInspection = tRobotInspectionDao.selectTRobotInspectionTmp(id);
                             tCruisePointInstance.setCruiseId(id);
                             tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
                             tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tRobotInspection.getInspectionName());
@@ -386,7 +386,8 @@ public class TCruisePointInstanceService{
                         }
                     }
                     if(cruiseType == 228){//机器人
-                        TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
+//                      TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
+                        TRobotInspectionTmp tRobotInspection = tRobotInspectionDao.selectTRobotInspectionTmp(id);
                         tCruisePointInstance.setCruiseId(id);
                         tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
                         tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tRobotInspection.getInspectionName());
@@ -441,7 +442,8 @@ public class TCruisePointInstanceService{
                     tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
                 }
                 if(cruiseType == 228){//机器人
-                    TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
+//                    TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
+                    TRobotInspectionTmp tRobotInspection = tRobotInspectionDao.selectTRobotInspectionTmp(id);
                     tCruisePointInstance.setCruiseId(id);
                     tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
                 }

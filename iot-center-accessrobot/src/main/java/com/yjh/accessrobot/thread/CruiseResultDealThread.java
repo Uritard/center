@@ -1,4 +1,4 @@
-package com.yjh.accessrobot.netty.server;
+package com.yjh.accessrobot.thread;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
@@ -10,7 +10,6 @@ import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -173,6 +172,7 @@ public class CruiseResultDealThread implements Runnable{
                 Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:"+cruiseResultMap.get("robotCode")+ ":" +taskId);
                 Map<String,String> tCruiseTaskResultMap = new HashMap<>();
                 String str = null;
+                List<Long> instanceIdList = new ArrayList<>();
                 //遍历在下任务时提前组装好的巡检点信息
                 for (String key : robotInfoKeys){
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
@@ -182,6 +182,7 @@ public class CruiseResultDealThread implements Runnable{
                         String instanceId = redisInfoMap.get("instanceId");
                         String cruiseTime = redisInfoMap.get("cruiseTime");
                         String inspectionCode = redisInfoMap.get("inspectionCode");
+                        instanceIdList.add(Long.valueOf(instanceId));
 
                         str = "t_cruise_task_result:"+tCruiseTask.getTaskId() + ":" + instanceId;
 
@@ -296,6 +297,7 @@ public class CruiseResultDealThread implements Runnable{
                         log.info("做完一个点-前端推送：" + json);
                         Constant.postUrl(webSocketUrl,json);
 
+                        Constant.flagMap.put(taskId, instanceIdList);
                     }
 
                     /*if ("null".equals(tCruiseTaskResultMap.get("cruiseAbnormal"))){

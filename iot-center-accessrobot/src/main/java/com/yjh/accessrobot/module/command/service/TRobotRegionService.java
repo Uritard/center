@@ -40,8 +40,8 @@ public class TRobotRegionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotRegion> select(String regionId, String regionName, Integer sort, Integer deviceType, String upRegionId, String upRegionIds, Integer regionType, String stationId, Integer state, Date createTime) {
-        List<TRobotRegion> tRobotRegionList = tRobotRegionDao.select(regionId, regionName, sort, deviceType, upRegionId, upRegionIds, regionType, stationId, state, createTime);
+    public List<TRobotRegion> select(String regionId, String regionName, Integer sort, Integer deviceType, String upRegionId, String upRegionIds, Integer regionType, String stationId, Integer state, Long robotId, Date createTime) {
+        List<TRobotRegion> tRobotRegionList = tRobotRegionDao.select(regionId, regionName, sort, deviceType, upRegionId, upRegionIds, regionType, stationId, state, robotId,createTime);
         return tRobotRegionList;
     }
 

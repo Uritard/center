@@ -186,11 +186,12 @@
 
     <select id="selectRobotTaskInstanceId" parameterType="java.lang.Long" resultType="java.lang.Long">
         SELECT
-        a.instance_id
+            a.instance_id
         FROM
-        t_cruise_point_instance a
-        WHERE
-        a.cruise_id IN ( SELECT inspection_id FROM t_robot_inspection WHERE ( SELECT robot_id FROM t_robot_info WHERE robot_code = #{robotCode,jdbcType=VARCHAR} ))
+            t_cruise_point_instance a
+        LEFT JOIN t_robot_inspection b on a.cruise_id = b.inspection_id
+        LEFT JOIN t_robot_info d on b.robot_id = d.robot_id
+        where d.robot_code = #{robotCode,jdbcType=VARCHAR}
         AND a.instance_id IN
         <foreach collection="list" open="(" close=")" separator="," item="instanceId">
             #{instanceId,jdbcType=BIGINT}
@@ -274,5 +275,25 @@
         FROM
             t_robot_info a
             where a.robot_id = #{robotId}
+    </select>
+
+    <select id="selectTRobotInspectionTmp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TRobotInspectionTmp">
+        select
+        a.inspection_id,
+        a.inspection_code,
+        a.robot_id,
+        a.inspection_name,
+        a.component_id,
+        a.meter_type,
+        a.appearance_type,
+        a.save_type_list,
+        a.recognition_type_list,
+        a.phase,
+        a.device_info
+        from t_robot_inspection a,t_robot_region b
+        where 1 = 1
+            and a.robot_id = b.robot_id
+            and a.inspection_id = #{inspectionId, jdbcType=BIGINT}
+        limit 1
     </select>
 </mapper>

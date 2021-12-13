@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.dao;
 import com.yjh.platform.module.device.entity.Robot;
 import com.yjh.platform.module.device.entity.TCruisePointAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
+import com.yjh.platform.module.device.entity.TRobotInspectionTmp;
 import com.yjh.platform.module.task.entity.ConfirmImmediately;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.ibatis.annotations.Param;
@@ -51,4 +52,7 @@ public interface TRobotInspectionDao {
     List<String> selectRobotTaskOnStart(@Param(value = "robotId") Long robotId);
 
     TRobotInfo selectRobot(@Param(value = "robotId") Long robotId);
+
+    TRobotInspectionTmp selectTRobotInspectionTmp(@Param(value = "inspectionId") Long inspectionId);
+
 }

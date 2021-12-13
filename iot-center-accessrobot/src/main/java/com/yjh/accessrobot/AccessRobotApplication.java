@@ -2,7 +2,6 @@ package com.yjh.accessrobot;
 
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.module.command.service.RobotService;
-import com.yjh.accessrobot.module.device.service.SysLogsService;
 import com.yjh.accessrobot.netty.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-import java.util.Map;
 
 /**
  * @Description
@@ -37,9 +35,6 @@ public class AccessRobotApplication implements CommandLineRunner {
 
     @Value("${netty.server.port}")
     private int port;
-
-    @Value("${netty.server.code}")
-    private String serverName;
     @Value("${netty.server.robotCode}")
     private String robotCode;
     @Value("${other.webSocketUrl}")
@@ -48,9 +43,6 @@ public class AccessRobotApplication implements CommandLineRunner {
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
-
-    @Autowired
-    private SysLogsService sysLogsService;
     @Autowired
     private RobotService robotService;
 
@@ -63,12 +55,14 @@ public class AccessRobotApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
+//        String url = "192.168.40.71";
+
         Constant.robotCode = robotCode;
         /*Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
         String websocketUrl = webSocketUrlMap.get("content");*/
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);
-        nettyServer.start(address, serverName, redisTemplate, sysLogsService,robotService,websocketUrl);
+        nettyServer.start(address,  redisTemplate, robotService,websocketUrl);
     }
 
     private static String getLocalIp() throws SocketException {

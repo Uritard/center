@@ -110,10 +110,11 @@ public class TRobotRegionController {
                          @RequestParam(value = "regionType", required = false) Integer regionType,
                          @RequestParam(value = "stationId", required = false) String stationId,
                          @RequestParam(value = "state", required = false) Integer state,
+                         @RequestParam(value = "robotId", required = false) Long robotId,
                          @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();
         try {
-            List<TRobotRegion> list = tRobotRegionService.select(regionId, regionName, sort, deviceType, upRegionId, upRegionIds, regionType, stationId, state, createTime);
+            List<TRobotRegion> list = tRobotRegionService.select(regionId, regionName, sort, deviceType, upRegionId, upRegionIds, regionType, stationId, state, robotId,createTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

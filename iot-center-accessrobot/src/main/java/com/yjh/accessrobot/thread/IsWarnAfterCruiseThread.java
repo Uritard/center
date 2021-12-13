@@ -1,4 +1,4 @@
-package com.yjh.accessrobot.netty.server;
+package com.yjh.accessrobot.thread;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
-import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.module.command.entity.TCruiseTask;
@@ -96,13 +95,15 @@ public class IsWarnAfterCruiseThread implements Runnable{
                             warnInfo.setCunstomId(tStdDevicemete.getCustomId());
                             warnInfo.setInstanceId(instanceId);
                             warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
-                            warnInfo.setConfMode(276);//未核查
+                            //未核查
+                            warnInfo.setConfMode(276);
                         /*warnInfo.setConfMode(275);//已核查
                         warnInfo.setDealType(286);//属实
                         warnInfo.setDealInfo("程序正常，告警属实");*/
                             Integer warnFlag = Integer.valueOf(StaticContextAccessor.getBean(RobotService.class).selectDictCodeByNote("其他", "defect_model"));
                             warnInfo.setDefectModel(warnFlag);
-                            warnInfo.setAlarmSource(282);//主辅设备
+                            //主辅设备
+                            warnInfo.setAlarmSource(282);
                             warnInfo.setImagePath(threadMap.get("relativePath"));
                             warnInfo.setValue(threadMap.get("value"));
                             warnInfo.setTaskId(threadMap.get("taskCode"));
@@ -110,7 +111,8 @@ public class IsWarnAfterCruiseThread implements Runnable{
                             warnInfo.setDeviceCode(robotId.toString());
 
                             //判断该点是否产生告警以及告警信息
-                            if (Boolean.TRUE.equals(isWarN)) {//触发告警
+                            //触发告警
+                            if (Boolean.TRUE.equals(isWarN)) {
                                 warnInfo.setWarnName(map.get("warnName").toString());
                                 warnInfo.setWarnLevel(Integer.valueOf(map.get("warnLevel").toString()));
                                 warnInfo.setWarnContent(map.get("warnContent").toString());

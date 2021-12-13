@@ -31,7 +31,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -315,12 +314,14 @@ public class RobotService {
             TRobotInspection tRobotInspection = new TRobotInspection()
                     .setInspectionCode(deviceMap.get("device_id").toString())
                     .setRobotId(robotId)
-                    .setInspectionName(deviceMap.get("device_name").toString())
+//                    .setInspectionName(deviceMap.get("device_name").toString())
+                    .setInspectionName((deviceMap.get("main_device_name").toString() + "/" + deviceMap.get("device_name").toString()))
                     .setSaveTypeList(deviceMap.get("save_type_list").toString())
+                    .setComponentId(deviceMap.get("main_device_id").toString())
                     .setRecognitionTypeList(deviceMap.get("recognition_type_list").toString());
-            if (!"".equals(deviceMap.get("component_id").toString())){
-                tRobotInspection.setComponentId(deviceMap.get("component_id").toString());
-            }
+//            if (!"".equals(deviceMap.get("component_id").toString())){
+//                tRobotInspection.setComponentId(deviceMap.get("component_id").toString());
+//            }
             if (!"".equals(deviceMap.get("meter_type").toString())){
                 Integer meterType = selectDictCode("meterType",deviceMap.get("meter_type").toString(),"meter_type");
                 tRobotInspection.setMeterType(meterType);
@@ -336,9 +337,21 @@ public class RobotService {
                 tRobotInspection.setDeviceInfo(deviceMap.get("device_info").toString());
             }
             deviceList.add(tRobotInspection);
+//            log.info("获得的deviceList是：" + deviceList);
 
             //机器人区域层级
-            TRobotRegion tr1 = new TRobotRegion();
+            //只有主设备信息
+            TRobotRegion tr3 = new TRobotRegion();
+            tr3.setRegionId(deviceMap.get("main_device_id").toString());
+            tr3.setRegionName(deviceMap.get("main_device_name").toString());
+            tr3.setUpRegionId(deviceMap.get("bay_id").toString());
+            tr3.setRobotId(robotId);
+            Integer deviceType = selectDictCode("deviceType",deviceMap.get("device_type").toString(),"device_type");
+            tr3.setDeviceType(deviceType);
+            tRobotRegionList.add(tr3);
+
+            //区域、间隔、主设备信息都有
+            /*TRobotRegion tr1 = new TRobotRegion();
             tr1.setRegionId(deviceMap.get("place_id").toString());
             tr1.setRegionName(deviceMap.get("place_name").toString());
             tr1.setUpRegionId("-1");
@@ -362,9 +375,8 @@ public class RobotService {
             tr4.setRegionId(deviceMap.get("component_id").toString());
             tr4.setRegionName(deviceMap.get("component_name").toString());
             tr4.setUpRegionId(deviceMap.get("main_device_id").toString());
-            tRobotRegionList.add(tr4);
+            tRobotRegionList.add(tr4);*/
         }
-//        log.info("获得的deviceList是：" + deviceList);
 
         //对机器人测点数据进行相应的处理
         List<String> nowList = tRobotInspectionDao.selectAllByRobotId(robotId);//该机器人现有的巡检点
@@ -404,15 +416,15 @@ public class RobotService {
             tRobotInspectionDao.update(tRobotInspection);//更新TRI
         }
 
-        //机器人区域层级
-//        log.info("获得的tRobotRegionList是："+tRobotRegionList);
+//        //机器人区域层级
+        log.info("获得的tRobotRegionList是："+tRobotRegionList);
         List<TRobotRegion> lst = tRobotRegionList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(
                 () -> new TreeSet<>(Comparator.comparing(o -> o.getRegionId() + "#" + o.getRegionName() + "#" + o.getUpRegionId()))),
                 ArrayList::new));
         log.info("去重后的tRobotRegionList是："+lst);
         //对机器人区域层级数据进行相应的处理
-        List<String> nowRobotRegionList = tRobotRegionDao.selectAllRobotRegion();//该机器人现有的区域层级带点
-        log.info("机器人现有的nowRobotRegionList=="+nowRobotRegionList);
+        List<String> nowRobotRegionList = tRobotRegionDao.selectAllByRobotId(robotId);//该机器人现有的区域层级带点
+//        log.info("机器人现有的nowRobotRegionList=="+nowRobotRegionList);
 
         List<TRobotRegion> addRobotRegionList = new ArrayList<>();
         for (TRobotRegion str : lst){
@@ -600,6 +612,7 @@ public class RobotService {
     public void feignRobotNormalTaskIssued(Map<String, List<RobotTaskInstanceInfo>> ItemMap) throws Exception{
         List<RobotTaskInstanceInfo> rTIIList = ItemMap.get("robotTaskInfoList");
         List<Map<String, String>> redisInfoList = new ArrayList<>();
+        List<String> robotAllInstanceId = new ArrayList<>();
 
         for (RobotTaskInstanceInfo rTII : rTIIList) {
             log.info("任务这才真正的下发到机器人,开始构建任务相关信息......");
@@ -698,7 +711,7 @@ public class RobotService {
             }
             map.put("invalid_start_time", "");
             map.put("invalid_end_time", "");
-            map.put("isenable", "");
+            map.put("isenable", "0");
             map.put("creator", "");
             map.put("create_time", "");
             mapList.add(map);

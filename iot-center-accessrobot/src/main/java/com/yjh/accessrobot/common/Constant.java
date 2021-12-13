@@ -1,23 +1,19 @@
 package com.yjh.accessrobot.common;
 
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
-import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
-import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import io.netty.channel.ChannelHandlerContext;
 import net.jodah.expiringmap.ExpirationPolicy;
 import net.jodah.expiringmap.ExpiringMap;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.net.URI;
@@ -36,12 +32,8 @@ public class Constant {
 
     public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
     public static AtomicInteger heartNum = new AtomicInteger(0);
-    public static int flag = 0;
-    public static String Packet = "";
     public static int registerCount = 0;
     public static  Integer registerFlag = 0;
-
-
     public static long sendSessionId = 0L;//巡视主机发送会话序列号
 
     public static Map<String, List<Long>> flagMap = new HashMap<>();
