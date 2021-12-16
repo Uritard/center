@@ -1341,6 +1341,30 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
                         send(ctx, taskIntoDBProtocol, xmlBaseModel.getSendCode());
                         log.info("巡视主机给机器人响应了");
                         break;
+                    //机器人设备告警
+                    case "62":
+                        log.info("巡视主机收到机器人设备测点告警了");
+                        //Deal with robot warn data
+                        Map<String, String> warnResultMap = new HashMap<>();
+                        warnResultMap.put("robotCode", xmlBaseModel.getSendCode());
+                        warnResultMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
+                        warnResultMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
+                        warnResultMap.put("deviceName", xmlBaseModel.getItems().get(0).get("device_name").toString());
+                        warnResultMap.put("deviceId", xmlBaseModel.getItems().get(0).get("device_id").toString());
+                        warnResultMap.put("alarmLevel", xmlBaseModel.getItems().get(0).get("alarm_level").toString());
+                        warnResultMap.put("alarmType", xmlBaseModel.getItems().get(0).get("alarm_type").toString());
+                        warnResultMap.put("recognitionType", xmlBaseModel.getItems().get(0).get("recognition_type").toString());
+                        warnResultMap.put("value", xmlBaseModel.getItems().get(0).get("value").toString());
+                        warnResultMap.put("valueUnit", xmlBaseModel.getItems().get(0).get("value_unit").toString());
+                        warnResultMap.put("unit", xmlBaseModel.getItems().get(0).get("unit").toString());
+                        warnResultMap.put("time", xmlBaseModel.getItems().get(0).get("time").toString());
+                        warnResultMap.put("taskPatrolledId", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
+                        warnResultMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
+
+                        log.info("机器人设备测点告警数据是：{}" ,warnResultMap);
+                        RobotWarnThread robotWarnThread = new RobotWarnThread(warnResultMap, redisTemplate, webSocketUrl);
+                        TaskExecutePool.getInstance().execute(robotWarnThread);
+                        break;
                     default:
                         break;
                 }
