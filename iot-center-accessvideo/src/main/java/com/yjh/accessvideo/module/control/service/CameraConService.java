@@ -8,6 +8,7 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
+import com.yjh.accessvideo.commons.utils.ByteUtil;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
@@ -547,7 +548,7 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public Object pTZControl(int dwPTZCommand, Long cameraId, int dStop, int speed) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-        int iChanNum = cameraConInfo.getChannelNum() + 32;
+        int iChanNum = cameraConInfo.getChannelNum() /*+ 32*/;
         m_lRealPlayHandle = realPlay(iChanNum, cameraConInfo.getRecordId());
         if (m_lRealPlayHandle.intValue() == -1) {
             log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
@@ -572,7 +573,7 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public String capturePicture(String filePath, Long cameraId) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-        int iChanNum = cameraConInfo.getChannelNum() + 32;
+        int iChanNum = cameraConInfo.getChannelNum() /*+ 32*/;
         NativeLong iChanNumLong = new NativeLong(iChanNum);
         HCNetSDK.NET_DVR_JPEGPARA lpJpegPara = new HCNetSDK.NET_DVR_JPEGPARA();
         lpJpegPara.wPicSize = 0xff;
@@ -655,7 +656,7 @@ public class CameraConService {
             //摄像机id和预置位Id不正确
             throw new BusinessException("无此摄像机或摄像机预置位不正确");
         }
-        int iChanNum = cameraConInfo.getChannelNum() + 32;
+        int iChanNum = cameraConInfo.getChannelNum() /*+ 32*/;
         int iPreset = cameraConInfo.getPresetNum();
 
         hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, iChanNum, presetCmd, iPreset);
@@ -690,7 +691,7 @@ public class CameraConService {
         if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
             lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
             IntByReference intByReference = new IntByReference(0);
-            HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG();
+            HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG(); //NET_DVR_IPPARACFG_V40--支持128通道
             m_strIpparaCfg.write();
             Pointer m_strIpparaCfgPointer = m_strIpparaCfg.getPointer();
             if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG, iChanNumTem, m_strIpparaCfgPointer, m_strIpparaCfg.size(), intByReference)) {
@@ -702,7 +703,7 @@ public class CameraConService {
             }
             m_strIpparaCfg.read();
             //设备支持IP通道
-            for (int iChannum = 1; iChannum < HCNetSDK.MAX_IP_CHANNEL + 1; iChannum++) {
+            for (int iChannum = 1; iChannum < HCNetSDK.MAX_IP_CHANNEL + 1 + 16; iChannum++) {
                 if (m_strIpparaCfg.struIPChanInfo[iChannum - 1].byEnable == 1) {
                     for (CameraStatusInfo cameraStatusInfo : cameraConInfoMap) {
                         if (Objects.equals(cameraStatusInfo.getChannelNum(), iChannum))
@@ -929,7 +930,7 @@ public class CameraConService {
         try {
             //查询视频参数
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() /*+ 32*/);
            /* if (hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化成功开始注册登录：");*/
                // String login = registerNVR(cameraConInfo.getRecordId());
@@ -1071,7 +1072,7 @@ public class CameraConService {
         try {
 
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() /*+ 32*/);
          /*  if (hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化成功开始注册登录：");*/
                // String login = registerNVR(cameraConInfo.getRecordId());
@@ -1185,7 +1186,7 @@ public class CameraConService {
 
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
-            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() /*+ 32*/);
             log.info("通道号：" + cameraConInfo.getChannelNum());
             log.info("getRecordId:" + cameraConInfo.getRecordId());
             String userName = cameraConInfo.getCameraManager();
@@ -1621,7 +1622,7 @@ public class CameraConService {
         }
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() /*+ 32*/);
             String userName = cameraConInfo.getCameraManager();
             String password = cameraConInfo.getCameraCode();
             String cameraIp = cameraConInfo.getCameraIp();

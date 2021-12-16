@@ -2922,17 +2922,17 @@ EMAIL参数结构
 
     public static class NET_DVR_IPSERVER_STREAM extends Structure
     {
-        public byte []   byEnable;   // 是否在线
+        public byte []   byEnable = new byte[1];   // 是否在线
         public byte  []  byRes = new byte[3];               // 保留字节
-        public NET_DVR_IPADDR struIPServer = new NET_DVR_IPADDR();    //IPServer 地址
+        public NET_DVR_IPADDR[] struIPServer = (NET_DVR_IPADDR[])new NET_DVR_IPADDR().toArray(144);    //IPServer 地址 144
         public short    wPort;                  //IPServer 端口
         public short    wDvrNameLen;            // DVR 名称长度
-        public byte []   byDVRName = new byte[NAME_LEN];    // DVR名称
+        public byte []   byDVRName = new byte[NAME_LEN];    // DVR名称 32
         public short    wDVRSerialLen;          // 序列号长度
         public short  [] byRes1 = new short[2];              // 保留字节
-        public byte  []  byDVRSerialNumber = new byte[SERIALNO_LEN];    // DVR序列号长度
-        public byte  []  byUserName = new byte[NAME_LEN];   // DVR 登陆用户名
-        public byte  []  byPassWord = new byte[PASSWD_LEN]; // DVR登陆密码
+        public byte  []  byDVRSerialNumber = new byte[SERIALNO_LEN];    // DVR序列号长度 48
+        public byte  []  byUserName = new byte[NAME_LEN];   // DVR 登陆用户名 32
+        public byte  []  byPassWord = new byte[PASSWD_LEN]; // DVR登陆密码 16
         public byte    byChannel;              // DVR 通道
         public byte  []  byRes2 = new byte[11];             //  保留字节
     }
@@ -2941,7 +2941,7 @@ EMAIL参数结构
     {
         public byte	byValid;			/*是否可用*/
         public byte[]	byRes1=new byte[3];
-        public NET_DVR_IPADDR  struDevIP = new NET_DVR_IPADDR();
+        public NET_DVR_IPADDR[]  struDevIP = (NET_DVR_IPADDR[])new NET_DVR_IPADDR().toArray(144);
         public short	wDevPort;			/*流媒体服务器端口*/
         public byte	byTransmitType;		/*传输协议类型 0-TCP，1-UDP*/
         public byte[]	byRes2=new byte[69];
@@ -2949,7 +2949,7 @@ EMAIL参数结构
 
     public static class NET_DVR_DEV_CHAN_INFO extends Structure
     {
-        public NET_DVR_IPADDR 	struIP = new NET_DVR_IPADDR();		    //DVR IP地址
+        public NET_DVR_IPADDR[] 	struIP = (NET_DVR_IPADDR[])new NET_DVR_IPADDR().toArray(144);		    //DVR IP地址
         public short 	wDVRPort;			 	//端口号
         public byte 	byChannel;				//通道号
         public byte	byTransProtocol;		//传输协议类型0-TCP，1-UDP
@@ -2968,19 +2968,19 @@ EMAIL参数结构
     public static class NET_DVR_PU_STREAM_CFG extends Structure
     {
         public int								dwSize;
-        public NET_DVR_STREAM_MEDIA_SERVER_CFG	struStreamMediaSvrCfg = new NET_DVR_STREAM_MEDIA_SERVER_CFG();
-        public NET_DVR_DEV_CHAN_INFO				struDevChanInfo = new NET_DVR_DEV_CHAN_INFO();
+        public NET_DVR_STREAM_MEDIA_SERVER_CFG[]	struStreamMediaSvrCfg = (NET_DVR_STREAM_MEDIA_SERVER_CFG[])new NET_DVR_STREAM_MEDIA_SERVER_CFG().toArray(48);
+        public NET_DVR_DEV_CHAN_INFO[]				struDevChanInfo = (NET_DVR_DEV_CHAN_INFO[])new NET_DVR_DEV_CHAN_INFO().toArray(24);
     }
 
     public static class NET_DVR_DDNS_STREAM_CFG extends Structure
     {
         public byte   byEnable;   // 是否启用
         public byte []  byRes1=new byte[3];
-        public NET_DVR_IPADDR  struStreamServer = new NET_DVR_IPADDR();            //流媒体服务器地址
+        public NET_DVR_IPADDR[]  struStreamServer = (NET_DVR_IPADDR[])new NET_DVR_IPADDR().toArray(144);            //流媒体服务器地址
         public short   wStreamServerPort;           //流媒体服务器端口
         public byte   byStreamServerTransmitType;  //流媒体传输协议类型 0-TCP，1-UDP
         public byte   byRes2;
-        public NET_DVR_IPADDR   struIPServer = new NET_DVR_IPADDR();          //IPSERVER地址
+        public NET_DVR_IPADDR[]   struIPServer = (NET_DVR_IPADDR[])new NET_DVR_IPADDR().toArray(144);          //IPSERVER地址
         public short   wIPServerPort;        //IPserver端口号
         public byte []  byRes3=new byte[2];
         public byte  [] sDVRName=new byte[NAME_LEN];   //DVR名称
@@ -3038,13 +3038,13 @@ EMAIL参数结构
 
     public static class NET_DVR_GET_STREAM_UNION extends Union
     {
-        public NET_DVR_IPCHANINFO      struChanInfo = new NET_DVR_IPCHANINFO();	/*IP通道信息*/
-        public NET_DVR_IPSERVER_STREAM struIPServerStream = new NET_DVR_IPSERVER_STREAM();  // IPServer去流
-        public NET_DVR_PU_STREAM_CFG   struPUStream = new NET_DVR_PU_STREAM_CFG();     //  通过前端设备获取流媒体去流
-        public NET_DVR_DDNS_STREAM_CFG struDDNSStream = new NET_DVR_DDNS_STREAM_CFG();     //通过IPServer和流媒体取流
-        public NET_DVR_PU_STREAM_URL   struStreamUrl = new NET_DVR_PU_STREAM_URL();        //通过流媒体到url取流
-        public NET_DVR_HKDDNS_STREAM	struHkDDNSStream = new NET_DVR_HKDDNS_STREAM();   //通过hiDDNS去取流
-        public NET_DVR_IPCHANINFO_V40 struIPChan = new NET_DVR_IPCHANINFO_V40(); //直接从设备取流（扩展）
+        public NET_DVR_IPCHANINFO[]      struChanInfo = (NET_DVR_IPCHANINFO[])new NET_DVR_IPCHANINFO().toArray(48);	/*IP通道信息 36*/
+        public NET_DVR_IPSERVER_STREAM[] struIPServerStream = (NET_DVR_IPSERVER_STREAM[])new NET_DVR_IPSERVER_STREAM().toArray(48);  // IPServer去流
+        public NET_DVR_PU_STREAM_CFG[]   struPUStream = (NET_DVR_PU_STREAM_CFG[])new NET_DVR_PU_STREAM_CFG().toArray(48);     //  通过前端设备获取流媒体去流
+        public NET_DVR_DDNS_STREAM_CFG[] struDDNSStream = (NET_DVR_DDNS_STREAM_CFG[])new NET_DVR_DDNS_STREAM_CFG().toArray(48);     //通过IPServer和流媒体取流
+        public NET_DVR_PU_STREAM_URL[]   struStreamUrl = (NET_DVR_PU_STREAM_URL[])new NET_DVR_PU_STREAM_URL().toArray(48);        //通过流媒体到url取流
+        public NET_DVR_HKDDNS_STREAM[]	struHkDDNSStream = (NET_DVR_HKDDNS_STREAM[])new NET_DVR_HKDDNS_STREAM().toArray(48);   //通过hiDDNS去取流
+        public NET_DVR_IPCHANINFO_V40[] struIPChan = (NET_DVR_IPCHANINFO_V40[])new NET_DVR_IPCHANINFO_V40().toArray(48); //直接从设备取流（扩展）
     }
 
     public static class NET_DVR_STREAM_MODE extends Structure
@@ -3052,7 +3052,7 @@ EMAIL参数结构
         public byte   byGetStreamType; //取流方式GET_STREAM_TYPE，0-直接从设备取流，1-从流媒体取流、2-通过IPServer获得ip地址后取流,3.通过IPServer找到设备，再通过流媒体去设备的流
         //4-通过流媒体由URL去取流,5-通过hkDDNS取流，6-直接从设备取流(扩展)，使用NET_DVR_IPCHANINFO_V40结构, 7-通过RTSP协议方式进行取流
         public byte []    byRes = new byte[3];        //保留字节
-        public NET_DVR_GET_STREAM_UNION uGetStream;    // 不同取流方式结构体
+        public NET_DVR_GET_STREAM_UNION[] uGetStream = (NET_DVR_GET_STREAM_UNION[]) new NET_DVR_GET_STREAM_UNION().toArray(48);    // 不同取流方式结构体
     }
 
     public static class NET_DVR_IPPARACFG_V40 extends Structure

@@ -105,7 +105,7 @@ public class TCameraInfoService {
                 Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
             }catch (Exception e){
                 log.error("调用vqd服务异常"+e);
-                return -2;
+//                return -2;
             }
         }
         this.tCameraInfoDao.deleteByPrimaryId(cameraId);
@@ -176,7 +176,7 @@ public class TCameraInfoService {
                 channel.setPort(recorder.getHttpPort().toString());
                 channel.setUserName(recorder.getIdentityManager());
                 channel.setUserPwd(recorder.getIdentityCode());
-                Integer realChannelNum = tCameraInfo.getChannelNum() + 32;
+                Integer realChannelNum = tCameraInfo.getChannelNum() /*+ 32*/;
                 channel.setChanIndex(realChannelNum.toString());
 
 
@@ -490,7 +490,7 @@ public class TCameraInfoService {
             channel.setPort(recorder.getHttpPort().toString());
             channel.setUserName(recorder.getIdentityManager());
             channel.setUserPwd(recorder.getIdentityCode());
-            Integer realChannelNum = tCameraInfo.getChannelNum() + 32;
+            Integer realChannelNum = tCameraInfo.getChannelNum() /*+ 32*/;
             channel.setChanIndex(realChannelNum.toString());
             channel.setProtocol("0");
             switch (tCameraInfo.getIsControl()) {
