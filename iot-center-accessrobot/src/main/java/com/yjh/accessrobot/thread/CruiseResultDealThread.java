@@ -172,7 +172,7 @@ public class CruiseResultDealThread implements Runnable{
                 Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:"+cruiseResultMap.get("robotCode")+ ":" +taskId);
                 Map<String,String> tCruiseTaskResultMap = new HashMap<>();
                 String str = null;
-                List<Long> instanceIdList = new ArrayList<>();
+                List<Long> instanceIdList = Optional.ofNullable(Constant.flagMap.get(taskId)).orElse(new ArrayList<>());
                 //遍历在下任务时提前组装好的巡检点信息
                 for (String key : robotInfoKeys){
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
@@ -321,7 +321,9 @@ public class CruiseResultDealThread implements Runnable{
                 Set<String> cruiseKey = redisScan("t_cruise_task_result:" + taskId);
                 for (String key : cruiseKey) {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-                    if (redisInfoMap.get("cruiseResult").equals("246") || redisInfoMap.get("cruiseResult").equals("247")){
+                    if ((redisInfoMap.get("cruiseResult").equals("246")
+                            || redisInfoMap.get("cruiseResult").equals("247"))
+                            && redisInfoMap.get("cruiseType").equals("228")){
                         resultList.add(redisInfoMap.get("instanceId"));
                     }
                 }
@@ -376,12 +378,12 @@ public class CruiseResultDealThread implements Runnable{
         log.info("已经做过的巡视点====" + instanceIDList);
 
         //删除已经做过的点
-        if (instanceIDList != null && !instanceIDList.isEmpty()){
+        /*if (instanceIDList != null && !instanceIDList.isEmpty()){
             for (Long instanceId : instanceIDList){
                 allInstanceIdList.remove(instanceId.toString());
             }
         }
-        log.info("删除已经做过的巡视点后==="+allInstanceIdList);
+        log.info("删除已经做过的巡视点后==="+allInstanceIdList);*/
 
         List<Long> isFinishedInstanceList = StaticContextAccessor.getBean(RobotService.class).selectInstanceForTaskGoOn(taskId);//已经入库的点
         log.info("已经入库的巡视点==="+isFinishedInstanceList);
@@ -427,7 +429,7 @@ public class CruiseResultDealThread implements Runnable{
                             //待完善.setOrigPicAnl(redisInfoMap.get("origPicAnl"))
                             .setEvaluationState(257)
                             .setCreatetime(sdf.parse(redisInfoMap.get("cruiseTime")))
-                            .setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")))
+                            .setIsWarn(0)
                             .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
                     if (!"null".equals(redisInfoMap.get("cruiseAbnormal"))) {
                         tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
