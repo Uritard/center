@@ -5,7 +5,6 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
 import org.apache.commons.lang.RandomStringUtils;

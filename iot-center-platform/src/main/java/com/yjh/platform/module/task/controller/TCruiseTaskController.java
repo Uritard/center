@@ -4,18 +4,15 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseTaskAttrService;
 import com.yjh.platform.module.task.service.TCruiseTaskService;
-import com.yjh.platform.module.user.entity.TCameraScreen;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.quartz.CronExpression;
@@ -24,8 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -117,7 +112,14 @@ public class TCruiseTaskController {
                 if (Objects.nonNull(tCruiseTaskAdd.getTaskId()))tCruiseTask.setTaskId(tCruiseTaskAdd.getTaskId());
                 if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("",tCruiseTaskAdd.getStartTime())) {
                     tCruiseTask.setStartTime(tCruiseTaskAdd.getStartTime());
-                } else { tCruiseTask.setStartTime(new Date()); }
+                } else {
+                      //延迟20s后
+//                    Calendar nowTimeCal = Calendar.getInstance();
+//                    nowTimeCal.add(Calendar.SECOND,20);
+//                    tCruiseTask.setStartTime(nowTimeCal.getTime());
+
+                    tCruiseTask.setStartTime(new Date());
+                }
                 String res = tCruiseTaskService.insert(tCruiseTask,tCruiseTaskAdd);
                 if ("啥也不是".equals(res)){
                     result.setCode(209,"任务间隔过短,机器人暂不支持");

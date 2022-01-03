@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.druid.util.StringUtils;
 import com.google.common.collect.Sets;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
@@ -9,39 +10,33 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
-import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.task.controller.HelloController;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
-import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
-import com.yjh.platform.common.Constant;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
-import com.yjh.platform.module.task.entity.CruiseInspectResult;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author czh
@@ -283,7 +278,12 @@ public class TCruiseTaskResultService {
             realTimeWarn.setInstanceName(cruiseMap.get("instanceName").toString());
             realTimeWarn.setCruiseTypeName(tDictBusinessDao.selectDictNoteByDictCode(cruiseMap.get("cruiseType").toString()));
             realTimeWarn.setWarnLevelName(tDictBusinessDao.selectDictNoteByDictCode(warnMap.get("warnLevel").toString()));
-            realTimeWarn.setCruiseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(cruiseMap.get("cruiseTime").toString()));
+            String cruiseTime = cruiseMap.get("cruiseTime").toString();
+            if (Objects.equals("null",cruiseTime)){
+                realTimeWarn.setCruiseTime(new Date());
+            }else {
+                realTimeWarn.setCruiseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(cruiseTime));
+            }
             realTimeWarn.setInstanceId(Long.valueOf(cruiseMap.get("instanceId").toString()));
             realTimeWarn.setAlarmContent(warnMap.get("warnContent").toString());
             realTimeWarns.add(realTimeWarn);
@@ -299,7 +299,12 @@ public class TCruiseTaskResultService {
             realTimeWarn.setInstanceName(cruiseMap.get("instanceName").toString());
             realTimeWarn.setCruiseTypeName(tDictBusinessDao.selectDictNoteByDictCode(cruiseMap.get("cruiseType").toString()));
             realTimeWarn.setWarnLevelName(tDictBusinessDao.selectDictNoteByDictCode(defectMap.get("defectLevel").toString()));
-            realTimeWarn.setCruiseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(cruiseMap.get("cruiseTime").toString()));
+            String cruiseTime = cruiseMap.get("cruiseTime").toString();
+            if (Objects.equals("null",cruiseTime)){
+                realTimeWarn.setCruiseTime(new Date());
+            }else {
+                realTimeWarn.setCruiseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(cruiseTime));
+            }
             realTimeWarn.setInstanceId(Long.valueOf(cruiseMap.get("instanceId").toString()));
             realTimeWarn.setAlarmContent(defectMap.get("defectContent").toString());
             realTimeWarns.add(realTimeWarn);

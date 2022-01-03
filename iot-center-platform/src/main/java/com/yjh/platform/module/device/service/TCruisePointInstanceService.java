@@ -404,18 +404,18 @@ public class TCruisePointInstanceService{
                 tCruisePointInstanceDao.insertInstanceInfo(tCruisePointInfo);
 
             }
-            //删除关联表的巡检实例
-            if(cruiseIdList != null && cruiseIdList.size()>0){
-                List<Long> instanceIdList = tCruisePointInstanceDao.selectInstanceId(cruiseIdList,tCruisePointInstanceDetail.getDeviceMeteId());
-                List<Long> instancePlanList = tCruisePlanAttrDao.batchSelectAttr(instanceIdList);
-                if (instancePlanList.size()>0) {
-                    result = -3;
-                    return result;
-                }
-                tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
-                tCruisePlanAttrDao.deleteByInstanceId(instanceIdList);
-                tCruiseTypeDao.deleteForInstanceId(instanceIdList);
+        }
+        //删除关联表的巡检实例
+        if(cruiseIdList != null && cruiseIdList.size()>0){
+            List<Long> instanceIdList = tCruisePointInstanceDao.selectInstanceId(cruiseIdList,tCruisePointInstanceDetail.getDeviceMeteId());
+            List<Long> instancePlanList = tCruisePlanAttrDao.batchSelectAttr(instanceIdList);
+            if (instancePlanList.size()>0) {
+                result = -3;
+                return result;
             }
+            tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
+            tCruisePlanAttrDao.deleteByInstanceId(instanceIdList);
+            tCruiseTypeDao.deleteForInstanceId(instanceIdList);
         }
         return result;
     }
