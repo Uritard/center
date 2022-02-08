@@ -1,21 +1,15 @@
 package com.yjh.accessrobot.module.command.controller;
 
 import com.yjh.accessrobot.common.smUtil.Demo;
-import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
-import com.yjh.accessrobot.module.command.entity.Analysis;
 import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
-import com.yjh.accessrobot.module.command.entity.TCruiseResult;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +28,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/robot/v1")
-@Api(value = "/operator", description = "机器人操作接口")
+@Api(value = "/operator", tags = "机器人操作接口")
 public class RobotController {
 
     @Autowired
@@ -51,7 +43,7 @@ public class RobotController {
     public RobotController(RobotService robotService) { this.robotService = robotService; }
 
     @ApiOperation(value = "发送控制指令接口")
-    @RequestMapping(value = "/command", method = RequestMethod.GET)
+    @GetMapping(value = "/command")
     // @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5)
     public Result feignRobotControl(HttpServletRequest request,
                                     @RequestParam(value = "robotCode") String robotCode,
@@ -72,7 +64,7 @@ public class RobotController {
                 password= demo.decryptIdentifier(password,identifier);
                 redisTemplate.delete("pubk:" + identifier);
             }
-            result.setData(robotService.feignRobotControl(robotCode,type,command,value,direction,key,userId,password,request,content));
+            result.setData(robotService.feignRobotControl(robotCode, type, command, value, direction, key, userId, password, request, content));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -82,7 +74,7 @@ public class RobotController {
         return result;
     }
     @ApiOperation(value = "发送模型同步指令接口")
-    @RequestMapping(value = "/fileTransfer", method = RequestMethod.GET)
+    @GetMapping(value = "/fileTransfer")
     @Logs(title = "模型同步",content = "根据用户传递的参数给机器人发送模型同步指令",logType = 5,authority = "1234")
     public Result feignRobotTransfer(@RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
@@ -97,27 +89,29 @@ public class RobotController {
         return result;
     }
     @ApiOperation(value = "发送任务指令接口")
-    @RequestMapping(value = "/taskIssued", method = RequestMethod.POST)
+    @PostMapping(value = "/taskIssued")
     @Logs(title = "机器人下发任务",content = "根据用户传递的参数给机器人下发任务",logType = 10)
-    public void feignRobotTaskIssued(@RequestBody Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
-//        Result result = new Result();
+    public Result feignRobotTaskIssued(@RequestBody Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
+        Result result = new Result();
         try {
+            log.info("platform传来的robotTaskInfoMap是=={}", robotTaskInfoMap);
             robotService.feignRobotTaskIssued(robotTaskInfoMap);
-//        } catch (BusinessException b) {
-//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
-//            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("发送任务接口调用错误:", e);
         }
-//        return result;
+        return result;
     }
     @ApiOperation(value = "发送任务控制指令接口")
-    @RequestMapping(value = "/taskControl", method = RequestMethod.POST)
+    @PostMapping(value = "/taskControl")
     @Logs(title = "机器人任务控制",content = "根据用户传递的参数给机器人发送任务控制指令",logType = 11)
     public Result feignRobotTaskControl(@RequestBody Map<String, Object> robotTaskControlMap) {
         Result result = new Result();
         try {
-            result.setData(robotService.feignRobotTaskControl(robotTaskControlMap));
+            log.info("platform传来的robotTaskControlMap是=={}", robotTaskControlMap);
+            result = robotService.feignRobotTaskControl(robotTaskControlMap);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -127,13 +121,13 @@ public class RobotController {
         return result;
     }
     @ApiOperation(value = "站端命令下发")
-    @RequestMapping(value = "/upSystemCommand", method = RequestMethod.POST)
+    @PostMapping(value = "/upSystemCommand")
     @Logs(title = "站端命令下发",content = "根据用户传递的参数控制机器人",logType = 5)
     public Result upSystemCommand(@RequestBody Map<String,List<XMLBaseModel>> map){
         Result result = new Result();
         try {
             XMLBaseModel xmlBaseModel = map.get("list").get(0);
-            log.info("--站端控制数据--"+xmlBaseModel);
+            log.info("--站端控制数据--{}",xmlBaseModel);
             result.setData(robotService.upSystemCommand(xmlBaseModel));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -144,13 +138,13 @@ public class RobotController {
         return result;
     }
     @ApiOperation(value = "巡视主机向机器人下发检修区域指令接口")
-    @RequestMapping(value = "/deviceMaintenanceIssued", method = RequestMethod.POST)
+    @PostMapping(value = "/deviceMaintenanceIssued")
     @Logs(title = "下发检修区域",content = "根据用户传递的参数给机器人下发检修区域指令",logType = 5)
     public Result deviceMaintenanceIssued(@RequestBody Map<String,Object> resMap){
         Result result = new Result();
         try {
+            log.info("platform传来的map是==={}", resMap);
             result.setData(robotService.deviceMaintenanceIssued(resMap));
-            log.info("下发检修区域返回结果: "+result.getData());
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -159,22 +153,7 @@ public class RobotController {
         }
         return result;
     }
-    @ApiOperation(value = "巡视主机向机器人下发联动任务指令接口")
-    @RequestMapping(value = "/linkTaskIssued", method = RequestMethod.POST)
-    @Logs(title = "给机器人下发联动任务",content = "根据用户传递的参数给机器人下发联动任务指令",logType = 5)
-    public Result feignRobotLinkTaskIssued(@RequestBody Map<String, List<RobotTaskInstanceInfo>> ItemMap){
-        Result result = new Result();
-        try {
-            robotService.feignRobotLinkTaskIssued(ItemMap);
-            result.setData(1);
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("巡视主机向机器人下发联动任务指令接口发生错误:", e);
-        }
-        return result;
-    }
+
     @ApiOperation(value = "断开连接接口")
     @GetMapping(value = "/removeLink")
     @Logs(title = "断开连接",content = "根据用户传递的参数断开该机器人的连接",logType = 5)
@@ -183,7 +162,7 @@ public class RobotController {
         Result result = new Result();
         try {
             log.info("RemoveLink coming......");
-            result.setData(robotService.removeLink(robotCode,robotId));
+            result.setData(robotService.removeLink(robotCode, robotId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -192,30 +171,8 @@ public class RobotController {
         }
         return result;
     }
-    /*用完就删*/
-    @ApiOperation(value = "方法测试")
-    @PostMapping(value = "/methodTest")
-    public Result methodTest(@RequestParam(value = "type",required = false) String type,
-                             @RequestParam(value = "command",required = false) String command,
-                             @RequestParam(value = "value",required = false) String value){
-        Result result = new Result();
-        try {
-            result.setData(robotService.deleteRedis());
-//            XMLBaseModel model = getXmlMessage("D:/testform/task_model_E200.xml");
-//            List<Map<String,Object>> modelMapList = model.getItems();
-//            log.info("taskModelItemsMap是："+modelMapList);
-//            XMLBaseModel xmlBaseModel = new XMLBaseModel().setSendCode("Client01");
-//            result.setData(robotService.robotTaskIntoDB(modelMapList,xmlBaseModel));
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("测试接口调用错误:", e);
-        }
-        return result;
-    }
     @ApiOperation(value = "上传至ftps服务器去")
-    @RequestMapping(value = "/uploadFile", method = RequestMethod.GET)
+    @GetMapping(value = "/uploadFile")
     public Result uploadFile() {
         Result result = new Result();
         try {
@@ -228,13 +185,13 @@ public class RobotController {
         return result;
     }
     @ApiOperation(value = "离线情况同步机器人模型信息-上传文件")
-    @RequestMapping(value = "/upLoadRobotModel", method = RequestMethod.POST)
+    @PostMapping(value = "/upLoadRobotModel")
     @Logs(title = "导入文件",content = "导入机器人模型信息文件",logType = 8)
     public Result upLoadRobotModel(@RequestParam(value="file", required=false) MultipartFile file,
                                    @RequestParam(value="robotCode", required=false) String robotCode){
         Result result = new Result();
         try {
-            robotService.upLoadRobotModel(file,robotCode);
+            result = robotService.upLoadRobotModel(file, robotCode);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -244,13 +201,13 @@ public class RobotController {
         return result;
     }
     @ApiOperation(value = "离线情况同步机器人设备文件-上传文件")
-    @RequestMapping(value = "/upLoadRobotDevice", method = RequestMethod.POST)
+    @PostMapping(value = "/upLoadRobotDevice")
     @Logs(title = "导入文件",content = "导入机器人设备点位文件",logType = 8)
     public Result upLoadRobotDevice(@RequestParam(value="file", required=false) MultipartFile file,
                                     @RequestParam(value="robotCode", required=false) String robotCode){
         Result result = new Result();
         try {
-            robotService.upLoadRobotDevice(file,robotCode);
+            robotService.upLoadRobotDevice(file, robotCode);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

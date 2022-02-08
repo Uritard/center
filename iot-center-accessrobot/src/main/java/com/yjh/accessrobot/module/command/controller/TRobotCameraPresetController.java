@@ -2,23 +2,25 @@ package com.yjh.accessrobot.module.command.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
-import com.yjh.accessrobot.module.command.service.TRobotCameraPresetService;
 import com.yjh.accessrobot.module.command.entity.TRobotCameraPreset;
-
-import java.util.*;
-
-import io.swagger.annotations.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
+import com.yjh.accessrobot.module.command.service.TRobotCameraPresetService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -27,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping("/tRobotCameraPreset/v1")
-@Api(value = "/tRobotCameraPreset", description = "机器人预位置表操作接口")
+@Api(value = "/tRobotCameraPreset", tags = "机器人预位置表操作接口")
 public class TRobotCameraPresetController {
 
     @Autowired
@@ -46,7 +48,7 @@ public class TRobotCameraPresetController {
     public Result add(HttpServletRequest request, @RequestBody TRobotCameraPreset tRobotCameraPreset) {
         Result result = new Result();
         try {
-            result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","10",tRobotCameraPreset.getPresetNum().toString(),null,null,null,null,null));
+            result = (robotController.feignRobotControl(request, tRobotCameraPreset.getRobotCode(),"3","10", tRobotCameraPreset.getPresetNum().toString(),null,null,null,null,null));
             if(result != null  && result.getData() != null){
             Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
@@ -75,7 +77,7 @@ public class TRobotCameraPresetController {
         Result result = new Result();
         try {
             TRobotCameraPreset tRobotCameraPreset = tRobotCameraPresetService.selectByPrimaryId(presetId);
-            result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode().toString(),"3","12",tRobotCameraPreset.getPresetNum().toString(),null,null,null,null,null));
+            result = (robotController.feignRobotControl(request,tRobotCameraPreset.getRobotCode(),"3","12", tRobotCameraPreset.getPresetNum().toString(),null,null,null,null,null));
             if(result != null && result.getData() != null){
                 Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
                 log.info("object转map的东西==="+map);
@@ -185,8 +187,6 @@ public class TRobotCameraPresetController {
     public Result batchDelete(@RequestParam(value = "presetIds") String presetIds) {
     Result result = new Result();
     try {
-//        List<String> list1= Arrays.asList(presetIds.split(","));
-//        for ()
         result.setData(tRobotCameraPresetService.batchDelete(presetIds));
     } catch (BusinessException e) {
         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

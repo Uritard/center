@@ -1,11 +1,12 @@
-package com.yjh.accessrobot.thread;
+package com.yjh.accessrobot.threadpool;
 
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 线程池拒绝请求
- * Created by tt on 2018/3/8.
+ * @author tt
+ * @date 2018/3/8
  */
 public class TaskRejectedExecutionHandler implements RejectedExecutionHandler {
 

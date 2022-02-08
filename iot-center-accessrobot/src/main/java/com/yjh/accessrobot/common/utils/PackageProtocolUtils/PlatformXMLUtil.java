@@ -15,14 +15,15 @@ import java.util.*;
  * @date 2020/11/13 - 16:02
  */
 public class PlatformXMLUtil {
-    //解析xml
+    // 解析xml
     public static XMLBaseModel readStringXmlOut(Document doc) {
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> itemsList = new ArrayList<>();
-//        Document doc = null;
+        /*Document doc = null;*/
 
         try {
-//            doc = DocumentHelper.parseText(xml); // 将字符串转为XML
+            /// 将字符串转为XML
+            /*doc = DocumentHelper.parseText(xml);*/
             // 获取根节点
             Element rootElt = doc.getRootElement();
             // 获取根节点下所有节点
@@ -99,35 +100,35 @@ public class PlatformXMLUtil {
     }
     /**
      * 根据模型生成xml文件
-     * @param xmlBaseModel 模型
+     * @param xmlBaseModel xml格式的内容
      * @return String
      */
     public static String generateXml(XMLBaseModel xmlBaseModel){
         Document document = DocumentHelper.createDocument();
-        //根节点
+        // 根节点
         Element rss = document.addElement("Robot");
-        //生成子节点（必有）
+        // 生成子节点（必有）
         Element childNode1 = rss.addElement("SendCode");
-        //子节点内容
+        // 子节点内容
         childNode1.setText(xmlBaseModel.getSendCode());
 
-        //必有
+        // 必有
         Element childNode2 = rss.addElement("ReceiveCode");
         childNode2.setText(xmlBaseModel.getReceiveCode());
 
-        //必有
+        // 必有
         Element childNode3 = rss.addElement("Type");
         childNode3.setText(xmlBaseModel.getType());
 
-        //非必有
+        // 非必有
         Element childNode4 = rss.addElement("Code");
         if (StringUtils.isNotEmpty(xmlBaseModel.getCode())){ childNode4.setText(xmlBaseModel.getCode()); }
 
-        //必有
+        // 必有
         Element childNode5 = rss.addElement("Time");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         childNode5.setText(sdf.format(new Date()));
-        //非必有
+        // 非必有
         Element childNode6= rss.addElement("Items");
         if(xmlBaseModel.getItems()!=null && xmlBaseModel.getItems().size()>0) {
             List<Map<String,Object>> itemsList = xmlBaseModel.getItems();
@@ -138,7 +139,7 @@ public class PlatformXMLUtil {
                 }
             }
         }
-        //必有
+        // 必有
         Element childNode7 = rss.addElement("Command");
         childNode7.setText(xmlBaseModel.getCommand());
         String xmlString = document.asXML();

@@ -1,4 +1,4 @@
-package com.yjh.accessrobot.thread;
+package com.yjh.accessrobot.netty.thread;
 
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
@@ -15,9 +15,9 @@ import java.util.concurrent.TimeUnit;
 public class StandTaskDealThread implements Runnable {
     private RedisTemplate redisTemplate;
     private String taskCode;
-    String robotCode;
+    private String robotCode;
 
-    public StandTaskDealThread(RedisTemplate redisTemplate,String taskCode,String robotCode) {
+    public StandTaskDealThread(RedisTemplate redisTemplate, String taskCode, String robotCode) {
         this.taskCode = taskCode;
         this.redisTemplate = redisTemplate;
         this.robotCode = robotCode;
@@ -31,7 +31,7 @@ public class StandTaskDealThread implements Runnable {
 
             TimeUnit.HOURS.sleep(tasksAreTime.longValue());
 
-            Map<String, Object> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode+":"+taskCode);
+            Map<String, Object> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskCode);
             Integer taskState = Integer.valueOf(redisInfoMap.get("taskState").toString());
 
             if (1 != taskState){

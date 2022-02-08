@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/t-robot-inspection/v1")
-@Api(value = "/t-robot-inspection", description = "机器人巡检点信息表操作接口")
+@Api(value = "/t-robot-inspection", tags = "机器人巡检点信息表操作接口")
 public class TRobotInspectionController {
 
     @Autowired

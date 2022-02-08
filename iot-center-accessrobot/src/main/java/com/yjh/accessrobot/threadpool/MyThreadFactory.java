@@ -1,10 +1,11 @@
-package com.yjh.accessrobot.thread;
+package com.yjh.accessrobot.threadpool;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Administrator
+ * @author YJH
  */
 public class MyThreadFactory implements ThreadFactory{
 

@@ -23,18 +23,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author YJH
+ */
 public class Constant {
-
-    //心跳报文
-    public static final byte HEARTBEAT = 0x03;
-
     public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
-    public static AtomicInteger heartNum = new AtomicInteger(0);
-    public static int registerCount = 0;
-    public static  Integer registerFlag = 0;
-    public static long sendSessionId = 0L;//巡视主机发送会话序列号
+    /**
+     * 巡视主机发送会话序列号
+     */
+    public static long sendSessionId = 0L;
+    /**
+     * 机器人注册次数
+     */
+    public static Map<String, Integer> robotRegisterCounts = new HashMap<>();
+    /**
+     * 机器人是否注册标识
+     */
+    public static Map<String, Boolean> robotRegisterFlag = new HashMap<>();
+    /**
+     * 不同通道处理不同消息，key为机器人code，value为通道号
+     */
+    public static Map<String, String> robotChannels = new HashMap<>();
+    /**
+     * 机器人收不到心跳次数
+     */
+    public static Map<String, Integer> robotRemoveCounts = new HashMap<>();
+    /**
+     * 心跳线程存活标识
+     */
+    public static Map<String, Boolean> robotThreadFlag = new HashMap<>();
+    /**
+     * 机器人收到心跳次数
+     */
+    public static Map<String, Integer> robotHeartBeatCounts = new HashMap<>();
 
     public static Map<String, List<Long>> flagMap = new HashMap<>();
 
@@ -55,13 +77,6 @@ public class Constant {
     }
 
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
-
-//    public static Map<String,String> robotResultMap =  new HashMap<>();
-
-    //算法接口
-    public static final String algorithmUrl = "http://iot-center-accessvideo/analysis/v1/algorithm";
-    //缺陷接口
-    public static final String defectUrl = "http://iot-center-accessvideo/analysis/v1/defect";
 
     public static<T> Result otherServerList( List<String> list, String url){
         return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);

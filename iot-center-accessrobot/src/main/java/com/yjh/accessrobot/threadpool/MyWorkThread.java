@@ -1,9 +1,10 @@
-package com.yjh.accessrobot.thread;
+package com.yjh.accessrobot.threadpool;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Administrator
+ * @author YJH
  */
 public class MyWorkThread extends Thread{
     private AtomicInteger atomicInteger;

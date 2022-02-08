@@ -37,8 +37,6 @@ public class AccessRobotApplication implements CommandLineRunner {
     private int port;
     @Value("${netty.server.robotCode}")
     private String robotCode;
-    @Value("${other.webSocketUrl}")
-    private String websocketUrl;
 
     @SuppressWarnings("rawtypes")
     @Autowired
@@ -58,11 +56,9 @@ public class AccessRobotApplication implements CommandLineRunner {
 //        String url = "192.168.40.71";
 
         Constant.robotCode = robotCode;
-        /*Map<String, String> webSocketUrlMap = redisTemplate.opsForHash().entries("t_sys_param:webSocketUrl");
-        String websocketUrl = webSocketUrlMap.get("content");*/
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);
-        nettyServer.start(address,  redisTemplate, robotService,websocketUrl);
+        nettyServer.start(address,redisTemplate, robotService);
     }
 
     private static String getLocalIp() throws SocketException {

@@ -4,10 +4,8 @@ import com.yjh.accessrobot.module.command.service.RobotService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author tt
@@ -18,12 +16,10 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
 
     private RedisTemplate redisTemplate;
     private RobotService robotService;
-    private String websocketUrl;
 
-    public RobotServerChannelInitializer( RedisTemplate redisTemplate,RobotService robotService,String websocketUrl) {
+    public RobotServerChannelInitializer( RedisTemplate redisTemplate, RobotService robotService) {
         this.redisTemplate = redisTemplate;
         this.robotService = robotService;
-        this.websocketUrl = websocketUrl;
     }
 
     @Override
@@ -31,8 +27,8 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
         RobotServerHandler robotServerHandler = new RobotServerHandler();
         robotServerHandler.setRedisTemplate(redisTemplate);
         robotServerHandler.setRobotService(robotService);
-        robotServerHandler.setWebSocketUrl(websocketUrl);
-        channel.pipeline().addLast(new IdleStateHandler(30,0,0, TimeUnit.SECONDS));
+        // netty自带心跳检测
+        /*channel.pipeline().addLast(new IdleStateHandler(30,0,0, TimeUnit.SECONDS));*/
         channel.pipeline().addLast(robotServerHandler);
     }
 

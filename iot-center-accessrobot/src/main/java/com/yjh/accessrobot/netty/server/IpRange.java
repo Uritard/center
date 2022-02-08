@@ -8,7 +8,7 @@ public class IpRange {
     // 结束ip
     private String ipEnd;
 
-    //构造方法
+    // 构造方法
     public IpRange(String ipStart, String ipEnd) {
 
         this.ipStart = ipStart;

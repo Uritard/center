@@ -349,18 +349,6 @@
         FROM t_robot_info a
         WHERE a.robot_code is not NULL
     </select>
-    <!--查询最新一条数据的机器人id-->
-    <select id="selectLastRobotId" resultType="java.lang.Long">
-        select robot_id from t_robot_info order by robot_id DESC limit 1
-    </select>
-    <select id="selectContent" resultType="java.lang.String">
-    SELECT
-        a.content
-    FROM
-        t_sys_param a
-    WHERE 1 = 1
-    <if test="paramCode != null and paramCode != ''">and a.param_code = #{paramCode,jdbcType = VARCHAR}</if>
-    </select>
     <select id="selectOnline" resultType="java.lang.String">
         SELECT
             a.robot_code
@@ -378,14 +366,6 @@
         select robot_name from t_robot_info
         where 1 = 1
         <if test="robotCode != null and robotCode != ''"> and robot_code = #{robotCode, jdbcType=VARCHAR}</if>
-    </select>
-    <select id="selectDictCode" resultType="java.lang.String">
-        select
-        a.dict_code
-        FROM t_dict_business a
-        where 1 = 1
-        <if test="colName != null and colName !=''">and a.col_name = #{colName, jdbcType=VARCHAR}</if>
-        <if test="dictNote != null and dictNote !=''">and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
     </select>
     <select id="selectDictCodeByNote" resultType="java.lang.String">
         SELECT
@@ -998,6 +978,7 @@
         SELECT COUNT(1) FROM t_warn_info a where 1 = 1
         <if test="instanceId != null ">and a.instance_id = #{instanceId,jdbcType=BIGINT}</if>
         <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=VARCHAR}</if>
+        limit 1
     </select>
     <update id="updateIsWarn" parameterType="java.lang.String">
         UPDATE t_cruise_data_result a <set>
