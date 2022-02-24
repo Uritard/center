@@ -11,14 +11,12 @@ import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.logs.LogsAspect;
+import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
-import com.yjh.accessrobot.module.command.dao.SysUserDao;
-import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
-import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
-import com.yjh.accessrobot.module.command.dao.TRobotRegionDao;
+import com.yjh.accessrobot.module.command.dao.*;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -39,6 +37,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -66,6 +65,8 @@ public class RobotService {
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
     @Autowired
+    private TRobotInspectionAttrService TRobotInspectionService;
+    @Autowired
     private TRobotRegionDao tRobotRegionDao;
     @Resource
     private SysUserDao sysUserDao;
@@ -85,6 +86,10 @@ public class RobotService {
     private String ftpsLocalPath;
     @Value("${netty.server.name}")
     private String sendCode;
+
+    @Value("${other.webSocketUrl}")
+    private String websocketUrl;
+
 
     /**
      * 巡视主机下发控制指令到机器人
@@ -305,10 +310,13 @@ public class RobotService {
 
         Object deviceFile = map.getOrDefault("deviceFile", "");
         Object robotFile = map.getOrDefault("robotFile", "");
+        Object propertyFile = map.getOrDefault("propertyFile", "");
         XMLBaseModel deviceModel = getXmlMessage(filePathMap.get("content") + File.separator + deviceFile);
         List<Map<String, Object>> deviceMap = deviceModel.getItems();
         XMLBaseModel robotModel = getXmlMessage(filePathMap.get("content") + File.separator + robotFile);
         List<Map<String, Object>> robotMap = robotModel.getItems();
+        XMLBaseModel propertyModel = getXmlMessage(filePathMap.get("content") + File.separator + propertyFile);
+        List<Map<String, Object>> propertyMap = propertyModel.getItems();
 
         if (CollectionUtils.isNotEmpty(deviceMap) && CollectionUtils.isNotEmpty(robotMap)) {
             Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
@@ -316,6 +324,8 @@ public class RobotService {
             addRobotModel(robotMap, robotId);
             // Device Point Info
             addDevicePoint(deviceMap, robotId);
+            //Property Info 属性信息 与点位绑定
+            addPropertyModel(propertyMap, robotId);
             // Device Point Region Info
             addDevicePointRegion(deviceMap, robotId);
         }
@@ -355,14 +365,36 @@ public class RobotService {
     }
 
     /**
+     *
+     * @param propertyMapList 属性文件信息
+     */
+    private void addPropertyModel(List<Map<String, Object>> propertyMapList, Long robotId){
+        if (CollectionUtils.isNotEmpty(propertyMapList)){
+            List<TRobotInspectionAttr> robotInspectionAttrList = new ArrayList<>();
+            for (Map<String, Object> propertyMap : propertyMapList){
+                TRobotInspectionAttr tRobotInspectionAttr = new TRobotInspectionAttr()
+                        .setRobotId(robotId)
+                        .setInspectionCode(propertyMap.get("device_id").toString())
+                        .setX(Integer.parseInt(propertyMap.get("x").toString()))
+                        .setY(Integer.parseInt(propertyMap.get("y").toString()))
+                        .setWidth(Integer.parseInt(propertyMap.get("width").toString()))
+                        .setHeight(Integer.parseInt(propertyMap.get("height").toString()));
+                robotInspectionAttrList.add(tRobotInspectionAttr);
+            }
+            //删除该机器人的测点属性表
+            TRobotInspectionService.deleteByRobotId(robotId);
+            TRobotInspectionService.batchInsert(robotInspectionAttrList);
+        }
+    }
+
+    /**
      * 更新机器人测点信息
      * @param deviceMapList 设备点位文件信息
      * @param robotId 机器人id
      * @return void
      */
-    private void addDevicePoint(List<Map<String, Object>> deviceMapList, Long robotId){
+    private void addDevicePoint(List<Map<String, Object>> deviceMapList, Long robotId) {
         List<TRobotInspection> deviceList = new ArrayList<>();
-
         for (Map<String, Object> deviceMap : deviceMapList) {
             TRobotInspection tRobotInspection = new TRobotInspection()
                     .setInspectionCode(deviceMap.get("device_id").toString())
@@ -374,66 +406,106 @@ public class RobotService {
             /*if (!"".equals(deviceMap.get("component_id").toString())){
                 tRobotInspection.setComponentId(deviceMap.get("component_id").toString());
             }*/
-            if (!"".equals(deviceMap.get("meter_type").toString())){
-                Integer meterType = selectDictCode("meterType", deviceMap.get("meter_type").toString(),"meter_type");
+            if (!"".equals(deviceMap.get("point_type").toString())) {
+                Integer inspectionType = Integer.parseInt(deviceMap.get("point_type").toString());
+                tRobotInspection.setInspectionType(inspectionType);
+            }
+            if (!"".equals(deviceMap.get("meter_type").toString())) {
+                Integer meterType = selectDictCode("meterType", deviceMap.get("meter_type").toString(), "meter_type");
                 tRobotInspection.setMeterType(meterType);
             }
-            if (!"".equals(deviceMap.get("appearance_type").toString())){
-                Integer appearanceType = selectDictCode("appearanceType", deviceMap.get("appearance_type").toString(),"appearance_type");
+            if (!"".equals(deviceMap.get("appearance_type").toString())) {
+                Integer appearanceType = selectDictCode("appearanceType", deviceMap.get("appearance_type").toString(), "appearance_type");
                 tRobotInspection.setAppearanceType(appearanceType);
             }
-            if (!"".equals(deviceMap.get("phase").toString())){
+            if (!"".equals(deviceMap.get("main_operation_type").toString())) {
+                Integer mainOperationType = selectDictCode("mainOperationType", deviceMap.get("main_operation_type").toString(), "main_operation_type");
+                tRobotInspection.setMainOperationType(mainOperationType);
+            }
+            if (!"".equals(deviceMap.get("operation_type").toString())) {
+                Integer operationType = selectDictCode("operationType", deviceMap.get("operation_type").toString(), "operation_type");
+                tRobotInspection.setOperationType(operationType);
+            }
+            if (!"".equals(deviceMap.get("phase").toString())) {
                 tRobotInspection.setPhase(deviceMap.get("phase").toString());
             }
-            if (!"".equals(deviceMap.get("device_info").toString())){
+            if (!"".equals(deviceMap.get("device_info").toString())) {
                 tRobotInspection.setDeviceInfo(deviceMap.get("device_info").toString());
+            }
+            if (!"".equals(deviceMap.get("property_pic_path").toString())) {
+                String relativePropertyPicPath = convertPropertyPicPath(deviceMap.get("property_pic_path").toString());
+                tRobotInspection.setPropertyPicPath(relativePropertyPicPath);
             }
 
             deviceList.add(tRobotInspection);
 //            log.info("获得的deviceList是：" + deviceList);
+        }
 
-            // 该机器人现有的巡检点
-            List<String> nowList = tRobotInspectionDao.selectAllByRobotId(robotId);
+        // 该机器人现有的巡检点
+        List<String> nowList = tRobotInspectionDao.selectAllByRobotId(robotId);
 //        log.info("机器人现有的deviceList是：" + nowList);
 
-            List<TRobotInspection> addList = new ArrayList<>();
-            for (TRobotInspection str : deviceList) {
-                if (nowList.contains(str.getInspectionCode())) {
-                    nowList.remove(str.getInspectionCode());
-                } else {
-                    addList.add(str);
-                }
-            }
-            log.info("最后要插库的deviceList是==={}", addList);
-            log.info("准备要删除的inspectionCodeList是==={}", nowList);
-            if (CollectionUtils.isNotEmpty(nowList)) {
-                List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowList);
-//            log.info("这些inspectionCode对应的inspectionIdList是==" + inspectionIdList);
-                List<Long> instanceIdList = tRobotInspectionDao.selectInstanceIdList(inspectionIdList);
-//            log.info("这些inspectionId对应的instanceIdList是==" + instanceIdList);
-
-                // 删库TRI
-                int res1 = tRobotInspectionDao.batchDeleteTRobotInspection(inspectionIdList);
-                // 删库TCPI
-                int res2 = tRobotInspectionDao.batchDeleteTCruisePointInstance(instanceIdList);
-                // 删库TCPA
-                int res3 = tRobotInspectionDao.batchDeleteTCruisePlanAttr(instanceIdList);
-                log.info("TRI删除条数=={},TCPI删除条数=={},TCPA删除条数=={}", res1, res2, res3);
-            }
-            if (CollectionUtils.isNotEmpty(addList)) {
-                // 插库TRI
-                int res = tRobotInspectionDao.batchInsertTRobotInspection(addList);
-                log.info("TRI插入条数=={}", res);
-            }
-            if (deviceList.containsAll(addList)) {
-                deviceList.removeAll(addList);
-            }
-            log.info("准备更新的deviceList是=={}", deviceList);
-            for (TRobotInspection item : deviceList) {
-                // 更新TRI
-                tRobotInspectionDao.update(item);
+        List<TRobotInspection> addList = new ArrayList<>();
+        for (TRobotInspection str : deviceList) {
+            if (nowList.contains(str.getInspectionCode())) {
+                nowList.remove(str.getInspectionCode());
+            } else {
+                addList.add(str);
             }
         }
+        log.info("最后要插库的deviceList是==={}", addList);
+        log.info("准备要删除的inspectionCodeList是==={}", nowList);
+        if (CollectionUtils.isNotEmpty(nowList)) {
+            List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowList);
+//            log.info("这些inspectionCode对应的inspectionIdList是==" + inspectionIdList);
+            List<Long> instanceIdList = tRobotInspectionDao.selectInstanceIdList(inspectionIdList);
+//            log.info("这些inspectionId对应的instanceIdList是==" + instanceIdList);
+
+            // 删库TRI
+            int res1 = 0, res2 = 0, res3 = 0;
+            if (CollectionUtils.isNotEmpty(inspectionIdList)) {
+                res1 = tRobotInspectionDao.batchDeleteTRobotInspection(inspectionIdList);
+            }
+            if (CollectionUtils.isNotEmpty(instanceIdList)) {
+                // 删库TCPI
+                res2 = tRobotInspectionDao.batchDeleteTCruisePointInstance(instanceIdList);
+                // 删库TCPA
+                res3 = tRobotInspectionDao.batchDeleteTCruisePlanAttr(instanceIdList);
+            }
+            log.info("TRI删除条数=={},TCPI删除条数=={},TCPA删除条数=={}", res1, res2, res3);
+        }
+        if (CollectionUtils.isNotEmpty(addList)) {
+            // 插库TRI
+            int res = tRobotInspectionDao.batchInsertTRobotInspection(addList);
+            log.info("TRI插入条数=={}", res);
+        }
+        if (deviceList.containsAll(addList)) {
+            deviceList.removeAll(addList);
+        }
+        log.info("准备更新的deviceList是=={}", deviceList);
+        for (TRobotInspection item : deviceList) {
+            // 更新TRI
+            tRobotInspectionDao.update(item);
+        }
+    }
+
+    /**
+     *
+     * @param path 属性图地址
+     * @return
+     */
+    private String convertPropertyPicPath(String path){
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+        String propertyPicPath = filePathMap.get("content") + "/" + path;
+        log.info("属性图片路径为：{}", propertyPicPath);
+
+        String[] splitArray = propertyPicPath.split("/");
+        String fileName = splitArray[splitArray.length - 1];
+        String developMap = absoluteImgMap.get("content") + "/PRO";
+        copyFileToDevelop(propertyPicPath, developMap);
+        return relativeImgMap.get("content") + "/PRO/" + fileName;
     }
 
     /**
@@ -652,36 +724,62 @@ public class RobotService {
         log.info("robotTaskInfoList是==={}", robotTaskInfoList);
 
         for (RobotTaskInstanceInfo item : robotTaskInfoList) {
-            String robotOnlineStatus = tRobotInfoDao.selectStatusByRobotCode(item.getRobotCode());
-            if (OFF_LINE.equals(robotOnlineStatus)){
-                log.info("==========该机器人处于离线状态,没有成功将任务下发到机器人,巡视结果数据默认==========");
-                return;
-            }else{
-                Map<String,String> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + item.getRobotCode() + ":41");
-                String robotStatus = mapForRobotState.get("value");
-                if ("4".equals(robotStatus)){
-                    log.info("==========该机器人处于检修状态,没有成功将任务下发到机器,巡视结果数据默认==========");
-                    return;
-                }else {
-                    // 控制权获得
-                    String controlRes = robotModeSwitch(item.getRobotCode(), "1", "6", "");
-                    if ("200".equals(controlRes)) {
-                        // 任务模式
-                       String taskModelRes = robotModeSwitch(item.getRobotCode(), "1", "5", "1");
-                        if ("200".equals(taskModelRes)) {
-                            feignRobotTask(itemMap);
-                            return;
-                        }else if ("500".equals(taskModelRes)) {
-                            log.info("==========机器人任务模式切换失败==========");
-                            return;
-                        }
-                    }else if ("500".equals(controlRes)) {
-                        log.info("==========机器人控制权获得失败==========");
-                        return;
+            boolean robotStatus = checkRobotStatus(item);
+            if (robotStatus) {
+                Thread thread = new Thread(() -> {
+                    try {
+                        feignRobotTask(itemMap);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                });
+                thread.start();
+            }
+        }
+    }
+
+    /**
+     * 判断机器人是否正在运作
+     *
+     * @param  item
+     * @return
+     * @throws InterruptedException
+     */
+    private boolean checkRobotStatus(RobotTaskInstanceInfo item) throws InterruptedException {
+        String robotOnlineStatus = tRobotInfoDao.selectStatusByRobotCode(item.getRobotCode());
+        if (OFF_LINE.equals(robotOnlineStatus)){
+            log.info("==========该机器人处于离线状态,没有成功将任务下发到机器人,巡视结果数据默认==========");
+            return false;
+        }else{
+            Map<String,String> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + item.getRobotCode() + ":41");
+            String robotStatus = mapForRobotState.get("value");
+            if ("4".equals(robotStatus)){
+                log.info("==========该机器人处于检修状态,没有成功将任务下发到机器,巡视结果数据默认==========");
+                return false;
+            }else {
+                // 控制权获得
+//                String controlRes = robotModeSwitch(item.getRobotCode(), "1", "6", "");
+//                if ("200".equals(controlRes)) {
+                    //操作任务直接下发（前端切换操作模式）
+                    if (item.getCruiseType() == 456 || item.getCruiseType() == 508 || item.getCruiseType() == 509){
+                        return true;
+                    }else {
+//                        // 任务模式
+//                        String taskModelRes = robotModeSwitch(item.getRobotCode(), "1", "5", "1");
+//                        if ("200".equals(taskModelRes)) {
+                            return true;
+//                        }else if ("500".equals(taskModelRes)) {
+//                            log.info("==========机器人任务模式切换失败==========");
+//                            return false;
+//                        }
+//                    }
+//                }else if ("500".equals(controlRes)) {
+//                    log.info("==========机器人控制权获得失败==========");
+//                    return false;
                 }
             }
         }
+//        return false;
     }
 
     /**
@@ -749,10 +847,16 @@ public class RobotService {
                     case 218: planType = 3;break;
                     // 特殊
                     case 216: planType = 4;break;
+                    //操作
+                    case 456: //操作票
+                    case 508: //单设备
+                    case 509: //紧急分合闸
+                        planType = 5;break;
                     default: break;
                 }
                 map.put("type", planType);
                 map.put("task_code", taskId);
+                map.put("plan_code", item.getPlanCode());
                 map.put("task_name", item.getTaskName());
                 map.put("priority", item.getPriority());
                 map.put("device_level", item.getDeviceLevel());
@@ -774,6 +878,7 @@ public class RobotService {
                 // 定期和立即任务参数
                 else{
                     map.put("fixed_start_time", item.getFixedStartTime());
+                    map.put("isorc", item.getIsOrc());
                     map.put("cycle_month", "");
                     map.put("cycle_week", "");
                     map.put("cycle_execute_time", "");
@@ -863,6 +968,76 @@ public class RobotService {
         }
         return result;
     }
+
+    /**
+     * 发送确认消息指令接口
+     * @param confirmMessageMap
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Result sendConfirmMsg(Map<String, Object> confirmMessageMap) {
+        Result result = new Result();
+        log.info("confirmMessageMap===" + confirmMessageMap);
+        String robotCode = confirmMessageMap.get("robotCode").toString();
+        if (StringUtils.isEmpty(robotCode)){
+            log.error("机器人编码为空,robotCode：{}", robotCode);
+            throw new RuntimeException("机器人编码为空");
+        }
+        String taskId = confirmMessageMap.get("taskId").toString();
+        List<Map<String, Object>> cfmList = (List<Map<String, Object>>) confirmMessageMap.get("confirmMsgList");
+        Map<String, String> robotConfirmMsg = new HashMap<>();
+        robotConfirmMsg.put("newMessage","false");
+        for (Map<String, Object> map : cfmList) {
+            boolean flag = false;
+            if (map.get("type").equals("1") && map.get("value").equals("")) {
+                robotConfirmMsg = redisTemplate.opsForHash().entries("RobotConfirmMsg:" + robotCode + ":" + taskId);
+                robotConfirmMsg.put("confirmMapList", robotConfirmMsg.get("splitConfirmMapList"));
+                robotConfirmMsg.put("splitConfirmMapList", "");
+                robotConfirmMsg.put("newMessage", "true");
+                redisTemplate.opsForHash().putAll("RobotConfirmMsg:" + robotCode + ":" + taskId, robotConfirmMsg);
+                //webSocket通知前端确认消息
+                String jsons = JSON.toJSONString(robotConfirmMsg);
+                log.info("确认消息生成-前端推送：" + jsons);
+                try {
+                    Constant.postUrl(websocketUrl, jsons);
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+                flag =true;
+            }
+            if (flag){
+                return result;
+            }
+        }
+
+        String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
+        if (robotStatus.equals("离线")){
+            result.setMessage(209,"该机器人处于离线状态,没有成功将确认消息下发到机器人......");
+            return result;
+        }else {
+            if (cfmList.size() > 0) {
+                XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                        .setType("51")
+                        .setSendCode(sendCode)
+                        .setReceiveCode(robotCode)
+                        .setCode(taskId)
+                        .setCommand("1")
+                        .setTime(DateTimeUtil.format(new Date()))
+                        .setItems(cfmList);
+                String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);//生成xml
+                log.info("生成的任务控制xml是<start>" + xmlString + "<end>");
+                Map<String, String> robotControlModelMap = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":61");
+                String robotPattern = robotControlModelMap.get("value");
+                if ("5".equals(robotPattern)){
+                    RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
+                }else {
+                    result.setMessage(209,"该机器人未处于操作模式！！！");
+                }
+            }
+        }
+        redisTemplate.opsForHash().putAll("RobotConfirmMsg:" + robotCode + ":" + taskId, robotConfirmMsg);
+        return result;
+    }
     /**
      * 更新任务状态及已做巡检点结果
      * @param taskId 任务id
@@ -878,49 +1053,51 @@ public class RobotService {
         List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);
         log.info("任务为{}已经做过的巡视点===={}", taskId, instanceIdDoneList);
 
-        for (Long instanceId : instanceIdDoneList) {
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());
-            log.info("redisInfoMap的数据是{}",redisInfoMap);
-            // 缓存中该巡检点有结果
-            boolean conditionRes = !StringUtils.equals("设备检修中", redisInfoMap.get("resultNum"))
-                && (StringUtils.equals("246", redisInfoMap.get("cruiseResult"))
-                || StringUtils.equals("247", redisInfoMap.get("cruiseResult")));
-            if (Boolean.TRUE.equals(conditionRes)){
-                TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail()
-                        .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
-                        .setTaskResultId(redisInfoMap.get("taskResultId"))
-                        .setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")))
-                        .setInstanceName(redisInfoMap.get("instanceName"))
-                        .setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
-                        .setEndTime(DateTimeUtil.parse(redisInfoMap.get("endTime")))
-                        .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
-                        .setDeviceName(redisInfoMap.get("deviceName"))
-                        .setCruiseStatus(252)
-                        .setRemark(redisInfoMap.get("remark"));
-                tctrdList.add(tCruiseTaskResultDetail);
-                cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
+        if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
+            for (Long instanceId : instanceIdDoneList) {
+                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());
+                log.info("redisInfoMap的数据是{}", redisInfoMap);
+                // 缓存中该巡检点有结果
+                boolean conditionRes = !StringUtils.equals("设备检修中", redisInfoMap.get("resultNum"))
+                        && (StringUtils.equals("246", redisInfoMap.get("cruiseResult"))
+                        || StringUtils.equals("247", redisInfoMap.get("cruiseResult")));
+                if (Boolean.TRUE.equals(conditionRes)) {
+                    TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail()
+                            .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
+                            .setTaskResultId(redisInfoMap.get("taskResultId"))
+                            .setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")))
+                            .setInstanceName(redisInfoMap.get("instanceName"))
+                            .setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
+                            .setEndTime(DateTimeUtil.parse(redisInfoMap.get("endTime")))
+                            .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
+                            .setDeviceName(redisInfoMap.get("deviceName"))
+                            .setCruiseStatus(252)
+                            .setRemark(redisInfoMap.get("remark"));
+                    tctrdList.add(tCruiseTaskResultDetail);
+                    cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
 
-                TCruiseDataResult tCruiseDataResult = new TCruiseDataResult()
-                        .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
-                        .setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")))
-                        .setCruiseName(redisInfoMap.get("cruiseName"))
-                        .setCruiseType(228)
-                        .setResultNum(redisInfoMap.get("resultNum"))
-                        .setModifyNum(redisInfoMap.get("modifyNum"))
-                        .setPicpath(redisInfoMap.get("picpath"))
-                        .setPicPathAnl(redisInfoMap.get("picPathAnl"))
-                        .setOrigpic(redisInfoMap.get("origpic"))
-                        .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
-                        .setEvaluationState(257)
-                        .setCreatetime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
-                        .setIsWarn(0)
-                        .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")))
-                        .setCruiseAbnormal(Boolean.TRUE.equals(!"null".equals(redisInfoMap.get("cruiseAbnormal"))) ?
-                                Integer.valueOf(redisInfoMap.get("cruiseAbnormal")) : null)
-                        .setResultPic(Boolean.TRUE.equals(!"null".equals(redisInfoMap.get("resultPic"))) ?
-                                redisInfoMap.get("resultPic") : null)
-                        .setFirName("f");
-                tcdrList.add(tCruiseDataResult);
+                    TCruiseDataResult tCruiseDataResult = new TCruiseDataResult()
+                            .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
+                            .setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")))
+                            .setCruiseName(redisInfoMap.get("cruiseName"))
+                            .setCruiseType(228)
+                            .setResultNum(redisInfoMap.get("resultNum"))
+                            .setModifyNum(redisInfoMap.get("modifyNum"))
+                            .setPicpath(redisInfoMap.get("picpath"))
+                            .setPicPathAnl(redisInfoMap.get("picPathAnl"))
+                            .setOrigpic(redisInfoMap.get("origpic"))
+                            .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
+                            .setEvaluationState(257)
+                            .setCreatetime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
+                            .setIsWarn(0)
+                            .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")))
+                            .setCruiseAbnormal(Boolean.TRUE.equals(!"null".equals(redisInfoMap.get("cruiseAbnormal"))) ?
+                                    Integer.valueOf(redisInfoMap.get("cruiseAbnormal")) : null)
+                            .setResultPic(Boolean.TRUE.equals(!"null".equals(redisInfoMap.get("resultPic"))) ?
+                                    redisInfoMap.get("resultPic") : null)
+                            .setFirName("f");
+                    tcdrList.add(tCruiseDataResult);
+                }
             }
         }
         log.info("任务{}的tCTRDList大小是:{},tCDRList大小是: {}", taskId, tctrdList.size(), tcdrList.size());
@@ -938,7 +1115,7 @@ public class RobotService {
         log.info("插tCTRD的条数:{},插tCDR的条数:{}", res1, res2);
 
         // 将已经做过的巡视点Map清空
-        if (StringUtils.isNotEmpty(Constant.flagMap.get(taskId).toString())){
+        if (Objects.nonNull(Constant.flagMap.get(taskId)) && StringUtils.isNotEmpty(Constant.flagMap.get(taskId).toString())){
             log.info("将公共类的instanceIdList清空");
             Constant.flagMap = new HashMap<>(16);
         }
@@ -1163,7 +1340,14 @@ public class RobotService {
     }
     public Result robotTaskStates(Map<String, List<XMLBaseModel>> robotMap) {
         Result result = new Result();
-        result = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.SEND_ROBOT_URL, robotMap, Result.class);
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                result = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.SEND_ROBOT_URL, robotMap, Result.class);
+            }
+        } catch (Exception e) {
+//            log.error(e.getMessage(), e);
+        }
 //        try {
 //            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
 //            if (null != serviceRestTemplate) {
@@ -1244,6 +1428,174 @@ public class RobotService {
                 case "28": dictNote = "避雷器动作次数表";break;
                 default: break;
             }
+        } else if (valueName.equals("mainOperationType")){
+            switch (value) {
+                case "1":
+                    dictNote = "旋钮";
+                    break;
+                case "2":
+                    dictNote = "按钮";
+                    break;
+                case "3":
+                    dictNote = "手车";
+                    break;
+                case "4":
+                    dictNote = "地刀";
+                    break;
+                case "5":
+                    dictNote = "紧急分合闸";
+                    break;
+                case "6":
+                    dictNote = "手车验电";
+                    break;
+                case "7":
+                    dictNote = "机械位判断";
+                    break;
+                case "8":
+                    dictNote = "压板";
+                    break;
+                case "9":
+                    dictNote = "其他";
+                    break;
+                default:
+                    break;
+            }
+        } else if (valueName.equals("operationType")) {
+            switch (value) {
+                case "1":
+                    dictNote = "转换开关";
+                    break;
+                case "2":
+                    dictNote = "控制开关";
+                    break;
+                case "3":
+                    dictNote = "储能开关";
+                    break;
+                case "4":
+                    dictNote = "手车旋钮";
+                    break;
+                case "5":
+                    dictNote = "转换控制开关";
+                    break;
+                case "6":
+                    dictNote = "电压选择旋钮";
+                    break;
+                case "7":
+                    dictNote = "手车操作开关";
+                    break;
+                case "8":
+                    dictNote = "接地刀操作开关";
+                    break;
+                case "9":
+                    dictNote = "闭锁开关";
+                    break;
+                case "10":
+                    dictNote = "风机旋钮";
+                    break;
+                case "11":
+                    dictNote = "加热器旋钮";
+                    break;
+                case "12":
+                    dictNote = "复归按钮";
+                    break;
+                case "13":
+                    dictNote = "带电显示器";
+                    break;
+                case "14":
+                    dictNote = "线路保护装置";
+                    break;
+                case "15":
+                    dictNote = "手车";
+                    break;
+                case "16":
+                    dictNote = "地刀";
+                    break;
+                case "17":
+                    dictNote = "许继_紧急分合闸";
+                    break;
+                case "18":
+                    dictNote = "西门子_紧急分合闸";
+                    break;
+                case "19":
+                    dictNote = "华电_紧急分合闸";
+                    break;
+                case "20":
+                    dictNote = "天灵_紧急分合闸";
+                    break;
+                case "21":
+                    dictNote = "北辰_紧急分合闸";
+                    break;
+                case "22":
+                    dictNote = "江苏_紧急分合闸";
+                    break;
+                case "23":
+                    dictNote = "手车验电装置";
+                    break;
+                case "24":
+                    dictNote = "地刀机械位判断拍照";
+                    break;
+                case "25":
+                    dictNote = "断路器开关";
+                    break;
+                case "26":
+                    dictNote = "压板";
+                    break;
+                case "27":
+                    dictNote = "OCR识别";
+                    break;
+                case "28":
+                    dictNote = "五防逻辑识别";
+                    break;
+                case "29":
+                    dictNote = "电压转换开关";
+                    break;
+                case "30":
+                    dictNote = "解锁/联锁控制开关";
+                    break;
+                case "31":
+                    dictNote = "并列/解锁控制开关";
+                    break;
+                default:
+                    break;
+            }
+        } else if (valueName.equals("pointAlarmType")) {
+            switch (value) {
+                case "1":
+                    dictNote = "超温报警";
+                    break;
+                case "2":
+                    dictNote = "温升报警";
+                    break;
+                case "3":
+                    dictNote = "三相温差报警";
+                    break;
+                case "4":
+                    dictNote = "三相对比报警";
+                    break;
+                case "5":
+                    dictNote = "声音异常";
+                    break;
+                case "6":
+                    dictNote = "外观异常";
+                    break;
+                case "7":
+                    dictNote = "仪表越限报警";
+                    break;
+                case "8":
+                    dictNote = "仪表超量程报警";
+                    break;
+                case "9":
+                    dictNote = "仪表三相对比";
+                    break;
+                case "10":
+                    dictNote = "变位报警";
+                    break;
+                case "11":
+                    dictNote = "操作告警";
+                    break;
+                default:
+                    break;
+            }
         }
         return Integer.valueOf(selectDictCodeByNote(dictNote, colName));
     }
@@ -1293,127 +1645,326 @@ public class RobotService {
      * @param xmlBaseModel xml格式的内容
      * @return int
      */
-    public int addRobotSelfTask(List<Map<String, Object>> taskModelMapList, XMLBaseModel xmlBaseModel) {
-        List<TCruiseTask> tCruiseTaskList = new ArrayList<>();
-        for (Map<String, Object> taskModelMap : taskModelMapList) {
-            // 构建t_cruise_task
-            String taskId = taskModelMap.get("task_code").toString();
-            String taskName = taskModelMap.get("task_name").toString();
+    public void addRobotSelfTask(List<Map<String, Object>> taskModelMapList, XMLBaseModel xmlBaseModel) {
+        try {
+            Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
+            Long upRegionId = tRobotInfoDao.selectByPrimaryId(robotId).getUpRegionId();
+            List<Map<String, Object>> cruiseSelfTask = taskModelMapList.stream().filter(task -> !"5".equals(task.get("type").toString())).collect(Collectors.toList());
+            //1.处理巡检任务模型
+            if (CollectionUtils.isNotEmpty(cruiseSelfTask)){
+                List<TCruiseTask> tCruiseTaskList = new ArrayList<>();
+                for (Map<String, Object> cruiseTaskModelMap : cruiseSelfTask) {
+                    // 构建t_cruise_task
+                    String taskId = cruiseTaskModelMap.get("task_code").toString();
+                    String taskName = cruiseTaskModelMap.get("task_name").toString();
+                    TCruiseTask tCruiseTask = new TCruiseTask();
+                    tCruiseTask.setTaskId(taskId);
+                    tCruiseTask.setTaskCode(taskId);
+                    tCruiseTask.setTaskName(taskName);
+                    //任务类型
+                    String type = cruiseTaskModelMap.get("type").toString();
+                    Integer cType = null;
+                    switch (type) {
+                        // 例行
+                        case "1":
+                            cType = 214;
+                            break;
+                        // 特殊
+                        case "2":
+                            cType = 216;
+                            break;
+                        // 专项
+                        case "3":
+                            cType = 217;
+                            break;
+                        // 自定义
+                        case "4":
+                            cType = 218;
+                            break;
+                        default:
+                            break;
+                    }
+                    tCruiseTask.setType(cType);
+                    if (!"".equals(cruiseTaskModelMap.get("cycle_execute_time")) || !"".equals(cruiseTaskModelMap.get("interval_start_time"))) {
+                        tCruiseTask.setIfRun(172);
+                    } else {
+                        tCruiseTask.setIfRun(174);
+                    }
+                    tCruiseTask.setStartTime(DateTimeUtil.parse(cruiseTaskModelMap.get("fixed_start_time").toString()));
+                    tCruiseTask.setRobotId(robotId);
+                    // 机器人本体任务
+                    tCruiseTask.setTaskType(271);
+                    if (!"".equals(cruiseTaskModelMap.get("priority").toString())) {
+                        tCruiseTask.setTaskLevel(Integer.valueOf(cruiseTaskModelMap.get("priority").toString()));
+                    }
+                    tCruiseTask.setCreateTime(new Date());
+                    tCruiseTaskList.add(tCruiseTask);
+                    log.info("tCruiseTaskList==={}", tCruiseTaskList);
 
-            TCruiseTask tCruiseTask = new TCruiseTask();
-            tCruiseTask.setTaskId(taskId);
-            tCruiseTask.setTaskCode(taskId);
-            tCruiseTask.setTaskName(taskName);
-            Integer cType = null;
-            if (StringUtils.isNotEmpty(null)){
-                String type = taskModelMap.get("type").toString();
-                switch (type){
-                    // 例行
-                    case "1": cType = 214;break;
-                    // 特殊
-                    case "2":cType = 216;break;
-                    // 专项
-                    case "3":cType = 217;break;
-                    // 自定义
-                    case "4":cType = 218;break;
-                    default:break;
+                    // 构建t_cruise_point_instance
+                    List<TCruisePointInstance> tCruisePointInstanceList = buildTCruisePointInstance(cruiseTaskModelMap, robotId);
+
+                    // 构建t_cruise_task_attr
+                    List<Map<String, String>> redisInfoList = new ArrayList<>();
+                    List<Long> instanceIdList = new ArrayList<>();
+                    List<TCruiseTaskAttr> tCruiseTaskAttrList = new ArrayList<>();
+                    for (TCruisePointInstance tCruisePointInstance : tCruisePointInstanceList) {
+                        TCruiseTaskAttr tCruiseTaskAttr = new TCruiseTaskAttr()
+                                .setTaskId(taskId)
+                                .setInstanceId(tCruisePointInstance.getInstanceId());
+                        tCruiseTaskAttrList.add(tCruiseTaskAttr);
+                        instanceIdList.add(tCruisePointInstance.getInstanceId());
+
+                        Map<String, String> redisInfoMap = new HashMap<>();
+                        redisInfoMap.put("robotCode", xmlBaseModel.getSendCode());
+                        redisInfoMap.put("instanceId", tCruisePointInstance.getInstanceId() + "");
+                        Map<String, Object> map = tRobotRegionDao.selectInspectionId(tCruisePointInstance.getCruiseId());
+                        redisInfoMap.put("inspectionCode", map.get("inspection_code").toString());
+                        redisInfoMap.put("deviceName", map.get("region_name").toString());
+                        redisInfoMap.put("taskId", taskId);
+                        redisInfoMap.put("inspectionName", tCruisePointInstance.getCruiseName());
+                        redisInfoList.add(redisInfoMap);
+                    }
+                    log.info("redisInfoList是==={}", redisInfoList);
+                    // 放数据到缓存
+                    for (Map<String, String> stringStringMap : redisInfoList) {
+                        redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + stringStringMap.get("robotCode")
+                                + ":" + stringStringMap.get("taskId") + ":" + stringStringMap.get("instanceId"), stringStringMap);
+                    }
+
+                    log.info("tCruiseTaskAttrList==={}", tCruiseTaskAttrList);
+                    tRobotInfoDao.batchInsertTaskAttr(tCruiseTaskAttrList);
+
+                    // 将instanceIdList放缓存，以备后续使用
+                    log.info("instanceIdList是==={}", instanceIdList);
+                    Map<String, Object> instanceListMap = new HashMap<>(5);
+                    instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
+                    instanceListMap.put("taskId", taskId);
+                    redisTemplate.opsForHash().putAll("RobotTaskStatus:" + xmlBaseModel.getSendCode() + ":" + taskId, instanceListMap);
+
+                    // 构建t_cruise_result
+                    TCruiseResult tCruiseResult = new TCruiseResult()
+                            .setTaskResultId(String.valueOf(UUID.randomUUID()).replace("-", ""))
+                            .setTaskId(taskId)
+                            .setTaskName(taskName)
+                            .setCType(cType)
+                            .setCState(238)
+                            .setTaskCode(taskId)
+                            .setCreateTime(new Date())
+                            .setRemark("0");
+                    log.info("tCruiseResult==={}", tCruiseResult);
+                    tRobotInfoDao.insertTCruiseResult(tCruiseResult);
+                }
+                if (CollectionUtils.isNotEmpty(tCruiseTaskList)) {
+                    tRobotInfoDao.batchInsertTask(tCruiseTaskList);
                 }
             }
-            tCruiseTask.setType(cType);
-            if (!"".equals(taskModelMap.get("cycle_execute_time")) || !"".equals(taskModelMap.get("interval_start_time"))){
-                tCruiseTask.setIfRun(172);
-            }else{
-                tCruiseTask.setIfRun(174);
+            //1.处理操作任务模型(操作票)
+            List<Map<String, Object>> operationSelfTask = taskModelMapList.stream().filter(task -> "5".equals(task.get("type").toString())).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(operationSelfTask)) {
+                Map<String, Object> params = new HashMap<>();
+                params.put("robotId", robotId);
+                List<String> orderOperationSelfTask = (List<String>) Constant.restTemplateGet(Constant.GET_PLAN_LIST, params).getData();
+                //1.添加或更新操作票
+                for (Map<String, Object> operationTaskModelMap : operationSelfTask) {
+                    // 构建t_cruise_task
+                    String taskId = operationTaskModelMap.get("task_code").toString();
+                    String taskName = operationTaskModelMap.get("task_name").toString();
+                    //任务类型5 ： 操作类任务模型（操作票）
+                    Map<String, Object> map = new HashMap<>();
+                    // 构建t_cruise_point_instance
+                    List<TCruisePointInstance> tCruisePointInstanceList = buildTCruisePointInstance(operationTaskModelMap, robotId);
+                    List<Long> instanceList = new ArrayList<>();
+                    tCruisePointInstanceList.forEach(tCruisePointInstance -> instanceList.add(tCruisePointInstance.getInstanceId()));
+                    if (instanceList.size() > 0) {
+                        String simulationSteps = operationTaskModelMap.get("simulation_steps").toString();//操作票初始状态
+                        map.put("type", 456);
+                        map.put("instanceList", instanceList);
+                        map.put("planName", taskName); //操作票名称
+                        map.put("planCode", taskId); //操作票编码
+                        map.put("robotId", robotId); //机器人id
+                        map.put("upRegionId", upRegionId); //机器人所在区域
+                        map.put("simulationSteps", simulationSteps);
+                        Result result = Constant.restTemplatePost(Constant.PLAN_URL, map);
+                        log.info("操作票入库：{}", result.getCode());
+                    }
+                    orderOperationSelfTask.remove(taskId);
+                }
+                //2.删除站端已删除的操作票
+                orderOperationSelfTask.forEach(s -> {
+                    Map<String, Object> order = new HashMap<>();
+                    order.put("planCode", s);
+                    Constant.restTemplateDelete(Constant.DELETE_PLAN_LIST,order);
+                });
             }
-            tCruiseTask.setStartTime(DateTimeUtil.parse(taskModelMap.get("fixed_start_time").toString()));
-            Long robotId = tRobotInfoDao.selectRobotIdByCode(xmlBaseModel.getSendCode());
-            tCruiseTask.setRobotId(robotId);
-            // 机器人本体任务
-            tCruiseTask.setTaskType(271);
-            if (!"".equals(taskModelMap.get("priority").toString())){
-                tCruiseTask.setTaskLevel(Integer.valueOf(taskModelMap.get("priority").toString()));
-            }
-            tCruiseTask.setCreateTime(new Date());
-            tCruiseTaskList.add(tCruiseTask);
-            log.info("tCruiseTaskList==={}", tCruiseTaskList);
-
-            // 该任务下包含的点位
-            String inspectionIdString = taskModelMap.get("device_list").toString();
-            String[] inspectionIds = inspectionIdString.split(",");
-            List<String> inspectionIdList = new ArrayList<>();
-            Collections.addAll(inspectionIdList, inspectionIds);
-            log.info("机器人对应点list==={}", inspectionIdList);
-
-            // 构建t_cruise_point_instance
-            List<TCruisePointInstance> tCruisePointInstanceList = new ArrayList<>();
-            for (String inspectionCode : inspectionIdList){
-                TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-                TStdRegion tStdRegion = tRobotInfoDao.selectTSRegionForStation();
-                tCruisePointInstance.setStationId(tStdRegion.getStationId());
-                tCruisePointInstance.setStationName(tStdRegion.getStationName());
-                tCruisePointInstance.setCruiseType(228);
-                Map<String,Object> map = tRobotInspectionDao.selectInspection(inspectionCode);
-                tCruisePointInstance.setCruiseId(Long.valueOf(map.get("inspection_id").toString()));
-                tCruisePointInstance.setCruiseName(map.get("inspection_name").toString());
-                tCruisePointInstance.setIfSy(1);
-                tCruisePointInstanceList.add(tCruisePointInstance);
-            }
-            log.info("tCruisePointInstanceList==={}", tCruisePointInstanceList);
-            tRobotInfoDao.batchInsertInstance(tCruisePointInstanceList);
-
-            // 构建t_cruise_task_attr
-            List<Map<String, String>> redisInfoList = new ArrayList<>();
-            List<Long> instanceIdList = new ArrayList<>();
-            List<TCruiseTaskAttr> tCruiseTaskAttrList = new ArrayList<>();
-            for (TCruisePointInstance tCruisePointInstance : tCruisePointInstanceList){
-                TCruiseTaskAttr tCruiseTaskAttr = new TCruiseTaskAttr()
-                        .setTaskId(taskId)
-                        .setInstanceId(tCruisePointInstance.getInstanceId());
-                tCruiseTaskAttrList.add(tCruiseTaskAttr);
-                instanceIdList.add(tCruisePointInstance.getInstanceId());
-
-                Map<String, String> redisInfoMap = new HashMap<>();
-                redisInfoMap.put("robotCode", xmlBaseModel.getSendCode());
-                redisInfoMap.put("instanceId", tCruisePointInstance.getInstanceId() + "");
-                Map<String,Object> map = tRobotRegionDao.selectInspectionId(tCruisePointInstance.getCruiseId());
-                redisInfoMap.put("inspectionCode", map.get("inspection_code").toString());
-                redisInfoMap.put("deviceName", map.get("region_name").toString());
-                redisInfoMap.put("taskId", taskId);
-                redisInfoMap.put("inspectionName", tCruisePointInstance.getCruiseName());
-                redisInfoList.add(redisInfoMap);
-            }
-            log.info("redisInfoList是==={}", redisInfoList);
-            // 放数据到缓存
-            for (int i = 0; i < redisInfoList.size(); i++) {
-                redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
-                        + ":" + redisInfoList.get(i).get("taskId") + ":" +redisInfoList.get(i).get("instanceId"), redisInfoList.get(i));
-            }
-
-            log.info("tCruiseTaskAttrList==={}", tCruiseTaskAttrList);
-            tRobotInfoDao.batchInsertTaskAttr(tCruiseTaskAttrList);
-
-            // 将instanceIdList放缓存，以备后续使用
-            log.info("instanceIdList是==={}", instanceIdList);
-            Map<String, Object> instanceListMap = new HashMap<>(5);
-            instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
-            instanceListMap.put("taskId", taskId);
-            redisTemplate.opsForHash().putAll("RobotTaskStatus:" + xmlBaseModel.getSendCode() + ":" +taskId, instanceListMap);
-
-            // 构建t_cruise_result
-            TCruiseResult tCruiseResult = new TCruiseResult()
-                    .setTaskResultId(String.valueOf(UUID.randomUUID()).replace("-", ""))
-                    .setTaskId(taskId)
-                    .setTaskName(taskName)
-                    .setCType(cType)
-                    .setCState(238)
-                    .setTaskCode(taskId)
-                    .setCreateTime(new Date())
-                    .setRemark("0");
-            log.info("tCruiseResult==={}", tCruiseResult);
-            tRobotInfoDao.insertTCruiseResult(tCruiseResult);
+        } catch (Exception e) {
+            log.error("addRobotSelfTask error", e);
         }
-        return  tRobotInfoDao.batchInsertTask(tCruiseTaskList);
     }
+
+    /**
+     * 构建t_cruise_point_instance
+     */
+    private List<TCruisePointInstance> buildTCruisePointInstance(Map<String, Object> taskModelMap, Long robotId) {
+        //操作机器人拓展协议 添加设备属性列表--处理操作测点行为
+        Map<String, String> inspectionIdAttrMap = new HashMap<>();
+        if (Objects.nonNull(taskModelMap.get("device_attr_list"))) {
+            String inspectionIdAttrString = taskModelMap.get("device_attr_list").toString();
+            String[] inspectionIdAttrs = inspectionIdAttrString.split(",");
+            List<String> inspectionIdAttrList = new ArrayList<>(Arrays.asList(inspectionIdAttrs));
+            for (String inspectionIdAttr : inspectionIdAttrList) {
+                String inspectionCode = StringUtils.substringBeforeLast(inspectionIdAttr, "_");
+                String attr = StringUtils.substringAfterLast(inspectionIdAttr, "_");
+                inspectionIdAttrMap.put(inspectionCode, attr);
+            }
+        }
+        // 该任务下包含的点位
+        String inspectionIdString = taskModelMap.get("device_list").toString();
+        String[] inspectionIds = inspectionIdString.split(",");
+        List<String> inspectionIdList = new ArrayList<>();
+        Collections.addAll(inspectionIdList, inspectionIds);
+        log.info("机器人对应点list==={}", inspectionIdList);
+        List<TCruisePointInstance> tCruisePointInstanceList = new ArrayList<>();
+        for (String inspectionCode : inspectionIdList) {
+            TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
+            TStdRegion tStdRegion = tRobotInfoDao.selectTSRegionForStation(robotId);
+            tCruisePointInstance.setStationId(tStdRegion.getRegionId().toString());
+            tCruisePointInstance.setStationName(tStdRegion.getRegionName());
+            tCruisePointInstance.setCruiseType(228);
+            Map<String, Object> map = tRobotInspectionDao.selectInspection(inspectionCode);
+            tCruisePointInstance.setCruiseId(Long.valueOf(map.get("inspection_id").toString()));
+            tCruisePointInstance.setCruiseName(map.get("inspection_name").toString());
+            tCruisePointInstance.setIfSy(1);
+            tCruisePointInstance.setTextDesc(inspectionIdAttrMap.get(inspectionCode));
+            tCruisePointInstanceList.add(tCruisePointInstance);
+        }
+        log.info("tCruisePointInstanceList==={}", tCruisePointInstanceList);
+        tRobotInfoDao.batchInsertInstance(tCruisePointInstanceList);
+        return tCruisePointInstanceList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateOperationStepsForRedis(XMLBaseModel xmlBaseModel) {
+        Map<String, Object> operationStepsMaps = new HashMap<>(11);
+        String robotCode = xmlBaseModel.getSendCode();
+        try {
+            String taskId = xmlBaseModel.getItems().get(0).get("task_code").toString();
+            operationStepsMaps.put("robotCode", robotCode);
+            operationStepsMaps.put("taskPatrolledId", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
+            operationStepsMaps.put("taskId", taskId);
+            operationStepsMaps.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
+            //当前操作测点id
+            String deviceId = xmlBaseModel.getItems().get(0).get("device_id").toString();
+            operationStepsMaps.put("deviceId", deviceId);
+            //当前操作点对应相机路径
+            List<String> cameraUrlList = tRobotInfoDao.selectCameraUrlByDeviceId(deviceId);
+            operationStepsMaps.put("cameraUrlList", String.valueOf(cameraUrlList));
+            //当前操作名称
+            operationStepsMaps.put("currentOperation", xmlBaseModel.getItems().get(0).get("current_operation").toString());
+            //上一步操作名称
+            operationStepsMaps.put("lastOperation", xmlBaseModel.getItems().get(0).get("last_operation").toString());
+            //下一步操作名称
+            operationStepsMaps.put("nextOperation", xmlBaseModel.getItems().get(0).get("next_operation").toString());
+            //操作任务步骤名称
+            Map<String, String> map = redisTemplate.opsForHash().entries("RobotOperationSteps:" + robotCode + ":" + taskId);
+            List<String> nowStepNameList = new ArrayList<>();
+            if (Objects.nonNull(map.get("stepName"))) {
+                String stepNameStringList = map.get("stepName");
+                stepNameStringList = stepNameStringList.replaceAll("\\[", "").replaceAll("]", "");
+                String[] stepNameArray = stepNameStringList.split(", ");
+                nowStepNameList = new ArrayList<>(Arrays.asList(stepNameArray));
+            }
+            nowStepNameList.add(xmlBaseModel.getItems().get(0).get("step_name").toString());
+            operationStepsMaps.put("stepName", String.valueOf(nowStepNameList));
+            //机器人步骤状态
+            operationStepsMaps.put("robotStepStatus", xmlBaseModel.getItems().get(0).get("robot_step_status").toString());
+            //操作进度
+            operationStepsMaps.put("process", xmlBaseModel.getItems().get(0).get("process").toString());
+            //机器人确认消息入redis
+            redisTemplate.opsForHash().putAll("RobotOperationSteps:" + robotCode + ":" + taskId, operationStepsMaps);
+        } catch (Exception e) {
+            log.error("机器人步骤消息错误！", e);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateConfirmMsgForRedis(XMLBaseModel xmlBaseModel) throws Exception{
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+        Map<String, Object> jasonMaps = new HashMap<>();
+        String robotCode = xmlBaseModel.getSendCode();
+        String taskId = xmlBaseModel.getItems().get(0).get("task_code").toString();
+        jasonMaps.put("type", "confirmMsg");
+        jasonMaps.put("robotCode", robotCode);
+        jasonMaps.put("taskPatrolledId", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
+        jasonMaps.put("taskId", taskId);
+        //当前操作测点id
+        String deviceId = xmlBaseModel.getItems().get(0).get("device_id").toString();
+        jasonMaps.put("deviceId", deviceId);
+        //点位类型名称
+        jasonMaps.put("deviceTypeName", tRobotInfoDao.selectDeviceTypeName(deviceId));
+        jasonMaps.put("content", xmlBaseModel.getItems().get(0).get("content"));
+        String confirmPath = filePathMap.get("content") + "/" + xmlBaseModel.getItems().get(0).get("file_path").toString();
+        String originalPath = "";
+        if (xmlBaseModel.getItems().get(0).containsKey("original_file_path")){
+            originalPath = filePathMap.get("content") + "/" + xmlBaseModel.getItems().get(0).get("original_file_path").toString();
+        }
+        log.info("确认图片路径为：" + confirmPath);
+        log.info("确认原始图片路径为：" + originalPath);
+        String developMap = absoluteImgMap.get("content") + "/CFM";
+        /*
+         * 将ftp图copy到开发环境
+         * */
+        String splitArray[] = confirmPath.split("/");
+        String fileName = splitArray[splitArray.length - 1];
+        copyFileToDevelop(confirmPath, developMap);
+        String confirmUrl = relativeImgMap.get("content") + "/CFM/" + fileName;
+        String originalFileUrl = "";
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(originalPath)){
+            String splitArrayOriginalPath[] = originalPath.split("/");
+            String originalPathName = splitArrayOriginalPath[splitArrayOriginalPath.length - 1];
+            copyFileToDevelop(originalPath, developMap);
+            originalFileUrl = relativeImgMap.get("content") + "/CFM/" + originalPathName;
+        }
+        //待确认图片
+        jasonMaps.put("confirmUrl", confirmUrl);
+        //原始图片
+        jasonMaps.put("originalFileUrl", originalFileUrl);
+        List<Map<String, Object>> confirmMapList = new ArrayList<>();
+        confirmMapList = xmlBaseModel.getItems().stream().filter(res -> !res.get("type").equals("0")).collect(Collectors.toList());
+
+        //操作选项拆分
+        List<Map<String, Object>> splitConfirmMapList = new ArrayList<>();
+        confirmMapList.forEach(map -> {
+            if (map.get("type").equals("7")){
+                splitConfirmMapList.add(map);
+            }
+        });
+        if (splitConfirmMapList.size() > 0){
+            confirmMapList.forEach(map -> {
+                if (map.get("type").equals("2")){
+                    splitConfirmMapList.add(map);
+                }
+            });
+            confirmMapList = confirmMapList.stream().filter(res -> !res.get("type").equals("7")).collect(Collectors.toList());
+            confirmMapList = confirmMapList.stream().filter(res -> !res.get("type").equals("2")).collect(Collectors.toList());
+        }
+        jasonMaps.put("splitConfirmMapList", JSONArray.toJSONString(splitConfirmMapList));
+        //转json字符串
+        jasonMaps.put("confirmMapList", JSONArray.toJSONString(confirmMapList));
+        //判定新的确认消息
+        jasonMaps.put("newMessage","true");
+        //机器人确认消息入redis
+        redisTemplate.opsForHash().putAll("RobotConfirmMsg:" + robotCode + ":" + taskId, jasonMaps);
+        //发给前端
+        jasonMaps.put("confirmMapList", confirmMapList);
+        //webSocket通知前端确认消息
+        String jsons = JSON.toJSONString(jasonMaps);
+        log.info("确认消息生成-前端推送：" + jsons);
+        Constant.postUrl(websocketUrl, jsons);
+    }
+
     /**
      * 机器人巡检点告警及分析机器人巡检点结果后的告警
      * @param warnInfo 告警信息
@@ -1907,6 +2458,8 @@ public class RobotService {
         return uuidStr;
     }
 
-
+    public void updateTCruiseTask(Map<String, Object> taskMap) {
+        tRobotInfoDao.updateTCruiseTask(taskMap);
+    }
 }
 

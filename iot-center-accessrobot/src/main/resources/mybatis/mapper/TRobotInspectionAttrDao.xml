@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TRobotInspectionAttrDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TRobotInspectionAttr">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
+        <result column="inspection_code" jdbcType="VARCHAR" property="inspectionCode" />
+        <result column="x" jdbcType="INTEGER" property="x" />
+        <result column="y" jdbcType="INTEGER" property="y" />
+        <result column="width" jdbcType="INTEGER" property="width" />
+        <result column="height" jdbcType="INTEGER" property="height" />
+    </resultMap>
+
+
+    <insert id="batchInsertTRobotInspectionAttr">
+        insert into t_robot_inspection_attr(
+        id,
+        robot_id,
+        inspection_code,
+        x,
+        y,
+        width,
+        height
+        )values
+        <foreach collection="list" item="TRobotInspectionAttr" separator=",">
+            (
+            #{TRobotInspectionAttr.id, jdbcType=BIGINT},
+            #{TRobotInspectionAttr.robotId, jdbcType=BIGINT},
+            #{TRobotInspectionAttr.inspectionCode, jdbcType=VARCHAR},
+            #{TRobotInspectionAttr.x, jdbcType=INTEGER},
+            #{TRobotInspectionAttr.y, jdbcType=INTEGER},
+            #{TRobotInspectionAttr.width, jdbcType=INTEGER},
+            #{TRobotInspectionAttr.height, jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+    <delete id="deleteByRobotId"  parameterType="java.lang.Long">
+        delete from t_robot_inspection_attr
+                where robot_id = #{robotId, jdbcType=BIGINT}
+    </delete>
+    <select id="selectByInspectionCode" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspectionAttr">
+        SELECT
+        a.id,
+        a.robot_id,
+        a.inspection_code,
+        a.x,
+        a.y,
+        a.width,
+        a.height
+        FROM
+        t_robot_inspection_attr a
+        where 1 = 1
+        <if test="inspectionCode != null and inspectionCode != ''">
+            and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}
+        </if>
+    </select>
+</mapper>

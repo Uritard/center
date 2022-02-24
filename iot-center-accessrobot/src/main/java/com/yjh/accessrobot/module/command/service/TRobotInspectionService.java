@@ -48,13 +48,12 @@ public class TRobotInspectionService {
 
     //@Logs(title = "查询", code = "module")
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInspection> select(Long inspectionId, String inspectionCode ,Long robotId, String inspectionName,
-                                         String componentId,Integer meterType,Integer appearanceType,String saveTypeList,
-                                         String recognitionTypeList,String phase,String deviceInfo) {
-        List<TRobotInspection> tRobotInspectionList = tRobotInspectionDao.select(inspectionId, inspectionCode, robotId, inspectionName,
-                componentId,meterType,appearanceType,saveTypeList,
-                recognitionTypeList,phase,deviceInfo);
-        return tRobotInspectionList;
+    public List<TRobotInspection> select(Long inspectionId, String inspectionCode, Long robotId, String inspectionName, Integer inspectionType,
+                                         String componentId, Integer meterType, Integer appearanceType, Integer mainOperationType,
+                                         Integer operationType, String saveTypeList, String recognitionTypeList, String phase, String deviceInfo) {
+        return tRobotInspectionDao.select(inspectionId, inspectionCode, robotId, inspectionName,inspectionType,
+                componentId, meterType, appearanceType, mainOperationType, operationType, saveTypeList,
+                recognitionTypeList, phase, deviceInfo);
     }
 
     //@Logs(title = "分页查询", code = "module")

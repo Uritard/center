@@ -517,6 +517,8 @@
         modify_num,
         pic_path_anl,
         picpath,
+        confirm_pic_path,
+        orig_confirm_pic_path,
         person_check,
         orig_pic_anl,
         origpic,
@@ -546,6 +548,8 @@
             #{TCruiseDataResult.modifyNum, jdbcType=VARCHAR},
             #{TCruiseDataResult.picPathAnl, jdbcType=VARCHAR},
             #{TCruiseDataResult.picpath, jdbcType=VARCHAR},
+            #{TCruiseDataResult.confirmPicPath, jdbcType=VARCHAR},
+            #{TCruiseDataResult.origConfirmPicPath, jdbcType=VARCHAR},
             #{TCruiseDataResult.personCheck, jdbcType=VARCHAR},
             #{TCruiseDataResult.origPicAnl, jdbcType=VARCHAR},
             #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
@@ -717,12 +721,14 @@
         where device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
     <select id="selectTSRegionForStation" resultType="com.yjh.accessrobot.module.command.entity.TStdRegion">
-        select
-        *
-        from
-        t_std_region a
-        where
-        a.up_region_id = -1
+        SELECT
+	    a.region_id,
+	    a.region_name
+        FROM
+	    t_std_region a
+        LEFT JOIN t_robot_info b ON b.up_region_id = a.region_id
+        WHERE
+	    b.robot_id = #{robotId, jdbcType=BIGINT}
     </select>
     <insert id="batchInsertInstance" useGeneratedKeys="true" keyProperty="instanceId">
         insert into t_cruise_point_instance(
@@ -1004,6 +1010,36 @@
         <if test="robotId != null and robotId != ''">and a.robot_id = #{robotId,jdbcType=BIGINT}</if>
         and b.c_state = 239
     </select>
+    <select id="selectCameraUrlByDeviceId" resultType="java.lang.String">
+        SELECT
+	        CONCAT('webrtc://', e.robot_ip, d.remark, '?eip=', e.robot_ip) AS cameraUrl
+        FROM
+	        t_robot_inspection a
+        LEFT JOIN t_dict_business b ON a.operation_type = b.dict_code AND b.col_name = `operation_type`
+        LEFT JOIN t_point_type_attr c ON c.id = a.operation_type
+        LEFT JOIN t_robot_camera_rule d ON d.rule_id = c.rule_id
+        LEFT JOIN t_robot_info e ON e.robot_id = a.robot_id
+        WHERE a.inspection_code = #{deviceId, jdbcType=VARCHAR};
+    </select>
+    <select id="selectDeviceTypeName" resultType="java.lang.String">
+        SELECT
+	    (CASE
+        WHEN a.main_operation_type = 457 THEN '旋钮'
+        WHEN a.main_operation_type = 458 THEN '按钮'
+        WHEN a.main_operation_type = 459 THEN '手车'
+        WHEN a.main_operation_type = 460 THEN '地刀'
+        WHEN a.main_operation_type = 461 THEN '紧急分合闸'
+        WHEN a.main_operation_type = 462 THEN '手车验电'
+        WHEN a.main_operation_type = 463 THEN '机械位判断'
+        WHEN a.main_operation_type = 464 THEN '压板'
+        ELSE '其他'
+        END
+        ) AS deviceTypeName
+        FROM
+	    t_robot_inspection a
+    WHERE
+	    a.inspection_code = #{deviceId, jdbcType=VARCHAR}
+    </select>
     <update id="updateStandTaskStatus">
         UPDATE t_cruise_result a <set>
         a.c_state = #{state,jdbcType=INTEGER}
@@ -1011,6 +1047,7 @@
         WHERE
         a.task_id = #{taskId,jdbcType=VARCHAR}
     </update>
+<<<<<<< HEAD
 
     <insert id="insertEnv" parameterType="Map">
         insert into
@@ -1058,5 +1095,14 @@
             t_robot_info a
             WHERE 1=1 and a.robot_code = #{robotCode} )
     </select>
+
+    <update id="updateTCruiseTask">
+        UPDATE t_cruise_task a
+        <set>
+        a.end_time = #{endTime, jdbcType=TIMESTAMP}
+        </set>
+        WHERE
+        a.task_id = #{taskId, jdbcType=VARCHAR}
+    </update>
 
 </mapper>

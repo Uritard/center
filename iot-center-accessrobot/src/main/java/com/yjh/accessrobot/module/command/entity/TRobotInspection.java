@@ -36,6 +36,10 @@ public class TRobotInspection implements Serializable {
     @TableField(value = "inspection_code",updateStrategy = FieldStrategy.IGNORED)
     private String inspectionCode;
 
+    @TableField(value = "inspection_type",updateStrategy = FieldStrategy.IGNORED)
+    @ApiModelProperty(value = "测点类型, 1.巡检点 2.操作点")
+    private Integer inspectionType;
+
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "机器人ID")
     @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
@@ -53,6 +57,10 @@ public class TRobotInspection implements Serializable {
     private Integer meterType;
     @ApiModelProperty(value = "外观类型")
     private Integer appearanceType;
+    @ApiModelProperty(value = "主操作类型")
+    private Integer mainOperationType;
+    @ApiModelProperty(value = "操作类型")
+    private Integer operationType;
     @ApiModelProperty(value = "采集/保存文件类型列表")
     @TableField(value = "save_type_list",updateStrategy = FieldStrategy.IGNORED)
     private String saveTypeList;
@@ -65,6 +73,9 @@ public class TRobotInspection implements Serializable {
     @ApiModelProperty(value = "备注信息")
     @TableField(value = "device_info",updateStrategy = FieldStrategy.IGNORED)
     private String deviceInfo;
+    @ApiModelProperty(value = "属性图")
+    @TableField(value = "property_pic_path",updateStrategy = FieldStrategy.IGNORED)
+    private String propertyPicPath;
 
     private Integer pageNum = 1;
 

@@ -14,6 +14,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -31,6 +32,7 @@ import java.util.Enumeration;
 @ComponentScan(nameGenerator = AnnotationBeanNameGenerator.class,basePackages = "com.yjh")
 @EnableFeignClients
 @Slf4j
+@EnableScheduling
 public class AccessRobotApplication implements CommandLineRunner {
 
     @Value("${netty.server.port}")

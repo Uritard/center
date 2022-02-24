@@ -232,6 +232,12 @@ public class InspectionResultThread implements Runnable{
                 if (cruiseResultMap.containsKey("absolutePath")){
                     tCruiseTaskResultMap.put("origpic", cruiseResultMap.get("absolutePath"));
                 }
+                if(cruiseResultMap.containsKey("confirmRelativePath")){
+                    tCruiseTaskResultMap.put("confirmPicPath", cruiseResultMap.get("confirmRelativePath"));
+                }
+                if (cruiseResultMap.containsKey("confirmAbsolutePath")){
+                    tCruiseTaskResultMap.put("origConfirmPicPath", cruiseResultMap.get("confirmAbsolutePath"));
+                }
                 tCruiseTaskResultMap.put("evaluationState", "257");
                 tCruiseTaskResultMap.put("createtime", cruiseResultMap.get("time"));
                 tCruiseTaskResultMap.put("isWarn", "0");
@@ -359,6 +365,8 @@ public class InspectionResultThread implements Runnable{
                         //待完善.setPicPathAnl(redisInfoMap.get("picPathAnl"))
                         .setOrigpic(redisInfoMap.get("origpic"))
                         //待完善.setOrigPicAnl(redisInfoMap.get("origPicAnl"))
+                        .setConfirmPicPath(redisInfoMap.get("confirmPicPath"))
+                        .setOrigConfirmPicPath(redisInfoMap.get("origConfirmPicPath"))
                         .setEvaluationState(257)
                         .setCreatetime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
                         .setIsWarn(0)

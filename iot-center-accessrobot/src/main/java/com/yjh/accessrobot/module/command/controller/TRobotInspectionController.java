@@ -105,17 +105,20 @@ public class TRobotInspectionController {
                          @RequestParam(value = "inspectionCode", required = false)String inspectionCode,
                          @RequestParam(value = "robotId", required = false) Long robotId,
                          @RequestParam(value = "inspectionName", required = false) String inspectionName,
+                         @RequestParam(value = "inspectionType", required = false) Integer inspectionType,
                          @RequestParam(value = "componentId", required = false) String componentId,
                          @RequestParam(value = "meterType", required = false) Integer meterType,
                          @RequestParam(value = "appearanceType", required = false) Integer appearanceType,
+                         @RequestParam(value = "mainOperationType", required = false) Integer mainOperationType,
+                         @RequestParam(value = "operationType", required = false) Integer operationType,
                          @RequestParam(value = "saveTypeList", required = false) String saveTypeList,
                          @RequestParam(value = "recognitionTypeList", required = false) String recognitionTypeList,
                          @RequestParam(value = "phase", required = false) String phase,
                          @RequestParam(value = "deviceInfo", required = false) String deviceInfo) {
         Result result = new Result();
         try {
-            List<TRobotInspection> list = tRobotInspectionService.select(inspectionId, inspectionCode, robotId, inspectionName,
-                    componentId,meterType,appearanceType,saveTypeList,
+            List<TRobotInspection> list = tRobotInspectionService.select(inspectionId, inspectionCode, robotId, inspectionName,inspectionType,
+                    componentId,meterType,appearanceType, mainOperationType, operationType,saveTypeList,
                     recognitionTypeList,phase,deviceInfo);
             result.setData(list);
         } catch (Exception e) {

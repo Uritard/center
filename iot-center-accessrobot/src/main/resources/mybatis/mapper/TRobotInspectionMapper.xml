@@ -22,25 +22,33 @@
             inspection_code,
             robot_id,
             inspection_name,
+            inspection_type,
             component_id,
             meter_type,
             appearance_type,
+            main_operation_type,
+            operation_type,
             save_type_list,
             recognition_type_list,
             phase,
-            device_info
+            device_info,
+            property_pic_path
         )values(
                 #{inspectionId, jdbcType=BIGINT},
                 #{inspectionCode, jdbcType=VARCHAR},
                 #{robotId, jdbcType=BIGINT},
                 #{inspectionName, jdbcType=VARCHAR},
+                #{inspectionType, jdbcType=INTEGER},
                 #{componentId, jdbcType=VARCHAR},
                 #{meterType, jdbcType=INTEGER},
                 #{appearanceType, jdbcType=INTEGER},
+                #{mainOperationType, jdbcType=INTEGER},
+                #{operationType, jdbcType=INTEGER},
                 #{saveTypeList, jdbcType=VARCHAR},
                 #{recognitionTypeList, jdbcType=VARCHAR},
                 #{phase, jdbcType=VARCHAR},
-                #{deviceInfo, jdbcType=VARCHAR}
+                #{deviceInfo, jdbcType=VARCHAR},
+                #{propertyPicPath, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -54,13 +62,17 @@
         <if test="inspectionCode != null "> a.inspection_code = #{inspectionCode},</if>
         <if test="robotId != null ">a.robot_id = #{robotId},</if>
         <if test="inspectionName != null ">a.inspection_name = #{inspectionName},</if>
+        <if test="inspectionType != null ">a.inspection_type = #{inspectionType},</if>
         <if test="componentId != null ">a.component_id = #{componentId},</if>
         <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
         <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
+        <if test="mainOperationType != null ">a.main_operation_type = #{mainOperationType, jdbcType=INTEGER},</if>
+        <if test="operationType != null ">a.operation_type = #{operationType, jdbcType=INTEGER},</if>
         <if test="saveTypeList != null ">a.save_type_list = #{saveTypeList},</if>
         <if test="recognitionTypeList != null ">a.recognition_type_list = #{recognitionTypeList},</if>
         <if test="phase != null ">a.phase = #{phase},</if>
         <if test="deviceInfo != null ">a.device_info = #{deviceInfo},</if>
+        <if test="propertyPicPath != null ">a.property_pic_path = #{propertyPicPath},</if>
 
     </set>
         where a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}
@@ -72,13 +84,17 @@
             a.inspection_code,
             a.robot_id,
             a.inspection_name,
+            a.inspection_type,
             a.component_id,
             a.meter_type,
             a.appearance_type,
+            a.main_operation_type,
+            a.operation_type,
             a.save_type_list,
             a.recognition_type_list,
             a.phase,
-            a.device_info
+            a.device_info,
+            property_pic_path
         from t_robot_inspection a
         where 1 = 1
             and a.inspection_id = #{inspectionId, jdbcType=BIGINT}
@@ -91,26 +107,34 @@
         a.inspection_code,
         a.robot_id,
         a.inspection_name,
+        a.inspection_type,
         a.component_id,
         a.meter_type,
         a.appearance_type,
+        a.main_operation_type,
+        a.operation_type,
         a.save_type_list,
         a.recognition_type_list,
         a.phase,
-        a.device_info
+        a.device_info,
+        property_pic_path
         from t_robot_inspection a
         where 1 = 1
         <if test="inspectionId != null and inspectionId != ''"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
         <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="inspectionName != null and inspectionName != ''"> and a.inspection_name = #{inspectionName, jdbcType=VARCHAR}</if>
-        <if test="componentId != null and componentId != ''">a.component_id = #{componentId, jdbcType=VARCHAR},</if>
-        <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=Integer},</if>
-        <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=Integer},</if>
-        <if test="saveTypeList != null and saveTypeList != ''">a.save_type_list = #{saveTypeList, jdbcType=VARCHAR},</if>
-        <if test="recognitionTypeList != null and recognitionTypeList != ''">a.recognition_type_list = #{recognitionTypeList, jdbcType=VARCHAR},</if>
-        <if test="phase != null and phase != ''">a.phase = #{phase, jdbcType=VARCHAR},</if>
-        <if test="deviceInfo != null and deviceInfo != ''">a.device_info = #{deviceInfo, jdbcType=VARCHAR},</if>
+        <if test="inspectionType != null and inspectionType != ''"> and a.inspection_type = #{inspectionType, jdbcType=INTEGER}</if>
+        <if test="componentId != null and componentId != ''">and a.component_id = #{componentId, jdbcType=VARCHAR}</if>
+        <if test="meterType != null ">and a.meter_type = #{meterType, jdbcType=Integer}</if>
+        <if test="appearanceType != null ">and a.appearance_type = #{appearanceType, jdbcType=Integer}</if>
+        <if test="mainOperationType != null ">and a.main_operation_type = #{mainOperationType, jdbcType=Integer}</if>
+        <if test="operationType != null ">and a.operation_type = #{operationType, jdbcType=Integer}</if>
+        <if test="saveTypeList != null and saveTypeList != ''">and a.save_type_list = #{saveTypeList, jdbcType=VARCHAR}</if>
+        <if test="recognitionTypeList != null and recognitionTypeList != ''">a.recognition_type_list = #{recognitionTypeList, jdbcType=VARCHAR}</if>
+        <if test="phase != null and phase != ''">and a.phase = #{phase, jdbcType=VARCHAR}</if>
+        <if test="deviceInfo != null and deviceInfo != ''">and a.device_info = #{deviceInfo, jdbcType=VARCHAR}</if>
+        <if test="propertyPicPath != null and propertyPicPath != ''">and a.property_pic_path = #{propertyPicPath, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
@@ -216,13 +240,17 @@
         inspection_code,
         robot_id,
         inspection_name,
+        inspection_type,
         component_id,
         meter_type,
         appearance_type,
+        main_operation_type,
+        operation_type,
         save_type_list,
         recognition_type_list,
         phase,
-        device_info
+        device_info,
+        property_pic_path
         )values
         <foreach collection="list" item="TRobotInspection" separator=",">
             (
@@ -230,20 +258,25 @@
             #{TRobotInspection.inspectionCode, jdbcType=VARCHAR},
             #{TRobotInspection.robotId, jdbcType=BIGINT},
             #{TRobotInspection.inspectionName, jdbcType=VARCHAR},
+            #{TRobotInspection.inspectionType, jdbcType=INTEGER},
             #{TRobotInspection.componentId, jdbcType=VARCHAR},
             #{TRobotInspection.meterType, jdbcType=INTEGER},
             #{TRobotInspection.appearanceType, jdbcType=INTEGER},
+            #{TRobotInspection.mainOperationType, jdbcType=INTEGER},
+            #{TRobotInspection.operationType, jdbcType=INTEGER},
             #{TRobotInspection.saveTypeList, jdbcType=VARCHAR},
             #{TRobotInspection.recognitionTypeList, jdbcType=VARCHAR},
             #{TRobotInspection.phase, jdbcType=VARCHAR},
-            #{TRobotInspection.deviceInfo, jdbcType=VARCHAR}
+            #{TRobotInspection.deviceInfo, jdbcType=VARCHAR},
+            #{TRobotInspection.propertyPicPath, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
     <select id="selectInspection" parameterType="java.lang.String" resultType="java.util.Map">
         SELECT
             a.inspection_id,
-            a.inspection_name
+            a.inspection_name,
+            a.property_pic_path
         FROM
             t_robot_inspection a
         WHERE 1 = 1

@@ -63,6 +63,11 @@ public class TCruiseDataResult implements Serializable {
     @ApiModelProperty(value = "巡检分析图片")
     private String picpath;
 
+    @ApiModelProperty(value = "操作前结果图片,相对")
+    private String confirmPicPath;
+    @ApiModelProperty(value = "操作前结果图片,绝对")
+    private String origConfirmPicPath;
+
     @Length(min=1,max = 256,message = "personCheck长度必须在{min}-{max}之间")
     @ApiModelProperty(value = "人工校核结果")
     private String personCheck;
@@ -119,7 +124,5 @@ public class TCruiseDataResult implements Serializable {
     private String firName;
     @ApiModelProperty(value = "红外FIR文件生成时间")
     private String firDate;
-
-
 
 }

@@ -21,6 +21,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.SAXReader;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.HashMap;
@@ -440,6 +441,8 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             }else {
                 log.error("robotCode:{},通道为空,发送指令失败", robotCode);
             }
+            robotRegisterCounts.remove(robotCode);
+            robotRemoveCounts.remove(robotCode);
         }
     }
 }

@@ -3,9 +3,13 @@ package com.yjh.accessrobot.netty.server;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author tt
@@ -30,6 +34,9 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
         // netty自带心跳检测
         /*channel.pipeline().addLast(new IdleStateHandler(30,0,0, TimeUnit.SECONDS));*/
         channel.pipeline().addLast(robotServerHandler);
+        //添加心跳检查包
+        ChannelPipeline pipeline = channel.pipeline();
+        pipeline.addLast(new IdleStateHandler(5,0,0, TimeUnit.SECONDS));
     }
 
     @Override

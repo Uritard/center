@@ -197,7 +197,7 @@ public interface TRobotInfoDao {
      * 查询站所信息
      * @return TStdRegion
      */
-    TStdRegion selectTSRegionForStation();
+    TStdRegion selectTSRegionForStation(@Param(value = "robotId") Long robotId);
     /**
      * 批量插入巡视点
      * @param list 巡视点id集
@@ -285,4 +285,11 @@ public interface TRobotInfoDao {
      * @date 2022
      */
     String selectRegionIdByrobotId(@Param(value = "robotCode")String robotCode);
+
+    int updateTCruiseTask(Map<String, Object> taskMap);
+
+    List<String> selectCameraUrlByDeviceId(@Param(value = "deviceId") String deviceId);
+
+    String selectDeviceTypeName(@Param(value = "deviceId") String deviceId);
+
 }

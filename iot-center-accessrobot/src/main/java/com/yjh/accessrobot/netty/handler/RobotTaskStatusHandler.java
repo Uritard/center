@@ -59,7 +59,8 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         taskStatusMap.put("taskName",taskName );
         String taskId = xmlBaseModel.getItems().get(0).get("task_code").toString();
         taskStatusMap.put("taskCode", taskId);
-        taskStatusMap.put("taskState", xmlBaseModel.getItems().get(0).get("task_state").toString());
+        String taskState = xmlBaseModel.getItems().get(0).get("task_state").toString();
+        taskStatusMap.put("taskState", taskState);
         taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time"));
         String startTime = xmlBaseModel.getItems().get(0).get("start_time").toString();
         taskStatusMap.put("startTime", DateTimeUtil.format(DateTimeUtil.parse(startTime)));
@@ -99,8 +100,16 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         RobotServerHandler.send(taskStatusProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
 
+        //任务已执行和任务终止 更新任务结束时间
+        if ("1".equals(taskState) || "4".equals(taskState)){
+            Map<String, Object> taskMap = new HashMap<>();
+            taskMap.put("taskId", taskId);
+            taskMap.put("endTime", new Date());
+            StaticContextAccessor.getBean(RobotService.class).updateTCruiseTask(taskMap);
+        }
+
         // 任务根本没做或者没有完成,但是上报任务状态信息进度为100%(E机器人出现过,里面有很多重复代码,未优化)
-        if (Objects.equals("1",taskStatusMap.get("task_state").toString())) {
+        if (Objects.equals("1",taskState)) {
 
             // 统计机器人返回任务结果的大小
             List<String> resultList = new ArrayList<>();
@@ -154,7 +163,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
 
         List<Long> instanceIdList = Constant.flagMap.get(taskId);
         log.info("已经做过的巡视点====" + instanceIdList);
-        if (!instanceIdList.isEmpty()){
+        if (CollectionUtils.isNotEmpty(instanceIdList)){
             for (Long instanceId : instanceIdList){
                 allInstanceIdList.remove(instanceId.toString());
             }
@@ -318,7 +327,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
 
         List<Long> instanceIdList = Constant.flagMap.get(taskId);
         log.info("已经做过的巡视点====" + instanceIdList);
-        if (!instanceIdList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(instanceIdList)) {
             for (Long instanceId : instanceIdList) {
                 allInstanceIdList.remove(instanceId.toString());
             }

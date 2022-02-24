@@ -124,6 +124,23 @@ public class RobotController {
         }
         return result;
     }
+
+    @ApiOperation(value = "发送确认消息指令接口")
+    @RequestMapping(value = "/sendConfirmMsg", method = RequestMethod.POST)
+    @Logs(title = "确认消息",content = "根据用户传递的参数给机器人发送确认消息指令",logType = 5)
+    public Result sendConfirmMsg(@RequestBody Map<String,Object> confirmMessageMap) {
+        Result result = new Result();
+        try {
+            result.setData(robotService.sendConfirmMsg(confirmMessageMap));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("发送确认消息接口调用错误:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "站端命令下发")
     @PostMapping(value = "/upSystemCommand")
     @Logs(title = "站端命令下发",content = "根据用户传递的参数控制机器人",logType = 5)

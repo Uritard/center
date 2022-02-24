@@ -34,7 +34,14 @@ public enum HandlerEnum {
     // 机器人设备测点告警数据
     ROBOT_INSPECTION_WARN("62","robotInspectionWarn"),
     //环境数据异常告警数据
-    ENV_WARN("22","envWarn");
+    ENV_WARN("22","envWarn"),
+    //机器操作结果
+    OPERATION_RESULT("64","OperationResult"),
+    //机器人确认消息
+    ROBOT_CONFIRM_MSG("81","robotConfirmMsg"),
+    //操作步骤消息
+    OPERATION_STEPS("82","robotOperationSteps");
+
     /**
      * 状态值
      */

@@ -22,6 +22,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,7 +49,7 @@ public class Constant {
     /**
      * 机器人收不到心跳次数
      */
-    public static Map<String, Integer> robotRemoveCounts = new HashMap<>();
+    public static Map<String, Integer> robotRemoveCounts = new ConcurrentHashMap<>();
     /**
      * 心跳线程存活标识
      */
@@ -91,6 +92,26 @@ public class Constant {
         re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
         return re;
     }
+
+    //添加操作任务模型入口
+    public static final String PLAN_URL="http://iot-center-platform/tCruisePlan/v1/add";
+    //查询操作任务模型入口
+    public static final String GET_PLAN_LIST = "http://iot-center-platform/tCruisePlan/v1/selectByRobotId?robotId={robotId}";
+    //删除
+    public static final String DELETE_PLAN_LIST = "http://iot-center-platform/tCruisePlan/v1/deleteByPlanCode?planCode={planCode}";
+
+    public static Result restTemplatePost(String url, Map<String, Object> map) {
+        return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+    }
+
+    public static Result restTemplateGet(String url, Map<String, Object> params) {
+        return StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class, params);
+    }
+
+    public static void restTemplateDelete(String url, Map<String, Object> params) {
+        StaticContextAccessor.getBean(ServiceRestTemplate.class).delete(url, params);
+    }
+
     //请求webSocket发送方法
     public static String postUrl(String url, String json) throws IOException, URISyntaxException {
         System.out.println("webSocketUrl="+url+",json="+json);

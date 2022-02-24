@@ -41,16 +41,18 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                     default: break;
                 }
             }
-        } else if (xmlBaseModel.getItems().get(0).size() == 2) {
+        } else if (xmlBaseModel.getItems().get(0).size() >= 2) {
             log.info("机器人收到模型指令了,这是机器人的响应");
             // model file sync
             String deviceFile = xmlBaseModel.getItems().get(0).get("device_file_path").toString();
             String robotFile = xmlBaseModel.getItems().get(0).get("robot_file_path").toString();
-            log.info("模型同步的文件路径信息,deviceFile:{},robotFile:{}", deviceFile, robotFile);
+            String propertyFile = xmlBaseModel.getItems().get(0).get("property_file_path").toString();
+            log.info("模型同步的文件路径信息,deviceFile:{},robotFile:{},propertyFile:{}", deviceFile, robotFile, propertyFile);
             if (StringUtils.isNotEmpty(deviceFile) && StringUtils.isNotEmpty(robotFile)) {
                 Map<String, String> map = new HashMap<>(5);
                 map.put("robotFile", robotFile);
                 map.put("deviceFile", deviceFile);
+                map.put("propertyFile", propertyFile);
                 map.put("robotCode", xmlBaseModel.getSendCode());
                 robotService.addRobotFile(map);
             }

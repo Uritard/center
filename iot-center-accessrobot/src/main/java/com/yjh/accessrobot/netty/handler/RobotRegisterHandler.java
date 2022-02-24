@@ -8,7 +8,6 @@ import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
-import com.yjh.accessrobot.netty.thread.HeartBeatThread;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -103,11 +102,11 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
         byte[] registerProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, registerXmlString);
         RobotServerHandler.send(registerProtocol, robotCode);
 
-        // Start heatBreakDealThread
-        HeartBeatThread dataDealThread = new HeartBeatThread(robotServerHandler, robotCode, redisTemplate, heartBeatInterval);
-        Thread thread = new Thread(dataDealThread);
-        thread.setDaemon(true);
-        thread.start();
+//        // Start heatBreakDealThread
+//        HeartBeatThread dataDealThread = new HeartBeatThread(robotServerHandler, robotCode, redisTemplate, heartBeatInterval);
+//        Thread thread = new Thread(dataDealThread);
+//        thread.setDaemon(true);
+//        thread.start();
 
         // Check whether there are unfinished tasks on the inspection host
         try{
