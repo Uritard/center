@@ -543,4 +543,23 @@
         where 1 = 1
         <if test="warnId != null "> and defect_id = #{warnId, jdbcType=BIGINT}</if>
     </select>
+
+    <select id="selectDeviceWarnInfo" resultType="com.yjh.platform.module.task.entity.WarnInforForHomePages">
+          SELECT
+            a.warn_id,
+            a.warn_time AS  warnTime,
+            a.conf_mode  AS  confMode,
+            b.dict_note AS  warnLevel,
+            c.device_name AS deviceName,
+            c.up_region_name AS regionName
+            from t_warn_info  a
+            LEFT JOIN
+            t_dict_business b ON a.warn_level = b.dict_code
+            LEFT JOIN
+            t_std_device c ON c.device_id = a.device_id
+            WHERE 1=1
+            and a.warn_type !='507' or a.warn_type  is null
+            and a.conf_mode = #{state}
+            order by warnTime desc LIMIT 20
+    </select>
 </mapper>

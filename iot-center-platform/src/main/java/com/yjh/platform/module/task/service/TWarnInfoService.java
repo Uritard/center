@@ -488,5 +488,9 @@ public class TWarnInfoService{
             return keys;
         });
     }
+
+    public List<HashMap<String,String>> selectOperationWarn(List<Long> deviceIdList, String startTime, String endTime) {
+       return tWarnInfoDao.selectOperationWarn(deviceIdList,startTime,endTime);
+    }
 }
 

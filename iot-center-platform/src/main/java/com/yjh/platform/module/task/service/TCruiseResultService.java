@@ -2,11 +2,14 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.yjh.platform.common.Constant;
 
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.IPage;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
@@ -386,5 +389,21 @@ public class TCruiseResultService{
         log.info("自动生成巡视报告的路径是=="+reportFilePath);
         return result + list.size();
     }
+
+        /**
+        * 操作任务记录查询
+        */
+
+    public List<OperationTaskRecord> QueryOperationTask(List<Long> deviceIdList , String operationType, String startTime, String endTime) {
+        return tCruiseResultDao.QueryOperationTask(deviceIdList ,operationType,startTime,endTime);
+    }
+
+    /**
+    * 查询操作任务详情
+    */
+    public List<OperationTaskRecordResult> QueryOperationResult(String taskId) {
+        return tCruiseResultDao.QueryOperationResult(taskId);
+    }
+
 }
 

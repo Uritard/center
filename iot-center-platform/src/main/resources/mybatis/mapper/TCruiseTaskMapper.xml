@@ -672,18 +672,20 @@ select *from (
     </select>
 
     <select id="selectTaskOnExecute" resultType="com.yjh.platform.module.task.entity.TaskOnExecuteInfo">
-        SELECT
-            a.task_id,
-            c.task_name,
-            c.start_time,
-            b.dict_note AS cruiseTypeName
-
-        FROM
-            t_cruise_result a, t_dict_business b,t_cruise_task c
-        WHERE
-            a.c_type = b.dict_code and a.task_id = c.task_id and isNull(robot_id)
-			and (a.c_state =239 or a.c_state=241)
-            order by c.start_time desc limit 3
+          SELECT
+                a.task_id,
+                c.task_name,
+                c.start_time,
+                b.dict_note AS cruiseTypeName
+                FROM
+                t_cruise_result a
+                LEFT JOIN  t_dict_business b ON a.c_type = b.dict_code
+                LEFT JOIN  t_cruise_task c ON a.task_id = c.task_id
+                WHERE
+                b.col_name = 'plan_type'
+                and a.c_state IN (239,241)
+                and isNull(robot_id)
+                order by c.start_time desc limit 3
     </select>
 
     <select id="countInstance" resultType="java.lang.Integer">
@@ -694,4 +696,79 @@ select *from (
         WHERE
             task_id = #{taskId,jdbcType = VARCHAR}
     </select>
+
+    <select id="envWarningQuery" resultType="java.util.HashMap">
+        SELECT
+        env.env_warn_id AS envWarnId,
+        env.type AS deviceType,
+        CONCAT(a.dict_note,'告警')  AS alarmContent,
+        env.value As deviceValue,
+        env.unit AS unit,
+        env.value_unit AS valueUnit,
+        env.sn AS deviceId,
+        env.value_type AS valueType,
+        date_format(env.alarm_time,'%Y-%c-%d %h:%i:%s') AS alarmTime,
+        env.device_name AS deviceName
+        FROM
+        t_env_warning env
+        LEFT JOIN t_dict_business a ON env.type = a.dict_code
+        WHERE
+        1=1
+        <if test="deviceId !=null and deviceId != -1">
+            and env.sn = #{deviceId}
+        </if>
+        <if test="deviceName !=null and deviceName !=''">
+            and env.device_name like concat('%',#{deviceName},'%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and env.alarm_time <![CDATA[>=]]> #{startTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and env.alarm_time <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="deviceType != null and deviceType !=-1">
+            and env.type = #{deviceType}
+        </if>
+        ORDER BY env.alarm_time DESC
+    </select>
+
+    <select id="queryStations" resultType="com.yjh.platform.module.task.entity.StationCount">
+       SELECT
+        CASE
+        a.robot_type
+        WHEN 157 THEN
+        'A200'
+        ELSE 'D200' END
+        AS type,
+        COUNT(1) AS count
+        FROM t_robot_info a WHERE 1=1
+        <if test="list!=null and list.size>0">
+            and a.up_region_id IN
+            <foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">
+                #{regionIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        GROUP BY a.robot_type
+        UNION
+        SELECT '视频设备' type,COUNT(1) AS count FROM t_camera_info b WHERE 1=1
+        <if test="list!=null and list.size>0">
+        and b.up_region_id IN
+        <foreach collection="list" item="regionIds" separator="," open="(" close=")" index="index">
+            #{regionIds,jdbcType=BIGINT}
+        </foreach>
+        </if>
+    </select>
+
+    <select id="queryRegion" resultType="com.yjh.platform.module.task.entity.RegionPath">
+        SELECT
+        t.region_name AS regionName,
+        t.region_path AS regionPath
+        FROM t_std_region t
+        WHERE 1=1
+        <if test="regionId!=null and regionId!=''">
+            and t.region_id = #{regionId}
+        </if>
+        and t.region_path IS NOT NULL
+    </select>
+
 </mapper>

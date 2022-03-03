@@ -1,25 +1,28 @@
 package com.yjh.platform.module.task.controller;
 
-import com.alibaba.fastjson.JSON;
+
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.task.entity.RegionPath;
+import com.yjh.platform.module.task.entity.StationCount;
 import com.yjh.platform.module.task.service.HomePageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import net.sf.json.JSONString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import rx.internal.operators.OnSubscribeGroupJoin;
 
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author lqh
@@ -36,6 +39,8 @@ public class HomePageController {
     private HomePageService homePageService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TStdRegionService tStdRegionService;
 
     @ApiOperation(value = "巡视任务数据概览")
     @RequestMapping(value = "/taskInfo", method = RequestMethod.GET)
@@ -224,7 +229,10 @@ public class HomePageController {
 //            }
 //            mapa.put("windDirection",windDirection);
             mapa.put("getTime",simpleDateFormat.format(new Date()));
+            //备注，根据站所id  stationId 存放redis中， stationId 根据机器人编码 从数据库中查询
             redisTemplate.opsForHash().putAll("weatherInfoForLastValue",mapa);
+
+
             Constant.weatherInfo = mapa;
             result.setData(1);
         } catch (BusinessException b) {
@@ -254,6 +262,123 @@ public class HomePageController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("获取天气信息错误:", e);
+        }
+        return result;
+    }
+
+    /**
+     * 查询环境设备告警数据
+     * @date 2022
+     */
+    @ApiOperation(value = "查询环境设备告警数据")
+    @RequestMapping(value = "/queryEnvWarning", method = RequestMethod.POST)
+    public Result envWarningQuery (@RequestBody JSONObject obj){
+        log.info( "查询环境设备告警");
+        Result result = new Result();
+        try{
+            HashMap<String,Object> map = new HashMap<>();
+            Page<Object> page = PageHelper.startPage(obj.getInteger("pageNum"), obj.getInteger("pageSize"));
+            List<HashMap<String, String>> list = homePageService.envWarningQuery(obj);
+            map.put("count", page.getTotal());
+            map.put("list",list);
+            result.setData(map);
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch(Exception e){
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询环境设备告警数据错误:", e);
+        }
+        return result;
+    }
+
+    /**
+     * 查詢微气象数据信息
+     * station  站所id
+     */
+    @ApiOperation(value = "查询微气象数据信息")
+    @RequestMapping(value = "/queryWeatherInfo", method = RequestMethod.POST)
+    public Result queryWeatherInfo(@RequestBody JSONObject object){
+        Long regionId = object.getLong("regionId");
+        Result result = new Result();
+        try {
+            if (regionId!=null){
+//                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+              List weather = (List) redisTemplate.opsForHash().get("Weather", regionId+"");
+              if (weather!=null && weather.size()>0){
+                  result.setData(weather);
+                  result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+              }
+            }
+        }catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询微气象数据信息错误:", e);
+        }
+        return result;
+    }
+
+    /**
+    * 站所概况统计
+    * @date 2022/3/1
+    */
+    @ApiOperation(value = "站所概况统计")
+    @RequestMapping(value = "/queryStations",method = RequestMethod.GET)
+    public Result queryStations(@RequestParam(value = "regionId",required = false)Long regionId){
+        Result result = new Result();
+        try {
+            //查询该regionId的子节点
+            List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
+            StationCount sta = new StationCount();
+            sta.setType("环控设备");
+            //环控数量
+            List weather = (List) redisTemplate.opsForHash().get("Weather", regionId+"");
+
+            if (weather!=null && weather.size()>0){
+                sta.setCount(weather.size()+"");
+            }else {
+                sta.setCount("0");
+            }
+            List<StationCount> list = homePageService.queryStations(regionIdList);
+            list.add(sta);
+            result.setData(list);
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站所概况统计信息错误:", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "站所地图查询")
+    @RequestMapping(value = "/queryRegionPath",method = RequestMethod.GET)
+    public Result queryRegionPath(@RequestParam(value = "regionId",required = false)Long regionId){
+        Result result = new Result();
+        try {
+            RegionPath regionPath = homePageService.queryRegionPath(regionId);
+            result.setData(regionPath);
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站所地图查询错误:", e);
+        }
+       return result;
+    }
+
+
+    /**
+     * 告警内容数据
+     * @date 2022/3/1
+     */
+    @ApiOperation(value = "首页告警统计数据展示")
+    @RequestMapping(value = "/deviceWarnInfo", method = RequestMethod.GET)
+    public Result deviceWarnInfo(@RequestParam(value ="state",required = false,defaultValue = "275")String state) {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.deviceWarnInfo(state));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取告警内容数据错误:", e);
         }
         return result;
     }

@@ -2,27 +2,18 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.service.SystemInfoService;
-import com.yjh.platform.module.task.controller.HomePageController;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TCameraGroupDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
-import io.swagger.models.auth.In;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +21,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -64,6 +52,8 @@ public class HomePageService {
     private TCameraGroupDao tCameraGroupDao;
     @Autowired
     private TCameraScreenDao tCameraScreenDao;
+
+
 
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> taskInfo(Integer date) {
@@ -357,6 +347,42 @@ public class HomePageService {
 
         }
         return re;
+    }
+
+    /**
+     * 环境告警数据查询
+     * @date 2022
+     */
+    public List<HashMap<String, String>>  envWarningQuery(JSONObject jsonObject) {
+        log.info("envWarningQuery开始");
+        List<HashMap<String, String>> map = tCruiseTaskDao.envWarningQuery(jsonObject);
+        Long regionId = null;
+        RegionPath regionPath = queryRegionPath(regionId);
+        map.forEach(maps->{
+            maps.put("regionName",regionPath.getRegionName());
+        });
+        return map;
+    }
+
+
+    /**
+    * 站所状况统计
+    * @date 2022/3/1
+    */
+    public List<StationCount> queryStations(List<Long> regionIdList) {
+        List<StationCount> list = tCruiseTaskDao.queryStations(regionIdList);
+        return list;
+    }
+
+    public RegionPath queryRegionPath(Long regionId){
+       return tCruiseTaskDao.queryRegion(regionId);
+    }
+    /**
+    * 告警统计内容
+    * @date 2022/3/1
+    */
+    public List<WarnInforForHomePages> deviceWarnInfo(String state) {
+       return tDefectInfoDao.selectDeviceWarnInfo(state);
     }
 
 }

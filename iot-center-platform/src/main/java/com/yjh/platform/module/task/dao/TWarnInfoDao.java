@@ -82,4 +82,8 @@ public interface TWarnInfoDao {
     Map<String,String> selectName(@Param(value = "stdMeteId")Long stdMeteId);
     Long selectPresetId(@Param(value = "instanceId")Long instanceId);
     Long selectCameraId(@Param(value = "instanceId")Long instanceId);
+
+    List<HashMap<String,String>> selectOperationWarn(List<Long> deviceIdList,
+                             @Param(value = "startTime")String startTime,
+                             @Param(value = "endTime")String endTime);
 }

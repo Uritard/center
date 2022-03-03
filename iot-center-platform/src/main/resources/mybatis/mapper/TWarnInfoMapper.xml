@@ -919,4 +919,42 @@
         <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
     </select>
 
+    <select id="selectOperationWarn" resultType="java.util.HashMap">
+        SELECT
+            a.warn_id AS warnId,
+            CASE
+            b.type
+            WHEN 456 THEN
+            '操作票操作'
+            WHEN 509 THEN
+            '紧急分合闸操作'
+            ELSE '单设备操作'
+            END AS taskName,
+            a.warn_content AS warnContent,
+            date_format( a.warn_time,'%Y-%c-%d %h:%i:%s') AS warnTime,
+            d.dict_note AS robotType,
+            e.up_region_name AS regionName
+            FROM
+            t_warn_info a
+            LEFT JOIN t_cruise_task b ON b.task_id = a.task_id
+            LEFT JOIN t_robot_info c ON c.robot_id = b.robot_id
+            LEFT JOIN t_dict_business d ON d.dict_code = c.robot_type
+            LEFT JOIN t_std_device e ON e.device_id = a.device_id
+            WHERE 1 = 1
+            and a.warn_type = '507'
+                <if test="startTime != null and startTime != ''">
+                    and a.warn_time <![CDATA[>=]]> #{startTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="endTime != null and endTime != ''">
+                    and  a.warn_time <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
+                </if>
+                <if test="deviceIdList != null and deviceIdList.size() > 0">
+                    and a.device_id IN
+                    <foreach collection="deviceIdList" item="deviceIds" separator="," open="(" close=")" index="index">
+                        #{deviceIds,jdbcType=BIGINT}
+                    </foreach>
+                </if>
+            ORDER BY a.warn_time DESC
+    </select>
+
 </mapper>

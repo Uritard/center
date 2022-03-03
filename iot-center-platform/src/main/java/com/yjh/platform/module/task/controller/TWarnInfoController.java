@@ -1,5 +1,7 @@
 package com.yjh.platform.module.task.controller;
 
+
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
@@ -9,6 +11,8 @@ import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.device.service.TStdDeviceService;
+import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import io.swagger.annotations.Api;
@@ -22,10 +26,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -43,6 +44,10 @@ public class TWarnInfoController {
     private LogsRecord logsRecord;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TStdRegionService tStdRegionService;
+    @Autowired
+    private TStdDeviceService tStdDeviceService;
 
     private Logger log = LoggerFactory.getLogger(TWarnInfoController.class);
 
@@ -499,5 +504,41 @@ public class TWarnInfoController {
         }
         return result;
     }
+
+    @ApiOperation(value = "查询操作任务告警")
+    @RequestMapping(value = "/selectOperationWarn",method = RequestMethod.POST)
+    @Logs(title = "查询操作任务告警",content = "根据用户传递的参数查询查询操作任务告警",logType = 1,authority = "1235")
+    public Result selectOperationWarn(@RequestBody JSONObject obj) {
+        Long regionId = obj.getLong("regionId");
+        String startTime= obj.getString("startTime");
+        String endTime = obj.getString("endTime");
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            List<Long> deviceIdList = new ArrayList<>();
+            if (regionId == null){
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                if (regionIdList != null && !regionIdList.isEmpty()){
+                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                }else {
+                    deviceIdList.add(regionId);
+                }
+            }
+            Page page = PageHelper.startPage(obj.getIntValue("pageNum"), obj.getIntValue("pageSize"), true, null, true);
+            List<HashMap<String, String>> list = tWarnInfoService.selectOperationWarn(deviceIdList, startTime, endTime);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询操作任务告警失败描述：", e);
+        }
+        return result;
+    }
+
+
 
 }

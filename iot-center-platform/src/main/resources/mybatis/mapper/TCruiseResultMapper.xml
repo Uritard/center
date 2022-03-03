@@ -752,4 +752,80 @@
 				a.task_id = #{taskId,jdbcType=VARCHAR}
     </select>
 
+
+    <select id="QueryOperationTask" resultType="com.yjh.platform.module.task.entity.OperationTaskRecord">
+        SELECT  DISTINCT
+            a.task_id AS taskId,
+            CASE
+            a.type
+            WHEN 456 THEN
+            '操作票操作'
+            WHEN 509 THEN
+            '紧急分合闸操作'
+            ELSE '单设备操作'
+            END AS operateTypeName,
+            TIMESTAMPDIFF( MINUTE, a.start_time,DATE_ADD(a.end_time,INTERVAL 59 second)) AS duration,
+            a.start_time AS startTime,
+            j.up_region_name AS regionName,
+            u.user_name AS  userName,
+            IF(a.type = 456, '-', f.dict_note) AS mainOperatioTypeName
+            FROM
+            t_cruise_task a
+            LEFT JOIN t_cruise_task_attr c ON a.task_code = c.task_id
+            LEFT JOIN t_cruise_point_instance d ON d.instance_id= c.instance_id
+            LEFT JOIN t_robot_inspection e ON e.inspection_id = d.cruise_id
+            LEFT JOIN t_dict_business f ON  f.dict_code = e.operation_type
+            LEFT JOIN sys_user u ON u.user_id = a.create_user_id
+            LEFT JOIN t_cruise_task_result h ON a.task_id = h.task_id
+            LEFT JOIN t_cruise_task_result_detail g ON h.task_result_id = g.task_result_id
+            LEFT JOIN t_std_device j ON j.device_id = g.device_id
+            WHERE 1=1
+            <if test="operationType == null or  operationType == -1">
+                and a.type IN (456,508,509)
+            </if>
+            <if test="operationType != null and operationType != -1">
+                and a.type=#{operationType}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and a.start_time <![CDATA[>=]]> #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and  a.end_time <![CDATA[<=]]> #{endTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="deviceIdList != null and deviceIdList.size() > 0">
+                and g.device_id IN
+                <foreach collection="deviceIdList" item="deviceIds" separator="," open="(" close=")" index="index">
+                    #{deviceIds,jdbcType=BIGINT}
+                </foreach>
+            </if>
+            GROUP BY
+            a.task_id
+            ORDER BY
+            a.start_time DESC
+    </select>
+
+     <select id="QueryOperationResult" resultType="com.yjh.platform.module.task.entity.OperationTaskRecordResult">
+        SELECT
+			a.cruise_result_id AS  resultId,
+            h.dict_note AS cruiseName,
+            a.result_num AS resultNum,
+            a.orig_confirm_pic_path  AS confirmPicpath,
+            a.origpic  AS picpath,
+            date_format(d.start_time,'%Y-%c-%d %h:%i:%s') AS startTime,
+            u.user_name AS userName,
+            u.user_id AS userId,
+            d.task_id AS taskId
+            FROM
+            t_cruise_data_result a
+            LEFT JOIN t_cruise_task_result_detail  b ON b.cruise_result_id = a.cruise_result_id
+            LEFT JOIN t_cruise_task_result  c ON c.task_result_id = b.task_result_id
+            LEFT JOIN t_cruise_task d ON d.task_id = c.task_id
+						LEFT JOIN sys_user u ON d.create_user_id = u.user_id
+						LEFT JOIN t_cruise_point_instance  e ON e.instance_id = a.cruise_id
+					  LEFT JOIN t_robot_inspection f ON f.inspection_id = e.cruise_id
+						LEFT JOIN t_dict_business h ON h.dict_code = f.operation_type
+        WHERE 1=1
+            and d.task_id =  #{taskId}
+    </select>
+
 </mapper>

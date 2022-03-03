@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.dao;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -61,4 +62,10 @@ public interface TCruiseTaskDao {
     List<TaskOnExecuteInfo> selectTaskOnExecute();
 
     int countInstance(@Param(value = "taskId") String taskId);
+
+    List<HashMap<String, String>> envWarningQuery(JSONObject jsonObject);
+
+    List<StationCount> queryStations(List<Long> list);
+
+    RegionPath queryRegion(@Param(value = "regionId")Long regionId);
 }

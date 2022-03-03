@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,4 +113,13 @@ public interface TCruiseResultDao {
     TCruiseResult selectForTaskId(@Param(value = "taskId") String taskId);
 
     String selectAlgorithmType(@Param(value = "deviceMeteId") Long deviceMeteId);
+
+
+    List<OperationTaskRecord> QueryOperationTask(List<Long> deviceIdList,
+                                     @Param(value = "operationType") String operationType,
+                                     @Param(value = "startTime") String startTime,
+                                     @Param(value = "endTime") String endTime);
+
+    List<OperationTaskRecordResult> QueryOperationResult(@Param(value = "taskId")String taskId);
+
 }

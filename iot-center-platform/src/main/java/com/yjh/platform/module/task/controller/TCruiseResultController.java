@@ -1,7 +1,14 @@
 package com.yjh.platform.module.task.controller;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.write.metadata.style.WriteCellStyle;
+import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
+
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.handler.CustomCellWriteHandler;
+import com.yjh.platform.common.handler.CustomCellWriteHeightConfig;
 import com.yjh.platform.common.logs.Logs;
 //import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.LogsRecord;
@@ -16,13 +23,18 @@ import com.yjh.platform.module.task.service.TCruiseResultService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
 import java.util.*;
+
+
 
 
 /**
@@ -370,5 +382,87 @@ public class TCruiseResultController {
             log.error("审核任务失败描述",e);
         }
         return result;
+    }
+
+    @ApiOperation(value = "操作任务记录查询")
+    @RequestMapping(value = "/QueryOperationTask",method = RequestMethod.POST)
+    public Result QueryOperationTask(@RequestBody JSONObject obj){
+
+        Long regionId = obj.getLong("regionId");
+        String operationType = obj.getString("operationType");
+        String startTime= obj.getString("startTime");
+        String endTime = obj.getString("endTime");
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try{
+            //递归查询
+            List<Long> deviceIdList = new ArrayList<>();
+            if (regionId == null){
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                if (regionIdList != null && !regionIdList.isEmpty()){
+                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                }else {
+                    deviceIdList.add(regionId);
+                }
+            }
+            Page page = PageHelper.startPage(obj.getIntValue("pageNum"), obj.getIntValue("pageSize"), true, null, true);
+            List<OperationTaskRecord> hashMaps = tCruiseResultService.QueryOperationTask(deviceIdList , operationType, startTime, endTime);
+            resultMap.put("count",page.getTotal());
+            resultMap.put("list",hashMaps);
+            result.setData(resultMap);
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(),ResultCodeEnum.QUERYERROR.getName());
+            log.error("操作任务记录查询失败描述",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "操作任务详情查询")
+    @RequestMapping(value = "/QueryOperationResult",method = RequestMethod.POST)
+    public Result QueryOperationResult(@RequestBody HashMap<String,String> map){
+        String taskId = map.get("taskId");
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            List<OperationTaskRecordResult> hashMaps = tCruiseResultService.QueryOperationResult(taskId);
+            resultMap.put("count",hashMaps.size());
+            resultMap.put("list",hashMaps);
+            result.setData(resultMap);
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(),ResultCodeEnum.QUERYERROR.getName());
+            log.error("操作任务详情查询失败描述",e);
+        }
+       return result;
+    }
+
+    @ApiOperation(value = "操作任务详情导出")
+    @RequestMapping(value = "/operationResultExport",method = RequestMethod.GET)
+    public void operationResultExport (HttpServletResponse response ,@RequestParam(value = "taskId",required = false) String taskId){
+
+        try {
+            //获取需要导出的数据
+            List<OperationTaskRecordResult> list = tCruiseResultService.QueryOperationResult(taskId);
+
+            WriteCellStyle headWriteCellStyle = new WriteCellStyle();
+            //设置头居中
+            headWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
+            //内容策略
+            WriteCellStyle contentWriteCellStyle = new WriteCellStyle();
+            //设置 水平居中
+            contentWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.LEFT);
+            response.setContentType("application/vnd.ms-excel;charset=utf-8");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("操作记录详情_"+taskId,"UTF-8");
+            response.setHeader("Content-disposition", "attachment;filename="+fileName+".xls");
+            EasyExcel.write(response.getOutputStream(), OperationTaskRecordResult.class).autoCloseStream(Boolean.FALSE)
+                    .sheet("操作记录详情_"+taskId).doWrite(list);
+        }catch (Exception e){
+            log.error("操作任务详情查询失败描述",e);
+        }
     }
 }

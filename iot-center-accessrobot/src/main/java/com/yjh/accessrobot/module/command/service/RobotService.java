@@ -2,6 +2,7 @@ package com.yjh.accessrobot.module.command.service;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.smUtil.Demo;
@@ -1836,7 +1837,52 @@ public class RobotService {
         log.info( "接收环境设备告警开始");
         try{
             if (envWarn.size() > 0){
+                String type = null;
                 envWarn.put("envWarnId",getUUID());
+                switch (Integer.parseInt(envWarn.get("type"))){
+                    case 1 :
+                        type = "510";
+                        break;
+                    case 2 :
+                        type = "511";
+                        break;
+                    case 3 :
+                        type = "512";
+                        break;
+                    case 4 :
+                        type = "513";
+                        break;
+                    case 5 :
+                        type = "514";
+                        break;
+                    case 6 :
+                        type = "515";
+                        break;
+                    case 7 :
+                        type = "516";
+                        break;
+                    case 8 :
+                        type = "517";
+                        break;
+                    case 9 :
+                        type = "518";
+                        break;
+                    case 10 :
+                        type = "519";
+                        break;
+                    case 11 :
+                        type = "520";
+                        break;
+                    case 12 :
+                        type = "521";
+                        break;
+                    case 13 :
+                        type = "522";
+                        break;
+                    default:
+                        break;
+                }
+                envWarn.put("type",type);
                 tRobotInfoDao.insertEnv(envWarn);
             }
         }catch (Exception e){
@@ -1861,6 +1907,6 @@ public class RobotService {
         return uuidStr;
     }
 
-}
+
 }
 

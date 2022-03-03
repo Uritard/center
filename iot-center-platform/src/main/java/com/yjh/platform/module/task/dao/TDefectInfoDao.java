@@ -63,4 +63,5 @@ public interface TDefectInfoDao {
 
     TWarnInfoDetail selectWarnPopUp(@Param(value = "warnId") Long warnId);
 
+    List<WarnInforForHomePages> selectDeviceWarnInfo(@Param(value = "state")String state);
 }
