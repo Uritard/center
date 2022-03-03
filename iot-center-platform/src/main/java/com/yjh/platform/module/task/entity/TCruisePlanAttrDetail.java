@@ -94,5 +94,8 @@ public class TCruisePlanAttrDetail implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    @ApiModelProperty(value = "绑定行为")
+    private String behavior;
+
 
 }

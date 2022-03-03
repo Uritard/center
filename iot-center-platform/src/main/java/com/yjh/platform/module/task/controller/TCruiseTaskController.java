@@ -89,6 +89,7 @@ public class TCruiseTaskController {
                     TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
                     tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
                     tCruiseTask.setType(tCruisePlanCount.getType());
+                    tCruiseTask.setCreateUserId(tCruiseTaskAdd.getCreateUserId());
                     String res = tCruiseTaskService.insert(tCruiseTask,tCruiseTaskAdd);
                     if ("啥也不是".equals(res)){
                         result.setCode(209,"任务间隔过短,机器人暂不支持");
@@ -107,8 +108,15 @@ public class TCruiseTaskController {
                 tCruiseTask.setTaskName(tCruiseTaskAdd.getTaskName());
                 tCruiseTask.setTaskLevel(tCruiseTaskAdd.getTaskLevel());
                 tCruiseTask.setTaskType(tCruiseTaskAdd.getTaskType());
-                TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
-                tCruiseTask.setType(tCruisePlanCount.getType());
+                tCruiseTask.setPlanCode(tCruiseTaskAdd.getPlanCode());
+                //planId不为空的  巡视类任务 与  操作票任务
+                if (Objects.nonNull(tCruiseTaskAdd.getPlanId())) {
+                    TCruisePlanCount tCruisePlanCount = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
+                    tCruiseTask.setType(tCruisePlanCount.getType());
+                }else {
+                    //单设备操作与紧急分合闸操作
+                    tCruiseTask.setType(tCruiseTaskAdd.getType());
+                }
                 if (Objects.nonNull(tCruiseTaskAdd.getTaskId()))tCruiseTask.setTaskId(tCruiseTaskAdd.getTaskId());
                 if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("",tCruiseTaskAdd.getStartTime())) {
                     tCruiseTask.setStartTime(tCruiseTaskAdd.getStartTime());
@@ -119,6 +127,8 @@ public class TCruiseTaskController {
 //                    tCruiseTask.setStartTime(nowTimeCal.getTime());
 
                     tCruiseTask.setStartTime(new Date());
+                    tCruiseTask.setEndTime(new Date());
+                    tCruiseTask.setCreateUserId(tCruiseTaskAdd.getCreateUserId()); //用户
                 }
                 String res = tCruiseTaskService.insert(tCruiseTask,tCruiseTaskAdd);
                 if ("啥也不是".equals(res)){
@@ -334,6 +344,59 @@ public class TCruiseTaskController {
         return result;
     }
 
+    @ApiOperation(value = "发送确认消息")
+    @RequestMapping(value = "/sendConfirmMsg", method = RequestMethod.POST)
+    @Logs(title = "确认消息发送",content = "确认消息发送",logType = 13,authority = "1235")
+    public Result sendConfirmMsg(@RequestBody Map<String,Object> confirmMessageMap) {
+        Result result = new Result();
+        try {
+            return tCruiseTaskService.sendConfirmMsg(confirmMessageMap);
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("确认消息发送异常", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("确认消息发送错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询确认消息")
+    @RequestMapping(value = "/queryConfirmMsg", method = RequestMethod.GET)
+    @Logs(title = "确认消息",content = "确认消息",logType = 13,authority = "1235")
+    public Result queryConfirmMsg(@RequestParam(value = "taskId") String taskId,
+                                  @RequestParam(value = "robotCode") String robotCode) {
+        Result result = new Result();
+        try {
+            result.setData(tCruiseTaskService.queryConfirmMsg(taskId,robotCode));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("确认消息查询异常", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("确认消息查询错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询步骤消息")
+    @RequestMapping(value = "/queryOperationSteps", method = RequestMethod.GET)
+    @Logs(title = "步骤消息",content = "步骤消息",logType = 13,authority = "1235")
+    public Result queryOperationSteps(@RequestParam(value = "taskId") String taskId,
+                                  @RequestParam(value = "robotCode") String robotCode) {
+        Result result = new Result();
+        try {
+            result.setData(tCruiseTaskService.queryOperationSteps(taskId,robotCode));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("步骤消息查询异常", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("步骤消息查询错误:", e);
+        }
+        return result;
+    }
+
     //任务统计
     @ApiOperation(value = "任务查询")
     @RequestMapping(value = "/taskCountByCondition", method = RequestMethod.GET)
@@ -360,6 +423,7 @@ public class TCruiseTaskController {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
+            tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
             if(Constant.apiPermissions) {
                 if (!"1235".equals(userRole)) {
@@ -370,25 +434,6 @@ public class TCruiseTaskController {
             }
             int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getpCode(),request,tCruiseTaskAdd.getIdentifier());
             if(i == 1){
-//                TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
-//                tCruiseTaskAdd.setTaskId(taskId);
-//                tCruiseTaskAdd.setTaskName(taskName);
-//                tCruiseTaskAdd.setPlanId(planId);
-//                tCruiseTaskAdd.setAreaId(areaId);
-//                tCruiseTaskAdd.setType(type);
-//                tCruiseTaskAdd.setIfRun(ifRun);
-//                tCruiseTaskAdd.setRobotId(robotId);
-//                tCruiseTaskAdd.setDateType(dateType);
-//                tCruiseTaskAdd.setTaskType(taskType);
-//                tCruiseTaskAdd.setStartTime(startTime);
-//                tCruiseTaskAdd.setCreateTime(createTime);
-//                tCruiseTaskAdd.setMin(min);
-//                tCruiseTaskAdd.setHour(hour);
-//                tCruiseTaskAdd.setDayOfMonth(dayOfMonth);
-//                tCruiseTaskAdd.setMonth(month);
-//                tCruiseTaskAdd.setDayOfWeek(dayOfWeek);
-//                tCruiseTaskAdd.setYear(year);
-//                tCruiseTaskAdd.setPeriodId(periodId);
                 result = this.insert(tCruiseTaskAdd);
             }else {
                 result.setCode(209);

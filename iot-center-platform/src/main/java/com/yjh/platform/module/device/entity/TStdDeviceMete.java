@@ -70,6 +70,10 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "设备类型")
     private Integer deviceType;
 
+    @TableField(value = "inspection_type",updateStrategy = FieldStrategy.IGNORED)
+    @ApiModelProperty(value = "测点类型, 1.巡检点 2.操作点")
+    private String inspectionType;
+
     @Length(max = 20, message = "positionType长度必须小于等于20")
     @ApiModelProperty(value = "点号位置，inside-内部设备，outside-外部设备")
     @TableField(value = "position_type",updateStrategy = FieldStrategy.IGNORED)

@@ -22,6 +22,9 @@ public class RobotTaskInstanceInfo implements Serializable {
 
     private String taskId;
 
+    @ApiModelProperty(value = "预案编码")
+    private String planCode;
+
     private String taskName;
 
     private Integer priority;
@@ -31,7 +34,8 @@ public class RobotTaskInstanceInfo implements Serializable {
     private List<Long> instanceList;
 
     private String robotCode;
-
+    @ApiModelProperty(value = "是否ORC识别 (0:是 1:否)")
+    private String isOrc;
     @ApiModelProperty(value = "执行方式")
     private String ifRun;
     @ApiModelProperty(value = "定期开始时间")

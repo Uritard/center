@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -41,7 +42,7 @@ public interface TRobotInspectionDao {
                                          @Param(value = "robotCode") String robotCode);
     List<TCruisePointAttr> selectRobotTaskMessage(@Param(value = "list") String[] list);
 
-    List<Robot> selectRobotInfo();
+    List<Robot> selectRobotInfo(@Param(value = "robotType") Integer robotType);
 
     List<ConfirmImmediately> selectRobotInspectionIds();
 
@@ -49,10 +50,14 @@ public interface TRobotInspectionDao {
 
     String selectRobotCode(@Param(value = "robotId") Long robotId);
 
-    List<String> selectRobotTaskOnStart(@Param(value = "robotId") Long robotId);
+    String selectRobotTaskOnStart(@Param(value = "robotId") Long robotId);
+
+    Map<String, Object> selectRobotOperationTaskOnStart(@Param(value = "robotId") Long robotId);
 
     TRobotInfo selectRobot(@Param(value = "robotId") Long robotId);
 
     TRobotInspectionTmp selectTRobotInspectionTmp(@Param(value = "inspectionId") Long inspectionId);
+
+    Map<String,Object> selectInspection(@Param(value = "inspectionCode") String inspectionCode);
 
 }

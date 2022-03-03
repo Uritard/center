@@ -13,6 +13,7 @@
         <result column="mete_name" jdbcType="VARCHAR" property="meteName" />
         <result column="appearance_type" jdbcType="INTEGER" property="appearanceType" />
         <result column="device_type" jdbcType="INTEGER" property="deviceType" />
+        <result column="inspection_type" jdbcType="VARCHAR" property="inspectionType" />
         <result column="position_type" jdbcType="VARCHAR" property="positionType" />
         <result column="analyse_type" jdbcType="INTEGER" property="analyseType" />
         <result column="is_ai" jdbcType="VARCHAR" property="isAi" />
@@ -41,7 +42,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_mete_id, device_id, custom_id, mete_id, mete_kind, mete_name, device_type, position_type,analyse_type,is_ai,is_judge,unit, alarm_note, alarm
+        device_mete_id, device_id, custom_id, mete_id, mete_kind, mete_name, device_type, inspection_type, position_type,analyse_type,is_ai,is_judge,unit, alarm_note, alarm
         up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per,
         mete_type, modulus, remark,state_zero,state_one,alarm_state
     </sql>
@@ -59,6 +60,7 @@
             mete_name,
             appearance_type,
             device_type,
+            inspection_type,
             position_type,
             analyse_type,
             is_ai,
@@ -97,6 +99,7 @@
                 #{meteName, jdbcType=VARCHAR},
                 #{appearanceType, jdbcType=INTEGER},
                 #{deviceType, jdbcType=INTEGER},
+                #{inspectionType, jdbcType=INTEGER},
                 #{positionType, jdbcType=VARCHAR},
                 #{analyseType, jdbcType=INTEGER},
                 #{isAi, jdbcType=VARCHAR},
@@ -147,6 +150,7 @@
         <if test="meteName != null">a.mete_name = #{meteName},</if>
         <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
         a.device_type = #{deviceType, jdbcType=INTEGER},
+        a.inspection_type = #{inspectionType, jdbcType=VARCHAR},
         <if test="positionType != null ">a.position_type = #{positionType},</if>
         a.analyse_type = #{analyseType, jdbcType=INTEGER},
         <if test="isAi != null ">a.is_ai = #{isAi,jdbcType=VARCHAR},</if>
@@ -191,6 +195,7 @@
         a.mete_name,
         a.appearance_type,
         a.device_type,
+        a.inspection_type,
         a.position_type,
         a.analyse_type,
         a.is_ai,
@@ -232,6 +237,7 @@
         a.mete_name,
         a.appearance_type,
         a.device_type,
+        a.inspection_type,
         a.position_type,
         a.analyse_type,
         a.is_ai,
@@ -288,6 +294,7 @@
         <if test="meteName != null and meteName != ''"> and a.mete_name = #{meteName, jdbcType=VARCHAR}</if>
         <if test="appearanceType != null "> and a.appearance_type = #{appearanceType, jdbcType=INTEGER}</if>
         <if test="deviceType != null "> and a.device_type = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="inspectionType != null "> and a.inspection_type = #{inspectionType, jdbcType=VARCHAR}</if>
         <if test="positionType != null and positionType != ''"> and a.position_type = #{positionType, jdbcType=VARCHAR}</if>
         <if test="analyseType != null "> and a.device_type = #{analyseType, jdbcType=INTEGER}</if>
         <if test="unit != null and unit != ''"> and a.unit = #{unit, jdbcType=VARCHAR}</if>
@@ -334,6 +341,7 @@
         a.mete_name,
         a.appearance_type,
         a.device_type,
+        a.inspection_type,
         a.position_type,
         a.is_ai,
         a.is_judge,
@@ -406,6 +414,7 @@
             mete_name,
         appearance_type,
             device_type,
+            inspection_type,
             position_type,
         analyse_type,
         is_ai,
@@ -442,6 +451,7 @@
             #{TStdDevicemete.meteName, jdbcType=VARCHAR},
             #{TStdDevicemete.appearanceType, jdbcType=INTEGER},
             #{TStdDevicemete.deviceType, jdbcType=INTEGER},
+            #{TStdDevicemete.inspectionType, jdbcType=INTEGER},
                 #{TStdDevicemete.positionType, jdbcType=VARCHAR},
             #{TStdDevicemete.analyseType, jdbcType=INTEGER},
             #{TStdDevicemete.isAi, jdbcType=VARCHAR},
@@ -478,6 +488,7 @@
         c.mete_kind,
         c.mete_name,
         b.device_type,
+        b.inspection_type,
         "inside" AS position_type,
         c.unit,
         c.alarm_note,
@@ -523,6 +534,7 @@
         b.mete_kind,
         b.mete_name,
         a.device_type,
+        a.inspection_type,
         a.position_type,
         b.unit,
         b.alarm_note,

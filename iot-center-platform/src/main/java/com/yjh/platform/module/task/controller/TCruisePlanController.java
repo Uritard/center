@@ -129,6 +129,39 @@ public class TCruisePlanController {
         return result;
     }
 
+    @ApiOperation(value = "根据robotId查询预案")
+    @RequestMapping(value = "/selectByRobotId", method = RequestMethod.GET)
+    @Logs(title = "查询预案",content = "根据用户传递的参数查询巡检预案属性信息",logType = 1,authority = "1234")
+    public Result selectByRobotId(@RequestParam(value = "robotId", required = false) Long robotId) {
+        Result result = new Result();
+        try {
+            List<String> List = tCruisePlanService.selectByRobotId(robotId);
+            result.setData(List);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "根据planCode删除")
+    @RequestMapping(value = "/deleteByPlanCode", method = RequestMethod.DELETE)
+    @Logs(title = "删除操作票",content = "根据用户传递的参数删除巡检预案属性数据",logType = 4,authority = "1235")
+    public Result deleteByPlanCode(@RequestParam(value = "planCode", required = true) String planCode) {
+        Result result = new Result();
+        try {
+            result.setData(tCruisePlanService.deleteByPlanCode(planCode));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("删除操作票异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("删除错误:", e);
+        }
+        return result;
+    }
+
+
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询预案",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1,authority = "1235")
@@ -162,6 +195,44 @@ public class TCruisePlanController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "分页查询操作模型(操作票)")
+    @RequestMapping(value = "/selectTicketPlanPage", method = RequestMethod.POST)
+    @Logs(title = "查询操作票", content = "根据用户传递的参数分页查询操作票信息", logType = 1, authority = "1235")
+    public Result selectTicketPlanPage(@RequestBody Map<String, Object> ticketMap) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Long upRegionId = ticketMap.get("upRegionId") == null ? null : Long.parseLong(ticketMap.get("upRegionId").toString());
+            Long deviceId = ticketMap.get("deviceId") == null ? null : Long.parseLong(ticketMap.get("deviceId").toString());
+            Integer flag = Integer.parseInt(ticketMap.get("flag").toString());
+            int pageNum = Integer.parseInt(ticketMap.get("pageNum").toString());
+            int pageSize = Integer.parseInt(ticketMap.get("pageSize").toString());
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<TCruisePlanCountByPage> list = tCruisePlanService.selectTicketPlanPage(deviceId, upRegionId, flag);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "绑定/解绑操作票")
+    @RequestMapping(value = "/updateTicket", method = RequestMethod.POST)
+    @Logs(title = "操作票", content = "根据用户传递的参数绑定/解绑操作票信息", logType = 1, authority = "1235")
+    public Result updateTicket(@RequestBody Map<String, Object> ticketMap){
+        Result result = new Result();
+        try {
+            result.setData(tCruisePlanService.updateTicket(ticketMap));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -212,6 +283,28 @@ public class TCruisePlanController {
         return result;
     }
 
+    @ApiOperation(value = "查询单设备操作测点接口")
+    @RequestMapping(value = "/queryOperationInstances", method = RequestMethod.GET)
+    @Logs(title = "查询操作测点",content = "查询单设备操作测点 ",logType = 1 ,authority = "1235")
+    public Result queryOperationInstances(@RequestParam(value = "deviceId", required = false) String deviceId,
+                                @RequestParam(value = "robotId", required = false) Long robotId,
+                                @RequestParam(value = "type", required = false) Integer type,
+                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+        try {
+            Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
+            List<InstanceTree> list = tCruisePlanService.queryOperationInstances(deviceId, robotId, type);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "查询预案详情")
     @RequestMapping(value = "/selectPlanDetail", method = RequestMethod.GET)
     @Logs(title = "查询预案详情",content = "查询预案详情",logType = 1)

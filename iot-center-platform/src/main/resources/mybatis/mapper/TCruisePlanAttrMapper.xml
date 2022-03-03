@@ -113,6 +113,7 @@
         b.device_id,
         d.device_name,
         b.custom_id,
+        b.text_desc AS behavior,
         i.dict_note AS custom_name,
         b.cruise_type,
         e.dict_note AS cruise_type_name,

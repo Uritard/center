@@ -37,6 +37,9 @@ public class Robot implements Serializable {
     @ApiModelProperty(value = "机器人型号")
     private Integer robotType;
 
+    @ApiModelProperty(value = "机器人ip")
+    private String robotIp;
+
     private String robotTypeName;
 
     @ApiModelProperty(value = "机器人类型")
@@ -45,6 +48,12 @@ public class Robot implements Serializable {
     private String robotPositionName;
 
     private String photePath;
+
+    @ApiModelProperty(value = "所属区域名称")
+    private String areaName;
+
+    @ApiModelProperty(value = "所属区域Id")
+    private String areaId;
 
     @ApiModelProperty(value = "ID")
     private Long Id;

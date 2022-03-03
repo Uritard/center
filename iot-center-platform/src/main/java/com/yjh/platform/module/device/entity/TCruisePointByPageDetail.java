@@ -34,6 +34,8 @@ public class TCruisePointByPageDetail {
 
     private String cruiseTypeName;
 
+    private Integer inspectionType;
+
     //private List<Long> meteIds;
 
     private CruisePointType robotType = new CruisePointType();//机器人

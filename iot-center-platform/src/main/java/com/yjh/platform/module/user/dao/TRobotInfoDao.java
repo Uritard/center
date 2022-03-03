@@ -71,8 +71,9 @@ public interface TRobotInfoDao {
                                   @Param(value = "regionIdList") List<Long> regionIdList);
 
     int batchInsert(@Param("list") List<TRobotInfo> list);
-    List<TRobotInspectionTree> selectInspectionTree();
-    List<TRobotInspectionTree> batchSelectInspection();
+    List<TRobotInspectionTree> selectInspectionTree(@Param(value = "upRegionId")  Long upRegionId);
+    List<TRobotInspectionTree> batchSelectInspection(@Param(value = "inspectionType") Integer inspectionType,
+                                                     @Param(value = "upRegionId") Long upRegionId);
 
     //通过巡视点ID查询绑定的机器人
     Long selectRobotScreen(@Param(value = "instanceId")Long instanceId);

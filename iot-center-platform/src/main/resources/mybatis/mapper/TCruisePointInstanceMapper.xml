@@ -118,7 +118,7 @@
         <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
         <if test="stationId != null">a.station_id = #{stationId},</if>
         <if test="stationName != null">a.station_name = #{stationName},</if>
-        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        a.device_id = #{deviceId},
         <if test="customId != null ">a.custom_id = #{customId},</if>
         <if test="dataFormat != null ">a.data_format = #{dataFormat},</if>
         <if test="identifyType != null ">a.identify_type = #{identifyType, jdbcType=INTEGER},</if>
@@ -134,7 +134,7 @@
         <if test="ifVideotape != null ">a.if_videotape = #{ifVideotape, jdbcType=INTEGER},</if>
         <if test="videotapeTime != null ">a.videotape_time = #{videotapeTime},</if>
         <if test="textDesc != null and textDesc != ''">a.text_desc = #{textDesc, jdbcType=VARCHAR},</if>
-        <if test="sort != null and ">a.sort = #{sort},</if>
+        <if test="sort != null">a.sort = #{sort},</if>
     </set>
         where a.instance_id = #{instanceId, jdbcType=BIGINT}
     </update>
@@ -237,6 +237,7 @@
     a.device_id,
     a.custom_id,
     a.mete_name,
+    a.inspection_type,
 	b.cruise_type as cruiseType,
 	b.cruise_id as cruiseId,
 	c.dict_note as cruiseTypeName,

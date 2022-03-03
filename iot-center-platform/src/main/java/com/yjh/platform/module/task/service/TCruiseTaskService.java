@@ -1,7 +1,9 @@
 package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mchange.v1.util.ArrayUtils;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
@@ -16,6 +18,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -45,6 +48,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -128,10 +132,15 @@ public class TCruiseTaskService {
         if (Objects.isNull(tCruiseTask.getTaskId()))
             tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
         tCruiseTask.setTaskCode(tCruiseTask.getTaskId());
-        List<TCruisePlanAttr> tCruisePlanAttrList = tCruisePlanAttrDao.select(tCruiseTask.getPlanId(), null, null, null, null, null, null, null, null, null, null, null, null, null);
         List<Long> instanceList = new ArrayList<>();
-        for (TCruisePlanAttr tCruisePlanAttr : tCruisePlanAttrList) {
-            instanceList.add(tCruisePlanAttr.getInstanceId());
+        if (Objects.nonNull(tCruiseTask.getPlanId())) {
+            List<TCruisePlanAttr> tCruisePlanAttrList = tCruisePlanAttrDao.select(tCruiseTask.getPlanId(), null, null, null, null, null, null, null, null, null, null, null, null, null);
+            for (TCruisePlanAttr tCruisePlanAttr : tCruisePlanAttrList) {
+                instanceList.add(tCruisePlanAttr.getInstanceId());
+            }
+        }else {
+            instanceList.add(tCruiseTaskAdd.getInstanceId());
+            tCruiseTask.setInstanceId(tCruiseTaskAdd.getInstanceId());
         }
         List<TCruisePointInstance> tCruisePointInstanceList = this.tCruiseTaskAttrDao.batchSelect(instanceList);
         List<TCruiseTaskAttr> tCruiseTaskAttrList = new ArrayList<>();
@@ -180,9 +189,8 @@ public class TCruiseTaskService {
         /*
          * 新版的机器人任务下发
          * */
-        List<Long> instanceIdList = tCruisePlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());//所有点
-        List<TCruisePointInstanceNameDetail> instancesList = new ArrayList<>();
-        instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);//巡检点
+//        List<Long> instanceIdList = tCruisePlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());//所有点
+        List<TCruisePointInstanceNameDetail> instancesList = tCruisePointInstanceDao.selectForTask(instanceList);//巡检点
 
         List<Long> robotCruiseList = new ArrayList<>();//找出机器人做任务的巡检点
         List<Long> robotInstanceList = new ArrayList<>();
@@ -202,6 +210,7 @@ public class TCruiseTaskService {
                 RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
                 robotTaskInfo.setCruiseType(tCruiseTask.getType());
                 robotTaskInfo.setTaskId(tCruiseTask.getTaskId());
+                robotTaskInfo.setPlanCode(tCruiseTask.getPlanCode());
                 robotTaskInfo.setPriority(4);//优先级 暂定4
                 robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
                 robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
@@ -209,6 +218,7 @@ public class TCruiseTaskService {
                 robotTaskInfo.setIfRun(tCruiseTaskAdd.getIfRun().toString());
                 robotTaskInfo.setRobotCode(item);
                 robotTaskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
+                robotTaskInfo.setIsOrc(tCruiseTaskAdd.getIsOrc());
                 switch (tCruiseTaskAdd.getIfRun().toString()){
                     case "172"://周期和间隔任务
                         if (!"".equals(tCruiseTaskAdd.getDayOfMonth())){//周期：月
@@ -296,7 +306,8 @@ public class TCruiseTaskService {
 
             log.info("robotTaskInfoMap   :" + robotTaskInfoMap);
             //让机器人做任务
-            robotTask(robotTaskInfoMap);
+            Result result = robotTask(robotTaskInfoMap);
+            log.info("让机器人做任务 result {}", result);
         }
         this.tCruiseTaskDao.insert(tCruiseTask);
         this.tCruiseTaskAttrDao.batchInsert(tCruiseTaskAttrList);
@@ -357,16 +368,18 @@ public class TCruiseTaskService {
 
         return tCruiseTask.getTaskId();
     }
-    public void robotTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
+    public Result robotTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
+               return serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, Result.class);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+        return null;
     }
+
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String taskId, String startTime) {
         TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
@@ -1365,6 +1378,62 @@ public class TCruiseTaskService {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * 查询机器人操作任务当前确认消息
+     * @param taskId
+     * @param robotCode
+     * @return
+     */
+    public Map<String, Object> queryConfirmMsg(String taskId, String robotCode) {
+        Map<String, Object> confirmMsgMap = redisTemplate.opsForHash().entries("RobotConfirmMsg:" + robotCode + ":" + taskId);
+        if (Objects.nonNull(confirmMsgMap.get("confirmMapList"))){
+            String confirmMapJsonStringList = confirmMsgMap.get("confirmMapList").toString();
+            confirmMsgMap.put("confirmMapList", JSONArray.parseArray(confirmMapJsonStringList));
+        }
+        return confirmMsgMap;
+    }
+
+    /**
+     * 查询机器人操作任务当步骤消息
+     * @param taskId
+     * @param robotCode
+     * @return
+     */
+    public Map<String, Object> queryOperationSteps(String taskId, String robotCode) {
+        Map<String, Object> operationStepsMap = redisTemplate.opsForHash().entries("RobotOperationSteps:" + robotCode + ":" + taskId);
+        if (Objects.nonNull(operationStepsMap.get("cameraUrlList"))){
+            String cameraUrlStringList = operationStepsMap.get("cameraUrlList").toString();
+            operationStepsMap.put("cameraUrlList", stringRedisToList(cameraUrlStringList));
+        }
+        if (Objects.nonNull(operationStepsMap.get("stepName"))){
+            String stepNameStringList = operationStepsMap.get("stepName").toString();
+            operationStepsMap.put("stepName", stringRedisToList(stepNameStringList));
+        }
+        return operationStepsMap;
+    }
+
+    private List<String> stringRedisToList(String stringList){
+        stringList = stringList.replaceAll("\\[", "").replaceAll("]", "");
+        String[] listArray = stringList.split(", ");
+        return new ArrayList<>(Arrays.asList(listArray));
+    }
+
+    private static List<Map<String,String>> stringToListMap(String stringList){
+        ObjectMapper mapper = new ObjectMapper();
+        List<Map<String,String>> conList = new ArrayList<>();
+        try {
+            conList = mapper.readValue(stringList, List.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return conList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Result sendConfirmMsg(Map<String, Object> confirmMessageMap) {
+        return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.ROBOT_CONFIRM_MSG_URL, confirmMessageMap, Result.class);
     }
 }
 

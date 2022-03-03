@@ -16,14 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author tt
@@ -153,8 +151,8 @@ public class TRobotInspectionService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Robot> selectRobotInfo(){
-        return this.tRobotInspectionDao.selectRobotInfo();
+    public List<Robot> selectRobotInfo(Integer robotType){
+        return this.tRobotInspectionDao.selectRobotInfo(robotType);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -242,8 +240,19 @@ public class TRobotInspectionService{
             if("4".equals(value)){
                 re.put("modelType","手持遥控模式");
             }
+            if ("5".equals(value)){
+                re.put("modelType", "操作模式");
+            }
         }else {
             re.put("modelType","");//机器人状态
+        }
+
+        //0 开启状态 1 关闭状态
+        Map<String,String> mapForRobotStopStatus  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":102");
+        if(mapForRobotStopStatus.size() != 0){
+            re.put("stopFlag",mapForRobotStopStatus.get("value"));//急停状态
+        }else {
+            re.put("stopFlag","");//急停状态
         }
 
         return re;
@@ -251,124 +260,118 @@ public class TRobotInspectionService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String,Object> selectRobotTaskProgress(Long robotId) throws Exception{
-        Map<String,Object> reMap = new HashMap<>();
+    public Map<String, Object> selectRobotTaskProgress(Long robotId) throws Exception {
+        Map<String, Object> reMap = new HashMap<>();
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
-        List<String> taskList = tRobotInspectionDao.selectRobotTaskOnStart(robotId);
-        if(taskList != null && taskList.size()>0){
-           String taskId = taskList.get(0);
-           reMap.put("taskId",taskId);
-               Map<String,String> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:"+robotCode+":"+taskId);
-               if(mapForRobotInstance == null || mapForRobotInstance.size() == 0){
-                   reMap.put("taskProgress",0);
-                   reMap.put("taskName","");
-                   reMap.put("startTime","");
-                   reMap.put("taskState","");
-
-//                   Map<String,String> jasonMap=new HashMap<>();
-//                   jasonMap.put("type","noTask");
-//                   //jasonMap.put("taskId",tCruiseTask.getTaskId());
-//                   String json= JSON.toJSONString(jasonMap);
-//                   Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
-//                   log.info("发送给前端的消息-停止调接口：   "+json);
-                   return reMap;
-               }
-               if(mapForRobotInstance != null && mapForRobotInstance.size() > 0){
-                   if("1".equals(mapForRobotInstance.get("taskState"))){
-                       reMap.put("taskProgress",0);
-                       reMap.put("taskName","");
-                       reMap.put("startTime","");
-                       reMap.put("taskState","");
-                       return reMap;
-                   }
-               }
-               //String taskId = (String)mapForRobotInstance.get("taskId");
-               String instanceList = (String)mapForRobotInstance.get("instanceIdList");
-               instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
-               String[] instanceIdList = instanceList.split(", ");
-               int i = 0;
-               for (String item:instanceIdList) {
-                   Map<String,Object> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+":"+item);
-                   if(mapForRobotTaskMessage.size() != 0){
-                       if("null".equals(mapForRobotTaskMessage.get("cruiseResult"))){
-                           continue;
-                       }
-                       i = i + 1;
-                   }
-               }
-               Integer re = (int) ((new BigDecimal((float) i / instanceIdList.length).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue())*100);
-               TCruiseResult tc = tCruiseResultDao.selectForTaskId(taskId);
-               if(tc == null){
-                   reMap.put("taskProgress",0);
-                   reMap.put("taskName","");
-                   reMap.put("startTime","");
-                   reMap.put("taskState","");
-               }else{
-                   if(tc.getCState() == 239 || tc.getCState() == 241){
-                       reMap.put("taskProgress",re);
-                       reMap.put("taskName",tc.getTaskName());
-                       reMap.put("startTime",mapForRobotInstance.get("startTime"));
-                       String state = mapForRobotInstance.get("taskState");
-                       if(state != null){
-                           //1=已执行 2=正在执行 3=暂停 4=终止 5=未执行 6=超期
-                           if("1".equals(state)){
-                               state = "已执行";
-                           }
-                           if("2".equals(state)){
-                               state = "正在执行";
-                           }
-                           if("3".equals(state)){
-                               state = "暂停";
-                           }
-                           if("4".equals(state)){
-                               state = "终止";
-                           }
-                           if("5".equals(state)){
-                               state = "未执行";
-                           }
-                           if("6".equals(state)){
-                               state = "超期";
-                           }
-                       }else {
-                           state="";
-                       }
-                       reMap.put("taskState",state);
-                       List<RobotTaskMessage> list =this.selectRobotTaskMessage(taskId,robotId);
-                       reMap.put("list",list);
-                   }else {
-                       reMap.put("taskProgress",0);
-                       reMap.put("taskName","");
-                       reMap.put("startTime","");
-                       reMap.put("taskState","");
-                   }
-               }
-        }else {
-            reMap.put("taskProgress",0);
-            reMap.put("taskName","");
-            reMap.put("startTime","");
-            reMap.put("taskState","");
-            reMap.put("taskId","");
-
-//            Map<String,String> jasonMap=new HashMap<>();
-//            jasonMap.put("type","noTask");
-//            //jasonMap.put("taskId",tCruiseTask.getTaskId());
-//            String json= JSON.toJSONString(jasonMap);
-//            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
-//            log.info("发送给前端的消息-停止调接口：   "+json);
+        String taskId = tRobotInspectionDao.selectRobotTaskOnStart(robotId);
+        if (!StringUtils.isEmpty(taskId)) {
+            reMap.put("taskId", taskId);
+            Map<String, String> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
+            if (mapForRobotInstance.size() == 0) {
+                reMap.put("taskProgress", 0);
+                reMap.put("taskName", "");
+                reMap.put("startTime", "");
+                reMap.put("taskState", "");
+                return reMap;
+            }
+            String instanceList = mapForRobotInstance.get("instanceIdList");
+            instanceList = instanceList.replaceAll("\\[", "").replaceAll("]", "");
+            String[] instanceIdList = instanceList.split(", ");
+            int i = 0;
+            for (String item : instanceIdList) {
+                Map<String, Object> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + item);
+                if (mapForRobotTaskMessage.size() != 0) {
+                    if ("null".equals(mapForRobotTaskMessage.get("cruiseResult"))) {
+                        continue;
+                    }
+                    i = i + 1;
+                }
+            }
+            Integer re = (int) ((new BigDecimal((float) i / instanceIdList.length).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()) * 100);
+            TCruiseResult tc = tCruiseResultDao.selectForTaskId(taskId);
+            if (tc == null) {
+                reMap.put("taskProgress", 0);
+                reMap.put("taskName", "");
+                reMap.put("startTime", "");
+                reMap.put("taskState", "");
+            } else {
+                if (tc.getCState() == 239 || tc.getCState() == 241) {
+                    reMap.put("taskProgress", re);
+                    reMap.put("taskName", tc.getTaskName());
+                    reMap.put("startTime", mapForRobotInstance.get("startTime"));
+                    String state = mapForRobotInstance.get("taskState");
+                    reMap.put("taskState", taskStatusToString(state));
+                    List<RobotTaskMessage> list = this.selectRobotTaskMessage(taskId, robotId);
+                    reMap.put("list", list);
+                } else {
+                    reMap.put("taskProgress", 0);
+                    reMap.put("taskName", "");
+                    reMap.put("startTime", "");
+                    reMap.put("taskState", "");
+                }
+            }
+        } else {
+            reMap.put("taskProgress", 0);
+            reMap.put("taskName", "");
+            reMap.put("startTime", "");
+            reMap.put("taskState", "");
+            reMap.put("taskId", "");
         }
 
         return reMap;
     }
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> selectRobotOperationTask(Long robotId) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> reMap = tRobotInspectionDao.selectRobotOperationTaskOnStart(robotId);
+        if (Objects.nonNull(reMap)){
+            resultMap.put("taskId", reMap.get("taskId"));
+            resultMap.put("taskName",reMap.get("taskName"));
+            resultMap.put("taskState",reMap.get("taskState"));
+        }else {
+            resultMap.put("taskId", "");
+            resultMap.put("taskName", "");
+            resultMap.put("taskState", "");
+        }
+        return resultMap;
+    }
+
+    private String taskStatusToString(String state){
+        if (!StringUtils.isEmpty(state)) {
+            //1=已执行 2=正在执行 3=暂停 4=终止 5=未执行 6=超期
+            if ("1".equals(state)) {
+                state = "已执行";
+            }
+            if ("2".equals(state)) {
+                state = "正在执行";
+            }
+            if ("3".equals(state)) {
+                state = "暂停";
+            }
+            if ("4".equals(state)) {
+                state = "终止";
+            }
+            if ("5".equals(state)) {
+                state = "未执行";
+            }
+            if ("6".equals(state)) {
+                state = "超期";
+            }
+        } else {
+            state = "";
+        }
+        return state;
+    }
 
     //机器人树
     @Transactional(rollbackFor = Exception.class)
-    public List<Robot> robotTree(){
+    public List<Robot> robotTree(Integer robotType){
         List<Robot> reList = new ArrayList<>();
         Robot node = new Robot();
         node.setId(1L);
         node.setLabel("机器人树");
         node.setInfoType("tree");
-        List<Robot> robotList = this.selectRobotInfo();
+        List<Robot> robotList = this.selectRobotInfo(robotType);
         for(Robot robot:robotList){
             robot.setId(robot.getRobotId());
             robot.setLabel(robot.getRobotName());

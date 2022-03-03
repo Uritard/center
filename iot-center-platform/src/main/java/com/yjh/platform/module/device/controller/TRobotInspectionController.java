@@ -183,7 +183,6 @@ public class TRobotInspectionController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Map<String,Object> map = tRobotInspectionService.selectRobotTaskProgress(robotId);
-            String taskId = map.get("taskId").toString();
             List<RobotTaskMessage> list = (List) map.get("list");
             if(list != null && list.size()>0){
                 resultMap.put("taskInfo",list);
@@ -191,19 +190,8 @@ public class TRobotInspectionController {
                 resultMap.put("taskInfo","");
             }
 
-            if(list != null){
-//                if("100".equals(map.get("taskProgress")) ){
-//                    Map<String,String> jasonMap=new HashMap<>();
-//                    jasonMap.put("type","noTask");
-//                    //jasonMap.put("taskId",tCruiseTask.getTaskId());
-//                    String json= JSON.toJSONString(jasonMap);
-//                    log.info("发送给前端的消息-停止调接口：   "+json);
-//                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
-//                }
-                resultMap.put("taskProgress",map.get("taskProgress"));
-            }else {
-                resultMap.put("taskProgress",map.get("taskProgress"));
-            }
+            resultMap.put("taskProgress",map.get("taskProgress"));
+            resultMap.put("taskId", map.get("taskId"));
             resultMap.put("taskName",map.get("taskName"));
             resultMap.put("startTime",map.get("startTime"));
             resultMap.put("taskState",map.get("taskState"));
@@ -215,13 +203,27 @@ public class TRobotInspectionController {
         return result;
     }
 
+    @ApiOperation(value = "机器人操作任务数据")
+    @RequestMapping(value = "/selectRobotOperationTask", method = RequestMethod.GET)
+    @Logs(title = "机器人操作任务数据",content = "根据用户传递的参数查询机器人操作任务数据",logType = 1,authority = "1235")
+    public Result selectRobotOperationTask(@RequestParam(value = "robotId") Long robotId){
+        Result result = new Result();
+        try {
+            result.setData(tRobotInspectionService.selectRobotOperationTask(robotId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("机器人操作任务数据失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "查询机器人信息")
     @RequestMapping(value = "/selectRobotInfo", method = RequestMethod.GET)
     @Logs(title = "查询机器人信息",content = "查询机器人信息",logType = 1)
-    public Result selectRobotInfo() {
+    public Result selectRobotInfo(@RequestParam(value = "robotType", required = false) Integer robotType) {
         Result result = new Result();
         try {
-            result.setData(tRobotInspectionService.selectRobotInfo());
+            result.setData(tRobotInspectionService.selectRobotInfo(robotType));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询机器人信息失败描述：", e);
@@ -246,10 +248,10 @@ public class TRobotInspectionController {
     @ApiOperation(value = "查询机器人树")
     @RequestMapping(value = "/robotTree", method = RequestMethod.GET)
     @Logs(title = "查询机器人树",content = "根据用户传递的参数查询机器人树",logType = 1,authority = "1235")
-    public Result robotTree() {
+    public Result robotTree(@RequestParam(value = "robotType", required = false) Integer robotType) {
         Result result = new Result();
         try {
-            result.setData(tRobotInspectionService.robotTree());
+            result.setData(tRobotInspectionService.robotTree(robotType));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询机器人状态信息失败描述：", e);

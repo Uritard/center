@@ -12,6 +12,7 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TRobotInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -256,13 +257,14 @@ public class TRobotInfoController {
         return result;
     }
 
-    @ApiOperation(value = "查询所有机器人巡检点信息树")
+    @ApiOperation(value = "查询所有机器人巡检点信息树 inspectionType: 1-巡检点 2-操作点")
     @GetMapping(value = "/selectInspectionTree")
     @Logs(title = "查询所有机器人巡检点信息树",content = "根据用户传递的参数查询机器人巡检点树",logType = 1,authority = "1234")
-    public Result selectInspectionTree() {
+    public Result selectInspectionTree(@RequestParam(value = "inspectionType", required = false) Integer inspectionType,
+                                       @RequestParam(value = "upRegionId", required = false) Long upRegionId) {
         Result result = new Result();
         try {
-            List<Map<String, Object>> robotInspectionTree = tRobotInfoService.selectInspectionTree();
+            List<Map<String, Object>> robotInspectionTree = tRobotInfoService.selectInspectionTree(inspectionType, upRegionId);
             result.setData(robotInspectionTree);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

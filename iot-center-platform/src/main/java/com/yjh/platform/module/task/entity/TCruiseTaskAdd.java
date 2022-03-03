@@ -97,6 +97,16 @@ public class TCruiseTaskAdd implements Serializable {
 
     private String deviceList;
 
+    private Long instanceId;
+
+    @ApiModelProperty(value = "是否ORC识别 (0:是 1:否)")
+    private String isOrc;
+
+    private Long createUserId;
+
+    @ApiModelProperty(value = "预案编码")
+    private String planCode;
+
     private String identifier;
 
     private String endTime;

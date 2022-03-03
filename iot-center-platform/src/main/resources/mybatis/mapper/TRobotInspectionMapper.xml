@@ -234,15 +234,22 @@
             a.robot_name,
             a.robot_status,
             a.robot_type,
+            a.robot_ip,
             b.dict_note AS robotTypeName,
             a.robot_position,
             c.dict_note AS robotPositionName,
-            a.phote_path
+            a.phote_path,
+			d.region_name AS areaName,
+			d.region_id AS areaId
         FROM
             t_robot_info a
             LEFT JOIN t_dict_business b ON a.robot_type = b.dict_code
             LEFT JOIN t_dict_business c ON a.robot_position = c.dict_code
+			LEFT JOIN t_std_region d ON d.region_id = a.up_region_id
         where 1=1
+        <if test="robotType != null">
+            and a.robot_type = #{robotType, jdbcType=VARCHAR}
+        </if>
     </select>
 
     <select id="selectRobotIsRunning" resultType="java.lang.String">
@@ -264,10 +271,46 @@
 
     <select id="selectRobotTaskOnStart" resultType="java.lang.String">
         SELECT DISTINCT
-            d.task_id
+	        d.task_id
         FROM
-            t_robot_inspection a, t_cruise_point_instance b , t_cruise_task_attr c , t_cruise_result d
-            WHERE a.robot_id = #{robotId} and a.inspection_id = b.cruise_id and b.instance_id = c.instance_id and c.task_id = d.task_id and (d.c_state = 239 or d.c_state = 241)
+	    t_robot_inspection a,
+	    t_cruise_point_instance b,
+	    t_cruise_task_attr c,
+	    t_cruise_result d
+        WHERE
+	    a.robot_id = #{robotId,jdbcType=BIGINT}
+        AND a.inspection_id = b.cruise_id
+        AND b.instance_id = c.instance_id
+        AND c.task_id = d.task_id
+        AND (
+	    d.c_state = 239
+	    OR d.c_state = 241
+        )
+        AND d.c_type != 508 AND d.c_type != 509 AND d.c_type != 456
+        ORDER BY d.create_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectRobotOperationTaskOnStart" resultType="java.util.Map">
+        SELECT DISTINCT
+	    (CASE WHEN a.c_state = 239 THEN a.task_id ELSE "" END) AS taskId,
+	    (CASE WHEN a.c_state = 239 THEN "正在执行" ELSE "" END) AS taskState,
+	    (CASE WHEN a.c_state = 239 THEN a.task_name ELSE "" END) AS taskName
+        FROM
+	    t_cruise_result a
+        LEFT JOIN t_cruise_task_attr b ON b.task_id = a.task_id
+        LEFT JOIN t_cruise_point_instance c ON c.instance_id = b.instance_id
+        LEFT JOIN t_robot_inspection d ON d.inspection_id = c.cruise_id
+        WHERE
+	    d.robot_id = #{robotId,jdbcType=BIGINT}
+        AND (
+	    a.c_type = 508
+	    OR a.c_type = 509
+	    OR a.c_type = 456
+        )
+        ORDER BY
+	    a.create_time DESC
+        LIMIT 1;
     </select>
     <select id="selectRobot" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         SELECT
@@ -295,5 +338,15 @@
             and a.robot_id = b.robot_id
             and a.inspection_id = #{inspectionId, jdbcType=BIGINT}
         limit 1
+    </select>
+    <select id="selectInspection" resultType="java.util.Map">
+        SELECT
+        a.inspection_id,
+        a.inspection_name,
+        a.property_pic_path
+        FROM
+        t_robot_inspection a
+        WHERE 1 = 1
+        <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
     </select>
 </mapper>

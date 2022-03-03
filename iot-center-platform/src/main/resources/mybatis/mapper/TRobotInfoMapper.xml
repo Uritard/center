@@ -445,11 +445,22 @@
 
     <select id="selectInspectionTree" resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
         select a.robot_id, a.robot_name from t_robot_info a
+        where 1 = 1
+         <if test="upRegionId != null and upRegionId != ''">
+             and a.up_region_id = #{upRegionId, jdbcType=BIGINT}
+         </if>
     </select>
 
     <select id="batchSelectInspection" resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
         select a.robot_id, b.robot_name, b.robot_position, a.inspection_id, a.inspection_name from t_robot_inspection a
         LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
+        WHERE 1 = 1
+        <if test="inspectionType != null and inspectionType != ''">
+            and a.inspection_type = #{inspectionType, jdbcType=INTEGER}
+        </if>
+        <if test="upRegionId != null and upRegionId != ''">
+            and b.up_region_id = #{upRegionId, jdbcType=BIGINT}
+        </if>
     </select>
 
     <select id="selectRobotScreen" parameterType="java.lang.Long" resultType="java.lang.Long">

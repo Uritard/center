@@ -8,6 +8,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
+import io.swagger.models.auth.In;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -290,9 +291,9 @@ public class TRobotInfoService{
         return this.tRobotInfoDao.batchInsert(list);
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String, Object>> selectInspectionTree() {
-        List<TRobotInspectionTree> robotList = tRobotInfoDao.selectInspectionTree();
-        List<TRobotInspectionTree> tRobotInspectionTreeList = tRobotInfoDao.batchSelectInspection();
+    public List<Map<String, Object>> selectInspectionTree(Integer inspectionType, Long upRegionId) {
+        List<TRobotInspectionTree> robotList = tRobotInfoDao.selectInspectionTree(upRegionId);
+        List<TRobotInspectionTree> tRobotInspectionTreeList = tRobotInfoDao.batchSelectInspection(inspectionType, upRegionId);
         List<Map<String, Object>> robotPresetTreeTemList = new ArrayList<>();
         for (TRobotInspectionTree tRobot : robotList) {
             Map<String, Object> robotPresetTreeTem = new HashMap<>();
@@ -320,7 +321,13 @@ public class TRobotInfoService{
         }
         Map<String, Object> robotInspectionTree = new HashMap<>();
         robotInspectionTree.put("children", robotPresetTreeTemList);
-        robotInspectionTree.put("label", "机器人巡检点列表");
+        if(inspectionType == null){
+            robotInspectionTree.put("label", "机器人测点列表");
+        }else if (inspectionType == 1){
+            robotInspectionTree.put("label", "机器人巡检点列表");
+        }else {
+            robotInspectionTree.put("label", "机器人操作点列表");
+        }
         robotInspectionTree.put("infoType", "tree");
         robotInspectionTree.put("id", "-1");
         List<Map<String, Object>> robotInspectionList = new ArrayList<>();

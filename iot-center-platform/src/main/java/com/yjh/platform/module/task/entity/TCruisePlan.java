@@ -38,6 +38,25 @@ public class TCruisePlan implements Serializable {
     @TableField(value = "plan_id", updateStrategy = FieldStrategy.IGNORED)
     private Long planId;
 
+    @Length(max = 50, message = "planCode长度必须小于等于50")
+    @ApiModelProperty(value = "预案编码")
+    @TableField(value = "plan_code", updateStrategy = FieldStrategy.IGNORED)
+    private String planCode;
+
+    @Length(max = 50, message = "deviceId长度必须小于等于50")
+    @ApiModelProperty(value = "device_id")
+    @TableField(value = "device_id", updateStrategy = FieldStrategy.IGNORED)
+    private Long deviceId;
+
+    @ApiModelProperty(value = "上级区域id")
+    @TableField(value = "upRegionId", updateStrategy = FieldStrategy.IGNORED)
+    private Long upRegionId;
+
+    @Max(value=999999999999999999l)
+    @ApiModelProperty(value = "机器人id")
+    @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
+    private Long robotId;
+
     @Length(max = 32, message = "planName长度必须小于等于32")
     @ApiModelProperty(value = "预案名称")
     @TableField(value = "plan_name", updateStrategy = FieldStrategy.IGNORED)

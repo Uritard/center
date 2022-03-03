@@ -348,6 +348,22 @@ public class TStdDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "操作设备树查询")
+    @RequestMapping(value = "/selectOperationDevTree", method = RequestMethod.GET)
+    @Logs(title = "操作设备树查询",content = "操作设备树查询",logType = 1)
+    public Result selectOperationDevTree(@RequestParam(value = "regionId", required = true) Long regionId) {
+        Result result = new Result();
+        try {
+            List<AreaInfo> devTaskTreeList = tStdDeviceService.selectOperationDevTree(regionId);
+            result.setData(devTaskTreeList);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+
     @ApiOperation(value = "设备任务树查询")
     @RequestMapping(value = "/selectDevTaskTree", method = RequestMethod.GET)
     @Logs(title = "设备任务树查询",content = "设备任务树查询",logType = 1)

@@ -5,6 +5,10 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.task.entity.TCruisePlan">
         <id column="plan_id" jdbcType="BIGINT" property="planId" />
+        <result column="plan_code" jdbcType="VARCHAR" property="planCode" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
+        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
         <result column="plan_name" jdbcType="VARCHAR" property="planName" />
         <result column="type" jdbcType="INTEGER" property="type" />
         <result column="plan_point_types" jdbcType="VARCHAR" property="planPointTypes" />
@@ -14,18 +18,26 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        plan_id, plan_name, type, plan_point_types, create_time, update_time
+        plan_id, plan_code, device_id, up_region_id, robot_id, plan_name, type, plan_point_types, create_time, update_time
     </sql>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="planId" parameterType="com.yjh.platform.module.task.entity.TCruisePlan">
         insert into t_cruise_plan(
             plan_id,
+            plan_code,
+            device_id,
+            up_region_id,
+            robot_id,
             plan_name,
             type,
             plan_point_types
         )values(
                 #{planId, jdbcType=BIGINT},
+                #{planCode, jdbcType=VARCHAR},
+                #{deviceId, jdbcType=BIGINT},
+                #{upRegionId, jdbcType=BIGINT},
+                #{robotId, jdbcType=BIGINT},
                 #{planName, jdbcType=VARCHAR},
                 #{type, jdbcType=INTEGER},
                 #{planPointTypes, jdbcType=VARCHAR}
@@ -36,10 +48,18 @@
         delete from t_cruise_plan
                 where plan_id = #{planId, jdbcType=BIGINT}
     </delete>
+    <delete id="deleteByPlanCode">
+        delete from t_cruise_plan
+                where plan_code = #{planCode, jdbcType=VARCHAR}
+    </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.task.entity.TCruisePlan">
         update t_cruise_plan a <set>
         <if test="planId != null">a.plan_id = #{planId},</if>
+        <if test="planCode != null ">a.plan_code = #{planCode},</if>
+        a.device_id = #{deviceId},
+        <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
+        <if test="robotId != null ">a.robot_id = #{robotId},</if>
         <if test="planName != null ">a.plan_name = #{planName},</if>
         <if test="type != null">a.type = #{type, jdbcType=INTEGER},</if>
         <if test="planPointTypes != null">a.plan_point_types = #{planPointTypes},</if>
@@ -52,6 +72,10 @@
     <update id="updateByMap" parameterType="java.util.Map">
         update t_cruise_plan a <set>
         <if test="map.planId != null">a.plan_id = #{map.planId},</if>
+        <if test="map.planCode != null ">a.plan_code = #{map.planCode},</if>
+        <if test="map.deviceId != null ">a.device_id = #{map.deviceId},</if>
+        <if test="map.upRegionId != null ">a.up_region_id = #{map.upRegionId},</if>
+        <if test="map.robotId != null ">a.robot_id = #{map.robotId},</if>
         <if test="map.planName != null ">a.plan_name = #{map.planName},</if>
         <if test="map.type != null">a.type = #{map.type, jdbcType=INTEGER},</if>
         <if test="map.planPointTypes != null">a.plan_point_types = #{map.planPointTypes},</if>
@@ -60,10 +84,13 @@
     </set>
         where a.plan_id = #{map.planId, jdbcType=BIGINT}
     </update>
-
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruisePlanCount">
+    <select id="selectByPlanCode" resultType="com.yjh.platform.module.task.entity.TCruisePlan">
         select
         a.plan_id,
+        a.plan_code,
+        a.device_id,
+        a.up_region_id,
+        a.robot_id,
         a.plan_name,
         a.type,
         b.dict_note AS plan_type_name,
@@ -71,7 +98,30 @@
         a.create_time,
         a.update_time
         from t_cruise_plan a
-        LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
+        LEFT JOIN t_dict_business b ON a.type = b.dict_code
+        where 1 = 1
+        <if test="planCode == null or planCode == ''">
+            and 1 = 2
+        </if>
+        <if test="planCode != null and planCode != ''">
+            AND a.plan_code = #{planCode, jdbcType=VARCHAR}
+        </if>
+    </select>
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruisePlanCount">
+        select
+        a.plan_id,
+        a.plan_code,
+        a.device_id,
+        a.up_region_id,
+        a.robot_id,
+        a.plan_name,
+        a.type,
+        b.dict_note AS plan_type_name,
+        a.plan_point_types,
+        a.create_time,
+        a.update_time
+        from t_cruise_plan a
+        LEFT JOIN t_dict_business b ON a.type = b.dict_code
         where 1 = 1
             and a.plan_id = #{planId, jdbcType=BIGINT}
         limit 1
@@ -80,14 +130,23 @@
     <select id="select" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlan">
         select
         a.plan_id,
+        a.plan_code,
+        a.device_id,
+        a.up_region_id,
+        a.robot_id,
         a.plan_name,
         a.type,
         a.plan_point_types,
         a.create_time,
         a.update_time
         from t_cruise_plan a
+        JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
         where 1 = 1
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="planCode != null and planCode != ''"> and a.plan_code = #{planCode, jdbcType=VARCHAR}</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="planName != null and planName != ''"> and a.plan_name = #{planName, jdbcType=VARCHAR}</if>
         <if test="type != null"> and a.type = #{type, jdbcType=INTEGER}</if>
         <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
@@ -98,6 +157,10 @@
     <select id="selectByPage" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlanCount">
         select
         a.plan_id,
+        a.plan_code,
+        a.device_id,
+        a.up_region_id,
+        a.robot_id,
         a.plan_name,
         a.type,
         a.plan_point_types,
@@ -105,8 +168,13 @@
         a.create_time,
         a.update_time
         from t_cruise_plan a
+        JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
         where 1 = 1
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="planCode != null and planCode != ''"> and a.plan_code = #{planCode, jdbcType=VARCHAR}</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="planName != null and planName != ''"> and a.plan_name like concat('%',#{planName, jdbcType=VARCHAR},'%') </if>
         <if test="type != null"> and a.type = #{type, jdbcType=INTEGER}</if>
         <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
@@ -118,6 +186,10 @@
     <select id="selectByPlanPage" parameterType="com.yjh.platform.module.task.entity.TCruisePlan" resultType="com.yjh.platform.module.task.entity.TCruisePlanCountByPage">
         select
         a.plan_id,
+        a.plan_code,
+        a.device_id,
+        a.up_region_id,
+        a.robot_id,
         a.plan_name,
         a.type,
         b.dict_note AS type_name,
@@ -126,9 +198,13 @@
         a.create_time,
         a.update_time
         from t_cruise_plan a
-        LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
+        JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
         where 1 = 1
         <if test="planId != null and planId != ''"> and a.plan_id = #{planId, jdbcType=BIGINT}</if>
+        <if test="planCode != null and planCode != ''"> and a.plan_code = #{planCode, jdbcType=VARCHAR}</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="planName != null and planName != ''"> and a.plan_name like concat('%',#{planName, jdbcType=VARCHAR},'%') </if>
         <if test="type != null"> and a.type = #{type, jdbcType=INTEGER}</if>
         <if test="planPointTypes != null and planPointTypes != ''"> and a.plan_point_types = #{planPointTypes, jdbcType=VARCHAR}</if>
@@ -137,9 +213,37 @@
         order by a.create_time desc
     </select>
 
+    <select id="selectTicketPlanPage" resultType="com.yjh.platform.module.task.entity.TCruisePlanCountByPage">
+        select
+        a.plan_id,
+        a.plan_code,
+        a.up_region_id,
+        a.robot_id,
+        a.device_id,
+        a.plan_name,
+        a.type,
+        b.dict_note AS type_name,
+        a.plan_point_types,
+        (select count(*) from t_cruise_plan_attr b where b.plan_id = a.plan_id) as total,
+        a.create_time,
+        a.update_time
+        from t_cruise_plan a
+        JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "operation_task"
+        where 1 = 1
+        <if test="deviceId != null">and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="flag == 1">and a.device_id is not null</if>
+        <if test="flag == 2">and a.device_id is null</if>
+        <if test="upRegionId != null and upRegionId != ''">and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        order by a.create_time desc
+    </select>
+
     <insert id="batchInsert">
         insert into t_cruise_plan(
             plan_id,
+            plan_code,
+            device_id,
+            up_region_id,
+            robot_id,
             plan_name,
             type,
             plan_point_types,
@@ -149,6 +253,10 @@
         <foreach collection="list" item="TCruisePlan" separator=",">
             (
                 #{TCruisePlan.planId, jdbcType=BIGINT},
+                #{TCruisePlan.planCode, jdbcType=VARCHAR},
+                #{TCruisePlan.deviceId, jdbcType=BIGINT},
+                #{TCruisePlan.upRegionId, jdbcType=BIGINT},
+                #{TCruisePlan.robotId, jdbcType=BIGINT},
                 #{TCruisePlan.planName, jdbcType=VARCHAR},
                 #{TCruisePlan.type, jdbcType=INTEGER},
                 #{TCruisePlan.planPointTypes, jdbcType=VARCHAR},
@@ -184,6 +292,7 @@
         <foreach collection="deviceIdList" item="deviceId" index="no" open="(" separator="," close=")">
             #{deviceId, jdbcType=BIGINT}
         </foreach>
+         and j.inspection_type = 1
          GROUP BY a.instance_id
          ORDER BY a.instance_id asc,a.device_id, a.custom_id
     </select>
@@ -200,6 +309,50 @@
         left join t_dict_business b on b.dict_id = a.up_dict
         WHERE a.col_name = 'sub_plan_type'
         and a.up_dict = ( SELECT c.dict_id FROM t_dict_business c WHERE c.dict_code = #{dictCode,jdbcType=VARCHAR} )
+    </select>
+    <select id="selectByRobotId" resultType="java.lang.String">
+        SELECT
+        a.plan_code
+        FROM
+        t_cruise_plan a
+        WHERE a.robot_id = #{robotId, jdbcType=BIGINT}
+    </select>
+
+    <select id="queryOperationInstances" resultType="com.yjh.platform.module.task.entity.InstanceTree">
+        SELECT a.device_id, a.instance_id, a.device_mete_id, a.station_id, a.custom_id, a.station_name, a.cruise_id, a.cruise_name, b.device_name,k.dict_note AS custom_name,
+          (CASE
+            WHEN ISNULL(j.mete_name) AND ISNULL(d.inspection_name) AND ISNULL(f.preset_name) THEN ''
+            WHEN ISNULL(j.mete_name) AND ISNULL(d.inspection_name) THEN f.preset_name
+            WHEN ISNULL(j.mete_name) AND ISNULL(f.preset_name) THEN d.inspection_name
+            WHEN ISNULL(d.inspection_name) AND ISNULL(f.preset_name) THEN j.mete_name
+            WHEN ISNULL(d.inspection_name) THEN CONCAT(j.mete_name,'/',f.preset_name)
+            WHEN ISNULL(f.preset_name) THEN CONCAT(j.mete_name,'/',d.inspection_name)
+            END) AS instance_name,e.robot_name,
+          g.camera_name,h.camera_name AS inferad_name,i.dict_note AS cruise_type_name,a.identify_type
+          FROM t_cruise_point_instance a
+                LEFT JOIN t_std_device b ON a.device_id = b.device_id AND a.custom_id = b.custom_id
+                LEFT JOIN t_cruise_point_attr c ON a.instance_id = c.instance_id
+                LEFT JOIN t_robot_inspection d ON d.inspection_id = a.cruise_id
+                LEFT JOIN t_robot_info e ON d.robot_id = e.robot_id
+                LEFT JOIN t_camera_preset f ON a.cruise_id = f.preset_id
+                LEFT JOIN t_camera_info g ON f.preset_id = g.camera_name AND g.camera_type = 205
+                LEFT JOIN t_camera_info h ON f.preset_id = h.camera_name AND h.camera_type = 206
+                LEFT JOIN t_dict_business i ON i.dict_code = a.cruise_type AND i.col_name = "cruise_type"
+                LEFT JOIN t_std_devicemete j ON j.device_mete_id = a.device_mete_id
+                LEFT JOIN t_dict_business k ON k.dict_code = b.custom_id AND k.col_name = "custom_type"
+        where 1 = 1
+            <if test="deviceId != null and deviceId != ''">
+                and a.device_id = #{deviceId, jdbcType=VARCHAR}
+            </if>
+            <if test="robotId != null">
+                and d.robot_id =  #{robotId, jdbcType=BIGINT}
+            </if>
+            <if test="type != null">
+                and d.main_operation_type = #{type, jdbcType=BIGINT}
+            </if>
+            and j.inspection_type =2
+         GROUP BY a.instance_id
+         ORDER BY a.instance_id asc,a.device_id, a.custom_id
     </select>
 
 </mapper>

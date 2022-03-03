@@ -270,7 +270,7 @@
     <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand" resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
         select distinct <include refid="TongYong"></include>
         FROM t_cruise_result a
-        LEFT JOIN t_dict_business d ON a.c_type = d.dict_code and d.col_name = 'plan_type'
+        JOIN t_dict_business d ON a.c_type = d.dict_code and d.col_name = 'plan_type'
         LEFT JOIN t_dict_business e ON a.c_state = e.dict_code and e.col_name='task_state'
         LEFT JOIN t_cruise_task_result f ON a.task_result_id = f.task_result_id
         LEFT JOIN t_cruise_task_result_detail g ON f.task_result_id = g.task_result_id
@@ -442,7 +442,7 @@
         e.dict_note AS 'typeName'
         FROM
         t_cruise_task d
-        LEFT JOIN t_dict_business e ON d.type=e.dict_code AND e.col_name='plan_type'
+        JOIN t_dict_business e ON d.type=e.dict_code AND e.col_name='plan_type'
         JOIN t_cruise_result a ON a.task_id=d.task_id
         LEFT JOIN t_dict_business b ON a.c_state=b.dict_code AND b.col_name='task_state'
 

@@ -1,13 +1,17 @@
 package com.yjh.platform.module.task.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -27,6 +31,23 @@ public class TCruisePlanCount implements Serializable {
     @ApiModelProperty(value = "预案ID")
     @TableId(value = "plan_id", type = IdType.AUTO)
     private Long planId;
+
+    @ApiModelProperty(value = "预案编码")
+    private String planCode;
+
+    @Length(max = 50, message = "deviceId长度必须小于等于50")
+    @ApiModelProperty(value = "device_id")
+    @TableField(value = "device_id", updateStrategy = FieldStrategy.IGNORED)
+    private Long deviceId;
+
+    @ApiModelProperty(value = "上级区域id")
+    @TableField(value = "upRegionId", updateStrategy = FieldStrategy.IGNORED)
+    private Long upRegionId;
+
+    @Max(value=999999999999999999l)
+    @ApiModelProperty(value = "机器人id")
+    @TableField(value = "robot_id",updateStrategy = FieldStrategy.IGNORED)
+    private Long robotId;
 
     @ApiModelProperty(value = "预案名称")
     private String planName;

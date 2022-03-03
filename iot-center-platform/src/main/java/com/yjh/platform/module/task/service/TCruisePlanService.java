@@ -5,7 +5,9 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
@@ -14,6 +16,7 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import com.yjh.platform.module.user.entity.TDictBusiness;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
 * @author tt
@@ -41,6 +45,9 @@ public class TCruisePlanService{
     @Autowired
     private TAlgorithmConfDao tAlgorithmConfDao;
 
+    @Autowired
+    private TStdDevicemeteDao tStdDevicemeteDao;
+
     private Logger log = LoggerFactory.getLogger(TCruisePlanService.class);
 
 
@@ -54,11 +61,25 @@ public class TCruisePlanService{
         tCruisePlan.setPlanName(String.valueOf(map.get("planName")));
         Integer planType = Integer.parseInt(String.valueOf(map.get("type")));
         tCruisePlan.setType(planType);
+        tCruisePlan.setUpRegionId(map.get("upRegionId") == null ? null : Long.parseLong(map.get("upRegionId").toString()));
+        tCruisePlan.setPlanCode(map.get("planCode") == null ? "" : map.get("planCode").toString());
+        tCruisePlan.setRobotId(map.get("robotId") == null ? null : Long.parseLong(map.get("robotId").toString()));
+        tCruisePlan.setPlanPointTypes(map.get("simulationSteps") == null ? "" : map.get("simulationSteps").toString());//该字段用于操作票初始状态
         if (Objects.isNull(map.get("instanceList"))) return this.tCruisePlanDao.insert(tCruisePlan);
         List<Long> InstanceMapList = (List<Long>) map.get("instanceList");
-        if (InstanceMapList.size()==0) return this.tCruisePlanDao.insert(tCruisePlan);
-        this.tCruisePlanDao.insert(tCruisePlan);
-
+        //处理操作票数据 新增的操作票不绑定设备以及区域 之前绑定的操作票进行更新
+        if (InstanceMapList.size() == 0) {
+            return this.tCruisePlanDao.insert(tCruisePlan);
+        } else {
+            Long planId = dealOperationTicket(tCruisePlan);
+            if (planId != null){
+                deleteTCruisePointInstance(planId);
+                this.tCruisePlanDao.update(tCruisePlan);
+                this.tCruisePlanAttrDao.deleteByPrimaryId(planId);
+            }else {
+                this.tCruisePlanDao.insert(tCruisePlan);
+            }
+        }
         Long planId = tCruisePlan.getPlanId();
 
         List<TCruisePointInstanceAttr> tCruisePointInstanceAttrList = tCruisePointInstanceDao.batchSelectInstanceAttr(InstanceMapList);
@@ -95,6 +116,31 @@ public class TCruisePlanService{
             tCruisePlanAttrList.add(tCruisePlanAttr);
         }
         return tCruisePlanAttrDao.batchInsert(tCruisePlanAttrList);
+    }
+
+    private void deleteTCruisePointInstance(Long planId){
+        List<Long> instanceIdList = tCruisePlanAttrDao.selectByPlanId(planId);
+        tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
+    }
+
+    /**
+     * 处理操作票信息
+     * @param tCruisePlan
+     * @return planId
+     */
+    private Long dealOperationTicket(TCruisePlan tCruisePlan){
+        Long planId = null;
+        if (!StringUtils.isEmpty(tCruisePlan.getPlanCode())) {
+            TCruisePlan orderTCruisePlan = tCruisePlanDao.selectByPlanCode(tCruisePlan.getPlanCode());
+            if (Objects.nonNull(orderTCruisePlan)
+                    && !StringUtils.isEmpty(orderTCruisePlan.getPlanCode())
+                    && orderTCruisePlan.getType() == 456) {
+                planId = orderTCruisePlan.getPlanId();
+                tCruisePlan.setDeviceId(orderTCruisePlan.getDeviceId());
+                tCruisePlan.setPlanId(planId);
+            }
+        }
+        return planId;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -161,6 +207,29 @@ public class TCruisePlanService{
     }
 
     @Transactional(rollbackFor = Exception.class)
+    public List<TCruisePlanCountByPage> selectTicketPlanPage(Long deviceId, Long upRegionId, Integer flag) {
+        return tCruisePlanDao.selectTicketPlanPage(deviceId, upRegionId, flag);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int updateTicket(Map<String, Object> ticketMap){
+        if (Optional.ofNullable(ticketMap.get("planId")).isPresent() && !StringUtils.isEmpty(ticketMap.get("planId").toString())){
+            String planId = ticketMap.get("planId").toString();
+            String deviceId = ticketMap.get("deviceId").toString();
+            List<Long> planIdList = Arrays.stream(planId.split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(planIdList)){
+                planIdList.forEach(p -> {
+                    List<Long> instanceId = tCruisePlanAttrDao.selectByPlanId(p);
+                    Long id = StringUtils.isEmpty(deviceId) ? null : Long.parseLong(deviceId);
+                    instanceId.forEach(i-> tCruisePointInstanceDao.update(new TCruisePointInstance().setInstanceId(i).setDeviceId(id)));
+                    tCruisePlanDao.update(new TCruisePlan().setPlanId(p).setDeviceId(id));
+                });
+            }
+        }
+        return 1;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<TCruisePlan> list) {
         return this.tCruisePlanDao.batchInsert(list);
     }
@@ -218,6 +287,21 @@ public class TCruisePlanService{
         up.setChildren(cruiseTypeTree);
         upList.add(up);
         return upList;
+    }
+
+    public List<String> selectByRobotId(Long robotId) {
+        return tCruisePlanDao.selectByRobotId(robotId);
+    }
+
+    public int deleteByPlanCode(String planCode) {
+        TCruisePlan tCruisePlan = tCruisePlanDao.selectByPlanCode(planCode);
+        Long planId = tCruisePlan.getPlanId();
+        deleteTCruisePointInstance(planId);
+        return this.deleteByPrimaryId(planId);
+    }
+
+    public List<InstanceTree> queryOperationInstances(String deviceId, Long robotId, Integer type) {
+        return tCruisePlanDao.queryOperationInstances(deviceId, robotId, type);
     }
 }
 

@@ -205,7 +205,12 @@ public class RunAtNowTask implements Runnable{
             //tCruiseTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
             //String uuid = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
             //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
-            List<Long> instanceIdList = tCruisePlanAttrDao.selectByPlanId(tCruiseTask.getPlanId());//获取此任务下的巡检点数量
+            List<Long> instanceIdList = new ArrayList<>();
+            if (Objects.nonNull(tCruiseTask.getPlanId())) {
+                instanceIdList = tCruisePlanAttrDao.selectByPlanId(tCruiseTask.getPlanId());//获取此任务下的巡检点数量
+            }else {
+                instanceIdList.add(tCruiseTask.getInstanceId());
+            }
             if(isGoOn){
                 //任务重启
                 List<Long> isFinishedInstanceList = tCruiseTaskResultDetailDao.selectInstanceForTaskGoOn(taskId);
@@ -389,7 +394,7 @@ public class RunAtNowTask implements Runnable{
                         tCruiseTaskResultDetailMap.put("taskId",taskId);
                         tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
                         tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
-                        tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
+                        tCruiseTaskResultDetailMap.put("device_mete_id", item.getDeviceMeteId()== null ? "" : item.getDeviceMeteId().toString());
                         tCruiseTaskResultDetailMap.put("taskName",tCruiseTask.getTaskName());
                         tCruiseTaskResultDetailMap.put("realCode",item.getRealCode());
                         tCruiseTaskResultDetailMap.put("taskCode",tCruiseTask.getTaskCode());
@@ -417,9 +422,9 @@ public class RunAtNowTask implements Runnable{
                 tCruiseTaskResultDetailMap.put("taskId",taskId);
                 tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
                 tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
-                tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
+                tCruiseTaskResultDetailMap.put("device_mete_id", item.getDeviceMeteId()== null ? "" : item.getDeviceMeteId().toString());
                 tCruiseTaskResultDetailMap.put("taskName",tCruiseTask.getTaskName());
-                tCruiseTaskResultDetailMap.put("realCode",item.getRealCode());
+                tCruiseTaskResultDetailMap.put("realCode",item.getRealCode() == null ? "" : item.getRealCode());
                 tCruiseTaskResultDetailMap.put("taskCode",tCruiseTask.getTaskCode());
 
                 //tCruiseTaskResultDetailMap.put("endTime",simpleDateFormat.format(new Date()));
