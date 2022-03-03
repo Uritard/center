@@ -32,8 +32,9 @@ public enum HandlerEnum {
     // 机器人站端任务
     ROBOT_SELF_TASK("71","robotSelfTask"),
     // 机器人设备测点告警数据
-    ROBOT_INSPECTION_WARN("62","robotInspectionWarn");
-
+    ROBOT_INSPECTION_WARN("62","robotInspectionWarn"),
+    //环境数据异常告警数据
+    ENV_WARN("22","envWarn");
     /**
      * 状态值
      */

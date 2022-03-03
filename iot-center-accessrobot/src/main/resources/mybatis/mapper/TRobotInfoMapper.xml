@@ -966,6 +966,7 @@
                 #{taskId, jdbcType=VARCHAR}
         )
     </insert>
+
     <select id="selectWarnId" resultType="java.lang.Long">
         SELECT
 	        a.warn_id
@@ -1010,4 +1011,52 @@
         WHERE
         a.task_id = #{taskId,jdbcType=VARCHAR}
     </update>
+
+    <insert id="insertEnv" parameterType="Map">
+        insert into
+        t_env_warning (
+            env_warn_id,
+            robot_name,
+            robot_code,
+            time,
+            type,
+            value,
+            unit,
+            value_unit,
+            sn,
+            value_type,
+            alarm_time,
+            device_name
+          )
+        values
+          (
+            #{envWarnId,jdbcType=VARCHAR},
+            #{robotName,jdbcType=VARCHAR},
+            #{robotCode,jdbcType=VARCHAR},
+            #{time,jdbcType=VARCHAR},
+            #{type,jdbcType=VARCHAR},
+            #{value,jdbcType=VARCHAR},
+            #{unit,jdbcType=VARCHAR},
+            #{valueUnit,jdbcType=VARCHAR},
+            #{sn,jdbcType=TIMESTAMP},
+            #{valueType,jdbcType=VARCHAR},
+            #{alarmTime,jdbcType=VARCHAR},
+            #{deviceName,jdbcType=VARCHAR}
+      )
+    </insert>
+
+
+    <select id="selectRegionIdByrobotId" resultType="java.lang.String">
+           SELECT
+            b.up_region_id
+            FROM
+            t_std_region b
+            WHERE 1=1 AND b.region_id = (
+             SELECT
+            a.up_region_id AS regionId
+            FROM
+            t_robot_info a
+            WHERE 1=1 and a.robot_code = #{robotCode} )
+    </select>
+
 </mapper>

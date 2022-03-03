@@ -1,11 +1,14 @@
 package com.yjh.accessrobot.module.command.dao;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.module.command.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YC
@@ -272,4 +275,14 @@ public interface TRobotInfoDao {
      */
     int updateStandTaskStatus(@Param(value = "taskId")String taskId,@Param(value = "state")Integer state);
 
+    /**
+     * 新增环控告警
+     */
+    int insertEnv(Map<String, String> envWarn);
+
+    /**
+     * 根据 设备机器人id，查询上级区域
+     * @date 2022
+     */
+    String selectRegionIdByrobotId(@Param(value = "robotCode")String robotCode);
 }

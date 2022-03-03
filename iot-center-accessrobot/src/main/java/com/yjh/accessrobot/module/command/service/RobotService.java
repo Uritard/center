@@ -12,6 +12,7 @@ import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.logs.LogsAspect;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.dao.SysUserDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
@@ -1740,5 +1741,126 @@ public class RobotService {
         }
         return 1;
     }
+
+    /**
+     * 查询机器人状态
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public String queryRobotStatus(String robotCode) {
+        log.info("查询机器人状态:robotCode{}====", robotCode);
+        Map<Object, Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":2");
+        if (null != mapForRobotState && mapForRobotState.size() > 0) {
+            return mapForRobotState.getOrDefault("value", "1").toString();
+        }
+        return OFF_LINE;
+    }
+
+    /**
+     * 智能环境设备控制指令
+     */
+    public Result robotControl(HashMap<String, String> map) {
+        log.info("下发智能环境设备控制指令,map===" + map);
+
+        Result result = new Result();
+        try {
+            String robotCode = map.get("robotCode");
+            log.info("sendCode:{},robotCode:{}====", sendCode, robotCode);
+            if (StringUtils.isEmpty(robotCode)) {
+                log.error("当前不存在机器人编码,没有成功将控制指令下发到机器人....");
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            }
+            Map<Object, Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":2");
+            Object robotStatus = mapForRobotState.get("value");
+            log.info("robotStatus====" + robotStatus);
+            if (Optional.ofNullable(robotStatus).isPresent()) {
+                if ("1".equals(robotStatus)) {
+                    log.error("该机器人处于离线状态,没有成功将控制指令下发到机器人......");
+                    result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+                } else {
+                    log.info("开始生成xml");
+                    String type = map.get("type");
+                    String cmd = map.get("deviceStatus");
+                    String value = map.get("deviceAttr");
+                    String deviceType = map.get("deviceType");
+                    String deviceId = map.get("deviceId");
+                    List<Map<String, Object>> Item = new LinkedList<>();
+                    Map<String, Object> maps = new HashMap<>();
+                    if (StringUtils.equals("7",deviceType)) {  //7.空调
+                        maps.put("value", value);
+                    }
+                    Item.add(maps);
+                    XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                            .setSendCode(sendCode)
+                            .setReceiveCode(robotCode)
+                            .setType(type)
+                            .setCode(deviceId)
+                            .setTime(DateTimeUtil.getDateTimeString(new Date(), false))
+                            .setCommand(cmd)
+                            .setItems(Item);
+                    String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+                    log.info("生成的机器人控制xml是<start>" + xmlString + "<end>");
+                    RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
+                    result.setCode(ResultCodeEnum.NORMAL.getCode(),ResultCodeEnum.NORMAL.getName());
+                }
+            }
+        }catch (Exception e){
+            log.info(e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+        }
+        return result;
+    }
+
+    /**
+     * 环控数据存储
+     * @date 2022/2/18
+     */
+    public void addWeatherInfo(JSONObject json) {
+        log.info("接收微气象数据");
+        try {
+            if(Optional.ofNullable(json).isPresent() && json.getJSONArray("envDeviceStatusList").size() > 0){
+                String robotCode = json.getString("robotCode");
+                //查询区域Id
+                String regionId = tRobotInfoDao.selectRegionIdByrobotId(robotCode);
+                JSONArray envDeviceStatusList = json.getJSONArray("envDeviceStatusList");
+                redisTemplate.opsForHash().put("Weather",regionId,envDeviceStatusList);
+            }
+        } catch (Exception e) {
+            log.error("获取天气信息错误:", e);
+        }
+    }
+
+    /**
+     * 环控告警数据入库
+     */
+    public  void addEnvWarning(Map<String, String> envWarn) {
+        log.info( "接收环境设备告警开始");
+        try{
+            if (envWarn.size() > 0){
+                envWarn.put("envWarnId",getUUID());
+                tRobotInfoDao.insertEnv(envWarn);
+            }
+        }catch (Exception e){
+            log.error("接收环境设备告警数据错误:", e);
+        }
+    }
+
+    /**
+     * 32位UUID生成方法
+     *
+     * @return 32位UUID生成方法
+     */
+    public static String getUUID() {
+        UUID uuid = UUID.randomUUID();
+        String uuidStr = uuid.toString();
+        if (StringUtils.isNotEmpty(uuidStr)) {
+            uuidStr = uuidStr.toUpperCase();
+            uuidStr = uuidStr.replaceAll("-", "");
+        } else {
+            uuidStr = "";
+        }
+        return uuidStr;
+    }
+
+}
 }
 

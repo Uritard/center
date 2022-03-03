@@ -1,10 +1,13 @@
 package com.yjh.accessrobot.module.command.controller;
 
+
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
+import com.yjh.accessrobot.module.command.entity.EnvDeviceStatus;
 import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -213,6 +217,51 @@ public class RobotController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("离线情况同步机器人模型信息-上传文件接口发生错误:", e);
+        }
+        return result;
+    }
+
+
+    /**
+     * 智能环境设备控制
+     */
+    @ApiOperation(value = "智能环境设备控制")
+    @PostMapping(value = "/envDeviceControl")
+    public Result envDeviceControl(@RequestBody JSONObject jsonObject){
+        log.info("智能环境设备控制");
+        Result result = new Result();
+        try {
+            if (null == jsonObject) {
+                result.setCode(ResultCodeEnum.PARAMERROR.getCode(),ResultCodeEnum.PARAMERROR.getName());
+                return result;
+            }
+            /**
+             * 1.deviceId   环控设备序列号
+             * 2.deviceStatus  1. 打开  2.关闭
+             * 3. deviceAttr  类型空调  1.制冷  2. 制热
+             * 4.deviceType 环控设备类型 type
+             * 5.tpe= 81 环境设备开关控制
+            */
+            String regionId = jsonObject.getString("regionId");
+            List<EnvDeviceStatus> weather = (List<EnvDeviceStatus>) redisTemplate.opsForHash().get("Weather", regionId);
+            String robotCode = weather.get(0).getRobotCode();
+
+            String deviceId= jsonObject.getString("deviceId");
+            String deviceStatus = jsonObject.getString("deviceStatus");
+            String deviceAttr = jsonObject.getString("deviceAttr");
+            String deviceType = jsonObject.getString("deviceType");
+            String type = "81";
+            HashMap<String,String> map = new HashMap<>();
+            map.put("robotCode",robotCode);
+            map.put("deviceId",deviceId);
+            map.put("deviceStatus",deviceStatus);
+            map.put("deviceAttr",deviceAttr);
+            map.put("type",type);
+            map.put("deviceType",deviceType);
+            result = robotService.robotControl(map);
+        } catch (Exception e) {
+            log.info("智能环境设备控制异常", e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         }
         return result;
     }
