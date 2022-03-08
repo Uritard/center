@@ -704,7 +704,7 @@ select *from (
     <select id="envWarningQuery" resultType="java.util.HashMap">
         SELECT
         env.env_warn_id AS envWarnId,
-        env.type AS deviceType,
+        a.dict_note AS deviceType,
         CONCAT(a.dict_note,'告警')  AS alarmContent,
         env.value As deviceValue,
         env.unit AS unit,

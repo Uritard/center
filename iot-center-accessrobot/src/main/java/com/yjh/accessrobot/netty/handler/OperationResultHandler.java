@@ -98,7 +98,7 @@ public class OperationResultHandler implements MessageHandlerStrategy, Initializ
         // 操作前确认图片
         String[] confirmArray = confirmFilePath.split("/");
         String confirmFtpFileName = confirmArray[confirmArray.length - 1];
-        String confirmTemporaryFilePath = filePathMap.get("content") + "/" + ftpFilePath;
+        String confirmTemporaryFilePath = filePathMap.get("content") + "/" + confirmFilePath;
         log.info("confirmTemporaryFilePath==={}", confirmTemporaryFilePath);
 
         String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
@@ -107,17 +107,17 @@ public class OperationResultHandler implements MessageHandlerStrategy, Initializ
             // 操作结果图
             copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "CCD");
             operationResultMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);
-            operationResultMap.put("absolutePath", developAbsoluteUrl + "CCD" + "/" + temporaryFilePath);
+            operationResultMap.put("absolutePath", developAbsoluteUrl + "CCD" + "/" + ftpFileName);
             // 操作前确认图
             copyFileToDevelop(confirmTemporaryFilePath, developAbsoluteUrl + "CCD");
             operationResultMap.put("confirmRelativePath", developRelativeUrl + "CCD" + "/" + confirmFtpFileName);
-            operationResultMap.put("confirmAbsolutePath", developAbsoluteUrl + "CCD" + "/" + temporaryFilePath);
+            operationResultMap.put("confirmAbsolutePath", developAbsoluteUrl + "CCD" + "/" + confirmFtpFileName);
 
         }else if (Objects.equals("4", fileType)) { //操作结果为视频时  只有结果
             // 拷贝巡视结果图
             copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Video");
             operationResultMap.put("relativePath", developRelativeUrl + "Video" + "/" + ftpFileName);
-            operationResultMap.put("absolutePath", developAbsoluteUrl + "Video" + "/" + temporaryFilePath);
+            operationResultMap.put("absolutePath", developAbsoluteUrl + "Video" + "/" + ftpFileName);
             // 操作前确认图
             operationResultMap.put("confirmRelativePath", "");
             operationResultMap.put("confirmAbsolutePath", "");
