@@ -38,8 +38,8 @@ public class ExportUtil {
         Set<String> OperationTaskDetailDataCol = new HashSet<>();
         OperationTaskDetailDataCol.add("cruiseName");
         OperationTaskDetailDataCol.add("resultNum");
-        OperationTaskDetailDataCol.add("confirmPicpath");
-        OperationTaskDetailDataCol.add("picpath");
+        OperationTaskDetailDataCol.add("origConfirmPicPath");
+        OperationTaskDetailDataCol.add("origpic");
         OperationTaskDetailDataCol.add("startTime");
         OperationTaskDetailDataCol.add("userName");
         OperationTaskDetailDataCol.add("userId");

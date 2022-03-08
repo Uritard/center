@@ -7,6 +7,7 @@ import com.alibaba.excel.annotation.write.style.ContentRowHeight;
 import com.alibaba.excel.annotation.write.style.HeadRowHeight;
 import com.yjh.platform.common.utils.MyUrlImageConverter;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 @Data
@@ -26,11 +27,17 @@ public class OperationTaskRecordResult {
     @ExcelProperty(value = "设备状态", index = 1)
     private String resultNum;
 
-    @ExcelProperty(value = "待确认图片",converter = MyUrlImageConverter.class, index = 2)
+    @ApiModelProperty(value = "待确认图片")
     private String confirmPicpath;
 
-    @ExcelProperty(value = "结果图片",converter = MyUrlImageConverter.class,index = 3)
+    @ApiModelProperty(value = "结果图片")
     private String picpath;
+
+    @ExcelProperty(value = "待确认图片",converter = MyUrlImageConverter.class, index = 2)
+    private String origConfirmPicPath;
+
+    @ExcelProperty(value = "结果图片",converter = MyUrlImageConverter.class, index = 3)
+    private String origpic;
 
     @ExcelProperty(value = "操作时间", index = 4)
     private String startTime;
