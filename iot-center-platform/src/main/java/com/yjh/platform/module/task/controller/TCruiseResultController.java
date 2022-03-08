@@ -1,6 +1,8 @@
 package com.yjh.platform.module.task.controller;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.metadata.style.WriteCellStyle;
 import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 
@@ -442,27 +444,15 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "操作任务详情导出")
     @RequestMapping(value = "/operationResultExport",method = RequestMethod.GET)
-    public void operationResultExport (HttpServletResponse response ,@RequestParam(value = "taskId",required = false) String taskId){
-
+    public Result operationResultExport (@RequestParam(value = "taskId",required = false) String taskId){
+        Result result = new Result();
         try {
-            //获取需要导出的数据
-            List<OperationTaskRecordResult> list = tCruiseResultService.QueryOperationResult(taskId);
-
-            WriteCellStyle headWriteCellStyle = new WriteCellStyle();
-            //设置头居中
-            headWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
-            //内容策略
-            WriteCellStyle contentWriteCellStyle = new WriteCellStyle();
-            //设置 水平居中
-            contentWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.LEFT);
-            response.setContentType("application/vnd.ms-excel;charset=utf-8");
-            response.setCharacterEncoding("utf-8");
-            String fileName = URLEncoder.encode("操作记录详情_"+taskId,"UTF-8");
-            response.setHeader("Content-disposition", "attachment;filename="+fileName+".xls");
-            EasyExcel.write(response.getOutputStream(), OperationTaskRecordResult.class).autoCloseStream(Boolean.FALSE)
-                    .sheet("操作记录详情_"+taskId).doWrite(list);
+            result.setData(tCruiseResultService.downLoadOperationDetailReport(taskId));
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
         }catch (Exception e){
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(),ResultCodeEnum.QUERYERROR.getName());
             log.error("操作任务详情查询失败描述",e);
         }
+        return result;
     }
 }

@@ -1,5 +1,8 @@
 package com.yjh.platform.module.task.service;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -11,6 +14,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.IPage;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.Report.FileUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -21,6 +25,7 @@ import com.yjh.platform.module.task.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -28,6 +33,9 @@ import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+
+import static com.yjh.platform.common.utils.Report.ExportUtil.getCellStyle;
+import static com.yjh.platform.common.utils.Report.ExportUtil.getOperationTaskDetailModel;
 
 /**
  * @author czh
@@ -47,6 +55,8 @@ public class TCruiseResultService{
     private TStdDeviceAttrDao tStdDeviceAttrDao;
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseResult tCruiseResult) {
@@ -403,6 +413,28 @@ public class TCruiseResultService{
     */
     public List<OperationTaskRecordResult> QueryOperationResult(String taskId) {
         return tCruiseResultDao.QueryOperationResult(taskId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String downLoadOperationDetailReport(String taskId) {
+
+        String reportName = taskId + ".xlsx";
+        Map<String, String> tempReflectMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+        String reportPath = tempReflectMap.get("content");
+        log.info("reportPath:" + reportPath);
+        //创建文件夹
+        FileUtil.createDirectory(reportPath);
+        //获取需要导出的数据
+        List<OperationTaskRecordResult> list = this.QueryOperationResult(taskId);
+        String fileNamePath = reportPath + "/" + reportName;
+        ExcelWriter excelWriter = EasyExcel.write(fileNamePath).build();
+        WriteSheet writeSheet = EasyExcel.writerSheet(0, "操作记录详情").includeColumnFiledNames(getOperationTaskDetailModel())
+                .head(OperationTaskRecordResult.class).registerWriteHandler(getCellStyle()).build();
+        excelWriter.write(list, writeSheet);
+        //关闭写excel
+        excelWriter.finish();
+        Map<String, String> meteModelPathMap = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
+        return meteModelPathMap.get("content") + "/" + reportName;
     }
 
 }

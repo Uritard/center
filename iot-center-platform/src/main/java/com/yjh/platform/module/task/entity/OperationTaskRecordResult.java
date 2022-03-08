@@ -26,10 +26,10 @@ public class OperationTaskRecordResult {
     @ExcelProperty(value = "设备状态", index = 1)
     private String resultNum;
 
-    @ExcelProperty(value = "待确认图片路径—相对",converter = MyUrlImageConverter.class, index = 2)
+    @ExcelProperty(value = "待确认图片",converter = MyUrlImageConverter.class, index = 2)
     private String confirmPicpath;
 
-    @ExcelProperty(value = "结果图片路径—相对",converter = MyUrlImageConverter.class,index = 3)
+    @ExcelProperty(value = "结果图片",converter = MyUrlImageConverter.class,index = 3)
     private String picpath;
 
     @ExcelProperty(value = "操作时间", index = 4)
