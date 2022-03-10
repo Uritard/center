@@ -28,16 +28,16 @@ public class OperationTaskRecordResult {
     private String resultNum;
 
     @ApiModelProperty(value = "待确认图片")
-    private String confirmPicpath;
+    private String confirmPicPath;
 
     @ApiModelProperty(value = "结果图片")
-    private String picpath;
+    private String picPath;
 
     @ExcelProperty(value = "待确认图片",converter = MyUrlImageConverter.class, index = 2)
     private String origConfirmPicPath;
 
     @ExcelProperty(value = "结果图片",converter = MyUrlImageConverter.class, index = 3)
-    private String origpic;
+    private String origPic;
 
     @ExcelProperty(value = "操作时间", index = 4)
     private String startTime;

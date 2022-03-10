@@ -39,7 +39,7 @@ public class ExportUtil {
         OperationTaskDetailDataCol.add("cruiseName");
         OperationTaskDetailDataCol.add("resultNum");
         OperationTaskDetailDataCol.add("origConfirmPicPath");
-        OperationTaskDetailDataCol.add("origpic");
+        OperationTaskDetailDataCol.add("origPic");
         OperationTaskDetailDataCol.add("startTime");
         OperationTaskDetailDataCol.add("userName");
         OperationTaskDetailDataCol.add("userId");
