@@ -46,7 +46,10 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
             // model file sync
             String deviceFile = xmlBaseModel.getItems().get(0).get("device_file_path").toString();
             String robotFile = xmlBaseModel.getItems().get(0).get("robot_file_path").toString();
-            String propertyFile = xmlBaseModel.getItems().get(0).get("property_file_path").toString();
+            String propertyFile = "";
+            if(xmlBaseModel.getItems().get(0).containsKey("property_file_path")){
+                propertyFile = xmlBaseModel.getItems().get(0).get("property_file_path").toString();
+            }
             log.info("模型同步的文件路径信息,deviceFile:{},robotFile:{},propertyFile:{}", deviceFile, robotFile, propertyFile);
             if (StringUtils.isNotEmpty(deviceFile) && StringUtils.isNotEmpty(robotFile)) {
                 Map<String, String> map = new HashMap<>(5);

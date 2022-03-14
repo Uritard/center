@@ -319,9 +319,11 @@ public class RobotService {
         List<Map<String, Object>> deviceMap = deviceModel.getItems();
         XMLBaseModel robotModel = getXmlMessage(filePathMap.get("content") + File.separator + robotFile);
         List<Map<String, Object>> robotMap = robotModel.getItems();
-        XMLBaseModel propertyModel = getXmlMessage(filePathMap.get("content") + File.separator + propertyFile);
-        List<Map<String, Object>> propertyMap = propertyModel.getItems();
-
+        List<Map<String, Object>> propertyMap= new ArrayList<>();
+        if (!"".equals(propertyFile)) {
+            XMLBaseModel propertyModel = getXmlMessage(filePathMap.get("content") + File.separator + propertyFile);
+            propertyMap = propertyModel.getItems();
+        }
         if (CollectionUtils.isNotEmpty(deviceMap) && CollectionUtils.isNotEmpty(robotMap)) {
             Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
             // Robot Model Info
@@ -410,10 +412,11 @@ public class RobotService {
             /*if (!"".equals(deviceMap.get("component_id").toString())){
                 tRobotInspection.setComponentId(deviceMap.get("component_id").toString());
             }*/
-            if (!"".equals(deviceMap.get("point_type").toString())) {
-                Integer inspectionType = Integer.parseInt(deviceMap.get("point_type").toString());
-                tRobotInspection.setInspectionType(inspectionType);
+            int inspectionType = 1;
+            if (deviceMap.containsKey("point_type") && !"".equals(deviceMap.get("point_type").toString())) {
+                inspectionType = Integer.parseInt(deviceMap.get("point_type").toString());
             }
+            tRobotInspection.setInspectionType(inspectionType);
             if (!"".equals(deviceMap.get("meter_type").toString())) {
                 Integer meterType = selectDictCode("meterType", deviceMap.get("meter_type").toString(), "meter_type");
                 tRobotInspection.setMeterType(meterType);
@@ -422,11 +425,11 @@ public class RobotService {
                 Integer appearanceType = selectDictCode("appearanceType", deviceMap.get("appearance_type").toString(), "appearance_type");
                 tRobotInspection.setAppearanceType(appearanceType);
             }
-            if (!"".equals(deviceMap.get("main_operation_type").toString())) {
+            if (deviceMap.containsKey("main_operation_type") && !"".equals(deviceMap.get("main_operation_type").toString())) {
                 Integer mainOperationType = selectDictCode("mainOperationType", deviceMap.get("main_operation_type").toString(), "main_operation_type");
                 tRobotInspection.setMainOperationType(mainOperationType);
             }
-            if (!"".equals(deviceMap.get("operation_type").toString())) {
+            if (deviceMap.containsKey("operation_type") && !"".equals(deviceMap.get("operation_type").toString())) {
                 Integer operationType = selectDictCode("operationType", deviceMap.get("operation_type").toString(), "operation_type");
                 tRobotInspection.setOperationType(operationType);
             }
@@ -436,7 +439,7 @@ public class RobotService {
             if (!"".equals(deviceMap.get("device_info").toString())) {
                 tRobotInspection.setDeviceInfo(deviceMap.get("device_info").toString());
             }
-            if (!"".equals(deviceMap.get("property_pic_path").toString())) {
+            if (deviceMap.containsKey("property_pic_path") && !"".equals(deviceMap.get("property_pic_path").toString())) {
                 String relativePropertyPicPath = convertPropertyPicPath(deviceMap.get("property_pic_path").toString());
                 tRobotInspection.setPropertyPicPath(relativePropertyPicPath);
             }
