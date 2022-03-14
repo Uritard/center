@@ -54,6 +54,7 @@ public class AccessRobotApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
+        robotService.updateAllRobotStatus();
         String url = getLocalIp();
 //        String url = "192.168.40.71";
 

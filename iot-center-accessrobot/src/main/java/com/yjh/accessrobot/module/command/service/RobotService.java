@@ -91,6 +91,10 @@ public class RobotService {
     private String websocketUrl;
 
 
+    @Transactional(rollbackFor = Exception.class)
+    public int updateAllRobotStatus(){
+        return tRobotInfoDao.updateAllRobotStatus("离线");
+    }
     /**
      * 巡视主机下发控制指令到机器人
      * @param robotCode 机器人唯一标识
@@ -946,12 +950,14 @@ public class RobotService {
                     return result;
                 }else {
                     String taskId = robotTaskControlMap.get("taskId").toString();
+                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
+                    String code = redisInfoMap.get("taskPatrolled_id");
 
                     XMLBaseModel xmlBaseModel = new XMLBaseModel()
                             .setType("41")
                             .setSendCode(sendCode)
                             .setReceiveCode(robotCode)
-                            .setCode(taskId)
+                            .setCode(code)
                             .setCommand(commandValue)
                             .setTime(DateTimeUtil.format(new Date()));
                     String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
@@ -1115,7 +1121,7 @@ public class RobotService {
         log.info("插tCTRD的条数:{},插tCDR的条数:{}", res1, res2);
 
         // 将已经做过的巡视点Map清空
-        if (Objects.nonNull(Constant.flagMap.get(taskId)) && StringUtils.isNotEmpty(Constant.flagMap.get(taskId).toString())){
+        if (StringUtils.isNotEmpty(Constant.flagMap.get(taskId).toString())){
             log.info("将公共类的instanceIdList清空");
             Constant.flagMap = new HashMap<>(16);
         }
@@ -2033,7 +2039,7 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("生成的机器人控制xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
-        TimeUnit.MILLISECONDS.sleep(1000);
+        TimeUnit.MILLISECONDS.sleep(2000);
 
         return RobotServerHandler.getRobotResultMap().get("Code").toString();
     }

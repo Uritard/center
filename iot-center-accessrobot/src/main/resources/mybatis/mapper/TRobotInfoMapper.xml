@@ -343,6 +343,12 @@
             )
         </foreach>
     </insert>
+
+    <update id="updateAllRobotStatus">
+        UPDATE t_robot_info a<set>
+        <if test="robotStatus != null and robotStatus != ''">a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
+    </set>
+    </update>
     <!--查询所有的robotCode-->
     <select id="selectAllRobotCode" resultType="java.lang.String">
         SELECT a.robot_code

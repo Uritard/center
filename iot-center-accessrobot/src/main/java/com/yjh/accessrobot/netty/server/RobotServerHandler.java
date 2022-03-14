@@ -263,7 +263,6 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             }else {
                 handlerType = type;
             }
-            log.info("响应处理的handler是:{}",handlerType);
             MessageHandlerStrategy messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
             if (Optional.of(messageHandlerStrategy).isPresent()){
                 messageHandlerStrategy.handler(ctx,this, xmlBaseModel, sendSessionId, receiveSessionId);

@@ -108,6 +108,7 @@ public class TaskShutDownJob extends QuartzJobBean {
 
             //机器人任务终止
             List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+            log.info("机器人任务终止,robotCodeList:{}",robotCodeList);
             if(robotCodeList != null && robotCodeList.size()>0){
                 Map<String,Object> robotTaskStatesMap = new HashMap<>();
                 robotTaskStatesMap.put("taskId",taskId);

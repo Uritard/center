@@ -334,7 +334,6 @@ public class InspectionResultThread implements Runnable{
 
         for (Long instanceId : instanceIdDoneList) {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());
-            log.info("redisInfoMap的数据是{}", redisInfoMap);
             // 缓存中该巡检点有结果
             boolean conditionRes = !StringUtils.equals("设备检修中", redisInfoMap.get("resultNum"))
                     && (StringUtils.equals("246", redisInfoMap.get("cruiseResult"))

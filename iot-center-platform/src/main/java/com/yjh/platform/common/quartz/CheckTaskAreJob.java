@@ -83,6 +83,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
         //获取正常和异常的点数
             //机器人任务终止
         List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+        log.info("机器人任务终止,robotCodeList:{}",robotCodeList);
         if(robotCodeList != null && robotCodeList.size()>0){
             Map<String,Object> robotTaskStatesMap = new HashMap<>();
             robotTaskStatesMap.put("taskId",taskId);

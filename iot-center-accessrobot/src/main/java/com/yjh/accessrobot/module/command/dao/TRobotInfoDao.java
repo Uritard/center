@@ -56,6 +56,12 @@ public interface TRobotInfoDao {
     int batchInsert(List<TRobotInfo> list);
 
     /**
+     * 更新所有的机器人状态，将其设置为离线
+     * @param robotStatus 机器人状态
+     * @return int
+     */
+    int updateAllRobotStatus(@Param(value = "robotStatus") String robotStatus);
+    /**
      * 查询表中所有机器人编码
      * @return List<String>
      */

@@ -673,6 +673,7 @@ public class TCruiseTaskService {
             //Thread.sleep(10000);
             //机器人任务暂停
             List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+            log.info("机器人任务暂停,robotCodeList:{}",robotCodeList);
             if (robotCodeList != null && robotCodeList.size() > 0) {
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
                 robotTaskStatesMap.put("taskId", taskId);
@@ -729,6 +730,7 @@ public class TCruiseTaskService {
 
         //机器人任务继续
         List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+        log.info("机器人任务继续,robotCodeList:{}",robotCodeList);
         if (robotCodeList != null && robotCodeList.size() > 0) {
             Map<String, Object> robotTaskStatesMap = new HashMap<>();
             robotTaskStatesMap.put("taskId", taskId);
@@ -1361,7 +1363,7 @@ public class TCruiseTaskService {
         tCruiseTask.setStartTime(new Date());
         int status=tCruiseTaskDao.insert(tCruiseTask);
 
-        // TODO: 2021/2/6 联调时放开 任务下发请求 
+        // TODO: 2021/2/6 联调时放开 任务下发请求
 //        //任务下发请求
 //        Map<String,List<Analysis>> listMap=new HashMap<>();
 //        listMap.put("list",analysisList);
