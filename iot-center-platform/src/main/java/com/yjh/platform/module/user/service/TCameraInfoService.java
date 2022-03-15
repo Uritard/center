@@ -104,7 +104,7 @@ public class TCameraInfoService {
                 Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
             }catch (Exception e){
                 log.error("调用vqd服务异常"+e);
-//                return -2;
+                return -2;
             }
         }
         this.tCameraInfoDao.deleteByPrimaryId(cameraId);
