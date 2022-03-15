@@ -38,7 +38,6 @@ public class NettyServer {
             .childOption(ChannelOption.SO_KEEPALIVE, true)
             // 防止数据传输延迟 如果false的话会缓冲数据达到一定量在flush,降低系统网络调用（具体场景）
             .childOption(ChannelOption.TCP_NODELAY, true)
-            .childOption(ChannelOption.AUTO_READ, true)
             // 容量动态调整的接收缓冲区分配器 以节约内存
             .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
             // Netty实现了一个Java版的Jemalloc内存管理库 ByteBuf内存池 要搭配ReferenceCountUtil.release(msg);不然造成内存泄漏;

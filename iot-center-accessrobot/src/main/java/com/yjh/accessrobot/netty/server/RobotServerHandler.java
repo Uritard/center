@@ -421,6 +421,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
                 if (Objects.nonNull(channelId)){
                     maps.remove(channelId.toString());
+                    robotChannels.remove(robotCode);
                     log.info("id: " + channelId + ", robotCode: " + robotCode + " left," + "onlineSize: " + maps.size());
 
                     try {
