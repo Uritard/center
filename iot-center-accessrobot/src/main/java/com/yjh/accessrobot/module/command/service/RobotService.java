@@ -994,17 +994,18 @@ public class RobotService {
         }
         String taskId = confirmMessageMap.get("taskId").toString();
         List<Map<String, Object>> cfmList = (List<Map<String, Object>>) confirmMessageMap.get("confirmMsgList");
-        Map<String, String> robotConfirmMsg = new HashMap<>();
+        Map<String, Object> robotConfirmMsg = new HashMap<>();
         robotConfirmMsg.put("newMessage","false");
         for (Map<String, Object> map : cfmList) {
             boolean flag = false;
             if (map.get("type").equals("1") && map.get("value").equals("")) {
                 robotConfirmMsg = redisTemplate.opsForHash().entries("RobotConfirmMsg:" + robotCode + ":" + taskId);
-                robotConfirmMsg.put("confirmMapList", robotConfirmMsg.get("splitConfirmMapList"));
+                robotConfirmMsg.put("confirmMapList", robotConfirmMsg.get("splitConfirmMapList").toString());
                 robotConfirmMsg.put("splitConfirmMapList", "");
                 robotConfirmMsg.put("newMessage", "true");
                 redisTemplate.opsForHash().putAll("RobotConfirmMsg:" + robotCode + ":" + taskId, robotConfirmMsg);
                 //webSocket通知前端确认消息
+                robotConfirmMsg.put("confirmMapList", JSONArray.parseArray(robotConfirmMsg.get("confirmMapList").toString()));
                 String jsons = JSON.toJSONString(robotConfirmMsg);
                 log.info("确认消息生成-前端推送：" + jsons);
                 try {
@@ -2383,7 +2384,7 @@ public class RobotService {
                 //查询区域Id
                 String regionId = tRobotInfoDao.selectRegionIdByrobotId(robotCode);
                 JSONArray envDeviceStatusList = json.getJSONArray("envDeviceStatusList");
-                redisTemplate.opsForHash().put("Weather",regionId,envDeviceStatusList);
+                redisTemplate.opsForHash().put("Weather",regionId,JSONArray.toJSONString(envDeviceStatusList));
             }
         } catch (Exception e) {
             log.error("获取天气信息错误:", e);

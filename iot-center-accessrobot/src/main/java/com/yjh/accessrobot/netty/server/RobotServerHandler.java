@@ -166,7 +166,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
 
         if (allPacket.length() >= onePacketLength){
             String onePacket= allPacket.substring(0,onePacketLength);
-            log.info("onePacket==="+onePacket);
+            log.info("onePacket==="+onePacket+ ", allPacket===" + allPacket.length());
             int headNum = appearNumber(onePacket,TAG);
             openPackage(ctx, onePacket, headNum);
         }

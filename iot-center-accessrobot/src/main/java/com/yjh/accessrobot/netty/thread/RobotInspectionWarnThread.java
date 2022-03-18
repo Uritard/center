@@ -123,8 +123,10 @@ public class RobotInspectionWarnThread implements Runnable{
         warnInfo.setWarnName(warnResultMap.get("content"));
         warnInfo.setWarnLevel(133);
         warnInfo.setWarnContent(warnResultMap.get("content"));
-        Integer warnType = StaticContextAccessor.getBean(RobotService.class).selectDictCode("pointAlarmType", warnResultMap.get("alarmType"), "point_alarm_type");
-        warnInfo.setWarnType(warnType);
+        if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmType"))) {
+            int warnType = StaticContextAccessor.getBean(RobotService.class).selectDictCode("pointAlarmType", warnResultMap.get("alarmType"), "point_alarm_type");
+            warnInfo.setWarnType(warnType);
+        }
         log.info("要插库的告警数据是==={}", warnInfo);
 
         String warnName = "warnInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
