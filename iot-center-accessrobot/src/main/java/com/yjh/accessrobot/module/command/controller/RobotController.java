@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.module.command.controller;
 
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.commons.logs.Logs;
@@ -13,6 +14,7 @@ import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -242,26 +244,26 @@ public class RobotController {
 
     /**
      * 智能环境设备控制
+     * 1.deviceId   环控设备序列号
+     * 2.deviceStatus  1. 打开  2.关闭
+     * 3. deviceAttr  类型空调  1.制冷  2. 制热
+     * 4.deviceType 环控设备类型 type
+     * 5.tpe= 23 环境设备开关控制
      */
     @ApiOperation(value = "智能环境设备控制")
     @PostMapping(value = "/envDeviceControl")
-    public Result envDeviceControl(@RequestBody JSONObject jsonObject){
+    public Result envDeviceControl(@RequestBody JSONObject jsonObject) {
         log.info("智能环境设备控制");
         Result result = new Result();
         try {
             if (Objects.nonNull(jsonObject) && jsonObject.size() > 0) {
-                /**
-                 * 1.deviceId   环控设备序列号
-                 * 2.deviceStatus  1. 打开  2.关闭
-                 * 3. deviceAttr  类型空调  1.制冷  2. 制热
-                 * 4.deviceType 环控设备类型 type
-                 * 5.tpe= 23 环境设备开关控制
-                 */
-                String regionId = jsonObject.getString("regionId");
-                List<EnvDeviceStatus> weather = (List<EnvDeviceStatus>) redisTemplate.opsForHash().get("Weather", regionId);
-                if (Objects.nonNull(weather) && weather.size() > 0) {
+                String regionId = jsonObject.get("regionId").toString();
+                String envDataJson = getRedisMapString("Weather", regionId);
+                List<EnvDeviceStatus> weather;
+                if (StringUtils.isNotEmpty(envDataJson)) {
+                    JSONArray objects = JSONArray.parseArray(envDataJson);
+                    weather = objects.toJavaList(EnvDeviceStatus.class);
                     String robotCode = weather.get(0).getRobotCode();
-
                     String deviceId = jsonObject.getString("deviceId");
                     String deviceStatus = jsonObject.getString("deviceStatus");
                     String deviceAttr = jsonObject.getString("deviceAttr");
@@ -276,8 +278,8 @@ public class RobotController {
                     map.put("deviceType", deviceType);
                     result = robotService.robotControl(map);
                 }
-            }else {
-                result.setCode(ResultCodeEnum.PARAMERROR.getCode(),ResultCodeEnum.PARAMERROR.getName());
+            } else {
+                result.setCode(ResultCodeEnum.PARAMERROR.getCode(), ResultCodeEnum.PARAMERROR.getName());
                 return result;
             }
         } catch (Exception e) {
@@ -285,5 +287,14 @@ public class RobotController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
         }
         return result;
+    }
+    /**
+     * 获取redis集合值
+     *
+     * @param key
+     * @return
+     */
+    private <T> T getRedisMapString(String key, String field) {
+        return (T) redisTemplate.opsForHash().get(key, field);
     }
 }
