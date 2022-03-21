@@ -116,7 +116,8 @@ public interface HCNetSDK extends Library {
     public static final int MAX_ANALOG_ALARMOUT = 32;    //最大32路模拟报警输出
     public static final int MAX_ANALOG_ALARMIN = 32;    //最大32路模拟报警输入
     public static final int MAX_IP_DEVICE = 32;    //允许接入的最大IP设备数
-    public static final int MAX_IP_CHANNEL = 32;   //允许加入的最多IP通道数
+//    public static final int MAX_IP_CHANNEL = 32;   //允许加入的最多IP通道数
+    public static final int MAX_IP_CHANNEL = 32 + 1 + 36 ;   //允许加入的最多IP通道数
     public static final int MAX_IP_ALARMIN = 128;   //允许加入的最多报警输入数
     public static final int MAX_IP_ALARMOUT = 64; //允许加入的最多报警输出数
 

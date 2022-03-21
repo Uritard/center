@@ -710,7 +710,7 @@ public class CameraConService {
             }
             m_strIpparaCfg.read();
             //设备支持IP通道
-            for (int iChannum = 1; iChannum < HCNetSDK.MAX_IP_CHANNEL + 1 + 16; iChannum++) {
+            for (int iChannum = 1; iChannum < HCNetSDK.MAX_IP_CHANNEL; iChannum++) {
                 if (m_strIpparaCfg.struIPChanInfo[iChannum - 1].byEnable == 1) {
                     for (CameraStatusInfo cameraStatusInfo : cameraConInfoMap) {
                         if (Objects.equals(cameraStatusInfo.getChannelNum(), iChannum))
