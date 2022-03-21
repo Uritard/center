@@ -101,7 +101,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                     env.setDeviceId("0000"+res.get("sn").toString());
                     env.setShowType(res.get("value_type").toString());
                     env.setType(res.get("type").toString());
-                    //1.0正常2异常 2.数值型 0.0开 2关
+                    //1.状态型 2.数值型 3.控制型
                     if ("2".equals(res.get("value_type").toString())) {
                         env.setStatus(0);
                         env.setDeviceValue(value);

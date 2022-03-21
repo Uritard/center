@@ -718,8 +718,8 @@ select *from (
         LEFT JOIN t_dict_business a ON env.type = a.dict_code
         WHERE
         1=1
-        <if test="deviceId !=null and deviceId != -1">
-            and env.sn = #{deviceId}
+        <if test="deviceId !=null and deviceId != '-1'">
+            and env.sn = #{deviceId, jdbcType=VARCHAR}
         </if>
         <if test="deviceName !=null and deviceName !=''">
             and env.device_name like concat('%',#{deviceName},'%')

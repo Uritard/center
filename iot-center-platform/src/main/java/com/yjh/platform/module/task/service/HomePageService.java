@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -13,6 +14,7 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TCameraGroupDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -385,4 +387,22 @@ public class HomePageService {
        return tDefectInfoDao.selectDeviceWarnInfo(state);
     }
 
+    public Object queryWeatherInfo(Long regionId) {
+       String envDataJson = getRedisMapString("Weather", regionId.toString());
+        List<EnvDeviceStatus> queryEnvDeviceInfo = null;
+        if(StringUtils.isNotEmpty(envDataJson)) {
+            JSONArray objects = JSONArray.parseArray(envDataJson);
+            queryEnvDeviceInfo = objects.toJavaList(EnvDeviceStatus.class);
+        }
+        return queryEnvDeviceInfo;
+    }
+    /**
+     * 获取redis集合值
+     *
+     * @param key
+     * @return
+     */
+    private <T> T getRedisMapString(String key, String field) {
+        return (T) redisTemplate.opsForHash().get(key, field);
+    }
 }

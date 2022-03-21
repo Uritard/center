@@ -301,13 +301,9 @@ public class HomePageController {
         Result result = new Result();
         try {
             if (regionId!=null){
-//                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
-              List weather = (List) redisTemplate.opsForHash().get("Weather", regionId+"");
-              if (weather!=null && weather.size()>0){
-                  result.setData(weather);
-                  result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
-              }
+                result.setData(homePageService.queryWeatherInfo(regionId));
             }
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询微气象数据信息错误:", e);

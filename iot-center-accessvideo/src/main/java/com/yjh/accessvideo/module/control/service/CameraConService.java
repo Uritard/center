@@ -548,23 +548,30 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public Object pTZControl(int dwPTZCommand, Long cameraId, int dStop, int speed) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+//        int iChanNum = cameraConInfo.getChannelNum() /*+ 32*/;
+//        m_lRealPlayHandle = realPlay(iChanNum, cameraConInfo.getRecordId());
+//        if (m_lRealPlayHandle.intValue() == -1) {
+//            log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
+//            return "fail";
+//        }
+//        if (dwPTZCommand == 29) {
+//            return hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPlayHandle, dwPTZCommand, dStop, speed);
+//        } else {
+//            if (hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPlayHandle, dwPTZCommand, 0, speed)) {
+//
+//                try { Thread.sleep(200); } catch (Exception e) { e.getMessage(); }
+//                hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPlayHandle, dwPTZCommand, 1, speed);
+//                return hCNetSDK.NET_DVR_StopRealPlay(m_lRealPlayHandle);
+//            } else {
+//                return "PTZ control fail, errorInfo: " + hCNetSDK.NET_DVR_GetLastError();
+//            }
+//        }
         int iChanNum = cameraConInfo.getChannelNum() /*+ 32*/;
-        m_lRealPlayHandle = realPlay(iChanNum, cameraConInfo.getRecordId());
-        if (m_lRealPlayHandle.intValue() == -1) {
-            log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
-            return "fail";
-        }
-        if (dwPTZCommand == 29) {
-            return hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPlayHandle, dwPTZCommand, dStop, speed);
-        } else {
-            if (hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPlayHandle, dwPTZCommand, 0, speed)) {
-
-                try { Thread.sleep(200); } catch (Exception e) { e.getMessage(); }
-                hCNetSDK.NET_DVR_PTZControlWithSpeed(m_lRealPlayHandle, dwPTZCommand, 1, speed);
-                return hCNetSDK.NET_DVR_StopRealPlay(m_lRealPlayHandle);
-            } else {
-                return "PTZ control fail, errorInfo: " + hCNetSDK.NET_DVR_GetLastError();
-            }
+        registerNVR(cameraConInfo.getRecordId());
+        if (hCNetSDK.NET_DVR_PTZControlWithSpeed_Other(new NativeLong(lUserID), new NativeLong(iChanNum), dwPTZCommand, dStop,speed)){
+            return "susses";
+        }else {
+            return "false";
         }
 
     }
