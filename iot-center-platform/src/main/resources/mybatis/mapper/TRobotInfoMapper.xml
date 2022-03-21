@@ -121,8 +121,8 @@
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete from t_robot_info
-                where robot_id = #{robotId, jdbcType=BIGINT}
+        delete a,b from t_robot_info a, t_robot_region b
+                where a.robot_id = b.robot_id and a.robot_id = #{robotId, jdbcType=BIGINT}
     </delete>
 
     <delete id="deleteInstance" parameterType="java.lang.Long">
@@ -133,6 +133,16 @@
     <delete id="deleteInspection" parameterType="java.lang.Long">
         delete from t_robot_inspection
                 where robot_id = #{robotId, jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteCruisePlan">
+        DELETE a,b,c FROM
+	    t_cruise_point_instance AS a,
+	    t_cruise_plan_attr AS b,
+	    t_cruise_plan AS c
+        WHERE
+	    b.instance_id = a.instance_id
+        AND c.plan_id = b.plan_id
+        AND b.robot_id = #{robotId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.user.entity.TRobotInfo">
@@ -527,7 +537,8 @@
           IFNULL(a.instance_id,b.inspection_id)
         FROM
         t_robot_inspection b
-        LEFT JOIN  t_cruise_point_instance a on a.cruise_id = b.inspection_id
+        JOIN  t_cruise_point_instance a on a.cruise_id = b.inspection_id
+        AND a.device_mete_id IS NOT NULL
         where b.robot_id = #{robotId, jdbcType=BIGINT}
     </select>
 

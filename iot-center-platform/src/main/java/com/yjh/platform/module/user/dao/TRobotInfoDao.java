@@ -18,9 +18,11 @@ import java.util.Map;
 public interface TRobotInfoDao {
 
     int insert(TRobotInfo tRobotInfo);
-    //多表删除 t_robot_info
+    //多表删除 t_robot_info t_robot_region
     int deleteByPrimaryId(Long robotId);
-    //多表删除 t_cruise_plan
+    //多表删除 t_cruise_plan t_cruise_plan_attr t_cruise_point_instance 删除操作票信息
+    int deleteCruisePlan(Long robotId);
+    //多表删除 t_robot_inspection
     int deleteInspection(Long robotId);
     //多表删除 t_cruise_point_instance
     int deleteInstance(Long robotId);

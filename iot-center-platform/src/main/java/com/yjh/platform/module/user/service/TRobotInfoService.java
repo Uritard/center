@@ -68,7 +68,10 @@ public class TRobotInfoService{
             }
         }
         TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
-        int res =  this.tRobotInfoDao.deleteByPrimaryId(robotId)+this.tRobotInfoDao.deleteInstance(robotId)+this.tRobotInfoDao.deleteInspection(robotId);
+        int res = this.tRobotInfoDao.deleteByPrimaryId(robotId)
+                + this.tRobotInfoDao.deleteInstance(robotId)
+                + this.tRobotInfoDao.deleteInspection(robotId)
+                + this.tRobotInfoDao.deleteCruisePlan(robotId);
         if (res > 0){
             redisTemplate.opsForHash().delete("AllRobotCode",tRobotInfo.getRobotId().toString());
         }
