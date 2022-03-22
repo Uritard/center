@@ -566,9 +566,13 @@ public class CameraConService {
 //                return "PTZ control fail, errorInfo: " + hCNetSDK.NET_DVR_GetLastError();
 //            }
 //        }
-        int iChanNum = cameraConInfo.getChannelNum() /*+ 32*/;
-        registerNVR(cameraConInfo.getRecordId());
-        if (hCNetSDK.NET_DVR_PTZControlWithSpeed_Other(new NativeLong(lUserID), new NativeLong(iChanNum), dwPTZCommand, dStop,speed)){
+        //修改为直接调用控制sdk NET_DVR_PTZControlWithSpeed_Other
+        int iChanNum = cameraConInfo.getChannelNum() + 32;
+        if (Objects.isNull(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())))){
+            registerNVR(cameraConInfo.getRecordId());
+        }
+        int userId = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
+        if (hCNetSDK.NET_DVR_PTZControlWithSpeed_Other(new NativeLong(userId), new NativeLong(iChanNum), dwPTZCommand, dStop,speed)){
             return "susses";
         }else {
             return "false";
