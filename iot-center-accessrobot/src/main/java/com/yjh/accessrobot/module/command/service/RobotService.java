@@ -771,22 +771,22 @@ public class RobotService {
                     if (item.getCruiseType() == 456 || item.getCruiseType() == 508 || item.getCruiseType() == 509){
                         return true;
                     }else {
-//                        // 任务模式
-//                        String taskModelRes = robotModeSwitch(item.getRobotCode(), "1", "5", "1");
-//                        if ("200".equals(taskModelRes)) {
+                        // 任务模式
+                        String taskModelRes = robotModeSwitch(item.getRobotCode(), "1", "5", "1");
+                        if ("200".equals(taskModelRes)) {
                             return true;
-//                        }else if ("500".equals(taskModelRes)) {
-//                            log.info("==========机器人任务模式切换失败==========");
-//                            return false;
-//                        }
-//                    }
+                        }else if ("500".equals(taskModelRes)) {
+                            log.info("==========机器人任务模式切换失败==========");
+                            return false;
+                        }
+                    }
 //                }else if ("500".equals(controlRes)) {
 //                    log.info("==========机器人控制权获得失败==========");
 //                    return false;
-                }
+//                }
             }
         }
-//        return false;
+        return false;
     }
 
     /**
@@ -954,15 +954,19 @@ public class RobotService {
                 }else {
                     String taskId = robotTaskControlMap.get("taskId").toString();
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
-                    String code = redisInfoMap.get("taskPatrolled_id");
-
+                    String taskPatrolledId = redisInfoMap.get("taskPatrolled_id");
+                    List<Map<String, Object>> itemList = new ArrayList<>();
+                    Map<String, Object> itemMap = new HashMap<>(1);
+                    itemMap.put("task_patrolled_id", taskPatrolledId);
+                    itemList.add(itemMap);
                     XMLBaseModel xmlBaseModel = new XMLBaseModel()
                             .setType("41")
                             .setSendCode(sendCode)
                             .setReceiveCode(robotCode)
-                            .setCode(code)
+                            .setCode(taskId)
                             .setCommand(commandValue)
-                            .setTime(DateTimeUtil.format(new Date()));
+                            .setTime(DateTimeUtil.format(new Date()))
+                            .setItems(itemList);
                     String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
                     log.info("生成的任务控制xml是<start>{}<end>", xmlString);
 
