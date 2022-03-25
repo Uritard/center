@@ -99,7 +99,7 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "红外用户名")
     private String inferadUsername;
 
-    @Length(max = 8, message = "inferadPassword长度必须小于等于8")
+    @Length(max = 15, message = "inferadPassword长度必须小于等于15")
     @TableField(value = "Inferad_password", updateStrategy = FieldStrategy.IGNORED)
     @ApiModelProperty(value = "红外密码")
     private String inferadPassword;

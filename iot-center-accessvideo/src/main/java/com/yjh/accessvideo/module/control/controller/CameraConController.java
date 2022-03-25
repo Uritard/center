@@ -91,7 +91,7 @@ public class CameraConController {
             //获取所有视频流信息
             //发送请求获取所有STREAM
             log.info("关闭流接口回调：");
-            String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
+            String getInfoUrl="http://"+srsStopUrl+":1985/api/v1/streams/";
             //SRS服务器有延迟，大概50-60秒 才更新管理数据
 //            Thread.sleep(1000*70);
             JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);

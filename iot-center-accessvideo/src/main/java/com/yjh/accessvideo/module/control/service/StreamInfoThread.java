@@ -19,13 +19,15 @@ public class StreamInfoThread implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(StreamInfoThread.class);
 
     private String srsStopUrl = "";
+    private String cameraFlow = "";
     private int livePath;
     private Long cameraId;
     private Map<String, Object> returnMap = new HashMap<>();
     private RedisTemplate redisTemplate;
 
-    public StreamInfoThread(String srsStopUrl, int livePath, Long cameraId, Map<String, Object> returnMap, RedisTemplate redisTemplate) {
+    public StreamInfoThread(String srsStopUrl, String cameraFlow, int livePath, Long cameraId, Map<String, Object> returnMap, RedisTemplate redisTemplate) {
         this.srsStopUrl = srsStopUrl;
+        this.cameraFlow = cameraFlow;
         this.livePath = livePath;
         this.cameraId = cameraId;
         this.returnMap = returnMap;
@@ -34,7 +36,7 @@ public class StreamInfoThread implements Runnable {
 
     @Override
     public void run() {
-        String getInfoUrl="http://"+srsStopUrl+":8082/api/v1/streams/";
+        String getInfoUrl="http://"+srsStopUrl+":1985/api/v1/streams/";
         JSONObject jsonList = new JSONObject();
         try {
             Thread.sleep(4000);
@@ -53,7 +55,7 @@ public class StreamInfoThread implements Runnable {
                 returnMap.put("videoFlowId", videoFlowId);
                 Constant.mapsForCamera.put(String.valueOf(cameraId), videoFlowId);
                 log.info("realReturnMap:{}", returnMap);
-                redisTemplate.opsForHash().putAll("cameraRealFlow:" + cameraId, returnMap);
+                redisTemplate.opsForHash().putAll(cameraFlow + cameraId, returnMap);
             }
         }
         log.info("mapsForCamera:{}", Constant.mapsForCamera);
