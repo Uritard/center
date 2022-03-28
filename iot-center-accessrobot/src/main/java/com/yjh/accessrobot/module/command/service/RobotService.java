@@ -194,12 +194,13 @@ public class RobotService {
 
             Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
             String robotPattern = robotStatusMap.get("value");
-            boolean flag = StringUtils.equals("1", robotPattern) && !("1".equals(type) && "5".equals(command));
+            boolean flag = StringUtils.equals("1", robotPattern)
+                    && !("1".equals(type) && "5".equals(command)) //切换模式
+                    && !("1".equals(type) && "8".equals(command)); //急停
             if (Boolean.TRUE.equals(flag)){
                 log.error("==========当前机器人处于任务模式,请切换模式==========");
                 scmap.put("code", 3);
                 scmap.put("result", "当前机器人处于任务模式,请切换模式");
-                return scmap;
             }else{
                 RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
 
@@ -223,8 +224,8 @@ public class RobotService {
                 scmap.put("code", 4);
                 scmap.put("result", "指令下发成功");
                 scmap.put("path", filePath);
-                return scmap;
             }
+            return scmap;
         }
     }
 
