@@ -39,8 +39,6 @@ public class HomePageController {
     private HomePageService homePageService;
     @Autowired
     private RedisTemplate redisTemplate;
-    @Autowired
-    private TStdRegionService tStdRegionService;
 
     @ApiOperation(value = "巡视任务数据概览")
     @RequestMapping(value = "/taskInfo", method = RequestMethod.GET)
@@ -320,21 +318,7 @@ public class HomePageController {
     public Result queryStations(@RequestParam(value = "regionId",required = false)Long regionId){
         Result result = new Result();
         try {
-            //查询该regionId的子节点
-            List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
-            StationCount sta = new StationCount();
-            sta.setType("环控设备");
-            //环控数量
-            List weather = (List) redisTemplate.opsForHash().get("Weather", regionId+"");
-
-            if (weather!=null && weather.size()>0){
-                sta.setCount(weather.size()+"");
-            }else {
-                sta.setCount("0");
-            }
-            List<StationCount> list = homePageService.queryStations(regionIdList);
-            list.add(sta);
-            result.setData(list);
+            result.setData(homePageService.queryStations(regionId));
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
         }catch (Exception e){
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

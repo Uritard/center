@@ -8,6 +8,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.service.SystemInfoService;
+import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.entity.*;
@@ -54,6 +55,8 @@ public class HomePageService {
     private TCameraGroupDao tCameraGroupDao;
     @Autowired
     private TCameraScreenDao tCameraScreenDao;
+    @Autowired
+    private TStdRegionService tStdRegionService;
 
 
 
@@ -372,10 +375,26 @@ public class HomePageService {
     /**
     * 站所状况统计
     * @date 2022/3/1
-    */
-    public List<StationCount> queryStations(List<Long> regionIdList) {
-        List<StationCount> list = tCruiseTaskDao.queryStations(regionIdList);
-        return list;
+     */
+    public List<StationCount> queryStations(Long regionId) {
+
+        List<Long> regionIdList = tStdRegionService.selectDownId(regionId);
+        StationCount sta = new StationCount();
+        sta.setType("环控设备");
+        //环控数量
+        if (regionId == null) {
+            RegionPath regionPath = tCruiseTaskDao.queryRegion(regionId);
+            regionId = regionPath.getRegionId();
+        }
+        List<EnvDeviceStatus> list = queryWeatherInfo(regionId);
+        if (list != null && list.size() > 0) {
+            sta.setCount(list.size() + "");
+        } else {
+            sta.setCount("0");
+        }
+        List<StationCount> stationCounts = tCruiseTaskDao.queryStations(regionIdList);
+        stationCounts.add(sta);
+        return stationCounts;
     }
 
     public RegionPath queryRegionPath(Long regionId){
@@ -389,10 +408,10 @@ public class HomePageService {
        return tDefectInfoDao.selectDeviceWarnInfo(state);
     }
 
-    public Object queryWeatherInfo(Long regionId) {
-       String envDataJson = getRedisMapString("Weather", regionId.toString());
+    public List<EnvDeviceStatus> queryWeatherInfo(Long regionId) {
+        String envDataJson = getRedisMapString("Weather", regionId.toString());
         List<EnvDeviceStatus> queryEnvDeviceInfo = null;
-        if(StringUtils.isNotEmpty(envDataJson)) {
+        if (StringUtils.isNotEmpty(envDataJson)) {
             JSONArray objects = JSONArray.parseArray(envDataJson);
             queryEnvDeviceInfo = objects.toJavaList(EnvDeviceStatus.class);
         }

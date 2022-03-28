@@ -541,6 +541,7 @@
         LEFT JOIN t_dict_business p ON a.defect_model = p.dict_code and p.col_name = 'defect_model'
         WHERE
         1 = 1
+        AND a.warn_type != '507' OR a.warn_type IS NULL
         )
         UNION ALL
         (SELECT

@@ -11,6 +11,8 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "站所统计数据", description = "站所统计数据")
 public class RegionPath {
 
+    private Long regionId;
+
     private String regionName;
 
     private String regionPath;

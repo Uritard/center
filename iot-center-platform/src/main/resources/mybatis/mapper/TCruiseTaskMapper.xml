@@ -765,6 +765,7 @@ select *from (
 
     <select id="queryRegion" resultType="com.yjh.platform.module.task.entity.RegionPath">
         SELECT
+        t.region_id AS regionId,
         t.region_name AS regionName,
         t.region_path AS regionPath
         FROM t_std_region t
