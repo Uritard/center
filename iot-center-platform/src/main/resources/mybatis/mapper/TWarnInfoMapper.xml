@@ -934,13 +934,14 @@
             a.warn_content AS warnContent,
             date_format( a.warn_time,'%Y-%c-%d %h:%i:%s') AS warnTime,
             d.dict_note AS robotType,
-            e.up_region_name AS regionName
+            f.region_nam AS regionName
             FROM
             t_warn_info a
             LEFT JOIN t_cruise_task b ON b.task_id = a.task_id
             LEFT JOIN t_robot_info c ON c.robot_id = b.robot_id
             LEFT JOIN t_dict_business d ON d.dict_code = c.robot_type
             LEFT JOIN t_std_device e ON e.device_id = a.device_id
+            LEFT JOIN t_std_region f ON f.region_id = e.up_region_id
             WHERE 1 = 1
             and a.warn_type = '507'
                 <if test="startTime != null and startTime != ''">
