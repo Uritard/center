@@ -1611,6 +1611,23 @@ public class RobotService {
                 default:
                     break;
             }
+        }else if (valueName.equals("alarmLevel")) {
+            switch (value) {
+                case "1":
+                    dictNote = "预警";
+                    break;
+                case "2":
+                    dictNote = "一般告警";
+                    break;
+                case "3":
+                    dictNote = "严重告警";
+                    break;
+                case "4":
+                    dictNote = "危急告警";
+                    break;
+                default:
+                    break;
+            }
         }
         return Integer.valueOf(selectDictCodeByNote(dictNote, colName));
     }
@@ -1927,20 +1944,20 @@ public class RobotService {
         }
         log.info("确认图片路径为：" + confirmPath);
         log.info("确认原始图片路径为：" + originalPath);
-        String developMap = absoluteImgMap.get("content") + "/CFM";
+        String developMap = absoluteImgMap.get("content") + "/CFM/" + taskId;
         /*
          * 将ftp图copy到开发环境
          * */
         String splitArray[] = confirmPath.split("/");
         String fileName = splitArray[splitArray.length - 1];
         copyFileToDevelop(confirmPath, developMap);
-        String confirmUrl = relativeImgMap.get("content") + "/CFM/" + fileName;
+        String confirmUrl = relativeImgMap.get("content") + "/CFM/" + taskId + "/" + fileName;
         String originalFileUrl = "";
         if (org.apache.commons.lang.StringUtils.isNotEmpty(originalPath)){
             String splitArrayOriginalPath[] = originalPath.split("/");
             String originalPathName = splitArrayOriginalPath[splitArrayOriginalPath.length - 1];
             copyFileToDevelop(originalPath, developMap);
-            originalFileUrl = relativeImgMap.get("content") + "/CFM/" + originalPathName;
+            originalFileUrl = relativeImgMap.get("content") + "/CFM/" + taskId + "/" + originalPathName;
         }
         //待确认图片
         jasonMaps.put("confirmUrl", confirmUrl);

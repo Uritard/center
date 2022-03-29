@@ -121,7 +121,10 @@ public class RobotInspectionWarnThread implements Runnable{
         Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(robotCode);
         warnInfo.setDeviceCode(robotId.toString());
         warnInfo.setWarnName(warnResultMap.get("content"));
-        warnInfo.setWarnLevel(133);
+        if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmLevel"))) {
+            int warnLevel = StaticContextAccessor.getBean(RobotService.class).selectDictCode("alarmLevel", warnResultMap.get("alarmLevel"), "alarm_level");
+            warnInfo.setWarnLevel(warnLevel);
+        }
         warnInfo.setWarnContent(warnResultMap.get("content"));
         if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmType"))) {
             int warnType = StaticContextAccessor.getBean(RobotService.class).selectDictCode("pointAlarmType", warnResultMap.get("alarmType"), "point_alarm_type");
