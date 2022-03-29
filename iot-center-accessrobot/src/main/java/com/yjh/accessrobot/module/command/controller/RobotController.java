@@ -268,7 +268,7 @@ public class RobotController {
                     String deviceStatus = jsonObject.getString("deviceStatus");
                     String deviceAttr = jsonObject.getString("deviceAttr");
                     String deviceType = jsonObject.getString("deviceType");
-                    String type = "23";
+                    String type = "26";
                     HashMap<String, String> map = new HashMap<>();
                     map.put("robotCode", robotCode);
                     map.put("deviceId", deviceId);

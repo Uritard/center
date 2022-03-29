@@ -71,7 +71,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 
         log.info("机器人巡视结果数据是：{}" , cruiseResultMap);
         // Start CruiseResultDealThread
-        InspectionResultThread cruiseResultDealThread = new InspectionResultThread(cruiseResultMap, redisTemplate, websocketUrl);
+        InspectionResultThread cruiseResultDealThread = new InspectionResultThread(cruiseResultMap, redisTemplate, websocketUrl, true);
         TaskExecutePool.getInstance().execute(cruiseResultDealThread);
 
         String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true,robotCode));

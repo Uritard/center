@@ -246,7 +246,7 @@ public class HttpClientUtils {
         if (headers != null && headers.size() > 0) {
             for (Map.Entry<String, String> entry : headers.entrySet()) { httpdelete.setHeader(entry.getKey(),entry.getValue()); }
         }
-        CloseableHttpResponse httpResponse = null;
+//        CloseableHttpResponse httpResponse = null;
         try {
             closeableHttpClient.execute(httpdelete);
 //            httpResponse = closeableHttpClient.execute(httpdelete);
@@ -257,8 +257,8 @@ public class HttpClientUtils {
 //            response.setReasonPhrase(httpResponse.getStatusLine().getReasonPhrase());
 //            response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
         } catch (Exception e) { e.printStackTrace();
-        }finally{
-            try { httpResponse.close(); } catch (IOException e) { e.printStackTrace(); }
+//        }finally{
+//            try { httpResponse.close(); } catch (IOException e) { e.printStackTrace(); }
         }
         //关闭连接、释放资源
         try { closeableHttpClient.close(); } catch (IOException e) { e.printStackTrace(); }

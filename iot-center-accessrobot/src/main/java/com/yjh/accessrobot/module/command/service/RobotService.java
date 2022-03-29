@@ -886,7 +886,7 @@ public class RobotService {
                 // 定期和立即任务参数
                 else{
                     map.put("fixed_start_time", item.getFixedStartTime());
-                    map.put("isorc", item.getIsOrc());
+                    map.put("isocr", item.getIsOcr());
                     map.put("cycle_month", "");
                     map.put("cycle_week", "");
                     map.put("cycle_execute_time", "");
@@ -1022,6 +1022,10 @@ public class RobotService {
             }
             if (flag){
                 return result;
+            }
+            //线路保护装置下发的命令都为新消息 不修改状态
+            if (map.get("type").equals("10")){
+                robotConfirmMsg.put("newMessage","true");
             }
         }
 

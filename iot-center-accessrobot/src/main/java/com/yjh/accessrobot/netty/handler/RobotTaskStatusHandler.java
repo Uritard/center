@@ -106,6 +106,14 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             taskMap.put("taskId", taskId);
             taskMap.put("endTime", new Date());
             StaticContextAccessor.getBean(RobotService.class).updateTCruiseTask(taskMap);
+            TCruiseResult tCruiseResult = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
+            if ("1".equals(taskState)){
+                tCruiseResult.setCState(240); //任务已执行
+            }else {
+                tCruiseResult.setCState(242); //任务终止
+            }
+            int res = StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+            log.info("更新TCR的条数====" + res);
         }
 
         // 任务根本没做或者没有完成,但是上报任务状态信息进度为100%(E机器人出现过,里面有很多重复代码,未优化)

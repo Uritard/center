@@ -934,7 +934,7 @@
             a.warn_content AS warnContent,
             date_format( a.warn_time,'%Y-%c-%d %h:%i:%s') AS warnTime,
             d.dict_note AS robotType,
-            f.region_nam AS regionName
+            f.region_name AS regionName
             FROM
             t_warn_info a
             LEFT JOIN t_cruise_task b ON b.task_id = a.task_id

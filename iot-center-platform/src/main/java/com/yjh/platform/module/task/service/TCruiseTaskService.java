@@ -218,7 +218,7 @@ public class TCruiseTaskService {
                 robotTaskInfo.setIfRun(tCruiseTaskAdd.getIfRun().toString());
                 robotTaskInfo.setRobotCode(item);
                 robotTaskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
-                robotTaskInfo.setIsOrc(tCruiseTaskAdd.getIsOrc());
+                robotTaskInfo.setIsOrc(tCruiseTaskAdd.getIsOcr());
                 switch (tCruiseTaskAdd.getIfRun().toString()){
                     case "172"://周期和间隔任务
                         if (!"".equals(tCruiseTaskAdd.getDayOfMonth())){//周期：月

@@ -42,12 +42,14 @@ public class InspectionResultThread implements Runnable{
     private RedisTemplate redisTemplate;
     private Map<String,String> cruiseResultMap;
     private String webSocketUrl;
+    private Boolean changeTaskStatus;
     private static final String IS_AI_AlGORITHM = "on";
 
-    public InspectionResultThread(Map<String,String> cruiseResultMap, RedisTemplate redisTemplate, String webSocketUrl){
+    public InspectionResultThread(Map<String,String> cruiseResultMap, RedisTemplate redisTemplate, String webSocketUrl, boolean changeTaskStatus){
         this.cruiseResultMap = cruiseResultMap;
         this.redisTemplate = redisTemplate;
         this.webSocketUrl = webSocketUrl;
+        this.changeTaskStatus = changeTaskStatus;
     }
 
     @Override
@@ -418,7 +420,9 @@ public class InspectionResultThread implements Runnable{
 
             Integer taskWait = totalCheckPoint - normal - abnormal;
             tCruiseResult.setTaskWait(taskWait);
-            tCruiseResult.setCState(240);
+            if (changeTaskStatus){ //操作类任务不更新任务状态
+                tCruiseResult.setCState(240);
+            }
             tCruiseResult.setTaskCode(taskId);
             tCruiseResult.setCreateTime(DateTimeUtil.parse(tCruiseTaskResultMap.get("cruiseTaskTime")));
             log.info("任务为{}的tCruiseResult内容是==={}", taskId, tCruiseResult);

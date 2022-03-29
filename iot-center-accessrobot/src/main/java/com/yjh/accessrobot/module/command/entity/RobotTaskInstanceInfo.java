@@ -32,8 +32,8 @@ public class RobotTaskInstanceInfo implements Serializable {
     @ApiModelProperty(value = "设备层级")
     private Integer deviceLevel;
 
-    @ApiModelProperty(value = "是否ORC识别 (0:是 1:否)")
-    private String isOrc;
+    @ApiModelProperty(value = "是否OCR识别 (0:是 1:否)")
+    private String isOcr;
 
     @ApiModelProperty(value = "机器人唯一标识")
     private String robotCode;

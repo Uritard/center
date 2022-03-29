@@ -99,8 +99,8 @@ public class TCruiseTaskAdd implements Serializable {
 
     private Long instanceId;
 
-    @ApiModelProperty(value = "是否ORC识别 (0:是 1:否)")
-    private String isOrc;
+    @ApiModelProperty(value = "是否OCR识别 (0:是 1:否)")
+    private String isOcr;
 
     private Long createUserId;
 
