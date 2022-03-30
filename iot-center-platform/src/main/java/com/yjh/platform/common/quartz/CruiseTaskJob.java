@@ -416,7 +416,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             tCruiseResult = tCruiseResultDao.selectByPrimaryId(tCruiseResult.getTaskResultId());
                             Integer taskWait = tCruiseResult.getTaskWait()-1;
                             if(taskWait == 0 ){
-                                tCruiseResult.setCState(240);
+                                tCruiseResult.setCState(243);
                             }
                             tCruiseResult.setTaskWait(taskWait);
                             tCruiseResultDao.update(tCruiseResult);
