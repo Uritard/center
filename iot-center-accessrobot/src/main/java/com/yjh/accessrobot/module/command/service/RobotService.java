@@ -2354,16 +2354,16 @@ public class RobotService {
             String robotCode = map.get("robotCode");
             log.info("sendCode:{},robotCode:{}====", sendCode, robotCode);
             if (StringUtils.isEmpty(robotCode)) {
-                log.error("当前不存在机器人编码,没有成功将控制指令下发到机器人....");
-                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+                log.error("当前不存在环控设备编码,没有成功将控制指令下发到环控设备....");
+                result.setMessage(200, "当前不存在环控设备编码,没有成功将控制指令下发到环控设备....");
             }
             Map<Object, Object> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":2");
             Object robotStatus = mapForRobotState.get("value");
             log.info("robotStatus====" + robotStatus);
             if (Optional.ofNullable(robotStatus).isPresent()) {
                 if ("1".equals(robotStatus)) {
-                    log.error("该机器人处于离线状态,没有成功将控制指令下发到机器人......");
-                    result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+                    log.error("该环控设备处于离线状态,没有成功将控制指令下发到环控设备......");
+                    result.setMessage(200, "该环控设备处于离线状态,没有成功将控制指令下发到环控设备......");
                 } else {
                     log.info("开始生成xml");
                     String type = map.get("type");

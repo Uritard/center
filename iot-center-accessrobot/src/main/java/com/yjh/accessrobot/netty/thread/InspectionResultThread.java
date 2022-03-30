@@ -422,13 +422,13 @@ public class InspectionResultThread implements Runnable{
             tCruiseResult.setTaskWait(taskWait);
             if (changeTaskStatus){ //操作类任务不更新任务状态
                 tCruiseResult.setCState(240);
+                tCruiseResult.setTaskCode(taskId);
+                tCruiseResult.setCreateTime(DateTimeUtil.parse(tCruiseTaskResultMap.get("cruiseTaskTime")));
+                log.info("任务为{}的tCruiseResult内容是==={}", taskId, tCruiseResult);
+                // 更新TCR表
+                int res = StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+                log.info("更新TCR的条数====" + res);
             }
-            tCruiseResult.setTaskCode(taskId);
-            tCruiseResult.setCreateTime(DateTimeUtil.parse(tCruiseTaskResultMap.get("cruiseTaskTime")));
-            log.info("任务为{}的tCruiseResult内容是==={}", taskId, tCruiseResult);
-            // 更新TCR表
-            int res = StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
-            log.info("更新TCR的条数====" + res);
 
             // webSocket通知前端调用巡视监控的接口（任务完成）
             Map<String, Object> jasonMap = new HashMap<>(2);

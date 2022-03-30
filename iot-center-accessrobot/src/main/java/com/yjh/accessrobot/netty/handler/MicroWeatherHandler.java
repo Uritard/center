@@ -102,34 +102,34 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                     env.setShowType(res.get("value_type").toString());
                     env.setType(res.get("type").toString());
                     //1.状态型 2.数值型 3.控制型 (0开 1关)
-                    if ("1".equals(res.get("value_type").toString())){
+                    if ("1".equals(res.get("value_type").toString())) {
                         env.setStatus(Integer.parseInt(value));
-                        if ("0".equals(value)){
+                        if ("0".equals(value)) {
                             env.setDeviceValue("正常");
-                        }else {
+                        } else {
                             env.setDeviceValue("异常");
                         }
-                    }else if ("2".equals(res.get("value_type").toString())) {
+                    } else if ("2".equals(res.get("value_type").toString())) {
                         env.setStatus(0);
                         env.setDeviceValue(value);
-                    }else {
+                    } else {
                         //空调  value="1,2"  开关，制冷制热
-                        if ("7".equals(res.get("type").toString())){
+                        if ("7".equals(res.get("type").toString())) {
                             String[] strings = value.split(",");
-                            if ("0".equals(strings[0])){  //空调开启
-                                if ("1".equals(strings[1])){ //制冷制热
+                            if ("0".equals(strings[0])) {  //空调开启
+                                if (strings.length > 1 && "1".equals(strings[1])) { //制冷制热
                                     env.setDeviceValue("制热");
-                                }else {
+                                } else {
                                     env.setDeviceValue("制冷");
                                 }
-                            }else {
+                            } else {
                                 env.setDeviceValue("关闭");
                             }
                             env.setStatus(Integer.parseInt(strings[0]));//空调的开关
-                        }else {
-                            if ("0".equals(value)){
+                        } else {
+                            if ("0".equals(value)) {
                                 env.setDeviceValue("开启");
-                            }else {
+                            } else {
                                 env.setDeviceValue("关闭");
                             }
                             env.setStatus(Integer.parseInt(value));
@@ -137,21 +137,21 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                     }
                     envDeviceStatusList.add(env);
                 }
-
-                if (envDeviceStatusList.size() > 0) {
-                    JSONObject json = new JSONObject();
-                    json.put("envDeviceStatusList", envDeviceStatusList);
-                    json.put("robotCode", xmlBaseModel.getSendCode());
-                    log.info("环境数据上报集控" + json);
-                    robotService.addWeatherInfo(json);
-                }
-
             });
+
+            if (envDeviceStatusList.size() > 0) {
+                JSONObject json = new JSONObject();
+                json.put("envDeviceStatusList", envDeviceStatusList);
+                json.put("robotCode", xmlBaseModel.getSendCode());
+                log.info("环境数据上报集控" + json);
+                robotService.addWeatherInfo(json);
+            }
+
 
             for (int i = 0; i < weatherList.size(); i++) {
                 redisTemplate.opsForHash().putAll("RobotWeather:" + robotCode + ":" + weatherList.get(i).get("type"), weatherList.get(i));
             }
-            System.out.println("微气象数据测试一波++++++++"+ info);
+            System.out.println("微气象数据测试一波++++++++" + info);
             Constant.weatherServer(info, Constant.WEATHER_URL);
             String weatherXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
             byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);

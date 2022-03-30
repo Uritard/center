@@ -2201,7 +2201,8 @@ public class CameraConService {
 //            Constant.mapsForCamera.remove(String.valueOf(cameraId));
 //            redisTemplate.delete("cameraRealFlow:" + cameraId);
 //        } catch (Exception e) { e.getMessage(); }
-        manager.terminate(cameraId);
+        //todo 目前先不关闭ffmpeg进程,在多用户同时播放统一个相机视频，一个用户关闭进程后，另外一个用户则无法观看
+//        manager.terminate(cameraId);
         return "stop " + cameraId + " preview success!";
     }
 
@@ -2258,10 +2259,11 @@ public class CameraConService {
 //            Constant.mapsForCamera.remove(infraredCameraId);
 //            redisTemplate.delete("cameraRealFlow:" + infraredCameraId);
 //        } catch (Exception e) { e.getMessage(); }
-        String lightCameraId = String.valueOf(robotId)+"9901";
-        manager.terminate(Long.parseLong(lightCameraId));
-        String infraredCameraId = String.valueOf(robotId)+"9902";
-        manager.terminate(Long.parseLong(infraredCameraId));
+        //todo 目前先不关闭ffmpeg进程,在多用户同时播放统一个相机视频，一个用户关闭进程后，另外一个用户则无法观看
+//        String lightCameraId = String.valueOf(robotId)+"9901";
+//        manager.terminate(Long.parseLong(lightCameraId));
+//        String infraredCameraId = String.valueOf(robotId)+"9902";
+//        manager.terminate(Long.parseLong(infraredCameraId));
         return "stop " + robotId + " preview success!";
     }
 
