@@ -193,8 +193,19 @@ public class RobotService {
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
 
             Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
+            Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
+            String robotTaskStatus = robotTaskStatusMap.get("value");
             String robotPattern = robotStatusMap.get("value");
+            int robotType = tRobotInfoDao.selectRobotTypeByCode(robotCode);
+            if (StringUtils.equals("2", robotTaskStatus) || StringUtils.equals("4", robotTaskStatus)) {
+                String returnMsg = robotTaskStatus.equals("2") ? "巡视状态" : "检修状态";
+                log.error("==========当前机器人处于" + returnMsg + ",无法操作==========");
+                scmap.put("code", 3);
+                scmap.put("result", "当前机器人处于" + returnMsg + ",无法操作");
+                return scmap;
+            }
             boolean flag = StringUtils.equals("1", robotPattern)
+                    && robotType != 157
                     && !("1".equals(type) && "5".equals(command)) //切换模式
                     && !("1".equals(type) && "8".equals(command)); //急停
             if (Boolean.TRUE.equals(flag)){

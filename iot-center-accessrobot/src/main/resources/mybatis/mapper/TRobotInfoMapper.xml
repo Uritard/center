@@ -1100,6 +1100,9 @@
             t_robot_info a
             WHERE 1=1 and a.robot_code = #{robotCode} )
     </select>
+    <select id="selectRobotTypeByCode" resultType="java.lang.Integer">
+        SELECT a.robot_type FROM `t_robot_info` a WHERE a.robot_code =  #{robotCode, jdbcType=VARCHAR};
+    </select>
 
     <update id="updateTCruiseTask">
         UPDATE t_cruise_task a

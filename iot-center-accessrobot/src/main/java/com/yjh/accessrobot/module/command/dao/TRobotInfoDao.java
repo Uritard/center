@@ -78,6 +78,12 @@ public interface TRobotInfoDao {
      */
     Long selectRobotIdByCode(@Param(value = "robotCode") String robotCode);
     /**
+     * 根据机器人编码查询机器人类型
+     * @param robotCode 机器人编码
+     * @return Integer
+     */
+    Integer selectRobotTypeByCode(@Param(value = "robotCode") String robotCode);
+    /**
      * 根据机器人编码查询机器人名称
      * @param robotCode 机器人编码
      * @return String
