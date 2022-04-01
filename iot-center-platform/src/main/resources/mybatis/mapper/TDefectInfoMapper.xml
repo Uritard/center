@@ -505,6 +505,7 @@
         from t_warn_info a
         left join (select DISTINCT device_id,device_name from t_std_device) b on a.device_id = b.device_id
         where 1=1
+        and TO_DAYS(a.warn_time) =TO_DAYS(NOW())
         <if test="alarmLevel != null "> and a.warn_level = #{alarmLevel, jdbcType=INTEGER}</if>
         union all(
         SELECT
@@ -514,6 +515,7 @@
         from t_robot_alarm c
         left join t_robot_info d on c.robot_id = d.robot_id
         where 1=1
+        and TO_DAYS(c.alarm_time) =TO_DAYS(NOW())
         <if test="alarmLevel != null "> and c.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
         )
         order by warnTime desc LIMIT 20
