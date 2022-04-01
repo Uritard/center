@@ -766,7 +766,7 @@
             END AS operateTypeName,
             TIMESTAMPDIFF( MINUTE, a.start_time,DATE_ADD(a.end_time,INTERVAL 59 second)) AS duration,
             a.start_time AS startTime,
-            j.up_region_name AS regionName,
+            i.region_name AS regionName,
             u.user_name AS  userName,
             IF(a.type = 456, '-', f.dict_note) AS mainOperatioTypeName
             FROM
@@ -779,6 +779,7 @@
             LEFT JOIN t_cruise_task_result h ON a.task_id = h.task_id
             LEFT JOIN t_cruise_task_result_detail g ON h.task_result_id = g.task_result_id
             LEFT JOIN t_std_device j ON j.device_id = g.device_id
+            LEFT JOIN t_std_region i ON i.region_id = j.up_region_id
             WHERE 1=1
             <if test="operationType == null or  operationType == -1">
                 and a.type IN (456,508,509)
