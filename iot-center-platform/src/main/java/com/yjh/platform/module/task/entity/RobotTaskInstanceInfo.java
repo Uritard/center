@@ -35,7 +35,7 @@ public class RobotTaskInstanceInfo implements Serializable {
 
     private String robotCode;
     @ApiModelProperty(value = "是否ORC识别 (0:是 1:否)")
-    private String isOrc;
+    private String isOcr;
     @ApiModelProperty(value = "执行方式")
     private String ifRun;
     @ApiModelProperty(value = "定期开始时间")
