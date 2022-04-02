@@ -34,6 +34,9 @@ public class AutoRecoveredProcessRunner implements ProcessRunner {
         startTime = System.currentTimeMillis();
     }
 
+    public void setStartTime(long newTime) {
+         this.startTime = newTime;
+    }
     public long getStartTime() {
         return startTime;
     }

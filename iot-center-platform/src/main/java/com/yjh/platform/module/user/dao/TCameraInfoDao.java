@@ -74,6 +74,7 @@ public interface TCameraInfoDao {
 
 
     List<Long> selectCameraAll();
+    List<Long> selectCameraByRecord(Long recordId);
     List<Long>selectHavePreset(@Param(value = "cameraId") Long cameraId);
     List<String> selectAllPMSId();
     String selectPmsIdById(@Param(value = "cameraId") Long cameraId);

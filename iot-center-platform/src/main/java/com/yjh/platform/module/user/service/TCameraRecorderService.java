@@ -14,6 +14,7 @@ import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -43,6 +44,8 @@ public class TCameraRecorderService {
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TCameraInfoService tCameraInfoService;
 
     private Logger log = LoggerFactory.getLogger(TCameraRecorderService.class);
 
@@ -77,6 +80,10 @@ public class TCameraRecorderService {
 
     @Transactional(rollbackFor = Exception.class)
     public int update(TCameraRecorder tCameraRecorder) {
+        List<Long> cameraList = tCameraInfoService.selectCameraByRecord(tCameraRecorder.getRecordId());
+        if (CollectionUtils.isNotEmpty(cameraList)) {
+            cameraList.forEach(cameraId -> tCameraInfoService.stopStream(cameraId));
+        }
         return this.tCameraRecorderDao.update(tCameraRecorder);
     }
 

@@ -426,6 +426,10 @@ public class TCameraInfoService {
         return cameraPresetList;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public List<Long> selectCameraByRecord(Long recordId){
+        return tCameraInfoDao.selectCameraByRecord(recordId);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public int intoRedis() {
@@ -530,6 +534,15 @@ public class TCameraInfoService {
         return null;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void stopStream(Long cameraId) {
+        try {
+            Result result=Constant.otherServerGet(String.valueOf(cameraId), Constant.CAMERA_STREAM_STOP);
+            log.info((String) result.getData());
+        } catch (Exception e) {
+            log.info("cameraId: {} stopStream failed", cameraId);
+        }
+    }
 }
 
 

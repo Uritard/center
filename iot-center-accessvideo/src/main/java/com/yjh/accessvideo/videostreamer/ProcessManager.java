@@ -3,10 +3,11 @@ package com.yjh.accessvideo.videostreamer;
 import com.yjh.accessvideo.module.control.entity.VideoInfo;
 import com.yjh.accessvideo.processmonitoring.impl.AutoRecoveredProcessRunner;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,13 +18,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ProcessManager {
 
-    @Value("${overTime}")
-    private Integer overTime;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     private final ConcurrentHashMap<Long, AutoRecoveredProcessRunner> runnerMap = new ConcurrentHashMap<Long, AutoRecoveredProcessRunner>();
 
     public void run(VideoInfo videoInfo) throws RuntimeException, Exception {
         if (Optional.ofNullable(runnerMap.get(videoInfo.getId())).isPresent()) {
+            AutoRecoveredProcessRunner runner = runnerMap.get(videoInfo.getId());
+            runner.setStartTime(System.currentTimeMillis());
             return;
         }
 
@@ -58,10 +61,12 @@ public class ProcessManager {
     public void checkOvertime() {
         for (Long cameraId : runnerMap.keySet()) {
             Optional.ofNullable(runnerMap.get(cameraId)).ifPresent(runner -> {
-                Integer runnedTime = Math.toIntExact((System.currentTimeMillis() - runner.getStartTime()) / (1000 * 60));
-                log.info("-------Process 相机{} runned {}分钟", cameraId, runnedTime);
+                int runnedTime = Math.toIntExact((System.currentTimeMillis() - runner.getStartTime()) / (1000 * 60));
+                int overTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
+                log.info("-------Process 相机{} runned {}分钟, overTime {}分钟", cameraId, runnedTime, overTime);
                 if (runnedTime > overTime) {
                     terminate(cameraId);
+                    log.info("cameraId: {} 关闭成功", cameraId);
                 }
             });
         }

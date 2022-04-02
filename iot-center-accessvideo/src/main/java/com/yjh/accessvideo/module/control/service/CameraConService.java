@@ -167,20 +167,13 @@ public class CameraConService {
 
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-            String userName = cameraConInfo.getCameraManager();
-            String password = cameraConInfo.getCameraCode();
-            String cameraIp = cameraConInfo.getCameraIp();
-            int cameraPort = cameraConInfo.getPort();
-            int iChanNum = 1;
+            String userName = cameraConInfo.getIdentityManager(); //nvr 用户名
+            String password = cameraConInfo.getIdentityCode();    //nvr 密码
+            String cameraIp = cameraConInfo.getRecordIp();        //nvr ip
+            int cameraPort = cameraConInfo.getRtspPort();         //nvr rtsp port
+            int iChanNum = cameraConInfo.getChannelNum();         //nvr 通道号
             int cameraType = cameraConInfo.getCameraType();
-            if (cameraType==206) { iChanNum = 2; }
-
-            String transUrl = "";
-            if (cameraType == 205) {
-                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
-            } else if (cameraType == 206) {
-                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, cameraId);
-            }
+            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId);
             manager.run(videoInfo);
 
@@ -263,23 +256,13 @@ public class CameraConService {
 
         list.forEach(cameraId -> {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-            String userName = cameraConInfo.getCameraManager();
-            String password = cameraConInfo.getCameraCode();
-            String cameraIp = cameraConInfo.getCameraIp();
-            int cameraPort = cameraConInfo.getPort();
-            int iChanNum = 1;
+            String userName = cameraConInfo.getIdentityManager(); //nvr 用户名
+            String password = cameraConInfo.getIdentityCode();    //nvr 密码
+            String cameraIp = cameraConInfo.getRecordIp();        //nvr ip
+            int cameraPort = cameraConInfo.getRtspPort();         //nvr rtsp port
+            int iChanNum = cameraConInfo.getChannelNum();         //nvr 通道号
             int cameraType = cameraConInfo.getCameraType();
-            if (cameraType == 206) {
-                iChanNum = 2;
-            }
-
-            String transUrl = "";
-            if (cameraType == 205) {
-                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
-            } else if (cameraType == 206) {
-                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, cameraId);
-            }
-
+            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId);
             try {
                 manager.run(videoInfo);
@@ -552,11 +535,11 @@ public class CameraConService {
         Map<String, Object> returnMap = new HashMap<>();
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-            String userName = cameraConInfo.getCameraManager();
-            String cameraIp = cameraConInfo.getCameraIp();
-            String password = cameraConInfo.getCameraCode();
-            int cameraPort = cameraConInfo.getPort();
-            int iChanNum = 1;
+            String userName = cameraConInfo.getIdentityManager(); //nvr 用户名
+            String password = cameraConInfo.getIdentityCode();    //nvr 密码
+            String cameraIp = cameraConInfo.getRecordIp();        //nvr ip
+            int cameraPort = cameraConInfo.getRtspPort();         //nvr rtsp port
+            int iChanNum = cameraConInfo.getChannelNum();         //nvr 通道号
 
             String startTimeTem = startTime.replace("-", "").replace(":", "").replace(" ", "T") + " ";
             String stopTimeTem = stopTime.replace("-", "").replace(":", "").replace(" ", "T") + " ";
@@ -2265,6 +2248,18 @@ public class CameraConService {
 //        String infraredCameraId = String.valueOf(robotId)+"9902";
 //        manager.terminate(Long.parseLong(infraredCameraId));
         return "stop " + robotId + " preview success!";
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String stopStream(Long cameraId) {
+        manager.terminate(cameraId);
+        return "stop " + cameraId + " preview success!";
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String stopAllStream() {
+        manager.terminateAll();
+        return "stop All preview success!";
     }
 
     /*

@@ -113,6 +113,36 @@ public class CameraConController {
 
     }
 
+    @ApiOperation(value = "结束推流")
+    @RequestMapping(value = "/stopStream", method = RequestMethod.GET)
+    public Result stopStream(@RequestParam(value = "cameraId") Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.stopStream(cameraId));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机停止播放失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "关闭所有流")
+    @RequestMapping(value = "/stopAllStream", method = RequestMethod.GET)
+    public Result stopAllStream() {
+        Result result = new Result();
+        try {
+            result.setData(cameraConService.stopAllStream());
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("相机停止播放失败:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "相机停止播放")
     @RequestMapping(value = "/stopRealPlay", method = RequestMethod.GET)
     public Result stopRealPlay(@RequestParam(value = "cameraId") Long cameraId,

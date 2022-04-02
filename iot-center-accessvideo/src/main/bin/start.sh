@@ -7,6 +7,10 @@ process_exists=`ps -ef|grep $latestjar|grep -v grep|awk '{print $2}'`
 if [ -n "${process_exists}" ];then
 	kill -9 ${process_exists}
 fi
+process_ffmpeg_exists=`ps -ef|grep 'ffmpeg'|grep -v grep|awk '{print $2}'`
+if [ -n "${process_ffmpeg_exists}" ];then
+	kill -9 ${process_ffmpeg_exists}
+fi
 if [ ! -n "$java_home" ]; then
         cd $SH_DIR/../;
         nohup java -jar $SH_DIR/../$latestjar > /dev/null 2>&1 &

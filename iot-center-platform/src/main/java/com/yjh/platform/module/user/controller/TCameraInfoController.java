@@ -143,6 +143,7 @@ public class TCameraInfoController {
                 if (state == 0) {
                     result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
                 } else {
+                    tCameraInfoService.stopStream(tCameraInfo.getCameraId());
                     result.setData(state);
                 }
             }

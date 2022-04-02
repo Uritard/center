@@ -8,3 +8,10 @@ if [ -n "${process_exists}" ];then
 	kill -9 ${process_exists}
 fi
 echo "------application stop sucess---------"
+
+echo 'stop:ffmpeg'
+process_ffmpeg_exists=`ps -ef|grep 'ffmpeg'|grep -v grep|awk '{print $2}'`
+if [ -n "${process_ffmpeg_exists}" ];then
+	kill -9 ${process_ffmpeg_exists}
+fi
+echo "------ffmpeg stop sucess---------"

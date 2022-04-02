@@ -26,7 +26,7 @@ public class InputStreamConsumer extends Thread {
         while (running.get()) {
             if (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-//                consumer.accept(line);
+                consumer.accept(line);
             }
         }
         scanner.close();
