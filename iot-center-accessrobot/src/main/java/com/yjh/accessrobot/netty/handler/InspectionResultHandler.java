@@ -131,7 +131,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         log.info("temporaryOriginPath==={}",temporaryOriginPath);
 
         String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
-        // 1.红外 2.可见光 3.音频
+        // 1.红外 2.可见光 3.音频 4.视频
         if (Objects.equals("1",fileType)) {
             // 拷贝巡视结果图
             copyFileToDevelop(temporaryOriginPath, developAbsoluteUrl + "Infrared");
@@ -155,6 +155,11 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Audio");
             cruiseResultMap.put("relativePath", developRelativeUrl + "Audio" + "/" + ftpFileName);
             cruiseResultMap.put("absolutePath", developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
+        }else if (Objects.equals("4", fileType)) {
+            // 拷贝巡视结果视频文件
+            copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Video");
+            cruiseResultMap.put("relativePath", developRelativeUrl + "Video" + "/" + ftpFileName);
+            cruiseResultMap.put("absolutePath", developAbsoluteUrl + "Video" + "/" + ftpOriginName);
         }
 
         /// 新版的图片处理

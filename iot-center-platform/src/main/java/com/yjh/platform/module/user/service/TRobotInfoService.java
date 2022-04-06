@@ -9,6 +9,7 @@ import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
 import io.swagger.models.auth.In;
+import org.apache.tomcat.jni.Thread;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -40,6 +41,8 @@ public class TRobotInfoService{
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private TCameraInfoService tCameraInfoService;
     private String ROBOT_REMOVE_LINK =  "http://iot-center-accessrobot/robot/v1/removeLink?robotCode={robotCode}&robotId={robotId}";
 
     private Logger log = LoggerFactory.getLogger(TRobotInfoService.class);
@@ -117,6 +120,10 @@ public class TRobotInfoService{
             WebSocketServer.sendMsg(json);*/
             tRobotInfoDao.update(tRobotInfoTemp);
         }
+        Long lightCameraId = Long.parseLong(String.valueOf(tRobotInfo.getRobotId())+ "9901");
+        Long infraredCameraId = Long.parseLong(String.valueOf(tRobotInfo.getRobotId())+ "9902");
+        tCameraInfoService.stopStream(lightCameraId);
+        tCameraInfoService.stopStream(infraredCameraId);
 
         return res;
     }

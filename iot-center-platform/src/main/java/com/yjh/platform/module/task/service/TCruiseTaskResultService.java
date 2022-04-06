@@ -192,46 +192,63 @@ public class TCruiseTaskResultService {
                     if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) videoInfo.put("videoCameraType", "2");
                     //机器人历史视频流Map（更新后保存60s，若未取到则重新请求流接口）
                     //机器人可见光-历史视频流
-                    Map<String, String> robotVideoHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotLight:" + resultMap.get("robotId").toString());
-                    //机器人红外-历史视频流
-                    Map<String, String> robotInfraredHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotInfrared:" + resultMap.get("robotId").toString());
+//                    Map<String, String> robotVideoHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotLight:" + resultMap.get("robotId").toString());
+//                    //机器人红外-历史视频流
+//                    Map<String, String> robotInfraredHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotInfrared:" + resultMap.get("robotId").toString());
 //                    log.info("robotVideoHistory：" + robotVideoHistory + ",robotInfraredHistory：" + robotInfraredHistory + ",videoCameraType==" +videoInfo.get("videoCameraType"));
                     HashMap<String, Long> robot = new HashMap<>();
                     robot.put("robotId", Long.valueOf(resultMap.get("robotId").toString()));
 
                     switch (videoInfo.get("videoCameraType")) {
                         case "1":
-                            if (Objects.isNull(robotVideoHistory)) {
+//                            if (Objects.isNull(robotVideoHistory)) {
                                 Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
                                 List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
-                                if (robotVideoInfo.size()>1) {
+                                if (robotVideoInfo.size()>0) {
                                     videoInfo.putAll(robotVideoInfo.get(0));
                                 }else {
                                     videoInfo.put("flvUrl", null);
                                     videoInfo.put("rtmpUrl", null);
+                                    videoInfo.put("webRtcUrl", null);
                                 }
                                 videoInfo.put("cameraId", robot.get("robotId").toString());
                                 cruiseInspectResult.setVideoInfo(videoInfo);
-                                redisTemplate.opsForValue().set("robotLight:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
-                            } else { cruiseInspectResult.setVideoInfo(robotVideoHistory); }
+//                                redisTemplate.opsForValue().set("robotLight:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
+//                            } else { cruiseInspectResult.setVideoInfo(robotVideoHistory); }
                             break;
                         case "2":
-                            if (Objects.isNull(robotInfraredHistory)) {
-                                Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
-                                List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
-                                if(robotVideoInfo.size()>2) {
-                                    videoInfo.put("flvUrl", robotVideoInfo.get(1).get("flvUrlInferad"));
-                                    videoInfo.put("rtmpUrl", robotVideoInfo.get(1).get("rtmpUrlInferad"));
+//                            if (Objects.isNull(robotInfraredHistory)) {
+                                Result result2 = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+                                List<Map<String, String>> robotInfraredVideoInfo = (List<Map<String, String>>) result2.getData();
+                                if(robotInfraredVideoInfo.size()>1) {
+                                    videoInfo.putAll(robotInfraredVideoInfo.get(1));
                                 }else {
                                     videoInfo.put("flvUrl", null);
                                     videoInfo.put("rtmpUrl", null);
+                                    videoInfo.put("webRtcUrl", null);
                                 }
                                 videoInfo.put("cameraId", robot.get("robotId").toString());
                                 cruiseInspectResult.setVideoInfo(videoInfo);
-                                redisTemplate.opsForValue().set("robotInfrared:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
-                            } else { cruiseInspectResult.setVideoInfo(robotInfraredHistory); }
+//                                redisTemplate.opsForValue().set("robotInfrared:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
+//                            } else { cruiseInspectResult.setVideoInfo(robotInfraredHistory); }
                             break;
                     }
+                }
+                //todo 摄像机的没写
+                //拉机器人的红外和可见光的视频流
+                if (!"".equals(resultMap.get("cameraId").toString())){
+                    HashMap<String, Long> cameraId = new HashMap<>();
+                    cameraId.put("cameraId", Long.valueOf(resultMap.get("cameraId").toString()));
+                    Result result = sendGetRequest(Constant.START_CAMERA_URL, cameraId);
+                    Map<String, String> cameraVideoInfo = (Map<String, String>) result.getData();
+                    if (Objects.nonNull(cameraVideoInfo)) {
+                        videoInfo.putAll(cameraVideoInfo);
+                    } else {
+                        videoInfo.put("flvUrl", null);
+                        videoInfo.put("rtmpUrl", null);
+                        videoInfo.put("webRtcUrl", null);
+                    }
+                    cruiseInspectResult.setVideoInfo(videoInfo);
                 }
                 inspectResult = cruiseInspectResult;
             }

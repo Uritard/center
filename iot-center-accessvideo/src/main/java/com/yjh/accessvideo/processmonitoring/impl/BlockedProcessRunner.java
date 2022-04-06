@@ -55,16 +55,16 @@ public class BlockedProcessRunner implements ProcessRunner {
         }
 
         Process process = processRef.get();
-        log.info("-------Process({}) started", cmd.get(6)); //getProcessInfoString(process)
+        log.info("-------Process({}) started", cmd.get(4)); //getProcessInfoString(process)
 
         try (InputStream errorStream = process.getErrorStream()) {
-//            InputStreamConsumer errorsConsumer = new InputStreamConsumer(errorStream, log::debug);
-//            errorConsumerRef.set(errorsConsumer);
-//            errorsConsumer.start();
+            InputStreamConsumer errorsConsumer = new InputStreamConsumer(errorStream, log::debug);
+            errorConsumerRef.set(errorsConsumer);
+            errorsConsumer.start();
 
             while (keepRunning.get() && process.isAlive()) {
                 if (log.isDebugEnabled()) {
-                    log.debug("-------Process({}) is alive", cmd.get(8)); //getProcessInfoString(process)
+                    log.debug("-------Process({}) is alive", cmd.get(4)); //getProcessInfoString(process)
                 }
 
                 synchronized (waiter) {
@@ -77,11 +77,11 @@ public class BlockedProcessRunner implements ProcessRunner {
                 }
             }
 
-//            errorsConsumer.shutdown();
+            errorsConsumer.shutdown();
         } catch (IOException eio) {
             throw new RuntimeException(eio);
         }
-        log.warn("-------Process({}) exited.", cmd.get(6)); //getProcessInfoString(process)
+        log.warn("-------Process({}) exited.", cmd.get(4)); //getProcessInfoString(process)
     }
 
     @Override
@@ -106,7 +106,7 @@ public class BlockedProcessRunner implements ProcessRunner {
             processRef.set(null);
         }
 
-//        Optional.ofNullable(errorConsumerRef.get()).ifPresent(InputStreamConsumer::shutdown);
-//        errorConsumerRef.set(null);
+        Optional.ofNullable(errorConsumerRef.get()).ifPresent(InputStreamConsumer::shutdown);
+        errorConsumerRef.set(null);
     }
 }

@@ -90,25 +90,25 @@ public class CameraConController {
         try {
             //获取所有视频流信息
             //发送请求获取所有STREAM
-            log.info("关闭流接口回调：");
-            String getInfoUrl="http://"+srsStopUrl+":1985/api/v1/streams/";
-            //SRS服务器有延迟，大概50-60秒 才更新管理数据
-//            Thread.sleep(1000*70);
-            JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
-            assert jsonList != null;
-
-            List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
-            int streamListSize = streamsJsonObjectList.size();
-            log.info("streamListSize：{}", streamListSize);
-            if (streamListSize==0) {
-                Constant.mapsForCamera.clear();
-                Constant.mapsForHistory.clear();
-            } else {
-                StreamStopThread streamStopThread = new StreamStopThread(streamListSize, streamsJsonObjectList, srsStopUrl, redisTemplate);
-                Thread thread = new Thread(streamStopThread);
-                thread.setDaemon(true);
-                thread.start();
-            }
+//            log.info("关闭流接口回调：");
+//            String getInfoUrl="http://"+srsStopUrl+":1985/api/v1/streams/";
+//            //SRS服务器有延迟，大概50-60秒 才更新管理数据
+////            Thread.sleep(1000*70);
+//            JSONObject jsonList = HttpClientUtils.sendGet(getInfoUrl, null);
+//            assert jsonList != null;
+//
+//            List<String> streamsJsonObjectList = JSONArray.parseArray(jsonList.getString("streams"),String.class);
+//            int streamListSize = streamsJsonObjectList.size();
+//            log.info("streamListSize：{}", streamListSize);
+//            if (streamListSize==0) {
+//                Constant.mapsForCamera.clear();
+//                Constant.mapsForHistory.clear();
+//            } else {
+//                StreamStopThread streamStopThread = new StreamStopThread(streamListSize, streamsJsonObjectList, srsStopUrl, redisTemplate);
+//                Thread thread = new Thread(streamStopThread);
+//                thread.setDaemon(true);
+//                thread.start();
+//            }
         } catch (Exception e) {e.getMessage();}
 
     }

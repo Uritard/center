@@ -64,6 +64,9 @@ public class CameraConService {
     @Value("${robot.inferad.video}")
     private String robotInferadTem;
 
+    @Value("${robot.A200.infrared.video}")
+    private String robotA200InfraredTem;
+
     @Value("${nvr.capture.Preset}")
     private String capturePresetPath;//预置位路径
 
@@ -438,7 +441,9 @@ public class CameraConService {
                 String inferadUsername = robotConInfo.getInferadUsername();
                 String inferadPassword = robotConInfo.getInferadPassword();
                 transUrlinferad = String.format(robotLightTem, inferadUsername, inferadPassword, inferadIp, inferadPort, 1, infraredCameraId);
-            } else {
+            } else if (robotConInfo.getRobotType() == 157){
+                transUrlinferad = String.format(robotA200InfraredTem, inferadIp, inferadPort, infraredCameraId);
+            }else {
                 transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, infraredCameraId);
             }
             VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlinferad).setId(Long.parseLong(infraredCameraId));

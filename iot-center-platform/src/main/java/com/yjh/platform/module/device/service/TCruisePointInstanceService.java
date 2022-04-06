@@ -372,7 +372,7 @@ public class TCruisePointInstanceService{
                 }else {
                     TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
                     if(cruiseType == 229){//视频
-                        if(205 == tCruisePointInstanceDao.selectForPresetId(Long.valueOf(id))){//可见光
+                        if(205 == tCruisePointInstanceDao.selectForPresetId(id)){//可见光
                             TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
                             tCruisePointInstance.setCruiseId(id);
                             tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());

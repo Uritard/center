@@ -235,6 +235,7 @@ public class RunAtNowTask implements Runnable{
                 mapForAbnormal.put("taskStart",simpleDateFormat.format(taskStart));
                 mapForAbnormal.put("overDay",tasksAreTime.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+                log.info("countForAbnormal: {} putAll", taskId);
             }
             TCruiseResult tCruiseResult = new TCruiseResult();
             tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);

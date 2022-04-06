@@ -21,7 +21,7 @@ public class NettyServer {
 
     public void start(InetSocketAddress address, RedisTemplate redisTemplate, RobotService robotService){
         // 1.创建两个事件组,boss用于处理请求的accept事件,work用于请求的read和write事件
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             // 2.创建辅助工具类ServerBootstrap,用于服务器通道的一系列配置
