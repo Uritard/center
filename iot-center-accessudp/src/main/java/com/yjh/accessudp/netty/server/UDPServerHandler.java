@@ -155,6 +155,19 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 
         //解析 Str = eb 90 eb 90 55 01 00 0a 27 01 06 e5 8a a8 e4 bd 9c 06 e5 90 88 e4 bd 8d
         String[] udp = Str.toString().split(" ");
+        // 处理校验和
+        if(udp.length > 6){
+            Integer he = 0;
+            for (int i = 5; i < udp.length-1; i++) {
+                he = he + Integer.parseInt(udp[i], 16);
+            }
+            Integer check = Integer.parseInt(udp[udp.length-1],16);
+            if(check != (he%256)){
+                //校验和不对
+                log.info("计算校验和{}，报文校验和{}",he,check);
+                return;
+            }
+        }
         if("55".equals(udp[4])){
             //获取meteid
             Integer meteId = Integer.valueOf(new BigInteger(udp[8]+udp[7],16).toString());
