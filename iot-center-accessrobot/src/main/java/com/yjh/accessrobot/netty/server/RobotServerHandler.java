@@ -8,6 +8,8 @@ import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.handler.MessageHandlerStrategy;
 import com.yjh.accessrobot.netty.handler.MessageHandlerStrategyFactory;
+import com.yjh.accessrobot.netty.handler.drone.DroneMessageHandlerStrategy;
+import com.yjh.accessrobot.netty.handler.drone.DroneMessageHandlerStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,7 +23,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.SAXReader;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.HashMap;
@@ -263,10 +264,20 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             }else {
                 handlerType = type;
             }
-            MessageHandlerStrategy messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
-            if (Optional.of(messageHandlerStrategy).isPresent()){
-                messageHandlerStrategy.handler(ctx,this, xmlBaseModel, sendSessionId, receiveSessionId);
+            String sendCode = xmlBaseModel.getSendCode();
+            // sendCode来判断设备类型 sendCode: Client开头-机器人  Drone开头-无人机
+            if (sendCode.startsWith("Drone")) {
+                DroneMessageHandlerStrategy droneMessageHandlerStrategy = DroneMessageHandlerStrategyFactory.getStrategyType(handlerType);
+                if (Optional.of(droneMessageHandlerStrategy).isPresent()) {
+                    droneMessageHandlerStrategy.handler(ctx, this, xmlBaseModel, sendSessionId, receiveSessionId);
+                }
+            } else {
+                MessageHandlerStrategy messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
+                if (Optional.of(messageHandlerStrategy).isPresent()) {
+                    messageHandlerStrategy.handler(ctx, this, xmlBaseModel, sendSessionId, receiveSessionId);
+                }
             }
+
         }catch (Exception e){
             log.error("处理机器人响应消息错误:" + e.getMessage());
             String responseMsgXmlString = PlatformXMLUtil.generateXml(sendMessageForCommandThree(false, xmlBaseModel.getSendCode()));
