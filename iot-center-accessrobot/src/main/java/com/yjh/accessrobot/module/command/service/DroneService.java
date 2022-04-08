@@ -707,10 +707,14 @@ public class DroneService {
     public String deviceMaintenanceIssued(Map<String, Object> resMap) {
         List<Map<String, Object>> itemList = new ArrayList<>();
         Map<String, Object> itemMap = new HashMap<>(16);
+        //2022过检增加config_code：配置编码、coordinate_pixel：检修区域坐标框
+        itemMap.put("config_code", resMap.get("configCode").toString());
+        itemMap.put("coordinate_pixel", resMap.get("coordinatePixel").toString());
         itemMap.put("enable", Integer.valueOf(resMap.get("enable").toString()));
         itemMap.put("start_time", resMap.get("startTime").toString());
         itemMap.put("end_time", resMap.get("endTime").toString());
         itemMap.put("device_level", resMap.get("deviceLevel").toString());
+
         String deviceList = resMap.get("deviceList").toString();
         String deviceIdList = deviceList.substring(1, deviceList.length() - 1);
         itemMap.put("device_list", deviceIdList);
@@ -727,7 +731,7 @@ public class DroneService {
                     .setType("81")
                     .setCommand("4")
                     .setItems(itemList);
-            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+            String xmlString = PlatformXMLUtil.generateXml2(xmlBaseModel, PlatformXMLUtil.DRONEROOTNAME);
             log.info("生成的无人机下发检修区域指令xml是<start>{}<end>", xmlString);
             RobotServerHandler.send(generateByteOrder(xmlString, droneCode), droneCode);
         }

@@ -37,11 +37,14 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
     @Value("${heart.beat.interval}")
     private String heartBeatInterval;
 
-    @Value("${run.data.interval}")
-    private String runDataInterval;
+    @Value("${patroldevice.run.interval}")
+    private String patroldeviceRunInterval;
 
-    @Value("${weather.data.interval}")
-    private String weatherDataInterval;
+    @Value("${env.interval}")
+    private String envInterval;
+
+    @Value("${nest.run.interval}")
+    private String nestRunInterval;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -74,9 +77,13 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
         // heart beat interval
         items.put("heart_beat_interval", heartBeatInterval);
         // robot run interval
-        items.put("robot_run_interval", runDataInterval);
-        // weather interval
-        items.put("weather_interval", weatherDataInterval);
+        //巡视设备运行时间间隔 2022过检 robot_run_interval修改为patroldevice_run_interval
+        items.put("patroldevice_run_interval", patroldeviceRunInterval);
+        //环境数据间隔 2022过检  weather interval 修改为 env_interval
+        items.put("env_interval", envInterval);
+        //2022过检新增 无人机机巢运行数据间隔
+        items.put("nest_run_interval", nestRunInterval);
+
         itemsList.add(items);
         XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
                 .setSendCode(sendCode)

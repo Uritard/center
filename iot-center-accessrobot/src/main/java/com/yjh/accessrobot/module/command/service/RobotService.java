@@ -700,6 +700,9 @@ public class RobotService {
     public String deviceMaintenanceIssued(Map<String, Object> resMap) {
         List<Map<String, Object>> itemList = new ArrayList<>();
         Map<String, Object> itemMap = new HashMap<>(16);
+        //2022过检增加config_code：配置编码、coordinate_pixel：检修区域坐标框
+        itemMap.put("config_code", resMap.get("configCode").toString());
+        itemMap.put("coordinate_pixel", resMap.get("coordinatePixel").toString());
         itemMap.put("enable", Integer.valueOf(resMap.get("enable").toString()));
         itemMap.put("start_time", resMap.get("startTime").toString());
         itemMap.put("end_time", resMap.get("endTime").toString());
