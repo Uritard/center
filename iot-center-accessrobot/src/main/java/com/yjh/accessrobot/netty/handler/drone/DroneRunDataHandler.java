@@ -41,8 +41,8 @@ public class DroneRunDataHandler implements DroneMessageHandlerStrategy, Initial
             List<Map<String, String>> droneOperationList = new ArrayList<>();
             xmlBaseModel.getItems().forEach(res -> {
                 Map<String, String> droneOperationMap = new HashMap<>(16);
-                droneOperationMap.put("patroldevice_name", res.get("patroldevice_name").toString());
-                droneOperationMap.put("patroldevice_code", droneCode);
+                droneOperationMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
+                droneOperationMap.put("patrolDeviceCode", droneCode);
                 droneOperationMap.put("time", res.get("time").toString());
                 droneOperationMap.put("type", res.get("type").toString());
                 droneOperationMap.put("value", res.get("value").toString());
@@ -52,7 +52,7 @@ public class DroneRunDataHandler implements DroneMessageHandlerStrategy, Initial
             });
 
             for (int i = 0; i < droneOperationList.size(); i++) {
-                redisTemplate.opsForHash().putAll("DroneOperation:" + droneCode + ":" + droneOperationList.get(i).get("type"), droneOperationList.get(i));
+                redisTemplate.opsForHash().putAll("RobotOperation:" + droneCode + ":" + droneOperationList.get(i).get("type"), droneOperationList.get(i));
             }
 
             String operationXmlString = PlatformXMLUtil.generateXml2(RobotServerHandler.sendMessageForCommandThree(true, droneCode), PlatformXMLUtil.DRONEROOTNAME);

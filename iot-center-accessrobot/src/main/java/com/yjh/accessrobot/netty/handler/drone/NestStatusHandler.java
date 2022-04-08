@@ -56,7 +56,7 @@ public class NestStatusHandler implements DroneMessageHandlerStrategy, Initializ
             log.info("无人机机巢状态数据是：" + droneStatusList);
 
             for (int i = 0; i < droneStatusList.size(); i++) {
-                redisTemplate.opsForHash().putAll("DroneStatus:" + droneCode + ":" + droneStatusList.get(i).get("type"), droneStatusList.get(i));
+                redisTemplate.opsForHash().putAll("NestStatus:" + droneCode + ":" + droneStatusList.get(i).get("type"), droneStatusList.get(i));
             }
 
             String statusXmlString = PlatformXMLUtil.generateXml2(RobotServerHandler.sendMessageForCommandThree(true, droneCode), PlatformXMLUtil.DRONEROOTNAME);

@@ -42,10 +42,11 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
             xmlBaseModel.getItems().forEach(res -> {
                 Map<String, String> robotCoordinateMap = new HashMap<>(16);
                 String filePath = res.get("file_path").toString();
-                robotCoordinateMap.put("robotName", res.get("robot_name").toString());
+                // 2022过检 robot_name -> patroldevice_name
+                robotCoordinateMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
                 robotCoordinateMap.put("filePath", filePath);
                 robotService.uploadFile(filePath, filePath);
-                robotCoordinateMap.put("robotCode",robotCode);
+                robotCoordinateMap.put("patrolDeviceCode",robotCode);
                 robotCoordinateMap.put("time", res.get("time").toString());
                 robotCoordinateMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
                 robotCoordinateMap.put("coordinateGeography", res.get("coordinate_geography").toString());

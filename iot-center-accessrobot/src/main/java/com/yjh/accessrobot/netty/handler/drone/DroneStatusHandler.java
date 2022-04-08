@@ -41,7 +41,7 @@ public class DroneStatusHandler implements DroneMessageHandlerStrategy, Initiali
             List<Map<String, String>> droneStatusList = new ArrayList<>();
             xmlBaseModel.getItems().forEach(res -> {
                 Map<String, String> droneStatusMap = new HashMap<>(16);
-                droneStatusMap.put("patrolDeviceCode", res.get("patroldevice_name").toString());
+                droneStatusMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
                 droneStatusMap.put("patrolDeviceCode", droneCode);
                 droneStatusMap.put("time", res.get("time").toString());
                 droneStatusMap.put("type", res.get("type").toString());
@@ -56,7 +56,7 @@ public class DroneStatusHandler implements DroneMessageHandlerStrategy, Initiali
             log.info("无人机状态数据是：" + droneStatusList);
 
             for (int i = 0; i < droneStatusList.size(); i++) {
-                redisTemplate.opsForHash().putAll("DroneStatus:" + droneCode + ":" + droneStatusList.get(i).get("type"), droneStatusList.get(i));
+                redisTemplate.opsForHash().putAll("RobotStatus:" + droneCode + ":" + droneStatusList.get(i).get("type"), droneStatusList.get(i));
             }
 
             String statusXmlString = PlatformXMLUtil.generateXml2(RobotServerHandler.sendMessageForCommandThree(true, droneCode), PlatformXMLUtil.DRONEROOTNAME);

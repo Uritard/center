@@ -53,7 +53,7 @@ public class NestRunDataHandler implements DroneMessageHandlerStrategy, Initiali
             });
 
             for (int i = 0; i < droneOperationList.size(); i++) {
-                redisTemplate.opsForHash().putAll("DroneOperation:" + droneCode + ":" + droneOperationList.get(i).get("type"), droneOperationList.get(i));
+                redisTemplate.opsForHash().putAll("NestOperation:" + droneCode + ":" + droneOperationList.get(i).get("type"), droneOperationList.get(i));
             }
 
             String operationXmlString = PlatformXMLUtil.generateXml2(RobotServerHandler.sendMessageForCommandThree(true, droneCode), PlatformXMLUtil.DRONEROOTNAME);

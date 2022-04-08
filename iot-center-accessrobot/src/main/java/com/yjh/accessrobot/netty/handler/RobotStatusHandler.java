@@ -41,8 +41,9 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
             List<Map<String, String>> robotStatusList = new ArrayList<>();
             xmlBaseModel.getItems().forEach(res -> {
                 Map<String, String> robotStatusMap = new HashMap<>(16);
-                robotStatusMap.put("robotName", res.get("robot_name").toString());
-                robotStatusMap.put("robotCode", robotCode);
+                // 2022过检 robot_name修改为patroldevice_name
+                robotStatusMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
+                robotStatusMap.put("patrolDeviceCode", robotCode);
                 robotStatusMap.put("time", res.get("time").toString());
                 robotStatusMap.put("type", res.get("type").toString());
                 robotStatusMap.put("value", res.get("value").toString());
