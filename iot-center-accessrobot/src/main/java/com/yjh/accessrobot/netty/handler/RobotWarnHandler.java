@@ -37,8 +37,8 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
         if (Constant.robotRegisterFlag.getOrDefault(robotCode, false)) {
             Map<String, String> robotAlarmMap = new HashMap<>(8);
             // 2022过检 robot_name -> patroldevice_name
-            robotAlarmMap.put("patrolDeviceName", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_name").toString()));
-            robotAlarmMap.put("patrolDeviceCode", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code").toString()));
+            robotAlarmMap.put("patrolDeviceName", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_name")));
+            robotAlarmMap.put("patrolDeviceCode", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code")));
             robotAlarmMap.put("robotCode", robotCode);
             robotAlarmMap.put("time", xmlBaseModel.getItems().get(0).get("time").toString());
             robotAlarmMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
