@@ -38,8 +38,8 @@ public interface HCNetSDK extends Library {
 //    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("/home/yjh_iot_center/iot-center-accessvideo-1.0.0/config/lib/libhcnetsdk.so",
 //            HCNetSDK.class);
 
-    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("hcnetsdk",
-            HCNetSDK.class);
+    HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary(Platform.isWindows() ? "HCNetSDK" : "hcnetsdk", HCNetSDK.class);
+
     /***宏定义***/
     //常量
 
