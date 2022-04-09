@@ -36,8 +36,9 @@ public class DroneWarnHandler implements DroneMessageHandlerStrategy, Initializi
         String droneCode = xmlBaseModel.getSendCode();
         if (Constant.robotRegisterFlag.getOrDefault(droneCode, false)) {
             Map<String, String> droneAlarmMap = new HashMap<>(8);
-            droneAlarmMap.put("droneName", xmlBaseModel.getItems().get(0).get("drone_name").toString());
-            droneAlarmMap.put("droneCode", droneCode);
+            // 2022过检 robot_name -> patroldevice_name
+            droneAlarmMap.put("patrolDeviceName", xmlBaseModel.getItems().get(0).get("patroldevice_name").toString());
+            droneAlarmMap.put("patrolDeviceCode", droneCode);
             droneAlarmMap.put("time", xmlBaseModel.getItems().get(0).get("time").toString());
             droneAlarmMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
 

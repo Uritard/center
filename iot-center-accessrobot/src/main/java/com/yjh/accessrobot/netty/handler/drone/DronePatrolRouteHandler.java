@@ -45,7 +45,7 @@ public class DronePatrolRouteHandler implements DroneMessageHandlerStrategy, Ini
         List<Map<String, String>> droneRoadList = new ArrayList<>();
         xmlBaseModel.getItems().forEach(res -> {
             Map<String, String> droneRoadMap = new HashMap<>(16);
-            droneRoadMap.put("droneName", res.get("drone_name").toString());
+            droneRoadMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
             String filePath = res.get("file_path").toString();
             droneService.uploadFile(filePath, filePath);
             String[] splitArray = filePath.split("/");
@@ -65,7 +65,7 @@ public class DronePatrolRouteHandler implements DroneMessageHandlerStrategy, Ini
 
             droneRoadMap.put("relativePath", developRelativeUrl + "/" + fileName);
             droneRoadMap.put("absolutePath", developAbsoluteUrl + "/" + fileName);
-            droneRoadMap.put("droneCode", droneCode);
+            droneRoadMap.put("patrolDeviceCode", droneCode);
             droneRoadMap.put("time", res.get("time").toString());
             droneRoadMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
             droneRoadMap.put("coordinateGeography", res.get("coordinate_geography").toString());
@@ -73,7 +73,7 @@ public class DronePatrolRouteHandler implements DroneMessageHandlerStrategy, Ini
         });
 
         for (int i = 0; i < droneRoadList.size(); i++) {
-            redisTemplate.opsForHash().putAll("DroneRoad:" + droneCode, droneRoadList.get(i));
+            redisTemplate.opsForHash().putAll("RobotRoad:" + droneCode, droneRoadList.get(i));
         }
 
         String roadXmlString = PlatformXMLUtil.generateXml2(RobotServerHandler.sendMessageForCommandThree(true, droneCode), PlatformXMLUtil.DRONEROOTNAME);
