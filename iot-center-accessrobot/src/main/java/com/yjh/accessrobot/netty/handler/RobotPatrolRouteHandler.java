@@ -46,7 +46,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
         xmlBaseModel.getItems().forEach(res -> {
             Map<String, String> robotRoadMap = new HashMap<>(16);
             // 2022过检 robot_name -> patroldevice_name
-            robotRoadMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
+            robotRoadMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
             String filePath = res.get("file_path").toString();
             robotService.uploadFile(filePath, filePath);
             String[] splitArray = filePath.split("/");
@@ -66,7 +66,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
             robotRoadMap.put("relativePath", developRelativeUrl + "/" + fileName);
             robotRoadMap.put("absolutePath", developAbsoluteUrl + "/" + fileName);
-            robotRoadMap.put("patrolDeviceCode", res.get("patroldevice_code").toString());
+            robotRoadMap.put("patrolDeviceCode",  String.valueOf(res.get("patroldevice_code")));
             robotRoadMap.put("robotCode", robotCode);
             robotRoadMap.put("time", res.get("time").toString());
             robotRoadMap.put("coordinatePixel", res.get("coordinate_pixel").toString());

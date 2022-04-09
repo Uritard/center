@@ -48,8 +48,8 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         String robotCode = xmlBaseModel.getSendCode();
         Map<String, String> cruiseResultMap = new HashMap<>(16);
         // 2022过检 robot_name -> patroldevice_name
-        cruiseResultMap.put("patrolDeviceName", xmlBaseModel.getItems().get(0).get("patroldevice_name").toString());
-        cruiseResultMap.put("patrolDeviceCode", xmlBaseModel.getItems().get(0).get("patroldevice_code").toString());
+        cruiseResultMap.put("patrolDeviceName", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_name")));
+        cruiseResultMap.put("patrolDeviceCode", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code")));
         cruiseResultMap.put("robotCode",robotCode);
         cruiseResultMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
         cruiseResultMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());

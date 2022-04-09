@@ -57,7 +57,10 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
             for (int i = 0; i < nestStatusList.size(); i++) {
                 redisTemplate.opsForHash().putAll("nestStatus:" + robotCode + ":" + nestStatusList.get(i).get("type"), nestStatusList.get(i));
             }
-
+            // 无人机机巢状态更新同步到主表形成绑定关系
+            if (nestStatusList.size() > 0) {
+                robotService.updateNestInfo(robotCode, String.valueOf(nestStatusList.get(0).get("nestCode")), String.valueOf(nestStatusList.get(0).get("nestName")));
+            }
             String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
             byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
             RobotServerHandler.send(statusProtocol, robotCode);

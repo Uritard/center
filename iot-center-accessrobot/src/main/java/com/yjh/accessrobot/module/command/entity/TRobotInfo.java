@@ -101,5 +101,10 @@ public class TRobotInfo implements Serializable {
     @TableField(value = "remarks",updateStrategy = FieldStrategy.IGNORED)
     private String remarks;
 
+    @TableField(value = "nest_code",updateStrategy = FieldStrategy.IGNORED)
+    private String nestCode;
+    @TableField(value = "nest_name",updateStrategy = FieldStrategy.IGNORED)
+    private String nestName;
+
 
 }

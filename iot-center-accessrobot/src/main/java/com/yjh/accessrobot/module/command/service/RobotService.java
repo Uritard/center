@@ -301,6 +301,26 @@ public class RobotService {
         log.info("robotCode为==={},robotId为==={}的机器人状态是==={},修改结果==={}", robotCode, robotId, tRobotInfo.getRobotStatus(), res);
         return res;
     }
+
+    /**
+     * 更新无人机巢信息
+     * @param robotCode
+     * @param nestCode
+     * @param nestName
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public int updateNestInfo(String robotCode, String nestCode, String nestName) {
+        Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
+        TRobotInfo tRobotInfo = new TRobotInfo()
+                .setRobotId(robotId)
+                .setNestCode(nestCode)
+                .setNestName(nestName);
+        int res = tRobotInfoDao.update(tRobotInfo);
+        log.info("robotCode为==={},robotId为==={}的机巢信息code{}和机巢名称==={},修改结果==={}", robotCode, robotId, nestCode, nestName, res > 0);
+        return res;
+    }
+
     /**
      * 查询表中所有的机器人
      * @return List<String>

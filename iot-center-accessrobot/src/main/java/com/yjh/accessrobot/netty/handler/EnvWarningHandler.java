@@ -9,12 +9,12 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -33,8 +33,9 @@ public class EnvWarningHandler implements MessageHandlerStrategy, InitializingBe
         log.info("巡视主机收到机器人站端的环境设备告警数据");
         String robotCode = xmlBaseModel.getSendCode();
             Map<String, String> envWarn = new HashMap<>();
-           envWarn.put("robotName",xmlBaseModel.getItems().get(0).get("robot_name").toString());
-           envWarn.put("robotCode",xmlBaseModel.getItems().get(0).get("robot_code").toString());
+           envWarn.put("patrolDeviceName", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_name")));
+           envWarn.put("patrolDeviceCode", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code")));
+           envWarn.put("robotCode",robotCode);
            envWarn.put("time",xmlBaseModel.getItems().get(0).get("time").toString());
            envWarn.put("type",xmlBaseModel.getItems().get(0).get("type").toString());
            envWarn.put("value",xmlBaseModel.getItems().get(0).get("vlaue").toString());

@@ -42,8 +42,8 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             xmlBaseModel.getItems().forEach(res -> {
                 Map<String, String> robotOperationMap = new HashMap<>(16);
                 // 2022过检 修改robot_name为patroldevice_name
-                robotOperationMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
-                robotOperationMap.put("patrolDeviceCode", res.get("patroldevice_code").toString());
+                robotOperationMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
+                robotOperationMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
                 robotOperationMap.put("robotCode", robotCode);
                 robotOperationMap.put("time", res.get("time").toString());
                 robotOperationMap.put("type", res.get("type").toString());
