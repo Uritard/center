@@ -66,7 +66,8 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
             robotRoadMap.put("relativePath", developRelativeUrl + "/" + fileName);
             robotRoadMap.put("absolutePath", developAbsoluteUrl + "/" + fileName);
-            robotRoadMap.put("patrolDeviceCode", robotCode);
+            robotRoadMap.put("patrolDeviceCode", res.get("patroldevice_code").toString());
+            robotRoadMap.put("robotCode", robotCode);
             robotRoadMap.put("time", res.get("time").toString());
             robotRoadMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
             robotRoadMap.put("coordinateGeography", res.get("coordinate_geography").toString());

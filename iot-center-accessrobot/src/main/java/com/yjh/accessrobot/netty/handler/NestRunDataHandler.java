@@ -35,7 +35,6 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到无人机机巢运行数据了+++++++++++++++++");
-        // Deal with drone operation data
         String robotCode = xmlBaseModel.getSendCode();
         if (Constant.robotRegisterFlag.getOrDefault(robotCode, false)) {
             List<Map<String, String>> nestOperationList = new ArrayList<>();

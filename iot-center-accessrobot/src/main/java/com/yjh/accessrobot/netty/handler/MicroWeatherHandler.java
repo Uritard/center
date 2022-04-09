@@ -52,7 +52,8 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 Map<String, String> weatherMap = new HashMap<>(16);
                 // 2022过检 robot_name -> patroldevice_name
                 weatherMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
-                weatherMap.put("patrolDeviceCode", robotCode);
+                weatherMap.put("patrolDeviceCode", res.get("patroldevice_code").toString());
+                weatherMap.put("robotCode", robotCode);
                 weatherMap.put("time", res.get("time").toString());
                 weatherMap.put("type", res.get("type").toString());
                 weatherMap.put("value", res.get("value").toString());

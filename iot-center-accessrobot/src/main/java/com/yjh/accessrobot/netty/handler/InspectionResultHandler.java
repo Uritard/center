@@ -47,11 +47,16 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         // Deal with robot task result data
         String robotCode = xmlBaseModel.getSendCode();
         Map<String, String> cruiseResultMap = new HashMap<>(16);
+        // 2022过检 robot_name -> patroldevice_name
+        cruiseResultMap.put("patrolDeviceName", xmlBaseModel.getItems().get(0).get("patroldevice_name").toString());
+        cruiseResultMap.put("patrolDeviceCode", xmlBaseModel.getItems().get(0).get("patroldevice_code").toString());
         cruiseResultMap.put("robotCode",robotCode);
         cruiseResultMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
         cruiseResultMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
         cruiseResultMap.put("deviceName", xmlBaseModel.getItems().get(0).get("device_name").toString());
         cruiseResultMap.put("deviceId", xmlBaseModel.getItems().get(0).get("device_id").toString());
+        // 2022过检 新增字段value_type 0:默认值类型 11:局放放电频次 12:局放信号峰值 13:局放信号均值
+        cruiseResultMap.put("valueType", xmlBaseModel.getItems().get(0).get("value_type").toString());
         cruiseResultMap.put("value", xmlBaseModel.getItems().get(0).get("value").toString());
         cruiseResultMap.put("valueUnit", xmlBaseModel.getItems().get(0).get("value_unit").toString());
         cruiseResultMap.put("unit", xmlBaseModel.getItems().get(0).get("unit").toString());

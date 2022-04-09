@@ -44,9 +44,10 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
                 String filePath = res.get("file_path").toString();
                 // 2022过检 robot_name -> patroldevice_name
                 robotCoordinateMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
+                robotCoordinateMap.put("patrolDeviceCode",res.get("patroldevice_code").toString());
                 robotCoordinateMap.put("filePath", filePath);
                 robotService.uploadFile(filePath, filePath);
-                robotCoordinateMap.put("patrolDeviceCode",robotCode);
+                robotCoordinateMap.put("robotCode",robotCode);
                 robotCoordinateMap.put("time", res.get("time").toString());
                 robotCoordinateMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
                 robotCoordinateMap.put("coordinateGeography", res.get("coordinate_geography").toString());

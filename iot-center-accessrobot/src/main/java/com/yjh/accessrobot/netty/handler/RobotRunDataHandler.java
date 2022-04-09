@@ -43,7 +43,8 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
                 Map<String, String> robotOperationMap = new HashMap<>(16);
                 // 2022过检 修改robot_name为patroldevice_name
                 robotOperationMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
-                robotOperationMap.put("patrolDeviceCode", robotCode);
+                robotOperationMap.put("patrolDeviceCode", res.get("patroldevice_code").toString());
+                robotOperationMap.put("robotCode", robotCode);
                 robotOperationMap.put("time", res.get("time").toString());
                 robotOperationMap.put("type", res.get("type").toString());
                 robotOperationMap.put("value", res.get("value").toString());
