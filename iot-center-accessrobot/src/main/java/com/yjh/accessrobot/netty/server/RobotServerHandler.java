@@ -8,8 +8,6 @@ import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.handler.MessageHandlerStrategy;
 import com.yjh.accessrobot.netty.handler.MessageHandlerStrategyFactory;
-import com.yjh.accessrobot.netty.handler.drone.DroneMessageHandlerStrategy;
-import com.yjh.accessrobot.netty.handler.drone.DroneMessageHandlerStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -264,18 +262,10 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
             }else {
                 handlerType = type;
             }
-            String sendCode = xmlBaseModel.getSendCode();
-            // sendCode来判断设备类型 sendCode: Client开头-机器人  Drone开头-无人机
-            if (sendCode.startsWith("Drone")) {
-                DroneMessageHandlerStrategy droneMessageHandlerStrategy = DroneMessageHandlerStrategyFactory.getStrategyType(handlerType);
-                if (Optional.of(droneMessageHandlerStrategy).isPresent()) {
-                    droneMessageHandlerStrategy.handler(ctx, this, xmlBaseModel, sendSessionId, receiveSessionId);
-                }
-            } else {
-                MessageHandlerStrategy messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
-                if (Optional.of(messageHandlerStrategy).isPresent()) {
-                    messageHandlerStrategy.handler(ctx, this, xmlBaseModel, sendSessionId, receiveSessionId);
-                }
+
+            MessageHandlerStrategy messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
+            if (Optional.of(messageHandlerStrategy).isPresent()) {
+                messageHandlerStrategy.handler(ctx, this, xmlBaseModel, sendSessionId, receiveSessionId);
             }
 
         }catch (Exception e){

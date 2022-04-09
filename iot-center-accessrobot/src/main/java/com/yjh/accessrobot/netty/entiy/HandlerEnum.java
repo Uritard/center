@@ -40,7 +40,11 @@ public enum HandlerEnum {
     //机器人确认消息
     ROBOT_CONFIRM_MSG("81","robotConfirmMsg"),
     //操作步骤消息
-    OPERATION_STEPS("82","robotOperationSteps");
+    OPERATION_STEPS("82","robotOperationSteps"),
+    // 无人机机巢状态数据
+    NEST_STATUS("20001","nestStatus"),
+    // 无人机机巢运行数据
+    NEST_RUN_DATA("10004","nestRunData");
 
     /**
      * 状态值

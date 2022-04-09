@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accessrobot.module.command.controller.RobotController;
 import com.yjh.accessrobot.module.command.entity.EnvDeviceStatus;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
@@ -51,8 +50,9 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             List<EnvDeviceStatus> envDeviceStatusList = new ArrayList<>();
             xmlBaseModel.getItems().forEach(res -> {
                 Map<String, String> weatherMap = new HashMap<>(16);
-                weatherMap.put("robotName", res.get("robot_name").toString());
-                weatherMap.put("robotCode", robotCode);
+                // 2022过检 robot_name -> patroldevice_name
+                weatherMap.put("patrolDeviceName", res.get("patroldevice_name").toString());
+                weatherMap.put("patrolDeviceCode", robotCode);
                 weatherMap.put("time", res.get("time").toString());
                 weatherMap.put("type", res.get("type").toString());
                 weatherMap.put("value", res.get("value").toString());
@@ -60,7 +60,8 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 weatherMap.put("unit", res.get("unit").toString());
 
                 weatherList.add(weatherMap);
-                // 1=温度 2=湿度 3=风速 4=大气压  5=防盗 6=灯 7=空调  8=门禁 9=SF6 10=O3 11=烟雾 12=液位传感器 13=风机
+                // 2022过检 环境类型修改
+                // 1:环境温度 2:环境湿度 3:=风速 4:=雨量 5:=风向 6:=气压 7:=氧气 8:=SF6
                 String weatherType = weatherMap.get("type");
                 if ("1".equals(weatherType)) {
                     info.put("temperature", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
@@ -75,14 +76,10 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                     info.put("windSpeedUnit", "m/s");
                 }
                 if ("4".equals(weatherType)) {
-                    info.put("airPressure", decimalFormat.format(Double.valueOf(weatherMap.get("value")) / 10));
-                    info.put("airPressureUnit", "kPa");
-                }
-                if ("5".equals(weatherType)) {
                     info.put("precipitation", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
                     info.put("precipitationUnit", "mm");
                 }
-                if ("6".equals(weatherType)) {
+                if ("5".equals(weatherType)) {
                     if ("".equals(weatherMap.get("value")) || null == weatherMap.get("value")) {
                         info.put("windDirection", "--");
                     } else {
@@ -90,7 +87,18 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                     }
                     // info.put("precipitationUnit","mm");
                 }
-
+                if ("6".equals(weatherType)) {
+                    info.put("airPressure", decimalFormat.format(Double.valueOf(weatherMap.get("value")) / 10));
+                    info.put("airPressureUnit", "kPa");
+                }
+                if ("7".equals(weatherType)) {
+                    info.put("oxygen", decimalFormat.format(Double.valueOf(weatherMap.get("value")) / 10));
+                    info.put("oxygenUnit", "kPa");
+                }
+                if ("8".equals(weatherType)) {
+                    info.put("sf6", decimalFormat.format(Double.valueOf(weatherMap.get("value")) / 10));
+                    info.put("sf6Unit", "mPa");
+                }
                 //环控数据组装
                 String value = res.get("value").toString();
                 if (res.get("value_type") != null) {
