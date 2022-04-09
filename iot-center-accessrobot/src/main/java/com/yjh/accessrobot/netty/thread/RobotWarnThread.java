@@ -18,8 +18,11 @@ import java.util.Objects;
 public class RobotWarnThread implements Runnable{
 
     private Map<String,String> robotAlarmMap;
-    public RobotWarnThread(Map<String,String> robotAlarmMap ){
+    private RobotService robotService;
+
+    public RobotWarnThread(Map<String, String> robotAlarmMap, RobotService robotService) {
         this.robotAlarmMap = robotAlarmMap;
+        this.robotService = robotService;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class RobotWarnThread implements Runnable{
                         .setAlarmTime(DateTimeUtil.parse(robotAlarmMap.get("time")))
                         .setAlarmState(276);
                 log.info("tRobotAlarm的内容==={}", tRobotAlarm);
-                int res = StaticContextAccessor.getBean(RobotService.class).insertRobotAlarm(tRobotAlarm);
+                int res = robotService.insertRobotAlarm(tRobotAlarm);
                 log.info("插告警表的结果="+res);
             }
         } catch (Exception e) {

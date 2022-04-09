@@ -44,7 +44,7 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
             robotAlarmMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
 
             // Start alarmResultDealThread
-            RobotWarnThread alarmResultDealThread = new RobotWarnThread(robotAlarmMap);
+            RobotWarnThread alarmResultDealThread = new RobotWarnThread(robotAlarmMap, robotService);
             TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
             String alarmXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
