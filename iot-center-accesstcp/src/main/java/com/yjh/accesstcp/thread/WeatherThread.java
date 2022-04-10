@@ -90,6 +90,22 @@ public class WeatherThread implements Runnable{
                     map6.put("value_unit", mapForWeather.get("airPressure") + mapForWeather.get("airPressureUnit"));
                     list.add(map6);
 
+                    Map<String, Object> map7 = new HashMap<>();
+                    map7.put("time", now);
+                    map7.put("type", 7);
+                    map7.put("value", mapForWeather.get("oxygen"));
+                    map7.put("unit", mapForWeather.get("oxygenUnit"));
+                    map7.put("value_unit", mapForWeather.get("oxygen") + mapForWeather.get("oxygenUnit"));
+                    list.add(map7);
+
+                    Map<String, Object> map8 = new HashMap<>();
+                    map8.put("time", now);
+                    map8.put("type", 6);
+                    map8.put("value", mapForWeather.get("SF6"));
+                    map8.put("unit", mapForWeather.get("SF6Unit"));
+                    map8.put("value_unit", mapForWeather.get("SF6") + mapForWeather.get("SF6Unit"));
+                    list.add(map8);
+
                     sendToUpSystemServices.sendResponse("21","3","",list);
                     log.info("--天气信息已发送--");
                 }

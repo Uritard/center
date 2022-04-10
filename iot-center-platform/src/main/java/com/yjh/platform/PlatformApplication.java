@@ -78,6 +78,7 @@ public class PlatformApplication  implements CommandLineRunner {
         redisTemplate.delete("AllRobotCode");
         tSysParamService.insertIntoRedis();
         tCameraInfoService.intoRedis();
+        tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
         sysUserService.insertIntoRedis();
         Constant.WEBSOCKET_URL = url;
         Constant.redisTemplate = redisTemplate;

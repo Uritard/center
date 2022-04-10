@@ -101,4 +101,6 @@ public class TWarnInfoDetail implements Serializable {
     @ApiModelProperty(value = "若是机器人，1可见光2红外")
     private String videoCameraType;
 
+    @ApiModelProperty(value = "间隔名称")
+    private String regionName;
 }

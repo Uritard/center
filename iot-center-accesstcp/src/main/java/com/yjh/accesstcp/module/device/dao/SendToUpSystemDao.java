@@ -17,6 +17,8 @@ import java.util.Map;
 public interface SendToUpSystemDao {
     List<Map<String,Object>> selectDeviceModel();
     List<Map<String,Object>> selectRobotInfo();
+    List<Map<String,Object>> selectCameraInfo();
     List<Map<String,Object>> selectTaskInfo();
+    List<MaintenanceModel> selectMaintenanceInfo();
     List<Long> selectInstanceId(@Param(value = "taskId") String taskId);
 }

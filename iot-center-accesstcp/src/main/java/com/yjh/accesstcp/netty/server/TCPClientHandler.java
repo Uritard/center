@@ -331,6 +331,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     if (items == null || items.size() == 0) {
                         return;
                     }
+                    Constant.paramMap.put("sendCode",xmlBaseModel.getSendCode());
                     for (Map<String, Object> item : items) {
                         if(item.get("heart_beat_interval") != null){
                             Constant.paramMap.put("heart_beat_interval", item.get("heart_beat_interval").toString());//心跳间隔
@@ -340,6 +341,9 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                         }
                         if(item.get("weather_interval") != null){
                             Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
+                        }
+                        if(item.get("nest_run_interval") != null){
+                            Constant.paramMap.put("nest_run_interval", item.get("nest_run_interval").toString());//无人机巢运行数据间隔
                         }
                     }
                     //将数据放入redis 做个保存
@@ -380,6 +384,9 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     if(item.get("weather_interval") != null){
                         Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
                     }
+                    if(item.get("nest_run_interval") != null){
+                        Constant.paramMap.put("nest_run_interval", item.get("nest_run_interval").toString());//无人机巢运行数据间隔
+                    }
                 }
                 //将数据放入redis 做个保存
                 redisTemplate.opsForHash().putAll("upSystemParameter",Constant.paramMap);
@@ -388,6 +395,28 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
         if("1".equals(xmlBaseModel.getType()) || "2".equals(xmlBaseModel.getType()) || "3".equals(xmlBaseModel.getType())
                 || "4".equals(xmlBaseModel.getType()) || "21".equals(xmlBaseModel.getType()) || "22".equals(xmlBaseModel.getType())){//控制消息
             log.info("--响应控制 控制下发--");
+            Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            robotMap.put("list",list);
+            Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//国网要求
+            if(re == null){
+                sendToUpSystemServices.sendResponse("251","3","100",null);
+            }else if(200 == re.getCode()){
+                sendToUpSystemServices.sendResponse("251","3","200",null);
+            }else {
+                sendToUpSystemServices.sendResponse("251","3","500",null);
+            }
+            log.info("==控制响应=="+re);
+        }
+        if("20001".equals(xmlBaseModel.getType())
+           || "20002".equals(xmlBaseModel.getType())
+           || "20003".equals(xmlBaseModel.getType())
+           || "20004".equals(xmlBaseModel.getType())
+           || "20005".equals(xmlBaseModel.getType())
+        ){
+            //发给无人机
+            log.info("--响应控制 无人机控制下发--");
             Map<String,List<XMLBaseModel>> robotMap = new HashMap<>();
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
@@ -426,6 +455,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
 
 
         }
+
 
         if ("101".equals(xmlBaseModel.getType())){
             log.info("--响应任务--");
@@ -568,30 +598,26 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
 
         if ("61".equals(xmlBaseModel.getType())){
             log.info("--模型同步--");
-            if("1".equals(xmlBaseModel.getCommand())){
+            //1-巡视主机模型 设备模型及设备点位模型文件中应至少包括设备信息及巡视点位信息 A.2.3
+            //2-机器人模型 巡视设备模型文件中应至少包括巡视主机、 智能分析主机、 机器人、 无人机、 高清视频、声纹的属性信息 A.2.4
+            //3-摄像机模型 同上
+            //4-点位模型 同上
+            //5-无人机模型  同上
+            //6-声纹模型  同上
+            //7-任务文件  任务模型 A.2.5
+            //8-检修区域配置文件 检修区域模型 A.2.6
+            if("1".equals(xmlBaseModel.getCommand())){//机器人模型
                 //log.info("----");
-                sendToUpSystemServices.creatFile();
+                Map<String,Object> map = sendToUpSystemServices.creatFile();
                 List<Map<String,Object>> list =new ArrayList<>();
-                Map<String,String> mapForGetPath = redisTemplate.opsForHash().entries("t_sys_param:modelRelativePath");
-                String path = mapForGetPath.get("content");
-                Map<String,Object> mapForDevice = new HashMap<>();
-                mapForDevice.put("device_file_path",path+"/"+"device_file.xml");
-                list.add(mapForDevice);
-
-                Map<String,Object> mapForRobot = new HashMap<>();
-                mapForDevice.put("robot_file_path",path+"/"+"robot_file.xml");
-                list.add(mapForRobot);
-
-                Map<String,Object> mapForTask = new HashMap<>();
-                mapForDevice.put("task_file_path",path+"/"+"task_file.xml");
-                list.add(mapForTask);
-
-                //sendToUpSystemServices.sendResponse("251","3","200",list);//江苏要求
-                Map<String,List<XMLBaseModel>> map = new HashMap<>();
-                List<XMLBaseModel> taskList = new ArrayList<>();
-                taskList.add(xmlBaseModel);
-                map.put("list",taskList);
-                Result re = Constant.otherServer(map,Constant.ROBOT_TASK_URL);//国网要求
+                list.add(map);
+                sendToUpSystemServices.sendResponse("251","3","100",list);
+//                //sendToUpSystemServices.sendResponse("251","3","200",list);//江苏要求
+//                Map<String,List<XMLBaseModel>> map = new HashMap<>();
+//                List<XMLBaseModel> taskList = new ArrayList<>();
+//                taskList.add(xmlBaseModel);
+//                map.put("list",taskList);
+////                Result re = Constant.otherServer(map,Constant.ROBOT_TASK_URL);//国网要求
             }
         }
 
@@ -601,8 +627,8 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
             robotMap.put("list",list);
-            //Result re = Constant.otherServer(robotMap,Constant.MAINTENANCE_URL);//江苏要求
-            Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//国网要求
+            Result re = Constant.otherServer(robotMap,Constant.MAINTENANCE_URL);//platfrom设置
+            Result re2 = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//下发给机器人
             log.info("--响应检修--"+re);
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","3","100",null);
@@ -611,6 +637,11 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             }else {
                 sendToUpSystemServices.sendResponse("251","3","500",null);
             }
+
+        }
+
+        if ("121".equals(xmlBaseModel.getType())){
+            log.info("巡视结果统计查询：{}",xmlBaseModel);
 
         }
 

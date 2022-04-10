@@ -700,6 +700,7 @@
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
+        <if test="customId != -1 and customId != null">and e.custom_id = #{customId,jdbcType = BIGINT} </if>
         <if test="cruiseRes != -1 ">and IFNULL(h.identify_result, h.cruise_result) IN (246,261)</if>
         GROUP BY f.device_mete_id
         ORDER BY cruise_time desc
@@ -739,6 +740,7 @@
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
+        <if test="customId != -1 and customId != null">and e.custom_id = #{customId,jdbcType = BIGINT} </if>
         <if test="cruiseRes != -1 ">and IFNULL(h.identify_result, h.cruise_result) IN (247,262,263,264)</if>
         GROUP BY f.device_mete_id
         ORDER BY cruise_time desc

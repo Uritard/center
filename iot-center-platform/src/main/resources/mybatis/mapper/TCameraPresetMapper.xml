@@ -10,6 +10,8 @@
         <result column="preset_name" jdbcType="VARCHAR" property="presetName" />
         <result column="creator_user" jdbcType="VARCHAR" property="creatorUser" />
         <result column="creator_time" jdbcType="TIMESTAMP" property="creatorTime" />
+        <result column="is_keep_watch" jdbcType="INTEGER" property="isKeepWatch" />
+        <result column="is_keep_watch_task" jdbcType="INTEGER" property="isKeepWatchTask" />
         <result column="is_use" jdbcType="INTEGER" property="isUse" />
         <result column="preset_img" jdbcType="VARCHAR" property="presetImg" />
         <result column="inspection_postion" jdbcType="INTEGER" property="inspectionPostion" />
@@ -21,7 +23,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        preset_id, camera_id, preset_num, preset_name, creator_user, creator_time, is_use, preset_img, inspection_postion, collect_status, calibration_status,remark
+        preset_id, camera_id, preset_num, preset_name, is_keep_watch,is_keep_watch_task, creator_user, creator_time, is_use, preset_img, inspection_postion, collect_status, calibration_status,remark
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="presetId" parameterType="com.yjh.platform.module.user.entity.TCameraPreset">
@@ -30,6 +32,8 @@
             camera_id,
             preset_num,
             preset_name,
+            is_keep_watch,
+            is_keep_watch_task,
             creator_user,
             creator_time,
             is_use,
@@ -43,6 +47,8 @@
                 #{cameraId, jdbcType=BIGINT},
                 #{presetNum, jdbcType=INTEGER},
                 #{presetName, jdbcType=VARCHAR},
+                #{isKeepWatch, jdbcType=INTEGER},
+                #{isKeepWatchTask, jdbcType=INTEGER},
                 #{creatorUser, jdbcType=VARCHAR},
                 #{creatorTime, jdbcType=TIMESTAMP},
                 #{isUse, jdbcType=INTEGER},
@@ -81,6 +87,8 @@
         <if test="cameraId != null ">a.camera_id = #{cameraId,},</if>
         <if test="presetNum != null ">a.preset_num = #{presetNum, jdbcType=INTEGER},</if>
         <if test="presetName != null ">a.preset_name = #{presetName},</if>
+        <if test="isKeepWatch != null ">a.is_keep_watch = #{isKeepWatch},</if>
+        <if test="isKeepWatchTask != null ">a.is_keep_watch_task = #{isKeepWatchTask},</if>
         <if test="creatorUser != null  ">a.creator_user = #{creatorUser},</if>
         <if test="creatorTime != null ">a.creator_time = #{creatorTime, jdbcType=TIMESTAMP},</if>
         <if test="isUse != null ">a.is_use = #{isUse, jdbcType=INTEGER},</if>
@@ -99,6 +107,8 @@
         a.camera_id,
         a.preset_num,
         a.preset_name,
+        a.is_keep_watch,
+        a.is_keep_watch_task,
         a.creator_user,
         a.creator_time,
         a.is_use,
@@ -118,6 +128,8 @@
         a.camera_id,
         a.preset_num,
         a.preset_name,
+        a.is_keep_watch,
+        a.is_keep_watch_task,
         a.creator_user,
         a.creator_time,
         a.is_use,
@@ -137,6 +149,8 @@
         a.camera_id,
         a.preset_num,
         a.preset_name,
+        a.is_keep_watch,
+        a.is_keep_watch_task,
         a.creator_user,
         a.creator_time,
         a.is_use,
@@ -156,6 +170,8 @@
         a.camera_id,
         a.preset_num,
         a.preset_name,
+        a.is_keep_watch,
+        a.is_keep_watch_task,
         a.creator_user,
         a.creator_time,
         a.is_use,
@@ -185,6 +201,8 @@
         b.camera_name,
         a.preset_num,
         a.preset_name,
+        a.is_keep_watch,
+        a.is_keep_watch_task,
         a.creator_user,
         a.creator_time,
         a.is_use,
@@ -217,6 +235,8 @@
             camera_id,
             preset_num,
             preset_name,
+            is_keep_watch,
+            is_keep_watch_task,
             creator_user,
             creator_time,
             is_use,
@@ -232,6 +252,8 @@
                 #{TCameraPreset.cameraId, jdbcType=BIGINT},
                 #{TCameraPreset.presetNum, jdbcType=INTEGER},
                 #{TCameraPreset.presetName, jdbcType=VARCHAR},
+                #{TCameraPreset.isKeepWatch, jdbcType=INTEGER},
+                #{TCameraPreset.isKeepWatchTask, jdbcType=INTEGER},
                 #{TCameraPreset.creatorUser, jdbcType=VARCHAR},
                 #{TCameraPreset.creatorTime, jdbcType=TIMESTAMP},
                 #{TCameraPreset.isUse, jdbcType=INTEGER},
@@ -328,5 +350,12 @@
        WHERE camera_id in <foreach collection="list" item="cameraId" open="(" separator="," close=")">
         #{cameraId, jdbcType=BIGINT}
     </foreach>
+    </select>
+    <select id="selectKeepWatch" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+            *
+        from t_camera_preset
+        where camera_id = #{cameraId}
+        and is_keep_watch = 1
     </select>
 </mapper>

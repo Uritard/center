@@ -39,18 +39,59 @@
 				left join t_dict_business j on f.device_type = j.dict_code
 				left join t_dict_business k on a.cruise_type = k.dict_code
     </select>
-	
+
 	<select id="selectRobotInfo" resultType="java.util.Map">
 		select
-		IFNULL(a.robot_name,""),
-		IFNULL(a.robot_code,""),
-		IFNULL(c.dict_note,"") as manufacturer,
-		IFNULL(b.up_dict,"") as type,
-		IFNULL(a.remarks,"") as robot_info,
-		if(b.dict_code=399,0,1) as istransport
+			a.robot_name as patroldevice_name,
+			a.robot_code as patroldevice_code,
+			b.dict_note as device_model,
+			c.dict_note as manufacturer,
+			"" as use_unit,
+			c.dict_note as device_source,
+			a.commission_date as production_date,
+			a.appearance_number as production_code,
+			if(b.dict_code=399,0,1) as istransport,
+			'10' as use_mode,
+			(CASE WHEN a.light_ip is null AND a.lnferad_IP is null THEN ''
+				  WHEN locate('.',a.light_ip) > 0 and locate('.',a.lnferad_IP) =0 THEN '2'
+				  WHEN locate('.',a.light_ip) = 0 and locate('.',a.lnferad_IP) >0 THEN '1'
+				  WHEN locate('.',a.light_ip) AND  locate('.',a.lnferad_IP)THEN '3'
+				  else ''
+				end) as video_mode,
+			'' as place,
+			(CASE WHEN a.robot_position = 155 THEN '2'
+				  WHEN a.robot_position = 156 THEN '1'
+				  WHEN a.robot_position = 399 THEN '3'
+				end) as type,
+			'' as patroldevcie_info,
+			'' as robots_code
 		from t_robot_info a
-		left join t_dict_business b on a.robot_type = b.dict_code
-		left join t_dict_business c on a.robot_factory = c.dict_code
+				 left join t_dict_business b on a.robot_type = b.dict_code
+				 left join t_dict_business c on a.robot_factory = c.dict_code
+	</select>
+
+	<select id="selectCameraInfo" resultType="java.util.Map">
+		select
+			a.camera_name as patroldevcie_name,
+			a.camera_id as patroldevcie_code,
+			b.dict_note as device_model,
+			c.dict_note as manufacturer,
+			"" as use_unit,
+			c.dict_note as device_source,
+			'' as production_date,
+			'' as production_code,
+			'' as istransport,
+			if(a.is_control = 0,'11','10') as use_mode,
+			(CASE WHEN a.camera_type = 205 THEN '1'
+				  WHEN a.camera_type = 206 THEN '2'
+				end) as video_mode,
+			'' as place,
+			'10' as type,
+			'' as patroldevcie_info,
+			'' as robots_code
+		from t_camera_info a
+				 left join t_dict_business b on a.camera_model = b.dict_code
+				 left join t_dict_business c on a.vendor_id = c.dict_code
 	</select>
 
 	<select id="selectTaskInfo" resultType="java.util.Map">
@@ -80,6 +121,21 @@
 		SELECT
 		a.instance_id
 		from t_cruise_task_attr a where a.task_id =#{taskId,jdbcType=VARCHAR}
+	</select>
+
+	<resultMap id="maintenanceMap" type="com.yjh.accesstcp.module.device.entity.MaintenanceModel">
+		<id column="maintenance_id" property="configCode"/>
+		<result column="is_valid" property="enable"/>
+		<result column="maintenance_start" property="startTime"/>
+		<result column="maintenance_stop" property="endTime"/>
+		<collection property="deviceIds" ofType="java.lang.String">
+			<id column="device_id" />
+		</collection>
+	</resultMap>
+	<select id="selectMaintenanceInfo" resultMap="maintenanceMap">
+		select
+			*
+		from t_device_maintenance
 	</select>
 
 </mapper>

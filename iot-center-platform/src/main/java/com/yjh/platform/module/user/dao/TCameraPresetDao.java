@@ -49,4 +49,5 @@ public interface TCameraPresetDao {
     List<Long>selectForThisPreset(@Param(value = "cameraId")Long cameraId);
     List<Long>selectCameraIdList();
     List<Long>selectCameraHavePreset(@Param(value = "list")List<Long> list);
+    TCameraPreset selectKeepWatch(@Param(value = "cameraId")Long cameraId);
 }

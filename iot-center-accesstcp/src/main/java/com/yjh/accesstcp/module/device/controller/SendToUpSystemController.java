@@ -72,7 +72,7 @@ public class SendToUpSystemController {
         }
         return result;
     }
-    @ApiOperation(value = "主键查询")
+    @ApiOperation(value = "模型同步")
     @RequestMapping(value = "/creatFile", method = RequestMethod.GET)
     public Result creatFile() {
         Result result = new Result();

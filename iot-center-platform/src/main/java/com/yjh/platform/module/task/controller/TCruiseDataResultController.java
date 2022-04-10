@@ -234,6 +234,7 @@ public class TCruiseDataResultController {
     @Logs(title = "查询测点信息",content = "查询测点信息",logType = 1,authority = "1235")
     public Result selectCruiseResultAnalyze(@RequestParam(value = "regionId", required = false) Long regionId,
                                             @RequestParam(value = "deviceType", required = false) Integer deviceType,
+                                            @RequestParam(value = "customId", required = false) Long customId,
                                             @RequestParam(value = "meteType", required = false) String meteType,
                                             @RequestParam(value = "meterType", required = false) Integer meterType,
                                             @RequestParam(value = "cruiseRes", required = false) Integer cruiseRes,
@@ -255,7 +256,7 @@ public class TCruiseDataResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = tCruiseDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes);
+            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = tCruiseDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes,customId);
             resultMap.put("count",page.getTotal());
             resultMap.put("list", cruiseResultAnalMeteInfoList);
             result.setData(resultMap);

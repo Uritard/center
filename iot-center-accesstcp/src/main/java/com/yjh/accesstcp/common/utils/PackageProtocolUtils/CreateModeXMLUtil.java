@@ -2,6 +2,7 @@ package com.yjh.accesstcp.common.utils.PackageProtocolUtils;
 
 
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.utils.ValueUtil;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -32,7 +33,7 @@ public class CreateModeXMLUtil {
             for(Map<String, Object> item : itemsList) {
                 Element childNode61 = rss.addElement("Item");
                 for(String key : item.keySet()){
-                    childNode61.addAttribute(key, String.valueOf(item.get(key)));
+                    childNode61.addAttribute(key, ValueUtil.Object2String(item.get(key),""));
                 }
             }
         }
