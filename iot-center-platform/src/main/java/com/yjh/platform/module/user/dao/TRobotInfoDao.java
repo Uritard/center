@@ -63,7 +63,7 @@ public interface TRobotInfoDao {
                                 @Param(value = "repairRecord") String repairRecord,
                                 @Param(value = "exitPutIntoRecord") String exitPutIntoRecord,
                                 @Param(value = "remarks") String remarks);
-    List<TRobotInfo> selectByPage(@Param(value = "robotName") String robotName,
+    List<TRobotInfo> selectRobotByPage(@Param(value = "robotName") String robotName,
                                 @Param(value = "buildingUser") String buildingUser,
                                   @Param(value = "robotFactory") Integer robotFactory,
                                   @Param(value = "robotType") Integer robotType,
@@ -72,10 +72,21 @@ public interface TRobotInfoDao {
                                   @Param(value = "address") String address,
                                   @Param(value = "regionIdList") List<Long> regionIdList);
 
+    List<TRobotInfo> selectDroneByPage(@Param(value = "robotName") String robotName,
+                                @Param(value = "buildingUser") String buildingUser,
+                                  @Param(value = "robotFactory") Integer robotFactory,
+                                  @Param(value = "droneType") Integer droneType,
+                                  @Param(value = "robotSource") String robotSource,
+                                  @Param(value = "isUse") Integer isUse,
+                                  @Param(value = "address") String address,
+                                  @Param(value = "regionIdList") List<Long> regionIdList);
+
     int batchInsert(@Param("list") List<TRobotInfo> list);
-    List<TRobotInspectionTree> selectInspectionTree(@Param(value = "upRegionId")  Long upRegionId);
+    List<TRobotInspectionTree> selectInspectionTree(@Param(value = "upRegionId")  Long upRegionId,
+                                                    @Param(value = "type")  Integer type);
     List<TRobotInspectionTree> batchSelectInspection(@Param(value = "inspectionType") Integer inspectionType,
-                                                     @Param(value = "upRegionId") Long upRegionId);
+                                                     @Param(value = "upRegionId") Long upRegionId,
+                                                     @Param(value = "type") Integer type);
 
     //通过巡视点ID查询绑定的机器人
     Long selectRobotScreen(@Param(value = "instanceId")Long instanceId);

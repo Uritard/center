@@ -147,9 +147,14 @@ public class TRobotInfoService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInfo> selectByPage(String robotName,String buildingUser,Integer robotFactory,Integer robotType,String robotSource,Integer isUse,
-                                          String address, List<Long> regionIdList) {
-        List<TRobotInfo> tRobotInfoList = tRobotInfoDao.selectByPage(robotName,buildingUser,robotFactory,robotType,robotSource,isUse,address,regionIdList);
+    public List<TRobotInfo> selectByPage(String robotName,String buildingUser,Integer robotFactory,Integer robotType, Integer droneType,String robotSource,Integer isUse,
+                                          String address,Integer type, List<Long> regionIdList) {
+        List<TRobotInfo> tRobotInfoList = new ArrayList<>();
+        if (type == 1){
+            tRobotInfoList = tRobotInfoDao.selectRobotByPage(robotName,buildingUser,robotFactory,robotType,robotSource,isUse,address,regionIdList);
+        }else {
+            tRobotInfoList = tRobotInfoDao.selectDroneByPage(robotName,buildingUser,robotFactory,droneType,robotSource,isUse,address,regionIdList);
+        }
         for (TRobotInfo tRobotInfo : tRobotInfoList){
             redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
         }
@@ -301,9 +306,9 @@ public class TRobotInfoService{
         return this.tRobotInfoDao.batchInsert(list);
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String, Object>> selectInspectionTree(Integer inspectionType, Long upRegionId) {
-        List<TRobotInspectionTree> robotList = tRobotInfoDao.selectInspectionTree(upRegionId);
-        List<TRobotInspectionTree> tRobotInspectionTreeList = tRobotInfoDao.batchSelectInspection(inspectionType, upRegionId);
+    public List<Map<String, Object>> selectInspectionTree(Integer inspectionType, Long upRegionId, Integer type) {
+        List<TRobotInspectionTree> robotList = tRobotInfoDao.selectInspectionTree(upRegionId, type);
+        List<TRobotInspectionTree> tRobotInspectionTreeList = tRobotInfoDao.batchSelectInspection(inspectionType, upRegionId, type);
         List<Map<String, Object>> robotPresetTreeTemList = new ArrayList<>();
         for (TRobotInspectionTree tRobot : robotList) {
             Map<String, Object> robotPresetTreeTem = new HashMap<>();
@@ -334,7 +339,11 @@ public class TRobotInfoService{
         if(inspectionType == null){
             robotInspectionTree.put("label", "机器人测点列表");
         }else if (inspectionType == 1){
-            robotInspectionTree.put("label", "机器人巡检点列表");
+            if (type == 1) {
+                robotInspectionTree.put("label", "机器人巡检点列表");
+            }else {
+                robotInspectionTree.put("label", "无人机巡检点列表");
+            }
         }else {
             robotInspectionTree.put("label", "机器人操作点列表");
         }

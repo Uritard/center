@@ -93,7 +93,14 @@ public class TCruisePointInstanceService{
 
     private void getConForCruisePoint(Integer length,TCruisePointByPageDetail tStdDeviceMeteForPointDetailItem,List<TCruisePointByPageDetail> listAll){
         //机器人
-        if("228".equals(tStdDeviceMeteForPointDetailItem.getCruiseType())) {
+        String robotTypeNum = "228";
+        //视频 红外
+        String cameraTypeNum = "229";
+        //声纹
+        String voiceTypeNum = "232";
+        //无人机
+        String droneTypeNum = "524";
+        if(robotTypeNum.equals(tStdDeviceMeteForPointDetailItem.getCruiseType())) {
             listAll.get(length).getRobotType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map = new HashMap<>();
             map.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
@@ -101,7 +108,7 @@ public class TCruisePointInstanceService{
             listAll.get(length).getRobotType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
         }
         //视频 红外
-        if("229".equals(tStdDeviceMeteForPointDetailItem.getCruiseType()) || "230".equals(tStdDeviceMeteForPointDetailItem.getCruiseType())) {
+        if(cameraTypeNum.equals(tStdDeviceMeteForPointDetailItem.getCruiseType()) || "230".equals(tStdDeviceMeteForPointDetailItem.getCruiseType())) {
                 listAll.get(length).getCameraType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
                 Map<Object,Object> map1 = new HashMap<>();
                 map1.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
@@ -124,13 +131,20 @@ public class TCruisePointInstanceService{
 //            listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
 //        }
 //        //scada 内容未作
-//        if("233".equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
-//            listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
-//            Map<Object,Object> map3 = new HashMap<>();
-//            map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
-//            listAll.get(length).getVoiceType().getList().add(map3);
-//            listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
-//        }
+        if(voiceTypeNum.equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
+            listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map3 = new HashMap<>();
+            map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getVoiceType().getList().add(map3);
+            listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
+        }
+        if(droneTypeNum.equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
+            listAll.get(length).getDroneType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
+            Map<Object,Object> map3 = new HashMap<>();
+            map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
+            listAll.get(length).getDroneType().getList().add(map3);
+            listAll.get(length).getDroneType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
+        }
     }
     private int isIn(List<TStdDeviceMeteForPointDetail> listAll,Long deviceMeteId){
         int i = -1;
@@ -253,7 +267,7 @@ public class TCruisePointInstanceService{
             listAll.get(length).getVoiceType().setCruiseTypeName(tCfgMeteForPointDetailItem.getCruiseTypeName());
         }
         //scada 内容未作
-        if("233".equals((tCfgMeteForPointDetailItem.getCruiseTypeName()))) {
+        if("232".equals((tCfgMeteForPointDetailItem.getCruiseTypeName()))) {
             listAll.get(length).getVoiceType().setCruiseType(tCfgMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map3 = new HashMap<>();
             map3.put("cruiseId",tCfgMeteForPointDetailItem.getCruiseId());
@@ -342,18 +356,18 @@ public class TCruisePointInstanceService{
                     }else {
                         TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
                         if(cruiseType == 229){//视频
-                            if(205 == tCruisePointInstanceDao.selectForPresetId(Long.valueOf(id))){//可见光
+//                            if(205 == tCruisePointInstanceDao.selectForPresetId(Long.valueOf(id))){//可见光
                                 TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
                                 tCruisePointInstance.setCruiseId(id);
                                 tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
                                 tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
-                            }else {//红外
-                                TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
-                                tCruisePointInstance.setCruiseType(230);
-                                tCruisePointInstance.setCruiseId(id);
-                                tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-                                tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
-                            }
+//                            }else {//红外
+//                                TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
+//                                tCruisePointInstance.setCruiseType(230);
+//                                tCruisePointInstance.setCruiseId(id);
+//                                tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
+//                                tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
+//                            }
                         }
                         if(cruiseType == 228){//机器人
 //                            TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
@@ -372,18 +386,18 @@ public class TCruisePointInstanceService{
                 }else {
                     TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
                     if(cruiseType == 229){//视频
-                        if(205 == tCruisePointInstanceDao.selectForPresetId(id)){//可见光
+//                        if(205 == tCruisePointInstanceDao.selectForPresetId(id)){//可见光
                             TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
                             tCruisePointInstance.setCruiseId(id);
                             tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
                             tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
-                        }else {//红外
-                            TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
-                            tCruisePointInstance.setCruiseType(230);
-                            tCruisePointInstance.setCruiseId(id);
-                            tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
-                        }
+//                        }else {//红外
+//                            TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
+//                            tCruisePointInstance.setCruiseType(230);
+//                            tCruisePointInstance.setCruiseId(id);
+//                            tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
+//                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
+//                        }
                     }
                     if(cruiseType == 228){//机器人
 //                      TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);

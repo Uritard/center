@@ -207,9 +207,11 @@ public class TRobotInfoController {
                                @RequestParam(value = "buildingUser", required = false) String buildingUser,
                                @RequestParam(value = "robotFactory", required = false) Integer robotFactory,
                                @RequestParam(value = "robotType", required = false) Integer robotType,
+                               @RequestParam(value = "droneType", required = false) Integer droneType,
                                @RequestParam(value = "robotSource", required = false) String robotSource,
                                @RequestParam(value = "isUse", required = false) Integer isUse,
                                @RequestParam(value = "address", required = false) String address,
+                               @RequestParam(value = "type", required = false) Integer type,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
@@ -218,7 +220,7 @@ public class TRobotInfoController {
 //            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tRobotInfo.getUpRegionId());
             List<Long> regionIdList =  tStdRegionDao.selectDownId(upRegionId);
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<TRobotInfo> list = tRobotInfoService.selectByPage(robotName,buildingUser, robotFactory,robotType,robotSource,isUse,address,regionIdList);
+            List<TRobotInfo> list = tRobotInfoService.selectByPage(robotName,buildingUser, robotFactory,robotType,droneType,robotSource,isUse,address,type,regionIdList);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -261,10 +263,11 @@ public class TRobotInfoController {
     @GetMapping(value = "/selectInspectionTree")
     @Logs(title = "查询所有机器人巡检点信息树",content = "根据用户传递的参数查询机器人巡检点树",logType = 1,authority = "1234")
     public Result selectInspectionTree(@RequestParam(value = "inspectionType", required = false) Integer inspectionType,
-                                       @RequestParam(value = "upRegionId", required = false) Long upRegionId) {
+                                       @RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                                       @RequestParam(value = "type", required = true) Integer type) {
         Result result = new Result();
         try {
-            List<Map<String, Object>> robotInspectionTree = tRobotInfoService.selectInspectionTree(inspectionType, upRegionId);
+            List<Map<String, Object>> robotInspectionTree = tRobotInfoService.selectInspectionTree(inspectionType, upRegionId, type);
             result.setData(robotInspectionTree);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

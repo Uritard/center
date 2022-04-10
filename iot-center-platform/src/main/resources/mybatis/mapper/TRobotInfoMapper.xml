@@ -7,8 +7,11 @@
         <id column="robot_id" jdbcType="BIGINT" property="robotId" />
         <result column="robot_code" jdbcType="VARCHAR" property="robotCode" />
         <result column="robot_name" jdbcType="VARCHAR" property="robotName" />
+        <result column="nest_code" jdbcType="VARCHAR" property="nestCode" />
+        <result column="nest_name" jdbcType="VARCHAR" property="nestName" />
         <result column="robot_status" jdbcType="VARCHAR" property="robotStatus" />
         <result column="robot_type" jdbcType="INTEGER" property="robotType" />
+        <result column="drone_type" jdbcType="INTEGER" property="droneType" />
         <result column="robot_ip" jdbcType="VARCHAR" property="robotIp" />
         <result column="robot_port" jdbcType="INTEGER" property="robotPort" />
         <result column="light_ip" jdbcType="VARCHAR" property="lightIp" />
@@ -38,7 +41,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        robot_id, robot_code, robot_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, identity_manager, identity_code,
+        robot_id, robot_code, robot_name, nest_code,nest_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, identity_manager, identity_code,
         lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date,
         robot_factory, is_use, commission_date, up_region_id, robot_position, remarks
     </sql>
@@ -48,8 +51,11 @@
         insert into t_robot_info(
             robot_code,
             robot_name,
+            nest_code,
+            nest_name,
             robot_status,
             robot_type,
+            drone_type,
             robot_ip,
             robot_port,
             light_ip,
@@ -84,8 +90,11 @@
         )values(
                 #{robotCode, jdbcType=VARCHAR},
                 #{robotName, jdbcType=VARCHAR},
+                #{nestCode, jdbcType=VARCHAR},
+                #{nestName, jdbcType=VARCHAR},
                 #{robotStatus, jdbcType=VARCHAR},
                 #{robotType, jdbcType=INTEGER},
+                #{droneType, jdbcType=INTEGER},
                 #{robotIp, jdbcType=VARCHAR},
                 #{robotPort, jdbcType=INTEGER},
                 #{lightIp, jdbcType=VARCHAR},
@@ -121,8 +130,11 @@
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
-        delete a,b from t_robot_info a, t_robot_region b
-                where a.robot_id = b.robot_id and a.robot_id = #{robotId, jdbcType=BIGINT}
+        DELETE a,b FROM
+        t_robot_info a
+        LEFT JOIN t_robot_region b ON a.robot_id = b.robot_id
+        WHERE
+	    a.robot_id = #{robotId, jdbcType=BIGINT}
     </delete>
 
     <delete id="deleteInstance" parameterType="java.lang.Long">
@@ -150,8 +162,11 @@
         <if test="robotId != null "> a.robot_id = #{robotId},</if>
         <if test="robotCode != null "> a.robot_code = #{robotCode},</if>
         <if test="robotName != null ">a.robot_name = #{robotName},</if>
+        <if test="nestCode != null ">a.nest_code = #{nestCode},</if>
+        <if test="nestName != null ">a.nest_code = #{nestName},</if>
         <if test="robotStatus != null ">a.robot_status = #{robotStatus},</if>
-        a.robot_type = #{robotType, jdbcType=INTEGER},
+        <if test="robotType != null ">a.robot_type = #{robotType, jdbcType=INTEGER},</if>
+        <if test="droneType != null ">a.drone_type = #{droneType, jdbcType=INTEGER},</if>
         <if test="robotIp != null ">a.robot_ip = #{robotIp},</if>
         a.robot_port = #{robotPort, jdbcType=INTEGER},
         <if test="lightIp != null ">a.light_ip = #{lightIp},</if>
@@ -192,8 +207,11 @@
         a.robot_id,
         a.robot_code,
         a.robot_name,
+        a.nest_code,
+        a.nest_name,
         a.robot_status,
         a.robot_type,
+        a.drone_type,
         a.robot_ip,
         a.robot_port,
         a.light_ip,
@@ -236,8 +254,11 @@
         a.robot_id,
         a.robot_code,
         a.robot_name,
+        a.nest_code,
+        a.nest_name,
         a.robot_status,
         a.robot_type,
+        a.drone_type,
         a.robot_ip,
         a.robot_port,
         a.light_ip,
@@ -274,8 +295,11 @@
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
         <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
+        <if test="nestCode != null and nestCode != ''"> and a.nest_code = #{nestCode, jdbcType=VARCHAR}</if>
+        <if test="nestName != null and nestName != ''"> and a.nest_name = #{nestName, jdbcType=VARCHAR}</if>
         <if test="robotStatus != null and robotStatus != ''"> and a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
         <if test="robotType != null"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
+        <if test="droneType != null"> and a.drone_type = #{droneType, jdbcType=INTEGER}</if>
         <if test="robotIp != null and robotIp != ''"> and a.robot_ip = #{robotIp, jdbcType=VARCHAR}</if>
         <if test="robotPort != null "> and a.robot_port = #{robotPort, jdbcType=INTEGER}</if>
         <if test="lightIp != null and lightIp != ''"> and a.light_ip = #{lightIp, jdbcType=VARCHAR}</if>
@@ -306,7 +330,7 @@
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
 
-    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TRobotInfo" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+    <select id="selectRobotByPage" parameterType="com.yjh.platform.module.user.entity.TRobotInfo" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         select
         a.robot_id,
         a.robot_code,
@@ -351,7 +375,7 @@
         a.channel_num_inferad,
         g.record_name
         from t_robot_info a
-        LEFT JOIN t_dict_business d ON a.robot_type=d.dict_code and d.col_name = 'robot_type'
+        JOIN t_dict_business d ON a.robot_type=d.dict_code and d.col_name = 'robot_type'
         LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code and b.col_name = 'robot_factory'
         LEFT JOIN t_dict_business c ON a.is_use=c.dict_code and c.col_name = 'robot_use'
         LEFT JOIN t_dict_business e ON a.robot_position = e.dict_code  and e.col_name = 'robot_position'
@@ -374,12 +398,85 @@
         ORDER BY robot_id
     </select>
 
+    <select id="selectDroneByPage" parameterType="com.yjh.platform.module.user.entity.TRobotInfo" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+        select
+        a.robot_id,
+        a.robot_code,
+        a.robot_name,
+        a.nest_code,
+        a.nest_name,
+        a.robot_status,
+        a.drone_type,
+        d.dict_note as drone_type_name,
+        a.robot_ip,
+        a.robot_port,
+        a.light_ip,
+        a.light_port,
+        a.identity_manager,
+        a.identity_code,
+        a.lnferad_IP,
+        a.Inferad_Port,
+        a.Inferad_username,
+        a.Inferad_password,
+        a.phote_path,
+        a.create_by,
+        a.create_date,
+        a.update_by,
+        a.update_date,
+        b.dict_note as robot_factory_name,
+        a.robot_factory,
+        c.dict_note as is_use_name,
+        a.is_use,
+        a.commission_date,
+        a.up_region_id,
+        f.region_name,
+        e.dict_note as robot_position_name,
+        a.robot_position ,
+        a.robot_source,
+        a.address,
+        a.building_user,
+        a.appearance_number,
+        a.defect_record,
+        a.repair_record,
+        a.exit_putInto_record,
+        a.remarks,
+        a.record_id,
+        a.channel_num_light,
+        a.channel_num_inferad,
+        g.record_name
+        from t_robot_info a
+        JOIN t_dict_business d ON a.drone_type=d.dict_code and d.col_name = 'drone_type'
+        LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code and b.col_name = 'robot_factory'
+        LEFT JOIN t_dict_business c ON a.is_use=c.dict_code and c.col_name = 'robot_use'
+        LEFT JOIN t_dict_business e ON a.robot_position = e.dict_code  and e.col_name = 'robot_position'
+        LEFT JOIN t_std_region f ON f.region_id = a.up_region_id
+        left join t_camera_recorder g on a.record_id = g.record_id
+        where 1 = 1
+        <if test="robotName != null and robotName != '' ">and a.robot_name  LIKE CONCAT('%',#{robotName, jdbcType=VARCHAR},'%')</if>
+        <if test="droneType != -1"> and a.drone_type = #{droneType, jdbcType=INTEGER}</if>
+        <if test="buildingUser != null and buildingUser != '' ">and a.building_user LIKE CONCAT('%',#{buildingUser, jdbcType=VARCHAR},'%')</if>
+        <if test="robotFactory != -1 ">and a.robot_factory = #{robotFactory,jdbcType=INTEGER}</if>
+        <if test="robotSource != null and robotSource != '' ">and a.robot_source LIKE CONCAT('%',#{robotSource, jdbcType=VARCHAR},'%')</if>
+        <if test="isUse != -1 ">and a.is_use = #{isUse,jdbcType=INTEGER}</if>
+        <if test="address != null and address != '' ">and a.address LIKE CONCAT('%',#{address, jdbcType=VARCHAR},'%')</if>
+
+        <if test="regionIdList != null and regionIdList.size() > 0">and a.up_region_id in
+            <foreach collection="regionIdList" item="upRegionIds"  separator="," open="(" close=")"  >
+                #{upRegionIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        ORDER BY robot_id
+    </select>
+
     <insert id="batchInsert">
         insert into t_robot_info(
         robot_code,
             robot_name,
+            nest_code,
+            nest_name,
             robot_status,
             robot_type,
+            drone_type,
             robot_ip,
             robot_port,
             light_ip,
@@ -416,8 +513,11 @@
             (
             #{TRobotInfo.robotCode, jdbcType=VARCHAR},
                 #{TRobotInfo.robotName, jdbcType=VARCHAR},
+                #{TRobotInfo.nestCode, jdbcType=VARCHAR},
+                #{TRobotInfo.nestName, jdbcType=VARCHAR},
                 #{TRobotInfo.robotStatus, jdbcType=VARCHAR},
                 #{TRobotInfo.robotType, jdbcType=INTEGER},
+                #{TRobotInfo.droneType, jdbcType=INTEGER},
                 #{TRobotInfo.robotIp, jdbcType=VARCHAR},
                 #{TRobotInfo.robotPort, jdbcType=INTEGER},
                 #{TRobotInfo.lightIp, jdbcType=VARCHAR},
@@ -459,6 +559,12 @@
          <if test="upRegionId != null and upRegionId != ''">
              and a.up_region_id = #{upRegionId, jdbcType=BIGINT}
          </if>
+         <if test="type == 1">
+             and a.robot_type != 1
+         </if>
+         <if test="type == 2">
+             and a.drone_type != 1
+         </if>
     </select>
 
     <select id="batchSelectInspection" resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
@@ -470,6 +576,12 @@
         </if>
         <if test="upRegionId != null and upRegionId != ''">
             and b.up_region_id = #{upRegionId, jdbcType=BIGINT}
+        </if>
+        <if test="type == 1">
+            and b.robot_type != 1
+        </if>
+        <if test="type == 2">
+            and b.drone_type != 1
         </if>
     </select>
 

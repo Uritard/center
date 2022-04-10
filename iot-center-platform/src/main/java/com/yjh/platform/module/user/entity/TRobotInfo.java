@@ -43,6 +43,16 @@ public class TRobotInfo implements Serializable {
     @TableField(value = "robot_name", updateStrategy = FieldStrategy.IGNORED)
     private String robotName;
 
+    @Length(max = 32, message = "nestCode长度必须小于等于32")
+    @ApiModelProperty(value = "机巢编号")
+    @TableField(value = "nest_code", updateStrategy = FieldStrategy.IGNORED)
+    private String nestCode;
+
+    @Length(max = 64, message = "nestName长度必须小于等于64")
+    @ApiModelProperty(value = "机巢名称")
+    @TableField(value = "nest_name", updateStrategy = FieldStrategy.IGNORED)
+    private String nestName;
+
     @Length(max = 6, message = "robotStatus长度必须小于等于6")
     @ApiModelProperty(value = "机器人状态 ")
     @TableField(value = "robot_status", updateStrategy = FieldStrategy.IGNORED)
@@ -52,8 +62,14 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "机器人型号")
     private Integer robotType;
 
+    @Max(value = 999999)
+    @ApiModelProperty(value = "无人机型号")
+    private Integer droneType;
+
     //    @Length(max = 255, message = "robotTypeName长度必须小于等于255")
     private String robotTypeName;
+
+    private String droneTypeName;
 
     @Length(max = 32, message = "robotIp长度必须小于等于32")
     @ApiModelProperty(value = "机器人IP")
