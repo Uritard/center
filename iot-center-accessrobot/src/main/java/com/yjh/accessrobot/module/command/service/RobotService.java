@@ -16,8 +16,12 @@ import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
-import com.yjh.accessrobot.module.command.dao.*;
+import com.yjh.accessrobot.module.command.dao.SysUserDao;
+import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
+import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
+import com.yjh.accessrobot.module.command.dao.TRobotRegionDao;
 import com.yjh.accessrobot.module.command.entity.*;
+import com.yjh.accessrobot.module.device.utils.StatisticsUtil;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.collections4.CollectionUtils;
@@ -297,6 +301,7 @@ public class RobotService {
         TRobotInfo tRobotInfo = new TRobotInfo()
                 .setRobotId(robotId)
                 .setRobotStatus(robotStatus);
+        StatisticsUtil.onlineDuration(tRobotInfo);
         int res = tRobotInfoDao.update(tRobotInfo);
         log.info("robotCode为==={},robotId为==={}的机器人状态是==={},修改结果==={}", robotCode, robotId, tRobotInfo.getRobotStatus(), res);
         return res;
@@ -320,6 +325,7 @@ public class RobotService {
         log.info("robotCode为==={},robotId为==={}的机巢信息code{}和机巢名称==={},修改结果==={}", robotCode, robotId, nestCode, nestName, res > 0);
         return res;
     }
+
 
     /**
      * 查询表中所有的机器人
@@ -2530,6 +2536,33 @@ public class RobotService {
 
     public void updateTCruiseTask(Map<String, Object> taskMap) {
         tRobotInfoDao.updateTCruiseTask(taskMap);
+    }
+
+    public List<Map<String,Object>>  selectStatisticsRobot(TRobotInfo tRobotInfo){
+
+        String robotStatus = null;
+        Long lastOnlineTime = null;
+        Long duration = null;
+        Long offLineCount = null;
+
+        List<Map<String,Object>> list=tRobotInfoDao.selectStatisticsRobot(tRobotInfo);
+        for(Map<String,Object> map:list){
+            List<TRobotInfo> tRobotInfoList =
+                    tRobotInfoDao.selectByPage(new TRobotInfo().setRobotId((Long) map.get("robotId")));
+            if (tRobotInfoList.size() > 0) {
+                robotStatus = tRobotInfoList.get(0).getRobotStatus();
+                lastOnlineTime = tRobotInfoList.get(0).getLastOnlineTime();
+                duration = tRobotInfoList.get(0).getDuration();
+                offLineCount = tRobotInfoList.get(0).getOffLineCount();
+                map.put("robotStatus",robotStatus);
+                map.put("lastOnlineTime",lastOnlineTime);
+                map.put("duration",duration);
+                map.put("offLineCount",offLineCount);
+            } else {
+                log.error("查询不到robotId={}的机器人信息", tRobotInfo.getRobotId());
+            }
+        }
+        return list;
     }
 }
 

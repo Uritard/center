@@ -304,4 +304,10 @@ public interface TRobotInfoDao {
 
     String selectDeviceTypeName(@Param(value = "deviceId") String deviceId);
 
+    /**
+     * 查询机器人总天数，告警异常天数，正常天数
+     * @return
+     */
+    List<Map<String,Object>> selectStatisticsRobot(TRobotInfo tRobotInfo);
+
 }

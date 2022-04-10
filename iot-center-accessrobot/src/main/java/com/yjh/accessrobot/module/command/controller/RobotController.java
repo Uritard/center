@@ -10,6 +10,7 @@ import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.module.command.entity.EnvDeviceStatus;
 import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
+import com.yjh.accessrobot.module.command.entity.TRobotInfo;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
@@ -288,6 +289,20 @@ public class RobotController {
         }
         return result;
     }
+
+    @ApiOperation(value = "机器人统计信息查询")
+    @GetMapping(value = "/statistics")
+    public Result statistics(@RequestParam(value = "robotCode") String robotCode) {
+        Result result = new Result();
+        try {
+            result.setData(robotService.selectStatisticsRobot(new TRobotInfo().setRobotCode(robotCode)));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询失败：", e);
+        }
+        return result;
+    }
+
     /**
      * 获取redis集合值
      *
