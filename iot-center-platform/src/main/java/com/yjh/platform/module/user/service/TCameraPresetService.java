@@ -203,7 +203,7 @@ public class TCameraPresetService {
                 }
             }
         }
-        
+
         if(cameraIdList == null){
             cameraIdList = tCameraPresetDao.selectCameraIdList();
         }
@@ -341,6 +341,15 @@ public class TCameraPresetService {
             e.getMessage();
         }
         return 1;
+    }
+
+    /**
+     * 查询所有配置了静默预置位的相机及对应预置位
+     *
+     * @return Long
+     */
+    public List<Map<String, Long>> selectCameraBySilent(){
+        return tCameraPresetDao.selectCameraBySilent();
     }
 }
 

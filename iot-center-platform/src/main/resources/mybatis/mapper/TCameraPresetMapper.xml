@@ -351,11 +351,22 @@
         #{cameraId, jdbcType=BIGINT}
     </foreach>
     </select>
+
     <select id="selectKeepWatch" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
         select
             *
         from t_camera_preset
         where camera_id = #{cameraId}
         and is_keep_watch = 1
+    </select>
+
+    <select id="selectCameraBySilent" resultType="java.util.Map">
+        SELECT DISTINCT
+            a.camera_id,
+            b.preset_id
+        FROM
+            t_camera_info a, t_camera_preset b
+        WHERE a.camera_id = b.camera_id
+          and b.is_keep_watch_task = 1
     </select>
 </mapper>

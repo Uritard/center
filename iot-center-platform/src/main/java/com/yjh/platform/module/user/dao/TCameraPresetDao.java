@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yc
@@ -50,4 +51,6 @@ public interface TCameraPresetDao {
     List<Long>selectCameraIdList();
     List<Long>selectCameraHavePreset(@Param(value = "list")List<Long> list);
     TCameraPreset selectKeepWatch(@Param(value = "cameraId")Long cameraId);
+
+    List<Map<String, Long>> selectCameraBySilent();
 }

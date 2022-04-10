@@ -30,6 +30,7 @@ import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
 import org.springframework.web.client.RestTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -46,6 +47,7 @@ import java.util.Set;
 @ComponentScan(nameGenerator = AnnotationBeanNameGenerator.class,basePackages = "com.yjh")
 @EnableFeignClients
 @EnableAsync   //开启异步
+@EnableScheduling
 public class PlatformApplication  implements CommandLineRunner {
 
     @Autowired
