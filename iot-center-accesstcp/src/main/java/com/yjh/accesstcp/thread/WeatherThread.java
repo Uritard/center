@@ -100,10 +100,10 @@ public class WeatherThread implements Runnable{
 
                     Map<String, Object> map8 = new HashMap<>();
                     map8.put("time", now);
-                    map8.put("type", 6);
-                    map8.put("value", mapForWeather.get("SF6"));
-                    map8.put("unit", mapForWeather.get("SF6Unit"));
-                    map8.put("value_unit", mapForWeather.get("SF6") + mapForWeather.get("SF6Unit"));
+                    map8.put("type", 8);
+                    map8.put("value", mapForWeather.get("sf6"));
+                    map8.put("unit", mapForWeather.get("sf6Unit"));
+                    map8.put("value_unit", mapForWeather.get("sf6") + mapForWeather.get("sf6Unit"));
                     list.add(map8);
 
                     sendToUpSystemServices.sendResponse("21","3","",list);
