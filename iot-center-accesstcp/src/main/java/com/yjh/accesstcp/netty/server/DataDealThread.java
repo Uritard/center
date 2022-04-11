@@ -1,11 +1,8 @@
 package com.yjh.accesstcp.netty.server;
 
 import com.yjh.accesstcp.common.Constant;
-import com.yjh.accesstcp.common.utils.Object2Map;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accesstcp.commons.logs.SpringBeanUtils;
-import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
@@ -16,7 +13,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -135,8 +131,8 @@ public class DataDealThread implements Runnable {
                         if(item.get("patroldevice_run_interval") != null){
                             Constant.paramMap.put("patroldevice_run_interval", item.get("patroldevice_run_interval").toString());//巡视设备运行数据间隔间隔
                         }
-                        if(item.get("weather_interval") != null){
-                            Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
+                        if(item.get("env_interval") != null){
+                            Constant.paramMap.put("env_interval", item.get("env_interval").toString());//微气象数据间隔
                         }
                     }
                     //将数据放入redis 做个保存
@@ -168,8 +164,8 @@ public class DataDealThread implements Runnable {
                     if(item.get("patroldevice_run_interval") != null){
                         Constant.paramMap.put("patroldevice_run_interval", item.get("patroldevice_run_interval").toString());//巡视设备运行数据间隔间隔
                     }
-                    if(item.get("weather_interval") != null){
-                        Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
+                    if(item.get("env_interval") != null){
+                        Constant.paramMap.put("env_interval", item.get("env_interval").toString());//微气象数据间隔
                     }
                 }
                 //将数据放入redis 做个保存

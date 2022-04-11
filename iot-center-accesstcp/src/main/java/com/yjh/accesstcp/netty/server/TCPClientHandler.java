@@ -1,11 +1,8 @@
 package com.yjh.accesstcp.netty.server;
 
 import com.yjh.accesstcp.common.Constant;
-import com.yjh.accesstcp.common.utils.ByteUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accesstcp.commons.logs.SpringBeanUtils;
-import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
@@ -14,28 +11,18 @@ import com.yjh.accesstcp.thread.TaskExecutePool;
 import com.yjh.accesstcp.thread.WeatherThread;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.*;
-
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.EventLoop;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.util.ReferenceCountUtil;
-import io.swagger.models.Xml;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -339,8 +326,8 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                         if(item.get("patroldevice_run_interval") != null){
                             Constant.paramMap.put("patroldevice_run_interval", item.get("patroldevice_run_interval").toString());//巡视设备运行数据间隔间隔
                         }
-                        if(item.get("weather_interval") != null){
-                            Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
+                        if(item.get("env_interval") != null){
+                            Constant.paramMap.put("env_interval", item.get("env_interval").toString());//微气象数据间隔
                         }
                         if(item.get("nest_run_interval") != null){
                             Constant.paramMap.put("nest_run_interval", item.get("nest_run_interval").toString());//无人机巢运行数据间隔
@@ -381,8 +368,8 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     if(item.get("patroldevice_run_interval") != null){
                         Constant.paramMap.put("patroldevice_run_interval", item.get("patroldevice_run_interval").toString());//巡视设备运行数据间隔间隔
                     }
-                    if(item.get("weather_interval") != null){
-                        Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
+                    if(item.get("env_interval") != null){
+                        Constant.paramMap.put("env_interval", item.get("env_interval").toString());//微气象数据间隔
                     }
                     if(item.get("nest_run_interval") != null){
                         Constant.paramMap.put("nest_run_interval", item.get("nest_run_interval").toString());//无人机巢运行数据间隔

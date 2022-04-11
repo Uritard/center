@@ -110,7 +110,7 @@ public class WeatherThread implements Runnable{
                     log.info("--天气信息已发送--");
                 }
 
-                String s = Constant.paramMap.get("weather_interval");
+                String s = Constant.paramMap.get("env_interval");
                 if(s == null){
                     s= "30";
                 }
