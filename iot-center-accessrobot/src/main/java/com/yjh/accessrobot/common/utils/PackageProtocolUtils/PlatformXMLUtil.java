@@ -16,8 +16,7 @@ import java.util.*;
  */
 public class PlatformXMLUtil {
 
-    public static String DRONEROOTNAME = "PatrolDevice";
-    public static String ROBOTROOTNAME = "Robot";
+    public static String XMLROOTNAME = "PatrolDevice";
     // 解析xml
     public static XMLBaseModel readStringXmlOut(Document doc) {
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
@@ -110,7 +109,7 @@ public class PlatformXMLUtil {
     public static String generateXml(XMLBaseModel xmlBaseModel){
         // 根据sendcode来判断设备类型对应rootname  Client1开头无人机 其他默认机器人
         String sendCode = xmlBaseModel.getSendCode();
-        String rootName = sendCode.startsWith("Client1") ? DRONEROOTNAME : ROBOTROOTNAME;
+        String rootName = XMLROOTNAME;
 
         Document document = DocumentHelper.createDocument();
         // 根节点
