@@ -1,5 +1,6 @@
 package com.yjh.accessvideo;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
@@ -54,8 +55,6 @@ public class AccessVideoApplication implements CommandLineRunner {
     private int lUserID;//用户句柄
     //设备登录信息
     private HCNetSDK.NET_DVR_USER_LOGIN_INFO m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();
-    //设备信息
-    private HCNetSDK.NET_DVR_DEVICEINFO_V40 m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();
 
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
 
@@ -87,6 +86,8 @@ public class AccessVideoApplication implements CommandLineRunner {
         log.info("NVR list: "+recorderConInfoList);
         new Thread(() -> {
             for (RecorderConInfo recorderConInfo:recorderConInfoList) {
+                //设备信息
+                HCNetSDK.NET_DVR_DEVICEINFO_V40 m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();
                 long recordId = recorderConInfo.getRecordId();
                 String m_sDeviceIP = recorderConInfo.getRecordIp();
                 String m_sUsername = recorderConInfo.getIdentityManager();
@@ -114,10 +115,13 @@ public class AccessVideoApplication implements CommandLineRunner {
                     log.error(recorderConInfo.getRecordName()+" register fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
                 } else {
                     Constant.maps.put(String.valueOf(recordId), lUserID);
+                    Constant.deviceMaps.put(recordId, m_strDeviceInfo);
                     log.info("NVR "+recorderConInfo.getRecordName()+" register success.");
+                    //IP通道个数
+                    log.info("The max number of IP channels: {}", m_strDeviceInfo.struDeviceV30.byIPChanNum);
                 }
             }
-            log.info("Constant.maps: "+Constant.maps);
+            log.info("Constant.maps: {}", JSON.toJSONString(Constant.maps));
         }).start();
         //设置HCNetSDKCom组件库所在路径
         String strPathCom = sdkPath;
@@ -146,8 +150,7 @@ public class AccessVideoApplication implements CommandLineRunner {
         System.arraycopy(ptrPlayCtrlPath.getBytes(), 0, ptrPlayCtrl.byValue, 0, ptrPlayCtrlPath.length());
         ptrPlayCtrl.write();
         hCNetSDK.NET_DVR_SetSDKInitCfg(5, ptrPlayCtrl.getPointer());
-        //IP通道个数
-        log.info("The max number of IP channels: "+ m_strDeviceInfo.struDeviceV30.byIPChanNum);
+
     }
 
 }

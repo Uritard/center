@@ -1,16 +1,21 @@
 package com.yjh.accessvideo.configuration;
 
 
+import com.alibaba.druid.filter.config.ConfigTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -143,4 +148,12 @@ public class RedisUtil {
         redisTemplate.opsForHash().putAll(hashname,map);   ;
     }
 
+    public static void main(String[] args) throws Exception {
+
+        Properties props = PropertiesLoaderUtils.loadProperties(new ClassPathResource("application-dev.properties"));
+        String publicKey = props.getProperty("spring.datasource.accessvideo.publicKey");
+        String passwordSec = props.getProperty("spring.redis.password");
+        String decode =  ConfigTools.decrypt(publicKey, passwordSec);
+        System.out.println("decodePassword: " + decode);
+    }
 }

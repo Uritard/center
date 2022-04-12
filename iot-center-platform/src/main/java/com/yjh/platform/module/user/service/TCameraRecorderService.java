@@ -109,10 +109,10 @@ public class TCameraRecorderService {
             log.info("re---"+re);
             if (Objects.nonNull(re)){
                 Map<String,Object> mapRes = JSONObject.parseObject(JSON.toJSONString(re.getData()));
-                if ("403".equals(mapRes.get("errorCode: ").toString())){
-                    res.setRecorderStatus("离线");
-                }else {
+                if ("200".equals(mapRes.get("errorCode: ").toString())){
                     res.setRecorderStatus("在线");
+                }else {
+                    res.setRecorderStatus("离线");
                 }
             }else {
                 res.setRecorderStatus("未知");

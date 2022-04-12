@@ -167,13 +167,20 @@ public class TRobotInspectionService{
             re.put("batteryLevel","");//电池电量
         }
 
+        Map<String,Object> mapForelCurrent  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":11");
+        if(mapForCell.size() != 0){
+            re.put("chargeCurrent",mapForelCurrent.get("valueUnit")); // 充电电流
+        }else {
+            re.put("chargeCurrent",""); // 充电电流
+        }
+
         Map<String,Object> mapForOnlineState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
         if(mapForOnlineState.size() != 0){
             re.put("onlineState",mapForOnlineState.get("value"));//网络状态
             //todo 通知前端停止调接口
         }else {
-            re.put("onlineState","");//网络状态
         }
+        re.put("onlineState","");//网络状态
 
         Map<String,Object> mapForRobotCoordinate  = redisTemplate.opsForHash().entries("RobotCoordinate:"+robotCode);
         if(mapForRobotCoordinate.size() != 0){

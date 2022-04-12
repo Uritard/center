@@ -40,6 +40,7 @@ public interface HCNetSDK extends Library {
 
     HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary(Platform.isWindows() ? "HCNetSDK" : "hcnetsdk", HCNetSDK.class);
 
+    // HCNetSDK INSTANCE = (HCNetSDK) Native.loadLibrary("hcnetsdk", HCNetSDK.class);
     /***宏定义***/
     //常量
 
@@ -535,6 +536,17 @@ public interface HCNetSDK extends Library {
     //设备的配置信息配置
     public static final int NET_DVR_GET_ISP_CAMERAPARAMCFG = 3255;	//获取设备的配置信息
     public static final int NET_DVR_SET_ISP_CAMERAPARAMCFG = 3256;	//设置设备的配置信息
+
+    // 完整性检查
+    public static final int NET_DVR_RECORD_CHECK = 6233; // 录像完整性检测
+    public static final int NET_DVR_GET_RECORD_SEGMENT_CFG = 6242; // 获取录像段总大小
+
+    public static final int NET_SDK_GET_NEXT_STATUS_SUCCESS = 1000; // 成功读取到数据，处理完本次数据后需要再次调用 NET_DVR_GetNextRemoteConfig
+    public static final int NET_SDK_GET_NETX_STATUS_NEED_WAIT = 1001; // 需等待设备发送数据，继续调用 NET_DVR_GetNextRemoteConfig
+    public static final int NET_SDK_GET_NEXT_STATUS_FINISH = 1002; // 数据全部取完，可调用 NET_DVR_StopRemoteConfig
+    public static final int NET_SDK_GET_NEXT_STATUS_FAILED = 1003; // 出现异常，可调用 NET_DVR_StopRemoteConfig
+
+    public static final int NET_DVR_GET_RECORDCFG_V40 = 1008; // 获取录像计划参数
     /***************************DS9000新增命令(_V30) end *****************************/
     /*************************参数配置命令 end*******************************/
     /*******************查找文件和日志函数返回值*************************/
@@ -959,6 +971,15 @@ public interface HCNetSDK extends Library {
         public byte byStartMin;
         public byte byStopHour;	        //结束时间
         public byte byStopMin;
+
+        //用于列表中显示
+        public String toStringTime(){
+            return  String.format("%02d:%02d - %02d:%02d", byStartHour, byStartMin, byStopHour, byStopMin);
+        }
+
+        public boolean isEmpty(){
+           return byStartHour == 0 && byStartMin == 0 && byStopHour == 0 && byStopMin == 0;
+        }
     }
 
     public static class NET_DVR_HANDLEEXCEPTION_V30 extends Structure {
@@ -1649,6 +1670,19 @@ public interface HCNetSDK extends Library {
         public byte byMinute;
         public byte bySecond;
         public byte byRes;
+
+        public NET_DVR_TIME_EX(){
+
+        }
+
+        public NET_DVR_TIME_EX(NET_DVR_TIME time){
+            wYear = (short)time.dwYear;
+            byMonth = (byte)time.dwMonth;
+            byDay = (byte)time.dwDay;
+            byHour = (byte)time.dwHour;
+            byMinute = (byte)time.dwMinute;
+            bySecond = (byte)time.dwSecond;
+        }
     }
 
     public static class  struRecordingHost extends Structure {
@@ -3149,6 +3183,7 @@ EMAIL参数结构
         public  byte byChanNum;				    //模拟通道个数
         public  byte byStartChan;			        //起始通道号,例如DVS-1,DVR - 1
         public  byte byAudioChanNum;                //语音通道数
+        public  byte byStartDChan;              // 起始数字通道号
         public  byte byIPChanNum;					//最大数字通道个数
         public  byte[] byRes1 = new byte[24];					//保留
     }
@@ -3192,6 +3227,54 @@ EMAIL参数结构
         public byte byRes1;
         public int dwSurplusLockTime;
         public byte[] byRes2 = new byte[256];
+    }
+
+    public static class NET_DVR_RECORD_V40 extends Structure {
+        public int                      dwSize; // 结构体大小
+        public int                      dwRecord;   // 是否启用计划录像配置：0-否，1-是
+        public NET_DVR_RECORDDAY_V40[]  struRecAllDay = new NET_DVR_RECORDDAY_V40[MAX_DAYS]; // 全天录像布防参数
+        public NET_DVR_RECORDSCHED_V40[][]  struRecordSched = new NET_DVR_RECORDSCHED_V40[MAX_DAYS][MAX_TIMESEGMENT_V30];   // 时间段录像布防参数
+        public int                      dwRecordTime;   // 录象延时时间，0-5秒， 1-10秒， 2-30秒， 3-1分钟， 4-2分钟， 5-5分钟， 6-10分钟
+        public int                      dwPreRecordTime;    // 预录时间：0-不预录，1-5秒，2-10秒，3-15秒，4-20秒，5-25秒，6-30秒，7-0xffffffff(尽可能预录)
+        public int                      dwRecorderDuration; // 录像保存的最长时间，单位：天。超过这个时间，该录像文件将被强制删除；若设置为0天则不强制删除，除非文件被循环覆盖。获取参数时若为0xffffffff，表示设备不支持设置该字段
+        public byte                     byRedundancyRec;  // 是否冗余录像（重要数据双备份）：0-不录像，1-录像
+        public byte                     byAudioRec;   // 录像时复合流编码时是否记录音频数据：0-不记录，1-记录
+        public byte                     byStreamType; // 码流类型：0- 主码流，1- 子码流，2- 主子码流同时录像，3- 第三码流
+        public byte                     byPassbackRecord; // 0- 不回传录像，1- 回传录像
+        public int                      wLockDuration; // 录像锁定时长，单位：小时，0表示不锁定，0xffff表示永久锁定。录像段的时长大于锁定的持续时长的录像，将不会锁定
+        public byte                     byRecordBackup;   // 0- 录像不存档，1- 录像存档，目前定时录像不存档
+        public byte                     bySVCLevel;   // SVC抽帧类型：0- 不抽，1- 抽二分之一，2- 抽四分之三
+        public byte                     byRecordManage;   // 录像调度：0- 启用，1- 不启用。启用时进行定时录像；不启用时不进行定时录像，但是录像计划仍在使用，比如移动侦测、回传都还在按这条录像计划进行
+        public byte                     byExtraSaveAudio; // 是否单独存储音频录像：0- 不存储，1- 存储
+        public byte[]                   byRes = new byte[126];  // 保留，置为0
+
+        public NET_DVR_RECORD_V40(){
+            for(int i = 0; i < MAX_DAYS; ++i){
+                for(int j = 0; j < MAX_TIMESEGMENT_V30; ++j){
+                    struRecordSched[i][j] = new NET_DVR_RECORDSCHED_V40();
+                }
+                struRecAllDay[i] = new NET_DVR_RECORDDAY_V40();
+            }
+        }
+    }
+
+    public static class NET_DVR_RECORDDAY_V40 extends Structure {
+        public byte byAllDayRecord;   // 是否全天录像：0-否，1-是
+        /**
+         * 录像类型：0-定时录像，1-移动侦测录像，2-报警录像，3-移动侦测或报警录像，4-移动侦测和报警录像，5-命令触发录像，6-智能报警录像，10-PIR报警，11-无线报警，12-呼救报警，13-全部事件(移动侦测、PIR、无线、呼救等所有报警类型的"或"），14-智能交通事件，15-越界侦测，16-区域入侵侦测，17-音频异常侦测，18-场景变更侦测，19-智能侦测（越界侦测|区域入侵侦测|进入区域侦测|离开区域侦测|人脸侦测），20-人脸侦测，21-POS录像，22-进入区域侦测，23-离开区域侦测，24-徘徊侦测，25-人员聚集侦测，26-快速运动侦测，27-停车侦测，28-物品遗留侦测，29-物品拿取侦测，30-火点检测，35-船只检测, 36-测温预警，37-测温报警，38-温差报警，39-离线测温报警，40-防区报警，41-紧急求助，42-业务咨询，43-起身检测，44-折线攀高，45-如厕超时
+         */
+        public byte byRecordType;
+        public byte[] byRes = new byte[62];  // 保留，置为0
+
+    }
+
+    public static class NET_DVR_RECORDSCHED_V40 extends Structure {
+        public NET_DVR_SCHEDTIME struRecordTime = new NET_DVR_SCHEDTIME();
+        /**
+         * 录像类型：0-定时录像，1-移动侦测录像，2-报警录像，3-移动侦测或报警录像，4-移动侦测和报警录像，5-命令触发录像，6-智能报警录像，10-PIR报警，11-无线报警，12-呼救报警，13-全部事件(移动侦测、PIR、无线、呼救等所有报警类型的"或"），14-智能交通事件，15-越界侦测，16-区域入侵侦测，17-音频异常侦测，18-场景变更侦测，19-智能侦测（越界侦测|区域入侵侦测|进入区域侦测|离开区域侦测|人脸侦测），20-人脸侦测，21-POS录像，22-进入区域侦测，23-离开区域侦测，24-徘徊侦测，25-人员聚集侦测，26-快速运动侦测，27-停车侦测，28-物品遗留侦测，29-物品拿取侦测，30-火点检测，35-船只检测, 36-测温预警，37-测温报警，38-温差报警，39-离线测温报警，40-防区报警，41-紧急求助，42-业务咨询，43-起身检测，44-折线攀高，45-如厕超时
+         */
+        public byte byRecordType;
+        public byte[] byRes = new byte[31];  // 保留，置为0
     }
 
     //sdk网络环境枚举变量，用于远程升级
@@ -4237,6 +4320,53 @@ EMAIL参数结构
         public byte[] byRes = new byte[32];
     }
 
+    public static class NET_DVR_RECORD_TIME_SPAN_INQUIRY extends Structure {
+        public int      dwSize;			                /* 结构大小 */
+        public byte	    byType;					/* 录像类型，0- 正常音视频录像，1- 图片通道录像，2- ANR通道录像，3- 抽帧通道录像 */
+        public byte[]   byRes = new byte[63];    /* 保留 */
+    }
+
+    public static class NET_DVR_RECORD_TIME_SPAN extends Structure {
+        public int      dwSize;			                /* 结构大小 */
+        public NET_DVR_TIME strBeginTime = new NET_DVR_TIME();  // 开始时间
+        public NET_DVR_TIME strEndTime = new NET_DVR_TIME();    // 结束时间
+        public byte	    byType;					/* 录像类型，0- 正常音视频录像，1- 图片通道录像，2- ANR通道录像，3- 抽帧通道录像 */
+        public byte[]   byRes = new byte[63];    /* 保留 */
+    }
+
+    public static class NET_DVR_RECORD_CHECK_COND extends Structure {
+        public int      dwSize;			                /* 结构大小 */
+        public NET_DVR_STREAM_INFO struStreamInfo = new NET_DVR_STREAM_INFO();		/* 流信息（仅流ID有效） */
+        public byte	    byCheckType;					/* 检测方式：0- 录像是否完整，1- 录像是否完整&缺失录像的起止时间 */
+        public byte[]   byRes1 = new byte[3];    /* 保留 */
+        public NET_DVR_TIME_EX struBeginTime = new NET_DVR_TIME_EX();  // 开始时间
+        public NET_DVR_TIME_EX struEndTime = new NET_DVR_TIME_EX();    // 结束时间
+        public byte[]   byRes = new byte[128];    /* 保留 */
+    }
+
+    public static class NET_DVR_RECORD_SEGMENT_COND extends Structure {
+        public int      dwSize;			                /* 结构大小 */
+        public NET_DVR_STREAM_INFO struStreamInfo = new NET_DVR_STREAM_INFO();		/* 流信息（仅流ID有效） */
+        public NET_DVR_TIME_EX struBeginTime = new NET_DVR_TIME_EX();  // 开始时间
+        public NET_DVR_TIME_EX struEndTime = new NET_DVR_TIME_EX();    // 结束时间
+        public byte[]   byRes = new byte[256];    /* 保留 */
+    }
+
+    public static class NET_DVR_RECORD_CHECK_RET extends Structure {
+        public int      dwSize;			                /* 结构大小 */
+        public byte	    byRecordNotComplete;			/* 录像是否完整：0- 完整，1- 不完整 */
+        public byte[]   byRes1 = new byte[3];    /* 保留 */
+        public NET_DVR_TIME_EX struBeginTime = new NET_DVR_TIME_EX();  // 缺失录像的开始时间
+        public NET_DVR_TIME_EX struEndTime = new NET_DVR_TIME_EX();    // 缺失录像的结束时间
+        public byte[]   byRes = new byte[128];    /* 保留 */
+    }
+
+    public static class NET_DVR_RECORD_SEGMENT_RET extends Structure {
+        public int      dwSize;			                /* 结构大小 */
+        public int      dwRecordTotalSize;			    /* 录像总大小，单位：MB */
+        public byte[]   byRes = new byte[256];    /* 保留 */
+    }
+
     /***API函数声明,详细说明见API手册***/
     public static interface FRealDataCallBack_V30 extends Callback {
         public void invoke(NativeLong lRealHandle, int dwDataType,
@@ -4464,6 +4594,13 @@ EMAIL参数结构
     boolean  NET_DVR_StopGetFile(NativeLong lFileHandle);
     int  NET_DVR_GetDownloadPos(NativeLong lFileHandle);
     int	 NET_DVR_GetPlayBackPos(NativeLong lPlayHandle);
+
+    // 通道录像起止时间和录像完整性检查
+    boolean NET_DVR_InquiryRecordTimeSpan(NativeLong lUserID, int dwChannel, NET_DVR_RECORD_TIME_SPAN_INQUIRY lpInquiry, NET_DVR_RECORD_TIME_SPAN lpResult);
+
+    NativeLong NET_DVR_GetNextRemoteConfig(NativeLong lHandle, Pointer lpOutBuff, int dwOutBuffSize);
+    // boolean NET_DVR_StopRemoteConfig(NativeLong lHandle);
+
 
     //升级
     NativeLong NET_DVR_Upgrade(NativeLong lUserID, String sFileName);

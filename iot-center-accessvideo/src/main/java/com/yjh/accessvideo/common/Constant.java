@@ -4,15 +4,17 @@ import com.sun.jna.NativeLong;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
+import com.yjh.accessvideo.hik.HCNetSDK;
 import io.netty.bootstrap.Bootstrap;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Constant {
 
     public static Map<String, Integer> maps = new ConcurrentHashMap<>();
+
+    public static Map<Long, HCNetSDK.NET_DVR_DEVICEINFO_V40> deviceMaps = new ConcurrentHashMap<>();
 
     public static Map<String, String> mapsForCamera = new HashMap<>();
 
