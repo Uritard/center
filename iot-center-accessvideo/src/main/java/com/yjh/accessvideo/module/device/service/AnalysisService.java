@@ -1,17 +1,17 @@
 package com.yjh.accessvideo.module.device.service;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.module.control.service.CameraConService;
 import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.Analysis;
+import com.yjh.accessvideo.module.device.entity.interlanalysis.PicAnalyseRequest;
 import com.yjh.accessvideo.netty.client.AnalysisClientHandler;
-import org.apache.xml.serializer.utils.MsgKey;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,9 +24,11 @@ import java.util.*;
 */
 @Service
 public class AnalysisService {
-
     @Autowired
     private AnalyseDataOperateDao analyseDataOperateDao;
+
+    @Autowired
+    private IntelAnalysisService intelAnalysisService;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -51,58 +53,68 @@ public class AnalysisService {
             log.info("----------------"+analysisList.get(0));
             AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).SendHeartBeat(analysisList.get(0));
         } else {
+            log.info("进入识别算法方法----------");
             algorithmMsgId = algorithmMsgId+1;
             analysisObject.put("msgID", String.valueOf(algorithmMsgId));
+            analysisObject.put("port", recognizePort);
             log.info("algorithmMsgId: "+algorithmMsgId);
             analysisObject.put("msgType", "1");
             msgDataObject.put("desNode", "serverSocket");
             msgDataObject.put("srcNode", "clientSocket001");
             try {
-        int i=1;
-        for (Analysis analysis: analysisList) {
-            log.info("表计IsAI："+analysis.getIsAi());
-            if (analysis.getIsAi()==1) {
-                Map<String,String> firHandelMap=new HashMap<>();
-                if(analysis.getAnalyseType().equals("9")) {
-                    firHandelMap.put("picPath",analysis.getPicPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content").toString()));
-                    firHandelMap.put("csvPath", analysis.getCsvPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredStorePath","content").toString()));
-                    firHandelMap.put("dataPath", analysis.getDataPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredStorePath","content").toString()));
+                int i=1;
+                for (Analysis analysis: analysisList) {
+                    log.info("表计IsAI："+analysis.getIsAi());
+                    if (analysis.getIsAi()==1) {
+                        Map<String,String> firHandelMap=new HashMap<>();
+                        if(analysis.getAnalyseType().equals("9")) {
+                            firHandelMap.put("picPath",analysis.getPicPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content").toString()));
+                            firHandelMap.put("csvPath", analysis.getCsvPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredStorePath","content").toString()));
+                            firHandelMap.put("dataPath", analysis.getDataPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredStorePath","content").toString()));
+                        }
+                        log.info("firData-------"+firHandelMap);
+                        JSONObject pictureInfoObject = new JSONObject();
+                        JSONObject pictureDataObject = new JSONObject();
+                        pictureDataObject.put("analyseType", analysis.getAnalyseType());
+                        pictureDataObject.put("imagePath", analysis.getPicPath());
+                        pictureDataObject.put("modelPath", analysis.getPicModelPath());
+                        // 表计算法图片存储路径
+                        pictureDataObject.put("meterResultImg",redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content").toString());
+                        pictureDataObject.put("taskId", analysis.getTaskId());
+                        pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
+                        if(firHandelMap.size()!=0){
+                            pictureDataObject.put("csvPath",firHandelMap.get("dataPath"));
+                            pictureDataObject.put("dataPath",firHandelMap.get("dataPath"));
+                            pictureDataObject.put("imagePath",firHandelMap.get("picPath"));
+                        }
+                        pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
+                        msgDataObject.put("data", pictureInfoObject);
+                    }
+                    i++;
                 }
-                log.info("firData-------"+firHandelMap);
-                JSONObject pictureInfoObject = new JSONObject();
-                JSONObject pictureDataObject = new JSONObject();
-                pictureDataObject.put("analyseType", analysis.getAnalyseType());
-                pictureDataObject.put("imagePath", analysis.getPicPath());
-                pictureDataObject.put("modelPath", analysis.getPicModelPath());
-                pictureDataObject.put("meterResultImg",redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content").toString());//表计算法图片存储路径
-                pictureDataObject.put("taskId", analysis.getTaskId());
-                pictureDataObject.put("instanceId", analysis.getInstanceId().toString());
-                if(firHandelMap.size()!=0){
-                    pictureDataObject.put("csvPath",firHandelMap.get("dataPath"));
-                    pictureDataObject.put("dataPath",firHandelMap.get("dataPath"));
-                    pictureDataObject.put("imagePath",firHandelMap.get("picPath"));
-                }
-                pictureInfoObject.put("pictureInfo"+i, pictureDataObject);
-                msgDataObject.put("data", pictureInfoObject);
-            }
-            i++;
-        }
-        analysisObject.put("msgData", msgDataObject);
-        log.info("analysisObject----:"+analysisObject);
-        AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendDataReguest(analysisObject);
-    }catch (Exception e){
-        log.error("表计识别算法异常："+e);
-        log.error("exceptionDetails:"+e.getStackTrace()[0]);
+                analysisObject.put("msgData", msgDataObject);
+                log.info("analysisObject----:"+analysisObject);
+                AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendDataReguest(analysisObject);
+                // 改为调用智能分析主机接口进行分析
+                /*PicAnalyseRequest request = new PicAnalyseRequest().setReserved(analysisObject.toString());
+                intelAnalysisService.picAnalyseNoDetection(request);*/
 
-        redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseResult","247");//异常
-        redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseAbnormal","251");//算法超时
-        redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseStatus","252");//已执行
-//        redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"","");
-    }
-}
+                log.info("算法数据初始化-----完成");
+            }catch (Exception e){
+                log.error("表计识别算法异常："+e);
+                log.error("exceptionDetails:"+e.getStackTrace()[0]);
+                // 异常
+                redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseResult","247");
+                // 算法超时
+                redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseAbnormal","251");
+                //已执行
+                redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseStatus","252");
+        //        redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"","");
+            }
+        }
         log.info("analysisList.get(0).getInstanceId():"+analysisList.get(0).getInstanceId());
-                return "success";
-                }
+        return "success";
+}
 
     //@Logs(title = "缺陷调用", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
@@ -115,7 +127,7 @@ public class AnalysisService {
         analysisObject.put("msgType", "1");
         msgDataObject.put("desNode", "serverSocket");
         msgDataObject.put("srcNode", "clientSocket001");
-        log.info("进入算法方法----------");
+        log.info("进入缺陷算法方法----------");
         try{
             int i=1;
             JSONObject pictureInfoObject = new JSONObject();
@@ -150,7 +162,21 @@ public class AnalysisService {
             log.info("msgData",msgDataObject);
             log.info("analysisObject-----"+analysisObject);
             log.info("aiPort---------:"+aiPort);
-            AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
+
+            // 开关
+            String flag = redisTemplate.opsForHash().get("t_sys_param:isIntelAnalysis","content").toString();
+            if (StringUtils.equals("false", flag)){
+                // 原来的socket协议
+                AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
+            }else {
+                // 调用智能分析主机接口进行分析
+                try {
+                    intelAnalysisService.picAnalyseNoDetection(analysisObject);
+                }catch (Exception e){
+                    log.error("调用智能分析主机进行缺陷分析异常："+e);
+                    log.error("exceptionDetails:"+e.getStackTrace()[0]);
+                }
+            }
             log.info("算法数据初始化-----完成");
         }catch (Exception e){
             log.error("缺陷算法识别异常："+e);

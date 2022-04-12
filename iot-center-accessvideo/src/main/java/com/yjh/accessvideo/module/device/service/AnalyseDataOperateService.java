@@ -203,10 +203,14 @@ public class AnalyseDataOperateService {
                 break;
             case "0":
                 if(flag==1){
-                  redisTemplate.opsForHash().put(cruiseRedisKey,"temResult","1");//临时值为正常点
+                  // 临时值为正常点
+                  redisTemplate.opsForHash().put(cruiseRedisKey,"temResult","1");
                 }else {
-                  redisTemplate.opsForHash().put(cruiseRedisKey,"temResult","0");//临时值为异常点
+                  // 临时值为异常点
+                  redisTemplate.opsForHash().put(cruiseRedisKey,"temResult","0");
                 }
+                break;
+            default:
                 break;
         }
 
@@ -277,6 +281,8 @@ public class AnalyseDataOperateService {
                    }
                 }
                 break;
+            default:
+                break;
         }
 
         handleResultMap.put("resultNum",resultNum);
@@ -327,43 +333,46 @@ public class AnalyseDataOperateService {
      * @param body 算法服务返回的报文消息体（信息不完整的消息报文）
      * @return  完整的合并拆包信息的结果报文
      */
-    //反拆包
     public String nonUnpacking(String body) {
-        //body清除空格
+        // body清除空格
         body = body.replaceAll("\\s++", "");
-        String usefulBody = "";//处理结果初始化
-        if (body.matches("\\{\"msgData.*?\"2\"}") || body.matches("\\{\"msgType.*?}}}}")) { //数据结果整包
+        // 处理结果初始化
+        String usefulBody = "";
+        if (body.matches("\\{\"msgData.*?\"2\"}") || body.matches("\\{\"msgType.*?}}}}")) {
+            // 数据结果整包
             log.info("整包数据...");
             usefulBody = body;
-        } else if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?")) {  //结果半包
-            if (body.contains("\"msgType\":\"4\"")) { //注册消息
-
-            } else if (body.contains("\"msgType\":\"6\"")) {  //结束消息
+        } else if (body.matches("\\{\"msgData.*?") || body.matches("\\{\"msgType.*?")) {
+            // 结果半包
+            if (body.contains("\"msgType\":\"4\"")) {
+                // 注册消息
+            } else if (body.contains("\"msgType\":\"6\"")) {
+                // 结束消息
                 usefulBody = body;
-            } else {                                         //数据结果（上半包）
+            } else {
+                // 数据结果（上半包）
                 redisTemplate.opsForHash().put("algoResponse", "A", body);
                 log.info("获取上半包数据");
                 if(Objects.nonNull(redisTemplate.opsForHash().get("algoResponse","B"))){
-                    usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body); //开始合体
+                    // 开始合体
+                    usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body);
                     log.info("success:" + usefulBody);
                     redisTemplate.delete("algoResponse");
                 }
-
             }
-
-        } else if (body.matches(".*?\"2\"}") || body.matches(".*?}")) {   //数据结果（下半包）
+        } else if (body.matches(".*?\"2\"}") || body.matches(".*?}")) {
+            // 数据结果（下半包）
             redisTemplate.opsForHash().put("algoResponse", "B", body);
             log.info("获取下半包数据");
             if (Objects.nonNull(redisTemplate.opsForHash().get("algoResponse","A"))){
-                usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body); //开始合体
+                // 开始合体
+                usefulBody = (redisTemplate.opsForHash().entries("algoResponse")).get("A").toString().concat(body);
                 log.info("success:" + usefulBody);
                 redisTemplate.delete("algoResponse");
             }
-
         }
         log.info("usefulBody:" + usefulBody);
         return usefulBody;
-
     }
 
 
@@ -439,7 +448,7 @@ public class AnalyseDataOperateService {
      * @param lowLimit3
      * @param highLimit4
      * @param lowLimit4
-     * @return 返回遥测告警等级或未告警
+     * @return 返回遥测告警等级或未告警  4:危急  3:严重  2:一般  1:预警  0:正常
      */
     //@Logs(title = "表计识别-告警判断-数值结果判断", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
@@ -490,15 +499,15 @@ public class AnalyseDataOperateService {
             warns2 = value >= highLimit1;
 
         if (emergency1 || emergency2) {
-            return 4;//危急
+            return 4;
         } else if (worse1 || worse2) {
-            return 3;//严重
+            return 3;
         } else if (general1 || general2) {
-            return 2;//一般
+            return 2;
         } else if (warns1 || warns2) {
-            return 1;//预警
+            return 1;
         } else {
-            return 0;//正常
+            return 0;
         }
 
     }
@@ -510,7 +519,8 @@ public class AnalyseDataOperateService {
         log.info("stateOne" + stateOne);
         log.info("stateTwo" + stateTwo);
         log.info("alarmState" + alarmState);
-        int finalResult = 0;//0-非告警 1-告警
+        int finalResult = 0;
+        // 0-非告警 1-告警
         switch (alarmState) {
             case 0:
                 if (value.equals(stateOne)) {

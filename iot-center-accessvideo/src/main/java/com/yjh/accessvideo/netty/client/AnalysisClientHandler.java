@@ -119,10 +119,14 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         try {
             String body = new String(bytes, "UTF-8");
             log.info("接收服务端数据:" + body);
-            String usefulBody = analyseDataOperateService.nonUnpacking(body);//反拆包解析
+            // 反拆包解析
+            String usefulBody = analyseDataOperateService.nonUnpacking(body);
+
+            // Port:13668-表计识别,Port:13669-缺陷识别
+            String remoteAdds = ctx.channel().remoteAddress().toString();
+            int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));
             if(usefulBody !="") {
-                //线程池数据处理
-                DataDealThread dataDealThread = new DataDealThread(usefulBody, redisTemplate, analyseDataOperateService, ctx,syncWebsocketUrl);
+                DataDealThread dataDealThread = new DataDealThread(usefulBody, remotePort, redisTemplate, analyseDataOperateService, syncWebsocketUrl);
                 TaskExecutePool.getInstance().execute(dataDealThread);
 //            handlerData(body); //单线程数据处理
             }

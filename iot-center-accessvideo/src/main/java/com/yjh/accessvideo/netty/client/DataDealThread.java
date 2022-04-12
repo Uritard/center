@@ -46,84 +46,43 @@ public class DataDealThread implements Runnable {
     private String body;
     private RedisTemplate redisTemplate;
     private AnalyseDataOperateService analyseDataOperateService;
-    private ChannelHandlerContext ctx;
     private String TASKID;
     private String INSTANCEID;
     private String syncWebsocketUrl;
+    /**
+     * 服务端口
+     */
+    private final int remotePort;
 
-
-    public DataDealThread(String body, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, ChannelHandlerContext ctx,String syncWebsocketUrl) {
+    public DataDealThread(String body, int remotePort, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, String syncWebsocketUrl) {
         this.analyseDataOperateService = analyseDataOperateService;
         this.redisTemplate = redisTemplate;
         this.body = body;
-        this.ctx = ctx;
         this.syncWebsocketUrl=syncWebsocketUrl;
+        this.remotePort = remotePort;
     }
-
-
-
-    //请求webSocket发送方法
-    public String postUrl(String url, String json) throws IOException, URISyntaxException {
-        log.info("webSocketUrl"+url);
-        CloseableHttpClient client = HttpClients.createDefault();
-        URI uri = new URIBuilder(url).setParameter("json", json).build();
-        HttpPost httpPost = new HttpPost(uri);
-        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
-        CloseableHttpResponse response = client.execute(httpPost);
-        HttpEntity entity = response.getEntity();
-        return EntityUtils.toString(entity, "UTF-8");
-    }
-
-
-    //读批量redis
-    public Set<String> redisScan(String key) {
-        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = Sets.newHashSet();
-
-            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
-            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
-
-            ScanParams scanParams = new ScanParams();
-            scanParams.match("*" + key + "*");
-            scanParams.count(1000);
-            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
-            while (null != scan.getStringCursor()) {
-                keys.addAll(scan.getResult());
-                if (!StringUtils.equals("0", scan.getStringCursor())) {
-                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
-                    continue;
-                } else {
-                    break;
-                }
-            }
-
-            return keys;
-        });
-    }
-
 
     @SneakyThrows
     @Override
     public void run() {
-        String remoteAdds = ctx.channel().remoteAddress().toString();
-        int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));//Port:13668-表计识别,Port:13669-缺陷识别
-        String usefulBody = body;//反拆包解析
+        // 反拆包解析
+        String usefulBody = body;
 //        String bodyTemp=body.replaceAll("\\S+","");
 //        String usefulBody=bodyTemp.replaceAll("\\{.*?\\}\\{","{");
         if (usefulBody != "") {
             JSONObject jsonObject = JSON.parseObject(usefulBody);
             log.info("JSON对象1：" + jsonObject);
+
             if (jsonObject.get("msgType").toString().equals("2")) {
                 JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
                 log.info("原生数据****：" + jsonObjectData);
-                Iterator iterator = jsonObjectData.entrySet().iterator();//迭代器取出data中的每一个resultInfo
+                Iterator iterator = jsonObjectData.entrySet().iterator();
+                // 迭代器取出data中的每一个resultInfo
                 while (iterator.hasNext()) {
                     Map.Entry entry = (Map.Entry) iterator.next();
-                    //遍历每一个结果子集
+                    // 遍历每一个结果子集
                     JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
-                    log.info("数据****：" + jsonObjectResult);//打印resultInfo
+                    log.info("数据****：" + jsonObjectResult);
 
 
 
@@ -1132,6 +1091,56 @@ public class DataDealThread implements Runnable {
 
 
         }
+    }
+
+    /**
+     * 请求webSocket发送方法
+     *
+     * @param url 请求地址
+     * @param json 发送内容
+     * @return String
+     */
+    public String postUrl(String url, String json) throws IOException, URISyntaxException {
+        log.info("webSocketUrl"+url);
+        CloseableHttpClient client = HttpClients.createDefault();
+        URI uri = new URIBuilder(url).setParameter("json", json).build();
+        HttpPost httpPost = new HttpPost(uri);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
+        CloseableHttpResponse response = client.execute(httpPost);
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, "UTF-8");
+    }
+
+    /**
+     * Redis数据库批量查询Key值游标
+     * @param key redis的key
+     * @return Set<String>
+     */
+    public Set<String> redisScan(String key) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
+
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+
+            ScanParams scanParams = new ScanParams();
+            scanParams.match("*" + key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            return keys;
+        });
     }
 
 }

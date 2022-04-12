@@ -24,7 +24,7 @@ import java.util.Objects;
  */
 @RestController
 @RequestMapping("/analysis/v1")
-@Api(value = "/analysis", description = "算法调用操作接口")
+@Api(value = "/analysis", tags = "算法调用操作接口")
 public class AnalysisController {
 
     @Autowired
@@ -36,13 +36,20 @@ public class AnalysisController {
         this.analysisService = analysisService;
     }
 
+    /**
+     * 识别算法端口
+     */
     @Value("${netty.recognize.port}")
-    private int recognizePort;//识别算法端口
+    private int recognizePort;
+
+    /**
+     * 缺陷算法端口
+     */
     @Value("${netty.ai.port}")
-    private int aiPort;//缺陷算法端口
+    private int aiPort;
 
     @ApiOperation(value = "算法接口")
-    @RequestMapping(value = "/algorithm", method = RequestMethod.POST)
+    @PostMapping(value = "/algorithm")
     public Result feignAlgorithm(@RequestBody Map<String, List<Analysis>> analysisMap) {
         Result result = new Result();
         try {
@@ -65,7 +72,7 @@ public class AnalysisController {
     }
 
     @ApiOperation(value = "缺陷接口")
-    @RequestMapping(value = "/defect", method = RequestMethod.POST)
+    @PostMapping(value = "/defect")
     public Result feignDefect(@RequestBody Map<String, List<Analysis>> analysisMap) {
         Result result = new Result();
         try {
