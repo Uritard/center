@@ -9,11 +9,14 @@ import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
+import com.yjh.accessvideo.commons.utils.VideoUtil;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.*;
+import com.yjh.accessvideo.thread.TaskExecutePool;
+import com.yjh.accessvideo.threads.RecordFileThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -551,10 +554,11 @@ public class CameraConService {
             String starttime = startTimeTem.replace(" ", "Z");
             String endtime = stopTimeTem.replace(" ", "Z");
 
-            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1, starttime, endtime, cameraId);
+            Long id = System.currentTimeMillis();
+            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1, starttime, endtime, id);
             log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}, historyTransUrl: {}"
                     , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
-            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId);
+            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(id);
             manager.run(videoInfo);
 
             String[] rtmpUrls = transUrl.split("rtmp");
@@ -562,9 +566,9 @@ public class CameraConService {
 
             returnMap.put("cameraId", String.valueOf(cameraConInfo.getCameraId()));
             returnMap.put("rtmpUrl", rtmpUrl);
-            String webRtc = "webrtc://" + hostIp + "/history/" + cameraId;
+            String webRtc = "webrtc://" + hostIp + "/history/" + id;
             returnMap.put("webRtcUrl", webRtc);
-            isHttpsHistory(videoHttps, String.valueOf(cameraId), returnMap);
+            isHttpsHistory(videoHttps, String.valueOf(id), returnMap);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -729,21 +733,22 @@ public class CameraConService {
             String portLigh = robotConInfo.getLightPort();
             String lightNum = robotConInfo.getNumLight();
 
+            Long lightId = Long.parseLong(lightCameraId) + System.currentTimeMillis();
             log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}"
-                    , userName, password, ipLight, portLigh, lightNum, starttime, endtime, lightCameraId);
-            String transUrl = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, lightCameraId);
+                    , userName, password, ipLight, portLigh, lightNum, starttime, endtime, lightId);
+            String transUrl = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, lightId);
 
             log.info("historyTransUrl: {}", transUrl);
-            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(Long.parseLong(lightCameraId));
+            VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(lightId);
             manager.run(videoInfo);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
 
             lightReturnMap.put("robotId", String.valueOf(robotId));
             lightReturnMap.put("rtmpUrl", rtmpUrl);
-            String lightWebRtc = "webrtc://" + hostIp + "/history/" + lightCameraId;
+            String lightWebRtc = "webrtc://" + hostIp + "/history/" + lightId;
             lightReturnMap.put("webRtcUrl", lightWebRtc);
-            isHttpsHistory(videoHttps, lightCameraId, lightReturnMap);
+            isHttpsHistory(videoHttps, String.valueOf(lightId), lightReturnMap);
 
             //开启红外历史流
             userName = robotConInfo.getInferadUsername();
@@ -752,20 +757,21 @@ public class CameraConService {
             String infraredPort = Objects.nonNull(robotConInfo.getInferadPort()) ? robotConInfo.getInferadPort().toString() : null;
             String infraredNum = robotConInfo.getNumInferad();
 
+            Long infraredId = Long.parseLong(infraredCameraId) + System.currentTimeMillis();
             log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}"
-                    , userName, password, infraredIp, infraredPort, infraredNum, starttime, endtime, infraredCameraId);
-            String transUrlIn = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, infraredCameraId);
+                    , userName, password, infraredIp, infraredPort, infraredNum, starttime, endtime, infraredId);
+            String transUrlIn = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, infraredId);
 
             log.info("historyTransUrl: {}", transUrlIn);
-            VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlIn).setId(Long.parseLong(infraredCameraId));
+            VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlIn).setId(infraredId);
             manager.run(videoInfo2);
             String[] rtmpUrlsIn = transUrlIn.split("rtmp");
             String rtmpUrlIn = "rtmp" + rtmpUrlsIn[rtmpUrlsIn.length - 1];
             infraredReturnMap.put("robotId", String.valueOf(robotId));
             infraredReturnMap.put("rtmpUrl", rtmpUrlIn);
-            String infraredWebRtc = "webrtc://" + hostIp + "/history/" + infraredCameraId;
+            String infraredWebRtc = "webrtc://" + hostIp + "/history/" + infraredId;
             infraredReturnMap.put("webRtcUrl", infraredWebRtc);
-            isHttpsHistory(videoHttps, infraredCameraId, infraredReturnMap);
+            isHttpsHistory(videoHttps, String.valueOf(infraredId), infraredReturnMap);
             Thread.sleep(3000);
             robotHistoryList.add(lightReturnMap);
             robotHistoryList.add(infraredReturnMap);
@@ -1184,6 +1190,77 @@ public class CameraConService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public String startDvrToPlace(long cameraId){
+        //返回结果
+        String judge = "";
+        NativeLong lRealPlayHandle;
+        int iErr = 0;
+        try{
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+            //生成文件名
+            Date date = new Date();
+            String fileName = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").format(date) + ".h264";
+            log.info("生成文件名" + fileName);
+            //保存文件地址
+            String path = videoPath + fileName;
+            log.info("保存文件地址：" + path);
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            HCNetSDK.NET_DVR_PREVIEWINFO struPlayInfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
+            struPlayInfo.lChannel = new NativeLong(cameraConInfo.getChannelNum());
+            struPlayInfo.dwStreamType = 0;
+            lRealPlayHandle = hCNetSDK.NET_DVR_RealPlay_V40(lUserIDLong, struPlayInfo, null, null);
+            if (lRealPlayHandle.longValue() < 0) {
+                iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.error("get camera video NET_DVR_RealPlay_V40, error code: " + iErr);
+            }
+            hCNetSDK.NET_DVR_SaveRealData(lRealPlayHandle, path);
+            Constant.recordLongMap.put(fileName, lRealPlayHandle);
+            //防止前端未调用停止接口
+            RecordFileThread recordFileThread = new RecordFileThread(cameraConDao, redisTemplate, hCNetSDK, date.getTime(),fileName, videoPath, savePath);
+            TaskExecutePool.getInstance().execute(recordFileThread);
+            judge = fileName;
+            RecordFileInfo recordFileInfo = new RecordFileInfo();
+            recordFileInfo.setFileName(fileName);
+            recordFileInfo.setStartTime(date);
+            recordFileInfo.setCameraId(cameraId);
+            recordFileInfo.setUpRegionId(cameraConInfo.getUpRegionId());
+            cameraConDao.insertRecordFile(recordFileInfo);
+        }catch (Exception e){
+            iErr = hCNetSDK.NET_DVR_GetLastError();
+            log.info("获取视频方发异常：" + iErr);
+            log.info(e.getMessage());
+        }
+        return judge;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String stopDvrToPlace(String fileName){
+        //返回结果
+        String judge = "";
+        try {
+            String path = videoPath + fileName;
+            NativeLong lRealPlayHandle = Constant.recordLongMap.get(fileName);
+            hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
+            String url = "chmod 777 " + videoPath + fileName;
+            Runtime.getRuntime().exec(url);
+            VideoUtil.h264ToMp4(path);
+            String url2 = "rm -rf " + path;
+            Runtime.getRuntime().exec(url2);
+            judge = savePath + fileName.replace("h264", "mp4");
+            RecordFileInfo recordFileInfo = new RecordFileInfo();
+            recordFileInfo.setFileName(fileName);
+            recordFileInfo.setEndTime(new Date());
+            recordFileInfo.setFilePath(judge);
+            recordFileInfo.setAbsoluteFilePath(path.replace("h264", "mp4"));
+            cameraConDao.updateRecordFile(recordFileInfo);
+            Constant.recordLongMap.remove(fileName);
+        }catch (Exception ignored){
+            log.info("录制失败");
+        }
+        return judge;
+    }
     /**
      * 下载nvr文件
      *
@@ -1368,13 +1445,14 @@ public class CameraConService {
                     // log.info("struStartTime 开始时间结束："+struStartTime.toString());
                     //结束时间
                     Date endTimes = format.parse(stopTime);
-                    c.setTime(endTimes);
-                    struStopTim.dwYear = c.get(Calendar.YEAR);
-                    struStopTim.dwMonth = c.get(Calendar.MONTH) + 1;
-                    struStopTim.dwDay = c.get(Calendar.DATE);
-                    struStopTim.dwHour = c.get(Calendar.HOUR_OF_DAY);
-                    struStopTim.dwMinute = c.get(Calendar.MINUTE);
-                    struStopTim.dwSecond = c.get(Calendar.SECOND);
+                    Calendar c2 = Calendar.getInstance();
+                    c2.setTime(endTimes);
+                    struStopTim.dwYear = c2.get(Calendar.YEAR);
+                    struStopTim.dwMonth = c2.get(Calendar.MONTH) + 1;
+                    struStopTim.dwDay = c2.get(Calendar.DATE);
+                    struStopTim.dwHour = c2.get(Calendar.HOUR_OF_DAY);
+                    struStopTim.dwMinute = c2.get(Calendar.MINUTE);
+                    struStopTim.dwSecond = c2.get(Calendar.SECOND);
                     log.info("时间赋值成功");
                     NativeLong lChannel = new NativeLong(cameraConInfo.getChannelNum());
                     log.info("lChannel赋值成功:" + lChannel);
@@ -2190,13 +2268,18 @@ public class CameraConService {
 //            redisTemplate.delete("cameraRealFlow:" + cameraId);
 //        } catch (Exception e) { e.getMessage(); }
         //todo 目前先不关闭ffmpeg进程,在多用户同时播放统一个相机视频，一个用户关闭进程后，另外一个用户则无法观看
+        //回放视频流可停止
+        if (rtmpUrl.contains("history")){
+            cameraId = Long.valueOf(StringUtils.substringAfterLast(rtmpUrl, "/"));
+            manager.terminate(cameraId);
+        }
 //        manager.terminate(cameraId);
         return "stop " + cameraId + " preview success!";
     }
 
     //@Logs(title = "机器人停止播放", code = "robotStopPlay", content = "机器人相机停止播放")
     @Transactional(rollbackFor = Exception.class)
-    public String robotStopRealPlay(Long robotId) {
+    public String robotStopRealPlay(Long robotId, String lightRtmpUrl, String infraredRtmpUrl) {
 //        String urlStop = "";
 //        String livePath;
 //        String lightCameraId = String.valueOf(robotId)+"9901";
@@ -2252,6 +2335,14 @@ public class CameraConService {
 //        manager.terminate(Long.parseLong(lightCameraId));
 //        String infraredCameraId = String.valueOf(robotId)+"9902";
 //        manager.terminate(Long.parseLong(infraredCameraId));
+        if (lightRtmpUrl.contains("history")){
+            Long lightCameraId = Long.valueOf(StringUtils.substringAfterLast(lightRtmpUrl, "/"));
+            manager.terminate(lightCameraId);
+        }
+        if (infraredRtmpUrl.contains("history")){
+            Long infraredCameraId = Long.valueOf(StringUtils.substringAfterLast(infraredRtmpUrl, "/"));
+            manager.terminate(infraredCameraId);
+        }
         return "stop " + robotId + " preview success!";
     }
 

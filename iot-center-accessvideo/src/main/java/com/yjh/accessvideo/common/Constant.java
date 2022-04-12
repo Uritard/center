@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.common;
 
+import com.sun.jna.NativeLong;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
@@ -16,6 +17,11 @@ public class Constant {
     public static Map<String, String> mapsForCamera = new HashMap<>();
 
     public static Map<String, String> mapsForHistory = new HashMap<>();
+
+    /**
+     录像信息
+     */
+    public static Map<String, NativeLong> recordLongMap = new HashMap<>();
 
 //    public static int connectTimeCounts = 0;
 

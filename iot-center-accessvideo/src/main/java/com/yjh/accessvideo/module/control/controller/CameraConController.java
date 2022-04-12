@@ -191,10 +191,12 @@ public class CameraConController {
 
     @ApiOperation(value = "机器人相机停止播放")
     @RequestMapping(value = "/robotStopRealPlay", method = RequestMethod.GET)
-    public Result robotStopRealPlay(@RequestParam(value = "robotId") Long robotId) {
+    public Result robotStopRealPlay(@RequestParam(value = "robotId") Long robotId,
+                                    @RequestParam(value = "lightRtmpUrl") String lightRtmpUrl,
+                                    @RequestParam(value = "infraredRtmpUrl") String infraredRtmpUrl) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.robotStopRealPlay(robotId));
+            result.setData(cameraConService.robotStopRealPlay(robotId, lightRtmpUrl, infraredRtmpUrl));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -513,6 +515,40 @@ public class CameraConController {
             if(null!=url) {
                 result.setData(url);
             } else { result.setData("下载失败请重新下载"); }
+        } catch (Exception e) {
+            result.setData(ResultCodeEnum.SYSTEMERROR);
+            log.error("视频上传服务器失败",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "开始录制视频")
+    @RequestMapping(value = "/startDvrToPlace", method = RequestMethod.GET)
+    public Result startDvrToPlace(@RequestParam(value = "cameraId") Long cameraId)  {
+        Result result = new Result();
+        try {
+            String  fileName= cameraConService.startDvrToPlace(cameraId);
+            log.info("service返回值："+fileName);
+            if(null!=fileName) {
+                result.setData(fileName);
+            } else { result.setData("开始录制失败"); }
+        } catch (Exception e) {
+            result.setData(ResultCodeEnum.SYSTEMERROR);
+            log.error("视频上传服务器失败",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "开始录制视频")
+    @RequestMapping(value = "/stopDvrToPlace", method = RequestMethod.GET)
+    public Result stopDvrToPlace(@RequestParam(value = "fileName") String fileName)  {
+        Result result = new Result();
+        try {
+            String path = cameraConService.stopDvrToPlace(fileName);
+            log.info("service返回值："+path);
+            if(null!=path) {
+                result.setData(path);
+            } else { result.setData("结束录制失败"); }
         } catch (Exception e) {
             result.setData(ResultCodeEnum.SYSTEMERROR);
             log.error("视频上传服务器失败",e);

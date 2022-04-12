@@ -22,6 +22,34 @@
         camera_id, channel_num, preset_id, preset_num, record_id, record_ip, identity_manager, identity_code, rtsp_port
     </sql>
 
+    <sql id="Record_File_Column_List">
+        camera_id, up_region_id, file_name, file_path, absolute_file_path, start_time, end_time
+    </sql>
+
+
+    <insert id="insertRecordFile" useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.accessvideo.module.control.entity.RecordFileInfo">
+        INSERT INTO t_record_file
+        (
+            <include refid="Record_File_Column_List"></include>
+        )VALUES(
+        #{cameraId, jdbcType=BIGINT},
+        #{upRegionId, jdbcType=BIGINT},
+        #{fileName, jdbcType=VARCHAR},
+        #{filePath, jdbcType=VARCHAR},
+        #{absoluteFilePath, jdbcType=VARCHAR},
+        #{startTime, jdbcType=TIMESTAMP},
+        #{endTime, jdbcType=TIMESTAMP}
+        )
+    </insert>
+    <update id="updateRecordFile" parameterType="com.yjh.accessvideo.module.control.entity.RecordFileInfo">
+        update t_record_file a <set>
+        <if test="endTime != null">a.end_time = #{endTime},</if>
+        <if test="filePath != null">a.file_path = #{filePath},</if>
+        <if test="absoluteFilePath != null">a.absolute_file_path = #{absoluteFilePath},</if>
+    </set>
+        where a.file_name= #{fileName, jdbcType=VARCHAR}
+    </update>
+
     <select id="selectConInfo" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.control.entity.CameraConInfo">
         SELECT
         a.camera_id,
@@ -39,7 +67,8 @@
         a.infread_port,
         a.camera_manager,
         a.camera_code,
-        a.camera_num
+        a.camera_num,
+        a.up_region_id
         FROM t_camera_info a
         LEFT JOIN t_camera_preset b ON a.camera_id = b.camera_id
         LEFT JOIN t_camera_recorder c ON a.record_id = c.record_id

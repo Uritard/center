@@ -150,10 +150,10 @@ public class TRobotInfoService{
     public List<TRobotInfo> selectByPage(String robotName,String buildingUser,Integer robotFactory,Integer robotType, Integer droneType,String robotSource,Integer isUse,
                                           String address,Integer type, List<Long> regionIdList) {
         List<TRobotInfo> tRobotInfoList = new ArrayList<>();
-        if (type == 1){
-            tRobotInfoList = tRobotInfoDao.selectRobotByPage(robotName,buildingUser,robotFactory,robotType,robotSource,isUse,address,regionIdList);
-        }else {
+        if (type != null && type == 2){
             tRobotInfoList = tRobotInfoDao.selectDroneByPage(robotName,buildingUser,robotFactory,droneType,robotSource,isUse,address,regionIdList);
+        }else {
+            tRobotInfoList = tRobotInfoDao.selectRobotByPage(robotName,buildingUser,robotFactory,robotType,robotSource,isUse,address,regionIdList);
         }
         for (TRobotInfo tRobotInfo : tRobotInfoList){
             redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());

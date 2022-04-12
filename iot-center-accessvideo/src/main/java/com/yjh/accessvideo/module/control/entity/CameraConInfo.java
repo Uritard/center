@@ -1,11 +1,14 @@
 package com.yjh.accessvideo.module.control.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Max;
 import java.io.Serializable;
 
 /**
@@ -67,5 +70,8 @@ public class CameraConInfo implements Serializable {
 
     @ApiModelProperty(value = "红外测温端口")
     private Integer infreadPort;
+
+    @ApiModelProperty(value = "上级区域ID")
+    private Long upRegionId;
 
 }

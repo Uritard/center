@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.TRecordFileInfoDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TRecordFileInfo">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="camera_id" jdbcType="BIGINT" property="cameraId" />
+        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
+        <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+        <result column="file_path" jdbcType="VARCHAR" property="filePath" />
+        <result column="absolute_file_path" jdbcType="VARCHAR" property="absoluteFilePath" />
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+
+    </resultMap>
+
+
+    <sql id="Record_File_Column_List">
+        camera_id, up_region_id, file_name, file_path, absolute_file_path, start_time, end_time
+    </sql>
+
+    <delete id="deleteByPrimaryId">
+        DELETE a FROM
+        t_record_file a
+        WHERE
+	    a.id = #{id, jdbcType=BIGINT}
+    </delete>
+    <select id="selectByPrimaryId" resultType="com.yjh.platform.module.user.entity.TRecordFileInfo">
+        select
+            a.id,
+            a.camera_id,
+            a.up_region_id,
+            a.file_name,
+            a.file_path,
+            a.absolute_file_path,
+            a.start_time,
+            a.end_time
+        from t_record_file a
+        where 1 = 1
+        and a.id = #{id, jdbcType=BIGINT}
+            limit 1
+    </select>
+    <select id="selectByPage" resultType="com.yjh.platform.module.user.entity.TRecordFileInfo">
+        SELECT
+            a.id,
+            a.camera_id,
+            a.up_region_id,
+            b.camera_name as  cameraName,
+            c.region_name as upRegionName,
+            ROUND(TIMESTAMPDIFF(SECOND,a.start_time,a.end_time) / 60,1) AS recordTimeValue,
+            a.start_time,
+            a.end_time,
+            a.file_path,
+            a.file_name
+        FROM
+            t_record_file a
+                LEFT JOIN t_camera_info b ON a.camera_id = b.camera_id
+                LEFT JOIN t_std_region c ON a.up_region_id = c.region_id
+        WHERE 1=1
+        <if test="cameraId != null and cameraId != ''">
+            AND a.camera_id = #{cameraId,jdbcType=VARCHAR}
+        </if>
+        <if test="startTime != null and endTime != null">
+            and a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} AND a.start_time &lt;= #{endTime, jdbcType=TIMESTAMP}
+        </if>
+    </select>
+</mapper>

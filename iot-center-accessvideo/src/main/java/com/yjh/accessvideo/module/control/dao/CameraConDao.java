@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author tt
@@ -27,5 +26,9 @@ public interface CameraConDao {
     RobotConInfo selectRobotConInfo(@Param("robotId") Long robotId);
 
     RecorderConInfo selectByRecordId(@Param(value = "recordId") Long recordId);
+
+    int insertRecordFile(RecordFileInfo recordFileInfo);
+
+    int updateRecordFile(RecordFileInfo recordFileInfo);
 
 }

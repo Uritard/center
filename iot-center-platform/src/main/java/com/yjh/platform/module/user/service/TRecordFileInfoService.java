@@ -1,0 +1,40 @@
+package com.yjh.platform.module.user.service;
+
+import com.yjh.platform.module.user.dao.TRecordFileInfoDao;
+import com.yjh.platform.module.user.entity.TRecordFileInfo;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @author hyh
+ * @since 2022/4/11
+ **/
+@Slf4j
+@Service
+public class TRecordFileInfoService {
+
+    @Resource
+    private TRecordFileInfoDao tRecordFileInfoDao;
+
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteByPrimaryId(Long id) {
+        TRecordFileInfo tRecordFileInfo = tRecordFileInfoDao.selectByPrimaryId(id);
+        String absolutePathUrl = "rm -rf " + tRecordFileInfo.getAbsoluteFilePath();
+        try {
+            Runtime.getRuntime().exec(absolutePathUrl);
+        }catch (Exception e){
+            log.info("录像文件删除失败", e);
+        }
+        return tRecordFileInfoDao.deleteByPrimaryId(id);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<TRecordFileInfo> selectByPage(Long cameraId, String startTime, String endTime) {
+        return tRecordFileInfoDao.selectByPage(cameraId, startTime, endTime);
+    }
+}

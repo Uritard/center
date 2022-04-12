@@ -560,10 +560,10 @@
              and a.up_region_id = #{upRegionId, jdbcType=BIGINT}
          </if>
          <if test="type == 1">
-             and a.robot_type != 1
+             and a.robot_type is not null
          </if>
          <if test="type == 2">
-             and a.drone_type != 1
+             and a.drone_type is not null
          </if>
     </select>
 
@@ -578,10 +578,10 @@
             and b.up_region_id = #{upRegionId, jdbcType=BIGINT}
         </if>
         <if test="type == 1">
-            and b.robot_type != 1
+            and b.robot_type is not null
         </if>
         <if test="type == 2">
-            and b.drone_type != 1
+            and b.drone_type is not null
         </if>
     </select>
 
