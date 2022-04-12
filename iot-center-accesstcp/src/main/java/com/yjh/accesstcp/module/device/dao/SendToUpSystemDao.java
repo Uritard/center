@@ -6,6 +6,7 @@ import com.yjh.accesstcp.module.device.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,4 +22,15 @@ public interface SendToUpSystemDao {
     List<Map<String,Object>> selectTaskInfo();
     List<MaintenanceModel> selectMaintenanceInfo();
     List<Long> selectInstanceId(@Param(value = "taskId") String taskId);
+    HashMap<String,Object> countTask(@Param(value = "startTime")String startTime,
+                                      @Param(value = "endTime")String endTime );
+    HashMap<String,Object> countWarnCheck(@Param(value = "startTime")String startTime,
+                                      @Param(value = "endTime")String endTime );
+    HashMap<String,Object> countWarnAccuracy(@Param(value = "startTime")String startTime,
+                                      @Param(value = "endTime")String endTime );
+    HashMap<String,Object> countInstanceLoss(@Param(value = "startTime")String startTime,
+                                      @Param(value = "endTime")String endTime );
+    HashMap<String,Object> countResultCheck(@Param(value = "startTime")String startTime,
+                                      @Param(value = "endTime")String endTime );
+
 }

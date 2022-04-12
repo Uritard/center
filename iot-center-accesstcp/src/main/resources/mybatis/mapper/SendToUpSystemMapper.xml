@@ -6,6 +6,8 @@
 
     <select id="selectDeviceModel"  resultType="java.util.Map">
         SELECT
+			f.up_region_id as area_id,
+            f.up_region_name as area_name,
         a.instance_id as device_id,
             (CASE WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_id )AND ISNULL( d.preset_name ) THEN ''
              WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_name ) THEN d.preset_name
@@ -22,6 +24,7 @@
 				f.device_name as main_device_name,
 				j.up_dict as device_type,
 				b.mete_type,
+				b.meter_type,
 				b.appearance_type,
 				"" as save_type_list,
 				k.dict_note as recognition_type_list,
@@ -36,8 +39,8 @@
         LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
         LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
         left join t_std_device f on a.device_id = f.device_id and a.custom_id = f.custom_id
-				left join t_dict_business j on f.device_type = j.dict_code
-				left join t_dict_business k on a.cruise_type = k.dict_code
+		left join t_dict_business j on f.device_type = j.dict_code
+		left join t_dict_business k on a.cruise_type = k.dict_code
     </select>
 
 	<select id="selectRobotInfo" resultType="java.util.Map">
@@ -72,8 +75,8 @@
 
 	<select id="selectCameraInfo" resultType="java.util.Map">
 		select
-			a.camera_name as patroldevcie_name,
-			a.camera_id as patroldevcie_code,
+			a.camera_name as patroldevice_name,
+			a.camera_id as patroldevice_code,
 			b.dict_note as device_model,
 			c.dict_note as manufacturer,
 			"" as use_unit,
@@ -87,7 +90,7 @@
 				end) as video_mode,
 			'' as place,
 			'10' as type,
-			'' as patroldevcie_info,
+			'' as patroldevice_info,
 			'' as robots_code
 		from t_camera_info a
 				 left join t_dict_business b on a.camera_model = b.dict_code
@@ -138,4 +141,59 @@
 		from t_device_maintenance
 	</select>
 
+	<select id="countTask" resultType="java.util.HashMap">
+		select
+		count(1) as totalNum,
+		(select count(1) from  t_cruise_task_result where cruise_task_time BETWEEN #{startTime} and #{endTime} and cruise_result = 247) as validNum
+		from t_cruise_task_result
+		where cruise_task_time BETWEEN #{startTime} and #{endTime}
+	</select>
+
+	<select id="countWarnCheck" resultType="java.util.HashMap">
+		SELECT
+			count(1) as totalNum,
+			count(t.deal_type) as validNum
+		FROM
+			(select deal_type,warn_time from t_warn_info
+			    union all(
+				 select deal_type,defect_time warn_time from t_defect_info
+			 )) t
+		where t.warn_time BETWEEN #{startTime} and #{endTime}
+	</select>
+
+	<select id="countWarnAccuracy" resultType="java.util.HashMap">
+		SELECT
+			count(1) as totalNum,
+			sum(if(t.deal_type = 286,1,0)) as validNum
+		FROM
+			(select deal_type,warn_time from t_warn_info where deal_type is not null
+			 union all(
+				 select deal_type,defect_time warn_time from t_defect_info where deal_type is not null
+			 )) t
+		where t.warn_time BETWEEN #{startTime} and #{endTime}
+	</select>
+
+	<select id="countInstanceLoss" resultType="java.util.HashMap">
+		SELECT
+			count( 1 ) AS totalNum,
+			sum( IF ( tcdr.cruise_result = 247, 1, 0 ) ) AS validNum
+		FROM
+			t_cruise_task_result result
+		LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
+		LEFT JOIN t_cruise_data_result tcdr ON detail.cruise_result_id = tcdr.cruise_result_id
+		WHERE
+			result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+	</select>
+
+	<select id="countResultCheck" resultType="java.util.HashMap">
+		SELECT
+			count( 1 ) AS totalNum,
+			count( result.identify_result ) AS validNum
+		FROM
+			t_cruise_data_result result
+		LEFT JOIN t_cruise_task_result_detail detail ON result.cruise_result_id = detail.cruise_result_id
+		AND result.cruise_id = detail.instance_id
+		WHERE
+			detail.cruise_time BETWEEN #{startTime} and #{endTime}
+	</select>
 </mapper>

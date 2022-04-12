@@ -148,6 +148,11 @@ public class SendToUpSystemServices {
 
     public String createDeviceModel(String path) throws Exception{
         List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel();
+        Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:stationName");
+        list.forEach(item->{
+            item.put("station_code",stationCode);
+            item.put("station_name",mapForPath.get("content"));
+        });
         return CreateModeXMLUtil.createXmlFile(list,path,"device_model.xml","Device_Model");
     }
     public String createRobotModel(String path) throws Exception{
@@ -233,7 +238,9 @@ public class SendToUpSystemServices {
             maintenanceMap.put("start_time",item.getStartTime());
             maintenanceMap.put("end_time",item.getEndTime());
             maintenanceMap.put("device_level","3 ");
-            maintenanceMap.put("device_list",item.getDeviceIds().toString().replace("[","").replace("]",""));
+            maintenanceMap.put("device_list",item.getDeviceIds().toString().replace("[","")
+                    .replace("]","")
+                    .replace(" ",""));
             finalList.add(maintenanceMap);
         });
         return CreateModeXMLUtil.createXmlFile(finalList,path,"overhaularea_model.xml","Robot_Model");
@@ -244,8 +251,59 @@ public class SendToUpSystemServices {
     public List<Map<String,Object>> resultStatistical(String cmd,String startTime,String endTime){
         // 1 - 巡视任务执行闭环率 任务执行闭环率=闭环任务数量/执行任务总数*100% 任务正常的判据（自主启停）；断点续传任务认为是闭环任务
         // 2 - 巡视告警人工审核完成率 巡视告警人工审核完成率=（已审核告警数量/告警总数）*100%
-        // 3 - 巡视告警准确率 告警准确率=（已审核未人工修正的告警数量/已审核告警总数）*100%4 - 巡视结果人工审核完成率
+        // 3 - 巡视告警准确率 告警准确率=（已审核未人工修正的告警数量/已审核告警总数）*100%
+        // 4 - 巡视结果人工审核完成率 巡视结果人工审核完成率 =  （已审核巡检结果数量/总巡检结果数量）*100%
         // 5 - 巡视点位漏检率  漏检率=（漏检点位数量/巡视点位总数量）*100%
-        return null;
+        List<Map<String,Object>> resultStatistical = new ArrayList<>();
+        switch (cmd){
+            case "1":
+                resultStatistical.add(countTask(startTime,endTime));
+                break;
+            case "2":
+                resultStatistical.add(countWarnCheck(startTime,endTime));
+                break;
+            case "3":
+                resultStatistical.add(countWarnAccuracy(startTime,endTime));
+                break;
+            case "4":
+                resultStatistical.add(countResultCheck(startTime,endTime));
+                break;
+            case "5":
+                resultStatistical.add(countInstanceLoss(startTime,endTime));
+                break;
+        }
+        return resultStatistical;
     }
+
+    private HashMap<String,Object> dealCount(HashMap<String,Object> countMap){
+        Double totalNum = Double.valueOf(countMap.get("totalNum").toString());
+        Double validNum = Double.valueOf(countMap.get("validNum").toString());
+        String percent =String.format("%.3f",validNum*100/totalNum);
+        HashMap<String,Object> reMap = new HashMap<>();
+        reMap.put("total_num",totalNum);
+        reMap.put("valid_num",validNum);
+        reMap.put("percent",percent+"%");
+        return reMap;
+    }
+    public HashMap<String,Object>countTask(String startTime,String endTime){
+        // 巡视任务闭环率
+        return dealCount(sendToUpSystemDao.countTask(startTime,endTime));
+    }
+    public HashMap<String,Object>countWarnCheck(String startTime,String endTime){
+        // 人工审核完成率
+        return dealCount(sendToUpSystemDao.countWarnCheck(startTime,endTime));
+    }
+    public HashMap<String,Object>countWarnAccuracy(String startTime,String endTime){
+        // 巡视告警准确率
+        return dealCount(sendToUpSystemDao.countWarnAccuracy(startTime,endTime));
+    }
+    public HashMap<String,Object>countInstanceLoss(String startTime,String endTime){
+        // 巡视点位漏检率
+        return dealCount(sendToUpSystemDao.countInstanceLoss(startTime,endTime));
+    }
+    public HashMap<String,Object>countResultCheck(String startTime,String endTime){
+        // 巡视结果人工审核完成率
+        return dealCount(sendToUpSystemDao.countResultCheck(startTime,endTime));
+    }
+
 }

@@ -351,5 +351,9 @@ public class TCameraPresetService {
     public List<Map<String, Long>> selectCameraBySilent(){
         return tCameraPresetDao.selectCameraBySilent();
     }
+
+    public TCameraPreset countKeepWatch(Long cameraId){
+        return tCameraPresetDao.selectKeepWatch(cameraId);
+    }
 }
 

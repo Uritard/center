@@ -20,6 +20,7 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.net.InetSocketAddress;
@@ -629,7 +630,25 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
 
         if ("121".equals(xmlBaseModel.getType())){
             log.info("巡视结果统计查询：{}",xmlBaseModel);
-
+            String startTime="";
+            String endTime="";
+            if(xmlBaseModel.getItems()!=null && xmlBaseModel.getItems().size()>0) {
+                List<Map<String,Object>> itemsList = xmlBaseModel.getItems();
+                for(Map<String, Object> item : itemsList) {
+                    if(item.get("begin_time") != null){
+                        startTime =item.get("begin_time").toString();
+                    }
+                    if(item.get("endTime") != null){
+                        endTime =item.get("endTime").toString();
+                    }
+                }
+            }
+            List<Map<String,Object>> list = sendToUpSystemServices.resultStatistical(xmlBaseModel.getCommand(),startTime,endTime);
+            if(list == null){
+                sendToUpSystemServices.sendResponse("251","3","100",null);
+            }else {
+                sendToUpSystemServices.sendResponse("251","4","200",list);
+            }
         }
 
     }
