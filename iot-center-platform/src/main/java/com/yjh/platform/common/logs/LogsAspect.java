@@ -6,7 +6,6 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.IPUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -26,6 +25,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -76,13 +77,37 @@ public class LogsAspect {
         log.info("ttIp: "+ip);
         Object result = null;
         if (annotation != null) {
+            content.append(annotation.content());
+            params.set("userId", userId);
+            params.set("userName", userName);
+            params.set("requestOrigin", request.getRequestURL());
+            params.set("requestPath", request.getRequestURI());
+            params.set("requestMethod", request.getMethod());
             if(Constant.apiPermissions){
-                try{
-                    if(!"".equals(annotation.authority()) ){
-                        if(! userRole.equals(annotation.authority())){
-                            //todo
-                            Result re= new Result();
-                            re.setCode(209,"此用户无权限");
+                try {
+                    if (!"".equals(annotation.authority())) {
+                        assert userRole != null;
+                        if (!userRole.equals(annotation.authority())) {
+                            //todo 越权访问入日志
+                            params.set("logType", "24");
+                            params.set("ip", ip);
+                            params.set("title", annotation.title());
+                            params.set("state", 3);
+                            Map<String, String> jsonMap = new HashMap<>(8);
+                            jsonMap.put("type", "alarmPopUp");
+                            jsonMap.put("ip", ip);
+                            jsonMap.put("warningInfo", "越权访问告警！！！");
+                            jsonMap.put("userId", userId);
+                            jsonMap.put("logType", "24");
+                            jsonMap.put("userName", userName);
+                            jsonMap.put("title", annotation.title());
+                            jsonMap.put("content", String.valueOf(content));
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
+                            content.append(";用户").append(userName).append("存在越权访问!");
+                            params.set("content", content.toString());
+                            post(params);
+                            Result re = new Result();
+                            re.setCode(209, "此用户无权限");
                             return re;
                         }
                     }
@@ -99,12 +124,6 @@ public class LogsAspect {
                 params.set("ip", ip);
                 params.set("title", annotation.title());
                 params.set("state", 1);
-                content.append(annotation.content());
-                params.set("userId", userId);
-                params.set("userName", userName);
-                params.set("requestOrigin", request.getRequestURL());
-                params.set("requestPath", request.getRequestURI());
-                params.set("requestMethod", request.getMethod());
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }

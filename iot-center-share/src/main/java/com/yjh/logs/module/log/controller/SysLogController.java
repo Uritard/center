@@ -360,6 +360,7 @@ public class SysLogController {
                                @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                @RequestParam(value = "sortFlag", required = false) int sortFlag,
+                               @RequestParam(value = "state", required = false) String state,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
@@ -382,12 +383,12 @@ public class SysLogController {
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             if(sortFlag==1){
-                List<SysLogDetail> list = sysLogService.selectByPageAsc(userName, title, startTime, endTime, logType);
+                List<SysLogDetail> list = sysLogService.selectByPageAsc(userName, title, startTime, endTime, logType, state);
                 resultMap.put("count", page.getTotal());
                 resultMap.put("list", list);
                 result.setData(resultMap);
             }else{
-                List<SysLogDetail> list = sysLogService.selectByPage(userName, title, startTime, endTime, logType);
+                List<SysLogDetail> list = sysLogService.selectByPage(userName, title, startTime, endTime, logType, state);
                 resultMap.put("count", page.getTotal());
                 resultMap.put("list", list);
                 result.setData(resultMap);
@@ -429,8 +430,8 @@ public class SysLogController {
                 //return -1;
             }*/
             result.setData(sysLogService.logAnalyze());
-        } catch (BusinessException e) {
-            result.setMessage(10008, "用户无权限");
+//        } catch (BusinessException e) {
+//            result.setMessage(10008, "用户无权限");
             //log.error("日志统计失败：" + e);
         }catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -489,6 +490,7 @@ public class SysLogController {
                          @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                          @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                          @RequestParam(value = "sortFlag", required = false) int sortFlag,
+                         @RequestParam(value = "state", required = false) String state,
                          @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
                          @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,
                          HttpServletRequest request) {
@@ -506,12 +508,12 @@ public class SysLogController {
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
             if(sortFlag==1){
-                List<SysLogDetail> list = sysLogService.selectByPageAsc(userName, title, startTime, endTime, logType);
+                List<SysLogDetail> list = sysLogService.selectByPageAsc(userName, title, startTime, endTime, logType, state);
                 resultMap.put("count", page.getTotal());
                 resultMap.put("list", list);
                 result.setData(resultMap);
             }else{
-                List<SysLogDetail> list = sysLogService.selectByPage(userName, title, startTime, endTime, logType);
+                List<SysLogDetail> list = sysLogService.selectByPage(userName, title, startTime, endTime, logType, state);
                 resultMap.put("count", page.getTotal());
                 resultMap.put("list", list);
                 result.setData(resultMap);

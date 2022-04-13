@@ -418,20 +418,20 @@ public class TCruiseTaskController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    //@Logs(title = "新增任务",content = "根据用户传递的参数新增数据",logType = 2)
+    @Logs(title = "新增任务",content = "根据用户传递的参数新增数据",logType = 2, authority = "1235")
     public Result taskConfirmation(HttpServletRequest request,@RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
             tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(Constant.apiPermissions) {
-                if (!"1235".equals(userRole)) {
-                    //权限不够；
-                    throw new BusinessException(10008, "用户无权限");
-                    //return -1;
-                }
-            }
+//            if(Constant.apiPermissions) {
+//                if (!"1235".equals(userRole)) {
+//                    //权限不够；
+//                    throw new BusinessException(10008, "用户无权限");
+//                    //return -1;
+//                }
+//            }
             int i = tCruiseTaskService.taskConfirmation(userId,tCruiseTaskAdd.getpCode(),request,tCruiseTaskAdd.getIdentifier());
             if(i == 1){
                 result = this.insert(tCruiseTaskAdd);

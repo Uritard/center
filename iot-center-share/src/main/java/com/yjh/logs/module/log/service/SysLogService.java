@@ -57,8 +57,8 @@ public class SysLogService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysLogDetail> selectByPage(String userName, String title, Date startTime, Date endTime,String logType) {
-        List<SysLogDetail> sysOperateLogList = sysLogDao.selectByPage(userName,title,startTime,endTime,logType);
+    public List<SysLogDetail> selectByPage(String userName, String title, Date startTime, Date endTime,String logType, String state) {
+        List<SysLogDetail> sysOperateLogList = sysLogDao.selectByPage(userName,title,startTime,endTime,logType, state);
         for (SysLogDetail item:sysOperateLogList) {
             String type = item.getLogType();
             if(type != null && !"".equals(type)){
@@ -67,18 +67,18 @@ public class SysLogService {
                     item.setLogType(type);
                 }
             }
-            String state = item.getState();
-            if(state != null && !"".equals(state)){
-                if("1".equals(state)){
-                    state = "成功";
+            String states = item.getState();
+            if(states != null && !"".equals(states)){
+                if("1".equals(states)){
+                    states = "成功";
                 }
-                if("2".equals(state)){
-                    state = "失败";
+                if("2".equals(states)){
+                    states = "失败";
                 }
-                if("3".equals(state)){
-                    state = "失败";
+                if("3".equals(states)){
+                    states = "异常";
                 }
-                item.setState(state);
+                item.setState(states);
             }
         }
         return sysOperateLogList;
@@ -86,8 +86,8 @@ public class SysLogService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<SysLogDetail> selectByPageAsc(String userName, String title, Date startTime, Date endTime,String logType) {
-        List<SysLogDetail> sysOperateLogList = sysLogDao.selectByPageAsc(userName,title,startTime,endTime,logType);
+    public List<SysLogDetail> selectByPageAsc(String userName, String title, Date startTime, Date endTime,String logType, String state) {
+        List<SysLogDetail> sysOperateLogList = sysLogDao.selectByPageAsc(userName,title,startTime,endTime,logType, state);
         for (SysLogDetail item:sysOperateLogList) {
             String type = item.getLogType();
             if(type != null && !"".equals(type)){
@@ -96,18 +96,18 @@ public class SysLogService {
                     item.setLogType(type);
                 }
             }
-            String state = item.getState();
-            if(state != null && !"".equals(state)){
-                if("1".equals(state)){
-                    state = "成功";
+            String states = item.getState();
+            if(states != null && !"".equals(states)){
+                if("1".equals(states)){
+                    states = "成功";
                 }
-                if("2".equals(state)){
-                    state = "失败";
+                if("2".equals(states)){
+                    states = "失败";
                 }
-                if("3".equals(state)){
-                    state = "失败";
+                if("3".equals(states)){
+                    states = "异常";
                 }
-                item.setState(state);
+                item.setState(states);
             }
         }
         return sysOperateLogList;

@@ -163,7 +163,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "分页查询--巡视结果任务查询")
     @GetMapping(value = "/selectTaskByPage")
-   // @Logs(title = "查询巡检任务结果数据",content = "根据用户传递的参数分页查询巡检任务结果信息",logType = 1)
+    @Logs(title = "查询巡检任务结果数据",content = "根据用户传递的参数分页查询巡检任务结果信息",logType = 1, authority = "1235")
     public Result selectTaskByPage(@RequestParam(value = "taskName", required = false) String taskName,
                                    @RequestParam(value = "cState", required = false) Integer cState,
                                    @RequestParam(value = "cType", required = false) Integer cType,
@@ -206,8 +206,8 @@ public class TCruiseResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-        } catch (BusinessException e) {
-            result.setMessage(10008, "用户无权限");
+//        } catch (BusinessException e) {
+//            result.setMessage(10008, "用户无权限");
             //log.error("日志统计失败：" + e);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -316,8 +316,8 @@ public class TCruiseResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
-        }catch (BusinessException e) {
-            result.setMessage(10008, "用户无权限");
+//        }catch (BusinessException e) {
+//            result.setMessage(10008, "用户无权限");
             //log.error("日志统计失败：" + e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

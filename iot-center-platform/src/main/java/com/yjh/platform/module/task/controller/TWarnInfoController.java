@@ -243,8 +243,8 @@ public class TWarnInfoController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-        }catch (BusinessException e) {
-            result.setMessage(10008, "用户无权限");
+//        }catch (BusinessException e) {
+//            result.setMessage(10008, "用户无权限");
             //log.error("日志统计失败：" + e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -437,20 +437,20 @@ public class TWarnInfoController {
 
     @ApiOperation(value = "告警信息计数统计(未核查)")
     @GetMapping(value = "/warnCountsNonIdentify")
-    // @Logs(title = "告警信息计数统计",content = "统计未核查的告警",logType = 1)
+    @Logs(title = "告警信息计数统计",content = "统计未核查的告警",logType = 1, authority = "1235")
     public Result warnCountsNonIdentify(HttpServletRequest request){
         Result result=new Result();
         Map<String,Integer> countResult=new HashMap<>();
         try{
-            String userId = request.getHeader("userId");
-            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
-            if(Constant.apiPermissions) {
-                if (!"1235".equals(userRole)) {
-                    //权限不够；
-                    throw new BusinessException(10008, "用户无权限");
-                    //return -1;
-                }
-            }
+//            String userId = request.getHeader("userId");
+//            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
+//            if(Constant.apiPermissions) {
+//                if (!"1235".equals(userRole)) {
+//                    //权限不够；
+//                    throw new BusinessException(10008, "用户无权限");
+//                    //return -1;
+//                }
+//            }
             countResult.put("count",tWarnInfoService.warnCountsNonIdentify());
             result.setData(countResult);
         }catch (Exception e){

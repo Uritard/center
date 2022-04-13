@@ -269,7 +269,7 @@ public class TCruiseDataResultController {
     }
     @ApiOperation(value = "巡视报表")
     @GetMapping(value = "/selectCruiseDataReport")
-    //  @Logs(title = "巡视报表",content = "根据用户传递的参数查询巡视报表",logType = 1)
+      @Logs(title = "巡视报表",content = "根据用户传递的参数查询巡视报表",logType = 1, authority = "1235")
     public Result selectCruiseDataReport(@RequestParam(value = "cType", required = false) Integer cType,
                                          @RequestParam(value = "meteType", required = false) String meteType,
                                          @RequestParam(value = "meterType", required = false) Integer meterType,
@@ -286,14 +286,14 @@ public class TCruiseDataResultController {
 
         String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userIds,"userName"));
         try {
-            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userIds).get("roleId"));
-            if(Constant.apiPermissions) {
-                if (!"1235".equals(userRole)) {
-                    //权限不够；
-                    throw new BusinessException(10008, "用户无权限");
-                    //return -1;
-                }
-            }
+//            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userIds).get("roleId"));
+//            if(Constant.apiPermissions) {
+//                if (!"1235".equals(userRole)) {
+//                    //权限不够；
+//                    throw new BusinessException(10008, "用户无权限");
+//                    //return -1;
+//                }
+//            }
             if(pageSize==0){
                 MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
                 param.set("logType", "9");
@@ -346,8 +346,8 @@ public class TCruiseDataResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalyzeInfoList);
             result.setData(resultMap);
-        }catch (BusinessException e) {
-            result.setMessage(10008, "用户无权限");
+//        }catch (BusinessException e) {
+//            result.setMessage(10008, "用户无权限");
             //log.error("日志统计失败：" + e);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

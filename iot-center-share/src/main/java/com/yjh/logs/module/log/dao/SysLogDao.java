@@ -37,7 +37,8 @@ public interface SysLogDao {
                                     @Param(value = "title") String title,
                                     @Param(value = "startTime") Date startTime,
                                     @Param(value = "endTime") Date endTime,
-                                    @Param(value = "logType") String logType);
+                                    @Param(value = "logType") String logType,
+                                    @Param(value = "state") String state);
 
     int batchInsert(List<SysLog> list);
     List<LongAnalyseDetail> logAnalyze();
@@ -45,5 +46,6 @@ public interface SysLogDao {
                                     @Param(value = "title") String title,
                                     @Param(value = "startTime") Date startTime,
                                     @Param(value = "endTime") Date endTime,
-                                    @Param(value = "logType") String logType);
+                                    @Param(value = "logType") String logType,
+                                    @Param(value = "state") String state);
 }

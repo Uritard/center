@@ -60,7 +60,7 @@ public class RecordFileThread implements Runnable{
                     String path =  videoPath + fileName;
                     VideoUtil.h264ToMp4(path);
                     RecordFileInfo recordFileInfo = new RecordFileInfo();
-                    recordFileInfo.setFileName(fileName);
+                    recordFileInfo.setFileName(fileName.replace(".h264", ""));
                     recordFileInfo.setEndTime(new Date());
                     recordFileInfo.setFilePath(judge.replace("h264", "mp4"));
                     recordFileInfo.setAbsoluteFilePath(path.replace("h264", "mp4"));

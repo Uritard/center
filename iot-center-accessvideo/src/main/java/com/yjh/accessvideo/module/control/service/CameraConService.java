@@ -1664,7 +1664,7 @@ public class CameraConService {
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
             //生成文件名
             Date date = new Date();
-            String fileName = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").format(date) + ".h264";
+            String fileName = new SimpleDateFormat("yyyyMMddHHmmss").format(date) + ".h264";
             log.info("生成文件名" + fileName);
             //保存文件地址
             String path = videoPath + fileName;
@@ -1685,7 +1685,7 @@ public class CameraConService {
             TaskExecutePool.getInstance().execute(recordFileThread);
             judge = fileName;
             RecordFileInfo recordFileInfo = new RecordFileInfo();
-            recordFileInfo.setFileName(fileName);
+            recordFileInfo.setFileName(fileName.replace(".h264", ""));
             recordFileInfo.setStartTime(date);
             recordFileInfo.setCameraId(cameraId);
             recordFileInfo.setUpRegionId(cameraConInfo.getUpRegionId());
@@ -1713,7 +1713,7 @@ public class CameraConService {
             Runtime.getRuntime().exec(url2);
             judge = savePath + fileName.replace("h264", "mp4");
             RecordFileInfo recordFileInfo = new RecordFileInfo();
-            recordFileInfo.setFileName(fileName);
+            recordFileInfo.setFileName(fileName.replace(".h264", ""));
             recordFileInfo.setEndTime(new Date());
             recordFileInfo.setFilePath(judge);
             recordFileInfo.setAbsoluteFilePath(path.replace("h264", "mp4"));
@@ -2742,7 +2742,7 @@ public class CameraConService {
 
     //@Logs(title = "机器人停止播放", code = "robotStopPlay", content = "机器人相机停止播放")
     @Transactional(rollbackFor = Exception.class)
-    public String robotStopRealPlay(Long robotId, String lightRtmpUrl, String infraredRtmpUrl) {
+    public String robotStopRealPlay(Long robotId) {
 //        String urlStop = "";
 //        String livePath;
 //        String lightCameraId = String.valueOf(robotId)+"9901";
@@ -2798,14 +2798,6 @@ public class CameraConService {
 //        manager.terminate(Long.parseLong(lightCameraId));
 //        String infraredCameraId = String.valueOf(robotId)+"9902";
 //        manager.terminate(Long.parseLong(infraredCameraId));
-        if (lightRtmpUrl.contains("history")){
-            Long lightCameraId = Long.valueOf(StringUtils.substringAfterLast(lightRtmpUrl, "/"));
-            manager.terminate(lightCameraId);
-        }
-        if (infraredRtmpUrl.contains("history")){
-            Long infraredCameraId = Long.valueOf(StringUtils.substringAfterLast(infraredRtmpUrl, "/"));
-            manager.terminate(infraredCameraId);
-        }
         return "stop " + robotId + " preview success!";
     }
 

@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.yjh.gateway.common.Constant;
-import com.yjh.gateway.common.utils.Decode;
-import com.yjh.gateway.common.utils.GPSFormatUtils;
-import com.yjh.gateway.common.utils.IpUtil;
-import com.yjh.gateway.common.utils.MultisMap;
+import com.yjh.gateway.common.utils.*;
 import com.yjh.gateway.commons.restTemplate.LogsAspect;
 import com.yjh.gateway.commons.utils.http.IPUtil;
 import com.yjh.gateway.commons.utils.smUtil.Demo;
@@ -59,6 +56,9 @@ public class zuulFilter extends ZuulFilter {
     private String LOGOUT_GATEWAY_URL;
     @Resource
     private RedisTemplate redisTemplate;
+
+    @Resource
+    private LogsAspect logsAspect;
 
     @Override
     public String filterType() {
@@ -167,22 +167,32 @@ public class zuulFilter extends ZuulFilter {
                         String referer = request.getHeader("Referer") != null ? request.getHeader("Referer") : "";
                         String number=referer.substring(0, referer.indexOf(":"));
                         String orig=origin.substring(origin.lastIndexOf('/') + 1);
+                        Map<String, Object>  paramMap = ParamUtil.getRequestParams(ctx);
+                        log.info("paramMap {}", paramMap);
+                        String userName = "unknown";
+                        if (paramMap != null && paramMap.containsKey("userName")){
+                            userName = String.valueOf(paramMap.get("userName"));
+                        }
                         String ym="yjh.biandian.com";
                         if(orig.contains(":")) {
-                            if (!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':'))) || !IpUtil.getLocalIp().equals(referer.substring(number.length() + 3, referer.lastIndexOf(':')))) {
-                                if (!ym.equals(origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':'))) || !ym.equals(referer.substring(number.length() + 3, referer.lastIndexOf(':')))) {
+                            String originIp = origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':'));
+                            if (!IpUtil.getLocalIp().equals(originIp) || !IpUtil.getLocalIp().equals(referer.substring(number.length() + 3, referer.lastIndexOf(':')))) {
+                                if (!ym.equals(originIp) || !ym.equals(referer.substring(number.length() + 3, referer.lastIndexOf(':')))) {
                                     log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
                                     ctx.setSendZuulResponse(false);
                                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                                    logsAspect.loginLogsSend(request, originIp, "27", "IP地址异常", "IP篡改: " + originIp + ",本机IP: " + IpUtil.getLocalIp() , userName , "0", 2);
                                     return false;
                                 }
                             }
                         }else{
-                            if (!IpUtil.getLocalIp().equals(origin.substring(origin.lastIndexOf('/') + 1)) || !IpUtil.getLocalIp().equals(referer.substring(number.length() + 3, referer.lastIndexOf('/')))) {
-                                if (!ym.equals(origin.substring(origin.lastIndexOf('/') + 1)) || !ym.equals(referer.substring(number.length() + 3, referer.lastIndexOf('/')))) {
-                                    log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
+                            String originIp = origin.substring(origin.lastIndexOf('/') + 1);
+                            if (!IpUtil.getLocalIp().equals(originIp) || !IpUtil.getLocalIp().equals(referer.substring(number.length() + 3, referer.lastIndexOf('/')))) {
+                                if (!ym.equals(originIp) || !ym.equals(referer.substring(number.length() + 3, referer.lastIndexOf('/')))) {
+                                    log.error("IP篡改: " + originIp + " ,之后的ip: " + originIp + ",本机IP: " + IpUtil.getLocalIp());
                                     ctx.setSendZuulResponse(false);
                                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                                    logsAspect.loginLogsSend(request, originIp, "27", "IP地址异常", "IP篡改: " + originIp + ",本机IP: " + IpUtil.getLocalIp() , userName, "0", 2);
                                     return false;
                                 }
                             }

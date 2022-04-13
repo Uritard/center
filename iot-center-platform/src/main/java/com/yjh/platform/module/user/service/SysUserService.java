@@ -78,6 +78,7 @@ public class SysUserService {
         BeanUtils.copyProperties(sysUser, sysUserBackUp);
         sysUserBackUp.setVerfiCode(Demo.summary(map.toString()));
         SysUserBackUpDao.insert(sysUserBackUp);
+        logsRecord.LoginLogsSend(request, "25", "数据备份", userName + "备份了" + sysUser.getUserName() + "用户信息", userName, String.valueOf(userIds), 1);
         logsRecord.LoginLogsSend(request, "17", "新增用户", userName + "用户新增了" + sysUser.getUserName() + "用户", userName, String.valueOf(userIds), 1);
         return total;
     }
@@ -87,14 +88,14 @@ public class SysUserService {
         Long userIds = Long.valueOf(request.getHeader("userId"));
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userIds, "userName"));
         String userNames = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
-        String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
-        if(Constant.apiPermissions) {
-            if (!"1234".equals(userRole)) {
-                //权限不够；
-                throw new BusinessException(10008, "用户无权限");
-                //return -1;
-            }
-        }
+//        String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
+//        if(Constant.apiPermissions) {
+//            if (!"1234".equals(userRole)) {
+//                //权限不够；
+//                throw new BusinessException(10008, "用户无权限");
+//                //return -1;
+//            }
+//        }
         redisTemplate.delete("userInfo:" + userId);
         this.SysUserBackUpDao.deleteByPrimaryId(userId);
         logsRecord.LoginLogsSend(request, "23", "删除用户", userName + "用户删除了" + userNames + "用户", userName, String.valueOf(userId), 1);
@@ -106,13 +107,13 @@ public class SysUserService {
         Long userId = Long.valueOf(request.getHeader("userId"));
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
         String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
-        if(Constant.apiPermissions) {
-            if (!"1234".equals(userRole)) {
-                //权限不够；
-                throw new BusinessException(10008, "用户无权限");
-                //return -1;
-            }
-        }
+//        if(Constant.apiPermissions) {
+//            if (!"1234".equals(userRole)) {
+//                //权限不够；
+//                throw new BusinessException(10008, "用户无权限");
+//                //return -1;
+//            }
+//        }
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(sysUser.getUserId());
         Long roleId = sysUser.getRoleId();
         if (roleId != null) {
@@ -192,6 +193,7 @@ public class SysUserService {
                         sysUsers.setUserId(sysUserLogin.getUserId());
                         sysUserDao.update(sysUsers);
                         logsRecord.LoginLogsSend(request, "6", "登录", "用户信息被篡改", userName, String.valueOf(sysUserLogin.getUserId()), 2);
+                        logsRecord.LoginLogsSend(request, "26", "数据恢复", "恢复了"+ userName +"用户信息", userName, String.valueOf(sysUserLogin.getUserId()), 1);
                     }
                     String appKey = getRandomNickname(10);
                     sysUserLogin.setAppkey(appKey);
@@ -223,7 +225,7 @@ public class SysUserService {
                             if (yxTime >= sysUserLogin.getInvalidTime() - 1 && yxTime < sysUserLogin.getInvalidTime()) {
                                 mapResult.put("pwdExpirationTip", "密码还有一天即将到期，请及时更换密码！");
                             } else if (yxTime >= sysUserLogin.getInvalidTime()) {
-                                logsRecord.LoginLogsSend(request, "6", "登录", userName + "账户密码超期登录失败，请联系管理员处理！", userName, String.valueOf(sysUserLogin.getUserId()), 3);
+                                logsRecord.LoginLogsSend(request, "6", "登录", userName + "账户密码超期登录失败，请联系管理员处理！", userName, String.valueOf(sysUserLogin.getUserId()), 2);
                                 logsRecord.LoginLogsSend(request, "6", "登录", "此用户账户长期未使用", userName, String.valueOf(sysUserLogin.getUserId()), 2);
                                 mapResult.put("errorCount", "密码超期登录失败，请联系管理员处理！");
                                 mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
@@ -272,7 +274,7 @@ public class SysUserService {
                         if (yxTime >= sysUserLogin.getInvalidTime() - 1 && yxTime < sysUserLogin.getInvalidTime()) {
                             mapResult.put("pwdExpirationTip", "密码还有一天即将到期，请及时更换密码！");
                         } else if (yxTime >= sysUserLogin.getInvalidTime()) {
-                            logsRecord.LoginLogsSend(request, "6", "登录", userName + "账户密码超期登录失败，请联系管理员处理！", userName, String.valueOf(sysUserLogin.getUserId()), 3);
+                            logsRecord.LoginLogsSend(request, "6", "登录", userName + "账户密码超期登录失败，请联系管理员处理！", userName, String.valueOf(sysUserLogin.getUserId()), 2);
                             logsRecord.LoginLogsSend(request, "6", "登录", "此用户账户长期未使用", userName, String.valueOf(sysUserLogin.getUserId()), 2);
                             mapResult.put("errorCount", "密码超期登录失败，请联系管理员处理！");
                             mapResult.put("code", ResultCodeEnum.CODE10108.getCode());

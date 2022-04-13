@@ -152,6 +152,18 @@ public class NumToStringUtil {
         if("23".equals(str)){
             return "删除用户";
         }
+        if("24".equals(str)){
+            return "越权访问";
+        }
+        if("25".equals(str)){
+            return "数据备份";
+        }
+        if("26".equals(str)){
+            return "数据恢复";
+        }
+        if("27".equals(str)){
+            return "IP地址异常";
+        }
         return null;
     }
 

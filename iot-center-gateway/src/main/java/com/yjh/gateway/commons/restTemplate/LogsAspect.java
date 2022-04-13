@@ -12,6 +12,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -26,6 +27,8 @@ public class LogsAspect {
 
     private static final String LOG_URL = "http://iot-center-platform/sysUser/v1/logoutGateway";
 
+    private static final String ADD_LOG = "http://iot-center-share/sysLog/v1/add";
+
 
     @LoadBalanced
     @Bean(name = "serviceRestTemplate")
@@ -37,13 +40,28 @@ public class LogsAspect {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
-                System.out.println("platformLogAdd...");
-                serviceRestTemplate.postForObject(LOG_URL, params, String.class);
+                System.out.println("gateWayLogAdd...");
+                serviceRestTemplate.postForObject(ADD_LOG, params, String.class);
             }
         } catch (Exception e) {
            e.printStackTrace();
         }
     }
 
+    public void loginLogsSend(HttpServletRequest request,String ip, String type, String title, String content, String userName, String userIds, Integer state){
+        MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+        param.set("logType", type);
+        param.set("ip", ip);
+        param.set("title", title);
+        param.set("state", state);
+        param.set("userId", userIds);
+        param.set("userName", userName);
+        param.set("requestOrigin", request.getRequestURL());
+        param.set("requestPath", request.getRequestURI());
+        param.set("requestMethod", request.getMethod());
+        param.set("content", content);
+        LogsAspect logsAspects = new LogsAspect();
+        logsAspects.post(param);
+    }
 
 }

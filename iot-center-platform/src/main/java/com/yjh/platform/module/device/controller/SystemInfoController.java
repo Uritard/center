@@ -1,6 +1,7 @@
 package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -45,6 +46,7 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取内存信息")
     @RequestMapping(value = "/getMemory", method = RequestMethod.GET)
+    @Logs(title = "查询内存信息",content = "根据用户传递的参数查询内存信息",logType = 1,authority = "1234")
     public Result getMemory(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -72,6 +74,7 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取cpu信息")
     @RequestMapping(value = "/getCPU", method = RequestMethod.GET)
+    @Logs(title = "查询cpu信息",content = "根据用户传递的参数查询cpu信息",logType = 1,authority = "1234")
     public Result getCPU(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -99,6 +102,7 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取磁盘信息")
     @RequestMapping(value = "/getDisk", method = RequestMethod.GET)
+    @Logs(title = "查询磁盘信息",content = "根据用户传递的参数查询磁盘信息",logType = 1,authority = "1234")
     public Result getDisk(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -124,6 +128,7 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取cpu利用率")
     @RequestMapping(value = "/getCpuOnUse", method = RequestMethod.GET)
+    @Logs(title = "查询cpu利用率",content = "根据用户传递的参数查询cpu利用率",logType = 1,authority = "1234")
     public Result getCpuOnUse(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -151,6 +156,7 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取硬盘利用率")
     @RequestMapping(value = "/getDiskOnUse", method = RequestMethod.GET)
+    @Logs(title = "查询硬盘利用率",content = "根据用户传递的参数查询硬盘利用率",logType = 1,authority = "1234")
     public Result getDiskOnUse(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -178,6 +184,7 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取关键服务")
     @RequestMapping(value = "/getServices", method = RequestMethod.GET)
+    @Logs(title = "查询关键服务",content = "根据用户传递的参数查询关键服务",logType = 1,authority = "1234")
     public Result getServices() {
         Result result = new Result();
         try {
@@ -193,6 +200,7 @@ public class SystemInfoController {
 
     @ApiOperation(value = "获取NVR信息")
     @RequestMapping(value = "/getNVRInfo", method = RequestMethod.GET)
+    @Logs(title = "查询NVR信息",content = "根据用户传递的参数查询NVR信息",logType = 1,authority = "1234")
     public Result getNVRInfo() {
         Result result = new Result();
         try {

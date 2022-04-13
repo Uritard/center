@@ -93,7 +93,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表删除")
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-   // @Logs(title = "删除系统用户数据", content = "根据用户传递的参数删除系统用户数据", logType = 4)
+    @Logs(title = "删除系统用户数据", content = "根据用户传递的参数删除系统用户数据", logType = 4, authority = "1234")
     public Result delete(@RequestParam(value = "userId", required = true) Long userId,HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -114,7 +114,7 @@ public class SysUserController {
 
     @ApiOperation(value = "系统用户表更新")
     @RequestMapping(value = "/update", method = RequestMethod.PUT)
-   // @Logs(title = "修改系统用户数据", content = "根据用户传递的参数修改系统用户数据", logType = 3)
+    @Logs(title = "修改系统用户数据", content = "根据用户传递的参数修改系统用户数据", logType = 3, authority = "1234")
     public Result update(@Validated @RequestBody SysUser sysUser, HttpServletRequest request) {
         Result result = new Result();
         try {

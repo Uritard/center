@@ -191,12 +191,10 @@ public class CameraConController {
 
     @ApiOperation(value = "机器人相机停止播放")
     @RequestMapping(value = "/robotStopRealPlay", method = RequestMethod.GET)
-    public Result robotStopRealPlay(@RequestParam(value = "robotId") Long robotId,
-                                    @RequestParam(value = "lightRtmpUrl") String lightRtmpUrl,
-                                    @RequestParam(value = "infraredRtmpUrl") String infraredRtmpUrl) {
+    public Result robotStopRealPlay(@RequestParam(value = "robotId") Long robotId) {
         Result result = new Result();
         try {
-            result.setData(cameraConService.robotStopRealPlay(robotId, lightRtmpUrl, infraredRtmpUrl));
+            result.setData(cameraConService.robotStopRealPlay(robotId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -539,7 +537,7 @@ public class CameraConController {
         return result;
     }
 
-    @ApiOperation(value = "开始录制视频")
+    @ApiOperation(value = "结束录制视频")
     @RequestMapping(value = "/stopDvrToPlace", method = RequestMethod.GET)
     public Result stopDvrToPlace(@RequestParam(value = "fileName") String fileName)  {
         Result result = new Result();
