@@ -1029,7 +1029,9 @@ public interface HCNetSDK extends Library {
         public byte[] sIpV4 = new byte[16];
         public byte[] byRes = new byte[128];
 
-
+        public String toString() {
+            return new String(sIpV4).trim();
+        }
     }
 
 

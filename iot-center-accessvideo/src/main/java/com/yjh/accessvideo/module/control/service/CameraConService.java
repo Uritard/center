@@ -7,6 +7,7 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
+import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.commons.utils.VideoUtil;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.hik.HCNetSDK;
@@ -17,6 +18,7 @@ import com.yjh.accessvideo.thread.TaskExecutePool;
 import com.yjh.accessvideo.threads.RecordFileThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1145,7 +1147,7 @@ public class CameraConService {
             channleStatusMap.put("freeTotal", String.valueOf(hardFreeTotal));
             HCNetSDK.NET_DVR_DEVICEINFO_V40 device = Constant.deviceMaps.get(recordId);
             // 查询通道信息
-            List<Map<String, Object>> chanInfo = getNVRIpparaCfg(recordId, lUserIDLong, iChanNumTem);
+            List<Map<String, Object>> chanInfo = getNVRIpparaCfg(recordId, lUserIDLong, iChanNumTem, new HCNetSDK.NET_DVR_TIME(), new HCNetSDK.NET_DVR_TIME());
             channleStatusMap.put("channel", chanInfo);
             channleStatusMap.put("status", "在线");
             return channleStatusMap;
@@ -1155,8 +1157,35 @@ public class CameraConService {
         return channleStatusMap;
     }
 
+    public List<Map<String, Object>> getNVRIpparaCfg(Long recordId, String startTime, String stopTime) {
+        List<Map<String, Object>> retList = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>();
+        Integer lUserIDLong = Constant.maps.get(String.valueOf(recordId));
+        if (Objects.nonNull(lUserIDLong)){
+            HCNetSDK.NET_DVR_TIME stTime = new HCNetSDK.NET_DVR_TIME();
+            HCNetSDK.NET_DVR_TIME edTime = new HCNetSDK.NET_DVR_TIME();
 
-    public List<Map<String, Object>> getNVRIpparaCfg(Long recordId, NativeLong lUserIDLong, NativeLong iChanNumTem) {
+            if (StringUtils.isNotEmpty(startTime)) {
+                Date d = DateTimeUtil.parse(startTime);
+                date2DvrTime(d, stTime);
+            }
+            if (StringUtils.isNotEmpty(stopTime)) {
+                Date d = DateTimeUtil.parse(stopTime);
+                date2DvrTime(d, edTime);
+            }
+
+            retList = getNVRIpparaCfg(recordId, new NativeLong(lUserIDLong), new NativeLong(0), stTime, edTime);
+        }
+        if (retList.isEmpty()) {
+            map.put("errorMessage", "录像机不在线");
+            retList.add(map);
+        }
+        return retList;
+    }
+        /**
+         * startTime 和 stopTime 不能为 null，至少要 new HCNetSDK.NET_DVR_TIME()
+         */
+    public List<Map<String, Object>> getNVRIpparaCfg(Long recordId, NativeLong lUserIDLong, NativeLong iChanNumTem, HCNetSDK.NET_DVR_TIME startTime, HCNetSDK.NET_DVR_TIME stopTime) {
 
         IntByReference ibrBytesReturned = new IntByReference(0);
         HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG();
@@ -1166,7 +1195,10 @@ public class CameraConService {
         List<Map<String, Object>> channelInfoList = new ArrayList<>();
         if(cfg) {
             m_strIpparaCfg.read();
+            // 通道信息
             HCNetSDK.NET_DVR_IPCHANINFO[] ipChans = m_strIpparaCfg.struIPChanInfo;
+            // 设备信息
+            HCNetSDK.NET_DVR_IPDEVINFO[] ipDevs = m_strIpparaCfg.struIPDevInfo;
             // ipChanNum = m_strIpparaCfg.dwDChanNum;
             // ipChanStart = m_strIpparaCfg.dwStartDChan;
             HCNetSDK.NET_DVR_DEVICEINFO_V40 device = Constant.deviceMaps.get(recordId);
@@ -1187,40 +1219,25 @@ public class CameraConService {
                 NativeLong ipChan = new NativeLong(i + chanStart);
                 Map<String, Object> chanInfoMap = new LinkedHashMap<>();
                 chanInfoMap.put("ipChanNum", i + 1);
+                chanInfoMap.put("enable", ipChans[i].byEnable);
+                chanInfoMap.put("ipAddr", ipDevs[i].struIP.toString());
 
-                List<String[]> recordschedList = recordCfg(lUserIDLong, ipChan);
+                // 录像计划和通道名称
+                MutablePair<String, List<String[]>> nameAndPlan = recordCfg(lUserIDLong, ipChan);
+                chanInfoMap.put("chanName", nameAndPlan.getLeft());
+                List<String[]> recordschedList = nameAndPlan.getRight();
                 chanInfoMap.put("recordPlan", recordschedList);
 
                 long timeRecord = 0L;
+                long timeDefect = 0L;
                 int[] intact = new int[3];
 
-                // 查询通道录像起止时间
-                HCNetSDK.NET_DVR_RECORD_TIME_SPAN_INQUIRY timeSpanInquiry = new HCNetSDK.NET_DVR_RECORD_TIME_SPAN_INQUIRY();
-                timeSpanInquiry.byType = 0;
-                HCNetSDK.NET_DVR_RECORD_TIME_SPAN lpResult = new HCNetSDK.NET_DVR_RECORD_TIME_SPAN();
-                timeSpanInquiry.write();
-                if(hCNetSDK.NET_DVR_InquiryRecordTimeSpan(lUserIDLong, ipChan.intValue(), timeSpanInquiry, lpResult)) {
-                    lpResult.read();
-                    log.info("通道录像起止时间, beginTime: {}, endTime: {}", lpResult.strBeginTime.toStringTime(), lpResult.strEndTime.toStringTime());
-                    fileCond.struStartTime = lpResult.strBeginTime;
-                    fileCond.struStopTime = lpResult.strEndTime;
-                } else {
-                    log.info("通道录像起止时间查询失败，使用默认时间, error: {}", hCNetSDK.NET_DVR_GetLastError());
-                    Calendar cal = Calendar.getInstance();
-                    fileCond.struStopTime.dwYear = cal.get(Calendar.YEAR);
-                    fileCond.struStopTime.dwMonth = cal.get(Calendar.MONTH) +  1;
-                    fileCond.struStopTime.dwDay = cal.get(Calendar.DAY_OF_MONTH);
-                    fileCond.struStopTime.dwHour = 23;
-                    fileCond.struStopTime.dwMinute = 59;
-                    fileCond.struStopTime.dwSecond = 59;
-                    // 三天前
-                    cal.add(Calendar.DAY_OF_MONTH, -3);
-                    fileCond.struStartTime.dwYear = cal.get(Calendar.YEAR);
-                    fileCond.struStartTime.dwMonth = cal.get(Calendar.MONTH) +  1;
-                    fileCond.struStartTime.dwDay = cal.get(Calendar.DAY_OF_MONTH);
-                }
+                // 处理开始结束时间
+                recordTimeSpan(startTime, stopTime, ipChan.intValue(), lUserIDLong);
                 // 设置通道号，开始/结束时间
                 fileCond.lChannel = ipChan;
+                fileCond.struStartTime = startTime;
+                fileCond.struStopTime = stopTime;
                 log.info("NVR file find start, channel: {}, beginTime: {}, endTime: {}", ipChan, fileCond.struStartTime.toStringTime(),
                     fileCond.struStopTime.toStringTime());
                 // 查询文件
@@ -1229,20 +1246,26 @@ public class CameraConService {
                 // 迭代查询所有文件
                 NativeLong lNext;
                 HCNetSDK.NET_DVR_TIME preEndTime = null;
+                long preStopTime = 0L;
                 while(true) {
                     lNext = hCNetSDK.NET_DVR_FindNextFile_V40(lFindFile, strFile);
                     if(lNext.longValue() == HCNetSDK.NET_DVR_FILE_SUCCESS) {
 
-                        long startTime = dvrTime2Timestamp(strFile.struStartTime);
-                        long stopTime = dvrTime2Timestamp(strFile.struStopTime);
-                        long speed = stopTime - startTime;
+                        long stTime = dvrTime2Timestamp(strFile.struStartTime);
+                        long spTime = dvrTime2Timestamp(strFile.struStopTime);
+                        long speed = spTime - stTime;
                         // 计算录像时长
                         timeRecord += speed;
                         log.info("找到文件, channel: {}, fileName: {}, time: [{}  {}]", ipChan.intValue(), new String(strFile.sFileName).trim(),
                             strFile.struStartTime.toStringTime(), strFile.struStopTime.toStringTime());
-                        // 录像完整性校验
+                        // 录像完整性视频段校验
                         recordCheck2(recordschedList, intact, strFile.struStartTime, preEndTime);
+
+                        // 录像完整性时间校验
+                        long def = (preStopTime > 0 && stTime > preStopTime) ? (stTime - preStopTime) : 0L;
+                        timeDefect += def;
                         preEndTime = newDvrTime(strFile.struStopTime);
+                        preStopTime = spTime;
                     } else if(lNext.longValue() == HCNetSDK.NET_DVR_FILE_NOFIND){
                         log.info("没有找到文件, channel: {}！", ipChan.intValue());
                         break;
@@ -1252,22 +1275,14 @@ public class CameraConService {
                         break;
                     }
                 }
-                int iTemp;
-                String sTemp;
-                long ms = 60 * 1000L;
-                long hm = 60 * 60 * 1000L;
-                if (timeRecord < ms) {
-                    iTemp = (int)(timeRecord / ms);
-                    sTemp = iTemp + "m ";
-                    iTemp = (int)((timeRecord % ms) / 1000);
-                    sTemp += iTemp + "s";
-                } else {
-                    iTemp = (int)(timeRecord / hm);
-                    sTemp = iTemp + "h ";
-                    iTemp = (int)((timeRecord % hm) / ms);
-                    sTemp += iTemp + "m";
-                }
+                String sTemp = timeStr(timeRecord);
                 chanInfoMap.put("recordTime", sTemp);
+                int intactTime = 10000;
+                if(timeRecord > 0L && timeDefect > 0L){
+                    intactTime = (int)((timeRecord * 10000)/(timeDefect + timeRecord));
+                }
+                chanInfoMap.put("intactTime", intactTime);
+                chanInfoMap.put("defectTime", timeStr(timeDefect));
 
                 if(intact[0] > 0){
                     intact[2] = (intact[0] * 10000)/(intact[0] + intact[1]);
@@ -1284,10 +1299,53 @@ public class CameraConService {
         return channelInfoList;
     }
 
+    public void recordTimeSpan(HCNetSDK.NET_DVR_TIME startTime, HCNetSDK.NET_DVR_TIME stopTime, int ipChan, NativeLong lUserIDLong) {
+        // 设置默认时间
+        if(startTime.dwYear == 0 || stopTime.dwYear == 0){
+            // 查询通道录像起止时间
+            HCNetSDK.NET_DVR_RECORD_TIME_SPAN_INQUIRY timeSpanInquiry = new HCNetSDK.NET_DVR_RECORD_TIME_SPAN_INQUIRY();
+            timeSpanInquiry.byType = 0;
+            HCNetSDK.NET_DVR_RECORD_TIME_SPAN lpResult = new HCNetSDK.NET_DVR_RECORD_TIME_SPAN();
+            // timeSpanInquiry.write();
+            if(hCNetSDK.NET_DVR_InquiryRecordTimeSpan(lUserIDLong, ipChan, timeSpanInquiry, lpResult)) {
+                lpResult.read();
+                log.info("通道录像起止时间, beginTime: {}, endTime: {}", lpResult.strBeginTime.toStringTime(), lpResult.strEndTime.toStringTime());
+                startTime.dwYear = lpResult.strBeginTime.dwYear;
+                startTime.dwMonth = lpResult.strBeginTime.dwMonth;
+                startTime.dwDay = lpResult.strBeginTime.dwDay;
+                startTime.dwHour = lpResult.strBeginTime.dwHour;
+                startTime.dwMinute = lpResult.strBeginTime.dwMinute;
+                startTime.dwSecond = lpResult.strBeginTime.dwSecond;
+
+                stopTime.dwYear = lpResult.strEndTime.dwYear;
+                stopTime.dwMonth = lpResult.strEndTime.dwMonth;
+                stopTime.dwDay = lpResult.strEndTime.dwDay;
+                stopTime.dwHour = lpResult.strEndTime.dwHour;
+                stopTime.dwMinute = lpResult.strEndTime.dwMinute;
+                stopTime.dwSecond = lpResult.strEndTime.dwSecond;
+            } else {
+                log.info("通道录像起止时间查询失败，使用默认时间, error: {}", hCNetSDK.NET_DVR_GetLastError());
+                Calendar cal = Calendar.getInstance();
+                stopTime.dwYear = cal.get(Calendar.YEAR);
+                stopTime.dwMonth = cal.get(Calendar.MONTH) +  1;
+                stopTime.dwDay = cal.get(Calendar.DAY_OF_MONTH);
+                stopTime.dwHour = 23;
+                stopTime.dwMinute = 59;
+                stopTime.dwSecond = 59;
+                // 7天前
+                cal.add(Calendar.DAY_OF_MONTH, -7);
+                startTime.dwYear = cal.get(Calendar.YEAR);
+                startTime.dwMonth = cal.get(Calendar.MONTH) +  1;
+                startTime.dwDay = cal.get(Calendar.DAY_OF_MONTH);
+            }
+        }
+
+    }
+
     /**
      * 录像计划
      */
-    public List<String[]> recordCfg(NativeLong lUserIDLong, NativeLong lChannel) {
+    public MutablePair<String, List<String[]>> recordCfg(NativeLong lUserIDLong, NativeLong lChannel) {
 
         IntByReference ibrBytesReturned = new IntByReference(0);
         HCNetSDK.NET_DVR_RECORD_V30 m_dvrRecord = new HCNetSDK.NET_DVR_RECORD_V30();
@@ -1324,7 +1382,28 @@ public class CameraConService {
             int iErr = hCNetSDK.NET_DVR_GetLastError();
             log.error("get NET_DVR_GetDVRConfig[录像计划] status fail, error code: {}", iErr);
         }
-        return recordschedList;
+
+        IntByReference ibrBytesReturned2 = new IntByReference(0);
+        HCNetSDK.NET_DVR_PICCFG_V30 m_dvrRecord2 = new HCNetSDK.NET_DVR_PICCFG_V30();
+        m_dvrRecord2.write();
+        Pointer lpPicConfig2 = m_dvrRecord2.getPointer();
+        cfg = hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_PICCFG_V30, lChannel, lpPicConfig2, m_dvrRecord2.size(), ibrBytesReturned2);
+        String sChanName;
+        if(cfg) {
+            m_dvrRecord2.read();
+            try {
+                sChanName = new String(m_dvrRecord2.sChanName, "GB2312").trim();
+            } catch (UnsupportedEncodingException e) {
+                sChanName = "IPCamera" + lChannel.intValue();
+            }
+
+        } else {
+            sChanName = "IPCamera" + lChannel.intValue();
+            int iErr = hCNetSDK.NET_DVR_GetLastError();
+            log.error("get NET_DVR_GetDVRConfig[录像计划] status fail, error code: {}", iErr);
+        }
+
+        return MutablePair.of(sChanName, recordschedList);
     }
 
     public void recordCheck2(List<String[]> recordschedList, int[] intact, HCNetSDK.NET_DVR_TIME struStartTime, HCNetSDK.NET_DVR_TIME preEndTime) {
@@ -1421,6 +1500,7 @@ public class CameraConService {
 
     public long dvrTime2Timestamp(HCNetSDK.NET_DVR_TIME struTime){
         Calendar date = Calendar.getInstance();
+        date.set(Calendar.MILLISECOND, 0);
         date.set(struTime.dwYear, struTime.dwMonth, struTime.dwDay, struTime.dwHour, struTime.dwMinute, struTime.dwSecond);
         return date.getTimeInMillis();
     }
@@ -1429,6 +1509,48 @@ public class CameraConService {
         Calendar date = Calendar.getInstance();
         date.set(struTime.dwYear, struTime.dwMonth, struTime.dwDay, struTime.dwHour, struTime.dwMinute, struTime.dwSecond);
         return date;
+    }
+
+    public void date2DvrTime(Date date, HCNetSDK.NET_DVR_TIME struTime){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        struTime.dwYear = cal.get(Calendar.YEAR);
+        struTime.dwMonth = cal.get(Calendar.MONTH) +  1;
+        struTime.dwDay = cal.get(Calendar.DAY_OF_MONTH);
+        struTime.dwHour = cal.get(Calendar.HOUR_OF_DAY);
+        struTime.dwMinute = cal.get(Calendar.MINUTE);
+        struTime.dwSecond = cal.get(Calendar.SECOND);
+    }
+
+    public String timeStr(long time){
+        if (time < 1000L){
+            return "0s";
+        }
+        int iTemp;
+        String sTemp;
+        long ms = 60 * 1000L;
+        long hm = 60 * 60 * 1000L;
+        long dh = 24 * 60 * 60 * 1000L;
+        if (time < hm) {
+            iTemp = (int)(time / ms);
+            sTemp = iTemp + "m ";
+            iTemp = (int)((time % ms) / 1000);
+            sTemp += iTemp + "s";
+        } else if (time < dh) {
+            iTemp = (int)(time / hm);
+            sTemp = iTemp + "h ";
+            iTemp = (int)((time % hm) / ms);
+            sTemp += iTemp + "m";
+        } else {
+            iTemp = (int)(time / dh);
+            sTemp = iTemp + "d ";
+            iTemp = (int)((time % dh) / hm);
+            sTemp += iTemp + "h ";
+            iTemp = (int)((time % hm) / ms);
+            sTemp += iTemp + "m";
+        }
+        return sTemp;
     }
 
     public HCNetSDK.NET_DVR_TIME newDvrTime(HCNetSDK.NET_DVR_TIME struTime){
@@ -2806,4 +2928,26 @@ public class CameraConService {
 //        return list;
 //    }
 
+    public static void main(String[] args) {
+        CameraConService service = new CameraConService();
+        long time1 = 36 * 1000 + 198;
+        String s1 = service.timeStr(time1);
+        System.out.println(s1);
+
+        time1 = 1000 * 18 * 60 + 1000*60*52 + 198;
+        s1 = service.timeStr(time1);
+        System.out.println(s1);
+
+        time1 = 1000 * 60 * 60 * 14 + 1000*60*52 + 198;
+        s1 = service.timeStr(time1);
+        System.out.println(s1);
+
+        time1 = 1000 * 60 * 60 * 64 + 1000*60*36 + 198;
+        s1 = service.timeStr(time1);
+        System.out.println(s1);
+
+        time1 = 1000 * 60 * 60 * 24 * 9 + 1000*60*52 + 198;
+        s1 = service.timeStr(time1);
+        System.out.println(s1);
+    }
 }

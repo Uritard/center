@@ -55,13 +55,12 @@ public class CameraConV2Controller {
     }
 
     @RequestMapping(value = "/getNVRChannelInfo", method = RequestMethod.GET)
-    public Result getNVRChannelInfo(@RequestParam(value = "recordId") Long recordId, @RequestParam(value = "startChan") int startChan,
-        @RequestParam(value = "chanNum") int chanNum) {
+    public Result getNVRChannelInfo(@RequestParam(value = "recordId") Long recordId,
+        @RequestParam(value = "startTime", required = false) String startTime,
+        @RequestParam(value = "endTime", required = false) String endTime) {
         Result result = new Result();
         try {
-
-            int lUserIDLong = Constant.maps.get(String.valueOf(recordId));
-            result.setData(cameraConService.getNVRIpparaCfg(recordId, new NativeLong(lUserIDLong), new NativeLong(0)));
+            result.setData(cameraConService.getNVRIpparaCfg(recordId, startTime, endTime));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
