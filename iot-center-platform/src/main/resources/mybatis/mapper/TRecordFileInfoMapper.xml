@@ -58,11 +58,13 @@
                 LEFT JOIN t_camera_info b ON a.camera_id = b.camera_id
                 LEFT JOIN t_std_region c ON a.up_region_id = c.region_id
         WHERE 1=1
+        and a.end_time is not null
         <if test="cameraId != null and cameraId != ''">
             AND a.camera_id = #{cameraId,jdbcType=VARCHAR}
         </if>
         <if test="startTime != null and endTime != null">
             and a.start_time &gt;= #{startTime, jdbcType=TIMESTAMP} AND a.start_time &lt;= #{endTime, jdbcType=TIMESTAMP}
         </if>
+        ORDER BY a.start_time DESC
     </select>
 </mapper>

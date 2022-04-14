@@ -369,7 +369,7 @@ public class TCruisePointInstanceService{
 //                                tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
 //                            }
                         }
-                        if(cruiseType == 228){//机器人
+                        if(cruiseType == 228 || cruiseType == 524){//机器人或无人机
 //                            TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
                             TRobotInspectionTmp tRobotInspection = tRobotInspectionDao.selectTRobotInspectionTmp(id);
                             tCruisePointInstance.setCruiseId(id);
@@ -399,7 +399,7 @@ public class TCruisePointInstanceService{
 //                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
 //                        }
                     }
-                    if(cruiseType == 228){//机器人
+                    if(cruiseType == 228 || cruiseType == 524){//机器人或无人机
 //                      TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
                         TRobotInspectionTmp tRobotInspection = tRobotInspectionDao.selectTRobotInspectionTmp(id);
                         tCruisePointInstance.setCruiseId(id);

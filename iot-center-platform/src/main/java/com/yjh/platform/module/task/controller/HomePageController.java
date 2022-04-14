@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -270,6 +271,7 @@ public class HomePageController {
      */
     @ApiOperation(value = "查询环境设备告警数据")
     @RequestMapping(value = "/queryEnvWarning", method = RequestMethod.POST)
+    @Logs(title = "查询环境设备告警数据",content = "根据用户传递的参数查询环境设备告警数据",logType = 1, authority = "1235")
     public Result envWarningQuery (@RequestBody JSONObject obj){
         log.info( "查询环境设备告警");
         Result result = new Result();
@@ -294,6 +296,7 @@ public class HomePageController {
      */
     @ApiOperation(value = "查询微气象数据信息")
     @RequestMapping(value = "/queryWeatherInfo", method = RequestMethod.POST)
+    @Logs(title = "查询微气象数据信息",content = "根据用户传递的参数查询微气象数据信息",logType = 1, authority = "1235")
     public Result queryWeatherInfo(@RequestBody JSONObject object){
         Long regionId = object.getLong("regionId");
         Result result = new Result();

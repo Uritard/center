@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.service;
 import com.yjh.platform.module.user.dao.TRecordFileInfoDao;
 import com.yjh.platform.module.user.entity.TRecordFileInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +25,13 @@ public class TRecordFileInfoService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(Long id) {
         TRecordFileInfo tRecordFileInfo = tRecordFileInfoDao.selectByPrimaryId(id);
-        String absolutePathUrl = "rm -rf " + tRecordFileInfo.getAbsoluteFilePath();
-        try {
-            Runtime.getRuntime().exec(absolutePathUrl);
-        }catch (Exception e){
-            log.info("录像文件删除失败", e);
+        if (StringUtils.isNotEmpty(tRecordFileInfo.getAbsoluteFilePath())){
+            String absolutePathUrl = "rm -rf " + tRecordFileInfo.getAbsoluteFilePath();
+            try {
+                Runtime.getRuntime().exec(absolutePathUrl);
+            }catch (Exception e){
+                log.info("录像文件删除失败", e);
+            }
         }
         return tRecordFileInfoDao.deleteByPrimaryId(id);
     }

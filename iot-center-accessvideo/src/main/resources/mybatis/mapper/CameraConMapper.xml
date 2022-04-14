@@ -43,9 +43,9 @@
     </insert>
     <update id="updateRecordFile" parameterType="com.yjh.accessvideo.module.control.entity.RecordFileInfo">
         update t_record_file a <set>
-        <if test="endTime != null">a.end_time = #{endTime},</if>
-        <if test="filePath != null">a.file_path = #{filePath},</if>
-        <if test="absoluteFilePath != null">a.absolute_file_path = #{absoluteFilePath},</if>
+        <if test="endTime != null">a.end_time = #{endTime, jdbcType=TIMESTAMP},</if>
+        <if test="filePath != null">a.file_path = #{filePath, jdbcType=VARCHAR},</if>
+        <if test="absoluteFilePath != null">a.absolute_file_path = #{absoluteFilePath, jdbcType=VARCHAR},</if>
     </set>
         where a.file_name= #{fileName, jdbcType=VARCHAR}
     </update>

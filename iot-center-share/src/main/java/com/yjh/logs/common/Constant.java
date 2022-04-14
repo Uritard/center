@@ -1,5 +1,22 @@
 package com.yjh.logs.common;
 
+import com.alibaba.fastjson.JSON;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 public class Constant {
 
     public static final String USER_COUNT = "statistics:userCount";
@@ -54,4 +71,35 @@ public class Constant {
 
     public static final String WEB_SCOKET = "http://192.168.9.40:18711/tCruiseTask/v1/syncWebsocket";
 
+    public static String WEBSOCKET_URL="";
+
+    public static RedisTemplate redisTemplate;
+
+    public static Boolean apiPermissions=false;
+
+    public static String websocketSendMsg(String url, Map<String,String> map) throws IOException {
+        //将websocket信息写入redis
+        String json= JSON.toJSONString(map);
+        //WebSocketServer.sendMsg(json);
+        // String.valueOf(map);
+        if("logError".equals(map.get("type")) || "newTask".equals(map.get("type")) || "newLinkage".equals(map.get("type"))
+                || "newAlarm".equals(map.get("type"))  || "alarmPopUp".equals(map.get("type"))  || "linkagePopUp".equals(map.get("type"))){
+            redisTemplate.opsForValue().set(map.get("type"),String.valueOf(map),5, TimeUnit.MINUTES);
+        }
+
+        CloseableHttpClient client = HttpClients.createDefault();
+        String result = "";
+        try {
+            URI uri = new URIBuilder(url).setParameter("json", json).build();
+            HttpPost httpGet = new HttpPost(uri);
+            httpGet.addHeader("Content-type", "application/json;charset=utf-8");
+            httpGet.setHeader("Accept", "application/json");
+            httpGet.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
+            CloseableHttpResponse response = client.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            result = EntityUtils.toString(entity, "UTF-8");
+        } catch (Exception e) {e.getMessage();}
+        return result;
+        //return "666";
+    }
 }

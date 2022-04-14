@@ -388,6 +388,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "操作任务记录查询")
     @RequestMapping(value = "/QueryOperationTask",method = RequestMethod.POST)
+    @Logs(title = "操作任务记录查询", content = "根据用户传递的参数查询操作任务记录", logType = 1, authority = "1235")
     public Result QueryOperationTask(@RequestBody JSONObject obj){
 
         Long regionId = obj.getLong("regionId");

@@ -158,7 +158,7 @@ public class VideoIntercomContrller {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询信息",content = "根据用户传递的参数分页查询信息",logType = 1)
+    @Logs(title = "查询信息",content = "根据用户传递的参数分页查询信息",logType = 1, authority = "1235")
     public Result selectByPage(@RequestParam(value = "cameraName", required = false) String cameraName,
                                @RequestParam(value = "regionId", required = false) Long regionId,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,

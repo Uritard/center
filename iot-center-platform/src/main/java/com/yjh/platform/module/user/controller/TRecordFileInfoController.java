@@ -40,7 +40,7 @@ public class TRecordFileInfoController {
 
     @ApiOperation(value = "删除")
     @DeleteMapping(value = "/delete")
-    @Logs(title = "删除录像文件", content = "根据用户传递的参数删除录像文件", logType = 4, authority = "1234")
+    @Logs(title = "删除录像文件", content = "根据用户传递的参数删除录像文件", logType = 4, authority = "1235")
     public Result delete(@RequestParam(value = "id", required = true) Long id) {
         Result result = new Result();
         try {
@@ -58,7 +58,7 @@ public class TRecordFileInfoController {
 
     @ApiOperation(value = "分页模糊查询")
     @GetMapping(value = "/selectByPage")
-    @Logs(title = "查询录像文件", content = "根据用户传递的参数分页查询录像文件", logType = 1, authority = "1234")
+    @Logs(title = "查询录像文件", content = "根据用户传递的参数分页查询录像文件", logType = 1, authority = "1235")
     public Result selectByPage(@RequestParam(value = "cameraId", required = false) Long cameraId,
                                @RequestParam(value = "startTime", required = false) String startTime,
                                @RequestParam(value = "stopTime", required = false)  String endTime,

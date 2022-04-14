@@ -16,6 +16,7 @@ import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.*;
 import com.yjh.accessvideo.thread.TaskExecutePool;
 import com.yjh.accessvideo.threads.RecordFileThread;
+import com.yjh.accessvideo.threads.TranscodeThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -107,6 +109,9 @@ public class CameraConService {
 
     @Value("${realtime.video.definition}")
     private String videoDefinition;
+
+    @Value("${system.webSocket.url}")
+    private String syncWebsocketUrl;//WS调用接口地址
 
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     private static PlayCtrl playCtrl = PlayCtrl.INSTANCE;
@@ -1716,26 +1721,16 @@ public class CameraConService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String stopDvrToPlace(String fileName){
+    public String stopDvrToPlace(String fileName, String userId){
         //返回结果
-        String judge = "";
+        String judge = "录制文件正在生成中...";
         try {
-            String path = videoPath + fileName;
             NativeLong lRealPlayHandle = Constant.recordLongMap.get(fileName);
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
             String url = "chmod 777 " + videoPath + fileName;
             Runtime.getRuntime().exec(url);
-            VideoUtil.h264ToMp4(path);
-            String url2 = "rm -rf " + path;
-            Runtime.getRuntime().exec(url2);
-            judge = savePath + fileName.replace("h264", "mp4");
-            RecordFileInfo recordFileInfo = new RecordFileInfo();
-            recordFileInfo.setFileName(fileName.replace(".h264", ""));
-            recordFileInfo.setEndTime(new Date());
-            recordFileInfo.setFilePath(judge);
-            recordFileInfo.setAbsoluteFilePath(path.replace("h264", "mp4"));
-            cameraConDao.updateRecordFile(recordFileInfo);
-            Constant.recordLongMap.remove(fileName);
+            TranscodeThread transcodeThread = new TranscodeThread(videoPath, savePath, fileName,syncWebsocketUrl,userId,cameraConDao);
+            TaskExecutePool.getInstance().execute(transcodeThread);
         }catch (Exception ignored){
             log.info("录制失败");
         }

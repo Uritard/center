@@ -193,7 +193,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "查询音频设备树")
     @RequestMapping(value = "/selectVoiceDeviceTree", method = RequestMethod.GET)
-    @Logs(title = "查询音频设备树", content = "音频设备树查询", logType = 1)
+    @Logs(title = "查询音频设备树", content = "音频设备树查询", logType = 1, authority = "1235")
     public Result selectVoiceDeviceTree(@RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName) {
         Result result = new Result();
         try {

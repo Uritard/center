@@ -525,7 +525,7 @@ public class CameraConController {
     public Result startDvrToPlace(@RequestParam(value = "cameraId") Long cameraId)  {
         Result result = new Result();
         try {
-            String  fileName= cameraConService.startDvrToPlace(cameraId);
+            String fileName= cameraConService.startDvrToPlace(cameraId);
             log.info("service返回值："+fileName);
             if(null!=fileName) {
                 result.setData(fileName);
@@ -539,11 +539,12 @@ public class CameraConController {
 
     @ApiOperation(value = "结束录制视频")
     @RequestMapping(value = "/stopDvrToPlace", method = RequestMethod.GET)
-    public Result stopDvrToPlace(@RequestParam(value = "fileName") String fileName)  {
+    public Result stopDvrToPlace(HttpServletRequest request, @RequestParam(value = "fileName") String fileName)  {
         Result result = new Result();
         try {
-            String path = cameraConService.stopDvrToPlace(fileName);
-            log.info("service返回值："+path);
+            String userId = request.getHeader("userId");
+            String path = cameraConService.stopDvrToPlace(fileName, userId);
+            log.info("service返回值："+path + ";" + userId);
             if(null!=path) {
                 result.setData(path);
             } else { result.setData("结束录制失败"); }

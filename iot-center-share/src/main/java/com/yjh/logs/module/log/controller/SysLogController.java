@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.logs.common.Constant;
+import com.yjh.logs.common.logs.Logs;
 import com.yjh.logs.common.smUtil.Demo;
 import com.yjh.logs.common.utils.NumToStringUtil;
 import com.yjh.logs.commons.result.BusinessException;
@@ -61,29 +62,10 @@ public class SysLogController {
     @Resource
     private RedisTemplate redisTemplate;
 
-
-    @Value("${spring.websocket.send.url}")
-    private String WEBSOCKET_SEND_URL;
-
     private Logger log = LoggerFactory.getLogger(SysLogController.class);
 
     public SysLogController(SysLogService sysOperateLogService) {
         this.sysLogService = sysOperateLogService;
-    }
-
-
-    //请求webSocket发送方法
-    public String postUrl(String json) throws IOException, URISyntaxException {
-      //  String url = redisTemplate.opsForHash().get("t_sys_param:webSocketUrl", "content").toString();
-        CloseableHttpClient client = HttpClients.createDefault();
-        URI uri = new URIBuilder(WEBSOCKET_SEND_URL).setParameter("json", json).build();
-        HttpPost httpPost = new HttpPost(uri);
-        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setEntity(new StringEntity(json, Charset.forName("UTF-8")));
-        CloseableHttpResponse response = client.execute(httpPost);
-        HttpEntity entity = response.getEntity();
-        return EntityUtils.toString(entity, "UTF-8");
     }
 
     @ApiOperation(value = "插入")
@@ -100,172 +82,7 @@ public class SysLogController {
                          @RequestParam(value = "requestMethod", required = false) String requestMethod) {
         Result result = new Result();
         try {
-            {
-                //判断是否需要写入日志
-                Map<String, String> mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogTime");
-                if (mapForParam != null && mapForParam.size() > 0) {
-                    String noLogTime = mapForParam.get("content");//日志时间 2021-03-04 00:00:00~2021-03-05 00:00:00
-                    if (noLogTime != null) {
-                        String[] timeList = noLogTime.split("~");
-                        if (timeList.length < 2) {
-                            //时间格式不对
-                            log.info("时间格式不对" + noLogTime);
-                        } else {
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            try {
-                                //String isIn = NumToStringUtil.findType(logType);
-                                if("0".equals(logType) || "1".equals(logType)|| "2".equals(logType)
-                                        || "3".equals(logType)
-                                        || "4".equals(logType)
-                                        || "5".equals(logType)
-                                        || "8".equals(logType)
-                                        || "9".equals(logType)
-                                        || "10".equals(logType)
-                                        || "11".equals(logType)
-                                        || "12".equals(logType)
-                                        || "13".equals(logType)
-                                        || "15".equals(logType)
-                                        || "18".equals(logType)
-                                        || "16".equals(logType)){
-                                    Date start = simpleDateFormat.parse(timeList[0]);
-                                    Date end = simpleDateFormat.parse(timeList[1]);
-                                    Date now = new Date();
-                                    if (start.getTime() <= now.getTime() && end.getTime() >= now.getTime()) {
-                                        //满足日期格式
-                                        result.setData("此条日志无需入库，原因：日志时间");
-                                        return result;
-                                    }
-                                }
-
-                            } catch (ParseException e) {
-                                log.error("日期格式错误" + e);
-                            }
-
-                        }
-                    }
-
-                }
-//                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogResult");
-//                if (mapForParam != null && mapForParam.size() > 0) {
-//                    String noLogResult = mapForParam.get("content");//日志结果  成功
-//                    if (noLogResult != null) {
-//                        //1：成功 2：失败
-//                        if ("成功".equals(noLogResult)) {
-//                            if (state == 1) {
-//                                result.setData("此条日志无需入库，原因：日志结果");
-//                                return result;
-//                            }
-//                        }
-//                        if ("失败".equals(noLogResult)) {
-//                            if (state == 2) {
-//                                result.setData("此条日志无需入库，原因：日志结果");
-//                                return result;
-//                            }
-//                        }
-//                    }
-//                }
-//                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogTitle");
-//                if (mapForParam != null && mapForParam.size() > 0) {
-//                    String noLogTitle = mapForParam.get("content");//日志标题  多个标题以，隔开  用户登录，用户登出
-//                    if (noLogTitle != null) {
-//                        //精确匹配
-//                        String[] resultList = noLogTitle.split("-");
-//                        if (resultList.length > 0) {
-//                            for (String item : resultList) {
-//                                if (item.equals(title)) {
-//                                    result.setData("此条日志无需入库，原因：日志标题");
-//                                    return result;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogType");
-                if (mapForParam != null && mapForParam.size() > 0) {
-                    String noLogType = mapForParam.get("content");//日志类型
-                    if (noLogType != null) {
-                        String[] typeList = noLogType.split("-");
-                        if (typeList.length > 0) {
-                            for (String item : typeList) {
-                                //todo 日志类型
-                                item = NumToStringUtil.findType(item);
-                                if (item != null && item.equals(logType)) {
-                                    result.setData("此条日志无需入库，原因：日志类型");
-                                    return result;
-                                }
-                            }
-                        }
-                    }
-                }
-//                mapForParam = redisTemplate.opsForHash().entries("t_sys_param:noLogUserIdentity");
-//                if (mapForParam != null && mapForParam.size() > 0) {
-//                    String noLogUserIdentity = mapForParam.get("content");//用户身份
-//                    if (noLogUserIdentity != null) {
-//                        String[] userList = noLogUserIdentity.split("-");
-//                        if (userList.length > 0) {
-//                            for (String item : userList) {
-//                                if (item.equals(userName)) {
-//                                    result.setData("此条日志无需入库，原因：用户身份");
-//                                    return result;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-            }
-            SysLog sysLog = new SysLog();
-            sysLog.setLogType(logType);
-            sysLog.setIp(ip);
-            sysLog.setTitle(title);
-            sysLog.setState(state);
-            sysLog.setContent(content);
-            sysLog.setUserId(userId);
-            sysLog.setUserName(userName);
-            sysLog.setRequestOrigin(requestOrigin);
-            sysLog.setRequestPath(requestPath);
-            sysLog.setRequestMethod(requestMethod);
-            sysLog.setCreateTime(new Date());
-            Random random = new Random();
-            if (state == 1) {
-                new Thread(() -> {
-                    String mathRandom = String.valueOf(random.nextInt(50)) + "000";
-                    long mathLong = Long.valueOf(mathRandom);
-                    log.info("mathLong: " + mathLong);
-                    try {
-                        Thread.sleep(mathLong);
-                    } catch (Exception e) {
-                        e.getMessage();
-                    }
-                    result.setData(sysLogService.insert(sysLog));
-                }).start();
-            } else {
-                Map<String, Object> errMessage = new HashMap<>();
-                errMessage.put("type", "errorLog");
-                errMessage.put("content", content);
-                errMessage.put("state", state);
-                String json = JSON.toJSONString(errMessage);
-                new Thread(() -> {
-                    try {
-                        postUrl(json);
-                        // Result result1 = restTemplate.getForObject(Constant.WEB_SCOKET, Result.class, json);
-                    } catch (Exception e) {
-                        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-                        log.error("发送失败：" + e);
-                    }
-                    if(state==3){
-                        redisTemplate.opsForValue().set("errorLog", content, 5, TimeUnit.MINUTES);
-                    }
-                    String mathRandom = String.valueOf(random.nextInt(50)) + "000";
-                    long mathLong = Long.valueOf(mathRandom);
-                    log.info("mathLong: " + mathLong);
-                    try {
-                        Thread.sleep(mathLong);
-                    } catch (Exception e) {
-                        e.getMessage();
-                    }
-                    result.setData(sysLogService.insert(sysLog));
-                }).start();
-            }
+            result.setData(sysLogService.insert(logType, ip, title, state, content, userId, userName, requestOrigin, requestPath, requestMethod));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -354,6 +171,7 @@ public class SysLogController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
+    @Logs(title = "查询日志", content = "根据用户传递的参数查询日志", logType = 1, authority = "1236")
     public Result selectByPage(@RequestParam(value = "userName", required = false) String userName,
                                @RequestParam(value = "title", required = false) String title,
                                @RequestParam(value = "logType", required = false) String logType,
@@ -419,6 +237,7 @@ public class SysLogController {
 
     @ApiOperation(value = "日志统计")
     @RequestMapping(value = "/logAnalyze", method = RequestMethod.GET)
+    @Logs(title = "日志统计", content = "根据用户传递的参数统计日志", logType = 1, authority = "1236")
     public Result logAnalyze(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -484,6 +303,7 @@ public class SysLogController {
 
     @ApiOperation(value = "导出")
     @RequestMapping(value = "/export", method = RequestMethod.GET)
+    @Logs(title = "日志导出", content = "根据用户传递的参数导出日志", logType = 8, authority = "1236")
     public Result export(@RequestParam(value = "userName", required = false) String userName,
                          @RequestParam(value = "title", required = false) String title,
                          @RequestParam(value = "logType", required = false) String logType,
