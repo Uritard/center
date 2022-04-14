@@ -101,5 +101,18 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>maven-public</id>
+            <name>yijiahe</name>
+            <url>http://192.168.9.53:8081/repository/maven-public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>

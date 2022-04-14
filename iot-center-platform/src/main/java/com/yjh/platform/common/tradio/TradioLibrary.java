@@ -14,6 +14,7 @@ import java.nio.LongBuffer;
  */
 public interface TradioLibrary extends Library {
     public static final String JNA_LIBRARY_NAME = "/usr/lib64/libtradio.so";
+//    public static final String JNA_LIBRARY_NAME = "D:\\work\\iom\\IotCenter\\iot-center-platform\\src\\main\\resources\\lib\\TradioCp.dll";
     //public static final String JNA_LIBRARY_NAME = "F:\\IotCenter\\iot-center-platform\\src\\main\\resources\\lib\\TradioCp.dll";
 //    public static final String JNA_LIBRARY_NAME = "D:\\code\\zhihui\\IotCenter\\iot-center-platform\\src\\main\\resources\\lib\\TradioCp.dll";
 //    public static final String JNA_LIBRARY_NAME = "D:\\IOT\\IotCenter\\iot-center-platform\\src\\main\\resources\\lib\\TradioCp.dll";

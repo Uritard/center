@@ -281,6 +281,11 @@
             <artifactId>commons-io</artifactId>
             <version>1.3.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.yjh</groupId>
+            <artifactId>messager</artifactId>
+            <version>3.2.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
