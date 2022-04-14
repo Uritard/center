@@ -129,15 +129,18 @@ public class TCruiseTaskService {
         * 立即任务为现场控制任务 等级3
         * */
         Integer ifRun = tCruiseTask.getIfRun();
-        if (Objects.equals("0" ,tCruiseTaskAdd.getUnionTaskStatus())){
-            if (Objects.equals(173, ifRun)){
-                tCruiseTask.setTaskLevel(3);
+        if(tCruiseTaskAdd.getTaskLevel() != null){
+            if (Objects.equals("0" ,tCruiseTaskAdd.getUnionTaskStatus())){
+                if (Objects.equals(173, ifRun)){
+                    tCruiseTask.setTaskLevel(3);
+                }else {
+                    tCruiseTask.setTaskLevel(1);
+                }
             }else {
-                tCruiseTask.setTaskLevel(1);
+                tCruiseTask.setTaskLevel(4);
             }
-        }else {
-            tCruiseTask.setTaskLevel(4);
         }
+
 
         try {
             if (tCruiseTask.getIfRun() == 172) {
@@ -362,7 +365,7 @@ public class TCruiseTaskService {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                             tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                             tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                            tRobotInspectionDao, tAlgorithmConfBakDao);
+                            tRobotInspectionDao, tAlgorithmConfBakDao,this);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();
@@ -753,7 +756,7 @@ public class TCruiseTaskService {
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                 tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                 tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, true, tasksAreTime,
-                tRobotInspectionDao, tAlgorithmConfBakDao);
+                tRobotInspectionDao, tAlgorithmConfBakDao,this);
         Thread thread = new Thread(runAtNowTask);
         thread.setDaemon(true);
         thread.start();
@@ -1246,7 +1249,7 @@ public class TCruiseTaskService {
                 RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                         tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                         tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                        tRobotInspectionDao, tAlgorithmConfBakDao);
+                        tRobotInspectionDao, tAlgorithmConfBakDao,this);
                 Thread thread = new Thread(runAtNowTask);
                 thread.setDaemon(true);
                 thread.start();
@@ -1329,7 +1332,7 @@ public class TCruiseTaskService {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                             tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                             tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                            tRobotInspectionDao, tAlgorithmConfBakDao);
+                            tRobotInspectionDao, tAlgorithmConfBakDao,this);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();

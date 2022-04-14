@@ -51,6 +51,10 @@ public interface TCameraPresetDao {
     List<Long>selectCameraIdList();
     List<Long>selectCameraHavePreset(@Param(value = "list")List<Long> list);
     TCameraPreset selectKeepWatch(@Param(value = "cameraId")Long cameraId);
+    TCameraPreset selectKeepWatchTask(@Param(value = "cameraId")Long cameraId,
+                                      @Param(value = "presetId")Long presetId,
+                                      @Param(value = "isKeepWatch")Integer isKeepWatch,
+                                      @Param(value = "isKeepWatchTask")Integer isKeepWatchTask);
 
     List<Map<String, Long>> selectCameraBySilent();
 }

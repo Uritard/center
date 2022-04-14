@@ -263,4 +263,17 @@
         where 1 = 1
         and a.plan_id = #{planId, jdbcType=BIGINT}
     </select>
+
+    <select id="selectPlanRunningTask" resultType="java.lang.String">
+        SELECT
+            distinct
+            planAttr.instance_id,
+            result.task_id
+        FROM
+            t_cruise_plan_attr planAttr
+                join t_cruise_result result on (result.c_state = 239  or result.c_state = 241)
+                join t_cruise_task task on task.task_id = result.task_id and task.task_level &lt; #{taskLevel}
+                join t_cruise_task_attr taskAttr on taskAttr.task_id = result.task_id and taskAttr.instance_id = planAttr.instance_id
+        WHERE planAttr.plan_id = #{planID}
+    </select>
 </mapper>

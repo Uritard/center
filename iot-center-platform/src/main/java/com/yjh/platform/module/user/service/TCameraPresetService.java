@@ -355,5 +355,10 @@ public class TCameraPresetService {
     public TCameraPreset countKeepWatch(Long cameraId){
         return tCameraPresetDao.selectKeepWatch(cameraId);
     }
+
+    public TCameraPreset countKeepWatchTask(Long cameraId,Long preset,Integer isKeepWatch,Integer isKeepWatchTask){
+        return tCameraPresetDao.selectKeepWatchTask(cameraId,preset,
+                isKeepWatch,isKeepWatchTask);
+    }
 }
 

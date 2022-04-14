@@ -1098,6 +1098,8 @@ public class DataDealThread implements Runnable {
                         tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state", "执行完成").toString()));
                         tCruiseResult.setTaskWait(0);
                         analyseDataOperateService.updateCruiseResult(tCruiseResult);
+                        //低优先级任务继续
+                        analyseDataOperateService.lowTaskGoOn(tCruiseResult.getTaskId());
 
 
                         // webSocket通知前端调用巡视监控的接口（任务完成）

@@ -428,6 +428,10 @@ public class InspectionResultThread implements Runnable{
                 // 更新TCR表
                 int res = StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
                 log.info("更新TCR的条数====" + res);
+                {
+                    //低优先任务继续
+                    StaticContextAccessor.getBean(RobotService.class).lowTaskGoOn(taskId);
+                }
             }
 
             // webSocket通知前端调用巡视监控的接口（任务完成）

@@ -303,6 +303,19 @@ public class RobotController {
         return result;
     }
 
+    @ApiOperation(value = "低优先级任务继续")
+    @GetMapping(value = "/lowTaskGoOn")
+    public Result lowTaskGoOn(@RequestParam(value = "tsakId") String tsakId) {
+        Result result = new Result();
+        try {
+            robotService.lowTaskGoOn(tsakId);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询失败：", e);
+        }
+        return result;
+    }
+
     /**
      * 获取redis集合值
      *

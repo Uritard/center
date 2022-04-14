@@ -15,8 +15,8 @@ import lombok.experimental.Accessors;
 @ApiModel(value = "巡视设备模型", description = "机器人、无人机等")
 public class PatrolDeviceModel {
 
-    private String patroldevcieName;//设备名称
-    private String patroldevcieCode;//设备编码
+    private String patroldeviceName;//设备名称
+    private String patroldeviceCode;//设备编码
     private String stationCode;//变电站编码
     private String deviceModel;//设备型号
     private String manufacturer;//生产厂家
@@ -29,6 +29,6 @@ public class PatrolDeviceModel {
     private String video_mode;//视频类型
     private String place;//安装位置
     private String type;//设备类型
-    private String patroldevcie_info;//备注信息
+    private String patroldevice_info;//备注信息
     private String robots_code;//所属机器人
 }

@@ -1,6 +1,7 @@
 package com.yjh.accessvideo.module.device.service;
 
 
+import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.*;
 import io.swagger.models.auth.In;
@@ -716,6 +717,18 @@ public class AnalyseDataOperateService {
         return analyseDataOperateDao.selectCurrentDefect();
     }
 
+    public void lowTaskGoOn(String taskId){
+        String lowTaskKey = "lowTask:" + taskId;
+        List<String> lowTaskList = redisTemplate.opsForList().range(lowTaskKey, 0, -1);
+//        List<String> lowTaskList = new ArrayList<>();
+//        lowTaskList.add("111");
+//        lowTaskList.add("222");
 
+        if(lowTaskList != null && lowTaskList.size()>0){
+            Map<String, Object> params = new HashMap<>();
+            params.put("lowTaskIdList", lowTaskList);
+            Constant.otherServerList(lowTaskList,Constant.GET_LOW_TASK_GO_ON);
+        }
+    }
 }
 

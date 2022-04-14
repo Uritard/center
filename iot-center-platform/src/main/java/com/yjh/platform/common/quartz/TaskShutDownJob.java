@@ -13,6 +13,7 @@ import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseDataResultService;
+import com.yjh.platform.module.task.service.TCruiseTaskService;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
@@ -57,6 +58,8 @@ public class TaskShutDownJob extends QuartzJobBean {
     private TCruisePointInstanceDao tCruisePointInstanceDao;
     @Autowired
     private TCruiseDataResultService tCruiseDataResultService;
+    @Autowired
+    private TCruiseTaskService tCruiseTaskService;
 
 
     //表记分析
@@ -371,7 +374,7 @@ public class TaskShutDownJob extends QuartzJobBean {
                 tCruiseTaskResultDao.insert(tCruiseTaskResult);
             }
 
-
+            taskGoOn(taskId);
 
             Map<String,String> jasonMapOnFinished=new HashMap<>();
             jasonMapOnFinished.put("type","newTask");
@@ -383,6 +386,20 @@ public class TaskShutDownJob extends QuartzJobBean {
         } catch (Exception e) {
             log.error("任务终止异常: " + e);
             e.printStackTrace();
+        }
+    }
+
+    private void taskGoOn(String taskId){
+        String lowTaskKey = "lowTask:" + taskId;
+        List<String> lowTaskList = redisTemplate.opsForList().range(lowTaskKey, 0, -1);
+        if (lowTaskList != null && lowTaskList.size() > 0) {
+            lowTaskList.forEach(lowTask -> {
+                try {
+                    tCruiseTaskService.taskGoOn(taskId);
+                }catch (Exception e){
+                    log.info("低优先级任务继续出错：{}",e);
+                }
+            });
         }
     }
 }

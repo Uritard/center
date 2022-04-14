@@ -9,7 +9,7 @@ public class PropertyUtil {
     private static Properties properties = new Properties();
 
     static {
-        ResourceBundle propResourceBundle = ResourceBundle.getBundle("prop");
+        ResourceBundle propResourceBundle = ResourceBundle.getBundle("application-dev");
         for (String key : propResourceBundle.keySet()) {
             properties.put(key, propResourceBundle.getString(key));
         }

@@ -516,4 +516,27 @@ public class TCruiseTaskController {
 //        return result;
 //    }
 
+    @ApiOperation(value = "低优先任务继续")
+    @RequestMapping(value = "/lowTaskGoOn", method = RequestMethod.POST)
+    public Result lowTaskGoOn(@RequestBody List<String> lowTaskIdList) {
+        Result result = new Result();
+        try {
+            lowTaskIdList.forEach(taskId->{
+                try {
+                    tCruiseTaskService.taskGoOn(taskId);
+                }catch (Exception e){
+                    log.info("其他服务调低优先级任务继续出错:{}",e);
+                }
+            });
+            result.setData(1);
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("任务继续异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务继续错误:", e);
+        }
+        return result;
+    }
+
 }

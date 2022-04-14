@@ -54,12 +54,15 @@ public class Constant {
 //    public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
 
-    public static<T> Result otherServerList( List<T> list, String url) throws Exception{
+    public static final String GET_LOW_TASK_GO_ON = "http://iot-center-platform-qh/tCruiseTask/v1/lowTaskGoOn";
+
+    public static<T> Result otherServerList( List<T> list, String url) {
         Result re = new Result();
         //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
         //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
         re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
         return re;
     }
+
     public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze?cruiseResultIdList";
 }

@@ -65,9 +65,6 @@ public class TCameraPresetController {
             if(tCameraPresetService.judgePresentNum(tCameraPreset.getCameraId(),tCameraPreset.getPresetNum())){
                 result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机该预置位点已被设置");
                 return result;
-            }else if (tCameraPresetService.countKeepWatch(tCameraPreset.getCameraId()) != null){
-                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), "此相机已有守望位，是预置位"+tCameraPreset.getPresetName());
-                return result;
             }else {
                 //操作数据库
                 resultNum = tCameraPresetService.insert(tCameraPreset);
@@ -195,6 +192,36 @@ public class TCameraPresetController {
     public Result update(@Validated @RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
+            if(tCameraPreset.getIsKeepWatch() == 1){//设置预置位为守望位
+                TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),null,1,null);
+                if (keepWatchPreset != null){
+                    //已有守望位
+                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此相机已有守望位，是预置位："+tCameraPreset.getPresetName());
+                    return result;
+                }
+                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),0,1);
+                if (keepWatchPreset != null){
+                    //此位置是静默任务预置位
+                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此预置位为静默任务预置位");
+                    return result;
+                }
+            }
+            if(tCameraPreset.getIsKeepWatchTask() == 1){//设置预置位为静默任务为
+                TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),null,0,1);
+                if (keepWatchPreset != null){
+                    //已有静默任务预置位
+                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此相机已有静默任务预置位，是预置位："+tCameraPreset.getPresetName());
+                    return result;
+                }
+                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),1,0);
+                if (keepWatchPreset != null){
+                    //此位置是守望位
+                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此预置位为守望预置位");
+                    return result;
+                }
+            }
+
+
             result.setData(tCameraPresetService.update(tCameraPreset));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());

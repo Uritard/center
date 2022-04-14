@@ -470,7 +470,12 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     tCruiseTaskAdd.setType(Integer.valueOf(type));
                     tCruiseTaskAdd.setTaskId(item.get("task_code").toString());
                     tCruiseTaskAdd.setTaskName(item.get("task_name").toString());
-                    tCruiseTaskAdd.setTaskLevel(Integer.valueOf(item.get("priority").toString()));
+                    if(item.get("priority") != null && "".equals(item.get("priority"))){
+                        tCruiseTaskAdd.setTaskLevel(Integer.valueOf(item.get("priority").toString()));
+                    }else {
+                        tCruiseTaskAdd.setTaskLevel(2);
+                    }
+
                     if(item.get("fixed_start_time") != null || "".equals(item.get("fixed_start_time"))){
                         tCruiseTaskAdd.setIfRun(172);
                         StringBuilder stringBuilder = new StringBuilder("0 0");

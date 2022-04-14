@@ -13,6 +13,7 @@ import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseDataResultService;
+import com.yjh.platform.module.task.service.TCruiseTaskService;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
@@ -60,6 +61,8 @@ public class CheckTaskAreJob extends QuartzJobBean {
     private TCruiseDataResultService tCruiseDataResultService;
     @Autowired
     TCruisePointInstanceDao tCruisePointInstanceDao;
+    @Autowired
+    private TCruiseTaskService tCruiseTaskService;
 
     //算法接口
     private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
@@ -379,6 +382,8 @@ public class CheckTaskAreJob extends QuartzJobBean {
             tCruiseTaskResultDao.update(tCruiseTaskResult);
         }
 
+        taskGoOn(taskId);
+
         // webSocket通知前端调用巡视监控的接口
 //        Map<String,String> jasonMapOnFinished=new HashMap<>();
 //        jasonMapOnFinished.put("type","finishedOneInstance");
@@ -468,5 +473,19 @@ public class CheckTaskAreJob extends QuartzJobBean {
             log.info("上报出错"+e.getMessage());
         }
         return re;
+    }
+
+    private void taskGoOn(String taskId){
+        String lowTaskKey = "lowTask:" + taskId;
+        List<String> lowTaskList = redisTemplate.opsForList().range(lowTaskKey, 0, -1);
+        if (lowTaskList != null && lowTaskList.size() > 0) {
+            lowTaskList.forEach(lowTask -> {
+                try {
+                    tCruiseTaskService.taskGoOn(taskId);
+                }catch (Exception e){
+                    log.info("低优先级任务继续出错：{}",e);
+                }
+            });
+        }
     }
 }

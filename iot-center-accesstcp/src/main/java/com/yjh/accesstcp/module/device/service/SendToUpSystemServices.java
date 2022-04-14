@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.service;
 
+import com.sun.deploy.config.Platform;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
@@ -68,7 +69,7 @@ public class SendToUpSystemServices {
             Map<String,Object> map = new HashMap<>();
             Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
 //            String path = mapForPath.get("content")+"/"+stationCode+"/Model";
-            String path = "C:\\robotData\\Model";
+            String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model":mapForPath.get("content")+"/"+stationCode+"/Model";
 
             //点位模型
             map.put("device_file_path",createDeviceModel(path));
@@ -87,8 +88,8 @@ public class SendToUpSystemServices {
 
             //巡视主机模型
 //            Map<String, Object> host = new HashMap<>();
-//            host.put("patroldevcie_name","巡视主机");
-//            host.put("patroldevcie_code","");
+//            host.put("patroldevice_name","巡视主机");
+//            host.put("patroldevice_code","");
 //            host.put("device_model","");
 //            host.put("manufacturer","");
 //            host.put("use_unit","");
@@ -100,18 +101,11 @@ public class SendToUpSystemServices {
 //            host.put("video_mode","");
 //            host.put("place","");
 //            host.put("type","20");
-//            host.put("patroldevcie_info","");
+//            host.put("patroldevice_info","");
 //            host.put("robots_code","");
 //            list = new ArrayList<>();
 //            list.add(host);
 //            map.put("robot_file_path",CreateModeXMLUtil.createXmlFile(list,path,"robot_model.xml","Robot_Model"));
-
-            //无人机模型
-            //声纹模型
-
-            //任务模型
-
-            //无人机模型
 
             //无人机
             map.put("drone_file_path",createDroneModel(path));
@@ -161,7 +155,7 @@ public class SendToUpSystemServices {
         list.forEach(item->{
             item.put("station_code",stationCode);
         });
-        return CreateModeXMLUtil.createXmlFile(list,path,"robot_model.xml","PatrolDevcie _Model");
+        return CreateModeXMLUtil.createXmlFile(list,path,"robot_model.xml","PatrolDevice _Model");
 
     }
     public String createCameraModel(String path) throws Exception{
@@ -170,7 +164,7 @@ public class SendToUpSystemServices {
         list.forEach(item->{
             item.put("station_code",stationCode);
         });
-        return CreateModeXMLUtil.createXmlFile(list,path,"video_model.xml","PatrolDevcie _Model");
+        return CreateModeXMLUtil.createXmlFile(list,path,"video_model.xml","PatrolDevice _Model");
 
     }
     public String createDroneModel(String path) throws Exception{
@@ -179,7 +173,7 @@ public class SendToUpSystemServices {
         list.forEach(item->{
             item.put("station_code",stationCode);
         });
-        return CreateModeXMLUtil.createXmlFile(list,path,"drone_model.xml","PatrolDevcie _Model");
+        return CreateModeXMLUtil.createXmlFile(list,path,"drone_model.xml","PatrolDevice _Model");
 
     }
     public String createVoiceModel(String path) throws Exception{
@@ -188,7 +182,7 @@ public class SendToUpSystemServices {
         list.forEach(item->{
             item.put("station_code",stationCode);
         });
-        return CreateModeXMLUtil.createXmlFile(list,path,"voice_model.xml","PatrolDevcie _Model");
+        return CreateModeXMLUtil.createXmlFile(list,path,"voice_model.xml","PatrolDevice _Model");
 
     }
     public String createTaskModel(String path) throws Exception{
@@ -243,7 +237,7 @@ public class SendToUpSystemServices {
                     .replace(" ",""));
             finalList.add(maintenanceMap);
         });
-        return CreateModeXMLUtil.createXmlFile(finalList,path,"overhaularea_model.xml","Robot_Model");
+        return CreateModeXMLUtil.createXmlFile(finalList,path,"overhaularea_model.xml","Effect_Config");
 
 
     }

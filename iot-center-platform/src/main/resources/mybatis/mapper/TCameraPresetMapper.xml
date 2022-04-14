@@ -360,6 +360,16 @@
         and is_keep_watch = 1
     </select>
 
+    <select id="selectKeepWatchTask" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+            *
+        from t_camera_preset
+        where camera_id = #{cameraId}
+        <if test="presetId != null and presetId != ''"> and preset_id = #{presetId, jdbcType=BIGINT}</if>
+        <if test="isKeepWatch != null and isKeepWatch != ''"> and is_keep_watch = 1</if>
+        <if test="isKeepWatchTask != null and isKeepWatchTask != ''"> and is_keep_watch_task = 1</if>
+    </select>
+
     <select id="selectCameraBySilent" resultType="java.util.Map">
         SELECT DISTINCT
             a.camera_id,

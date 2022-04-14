@@ -2564,5 +2564,20 @@ public class RobotService {
         }
         return list;
     }
+
+
+    public void lowTaskGoOn(String taskId){
+        String lowTaskKey = "lowTask:" + taskId;
+        List<String> lowTaskList = redisTemplate.opsForList().range(lowTaskKey, 0, -1);
+//        List<String> lowTaskList = new ArrayList<>();
+//        lowTaskList.add("111");
+//        lowTaskList.add("222");
+
+        if(lowTaskList != null && lowTaskList.size()>0){
+            Map<String, Object> params = new HashMap<>();
+            params.put("lowTaskIdList", lowTaskList);
+            Constant.otherServerList(lowTaskList,Constant.GET_LOW_TASK_GO_ON);
+        }
+    }
 }
 

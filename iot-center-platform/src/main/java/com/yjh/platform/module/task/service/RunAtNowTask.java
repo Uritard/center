@@ -55,6 +55,7 @@ public class RunAtNowTask implements Runnable{
     private Boolean isGoOn;
     private TRobotInspectionDao tRobotInspectionDao;
     private TAlgorithmConfBakDao tAlgorithmConfBakDao;
+    private TCruiseTaskService tCruiseTaskService;
 
     private Logger log = LoggerFactory.getLogger(RunAtNowTask.class);
 
@@ -83,7 +84,7 @@ public class RunAtNowTask implements Runnable{
                         TCameraPresetDao tCameraPresetDao,TCruiseResultDao tCruiseResultDao,TAlgorithmConfDao tAlgorithmConfDao,
                         TAlgorithmInfoDao tAlgorithmInfoDao,TCruisePlanAttrDao tCruisePlanAttrDao,TCruiseDataResultDao tCruiseDataResultDao,
                         TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn,Float tasksAreTime,
-                        TRobotInspectionDao tRobotInspectionDao,TAlgorithmConfBakDao tAlgorithmConfBakDao) {
+                        TRobotInspectionDao tRobotInspectionDao,TAlgorithmConfBakDao tAlgorithmConfBakDao,TCruiseTaskService tCruiseTaskService) {
         this.tCruiseTask = tCruiseTask;
         this.waitTime = waitTime;
         this.picModelPath = picModelPath;
@@ -101,6 +102,7 @@ public class RunAtNowTask implements Runnable{
         this.tasksAreTime = tasksAreTime;
         this.tRobotInspectionDao = tRobotInspectionDao;
         this.tAlgorithmConfBakDao = tAlgorithmConfBakDao;
+        this.tCruiseTaskService = tCruiseTaskService;
     }
 
     //相机抓图
@@ -183,6 +185,23 @@ public class RunAtNowTask implements Runnable{
             log.info("开始进行任务" +taskStart);
             Long taskIsStart = taskStart.getTime();
             String taskId = tCruiseTask.getTaskId();
+            try{
+                if(tCruiseTask.getPlanId() !=null && tCruiseTask.getTaskLevel() !=null) {
+                    //任务开始前 判断任务优先级 找到优先级比当前任务小的任务
+                    List<String> lowTaskList = tCruisePlanAttrDao.selectPlanRunningTask(tCruiseTask.getPlanId(), tCruiseTask.getTaskLevel());
+                    //将此任务暂停的任务放入 redis
+                    if (lowTaskList != null && lowTaskList.size()>0) {
+                        String lowTaskKey = "lowTask:"+taskId;
+                        redisTemplate.opsForList().leftPushAll(lowTaskKey,lowTaskList);
+                        //将低优先任务暂停
+                        lowTaskList.forEach(lowTask -> {
+                            tCruiseTaskService.taskPause(lowTask);
+                        });
+                    }
+                }
+            }catch (Exception e){
+                log.info("将低优先任务暂停失败:{}",e);
+            }
             Constant.taskStateMap.put(taskId,1);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
             String taskDate = simpleDateFormat.format(tCruiseTask.getStartTime());
@@ -369,6 +388,7 @@ public class RunAtNowTask implements Runnable{
                         Integer taskWait = tCruiseResult.getTaskWait()-1;
                         if(taskWait == 0 ){
                             tCruiseResult.setCState(240);
+                            taskGoOn(taskId);
                         }
                         taskAbnormal = taskAbnormal+1;
                         tCruiseResult.setTaskWait(taskWait);
@@ -630,6 +650,7 @@ public class RunAtNowTask implements Runnable{
                         Integer taskWait = tCruiseResult.getTaskWait()-1;
                         if(taskWait == 0 ){
                             tCruiseResult.setCState(240);
+                            taskGoOn(taskId);
                         }
                         tCruiseResult.setTaskWait(taskWait);
                         tCruiseResultDao.update(tCruiseResult);
@@ -807,6 +828,7 @@ public class RunAtNowTask implements Runnable{
                             Integer taskWait = tCruiseResult.getTaskWait()-1;
                             if(taskWait == 0 ){
                                 tCruiseResult.setCState(240);
+                                taskGoOn(taskId);
                             }
                             tCruiseResult.setTaskWait(taskWait);
                             tCruiseResultDao.update(tCruiseResult);
@@ -976,6 +998,7 @@ public class RunAtNowTask implements Runnable{
                         tCruiseTaskResultDao.insert(tCruiseTaskResult);
                         //Thread.sleep(15000);
                         tCruiseResult.setCState(240);
+                        taskGoOn(taskId);
                         tCruiseResultDao.update(tCruiseResult);
                         Constant.taskStateMap.put(taskId,0);
                         sendTaskStateToUp(tCruiseTask,1);
@@ -1044,6 +1067,7 @@ public class RunAtNowTask implements Runnable{
 
                 Thread.sleep(15000);
                 tCruiseResult.setCState(240);
+                taskGoOn(taskId);
                 tCruiseResultDao.update(tCruiseResult);
                 Constant.taskStateMap.put(taskId,0);
                 sendTaskStateToUp(tCruiseTask,1);
@@ -1133,4 +1157,19 @@ public class RunAtNowTask implements Runnable{
         }
         return re;
     }
+
+    private void taskGoOn(String taskId){
+            String lowTaskKey = "lowTask:" + taskId;
+            List<String> lowTaskList = redisTemplate.opsForList().range(lowTaskKey, 0, -1);
+            if (lowTaskList != null && lowTaskList.size() > 0) {
+                lowTaskList.forEach(lowTask -> {
+                    try {
+                        tCruiseTaskService.taskGoOn(taskId);
+                    }catch (Exception e){
+                        log.info("低优先级任务继续出错：{}",e);
+                    }
+                });
+            }
+    }
+
 }
