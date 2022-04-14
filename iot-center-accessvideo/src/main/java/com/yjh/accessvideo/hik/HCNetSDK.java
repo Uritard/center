@@ -25,7 +25,6 @@ import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.sun.jna.ptr.ShortByReference;
-import com.sun.jna.win32.StdCallLibrary;
 
 
 import java.util.Arrays;
@@ -4461,7 +4460,7 @@ EMAIL参数结构
     public static interface FLoginResultCallBack extends Callback {
         public int invoke(NativeLong lUserID, int dwResult, Pointer lpDeviceinfo, Pointer pUser);
     }
-    public static interface FMSGCallBack_V31 extends StdCallLibrary.StdCallCallback  {
+    public static interface FMSGCallBack_V31 extends Callback  {
         public boolean invoke(int lCommand, NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser);
     }
     public static final int  NET_SDK_MAX_FILE_PATH = 256;
@@ -4704,7 +4703,7 @@ EMAIL参数结构
     boolean  NET_DVR_SetSTDConfig(NativeLong lUserID, int dwCommand, NET_DVR_STD_CONFIG lpConfigParam);
     boolean NET_DVR_GetSTDConfig(NativeLong lUserID,int dwCommand,NET_DVR_STD_CONFIG lpOutConfigParam);
 
-    public static interface FRemoteConfigCallback extends StdCallLibrary.StdCallCallback {
+    public static interface FRemoteConfigCallback extends Callback {
         public void invoke(int dwType, Pointer lpBuffer, int dwBufLen, Pointer pUserData);
     }
     NativeLong NET_DVR_StartRemoteConfig (NativeLong lUserID, int dwCommand, Pointer lpInBuffer, int dwInBufferLen, FRemoteConfigCallback cbStateCallback, Pointer pUserData);

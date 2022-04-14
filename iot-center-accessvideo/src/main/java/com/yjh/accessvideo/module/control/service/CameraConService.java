@@ -1247,6 +1247,9 @@ public class CameraConService {
                 NativeLong lNext;
                 HCNetSDK.NET_DVR_TIME preEndTime = null;
                 long preStopTime = 0L;
+                if (lFindFile.intValue() == -1) {
+                    log.error("文件查找失败 NET_DVR_FindFile_V40, channel: {}, [{} —— {}]", ipChan.intValue(), hCNetSDK.NET_DVR_GetLastError(), lFindFile.intValue());
+                }
                 while(true) {
                     lNext = hCNetSDK.NET_DVR_FindNextFile_V40(lFindFile, strFile);
                     if(lNext.longValue() == HCNetSDK.NET_DVR_FILE_SUCCESS) {
@@ -1270,8 +1273,8 @@ public class CameraConService {
                         log.info("没有找到文件, channel: {}！", ipChan.intValue());
                         break;
                     } else if(lNext.longValue() != HCNetSDK.NET_DVR_ISFINDING){
+                        log.info("文件查找关闭 NET_DVR_FindClose_V30, channel: {}, [{} —— {}]", ipChan.intValue(), hCNetSDK.NET_DVR_GetLastError(), lNext.longValue());
                         hCNetSDK.NET_DVR_FindClose_V30(lFindFile);
-                        log.info("文件查找关闭 NET_DVR_FindClose_V30, channel: {}, [{}]", ipChan.intValue(), lNext.longValue());
                         break;
                     }
                 }
