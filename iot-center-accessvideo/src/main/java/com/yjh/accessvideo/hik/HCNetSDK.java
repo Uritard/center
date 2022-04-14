@@ -955,7 +955,7 @@ public interface HCNetSDK extends Library {
         //用于列表中显示
         public String toStringTime()
         {
-            return  String.format("%02d/%02d/%02d%02d:%02d:%02d", dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond);
+            return  String.format("%02d/%02d/%02d %02d:%02d:%02d", dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond);
         }
 
         //存储文件名使用
@@ -3499,7 +3499,7 @@ EMAIL参数结构
 
     public static class NET_DVR_FILECOND_V40 extends Structure
     {
-        public NativeLong lChannel;
+        public int lChannel;
         public int dwFileType;
         public int dwIsLocked;
         public int dwUseCardNo;
@@ -4332,7 +4332,7 @@ EMAIL参数结构
         public NET_DVR_TIME strBeginTime = new NET_DVR_TIME();  // 开始时间
         public NET_DVR_TIME strEndTime = new NET_DVR_TIME();    // 结束时间
         public byte	    byType;					/* 录像类型，0- 正常音视频录像，1- 图片通道录像，2- ANR通道录像，3- 抽帧通道录像 */
-        public byte[]   byRes = new byte[63];    /* 保留 */
+        public byte[]   byRes = new byte[35];    /* 保留 */
     }
 
     public static class NET_DVR_RECORD_CHECK_COND extends Structure {
@@ -4568,9 +4568,9 @@ EMAIL参数结构
     boolean  NET_DVR_FindClose(NativeLong lFindHandle);
     NativeLong NET_DVR_FindNextFile_V30(NativeLong lFindHandle, NET_DVR_FINDDATA_V30 lpFindData);
     NativeLong NET_DVR_FindFile_V30(NativeLong lUserID, NET_DVR_FILECOND pFindCond);
-    boolean  NET_DVR_FindClose_V30(NativeLong lFindHandle);
-    NativeLong NET_DVR_FindFile_V40(NativeLong lUserID, NET_DVR_FILECOND_V40 pFindCond);
-    NativeLong NET_DVR_FindNextFile_V40(NativeLong lFindHandle, NET_DVR_FINDDATA_V40 lpFindData);
+    boolean  NET_DVR_FindClose_V30(int lFindHandle);
+    int NET_DVR_FindFile_V40(int lUserID, NET_DVR_FILECOND_V40 pFindCond);
+    int NET_DVR_FindNextFile_V40(int lFindHandle, NET_DVR_FINDDATA_V40 lpFindData);
     //2007-04-16增加查询结果带卡号的文件查找
     NativeLong NET_DVR_FindNextFile_Card(NativeLong lFindHandle, NET_DVR_FINDDATA_CARD lpFindData);
     NativeLong NET_DVR_FindFile_Card(NativeLong lUserID, NativeLong lChannel, int dwFileType, NET_DVR_TIME lpStartTime, NET_DVR_TIME lpStopTime);
@@ -4597,7 +4597,7 @@ EMAIL参数结构
     int	 NET_DVR_GetPlayBackPos(NativeLong lPlayHandle);
 
     // 通道录像起止时间和录像完整性检查
-    boolean NET_DVR_InquiryRecordTimeSpan(NativeLong lUserID, int dwChannel, NET_DVR_RECORD_TIME_SPAN_INQUIRY lpInquiry, NET_DVR_RECORD_TIME_SPAN lpResult);
+    boolean NET_DVR_InquiryRecordTimeSpan(int lUserID, int dwChannel, NET_DVR_RECORD_TIME_SPAN_INQUIRY lpInquiry, NET_DVR_RECORD_TIME_SPAN lpResult);
 
     NativeLong NET_DVR_GetNextRemoteConfig(NativeLong lHandle, Pointer lpOutBuff, int dwOutBuffSize);
     // boolean NET_DVR_StopRemoteConfig(NativeLong lHandle);

@@ -67,16 +67,49 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         log.info("videoAccess is running...");
+        setSDKCom();
         if (!hCNetSDK.NET_DVR_Init()) { log.error("init fail.."); return; }
         log.info("init success..");
-        hCNetSDK.NET_DVR_SetLogToFile(logLevel,sdkLogPath,false);
+        hCNetSDK.NET_DVR_SetLogToFile(logLevel, sdkLogPath,false);
         register();
         InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
         nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate,analyseDataOperateService,syncWebsocketUrl);
     }
 
+    private void setSDKCom() {
+        //设置HCNetSDKCom组件库所在路径
+        String strPathCom = sdkPath;
+        HCNetSDK.NET_DVR_LOCAL_SDK_PATH struComPath = new HCNetSDK.NET_DVR_LOCAL_SDK_PATH();
+        System.arraycopy(strPathCom.getBytes(), 0, struComPath.sPath, 0, strPathCom.length());
+        struComPath.write();
+        hCNetSDK.NET_DVR_SetSDKInitCfg(2, struComPath.getPointer());
+
+        //设置libcrypto.so所在路径
+        HCNetSDK.BYTE_ARRAY ptrByteArrayCrypto = new HCNetSDK.BYTE_ARRAY(256);
+        String strPathCrypto = sdkPath+"/libcrypto.so";
+        System.arraycopy(strPathCrypto.getBytes(), 0, ptrByteArrayCrypto.byValue, 0, strPathCrypto.length());
+        ptrByteArrayCrypto.write();
+        hCNetSDK.NET_DVR_SetSDKInitCfg(3, ptrByteArrayCrypto.getPointer());
+
+        //设置libssl.so所在路径
+        HCNetSDK.BYTE_ARRAY ptrByteArraySsl = new HCNetSDK.BYTE_ARRAY(256);
+        String strPathSsl = sdkPath+"/libssl.so";
+        System.arraycopy(strPathSsl.getBytes(), 0, ptrByteArraySsl.byValue, 0, strPathSsl.length());
+        ptrByteArraySsl.write();
+        hCNetSDK.NET_DVR_SetSDKInitCfg(4, ptrByteArraySsl.getPointer());
+
+        //设置libPlayCtrl.so所在路径
+        HCNetSDK.BYTE_ARRAY ptrPlayCtrl = new HCNetSDK.BYTE_ARRAY(256);
+        String ptrPlayCtrlPath = sdkPath+"/libPlayCtrl.so";
+        System.arraycopy(ptrPlayCtrlPath.getBytes(), 0, ptrPlayCtrl.byValue, 0, ptrPlayCtrlPath.length());
+        ptrPlayCtrl.write();
+        hCNetSDK.NET_DVR_SetSDKInitCfg(5, ptrPlayCtrl.getPointer());
+
+    }
+
     private void register() {
+
         if (lUserID > -1) {
             //NVR log out first...
             hCNetSDK.NET_DVR_Logout(lUserID);
@@ -123,33 +156,6 @@ public class AccessVideoApplication implements CommandLineRunner {
             }
             log.info("Constant.maps: {}", JSON.toJSONString(Constant.maps));
         }).start();
-        //设置HCNetSDKCom组件库所在路径
-        String strPathCom = sdkPath;
-        HCNetSDK.NET_DVR_LOCAL_SDK_PATH struComPath = new HCNetSDK.NET_DVR_LOCAL_SDK_PATH();
-        System.arraycopy(strPathCom.getBytes(), 0, struComPath.sPath, 0, strPathCom.length());
-        struComPath.write();
-        hCNetSDK.NET_DVR_SetSDKInitCfg(2, struComPath.getPointer());
-
-        //设置libcrypto.so所在路径
-        HCNetSDK.BYTE_ARRAY ptrByteArrayCrypto = new HCNetSDK.BYTE_ARRAY(256);
-        String strPathCrypto = sdkPath+"/libcrypto.so";
-        System.arraycopy(strPathCrypto.getBytes(), 0, ptrByteArrayCrypto.byValue, 0, strPathCrypto.length());
-        ptrByteArrayCrypto.write();
-        hCNetSDK.NET_DVR_SetSDKInitCfg(3, ptrByteArrayCrypto.getPointer());
-
-        //设置libssl.so所在路径
-        HCNetSDK.BYTE_ARRAY ptrByteArraySsl = new HCNetSDK.BYTE_ARRAY(256);
-        String strPathSsl = sdkPath+"/libssl.so";
-        System.arraycopy(strPathSsl.getBytes(), 0, ptrByteArraySsl.byValue, 0, strPathSsl.length());
-        ptrByteArraySsl.write();
-        hCNetSDK.NET_DVR_SetSDKInitCfg(4, ptrByteArraySsl.getPointer());
-
-        //设置libPlayCtrl.so所在路径
-        HCNetSDK.BYTE_ARRAY ptrPlayCtrl = new HCNetSDK.BYTE_ARRAY(256);
-        String ptrPlayCtrlPath = sdkPath+"/libPlayCtrl.so";
-        System.arraycopy(ptrPlayCtrlPath.getBytes(), 0, ptrPlayCtrl.byValue, 0, ptrPlayCtrlPath.length());
-        ptrPlayCtrl.write();
-        hCNetSDK.NET_DVR_SetSDKInitCfg(5, ptrPlayCtrl.getPointer());
 
     }
 
