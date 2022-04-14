@@ -290,18 +290,6 @@ public class RobotController {
         return result;
     }
 
-    @ApiOperation(value = "机器人统计信息查询")
-    @GetMapping(value = "/statistics")
-    public Result statistics(@RequestParam(value = "robotCode") String robotCode) {
-        Result result = new Result();
-        try {
-            result.setData(robotService.selectStatisticsRobot(new TRobotInfo().setRobotCode(robotCode)));
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("查询失败：", e);
-        }
-        return result;
-    }
 
     @ApiOperation(value = "低优先级任务继续")
     @GetMapping(value = "/lowTaskGoOn")

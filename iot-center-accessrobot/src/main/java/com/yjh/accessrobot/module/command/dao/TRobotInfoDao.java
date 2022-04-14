@@ -305,9 +305,9 @@ public interface TRobotInfoDao {
     String selectDeviceTypeName(@Param(value = "deviceId") String deviceId);
 
     /**
-     * 查询机器人总天数，告警异常天数，正常天数
-     * @return
+     * 将有投运日期的机器人信息查询出来
+     * @return 机器人列表
      */
-    List<Map<String,Object>> selectStatisticsRobot(TRobotInfo tRobotInfo);
+    List<TRobotInfo> selectByCommission();
 
 }

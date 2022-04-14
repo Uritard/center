@@ -1,12 +1,15 @@
 package com.yjh.accessrobot.module.device.utils;
 
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
+import com.yjh.accessrobot.module.command.entity.TRobotAlarm;
 import com.yjh.accessrobot.module.command.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,13 +46,19 @@ public class StatisticsUtil {
     Long lastOnlineTime = null;
     Long duration = null;
     Long offLineCount = null;
+    Date commissionDate = null;
     if (tRobotInfoList.size() > 0) {
       robotStatus = tRobotInfoList.get(0).getRobotStatus();
       lastOnlineTime = tRobotInfoList.get(0).getLastOnlineTime();
       duration = tRobotInfoList.get(0).getDuration();
       offLineCount = tRobotInfoList.get(0).getOffLineCount();
+      commissionDate = tRobotInfoList.get(0).getCommissionDate();
     } else {
       log.error("查询不到robotId={}的机器人信息", robotInfo.getRobotId());
+    }
+    // 投运日期未到，不做处理
+    if (commissionDate != null && commissionDate.after(new Date())) {
+      return;
     }
     if (duration == null) {
       duration = 0L;
@@ -57,6 +66,7 @@ public class StatisticsUtil {
     if (offLineCount == null) {
       offLineCount = 0L;
     }
+    Long currTime = System.currentTimeMillis();
     /*
      在线->离线 只记录状态 <br/>
      离线->离线 4 小时未收到机器人监控系统心跳报文，则记录离线次数+1 <br>
@@ -66,12 +76,12 @@ public class StatisticsUtil {
       case ON_LINE:
         robotInfo.setRobotStatus(ON_LINE);
         if (lastOnlineTime != null) {
-          boolean lessFour = System.currentTimeMillis() - lastOnlineTime <= 4 * 60 * 60 * 1000;
+          boolean lessFour = currTime - lastOnlineTime <= 4 * 60 * 60 * 1000;
           if (lessFour) {
-            robotInfo.setDuration(duration + (System.currentTimeMillis() - lastOnlineTime));
+            robotInfo.setDuration(duration + (currTime - lastOnlineTime));
           }
         }
-        robotInfo.setLastOnlineTime(System.currentTimeMillis());
+        robotInfo.setLastOnlineTime(currTime);
         break;
       case OFF_LINE:
         if (ON_LINE.equals(robotStatus)) {
@@ -79,7 +89,7 @@ public class StatisticsUtil {
         } else {
           // 没有lastOnlineTime说明没有成功登录过，不统计
           if (lastOnlineTime != null) {
-            boolean greaterFour = System.currentTimeMillis() - lastOnlineTime > 4 * 60 * 60 * 1000;
+            boolean greaterFour = currTime - lastOnlineTime > 4 * 60 * 60 * 1000;
             if (greaterFour) {
               robotInfo.setOffLineCount(offLineCount + 1);
             }
@@ -91,8 +101,44 @@ public class StatisticsUtil {
     }
   }
 
-  /** 连续正常运行天数、投运期间累计自检结果正常天数、正常巡检天数 <br> */
-  public static void static1() {}
+  /**
+   * 定时任务检查机器人状态：4小时一次<br>
+   * 如不在线，则生成一条离线告警，统计在线时长根据告警进行过滤
+   */
+  @Scheduled(cron = "0 0 */4 * * ?")
+  public void checkRobotStatus() {
+    long currTime = System.currentTimeMillis();
+    Date now = new Date(currTime);
+    try {
+      List<TRobotInfo> robotInfoList = tRobotInfoDao.selectByCommission();
+
+      // 对投运时间后+最后登录时间不为空+间隔超过4小时的
+      for (TRobotInfo robotInfo : robotInfoList) {
+        if (ON_LINE.equals(robotInfo.getRobotStatus())
+            || robotInfo.getLastOnlineTime() == null
+            || robotInfo.getCommissionDate().after(now)) {
+          continue;
+        }
+        boolean greaterFour = currTime - robotInfo.getLastOnlineTime() > 4 * 60 * 60 * 1000;
+        if (greaterFour) {
+          TRobotAlarm tRobotAlarm =
+              new TRobotAlarm()
+                  .setRobotId(robotInfo.getRobotId())
+                  .setRobotName(robotInfo.getRobotName())
+                  .setAlarmName("离线告警")
+                  .setAlarmLevel(132)
+                  .setAlarmInfo("已离线超过4小时")
+                  .setAlarmTime(now)
+                  .setAlarmState(0);
+          log.info("tRobotAlarm的内容==={}", tRobotAlarm);
+          int res = tRobotInfoDao.insertRobotAlarm(tRobotAlarm);
+          log.info("插告警表的结果=" + res);
+        }
+      }
+    } catch (Exception e) {
+      log.error("定时查询在线状态定时任务发生异常{}", e.getMessage());
+    }
+  }
 
   @PostConstruct
   public void init() {

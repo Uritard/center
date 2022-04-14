@@ -35,6 +35,16 @@ public class DateTimeUtil {
     private DateTimeUtil() {
 
     }
+    /**
+     * 毫秒数转换为string时间
+     *
+     * @return
+     */
+    public static String getDateByLong(Long source) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat(DATETIMEMSFORMATTPL);
+        return sdf.format(source);
+    }
 
     /**
      * 整点日期格式。

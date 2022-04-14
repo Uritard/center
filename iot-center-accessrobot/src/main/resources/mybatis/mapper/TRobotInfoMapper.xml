@@ -1124,20 +1124,17 @@
         a.task_id = #{taskId, jdbcType=VARCHAR}
     </update>
 
-    <select id="selectStatisticsRobot"  parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo" resultType="java.util.Map">
-        SELECT tr.robot_id                                            robotId,
-               tr.robot_code                                          robotCode,
-               TO_DAYS(NOW()) - TO_DAYS(tr.`create_date`)             runDay,
-               COUNT(DISTINCT DATE_FORMAT(ta.alarm_time, '%Y-%m-%d')) alarmDay,
-               TO_DAYS(NOW()) - TO_DAYS(tr.`create_date`) - COUNT(
-                       DISTINCT DATE_FORMAT(ta.alarm_time, '%Y-%m-%d')
-                   )                                                  normalDay
-        FROM t_robot_info tr
-                 LEFT JOIN t_robot_alarm ta
-                           ON ta.`robot_id` = tr.`robot_id`
-        WHERE 1 = 1
-        <if test="robotId != null and robotId != ''"> and tr.robot_id = #{robotId, jdbcType=BIGINT}</if>
-        <if test="robotCode != null and robotCode != ''"> and tr.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
-        GROUP BY robotId
+
+    <select id="selectByCommission" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        select a.robot_id,
+               a.robot_code,
+               a.robot_name,
+               a.robot_status,
+               a.commission_date,
+               a.last_online_time,
+               a.off_line_count,
+               a.duration
+        from t_robot_info a
+        where commission_date IS TRUE
     </select>
 </mapper>

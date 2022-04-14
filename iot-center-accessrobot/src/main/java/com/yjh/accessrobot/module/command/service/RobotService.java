@@ -2538,34 +2538,6 @@ public class RobotService {
         tRobotInfoDao.updateTCruiseTask(taskMap);
     }
 
-    public List<Map<String,Object>>  selectStatisticsRobot(TRobotInfo tRobotInfo){
-
-        String robotStatus = null;
-        Long lastOnlineTime = null;
-        Long duration = null;
-        Long offLineCount = null;
-
-        List<Map<String,Object>> list=tRobotInfoDao.selectStatisticsRobot(tRobotInfo);
-        for(Map<String,Object> map:list){
-            List<TRobotInfo> tRobotInfoList =
-                    tRobotInfoDao.selectByPage(new TRobotInfo().setRobotId((Long) map.get("robotId")));
-            if (tRobotInfoList.size() > 0) {
-                robotStatus = tRobotInfoList.get(0).getRobotStatus();
-                lastOnlineTime = tRobotInfoList.get(0).getLastOnlineTime();
-                duration = tRobotInfoList.get(0).getDuration();
-                offLineCount = tRobotInfoList.get(0).getOffLineCount();
-                map.put("robotStatus",robotStatus);
-                map.put("lastOnlineTime",lastOnlineTime);
-                map.put("duration",duration);
-                map.put("offLineCount",offLineCount);
-            } else {
-                log.error("查询不到robotId={}的机器人信息", tRobotInfo.getRobotId());
-            }
-        }
-        return list;
-    }
-
-
     public void lowTaskGoOn(String taskId){
         String lowTaskKey = "lowTask:" + taskId;
         List<String> lowTaskList = redisTemplate.opsForList().range(lowTaskKey, 0, -1);
