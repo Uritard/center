@@ -153,6 +153,16 @@ public class TRobotInfo implements Serializable {
     //    @Length(max = 100, message = "robotFactoryName长度必须小于等于100")
     private String robotFactoryName;
 
+    @Length(max = 28, message = "madeIn长度必须小于等于28")
+    @ApiModelProperty(value = "生产国家 ")
+    @TableField(value = "made_in", updateStrategy = FieldStrategy.IGNORED)
+    private String madeIn;
+
+    @ApiModelProperty(value = "出厂日期", example = "2018-10-01 12:18:48")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @TableField(value = "made_date", updateStrategy = FieldStrategy.IGNORED)
+    private String madeDate;
+
     @Length(max = 10, message = "isUse长度必须小于等于10")
     @ApiModelProperty(value = "使用状态 ")
     @TableField(value = "is_use", updateStrategy = FieldStrategy.IGNORED)

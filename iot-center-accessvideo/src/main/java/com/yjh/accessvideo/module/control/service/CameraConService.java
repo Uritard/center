@@ -1197,7 +1197,7 @@ public class CameraConService {
 
         IntByReference ibrBytesReturned = new IntByReference(0);
         HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG();
-        // m_strIpparaCfg.write();
+        m_strIpparaCfg.write();
         Pointer lpIpConfig = m_strIpparaCfg.getPointer();
         boolean cfg = hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG, iChanNumTem, lpIpConfig, m_strIpparaCfg.size(), ibrBytesReturned);
         List<Map<String, Object>> channelInfoList = new ArrayList<>();
@@ -1219,7 +1219,8 @@ public class CameraConService {
             fileCond.dwFileType = 0xff;
             fileCond.dwIsLocked = 0xff;
             for (int i = 0; i < ipChans.length; i++) {
-                if(ipChans[i].byChannel == 0){
+                int ipId = ipChans[i].byIPID;
+                if(ipId == 0){
                     // 通道未启用，跳出
                     break;
                 }
@@ -1230,7 +1231,8 @@ public class CameraConService {
                 Map<String, Object> chanInfoMap = new LinkedHashMap<>();
                 chanInfoMap.put("ipChanNum", i + 1);
                 chanInfoMap.put("enable", ipChans[i].byEnable);
-                chanInfoMap.put("ipAddr", ipDevs[i].struIP.toString());
+                chanInfoMap.put("channel", ipChans[i].byChannel);
+                chanInfoMap.put("ipAddr", ipDevs[ipId - 1].struIP.toString());
 
                 // 录像计划和通道名称
                 MutablePair<String, List<String[]>> nameAndPlan = recordCfg(lUserIDLong, ipChan);

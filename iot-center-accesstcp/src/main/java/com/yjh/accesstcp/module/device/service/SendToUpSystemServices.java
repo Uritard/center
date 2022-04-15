@@ -1,6 +1,5 @@
 package com.yjh.accesstcp.module.device.service;
 
-import com.sun.deploy.config.Platform;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
@@ -10,7 +9,6 @@ import com.yjh.accesstcp.module.device.entity.MaintenanceModel;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
-import org.apache.commons.collections.iterators.ObjectGraphIterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

@@ -28,6 +28,8 @@
         <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
         <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
         <result column="robot_factory" jdbcType="VARCHAR" property="robotFactory" />
+        <result column="made_in" jdbcType="VARCHAR" property="madeIn" />
+        <result column="made_date" jdbcType="TIMESTAMP" property="madeDate" />
         <result column="is_use" jdbcType="VARCHAR" property="isUse" />
         <result column="commission_date" jdbcType="TIMESTAMP" property="commissionDate" />
         <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
@@ -43,7 +45,7 @@
     <sql id="Base_Column_List">
         robot_id, robot_code, robot_name, nest_code,nest_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, identity_manager, identity_code,
         lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date,
-        robot_factory, is_use, commission_date, up_region_id, robot_position, remarks
+        robot_factory, made_in, made_date, is_use, commission_date, up_region_id, robot_position, remarks
     </sql>
 
 
@@ -72,6 +74,8 @@
             update_by,
             update_date,
             robot_factory,
+            made_in,
+            made_date,
             is_use,
             commission_date,
             up_region_id,
@@ -111,6 +115,8 @@
                 #{updateBy, jdbcType=VARCHAR},
                 #{updateDate, jdbcType=TIMESTAMP},
                 #{robotFactory, jdbcType=VARCHAR},
+                #{madeIn, jdbcType=VARCHAR},
+                #{madeDate, jdbcType=TIMESTAMP},
                 #{isUse, jdbcType=VARCHAR},
                 #{commissionDate, jdbcType=TIMESTAMP},
                 #{upRegionId, jdbcType=BIGINT},
@@ -228,6 +234,8 @@
         a.update_by,
         a.update_date,
         a.robot_factory,
+        a.made_in,
+        a.made_date,
         a.is_use,
         a.commission_date,
         a.up_region_id,
@@ -275,6 +283,8 @@
         a.update_by,
         a.update_date,
         a.robot_factory,
+        a.made_in,
+        a.made_date,
         a.is_use,
         a.commission_date,
         a.up_region_id,
@@ -355,6 +365,8 @@
         a.update_date,
         b.dict_note as robot_factory_name,
         a.robot_factory,
+        a.made_in,
+        a.made_date,
         c.dict_note as is_use_name,
         a.is_use,
         a.commission_date,
@@ -425,6 +437,8 @@
         a.update_date,
         b.dict_note as robot_factory_name,
         a.robot_factory,
+        a.made_in,
+        a.made_date,
         c.dict_note as is_use_name,
         a.is_use,
         a.commission_date,
@@ -493,6 +507,8 @@
             update_by,
             update_date,
             robot_factory,
+            made_in,
+            made_date,
             is_use,
             commission_date,
             up_region_id,
@@ -534,6 +550,8 @@
                 #{TRobotInfo.updateBy, jdbcType=VARCHAR},
                 #{TRobotInfo.updateDate, jdbcType=TIMESTAMP},
                 #{TRobotInfo.robotFactory, jdbcType=VARCHAR},
+                #{TRobotInfo.madeIn, jdbcType=VARCHAR},
+                #{TRobotInfo.madeDate, jdbcType=TIMESTAMP},
                 #{TRobotInfo.isUse, jdbcType=VARCHAR},
                 #{TRobotInfo.commissionDate, jdbcType=TIMESTAMP},
                 #{TRobotInfo.upRegionId, jdbcType=BIGINT},
