@@ -50,7 +50,7 @@ public class IntelAnalysisController {
 
         JSONObject pictureDataObject = new JSONObject();
         pictureDataObject.put("analyseType", "11");
-        pictureDataObject.put("imagePath", "imagePath.jpg");
+        pictureDataObject.put("imagePath", "/home/yjh_iot_center/iot-picture/resultImg/120420221600367331057.jpg");
         pictureDataObject.put("modelPath", "modelPath.jpg");
         pictureDataObject.put("taskId", String.valueOf(UUID.randomUUID()));
         pictureDataObject.put("instanceId", "123456");
@@ -58,7 +58,7 @@ public class IntelAnalysisController {
 
         JSONObject pictureDataObject2 = new JSONObject();
         pictureDataObject2.put("analyseType", "11");
-        pictureDataObject2.put("imagePath", "imagePath.jpg");
+        pictureDataObject2.put("imagePath", "/home/yjh_iot_center/iot-picture/resultImg/120420221600367331057.jpg");
         pictureDataObject2.put("modelPath", "modelPath.jpg");
         pictureDataObject2.put("taskId", String.valueOf(UUID.randomUUID()));
         pictureDataObject2.put("instanceId", "123456");
@@ -83,7 +83,8 @@ public class IntelAnalysisController {
     @PostMapping(value = "/picAnalyseRetNotify")
     public ResponseEntity<Response> picAnalyseRetNotify(@Valid @RequestBody PicAnalyseResponse response) {
         log.info("< < < < < < 开始处理分析结果 > > > > > >");
-        return intelAnalysisService.picAnalyseRetNotify(response);
+        intelAnalysisService.picAnalyseRetNotify(response);
+        return ResponseEntity.ok(Response.ok());
     }
 
     /**

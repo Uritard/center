@@ -47,28 +47,30 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         // Deal with robot task result data
         String robotCode = xmlBaseModel.getSendCode();
         Map<String, String> cruiseResultMap = new HashMap<>(16);
+        Map<String, Object> item = xmlBaseModel.getItems().get(0);
+
         // 2022过检 robot_name -> patroldevice_name
-        cruiseResultMap.put("patrolDeviceName", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_name")));
-        cruiseResultMap.put("patrolDeviceCode", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code")));
+        cruiseResultMap.put("patrolDeviceName", String.valueOf(item.get("patroldevice_name")));
+        cruiseResultMap.put("patrolDeviceCode", String.valueOf(item.get("patroldevice_code")));
         cruiseResultMap.put("robotCode",robotCode);
-        cruiseResultMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
-        cruiseResultMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
-        cruiseResultMap.put("deviceName", xmlBaseModel.getItems().get(0).get("device_name").toString());
-        cruiseResultMap.put("deviceId", xmlBaseModel.getItems().get(0).get("device_id").toString());
+        cruiseResultMap.put("taskName", item.get("task_name").toString());
+        cruiseResultMap.put("taskCode", item.get("task_code").toString());
+        cruiseResultMap.put("deviceName", item.get("device_name").toString());
+        cruiseResultMap.put("deviceId", item.get("device_id").toString());
         // 2022过检 新增字段value_type 0:默认值类型 11:局放放电频次 12:局放信号峰值 13:局放信号均值
-        cruiseResultMap.put("valueType", xmlBaseModel.getItems().get(0).get("value_type").toString());
-        cruiseResultMap.put("value", xmlBaseModel.getItems().get(0).get("value").toString());
-        cruiseResultMap.put("valueUnit", xmlBaseModel.getItems().get(0).get("value_unit").toString());
-        cruiseResultMap.put("unit", xmlBaseModel.getItems().get(0).get("unit").toString());
-        cruiseResultMap.put("time", xmlBaseModel.getItems().get(0).get("time").toString());
-        cruiseResultMap.put("recognitionType", xmlBaseModel.getItems().get(0).get("recognition_type").toString());
-        cruiseResultMap.put("fileType", xmlBaseModel.getItems().get(0).get("file_type").toString());
-        cruiseResultMap.put("rectangle", xmlBaseModel.getItems().get(0).get("rectangle").toString());
-        cruiseResultMap.put("taskPatrolledId", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
-        if (Objects.nonNull(xmlBaseModel.getItems().get(0).get("valid"))) {
-            cruiseResultMap.put("valid", xmlBaseModel.getItems().get(0).get("valid").toString());
+        cruiseResultMap.put("valueType", item.get("value_type").toString());
+        cruiseResultMap.put("value", item.get("value").toString());
+        cruiseResultMap.put("valueUnit", item.get("value_unit").toString());
+        cruiseResultMap.put("unit", item.get("unit").toString());
+        cruiseResultMap.put("time", item.get("time").toString());
+        cruiseResultMap.put("recognitionType", item.get("recognition_type").toString());
+        cruiseResultMap.put("fileType", item.get("file_type").toString());
+        cruiseResultMap.put("rectangle", item.get("rectangle").toString());
+        cruiseResultMap.put("taskPatrolledId", item.get("task_patrolled_id").toString());
+        if (Objects.nonNull(item.get("valid"))) {
+            cruiseResultMap.put("valid", item.get("valid").toString());
         }
-        String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+        String ftpFilePath = item.get("file_path").toString();
         robotService.uploadFile(ftpFilePath, ftpFilePath);
 
         // 结果文件处理及判断结果是否告警
@@ -99,9 +101,11 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, String> isAlarmMap = new HashMap<>(16);
+        Map<String, Object> item = xmlBaseModel.getItems().get(0);
 
-        String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
-        String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
+
+        String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code").toString() + "/";
+        String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code").toString() + "/";
         // 可见光结果、红外fir、音频wav
         String[] sArray = ftpFilePath.split("/");
         String ftpFileName = sArray[sArray.length - 1];
@@ -109,9 +113,9 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         log.info("temporaryFilePath==={}",temporaryFilePath);
 
         // 红外原图
-        if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")) {
+        if (item.containsKey("origin_file_path")) {
             // 红外原图
-            String ftpInfraredOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();
+            String ftpInfraredOriginPath = item.get("origin_file_path").toString();
             String[] sArray2 = ftpInfraredOriginPath.split("/");
             // 红外原图名称
             String ftpInfraredOriginName = sArray2[sArray2.length - 1];
@@ -122,20 +126,25 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         }
         String ftpOriginPath = null;
         // 可见光原图、音频和红外结果
-        if (xmlBaseModel.getItems().get(0).containsKey("origin_file_result_path")) {
+        if (item.containsKey("origin_file_result_path")) {
             // 可见光原图、红外结果
-            ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_result_path").toString();
+            ftpOriginPath = item.get("origin_file_result_path").toString();
         } else {
             // 可见光原图、音频
-            ftpOriginPath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+            ftpOriginPath = item.get("file_path").toString();
         }
+
+        // 针对2022过检
+        boolean flag = item.containsKey("file_path") && !item.containsKey("origin_file_result_path") && !item.containsKey("origin_file_path");
+        temporaryMethod(cruiseResultMap, filePathMap, developAbsoluteUrl, developRelativeUrl, ftpFileName, temporaryFilePath, ftpOriginPath, flag);
+
         String[] sArray2 = ftpOriginPath.split("/");
         // 原图文件名称
         String ftpOriginName = sArray2[sArray2.length - 1];
         String temporaryOriginPath = filePathMap.get("content") + "/" + ftpOriginPath;
         log.info("temporaryOriginPath==={}",temporaryOriginPath);
 
-        String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
+        String fileType = item.get("file_type").toString();
         // 1.红外 2.可见光 3.音频 4.视频
         if (Objects.equals("1",fileType)) {
             // 拷贝巡视结果图
@@ -168,17 +177,17 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         }
 
         /// 新版的图片处理
-        /*String fileType = xmlBaseModel.getItems().get(0).get("file_type").toString();
-        String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+        /*String fileType = item.get("file_type").toString();
+        String ftpFilePath = item.get("file_path").toString();
         String sArray[] = ftpFilePath.split("/");
         String ftpFileName = sArray[sArray.length - 1];//巡视结果文件名称
         String temporaryFilePath = filePathMap.get(redisValue) + "/" +ftpFilePath;
 
         String ftpOriginPath = null;
-        if (xmlBaseModel.getItems().get(0).containsKey("origin_file_path")){
-            ftpOriginPath = xmlBaseModel.getItems().get(0).get("origin_file_path").toString();
+        if (item.containsKey("origin_file_path")){
+            ftpOriginPath = item.get("origin_file_path").toString();
         }else {
-            ftpOriginPath = xmlBaseModel.getItems().get(0).get("file_path").toString();
+            ftpOriginPath = item.get("file_path").toString();
         }
         String sArray2[] = ftpOriginPath.split("/");
         String ftpOriginName = sArray2[sArray2.length - 1];//原图文件名称
@@ -204,13 +213,61 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 
         // 只对红外和可见光进行二次分析判断是否产生告警
         isAlarmMap.put("robotCode", xmlBaseModel.getSendCode());
-        isAlarmMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
-        isAlarmMap.put("deviceId", xmlBaseModel.getItems().get(0).get("device_id").toString());
-        isAlarmMap.put("value", xmlBaseModel.getItems().get(0).get("value").toString());
+        isAlarmMap.put("taskCode", item.get("task_code").toString());
+        isAlarmMap.put("deviceId", item.get("device_id").toString());
+        isAlarmMap.put("value", item.get("value").toString());
         // Start IsWarnAfterCruiseThread
         IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate, websocketUrl);
         TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
     }
+
+    /**
+     * 27大类、表计、缺陷、判别需要机器人,且需算法分析
+     * 这些都是可见光的图片
+     * 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path
+     * @param
+     * @param cruiseResultMap 机器人巡视结果临时Map
+     * @param filePathMap
+     * @param developAbsoluteUrl
+     * @param developRelativeUrl
+     * @param ftpFileName
+     * @param temporaryFilePath
+     * @param ftpOriginPath
+     * @param flag 是否满足条件 即是否为模拟机器人做任务
+     * @return void
+     */
+    private void temporaryMethod(Map<String, String> cruiseResultMap, Map<String, String> filePathMap, String developAbsoluteUrl, String developRelativeUrl, String ftpFileName, String temporaryFilePath, String ftpOriginPath, boolean flag) {
+        if (Boolean.FALSE.equals(flag)) {
+            return;
+        }
+        // 机器人上传至ftp的文件路径
+        String temporaryOriginPath = filePathMap.get("content") + "/" + ftpOriginPath;
+        // 将机器人上传在ftp文件夹的图片复制到算法需要的目录
+
+        // 组装算法服务需要的信息  调用算法服务
+
+
+
+
+
+
+
+
+
+        // 剩下的结果存储就交给video服务来处理
+
+        /*String temporaryOriginPath = filePathMap.get("content") + "/" + ftpOriginPath;
+        String[] sArray2 = ftpOriginPath.split("/");
+        // 原图文件名称
+        String ftpOriginName = sArray2[sArray2.length - 1];
+        // 拷贝巡视结果图
+        copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "CCD");
+        // 拷贝原图
+        copyFileToDevelop(temporaryOriginPath, developAbsoluteUrl + "BigImg");
+        cruiseResultMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);
+        cruiseResultMap.put("absolutePath", developAbsoluteUrl + "BigImg" + "/" + ftpOriginName);*/
+    }
+
     /**
      * 巡视点结果上报站端
      * @param xmlBaseModel xml格式的内容

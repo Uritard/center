@@ -78,8 +78,8 @@ public class IntelAnalysisService {
         List<Map<String, Object>> objectList = new ArrayList<>();
         picAnalyseRequest.getObjectList().forEach(analyseObject -> {
             Map<String, Object> map = new HashMap<>(16);
-            map.put("objectId", analyseObject.getObjectId());
-            map.put("imageNormalUrlPath", analyseObject.getImageNormalUrlPath());
+            map.put("objectId", Optional.ofNullable(analyseObject.getObjectId()).orElse(""));
+            map.put("imageNormalUrlPath", Optional.ofNullable(analyseObject.getImageNormalUrlPath()).orElse(""));
             map.put("typeList", analyseObject.getTypeList());
             map.put("imageUrlList", analyseObject.getImageUrlList());
             objectList.add(map);
@@ -166,7 +166,7 @@ public class IntelAnalysisService {
      *
      * @param response 参数
      */
-    public ResponseEntity<Response> picAnalyseRetNotify(PicAnalyseResponse response){
+    public void picAnalyseRetNotify(PicAnalyseResponse response){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("msgID", String.valueOf(100000001));
         jsonObject.put("msgType", "2");
@@ -187,10 +187,13 @@ public class IntelAnalysisService {
             resultDataObject.put("instanceId", analyseResult.getObjectId());
 
             List<AnalyseResultItem> results = analyseResult.getResults();
+            StringJoiner resultValue = new StringJoiner(",");
+            StringJoiner type = new StringJoiner(",");
+
             // 遍历单个点的分析结果,不同的缺陷
             for (AnalyseResultItem result : results) {
-                resultDataObject.put("analyseType", "11");
-                resultDataObject.put("resultValue", result.getDesc());
+                resultValue.add(result.getDesc());
+                type.add(result.getType());
                 resultDataObject.put("analyseResultImg", result.getResImageUrl());
                 resultDataObject.put("pictureCoordinate", result.getPos());
 
@@ -198,9 +201,13 @@ public class IntelAnalysisService {
                 resultDataObject.put("code", result.getCode());
                 resultDataObject.put("conf", result.getConf());
                 resultDataObject.put("value", result.getValue());
-                i++;
+
             }
+            resultDataObject.put("type", type.toString());
+            resultDataObject.put("analyseType", 398);
+            resultDataObject.put("resultValue", resultValue.toString());
             resultInfoObject.put("resultInfo" + i, resultDataObject);
+            i++;
         }
         msgDataObject.put("data", resultInfoObject);
         jsonObject.put("msgData", msgDataObject);
@@ -210,10 +217,13 @@ public class IntelAnalysisService {
         System.out.println(pretty);
 
         int remotePort = 13669;
-        DataDealThread dataDealThread = new DataDealThread(jsonObject.toJSONString(), remotePort, redisTemplate, analyseDataOperateService, syncWebsocketUrl);
-        TaskExecutePool.getInstance().execute(dataDealThread);
-
-        return ResponseEntity.ok(Response.ok());
+        try {
+            DataDealThread dataDealThread = new DataDealThread(jsonObject.toJSONString(), remotePort, redisTemplate, analyseDataOperateService, syncWebsocketUrl);
+            TaskExecutePool.getInstance().execute(dataDealThread);
+        }catch (Exception e){
+            log.error("算法结果处理异常：{}", e);
+            log.error("exceptionDetails:{}", e.getStackTrace()[0]);
+        }
     }
 
     /**
@@ -249,7 +259,10 @@ public class IntelAnalysisService {
             analyseObject.setTypeList(typeList);
             // 待分析图像的URL,可多选
             List<String> imageUrlList = new ArrayList<>();
-            imageUrlList.add(jsonObjectResult.get("imagePath").toString());
+            String imagePath = jsonObjectResult.get("imagePath").toString().replaceAll(
+                    redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content").toString(),
+                    redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content").toString());
+            imageUrlList.add(imagePath);
 
             analyseObject.setImageUrlList(imageUrlList);
             objectList.add(analyseObject);
@@ -284,7 +297,8 @@ public class IntelAnalysisService {
      * @return String
      */
     public ResponseEntity<Response> restTemplatePost(String url, Map<String, Object> map) {
-        return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, ResponseEntity.class);
+        ResponseEntity<Response> response = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, ResponseEntity.class);
+        return response;
     }
 
     /**
