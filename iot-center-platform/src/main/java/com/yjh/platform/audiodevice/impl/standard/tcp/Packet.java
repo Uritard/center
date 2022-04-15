@@ -4,6 +4,7 @@
 
 package com.yjh.platform.audiodevice.impl.standard.tcp;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.mina.core.buffer.IoBuffer;
 
 import java.nio.ByteOrder;
@@ -13,6 +14,7 @@ import java.util.Arrays;
  * @author zilong
  * @date 2022/4/14
  */
+@Slf4j
 public class Packet {
     private static final byte[] HEAD = {(byte) 0xFC, (byte) 0xFC, (byte) 0xFC, (byte) 0xFC};
     private static final byte END = (byte) 0xFD;
@@ -96,6 +98,7 @@ public class Packet {
             }
         }
 
+        //TODO: 协议里没说大端还是小端，这里先按照小端解析
         in.order(ByteOrder.BIG_ENDIAN);
 
         //包格式版本
@@ -107,8 +110,11 @@ public class Packet {
             return null;
         }
 
-        Packet packet = new Packet();
+        if (!checkCrc(in.array(), in.position(), remainingLength - (2 + 1))) {
+//            throw new IllegalArgumentException("Crc校验失败");
+        }
 
+        Packet packet = new Packet();
         packet.timestamp = in.getLong();
         in.get(packet.basicInfo);
         in.get(packet.deviceId);
@@ -120,7 +126,7 @@ public class Packet {
         int dataGroupSize = calcDataGroupSize(remainingLength);
         byte[] dataGroupBytes = new byte[dataGroupSize];
         in.get(dataGroupBytes);
-        //调试作用，当version是0x7F时，认为每个通道数据时两个字节
+        //调试作用，当version是0x7F时，认为每个通道数据是两个字节
         if (0x7F == version) {
             packet.dataGroup = new DataGroup(dataGroupBytes, 2);
         } else {
@@ -137,6 +143,20 @@ public class Packet {
         }
 
         return packet;
+    }
+
+    private static boolean checkCrc(byte[] buf, int start, int dataLength) {
+        byte[] crcValue = CrcCheck.calcCrc16(buf, start, dataLength);
+        byte crcH = buf[start + dataLength];
+        byte crcL = buf[start + dataLength + 1];
+        if (crcValue[0] != crcH || crcValue[1] != crcL) {
+            log.warn(String.format("CRC校验不对, 计算值: %02X %02X, 期望值: %02X %02X",
+                    crcValue[0], crcValue[1], crcH, crcL)
+            );
+            return false;
+        }
+
+        return true;
     }
 
     public long getTimestamp() {
