@@ -77,13 +77,59 @@ public class StandardAudioDevice implements AudioDevice {
     @Override
     synchronized public void stopRecordingAndSave(String audioFilepath) throws Exception {
         stopRecording();
-
         try {
             packetsLock.readLock().lock();
-            //TODO: xiaoming 写wav文件
+            if (packets.size() > 0) {
+                genAudioFile(audioFilepath, packets);
+            }
             packets.clear();
         } finally {
             packetsLock.readLock().unlock();
         }
+    }
+
+    private void genAudioFile(String audioFilepath, List<Packet> packets) {
+        // 生成文件头
+        int totalAudioLen = getTotalAudioLen(packets);
+        byte[] headerByte = getHeaderByte(totalAudioLen,packets);
+        byte[] contentByte = getContentByte(totalAudioLen,packets);
+        writeWAVFile(audioFilepath, headerByte,contentByte);
+    }
+
+    private void writeWAVFile(String audioFilepath, byte[] headerByte, byte[] contentByte) {
+        boolean flag = AudioFileUtils.writePCMAudioFile(audioFilepath,headerByte,contentByte);
+        log.info("wav数据文件生成状态：{}",flag);
+    }
+
+    private byte[] getContentByte(int totalAudioLen, List<Packet> packets) {
+        byte[] contentByte = new byte[totalAudioLen];
+        int startLen = 0;
+        for (Packet packet : packets) {
+            List<byte[]> lb = packet.getDataGroup().getAudioDatas();
+            for (byte[] b : lb) {
+                System.arraycopy(b, 0, contentByte, startLen, b.length);
+                startLen += b.length;
+            }
+        }
+        return contentByte;
+    }
+
+    byte[] getHeaderByte(long totalAudioLen, List<Packet> packets){
+        long totalDateLen = totalAudioLen + 36;
+        long sampleRate = packets.get(0).getDataGroup().getSampleRate();
+        int channels = packets.get(0).getDataGroup().getChannels();
+        long byteRate = packets.get(0).getDataGroup().getBits();
+        return AudioFileUtils.getWaveFileHeader(totalAudioLen,totalDateLen,sampleRate,channels,byteRate);
+    }
+
+    private int getTotalAudioLen(List<Packet> packets) {
+        int totolLen = 0;
+        for (Packet packet : packets){
+            List<byte[]> list = packet.getDataGroup().getAudioDatas();
+            for (byte[] b : list){
+                totolLen += b.length;
+            }
+        }
+        return totolLen;
     }
 }

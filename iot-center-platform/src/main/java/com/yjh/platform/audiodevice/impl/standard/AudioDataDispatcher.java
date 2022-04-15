@@ -32,7 +32,7 @@ public class AudioDataDispatcher {
 
     private void onAudioMessage(InboundMessage inboundMessage) {
         log.info("收到声纹设备({})的录音数据", inboundMessage.getDeviceId());
-        AudioDevice audioDevice = audioDeviceManager.getAudioDevice(inboundMessage.getDeviceId()).orElse(null);
+        AudioDevice audioDevice = audioDeviceManager.getAudioDevice(inboundMessage.getDeviceId());
         if (audioDevice == null) {
             log.warn("声纹设备还未注册({})", inboundMessage.getDeviceId());
         }

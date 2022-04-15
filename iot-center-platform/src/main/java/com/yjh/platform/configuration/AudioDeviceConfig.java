@@ -7,7 +7,6 @@ import com.yjh.messager.api.channel.RxBusMsgChannel;
 import com.yjh.messager.api.msg.Msg;
 import com.yjh.messager.api.socket.BaseSocketServer;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
-import com.yjh.platform.audiodevice.impl.AudioDeviceFactory;
 import com.yjh.platform.audiodevice.impl.AudioDeviceManagerImpl;
 import com.yjh.platform.audiodevice.impl.standard.AudioDataDispatcher;
 import com.yjh.platform.audiodevice.impl.standard.StandardAudioDevice;
@@ -67,6 +66,7 @@ public class AudioDeviceConfig {
     public AudioDeviceManager audioDeviceManager() {
         //TODO: 调试目的
         AudioDeviceManager audioDeviceManager = new AudioDeviceManagerImpl();
+        audioDeviceManager.registerAudioDevice("YWJjZGVm", new StandardAudioDevice());
         audioDeviceManager.registerAudioDevice("AQIDBAUG", new StandardAudioDevice());
         return audioDeviceManager;
     }

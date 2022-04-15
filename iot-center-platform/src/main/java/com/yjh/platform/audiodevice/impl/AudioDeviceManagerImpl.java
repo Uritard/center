@@ -4,7 +4,6 @@ import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -21,8 +20,8 @@ public class AudioDeviceManagerImpl implements AudioDeviceManager {
     ConcurrentMap<String, AudioDevice> deviceMap = new ConcurrentHashMap<>();
 
     @Override
-    public Optional<AudioDevice> getAudioDevice(String deviceId) {
-        return Optional.of(deviceMap.get(deviceId));
+    public AudioDevice getAudioDevice(String deviceId) {
+        return deviceMap.get(deviceId);
     }
 
     @Override

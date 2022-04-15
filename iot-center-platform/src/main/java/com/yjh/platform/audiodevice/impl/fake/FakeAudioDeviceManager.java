@@ -3,8 +3,6 @@ package com.yjh.platform.audiodevice.impl.fake;
 import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 
-import java.util.Optional;
-
 /**
  * <功能描述>
  *
@@ -15,8 +13,8 @@ import java.util.Optional;
 public class FakeAudioDeviceManager implements AudioDeviceManager {
 
     @Override
-    public Optional<AudioDevice> getAudioDevice(String deviceId) {
-        return Optional.of(new FakeAudioDevice());
+    public AudioDevice getAudioDevice(String deviceId) {
+        return new FakeAudioDevice();
     }
 
     @Override

@@ -1,7 +1,5 @@
 package com.yjh.platform.audiodevice;
 
-import java.util.Optional;
-
 /**
  * 录音设备管理器
  *
@@ -18,7 +16,7 @@ public interface AudioDeviceManager {
      * @return 设备实例
      * @throws Exception 不存在设备时抛出异常
      */
-    Optional<AudioDevice> getAudioDevice(String deviceId);
+    AudioDevice getAudioDevice(String deviceId);
 
     /**
      * 注册声纹设备
