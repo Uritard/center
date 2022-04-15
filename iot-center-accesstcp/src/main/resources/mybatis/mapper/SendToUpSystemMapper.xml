@@ -144,7 +144,7 @@
 	<select id="countTask" resultType="java.util.HashMap">
 		select
 		count(1) as totalNum,
-		(select count(1) from  t_cruise_task_result where cruise_task_time BETWEEN #{startTime} and #{endTime} and cruise_result = 247) as validNum
+		(select count(1) from  t_cruise_task_result where cruise_task_time BETWEEN #{startTime} and #{endTime} and cruise_result = 246) as validNum
 		from t_cruise_task_result
 		where cruise_task_time BETWEEN #{startTime} and #{endTime}
 	</select>

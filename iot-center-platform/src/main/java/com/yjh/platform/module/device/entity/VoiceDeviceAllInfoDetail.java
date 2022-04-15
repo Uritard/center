@@ -79,6 +79,19 @@ public class VoiceDeviceAllInfoDetail{
     @TableField("filePath")
     private String filePath;
 
+
+    public String getVoiceCode() {
+        return voiceCode;
+    }
+
+    public void setVoiceCode(String voiceCode) {
+        this.voiceCode = voiceCode;
+    }
+
+    @ApiModelProperty(value = "声纹设备编码")
+    private String voiceCode;
+
+
     private String channelNum;
 
     private String regionName;

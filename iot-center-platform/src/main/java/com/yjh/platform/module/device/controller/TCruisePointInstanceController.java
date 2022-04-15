@@ -170,7 +170,6 @@ public class TCruisePointInstanceController {
 
     ) {
         Result result = tCruisePointInstanceService.selectCruisePointByPage(tStdDeviceMete,tStdDeviceMete.getPageNum()!=null?tStdDeviceMete.getPageNum():1, tStdDeviceMete.getPageSize()!=null?tStdDeviceMete.getPageSize():0);
-        log.info("666666");
         return result;
     }
 

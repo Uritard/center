@@ -589,8 +589,8 @@
         a.defect_type as defect_model,
         p.dict_note as defect_model_name,
         n.cruise_id as preset_id,
-        j.camera_id,
         b.up_region_name as regionName,
+        j.camera_id,
         '' AS video_camera_type
         FROM
         t_defect_info a

@@ -2,6 +2,7 @@ package com.yjh.platform.common.quartz;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -12,6 +13,7 @@ import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.*;
+import com.yjh.platform.module.device.service.VoiceTask;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruiseDataResultService;
@@ -70,6 +72,8 @@ public class CruiseTaskJob extends QuartzJobBean {
     private TAlgorithmConfBakDao tAlgorithmConfBakDao;
     @Autowired
     private TCruiseTaskService tCruiseTaskService;
+    @Autowired
+    private AudioDeviceManager audioDeviceManager;
 
 
 
@@ -244,7 +248,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
                         robotTaskInfo.setCruiseType(tCruiseTask.getType());
                         robotTaskInfo.setTaskId(taskId);
-                        robotTaskInfo.setPriority(4);//优先级 暂定4
+                        robotTaskInfo.setPriority(tCruiseTask.getTaskLevel());//优先级
                         robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
                         List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
                         robotTaskInfo.setInstanceList(robotTaskInstanceList);
@@ -258,6 +262,10 @@ public class CruiseTaskJob extends QuartzJobBean {
                     //让机器人做任务
                     robotTask(robotTaskInfoMap);
                 }
+
+
+                //声纹设备
+                List<Long> voiceDeviceList = new ArrayList<>();
 
                 log.info("开始巡检"+new Date()+"--"+tCruiseTask.getTaskId());
 
@@ -855,7 +863,29 @@ public class CruiseTaskJob extends QuartzJobBean {
                     }
                     if (231 == item.getCruiseType()) {//todo 在线监控
                     }
-                    if (232 == item.getCruiseType()) {//todo scala
+                    if (232 == item.getCruiseType()) {// 声纹
+                        //声纹预置信息
+                        tCruiseTaskResultDetailMap.put("cruiseTime", simpleDateFormat.format(new Date()));
+                        tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
+                        tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
+                        redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
+
+                        if(!voiceDeviceList.contains(item.getCruiseId())){
+                            String voicePath = redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content").toString();
+                            long dateTime = System.currentTimeMillis();
+                            Long maoForTime= Long.valueOf(redisTemplate.opsForHash().entries("t_sys_param:voiceDeviceTime").get("content").toString());
+                            long dateTimeAfter = dateTime+maoForTime*1000;
+                            String timeAfterTem = new SimpleDateFormat("yyyy-MM-dd").format(new Date(dateTime));
+                            String voiceName = item.getCruiseId() +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
+                                    +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter));
+                            String voiceFilePath = voicePath+"/"+item.getCruiseId()+"/1/"+timeAfterTem+"/"+voiceName + ".wav";
+                            //创建一个线程去处理声纹巡视
+                            VoiceTask voiceTask = new VoiceTask(redisTemplate,item.getCruiseId(),voiceFilePath,taskId,item.getInstanceId()
+                                    ,tCruiseDataResultDao,tCruiseTaskResultDetailDao,audioDeviceManager,tCruiseResult,item,tCruiseResultDao);
+                            Thread thread = new Thread(voiceTask);
+                            thread.setDaemon(true);
+                            thread.start();
+                        }
                     }
 
                     //检测任务是否暂停  或者任务是否超期

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mchange.v1.util.ArrayUtils;
+import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsAspect;
@@ -26,6 +27,7 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
+import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.*;
@@ -99,6 +101,12 @@ public class TCruiseTaskService {
     @Autowired
     private Demo demo;
     private RunAtNowTask runAtNowTask;
+
+    @Autowired
+    private AudioDeviceManager audioDeviceManager;
+
+    @Autowired
+    private TVoiceDeviceService tVoiceDeviceService;
 
     //模板图片路径
     private String picModelPath;
@@ -365,7 +373,7 @@ public class TCruiseTaskService {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                             tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                             tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                            tRobotInspectionDao, tAlgorithmConfBakDao,this);
+                            tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();
@@ -756,7 +764,7 @@ public class TCruiseTaskService {
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                 tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                 tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, true, tasksAreTime,
-                tRobotInspectionDao, tAlgorithmConfBakDao,this);
+                tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager);
         Thread thread = new Thread(runAtNowTask);
         thread.setDaemon(true);
         thread.start();
@@ -1249,7 +1257,7 @@ public class TCruiseTaskService {
                 RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                         tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                         tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                        tRobotInspectionDao, tAlgorithmConfBakDao,this);
+                        tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager);
                 Thread thread = new Thread(runAtNowTask);
                 thread.setDaemon(true);
                 thread.start();
@@ -1332,7 +1340,7 @@ public class TCruiseTaskService {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                             tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                             tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                            tRobotInspectionDao, tAlgorithmConfBakDao,this);
+                            tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();

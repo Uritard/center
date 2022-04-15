@@ -48,6 +48,8 @@ public class TVoiceDevice implements Serializable {
 
     private String state;
 
+    private String voiceCode;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;

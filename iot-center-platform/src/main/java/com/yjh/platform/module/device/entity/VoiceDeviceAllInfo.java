@@ -84,5 +84,7 @@ public class VoiceDeviceAllInfo {
 
     private String  state;
 
+    private String voiceCode;
+
 
 }

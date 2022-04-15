@@ -12,6 +12,7 @@ import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import org.apache.commons.collections.iterators.ObjectGraphIterator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,9 @@ public class SendToUpSystemServices {
     private RedisTemplate redisTemplate;
     @Value("${spring.union.stationCode}")
     private String stationCode;
+
+    @Autowired
+    private FtpsUtil ftpsUtil;
 
     @Autowired
     private SendToUpSystemDao sendToUpSystemDao;
@@ -74,17 +78,17 @@ public class SendToUpSystemServices {
             //点位模型
             map.put("device_file_path",createDeviceModel(path));
             String deviceModelTargetPath = String.format(stationCode + "/Model/device_model.xml");
-            FtpsUtil.putFile(map.get("device_file_path").toString(),deviceModelTargetPath);
+            ftpsUtil.putFile(map.get("device_file_path").toString(),deviceModelTargetPath);
 
             //机器人模型
             map.put("robot_file_path",createRobotModel(path));
             String robotModelTargetPath = String.format(stationCode + "/Model/robot_model.xml");
-            FtpsUtil.putFile(map.get("robot_file_path").toString(),robotModelTargetPath);
+            ftpsUtil.putFile(map.get("robot_file_path").toString(),robotModelTargetPath);
 
             //摄像机模型
             map.put("video_file_path",createCameraModel(path));
             String videoModelTargetPath = String.format(stationCode + "/Model/video_model.xml");
-            FtpsUtil.putFile(map.get("video_file_path").toString(),videoModelTargetPath);
+            ftpsUtil.putFile(map.get("video_file_path").toString(),videoModelTargetPath);
 
             //巡视主机模型
 //            Map<String, Object> host = new HashMap<>();
@@ -110,22 +114,22 @@ public class SendToUpSystemServices {
             //无人机
             map.put("drone_file_path",createDroneModel(path));
             String droneModelTargetPath = String.format(stationCode + "/Model/drone_model.xml");
-            FtpsUtil.putFile(map.get("drone_file_path").toString(),droneModelTargetPath);
+            ftpsUtil.putFile(map.get("drone_file_path").toString(),droneModelTargetPath);
 
             //声纹模型
             map.put("voice_file_path",createVoiceModel(path));
             String voiceModelTargetPath = String.format(stationCode + "/Model/voice_model.xml");
-            FtpsUtil.putFile(map.get("voice_file_path").toString(),voiceModelTargetPath);
+            ftpsUtil.putFile(map.get("voice_file_path").toString(),voiceModelTargetPath);
 
             //任务模型
             map.put("task_file_path",createTaskModel(path));
             String taskModelTargetPath = String.format(stationCode + "/Model/task_model.xml");
-            FtpsUtil.putFile(map.get("task_file_path").toString(),taskModelTargetPath);
+            ftpsUtil.putFile(map.get("task_file_path").toString(),taskModelTargetPath);
 
             //检修区域模型
             map.put("overhaularea_file_path",createMaintenanceModel(path));
             String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
-            FtpsUtil.putFile(map.get("overhaularea_file_path").toString(),overhaulareaModelTargetPath);
+            ftpsUtil.putFile(map.get("overhaularea_file_path").toString(),overhaulareaModelTargetPath);
 
 
             return map;

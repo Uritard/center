@@ -295,4 +295,18 @@ public class TVoiceDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "获取拾音器树")
+    @RequestMapping(value = "/selectVoiceTree", method = RequestMethod.GET)
+//    @Logs(title = "关闭拾音器",content = "拾音器停止录音",logType = 5,authority = "1235")
+    public Result selectVoiceTree() {
+        Result result = new Result();
+        try {
+            result.setData(tVoiceDeviceService.selectVoiceTree());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
 }

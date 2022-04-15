@@ -56,8 +56,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private TCameraInfoService tCameraInfoService;
     @Autowired
     private SysUserService sysUserService;
-//    @Autowired
-//    private TVoiceDeviceService tVoiceDeviceService;
+    @Autowired
+    private TVoiceDeviceService tVoiceDeviceService;
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -82,6 +82,7 @@ public class PlatformApplication  implements CommandLineRunner {
         tCameraInfoService.intoRedis();
         tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
         sysUserService.insertIntoRedis();
+        tVoiceDeviceService.registerAudioDevice();//声纹设备注册
         Constant.WEBSOCKET_URL = url;
         Constant.redisTemplate = redisTemplate;
         Constant.apiPermissions= Boolean.valueOf(interfaceApi);

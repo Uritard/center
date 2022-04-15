@@ -5,10 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
-import com.yjh.platform.module.device.dao.TCruisePointAttrDao;
-import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
-import com.yjh.platform.module.device.dao.TRobotInspectionDao;
-import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
@@ -56,6 +53,9 @@ public class TCruisePointInstanceService{
     private TCruisePointAttrDao tCruisePointAttrDao;
     @Autowired
     private TCruiseTypeDao tCruiseTypeDao;
+
+    @Autowired
+    private TVoiceDeviceDao tVoiceDeviceDao;
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
@@ -377,6 +377,11 @@ public class TCruisePointInstanceService{
                             tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tRobotInspection.getInspectionName());
                         }
                         if(cruiseType == 232){//声纹
+                            //声纹是一个测点对应一个巡视设备
+                            VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail = tVoiceDeviceDao.selectByPrimaryId(id);
+                            tCruisePointInstance.setCruiseId(id);
+                            tCruisePointInstance.setCruiseName(voiceDeviceAllInfoDetail.getVoiceDeviceName());
+                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+voiceDeviceAllInfoDetail.getVoiceDeviceName());
                         }
                         //新增配置号的巡检点
                         result =  tCruisePointInstanceDao.insert(tCruisePointInstance);
@@ -405,6 +410,13 @@ public class TCruisePointInstanceService{
                         tCruisePointInstance.setCruiseId(id);
                         tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
                         tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tRobotInspection.getInspectionName());
+                    }
+                    if(cruiseType == 232){//声纹
+                        //声纹是一个测点对应一个巡视设备
+                        VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail = tVoiceDeviceDao.selectByPrimaryId(id);
+                        tCruisePointInstance.setCruiseId(id);
+                        tCruisePointInstance.setCruiseName(voiceDeviceAllInfoDetail.getVoiceDeviceName());
+                        tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+voiceDeviceAllInfoDetail.getVoiceDeviceName());
                     }
                     //新增配置号的巡检点
                     result =  tCruisePointInstanceDao.insert(tCruisePointInstance);

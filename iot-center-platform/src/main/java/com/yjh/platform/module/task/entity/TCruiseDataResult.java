@@ -148,6 +148,8 @@ public class TCruiseDataResult implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
+    private String voicePath;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;

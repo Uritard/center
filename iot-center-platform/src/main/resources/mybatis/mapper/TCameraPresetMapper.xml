@@ -368,6 +368,7 @@
         <if test="presetId != null and presetId != ''"> and preset_id = #{presetId, jdbcType=BIGINT}</if>
         <if test="isKeepWatch != null and isKeepWatch != ''"> and is_keep_watch = 1</if>
         <if test="isKeepWatchTask != null and isKeepWatchTask != ''"> and is_keep_watch_task = 1</if>
+        <if test="selfPreset != null and selfPreset != ''"> and preset_id &lt;&gt; #{selfPreset, jdbcType=BIGINT}</if>
     </select>
 
     <select id="selectCameraBySilent" resultType="java.util.Map">

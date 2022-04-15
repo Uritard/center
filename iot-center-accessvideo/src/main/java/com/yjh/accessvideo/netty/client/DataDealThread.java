@@ -401,7 +401,7 @@ public class DataDealThread implements Runnable {
                                                     currentWarnInfo.put("defectModel","450");
                                                     currentWarnInfo.put("isPop","false");
 
-                                                    {
+                                                    try{
 
                                                         //告警上报站端
                                                         XMLBaseModel xmlBaseModel = new XMLBaseModel();
@@ -434,8 +434,11 @@ public class DataDealThread implements Runnable {
                                                         Map<String, List<XMLBaseModel>> map = new HashMap<>();
                                                         map.put("list", list);
                                                         log.info("告警上报：-" + map);
-                                                        //Constant.otherServer(map, Constant.TCP_URL);//江苏要求
+                                                        Constant.otherServer(map, Constant.TCP_URL);//江苏要求
+                                                    }catch (Exception e){
+                                                        log.info("告警上报出错：{}",e);
                                                     }
+
 
 
 

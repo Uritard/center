@@ -193,13 +193,13 @@ public class TCameraPresetController {
         Result result = new Result();
         try {
             if(tCameraPreset.getIsKeepWatch() == 1){//设置预置位为守望位
-                TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),null,1,null);
+                TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),null,1,null,tCameraPreset.getPresetId());
                 if (keepWatchPreset != null){
                     //已有守望位
                     result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此相机已有守望位，是预置位："+tCameraPreset.getPresetName());
                     return result;
                 }
-                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),0,1);
+                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),null,1,null);
                 if (keepWatchPreset != null){
                     //此位置是静默任务预置位
                     result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此预置位为静默任务预置位");
@@ -207,13 +207,13 @@ public class TCameraPresetController {
                 }
             }
             if(tCameraPreset.getIsKeepWatchTask() == 1){//设置预置位为静默任务为
-                TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),null,0,1);
+                TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),null,null,1,tCameraPreset.getPresetId());
                 if (keepWatchPreset != null){
                     //已有静默任务预置位
                     result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此相机已有静默任务预置位，是预置位："+tCameraPreset.getPresetName());
                     return result;
                 }
-                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),1,0);
+                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),1,null,null);
                 if (keepWatchPreset != null){
                     //此位置是守望位
                     result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此预置位为守望预置位");

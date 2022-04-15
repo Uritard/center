@@ -3,6 +3,8 @@ package com.yjh.platform.module.device.service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sun.jna.Pointer;
+import com.yjh.platform.audiodevice.AudioDeviceManager;
+import com.yjh.platform.audiodevice.impl.standard.StandardAudioDevice;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -54,18 +56,20 @@ public class TVoiceDeviceService{
     private TStdRegionDao tStdRegionDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private AudioDeviceManager audioDeviceManager;
 
     private Logger log = LoggerFactory.getLogger(TVoiceDeviceService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public int add(VoiceDeviceAllInfoDetail tVoiceDevice) {
-        List<TStdDevice> tStdDevice = tStdDeviceDao.selectByPrimaryId(tVoiceDevice.getStdDeviceId());
-        if(tStdDevice.size()!=0){
-            tVoiceDevice.setDeviceType(tStdDevice.get(0).getDeviceType().toString());
-            //tVoiceDevice.setStationId(tStdDevice.getS)
-        }else {
-            return -1;
-        }
+//        List<TStdDevice> tStdDevice = tStdDeviceDao.selectByPrimaryId(tVoiceDevice.getStdDeviceId());
+//        if(tStdDevice.size()!=0){
+//            tVoiceDevice.setDeviceType(tStdDevice.get(0).getDeviceType().toString());
+//            //tVoiceDevice.setStationId(tStdDevice.getS)
+//        }else {
+//            return -1;
+//        }
         //tVoiceDevice.setState("未知");
         if(ping(tVoiceDevice.getFtpUrl())){
             tVoiceDevice.setState("在线");
@@ -87,13 +91,13 @@ public class TVoiceDeviceService{
 
     @Transactional(rollbackFor = Exception.class)
     public int update(VoiceDeviceAllInfoDetail tVoiceDevice) {
-        List<TStdDevice> tStdDevice = tStdDeviceDao.selectByPrimaryId(tVoiceDevice.getStdDeviceId());
-        if(tStdDevice.size() != 0){
-            tVoiceDevice.setDeviceType(tStdDevice.get(0).getDeviceType().toString());
-            //tVoiceDevice.setStationId(tStdDevice.getS)
-        }else {
-            return -1;
-        }
+//        List<TStdDevice> tStdDevice = tStdDeviceDao.selectByPrimaryId(tVoiceDevice.getStdDeviceId());
+//        if(tStdDevice.size() != 0){
+//            tVoiceDevice.setDeviceType(tStdDevice.get(0).getDeviceType().toString());
+//            //tVoiceDevice.setStationId(tStdDevice.getS)
+//        }else {
+//            return -1;
+//        }
         //tVoiceDevice.setState("未知");
         if(ping(tVoiceDevice.getFtpUrl())){
              tVoiceDevice.setState("在线");
@@ -733,5 +737,24 @@ public class TVoiceDeviceService{
         }
         return 1;
     }
+
+    public VoiceDevice selectVoiceTree(){
+        VoiceDevice voiceDevice =new VoiceDevice();
+        voiceDevice.setId("-1");
+        voiceDevice.setLabel("声纹设备树");
+        voiceDevice.setInfoType("area");
+        voiceDevice.setChildren(tVoiceDeviceDao.selectVoiceTree());
+        return voiceDevice;
+    }
+
+    public void registerAudioDevice(){
+        List<TVoiceDevice> list = tVoiceDeviceDao.select(null,null,null,null,null,null);
+        list.forEach(tVoiceDevice -> {
+            if(tVoiceDevice.getVoiceCode() != null && !"".equals(tVoiceDevice.getVoiceCode())){
+                audioDeviceManager.registerAudioDevice(tVoiceDevice.getVoiceCode(),new StandardAudioDevice());
+            }
+        });
+    }
+
 }
 

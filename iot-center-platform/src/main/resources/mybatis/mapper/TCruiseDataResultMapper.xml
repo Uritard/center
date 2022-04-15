@@ -57,7 +57,8 @@
             remark,
             check_user,
             check_date,
-            is_warn
+            is_warn,
+            voice_path
         )values(
                 #{cruiseDataId, jdbcType=BIGINT},
                 #{cruiseResultId, jdbcType=VARCHAR},
@@ -81,7 +82,8 @@
                 #{remark, jdbcType=VARCHAR},
                 #{checkUser, jdbcType=VARCHAR},
                 #{checkDate, jdbcType=TIMESTAMP},
-                #{isWarn, jdbcType=INTEGER}
+                #{isWarn, jdbcType=INTEGER},
+                #{voicePath, jdbcType=VARCHAR}
         )
     </insert>
 

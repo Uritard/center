@@ -4,6 +4,7 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import com.yjh.accessrobot.netty.thread.RobotInspectionWarnThread;
@@ -32,6 +33,9 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private RobotService robotService;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -62,6 +66,9 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
         byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
         RobotServerHandler.send( alarmProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
+
+        // 国网要求
+        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override
