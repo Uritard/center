@@ -223,4 +223,17 @@ public class TRobotInfo implements Serializable {
 
     private Integer channelNumLight;
     private Integer channelNumInferad;
+
+
+    @ApiModelProperty(value = "上次登录时间(毫秒数)")
+    @TableField(value = "last_online_time",updateStrategy = FieldStrategy.IGNORED)
+    private Long lastOnlineTime;
+
+    @ApiModelProperty(value = "在线时长累积(毫秒)")
+    @TableField(value = "duration",updateStrategy = FieldStrategy.IGNORED)
+    private Long duration;
+
+    @ApiModelProperty(value = "离线次数")
+    @TableField(value = "off_line_count",updateStrategy = FieldStrategy.IGNORED)
+    private Long offLineCount;
 }

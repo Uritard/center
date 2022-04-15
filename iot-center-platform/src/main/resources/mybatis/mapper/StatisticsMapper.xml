@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.task.dao.StatisticsDao">
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TRobotInfo"
+            resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+        select
+        a.robot_id robotId,
+        a.robot_code robotCode,
+        a.robot_name robotName,
+        a.robot_status robotStatus,
+        a.last_online_time lastOnlineTime,
+        a.off_line_count offLineCount,
+        a.duration
+        from t_robot_info a
+        where 1 = 1
+        <if test="robotId != null and robotId != ''">and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="robotCode != null and robotCode != ''">and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectStatisticsRobot"  resultType="java.util.Map">
+        SELECT
+        tr.robot_id robotId,
+        tr.robot_code robotCode,
+        tr.commission_date commissionDate,
+        TO_DAYS(NOW()) - TO_DAYS(tr.`commission_date`) + 1 runDay,
+        COUNT(
+        DISTINCT DATE_FORMAT(tcr.create_time, '%Y-%m-%d')
+        ) taskDay,
+        TO_DAYS(NOW()) - TO_DAYS(tr.`commission_date`) - COUNT(
+        DISTINCT DATE_FORMAT(ta.alarm_time, '%Y-%m-%d')
+        ) + 1 normalDay
+        FROM
+        t_robot_info tr
+        LEFT JOIN t_robot_alarm ta
+        ON ta.`robot_id` = tr.`robot_id`
+        AND (
+        ta.alarm_time IS NULL
+        OR ta.alarm_time >= tr.commission_date
+        )
+        LEFT JOIN t_cruise_task tc
+        ON tc.`robot_id` = tr.`robot_id`
+        LEFT JOIN t_cruise_result tcr
+        ON tcr.`task_id` = tc.`task_id`  AND tcr.execute_time <![CDATA[<=]]>NOW()
+        WHERE tr.commission_date IS TRUE AND tr.commission_date  <![CDATA[<=]]> NOW()
+        <if test="robotId != null and robotId != ''">and tr.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        GROUP BY robotId
+    </select>
+
+
+    <select id="countTaskAttend" resultType="java.util.HashMap">
+        SELECT
+        robot_id,
+        TO_DAYS(NOW()) - TO_DAYS(tr.`commission_date`) + 1 totalNum,
+        (SELECT
+        COUNT(
+        DISTINCT DATE_FORMAT(tcr.cruise_task_time, '%Y-%m-%d')
+        )
+        FROM
+        t_cruise_task_result tcr
+        LEFT JOIN t_cruise_task tct
+        ON tcr.task_id = tct.task_id  AND tcr.task_status!=238 and tcr.cruise_task_time BETWEEN #{startTime} and #{endTime}
+        WHERE tct.robot_id = tr.`robot_id`) AS validNum
+        FROM
+        t_robot_info tr  WHERE tr.`commission_date` IS TRUE AND tr.`commission_date` <![CDATA[<=]]>  NOW()
+          AND robot_id =  #{robotId, jdbcType=BIGINT}
+    </select>
+
+    <select id="countWarnCheck" resultType="java.util.HashMap">
+        SELECT
+            count(1) as totalNum,
+            count(t.deal_type) as validNum
+        FROM
+            (select deal_type,warn_time from t_warn_info
+             union all(
+                 select deal_type,defect_time warn_time from t_defect_info
+             )) t
+        where t.warn_time BETWEEN #{startTime} and #{endTime}
+    </select>
+
+    <select id="countWarnAccuracy" resultType="java.util.HashMap">
+        SELECT
+            count(1) as totalNum,
+            sum(if(t.deal_type = 286,1,0)) as validNum
+        FROM
+            (select deal_type,warn_time from t_warn_info where deal_type is not null
+             union all(
+                 select deal_type,defect_time warn_time from t_defect_info where deal_type is not null
+             )) t
+        where t.warn_time BETWEEN #{startTime} and #{endTime}
+    </select>
+
+    <select id="countInstanceLoss" resultType="java.util.HashMap">
+        SELECT
+            count( 1 ) AS totalNum,
+            sum( IF ( tcdr.cruise_result = 247, 1, 0 ) ) AS validNum
+        FROM
+            t_cruise_task_result result
+                LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
+                LEFT JOIN t_cruise_data_result tcdr ON detail.cruise_result_id = tcdr.cruise_result_id
+        WHERE
+            result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+        <if test="taskId != null and taskId != ''"> and result.task_id = #{taskId}</if>
+    </select>
+
+    <select id="countResultCheck" resultType="java.util.HashMap">
+        SELECT
+            count( 1 ) AS totalNum,
+            count( result.identify_result ) AS validNum
+        FROM
+            t_cruise_data_result result
+                LEFT JOIN t_cruise_task_result_detail detail ON result.cruise_result_id = detail.cruise_result_id
+                AND result.cruise_id = detail.instance_id
+        WHERE
+            detail.cruise_time BETWEEN #{startTime} and #{endTime}
+    </select>
+
+</mapper>
