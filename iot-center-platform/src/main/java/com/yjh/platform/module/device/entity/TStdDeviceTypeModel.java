@@ -76,7 +76,7 @@ public class TStdDeviceTypeModel {
 
     @Max(value = 999999999)
     @ApiModelProperty(value = "告警级别")
-    private Integer alarmLevel;
+    private String alarmLevel;
 
     @Max(value = 999999999)
     @ApiModelProperty(value = "告警上限1")
