@@ -3,9 +3,11 @@ package com.yjh.platform.audiodevice.impl.standard;
 import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.impl.standard.tcp.InboundMessage;
 import com.yjh.platform.audiodevice.impl.standard.tcp.Packet;
+import com.yjh.platform.common.mqtt.MqttUtilsServer;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.module.device.entity.AuidoOprInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,13 +23,20 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Slf4j
 public class StandardAudioDevice implements AudioDevice {
+    private String deviceId;
     private final AtomicBoolean isRecording = new AtomicBoolean(false);
     private final List<Packet> packets = new LinkedList<>();
     private final ReadWriteLock packetsLock = new ReentrantReadWriteLock();
+    @Autowired
+    private MqttUtilsServer mqttUtilsServer;
     /**
      * 限制一下最大的录音数据，一帧数据差不多是4096个字节，限制单个录音文件不超过100MB
      */
     private final static int MAX_BUFFERED_PACKETS = (100 * 1024 * 1024) / 4096;
+
+    public StandardAudioDevice(String deviceId) {
+        this.deviceId = deviceId;
+    }
 
     public void onAudioData(InboundMessage inboundMessage) {
         if (!isRecording.get()) {
@@ -49,7 +58,12 @@ public class StandardAudioDevice implements AudioDevice {
     }
 
     @Override
-    synchronized public void startRecording(String deviceId) throws Exception {
+    public String getDeviceID() {
+        return deviceId;
+    }
+
+    @Override
+    synchronized public void startRecording() throws Exception {
         if (isRecording.compareAndSet(false, true)) {
             try {
                 packetsLock.writeLock().lock();
@@ -57,37 +71,38 @@ public class StandardAudioDevice implements AudioDevice {
             } finally {
                 packetsLock.writeLock().unlock();
             }
-            sendCommand(deviceId, ActionType.START.getCode());
+            sendCommand(ActionType.START.getCode());
         } else {
             log.warn("当前已经处于录音中");
         }
     }
 
-    private void sendCommand(String deviceId, String code) {
+    private void sendCommand(String code) {
         AuidoOprInfo info = new AuidoOprInfo();
         info.setGlobalClientid(deviceId);
         info.setActionPower(code);
-        sendMTQQ(JSONUtil.toJSONString(info));
+        sendMTQQ(info);
     }
 
-    private void sendMTQQ(String s) {
-        log.info("发送语音控制指令：{}", s);
+    private void sendMTQQ(Object obj) {
+        log.info("发送语音控制指令：{}", obj.toString());
+        mqttUtilsServer.pushMsg("CONTROL/" + deviceId, obj, 1);
     }
 
     @Override
-    public boolean isRecording(String deviceId) {
+    public boolean isRecording() {
         return isRecording.get();
     }
 
     @Override
-    synchronized public void stopRecording(String deviceId) throws Exception {
+    synchronized public void stopRecording() throws Exception {
         isRecording.set(false);
-        sendCommand(deviceId, ActionType.STOP.getCode());
+        sendCommand(ActionType.STOP.getCode());
     }
 
     @Override
-    synchronized public void stopRecordingAndSave(String audioFilepath, String deviceId) throws Exception {
-        stopRecording(deviceId);
+    synchronized public void stopRecordingAndSave(String audioFilepath) throws Exception {
+        stopRecording();
         try {
             packetsLock.readLock().lock();
             if (packets.size() > 0) {

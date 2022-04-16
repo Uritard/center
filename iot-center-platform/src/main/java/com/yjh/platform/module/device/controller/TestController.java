@@ -35,7 +35,7 @@ public class TestController {
                 result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "设备未注册");
                 return result;
             }
-            device.startRecording(deviceId);
+            device.startRecording();
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -55,7 +55,7 @@ public class TestController {
                 result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "设备未注册");
                 return result;
             }
-            device.stopRecording(deviceId);;
+            device.stopRecording();;
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

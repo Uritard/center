@@ -751,7 +751,7 @@ public class TVoiceDeviceService{
         List<TVoiceDevice> list = tVoiceDeviceDao.select(null,null,null,null,null,null);
         list.forEach(tVoiceDevice -> {
             if(tVoiceDevice.getVoiceCode() != null && !"".equals(tVoiceDevice.getVoiceCode())){
-                audioDeviceManager.registerAudioDevice(tVoiceDevice.getVoiceCode(),new StandardAudioDevice());
+                audioDeviceManager.registerAudioDevice(new StandardAudioDevice(tVoiceDevice.getVoiceCode()));
             }
         });
     }

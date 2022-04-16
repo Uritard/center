@@ -66,8 +66,8 @@ public class AudioDeviceConfig {
     public AudioDeviceManager audioDeviceManager() {
         //TODO: 调试目的
         AudioDeviceManager audioDeviceManager = new AudioDeviceManagerImpl();
-        audioDeviceManager.registerAudioDevice("YWJjZGVm", new StandardAudioDevice());
-        audioDeviceManager.registerAudioDevice("AQIDBAUG", new StandardAudioDevice());
+        audioDeviceManager.registerAudioDevice(new StandardAudioDevice("YWJjZGVm"));
+        audioDeviceManager.registerAudioDevice(new StandardAudioDevice("AQIDBAUG"));
         return audioDeviceManager;
     }
 

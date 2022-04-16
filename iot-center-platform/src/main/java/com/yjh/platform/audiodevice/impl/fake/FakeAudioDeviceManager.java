@@ -14,11 +14,11 @@ public class FakeAudioDeviceManager implements AudioDeviceManager {
 
     @Override
     public AudioDevice getAudioDevice(String deviceId) {
-        return new FakeAudioDevice();
+        return new FakeAudioDevice(deviceId);
     }
 
     @Override
-    public void registerAudioDevice(String deviceId, AudioDevice audioDevice) {
+    public void registerAudioDevice(AudioDevice audioDevice) {
 
     }
 

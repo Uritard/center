@@ -1,6 +1,6 @@
 package com.yjh.platform.common.mqtt;
 
-import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.utils.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
@@ -87,15 +87,15 @@ public class MqttUtilsServer {
         //保证消息能到达一次
         message.setQos(qos);
         message.setRetained(true);
-        byte[] msgbytes = JSON.toJSONString(msg).getBytes();
+        byte[] msgbytes = JSONUtil.toJSONString(msg).getBytes();
         message.setPayload(msgbytes);
         try {
-            log.info("pubushi:{}", JSON.toJSONString(msg));
+            log.info("pubushi:{}", JSONUtil.toJSONString(msg));
             MqttTopic mqtttopic = this.mqttClient.getTopic(theme);
             MqttDeliveryToken token = mqtttopic.publish(message);
             token.waitForCompletion();
             if (!token.isComplete()) {
-                log.error("推送消息--失败--msg：{}", JSON.toJSONString(message));
+                log.error("推送消息--失败--msg：{}", JSONUtil.toJSONString(message));
                 return false;
             }
         } catch (Exception e) {

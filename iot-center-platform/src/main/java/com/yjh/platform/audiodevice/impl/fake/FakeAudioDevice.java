@@ -16,30 +16,40 @@ import java.nio.file.Paths;
  * @since [产品/模块版本] （可选）
  */
 public class FakeAudioDevice implements AudioDevice {
+    private String deviceId;
     private boolean isRecording;
 
+    public FakeAudioDevice(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
     @Override
-    public void startRecording(String deviceId) throws Exception {
+    public void startRecording() throws Exception {
         isRecording = true;
     }
 
     @Override
-    public boolean isRecording(String deviceId) {
+    public boolean isRecording() {
         return isRecording;
     }
 
     @Override
-    public void stopRecording(String deviceId) throws Exception {
+    public void stopRecording() throws Exception {
         isRecording = false;
     }
 
     @Override
-    public void stopRecordingAndSave(String audioFilepath,String deviceId) throws Exception {
-        stopRecording(deviceId);
+    public void stopRecordingAndSave(String audioFilepath) throws Exception {
+        stopRecording();
 
         String dir = FilenameUtils.getFullPath(audioFilepath);
         Path dirPath = Paths.get(dir);
         Files.createDirectories(dirPath);
         Files.write(Paths.get(audioFilepath), "TESTING WAV FILE".getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public String getDeviceID() {
+        return deviceId;
     }
 }
