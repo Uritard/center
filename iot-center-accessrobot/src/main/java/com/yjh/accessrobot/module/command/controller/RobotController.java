@@ -8,6 +8,7 @@ import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
+import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.entity.EnvDeviceStatus;
 import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
 import com.yjh.accessrobot.module.command.entity.TRobotInfo;
@@ -313,4 +314,20 @@ public class RobotController {
     private <T> T getRedisMapString(String key, String field) {
         return (T) redisTemplate.opsForHash().get(key, field);
     }
+
+
+    @ApiOperation(value = "测试")
+    @GetMapping(value = "/test")
+    public Result test(@RequestParam(value = "source") String source,
+                       @RequestParam(value = "desc") String desc) {
+        Result result = new Result();
+        try {
+            FileUtil.copyFileUsingStream(source, desc);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("测试失败：", e);
+        }
+        return result;
+    }
+
 }

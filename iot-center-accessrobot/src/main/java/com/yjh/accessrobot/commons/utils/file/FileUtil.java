@@ -1,11 +1,12 @@
 package com.yjh.accessrobot.commons.utils.file;
 
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.File;
+import java.io.*;
 import java.net.URLEncoder;
 
 /**
@@ -74,5 +75,32 @@ public class FileUtil {
             e.printStackTrace();
         }
         return fileName;
+    }
+
+
+    /**
+     * 根据不同浏览器返回不同的数据
+     *
+     * @param sourcePath 文件源路径
+     * @param descPath 文件目的路径
+     * @return
+     */
+    public static void copyFileUsingStream(String sourcePath, String descPath) throws IOException {
+        File source = new File(sourcePath);
+        File dest = new File(descPath);
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = new FileInputStream(source);
+            os = new FileOutputStream(dest);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+        } finally {
+            is.close();
+            os.close();
+        }
     }
 }

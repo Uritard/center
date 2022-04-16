@@ -32,4 +32,7 @@ public class TCruisePointInstanceDetail implements Serializable {
     @ApiModelProperty(value = "是否缺陷")
     private String isAi;
 
+    @ApiModelProperty(value = "是否判别")
+    private String isJudge;
+
 }

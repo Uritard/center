@@ -16,6 +16,7 @@ import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
+import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.SysUserDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;

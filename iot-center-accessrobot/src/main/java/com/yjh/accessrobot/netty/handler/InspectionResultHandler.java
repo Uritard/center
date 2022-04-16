@@ -1,9 +1,15 @@
 package com.yjh.accessrobot.netty.handler;
 
+import com.alibaba.druid.util.StringUtils;
+import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.utils.file.FileUtil;
+import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
@@ -15,10 +21,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.MultiKeyCommands;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -38,6 +50,14 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
     @Autowired
     private RobotService robotService;
 
+    /**
+     * 算法接口url
+     */
+    private static final String ALGORITHM_URL = "http://iot-center-accessvideo/analysis/v1/algorithm";
+    /**
+     * 缺陷接口url
+     */
+    private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
     private String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
     @Override
@@ -136,7 +156,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 
         // 针对2022过检
         boolean flag = item.containsKey("file_path") && !item.containsKey("origin_file_result_path") && !item.containsKey("origin_file_path");
-        temporaryMethod(cruiseResultMap, filePathMap, developAbsoluteUrl, developRelativeUrl, ftpFileName, temporaryFilePath, ftpOriginPath, flag);
+        temporaryMethod(cruiseResultMap, filePathMap,  ftpFileName, ftpOriginPath, flag);
 
         String[] sArray2 = ftpOriginPath.split("/");
         // 原图文件名称
@@ -225,47 +245,187 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
      * 27大类、表计、缺陷、判别需要机器人,且需算法分析
      * 这些都是可见光的图片
      * 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path
-     * @param
+     *
      * @param cruiseResultMap 机器人巡视结果临时Map
-     * @param filePathMap
-     * @param developAbsoluteUrl
-     * @param developRelativeUrl
-     * @param ftpFileName
-     * @param temporaryFilePath
-     * @param ftpOriginPath
+     * @param filePathMap ftp的路径
+     * @param ftpFileName 机器人结果文件名称
+     * @param ftpOriginPath 可见光原图在ftp下的路径
      * @param flag 是否满足条件 即是否为模拟机器人做任务
      * @return void
      */
-    private void temporaryMethod(Map<String, String> cruiseResultMap, Map<String, String> filePathMap, String developAbsoluteUrl, String developRelativeUrl, String ftpFileName, String temporaryFilePath, String ftpOriginPath, boolean flag) {
+    private void temporaryMethod(Map<String, String> cruiseResultMap, Map<String, String> filePathMap, String ftpFileName, String ftpOriginPath, boolean flag) {
         if (Boolean.FALSE.equals(flag)) {
             return;
         }
-        // 机器人上传至ftp的文件路径
+        // 获取并组装算法需要的信息
+        extracted(cruiseResultMap, filePathMap, ftpFileName, ftpOriginPath);
+    }
+
+    /**
+     * 组装算法服务需要的信息  调用算法服务
+     *
+     * @param cruiseResultMap 机器人巡视结果临时Map
+     * @param filePathMap 任务id
+     * @param ftpFileName
+     * @param ftpOriginPath
+     * @return void
+     */
+    private void extracted(Map<String, String> cruiseResultMap, Map<String, String> filePathMap, String ftpFileName, String ftpOriginPath) {
+        // 获取基本信息
+        String taskId = cruiseResultMap.get("taskCode");
+        String robotCode = cruiseResultMap.get("robotCode");
+        String inspectionCode = cruiseResultMap.get("deviceId");
+        Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + taskId);
+        Long instanceId = null;
+        for (String key : robotInfoKeys) {
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+            if (Objects.equals(robotCode, redisInfoMap.get("robotCode"))
+                    && Objects.equals(taskId, redisInfoMap.get("taskId"))
+                    && Objects.equals(inspectionCode, redisInfoMap.get("inspectionCode"))) {
+                instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
+            }
+        }
+        // 机器人可见光原图上传至ftp的文件路径
         String temporaryOriginPath = filePathMap.get("content") + "/" + ftpOriginPath;
-        // 将机器人上传在ftp文件夹的图片复制到算法需要的目录
+        // 原图
+        String resultImagePath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content").toString() + "/" + ftpFileName;
+        try {
+            FileUtil.copyFileUsingStream(temporaryOriginPath, resultImagePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 标定文件
+        String picModelPath = redisTemplate.opsForHash().get("t_sys_param:picModelPath", "content").toString() + "/" + inspectionCode;
+        // 判别基准图
+        String imagePath = "";
 
-        // 组装算法服务需要的信息  调用算法服务
+        // 巡检点信息
+        TCruisePointInstanceDetail details = StaticContextAccessor.getBean(RobotService.class).selectForTask(instanceId);
+        if(details.getAnalyseType() != null || "on".equals(details.getIsAi()) || "on".equals(details.getIsJudge())) {
+            List<TAlgorithmInfo> tAlgorithmInfoList = StaticContextAccessor.getBean(RobotService.class).selectByDeviceMeteId(details.getDeviceMeteId());
+            TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMete(details.getDeviceMeteId());
 
+            String recognitionMode = "0";
+            if(!tAlgorithmInfoList.isEmpty()){
+                recognitionMode = "1";
+            }
 
+            if("1".equals(recognitionMode)){
+                recognitionMode = "0";
+            }else {
+                recognitionMode = "2";
+            }
+            Map<String,String> tCruiseTaskResultMap = new HashMap<>(16);
+            tCruiseTaskResultMap.put("recognitionMode", recognitionMode);
+            String str = "t_cruise_task_result:" + taskId + ":" + instanceId;
+            redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
+            List<String> analysisInstanceList = new ArrayList<>();
+            if(redisTemplate.hasKey("analysisList:" + taskId)) {
+                redisTemplate.opsForList().leftPush("analysisList:" + taskId, String.valueOf(instanceId));
+            } else {
+                analysisInstanceList.add(String.valueOf(instanceId));
+                redisTemplate.opsForList().leftPushAll("analysisList:" + taskId, analysisInstanceList);
+            }
 
+            for (TAlgorithmInfo tAlgorithmInfo : tAlgorithmInfoList) {
+                Analysis analysis = new Analysis();
+                analysis.setTaskId(taskId);
+                analysis.setInstanceId(instanceId);
+                analysis.setPicPath(resultImagePath);
+                analysis.setAnalyseType(tAlgorithmInfo.getAnalyseType());
+                analysis.setPicModelPath(picModelPath);
+                analysis.setIsAi(tAlgorithmInfo.getIsAi());
+                List<Analysis> analysisList = new ArrayList<>();
+                analysisList.add(analysis);
+                Map<String, List<Analysis>> analysisMap  = new HashMap<>(3);
+                analysisMap.put("list", analysisList);
+                log.info("算法信息：    " + analysisMap);
+                //0-缺陷 1-表记
+                if(tAlgorithmInfo.getIsAi() == 1){
+                    analysis(analysisMap);
+                }else {
+                    defect(analysisMap);
+                }
+            }
 
+            if("on".equals(tStdDevicemete.getIsAi()) || "on".equals(tStdDevicemete.getIsJudge())){
+                Analysis analysis = new Analysis();
+                analysis.setTaskId(taskId);
+                analysis.setInstanceId(instanceId);
+                analysis.setPicPath(resultImagePath);
+                if("on".equals(tStdDevicemete.getIsJudge())){
+                    analysis.setAnalyseType("11");
+                }else {
+                    analysis.setAnalyseType("398");
+                }
+                analysis.setPicModelPath(picModelPath);
+                analysis.setIsAi(0);
+                List<Analysis> analysisList = new ArrayList<>();
+                analysisList.add(analysis);
+                Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+                analysisMap.put("list",analysisList);
+                log.info("算法信息：    "+analysisMap);
+                defect(analysisMap);
+            }
+        }
+    }
 
+    /**
+     * Redis数据库批量查询Key值游标
+     * @param key redis的key
+     * @return Set<String>
+     */
+    public Set<String> redisScan(String key) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
 
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
 
+            ScanParams scanParams = new ScanParams();
+            scanParams.match("*" + key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                    continue;
+                } else {
+                    break;
+                }
+            }
 
-        // 剩下的结果存储就交给video服务来处理
+            return keys;
+        });
+    }
 
-        /*String temporaryOriginPath = filePathMap.get("content") + "/" + ftpOriginPath;
-        String[] sArray2 = ftpOriginPath.split("/");
-        // 原图文件名称
-        String ftpOriginName = sArray2[sArray2.length - 1];
-        // 拷贝巡视结果图
-        copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "CCD");
-        // 拷贝原图
-        copyFileToDevelop(temporaryOriginPath, developAbsoluteUrl + "BigImg");
-        cruiseResultMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);
-        cruiseResultMap.put("absolutePath", developAbsoluteUrl + "BigImg" + "/" + ftpOriginName);*/
+    /**
+     * 表记分析
+     * */
+    private void analysis(Map<String, List<Analysis>> analysisMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(ALGORITHM_URL, analysisMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+    /**
+     * 缺陷分析
+     * */
+    private void defect(Map<String, List<Analysis>> analysisMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(DEFECT_URL, analysisMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     /**
