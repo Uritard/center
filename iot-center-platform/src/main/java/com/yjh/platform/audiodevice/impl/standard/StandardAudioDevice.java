@@ -3,6 +3,8 @@ package com.yjh.platform.audiodevice.impl.standard;
 import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.impl.standard.tcp.InboundMessage;
 import com.yjh.platform.audiodevice.impl.standard.tcp.Packet;
+import com.yjh.platform.common.utils.JSONUtil;
+import com.yjh.platform.module.device.entity.AuidoOprInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;
@@ -28,7 +30,6 @@ public class StandardAudioDevice implements AudioDevice {
     private final static int MAX_BUFFERED_PACKETS = (100 * 1024 * 1024) / 4096;
 
     public void onAudioData(InboundMessage inboundMessage) {
-        //TODO: xiaoming
         if (!isRecording.get()) {
             log.warn("非录音时段收到录音数据: {}", inboundMessage);
             return;
@@ -39,7 +40,6 @@ public class StandardAudioDevice implements AudioDevice {
             log.warn("录音数据缓存已经超过最大限制，丢弃");
             return;
         }
-
         try {
             packetsLock.writeLock().lock();
             packets.add(inboundMessage.getPacket());
@@ -49,7 +49,7 @@ public class StandardAudioDevice implements AudioDevice {
     }
 
     @Override
-    synchronized public void startRecording() throws Exception {
+    synchronized public void startRecording(String deviceId) throws Exception {
         if (isRecording.compareAndSet(false, true)) {
             try {
                 packetsLock.writeLock().lock();
@@ -57,26 +57,37 @@ public class StandardAudioDevice implements AudioDevice {
             } finally {
                 packetsLock.writeLock().unlock();
             }
-            //TODO: 发开始录音指令
+            sendCommand(deviceId, ActionType.START.getCode());
         } else {
             log.warn("当前已经处于录音中");
         }
     }
 
+    private void sendCommand(String deviceId, String code) {
+        AuidoOprInfo info = new AuidoOprInfo();
+        info.setGlobalClientid(deviceId);
+        info.setActionPower(code);
+        sendMTQQ(JSONUtil.toJSONString(info));
+    }
+
+    private void sendMTQQ(String s) {
+        log.info("发送语音控制指令：{}", s);
+    }
+
     @Override
-    public boolean isRecording() {
+    public boolean isRecording(String deviceId) {
         return isRecording.get();
     }
 
     @Override
-    synchronized public void stopRecording() throws Exception {
+    synchronized public void stopRecording(String deviceId) throws Exception {
         isRecording.set(false);
-        //TODO: 发停止录音指令
+        sendCommand(deviceId, ActionType.STOP.getCode());
     }
 
     @Override
-    synchronized public void stopRecordingAndSave(String audioFilepath) throws Exception {
-        stopRecording();
+    synchronized public void stopRecordingAndSave(String audioFilepath, String deviceId) throws Exception {
+        stopRecording(deviceId);
         try {
             packetsLock.readLock().lock();
             if (packets.size() > 0) {

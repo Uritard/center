@@ -19,23 +19,23 @@ public class FakeAudioDevice implements AudioDevice {
     private boolean isRecording;
 
     @Override
-    public void startRecording() throws Exception {
+    public void startRecording(String deviceId) throws Exception {
         isRecording = true;
     }
 
     @Override
-    public boolean isRecording() {
+    public boolean isRecording(String deviceId) {
         return isRecording;
     }
 
     @Override
-    public void stopRecording() throws Exception {
+    public void stopRecording(String deviceId) throws Exception {
         isRecording = false;
     }
 
     @Override
-    public void stopRecordingAndSave(String audioFilepath) throws Exception {
-        stopRecording();
+    public void stopRecordingAndSave(String audioFilepath,String deviceId) throws Exception {
+        stopRecording(deviceId);
 
         String dir = FilenameUtils.getFullPath(audioFilepath);
         Path dirPath = Paths.get(dir);
