@@ -588,7 +588,7 @@ public class TCruiseTaskService {
         }
         List<TCruiseTaskCount> list = new ArrayList<>();
         list = this.tCruiseTaskDao.taskCount(dayBefore, dayAfter);
-        log.info("list: " + list);
+//        log.info("list: " + list);
         List<TCruiseTaskDel> listDel = this.tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
         List<Map<String, Object>> listTask = new ArrayList<>();
         for (TCruiseTaskCount tCruiseTaskCount : list) {
@@ -683,7 +683,7 @@ public class TCruiseTaskService {
                 listTask.add(taskCountMap);
             }
         }
-        log.info("listTask: " + listTask);
+//        log.info("listTask: " + listTask);
         return listTask;
     }
 

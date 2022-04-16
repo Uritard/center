@@ -13,6 +13,7 @@ import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.*;
+import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.device.service.VoiceTask;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
@@ -74,6 +75,8 @@ public class CruiseTaskJob extends QuartzJobBean {
     private TCruiseTaskService tCruiseTaskService;
     @Autowired
     private AudioDeviceManager audioDeviceManager;
+    @Autowired
+    private TVoiceDeviceService tVoiceDeviceService;
 
 
 
@@ -266,6 +269,18 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                 //声纹设备
                 List<Long> voiceDeviceList = new ArrayList<>();
+                Map<Long,List<TCruisePointInstanceNameDetail>> voiceinstanceList =new HashMap<>();
+                for (TCruisePointInstanceNameDetail item : instancesList) {
+                    if(item.getCruiseType() != 228){
+                        if(voiceinstanceList.get(item.getCruiseId()) == null){
+                            List<TCruisePointInstanceNameDetail> instanceVoiceList = new ArrayList<>();
+                            instanceVoiceList.add(item);
+                            voiceinstanceList.put(item.getCruiseId(),instanceVoiceList);
+                        }else {
+                            voiceinstanceList.get(item.getCruiseId()).add(item);
+                        }
+                    }
+                }
 
                 log.info("开始巡检"+new Date()+"--"+tCruiseTask.getTaskId());
 
@@ -870,7 +885,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
 
-                        if(!voiceDeviceList.contains(item.getCruiseId())){
+                        if(voiceDeviceList.size() == 0 || !voiceDeviceList.contains(item.getCruiseId())){
                             String voicePath = redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content").toString();
                             long dateTime = System.currentTimeMillis();
                             Long maoForTime= Long.valueOf(redisTemplate.opsForHash().entries("t_sys_param:voiceDeviceTime").get("content").toString());
@@ -881,7 +896,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                             String voiceFilePath = voicePath+"/"+item.getCruiseId()+"/1/"+timeAfterTem+"/"+voiceName + ".wav";
                             //创建一个线程去处理声纹巡视
                             VoiceTask voiceTask = new VoiceTask(redisTemplate,item.getCruiseId(),voiceFilePath,taskId,item.getInstanceId()
-                                    ,tCruiseDataResultDao,tCruiseTaskResultDetailDao,audioDeviceManager,tCruiseResult,item,tCruiseResultDao);
+                                    ,tCruiseDataResultDao,tCruiseTaskResultDetailDao,audioDeviceManager,tCruiseResult,item,tCruiseResultDao
+                                    ,tVoiceDeviceService,voiceinstanceList,tCruiseTaskResultDao,tCruiseTaskResult);
                             Thread thread = new Thread(voiceTask);
                             thread.setDaemon(true);
                             thread.start();

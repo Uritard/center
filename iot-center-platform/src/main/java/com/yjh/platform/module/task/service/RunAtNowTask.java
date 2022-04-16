@@ -368,6 +368,18 @@ public class RunAtNowTask implements Runnable{
 
             //声纹设备
             List<Long> voiceDeviceList = new ArrayList<>();
+            Map<Long,List<TCruisePointInstanceNameDetail>> voiceinstanceList =new HashMap<>();
+            for (TCruisePointInstanceNameDetail item : instancesList) {
+                if(item.getCruiseType() != 228){
+                    if(voiceinstanceList.get(item.getCruiseId()) == null){
+                        List<TCruisePointInstanceNameDetail> instanceVoiceList = new ArrayList<>();
+                        instanceVoiceList.add(item);
+                        voiceinstanceList.put(item.getCruiseId(),instanceVoiceList);
+                    }else {
+                        voiceinstanceList.get(item.getCruiseId()).add(item);
+                    }
+                }
+            }
 
             log.info("开始巡检"+new Date()+"--"+tCruiseTask.getTaskId());
 
@@ -982,7 +994,8 @@ public class RunAtNowTask implements Runnable{
                     tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
                     redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
 
-                    if(!voiceDeviceList.contains(item.getCruiseId())){
+                    if(voiceDeviceList.size() == 0 || !voiceDeviceList.contains(item.getCruiseId())){
+                        voiceDeviceList.add(item.getCruiseId());
                         String voicePath = redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content").toString();
                         long dateTime = System.currentTimeMillis();
                         Long maoForTime= Long.valueOf(redisTemplate.opsForHash().entries("t_sys_param:voiceDeviceTime").get("content").toString());
@@ -991,12 +1004,16 @@ public class RunAtNowTask implements Runnable{
                         String voiceName = item.getCruiseId() +"_"+new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTime))+"-"
                                 +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter));
                         String voiceFilePath = voicePath+"/"+item.getCruiseId()+"/1/"+timeAfterTem+"/"+voiceName + ".wav";
+
                         //创建一个线程去处理声纹巡视
                         VoiceTask voiceTask = new VoiceTask(redisTemplate,item.getCruiseId(),voiceFilePath,taskId,item.getInstanceId()
-                                                                ,tCruiseDataResultDao,tCruiseTaskResultDetailDao,audioDeviceManager,tCruiseResult,item);
+                                                                ,tCruiseDataResultDao,tCruiseTaskResultDetailDao,audioDeviceManager,tCruiseResult,item,tCruiseResultDao
+                                                        ,tVoiceDeviceService,voiceinstanceList,tCruiseTaskResultDao,tCruiseTaskResult);
                         Thread thread = new Thread(voiceTask);
                         thread.setDaemon(true);
                         thread.start();
+                    }else {
+                        //这个点不需要做
                     }
                 }
                 //检测任务是否暂停  或者任务是否超期
