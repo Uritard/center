@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.device.dao.TStdDeviceTypeModelDao">
+
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdDeviceTypeModel">
+        <id column="id" jdbcType="BIGINT" property="deviceTypeId"/>
+        <result column="custom_id" jdbcType="VARCHAR" property="customType"/>
+        <result column="mete_kind" jdbcType="VARCHAR" property="meteKind"/>
+        <result column="meter_type" jdbcType="VARCHAR" property="meterType"/>
+        <result column="analyse_type" jdbcType="INTEGER" property="analyseType"/>
+        <result column="is_ai" jdbcType="VARCHAR" property="isAi"/>
+        <result column="is_judge" jdbcType="VARCHAR" property="isJudge"/>
+        <result column="unit" jdbcType="VARCHAR" property="unit"/>
+        <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote"/>
+        <result column="alarm_type" jdbcType="VARCHAR" property="alarmType"/>
+        <result column="up_effect" jdbcType="REAL" property="upEffect"/>
+        <result column="down_effect" jdbcType="REAL" property="downEffect"/>
+        <result column="alarm_level" jdbcType="INTEGER" property="alarmLevel"/>
+        <result column="high_limit1" jdbcType="REAL" property="highLimit1"/>
+        <result column="low_limit1" jdbcType="REAL" property="lowLimit1"/>
+        <result column="high_limit2" jdbcType="REAL" property="highLimit2"/>
+        <result column="low_limit2" jdbcType="REAL" property="lowLimit2"/>
+        <result column="alarm_delay" jdbcType="INTEGER" property="alarmDelay"/>
+        <result column="alarm_cnt" jdbcType="INTEGER" property="alarmCnt"/>
+        <result column="threshold_abs" jdbcType="NUMERIC" property="thresholdAbs"/>
+        <result column="threshold_per" jdbcType="NUMERIC" property="thresholdPer"/>
+        <result column="mete_type" jdbcType="VARCHAR" property="meteType"/>
+        <result column="modulus" jdbcType="INTEGER" property="modulus"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="stateZero" jdbcType="VARCHAR" property="stateZero"/>
+        <result column="stateOne" jdbcType="VARCHAR" property="stateOne"/>
+        <result column="alarmState" jdbcType="INTEGER" property="alarmState"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        device_type_id, custom_id, mete_kind, meter_type, analyse_type, is_ai, is_judge, unit, alarm_note, alarm
+        up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per,
+        mete_type, modulus, remark,state_zero,state_one,alarm_state
+    </sql>
+
+
+    <insert id="add"  useGeneratedKeys="true" keyProperty="deviceMeteId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceTypeModel">
+        insert into t_std_device_type_model(
+            device_type_id,
+            custom_id,
+            mete_kind,
+            mete_type,
+            meter_type,
+            analyse_type,
+            is_ai,
+            is_judge,
+            unit,
+            alarm_note,
+            alarm_type,
+            up_effect,
+            down_effect,
+            alarm_level,
+            high_limit1,
+            low_limit1,
+            high_limit2,
+            low_limit2,
+            high_limit3,
+            low_limit3,
+            high_limit4,
+            low_limit4,
+            alarm_delay,
+            alarm_cnt,
+            threshold_abs,
+            threshold_per,
+            modulus,
+            remark,
+            state_zero,
+            state_one,
+            alarm_state
+        )values(
+                   #{deviceTypeId, jdbcType=BIGINT},
+                   #{customType, jdbcType=VARCHAR},
+                   #{meteKind, jdbcType=INTEGER},
+                   #{meteType, jdbcType=VARCHAR},
+                   #{meterType, jdbcType=INTEGER},
+                   #{analyseType, jdbcType=INTEGER},
+                   #{isAi, jdbcType=VARCHAR},
+                   #{isJudge,jdbcType=VARCHAR},
+                   #{unit, jdbcType=VARCHAR},
+                   #{alarmNote, jdbcType=VARCHAR},
+                   #{alarmType, jdbcType=VARCHAR},
+                   #{upEffect, jdbcType=REAL},
+                   #{downEffect, jdbcType=REAL},
+                   #{alarmLevel, jdbcType=INTEGER},
+                   #{highLimit1, jdbcType=REAL},
+                   #{lowLimit1, jdbcType=REAL},
+                   #{highLimit2, jdbcType=REAL},
+                   #{lowLimit2, jdbcType=REAL},
+                   #{highLimit3, jdbcType=REAL},
+                   #{lowLimit3, jdbcType=REAL},
+                   #{highLimit4, jdbcType=REAL},
+                   #{lowLimit4, jdbcType=REAL},
+                   #{alarmDelay, jdbcType=INTEGER},
+                   #{alarmCnt, jdbcType=INTEGER},
+                   #{thresholdAbs, jdbcType=NUMERIC},
+                   #{thresholdPer, jdbcType=NUMERIC},
+                   #{modulus, jdbcType=INTEGER},
+                   #{remark, jdbcType=VARCHAR},
+                   #{stateZero, jdbcType=VARCHAR},
+                   #{stateOne, jdbcType=VARCHAR},
+                   #{alarmState, jdbcType=INTEGER}
+               )
+    </insert>
+
+    <update id="update">
+        update t_std_device_type_model a <set>
+        <if test="deviceTypeId != null">a.device_type_id = #{deviceTypeId, jdbcType=BIGINT},</if>
+        <if test="customType != null">a.custom_id = #{customType},</if>
+        a.mete_kind = #{meteKind},
+        a.meter_type = #{meterType, jdbcType=INTEGER},
+        a.analyse_type = #{analyseType, jdbcType=INTEGER},
+        <if test="isAi != null ">a.is_ai = #{isAi,jdbcType=VARCHAR},</if>
+        <if test="isJudge != null ">a.is_judge = #{isJudge,jdbcType=VARCHAR},</if>
+        <if test="unit != null ">a.unit = #{unit},</if>
+        <if test="alarmNote != null ">a.alarm_note = #{alarmNote},</if>
+        a.alarm_type = #{alarmType},
+        a.up_effect = #{upEffect, jdbcType=REAL},
+        a.down_effect = #{downEffect, jdbcType=REAL},
+        a.alarm_level = #{alarmLevel, jdbcType=INTEGER},
+        a.high_limit1 = #{highLimit1, jdbcType=REAL},
+        a.low_limit1 = #{lowLimit1, jdbcType=REAL},
+        a.high_limit2 = #{highLimit2, jdbcType=REAL},
+        a.low_limit2 = #{lowLimit2, jdbcType=REAL},
+        a.high_limit3 = #{highLimit3, jdbcType=REAL},
+        a.low_limit3 = #{lowLimit3, jdbcType=REAL},
+        a.high_limit4 = #{highLimit4, jdbcType=REAL},
+        a.low_limit4 = #{lowLimit4, jdbcType=REAL},
+        a.alarm_delay = #{alarmDelay, jdbcType=INTEGER},
+        a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER},
+        a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC},
+        a.threshold_per = #{thresholdPer, jdbcType=NUMERIC},
+        <if test="meteType != null ">a.mete_type = #{meteType},</if>
+        a.modulus = #{modulus, jdbcType=INTEGER},
+        <if test="remark != null ">a.remark = #{remark},</if>
+        a.state_zero = #{stateZero},
+        a.state_one = #{stateOne},
+        a.alarm_state = #{alarmState, jdbcType=INTEGER},
+
+    </set>
+        where a.device_type_id = #{deviceTypeId, jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteByPrimaryId">
+        delete from t_std_device_type_model
+        where device_type_id = #{deviceTypeId, jdbcType=BIGINT}
+    </delete>
+
+    <select id="selectByPrimaryId" resultType="com.yjh.platform.module.device.entity.TStdDeviceTypeModel">
+        select
+            a.device_type_id,
+            a.custom_id as customType,
+            a.mete_kind,
+            a.meter_type,
+            a.analyse_type,
+            a.is_ai,
+            a.is_judge,
+            a.unit,
+            a.alarm_note,
+            a.alarm_type,
+            a.up_effect,
+            a.down_effect,
+            a.alarm_level,
+            a.high_limit1,
+            a.low_limit1,
+            a.high_limit2,
+            a.low_limit2,
+            a.alarm_delay,
+            a.alarm_cnt,
+            a.threshold_abs,
+            a.threshold_per,
+            a.mete_type,
+            a.modulus,
+            a.remark,
+            state_zero,
+            state_one,
+            alarm_state
+        from t_std_device_type_model a
+        where 1 = 1
+        and a.device_type_id = #{deviceTypeId, jdbcType=BIGINT}
+        limit 1
+    </select>
+</mapper>

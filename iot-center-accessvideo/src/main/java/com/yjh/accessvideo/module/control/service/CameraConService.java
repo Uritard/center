@@ -8,7 +8,6 @@ import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.utils.DateTimeUtil;
-import com.yjh.accessvideo.commons.utils.VideoUtil;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
@@ -30,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.imageio.stream.FileImageOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -39,6 +37,8 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.yjh.accessvideo.commons.utils.FileUtil.createDirectory;
 
 
 /**
@@ -1691,6 +1691,7 @@ public class CameraConService {
             String fileName = new SimpleDateFormat("yyyyMMddHHmmss").format(date) + ".h264";
             log.info("生成文件名" + fileName);
             //保存文件地址
+            createDirectory(videoPath);
             String path = videoPath + fileName;
             log.info("保存文件地址：" + path);
             lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));

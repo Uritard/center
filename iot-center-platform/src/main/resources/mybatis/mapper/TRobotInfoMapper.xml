@@ -574,9 +574,9 @@
     <select id="selectInspectionTree" resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
         select a.robot_id, a.robot_name from t_robot_info a
         where 1 = 1
-         <if test="upRegionId != null and upRegionId != ''">
-             and a.up_region_id = #{upRegionId, jdbcType=BIGINT}
-         </if>
+<!--         <if test="upRegionId != -1">-->
+<!--             and a.up_region_id = #{upRegionId, jdbcType=BIGINT}-->
+<!--         </if>-->
          <if test="type == 1">
              and a.robot_type is not null
          </if>
@@ -592,9 +592,9 @@
         <if test="inspectionType != null and inspectionType != ''">
             and a.inspection_type = #{inspectionType, jdbcType=INTEGER}
         </if>
-        <if test="upRegionId != null and upRegionId != ''">
-            and b.up_region_id = #{upRegionId, jdbcType=BIGINT}
-        </if>
+<!--        <if test="upRegionId != -1">-->
+<!--            and b.up_region_id = #{upRegionId, jdbcType=BIGINT}-->
+<!--        </if>-->
         <if test="type == 1">
             and b.robot_type is not null
         </if>

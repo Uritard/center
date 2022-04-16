@@ -238,6 +238,7 @@
     a.custom_id,
     a.mete_name,
     a.inspection_type,
+    d.up_region_id,
 	b.cruise_type as cruiseType,
 	b.cruise_id as cruiseId,
 	c.dict_note as cruiseTypeName,

@@ -15,7 +15,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,6 +22,8 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.yjh.accessvideo.commons.utils.FileUtil.deleteFile;
 
 /**
  * @author hyh
@@ -57,8 +58,7 @@ public class TranscodeThread implements Runnable {
         try {
             String path = videoPath + fileName;
             VideoUtil.h264ToMp4(path);
-            String url2 = "rm -rf " + path;
-            Runtime.getRuntime().exec(url2);
+            deleteFile(path);
             String judge = savePath + fileName.replace("h264", "mp4");
             RecordFileInfo recordFileInfo = new RecordFileInfo();
             recordFileInfo.setFileName(fileName.replace(".h264", ""));

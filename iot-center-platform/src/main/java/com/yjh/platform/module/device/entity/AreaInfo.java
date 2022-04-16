@@ -39,6 +39,9 @@ public class AreaInfo implements Serializable {
     @ApiModelProperty(value = "消息类型")
     private String infoType;
 
+    @ApiModelProperty(value = "设备类型Id")
+    private String deviceTypeId;
+
     @ApiModelProperty(value = "子类")
     private List<AreaInfo> children;
 

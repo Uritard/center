@@ -551,6 +551,7 @@ public class TStdDeviceService{
                     areaInfoTem.setLabel(areaInfoMap.getLabel());
                     areaInfoTem.setInfoType(areaInfoMap.getInfoType());
                     areaInfoTem.setUpName(areaInfoMap.getUpName());
+                    areaInfoTem.setDeviceTypeId(areaInfoMap.getDeviceTypeId());
                     childrenList.add(areaInfoTem);
                 }
             }

@@ -470,13 +470,13 @@
     </select>
 
     <select id="selectDevTreeDevice" resultType="com.yjh.platform.module.device.entity.AreaInfo">
-        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType, "" AS deviceTypeId
             FROM t_std_region a
             LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
             where 1 = 1
             <if test="regionId != null">and a.region_id =#{regionId, jdbcType=BIGINT}</if>
         UNION ALL (
-            SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType
+            SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType, b.device_type AS deviceTypeId
                 FROM t_std_device b
                 LEFT JOIN t_std_region d ON b.up_region_id = d.region_id
                 where 1 = 1

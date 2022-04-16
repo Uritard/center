@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static com.yjh.accessvideo.commons.utils.FileUtil.deleteFile;
+
 /**
  * @author hyh
  * @since 2022/4/11
@@ -59,6 +61,7 @@ public class RecordFileThread implements Runnable{
                     String judge = savePath + fileName;
                     String path =  videoPath + fileName;
                     VideoUtil.h264ToMp4(path);
+                    deleteFile(path);
                     RecordFileInfo recordFileInfo = new RecordFileInfo();
                     recordFileInfo.setFileName(fileName.replace(".h264", ""));
                     recordFileInfo.setEndTime(new Date());

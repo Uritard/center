@@ -11,6 +11,8 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
+import static com.yjh.platform.common.utils.Report.FileUtil.deleteFile;
+
 /**
  * @author hyh
  * @since 2022/4/11
@@ -26,12 +28,7 @@ public class TRecordFileInfoService {
     public int deleteByPrimaryId(Long id) {
         TRecordFileInfo tRecordFileInfo = tRecordFileInfoDao.selectByPrimaryId(id);
         if (StringUtils.isNotEmpty(tRecordFileInfo.getAbsoluteFilePath())){
-            String absolutePathUrl = "rm -rf " + tRecordFileInfo.getAbsoluteFilePath();
-            try {
-                Runtime.getRuntime().exec(absolutePathUrl);
-            }catch (Exception e){
-                log.info("录像文件删除失败", e);
-            }
+            deleteFile(tRecordFileInfo.getAbsoluteFilePath());
         }
         return tRecordFileInfoDao.deleteByPrimaryId(id);
     }
