@@ -128,10 +128,14 @@ public class TVoiceDeviceController {
                          @RequestParam(value = "stdDeviceId", required = false) Long stdDeviceId,
                          @RequestParam(value = "deviceType", required = false) String deviceType,
                          @RequestParam(value = "configId", required = false) Long configId,
-                         @RequestParam(value = "upRegionId", required = false) Long upRegionId) {
+                         @RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                        @RequestParam(value = "voiceType", required = false) String voiceType,
+                        @RequestParam(value = "voiceModel", required = false) String voiceModel,
+                        @RequestParam(value = "voiceFactory", required = false) String voiceFactory) {
         Result result = new Result();
         try {
-            List<TVoiceDevice> list = tVoiceDeviceService.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId, upRegionId);
+            List<TVoiceDevice> list = tVoiceDeviceService.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId
+                , upRegionId, voiceType, voiceModel, voiceFactory);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -146,12 +150,15 @@ public class TVoiceDeviceController {
     public Result selectByPage(@RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName,
                                @RequestParam(value = "deviceType", required = false) String deviceType,
                                @RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                               @RequestParam(value = "voiceType", required = false) String voiceType,
+                               @RequestParam(value = "voiceModel", required = false) String voiceModel,
+                               @RequestParam(value = "voiceFactory", required = false) String voiceFactory,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            result = tVoiceDeviceService.selectByPage(voiceDeviceName,deviceType,upRegionId,pageNum,pageSize);
+            result = tVoiceDeviceService.selectByPage(voiceDeviceName,deviceType,upRegionId, voiceType, voiceModel, voiceFactory,pageNum,pageSize);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

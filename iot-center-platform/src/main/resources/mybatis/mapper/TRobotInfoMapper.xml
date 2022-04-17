@@ -38,6 +38,8 @@
         <result column="robot_factory_name" jdbcType="VARCHAR" property="robotFactoryName" />
         <result column="is_use_name" jdbcType="VARCHAR" property="isUseName" />
         <result column="robot_position_name" jdbcType="VARCHAR" property="robotPositionName" />
+        <result column="dronePosition" jdbcType="VARCHAR" property="dronePosition" />
+        <result column="drone_position_name" jdbcType="VARCHAR" property="dronePositionName" />
         <result column="region_name" jdbcType="VARCHAR" property="regionName" />
     </resultMap>
 
@@ -45,7 +47,7 @@
     <sql id="Base_Column_List">
         robot_id, robot_code, robot_name, nest_code,nest_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, identity_manager, identity_code,
         lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date,
-        robot_factory, made_in, made_date, is_use, commission_date, up_region_id, robot_position, remarks
+        robot_factory, made_in, made_date, is_use, commission_date, up_region_id, robot_position, drone_position, remarks
     </sql>
 
 
@@ -80,6 +82,7 @@
             commission_date,
             up_region_id,
             robot_position,
+            drone_position,
             robot_source,
             address,
             building_user,
@@ -121,6 +124,7 @@
                 #{commissionDate, jdbcType=TIMESTAMP},
                 #{upRegionId, jdbcType=BIGINT},
                 #{robotPosition, jdbcType=VARCHAR},
+                #{dronePosition, jdbcType=VARCHAR},
                 #{robotSource, jdbcType=VARCHAR},
                 #{address, jdbcType=VARCHAR},
                 #{buildingUser, jdbcType=VARCHAR},
@@ -189,10 +193,13 @@
         <if test="updateBy != null ">a.update_by = #{updateBy},</if>
         <if test="updateDate != null">a.update_date = #{updateDate, jdbcType=TIMESTAMP},</if>
         a.robot_factory = #{robotFactory},
+        <if test="madeIn != null">a.made_in = #{madeIn},</if>
+        <if test="madeDate != null">a.made_date = #{madeDate, jdbcType=TIMESTAMP},</if>
         <if test="isUse != null ">a.is_use = #{isUse},</if>
         a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},
         <if test="upRegionId != null ">a.up_region_id = #{upRegionId},</if>
         a.robot_position = #{robotPosition},
+        a.drone_position = #{dronePosition},
         <if test="robotSource != null ">a.robot_source = #{robotSource},</if>
         <if test="address != null ">a.address = #{address},</if>
         <if test="buildingUser != null ">a.building_user = #{buildingUser},</if>
@@ -240,6 +247,7 @@
         a.commission_date,
         a.up_region_id,
         a.robot_position,
+        a.drone_position,
         a.robot_source,
         a.address,
         a.building_user,
@@ -289,6 +297,7 @@
         a.commission_date,
         a.up_region_id,
         a.robot_position,
+        a.drone_position,
         a.robot_source,
         a.address,
         a.building_user,
@@ -330,6 +339,7 @@
         <if test="commissionDate != null">and a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
         <if test="upRegionId != null and upRegionId !=''">and a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
         <if test="robotPosition != null and robotPosition !=''">and a.robot_position = #{robotPosition, jdbcType=VARCHAR},</if>
+        <if test="dronePosition != null and dronePosition !=''">and a.drone_position = #{dronePosition, jdbcType=VARCHAR},</if>
         <if test="robotSource != null and robotSource !=''">and a.robot_source = #{robotSource, jdbcType=VARCHAR},</if>
         <if test="address != null and address !=''">and a.address = #{address, jdbcType=VARCHAR},</if>
         <if test="buildingUser != null and buildingUser !=''">and a.building_user = #{buildingUser, jdbcType=VARCHAR},</if>
@@ -374,6 +384,8 @@
         f.region_name,
         e.dict_note as robot_position_name,
         a.robot_position ,
+        h.dict_note as drone_position_name,
+        a.drone_position ,
         a.robot_source,
         a.address,
         a.building_user,
@@ -391,6 +403,7 @@
         LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code and b.col_name = 'robot_factory'
         LEFT JOIN t_dict_business c ON a.is_use=c.dict_code and c.col_name = 'robot_use'
         LEFT JOIN t_dict_business e ON a.robot_position = e.dict_code  and e.col_name = 'robot_position'
+        LEFT JOIN t_dict_business h ON a.drone_position = h.dict_code  and h.col_name = 'drone_position'
         LEFT JOIN t_std_region f ON f.region_id = a.up_region_id
         left join t_camera_recorder g on a.record_id = g.record_id
         where 1 = 1
@@ -446,6 +459,8 @@
         f.region_name,
         e.dict_note as robot_position_name,
         a.robot_position ,
+        h.dict_note as drone_position_name,
+        a.drone_position,
         a.robot_source,
         a.address,
         a.building_user,
@@ -463,6 +478,7 @@
         LEFT JOIN t_dict_business b ON a.robot_factory=b.dict_code and b.col_name = 'robot_factory'
         LEFT JOIN t_dict_business c ON a.is_use=c.dict_code and c.col_name = 'robot_use'
         LEFT JOIN t_dict_business e ON a.robot_position = e.dict_code  and e.col_name = 'robot_position'
+        LEFT JOIN t_dict_business h ON a.drone_position = h.dict_code  and h.col_name = 'drone_position'
         LEFT JOIN t_std_region f ON f.region_id = a.up_region_id
         left join t_camera_recorder g on a.record_id = g.record_id
         where 1 = 1
@@ -513,6 +529,7 @@
             commission_date,
             up_region_id,
             robot_position,
+            drone_position,
             robot_source,
             address,
             building_user,
@@ -556,6 +573,7 @@
                 #{TRobotInfo.commissionDate, jdbcType=TIMESTAMP},
                 #{TRobotInfo.upRegionId, jdbcType=BIGINT},
                 #{TRobotInfo.robotPosition, jdbcType=VARCHAR},
+                #{TRobotInfo.dronePosition, jdbcType=VARCHAR},
                 #{TRobotInfo.robotSource, jdbcType=VARCHAR},
                 #{TRobotInfo.address, jdbcType=VARCHAR},
                 #{TRobotInfo.buildingUser, jdbcType=VARCHAR},
@@ -586,7 +604,7 @@
     </select>
 
     <select id="batchSelectInspection" resultType="com.yjh.platform.module.user.entity.TRobotInspectionTree">
-        select a.robot_id, b.robot_name, b.robot_position, a.inspection_id, a.inspection_name from t_robot_inspection a
+        select a.robot_id, b.robot_name, b.robot_position, b.drone_position, a.inspection_id, a.inspection_name from t_robot_inspection a
         LEFT JOIN t_robot_info b ON a.robot_id = b.robot_id
         WHERE 1 = 1
         <if test="inspectionType != null and inspectionType != ''">

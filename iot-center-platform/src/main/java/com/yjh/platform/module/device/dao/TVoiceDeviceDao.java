@@ -22,11 +22,17 @@ public interface TVoiceDeviceDao {
                                 @Param(value = "stdDeviceId") Long stdDeviceId,
                                 @Param(value = "deviceType") String deviceType,
                                 @Param(value = "configId") Long configId,
-                              @Param(value = "upRegionId")Long upRegionId);
+                                @Param(value = "upRegionId")Long upRegionId,
+                                @Param(value = "voiceType")String voiceType,
+                                @Param(value = "voiceModel")String voiceModel,
+                                @Param(value = "voiceFactory")String voiceFactory);
     List<VoiceDeviceAllInfoDetail> selectByPage(@Param(value = "voiceDeviceName") String voiceDeviceName,
                                     @Param(value = "deviceType") String deviceType,
                                     @Param(value = "list") List<Long> list,
-                                                @Param(value = "upRegionId")Long upRegionId);
+                                    @Param(value = "upRegionId")Long upRegionId,
+                                    @Param(value = "voiceType")String voiceType,
+                                    @Param(value = "voiceModel")String voiceModel,
+                                    @Param(value = "voiceFactory")String voiceFactory);
 
     int batchAdd(List<VoiceDeviceAllInfoDetail> list);
     int batchDelete(List<String> list);

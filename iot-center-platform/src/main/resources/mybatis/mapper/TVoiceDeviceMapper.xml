@@ -12,11 +12,14 @@
         <result column="voice_code" jdbcType="VARCHAR" property="voiceCode" />
         <result column="config_id" jdbcType="BIGINT" property="configId" />
         <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
+        <result column="voice_type" jdbcType="BIGINT" property="voiceType" />
+        <result column="voice_model" jdbcType="BIGINT" property="voiceModel" />
+        <result column="voice_factory" jdbcType="BIGINT" property="voiceFactory" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        voice_device_id, voice_device_name, std_device_id, device_type, config_id,state,voice_code
+        voice_device_id, voice_device_name, std_device_id, device_type, config_id,state,voice_code,voice_type,voice_model,voice_factory
     </sql>
 
 
@@ -29,7 +32,10 @@
             state,
             config_id,
             up_region_id,
-            voice_code
+            voice_code,
+            voice_type,
+            voice_model,
+            voice_factory
         )values(
                 #{voiceDeviceId, jdbcType=BIGINT},
                 #{voiceDeviceName, jdbcType=VARCHAR},
@@ -39,6 +45,9 @@
                 #{configId, jdbcType=BIGINT},
                 #{upRegionId, jdbcType=BIGINT},
                 #{voiceCode, jdbcType=VARCHAR}
+                #{voiceType, jdbcType=VARCHAR},
+                #{voiceModel, jdbcType=VARCHAR},
+                #{voiceFactory, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -57,6 +66,9 @@
         <if test="configId != null">a.config_id = #{configId, jdbcType=BIGINT},</if>
         <if test="upRegionId != null">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
         <if test="voiceCode != null">a.voice_code = #{voiceCode, jdbcType=VARCHAR},</if>
+        <if test="voiceType != null">a.voice_type = #{voiceType, jdbcType=VARCHAR},</if>
+        <if test="voiceModel != null">a.voice_model = #{voiceModel, jdbcType=VARCHAR},</if>
+        <if test="voiceFactory != null">a.voice_factory = #{voiceFactory, jdbcType=VARCHAR},</if>
     </set>
             where a.voice_device_id = #{voiceDeviceId, jdbcType=BIGINT}
     </update>
@@ -68,11 +80,17 @@
         b.region_name,
         c.device_name,
         d.dict_note as deviceTypeName
+        f.dict_note as voiceTypeName
+        g.dict_note as voiceModelName
+        h.dict_note as voiceFactoryName
         FROM
         t_voice_device a
         left join t_std_region b on a.up_region_id = b.region_id
         left join t_std_device c on a.std_device_id = c.device_id
         left join t_dict_business d on a.device_type = d.dict_code and d.col_name="device_type"
+        left join t_dict_business f on a.voice_type = f.dict_code and f.col_name="voice_type"
+        left join t_dict_business g on a.voice_model = g.dict_code and g.col_name="voice_model"
+        left join t_dict_business h on a.voice_factory = h.dict_code and h.col_name="voice_factory"
         left join t_voice_config e on a.config_id = e.config_id
         where 1=1
             and a.voice_device_id = #{voiceDeviceId, jdbcType=BIGINT}
@@ -87,15 +105,21 @@
         a.state,
         a.config_id,
         a.up_region_id,
-        a.voice_code
+        a.voice_code,
+        a.voice_type,
+        a.voice_model,
+        a.voice_factory
         from t_voice_device a
         where 1 = 1
         <if test="voiceDeviceId != null and voiceDeviceId != ''"> and a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}</if>
-        <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR}</if>
+        <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name like concat('%',#{voiceDeviceName, jdbcType=VARCHAR},'%')</if>
         <if test="stdDeviceId != null and stdDeviceId != ''"> and a.std_device_id = #{stdDeviceId, jdbcType=BIGINT}</if>
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="configId != null and configId != ''"> and a.config_id = #{configId, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
+        <if test="voiceType != null and voiceType != ''"> and a.voice_type = #{voiceType, jdbcType=VARCHAR}</if>
+        <if test="voiceModel != null and voiceModel != ''"> and a.voice_model = #{voiceModel, jdbcType=VARCHAR}</if>
+        <if test="voiceFactory != null and voiceFactory != ''"> and a.voice_factory = #{voiceFactory, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage"  resultType="com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail">

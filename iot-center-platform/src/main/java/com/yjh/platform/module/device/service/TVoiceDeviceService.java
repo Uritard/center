@@ -114,13 +114,17 @@ public class TVoiceDeviceService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TVoiceDevice> select(Long voiceDeviceId, String voiceDeviceName, Long stdDeviceId, String deviceType, Long configId,Long upRegionId) {
-        List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId, upRegionId);
+    public List<TVoiceDevice> select(Long voiceDeviceId, String voiceDeviceName, Long stdDeviceId, String deviceType, Long configId,
+        Long upRegionId, String voiceType, String voiceModel, String voiceFactory) {
+
+        List<TVoiceDevice> tVoiceDeviceList = tVoiceDeviceDao.select(voiceDeviceId, voiceDeviceName, stdDeviceId, deviceType, configId,
+            upRegionId, voiceType, voiceModel, voiceFactory);
         return tVoiceDeviceList;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Result selectByPage(String voiceDeviceName,String deviceType,Long upRegionId,int pageNum,int pageSize) {
+    public Result selectByPage(String voiceDeviceName,String deviceType,Long upRegionId,
+        String voiceType, String voiceModel, String voiceFactory,int pageNum,int pageSize) {
         Result result= new Result();
         Map<String, Object> resultMap = new HashMap<>();
         if("-1".equals(deviceType)){
@@ -131,7 +135,8 @@ public class TVoiceDeviceService{
             list.add(upRegionId);
         }
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-        List<VoiceDeviceAllInfoDetail> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(voiceDeviceName,deviceType,list,upRegionId);
+        List<VoiceDeviceAllInfoDetail> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(voiceDeviceName,deviceType,list,upRegionId,
+            voiceType, voiceModel, voiceFactory);
         for(VoiceDeviceAllInfoDetail item:tVoiceDeviceList){
 //            if(ping(item.getFtpUrl())){
 //                item.setState("在线");
@@ -748,7 +753,7 @@ public class TVoiceDeviceService{
     }
 
     public void registerAudioDevice(){
-        List<TVoiceDevice> list = tVoiceDeviceDao.select(null,null,null,null,null,null);
+        List<TVoiceDevice> list = tVoiceDeviceDao.select(null,null,null,null,null,null,null,null,null);
         list.forEach(tVoiceDevice -> {
             if(tVoiceDevice.getVoiceCode() != null && !"".equals(tVoiceDevice.getVoiceCode())){
                 audioDeviceManager.registerAudioDevice(audioDeviceFactory.newAudioDevice(tVoiceDevice.getVoiceCode()));

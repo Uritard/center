@@ -192,6 +192,12 @@ public class TRobotInfo implements Serializable {
 
     private String robotPositionName;
 
+    @Length(max = 32, message = "dronePosition长度必须小于等于32")
+    @ApiModelProperty(value = "无人机类型")
+    @TableField(value = "drone_position", updateStrategy = FieldStrategy.IGNORED)
+    private String dronePosition;
+    private String dronePositionName;
+
     @Length(max = 255, message = "remarks长度必须小于等于255")
     @TableField(value = "remarks", updateStrategy = FieldStrategy.IGNORED)
     private String remarks;

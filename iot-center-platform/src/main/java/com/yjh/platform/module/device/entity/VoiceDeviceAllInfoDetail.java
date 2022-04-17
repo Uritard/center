@@ -20,7 +20,7 @@ import javax.validation.constraints.Max;
 public class VoiceDeviceAllInfoDetail{
 
     private static final long serialVersionUID = 1L;
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "声纹监控设备Id（默认为Ip地址）")
     private Long voiceDeviceId;
 
@@ -28,7 +28,7 @@ public class VoiceDeviceAllInfoDetail{
     @ApiModelProperty(value = "声纹监控设备名称（）")
     private String voiceDeviceName;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "变压器下面换流变的设备Id")
     private Long stdDeviceId;
 
@@ -36,12 +36,31 @@ public class VoiceDeviceAllInfoDetail{
     @ApiModelProperty(value = "被监测的设备类型")
     private String deviceType;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     private Long configId;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "上级区域id")
     private Long upRegionId;
+
+    @Length(max = 32, message = "voiceCode长度必须小于等于32")
+    @ApiModelProperty(value = "声纹设备编码")
+    private String voiceCode;
+
+    @Length(max = 32, message = "voiceType长度必须小于等于32")
+    @ApiModelProperty(value = "设备类型")
+    private String voiceType;
+    private String voiceTypeName;
+
+    @Length(max = 32, message = "voiceModel长度必须小于等于32")
+    @ApiModelProperty(value = "设备型号")
+    private String voiceModel;
+    private String voiceModelName;
+
+    @Length(max = 32, message = "voiceFactory长度必须小于等于32")
+    @ApiModelProperty(value = "生产厂家")
+    private String voiceFactory;
+    private String voiceFactoryName;
 
     @ApiModelProperty(value = "ftp地址")
     private String ftpUrl;
@@ -78,19 +97,6 @@ public class VoiceDeviceAllInfoDetail{
     @ApiModelProperty(value = "算法配置文件路径")
     @TableField("filePath")
     private String filePath;
-
-
-    public String getVoiceCode() {
-        return voiceCode;
-    }
-
-    public void setVoiceCode(String voiceCode) {
-        this.voiceCode = voiceCode;
-    }
-
-    @ApiModelProperty(value = "声纹设备编码")
-    private String voiceCode;
-
 
     private String channelNum;
 
@@ -182,6 +188,62 @@ public class VoiceDeviceAllInfoDetail{
 
     public void setUpRegionId(Long upRegionId) {
         this.upRegionId = upRegionId;
+    }
+
+    public String getVoiceCode() {
+        return voiceCode;
+    }
+
+    public void setVoiceCode(String voiceCode) {
+        this.voiceCode = voiceCode;
+    }
+
+    public String getVoiceType() {
+        return voiceType;
+    }
+
+    public void setVoiceType(String voiceType) {
+        this.voiceType = voiceType;
+    }
+
+    public String getVoiceTypeName() {
+        return voiceTypeName;
+    }
+
+    public void setVoiceTypeName(String voiceTypeName) {
+        this.voiceTypeName = voiceTypeName;
+    }
+
+    public String getVoiceModel() {
+        return voiceModel;
+    }
+
+    public void setVoiceModel(String voiceModel) {
+        this.voiceModel = voiceModel;
+    }
+
+    public String getVoiceModelName() {
+        return voiceModelName;
+    }
+
+    public void setVoiceModelName(String voiceModelName) {
+        this.voiceModelName = voiceModelName;
+    }
+
+    public String getVoiceFactory() {
+        return voiceFactory;
+    }
+
+    public void setVoiceFactory(String voiceFactory) {
+        this.voiceFactory = voiceFactory;
+    }
+
+    public String getVoiceFactoryName() {
+        return voiceFactoryName;
+    }
+
+    public void setVoiceFactoryName(String voiceFactoryName) {
+        this.voiceFactoryName = voiceFactoryName;
     }
 
     public String getFtpUrl() {
@@ -303,4 +365,5 @@ public class VoiceDeviceAllInfoDetail{
     public void setDeviceTypeName(String deviceTypeName) {
         this.deviceTypeName = deviceTypeName;
     }
+
 }
