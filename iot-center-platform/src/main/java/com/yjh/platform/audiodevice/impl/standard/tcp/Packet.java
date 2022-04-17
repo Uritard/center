@@ -135,11 +135,10 @@ public class Packet {
 
         packet.crc[0] = in.get();
         packet.crc[1] = in.get();
-        //TODO: CRC校验
 
         byte eop0 = in.get();
         if (eop0 != END) {
-            throw new IllegalArgumentException(String.format("Unexpected ending bytes: 0X%2X", eop0));
+            throw new IllegalArgumentException(String.format("Unexpected ending byte: 0X%2X", eop0));
         }
 
         return packet;

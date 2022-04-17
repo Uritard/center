@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentMap;
 @Slf4j
 public class AudioDeviceManagerImpl implements AudioDeviceManager {
 
-    ConcurrentMap<String, AudioDevice> deviceMap = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, AudioDevice> deviceMap = new ConcurrentHashMap<>();
 
     @Override
     public AudioDevice getAudioDevice(String deviceId) {
@@ -26,7 +26,7 @@ public class AudioDeviceManagerImpl implements AudioDeviceManager {
 
     @Override
     public void registerAudioDevice(AudioDevice audioDevice) {
-        log.info("Register audio device({}) with device id: {}", audioDevice, audioDevice.getDeviceID());
-        deviceMap.put(audioDevice.getDeviceID(), audioDevice);
+        log.info("Register audio device({}) with device id: {}", audioDevice, audioDevice.getDeviceId());
+        deviceMap.put(audioDevice.getDeviceId(), audioDevice);
     }
 }

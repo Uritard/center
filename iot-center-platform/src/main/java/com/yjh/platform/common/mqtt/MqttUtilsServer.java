@@ -47,7 +47,7 @@ public class MqttUtilsServer {
             mqttClient.connect(options);
             // return this.mqttTopic;
         } catch (Exception e) {
-            log.error("connetct mqttserver-异常\nclientId:{}\ntheme:{}\nexception:{}", serverClientId, e.toString());
+            log.error("connetct mqttserver-异常\nclientId:{}\nexception:{}", serverClientId, e.getMessage());
         }
         //  return null;
 
@@ -69,7 +69,7 @@ public class MqttUtilsServer {
             return true;
 
         } catch (Exception e) {
-            log.error("推送消息--异常\nclientId:{}\nexception:{}", e.toString());
+            log.error("订阅消息--异常\nclientId:{}\nexception:{}", mqttClient.getClientId(), e.getMessage());
             return false;
         }
     }
@@ -87,19 +87,20 @@ public class MqttUtilsServer {
         //保证消息能到达一次
         message.setQos(qos);
         message.setRetained(true);
-        byte[] msgbytes = JSONUtil.toJSONString(msg).getBytes();
-        message.setPayload(msgbytes);
+        String jsonStr = JSONUtil.toJSONString(msg);
+        byte[] msgBytes = jsonStr.getBytes();
+        message.setPayload(msgBytes);
         try {
-            log.info("pubushi:{}", JSONUtil.toJSONString(msg));
+            log.info("发送MQTT消息, 话题:{}, 消息:{}", theme, jsonStr);
             MqttTopic mqtttopic = this.mqttClient.getTopic(theme);
             MqttDeliveryToken token = mqtttopic.publish(message);
             token.waitForCompletion();
             if (!token.isComplete()) {
-                log.error("推送消息--失败--msg：{}", JSONUtil.toJSONString(message));
+                log.error("推送消息--失败--msg：{}", jsonStr);
                 return false;
             }
         } catch (Exception e) {
-            log.error("推送消息--异常\nclientId:{}\nexception:{}", e.toString());
+            log.error("推送消息--异常\nclientId:{}\nexception:{}", mqttClient.getClientId(), e.getMessage());
         }
         return true;
     }
@@ -108,7 +109,7 @@ public class MqttUtilsServer {
         try {
             this.mqttClient.disconnect();
         } catch (Exception e) {
-            log.error("关闭连接\nclientId:{}\nexception:{}", e.toString());
+            log.error("关闭连接\nclientId:{}\nexception:{}", mqttClient.getClientId(), e.getMessage());
         }
     }
 
@@ -129,7 +130,7 @@ public class MqttUtilsServer {
             mqttClient.connect(options);
             // return this.mqttTopic;
         } catch (Exception e) {
-            log.error("connetct mqttserver-异常\nclientId:{}\ntheme:{}\nexception:{}", serverClientId, e.toString());
+            log.error("connetct mqttserver-异常\nclientId:{}\nexception:{}", serverClientId, e.getMessage());
         }
 
     }

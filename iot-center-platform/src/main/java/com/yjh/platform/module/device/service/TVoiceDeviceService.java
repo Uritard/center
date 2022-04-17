@@ -2,8 +2,8 @@ package com.yjh.platform.module.device.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.sun.jna.Pointer;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
+import com.yjh.platform.audiodevice.impl.AudioDeviceFactory;
 import com.yjh.platform.audiodevice.impl.standard.StandardAudioDevice;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
@@ -12,7 +12,6 @@ import com.yjh.platform.common.tradio.NET_TRADIO_DEVICEINFO;
 import com.yjh.platform.common.tradio.RecordVoiceFileTestThread;
 import com.yjh.platform.common.tradio.TradioLibrary;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
-import com.yjh.platform.configuration.RedisUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
@@ -26,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ws.schild.jave.MultimediaInfo;
@@ -58,6 +56,8 @@ public class TVoiceDeviceService{
     private RedisTemplate redisTemplate;
     @Autowired
     private AudioDeviceManager audioDeviceManager;
+    @Autowired
+    private AudioDeviceFactory audioDeviceFactory;
 
     private Logger log = LoggerFactory.getLogger(TVoiceDeviceService.class);
 
@@ -751,7 +751,7 @@ public class TVoiceDeviceService{
         List<TVoiceDevice> list = tVoiceDeviceDao.select(null,null,null,null,null,null);
         list.forEach(tVoiceDevice -> {
             if(tVoiceDevice.getVoiceCode() != null && !"".equals(tVoiceDevice.getVoiceCode())){
-                audioDeviceManager.registerAudioDevice(new StandardAudioDevice(tVoiceDevice.getVoiceCode()));
+                audioDeviceManager.registerAudioDevice(audioDeviceFactory.newAudioDevice(tVoiceDevice.getVoiceCode()));
             }
         });
     }

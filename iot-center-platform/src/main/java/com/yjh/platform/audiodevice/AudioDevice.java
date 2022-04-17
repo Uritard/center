@@ -1,8 +1,5 @@
 package com.yjh.platform.audiodevice;
 
-import com.yjh.platform.common.utils.JSONUtil;
-import com.yjh.platform.module.device.entity.AuidoOprInfo;
-
 /**
  * 录音设备接口
  *
@@ -12,7 +9,11 @@ import com.yjh.platform.module.device.entity.AuidoOprInfo;
  */
 public interface AudioDevice {
 
-    String getDeviceID();
+    /**
+     * 获取设备ID
+     * @return
+     */
+    String getDeviceId();
     /**
      * 开始录音
      *
@@ -41,22 +42,5 @@ public interface AudioDevice {
      * @throws Exception
      */
     void stopRecordingAndSave(String audioFilepath) throws Exception;
-
-    enum ActionType {
-        START("ON"),
-
-
-        STOP("OFF");
-
-        private String code;
-
-        ActionType(String code) {
-            this.code = code;
-        }
-
-        public String getCode() {
-            return code;
-        }
-    }
 
 }

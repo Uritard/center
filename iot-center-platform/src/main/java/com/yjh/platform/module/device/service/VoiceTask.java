@@ -92,7 +92,7 @@ public class VoiceTask implements Runnable{
                     audioDevice.stopRecordingAndSave(voicePath);
                     isok = true;
                 } catch (Exception e) {
-                    log.info("声纹设备录音出错：{}", e);
+                    log.warn("声纹设备录音出错", e);
 
                 }
             }

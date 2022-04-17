@@ -1,4 +1,4 @@
-package com.yjh.platform.audiodevice.impl.standard;
+package com.yjh.platform.audiodevice.impl;
 
 import java.io.FileOutputStream;
 
@@ -19,18 +19,13 @@ public class AudioFileUtils {
      * @param headerByte
      * @param contentByte
      */
-    public static boolean writePCMAudioFile(String audioFilepath, byte[] headerByte, byte[] contentByte) {
-        FileOutputStream outStream = null;
-        try {
-            outStream = new FileOutputStream(audioFilepath);
+    public static void writeWavAudioFile(String audioFilepath, byte[] headerByte, byte[] contentByte) {
+        try (FileOutputStream outStream = new FileOutputStream(audioFilepath)) {
             outStream.write(headerByte);
             outStream.write(contentByte);
-            outStream.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("写WAV文件失败", e);
         }
-        return true;
-
     }
 
     /**

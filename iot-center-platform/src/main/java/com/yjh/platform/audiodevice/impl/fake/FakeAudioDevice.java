@@ -49,7 +49,7 @@ public class FakeAudioDevice implements AudioDevice {
     }
 
     @Override
-    public String getDeviceID() {
+    public String getDeviceId() {
         return deviceId;
     }
 }

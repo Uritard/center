@@ -7,12 +7,14 @@ import com.yjh.messager.api.channel.RxBusMsgChannel;
 import com.yjh.messager.api.msg.Msg;
 import com.yjh.messager.api.socket.BaseSocketServer;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
+import com.yjh.platform.audiodevice.impl.AudioDeviceFactory;
 import com.yjh.platform.audiodevice.impl.AudioDeviceManagerImpl;
 import com.yjh.platform.audiodevice.impl.standard.AudioDataDispatcher;
 import com.yjh.platform.audiodevice.impl.standard.StandardAudioDevice;
 import com.yjh.platform.audiodevice.impl.standard.StandardAudioDeviceMonitor;
 import com.yjh.platform.audiodevice.impl.standard.tcp.MessageCodec;
 import com.yjh.platform.audiodevice.impl.standard.tcp.PacketCodecFactory;
+import com.yjh.platform.common.mqtt.MqttUtilsServer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,11 +65,16 @@ public class AudioDeviceConfig {
     }
 
     @Bean
-    public AudioDeviceManager audioDeviceManager() {
+    public AudioDeviceFactory audioDeviceFactory(MqttUtilsServer mqttUtilsServer) {
+        return deviceId -> new StandardAudioDevice(deviceId, mqttUtilsServer);
+    }
+
+    @Bean
+    public AudioDeviceManager audioDeviceManager(AudioDeviceFactory audioDeviceFactory) {
         //TODO: 调试目的
         AudioDeviceManager audioDeviceManager = new AudioDeviceManagerImpl();
-        audioDeviceManager.registerAudioDevice(new StandardAudioDevice("YWJjZGVm"));
-        audioDeviceManager.registerAudioDevice(new StandardAudioDevice("AQIDBAUG"));
+        audioDeviceManager.registerAudioDevice(audioDeviceFactory.newAudioDevice("YWJjZGVm"));
+        audioDeviceManager.registerAudioDevice(audioDeviceFactory.newAudioDevice("AQIDBAUG"));
         return audioDeviceManager;
     }
 

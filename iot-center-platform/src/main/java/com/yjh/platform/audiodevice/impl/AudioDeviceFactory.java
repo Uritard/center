@@ -13,7 +13,8 @@ public interface AudioDeviceFactory {
 
     /**
      * 创建新的声纹设备
+     * @param deviceId 设备ID
      * @return
      */
-    AudioDevice newAudioDevice();
+    AudioDevice newAudioDevice(String deviceId);
 }

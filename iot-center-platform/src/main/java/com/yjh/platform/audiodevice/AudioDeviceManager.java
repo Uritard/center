@@ -21,7 +21,6 @@ public interface AudioDeviceManager {
     /**
      * 注册声纹设备
      *
-     * @param deviceId    设备ID
      * @param audioDevice 声纹设备实例
      */
     void registerAudioDevice(AudioDevice audioDevice);
