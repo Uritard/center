@@ -4,8 +4,6 @@ import com.yjh.platform.common.utils.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 /**
  * MQTT服务类
@@ -13,27 +11,28 @@ import org.springframework.stereotype.Service;
  * @author jeff
  * @since 2022/04/11
  */
-@Service
 @Slf4j
 public class MqttUtilsServer {
 
-    @Value("${mqtt.host}")
     private String host;
-    @Value("${mqtt.serverClientId}")
     private String serverClientId;
-    @Value("${mqtt.user}")
     private String user;
-    @Value("${mqtt.pwd}")
     private String pwd;
 
-    private
-    MqttClient mqttClient;
+    private MqttClient mqttClient;
 
-    MqttUtilsServer(@Value("${mqtt.host}") String host, @Value("${mqtt.serverClientId}") String serverClientId
-            , @Value("${mqtt.user}") String user, @Value("${mqtt.pwd}") String pwd) {
+    public MqttUtilsServer(String host, String serverClientId, String user, String pwd) {
         log.info("start init mqttserver");
+        this.host = host;
+        this.serverClientId = serverClientId;
+        this.user = user;
+        this.pwd = pwd;
+        initClient(host, serverClientId, user, pwd);
+    }
+
+    private void initClient(String host, String serverClientId, String user, String pwd) {
         try {
-            mqttClient = new MqttClient(host, serverClientId, new MemoryPersistence());
+            this.mqttClient = new MqttClient(host, serverClientId, new MemoryPersistence());
             MqttConnectOptions options = new MqttConnectOptions();
             options.setCleanSession(false);
             options.setUserName(user);
@@ -43,31 +42,27 @@ public class MqttUtilsServer {
             // 设置会话心跳时间
             options.setKeepAliveInterval(60);
             options.setAutomaticReconnect(true);
-            mqttClient.setCallback(new PushCallback());
-            mqttClient.connect(options);
-            // return this.mqttTopic;
+            this.mqttClient.setCallback(new PushCallback());
+            this.mqttClient.connect(options);
         } catch (Exception e) {
             log.error("connetct mqttserver-异常\nclientId:{}\nexception:{}", serverClientId, e.getMessage());
         }
-        //  return null;
-
     }
 
     /**
      * 订阅主题
      */
-    public boolean subscribe(String theme) {
+    public boolean subscribe(String topic) {
         if (!this.mqttClient.isConnected()) {
             log.info("订阅重新连接");
             this.reconnection();
         }
         int[] qos = {1};
-        String[] topic1 = {theme};
+        String[] topic1 = {topic};
         try {
-            mqttClient.subscribe(topic1, qos);
+            this.mqttClient.subscribe(topic1, qos);
             log.info("get message");
             return true;
-
         } catch (Exception e) {
             log.error("订阅消息--异常\nclientId:{}\nexception:{}", mqttClient.getClientId(), e.getMessage());
             return false;
@@ -78,7 +73,7 @@ public class MqttUtilsServer {
     /**
      * 推送消息
      */
-    public boolean pushMsg(String theme, Object msg,int qos) {
+    public boolean pushMsg(String topic, Object msg, int qos) {
         if (!this.mqttClient.isConnected()) {
             log.info("连接断开，重连接");
             this.reconnection();
@@ -91,8 +86,8 @@ public class MqttUtilsServer {
         byte[] msgBytes = jsonStr.getBytes();
         message.setPayload(msgBytes);
         try {
-            log.info("发送MQTT消息, 话题:{}, 消息:{}", theme, jsonStr);
-            MqttTopic mqtttopic = this.mqttClient.getTopic(theme);
+            log.info("发送MQTT消息, 话题:{}, 消息:{}", topic, jsonStr);
+            MqttTopic mqtttopic = this.mqttClient.getTopic(topic);
             MqttDeliveryToken token = mqtttopic.publish(message);
             token.waitForCompletion();
             if (!token.isComplete()) {
@@ -115,24 +110,7 @@ public class MqttUtilsServer {
 
     public void reconnection() {
         log.info("reconnection mqtt");
-        try {
-            mqttClient = new MqttClient(host, serverClientId, new MemoryPersistence());
-            MqttConnectOptions options = new MqttConnectOptions();
-            options.setCleanSession(false);
-            options.setUserName(user);
-            options.setPassword(pwd.toCharArray());
-            // 设置超时时间
-            options.setConnectionTimeout(60);
-            // 设置会话心跳时间
-            options.setKeepAliveInterval(60);
-            options.setAutomaticReconnect(true);
-            mqttClient.setCallback(new PushCallback());
-            mqttClient.connect(options);
-            // return this.mqttTopic;
-        } catch (Exception e) {
-            log.error("connetct mqttserver-异常\nclientId:{}\nexception:{}", serverClientId, e.getMessage());
-        }
-
+        initClient(host, serverClientId, user, pwd);
     }
 
 }
