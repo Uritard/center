@@ -12,6 +12,7 @@ import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.SysRoleMenuDao;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.*;
+import com.yjh.platform.module.user.service.SysKeyService;
 import com.yjh.platform.module.user.service.SysUserService;
 
 import java.text.SimpleDateFormat;
@@ -61,8 +62,9 @@ public class SysUserController {
     private RedisTemplate redisTemplate;
     @Autowired
     private Demo demo;
+    @Autowired
+    private SysKeyService sysKeyService;
     private Logger log = LoggerFactory.getLogger(SysUserController.class);
-
 
     public SysUserController(SysUserService sysUserService) {
         this.sysUserService = sysUserService;
@@ -764,12 +766,12 @@ public class SysUserController {
     public Result getPubk() {
         Result result = new Result();
         try {
-            Map mapPubk=new HashMap();
+            Map<String, Object> mapPubk=new HashMap<>();
             Long random =System.currentTimeMillis();
-            Long num = new Date().getTime();
+            Long num = System.currentTimeMillis();
             Double d = Math.random()*num;
-            Long nums=random+d.longValue();
-            Map map=Demo.createKey();
+            Long nums = random+d.longValue();
+            Map map = Demo.createKey();
             String pubk=String.valueOf(map.get("pubk"));
             String prik=String.valueOf(map.get("prik"));
             Map<String, Object> mapAppKey = new HashMap<>();
@@ -787,4 +789,57 @@ public class SysUserController {
         return result;
     }
 
+    @ApiOperation(value = "用户绑定")
+    @RequestMapping(value = "/userBind", method = RequestMethod.POST)
+    public Result userBind(@Validated @RequestBody SysKey sysKey, HttpServletRequest request) {
+        Result result = new Result();
+        try {
+            result.setData(sysKeyService.insert(sysKey, request));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.PARAMERROR.getCode(), e.getMessage());
+            log.error("用户绑定{}失败:", sysKey.getBindName(), e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "用户绑定获取")
+    @RequestMapping(value = "/userBindList", method = RequestMethod.GET)
+    @Logs(title = "根据用户ID查询用户绑定", content = "根据用户传递的用户ID查询用户绑定的 IP 或 UKEY 信息", logType = 28)
+    public Result userBind(@RequestParam(value = "userId") Long userId, HttpServletRequest request) {
+        Result result = new Result();
+        try {
+            result.setData(sysKeyService.getUserKeys(userId));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.PARAMERROR.getCode(), e.getMessage());
+            log.error("获取用户绑定列表失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "删除用户绑定")
+    @RequestMapping(value = "/userBindDel", method = RequestMethod.DELETE)
+    public Result userBindDel(@RequestParam(value = "keyId") Long keyId, HttpServletRequest request) {
+        Result result = new Result();
+        try {
+            result.setData(sysKeyService.deleteByPrimaryId(keyId, request));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.PARAMERROR.getCode(), e.getMessage());
+            log.error("用户绑定删除失败: {}", keyId, e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "删除用户绑定")
+    @RequestMapping(value = "/redisBindKey", method = RequestMethod.GET)
+    public Result redisBindKey(@RequestParam(value = "userId") Long userId, HttpServletRequest request) {
+        Result result = new Result();
+        try {
+            Set<String> ips = redisTemplate.opsForSet().members("sysKey:" + userId + ":2");
+            result.setData(ips);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.PARAMERROR.getCode(), e.getMessage());
+            log.error("获取Redis中用户绑定数据失败: {}", userId, e);
+        }
+        return result;
+    }
 }

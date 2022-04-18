@@ -5,6 +5,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
+import com.yjh.platform.module.user.service.SysKeyService;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TSysParamService;
@@ -57,6 +58,8 @@ public class PlatformApplication  implements CommandLineRunner {
     @Autowired
     private SysUserService sysUserService;
     @Autowired
+    private SysKeyService sysKeyService;
+    @Autowired
     private TVoiceDeviceService tVoiceDeviceService;
     @Autowired
     private RedisTemplate redisTemplate;
@@ -78,6 +81,7 @@ public class PlatformApplication  implements CommandLineRunner {
 //        quartzTask.setJobGroup("Platform");
 //        jobManager.addJob(quartzTask);
         redisTemplate.delete("AllRobotCode");
+        sysKeyService.loadKeysToRedis();
         tSysParamService.insertIntoRedis();
         tCameraInfoService.intoRedis();
         tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务

@@ -41,10 +41,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Component
 public class zuulFilter extends ZuulFilter {
@@ -79,6 +76,8 @@ public class zuulFilter extends ZuulFilter {
         String isUkey = uKeymap.get("content");
         Map<String, String> ipmap = redisTemplate.opsForHash().entries("t_sys_param:isIp");
         String isIp = ipmap.get("content");
+        Map<String, String> ipLoginmap = redisTemplate.opsForHash().entries("t_sys_param:isIpLogin");
+        String isIpLogin = ipLoginmap.get("content");
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
         String url = request.getRequestURI();
@@ -275,25 +274,46 @@ public class zuulFilter extends ZuulFilter {
                 }
             }
         }
+        // 判断登录用户 ip 地址
+        if ("true".equals(isIpLogin)) {
+            String ipAddr = IpUtil.getRemoteIP(request);
+            String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
+            Set<String> ips = redisTemplate.opsForSet().members("sysKey:" + userId + ":2");
+
+            boolean ipValid = ips == null || ips.isEmpty() || ips.contains(ipAddr);
+
+            if (!ipValid) {
+                log.error("IP 地址验证结果 - {}", ipValid);
+                ctx.setSendZuulResponse(false);
+                ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
+                ctx.setResponseBody("{\"error\":\"非绑定IP地址\"}");
+                return false;
+            }
+        }
+        // 判断登录用户 UKey
         if ("true".equals(isUkey)) {
             String signStr = request.getHeader("signStr") != null ? request.getHeader("signStr") : "";
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
             if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                 String ukeyId = request.getHeader("ukeyId") != null ? request.getHeader("ukeyId") : "";
-                String xlh=Constant.UKEY_XLH.get(userId);
-                if(!xlh.equals(ukeyId.substring(0,16))){
-                    log.error("序列号篡改------------------------ ");
+
+                String xlh = ukeyId.substring(0,16);
+
+                String pubkey = (String)redisTemplate.opsForHash().get("sysKey:" + userId + ":1", xlh);
+                if(StringUtils.isEmpty(pubkey)){
+                    log.error("序列号不正确------------------------ {}", xlh);
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
+                    ctx.setResponseBody("{\"error\":\"序列号不正确\"}");
                     return false;
                 }
-                String pub=Constant.UKEY_GY.get(userId);
-                boolean status = Demo.verify(webcode, signStr,pub);
+                boolean status = Demo.verify(webcode, signStr, pubkey);
                 if (!status) {
-                    log.error("签名验证结果 - " + status);
+                    log.error("签名验证结果 - {}", status);
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
+                    ctx.setResponseBody("{\"error\":\"签名验证失败\"}");
                     return false;
                 }
             }

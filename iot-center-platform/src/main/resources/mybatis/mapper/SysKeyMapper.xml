@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.SysKeyDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.SysKey">
+        <id column="key_id" jdbcType="BIGINT" property="keyId" />
+        <result column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="bind_type" jdbcType="INTEGER" property="bindType" />
+        <result column="pub_key" jdbcType="VARCHAR" property="pubKey" />
+        <result column="serial_num" jdbcType="VARCHAR" property="serialNum" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        key_id, user_id, bind_type, pub_key, serial_num, remark
+    </sql>
+
+    <insert id="insert" parameterType="com.yjh.platform.module.user.entity.SysKey">
+        insert into sys_key(
+            user_id,
+            bind_type,
+            pub_key,
+            serial_num,
+            remark
+        )values(
+                #{userId, jdbcType=BIGINT},
+                #{bindType, jdbcType=INTEGER},
+                #{pubKey, jdbcType=VARCHAR},
+                #{serialNum, jdbcType=VARCHAR},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from sys_key
+                where key_id = #{keyId, jdbcType=BIGINT}
+    </delete>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysKey">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_key a
+        where a.key_id = #{keyId, jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByUserId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysKey">
+        select
+            <include refid="Base_Column_List"/>
+            from sys_key a
+            where a.user_id = #{userId, jdbcType=BIGINT}
+    </select>
+
+    <select id="selectAll" resultType="com.yjh.platform.module.user.entity.SysKey">
+        select
+            <include refid="Base_Column_List"/> from sys_key
+    </select>
+
+</mapper>
