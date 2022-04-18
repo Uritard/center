@@ -55,7 +55,7 @@ public class TestController {
                 result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "设备未注册");
                 return result;
             }
-            device.stopRecording();;
+            device.stopRecordingAndSave("E:\\FFOutput\\test.wav");;
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

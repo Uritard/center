@@ -5,10 +5,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.lang.reflect.Type;
 
 /**
  * <功能描述>
@@ -42,5 +46,32 @@ public class JSONUtil {
             }
         }
         return StringUtils.EMPTY;
+    }
+
+    public static <T> T toBean(String str, Type type) {
+        return toBean(str, TypeFactory.defaultInstance().constructType(type));
+    }
+
+    public static <T> T toBean(String str, JavaType javaType) {
+        if (StringUtils.isEmpty(str)) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(str, javaType);
+        } catch (Exception e) {
+            log.error("Jsons.toBean error: ", e);
+        }
+        return null;
+    }
+    public static <T> T toBean(String str, Class<T> cls) {
+        if (StringUtils.isEmpty(str)) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(str, cls);
+        } catch (Exception e) {
+            log.error("Jsons.toBean error: ", e);
+        }
+        return null;
     }
 }

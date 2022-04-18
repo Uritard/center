@@ -1,19 +1,23 @@
 package com.yjh.platform.common.mqtt;
 
-import com.yjh.platform.common.mqtt.msg.postbody;
+import com.yjh.platform.common.mqtt.msg.HeartMessageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/mqtt")
-public class pushcontroller {
+public class PushController {
 
     @Autowired
     MqttUtilsServer mqttUtilsServer;
 
+    @Value("${mqtt.heart.topic}")
+    private String topic;
+
     @PostMapping("/postMsg")
-    public Boolean postjosnMsg2(@RequestBody postbody msg) {
-        Boolean pushflag = mqttUtilsServer.pushMsg(msg.getTopic(), msg.getMqttmsg(),1);
+    public Boolean postjosnMsg2(@RequestBody HeartMessageInfo msg) {
+        Boolean pushflag = mqttUtilsServer.pushMsg(topic, msg,1);
         return pushflag;
     }
 
