@@ -7,7 +7,6 @@ package com.yjh.platform.audiodevice.impl.standard.tcp;
 import com.yjh.messager.api.msg.BaseMessage;
 import com.yjh.messager.api.msg.Msg;
 
-import java.util.Base64;
 import java.util.Objects;
 
 /**
@@ -22,8 +21,12 @@ public class InboundMessage extends BaseMessage implements Msg.Inbound {
 
     public InboundMessage(Packet packet) {
         this.packet = packet;
-        //把收到的6个字节设备ID做一次base64编码，转成字符串形式的device id
-        deviceId = Base64.getEncoder().encodeToString(packet.getDeviceId());
+        byte[] bytes = packet.getDeviceId();
+        StringBuilder sb = new StringBuilder();
+        for (byte aByte : bytes) {
+            sb.append(String.format("%02X", aByte));
+        }
+        deviceId = sb.toString();
     }
 
     public Packet getPacket() {
