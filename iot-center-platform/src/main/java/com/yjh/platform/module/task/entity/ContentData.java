@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
+ * 表格样式
+ *
  * @author YC
  * @date 2020/10/29 - 15:13
  */

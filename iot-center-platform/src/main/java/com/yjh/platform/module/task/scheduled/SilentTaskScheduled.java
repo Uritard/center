@@ -102,15 +102,26 @@ public class SilentTaskScheduled {
      * @return void
      */
     private void analysePicture(Result result){
-        String urlPath = "";
         String absPath = "";
 
         if(Objects.nonNull(result) && Objects.equals(msg, result.getMessage())){
             JSONObject jsonForRe = (JSONObject) JSON.toJSON(result.getData());
-            urlPath = (String) jsonForRe.get("urlPath");
-            absPath = (String) jsonForRe.get("absPath");
+            absPath = String.valueOf(jsonForRe.get("absPath"));
             // 调用算法接口分析结果
-            // TODO something
+            PicAnalyseRequest request = new PicAnalyseRequest();
+            request.setRequestHostIp("123");
+            request.setRequestHostPort("456");
+            request.setRequestId(UUID.randomUUID() + "#jm");
+            AnalyseObject analyseObject = new AnalyseObject();
+            analyseObject.setObjectId("1");
+            ArrayList<String> typeList = new ArrayList<>();
+            typeList.add("");
+            analyseObject.setTypeList(typeList);
+            ArrayList<String> imageUrlList = new ArrayList<>();
+            imageUrlList.add(absPath);
+            analyseObject.setImageUrlList(imageUrlList);
+
+
         }else {
             // 抓图失败 逻辑处理
             // TODO something

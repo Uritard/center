@@ -1,4 +1,4 @@
-package com.yjh.platform.common.utils.Report;
+package com.yjh.platform.common.utils.smUtil.report;
 
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.alibaba.excel.annotation.write.style.ContentRowHeight;
@@ -8,7 +8,6 @@ import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import lombok.EqualsAndHashCode;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Set;
 

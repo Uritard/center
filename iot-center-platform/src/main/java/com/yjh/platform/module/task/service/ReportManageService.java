@@ -1,8 +1,8 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.Report.ReportDataRepo;
-import com.yjh.platform.common.utils.Report.ReportHelper;
+import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
+import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
@@ -223,21 +223,14 @@ public class ReportManageService {
         Map<String, String> absoluteImgMap3 = redisTemplate.opsForHash().entries("t_sys_param:defectResultImg");
 
         ReportData recordData = new ReportData();
-        //1.总体情况
-        TaskVO taskVO = new TaskVO();
-        //测点数
-        Integer meteNum = reportManageDao.selectMeteNumByTask(taskId);
-        taskVO.setMeteNum(meteNum);
-        //站所名称、任务名称、巡检时间
-        TaskVO someThing = reportManageDao.selectTaskNameAndTime(taskId);
-        taskVO.setStationName(someThing.getStationName());
-        taskVO.setTaskName(someThing.getTaskName());
-        taskVO.setCruiseDate(someThing.getCruiseDate());
+        // 1.总体情况
+        TaskVO taskVO = getTaskVO(taskId);
         recordData.setTaskVO(taskVO);
-        //2.分项预览
+
+        // 2.分项预览
         List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType2(taskId);
         recordData.setCpTypeItems(cpTypeItems);
-        //3.明细-所选设备的所有测点巡检结果详情
+        // 3.明细-所选设备的所有测点巡检结果详情
         List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
         for (TCruiseDataResultDetail tcdr : tCDRDList){
             String relativePath = tcdr.getPicPath();
@@ -245,11 +238,15 @@ public class ReportManageService {
                 if (Objects.nonNull(relativePath) && !"null".equals(relativePath) && !"--".equals(relativePath)){
                     String aaa[] =  relativePath.split("/");
                     String type = aaa[5];
-                    if ("defect".equals(type)){//缺陷
+
+                    if ("defect".equals(type)){
+                        // 缺陷
                         relativePath = relativePath.replace(relativeImgMap3.get("content"),absoluteImgMap3.get("content"));
-                    }else if ("meter".equals(type)){//表計
+                    }else if ("meter".equals(type)){
+                        // 表計
                         relativePath = relativePath.replace(relativeImgMap1.get("content"),absoluteImgMap1.get("content"));
-                    }else if ("panbie".equals(type)){//判別
+                    }else if ("panbie".equals(type)){
+                        // 判別
                         relativePath = relativePath.replace(relativeImgMap2.get("content"),absoluteImgMap2.get("content"));
                     }
                 }
@@ -280,9 +277,10 @@ public class ReportManageService {
 
 //        String reportPath = "D:/MyDocuments/workspace_idea/IotCenterDev/templateFile";
 //        String reportName = "Task-"+ "_" +sdf.format(new Date())+".xlsx";
-        String reportName =  taskId +".xlsx";//巡视报告名称
+        // 巡视报告名称
+        String reportName =  taskId +".xlsx";
 
-        //从缓存中获取系统参数
+        // 从缓存中获取系统参数
         Map<String,String> redisMap = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
         String reportPath = redisMap.get("content");
         log.info("reportPath:"+reportPath);
@@ -311,6 +309,24 @@ public class ReportManageService {
 //        String fileRelativePath = map.get("content") + "/" + reportName;
 //        log.info("该文件相对路径是==="+fileRelativePath);
         return newReportPath;
+    }
+
+    public TaskVO getTaskVO(String taskId) {
+        TaskVO taskVO = reportManageDao.selectTaskNameAndTime(taskId);
+        // 测点数
+        Integer meteNum = reportManageDao.selectMeteNumByTask(taskId);
+        taskVO.setMeteNum(meteNum);
+        taskVO.setVoltageClasses("");
+        taskVO.setStationType("");
+        taskVO.setEnvInfo("");
+        String CruiseStatistics = "总点位" + taskVO.getTotal() + "个,已检点位" + taskVO.getAlready() + "个,未检点位" + taskVO.getWait()
+                + "个,正常点位" + taskVO.getNormal() + "个,异常点位" + taskVO.getAbnormal() +  "个";
+        if (Objects.nonNull(taskVO.getUnReview())){
+            CruiseStatistics = CruiseStatistics +  ",待人工确认点位" + taskVO.getUnReview() + "个。";
+        }
+        taskVO.setCruiseStatistics(CruiseStatistics);
+        taskVO.setCruiseConclusion("");
+        return taskVO;
     }
 
     @Transactional(rollbackFor = Exception.class)

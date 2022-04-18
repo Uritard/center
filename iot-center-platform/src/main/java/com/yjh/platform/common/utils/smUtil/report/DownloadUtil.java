@@ -1,4 +1,4 @@
-package com.yjh.platform.common.utils.Report;
+package com.yjh.platform.common.utils.smUtil.report;
 
 import lombok.extern.slf4j.Slf4j;
 

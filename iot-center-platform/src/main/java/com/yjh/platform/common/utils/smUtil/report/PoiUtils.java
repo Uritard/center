@@ -1,4 +1,4 @@
-package com.yjh.platform.common.utils.Report;
+package com.yjh.platform.common.utils.smUtil.report;
 
 /* ====================================================================
    Licensed to the Apache Software Foundation (ASF) under one or more

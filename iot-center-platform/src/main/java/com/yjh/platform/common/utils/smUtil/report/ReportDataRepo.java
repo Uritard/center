@@ -1,4 +1,4 @@
-package com.yjh.platform.common.utils.Report;
+package com.yjh.platform.common.utils.smUtil.report;
 
 import com.yjh.platform.module.task.entity.*;
 import org.apache.commons.lang.StringUtils;
@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * 巡视报告模板--南瑞检测要求
+ *
  * @author YC
  * @date 2020/10/29 - 15:18
  */

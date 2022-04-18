@@ -5,16 +5,12 @@ import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import com.yjh.platform.common.Constant;
 
-import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.common.result.IPage;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.utils.Report.FileUtil;
+import com.yjh.platform.common.utils.smUtil.report.FileUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -29,14 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
-import static com.yjh.platform.common.utils.Report.ExportUtil.getCellStyle;
-import static com.yjh.platform.common.utils.Report.ExportUtil.getOperationTaskDetailModel;
+import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getCellStyle;
+import static com.yjh.platform.common.utils.smUtil.report.ExportUtil.getOperationTaskDetailModel;
 
 /**
  * @author czh
@@ -312,7 +306,7 @@ public class TCruiseResultService{
         String lastWeekStart = tCruiseResultDao.selectLastMonday() + " 00:00:00";//上周一的日期
         String lastWeekend = tCruiseResultDao.selectLastSunday()+ " 23:59:59";//上周日的日期
         log.info("本周一："+weekStart+",本周日："+weekEnd+",上周一："+lastWeekStart+",上周日："+lastWeekend);
-        
+
         String colName1 = "plan_type";
 
         List<StatisticalResult> taskStatisticalList = new ArrayList<>();

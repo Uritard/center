@@ -1,4 +1,4 @@
-package com.yjh.platform.common.utils.Report;
+package com.yjh.platform.common.utils.smUtil.report;
 
 import com.google.common.base.Strings;
 import com.yjh.platform.module.task.entity.TableCellElement;

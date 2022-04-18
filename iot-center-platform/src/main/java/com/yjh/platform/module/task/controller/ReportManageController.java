@@ -193,12 +193,12 @@ public class ReportManageController {
         }
         return result;
     }
-    /*@ApiOperation(value = "测试方法，用完就删")
+    @ApiOperation(value = "测试方法，用完就删")
     @GetMapping(value = "/xixixi")
     public Result test(@RequestParam(value="taskId")String taskId) {
         Result result = new Result();
         try {
-            result.setData(reportManageService.test(taskId));
+            result.setData(reportManageService.getTaskVO(taskId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -206,7 +206,7 @@ public class ReportManageController {
             log.error("测试方法发生错误:", e);
         }
         return result;
-    }*/
+    }
 
    /* @ApiOperation(value = "巡视结果分析报表生成")
     @GetMapping(value = "/cruiseResultAnalyseReporter")

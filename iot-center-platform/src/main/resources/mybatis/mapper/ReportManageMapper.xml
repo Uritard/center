@@ -268,11 +268,23 @@
         SELECT
         a.task_name,
         a.start_time as cruise_date,
-        b.region_name as station_name
+        g.region_name as station_name,
+        d.task_count as total,
+        d.task_wait as wait,
+        d.task_count - task_wait as already,
+        b.task_abnormal as abnormal,
+        d.task_count -  b.task_abnormal as normal,
+        COUNT(ISNULL(e.check_user)) as unReview,
+        MIN(f.cruise_time) as cruiseStartTime,
+        MAX(f.end_time) as cruiseEndTime
         from
-        t_cruise_task a,t_std_region b
+        t_std_region g, t_cruise_task a,t_cruise_result d,t_cruise_task_result b,t_cruise_task_result_detail f,t_cruise_data_result e
         where 1 = 1
-        and b.up_region_id = -1
+        and a.task_id = d.task_id
+        and d.task_result_id = b.task_result_id
+        and b.task_result_id = f.task_result_id
+        and f.cruise_result_id = e.cruise_result_id
+        and g.up_region_id = -1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
     <select id="selectReviewTaskFlag" parameterType="java.lang.String" resultType="java.lang.String">

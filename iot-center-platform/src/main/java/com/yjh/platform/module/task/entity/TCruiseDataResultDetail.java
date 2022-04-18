@@ -11,38 +11,80 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * 巡检记录报表-明细
+ *
  * @author YC
  * @date 2020/10/29 - 14:46
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TCruiseDataResultDetail对象", description = "巡检记录报表-明细")
 public class TCruiseDataResultDetail implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "巡视设备")
+    /**
+     * 巡视设备
+     */
     private String deviceName;
-    @ApiModelProperty(value = "巡视点")
+    /**
+     * 巡视点
+     */
     private String instanceName;
-    @ApiModelProperty(value = "巡视值")
+    /**
+     * 巡视值
+     */
     private String resultNum;
-    @ApiModelProperty(value = "图片")
+    /**
+     * 图片
+     */
     private String picPath;
-    @ApiModelProperty(value = "识别状态")
+    /**
+     * 识别状态
+     */
     private String cruiseResultName;
+    /**
+     * 巡视时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @ApiModelProperty(value = "巡视时间")
     private Date cruiseTime;
-    @ApiModelProperty(value = "序号")
+    /**
+     * 序号
+     */
     private int px;
-    @ApiModelProperty(value = "实物编码")
+    /**
+     * 实物编码
+     */
     private String realCode;
-    @ApiModelProperty(value = "审核值")
+    /**
+     * 审核值
+     */
     private String personCheck;
-    @ApiModelProperty(value = "审核结果")
+    /**
+     * 审核结果
+     */
     private String identifyResultName;
-    @ApiModelProperty(value = "审核状态")
+    /**
+     * 审核状态
+     */
     private String evaluationStateName;
+    /**
+     * 巡视类型
+     */
     private Integer cruiseType;
+    /**
+     * 区域
+     */
+    private String regionName;
+    /**
+     * 间隔
+     */
+    private String interval;
+    /**
+     * 部件
+     */
+    private String component;
+    /**
+     * 数据来源
+     */
+    private String dataType;
 }
