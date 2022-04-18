@@ -172,6 +172,7 @@ public class TCruiseResultController {
                                    @RequestParam(value = "startDate",required = false) String startDate,
                                    @RequestParam(value = "endDate",required = false) String endDate,
                                    @RequestParam(value = "meteType", required = false) Integer meteType,
+                                   @RequestParam(value = "customId", required = false) String customId,
                                    @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                    @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
 
@@ -202,7 +203,7 @@ public class TCruiseResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TCruiseResultExpand> list = tCruiseResultService.selectTaskByPage(taskName,cState,cType,deviceType,startDate,endDate,deviceIdList,meteType);
+            List<TCruiseResultExpand> list = tCruiseResultService.selectTaskByPage(taskName,cState,cType,deviceType,startDate,endDate,deviceIdList,meteType,customId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -282,6 +283,7 @@ public class TCruiseResultController {
                                      @RequestParam(value = "startTime",required = false) String startTime,
                                      @RequestParam(value = "endTime",required = false) String endTime,
                                      @RequestParam(value = "regionId",required = false) Long regionId,
+                                     @RequestParam(value = "customId",required = false) String customId,
                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                      @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
@@ -312,7 +314,7 @@ public class TCruiseResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList);
+            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList,customId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);

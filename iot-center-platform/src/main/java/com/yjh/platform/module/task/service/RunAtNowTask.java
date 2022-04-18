@@ -1008,7 +1008,7 @@ public class RunAtNowTask implements Runnable{
                         //创建一个线程去处理声纹巡视
                         VoiceTask voiceTask = new VoiceTask(redisTemplate,item.getCruiseId(),voiceFilePath,taskId,item.getInstanceId()
                                                                 ,tCruiseDataResultDao,tCruiseTaskResultDetailDao,audioDeviceManager,tCruiseResult,item,tCruiseResultDao
-                                                        ,tVoiceDeviceService,voiceinstanceList,tCruiseTaskResultDao,tCruiseTaskResult);
+                                                        ,tVoiceDeviceService,voiceinstanceList,tCruiseTaskResultDao,tCruiseTaskResult,tCruiseTaskService);
                         Thread thread = new Thread(voiceTask);
                         thread.setDaemon(true);
                         thread.start();
@@ -1215,7 +1215,7 @@ public class RunAtNowTask implements Runnable{
             if (lowTaskList != null && lowTaskList.size() > 0) {
                 lowTaskList.forEach(lowTask -> {
                     try {
-                        tCruiseTaskService.taskGoOn(taskId);
+                        tCruiseTaskService.taskGoOn(lowTask);
                     }catch (Exception e){
                         log.info("低优先级任务继续出错：{}",e);
                     }

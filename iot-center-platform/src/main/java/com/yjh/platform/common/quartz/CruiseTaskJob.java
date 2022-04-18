@@ -613,6 +613,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             jasonMapOnFinished.put("taskId",tCruiseTask.getTaskId());
                             String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
                             log.info("发送给前端的消息："+jsonMessage);
+                            Thread.sleep(5000);
                             Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
 
                             {
@@ -897,7 +898,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             //创建一个线程去处理声纹巡视
                             VoiceTask voiceTask = new VoiceTask(redisTemplate,item.getCruiseId(),voiceFilePath,taskId,item.getInstanceId()
                                     ,tCruiseDataResultDao,tCruiseTaskResultDetailDao,audioDeviceManager,tCruiseResult,item,tCruiseResultDao
-                                    ,tVoiceDeviceService,voiceinstanceList,tCruiseTaskResultDao,tCruiseTaskResult);
+                                    ,tVoiceDeviceService,voiceinstanceList,tCruiseTaskResultDao,tCruiseTaskResult,tCruiseTaskService);
                             Thread thread = new Thread(voiceTask);
                             thread.setDaemon(true);
                             thread.start();

@@ -15,6 +15,7 @@ import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDetailDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.RunAtNowTask;
+import com.yjh.platform.module.task.service.TCruiseTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -47,6 +48,7 @@ public class VoiceTask implements Runnable{
     private Map<Long,List<TCruisePointInstanceNameDetail>> voiceinstanceList;
     private TCruiseTaskResultDao tCruiseTaskResultDao;
     private TCruiseTaskResult tCruiseTaskResult;
+    private TCruiseTaskService tCruiseTaskService;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
 
@@ -54,7 +56,7 @@ public class VoiceTask implements Runnable{
                      TCruiseDataResultDao tCruiseDataResultDao,TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,
                      AudioDeviceManager audioDeviceManager,TCruiseResult tCruiseResult,TCruisePointInstanceNameDetail tCruisePointInstanceNameDetail,
                      TCruiseResultDao tCruiseResultDao,TVoiceDeviceService tVoiceDeviceService,Map<Long,List<TCruisePointInstanceNameDetail>> voiceinstanceList
-                    ,TCruiseTaskResultDao tCruiseTaskResultDao,TCruiseTaskResult tCruiseTaskResult){
+                    ,TCruiseTaskResultDao tCruiseTaskResultDao,TCruiseTaskResult tCruiseTaskResult,TCruiseTaskService tCruiseTaskService){
         this.redisTemplate = redisTemplate;
         this.voiceDeviceId = voiceDeviceId;
         this.audioDeviceManager = audioDeviceManager;
@@ -70,6 +72,7 @@ public class VoiceTask implements Runnable{
         this.voiceinstanceList = voiceinstanceList;
         this.tCruiseTaskResultDao = tCruiseTaskResultDao;
         this.tCruiseTaskResult = tCruiseTaskResult;
+        this.tCruiseTaskService = tCruiseTaskService;
     }
 
 
@@ -179,6 +182,8 @@ public class VoiceTask implements Runnable{
                     tCruiseResult.setCState(240);
                     tCruiseResult.setTaskWait(0);
                     tCruiseResultDao.update(tCruiseResult);
+
+                    taskGoOn(taskId);
                 } else {
                     Map<String, String> mapForAbnormal = new HashMap<>();
                     mapForAbnormal.put("abnormal", abnormal.toString());
@@ -197,6 +202,20 @@ public class VoiceTask implements Runnable{
 
         }catch (Exception e){
             log.info("声纹结果处理出错：{}",e);
+        }
+    }
+
+    private void taskGoOn(String taskId){
+        String lowTaskKey = "lowTask:" + taskId;
+        List<String> lowTaskList = redisTemplate.opsForList().range(lowTaskKey, 0, -1);
+        if (lowTaskList != null && lowTaskList.size() > 0) {
+            lowTaskList.forEach(lowTask -> {
+                try {
+                    tCruiseTaskService.taskGoOn(lowTask);
+                }catch (Exception e){
+                    log.info("低优先级任务继续出错：{}",e);
+                }
+            });
         }
     }
 }

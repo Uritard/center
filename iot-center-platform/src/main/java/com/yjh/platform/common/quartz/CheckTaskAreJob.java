@@ -481,7 +481,7 @@ public class CheckTaskAreJob extends QuartzJobBean {
         if (lowTaskList != null && lowTaskList.size() > 0) {
             lowTaskList.forEach(lowTask -> {
                 try {
-                    tCruiseTaskService.taskGoOn(taskId);
+                    tCruiseTaskService.taskGoOn(lowTask);
                 }catch (Exception e){
                     log.info("低优先级任务继续出错：{}",e);
                 }

@@ -79,9 +79,9 @@
         e.*,
         b.region_name,
         c.device_name,
-        d.dict_note as deviceTypeName
-        f.dict_note as voiceTypeName
-        g.dict_note as voiceModelName
+        d.dict_note as deviceTypeName,
+        f.dict_note as voiceTypeName,
+        g.dict_note as voiceModelName,
         h.dict_note as voiceFactoryName
         FROM
         t_voice_device a

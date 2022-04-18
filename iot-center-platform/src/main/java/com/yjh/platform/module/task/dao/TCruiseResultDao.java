@@ -43,14 +43,17 @@ public interface TCruiseResultDao {
                                                @Param(value = "startDate") String startDate,
                                                @Param(value = "endDate") String endDate,
                                                @Param(value = "list") List<Long> list,
-                                               @Param(value = "meteType") Integer meteType);
+                                               @Param(value = "meteType") Integer meteType,
+                                               @Param(value = "customId") String customId
+                                               );
     List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskResultId") String taskResultId,
                                                 @Param(value = "cruiseType") Integer cruiseType,
                                                 @Param(value = "cruiseResult") Integer cruiseResult,
                                                 @Param(value = "deviceType") Integer deviceType,
                                                 @Param(value = "startTime") String startTime,
                                                 @Param(value = "endTime") String endTime,
-                                                @Param(value = "list") List<Long> list);
+                                                @Param(value = "list") List<Long> list,
+                                                @Param(value = "customId") String customId);
 
     int manualReview(CruiseManualReview cruiseManualReview);
     Long selectDeviceMeteId(@Param(value = "cruiseDataId")Long cruiseDataId);

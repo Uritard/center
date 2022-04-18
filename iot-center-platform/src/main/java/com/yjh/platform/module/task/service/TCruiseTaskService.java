@@ -137,8 +137,8 @@ public class TCruiseTaskService {
         * 立即任务为现场控制任务 等级3
         * */
         Integer ifRun = tCruiseTask.getIfRun();
-        if(tCruiseTaskAdd.getTaskLevel() != null){
-            if (Objects.equals("0" ,tCruiseTaskAdd.getUnionTaskStatus())){
+        if(tCruiseTaskAdd.getTaskLevel() == null){
+            if (Objects.equals("0" ,tCruiseTaskAdd.getUnionTaskStatus()) || tCruiseTaskAdd.getUnionTaskStatus() == null){
                 if (Objects.equals(173, ifRun)){
                     tCruiseTask.setTaskLevel(3);
                 }else {

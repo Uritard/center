@@ -587,7 +587,15 @@
         LEFT JOIN t_std_region d ON b.up_region_id = d.region_id
         LEFT JOIN t_cruise_task_attr e ON e.device_id = b.device_id
         WHERE 1 = 1
-        <if test="taskId != null and taskId != ''"> and e.task_id = #{taskId, jdbcType=VARCHAR}</if>);
+        <if test="taskId != null and taskId != ''"> and e.task_id = #{taskId, jdbcType=VARCHAR}</if>)
+        UNION ALL (
+        SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+        FROM t_std_device c
+        LEFT JOIN t_std_device e ON c.device_id = e.device_id
+        LEFT JOIN t_std_region d ON c.up_region_id = d.region_id
+        LEFT JOIN t_cruise_task_attr f ON f.device_id = c.device_id
+        WHERE 1 = 1
+        <if test="taskId != null and taskId != ''"> and f.task_id = #{taskId, jdbcType=VARCHAR}</if>)
     </select>
 
     <select id="selectByModelId" parameterType="java.lang.Long" resultType="java.lang.String">
