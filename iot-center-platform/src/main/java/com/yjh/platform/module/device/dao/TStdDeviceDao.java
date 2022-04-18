@@ -95,6 +95,12 @@ public interface TStdDeviceDao {
     List<AreaInfo> selectRobotTree();
     List<AreaInfo> selectRobotInspectionTree();
     List<AreaInfo> selectAllMeteTree();
+    List<AreaInfo> selectAllMeteCruiseTree(@Param(value = "deviceType") String deviceType,
+                                           @Param(value = "analyseType") String analyseType);
+    List<AreaInfo> selectRobotMeteCruiseTree(@Param(value = "deviceType") String deviceType,
+                                           @Param(value = "analyseType") String analyseType);
+    List<AreaInfo> selectCameraMeteCruiseTree(@Param(value = "deviceType") String deviceType,
+                                           @Param(value = "analyseType") String analyseType);
     List<AreaInfo> selectDevTaskTree(@Param(value = "taskId") String taskId);
     List<String> selectByModelId(@Param(value = "modelId") Long modelId);
 

@@ -1,0 +1,95 @@
+package com.yjh.platform.module.device.dao;
+
+import com.yjh.platform.module.device.entity.*;
+import com.yjh.platform.module.user.entity.TDictBusiness;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author sunjinyan
+ * @since 2022-04-08
+ */
+@Repository
+public interface TCruiseNonhomologousPointInstanceDao {
+
+    int insert(TCruiseNonhomologousPointInstance tCruiseNonhomologousPointInstance);
+    int insertInstanceInfo(TCruisePointInfo tCruisePointInfo);
+    int deleteByPrimaryId(@Param(value = "instanceId") Long instanceId);
+    int deleteByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
+    int deleteByDeviceId(@Param(value = "deviceId") Long deviceId);
+    int update(TCruiseNonhomologousPointInstance tCruiseNonhomologousPointInstance);
+    TCruisePointInstance selectByPrimaryId(@Param(value = "instanceId") Long instanceId);
+    Map<String,Object> selectWarnByPrimaryId(@Param(value = "warnId") String warnId);
+    List<Map<String,Object>> selectWarnInspections(@Param(value = "warnId") String warnId);
+    List<TCruisePointInstance> select(@Param(value = "instanceId") Long instanceId,
+                                      @Param(value = "deviceMeteId") Long deviceMeteId,
+                                      @Param(value = "stationId") String stationId,
+                                      @Param(value = "stationName") String stationName,
+                                      @Param(value = "deviceId") Long deviceId,
+                                      @Param(value = "customId") String customId,
+                                      @Param(value = "dataFormat") String dataFormat,
+                                      @Param(value = "identifyType") Integer identifyType,
+                                      @Param(value = "identifySonType") Integer identifySonType,
+                                      @Param(value = "cruiseType") Integer cruiseType,
+                                      @Param(value = "cruiseId") Long cruiseId,
+                                      @Param(value = "cruiseName") String cruiseName,
+                                      @Param(value = "cruiseContent") String cruiseContent,
+                                      @Param(value = "positionType") String positionType,
+                                      @Param(value = "unit") String unit,
+                                      @Param(value = "ifSy") Integer ifSy,
+                                      @Param(value = "syType") Integer syType,
+                                      @Param(value = "ifVideotape") Integer ifVideotape,
+                                      @Param(value = "videotapeTime") String videotapeTime,
+                                      @Param(value = "textDesc") String textDesc,
+                                      @Param(value = "sort") String sort);
+    List<TCruiseNonhomologousPointInstance> selectByPage(TCruiseNonhomologousPointInstance tCruiseNonhomologousPointInstance);
+
+    List<TCruiseNonhomologousWarnInfo> selectWarnByPage(TCruiseNonhomologousWarnInfo tCruiseNonhomologousWarnInfo);
+
+    int delete(TCruisePointInstance tCruisePointInstance);
+
+    List<Long> selectForCruiseByPage(TStdDeviceMete tStdDeviceMete);
+    List<TCruisePointByPageDetail> selectCruisePointByPage(@Param(value = "meteName") String meteName,
+                                                           @Param(value = "deviceId") Long deviceId,
+                                                           @Param(value = "customId") String customId,
+                                                           @Param(value = "pageSize") Integer pageSize,
+                                                           @Param(value = "list") List<Long> list
+    );
+
+    List<String> selectSYForCruiseByPage(TCfgMeteForPointDetail tCfgMeteForPointDetail);
+    List<TCfgMeteForPointDetail> selectSYCruisePointByPage(@Param(value = "list") List<String> list);
+
+    int batchInsert(List<TCruisePointInstance> list);
+    List<TCruisePointInstance> StdMeteUnionInspectionId(@Param(value = "deviceId") Long deviceId);
+
+    //为创建实例服务
+    TStdRegion selectTSRegionForStation();
+    TDictBusiness selectTDBusinessForUnitName(String dictCode);
+    //统计当前任务下的巡检点数量
+    int selectCruiseCount(@Param(value = "taskId") String taskId);
+
+    //根据巡检点类型查询巡检点数量
+    List<CruiseCountOfType> selectCruiseCountByType(@Param(value = "taskId") String taskId);
+
+    //查询巡检类型
+    CruiseTypeInfo selectCruiseCommonInfoByInstanceId(@Param(value = "instanceId") Long instanceId);
+    List<Long> selectCruiseId(TCruisePointInstanceDetail tCruisePointInstanceDetail);
+    List<Long> selectInstanceId(@Param(value = "ids") List<Long> ids,
+                                @Param(value = "deviceMeteId") Long deviceMeteId);
+    List<TCruisePointInstanceNameDetail> selectForTask(@Param(value = "list") List<Long> list);
+
+    int deleteByInstanceId(@Param(value = "list") List<Long> list);
+
+    String selectInstanceName(@Param(value = "instanceId") Long instanceId);
+
+    Long selectForPresetId(@Param(value = "presetId") Long presetId);
+
+    List<TCruisePointInstanceAttr> batchSelectInstanceAttr(@Param(value = "list") List<Long> list);
+    List<Long> selectTimeIsIn(@Param(value = "time") Date time);
+    List<Map<Object,Object>>selectCameraByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
+    List<Map<Object,Object>>selectRobotByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
+}

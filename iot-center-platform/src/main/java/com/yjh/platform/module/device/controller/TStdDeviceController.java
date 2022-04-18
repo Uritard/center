@@ -332,14 +332,16 @@ public class TStdDeviceController {
         return result;
     }
 
-    @ApiOperation(value = "设备树查询(level：5-间隔，6-设备，7-部位，8-点位；deviceShow：all-所有，dev-设备，camera-摄像头，robot-机器人)")
+    @ApiOperation(value = "设备树查询(level：5-间隔，6-设备，7-部位，8-点位，9巡视点；deviceShow：all-所有，dev-设备，camera-摄像头，robot-机器人)")
     @RequestMapping(value = "/selectDevTree", method = RequestMethod.GET)
     @Logs(title = "设备树查询",content = "设备树查询",logType = 1)
     public Result selectDevTree(@RequestParam(value = "level", required = true) String level,
-                                    @RequestParam(value = "deviceShow", required = true) String deviceShow) {
+                                    @RequestParam(value = "deviceShow", required = true) String deviceShow,
+                                @RequestParam(value = "deviceType", required = false) String deviceType,
+                                @RequestParam(value = "analyseType", required = false) String analyseType) {
         Result result = new Result();
         try {
-            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTree(level, deviceShow);
+            List<AreaInfo> devTreeList = tStdDeviceService.selectDevTree(level, deviceShow,deviceType,analyseType);
             result.setData(devTreeList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

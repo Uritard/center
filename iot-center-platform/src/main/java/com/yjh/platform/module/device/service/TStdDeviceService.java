@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -328,7 +329,7 @@ public class TStdDeviceService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<AreaInfo> selectDevTree(String level, String deviceShow) {
+    public List<AreaInfo> selectDevTree(String level, String deviceShow, String deviceType, String analyseType) {
         List<AreaInfo> listTree = new ArrayList<>();
         switch (level) {
             case "5":
@@ -351,6 +352,16 @@ public class TStdDeviceService{
                 else if (Objects.equals(deviceShow, "robot")) { listTree = this.tStdDeviceDao.selectRobotInspectionTree(); }
                 else if (Objects.equals(deviceShow, "all")) { listTree = this.tStdDeviceDao.selectAllMeteTree(); }
                 else { throw new BusinessException("设备树展示内容输入有误！"); }
+                break;
+            case "9":
+                if(StringUtils.isNotEmpty(deviceType)){
+                    if (Objects.equals(deviceShow, "camera")) { listTree = this.tStdDeviceDao.selectCameraMeteCruiseTree(deviceType,analyseType); }
+                    else if (Objects.equals(deviceShow, "robot")) { listTree = this.tStdDeviceDao.selectRobotMeteCruiseTree(deviceType,analyseType); }
+                    else if (Objects.equals(deviceShow, "all")) { listTree = this.tStdDeviceDao.selectAllMeteCruiseTree(deviceType,analyseType); }
+                    else { throw new BusinessException("设备树展示内容输入有误！"); }
+                }else{
+                    throw new BusinessException("设备树展示内容传参有误！");
+                }
                 break;
             default:
                 throw new BusinessException("设备树展示层级输入有误！");

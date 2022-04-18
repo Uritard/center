@@ -577,6 +577,98 @@
                 LEFT JOIN t_camera_info f ON f.camera_id = e.camera_id);
     </select>
 
+    <select id="selectAllMeteCruiseTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+            SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType
+                FROM t_std_device b
+                LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
+        UNION ALL (
+            SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+                FROM t_std_device c
+                LEFT JOIN t_std_device e ON c.device_id = e.device_id)
+        UNION ALL (
+		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,dm.custom_id AS upId,	d.custom_name AS upName,"devicemete" AS infoType
+		        FROM t_std_devicemete dm
+		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id
+		        where 1=1
+        <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
+        )
+        UNION ALL (
+		    SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
+		    (case when cpi.cruise_type = 228 then "robotCruiseInspection"
+			when cpi.cruise_type = 229 then "videoCruiseInspection" END) AS infoType
+		    FROM  t_cruise_point_instance cpi
+            LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
+        where 1=1
+        <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>);
+    </select>
+
+    <select id="selectRobotMeteCruiseTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+            SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType
+                FROM t_std_device b
+                LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
+        UNION ALL (
+            SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+                FROM t_std_device c
+                LEFT JOIN t_std_device e ON c.device_id = e.device_id)
+        UNION ALL (
+		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,dm.custom_id AS upId,	d.custom_name AS upName,"devicemete" AS infoType
+		        FROM t_std_devicemete dm
+		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id
+                where 1=1
+                <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
+                <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>)
+        UNION ALL (
+		    SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
+		    (case when cpi.cruise_type = 228 then "robotCruiseInspection"
+			when cpi.cruise_type = 229 then "videoCruiseInspection" END) AS infoType
+		    FROM  t_cruise_point_instance cpi
+            LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
+            where cpi.cruise_type = 228
+            <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
+            <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
+            );
+    </select>
+
+    <select id="selectCameraMeteCruiseTree" resultType="com.yjh.platform.module.device.entity.AreaInfo">
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+            FROM t_std_region a
+            LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+        UNION ALL (
+            SELECT DISTINCT b.device_id AS Id, b.device_name AS label, b.up_region_id AS upId, d.region_name AS upName, "device" AS infoType
+                FROM t_std_device b
+                LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
+        UNION ALL (
+            SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+                FROM t_std_device c
+                LEFT JOIN t_std_device e ON c.device_id = e.device_id)
+        UNION ALL (
+		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,dm.custom_id AS upId,	d.custom_name AS upName,"devicemete" AS infoType
+		        FROM t_std_devicemete dm
+		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id
+                where 1=1
+                <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
+                <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>)
+        UNION ALL (
+		    SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
+		    (case when cpi.cruise_type = 228 then "robotCruiseInspection"
+			when cpi.cruise_type = 229 then "videoCruiseInspection" END) AS infoType
+		    FROM  t_cruise_point_instance cpi
+            LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
+            where cpi.cruise_type = 229
+            <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
+            <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>);
+    </select>
+
     <select id="selectDevTaskTree" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.AreaInfo">
         SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
         FROM t_std_region a

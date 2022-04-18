@@ -16,6 +16,7 @@ import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import com.yjh.accessrobot.netty.thread.AnalysisResultThread;
 import com.yjh.accessrobot.netty.thread.InspectionResultThread;
 import com.yjh.accessrobot.netty.thread.IsWarnAfterCruiseThread;
+import com.yjh.accessrobot.netty.thread.NonhomologousWarnThread;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -101,6 +102,10 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             // Start CruiseResultDealThread
             InspectionResultThread cruiseResultDealThread = new InspectionResultThread(cruiseResultMap, redisTemplate, websocketUrl, true);
             TaskExecutePool.getInstance().execute(cruiseResultDealThread);
+
+            //非同源告警处理
+            NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap, redisTemplate, websocketUrl);
+            TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
         }
 
 
