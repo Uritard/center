@@ -166,4 +166,8 @@
     </set>
         where a.param_code = #{paramCode}
     </update>
+
+    <select id="selectVersion" resultType="com.yjh.platform.module.user.entity.Version">
+        select * from t_version
+    </select>
 </mapper>

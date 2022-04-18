@@ -228,6 +228,19 @@ public class TSysParamController {
         return result;
     }
 
+    @ApiOperation(value = "查询系统版本")
+    @RequestMapping(value = "/selectVersion", method = RequestMethod.GET)
+    public Result selectVersion() {
+        Result result = new Result();
+        try {
+            result.setData(this.tSysParamService.selectVersion());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("将数据写入redis失败：" + e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "查询系统参数")
     @RequestMapping(value = "/selectQuery", method = RequestMethod.GET)
     @Logs(title = "查询系统参数", content = "根据用户传递的参数分页查询系统参数", logType = 1)

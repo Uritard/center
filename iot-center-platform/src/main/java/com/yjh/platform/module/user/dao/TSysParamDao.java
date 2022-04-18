@@ -3,6 +3,7 @@ package com.yjh.platform.module.user.dao;
 import java.util.List;
 
 import com.yjh.platform.module.user.entity.TSysParam;
+import com.yjh.platform.module.user.entity.Version;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -47,4 +48,6 @@ public interface TSysParamDao {
     List<TSysParam> selectQuery(@Param("params") List<String> params);
     int updateByCode(@Param(value = "paramCode") String paramCode,
                      @Param(value = "content") String content);
+
+    List<Version> selectVersion();
 }
