@@ -6,6 +6,8 @@ import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -14,7 +16,7 @@ import java.math.BigInteger;
  * @Description: TODO(国密SM2签名验签 / SM3报文摘要)
  */
 public class Demo {
-
+    private static final Logger log = LoggerFactory.getLogger(Demo.class);
     // 国密规范测试用户ID
     private static final String userId ="1234567812345678";
     // 国密规范测试私钥
@@ -71,10 +73,8 @@ public class Demo {
         try {
             vs = SM2Utils.verifySign(userId.getBytes(),  Util.hexToByte(pub), summary.getBytes(), Base64.decode(sign));
             // vs = SM2Utils.verifySign(userId.getBytes(), Base64.decode(pubkS.getBytes()), Util.hexToByte(summary), Util.hexToByte(sign));
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IllegalArgumentException | IOException e) {
+            log.error("验签失败", e);
         }
         return vs;
     }
@@ -92,4 +92,13 @@ public class Demo {
 
     }
 
+    public static void main(String[] args) {
+        String webcode = "eaf1f58142c403aa0ccb61636acf9fcec5630164dc4c529b3625457443e2ba27";
+        String signStr = "MEUCIQDNG5HXr+LMuUmmZDNn74E8cjdZgAncQgLqGS/uw+SITAIgGU3JRN+1BfGzzt/J+6aqWo2hncsZ4L/5zqjDJsofOck=";
+        String sign64Str = "TUVVQ0lRRE5HNUhYcitMTXVVbW1aRE5uNzRFOGNqZFpnQW5jUWdMcUdTL3V3K1NJVEFJZ0dVM0pSTisxQmZHenp0L0orNmFxV28yaG5jc1o0TC81enFqREpzb2ZPY2s9";
+        String pubkey = "AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAS3ARQfAF9BAXZaI/7WNuHdO1iWQmjjwyyxQLBCcs5PEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP4LNKHL756PufgrTqsljIxKpzFCOpvB66rQMCbXogI3";
+
+        boolean st = verify(webcode, sign64Str, pubkey);
+        System.out.println(st);
+    }
 }

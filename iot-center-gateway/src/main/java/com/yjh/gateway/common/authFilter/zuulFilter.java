@@ -276,7 +276,7 @@ public class zuulFilter extends ZuulFilter {
         }
         // 判断登录用户 ip 地址
         if ("true".equals(isIpLogin)) {
-            String ipAddr = IpUtil.getRemoteIP(request);
+            String ipAddr = "\"" + IpUtil.getRemoteIP(request) + "\"";
             String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
             Set<String> ips = redisTemplate.opsForSet().members("sysKey:" + userId + ":2");
 
@@ -286,7 +286,7 @@ public class zuulFilter extends ZuulFilter {
                 log.error("IP 地址验证结果 - {}", ipValid);
                 ctx.setSendZuulResponse(false);
                 ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
-                ctx.setResponseBody("{\"error\":\"非绑定IP地址\"}");
+                ctx.setResponseBody("{\"error\":\"Unbound IP address!\"}");
                 return false;
             }
         }
@@ -300,12 +300,12 @@ public class zuulFilter extends ZuulFilter {
 
                 String xlh = ukeyId.substring(0,16);
 
-                String pubkey = (String)redisTemplate.opsForHash().get("sysKey:" + userId + ":1", xlh);
+                String pubkey = (String)redisTemplate.opsForHash().get("sysKey:" + userId + ":1", ukeyId);
                 if(StringUtils.isEmpty(pubkey)){
                     log.error("序列号不正确------------------------ {}", xlh);
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
-                    ctx.setResponseBody("{\"error\":\"序列号不正确\"}");
+                    ctx.setResponseBody("{\"error\":\"Incorrect serial number!\"}");
                     return false;
                 }
                 boolean status = Demo.verify(webcode, signStr, pubkey);
@@ -313,7 +313,7 @@ public class zuulFilter extends ZuulFilter {
                     log.error("签名验证结果 - {}", status);
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
-                    ctx.setResponseBody("{\"error\":\"签名验证失败\"}");
+                    ctx.setResponseBody("{\"error\":\"Signature verification failed\"}");
                     return false;
                 }
             }
