@@ -98,7 +98,7 @@ public class Packet {
             }
         }
 
-        //TODO: 协议里没说大端还是小端，这里先按照小端解析
+        //TODO: 协议里没说大端还是小端，这里先按照大端解析
         in.order(ByteOrder.BIG_ENDIAN);
 
         //包格式版本

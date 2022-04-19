@@ -35,6 +35,7 @@ public class AudioDataDispatcher {
         AudioDevice audioDevice = audioDeviceManager.getAudioDevice(inboundMessage.getDeviceId());
         if (audioDevice == null) {
             log.warn("声纹设备还未注册({})", inboundMessage.getDeviceId());
+            return;
         }
         if (audioDevice instanceof StandardAudioDevice) {
             StandardAudioDevice standardAudioDevice = (StandardAudioDevice) audioDevice;
