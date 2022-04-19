@@ -38,7 +38,7 @@ public class CrcCheck {
         }
 
 
-        byte[] ret = {(byte) ((high & 0x00ff) << 8), (byte) (low & 0x00ff)};
+        byte[] ret = {(byte) (high & 0x00ff), (byte) (low & 0x00ff)};
         return ret;
 //        short crc = (short) ((((high & 0x00ff) << 8) | (low & 0x00ff)) & 0xffff);
 //        return crc;
