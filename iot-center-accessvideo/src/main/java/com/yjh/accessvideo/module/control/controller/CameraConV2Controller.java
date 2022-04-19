@@ -11,6 +11,7 @@ import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.service.CameraConService;
+import com.yjh.accessvideo.service.ftpsservice;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

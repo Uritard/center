@@ -156,6 +156,7 @@
         <result column="custom_id" jdbcType="VARCHAR" property="customId" />
         <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
         <result column="cruise_type" jdbcType="INTEGER" property="cruiseType" />
+        <result column="cruise_id" jdbcType="INTEGER" property="cruiseid" />
     </resultMap>
 
     <resultMap id="defectInfo" type="com.yjh.accessvideo.module.device.entity.TDefectInfo">
@@ -714,6 +715,7 @@
     <select id="selectPointInstance" parameterType="java.lang.Long" resultType="com.yjh.accessvideo.module.device.entity.TCruisePointInstance">
       SELECT DISTINCT
         a.instance_id,
+        a.cruise_id,
         a.device_id,
         b.device_code,
         a.custom_id,

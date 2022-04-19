@@ -4,15 +4,14 @@ import com.google.common.base.Optional;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.ftp.FTPSClient;
+import org.apache.commons.net.ftp.*;
 
 import javax.net.ssl.*;
 import java.io.*;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -149,91 +148,6 @@ public class FtpsUtil {
 
     public void putFile(String filepath,
                                String remoteFilename) throws NoSuchAlgorithmException {
-//        try {
-//            log.info("-------------------------------文件上传开始");
-//            File file = new File(filepath);
-//            try {
-//                FileInputStream fis = new FileInputStream(file);
-//                ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-//                byte[] b = new byte[1000];
-//                int n;
-//                while ((n = fis.read(b)) != -1) {
-//                    bos.write(b, 0, n);
-//                }
-//                fis.close();
-//                byte[] data = bos.toByteArray();
-//                bos.close();
-//                FTPSClient ftpClient = new FTPSClient();
-//
-//                //        ftpClient.setTrustManager(getTrustManager());
-//                //      ftpClient.setKeyManager(getKeyManager());
-//                ftpClient.connect(host, port);
-//                // Connect to host
-//                int reply = ftpClient.getReplyCode();
-//
-//                SSLContext sslContext = SSLContext.getInstance("SSL");
-//
-//                if (FTPReply.isPositiveCompletion(reply)) {
-//
-//                    // Login
-//                    if (ftpClient.login(username, password)) {
-//                        if (FTPReply.isPositiveCompletion(ftpClient.sendCommand(
-//                                "OPTS UTF8", "ON"))) {
-//                            // 开启服务器对UTF-8的支持，
-//                            LOCAL_CHARSET = "UTF-8";
-//                        }
-//
-//                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-//
-//                        ftpClient.setControlEncoding(LOCAL_CHARSET);
-//                        // Set protection buffer size
-//                               ftpClient.execPBSZ(0);
-//                        // Set data channel protection to private
-//                               ftpClient.execPROT("P");
-//                        // Enter local passive mode
-//                        ftpClient.enterLocalPassiveMode();
-//                        ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
-//                        // Store file on host
-//                        String fileName = remoteFilename;
-//                        // 上传文件名编码转换
-//                        fileName = new String(remoteFilename.getBytes(LOCAL_CHARSET), SERVER_CHARSET);
-//                        InputStream is = new ByteArrayInputStream(data);
-//                        String[] dirs = fileName.split("/");
-//                        String fianlName = dirs[dirs.length - 1];
-//                        for (int i = 0; i < dirs.length - 1; i++) {
-//                            ftpClient.mkd(dirs[i]);
-//                            ftpClient.changeWorkingDirectory(dirs[i]);
-//                        }
-////                        ftpClient.enterLocalPassiveMode();
-//                        if (ftpClient.storeFile(fianlName, is)) {
-//                            log.info(username + "," + remoteFilename);
-//                        } else {
-//                            log.info("code :"+ftpClient.getReplyCode());
-//                            log.info("message :"+ftpClient.getReplyString());
-//                            log.info("Could not store file");
-//                        }
-//                        is.close();
-//
-//                        // Logout
-//                        ftpClient.logout();
-//                    } else {
-//                        System.out.println("FTP login failed");
-//                    }
-//
-//                    // Disconnect
-//                    ftpClient.disconnect();
-//                } else {
-//                    System.out.println("FTP connect to host failed");
-//                }
-//            } catch (IOException ioe) {
-//                ioe.printStackTrace();
-//                System.out.println("FTP client received network error");
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
         try {
             log.info("-------------------------------文件上传开始");

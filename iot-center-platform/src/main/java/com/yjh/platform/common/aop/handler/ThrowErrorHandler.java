@@ -1,4 +1,4 @@
-package com.yjh.platform.common.handler;
+package com.yjh.platform.common.aop.handler;
 
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;

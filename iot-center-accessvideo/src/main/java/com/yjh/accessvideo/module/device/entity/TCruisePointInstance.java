@@ -14,8 +14,10 @@ import java.io.Serializable;
 @ApiModel(value = "巡视点所需信息对象", description = "巡视点实例表")
 public class TCruisePointInstance implements Serializable {
 
-    @ApiModelProperty(value = "巡视点Id")
+    @ApiModelProperty(value = "巡视点实例Id")
     private Long instanceId;
+    @ApiModelProperty(value = "巡视点Id")
+    private Long cruiseid;
     @ApiModelProperty(value = "设备ID")
     private Long deviceId;
     @ApiModelProperty(value = "设备编码")

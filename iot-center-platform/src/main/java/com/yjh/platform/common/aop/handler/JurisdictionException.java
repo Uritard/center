@@ -1,4 +1,4 @@
-package com.yjh.platform.common.handler;
+package com.yjh.platform.common.aop.handler;
 
 public class JurisdictionException extends Exception{
      public JurisdictionException(){

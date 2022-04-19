@@ -1,6 +1,5 @@
 package com.yjh.platform.module.task.controller;
 
-import com.yjh.platform.common.handler.JurisdictionException;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.task.entity.TRobotAlarm;
 import java.util.HashMap;

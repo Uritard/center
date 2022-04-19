@@ -1,5 +1,5 @@
 
-package com.yjh.platform.common.handler;
+package com.yjh.platform.common.aop.handler;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

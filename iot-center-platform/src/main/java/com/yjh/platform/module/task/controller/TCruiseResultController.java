@@ -1,16 +1,8 @@
 package com.yjh.platform.module.task.controller;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.write.metadata.WriteSheet;
-import com.alibaba.excel.write.metadata.style.WriteCellStyle;
-import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
-
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.yjh.platform.common.handler.CustomCellWriteHandler;
-import com.yjh.platform.common.handler.CustomCellWriteHeightConfig;
 import com.yjh.platform.common.logs.Logs;
 //import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.LogsRecord;
@@ -25,15 +17,12 @@ import com.yjh.platform.module.task.service.TCruiseResultService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import java.net.URLEncoder;
 import java.util.*;
 
 

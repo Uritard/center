@@ -1,6 +1,5 @@
 package com.yjh.platform.module.device.controller;
 
-import com.yjh.platform.common.handler.JurisdictionException;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.service.TStdMetemodelDetailService;
 import com.yjh.platform.module.device.entity.TStdMeteModelDetail;

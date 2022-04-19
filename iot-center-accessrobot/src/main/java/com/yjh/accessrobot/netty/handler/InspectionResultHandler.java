@@ -191,6 +191,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" + ftpFileName);
 
             isAlarmMap.put("relativePath", developRelativeUrl + "Infrared" + "/" + ftpOriginName);
+            isAlarmMap.put("OriginPath",item.get("origin_file_path").toString());
         } else if (Objects.equals("2",fileType) && Boolean.FALSE.equals(flag)) {
             // 拷贝巡视结果图
             copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "CCD");
@@ -200,6 +201,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             cruiseResultMap.put("absolutePath", developAbsoluteUrl + "BigImg" + "/" + ftpOriginName);
 
             isAlarmMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);
+            isAlarmMap.put("OriginPath",item.get("origin_file_path").toString());
         } else if (Objects.equals("3",fileType)) {
             // 拷贝巡视结果图
             copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Audio");
@@ -252,6 +254,9 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         isAlarmMap.put("taskCode", item.get("task_code").toString());
         isAlarmMap.put("deviceId", item.get("device_id").toString());
         isAlarmMap.put("value", item.get("value").toString());
+        isAlarmMap.put("absolutePath",cruiseResultMap.get("absolutePath"));
+        isAlarmMap.put("deviceName", cruiseResultMap.get("device_name"));
+        //jeff add 把机器人任务结果图的物理路径传到isWarnAfterCruiseThread
         // Start IsWarnAfterCruiseThread
         IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate, websocketUrl);
         TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);

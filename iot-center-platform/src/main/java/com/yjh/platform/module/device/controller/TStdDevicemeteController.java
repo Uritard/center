@@ -1,6 +1,5 @@
 package com.yjh.platform.module.device.controller;
 
-import com.yjh.platform.common.handler.JurisdictionException;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -14,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
-import io.swagger.models.auth.In;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

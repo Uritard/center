@@ -5,8 +5,15 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.accessvideo.common.Constant;
+import com.yjh.accessvideo.common.mqtt.AlarmService;
+import com.yjh.accessvideo.common.mqtt.GetSpringUtil;
+import com.yjh.accessvideo.common.mqtt.alarmMsgBody.AlarmMqttMsg;
+import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Defect;
+import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Different;
+import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
+import com.yjh.accessvideo.service.ftpsservice;
 import lombok.SneakyThrows;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.http.HttpEntity;
@@ -30,6 +37,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -68,11 +76,13 @@ public class DataDealThread implements Runnable {
         if (usefulBody != "") {
             JSONObject jsonObject = JSON.parseObject(usefulBody);
             log.info("JSON对象1：" + jsonObject);
+            String reponseMessage=jsonObject.get("msgID").toString();
 
             if ("2".equals(jsonObject.getString("msgType"))) {
                 JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.getString("msgData")).getString("data")); //全量数据结果集
                 log.info("原生数据****：" + jsonObjectData);
                 Iterator iterator = jsonObjectData.entrySet().iterator();
+
                 // 迭代器取出data中的每一个resultInfo
                 while (iterator.hasNext()) {
                     Map.Entry entry = (Map.Entry) iterator.next();
@@ -118,6 +128,7 @@ public class DataDealThread implements Runnable {
                     log.info("读取到的redis：" + cruiseResult);
                     String recognitionMode = String.valueOf(cruiseResult.get("recognitionMode"));
                     log.info("recognitionMode----识别模式 ：-------" + recognitionMode);
+
                     Map<String, String> cruiseResultMap = new HashMap<>();//修改redis的巡检点结果map
 
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -137,7 +148,6 @@ public class DataDealThread implements Runnable {
                             continue;
                         }
                     }
-
 
                     log.info("端口号：" + remotePort);
 
@@ -218,6 +228,7 @@ public class DataDealThread implements Runnable {
                                                 tStdDevicemeteM.getLowLimit4()) == 1) {
                                             //初始化告警信息redis表
                                             String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                            String msgName = "msg:" + reponseMessage + ":" + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             Map<String, String> warnMap = new HashMap<>();
 //                                            warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
                                             warnMap.put("deviceId", String.valueOf(tCruisePointInstance.getDeviceId()));
@@ -230,8 +241,10 @@ public class DataDealThread implements Runnable {
                                             warnMap.put("confMode", "276");
                                             warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
                                             warnMap.put("defectModel", analyseDataOperateService.selectDictCode("defect_model", "其他"));
+
                                             log.info("开始告警判断");
                                             log.info("测点种类:" + tStdDevicemeteM.getMeteKind());
+
                                             switch (tStdDevicemeteM.getMeteKind()) {
                                                 case "1":
                                                     String resultValue = jsonObjectResult.getString("resultValue");
@@ -256,6 +269,7 @@ public class DataDealThread implements Runnable {
                                                         log.info("告警MAP：" + warnMap);
                                                         try {
                                                             redisTemplate.opsForHash().putAll(warnName, warnMap);
+                                                            redisTemplate.opsForHash().putAll(msgName, warnMap);
                                                             cruiseResultMap.put("isWarn", "1");
                                                         } catch (Exception e) {
                                                             log.info("生成错误", e);
@@ -349,6 +363,7 @@ public class DataDealThread implements Runnable {
                                                         }
 
                                                         redisTemplate.opsForHash().putAll(warnName, warnMap);
+                                                        redisTemplate.opsForHash().putAll(msgName, warnMap);
                                                         cruiseResultMap.put("isWarn", "1");
                                                         log.info("告警Map:" + warnMap);
 
@@ -591,6 +606,7 @@ public class DataDealThread implements Runnable {
                                         Map<String, String> defectMap = new HashMap<>();
                                         String redisFlag = jsonObjectResult.get("taskId") + String.valueOf(UUID.randomUUID()).replace("-", "");
                                         String defectRedisName = "defectInfo:" + redisFlag;
+                                        String defectAlarmMsg="defect:" + reponseMessage + ":" + String.valueOf(UUID.randomUUID()).replace("-", "");
                                         // TODO: 2021/2/19 判别并获取对应缺陷的缺陷算法等级
                                         defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
                                         log.info("defectMap:"+defectMap);
@@ -605,7 +621,9 @@ public class DataDealThread implements Runnable {
                                         defectMap.put("imagePath", analyseResultImg);
                                         defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
                                         defectMap.put("defectTime", simpleDateFormat.format(new Date()));
+                                        defectMap.put("value", jsonObjectResult.get("resultValue").toString());
                                         redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
+                                        redisTemplate.opsForHash().putAll(defectAlarmMsg, defectMap);
 
                                         //缺陷插库  To be continue。。。
                                         tDefectInfo.setDefectLevel(NumberUtils.toInt(defectMap.get("defectLevel")));
@@ -672,8 +690,8 @@ public class DataDealThread implements Runnable {
                                             TDefectInfo tDefectInfo=new TDefectInfo();//实时入库
                                             String redisFlag = jsonObjectResult.get("taskId") + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             String defectRedisName = "defectInfo:" + redisFlag;
+                                            String defectAlarmMsg="defect:" + reponseMessage + ":" + String.valueOf(UUID.randomUUID()).replace("-", "");
 //                                            defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
-
                                             log.info("redisFlag:"+redisFlag);
                                             defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultArr[i]));
                                             defectMap.put("defectLevel", analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
@@ -687,10 +705,11 @@ public class DataDealThread implements Runnable {
                                             defectMap.put("imagePath", analyseResultImg);
                                             defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
                                             defectMap.put("defectTime", defectTime);
-
+                                            defectMap.put("value", jsonObjectResult.get("resultValue").toString());
                                             log.info("defectMap:"+defectMap);
-
                                             redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
+                                            //jeff add
+                                            redisTemplate.opsForHash().putAll(defectAlarmMsg, defectMap);
 
                                             //缺陷插库
                                             tDefectInfo.setDefectLevel(NumberUtils.toInt(defectMap.get("defectLevel")));
@@ -716,7 +735,7 @@ public class DataDealThread implements Runnable {
 
 
                                             //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
-                                            String alarmNote = tStdDevicemete.getAlarmNote();
+                                            String alarmNote = tStdDevicemete.getAlarmNote();  //jeff测试注释
                                             log.info("该测点是否配置了告警提示是===" + alarmNote);
                                             Integer defectLevel = NumberUtils.toInt(defectMap.get("defectLevel"));
                                             log.info("产生的该条缺陷的等级是===" + defectLevel);
@@ -736,7 +755,6 @@ public class DataDealThread implements Runnable {
 
                                             redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3, TimeUnit.MINUTES);
                                             log.info("currentWarnInfo666"+currentWarnInfo);
-
 
                                             defectNames = defectNames + resultArr[i] + " ";
 
@@ -877,9 +895,159 @@ public class DataDealThread implements Runnable {
 
                 }
 
-            } else if ("6".equals(jsonObject.get("msgType"))) { //任务结束后发来的心跳信息
-                String taskId = JSON.parseObject(jsonObject.getString("msgData")).getString("taskId");
-                String instanceId = JSON.parseObject(jsonObject.getString("msgData")).getString("instanceId");
+                try{
+                    //jeff: 每一次算法返回响应处理结束后，上传告警图片信息并发送告警信息到算法管理平台
+                    Set<String> differentList= redisScan( "msg:" + reponseMessage);  //标记告警，也就是判别告警
+                    Set<String> defectList=  redisScan("defect:" + reponseMessage);   //缺陷告警
+                    Alarm alarmDetail=new Alarm();
+                    ftpsservice ftpsservice= GetSpringUtil.getBean("ftpsservice");
+                    String flag= ftpsservice.getFlag();
+                    if(differentList.size()>0&&("1".equals(flag))){
+                        log.info("different类型:开始向算法管理平台发送图片和mqtt消息");
+                        String year=Integer.toString(LocalDate.now().getYear());
+                        String month=Integer.toString(LocalDate.now().getMonthValue());
+                        Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
+                        JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
+                        //,先取出算法平台返回的resultinfo中的结果图片路径
+                        String resultImagebak=jsonObjectResultbak.get("analyseResultImg").toString();
+                        String taskidbak=jsonObjectResultbak.get("taskId").toString();
+                        String  instanceId=jsonObjectResultbak.get("instanceId").toString();
+                        Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak+":"+instanceId);//读redis
+                        String devicename= cruiseResult2.get("deviceName").toString();
+                        //,获取原始路径.并拼接算法管理平台对应远程文件路径
+                        String origpicpath=cruiseResult2.get("origpic").toString();
+                        String[] str2=origpicpath.split("/");
+                        String origpcimagename=str2[str2.length-1];
+                        String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+origpcimagename;
+                        //,获取结果路径.并拼接算法管理平台对应远程文件路径
+                        String[] str=resultImagebak.split("/");
+                        String imagename=str[str.length-1];
+                        String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+imagename;
+                        //,获取基准路径.并拼接算法管理平台所需要的基准文件路径
+                        TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
+                        String Cruiseid=tCruisePointInstance.getCruiseid().toString();   //获取巡视点位id
+                        String judgeBaseImagepath= redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString();
+                        judgeBaseImagepath=judgeBaseImagepath+"/"+Cruiseid+"/"+Cruiseid+".jpg"; //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
+                        //拼接算法管理平台分析告警结果图片地址
+                        String remotebaseimagicpath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+Cruiseid+".jpg";
+                        Iterator it=differentList.iterator();
+                        List<Different> defectList1=new ArrayList<>();
+                        while (it.hasNext()){
+                            String key=it.next().toString();//所有的key
+                            Map<String, String>  differentlistmap= redisTemplate.opsForHash().entries(key);
+                            String resultinfo=differentlistmap.get("value");      //获取返回的resultvalue值,判别类是一个数值，缺陷类是坐标
+                            Different different= new Different();
+                            different.setX1(resultinfo);
+                            different.setY1("0");
+                            different.setX2("0");
+                            different.setY2("0");
+                            defectList1.add(different);
+                            alarmDetail.setBay_name("");
+                            alarmDetail.setDevice_name(devicename);
+                            alarmDetail.setTime(differentlistmap.get("warnTime"));
+                            alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
+                            alarmDetail.setPic_diff_base(remotebaseimagicpath);               //判别基准图路径
+                            alarmDetail.setPic_different(remotefilepath);               //判别告警图路径,判别结果图
+                            alarmDetail.setPic_defect("");      //缺陷告警图路径//
+                        }
+                        alarmDetail.setDifferent(defectList1);
+                        ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
+                        ftpsservice.uploadFile("判别告警",judgeBaseImagepath,remotebaseimagicpath);  //判别基准图片上传
+                        ftpsservice.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
+                        //可靠性 文件是否传输成功
+                        if( !ftpsservice.fileExits(remoteorigfilepath)){
+                           ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
+                        }
+                        if( !ftpsservice.fileExits(remotebaseimagicpath)){
+                            ftpsservice.uploadFile("判别告警",judgeBaseImagepath,remotebaseimagicpath);  //判别基准图片上传
+                        }
+                        if( !ftpsservice.fileExits(remotefilepath)){
+                            ftpsservice.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
+                        }
+                        AlarmService alarmService= GetSpringUtil.getBean("alarmService");
+                        alarmService.PushMsg(alarmDetail);
+                    }
+
+                    if(differentList.size()>0&&("1".equals(flag))){
+                        log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
+                        String year=Integer.toString(LocalDate.now().getYear());
+                        String month=Integer.toString(LocalDate.now().getMonthValue());
+                        Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
+                        JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
+                        //,先取出算法平台返回的resultinfo中的结果图片路径
+                        String resultImagebak=jsonObjectResultbak.get("analyseResultImg").toString(); //分析结果过
+                        String taskidbak=jsonObjectResultbak.get("taskId").toString();
+                        String  instanceId=jsonObjectResultbak.get("instanceId").toString();
+                        Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak+":"+instanceId);//读redis
+                        String devicename= cruiseResult2.get("deviceName").toString();
+                        // 获取原始图路径
+                        String origpicpath=cruiseResult2.get("origpic").toString();
+                        String[] str2=origpicpath.split("/");
+                        String origpcimagename=str2[str2.length-1];
+                        //拼接算法管理平台原始图片推送地址
+                        String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+"/"+month+"/"+origpcimagename;
+                        log.info("开始向算法管理平台发送图片和mqtt消息");
+                        String[] str=resultImagebak.split("/");
+                        String imagename=str[str.length-1];
+                        //拼接算法管理平台分析告警结果图片地址
+                        String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+"/"+month+"/"+imagename;
+                        Iterator it=defectList.iterator();
+                        while (it.hasNext()){
+                            String key=it.next().toString();//所有的key
+                            Map<String, String>  differenmap= redisTemplate.opsForHash().entries(key);
+                            String resultinfo=differenmap.get("value");      //获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
+                            String[] arr1 = resultinfo.split(",");   //目前格式："sly_dmyw,0,171,502,667,bj_bpps,745,143,724,923"
+                            List<Defect> defectList1=new ArrayList<>();
+                            for(int i=0;i<arr1.length;){
+                                Defect defect=new Defect();
+                                defect.setX1(arr1[i+1]);
+                                defect.setY1(arr1[i+2]);
+                                defect.setX2(arr1[i+3]);
+                                defect.setY2(arr1[i+4]);
+                                defect.setType(arr1[i]);
+                                defect.setDesc(differenmap.get("defectContent"));
+                                defect.setConfidence("");
+                                defectList1.add(defect);
+                                i=i+5;
+                            }
+                            alarmDetail.setDefect(defectList1);
+                            alarmDetail.setBay_name("");
+                            alarmDetail.setDevice_name(devicename);  //需要修改位devicename
+                            alarmDetail.setTime(differenmap.get("defectTime"));
+                            alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
+                            alarmDetail.setPic_diff_base("");               //判别基准图路径
+                            alarmDetail.setPic_different("");               //判别告警图路径,即分析结果图
+                            alarmDetail.setPic_defect(remotefilepath);      //缺陷告警图路径//
+                        }
+                        ftpsservice.uploadFile("遥信告警",origpicpath,remoteorigfilepath);
+                        ftpsservice.uploadFile("遥信告警",resultImagebak,remotefilepath);
+                        if( !ftpsservice.fileExits(remoteorigfilepath)){
+                            ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
+                        }
+                        if( !ftpsservice.fileExits(remotefilepath)){
+                            ftpsservice.uploadFile("遥信告警",resultImagebak,remotefilepath);
+                        }
+
+                        log.info("巡视主机与智能分析主机：origpicpath:{}",origpicpath);
+                        log.info("巡视主机与智能分析主机：remoteorigfilepath:{}",remoteorigfilepath);
+                        log.info("巡视主机与智能分析主机：resultImagebak:{}",resultImagebak);
+                        log.info("巡视主机与智能分析主机：remotefilepath:{}",remotefilepath);
+//                       ftp文件上传测试数据
+//                      String localpath="D://信息化工作.jpg";
+//                      ftpsservice.uploadFile("遥信告警",localpath,remotefilepath);
+                        AlarmService alarmService= GetSpringUtil.getBean("alarmService");
+                        alarmService.PushMsg(alarmDetail);
+                        log.info("发送算法管理平台结束");
+                    }
+                } catch (Exception e) {
+                    log.error("与算法管理平台交互失败" + e);
+                }
+
+                //jeff: mqtt消息发个告警平台结束
+
+            } else if (jsonObject.get("msgType").toString().equals("6")) { //任务结束后发来的心跳信息
+                String taskId = JSON.parseObject(jsonObject.get("msgData").toString()).get("taskId").toString();
+                String instanceId = JSON.parseObject(jsonObject.get("msgData").toString()).get("instanceId").toString();
                 redisTemplate.opsForList().leftPush("analysisList:" + taskId, "-1");
                 log.info("心跳处理结束" + taskId);
                 //处理心跳线程私有变量 taskId赋值

@@ -7,6 +7,7 @@ import com.yjh.accesstcp.module.device.entity.SysLogs;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.module.device.service.SysLogsService;
+import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

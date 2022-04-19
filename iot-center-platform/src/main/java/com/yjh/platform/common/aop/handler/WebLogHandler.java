@@ -1,5 +1,5 @@
 
-package com.yjh.platform.common.handler;
+package com.yjh.platform.common.aop.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

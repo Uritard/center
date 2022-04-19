@@ -1,6 +1,6 @@
 package com.yjh.platform.configuration;
 
-import com.yjh.platform.common.handler.ThrowErrorHandler;
+import com.yjh.platform.common.aop.handler.ThrowErrorHandler;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
