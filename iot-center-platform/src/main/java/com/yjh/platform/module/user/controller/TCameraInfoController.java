@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -67,6 +68,8 @@ public class TCameraInfoController {
                     result.setMessage(ResultCodeEnum.CODE2.getCode(), ResultCodeEnum.CODE2.getName());
                 } else {
                     result.setData(state);
+                    //有变动 同步模型
+                    Constant.modelUpload("4");
                 }
             }
         } catch (BusinessException b) {
@@ -91,6 +94,8 @@ public class TCameraInfoController {
                 result.setCode(209,"诊断服务异常，删除失败");
             }else {
                 result.setData(re);
+                //有变动 同步模型
+                Constant.modelUpload("4");
             }
             //result.setData(tCameraInfoService.deleteByPrimaryId(cameraId));
         } catch (BusinessException e) {
@@ -116,6 +121,8 @@ public class TCameraInfoController {
                 result.setCode(209,"诊断服务异常，删除失败");
             }else {
                 result.setData(re);
+                //有变动 同步模型
+                Constant.modelUpload("4");
             }
             //result.setData(tCameraInfoService.deleteSelectedCamera(cameraIds));
         } catch (BusinessException e) {
@@ -145,6 +152,8 @@ public class TCameraInfoController {
                 } else {
                     tCameraInfoService.stopStream(tCameraInfo.getCameraId());
                     result.setData(state);
+                    //有变动 同步模型
+                    Constant.modelUpload("4");
                 }
             }
         } catch (BusinessException e) {

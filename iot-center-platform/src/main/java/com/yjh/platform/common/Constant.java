@@ -8,6 +8,7 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.websocket.WebSocketServer;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.entity.Channel;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -29,6 +30,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class Constant {
     public static final String account_lock_times = "account_lock_times:userAccountID";
 
@@ -78,10 +80,21 @@ public class Constant {
         Result re = new Result();
         //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
         //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-        //re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);//江苏要求
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);//江苏要求
         return re;
     }
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
+
+    public static final String TCP_MODEL_URL = "http://iot-center-accesstcp-qh/sendToUpSystem/v1/modelUpload?type={type}";
+    public static void modelUpload(String type){
+        try {
+            Map<String, Object> param = new HashMap<>();
+            param.put("type", type);
+            StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);//江苏要求
+        }catch (Exception e){
+            log.info("模型文件上传失败"+e);
+        }
+    }
 
     public static Map<String,String> userInfo= new HashMap<>();
     public static final String START_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/startRealPlay?cameraId={cameraId}";

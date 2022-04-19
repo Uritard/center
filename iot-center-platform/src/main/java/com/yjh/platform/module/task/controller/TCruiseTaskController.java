@@ -135,6 +135,8 @@ public class TCruiseTaskController {
                     result.setCode(209,"任务间隔过短,机器人暂不支持");
                 }else {
                     result.setData(res);
+                    //有变动 同步模型
+                    Constant.modelUpload("7");
                 }
             }
         } catch (BusinessException b) {

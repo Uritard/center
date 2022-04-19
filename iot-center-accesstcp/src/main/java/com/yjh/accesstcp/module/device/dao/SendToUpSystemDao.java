@@ -33,4 +33,7 @@ public interface SendToUpSystemDao {
     HashMap<String,Object> countResultCheck(@Param(value = "startTime")String startTime,
                                       @Param(value = "endTime")String endTime );
 
+    List<DeviceStatisticsInfo>selectRobot();
+    List<DeviceStatisticsInfo>selectCamera();
+    List<DeviceStatisticsInfo>selectDrone();
 }

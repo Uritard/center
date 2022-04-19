@@ -3,109 +3,108 @@
 <mapper namespace="com.yjh.accesstcp.module.device.dao.SendToUpSystemDao">
 
 
-
-    <select id="selectDeviceModel"  resultType="java.util.Map">
-        SELECT
-			f.up_region_id as area_id,
-            f.up_region_name as area_name,
-        a.instance_id as device_id,
-            (CASE WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_id )AND ISNULL( d.preset_name ) THEN ''
-             WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_name ) THEN d.preset_name
-             WHEN ISNULL( b.mete_name ) AND ISNULL( d.preset_img ) THEN c.inspection_name
-             WHEN ISNULL( c.inspection_name ) AND ISNULL( d.preset_name ) THEN b.mete_name
-             WHEN ISNULL( c.inspection_name ) THEN CONCAT( b.mete_name, ' /', d.preset_name )
-             WHEN ISNULL( d.preset_name ) THEN CONCAT( b.mete_name, ' /', c.inspection_name )
-        END) AS device_name,
-				f.custom_id as component_id,
-				f.custom_name as component_name,
-				f.up_region_id as bay_id,
-				f.up_region_name as bay_name,
-				f.device_id as main_device_id,
-				f.device_name as main_device_name,
-				j.up_dict as device_type,
-				b.mete_type,
-				b.meter_type,
-				b.appearance_type,
-				"" as save_type_list,
-				k.dict_note as recognition_type_list,
-				"" as phase,
-				"" as device_info,
-				"" as data_type,
-				"" as lower_value,
-				"" as upper_value,
-				"" as video_pos
-		FROM t_cruise_point_instance a
-        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
-        LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
-        LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
-        left join t_std_device f on a.device_id = f.device_id and a.custom_id = f.custom_id
-		left join t_dict_business j on f.device_type = j.dict_code
-		left join t_dict_business k on a.cruise_type = k.dict_code
+    <select id="selectDeviceModel" resultType="java.util.Map">
+        SELECT f.up_region_id   as area_id,
+               f.up_region_name as area_name,
+               a.instance_id    as device_id,
+               (CASE
+                    WHEN ISNULL(b.mete_name) AND ISNULL(c.inspection_id) AND ISNULL(d.preset_name) THEN ''
+                    WHEN ISNULL(b.mete_name) AND ISNULL(c.inspection_name) THEN d.preset_name
+                    WHEN ISNULL(b.mete_name) AND ISNULL(d.preset_img) THEN c.inspection_name
+                    WHEN ISNULL(c.inspection_name) AND ISNULL(d.preset_name) THEN b.mete_name
+                    WHEN ISNULL(c.inspection_name) THEN CONCAT(b.mete_name, ' /', d.preset_name)
+                    WHEN ISNULL(d.preset_name) THEN CONCAT(b.mete_name, ' /', c.inspection_name)
+                   END)         AS device_name,
+               f.custom_id      as component_id,
+               f.custom_name    as component_name,
+               f.up_region_id   as bay_id,
+               f.up_region_name as bay_name,
+               f.device_id      as main_device_id,
+               f.device_name    as main_device_name,
+               j.up_dict        as device_type,
+               b.mete_type,
+               b.meter_type,
+               b.appearance_type,
+               ""               as save_type_list,
+               k.dict_note      as recognition_type_list,
+               ""               as phase,
+               ""               as device_info,
+               ""               as data_type,
+               ""               as lower_value,
+               ""               as upper_value,
+               ""               as video_pos
+        FROM t_cruise_point_instance a
+                 LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+                 LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
+                 LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
+                 left join t_std_device f on a.device_id = f.device_id and a.custom_id = f.custom_id
+                 left join t_dict_business j on f.device_type = j.dict_code
+                 left join t_dict_business k on a.cruise_type = k.dict_code
     </select>
 
-	<select id="selectRobotInfo" resultType="java.util.Map">
-		select
-			a.robot_name as patroldevice_name,
-			a.robot_code as patroldevice_code,
-			b.dict_note as device_model,
-			c.dict_note as manufacturer,
-			"" as use_unit,
-			c.dict_note as device_source,
-			a.commission_date as production_date,
-			a.appearance_number as production_code,
-			if(b.dict_code=399,0,1) as istransport,
-			'10' as use_mode,
-			(CASE WHEN a.light_ip is null AND a.lnferad_IP is null THEN ''
-				  WHEN locate('.',a.light_ip) > 0 and locate('.',a.lnferad_IP) =0 THEN '2'
-				  WHEN locate('.',a.light_ip) = 0 and locate('.',a.lnferad_IP) >0 THEN '1'
-				  WHEN locate('.',a.light_ip) AND  locate('.',a.lnferad_IP)THEN '3'
-				  else ''
-				end) as video_mode,
-			'' as place,
-			(CASE WHEN a.robot_position = 155 THEN '2'
-				  WHEN a.robot_position = 156 THEN '1'
-				  WHEN a.robot_position = 399 THEN '3'
-				end) as type,
-			'' as patroldevcie_info,
-			'' as robots_code
-		from t_robot_info a
-				 left join t_dict_business b on a.robot_type = b.dict_code
-				 left join t_dict_business c on a.robot_factory = c.dict_code
-	</select>
+    <select id="selectRobotInfo" resultType="java.util.Map">
+        select a.robot_name                as patroldevice_name,
+               a.robot_code                as patroldevice_code,
+               b.dict_note                 as device_model,
+               c.dict_note                 as manufacturer,
+               ""                          as use_unit,
+               c.dict_note                 as device_source,
+               a.commission_date           as production_date,
+               a.appearance_number         as production_code,
+               if(b.dict_code = 399, 0, 1) as istransport,
+               '10'                        as use_mode,
+               (CASE
+                    WHEN a.light_ip is null AND a.lnferad_IP is null THEN ''
+                    WHEN locate('.', a.light_ip) > 0 and locate('.', a.lnferad_IP) = 0 THEN '2'
+                    WHEN locate('.', a.light_ip) = 0 and locate('.', a.lnferad_IP) > 0 THEN '1'
+                    WHEN locate('.', a.light_ip) AND locate('.', a.lnferad_IP) THEN '3'
+                    else ''
+                   end)                    as video_mode,
+               ''                          as place,
+               (CASE
+                    WHEN a.robot_position = 155 THEN '2'
+                    WHEN a.robot_position = 156 THEN '1'
+                    WHEN a.robot_position = 399 THEN '3'
+                   end)                    as type,
+               ''                          as patroldevcie_info,
+               ''                          as robots_code
+        from t_robot_info a
+                 left join t_dict_business b on a.robot_type = b.dict_code
+                 left join t_dict_business c on a.robot_factory = c.dict_code
+    </select>
 
-	<select id="selectCameraInfo" resultType="java.util.Map">
-		select
-			a.camera_name as patroldevice_name,
-			a.camera_id as patroldevice_code,
-			b.dict_note as device_model,
-			c.dict_note as manufacturer,
-			"" as use_unit,
-			c.dict_note as device_source,
-			'' as production_date,
-			'' as production_code,
-			'' as istransport,
-			if(a.is_control = 0,'11','10') as use_mode,
-			(CASE WHEN a.camera_type = 205 THEN '1'
-				  WHEN a.camera_type = 206 THEN '2'
-				end) as video_mode,
-			'' as place,
-			'10' as type,
-			'' as patroldevice_info,
-			'' as robots_code
-		from t_camera_info a
-				 left join t_dict_business b on a.camera_model = b.dict_code
-				 left join t_dict_business c on a.vendor_id = c.dict_code
-	</select>
+    <select id="selectCameraInfo" resultType="java.util.Map">
+        select a.camera_name                    as patroldevice_name,
+               a.camera_id                      as patroldevice_code,
+               b.dict_note                      as device_model,
+               c.dict_note                      as manufacturer,
+               ""                               as use_unit,
+               c.dict_note                      as device_source,
+               ''                               as production_date,
+               ''                               as production_code,
+               ''                               as istransport,
+               if(a.is_control = 0, '11', '10') as use_mode,
+               (CASE
+                    WHEN a.camera_type = 205 THEN '1'
+                    WHEN a.camera_type = 206 THEN '2'
+                   end)                         as video_mode,
+               ''                               as place,
+               '10'                             as type,
+               ''                               as patroldevice_info,
+               ''                               as robots_code
+        from t_camera_info a
+                 left join t_dict_business b on a.camera_model = b.dict_code
+                 left join t_dict_business c on a.vendor_id = c.dict_code
+    </select>
 
-	<select id="selectTaskInfo" resultType="java.util.Map">
-		SELECT
-		b.up_dict as type,
-		a.task_id as task_code,
-		a.task_name,
-		a.task_level as priority,
-		"3" as device_level,
-		if(a.if_run=174,a.start_time,"") as fixed_start_time,
-		IFNULL(a.date_type,"") as time,
+    <select id="selectTaskInfo" resultType="java.util.Map">
+        SELECT b.up_dict                            as type,
+               a.task_id                            as task_code,
+               a.task_name,
+               a.task_level                         as priority,
+               "3"                                  as device_level,
+               if(a.if_run = 174, a.start_time, "") as fixed_start_time,
+               IFNULL(a.date_type, "") as time,
 		"" as cycle_month,
 		"" as  cycle_week,
 		"" as cycle_execute_time,
@@ -116,84 +115,114 @@
 		if(c.c_state=240,1,0) isenable,
 		"" as creator,
 		"" as create_time
-		from t_cruise_task a
-		left join t_dict_business b on a.type = b.dict_code and b.col_name="plan_type"
-		left join t_cruise_result c on a.task_id = c.task_id
-	</select>
-	<select id="selectInstanceId" resultType="java.lang.Long">
-		SELECT
-		a.instance_id
-		from t_cruise_task_attr a where a.task_id =#{taskId,jdbcType=VARCHAR}
-	</select>
+        from t_cruise_task a
+            left join t_dict_business b
+        on a.type = b.dict_code and b.col_name="plan_type"
+            left join t_cruise_result c on a.task_id = c.task_id
+    </select>
+    <select id="selectInstanceId" resultType="java.lang.Long">
+        SELECT a.instance_id
+        from t_cruise_task_attr a
+        where a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
 
-	<resultMap id="maintenanceMap" type="com.yjh.accesstcp.module.device.entity.MaintenanceModel">
-		<id column="maintenance_id" property="configCode"/>
-		<result column="is_valid" property="enable"/>
-		<result column="maintenance_start" property="startTime"/>
-		<result column="maintenance_stop" property="endTime"/>
-		<collection property="deviceIds" ofType="java.lang.String">
-			<id column="device_id" />
-		</collection>
-	</resultMap>
-	<select id="selectMaintenanceInfo" resultMap="maintenanceMap">
-		select
-			*
-		from t_device_maintenance
-	</select>
+    <resultMap id="maintenanceMap" type="com.yjh.accesstcp.module.device.entity.MaintenanceModel">
+        <id column="maintenance_id" property="configCode"/>
+        <result column="is_valid" property="enable"/>
+        <result column="maintenance_start" property="startTime"/>
+        <result column="maintenance_stop" property="endTime"/>
+        <collection property="deviceIds" ofType="java.lang.String">
+            <id column="device_id"/>
+        </collection>
+    </resultMap>
+    <select id="selectMaintenanceInfo" resultMap="maintenanceMap">
+        select *
+        from t_device_maintenance
+    </select>
 
-	<select id="countTask" resultType="java.util.HashMap">
-		select
-		count(1) as totalNum,
-		(select count(1) from  t_cruise_task_result where cruise_task_time BETWEEN #{startTime} and #{endTime} and cruise_result = 246) as validNum
-		from t_cruise_task_result
-		where cruise_task_time BETWEEN #{startTime} and #{endTime}
-	</select>
+    <select id="countTask" resultType="java.util.HashMap">
+        select count(1)                    as totalNum,
+               (select count(1)
+                from t_cruise_task_result
+                where cruise_task_time BETWEEN #{startTime} and #{endTime}
+                  and cruise_result = 246) as validNum
+        from t_cruise_task_result
+        where cruise_task_time BETWEEN #{startTime} and #{endTime}
+    </select>
 
-	<select id="countWarnCheck" resultType="java.util.HashMap">
-		SELECT
-			count(1) as totalNum,
-			count(t.deal_type) as validNum
-		FROM
-			(select deal_type,warn_time from t_warn_info
-			    union all(
-				 select deal_type,defect_time warn_time from t_defect_info
-			 )) t
-		where t.warn_time BETWEEN #{startTime} and #{endTime}
-	</select>
+    <select id="countWarnCheck" resultType="java.util.HashMap">
+        SELECT count(1)           as totalNum,
+               count(t.deal_type) as validNum
+        FROM (select deal_type, warn_time
+              from t_warn_info
+              union all
+              (
+                  select deal_type, defect_time warn_time
+                  from t_defect_info
+              )) t
+        where t.warn_time BETWEEN #{startTime} and #{endTime}
+    </select>
 
-	<select id="countWarnAccuracy" resultType="java.util.HashMap">
-		SELECT
-			count(1) as totalNum,
-			sum(if(t.deal_type = 286,1,0)) as validNum
-		FROM
-			(select deal_type,warn_time from t_warn_info where deal_type is not null
-			 union all(
-				 select deal_type,defect_time warn_time from t_defect_info where deal_type is not null
-			 )) t
-		where t.warn_time BETWEEN #{startTime} and #{endTime}
-	</select>
+    <select id="countWarnAccuracy" resultType="java.util.HashMap">
+        SELECT count(1)                         as totalNum,
+               sum(if(t.deal_type = 286, 1, 0)) as validNum
+        FROM (select deal_type, warn_time
+              from t_warn_info
+              where deal_type is not null
+              union all
+              (
+                  select deal_type, defect_time warn_time from t_defect_info where deal_type is not null
+              )) t
+        where t.warn_time BETWEEN #{startTime} and #{endTime}
+    </select>
 
-	<select id="countInstanceLoss" resultType="java.util.HashMap">
-		SELECT
-			count( 1 ) AS totalNum,
-			sum( IF ( tcdr.cruise_result = 247, 1, 0 ) ) AS validNum
-		FROM
-			t_cruise_task_result result
-		LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
-		LEFT JOIN t_cruise_data_result tcdr ON detail.cruise_result_id = tcdr.cruise_result_id
-		WHERE
-			result.cruise_task_time BETWEEN #{startTime} and #{endTime}
-	</select>
+    <select id="countInstanceLoss" resultType="java.util.HashMap">
+        SELECT count(1)                                AS totalNum,
+               sum(IF(tcdr.cruise_result = 247, 1, 0)) AS validNum
+        FROM t_cruise_task_result result
+                 LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
+                 LEFT JOIN t_cruise_data_result tcdr ON detail.cruise_result_id = tcdr.cruise_result_id
+        WHERE result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+    </select>
 
-	<select id="countResultCheck" resultType="java.util.HashMap">
-		SELECT
-			count( 1 ) AS totalNum,
-			count( result.identify_result ) AS validNum
-		FROM
-			t_cruise_data_result result
-		LEFT JOIN t_cruise_task_result_detail detail ON result.cruise_result_id = detail.cruise_result_id
-		AND result.cruise_id = detail.instance_id
-		WHERE
-			detail.cruise_time BETWEEN #{startTime} and #{endTime}
-	</select>
+    <select id="countResultCheck" resultType="java.util.HashMap">
+        SELECT count(1)                      AS totalNum,
+               count(result.identify_result) AS validNum
+        FROM t_cruise_data_result result
+                 LEFT JOIN t_cruise_task_result_detail detail ON result.cruise_result_id = detail.cruise_result_id
+            AND result.cruise_id = detail.instance_id
+        WHERE detail.cruise_time BETWEEN #{startTime} and #{endTime}
+    </select>
+
+    <select id="selectRobot" resultType="com.yjh.accesstcp.module.device.entity.DeviceStatisticsInfo">
+        SELECT
+            robot_id as id,
+            robot_code as patrolDeviceCode,
+            robot_name as patrolDeviceName,
+            commission_date as commissionTime
+        FROM
+            t_robot_info
+        WHERE
+            robot_type IS NOT NULL
+    </select>
+    <select id="selectCamera" resultType="com.yjh.accesstcp.module.device.entity.DeviceStatisticsInfo">
+        SELECT
+            camera_id as id,
+            camera_id as patrolDeviceCode,
+            camera_name as patrolDeviceName,
+            create_time as commissionTime
+        FROM
+            t_camera_info
+    </select>
+    <select id="selectDrone" resultType="com.yjh.accesstcp.module.device.entity.DeviceStatisticsInfo">
+        SELECT
+            robot_id as id,
+            robot_code as patrolDeviceCode,
+            robot_name as patrolDeviceName,
+            commission_date as commissionTime
+        FROM
+            t_robot_info
+        WHERE
+            drone_type IS NOT NULL
+    </select>
 </mapper>

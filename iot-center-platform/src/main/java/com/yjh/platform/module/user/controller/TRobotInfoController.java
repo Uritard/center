@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -75,6 +76,8 @@ public class TRobotInfoController {
                 result.setMessage(209, "机器人编码已存在，不可重复");
             }else {
                 result.setData(tRobotInfoService.insert(tRobotInfo,userId));
+                //有变动 同步模型
+                Constant.modelUpload("3");
             }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -96,6 +99,8 @@ public class TRobotInfoController {
                 result.setCode(209,"此机器人下存在测点或巡视点");
             }else {
                 result.setData(re);
+                //有变动 同步模型
+                Constant.modelUpload("3");
             }
             //result.setData(tRobotInfoService.deleteByPrimaryId(robotId));
         } catch (BusinessException e) {
@@ -121,6 +126,8 @@ public class TRobotInfoController {
             }else {
                 Long userId = Long.valueOf(request.getHeader("userId"));
                 result.setData(tRobotInfoService.update(tRobotInfo,userId));
+                //有变动 同步模型
+                Constant.modelUpload("3");
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -287,6 +294,8 @@ public class TRobotInfoController {
                 result.setCode(209,"此机器人下存在测点或巡视点");
             }else {
                 result.setData(re);
+                //有变动 同步模型
+                Constant.modelUpload("3");
             }
             //result.setData(tRobotInfoService.batchDelete(robotIds));
         } catch (BusinessException e) {

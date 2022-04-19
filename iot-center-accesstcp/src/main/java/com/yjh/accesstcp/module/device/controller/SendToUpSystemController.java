@@ -85,7 +85,7 @@ public class SendToUpSystemController {
         return result;
     }
 
-    @ApiOperation(value = "模型同步")
+    @ApiOperation(value = "巡视结果查询")
     @RequestMapping(value = "/testCount", method = RequestMethod.GET)
     public Result testCount(@RequestParam(value = "type") String type,
                             @RequestParam(value = "startTime") String startTime,
@@ -93,6 +93,19 @@ public class SendToUpSystemController {
         Result result = new Result();
         try {
             result.setData(sendToUpSystemService.resultStatistical(type,startTime,endTime));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "模型同步上报")
+    @RequestMapping(value = "/modelUpload", method = RequestMethod.GET)
+    public Result modelUpload(@RequestParam(value = "type") String type) {
+        Result result = new Result();
+        try {
+           sendToUpSystemService.creatFile(type);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);

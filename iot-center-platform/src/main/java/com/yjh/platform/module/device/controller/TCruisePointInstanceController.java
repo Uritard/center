@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -219,7 +220,11 @@ public class TCruisePointInstanceController {
             if (i==-3) {
                 result.setMessage("巡视点已经绑定了预案,操作无法生效！");
                 result.setCode(10102);
-            } else {result.setData(i);}
+            } else {
+                result.setData(i);
+                //巡视点有变动 同步模型
+                Constant.modelUpload("1");
+            }
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("巡检点关联配置失败描述：", e);

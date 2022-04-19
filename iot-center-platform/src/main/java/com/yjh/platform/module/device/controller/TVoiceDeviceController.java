@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -55,6 +56,8 @@ public class TVoiceDeviceController {
                 result.setCode(209,"监视设备不存在");
             }else {
                 result.setData(re);
+                //有变动 同步模型
+                Constant.modelUpload("6");
             }
 
         } catch (BusinessException b) {
@@ -73,6 +76,8 @@ public class TVoiceDeviceController {
         Result result = new Result();
         try {
             result.setData(tVoiceDeviceService.deleteByPrimaryId(voiceDeviceId));
+            //有变动 同步模型
+            Constant.modelUpload("6");
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除异常:", e);
@@ -94,6 +99,8 @@ public class TVoiceDeviceController {
                 result.setCode(209,"监视设备不存在");
             }else {
                 result.setData(re);
+                //有变动 同步模型
+                Constant.modelUpload("6");
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -173,6 +180,8 @@ public class TVoiceDeviceController {
         Result result = new Result();
         try {
             result.setData(tVoiceDeviceService.batchAdd(list));
+            //有变动 同步模型
+            Constant.modelUpload("6");
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("批量插入失败：" + e);
@@ -187,6 +196,8 @@ public class TVoiceDeviceController {
         Result result = new Result();
         try {
             result.setData(tVoiceDeviceService.batchDelete(voiceDeviceIds));
+            //有变动 同步模型
+            Constant.modelUpload("6");
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("批量删除失败：" + e);
