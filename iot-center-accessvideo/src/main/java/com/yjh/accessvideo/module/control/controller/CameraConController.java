@@ -4,6 +4,7 @@ package com.yjh.accessvideo.module.control.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.common.Constant;
+import com.yjh.accessvideo.common.logs.Logs;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
@@ -70,6 +71,7 @@ public class CameraConController {
 
     @ApiOperation(value = "相机播放")
     @RequestMapping(value = "/startRealPlay", method = RequestMethod.GET)
+//    @Logs(title = "相机播放",content = "根据用户传递的参数相机播放",logType = 5, authority = "1234,1235")
     public Result startRealPlay(@RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
@@ -145,6 +147,7 @@ public class CameraConController {
 
     @ApiOperation(value = "相机停止播放")
     @RequestMapping(value = "/stopRealPlay", method = RequestMethod.GET)
+//    @Logs(title = "相机停止播放",content = "根据用户传递的参数停止相机播放",logType = 5, authority = "1234,1235")
     public Result stopRealPlay(@RequestParam(value = "cameraId") Long cameraId,
                                 @RequestParam(value = "rtmpUrl", required = false) String rtmpUrl) {
         Result result = new Result();
@@ -161,6 +164,7 @@ public class CameraConController {
 
     @ApiOperation(value = "相机批量播放")
     @RequestMapping(value = "/batchStartRealPlay", method = RequestMethod.GET)
+//    @Logs(title = "相机批量播放",content = "根据用户传递的参数控制相机批量播放",logType = 5, authority = "1234,1235")
     public Result batchStartRealPlay(@RequestParam(value = "cameraIds") String cameraIds) {
         Result result = new Result();
         try {
@@ -176,6 +180,7 @@ public class CameraConController {
 
     @ApiOperation(value = "机器人相机播放")
     @RequestMapping(value = "/robotStartRealPlay", method = RequestMethod.GET)
+//    @Logs(title = "机器人相机播放",content = "根据用户传递的参数控制机器人相机播放",logType = 5, authority = "1234,1235")
     public Result robotStartRealPlay(@RequestParam(value = "robotId") Long robotId) {
         Result result = new Result();
         try {
@@ -191,6 +196,7 @@ public class CameraConController {
 
     @ApiOperation(value = "机器人相机停止播放")
     @RequestMapping(value = "/robotStopRealPlay", method = RequestMethod.GET)
+//    @Logs(title = "机器人相机停止播放",content = "根据用户传递的参数控制机器人相机停止播放",logType = 5, authority = "1234,1235")
     public Result robotStopRealPlay(@RequestParam(value = "robotId") Long robotId) {
         Result result = new Result();
         try {
@@ -226,6 +232,7 @@ public class CameraConController {
 
     @ApiOperation(value = "视频回放")
     @RequestMapping(value = "/startPlayBack", method = RequestMethod.GET)
+//    @Logs(title = "视频回放",content = "根据用户传递的参数控制视频回放",logType = 5, authority = "1234,1235")
     public Result startPlayBack(@RequestParam(value = "cameraId") Long cameraId,
                                 @RequestParam(value = "startTime") String startTime,
                                 @RequestParam(value = "stopTime") String stopTime) {
@@ -261,6 +268,7 @@ public class CameraConController {
 //    11 焦距变大(倍率变大) 12 焦距变小(倍率变小) 25 云台上仰和左转 26 云台上仰和右转 27 云台下俯和左转 28 云台下俯和右转 29 云台左右自动扫描
     @ApiOperation(value = "云台控制")
     @RequestMapping(value = "/ptzControl", method = RequestMethod.GET)
+//    @Logs(title = "相机云台控制",content = "根据用户传递的参数控制相机云台",logType = 5, authority = "1234,1235")
     public Result ptzControl(@RequestParam(value = "dwPTZCommand") int dwPTZCommand,
                              @RequestParam(value = "cameraId") Long cameraId,
                              @RequestParam(value = "dStop") int dStop,
@@ -280,6 +288,7 @@ public class CameraConController {
 
     @ApiOperation(value = "相机抓图")
     @RequestMapping(value = "/capturePicture", method = RequestMethod.GET)
+//    @Logs(title = "相机抓图",content = "根据用户传递的参数控制相机抓图",logType = 5, authority = "1234,1235")
     public Result capturePicture(@RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
@@ -370,6 +379,7 @@ public class CameraConController {
 
     @ApiOperation(value = "转到预置点")
     @RequestMapping(value = "/moveToPreset", method = RequestMethod.GET)
+//    @Logs(title = "转到预置点",content = "根据用户传递的参数转到预置点",logType = 5, authority = "1234,1235")
     public Result moveToPreset(@RequestParam(value = "presetId") Long presetId,
                                @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
@@ -708,6 +718,7 @@ public class CameraConController {
 
     @ApiOperation(value = "根据坐标获取温度")
     @RequestMapping(value = "/PointTemperature", method = RequestMethod.POST)
+//    @Logs(title = "根据坐标获取温度",content = "根据用户传递的参数根据坐标获取温度",logType = 1, authority = "1234,1235")
     public Result  PointTemperature ( @RequestBody TemperatureInfo temperatureInfo)
     {
         log.info(temperatureInfo.toString());

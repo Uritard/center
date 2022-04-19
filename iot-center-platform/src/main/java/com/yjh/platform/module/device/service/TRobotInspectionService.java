@@ -179,8 +179,8 @@ public class TRobotInspectionService{
             re.put("onlineState",mapForOnlineState.get("value"));//网络状态
             //todo 通知前端停止调接口
         }else {
+            re.put("onlineState","");//网络状态
         }
-        re.put("onlineState","");//网络状态
 
         Map<String,Object> mapForRobotCoordinate  = redisTemplate.opsForHash().entries("RobotCoordinate:"+robotCode);
         if(mapForRobotCoordinate.size() != 0){

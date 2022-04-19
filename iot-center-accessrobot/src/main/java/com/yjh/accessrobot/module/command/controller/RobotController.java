@@ -16,6 +16,7 @@ import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.java.Log;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ public class RobotController {
 
     @ApiOperation(value = "发送控制指令接口")
     @GetMapping(value = "/command")
-    // @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5)
+    @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5, authority = "1235")
     public Result feignRobotControl(HttpServletRequest request,
                                     @RequestParam(value = "robotCode") String robotCode,
                                     @RequestParam(value = "type") String type,
@@ -254,6 +255,7 @@ public class RobotController {
      */
     @ApiOperation(value = "智能环境设备控制")
     @PostMapping(value = "/envDeviceControl")
+    @Logs(title = "智能环境设备控制",content = "根据用户传递的参数控制智能环境设备",logType = 5, authority = "1235")
     public Result envDeviceControl(@RequestBody JSONObject jsonObject) {
         log.info("智能环境设备控制");
         Result result = new Result();

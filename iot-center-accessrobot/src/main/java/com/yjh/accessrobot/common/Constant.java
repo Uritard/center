@@ -14,6 +14,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.IOException;
 import java.net.URI;
@@ -113,6 +114,12 @@ public class Constant {
     public static void restTemplateDelete(String url, Map<String, Object> params) {
         StaticContextAccessor.getBean(ServiceRestTemplate.class).delete(url, params);
     }
+
+    public static boolean apiPermissions;
+
+    public static String WEBSOCKET_URL="";
+
+    public static RedisTemplate redisTemplate;
 
     //请求webSocket发送方法
     public static String postUrl(String url, String json) throws IOException, URISyntaxException {

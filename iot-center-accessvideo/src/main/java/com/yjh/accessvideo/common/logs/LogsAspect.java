@@ -1,8 +1,10 @@
 package com.yjh.accessvideo.common.logs;
 
 
+import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.result.BusinessException;
+import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.utils.http.IPUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -24,6 +26,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -58,7 +62,7 @@ public class LogsAspect {
         Logs annotation = signature.getMethod().getAnnotation(Logs.class);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         StringBuilder content = new StringBuilder("");
-        String userId = "99999", userName = null, serviceId = null, ip = null;
+        String userId = "99999", userName = null, serviceId = null, ip = null,userRole=null;
         HttpServletRequest request = null;
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) requestAttributes;
@@ -67,37 +71,65 @@ public class LogsAspect {
             if (Objects.nonNull(request.getHeader("userId")) && !Objects.equals(request.getHeader("userId"), "undefined")) {
                 userId = request.getHeader("userId");
                 userName = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("userName"));
+                userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
             } else { userName = "admin"; }
         }
         ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         Object result = null;
         if (annotation != null) {
+            content.append(annotation.content());
+            params.set("userId", userId);
+            params.set("userName", userName);
+            params.set("requestOrigin", request.getRequestURL());
+            params.set("requestPath", request.getRequestURI());
+            params.set("requestMethod", request.getMethod());
+            if(Constant.apiPermissions){
+                try {
+                    if (!"".equals(annotation.authority())) {
+                        String[] ans = annotation.authority().split(",");
+                        for (String an : ans) {
+                            assert userRole != null;
+                            if (!userRole.equals(an)) {
+                                //todo 越权访问入日志
+                                params.set("logType", "24");
+                                params.set("ip", ip);
+                                params.set("title", annotation.title());
+                                params.set("state", 3);
+                                Map<String, String> jsonMap = new HashMap<>(8);
+                                jsonMap.put("type", "alarmPopUp");
+                                jsonMap.put("ip", ip);
+                                jsonMap.put("warningInfo", "越权访问告警！！！");
+                                jsonMap.put("userId", userId);
+                                jsonMap.put("logType", "24");
+                                jsonMap.put("userName", userName);
+                                jsonMap.put("title", annotation.title());
+                                jsonMap.put("content", String.valueOf(content));
+                                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
+                                content.append(";用户").append(userName).append("存在越权访问!");
+                                params.set("content", content.toString());
+                                post(params);
+                                Result re = new Result();
+                                re.setCode(209, "此用户无权限");
+                                return re;
+                            }
+                        }
+                    }
+                }catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
             try {
                 // 记录操作日志...谁..在什么时间..做了什么事情..
-                params.set("logType", annotation.logType());
-                params.set("ip", ip);
-                params.set("title", annotation.title());
-                params.set("state", 1);
-                content.append(annotation.content());
-                params.set("userId", userId);
-                params.set("userName", userName);
-                params.set("requestOrigin", request.getRequestURL());
-                params.set("requestPath", request.getRequestURI());
-                params.set("requestMethod", request.getMethod());
                 result = joinPoint.proceed();
+                params.set("content", content.toString());
                 post(params);
+                return result;
             } catch (BusinessException e) {
-//                String s = null;
-//                if (Objects.isNull(s)) throw new BusinessException(111, "is null....");
-                log.info("Exception.... ");
-                params.set("state", e.getCode());
-//                params.set("content", content.toString() + "；错误信息：" + e.getMessage());
+                params.set("state", 2);
+                params.set("content", content.toString() + "；错误信息：" + e.getMessage());
                 post(params);
                 throw e;
             } catch (Throwable e) {
-//                try{ s = s.replace("a",""); }catch (Exception e){ throw new ClassCastException(); }
-//                try{ s = s.replace("a",""); }catch (Exception e){ throw new NullPointerException(); }
-                log.info("Error.... ");
                 params.set("content", content.toString() + "；异常信息：" + e.getMessage());
                 params.set("state", 3);
                 post(params);

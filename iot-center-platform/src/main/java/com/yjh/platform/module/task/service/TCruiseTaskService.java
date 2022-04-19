@@ -1140,19 +1140,19 @@ public class TCruiseTaskService {
         //password = Demo.decrypt(password);
         //sysUser.setPassword(Demo.decryptDB(sysUser.getPassword()));
         if (sysUser.getPassword().equals(password)) {
-            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-            params.set("logType", "2");
-            params.set("ip", iP);
-            params.set("title", "新增任务");
-            params.set("state", 1);
-            params.set("userId",  Long.valueOf(userId));
-            params.set("userName", sysUser.getUserName());
-            params.set("requestOrigin",request.getRequestURL());
-            params.set("requestPath",request.getRequestURI());
-            params.set("requestMethod",request.getMethod());
-            params.set("content", "根据用户传递的参数新增数据");
-            LogsAspect logsAspect = new LogsAspect();
-            logsAspect.post(params);
+//            MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+//            params.set("logType", "2");
+//            params.set("ip", iP);
+//            params.set("title", "新增任务");
+//            params.set("state", 1);
+//            params.set("userId",  Long.valueOf(userId));
+//            params.set("userName", sysUser.getUserName());
+//            params.set("requestOrigin",request.getRequestURL());
+//            params.set("requestPath",request.getRequestURI());
+//            params.set("requestMethod",request.getMethod());
+//            params.set("content", "根据用户传递的参数新增数据");
+//            LogsAspect logsAspect = new LogsAspect();
+//            logsAspect.post(params);
             return 1;
         }else {
             MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();

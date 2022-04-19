@@ -46,6 +46,12 @@ public class AccessRobotApplication implements CommandLineRunner {
     @Autowired
     private RobotService robotService;
 
+    @Value("${other.webSocketUrl}")
+    private String syncWebsocketUrl;//WS调用接口地址
+
+    @Value("${spring.interface.api}")
+    private String interfaceApi;
+
     private NettyServer nettyServer = new NettyServer();
 
     public static void main(String[] args) {
@@ -54,6 +60,9 @@ public class AccessRobotApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
+        Constant.WEBSOCKET_URL = syncWebsocketUrl;
+        Constant.redisTemplate = redisTemplate;
+        Constant.apiPermissions= Boolean.valueOf(interfaceApi);
         robotService.updateAllRobotStatus();
         String url = getLocalIp();
 //        String url = "192.168.40.71";

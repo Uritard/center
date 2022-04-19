@@ -149,21 +149,21 @@ public class RobotService {
                 return zcz;
             }
         }
-        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.set("logType", "5");
-        params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-        params.set("title", "控制机器人");
-        params.set("state", 1);
-        params.set("userId", userId);
-        params.set("userName", userName);
-        params.set("requestOrigin", request.getRequestURL());
-        params.set("requestPath", request.getRequestURI());
-        params.set("requestMethod", request.getMethod());
-        /*String operationContent = selectContentByCommand(type,command,value);
-        params.set("content",operationContent);*/
-        params.set("content", content);
-        LogsAspect logsAspect = new LogsAspect();
-        logsAspect.post(params);
+//        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+//        params.set("logType", "5");
+//        params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+//        params.set("title", "控制机器人");
+//        params.set("state", 1);
+//        params.set("userId", userId);
+//        params.set("userName", userName);
+//        params.set("requestOrigin", request.getRequestURL());
+//        params.set("requestPath", request.getRequestURI());
+//        params.set("requestMethod", request.getMethod());
+//        /*String operationContent = selectContentByCommand(type,command,value);
+//        params.set("content",operationContent);*/
+//        params.set("content", content);
+//        LogsAspect logsAspect = new LogsAspect();
+//        logsAspect.post(params);
         List<Map<String, Object>> item = new LinkedList<>();
         Map<String, Object> map = new HashMap<>(3);
         if (StringUtils.isNotEmpty(value)) {

@@ -52,6 +52,9 @@ public class AccessVideoApplication implements CommandLineRunner {
     @Value("${system.webSocket.url}")
     private String syncWebsocketUrl;//WS调用接口地址
 
+    @Value("${spring.interface.api}")
+    private String interfaceApi;
+
     private int lUserID;//用户句柄
     //设备登录信息
     private HCNetSDK.NET_DVR_USER_LOGIN_INFO m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();
@@ -66,6 +69,9 @@ public class AccessVideoApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
+        Constant.WEBSOCKET_URL = syncWebsocketUrl;
+        Constant.redisTemplate = redisTemplate;
+        Constant.apiPermissions= Boolean.valueOf(interfaceApi);
         log.info("videoAccess is running...");
         setSDKCom();
         if (!hCNetSDK.NET_DVR_Init()) { log.error("init fail.."); return; }

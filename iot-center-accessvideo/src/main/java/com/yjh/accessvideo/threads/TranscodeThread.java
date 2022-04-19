@@ -56,13 +56,14 @@ public class TranscodeThread implements Runnable {
     @Override
     public void run() {
         try {
+            Date date = new Date();
             String path = videoPath + fileName;
             VideoUtil.h264ToMp4(path);
             deleteFile(path);
             String judge = savePath + fileName.replace("h264", "mp4");
             RecordFileInfo recordFileInfo = new RecordFileInfo();
             recordFileInfo.setFileName(fileName.replace(".h264", ""));
-            recordFileInfo.setEndTime(new Date());
+            recordFileInfo.setEndTime(date);
             recordFileInfo.setFilePath(judge);
             recordFileInfo.setAbsoluteFilePath(path.replace("h264", "mp4"));
             cameraConDao.updateRecordFile(recordFileInfo);

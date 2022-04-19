@@ -2,8 +2,11 @@ package com.yjh.accessrobot.commons.logs;
 
 
 
+import com.alibaba.fastjson.JSON;
+import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.BusinessException;
+import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.utils.http.IPUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -25,6 +28,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -74,31 +79,44 @@ public class LogsAspect {
         ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         Object result = null;
         if (annotation != null) {
-//            try{
-//                if(!"".equals(annotation.authority()) ){
-//                    if(! userRole.equals(annotation.authority())){
-//                        //todo
-//                        return null;
-//                    }
-//                }
-//
-//            }catch (Exception e) {
-//                log.error(e.getMessage(), e);
-//            }
-            try {
-//                serviceId = logsConfig.getName();
-                params.set("logType", annotation.logType());
-                params.set("ip", ip);
-                params.set("title", annotation.title());
-                params.set("state", 1);
-                content.append(annotation.content());
-                params.set("userId", userId);
-                params.set("userName", userName);
-                params.set("requestOrigin", request.getRequestURL());
-                params.set("requestPath", request.getRequestURI());
-                params.set("requestMethod", request.getMethod());
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
+            content.append(annotation.content());
+            params.set("userId", userId);
+            params.set("userName", userName);
+            params.set("requestOrigin", request.getRequestURL());
+            params.set("requestPath", request.getRequestURI());
+            params.set("requestMethod", request.getMethod());
+            if(Constant.apiPermissions){
+                try {
+                    if (!"".equals(annotation.authority())) {
+                        assert userRole != null;
+                        if (!userRole.equals(annotation.authority())) {
+                            //todo 越权访问入日志
+                            params.set("logType", "24");
+                            params.set("ip", ip);
+                            params.set("title", annotation.title());
+                            params.set("state", 3);
+                            Map<String, String> jsonMap = new HashMap<>(8);
+                            jsonMap.put("type", "alarmPopUp");
+                            jsonMap.put("ip", ip);
+                            jsonMap.put("warningInfo", "越权访问告警！！！");
+                            jsonMap.put("userId", userId);
+                            jsonMap.put("logType", "24");
+                            jsonMap.put("userName", userName);
+                            jsonMap.put("title", annotation.title());
+                            jsonMap.put("content", String.valueOf(content));
+                            Constant.postUrl(Constant.WEBSOCKET_URL, JSON.toJSONString(jsonMap));
+                            content.append(";用户").append(userName).append("存在越权访问!");
+                            params.set("content", content.toString());
+                            post(params);
+                            Result re = new Result();
+                            re.setCode(209, "此用户无权限");
+                            return re;
+                        }
+                    }
+
+                }catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
             }
             try {
                 // 记录操作日志...谁..在什么时间..做了什么事情..

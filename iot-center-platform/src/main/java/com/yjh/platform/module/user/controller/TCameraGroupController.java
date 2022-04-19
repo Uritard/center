@@ -189,7 +189,7 @@ public class TCameraGroupController {
 
     @ApiOperation(value = "获取分组树")
     @RequestMapping(value = "/groupTree", method = RequestMethod.GET)
-    @Logs(title = "获取分组树",content = "查询相机分组树",logType = 1, authority = "1235")
+    @Logs(title = "获取分组树",content = "查询相机分组树",logType = 1)
     public Result groupTree() {
         Result result = new Result();
         try {
