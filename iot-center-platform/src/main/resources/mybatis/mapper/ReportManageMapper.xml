@@ -241,7 +241,48 @@
         ORDER BY dict_code
     </select>
     <select id="selectTaskResult" resultType="com.yjh.platform.module.task.entity.TCruiseDataResultDetail">
-        <include refid="TongYong2"></include>
+        select
+        q.task_id,
+        e.cruise_result_id,
+        f.cruise_data_id,
+        e.device_id,
+        e.device_name,
+        b.device_mete_id,
+        e.instance_id,
+        e.instance_name,
+        b.mete_type,
+        w.dict_note as mete_type_name,
+        f.evaluation_state,
+        x.dict_note as evaluation_state_name,
+        f.result_num,
+        f.picpath,
+        F.cruise_result,
+        g.dict_note as cruise_result_name,
+        e.cruise_time,
+        y.real_code,
+        f.person_check,
+        f.identify_result,
+        z.dict_note as identify_result_name,
+        f.cruise_type,
+        n.dict_note as dataType,
+        b.custom_id,
+        a.custom_name as componentName,
+        a.up_region_name as intervalName,
+        m.region_name as regionName
+        from t_cruise_result q
+        LEFT JOIN t_cruise_task_result_detail e on q.task_result_id = e.task_result_id
+        LEFT JOIN t_cruise_data_result f on e.cruise_result_id = f.cruise_result_id
+        LEFT JOIN t_cruise_point_info h on h.instance_id = e.instance_id
+        LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id
+        LEFT JOIN t_std_device_attr y on y.device_id = e.device_id
+        LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result and g.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business w on w.dict_code = b.mete_type and w.col_name = 'mete_type'
+        LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state and x.col_name = 'evaluation_state'
+        LEFT JOIN t_dict_business z on z.dict_code = f.identify_result and z.col_name = 'identify_result'
+        LEFT JOIN t_std_device a on a.device_id = b.device_id and a.custom_id = b.custom_id
+        LEFT JOIN t_std_region d on d.region_id = a.up_region_id
+        LEFT JOIN t_std_region m on m.region_id = d.up_region_id
+        LEFT JOIN t_dict_business n on n.dict_code = f.cruise_type and n.col_name = 'cruise_type'
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and task_id = #{taskId, jdbcType=VARCHAR}</if>
         ORDER by cruise_time
@@ -276,7 +317,9 @@
         d.task_count -  b.task_abnormal as normal,
         COUNT(ISNULL(e.check_user)) as unReview,
         MIN(f.cruise_time) as cruiseStartTime,
-        MAX(f.end_time) as cruiseEndTime
+        MAX(f.end_time) as cruiseEndTime,
+        d.check_user as reviewer,
+        d.check_date as reviewTime
         from
         t_std_region g, t_cruise_task a,t_cruise_result d,t_cruise_task_result b,t_cruise_task_result_detail f,t_cruise_data_result e
         where 1 = 1

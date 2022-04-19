@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.service;
 
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
 import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
@@ -293,14 +294,22 @@ public class ReportManageService {
             newReportPath = reportPath+"/"+reportName;
             log.info("不存在，创建的文件绝对路径是==="+newReportPath);
             File file = new File(reportPath);
-            ContentData contentData = ReportDataRepo.getData(recordData);
+            // 南瑞要求
+//            ContentData contentData = ReportDataRepo.getData(recordData);
+            // 北京要求
+            ContentData contentData = ReportDataModel.getData(recordData);
+
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
         }else {
             newReportPath = reportPath+"/"+reportName;
             log.info("存在，该文件绝对路径是==="+newReportPath);
             File file = new File(newReportPath);
-            ContentData contentData = ReportDataRepo.getData(recordData);
+            // 南瑞要求
+//            ContentData contentData = ReportDataRepo.getData(recordData);
+            // 北京要求
+            ContentData contentData = ReportDataModel.getData(recordData);
+
             ReportHelper.createDocument(contentData.getRowCount(), contentData.getColumnCount(),
                     contentData.getElements(), file);
         }
@@ -318,7 +327,12 @@ public class ReportManageService {
         taskVO.setMeteNum(meteNum);
         taskVO.setVoltageClasses("");
         taskVO.setStationType("");
-        taskVO.setEnvInfo("");
+
+        String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "1").get("valueUnit"));
+        String airPressure = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "6").get("valueUnit"));
+        String windSpeed = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "3").get("valueUnit"));
+        String envInfo = "气温" + temperature + ",气压" + airPressure + ",风速" + windSpeed;
+        taskVO.setEnvInfo(envInfo);
         String CruiseStatistics = "总点位" + taskVO.getTotal() + "个,已检点位" + taskVO.getAlready() + "个,未检点位" + taskVO.getWait()
                 + "个,正常点位" + taskVO.getNormal() + "个,异常点位" + taskVO.getAbnormal() +  "个";
         if (Objects.nonNull(taskVO.getUnReview())){

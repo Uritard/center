@@ -78,11 +78,11 @@ public class TCruiseDataResultDetail implements Serializable {
     /**
      * 间隔
      */
-    private String interval;
+    private String intervalName;
     /**
      * 部件
      */
-    private String component;
+    private String componentName;
     /**
      * 数据来源
      */

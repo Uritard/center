@@ -159,6 +159,8 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
 
             for (int i = 0; i < weatherList.size(); i++) {
                 redisTemplate.opsForHash().putAll("RobotWeather:" + robotCode + ":" + weatherList.get(i).get("type"), weatherList.get(i));
+                redisTemplate.opsForHash().putAll("stationWeather:" + weatherList.get(i).get("type"), weatherList.get(i));
+
             }
             System.out.println("微气象数据测试一波++++++++" + info);
             Constant.weatherServer(info, Constant.WEATHER_URL);
