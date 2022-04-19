@@ -499,6 +499,7 @@ select *from (
         LEFT JOIN t_camera_preset d ON n.cruise_id = d.preset_id
         WHERE
             a.task_id = #{taskId,jdbcType=VARCHAR}
+        GROUP BY instanceId
     </select>
 
     <select id="selectForSevenDay" resultType="com.yjh.platform.module.task.entity.WarnStatistical">
