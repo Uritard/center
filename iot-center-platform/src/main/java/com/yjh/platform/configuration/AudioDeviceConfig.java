@@ -33,6 +33,9 @@ public class AudioDeviceConfig {
     @Value("${audio.tcp.server.port}")
     private int port;
 
+    @Value("${audio.tcp.byteorder-little-endian-enabled}")
+    private boolean byteOrderLittleFlag;
+
     @Bean
     public RxBus serverRxBus() {
         return new RxBus();
@@ -60,7 +63,7 @@ public class AudioDeviceConfig {
 
     @Bean
     public BaseSocketServer socketServer(MsgChannel serverMsgChannel) {
-        return new BaseSocketServer("0.0.0.0", port, serverMsgChannel, new PacketCodecFactory()
+        return new BaseSocketServer("0.0.0.0", port, serverMsgChannel, new PacketCodecFactory(byteOrderLittleFlag)
         );
     }
 

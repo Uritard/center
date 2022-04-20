@@ -34,19 +34,20 @@ public class DataGroup {
 
     private List<byte[]> audioDatas;
 
-    public DataGroup(byte[] data) {
-        this(data, 2048);
+    public DataGroup(byte[] data, boolean byteOrderLittleFlag) {
+        this(data, byteOrderLittleFlag, 2048);
     }
 
-    public DataGroup(byte[] data, int bytesPerChannel) {
+    public DataGroup(byte[] data, boolean byteOrderLittleFlag, int bytesPerChannel) {
         this.bytesPerChannel = bytesPerChannel;
-        parse(data);
+        parse(data, byteOrderLittleFlag);
     }
 
-    private void parse(byte[] data) {
+    private void parse(byte[] data, boolean byteOrderLittleFlag) {
         int offset = 0;
         sType = data[offset++];
-        sampleRate = (Byte.toUnsignedInt(data[offset]) << 8) | Byte.toUnsignedInt(data[offset + 1]);
+        sampleRate = byteOrderLittleFlag ? (Byte.toUnsignedInt(data[offset])) | Byte.toUnsignedInt(data[offset + 1]) << 8
+                : (Byte.toUnsignedInt(data[offset])) << 8 | Byte.toUnsignedInt(data[offset + 1]);
         offset += 2;
         bits = data[offset++];
         channels = data[offset++];

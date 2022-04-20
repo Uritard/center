@@ -30,26 +30,28 @@ public class AudioFileUtils {
 
     /**
      * 生成音频文件头部消息
-     * @param totalAudioLen
-     * @param totalDateLen
-     * @param sampleRate
-     * @param channels
-     * @param byteRate
+     * @param totalAudioLen 不包括header的音频数据总长度
+     * @param sampleRate 采样率,也就是录制时使用的频率、音频采样级别 8000 = 8KHz
+     * @param channels audioRecord的声道数1/2
+     * @param audioFormat  采样精度; 譬如 16bit
      * @return
      */
-    public static byte[] getWaveFileHeader(long totalAudioLen, long totalDateLen, long sampleRate, int channels,
-                                            long byteRate) {
+    public static byte[] getWaveFileHeader(long totalAudioLen, long sampleRate, int channels,
+                                            long audioFormat) {
         byte[] header = new byte[AUDIO_HEADER_LENGTH];
+        long totalDataLen = totalAudioLen + 36;
+        long byteRate = sampleRate * 2 * channels;
+
         // RIFF/WAVE header
         header[0] = 'R';
         header[1] = 'I';
         header[2] = 'F';
         header[3] = 'F';
 
-        header[4] = (byte) (totalDateLen & 0xff);
-        header[5] = (byte) ((totalDateLen >> 8) & 0xff);
-        header[6] = (byte) ((totalDateLen >> 16) & 0xff);
-        header[7] = (byte) ((totalDateLen >> 24) & 0xff);
+        header[4] = (byte) (totalDataLen & 0xff);
+        header[5] = (byte) ((totalDataLen >> 8) & 0xff);
+        header[6] = (byte) ((totalDataLen >> 16) & 0xff);
+        header[7] = (byte) ((totalDataLen >> 24) & 0xff);
 
         header[8] = 'W';
         header[9] = 'A';
@@ -81,9 +83,9 @@ public class AudioFileUtils {
         header[30] = (byte) ((byteRate >> 16) & 0xff);
         header[31] = (byte) ((byteRate >> 24) & 0xff);
         // block align
-        header[32] = (byte) (2 * 16 / 8);
+        header[32] = (byte) (2 * channels);
         header[33] = 0;
-        header[34] = 16;
+        header[34] = (byte) audioFormat;
         header[35] = 0;
         // data
         header[36] = 'd';
@@ -96,6 +98,4 @@ public class AudioFileUtils {
         header[43] = (byte) ((totalAudioLen >> 24) & 0xff);
         return header;
     }
-
-
 }

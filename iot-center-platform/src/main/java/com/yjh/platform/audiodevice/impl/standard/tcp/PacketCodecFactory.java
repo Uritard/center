@@ -15,6 +15,10 @@ import org.apache.mina.filter.codec.*;
 public class PacketCodecFactory implements ProtocolCodecFactory {
     private final TcpPacketEncoder encoder = new TcpPacketEncoder();
     private final TcpPacketDecoder decoder = new TcpPacketDecoder();
+    private static boolean byteOrderLittleFlag;
+    public PacketCodecFactory(boolean byteOrderLittleFlag) {
+        PacketCodecFactory.byteOrderLittleFlag = byteOrderLittleFlag;
+    }
 
     @Override
     public ProtocolDecoder getDecoder(IoSession session) throws Exception {
@@ -41,7 +45,7 @@ public class PacketCodecFactory implements ProtocolCodecFactory {
             //只要本次decode不完，都要reset到此位置
             in.mark();
 
-            Packet packet = Packet.tryParse(in);
+            Packet packet = Packet.tryParse(in, byteOrderLittleFlag);
             if (packet == null) {
                 //继续读
                 return false;

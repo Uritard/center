@@ -145,11 +145,10 @@ public class StandardAudioDevice implements AudioDevice {
     }
 
     byte[] getHeaderByte(long totalAudioLen, List<Packet> packets) {
-        long totalDateLen = totalAudioLen + 36;
         long sampleRate = packets.get(0).getDataGroup().getSampleRate();
         int channels = packets.get(0).getDataGroup().getChannels();
-        long byteRate = packets.get(0).getDataGroup().getBits();
-        return AudioFileUtils.getWaveFileHeader(totalAudioLen, totalDateLen, sampleRate, channels, byteRate);
+        long audioFormat = packets.get(0).getDataGroup().getBits();
+        return AudioFileUtils.getWaveFileHeader(totalAudioLen, sampleRate, channels, audioFormat);
     }
 
     private int getTotalAudioLen(List<Packet> packets) {

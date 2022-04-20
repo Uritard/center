@@ -81,7 +81,7 @@ public class Packet {
         return dataSize - (8 + 6 + 6 + 3 + 1 + 2 + 3 + 1 + 2 + 1);
     }
 
-    public static Packet tryParse(IoBuffer in) {
+    public static Packet tryParse(IoBuffer in, boolean byteOrderLittleFlag) {
         if (in.remaining() < MINIMUM_PARSING_SIZE) {
             //数据长度不够解析(断包)，重置读位置，放弃此轮解析
             in.reset();
@@ -98,8 +98,9 @@ public class Packet {
             }
         }
 
-        //TODO: 协议里没说大端还是小端，这里先按照大端解析
-        in.order(ByteOrder.BIG_ENDIAN);
+        // 字节解析方式
+        in.order(byteOrderLittleFlag ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN);
+
 
         //包格式版本
         byte version = in.get();
@@ -128,9 +129,9 @@ public class Packet {
         in.get(dataGroupBytes);
         //调试作用，当version是0x7F时，认为每个通道数据是两个字节
         if (0x7F == version) {
-            packet.dataGroup = new DataGroup(dataGroupBytes, 2);
+            packet.dataGroup = new DataGroup(dataGroupBytes, byteOrderLittleFlag, 2);
         } else {
-            packet.dataGroup = new DataGroup(dataGroupBytes);
+            packet.dataGroup = new DataGroup(dataGroupBytes, byteOrderLittleFlag);
         }
 
         packet.crc[0] = in.get();
