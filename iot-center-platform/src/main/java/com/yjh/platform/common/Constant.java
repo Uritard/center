@@ -85,7 +85,7 @@ public class Constant {
     }
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
-    public static final String TCP_MODEL_URL = "http://iot-center-accesstcp-qh/sendToUpSystem/v1/modelUpload?type={type}";
+    public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
     public static void modelUpload(String type){
         try {
             Map<String, Object> param = new HashMap<>();

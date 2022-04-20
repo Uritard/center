@@ -81,7 +81,7 @@ public class DeviceStatistics {
             List<Map<String,Object>> mapList = new ArrayList<>();
             HashMap<String,Object> paramMap = new HashMap<>();
             paramMap.put("cameraId",robot.getId());
-            Result re = deviceStatistics(paramMap,ROBOT_URL);
+            Result re = deviceStatistics(paramMap,CAMERA_URL);
             if (re != null) {
                 Map<String,Object> result = (Map<String,Object>)re.getData();
                 if(result != null && !result.isEmpty()){
