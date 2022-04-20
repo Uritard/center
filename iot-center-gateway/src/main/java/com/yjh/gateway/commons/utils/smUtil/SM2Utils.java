@@ -32,8 +32,8 @@ public class SM2Utils {
 		byte[] c3 = new byte[32];
 		cipher.Dofinal(c3);
 		
-		DERInteger x = new DERInteger(c1.getX().toBigInteger());
-		DERInteger y = new DERInteger(c1.getY().toBigInteger());
+		DERInteger x = new DERInteger(c1.getXCoord().toBigInteger());
+		DERInteger y = new DERInteger(c1.getYCoord().toBigInteger());
 		DEROctetString derDig = new DEROctetString(c3);
 		DEROctetString derEnc = new DEROctetString(source);
 		ASN1EncodableVector v = new ASN1EncodableVector();
@@ -66,11 +66,11 @@ public class SM2Utils {
 		ByteArrayInputStream bis = new ByteArrayInputStream(enc);
 		ASN1InputStream dis = new ASN1InputStream(bis);
 
-		DERObject derObj = dis.readObject();
+		ASN1Object derObj = dis.readObject();
 		ASN1Sequence asn1 = (ASN1Sequence) derObj;
 		DERInteger x = (DERInteger) asn1.getObjectAt(0);
 		DERInteger y = (DERInteger) asn1.getObjectAt(1);
-		ECPoint c1 = sm2.ecc_curve.createPoint(x.getValue(), y.getValue(), true);
+		ECPoint c1 = sm2.ecc_curve.createPoint(x.getValue(), y.getValue());
 		
 		Cipher cipher = new Cipher();
 		cipher.Init_dec(userD, c1);
@@ -119,8 +119,8 @@ public class SM2Utils {
 	    ASN1EncodableVector v2 = new ASN1EncodableVector();
 	    v2.add(d_r);
 	    v2.add(d_s);
-	    DERObject sign = new DERSequence(v2);
-	    byte[] signdata = sign.getDEREncoded();
+		ASN1Object sign = new DERSequence(v2);
+	    byte[] signdata = sign.getEncoded();
 		return signdata;
 	}
 	
@@ -147,7 +147,7 @@ public class SM2Utils {
 		
 	    ByteArrayInputStream bis = new ByteArrayInputStream(signData);
 	    ASN1InputStream dis = new ASN1InputStream(bis);
-	    DERObject derObj = dis.readObject();
+		ASN1Object derObj = dis.readObject();
 	    Enumeration<DERInteger> e = ((ASN1Sequence) derObj).getObjects();
 	    BigInteger r = ((DERInteger)e.nextElement()).getValue();
 	    BigInteger s = ((DERInteger)e.nextElement()).getValue();

@@ -10,9 +10,12 @@ import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECFieldElement;
 import org.bouncycastle.math.ec.ECFieldElement.Fp;
 import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.math.ec.custom.djb.Curve25519Point;
+import org.bouncycastle.math.ec.custom.gm.SM2P256V1Point;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.security.spec.ECFieldFp;
 
 public class SM2 {
 	// 测试参数
@@ -64,8 +67,8 @@ public class SM2 {
 		this.ecc_gy_fieldelement = new Fp(this.ecc_p, this.ecc_gy);
 
 		this.ecc_curve = new ECCurve.Fp(this.ecc_p, this.ecc_a, this.ecc_b);
-		this.ecc_point_g = new ECPoint.Fp(this.ecc_curve, this.ecc_gx_fieldelement, this.ecc_gy_fieldelement);
-
+		// this.ecc_point_g = new ECPoint.Fp(this.ecc_curve, this.ecc_gx_fieldelement, this.ecc_gy_fieldelement);
+		this.ecc_point_g = ecc_curve.createPoint(ecc_gy, ecc_gy);
 		this.ecc_bc_spec = new ECDomainParameters(this.ecc_curve, this.ecc_point_g, this.ecc_n);
 
 		ECKeyGenerationParameters ecc_ecgenparam;
@@ -95,10 +98,10 @@ public class SM2 {
 		p = Util.byteConvert32Bytes(ecc_gy);
 		sm3.update(p, 0, p.length);
 		
-		p = Util.byteConvert32Bytes(userKey.getX().toBigInteger());
+		p = Util.byteConvert32Bytes(userKey.getXCoord().toBigInteger());
 		sm3.update(p, 0, p.length);
 		
-		p = Util.byteConvert32Bytes(userKey.getY().toBigInteger());
+		p = Util.byteConvert32Bytes(userKey.getYCoord().toBigInteger());
 		sm3.update(p, 0, p.length);
 		
 		byte[] md = new byte[sm3.getDigestSize()];
@@ -121,7 +124,7 @@ public class SM2 {
 				k = ecpriv.getD();
 				kp = ecpub.getQ();
 
-				r = e.add(kp.getX().toBigInteger());
+				r = e.add(kp.getXCoord().toBigInteger());
 				r = r.mod(ecc_n);
 			} while (r.equals(BigInteger.ZERO) || r.add(k).equals(ecc_n));
 
@@ -148,7 +151,7 @@ public class SM2 {
         } else {
             ECPoint x1y1 = ecc_point_g.multiply(sm2Result.s);
             x1y1 = x1y1.add(userKey.multiply(t));
-            sm2Result.R = e.add(x1y1.getX().toBigInteger()).mod(ecc_n);
+            sm2Result.R = e.add(x1y1.getXCoord().toBigInteger()).mod(ecc_n);
             return;
         }
     }

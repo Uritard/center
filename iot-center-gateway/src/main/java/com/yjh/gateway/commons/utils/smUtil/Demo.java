@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
 /**
@@ -55,10 +56,8 @@ public class Demo {
         byte[] sign = null; //摘要签名
         try {
             sign = SM2Utils.sign(userId.getBytes(), Base64.decode(prikS.getBytes()), Util.hexToByte(summaryString));
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IllegalArgumentException | IOException e) {
+            log.error("签名失败", e);
         }
         return Util.getHexString(sign);
     }
@@ -93,12 +92,19 @@ public class Demo {
     }
 
     public static void main(String[] args) {
-        String webcode = "eaf1f58142c403aa0ccb61636acf9fcec5630164dc4c529b3625457443e2ba27";
-        String signStr = "MEUCIQDNG5HXr+LMuUmmZDNn74E8cjdZgAncQgLqGS/uw+SITAIgGU3JRN+1BfGzzt/J+6aqWo2hncsZ4L/5zqjDJsofOck=";
-        String sign64Str = "TUVVQ0lRRE5HNUhYcitMTXVVbW1aRE5uNzRFOGNqZFpnQW5jUWdMcUdTL3V3K1NJVEFJZ0dVM0pSTisxQmZHenp0L0orNmFxV28yaG5jc1o0TC81enFqREpzb2ZPY2s9";
-        String pubkey = "AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAS3ARQfAF9BAXZaI/7WNuHdO1iWQmjjwyyxQLBCcs5PEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP4LNKHL756PufgrTqsljIxKpzFCOpvB66rQMCbXogI3";
+        try {
+            String webcode = "eaf1f58142c403aa0ccb61636acf9fcec5630164dc4c529b3625457443e2ba27";
+            String signStr = "MEUCIQDNG5HXr+LMuUmmZDNn74E8cjdZgAncQgLqGS/uw+SITAIgGU3JRN+1BfGzzt/J+6aqWo2hncsZ4L/5zqjDJsofOck=";
+            String sign64Str = "TUVVQ0lRRE5HNUhYcitMTXVVbW1aRE5uNzRFOGNqZFpnQW5jUWdMcUdTL3V3K1NJVEFJZ0dVM0pSTisxQmZHenp0L0orNmFxV28yaG5jc1o0TC81enFqREpzb2ZPY2s9";
+            String pubkey = "AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5y2lr0dZBzqaEy1qhn60/uemjXWUyW0/4RT/BClM1d4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHeH0SzmS3kElZnesFUHdoVErr+S0TglXcNbHk+E2EJf";
 
-        boolean st = verify(webcode, sign64Str, pubkey);
-        System.out.println(st);
+            String pubStr = Util.byteToHex(pubkey.getBytes("UTF-8"));
+            System.out.println(pubStr);
+
+            boolean st = verify(webcode, pubStr, pubkey);
+            System.out.println(st);
+        } catch (Exception e) {
+            log.error("验签失败", e);
+        }
     }
 }

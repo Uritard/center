@@ -7,6 +7,7 @@ import com.netflix.zuul.context.RequestContext;
 import com.yjh.gateway.common.Constant;
 import com.yjh.gateway.common.utils.*;
 import com.yjh.gateway.commons.restTemplate.LogsAspect;
+import com.yjh.gateway.commons.utils.gmhelper.SM2Verify_SKF;
 import com.yjh.gateway.commons.utils.http.IPUtil;
 import com.yjh.gateway.commons.utils.smUtil.Demo;
 import lombok.SneakyThrows;
@@ -46,8 +47,10 @@ import java.util.*;
 @Component
 public class zuulFilter extends ZuulFilter {
 
-
     private static Logger log = LoggerFactory.getLogger(zuulFilter.class);
+
+    // 国密规范测试用户ID
+    private static final String UKEY_USERID ="1234567812345678";
 
     @Value("${spring.logout.path}")
     private String LOGOUT_GATEWAY_URL;
@@ -308,7 +311,7 @@ public class zuulFilter extends ZuulFilter {
                     ctx.setResponseBody("{\"error\":\"Incorrect serial number!\"}");
                     return false;
                 }
-                boolean status = Demo.verify(webcode, signStr, pubkey);
+                boolean status = SM2Verify_SKF.SM2Verify(pubkey, signStr, webcode, UKEY_USERID);
                 if (!status) {
                     log.error("签名验证结果 - {}", status);
                     ctx.setSendZuulResponse(false);
