@@ -153,4 +153,12 @@ public class TStdDeviceDetail {
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
+
+    private Long presetId;
+
+    private String presetName;
+
+    private Long cameraId;
+
+    private String cameraName;
 }

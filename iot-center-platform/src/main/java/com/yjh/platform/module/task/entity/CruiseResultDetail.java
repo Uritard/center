@@ -115,6 +115,8 @@ public class CruiseResultDetail extends TStdDeviceMete {
     @ApiModelProperty(value = "告警级别--字典表")
     private String alarmLevelName;
 
+    private String voicePath;
+
 
 }
 

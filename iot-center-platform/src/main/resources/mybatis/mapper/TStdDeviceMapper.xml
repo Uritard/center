@@ -20,11 +20,13 @@
         <result column="status" jdbcType="INTEGER" property="status" />
         <result column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP" property="updateTime" />
         <result column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="preset_id" jdbcType="BIGINT" property="presetId" />
+        <result column="camera_id" jdbcType="BIGINT" property="cameraId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_id, custom_id, device_code, device_name, alias_name, device_type, position_type, model_id, region_path, up_region_id, up_region_name, custom_name, custom_type, status, update_time, create_time
+        device_id, custom_id, device_code, device_name, alias_name, device_type, position_type, model_id, region_path, up_region_id, up_region_name, custom_name, custom_type, status, update_time, create_time,preset_id,camera_id
     </sql>
 
    <sql id="All">
@@ -43,6 +45,8 @@
         a.status ,
         a.update_time ,
         a.create_time ,
+        a.preset_id,
+        a.camera_id,
         b.device_model,
         b.used_time,
         b.pms_type,
@@ -83,7 +87,9 @@
             custom_type,
             status,
             update_time,
-            create_time
+            create_time,
+            preset_id,
+            camera_id
         )values(
                 #{deviceId, jdbcType=BIGINT},
                 #{customId, jdbcType=VARCHAR},
@@ -100,7 +106,9 @@
                 #{customType, jdbcType=INTEGER},
                 #{status, jdbcType=INTEGER},
                 CURRENT_TIMESTAMP(),
-                CURRENT_TIMESTAMP
+                CURRENT_TIMESTAMP,
+                #{presetId, jdbcType=BIGINT},
+                #{cameraId, jdbcType=BIGINT}
         )
     </insert>
 
@@ -131,6 +139,8 @@
         <if test="customName != null ">a.custom_name = #{customName},</if>
         <if test="customType != null ">a.custom_type = #{customType, jdbcType=INTEGER},</if>
         <if test="status != null ">a.status = #{status, jdbcType=INTEGER},</if>
+        <if test="presetId != null and '' != presetId">a.preset_id = #{presetId},</if>
+        <if test="cameraId != null and '' != cameraId">a.camera_id = #{cameraId},</if>
         a.update_time = CURRENT_TIMESTAMP(),
     </set>
             where a.device_id = #{deviceId, jdbcType=VARCHAR}
@@ -154,7 +164,9 @@
         a.custom_type,
         a.status,
         a.update_time,
-        a.create_time
+        a.create_time,
+        a.preset_id,
+        a.camera_id
         from t_std_device a
         where 1 = 1
             and a.device_id = #{deviceId, jdbcType=BIGINT}
@@ -179,7 +191,9 @@
         a.custom_type,
         a.status,
         a.update_time,
-        a.create_time
+        a.create_time,
+        a.preset_id,
+        a.camera_id
         from t_std_device a
         where 1 = 1
         and a.device_id = #{deviceId, jdbcType=BIGINT}
@@ -204,6 +218,8 @@
         a.status ,
         a.update_time ,
         a.create_time ,
+        a.preset_id,
+        a.camera_id,
         b.device_model,
         e.dict_note as deviceModelName,
         b.pms_type,
@@ -251,7 +267,9 @@
         a.custom_type,
         a.status,
         a.update_time,
-        a.create_time
+        a.create_time,
+        a.preset_id,
+        a.camera_id
         from t_std_device a
         where 1 = 1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
@@ -289,14 +307,21 @@
         a.custom_type,
         a.status,
         a.update_time,
-        a.create_time
+        a.create_time,
+        a.preset_id,
+        a.camera_id
         from t_std_device a
         where a.device_id=#{deviceId, jdbcType=BIGINT} and a.custom_id = #{customId, jdbcType=VARCHAR}
     </select>
 
     <select id="selectAll" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
-        *
+        a.*,
+        b.*,
+        d.*,
+        h.*,
+        preset.preset_name as presetName,
+        info.camera_name as cameraName
         from t_std_device a
         left join (select * from t_std_device_attr
         left join (select dict_code as code1 ,dict_note as deviceModelName from t_dict_business) e on device_model = e.code1
@@ -305,6 +330,8 @@
         ) b on a.device_id = b.device_id
         left join (select model_id ,model_name as modelName from t_std_metemodel) d on d.model_id=a.model_id
         left join (select dict_code as code4,dict_note as deviceTypeName from t_dict_business) h on h.code4 = a.device_type
+        left join t_camera_preset preset on a.preset_id = preset.preset_id
+        left join t_camera_info info on a.camera_id = info.camera_id
         where 1=1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
@@ -362,7 +389,9 @@
         a.custom_type,
         a.status,
         a.update_time,
-        a.create_time
+        a.create_time,
+        a.preset_id,
+        a.camera_Id
         from t_std_device a
         where 1 = 1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
@@ -409,7 +438,9 @@
         d.model_name as modelName,
         h.dict_note as deviceTypeName,
         l.pic_real_path,
-        k.region_name as upRegionName
+        k.region_name as upRegionName,
+        preset.preset_name as presetName,
+        info.camera_name as cameraName
         from t_std_device a
         left join t_std_device_attr b on a.device_id = b.device_id
         left join t_dict_business e on device_model = e.dict_code
@@ -419,6 +450,8 @@
         left join t_dict_business h on h.dict_code = a.device_type
         left join t_std_region k on a.up_region_id = k.region_id
         left join t_device_type_img l on a.device_type = l.type_id
+        left join t_camera_preset preset on a.preset_id = preset.preset_id
+        left join t_camera_info info on a.camera_id = info.camera_id
         where 1=1
         <if test="upRegionId != null and upRegionId != '' and upRegionId != -1">
         and a.up_region_id in

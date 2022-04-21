@@ -90,6 +90,8 @@ public class TStdDeviceService{
         tStdDevice.setUpdateTime(tStdDeviceDetail.getUpdateTime());
         tStdDevice.setUpRegionId(tStdDeviceDetail.getUpRegionId());
         tStdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
+        tStdDevice.setPresetId(tStdDeviceDetail.getPresetId());
+        tStdDevice.setCameraId(tStdDeviceDetail.getCameraId());
         this.tStdDeviceDao.add(tStdDevice);
         Long deivceIdUnique=tStdDevice.getDeviceId();
         List<TStdMeteModelDetail> tStdMeteModelDetailList = tStdMetemodelDetailDao.selectByPrimaryId(tStdDeviceDetail.getModelId());//根据模板ID查询测点模板
@@ -114,6 +116,8 @@ public class TStdDeviceService{
                 stdDevice.setUpdateTime(tStdDeviceDetail.getUpdateTime());
                 stdDevice.setUpRegionId(tStdDeviceDetail.getUpRegionId());
                 stdDevice.setUpRegionName(tStdDeviceDetail.getUpRegionName());
+                tStdDevice.setPresetId(tStdDeviceDetail.getPresetId());
+                tStdDevice.setCameraId(tStdDeviceDetail.getCameraId());
                 tStdDeviceDao.add(stdDevice);
             }
 
@@ -187,6 +191,8 @@ public class TStdDeviceService{
             tStdDevice.setPositionType(tStdDeviceDetail.getPositionType());
             tStdDevice.setRegionPath(tStdDeviceDetail.getRegionPath());
             tStdDevice.setStatus(tStdDeviceDetail.getStatus());
+            tStdDevice.setPresetId(tStdDeviceDetail.getPresetId());
+            tStdDevice.setCameraId(tStdDeviceDetail.getCameraId());
             tStdDeviceDao.update(tStdDevice);
         }
 //        TStdDevice tStdDevice = tStdDeviceDao.selectByPrimaryId(tStdDeviceDetail.getDeviceId());

@@ -108,4 +108,8 @@ public class TStdDevice implements Serializable {
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
+
+    private Long presetId;
+
+    private Long cameraId;
 }

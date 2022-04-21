@@ -54,7 +54,7 @@ public class SilentTaskScheduled {
     @Scheduled(cron = "0/${silent.task.interval} * * * * ?")
     public void SilentTaskScheduled() {
 
-        log.info("定时任务");
+//        log.info("定时任务");
 //        List<Map<String, Long>> list = tCameraPresetService.selectCameraBySilent();
 //        for (Map<String, Long> map : list) {
 //            String cameraId = String.valueOf(map.get("camera_id"));
