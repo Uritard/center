@@ -482,7 +482,7 @@ public class TStdMetemodelService {
                 workbook.write(stream);
                 stream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+                log.error(e.getMessage(), e);
         }
         return newFile;
     }
@@ -495,11 +495,9 @@ public class TStdMetemodelService {
         // 将上传文件写入
         try {
             deleteDir(new File(path +"/"+ fileName));
-            file.transferTo(new File(path +"/"+ fileName));
-        }catch (NullPointerException e) {
-            e.getMessage();
-        } catch (IOException e) {
-            e.getMessage();
+            file.transferTo(new File(path +"/"+ fileName).getAbsoluteFile());
+        }catch (NullPointerException | IOException e) {
+            log.error(e.getMessage(), e);
         }
         return path +"/"+ fileName;
     }
@@ -508,6 +506,7 @@ public class TStdMetemodelService {
         FileInputStream in = null;
         HSSFWorkbook wb = null;
         Result result = new Result();
+        List<Integer> insertRetList = new ArrayList<>();
         try {
             result.setCode(209);
             if(file == null){
@@ -958,15 +957,21 @@ public class TStdMetemodelService {
                     continue;
                 }
                 tStdMeteList.add(tStdMete);
+                if (tStdMeteList.size() >= 2000) {
+                    int ret = tStdMeteDao.batchAdd(tStdMeteList);
+                    insertRetList.add(ret);
+                    tStdMeteList.clear();
+                }
             }
             int isInsert = 0;
             if (tStdMeteList.size() > 0) {
                 isInsert = tStdMeteDao.batchAdd(tStdMeteList);
+                insertRetList.add(isInsert);
             }
 
             if (isInsert >= 0) {
                 result.setCode(200);
-                result.setData("ok");
+                result.setData(insertRetList);
                 result.setMessage("ok");
             }
             deleteDir(new File(pathName));
@@ -983,7 +988,7 @@ public class TStdMetemodelService {
                     wb.close();
                 }
             } catch (Exception e) {
-                log.error(e.getMessage());;
+                log.error(e.getMessage(), e);
             }
         }
         return result;

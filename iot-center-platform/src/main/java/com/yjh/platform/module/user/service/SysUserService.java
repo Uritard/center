@@ -589,14 +589,17 @@ public class SysUserService {
     @Transactional(rollbackFor = Exception.class)
     public int insertIntoRedis() {
         List<SysUser> list = this.sysUserDao.selectUser();
+        Map<String, String> userMap = new HashMap<>();
         for (SysUser item : list) {
             Map map = new HashMap();
             map.put("userId", item.getUserId());
             map.put("userName", item.getUserName());
             map.put("roleId", item.getRoleId());
+            userMap.put(item.getUserName(), String.valueOf(item.getUserId()));
             String str = "userInfo:" + item.getUserId();
             redisTemplate.opsForHash().putAll(str, Object2Map.toStringMap(map));
         }
+        redisTemplate.opsForHash().putAll("userInfo:nameId", userMap);
         return 1;
     }
 
