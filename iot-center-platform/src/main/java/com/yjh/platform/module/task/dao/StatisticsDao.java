@@ -1,9 +1,11 @@
 package com.yjh.platform.module.task.dao;
 
+import com.yjh.platform.module.task.entity.Statistics;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,16 +33,20 @@ public interface StatisticsDao {
    */
   List<Map<String, Object>> selectStatisticsDrone(@Param(value = "robotId") Long robotId);
 
-  HashMap<String, Object> countTaskAttend(
-      @Param(value = "robotId") Long robotId,
-      @Param(value = "startTime") String startTime,
-      @Param(value = "endTime") String endTime);
+  /**
+   * 摄像机 可靠性
+   *
+   * @return map列表
+   */
+  List<Map<String, Object>> countCamera();
 
-  HashMap<String, Object> countWarnCheck(
-      @Param(value = "startTime") String startTime, @Param(value = "endTime") String endTime);
-
-  HashMap<String, Object> countWarnAccuracy(
-      @Param(value = "startTime") String startTime, @Param(value = "endTime") String endTime);
+  /**
+   * 根据相机id查询录像机id
+   *
+   * @param cameraId
+   * @return
+   */
+  Long selectRecordByCamera(@Param(value = "cameraId") Long cameraId);
 
   HashMap<String, Object> countInstanceLoss(
       @Param(value = "taskId") String taskId,
@@ -48,21 +54,48 @@ public interface StatisticsDao {
       @Param(value = "startTime") String startTime,
       @Param(value = "endTime") String endTime);
 
-  HashMap<String, Object> countResultCheck(
-      @Param(value = "startTime") String startTime, @Param(value = "endTime") String endTime);
+  List<Statistics> countWarnCheckByDay(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
 
-  HashMap<String, Object> countTask(
-      @Param(value = "startTime") String startTime, @Param(value = "endTime") String endTime);
+  List<Statistics> countWarnCheckByWeek(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
 
-  /**
-   * 摄像机 可靠性
-   *
-   * @param startTime 开始时间
-   * @param endTime 结束时间
-   * @return map列表
-   */
-  List<Map<String, Object>> countCamera(
-      @Param(value = "startTime") String startTime, @Param(value = "endTime") String endTime);
+  List<Statistics> countWarnCheckByMonth(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
 
-  Long selectRecordByCamera(@Param(value = "cameraId") Long cameraId);
+  List<Statistics> countWarnAccuracyByDay(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countWarnAccuracyByWeek(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countWarnAccuracyByMonth(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countInstanceLossByDay(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countInstanceLossByWeek(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countInstanceLossByMonth(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countResultCheckByDay(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countResultCheckByWeek(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countResultCheckByMonth(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countTaskByDay(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countTaskByWeek(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Statistics> countTaskByMonth(
+      @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
 }

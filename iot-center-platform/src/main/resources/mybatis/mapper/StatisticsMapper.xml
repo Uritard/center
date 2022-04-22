@@ -78,48 +78,93 @@
         GROUP BY robotId
     </select>
 
-    <select id="countTaskAttend" resultType="java.util.HashMap">
-        SELECT robot_id,
-               TO_DAYS(NOW()) - TO_DAYS(tr.`commission_date`) + 1 totalNum,
-               (SELECT COUNT(
-                               DISTINCT DATE_FORMAT(tcr.cruise_task_time, '%Y-%m-%d')
-                           )
-                FROM t_cruise_task_result tcr
-                         LEFT JOIN t_cruise_task tct
-                                   ON tcr.task_id = tct.task_id AND tcr.task_status != 238 and
-                                      tcr.cruise_task_time BETWEEN #{startTime} and #{endTime}
-                WHERE tct.robot_id = tr.`robot_id`) AS            validNum
-        FROM t_robot_info tr
-        WHERE tr.`commission_date` IS TRUE
-          AND tr.`commission_date` <![CDATA[<=]]> NOW()
-          AND robot_id = #{robotId, jdbcType=BIGINT}
-    </select>
 
-    <select id="countTask" resultType="java.util.HashMap">
-        select count(1)                    as totalNum,
+    <select id="countTaskByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
+        select DATE_FORMAT(cruise_task_time, '%Y-%m') MONTH,
+               count(1)                    as         totalNum,
                (select count(1)
                 from t_cruise_task_result
                 where cruise_task_time BETWEEN #{startTime} and #{endTime}
-                  and cruise_result = 246) as validNum
+                  and cruise_result = 246) as         validNum
         from t_cruise_task_result
         where cruise_task_time BETWEEN #{startTime} and #{endTime}
+        group by MONTH
+    </select>
+    <select id="countTaskByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
+        select DATE_FORMAT(cruise_task_time, '%u') WEEK,
+               count(1)                    as      totalNum,
+               (select count(1)
+                from t_cruise_task_result
+                where cruise_task_time BETWEEN #{startTime} and #{endTime}
+                  and cruise_result = 246) as      validNum
+        from t_cruise_task_result
+        where cruise_task_time BETWEEN #{startTime} and #{endTime}
+        group by WEEK
+    </select>
+    <select id="countTaskByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
+        select DATE_FORMAT(cruise_task_time, '%Y-%m-%d') day,
+               count(1)                    as            totalNum,
+               (select count(1)
+                from t_cruise_task_result
+                where cruise_task_time BETWEEN #{startTime} and #{endTime}
+                  and cruise_result = 246) as            validNum
+        from t_cruise_task_result
+        where cruise_task_time BETWEEN #{startTime} and #{endTime}
+        group by day
     </select>
 
-    <select id="countWarnCheck" resultType="java.util.HashMap">
-        SELECT count(1)           as totalNum,
-               count(t.deal_type) as validNum
-        FROM (select deal_type, warn_time
-              from t_warn_info
-              union all
-              (
-                  select deal_type, defect_time warn_time
-                  from t_defect_info
-              )) t
-        where t.warn_time BETWEEN #{startTime} and #{endTime}
+    <select id="countWarnCheckByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(t.`warn_time`, '%u') WEEK,
+               COUNT(1)           AS            totalNum,
+               COUNT(t.deal_type) AS            validNum
+        FROM (SELECT deal_type,
+                     warn_time
+              FROM t_warn_info
+              UNION
+                  ALL
+              (SELECT deal_type,
+                      defect_time warn_time
+               FROM t_defect_info)) t
+        WHERE t.warn_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY WEEK
     </select>
 
-    <select id="countWarnAccuracy" resultType="java.util.HashMap">
-        SELECT count(1)                         as totalNum,
+
+    <select id="countWarnCheckByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(t.`warn_time`, '%Y-%m') MONTH,
+               COUNT(1)           AS               totalNum,
+               COUNT(t.deal_type) AS               validNum
+        FROM (SELECT deal_type,
+                     warn_time
+              FROM t_warn_info
+              UNION
+                  ALL
+              (SELECT deal_type,
+                      defect_time warn_time
+               FROM t_defect_info)) t
+        WHERE t.warn_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY MONTH
+    </select>
+
+    <select id="countWarnCheckByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(t.`warn_time`, '%Y-%m-%d') day,
+               COUNT(1)           AS                  totalNum,
+               COUNT(t.deal_type) AS                  validNum
+        FROM (SELECT deal_type,
+                     warn_time
+              FROM t_warn_info
+              UNION
+                  ALL
+              (SELECT deal_type,
+                      defect_time warn_time
+               FROM t_defect_info)) t
+        WHERE t.warn_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY day
+    </select>
+
+    <select id="countWarnAccuracyByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(t.warn_time, '%u')      WEEK,
+               count(1)                         as totalNum,
                sum(if(t.deal_type = 286, 1, 0)) as validNum
         FROM (select deal_type, warn_time
               from t_warn_info
@@ -129,6 +174,74 @@
                   select deal_type, defect_time warn_time from t_defect_info where deal_type is not null
               )) t
         where t.warn_time BETWEEN #{startTime} and #{endTime}
+        group by WEEK
+    </select>
+    <select id="countWarnAccuracyByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(t.warn_time, '%Y-%m')   MONTH,
+               count(1)                         as totalNum,
+               sum(if(t.deal_type = 286, 1, 0)) as validNum
+        FROM (select deal_type, warn_time
+              from t_warn_info
+              where deal_type is not null
+              union all
+              (
+                  select deal_type, defect_time warn_time from t_defect_info where deal_type is not null
+              )) t
+        where t.warn_time BETWEEN #{startTime} and #{endTime}
+        group by MONTH
+    </select>
+    <select id="countWarnAccuracyByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(t.warn_time, '%Y-%m-%d') day,
+               count(1)                         as  totalNum,
+               sum(if(t.deal_type = 286, 1, 0)) as  validNum
+        FROM (select deal_type, warn_time
+              from t_warn_info
+              where deal_type is not null
+              union all
+              (
+                  select deal_type, defect_time warn_time from t_defect_info where deal_type is not null
+              )) t
+        where t.warn_time BETWEEN #{startTime} and #{endTime}
+        group by day
+    </select>
+
+    <select id="countInstanceLossByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(result.cruise_task_time, '%Y-%m') MONTH,
+               count(1)                                AS    totalNum,
+               sum(IF(tcdr.cruise_result = 247, 1, 0)) AS    validNum
+        FROM t_cruise_task_result result
+                 LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
+                 LEFT JOIN t_cruise_data_result tcdr ON detail.cruise_result_id = tcdr.cruise_result_id
+                 LEFT JOIN t_cruise_task tct
+                           ON tct.task_id = result.`task_id`
+        WHERE result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+        group by MONTH
+    </select>
+
+    <select id="countInstanceLossByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(result.cruise_task_time, '%u') WEEK,
+               count(1)                                AS totalNum,
+               sum(IF(tcdr.cruise_result = 247, 1, 0)) AS validNum
+        FROM t_cruise_task_result result
+                 LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
+                 LEFT JOIN t_cruise_data_result tcdr ON detail.cruise_result_id = tcdr.cruise_result_id
+                 LEFT JOIN t_cruise_task tct
+                           ON tct.task_id = result.`task_id`
+        WHERE result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+        group by WEEK
+    </select>
+
+    <select id="countInstanceLossByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(result.cruise_task_time, '%Y-%m-%d') day,
+               count(1)                                AS       totalNum,
+               sum(IF(tcdr.cruise_result = 247, 1, 0)) AS       validNum
+        FROM t_cruise_task_result result
+                 LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
+                 LEFT JOIN t_cruise_data_result tcdr ON detail.cruise_result_id = tcdr.cruise_result_id
+                 LEFT JOIN t_cruise_task tct
+                           ON tct.task_id = result.`task_id`
+        WHERE result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+        group by day
     </select>
 
     <select id="countInstanceLoss" resultType="java.util.HashMap">
@@ -147,27 +260,48 @@
         <if test="robotId != null and robotId != ''">and tct.robot_id = #{robotId, jdbcType=BIGINT}</if>
     </select>
 
-    <select id="countResultCheck" resultType="java.util.HashMap">
-        SELECT count(1)                      AS totalNum,
-               count(result.identify_result) AS validNum
+
+    <select id="countResultCheckByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(detail.cruise_time, '%Y-%m-%d') day,
+               count(1)                      AS            totalNum,
+               count(result.identify_result) AS            validNum
         FROM t_cruise_data_result result
                  LEFT JOIN t_cruise_task_result_detail detail ON result.cruise_result_id = detail.cruise_result_id
             AND result.cruise_id = detail.instance_id
         WHERE detail.cruise_time BETWEEN #{startTime} and #{endTime}
+        group by day
+    </select>
+
+    <select id="countResultCheckByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(detail.cruise_time, '%u') WEEK,
+               count(1)                      AS      totalNum,
+               count(result.identify_result) AS      validNum
+        FROM t_cruise_data_result result
+                 LEFT JOIN t_cruise_task_result_detail detail ON result.cruise_result_id = detail.cruise_result_id
+            AND result.cruise_id = detail.instance_id
+        WHERE detail.cruise_time BETWEEN #{startTime} and #{endTime}
+        group by WEEK
+    </select>
+
+    <select id="countResultCheckByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(detail.cruise_time, '%Y-%m') month,
+               count(1)                      AS         totalNum,
+               count(result.identify_result) AS         validNum
+        FROM t_cruise_data_result result
+                 LEFT JOIN t_cruise_task_result_detail detail ON result.cruise_result_id = detail.cruise_result_id
+            AND result.cruise_id = detail.instance_id
+        WHERE detail.cruise_time BETWEEN #{startTime} and #{endTime}
+        group by month
     </select>
 
     <select id="countCamera" resultType="java.util.HashMap">
         SELECT tcp.`camera_id`,
-               TO_DAYS(
-                       #{endTime}
-                   ) - TO_DAYS(
-                       #{startTime}
-                   )                                      allDay,
+               TO_DAYS(NOW()) - TO_DAYS(MIN(tcdr.createtime)) allDay,
                (SELECT COUNT(
                                DISTINCT DATE_FORMAT(tcdr.`createtime`, '%Y-%m-%d')
-                           ))                             cruiseDay,
-               SUM(IF(tcdr.cruise_result = 247, 1, 0)) AS validNum,
-               COUNT(result.task_result_id)               totalNum
+                           ))                                 cruiseDay,
+               SUM(IF(tcdr.cruise_result = 247, 1, 0)) AS     validNum,
+               COUNT(result.task_result_id)                   totalNum
         FROM t_camera_preset tcp
                  LEFT JOIN `t_cruise_point_instance` tcpi
                            ON tcp.`preset_id` = tcpi.`cruise_id`
@@ -178,7 +312,7 @@
                  LEFT JOIN t_cruise_task_result result
                            ON detail.task_result_id = result.task_result_id
         WHERE tcp.`camera_id` IS TRUE
-          AND tcdr.`createtime` BETWEEN #{startTime} and #{endTime}
+          AND tcdr.createtime  <![CDATA[<=]]> NOW()
         GROUP BY camera_id
     </select>
 
