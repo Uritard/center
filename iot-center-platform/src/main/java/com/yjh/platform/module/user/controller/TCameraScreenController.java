@@ -185,8 +185,8 @@ public class TCameraScreenController {
                                   @RequestParam(value = "flag",required = false) Integer flag) {
         Result result = new Result();
         try {
-            result.setData(tCameraScreenService.cameraStateTree(cameraName,flag));
-            //result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag));
+//            result.setData(tCameraScreenService.cameraStateTree(cameraName,flag));
+              result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag, "1"));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -201,7 +201,7 @@ public class TCameraScreenController {
                                   @RequestParam(value = "flag",required = false) Integer flag) {
         Result result = new Result();
         try {
-            result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag));
+            result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag, null));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

@@ -44,7 +44,7 @@
                 #{state, jdbcType=VARCHAR},
                 #{configId, jdbcType=BIGINT},
                 #{upRegionId, jdbcType=BIGINT},
-                #{voiceCode, jdbcType=VARCHAR}
+                #{voiceCode, jdbcType=VARCHAR},
                 #{voiceType, jdbcType=VARCHAR},
                 #{voiceModel, jdbcType=VARCHAR},
                 #{voiceFactory, jdbcType=VARCHAR}

@@ -549,7 +549,34 @@ public class CameraConService {
 
         Map<String, Object> returnMap = new HashMap<>();
         try {
-            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            CameraConInfo cameraConInfo = new CameraConInfo();
+            if (String.valueOf(cameraId).contains("9901") || String.valueOf(cameraId).contains("9902")) {
+                long robotId;
+                if (String.valueOf(cameraId).contains("9901")) {
+                    robotId = Long.parseLong(String.valueOf(cameraId).replace("9901", ""));
+                    RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
+                    RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(robotConInfo.getRecordId());
+                    cameraConInfo.setCameraId(cameraId);
+                    cameraConInfo.setIdentityManager(recorderConInfo.getIdentityManager());
+                    cameraConInfo.setIdentityCode(recorderConInfo.getIdentityCode());
+                    cameraConInfo.setRecordIp(recorderConInfo.getRecordIp());
+                    cameraConInfo.setRtspPort(recorderConInfo.getRtspPort());
+                    cameraConInfo.setChannelNum(Integer.parseInt(robotConInfo.getNumLight()));
+                } else {
+                    robotId = Long.parseLong(String.valueOf(cameraId).replace("9902", ""));
+                    RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
+                    RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(robotConInfo.getRecordId());
+                    cameraConInfo.setCameraId(cameraId);
+                    cameraConInfo.setIdentityManager(recorderConInfo.getIdentityManager());
+                    cameraConInfo.setIdentityCode(recorderConInfo.getIdentityCode());
+                    cameraConInfo.setRecordIp(recorderConInfo.getRecordIp());
+                    cameraConInfo.setRtspPort(recorderConInfo.getRtspPort());
+                    cameraConInfo.setChannelNum(Integer.parseInt(robotConInfo.getNumInferad()));
+                }
+
+            } else {
+                cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            }
             String userName = cameraConInfo.getIdentityManager(); //nvr 用户名
             String password = cameraConInfo.getIdentityCode();    //nvr 密码
             String cameraIp = cameraConInfo.getRecordIp();        //nvr ip
@@ -855,7 +882,27 @@ public class CameraConService {
     //@Logs(title = "相机抓图", code = "capturePicture")
     @Transactional(rollbackFor = Exception.class)
     public String capturePicture(String filePath, Long cameraId) {
-        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        CameraConInfo cameraConInfo = new CameraConInfo();
+        if (String.valueOf(cameraId).contains("9901") || String.valueOf(cameraId).contains("9902")) {
+            long robotId;
+            if (String.valueOf(cameraId).contains("9901")) {
+                robotId = Long.parseLong(String.valueOf(cameraId).replace("9901", ""));
+                RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
+                cameraConInfo.setCameraId(cameraId);
+                cameraConInfo.setRecordId(robotConInfo.getRecordId());
+                cameraConInfo.setChannelNum(Integer.parseInt(robotConInfo.getNumLight()));
+            } else {
+                robotId = Long.parseLong(String.valueOf(cameraId).replace("9902", ""));
+                RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
+                cameraConInfo.setCameraId(cameraId);
+                cameraConInfo.setRecordId(robotConInfo.getRecordId());
+                cameraConInfo.setChannelNum(Integer.parseInt(robotConInfo.getNumInferad()));
+            }
+            cameraConInfo.setCameraType(205); //机器人
+
+        } else {
+            cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+        }
         int iChanNum = cameraConInfo.getChannelNum() + 32;
         NativeLong iChanNumLong = new NativeLong(iChanNum);
         HCNetSDK.NET_DVR_JPEGPARA lpJpegPara = new HCNetSDK.NET_DVR_JPEGPARA();
@@ -864,7 +911,7 @@ public class CameraConService {
         if (Objects.nonNull(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())))) {
             lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
             log.info("lUserIDLong: {}", lUserIDLong);
-            if (cameraConInfo.getCameraType() == 207) {
+            if (cameraConInfo.getCameraType() == 206) {
                 log.info("红外相机，特殊拍照");
                 m_sClientInfo.lChannel = new NativeLong(iChanNum);
                 if (Objects.nonNull(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())))) {
@@ -1683,12 +1730,33 @@ public class CameraConService {
         String judge = "";
         NativeLong lRealPlayHandle;
         int iErr = 0;
-        try{
-            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
-            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+        try {
+            CameraConInfo cameraConInfo = new CameraConInfo();
+            if (String.valueOf(cameraId).contains("9901") || String.valueOf(cameraId).contains("9902")) {
+                long robotId;
+                if (String.valueOf(cameraId).contains("9901")) {
+                    robotId = Long.parseLong(String.valueOf(cameraId).replace("9901", ""));
+                    RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
+                    cameraConInfo.setCameraId(cameraId);
+                    cameraConInfo.setRecordId(robotConInfo.getRecordId());
+                    cameraConInfo.setChannelNum(Integer.parseInt(robotConInfo.getNumLight()) + 32);
+                    cameraConInfo.setUpRegionId(robotConInfo.getUpRegionId());
+                } else {
+                    robotId = Long.parseLong(String.valueOf(cameraId).replace("9902", ""));
+                    RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
+                    cameraConInfo.setCameraId(cameraId);
+                    cameraConInfo.setRecordId(robotConInfo.getRecordId());
+                    cameraConInfo.setChannelNum(Integer.parseInt(robotConInfo.getNumInferad()) + 32);
+                    cameraConInfo.setUpRegionId(robotConInfo.getUpRegionId());
+                }
+
+            } else {
+                cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+                cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+            }
             //生成文件名
             Date date = new Date();
-            String fileName = new SimpleDateFormat("yyyyMMddHHmmss").format(date) + ".h264";
+            String fileName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(date) + ".h264";
             log.info("生成文件名" + fileName);
             //保存文件地址
             createDirectory(videoPath);

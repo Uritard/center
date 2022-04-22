@@ -173,7 +173,10 @@
         a.commission_date,
         a.up_region_id,
         a.robot_position,
-        a.remarks
+        a.remarks,
+        a.record_id,
+        a.channel_num_light as numLight,
+        a.channel_num_inferad as numInferad
         from t_robot_info a
         where 1 = 1
         and a.robot_id = #{robotId, jdbcType=BIGINT}

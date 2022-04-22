@@ -54,7 +54,7 @@ public class RobotController {
 
     @ApiOperation(value = "发送控制指令接口")
     @GetMapping(value = "/command")
-    @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5, authority = "1235")
+    @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5, authority = "1234,1235")
     public Result feignRobotControl(HttpServletRequest request,
                                     @RequestParam(value = "robotCode") String robotCode,
                                     @RequestParam(value = "type") String type,

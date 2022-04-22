@@ -62,26 +62,43 @@ public class TCameraScreenService{
         List<Object> cameraList = new LinkedList<>();
         String[] strList = tCameraScreenDetail.getCameraIds().split(",");
         for (String item: strList) {
-            if(item.equals("")){
-                Camera camera = new Camera();
-               camera.setCameraId("");
-               camera.setCameraName("");
-                cameraList.add(camera);
+            Camera camera = new Camera();
+            if(item.isEmpty()){
+                camera.setCameraId("");
+                camera.setCameraName("");
             }else {
-                Camera camera = new Camera();
-                TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(Long.parseLong(item));
-                if(tCameraInfo == null){
-                    tCameraScreenDetail.setCameraIds(tCameraScreenDetail.getCameraIds().replace(","+item,",").replace(item+",",",").replace(item,","));
-                    camera.setCameraId("");
-                    camera.setCameraName("");
-                    cameraList.add(camera);
-                    this.update(tCameraScreenDetail,userId.toString());
-                    continue;
+                if (item.contains("9901") || item.contains("9902")){
+                    Long robotId = item.contains("9901") ? Long.parseLong(item.replace("9901", "")) : Long.parseLong(item.replace("9902", ""));
+                    TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
+                    if (tRobotInfo == null) {
+                        tCameraScreenDetail.setCameraIds(tCameraScreenDetail.getCameraIds().replace("," + item, ",").replace(item + ",", ",").replace(item, ","));
+                        camera.setCameraId("");
+                        camera.setCameraName("");
+                        cameraList.add(camera);
+                        this.update(tCameraScreenDetail, userId.toString());
+                        continue;
+                    }
+                    camera.setCameraId(item);
+                    if (item.contains("9901")) {
+                        camera.setCameraName(tRobotInfo.getRobotName() + "机器人可见光");
+                    } else {
+                        camera.setCameraName(tRobotInfo.getRobotName() + "机器人红外");
+                    }
+                }else {
+                    TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(Long.parseLong(item));
+                    if (tCameraInfo == null) {
+                        tCameraScreenDetail.setCameraIds(tCameraScreenDetail.getCameraIds().replace("," + item, ",").replace(item + ",", ",").replace(item, ","));
+                        camera.setCameraId("");
+                        camera.setCameraName("");
+                        cameraList.add(camera);
+                        this.update(tCameraScreenDetail, userId.toString());
+                        continue;
+                    }
+                    camera.setCameraId(tCameraInfo.getCameraId().toString());
+                    camera.setCameraName(tCameraInfo.getCameraName());
                 }
-                camera.setCameraId(tCameraInfo.getCameraId().toString());
-                camera.setCameraName(tCameraInfo.getCameraName());
-                cameraList.add(camera);
             }
+            cameraList.add(camera);
         }
         tCameraScreenDetail.setCameraList(cameraList);
         return tCameraScreenDetail;
@@ -205,9 +222,9 @@ public class TCameraScreenService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<AreaInfoDetail> selectCameraTreeWithRobot(String cameraName,Integer flag) {
+    public List<AreaInfoDetail> selectCameraTreeWithRobot(String cameraName,Integer flag, String robotFlag) {
         List<AreaInfoDetail> listTree = new ArrayList<>();
-        listTree = tCameraScreenDao.selectCameraTreeWithRobot(cameraName);
+        listTree = tCameraScreenDao.selectCameraTreeWithRobot(cameraName, robotFlag);
         List<AreaInfoDetail> areaInfoCountryList = new ArrayList<>();
         for(Iterator<AreaInfoDetail> it = listTree.iterator(); it.hasNext();){
             AreaInfoDetail areaInfoMap = it.next();
@@ -281,7 +298,8 @@ public class TCameraScreenService{
                         List<AreaInfoDetail> robotCameraList = new ArrayList<>();
                         //可见光
                         AreaInfoDetail lightCamera = new AreaInfoDetail();
-                        lightCamera.setId(1L);
+                        String light = String.valueOf(tRobotInfo.getRobotId()) + "9901";
+                        lightCamera.setId(Long.parseLong(light));
                         lightCamera.setLabel("机器人可见光");
                         lightCamera.setInfoType("robotCamera");
                         lightCamera.setUpId(areaInfoMap.getId());
@@ -303,7 +321,8 @@ public class TCameraScreenService{
                         }
                         //红外
                         AreaInfoDetail redCamera = new AreaInfoDetail();
-                        redCamera.setId(2L);
+                        String infrared = String.valueOf(tRobotInfo.getRobotId()) + "9902";
+                        redCamera.setId(Long.parseLong(infrared));
                         redCamera.setLabel("机器人红外");
                         redCamera.setInfoType("robotCamera");
                         redCamera.setUpId(areaInfoMap.getId());

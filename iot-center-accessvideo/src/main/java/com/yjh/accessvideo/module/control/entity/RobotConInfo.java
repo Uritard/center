@@ -126,4 +126,7 @@ public class RobotConInfo implements Serializable {
 
     private String remarks;
 
+    @ApiModelProperty(value = "录像机ID")
+    private Long recordId;
+
 }

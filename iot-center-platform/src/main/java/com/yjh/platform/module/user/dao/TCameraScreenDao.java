@@ -32,5 +32,6 @@ public interface TCameraScreenDao {
     List<AreaInfoDetail> infraredCameraStateTree(@Param(value = "cameraName") String cameraName);
     List<Long> selectRecordId();
     List<Long> selectRecordId2();
-    List<AreaInfoDetail> selectCameraTreeWithRobot(@Param(value = "cameraName") String cameraName);
+    List<AreaInfoDetail> selectCameraTreeWithRobot(@Param(value = "cameraName") String cameraName,
+                                                   @Param(value = "robotFlag") String robotFlag);
 }
