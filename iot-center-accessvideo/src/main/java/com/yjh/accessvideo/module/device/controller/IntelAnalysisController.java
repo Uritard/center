@@ -1,12 +1,15 @@
 package com.yjh.accessvideo.module.device.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.accessvideo.module.device.entity.Analysis;
 import com.yjh.accessvideo.module.device.entity.interlanalysis.*;
 import com.yjh.accessvideo.module.device.service.IntelAnalysisService;
 import io.swagger.annotations.Api;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +30,8 @@ public class IntelAnalysisController {
 
     @Autowired
     private final IntelAnalysisService intelAnalysisService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     public IntelAnalysisController(IntelAnalysisService intelAnalysisService) {
         this.intelAnalysisService = intelAnalysisService;
@@ -39,36 +44,23 @@ public class IntelAnalysisController {
 
     @PostMapping(value = "/picAnalyseNoDetection")
     public ResponseEntity<Response> picAnalyseNoDetection() {
-        JSONObject analysisObject = new JSONObject();
-        analysisObject.put("msgID", String.valueOf(100000001));
-        analysisObject.put("msgType", "1");
-        JSONObject msgDataObject = new JSONObject();
-        msgDataObject.put("desNode", "serverSocket");
-        msgDataObject.put("srcNode", "clientSocket001");
+        // 测试数据
+        List<Analysis> analysisList = new ArrayList<>();
+        Analysis analysis = new Analysis();
+        analysis.setTaskId("task666");
+        analysis.setInstanceId(11000003566L);
+        analysis.setPicPath("/home/yjh_iot_center/iot-picture/resultImg/11.jpg");
+        analysis.setAnalyseType("11");
+        analysisList.add(analysis);
 
-        JSONObject pictureInfoObject = new JSONObject();
-
-        JSONObject pictureDataObject = new JSONObject();
-        pictureDataObject.put("analyseType", "11");
-        pictureDataObject.put("imagePath", "/home/yjh_iot_center/iot-picture/resultImg/120420221600367331057.jpg");
-        pictureDataObject.put("modelPath", "modelPath.jpg");
-        pictureDataObject.put("taskId", String.valueOf(UUID.randomUUID()));
-        pictureDataObject.put("instanceId", "123456");
-        pictureInfoObject.put("pictureInfo1", pictureDataObject);
-
-        JSONObject pictureDataObject2 = new JSONObject();
-        pictureDataObject2.put("analyseType", "11");
-        pictureDataObject2.put("imagePath", "/home/yjh_iot_center/iot-picture/resultImg/120420221600367331057.jpg");
-        pictureDataObject2.put("modelPath", "modelPath.jpg");
-        pictureDataObject2.put("taskId", String.valueOf(UUID.randomUUID()));
-        pictureDataObject2.put("instanceId", "123456");
-        pictureInfoObject.put("pictureInfo2", pictureDataObject2);
-
-        msgDataObject.put("data", pictureInfoObject);
-        analysisObject.put("msgData", msgDataObject);
-        return intelAnalysisService.picAnalyseNoDetection(analysisObject);
+        Analysis analysis2 = new Analysis();
+        analysis2.setTaskId("task666");
+        analysis2.setInstanceId(11000003566L);
+        analysis2.setPicPath("/home/yjh_iot_center/iot-picture/resultImg/398.jpg");
+        analysis2.setAnalyseType("398");
+        analysisList.add(analysis2);
+        return intelAnalysisService.picAnalyseNoDetection(analysisList);
     }
-
 
     @PostMapping("/algorithmUpdate")
     public ResponseEntity<Response> algorithmUpdate(@Valid @RequestBody UpdateRequest request) {
@@ -82,8 +74,12 @@ public class IntelAnalysisController {
 
     @PostMapping(value = "/picAnalyseRetNotify")
     public ResponseEntity<Response> picAnalyseRetNotify(@Valid @RequestBody PicAnalyseResponse response) {
-        log.info("< < < < < < 开始处理分析结果 > > > > > >");
-        intelAnalysisService.picAnalyseRetNotify(response);
+        log.info("< < < < < < 收到的处理分析结果：{}", response);
+        // 开关
+        String flag = redisTemplate.opsForHash().get("t_sys_param:isIntelAnalysis","content").toString();
+        if (StringUtils.equals("true", flag)){
+            intelAnalysisService.picAnalyseRetNotify(response);
+        }
         return ResponseEntity.ok(Response.ok());
     }
 

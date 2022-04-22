@@ -5,13 +5,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.module.control.service.CameraConService;
 import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.Analysis;
-import com.yjh.accessvideo.module.device.entity.interlanalysis.PicAnalyseRequest;
 import com.yjh.accessvideo.netty.client.AnalysisClientHandler;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +23,6 @@ import java.util.*;
 public class AnalysisService {
     @Autowired
     private AnalyseDataOperateDao analyseDataOperateDao;
-
-    @Autowired
-    private IntelAnalysisService intelAnalysisService;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -95,9 +89,6 @@ public class AnalysisService {
                 analysisObject.put("msgData", msgDataObject);
                 log.info("analysisObject----:"+analysisObject);
                 AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendDataReguest(analysisObject);
-                // 改为调用智能分析主机接口进行分析
-                /*PicAnalyseRequest request = new PicAnalyseRequest().setReserved(analysisObject.toString());
-                intelAnalysisService.picAnalyseNoDetection(request);*/
 
                 log.info("算法数据初始化-----完成");
             }catch (Exception e){
@@ -163,20 +154,7 @@ public class AnalysisService {
             log.info("analysisObject-----"+analysisObject);
             log.info("aiPort---------:"+aiPort);
 
-            // 开关
-            String flag = redisTemplate.opsForHash().get("t_sys_param:isIntelAnalysis","content").toString();
-            if (StringUtils.equals("false", flag)){
-                // 原来的socket协议
-                AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
-            }else {
-                // 调用智能分析主机接口进行分析
-                try {
-                    intelAnalysisService.picAnalyseNoDetection(analysisObject);
-                }catch (Exception e){
-                    log.error("调用智能分析主机进行缺陷分析异常："+e);
-                    log.error("exceptionDetails:"+e.getStackTrace()[0]);
-                }
-            }
+            AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
             log.info("算法数据初始化-----完成");
         }catch (Exception e){
             log.error("缺陷算法识别异常："+e);

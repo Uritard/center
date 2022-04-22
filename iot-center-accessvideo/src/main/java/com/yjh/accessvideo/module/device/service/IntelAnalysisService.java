@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
+import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
+import com.yjh.accessvideo.module.device.entity.Analysis;
 import com.yjh.accessvideo.module.device.entity.interlanalysis.*;
 import com.yjh.accessvideo.netty.client.DataDealThread;
 import com.yjh.accessvideo.thread.TaskExecutePool;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -58,6 +61,8 @@ public class IntelAnalysisService {
     private AnalyseDataOperateService analyseDataOperateService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private AnalyseDataOperateDao analyseDataOperateDao;
 
     public IntelAnalysisService(AnalyseDataOperateService analyseDataOperateService) {
         this.analyseDataOperateService = analyseDataOperateService;
@@ -102,11 +107,11 @@ public class IntelAnalysisService {
     /**
      * 巡视主机请求图像分析--功能
      *
-     * @param analysisObject json格式的参数
+     * @param analysisList 需要分析的对象
      * @return ResponseEntity<Response>
      */
-    public ResponseEntity<Response> picAnalyseNoDetection(JSONObject analysisObject){
-        PicAnalyseRequest request = formatTransition(analysisObject);
+    public ResponseEntity<Response> picAnalyseNoDetection(List<Analysis> analysisList){
+        PicAnalyseRequest request = formatTransition(analysisList);
         ResponseEntity<Response> response = picAnalyse(request);
         return response;
     }
@@ -227,47 +232,47 @@ public class IntelAnalysisService {
     }
 
     /**
-     * Json格式转换为http需要的参数
+     * 格式转换为http需要的参数
      *
-     * @param analysisObject Json格式的参数
+     * @param analysisList 需要分析的对象
      * @return PicAnalyseRequest
      */
-    private PicAnalyseRequest formatTransition(JSONObject analysisObject) {
-        log.info("analysisObject=={}", analysisObject);
-
+    private PicAnalyseRequest formatTransition(List<Analysis> analysisList) {
         PicAnalyseRequest picAnalyseRequest = new PicAnalyseRequest();
+
         picAnalyseRequest.setRequestHostIp(analysisResultIp);
         picAnalyseRequest.setRequestHostPort(analysisResultPort);
         List<AnalyseObject> objectList = new ArrayList<>();
+        // 待分析图像的URL,可多选
+        List<String> imageUrlList = new ArrayList<>();
+        // 图像分析类型,可多选
+        List<String> typeList = new ArrayList<>();
+        AnalyseObject analyseObject = new AnalyseObject();
+        String taskId = "";
+        String instanceId = "";
+        String picPath = "";
+        String imageNormalUrlPath = "";
 
-        JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(analysisObject.get("msgData").toString()).get("data").toString());
-        Iterator iterator = jsonObjectData.entrySet().iterator();
-        // 迭代器取出data中的每一个数据
-        while (iterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) iterator.next();
-            // 遍历每一个结果子集
-            JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
-            log.info("数据======{}", jsonObjectResult);
-            String taskId = jsonObjectResult.get("taskId").toString();
-            picAnalyseRequest.setRequestId(UUID.randomUUID() + "#" + taskId);
-
-            AnalyseObject analyseObject = new AnalyseObject();
-            analyseObject.setObjectId(jsonObjectResult.get("instanceId").toString());
-            // 图像分析类型,可多选
-            List<String> typeList = new ArrayList<>();
-            typeList.add(jsonObjectResult.get("analyseType").toString());
-            analyseObject.setTypeList(typeList);
-            // 待分析图像的URL,可多选
-            List<String> imageUrlList = new ArrayList<>();
-            String imagePath = jsonObjectResult.get("imagePath").toString().replaceAll(
+        for (Analysis analysis: analysisList) {
+            taskId = analysis.getTaskId();
+            instanceId = String.valueOf(analysis.getInstanceId());
+            picPath = analysis.getPicPath().replaceAll(
                     redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content").toString(),
                     redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content").toString());
-            imageUrlList.add(imagePath);
-
-            analyseObject.setImageUrlList(imageUrlList);
-            objectList.add(analyseObject);
+            typeList.add(analysis.getAnalyseType());
+            analyseObject.setTypeList(typeList);
+            // 判别算法 需要判别基准图
+            if (analysis.getAnalyseType().equals("11")) {
+                 imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId());
+            }
         }
+        analyseObject.setObjectId(instanceId);
+        imageUrlList.add(picPath);
+        analyseObject.setImageUrlList(imageUrlList);
+        analyseObject.setImageNormalUrlPath(imageNormalUrlPath);
+        objectList.add(analyseObject);
         picAnalyseRequest.setObjectList(objectList);
+        picAnalyseRequest.setRequestId(UUID.randomUUID() + "#" + taskId);
         return picAnalyseRequest;
     }
 
@@ -316,4 +321,21 @@ public class IntelAnalysisService {
         System.out.println("====================================================================================");
     }
 
+
+    /**
+     * 将文件上传至ftp服务器
+     *
+     * @param sourcePath 源文件地址
+     * @param targetName 目标文件名称
+     * @return void
+     */
+//    public void uploadFile(String sourcePath, String targetName) {
+//        try {
+//            if("".equals(sourcePath)) {return;}
+//            FtpsUtil.putFile(sourcePath, ftpsLocalPath + "/" + targetName,
+//                    serverUrl, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
+//        } catch (Exception e) {
+//            log.error("上传至ftps错误 " + e);
+//        }
+//    }
 }

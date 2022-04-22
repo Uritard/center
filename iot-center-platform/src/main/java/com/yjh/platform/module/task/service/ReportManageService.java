@@ -322,12 +322,15 @@ public class ReportManageService {
 
     public TaskVO getTaskVO(String taskId) {
         TaskVO taskVO = reportManageDao.selectTaskNameAndTime(taskId);
+        String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
+        taskVO.setStationName(stationName);
         // 测点数
         Integer meteNum = reportManageDao.selectMeteNumByTask(taskId);
         taskVO.setMeteNum(meteNum);
-        taskVO.setVoltageClasses("");
-        taskVO.setStationType("");
-
+        String voltageClasses = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content")) + "kV";
+        String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
+        taskVO.setVoltageClasses(voltageClasses);
+        taskVO.setStationType(stationType);
         String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "1").get("valueUnit"));
         String airPressure = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "6").get("valueUnit"));
         String windSpeed = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "3").get("valueUnit"));
@@ -339,7 +342,7 @@ public class ReportManageService {
             CruiseStatistics = CruiseStatistics +  ",待人工确认点位" + taskVO.getUnReview() + "个。";
         }
         taskVO.setCruiseStatistics(CruiseStatistics);
-        taskVO.setCruiseConclusion("");
+        taskVO.setCruiseConclusion("已审核");
         return taskVO;
     }
 
