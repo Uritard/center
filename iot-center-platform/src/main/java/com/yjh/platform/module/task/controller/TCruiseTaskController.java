@@ -262,10 +262,11 @@ public class TCruiseTaskController {
     @ApiOperation(value = "任务统计")
     @RequestMapping(value = "/taskCount", method = RequestMethod.GET)
     @Logs(title = "查询巡检任务",content = "根据用户传递的参数统计任务",logType = 1,authority = "1235")
-    public Result taskCount(@RequestParam(value = "taskDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date taskStartDate){
+    public Result taskCount(@RequestParam(value = "taskDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date taskStartDate,
+                            @RequestParam(value = "flag") int flag){
         Result result = new Result();
         try {
-            List<Map<String, Object>> list = this.tCruiseTaskService.taskCount(taskStartDate);
+            List<Map<String, Object>> list = this.tCruiseTaskService.taskCount(taskStartDate, flag);
             result.setData(list);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());

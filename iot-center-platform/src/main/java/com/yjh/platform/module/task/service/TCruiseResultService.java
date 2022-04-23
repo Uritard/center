@@ -95,6 +95,14 @@ public class TCruiseResultService{
         return cruiseResultDetailList;
     }
     @Transactional(rollbackFor = Exception.class)
+    public List<CruiseResultDetail>  selectAbnormalResult( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String instanceName,String startTime,String endTime,List<Long> deviceIdList,String customId) {
+        List<CruiseResultDetail> cruiseResultDetailList = new ArrayList<>();
+        if (deviceIdList != null && !deviceIdList.isEmpty()){
+            cruiseResultDetailList = tCruiseResultDao.selectAbnormalResult(taskResultId, cruiseType, cruiseResult, deviceType, instanceName,startTime, endTime, deviceIdList,customId);
+        }
+        return cruiseResultDetailList;
+    }
+    @Transactional(rollbackFor = Exception.class)
     public int manualReview(CruiseManualReview cruiseManualReview,String userId){
         //checkUser && checkDate
         String userName = tCruiseResultDao.selectUserName(Integer.valueOf(userId));

@@ -396,6 +396,99 @@
         ORDER BY b.instance_id asc,b.device_id, n.custom_id
     </select>
 
+    <select id="selectAbnormalResult" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
+        SELECT DISTINCT
+        b.task_result_id,
+        f.real_code,
+        b.device_name,
+        b.instance_name,
+        g.cruise_type,
+        h.dict_note as cruise_type_name,
+        g.result_num,
+        g.cruise_result,
+        j.dict_note as cruise_result_name,
+        b.cruise_time,
+        g.cruise_abnormal,
+        p.dict_note as abnormal_type1,
+        IF(ISNULL(g.remark),p.dict_note,CONCAT(p.dict_note,',',x.dict_note)) as abnormal_type,
+        g.remark,
+        x.dict_note as abnormal_type2,
+        g.evaluation_state,
+        i.dict_note as evaluation_state_name,
+        g.check_user,
+        g.check_date,
+        g.picpath as pic_path,
+        g.identify_result,
+        w.dict_note as identify_result_name,
+        g.identify_state,
+        g.person_check,
+        b.device_id,
+        g.cruise_data_id,
+        g.cruise_result_id,
+        b.instance_id,
+        e.device_mete_id,
+        q.state_zero,
+        q.state_one,
+        q.high_limit1,
+        q.high_limit2,
+        q.high_limit3,
+        q.high_limit4,
+        q.low_limit1,
+        q.low_limit2,
+        q.low_limit3,
+        q.low_limit4,
+        q.mete_kind,
+        q.meter_type,
+        q.mete_type,
+        m.dict_note as mete_kind_name,
+        e.cruise_id as preset_id,
+        k.camera_id,
+        b.end_time,
+        g.is_warn,
+        q.alarm_state,
+        q.alarm_level,
+        s.dict_note as alarm_level_name,
+        n.device_type,
+        g.voice_path
+        FROM t_cruise_result a
+        LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
+        LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
+        LEFT JOIN t_std_device n on n.device_id = b.device_id
+        LEFT JOIN t_std_device_attr f on f.device_id = b.device_id
+        LEFT JOIN t_cruise_data_result g on g.cruise_result_id = b.cruise_result_id
+        LEFT JOIN t_dict_business h on h.dict_code = g.cruise_type and h.col_name = 'cruise_type'
+        LEFT JOIN t_dict_business i on i.dict_code = g.evaluation_state and i.col_name = 'evaluation_state'
+        LEFT JOIN t_dict_business j on j.dict_code = g.cruise_result and j.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business p ON p.dict_code = g.cruise_abnormal and p.col_name = 'abnormal_type'
+        LEFT JOIN t_std_devicemete q on q.device_mete_id = e.device_mete_id
+        LEFT JOIN t_dict_business m on q.mete_kind = m.dict_code and m.col_name ='mete_kind'
+        LEFT JOIN t_camera_preset k on k.preset_id = e.cruise_id
+        LEFT JOIN t_dict_business w on w.dict_code = g.identify_result and w.col_name ='identify_result'
+        LEFT JOIN t_dict_business s on s.dict_code = q.alarm_level and s.col_name ='alarm_level'
+        LEFT JOIN t_dict_business x ON x.dict_code = g.remark and x.col_name = 'abnormal_type'
+        WHERE 1 = 1
+        <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
+
+        <if test="deviceType != null and deviceType != -1"> and n.device_type = #{deviceType, jdbcType=INTEGER}</if>
+
+        <if test="cruiseType != null and cruiseType != -1"> and g.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+
+        <if test="startTime != null and endTime != null"> and cruise_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+
+        <if test="cruiseResult != null and cruiseResult != -1 "> and g.cruise_result = #{cruiseResult, jdbcType=INTEGER}</if>
+
+        <if test="customId != null and customId != -1 "> and e.custom_id = #{customId, jdbcType=VARCHAR}</if>
+
+        <if test="instanceName != null and instanceName != ''">and b.instance_name like concat('%',#{instanceName, jdbcType=VARCHAR},'%') </if>
+
+        <if test="list != null and list.size() > 0">and b.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        ORDER BY b.cruise_time DESC
+    </select>
+
     <insert id="batchInsert">
         insert into t_cruise_result(
         task_result_id,

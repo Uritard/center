@@ -317,6 +317,59 @@ public class TCruiseResultController {
         return result;
     }
 
+    @ApiOperation(value = "分页查询--识别异常点位")
+    @GetMapping(value = "/selectAbnormalResult")
+    // @Logs(title = "巡视结果任务详情查询",content = "根据用户传递的参数查询巡视结果任务详情",logType = 1)
+    public Result selectAbnormalResult(@RequestParam(value = "taskResultId", required = false) String taskResultId,
+                                     @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
+                                     @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
+                                     @RequestParam(value = "deviceType", required = false) Integer deviceType,
+                                       @RequestParam(value = "instanceName", required = false) String instanceName,
+                                     @RequestParam(value = "startTime",required = false) String startTime,
+                                     @RequestParam(value = "endTime",required = false) String endTime,
+                                     @RequestParam(value = "regionId",required = false) Long regionId,
+                                     @RequestParam(value = "customId",required = false) String customId,
+                                     @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
+                                     @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
+        Result result = new Result();
+        Map<String, Object> resultMap = new HashMap<>();
+
+        try {
+            logsRecord.LogsSend(request,"1","识别异常点位查询","根据用户传递的参数查询识别异常点位");
+
+            if (Objects.isNull(startTime) || "".equals(startTime)){
+                startTime = null;
+            }
+            if (Objects.isNull(endTime) || "".equals(endTime)){
+                endTime = null;
+            }
+            List<Long> deviceIdList = new ArrayList<>();
+            if (regionId == null){
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+            }else {
+                List<Long> regionIdList = tStdRegionService.selectDownId(regionId);//查询该regionId的子节点
+                if (regionIdList != null && !regionIdList.isEmpty()){
+                    deviceIdList =  tStdDeviceService.selectDeviceIdListByRegion(regionIdList);
+                }else {
+                    deviceIdList.add(regionId);
+                }
+            }
+            Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
+            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultService.selectAbnormalResult(taskResultId,cruiseType,cruiseResult,deviceType,instanceName,startTime,endTime,deviceIdList,customId);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", cruiseResultDetailList);
+            result.setData(resultMap);
+//        }catch (BusinessException e) {
+//            result.setMessage(10008, "用户无权限");
+            //log.error("日志统计失败：" + e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "人工复核")
     @PutMapping(value = "/manualReview")
     @Logs(title = "人工复核",content = "人工复核",logType = 5,authority = "1235")

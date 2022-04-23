@@ -54,6 +54,15 @@ public interface TCruiseResultDao {
                                                 @Param(value = "endTime") String endTime,
                                                 @Param(value = "list") List<Long> list,
                                                 @Param(value = "customId") String customId);
+    List<CruiseResultDetail> selectAbnormalResult(@Param(value = "taskResultId") String taskResultId,
+                                                @Param(value = "cruiseType") Integer cruiseType,
+                                                @Param(value = "cruiseResult") Integer cruiseResult,
+                                                @Param(value = "deviceType") Integer deviceType,
+                                                  @Param(value = "instanceName") String instanceName,
+                                                @Param(value = "startTime") String startTime,
+                                                @Param(value = "endTime") String endTime,
+                                                @Param(value = "list") List<Long> list,
+                                                @Param(value = "customId") String customId);
 
     int manualReview(CruiseManualReview cruiseManualReview);
     Long selectDeviceMeteId(@Param(value = "cruiseDataId")Long cruiseDataId);
