@@ -277,6 +277,7 @@ public class CameraConController {
         try {
             cameraConService.isCameraControlled(cameraId);
             result.setData(cameraConService.pTZControl(dwPTZCommand, cameraId, dStop, speed));
+            cameraConService.pushCtrlTime(cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -308,6 +309,7 @@ public class CameraConController {
             Runtime.getRuntime().exec(url);
             result.setData(resultMap);
             result.setMessage(message);
+            cameraConService.pushCtrlTime(cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -337,6 +339,7 @@ public class CameraConController {
             Runtime.getRuntime().exec(url);
             result.setData(resultMap);
             result.setMessage(message);
+            cameraConService.pushCtrlTime(cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -368,6 +371,7 @@ public class CameraConController {
             Runtime.getRuntime().exec(url);
             result.setData(resultMap);
             result.setMessage(message);
+            cameraConService.pushCtrlTime(cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -386,6 +390,7 @@ public class CameraConController {
         try {
             cameraConService.isCameraControlled(cameraId);
             result.setData(cameraConService.presetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET));
+            cameraConService.pushCtrlTime(cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -402,6 +407,7 @@ public class CameraConController {
         Result result = new Result();
         try {
             result.setData(cameraConService.presetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET));
+            cameraConService.pushCtrlTime(cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

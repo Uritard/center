@@ -113,6 +113,8 @@ public class CameraConService {
     @Value("${system.webSocket.url}")
     private String syncWebsocketUrl;//WS调用接口地址
 
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     private static PlayCtrl playCtrl = PlayCtrl.INSTANCE;
     private NativeLong m_lRealPlayHandle = new NativeLong(-1);// playhandle
@@ -3024,5 +3026,21 @@ public class CameraConService {
         time1 = 1000 * 60 * 60 * 24 * 9 + 1000*60*52 + 198;
         s1 = service.timeStr(time1);
         System.out.println(s1);
+    }
+
+    public void pushCtrlTime(Long cameraId){
+        try {
+            String str = "camera_info:" + cameraId;
+            Map<String, String> map = redisTemplate.opsForHash().entries(str);
+            if (map != null && map.size() > 0) {
+                map.put("lastTime", format.format(new Date()));
+            } else {
+                map = new HashMap<>();
+                map.put("cameraId", String.valueOf(cameraId));
+            }
+            redisTemplate.opsForHash().putAll(str, map);
+        }catch (Exception e){
+            log.info("更新相机最后操作时间出错："+e);
+        }
     }
 }
