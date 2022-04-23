@@ -526,6 +526,14 @@
         p.dict_note as defect_model_name,
         n.cruise_id as preset_id,
         b.up_region_name as regionName,
+        k.low_limit1,
+        k.low_limit2,
+        k.low_limit3,
+        k.low_limit4,
+        k.high_limit1,
+        k.high_limit2,
+        k.high_limit3,
+        k.high_limit4,
         (
         CASE
         WHEN (j.camera_id IS NOT NULL) THEN
@@ -591,6 +599,14 @@
         n.cruise_id as preset_id,
         b.up_region_name as regionName,
         j.camera_id,
+        null as low_limit1,
+        null as low_limit2,
+        null as low_limit3,
+        null as low_limit4,
+        null as high_limit1,
+        null as high_limit2,
+        null as high_limit3,
+        null as high_limit4,
         '' AS video_camera_type
         FROM
         t_defect_info a
@@ -875,7 +891,15 @@
             a.defect_model,
             m.dict_note as defect_model_name,
             b.custom_name,
-            a.device_code
+            a.device_code,
+            d.low_limit1,
+            d.low_limit2,
+            d.low_limit3,
+            d.low_limit4,
+            d.high_limit1,
+            d.high_limit2,
+            d.high_limit3,
+            d.high_limit4
         FROM t_warn_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
         LEFT JOIN t_std_devicemete d on a.std_mete_id = d.device_mete_id

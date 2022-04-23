@@ -500,7 +500,13 @@ public class TCruiseTaskService {
         return this.tCruiseTaskDao.batchInsert(list);
     }
 
-    //任务统计
+
+    /**
+     * 任务数量统计
+     *
+     * @param taskStartDate 开始时间
+     * @return List<Map<String,Object>>
+     */
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> taskCount(Date taskStartDate) {
 

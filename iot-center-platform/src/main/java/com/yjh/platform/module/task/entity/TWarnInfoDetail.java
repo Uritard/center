@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -103,4 +104,31 @@ public class TWarnInfoDetail implements Serializable {
 
     @ApiModelProperty(value = "间隔名称")
     private String regionName;
+
+    @ApiModelProperty(value = "告警阈值")
+    private String thresholdValue;
+
+    @ApiModelProperty(value = "告警上限1")
+    private Float highLimit1;
+
+    @ApiModelProperty(value = "告警下限1")
+    private Float lowLimit1;
+
+    @ApiModelProperty(value = "告警上限2")
+    private Float highLimit2;
+
+    @ApiModelProperty(value = "告警下限2")
+    private Float lowLimit2;
+
+    @ApiModelProperty(value = "告警上限3")
+    private Float highLimit3;
+
+    @ApiModelProperty(value = "告警下限3")
+    private Float lowLimit3;
+
+    @ApiModelProperty(value = "告警上限4")
+    private Float highLimit4;
+
+    @ApiModelProperty(value = "告警下限4")
+    private Float lowLimit4;
 }

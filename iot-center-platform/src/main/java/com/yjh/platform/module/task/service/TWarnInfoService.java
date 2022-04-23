@@ -109,7 +109,24 @@ public class TWarnInfoService{
         map.put("endTime", endTime);
         map.put("deviceName", deviceName);
         map.put("meteName", meteName);
-        return tWarnInfoDao.WarnConfirm(map);
+        List<TWarnInfoDetail> list = tWarnInfoDao.WarnConfirm(map);
+        for (TWarnInfoDetail tWarnInfoDetail : list) {
+            String thresholdValue = "";
+            if (Objects.nonNull(tWarnInfoDetail.getLowLimit1()) && Objects.nonNull(tWarnInfoDetail.getHighLimit1())){
+                thresholdValue = "预警阈值：" + tWarnInfoDetail.getLowLimit1() + "-" + tWarnInfoDetail.getHighLimit1();
+            }
+            if (Objects.nonNull(tWarnInfoDetail.getLowLimit2()) && Objects.nonNull(tWarnInfoDetail.getHighLimit2())){
+                thresholdValue = thresholdValue + " 一般阈值：" + tWarnInfoDetail.getLowLimit2() + "-" + tWarnInfoDetail.getHighLimit2();
+            }
+            if (Objects.nonNull(tWarnInfoDetail.getLowLimit3()) && Objects.nonNull(tWarnInfoDetail.getHighLimit3())){
+                thresholdValue = thresholdValue + " 严重阈值：" + tWarnInfoDetail.getLowLimit3() + "-" + tWarnInfoDetail.getHighLimit3();
+            }
+            if (Objects.nonNull(tWarnInfoDetail.getLowLimit4()) && Objects.nonNull(tWarnInfoDetail.getHighLimit4())){
+                thresholdValue = thresholdValue + " 危急阈值：" + tWarnInfoDetail.getLowLimit4() + "-" + tWarnInfoDetail.getHighLimit4();
+            }
+            tWarnInfoDetail.setThresholdValue(thresholdValue);
+        }
+        return list;
     }
     @Transactional(rollbackFor = Exception.class)
     public List<TJContentInfo> countByAlarmSource() {
@@ -402,6 +419,21 @@ public class TWarnInfoService{
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
         if (defectModel.equals(warnFlag)){//告警信息
             tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(Long.valueOf(warnId));
+            String thresholdValue = "";
+            if (Objects.nonNull(tWarnInfoDetail.getLowLimit1()) && Objects.nonNull(tWarnInfoDetail.getHighLimit1())){
+                thresholdValue = "预警阈值：" + tWarnInfoDetail.getLowLimit1() + "-" + tWarnInfoDetail.getHighLimit1();
+            }
+            if (Objects.nonNull(tWarnInfoDetail.getLowLimit2()) && Objects.nonNull(tWarnInfoDetail.getHighLimit2())){
+                thresholdValue = thresholdValue + " 一般阈值：" + tWarnInfoDetail.getLowLimit2() + "-" + tWarnInfoDetail.getHighLimit2();
+            }
+            if (Objects.nonNull(tWarnInfoDetail.getLowLimit3()) && Objects.nonNull(tWarnInfoDetail.getHighLimit3())){
+                thresholdValue = thresholdValue + " 严重阈值：" + tWarnInfoDetail.getLowLimit3() + "-" + tWarnInfoDetail.getHighLimit3();
+            }
+            if (Objects.nonNull(tWarnInfoDetail.getLowLimit4()) && Objects.nonNull(tWarnInfoDetail.getHighLimit4())){
+                thresholdValue = thresholdValue + " 危急阈值：" + tWarnInfoDetail.getLowLimit4() + "-" + tWarnInfoDetail.getHighLimit4();
+            }
+            tWarnInfoDetail.setThresholdValue(thresholdValue);
+
             if (Objects.nonNull(tWarnInfoDetail.getDeviceCode()) && Objects.nonNull(tWarnInfoDetail.getDeviceCode())){
                 tWarnInfoDetail.setCameraId(Long.valueOf(tWarnInfoDetail.getDeviceCode()));
                 tWarnInfoDetail.setDeviceType(0);
@@ -424,6 +456,7 @@ public class TWarnInfoService{
             Long presetId = tWarnInfoDao.selectPresetId(Long.valueOf(defectMap.get("instanceId")));
             Long cameraId = tWarnInfoDao.selectCameraId(Long.valueOf(defectMap.get("instanceId")));
 
+            tWarnInfoDetail.setThresholdValue("");
             tWarnInfoDetail.setWarnContent(defectMap.get("defectContent"));
             tWarnInfoDetail.setAlarmTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(defectMap.get("defectTime")));
             tWarnInfoDetail.setDeviceId(Long.valueOf(defectMap.get("deviceId")));
