@@ -32,4 +32,7 @@ public class TCamreaPresetTree implements Serializable {
     @ApiModelProperty(value = "预置位名称")
     private String presetName ;
 
+    @ApiModelProperty(value = "相机类型")
+    private Long cameraType;
+
 }

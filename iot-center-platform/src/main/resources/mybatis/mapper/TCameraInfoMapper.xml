@@ -332,11 +332,11 @@
     </select>
 
     <select id="selectCameraId" resultType="com.yjh.platform.module.user.entity.TCamreaPresetTree">
-        select a.camera_id, a.camera_name from t_camera_info a
+        select a.camera_id, a.camera_name, a.camera_type from t_camera_info a
     </select>
 
     <select id="batchSelectPreset" resultType="com.yjh.platform.module.user.entity.TCamreaPresetTree">
-        select a.camera_id, b.camera_name, a.preset_id, a.preset_name from t_camera_preset a
+        select a.camera_id, b.camera_name, a.preset_id, a.preset_name, b.camera_type from t_camera_preset a
           LEFT JOIN t_camera_info b ON a.camera_id = b.camera_id
     </select>
 

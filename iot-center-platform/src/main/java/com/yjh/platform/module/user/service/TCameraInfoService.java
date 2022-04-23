@@ -403,6 +403,7 @@ public class TCameraInfoService {
                     presetMap.put("label", tCamreaPresetTree.getPresetName());
                     presetMap.put("infoType", "preset");
                     presetMap.put("upId", cameraId);
+                    presetMap.put("cameraType", tCamreaPresetTree.getCameraType());
                     presetList.add(presetMap);
                 }
             }

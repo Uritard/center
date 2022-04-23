@@ -355,19 +355,11 @@ public class TCruisePointInstanceService{
                         continue;
                     }else {
                         TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
-                        if(cruiseType == 229){//视频
-//                            if(205 == tCruisePointInstanceDao.selectForPresetId(Long.valueOf(id))){//可见光
+                        if(cruiseType == 229 || cruiseType == 230){//视频
                                 TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
                                 tCruisePointInstance.setCruiseId(id);
                                 tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
                                 tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
-//                            }else {//红外
-//                                TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
-//                                tCruisePointInstance.setCruiseType(230);
-//                                tCruisePointInstance.setCruiseId(id);
-//                                tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-//                                tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
-//                            }
                         }
                         if(cruiseType == 228 || cruiseType == 524){//机器人或无人机
 //                            TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
@@ -390,19 +382,11 @@ public class TCruisePointInstanceService{
                     }
                 }else {
                     TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
-                    if(cruiseType == 229){//视频
-//                        if(205 == tCruisePointInstanceDao.selectForPresetId(id)){//可见光
-                            TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
-                            tCruisePointInstance.setCruiseId(id);
-                            tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
-//                        }else {//红外
-//                            TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
-//                            tCruisePointInstance.setCruiseType(230);
-//                            tCruisePointInstance.setCruiseId(id);
-//                            tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-//                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
-//                        }
+                    if (cruiseType == 229 || cruiseType == 230) {//视频
+                        TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
+                        tCruisePointInstance.setCruiseId(id);
+                        tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
+                        tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName() + "/" + tCameraPreset.getPresetName());
                     }
                     if(cruiseType == 228 || cruiseType == 524){//机器人或无人机
 //                      TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
