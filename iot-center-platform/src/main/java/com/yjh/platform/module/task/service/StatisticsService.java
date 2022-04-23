@@ -129,7 +129,7 @@ public class StatisticsService {
         // 在线总时长
         if (duration != null) {
           long totalHour = duration / 1000 / 60 / 60;
-          map.put("duration", totalHour + "小时");
+          map.put("duration", totalHour);
         } else {
           map.put("duration", 0);
         }
@@ -173,6 +173,7 @@ public class StatisticsService {
       String taskId, Long robotId, String startTime, String endTime) {
     return dealCount(statisticsDao.countInstanceLoss(taskId, null, startTime, endTime));
   }
+
   private HashMap<String, Object> dealCount(HashMap<String, Object> countMap) {
     Double totalNum = Double.valueOf(countMap.get("totalNum").toString());
     Double validNum = Double.valueOf(countMap.get("validNum").toString());
@@ -189,24 +190,29 @@ public class StatisticsService {
    *
    * @return
    */
-  public List<Map<String, Object>> countCamera() {
-    List<Map<String, Object>> mapList = statisticsDao.countCamera();
+  public List<Map<String, Object>> countCamera(Long cameraId) {
+    List<Map<String, Object>> mapList = statisticsDao.countCamera(cameraId);
     for (Map<String, Object> map : mapList) {
-      Double totalNum = Double.valueOf(map.get("totalNum").toString());
-      Double validNum = Double.valueOf(map.get("validNum").toString());
-      String lossPercent = String.format("%.3f", validNum * 100 / totalNum);
-      map.put("lossPercent", lossPercent + "%");
+      double totalNum = Double.parseDouble(map.get("totalNum").toString());
+      double validNum = Double.parseDouble(map.get("validNum").toString());
+      if (totalNum != 0) {
+        String lossPercent = String.format("%.3f", validNum * 100 / totalNum);
+        map.put("lossPercent", lossPercent + "%");
+      }
 
-      Double allDay = Double.valueOf(map.get("allDay").toString());
-      Double cruiseDay = Double.valueOf(map.get("validNum").toString());
-      String cruisePercent = String.format("%.3f", cruiseDay * 100 / allDay);
-      map.put("cruisePercent", cruisePercent + "%");
+      double allDay = Double.parseDouble(map.get("commissionDay").toString());
+      double cruiseDay = Double.parseDouble(map.get("validNum").toString());
+      if (allDay != 0) {
+        String cruisePercent = String.format("%.3f", cruiseDay * 100 / allDay);
+        map.put("cruisePercent", cruisePercent + "%");
+      }
+
       // 根据cameraId查询recordId，查询摄像机完整率
-      Long cameraId = (Long) map.get("camera_id");
-      Long recordId = statisticsDao.selectRecordByCamera(cameraId);
+      Long camera_id = (Long) map.get("camera_id");
+      Long recordId = statisticsDao.selectRecordByCamera(camera_id);
       map.put("recordId", recordId);
       if (recordId == null) {
-        log.error("相机cameraId={}无对应的录像机", cameraId);
+        log.error("相机cameraId={}无对应的录像机", camera_id);
         continue;
       }
       Result re = getNVRInfo(recordId);

@@ -48,10 +48,10 @@ public class StatisticsController {
 
   @ApiOperation(value = "摄像机可靠性")
   @GetMapping(value = "/camera")
-  public Result camera() {
+  public Result camera(@RequestParam(value = "id") Long id) {
     Result result = new Result();
     try {
-      result.setData(statisticsService.countCamera());
+      result.setData(statisticsService.countCamera(id));
 
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
