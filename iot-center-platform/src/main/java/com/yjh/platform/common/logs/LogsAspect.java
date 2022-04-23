@@ -105,7 +105,9 @@ public class LogsAspect {
                             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
                             content.append(";用户").append(userName).append("存在越权访问!");
                             params.set("content", content.toString());
-                            post(params);
+                            if (!"修改系统用户数据".equals(annotation.title()) && !"删除系统用户数据".equals(annotation.title())) {
+                                post(params);
+                            }
                             Result re = new Result();
                             re.setCode(209, "此用户无权限");
                             return re;

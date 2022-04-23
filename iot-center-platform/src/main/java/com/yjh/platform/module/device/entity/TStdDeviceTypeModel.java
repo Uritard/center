@@ -27,7 +27,6 @@ public class TStdDeviceTypeModel {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "设备测点实例ID")
     @TableId(value = "device_type_id")
     private Long deviceTypeId;
@@ -35,7 +34,6 @@ public class TStdDeviceTypeModel {
     @Length(max = 50, message = "customId长度必须小于等于50")
     private String customType;
 
-    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
     @TableField(value = "mete_kind",updateStrategy = FieldStrategy.IGNORED)
     private String meteKind;
@@ -43,7 +41,6 @@ public class TStdDeviceTypeModel {
     @Length(max = 50, message = "meteKindName长度必须小于等于50")
     private String meteKindName;
 
-    @Max(value = 99999999)
     @ApiModelProperty(value = "表计类型")
     private String meterType;
 
@@ -66,63 +63,48 @@ public class TStdDeviceTypeModel {
     @TableField(value = "alarm_type",updateStrategy = FieldStrategy.IGNORED)
     private String alarmType;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "有效上限")
     private Float upEffect;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "有效下限")
     private Float downEffect;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警级别")
     private String alarmLevel;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警上限1")
     private Float highLimit1;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警下限1")
     private Float lowLimit1;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警上限2")
     private Float highLimit2;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警下限2")
     private Float lowLimit2;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警上限3")
     private Float highLimit3;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警下限3")
     private Float lowLimit3;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警上限4")
     private Float highLimit4;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警下限4")
     private Float lowLimit4;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警延时")
     private Integer alarmDelay;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "告警次数")
     private Integer alarmCnt;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "绝对阀值")
     private BigDecimal thresholdAbs;
 
-    @Max(value = 99999)
     @ApiModelProperty(value = "百分比阀值")
     private BigDecimal thresholdPer;
 
@@ -130,7 +112,6 @@ public class TStdDeviceTypeModel {
     @TableField(value = "mete_type",updateStrategy = FieldStrategy.IGNORED)
     private String meteType;
 
-    @Max(value = 999999999)
     @ApiModelProperty(value = "系数")
     private Integer modulus;
 
@@ -149,7 +130,6 @@ public class TStdDeviceTypeModel {
     @TableField(value = "state_one",updateStrategy = FieldStrategy.IGNORED)
     private String stateOne;
 
-    @Max(value = 99999999)
     private Integer alarmState;
 
     private String isJudge;
