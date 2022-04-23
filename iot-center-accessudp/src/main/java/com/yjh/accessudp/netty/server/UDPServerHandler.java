@@ -302,7 +302,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                     SYAllInfo syAllInfo = new SYAllInfo();
                     syAllInfo.setStationId(strArray[1]);
                     String[] mete = strArray[3].split("/");
-                    String meteName = mete[mete.length-1]+"-"+strArray[4];
+                    String meteName = mete[mete.length-2]+"/"+mete[mete.length-1]+"-"+strArray[4];
                     syAllInfo.setMeteId(strArray[2]);
                     syAllInfo.setMeteName(meteName);
                     syAllInfo.setDeviceId(strArray[2]);
