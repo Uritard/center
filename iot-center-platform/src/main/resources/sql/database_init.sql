@@ -533,6 +533,7 @@ CREATE TABLE `t_camera_info` (
   `longitude` varchar(32) DEFAULT '',
   `address` varchar(32) DEFAULT '',
   `unit` varchar(255) DEFAULT '' COMMENT '单位',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`camera_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=40001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='摄像头信息表';
 
@@ -899,6 +900,7 @@ CREATE TABLE `t_cruise_data_result` (
   `fir_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '红外FIR文件生成时间',
   `result_pic` varchar(255) DEFAULT '' COMMENT 'FIR文件存储路径',
   `points` varchar(125) DEFAULT '' COMMENT '图片坐标点',
+  `voice_path` varchar(512) DEFAULT null COMMENT '声纹文件地址',
   PRIMARY KEY (`cruise_data_id`) USING BTREE,
   KEY `cruiseid` (`cruise_data_id`) USING BTREE,
   KEY `cid` (`cruise_result_id`) USING BTREE
@@ -1504,6 +1506,8 @@ CREATE TABLE `t_std_device` (
   `custom_type` int(8) DEFAULT '1' COMMENT '部位类型',
   `custom_name` varchar(32) DEFAULT '' COMMENT '部位名称',
   `status` int(1) DEFAULT '1' COMMENT '设备状态(0：新建，1：在线，2：离线)',
+  `preset_id` bigint(32) DEFAULT NULL COMMENT '预置位id',
+  `camera_id` bigint(32) DEFAULT NULL COMMENT '摄像机id',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`device_id`,`custom_id`) USING BTREE,
@@ -1871,7 +1875,7 @@ CREATE TABLE `t_voice_device` (
   `config_id` bigint(32) NOT NULL DEFAULT '1',
   `up_region_id` bigint(32) DEFAULT '1' COMMENT '上级区域id',
   `state` varchar(30) DEFAULT '' COMMENT '在线状态',
-  `voice_code`  varchar(64) NULL COMMENT '声纹编码',
+  `voice_code`  varchar(256) NULL COMMENT '声纹编码',
   `voice_type`  varchar(32) NULL COMMENT '设备类型',
   `voice_model`  varchar(32) NULL COMMENT '设备型号',
   `voice_factory`  varchar(64) NULL COMMENT '生产厂家',

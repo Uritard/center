@@ -131,7 +131,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
 //            handlerData(body); //单线程数据处理
             }
         } catch (Exception e) {
-            e.getMessage();
+            log.error("任务失败: ", e);
         }
 
         ReferenceCountUtil.release(byteBuf);

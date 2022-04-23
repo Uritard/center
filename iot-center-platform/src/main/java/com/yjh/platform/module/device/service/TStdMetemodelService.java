@@ -2,12 +2,23 @@ package com.yjh.platform.module.device.service;
 
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.ResultHandleUtils;
-import com.yjh.platform.module.device.controller.TStdMetemodelController;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdMeteDao;
+import com.yjh.platform.module.device.dao.TStdMetemodelDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.*;
-import com.yjh.platform.module.device.dao.TStdMetemodelDao;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,25 +31,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import static org.apache.catalina.startup.ExpandWar.deleteDir;
-import static org.apache.catalina.startup.ExpandWar.expand;
 
 /**
 * @author tt
@@ -127,7 +120,7 @@ public class TStdMetemodelService {
         List<MeteModel> list1=new ArrayList<>();
         if(deviceType==null || deviceType==""){
              list1 = tStdMetemodelDao.selectModel(null);
-        }else { list1 = tStdMetemodelDao.selectModel(Integer.valueOf(deviceType));}
+        }else { list1 = tStdMetemodelDao.selectModel(NumberUtils.toInt(deviceType));}
         List<DeviceTypeTree> list2 = tStdMetemodelDao.selectDevice(deviceType);
         for (int i = 0; i < list2.size(); i++) {
             List<MeteModel> list=new ArrayList<>();
@@ -562,7 +555,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setDeviceType(Integer.valueOf(nameMap.get(item)));
+                    tStdMete.setDeviceType(NumberUtils.toInt(nameMap.get(item)));
                 }
 
                 cell = row.getCell(2);
@@ -659,7 +652,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setAnalyseType(Integer.valueOf(nameMap.get(item)));
+                    tStdMete.setAnalyseType(NumberUtils.toInt(nameMap.get(item)));
                 }
 
 
@@ -686,7 +679,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setUpEffect(Float.valueOf(item));
+                    tStdMete.setUpEffect(NumberUtils.toFloat(item));
                 }
 
 
@@ -700,7 +693,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setDownEffect(Float.valueOf(item));
+                    tStdMete.setDownEffect(NumberUtils.toFloat(item));
                 }
 
 
@@ -714,7 +707,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setAlarmLevel(Integer.valueOf(nameMap.get(item)));
+                    tStdMete.setAlarmLevel(NumberUtils.toInt(nameMap.get(item)));
                 }
 
 
@@ -728,7 +721,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setAlarmLimit(Integer.valueOf(item));
+                    tStdMete.setAlarmLimit(NumberUtils.toInt(item));
                 }
 
 
@@ -742,7 +735,7 @@ public class TStdMetemodelService {
 //                        result.setMessage(errMsg.toString());
 //                        return result;
 //                    }
-//                    tStdMete.setAlarmDelay(Integer.valueOf(item));
+//                    tStdMete.setAlarmDelay(NumberUtils.toInt(item));
 //                }
 
                 cell = row.getCell(15-1-1-1);
@@ -782,7 +775,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setHighLimit1(Float.valueOf(item));
+                    tStdMete.setHighLimit1(NumberUtils.toFloat(item));
                 }
 
 
@@ -796,7 +789,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setLowLimit1(Float.valueOf(item));
+                    tStdMete.setLowLimit1(NumberUtils.toFloat(item));
                 }
 
 
@@ -810,7 +803,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setHighLimit2(Float.valueOf(item));
+                    tStdMete.setHighLimit2(NumberUtils.toFloat(item));
                 }
 
 
@@ -824,7 +817,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setLowLimit2(Float.valueOf(item));
+                    tStdMete.setLowLimit2(NumberUtils.toFloat(item));
                 }
 
 
@@ -838,7 +831,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setHighLimit3(Float.valueOf(item));
+                    tStdMete.setHighLimit3(NumberUtils.toFloat(item));
                 }
 
 
@@ -852,7 +845,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setLowLimit3(Float.valueOf(item));
+                    tStdMete.setLowLimit3(NumberUtils.toFloat(item));
                 }
 
 
@@ -866,7 +859,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setHighLimit4(Float.valueOf(item));
+                    tStdMete.setHighLimit4(NumberUtils.toFloat(item));
                 }
 
 
@@ -880,7 +873,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setLowLimit4(Float.valueOf(item));
+                    tStdMete.setLowLimit4(NumberUtils.toFloat(item));
                 }
 
 
@@ -894,7 +887,7 @@ public class TStdMetemodelService {
 //                        result.setMessage(errMsg.toString());
 //                        return result;
 //                    }
-//                    tStdMete.setAlarmCnt(Integer.valueOf(item));
+//                    tStdMete.setAlarmCnt(NumberUtils.toInt(item));
 //                }
 
 
@@ -908,7 +901,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setThresholdAbs(BigDecimal.valueOf(Long.valueOf(item)));
+                    tStdMete.setThresholdAbs(BigDecimal.valueOf(NumberUtils.toLong(item)));
                 }
 
 
@@ -922,7 +915,7 @@ public class TStdMetemodelService {
                         result.setMessage(errMsg.toString());
                         return result;
                     }
-                    tStdMete.setThresholdPer(BigDecimal.valueOf(Long.valueOf(item)));
+                    tStdMete.setThresholdPer(BigDecimal.valueOf(NumberUtils.toLong(item)));
                 }
 
 
@@ -936,7 +929,7 @@ public class TStdMetemodelService {
 //                        result.setMessage(errMsg.toString());
 //                        return result;
 //                    }
-//                    tStdMete.setModulus(Integer.valueOf(item));
+//                    tStdMete.setModulus(NumberUtils.toInt(item));
 //                }
 //
 //
@@ -978,7 +971,7 @@ public class TStdMetemodelService {
             return result;
         }catch (Exception e){
             result.setCode(209,"导入文件失败");
-            log.error("导入文件失败"+e);
+            log.error("导入文件失败", e);
         }finally {
             try {
                 if (in != null) {

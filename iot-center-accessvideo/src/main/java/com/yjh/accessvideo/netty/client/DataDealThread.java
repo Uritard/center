@@ -1,19 +1,14 @@
 package com.yjh.accessvideo.netty.client;
 
-import com.alibaba.druid.util.HttpClientUtils;
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.accessvideo.common.Constant;
-import com.yjh.accessvideo.common.logs.SpringBeanUtils;
-import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
-import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
-import com.yjh.accessvideo.commons.result.Result;
-import io.netty.channel.ChannelHandlerContext;
 import lombok.SneakyThrows;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -28,6 +23,7 @@ import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -73,22 +69,22 @@ public class DataDealThread implements Runnable {
             JSONObject jsonObject = JSON.parseObject(usefulBody);
             log.info("JSON对象1：" + jsonObject);
 
-            if (jsonObject.get("msgType").toString().equals("2")) {
-                JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.get("msgData").toString()).get("data").toString()); //全量数据结果集
+            if ("2".equals(jsonObject.getString("msgType"))) {
+                JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.getString("msgData")).getString("data")); //全量数据结果集
                 log.info("原生数据****：" + jsonObjectData);
                 Iterator iterator = jsonObjectData.entrySet().iterator();
                 // 迭代器取出data中的每一个resultInfo
                 while (iterator.hasNext()) {
                     Map.Entry entry = (Map.Entry) iterator.next();
                     // 遍历每一个结果子集
-                    JSONObject jsonObjectResult = JSON.parseObject(entry.getValue().toString());
+                    JSONObject jsonObjectResult = JSON.parseObject(String.valueOf(entry.getValue()));
                     log.info("数据****：" + jsonObjectResult);
 
 
 
                     //初始化TASKID和INSTANCEID
-                    TASKID = jsonObjectResult.get("taskId").toString();
-                    INSTANCEID = jsonObjectResult.get("instanceId").toString();
+                    TASKID = jsonObjectResult.getString("taskId");
+                    INSTANCEID = jsonObjectResult.getString("instanceId");
                     String name = "t_cruise_task_result:" + TASKID + ":" + INSTANCEID;
                     //将每个任务下所需的正常点数、异常点数放入"任务常量Map"中
                     Map<String, String> taskConstant = new HashMap<>();
@@ -113,14 +109,14 @@ public class DataDealThread implements Runnable {
 
                     //redis数据键名由taskId+instanceId命名
                     log.info("数据Redis业务开启");
-                    String redisName = jsonObjectResult.get("taskId").toString() + ":" + jsonObjectResult.get("instanceId").toString();
+                    String redisName = jsonObjectResult.getString("taskId") + ":" + jsonObjectResult.getString("instanceId");
                     log.info("template:" + redisTemplate);
                     log.info("redisName:" + redisName);
                     //巡视点信息存储Redis KeyName
                     String cruiseRedisName = "t_cruise_task_result:" + redisName;
-                    Map<String, Object> cruiseResult = redisTemplate.opsForHash().entries("t_cruise_task_result:" + redisName);//读redis
+                    Map<String, String> cruiseResult = redisTemplate.opsForHash().entries("t_cruise_task_result:" + redisName);//读redis
                     log.info("读取到的redis：" + cruiseResult);
-                    String recognitionMode = cruiseResult.get("recognitionMode").toString();
+                    String recognitionMode = String.valueOf(cruiseResult.get("recognitionMode"));
                     log.info("recognitionMode----识别模式 ：-------" + recognitionMode);
                     Map<String, String> cruiseResultMap = new HashMap<>();//修改redis的巡检点结果map
 
@@ -129,15 +125,15 @@ public class DataDealThread implements Runnable {
 
                     //处理判别结果
                     //获取分析结果图片地址
-                    String taskId = jsonObjectResult.get("taskId").toString();
-                    Long instanceId = Long.valueOf(jsonObjectResult.get("instanceId").toString());
-                    String resultImage=cruiseResult.get("picpath").toString();
+                    String taskId = jsonObjectResult.getString("taskId");
+                    Long instanceId = NumberUtils.toLong(jsonObjectResult.getString("instanceId"));
+                    String resultImage=cruiseResult.get("picpath");
                     if(Objects.nonNull(jsonObjectResult.get("analyseResultImg"))) {
-                        resultImage = jsonObjectResult.get("analyseResultImg").toString();
+                        resultImage = jsonObjectResult.getString("analyseResultImg");
                     }
-                    String analyseType = jsonObjectResult.get("analyseType").toString();
-                    if (analyseType.equals("11")) {
-                        if (resultImage.equals("")) {
+                    String analyseType = jsonObjectResult.getString("analyseType");
+                    if ("11".equals(analyseType)) {
+                        if ("".equals(resultImage)) {
                             continue;
                         }
                     }
@@ -149,18 +145,20 @@ public class DataDealThread implements Runnable {
                         switch (remotePort) {
                             case 13668:
 
-                                String analyseResultPic =cruiseResult.get("picpath").toString();
-                                if (recognitionMode.equals("0")) {
+                                String analyseResultPic =cruiseResult.get("picpath");
+                                if ("0".equals(recognitionMode)) {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-2");
                                 }
                                 //表计识别图片放入缓存(已考虑双算法)
-                                if(Objects.nonNull(jsonObjectResult.get("analyseResultImg")) && !(jsonObjectResult.get("analyseResultImg").toString().equals("")) ){
-                                     analyseResultPic = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content").toString());
+                                if(Objects.nonNull(jsonObjectResult.get("analyseResultImg")) && !("".equals(
+                                    jsonObjectResult.getString("analyseResultImg"))) ){
+                                     analyseResultPic = jsonObjectResult.getString("analyseResultImg").replaceAll(
+                                         (String)redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content"), (String)redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content"));
                                     log.info("表计识别图片-------------------------------"+analyseResultPic);
                                     log.info("缓存地址-----------------------"+redisName);
-                                    if(recognitionMode.equals("-1") || recognitionMode.equals("-2")) {
+                                    if("-1".equals(recognitionMode) || "-2".equals(recognitionMode)) {
                                         log.info("双算法-第二算法图片生成-M");
-                                        redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName, "picpath").toString() + "," + analyseResultPic);
+                                        redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName, "picpath") + "," + analyseResultPic);
                                     }else {
                                         redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultPic);
                                     }
@@ -169,40 +167,41 @@ public class DataDealThread implements Runnable {
 
 
 
-                                if (jsonObjectResult.get("resultValue").equals("NULL_Model")) {
+                                if ("NULL_Model".equals(jsonObjectResult.get("resultValue"))) {
                                     Map<String, String> doubleHandelMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", "缺少标定文件");
                                     cruiseResultMap.put("resultNum", doubleHandelMap.get("resultNum"));
                                     cruiseResultMap.put("cruiseResult", doubleHandelMap.get("cruiseResult"));
                                     cruiseResultMap.put("cruiseAbnormal", doubleHandelMap.get("cruiseAbnormal"));
                                     tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
-                                } else if (jsonObjectResult.get("resultValue").equals("识别失败")) {
-                                    Map<String, String> doubleHandelMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", jsonObjectResult.get("resultValue").toString());
+                                } else if ("识别失败".equals(jsonObjectResult.get("resultValue"))) {
+                                    Map<String, String> doubleHandelMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", jsonObjectResult.getString("resultValue"));
                                     cruiseResultMap.put("resultNum", doubleHandelMap.get("resultNum"));
                                     cruiseResultMap.put("cruiseResult", doubleHandelMap.get("cruiseResult"));
                                     cruiseResultMap.put("cruiseAbnormal", doubleHandelMap.get("cruiseAbnormal"));
                                     tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                 } else {
-                                    if (jsonObjectResult.get("resultValue").toString().matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+")) {
+                                    if (jsonObjectResult.getString("resultValue").matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+")) {
 
-                                        String alarmValue = jsonObjectResult.get("resultValue").toString();
+                                        String alarmValue = jsonObjectResult.getString("resultValue");
                                         //判断是否为红外识别且获取FIR文件
                                         //  JsonObject中存在 firDocPath 则放入缓存中
                                         if(Objects.nonNull(jsonObjectResult.get("firDocPath"))){
-                                            if(!(jsonObjectResult.get("firDocPath").toString().equals(""))){
-                                                String firDocPath=jsonObjectResult.get("firDocPath").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content").toString());
+                                            if(!("".equals(jsonObjectResult.get("firDocPath")))){
+                                                String firDocPath=jsonObjectResult.getString("firDocPath").replaceAll(
+                                                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content")), String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content")));
                                                 cruiseResultMap.put("firDocPath",firDocPath);
                                                 File file=new File(firDocPath);
                                                 cruiseResultMap.put("firName",file.getName().substring(0,file.getName().lastIndexOf(".")));//放入文件名
-                                                log.info("FIR-Doc-----:"+jsonObjectResult.get("firDocPath").toString());
+                                                log.info("FIR-Doc-----:"+jsonObjectResult.get("firDocPath"));
                                             }
                                         }
 
                                         log.info("开始告警预处理");
-                                        TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+                                        TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
                                         //单个数值表计识别结果的告警判断与处理
-                                        TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+                                        TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
                                         log.info("数据查询初始化");
                                         //满足告警数据结构-进行告警判断
                                         //表计测点未配置告警规则
@@ -221,12 +220,12 @@ public class DataDealThread implements Runnable {
                                             String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             Map<String, String> warnMap = new HashMap<>();
 //                                            warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
-                                            warnMap.put("deviceId", tCruisePointInstance.getDeviceId().toString());
+                                            warnMap.put("deviceId", String.valueOf(tCruisePointInstance.getDeviceId()));
                                             warnMap.put("customId", tCruisePointInstance.getCustomId());
-                                            warnMap.put("instanceId", jsonObjectResult.get("instanceId").toString());
-                                            warnMap.put("stdMeteId", tCruisePointInstance.getDeviceMeteId().toString());
-                                            warnMap.put("taskId", jsonObjectResult.get("taskId").toString());
-                                            warnMap.put("value", jsonObjectResult.get("resultValue").toString());
+                                            warnMap.put("instanceId", jsonObjectResult.getString("instanceId"));
+                                            warnMap.put("stdMeteId", String.valueOf(tCruisePointInstance.getDeviceMeteId()));
+                                            warnMap.put("taskId", jsonObjectResult.getString("taskId"));
+                                            warnMap.put("value", jsonObjectResult.getString("resultValue"));
                                             warnMap.put("imagePath", analyseResultPic);
                                             warnMap.put("confMode", "276");
                                             warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
@@ -235,7 +234,7 @@ public class DataDealThread implements Runnable {
                                             log.info("测点种类:" + tStdDevicemeteM.getMeteKind());
                                             switch (tStdDevicemeteM.getMeteKind()) {
                                                 case "1":
-                                                    String resultValue = jsonObjectResult.get("resultValue").toString();
+                                                    String resultValue = jsonObjectResult.getString("resultValue");
                                                     int warnRuleTeleSigning = analyseDataOperateService.warnJudgementTelesignaling(resultValue,
                                                             tStdDevicemeteM.getStateZero(),
                                                             tStdDevicemeteM.getStateOne(),
@@ -244,13 +243,13 @@ public class DataDealThread implements Runnable {
                                                     log.info("告警结果：" + warnRuleTeleSigning);
                                                     if (warnRuleTeleSigning == 1) {
                                                         log.info("告警信息生成");
-                                                        warnMap.put("warnLevel", tStdDevicemeteM.getAlarmLevel().toString());
+                                                        warnMap.put("warnLevel", String.valueOf(tStdDevicemeteM.getAlarmLevel()));
                                                         warnMap.put("warnName", tStdDevicemeteM.getMeteName() + "状态异常");
                                                         warnMap.put("warnTime", simpleDateFormat.format(new Date()));
                                                         if (tStdDevicemeteM.getAlarmState() == 0) {
-                                                            warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + tStdDevicemeteM.getStateZero() + "--" + analyseDataOperateService.selectDictNote(tStdDevicemeteM.getAlarmLevel().toString(), "alarm_level"));
+                                                            warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + tStdDevicemeteM.getStateZero() + "--" + analyseDataOperateService.selectDictNote(String.valueOf(tStdDevicemeteM.getAlarmLevel()), "alarm_level"));
                                                         } else {
-                                                            warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + tStdDevicemeteM.getStateOne() + "--" + analyseDataOperateService.selectDictNote(tStdDevicemeteM.getAlarmLevel().toString(), "alarm_level"));
+                                                            warnMap.put("warnContent", tStdDevicemeteM.getMeteName() + ":" + tStdDevicemeteM.getStateOne() + "--" + analyseDataOperateService.selectDictNote(String.valueOf(tStdDevicemeteM.getAlarmLevel()), "alarm_level"));
                                                         }
                                                         warnMap.put("outRange", "--");
 
@@ -282,7 +281,7 @@ public class DataDealThread implements Runnable {
                                                     }
                                                     break;
                                                 case "2":
-                                                    Float resultValueMeter = Float.valueOf(jsonObjectResult.get("resultValue").toString());
+                                                    Float resultValueMeter = NumberUtils.toFloat(jsonObjectResult.getString("resultValue"));
                                                     int warnRuleMeter = analyseDataOperateService.warnJudgement(resultValueMeter,
                                                             tStdDevicemeteM.getHighLimit1(),
                                                             tStdDevicemeteM.getLowLimit1(),
@@ -372,32 +371,32 @@ public class DataDealThread implements Runnable {
                                             }
                                             try {
                                                 // TODO: 2020/12/15 告警信息插库 并推送
-                                                Map<String, Object> warningMsg = redisTemplate.opsForHash().entries(warnName);
+                                                Map<String, String> warningMsg = redisTemplate.opsForHash().entries(warnName);
                                                 log.info("warnMsg:" + warningMsg);
                                                 if (warningMsg.size() != 0) {
                                                     TWarnInfo tWarnInfo = new TWarnInfo();
-                                                    tWarnInfo.setWarnLevel(Integer.valueOf(warningMsg.get("warnLevel").toString()));
-//                                                    tWarnInfo.setWarnType(Integer.valueOf(warningMsg.get("warnType").toString()));
-                                                    tWarnInfo.setDeviceId(Long.valueOf(warningMsg.get("deviceId").toString()));
-                                                    tWarnInfo.setCunstomId(warningMsg.get("customId").toString());
-                                                    tWarnInfo.setInstanceId(Long.valueOf(warningMsg.get("instanceId").toString()));
-                                                    tWarnInfo.setStdMeteId(Long.valueOf(warningMsg.get("stdMeteId").toString()));
-                                                    tWarnInfo.setTaskId(warningMsg.get("taskId").toString());
-                                                    tWarnInfo.setValue(warningMsg.get("value").toString());
-                                                    tWarnInfo.setConfMode(Integer.valueOf(warningMsg.get("confMode").toString()));
-                                                    tWarnInfo.setImagePath(warningMsg.get("imagePath").toString());
-                                                    tWarnInfo.setAlarmSource(Integer.valueOf(warningMsg.get("alarmSource").toString()));
-                                                    tWarnInfo.setWarnName(warningMsg.get("warnName").toString());
-                                                    tWarnInfo.setOutRange(warningMsg.get("outRange").toString());
-                                                    tWarnInfo.setWarnContent(warningMsg.get("warnContent").toString());
-                                                    tWarnInfo.setDefectModel(Integer.valueOf(warningMsg.get("defectModel").toString()));
-                                                    tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warningMsg.get("warnTime").toString()));
+                                                    tWarnInfo.setWarnLevel(NumberUtils.toInt(warningMsg.get("warnLevel")));
+//                                                    tWarnInfo.setWarnType(NumberUtils.toInt(warningMsg.get("warnType")));
+                                                    tWarnInfo.setDeviceId(NumberUtils.toLong(warningMsg.get("deviceId")));
+                                                    tWarnInfo.setCunstomId(warningMsg.get("customId"));
+                                                    tWarnInfo.setInstanceId(NumberUtils.toLong(warningMsg.get("instanceId")));
+                                                    tWarnInfo.setStdMeteId(NumberUtils.toLong(warningMsg.get("stdMeteId")));
+                                                    tWarnInfo.setTaskId(warningMsg.get("taskId"));
+                                                    tWarnInfo.setValue(warningMsg.get("value"));
+                                                    tWarnInfo.setConfMode(NumberUtils.toInt(warningMsg.get("confMode")));
+                                                    tWarnInfo.setImagePath(warningMsg.get("imagePath"));
+                                                    tWarnInfo.setAlarmSource(NumberUtils.toInt(warningMsg.get("alarmSource")));
+                                                    tWarnInfo.setWarnName(warningMsg.get("warnName"));
+                                                    tWarnInfo.setOutRange(warningMsg.get("outRange"));
+                                                    tWarnInfo.setWarnContent(warningMsg.get("warnContent"));
+                                                    tWarnInfo.setDefectModel(NumberUtils.toInt(warningMsg.get("defectModel")));
+                                                    tWarnInfo.setWarnTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(warningMsg.get("warnTime")));
                                                     log.info("------------------------------------------------------------");
                                                     analyseDataOperateService.insertWarnInfo(tWarnInfo);
 
                                                     // TODO:最新告警信息获取
                                                     Map<String,String> currentWarnInfo=new HashMap<>();
-                                                    currentWarnInfo.put("warnId",analyseDataOperateService.selectCurrentWarn().toString());
+                                                    currentWarnInfo.put("warnId", String.valueOf(analyseDataOperateService.selectCurrentWarn()));
                                                     currentWarnInfo.put("defectModel","450");
                                                     currentWarnInfo.put("isPop","false");
 
@@ -414,8 +413,8 @@ public class DataDealThread implements Runnable {
                                                         xmlItem.put("device_name", cruiseResult.get("instanceName"));
                                                         xmlItem.put("device_id", cruiseResult.get("instanceId"));
                                                         xmlItem.put("alarm_level", alarm_level);
-                                                        String deviceMeteId = cruiseResult.get("device_mete_id").toString();
-                                                        Map<String, Object> info = analyseDataOperateService.selectWarnInfo(Long.valueOf(deviceMeteId));
+                                                        String deviceMeteId = cruiseResult.get("device_mete_id");
+                                                        Map<String, Object> info = analyseDataOperateService.selectWarnInfo(NumberUtils.toLong(deviceMeteId));
                                                         xmlItem.put("alarm_type", (null == info.get("alarm_type") ? "" : info.get("alarm_type")));
                                                         xmlItem.put("recognition_type", (null == info.get("recognition_type") ? "" : info.get("recognition_type")));
                                                         xmlItem.put("value", tWarnInfo.getValue());
@@ -423,7 +422,7 @@ public class DataDealThread implements Runnable {
                                                         xmlItem.put("value_unit", tWarnInfo.getValue() + xmlItem.get("unit"));
                                                         xmlItem.put("time", simpleDateFormat.format(new Date()));
                                                         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-                                                        xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(simpleDateFormat2.parse(cruiseResult.get("cruiseTime").toString())));
+                                                        xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(simpleDateFormat2.parse(cruiseResult.get("cruiseTime"))));
                                                         xmlItem.put("content", tWarnInfo.getWarnContent());
 
 
@@ -436,7 +435,7 @@ public class DataDealThread implements Runnable {
                                                         log.info("告警上报：-" + map);
                                                         Constant.otherServer(map, Constant.TCP_URL);//江苏要求
                                                     }catch (Exception e){
-                                                        log.info("告警上报出错：{}",e);
+                                                        log.error("告警上报出错：", e);
                                                     }
 
 
@@ -490,8 +489,8 @@ public class DataDealThread implements Runnable {
 //                                                    redisTemplate.delete(warnName);
                                                 }
                                             } catch (Exception e) {
-                                                log.error("告警入库失败" + e);
-                                                log.error("Exception--Detail:"+e.getStackTrace()[0]);
+                                                log.error("告警入库失败", e);
+                                                log.error("Exception--Detail:{}", e.getStackTrace()[0]);
                                             }
 
                                         } else {
@@ -504,7 +503,7 @@ public class DataDealThread implements Runnable {
                                             tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
                                         }
                                     } else {
-                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", jsonObjectResult.get("resultValue").toString());
+                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", jsonObjectResult.getString("resultValue"));
                                         cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
                                         cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
                                         cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
@@ -517,18 +516,18 @@ public class DataDealThread implements Runnable {
                                 break;
                             case 13669:
 
-                                String analyseResultImg =cruiseResult.get("picpath").toString();//图片路径初始化
-                                if (recognitionMode.equals("0")) {
+                                String analyseResultImg =cruiseResult.get("picpath");//图片路径初始化
+                                if ("0".equals(recognitionMode)) {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-1");
                                 }
 
                                 //判别结果处理逻辑
-                                if(analyseType.equals("11")){
+                                if("11".equals(analyseType)){
 
-                                    analyseResultImg=resultImage.replaceAll(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content").toString(),redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content").toString());
-                                    String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
+                                    analyseResultImg=resultImage.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));
+                                    String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.getString("resultValue"));
 
-                                    if(jsonObjectResult.get("resultValue").toString().contains("abnormal")){
+                                    if(jsonObjectResult.getString("resultValue").contains("abnormal")){
 
                                         tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                         tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
@@ -556,22 +555,22 @@ public class DataDealThread implements Runnable {
 
 
                                 List<TDefectInfo> defectInfos=new ArrayList<>();//缺陷信息List
-                                String originResult = jsonObjectResult.get("resultValue").toString();
-                                String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.get("resultValue").toString());
+                                String originResult = jsonObjectResult.getString("resultValue");
+                                String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.getString("resultValue"));
                                 log.info("解析的缺陷数据：" + resultValue);
                                 //获取算法标定结果图片并放入缓存（已考虑双算法情况）
-                                if(Objects.nonNull(jsonObjectResult.get("analyseResultImg")) && !(jsonObjectResult.get("analyseResultImg").toString().equals("")) ) {
-                                     analyseResultImg = jsonObjectResult.get("analyseResultImg").toString().replaceAll(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content").toString(), redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content").toString());
-                                    if (recognitionMode.equals("-1") || recognitionMode.equals("-2")) {
+                                if(Objects.nonNull(jsonObjectResult.get("analyseResultImg")) && !(jsonObjectResult.get("analyseResultImg").equals("")) ) {
+                                     analyseResultImg = jsonObjectResult.getString("analyseResultImg").replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
+                                    if ("-1".equals(recognitionMode) || "-2".equals(recognitionMode)) {
                                         log.info("双算法-第二算法图片生成-D");
-                                        redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName, "picpath").toString() + "," + analyseResultImg);
+                                        redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName, "picpath") + "," + analyseResultImg);
                                     } else {
                                         redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", analyseResultImg);
                                     }
                                 }
 
                                 // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形
-                                if (resultValue != "null" && !(resultValue.contains("device"))) {
+                                if (resultValue != null && !(resultValue.contains("device"))) {
                                     //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
                                     Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "缺陷异常", resultValue);
                                     cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
@@ -581,7 +580,7 @@ public class DataDealThread implements Runnable {
                                     tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
 
-                                    TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(jsonObjectResult.get("instanceId").toString()));
+                                    TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
 
                                     //生成缺陷缓存信息（单一缺陷和多元缺陷）
                                     log.info("--------____--------生成缺陷缓存");
@@ -590,18 +589,18 @@ public class DataDealThread implements Runnable {
                                         log.info("--------____--------单一缺陷");
                                         TDefectInfo tDefectInfo=new TDefectInfo();//实时入库
                                         Map<String, String> defectMap = new HashMap<>();
-                                        String redisFlag = jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                        String redisFlag = jsonObjectResult.get("taskId") + String.valueOf(UUID.randomUUID()).replace("-", "");
                                         String defectRedisName = "defectInfo:" + redisFlag;
                                         // TODO: 2021/2/19 判别并获取对应缺陷的缺陷算法等级
                                         defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
                                         log.info("defectMap:"+defectMap);
                                         defectMap.put("defectLevel", analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
                                         defectMap.put("defectContent", resultValue);
-                                        defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
-                                        defectMap.put("instanceId", cruiseResult.get("instanceId").toString());
-                                        TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(cruiseResult.get("instanceId").toString()));
+                                        defectMap.put("deviceId", cruiseResult.get("deviceId"));
+                                        defectMap.put("instanceId", cruiseResult.get("instanceId"));
+                                        TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResult.get("instanceId")));
                                         defectMap.put("customId", tStdDevicemete.getCustomId());
-                                        defectMap.put("stdMeteId", tStdDevicemete.getDeviceMeteId().toString());
+                                        defectMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
                                         defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未核查"));
                                         defectMap.put("imagePath", analyseResultImg);
                                         defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
@@ -609,24 +608,24 @@ public class DataDealThread implements Runnable {
                                         redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
 
                                         //缺陷插库  To be continue。。。
-                                        tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
-                                        tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime").toString()));//缺陷识别时间
-                                        tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
-                                        tDefectInfo.setDefectContent(defectMap.get("defectContent").toString());
-                                        tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId").toString()));
-                                        tDefectInfo.setInstanceId(Long.valueOf(defectMap.get("instanceId").toString()));
-                                        tDefectInfo.setCunstomId(defectMap.get("customId").toString());
-                                        tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId").toString()));
-                                        tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode").toString()));
-                                        tDefectInfo.setImagePath(defectMap.get("imagePath").toString());
-                                        tDefectInfo.setAlarmSource(Integer.valueOf(defectMap.get("alarmSource").toString()));
+                                        tDefectInfo.setDefectLevel(NumberUtils.toInt(defectMap.get("defectLevel")));
+                                        tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime")));//缺陷识别时间
+                                        tDefectInfo.setDefectType(NumberUtils.toInt(defectMap.get("defectType")));
+                                        tDefectInfo.setDefectContent(defectMap.get("defectContent"));
+                                        tDefectInfo.setDeviceId(NumberUtils.toLong(defectMap.get("deviceId")));
+                                        tDefectInfo.setInstanceId(NumberUtils.toLong(defectMap.get("instanceId")));
+                                        tDefectInfo.setCunstomId(defectMap.get("customId"));
+                                        tDefectInfo.setStdMeteId(NumberUtils.toLong(defectMap.get("stdMeteId")));
+                                        tDefectInfo.setConfMode(NumberUtils.toInt(defectMap.get("confMode")));
+                                        tDefectInfo.setImagePath(defectMap.get("imagePath"));
+                                        tDefectInfo.setAlarmSource(NumberUtils.toInt(defectMap.get("alarmSource")));
                                         defectInfos.add(tDefectInfo);
 
 
                                         //缺陷弹框PlanB-推送-单缺陷
                                         Map<String,String> currentWarnInfo=new HashMap<>();
-                                        currentWarnInfo.put("warnId",analyseDataOperateService.selectCurrentDefect().toString());
-                                        currentWarnInfo.put("defectModel",defectMap.get("defectType").toString());
+                                        currentWarnInfo.put("warnId", String.valueOf(analyseDataOperateService.selectCurrentDefect()));
+                                        currentWarnInfo.put("defectModel",defectMap.get("defectType"));
                                         currentWarnInfo.put("isPop","false");
 
 
@@ -643,7 +642,7 @@ public class DataDealThread implements Runnable {
                                         //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
                                         String alarmNote = tStdDevicemete.getAlarmNote();
                                         log.info("该测点是否配置了告警提示是===" + alarmNote);
-                                        Integer defectLevel = Integer.valueOf(defectMap.get("defectLevel"));
+                                        Integer defectLevel = NumberUtils.toInt(defectMap.get("defectLevel"));
                                         log.info("产生的该条缺陷的等级是===" + defectLevel);
                                         if (alarmNote != null && "1".equals(alarmNote)) {
                                             if (defectLevel == 133) {//危急
@@ -671,7 +670,7 @@ public class DataDealThread implements Runnable {
                                             log.info("缺陷处理方法：" + resultArr[i]);
                                             Map<String, String> defectMap = new HashMap<>();
                                             TDefectInfo tDefectInfo=new TDefectInfo();//实时入库
-                                            String redisFlag = jsonObjectResult.get("taskId").toString() + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                            String redisFlag = jsonObjectResult.get("taskId") + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             String defectRedisName = "defectInfo:" + redisFlag;
 //                                            defectMap.put("defectLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
 
@@ -679,11 +678,11 @@ public class DataDealThread implements Runnable {
                                             defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultArr[i]));
                                             defectMap.put("defectLevel", analyseDataOperateService.selectAlgorithmDefectInfo(defectMap.get("defectType")));
                                             defectMap.put("defectContent", resultArr[i]);
-                                            defectMap.put("deviceId", cruiseResult.get("deviceId").toString());
-                                            defectMap.put("instanceId", cruiseResult.get("instanceId").toString());
-                                            TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(cruiseResult.get("instanceId").toString()));
+                                            defectMap.put("deviceId", cruiseResult.get("deviceId"));
+                                            defectMap.put("instanceId", cruiseResult.get("instanceId"));
+                                            TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResult.get("instanceId")));
                                             defectMap.put("customId", tStdDevicemete.getCustomId());
-                                            defectMap.put("stdMeteId", tStdDevicemete.getDeviceMeteId().toString());
+                                            defectMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
                                             defectMap.put("confMode", "276");//确认状态--未核查
                                             defectMap.put("imagePath", analyseResultImg);
                                             defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
@@ -694,24 +693,24 @@ public class DataDealThread implements Runnable {
                                             redisTemplate.opsForHash().putAll(defectRedisName, defectMap);
 
                                             //缺陷插库
-                                            tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
-                                            tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime").toString()));//缺陷识别时间
-                                            tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
-                                            tDefectInfo.setDefectContent(defectMap.get("defectContent").toString());
-                                            tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId").toString()));
-                                            tDefectInfo.setInstanceId(Long.valueOf(defectMap.get("instanceId").toString()));
-                                            tDefectInfo.setCunstomId(defectMap.get("customId").toString());
-                                            tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId").toString()));
-                                            tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode").toString()));
-                                            tDefectInfo.setImagePath(defectMap.get("imagePath").toString());
-                                            tDefectInfo.setAlarmSource(Integer.valueOf(defectMap.get("alarmSource").toString()));
+                                            tDefectInfo.setDefectLevel(NumberUtils.toInt(defectMap.get("defectLevel")));
+                                            tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime")));//缺陷识别时间
+                                            tDefectInfo.setDefectType(NumberUtils.toInt(defectMap.get("defectType")));
+                                            tDefectInfo.setDefectContent(defectMap.get("defectContent"));
+                                            tDefectInfo.setDeviceId(NumberUtils.toLong(defectMap.get("deviceId")));
+                                            tDefectInfo.setInstanceId(NumberUtils.toLong(defectMap.get("instanceId")));
+                                            tDefectInfo.setCunstomId(defectMap.get("customId"));
+                                            tDefectInfo.setStdMeteId(NumberUtils.toLong(defectMap.get("stdMeteId")));
+                                            tDefectInfo.setConfMode(NumberUtils.toInt(defectMap.get("confMode")));
+                                            tDefectInfo.setImagePath(defectMap.get("imagePath"));
+                                            tDefectInfo.setAlarmSource(NumberUtils.toInt(defectMap.get("alarmSource")));
                                             defectInfos.add(tDefectInfo);
 
 
                                             //缺陷弹框PlanB-推送-多缺陷
                                             Map<String,String> currentWarnInfo=new HashMap<>();
-                                            currentWarnInfo.put("warnId",analyseDataOperateService.selectCurrentWarn().toString());
-                                            currentWarnInfo.put("defectModel",defectMap.get("defectType").toString());
+                                            currentWarnInfo.put("warnId", String.valueOf(analyseDataOperateService.selectCurrentWarn()));
+                                            currentWarnInfo.put("defectModel",defectMap.get("defectType"));
                                             currentWarnInfo.put("isPop","false");
 
 
@@ -719,7 +718,7 @@ public class DataDealThread implements Runnable {
                                             //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
                                             String alarmNote = tStdDevicemete.getAlarmNote();
                                             log.info("该测点是否配置了告警提示是===" + alarmNote);
-                                            Integer defectLevel = Integer.valueOf(defectMap.get("defectLevel"));
+                                            Integer defectLevel = NumberUtils.toInt(defectMap.get("defectLevel"));
                                             log.info("产生的该条缺陷的等级是===" + defectLevel);
                                             if (alarmNote != null && "1".equals(alarmNote)) {
                                                 if (defectLevel == 133) {//危急
@@ -786,7 +785,7 @@ public class DataDealThread implements Runnable {
                     }
 
 
-                    if (recognitionMode.equals("0")) {
+                    if ("0".equals(recognitionMode)) {
                         //双算法-第一算法处理
                         log.info("DoubleAlgorithmDealing......................");
                         redisTemplate.opsForHash().putAll("t_cruise_task_result:" + redisName, cruiseResultMap);
@@ -851,11 +850,11 @@ public class DataDealThread implements Runnable {
                         log.info("Border_______---------______________________________________________________________________________________________");
                         //若本任务上一次有巡视数据，则正常或异常点数要进行加和
                         if (redisTemplate.opsForHash().entries("taskConstant:" + TASKID).size() != 0) {
-                            tNormal = Integer.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tNormal").toString()) + tNormal;
-                            tAbnormal = Integer.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tAbnormal").toString()) + tAbnormal;
+                            tNormal = NumberUtils.toInt(String.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tNormal"))) + tNormal;
+                            tAbnormal = NumberUtils.toInt(String.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tAbnormal"))) + tAbnormal;
                         }
-                        taskConstant.put("tNormal", tNormal.toString());
-                        taskConstant.put("tAbnormal", tAbnormal.toString());
+                        taskConstant.put("tNormal", String.valueOf(tNormal));
+                        taskConstant.put("tAbnormal", String.valueOf(tAbnormal));
                         redisTemplate.opsForHash().putAll("taskConstant:" + TASKID, taskConstant);//插入任务常量Map
                         log.info("任务常量配置完成");
 
@@ -864,37 +863,37 @@ public class DataDealThread implements Runnable {
                         // webSocket通知前端调用巡视监控的接口
                         Map<String, Object> jasonMap = new HashMap<>();
                         jasonMap.put("type", "finishedOneInstance");
-                        jasonMap.put("taskId", cruiseResult.get("taskId").toString());
+                        jasonMap.put("taskId", cruiseResult.get("taskId"));
                         String json = JSON.toJSONString(jasonMap);
                         log.info("发送给前端的消息：" + json);
                         postUrl(syncWebsocketUrl,json);
 
                         //修改缓存中任务算法巡视点List
-                        redisTemplate.opsForList().remove("analysisList:" + cruiseResult.get("taskId").toString(), 0, cruiseResult.get("instanceId").toString());
-                        redisTemplate.opsForList().leftPush("analysisList:" + cruiseResult.get("taskId").toString(), "0");
+                        redisTemplate.opsForList().remove("analysisList:" + cruiseResult.get("taskId"), 0, cruiseResult.get("instanceId"));
+                        redisTemplate.opsForList().leftPush("analysisList:" + cruiseResult.get("taskId"), "0");
 
                         log.info("RedisList修改成功");
                     }
 
                 }
 
-            } else if (jsonObject.get("msgType").toString().equals("6")) { //任务结束后发来的心跳信息
-                String taskId = JSON.parseObject(jsonObject.get("msgData").toString()).get("taskId").toString();
-                String instanceId = JSON.parseObject(jsonObject.get("msgData").toString()).get("instanceId").toString();
+            } else if ("6".equals(jsonObject.get("msgType"))) { //任务结束后发来的心跳信息
+                String taskId = JSON.parseObject(jsonObject.getString("msgData")).getString("taskId");
+                String instanceId = JSON.parseObject(jsonObject.getString("msgData")).getString("instanceId");
                 redisTemplate.opsForList().leftPush("analysisList:" + taskId, "-1");
                 log.info("心跳处理结束" + taskId);
                 //处理心跳线程私有变量 taskId赋值
                 TASKID = taskId;
             }
 
-            if (redisTemplate.opsForList().index("analysisList:" + TASKID, 0).equals("-1")) {  //满足插库条件
+            if ("-1".equals(redisTemplate.opsForList().index("analysisList:" + TASKID, 0))) {  //满足插库条件
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String finalCruiseKey = "instanceId";//最后修改任务表信息所需的redis KEY名
                 log.info("任务结束-开始数据存储");
                 //插库时从redis中取出正常、异常点数
-                Map<String, Object> taskConstant = redisTemplate.opsForHash().entries("taskConstant:" + TASKID);
-                Integer tAbnormal = Integer.valueOf(taskConstant.get("tAbnormal").toString());
-                Integer tNormal = Integer.valueOf(taskConstant.get("tNormal").toString());
+                Map<String, String> taskConstant = redisTemplate.opsForHash().entries("taskConstant:" + TASKID);
+                Integer tAbnormal = NumberUtils.toInt(taskConstant.get("tAbnormal"));
+                Integer tNormal = NumberUtils.toInt(taskConstant.get("tNormal"));
                 log.info("正常点数：" + tNormal);
                 log.info("异常点数：" + tAbnormal);
                 List<String> cruiseResultIds = new ArrayList<>();//cruiseResultIds
@@ -909,20 +908,20 @@ public class DataDealThread implements Runnable {
                     log.info("cruisekeys:" + cruiseKeys);
                     finalCruiseKey = cruiseKeys.get(0);//挑选一名幸运Redis KEY值
                     for (String cruiseKey : cruiseKeys) {
-                        Map<String, Object> cruiseWorkedMap = redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
+                        Map<String, String> cruiseWorkedMap = redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
                         //TCTRD
                         log.info("TCTRD开始");
                         TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
-                        tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
-                        tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId").toString());
-                        tCruiseTaskResultDetail.setDeviceId(Long.valueOf(cruiseWorkedMap.get("deviceId").toString()));
-                        tCruiseTaskResultDetail.setDeviceName(cruiseWorkedMap.get("deviceName").toString());
-                        tCruiseTaskResultDetail.setInstanceId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
-                        tCruiseTaskResultDetail.setInstanceName(cruiseWorkedMap.get("instanceName").toString());
-                        tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime").toString()));
-                        tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime").toString()));
-                        tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(cruiseWorkedMap.get("cruiseStatus").toString()));
-                        tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark").toString());
+                        tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId") + cruiseWorkedMap.get("instanceId"));
+                        tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId"));
+                        tCruiseTaskResultDetail.setDeviceId(NumberUtils.toLong(cruiseWorkedMap.get("deviceId")));
+                        tCruiseTaskResultDetail.setDeviceName(cruiseWorkedMap.get("deviceName"));
+                        tCruiseTaskResultDetail.setInstanceId(NumberUtils.toLong(cruiseWorkedMap.get("instanceId")));
+                        tCruiseTaskResultDetail.setInstanceName(cruiseWorkedMap.get("instanceName"));
+                        tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime")));
+                        tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime")));
+                        tCruiseTaskResultDetail.setCruiseStatus(NumberUtils.toInt(cruiseWorkedMap.get("cruiseStatus")));
+                        tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark"));
                         log.info("TCDRD内容：" + tCruiseTaskResultDetail);
                         detailList.add(tCruiseTaskResultDetail);
                         cruiseResultIds.add(tCruiseTaskResultDetail.getCruiseResultId());
@@ -930,39 +929,39 @@ public class DataDealThread implements Runnable {
                         //TCDR
                         log.info("TCDR开始");
                         TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
-                        tCruiseDataResult.setCruiseId(Long.valueOf(cruiseWorkedMap.get("instanceId").toString()));
-                        tCruiseDataResult.setCruiseName(cruiseWorkedMap.get("cruiseName").toString());
-                        tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath").toString());
-                        tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum").toString());
-                        tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc").toString());
-                        tCruiseDataResult.setCruiseType(Integer.valueOf(cruiseWorkedMap.get("cruiseType").toString()));
-                        tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum").toString());
-                        tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic").toString());
-                        tCruiseDataResult.setEvaluationState(Integer.valueOf(analyseDataOperateService.selectDictCode("evaluation_state", "未审核")));
-                        tCruiseDataResult.setCruiseResult(Integer.valueOf(cruiseWorkedMap.get("cruiseResult").toString()));
-                        if (cruiseWorkedMap.get("cruiseAbnormal").toString().equals("--")) {
+                        tCruiseDataResult.setCruiseId(NumberUtils.toLong(cruiseWorkedMap.get("instanceId")));
+                        tCruiseDataResult.setCruiseName(cruiseWorkedMap.get("cruiseName"));
+                        tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath"));
+                        tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum"));
+                        tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc"));
+                        tCruiseDataResult.setCruiseType(NumberUtils.toInt(cruiseWorkedMap.get("cruiseType")));
+                        tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum"));
+                        tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic"));
+                        tCruiseDataResult.setEvaluationState(NumberUtils.toInt(analyseDataOperateService.selectDictCode("evaluation_state", "未审核")));
+                        tCruiseDataResult.setCruiseResult(NumberUtils.toInt(cruiseWorkedMap.get("cruiseResult")));
+                        if ("--".equals(cruiseWorkedMap.get("cruiseAbnormal"))) {
                             tCruiseDataResult.setCruiseAbnormal(null);
                         } else {
-                            if (cruiseWorkedMap.get("cruiseAbnormal").toString().contains(",")) {
-                                String[] abnormalArr = cruiseWorkedMap.get("cruiseAbnormal").toString().split(",");
-                                tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(abnormalArr[0]));
+                            if (cruiseWorkedMap.get("cruiseAbnormal").contains(",")) {
+                                String[] abnormalArr = cruiseWorkedMap.get("cruiseAbnormal").split(",");
+                                tCruiseDataResult.setCruiseAbnormal(NumberUtils.toInt(abnormalArr[0]));
                                 tCruiseDataResult.setRemark(abnormalArr[1]);
                             } else {
-                                tCruiseDataResult.setCruiseAbnormal(Integer.valueOf(cruiseWorkedMap.get("cruiseAbnormal").toString()));
+                                tCruiseDataResult.setCruiseAbnormal(NumberUtils.toInt(cruiseWorkedMap.get("cruiseAbnormal")));
                             }
 
                         }
-                        tCruiseDataResult.setEvaluationState(Integer.valueOf(cruiseWorkedMap.get("evaluationState").toString()));
+                        tCruiseDataResult.setEvaluationState(NumberUtils.toInt(cruiseWorkedMap.get("evaluationState")));
                         tCruiseDataResult.setCreatetime(new Date());
-                        tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId").toString() + cruiseWorkedMap.get("instanceId").toString());
-                        tCruiseDataResult.setIsWarn(Integer.valueOf(cruiseWorkedMap.get("isWarn").toString()));
+                        tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId") + cruiseWorkedMap.get("instanceId"));
+                        tCruiseDataResult.setIsWarn(NumberUtils.toInt(cruiseWorkedMap.get("isWarn")));
                         if(Objects.nonNull(cruiseWorkedMap.get("firDocPath"))){
-                            tCruiseDataResult.setResultPic(cruiseWorkedMap.get("firDocPath").toString());
+                            tCruiseDataResult.setResultPic(cruiseWorkedMap.get("firDocPath"));
                         }else {
                             tCruiseDataResult.setResultPic("");
                         }
-                        if(Objects.nonNull(cruiseWorkedMap.get("firName")) && !(cruiseWorkedMap.get("firName").equals("null"))){
-                            tCruiseDataResult.setFirName(cruiseWorkedMap.get("firName").toString());
+                        if(Objects.nonNull(cruiseWorkedMap.get("firName")) && !("null".equals(cruiseWorkedMap.get("firName")))){
+                            tCruiseDataResult.setFirName(cruiseWorkedMap.get("firName"));
                             tCruiseDataResult.setFirDate(new SimpleDateFormat("yyyyMMddHHmmssSSS").parse(tCruiseDataResult.getFirName()));
                             // TODO: 2021/3/25 FIR文件名与时间赋值
                         }
@@ -977,17 +976,17 @@ public class DataDealThread implements Runnable {
 //                        Map<String, Object> defectMap = redisTemplate.opsForHash().entries(key);
 //                        log.info("TDI开始");
 //                        TDefectInfo tDefectInfo = new TDefectInfo();
-//                        tDefectInfo.setDefectLevel(Integer.valueOf(defectMap.get("defectLevel").toString()));
-//                        tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime").toString()));//缺陷识别时间
-//                        tDefectInfo.setDefectType(Integer.valueOf(defectMap.get("defectType").toString()));
-//                        tDefectInfo.setDefectContent(defectMap.get("defectContent").toString());
-//                        tDefectInfo.setDeviceId(Long.valueOf(defectMap.get("deviceId").toString()));
-//                        tDefectInfo.setInstanceId(Long.valueOf(defectMap.get("instanceId").toString()));
-//                        tDefectInfo.setCunstomId(defectMap.get("customId").toString());
-//                        tDefectInfo.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId").toString()));
-//                        tDefectInfo.setConfMode(Integer.valueOf(defectMap.get("confMode").toString()));
-//                        tDefectInfo.setImagePath(defectMap.get("imagePath").toString());
-//                        tDefectInfo.setAlarmSource(Integer.valueOf(defectMap.get("alarmSource").toString()));
+//                        tDefectInfo.setDefectLevel(NumberUtils.toInt(defectMap.get("defectLevel")));
+//                        tDefectInfo.setDefectTime(simpleDateFormat.parse(defectMap.get("defectTime")));//缺陷识别时间
+//                        tDefectInfo.setDefectType(NumberUtils.toInt(defectMap.get("defectType")));
+//                        tDefectInfo.setDefectContent(defectMap.get("defectContent"));
+//                        tDefectInfo.setDeviceId(NumberUtils.toLong(defectMap.get("deviceId")));
+//                        tDefectInfo.setInstanceId(NumberUtils.toLong(defectMap.get("instanceId")));
+//                        tDefectInfo.setCunstomId(defectMap.get("customId"));
+//                        tDefectInfo.setStdMeteId(NumberUtils.toLong(defectMap.get("stdMeteId")));
+//                        tDefectInfo.setConfMode(NumberUtils.toInt(defectMap.get("confMode")));
+//                        tDefectInfo.setImagePath(defectMap.get("imagePath"));
+//                        tDefectInfo.setAlarmSource(NumberUtils.toInt(defectMap.get("alarmSource")));
 //                        defectList.add(tDefectInfo);
 //                    }
 
@@ -1015,17 +1014,16 @@ public class DataDealThread implements Runnable {
                     log.info("两表结束插入");
                     cruiseKeys.clear();
                 } catch (Exception e) {
-                    log.error("插表错误" + e);
-                    log.info("ReasonDetail"+e.getStackTrace()[0]);
+                    log.error("插表错误", e);
                 }
 
                 // 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作
-                Map<String, Object> cruiseResult = redisTemplate.opsForHash().entries(finalCruiseKey);
+                Map<String, String> cruiseResult = redisTemplate.opsForHash().entries(finalCruiseKey);
                 String strForCountAbnormal = "countForAbnormal:" + TASKID;
-                Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
-                Integer total = Integer.valueOf(abnormalCount.get("all").toString());
-                Integer abnormal = Integer.valueOf(abnormalCount.get("abnormal").toString());
-                Integer normal = Integer.valueOf(abnormalCount.get("normal").toString());
+                Map<String, String> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                Integer total = NumberUtils.toInt(abnormalCount.get("all"));
+                Integer abnormal = NumberUtils.toInt(abnormalCount.get("abnormal"));
+                Integer normal = NumberUtils.toInt(abnormalCount.get("normal"));
                 log.info("All：" + total);
                 //判断最后一个执行完成的巡视点是否是算法点--T:插TCTR库表和修改TCR库表；F：更新异常、正常点数量
                 tAbnormal = tAbnormal + abnormal;
@@ -1038,12 +1036,12 @@ public class DataDealThread implements Runnable {
                     try {
                         log.info("TCTR开始");
                         TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
-                        tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId").toString());
-                        tCruiseTaskResult.setTaskId(cruiseResult.get("taskId").toString());
-                        tCruiseTaskResult.setTaskName(cruiseResult.get("taskName").toString());
+                        tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId"));
+                        tCruiseTaskResult.setTaskId(cruiseResult.get("taskId"));
+                        tCruiseTaskResult.setTaskName(cruiseResult.get("taskName"));
                         tCruiseTaskResult.setTaskAbnormal(tAbnormal);
                         tCruiseTaskResult.setTaskAlarm(0);
-                        tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run").toString());
+                        tCruiseTaskResult.setRunExecute(cruiseResult.get("if_run"));
 //                                tCruiseTaskResult.setCruiseTaskTime();
 
                         log.info("taskId-----------:" + tCruiseTaskResult.getTaskId());
@@ -1056,8 +1054,8 @@ public class DataDealThread implements Runnable {
 
                         //TCR开始
                         log.info("TCR开始");
-                        TCruiseResult tCruiseResult = analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId").toString());
-                        tCruiseResult.setCState(Integer.valueOf(analyseDataOperateService.selectDictCode("task_state", "执行完成").toString()));
+                        TCruiseResult tCruiseResult = analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId"));
+                        tCruiseResult.setCState(NumberUtils.toInt(analyseDataOperateService.selectDictCode("task_state", "执行完成")));
                         tCruiseResult.setTaskWait(0);
                         analyseDataOperateService.updateCruiseResult(tCruiseResult);
                         //低优先级任务继续
@@ -1067,7 +1065,7 @@ public class DataDealThread implements Runnable {
                         // webSocket通知前端调用巡视监控的接口（任务完成）
                         Map<String, Object> jasonMap = new HashMap<>();
                         jasonMap.put("type", "lastOneInstance");
-                        jasonMap.put("taskId", cruiseResult.get("taskId").toString());
+                        jasonMap.put("taskId", cruiseResult.get("taskId"));
                         String json = JSON.toJSONString(jasonMap);
                         log.info("发送给前端的消息：" + json);
                         postUrl(syncWebsocketUrl,json);
@@ -1083,8 +1081,8 @@ public class DataDealThread implements Runnable {
                     log.info("不满足修改任务条件，对正常异常点数进行修改...............");
                     redisTemplate.delete("taskConstant:" + TASKID);//清楚当前-1阶段所有点数
                     Map<String, String> mapForAbnormal = new HashMap<>();
-                    mapForAbnormal.put("abnormal", tAbnormal.toString());
-                    mapForAbnormal.put("normal", tNormal.toString());
+                    mapForAbnormal.put("abnormal", String.valueOf(tAbnormal));
+                    mapForAbnormal.put("normal", String.valueOf(tNormal));
                     redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
                     log.info("修改后的abnormal：" + tAbnormal);
                     log.info("修改后的normal：" + tNormal);
