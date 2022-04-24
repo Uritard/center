@@ -35,7 +35,8 @@ public class StatisticsController {
   @ApiOperation(value = "机器人/无人机可靠性")
   @GetMapping(value = "/robot")
   public Result robot(
-      @RequestParam(value = "id") Long id, @RequestParam(value = "type") String type) {
+      @RequestParam(value = "id", required = false) Long id,
+      @RequestParam(value = "type") String type) {
     Result result = new Result();
     try {
       result.setData(statisticsService.selectStatisticsRobot(id, type));
@@ -48,7 +49,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "摄像机可靠性")
   @GetMapping(value = "/camera")
-  public Result camera(@RequestParam(value = "id") Long id) {
+  public Result camera(@RequestParam(value = "id", required = false) Long id) {
     Result result = new Result();
     try {
       result.setData(statisticsService.countCamera(id));

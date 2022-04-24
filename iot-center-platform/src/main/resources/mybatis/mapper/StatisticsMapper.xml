@@ -19,26 +19,26 @@
     </select>
     <select id="countCamera" resultType="java.util.HashMap">
         SELECT tcp.`camera_id`,
-               TO_DAYS(NOW()) - TO_DAYS(tci.commission_date) + 1 commissionDay,
-               (SELECT COUNT(
-                               DISTINCT DATE_FORMAT(tcdr.`createtime`, '%Y-%m-%d')
-                           ))                                    cruiseDay,
-               SUM(IF(tcdr.cruise_result = 247, 1, 0)) AS        validNum,
-               COUNT(result.task_result_id)                      totalNum
+        TO_DAYS(NOW()) - TO_DAYS(tci.commission_date) + 1 commissionDay,
+        (SELECT COUNT(
+        DISTINCT DATE_FORMAT(tcdr.`createtime`, '%Y-%m-%d')
+        )) cruiseDay,
+        SUM(IF(tcdr.cruise_result = 247, 1, 0)) AS lossNum,
+        COUNT(result.task_result_id) totalNum
         FROM t_camera_preset tcp
-                 LEFT JOIN `t_cruise_point_instance` tcpi
-                           ON tcp.`preset_id` = tcpi.`cruise_id`
-                 LEFT JOIN `t_camera_info` tci
-                           ON tci.`camera_id` = tcp.`camera_id`
-                 LEFT JOIN `t_cruise_data_result` tcdr
-                           ON tcdr.`cruise_id` = tcpi.`instance_id`
-                               and tci.commission_date  <![CDATA[<]]> tcdr.`createtime`
-                 LEFT JOIN t_cruise_task_result_detail detail
-                           ON detail.cruise_result_id = tcdr.cruise_result_id
-                 LEFT JOIN t_cruise_task_result result
-                           ON detail.task_result_id = result.task_result_id
+        LEFT JOIN `t_cruise_point_instance` tcpi
+        ON tcp.`preset_id` = tcpi.`cruise_id`
+        LEFT JOIN `t_camera_info` tci
+        ON tci.`camera_id` = tcp.`camera_id`
+        LEFT JOIN `t_cruise_data_result` tcdr
+        ON tcdr.`cruise_id` = tcpi.`instance_id`
+        and tci.commission_date  <![CDATA[<]]> tcdr.`createtime`
+        LEFT JOIN t_cruise_task_result_detail detail
+        ON detail.cruise_result_id = tcdr.cruise_result_id
+        LEFT JOIN t_cruise_task_result result
+        ON detail.task_result_id = result.task_result_id
         WHERE tci.`commission_date` IS TRUE
-          and tci.`commission_date`  <![CDATA[<=]]> now()
+        and tci.`commission_date`  <![CDATA[<=]]> now()
         <if test="cameraId != null and cameraId != ''">and tcp.camera_id = #{cameraId, jdbcType=BIGINT}</if>
         GROUP BY camera_id
     </select>
@@ -317,7 +317,6 @@
         WHERE detail.cruise_time BETWEEN #{startTime} and #{endTime}
         group by month
     </select>
-
 
 
     <select id="selectRecordByCamera" resultType="java.lang.Long">

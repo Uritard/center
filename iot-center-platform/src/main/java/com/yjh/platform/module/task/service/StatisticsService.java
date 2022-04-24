@@ -192,18 +192,19 @@ public class StatisticsService {
    */
   public List<Map<String, Object>> countCamera(Long cameraId) {
     List<Map<String, Object>> mapList = statisticsDao.countCamera(cameraId);
+    Map<Long, Long> recordMap = new HashMap<Long, Long>(16);
     for (Map<String, Object> map : mapList) {
       double totalNum = Double.parseDouble(map.get("totalNum").toString());
-      double validNum = Double.parseDouble(map.get("validNum").toString());
+      double lossNum = Double.parseDouble(map.get("lossNum").toString());
       if (totalNum != 0) {
-        String lossPercent = String.format("%.3f", validNum * 100 / totalNum);
+        String lossPercent = String.format("%.3f", lossNum * 100 / totalNum);
         map.put("lossPercent", lossPercent + "%");
       }
 
-      double allDay = Double.parseDouble(map.get("commissionDay").toString());
-      double cruiseDay = Double.parseDouble(map.get("validNum").toString());
-      if (allDay != 0) {
-        String cruisePercent = String.format("%.3f", cruiseDay * 100 / allDay);
+      double commissionDay = Double.parseDouble(map.get("commissionDay").toString());
+      double cruiseDay = Double.parseDouble(map.get("cruiseDay").toString());
+      if (commissionDay != 0) {
+        String cruisePercent = String.format("%.3f", cruiseDay * 100 / commissionDay);
         map.put("cruisePercent", cruisePercent + "%");
       }
 
@@ -215,6 +216,16 @@ public class StatisticsService {
         log.error("相机cameraId={}无对应的录像机", camera_id);
         continue;
       }
+      recordMap.put(camera_id, recordId);
+    }
+
+    Set<Long> set = new HashSet();
+    for (Map.Entry map : recordMap.entrySet()) {
+      Long recordId = (Long) map.getValue();
+      set.add(recordId);
+    }
+    Map<Long, String> percentMap = new HashMap<>(8);
+    for (Long recordId : set) {
       Result re = getNVRInfo(recordId);
       if (re == null) {
         continue;
@@ -222,9 +233,19 @@ public class StatisticsService {
       Map<String, String> mapData = (Map<String, String>) re.getData();
       int intactTime =
           mapData.get("intactTime") == null ? 0 : Integer.parseInt(mapData.get("intactTime"));
+      log.info("录像机{}的完整率查询结果：{}", recordId, intactTime);
       if (intactTime != 0) {
         String intactPercent = String.format("%.3f", intactTime / 100d);
-        map.put("intactPercent", intactPercent + "%");
+        for (Map.Entry map : recordMap.entrySet()) {
+          if (recordId.equals(map.getValue())) {
+            percentMap.put((Long) map.getKey(), intactPercent + "%");
+          }
+        }
+      }
+    }
+    if (percentMap.size() > 0) {
+      for (Map<String, Object> map : mapList) {
+        map.put("intactPercent", percentMap.get("camera_id"));
       }
     }
     return mapList;
