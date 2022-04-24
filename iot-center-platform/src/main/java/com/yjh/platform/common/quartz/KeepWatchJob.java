@@ -65,6 +65,7 @@ public class KeepWatchJob implements Runnable {
             //获取间隔时间
             Map<String, String> mapForKeepWatchTime = redisTemplate.opsForHash().entries("t_sys_param:keepWatchTime");
             Integer keepWatchTime = Integer.parseInt(mapForKeepWatchTime.get("content")) * 60 * 1000;
+            Date start = new Date();
             cameraIdList.forEach(cameraId -> {
                         String str = "camera_info:" + cameraId;
                         Map<String, String> map = redisTemplate.opsForHash().entries(str);
@@ -81,13 +82,16 @@ public class KeepWatchJob implements Runnable {
                                     log.info("摄像机id：{} 回到守望位错误：{}", cameraId, e);
                                 }
                                 long now = new Date().getTime();
-                                if ((now - oldTime) > keepWatchTime) {
+                                if ((now - oldTime) >= keepWatchTime) {
                                     TCameraPreset preset = tCameraPresetDao.selectKeepWatch(cameraId);
                                     if (preset != null) {
                                         HashMap<String, Object> moveMap = new HashMap<>();
                                         moveMap.put("presetId", preset.getPresetId());
                                         moveMap.put("cameraId", preset.getCameraId());
-                                        move(moveMap);
+                                        log.info("守望时间："+new Date());
+                                        new Thread(()->{
+                                            move(moveMap);
+                                        });
                                     }
                                 }
 
@@ -97,7 +101,11 @@ public class KeepWatchJob implements Runnable {
             );
 
             try {
-                Thread.sleep(keepWatchTime);
+                Date End = new Date();
+                log.info("代码执行开始时间："+start);
+                log.info("代码执行结束时间："+End);
+
+                Thread.sleep(10*1000);//10秒查一次
             } catch (Exception e) {
                 log.info("摄像头获取手守望时间出错，{}", e);
             }
