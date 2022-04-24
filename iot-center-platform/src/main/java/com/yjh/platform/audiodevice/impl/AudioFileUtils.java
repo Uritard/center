@@ -38,9 +38,9 @@ public class AudioFileUtils {
      */
     public static byte[] getWaveFileHeader(long totalAudioLen, long sampleRate, int channels,
                                             long audioFormat) {
-        byte[] header = new byte[AUDIO_HEADER_LENGTH];
         long totalDataLen = totalAudioLen + 36;
-        long byteRate = sampleRate * 2 * channels;
+        byte[] header = new byte[AUDIO_HEADER_LENGTH];
+        long byteRate = (sampleRate * audioFormat * channels) / 8;
 
         // RIFF/WAVE header
         header[0] = 'R';
