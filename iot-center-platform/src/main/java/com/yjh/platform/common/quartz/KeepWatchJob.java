@@ -91,7 +91,7 @@ public class KeepWatchJob implements Runnable {
                                         log.info("守望时间："+new Date());
                                         new Thread(()->{
                                             move(moveMap);
-                                        });
+                                        }).start();
                                     }
                                 }
 
