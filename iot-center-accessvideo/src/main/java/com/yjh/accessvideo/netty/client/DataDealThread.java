@@ -909,13 +909,13 @@ public class DataDealThread implements Runnable {
                         Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
                         JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
                         //,先取出算法平台返回的resultinfo中的结果图片路径
-                        String resultImagebak=jsonObjectResultbak.get("analyseResultImg").toString();
-                        String taskidbak=jsonObjectResultbak.get("taskId").toString();
-                        String  instanceId=jsonObjectResultbak.get("instanceId").toString();
+                        String resultImagebak=jsonObjectResultbak.getString("analyseResultImg");
+                        String taskidbak=jsonObjectResultbak.getString("taskId");
+                        String  instanceId=jsonObjectResultbak.getString("instanceId");
                         Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak+":"+instanceId);//读redis
-                        String devicename= cruiseResult2.get("deviceName").toString();
+                        String devicename= String.valueOf(cruiseResult2.get("deviceName"));
                         //,获取原始路径.并拼接算法管理平台对应远程文件路径
-                        String origpicpath=cruiseResult2.get("origpic").toString();
+                        String origpicpath=String.valueOf(cruiseResult2.get("origpic").toString());
                         String[] str2=origpicpath.split("/");
                         String origpcimagename=str2[str2.length-1];
                         String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+origpcimagename;
@@ -925,7 +925,7 @@ public class DataDealThread implements Runnable {
                         String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+imagename;
                         //,获取基准路径.并拼接算法管理平台所需要的基准文件路径
                         TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
-                        String Cruiseid=tCruisePointInstance.getCruiseid().toString();   //获取巡视点位id
+                        String Cruiseid=String.valueOf(tCruisePointInstance.getCruiseid());   //获取巡视点位id
                         String judgeBaseImagepath= redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString();
                         judgeBaseImagepath=judgeBaseImagepath+"/"+Cruiseid+"/"+Cruiseid+".jpg"; //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
                         //拼接算法管理平台分析告警结果图片地址
@@ -975,13 +975,13 @@ public class DataDealThread implements Runnable {
                         Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
                         JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
                         //,先取出算法平台返回的resultinfo中的结果图片路径
-                        String resultImagebak=jsonObjectResultbak.get("analyseResultImg").toString(); //分析结果过
-                        String taskidbak=jsonObjectResultbak.get("taskId").toString();
-                        String  instanceId=jsonObjectResultbak.get("instanceId").toString();
+                        String resultImagebak=jsonObjectResultbak.getString("analyseResultImg"); //分析结果过
+                        String taskidbak=jsonObjectResultbak.getString("taskId");
+                        String  instanceId=jsonObjectResultbak.getString("instanceId");
                         Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak+":"+instanceId);//读redis
-                        String devicename= cruiseResult2.get("deviceName").toString();
+                        String devicename= String.valueOf(cruiseResult2.get("deviceName"));
                         // 获取原始图路径
-                        String origpicpath=cruiseResult2.get("origpic").toString();
+                        String origpicpath=String.valueOf(cruiseResult2.get("origpic"));
                         String[] str2=origpicpath.split("/");
                         String origpcimagename=str2[str2.length-1];
                         //拼接算法管理平台原始图片推送地址
