@@ -61,7 +61,7 @@ public class TRecordFileInfoController {
     @Logs(title = "查询录像文件", content = "根据用户传递的参数分页查询录像文件", logType = 1, authority = "1235")
     public Result selectByPage(@RequestParam(value = "cameraId", required = false) Long cameraId,
                                @RequestParam(value = "startTime", required = false) String startTime,
-                               @RequestParam(value = "stopTime", required = false)  String endTime,
+                               @RequestParam(value = "endTime", required = false)  String endTime,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
         Result result = new Result();

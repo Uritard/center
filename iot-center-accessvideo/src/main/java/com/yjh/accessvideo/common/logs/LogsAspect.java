@@ -140,6 +140,7 @@ public class LogsAspect {
             return joinPoint.proceed();
         } catch (Throwable e) {
             serviceId = logsConfig.getName();
+            assert false;
             params.set("logType", annotation.logType());
             params.set("ip", ip);
             params.set("title", "内部接口错误");

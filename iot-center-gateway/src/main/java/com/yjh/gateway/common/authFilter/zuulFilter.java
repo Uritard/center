@@ -176,7 +176,10 @@ public class zuulFilter extends ZuulFilter {
                         String referer = request.getHeader("Referer") != null ? request.getHeader("Referer") : "";
                         String number=referer.substring(0, referer.indexOf(":"));
                         String orig=origin.substring(origin.lastIndexOf('/') + 1);
-
+                        String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
+                        if(StringUtils.isEmpty(userId)) {
+                            userId = (String)redisTemplate.opsForHash().get("userInfo:nameId", userName);
+                        }
                         String ym="yjh.biandian.com";
                         if(orig.contains(":")) {
                             String originIp = origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':'));
@@ -185,7 +188,7 @@ public class zuulFilter extends ZuulFilter {
                                     log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
                                     ctx.setSendZuulResponse(false);
                                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                                    logsAspect.loginLogsSend(request, originIp, "27", "IP地址异常", "IP篡改: " + originIp + ",本机IP: " + IpUtil.getLocalIp() , userName , "0", 2);
+                                    logsAspect.loginLogsSend(request, originIp, "27", "IP地址异常", "IP篡改: " + originIp + ",本机IP: " + IpUtil.getLocalIp() , userName , userId, 2);
                                     return false;
                                 }
                             }
@@ -196,7 +199,7 @@ public class zuulFilter extends ZuulFilter {
                                     log.error("IP篡改: " + originIp + " ,之后的ip: " + originIp + ",本机IP: " + IpUtil.getLocalIp());
                                     ctx.setSendZuulResponse(false);
                                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                                    logsAspect.loginLogsSend(request, originIp, "27", "IP地址异常", "IP篡改: " + originIp + ",本机IP: " + IpUtil.getLocalIp() , userName, "0", 2);
+                                    logsAspect.loginLogsSend(request, originIp, "27", "IP地址异常", "IP篡改: " + originIp + ",本机IP: " + IpUtil.getLocalIp() , userName, userId, 2);
                                     return false;
                                 }
                             }
@@ -295,6 +298,7 @@ public class zuulFilter extends ZuulFilter {
                 ctx.setSendZuulResponse(false);
                 ctx.setResponseStatusCode(HttpStatus.SC_PAYMENT_REQUIRED);
                 ctx.setResponseBody("{\"code\":500,\"message\":\"Unbound IP address!\"}");
+                logsAspect.loginLogsSend(request, ipAddr, "27", "IP地址异常", "IP:" + ipAddr + "与用户" + userName + "未绑定", userName, userId, 2);
                 return false;
             }
         }

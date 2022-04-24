@@ -36,15 +36,15 @@ public class TStdDeviceTypeModel {
 
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
     @TableField(value = "mete_kind",updateStrategy = FieldStrategy.IGNORED)
-    private String meteKind;
+    private Integer meteKind;
 
     @Length(max = 50, message = "meteKindName长度必须小于等于50")
     private String meteKindName;
 
     @ApiModelProperty(value = "表计类型")
-    private String meterType;
+    private Integer meterType;
 
-    private String analyseType;
+    private Integer analyseType;
 
     private String isAi;
 
@@ -70,7 +70,7 @@ public class TStdDeviceTypeModel {
     private Float downEffect;
 
     @ApiModelProperty(value = "告警级别")
-    private String alarmLevel;
+    private Integer alarmLevel;
 
     @ApiModelProperty(value = "告警上限1")
     private Float highLimit1;

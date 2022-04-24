@@ -2212,6 +2212,7 @@ public class CameraConService {
         } catch (Exception e) {
             int iErr = hCNetSDK.NET_DVR_GetLastError();
             log.info("系统异常" + iErr);
+            log.error("红外图片抓取异常", e);
         } finally {
             hCNetSDK.NET_DVR_Logout(lUserID);
             //hCNetSDK.NET_DVR_Cleanup();
