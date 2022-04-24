@@ -252,6 +252,34 @@
         </if>
     </select>
 
+    <select id="selectDroneInfo" resultType="com.yjh.platform.module.device.entity.Robot">
+        SELECT
+        a.robot_id,
+        a.robot_code,
+        a.robot_name,
+        a.nest_code,
+        a.nest_name,
+        a.robot_status,
+        a.drone_type,
+        a.robot_ip,
+        b.dict_note AS droneTypeName,
+        a.drone_position,
+        c.dict_note AS dronePositionName,
+        a.phote_path,
+        d.region_name AS areaName,
+        d.region_id AS areaId
+        FROM
+        t_robot_info a
+        LEFT JOIN t_dict_business b ON a.drone_type = b.dict_code
+        LEFT JOIN t_dict_business c ON a.drone_position = c.dict_code
+        LEFT JOIN t_std_region d ON d.region_id = a.up_region_id
+        where 1=1
+        <if test="droneType != null">
+            and a.drone_type = #{droneType, jdbcType=VARCHAR}
+        </if>
+    </select>
+
+
     <select id="selectRobotIsRunning" resultType="java.lang.String">
         SELECT DISTINCT
         e.robot_code

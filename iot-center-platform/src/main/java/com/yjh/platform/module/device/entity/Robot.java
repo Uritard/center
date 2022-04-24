@@ -1,10 +1,13 @@
 package com.yjh.platform.module.device.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 import java.util.List;
@@ -34,18 +37,34 @@ public class Robot implements Serializable {
     @ApiModelProperty(value = "机器人状态 ")
     private String robotStatus;
 
+    @ApiModelProperty(value = "机巢编号")
+    private String nestCode;
+
+    @ApiModelProperty(value = "机巢名称")
+    private String nestName;
+
     @ApiModelProperty(value = "机器人型号")
     private Integer robotType;
+
+    @ApiModelProperty(value = "无人机型号")
+    private Integer droneType;
 
     @ApiModelProperty(value = "机器人ip")
     private String robotIp;
 
     private String robotTypeName;
 
+    private String droneTypeName;
+
     @ApiModelProperty(value = "机器人类型")
     private String robotPosition;
 
     private String robotPositionName;
+
+    @ApiModelProperty(value = "机器人类型")
+    private String dronePosition;
+
+    private String dronePositionName;
 
     private String photePath;
 

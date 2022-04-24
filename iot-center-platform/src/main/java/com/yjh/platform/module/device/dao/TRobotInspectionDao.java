@@ -44,6 +44,8 @@ public interface TRobotInspectionDao {
 
     List<Robot> selectRobotInfo(@Param(value = "robotType") Integer robotType);
 
+    List<Robot> selectDroneInfo(@Param(value = "droneType") Integer droneType);
+
     List<ConfirmImmediately> selectRobotInspectionIds();
 
     List<String> selectRobotIsRunning(@Param(value = "taskId") String taskId);

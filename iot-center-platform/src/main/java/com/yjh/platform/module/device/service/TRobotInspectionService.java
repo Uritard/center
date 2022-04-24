@@ -390,6 +390,26 @@ public class TRobotInspectionService{
         reList.add(node);
         return reList;
     }
+    //无人机树
+    @Transactional(rollbackFor = Exception.class)
+    public List<Robot> droneTree(Integer droneType){
+        List<Robot> reList = new ArrayList<>();
+        Robot node = new Robot();
+        node.setId(1L);
+        node.setLabel("无人机树");
+        node.setInfoType("tree");
+        List<Robot> robotList = this.tRobotInspectionDao.selectDroneInfo(droneType);
+        for(Robot robot:robotList){
+            robot.setId(robot.getRobotId());
+            robot.setLabel(robot.getRobotName());
+            robot.setUpId(1L);
+            robot.setUpName("无人机树");
+            robot.setInfoType("drone");
+        }
+        node.setChildren(robotList);
+        reList.add(node);
+        return reList;
+    }
 
 }
 

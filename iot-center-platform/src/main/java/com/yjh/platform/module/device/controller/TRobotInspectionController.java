@@ -258,4 +258,18 @@ public class TRobotInspectionController {
         }
         return result;
     }
+
+    @ApiOperation(value = "查询无人机树")
+    @RequestMapping(value = "/droneTree", method = RequestMethod.GET)
+    @Logs(title = "查询机器人树",content = "根据用户传递的参数查询无人机树",logType = 1,authority = "1235")
+    public Result droneTree(@RequestParam(value = "droneType", required = false) Integer droneType) {
+        Result result = new Result();
+        try {
+            result.setData(tRobotInspectionService.droneTree(droneType));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询无人机状态信息失败描述：", e);
+        }
+        return result;
+    }
 }

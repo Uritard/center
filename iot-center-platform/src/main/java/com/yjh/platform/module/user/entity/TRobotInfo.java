@@ -158,8 +158,8 @@ public class TRobotInfo implements Serializable {
     @TableField(value = "made_in")
     private String madeIn;
 
-    @ApiModelProperty(value = "出厂日期", example = "2018-10-01 12:18:48")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @ApiModelProperty(value = "出厂日期", example = "2018-10-01")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @TableField(value = "made_date")
     private Date madeDate;
 
