@@ -28,11 +28,10 @@ public class TCruiseNonhomologousWarnInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value=999999999999999999l)
+    @Max(value=60)
     @ApiModelProperty(value = "非同源巡检点实例ID")
-    @TableId(value = "warn_id", type = IdType.AUTO)
     @TableField(value = "warn_id",updateStrategy = FieldStrategy.IGNORED)
-    private Long warnId;
+    private String warnId;
 
 //    @Length(max = 32,message = "stationId长度必须小于等于32")
 //    @ApiModelProperty(value = "变电站id")
@@ -93,6 +92,16 @@ public class TCruiseNonhomologousWarnInfo implements Serializable {
     @ApiModelProperty(value = "关联设备点位名称")
     @TableField(value = "mete_name",updateStrategy = FieldStrategy.IGNORED)
     private String deviceMeteName;
+
+    @Max(value=32)
+    @ApiModelProperty(value = "机器人名称")
+    @TableField(value = "robot_name",updateStrategy = FieldStrategy.IGNORED)
+
+    private String robotName;
+    @Max(value=32)
+    @ApiModelProperty(value = "相机名称")
+    @TableField(value = "camera_name",updateStrategy = FieldStrategy.IGNORED)
+    private String cameraName;
 
     @Max(value=999999999)
     @ApiModelProperty(value = "告警类型")

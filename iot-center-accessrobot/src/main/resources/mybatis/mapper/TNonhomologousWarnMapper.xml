@@ -13,7 +13,7 @@
                 #{warnId, jdbcType=VARCHAR},
                 #{instanceId, jdbcType=VARCHAR},
                 #{warnContent, jdbcType=VARCHAR},
-                sysdate,
+                sysdate(),
                 #{warnType, jdbcType=INTEGER}
         )
     </insert>
@@ -28,7 +28,7 @@
             (
             #{inspections.warnId, jdbcType=VARCHAR},
             #{inspections.taskId, jdbcType=VARCHAR},
-            #{inspections.inspectionId, jdbcType=BIGINT},
+            #{inspections.inspectionId, jdbcType=BIGINT}
             )
         </foreach>
     </insert>
@@ -41,18 +41,17 @@
     <select id="getNonhomologousInspections" parameterType="java.util.Map" resultType="java.util.Map">
         select
         a.instance_id as instanceId,
---         a.station_id,
---         a.station_name,
         a.robot_instance_id as robotInstanceId,
         a.video_preset_id as videoInstanceId,
         b.cruise_name as robotInspectionName,
         c.cruise_name as videoInspectionName,
         a.warn_threshold as warnThreshold,
-        a.interval_type as intervalType
+        a.interval_type as intervalType,
+        a.cruise_type as warnType
         from t_cruise_nonhomologous_point_instance a left join t_cruise_nonhomologous_warn n on n.instance_id = a.instance_id
         left join t_cruise_point_instance b on b.instance_id = a.robot_instance_id
         left join t_cruise_point_instance c on c.instance_id = a.video_preset_id
-        left join t_robot_inspection g on g.inspection_id = b.curise_id
+        left join t_robot_inspection g on g.inspection_id = b.cruise_id
         where g.inspection_code = #{deviceId, jdbcType=VARCHAR}
     </select>
 

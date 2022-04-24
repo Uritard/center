@@ -619,13 +619,13 @@
                 FROM t_std_device b
                 LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
         UNION ALL (
-            SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+            SELECT DISTINCT CONCAT(c.device_id,c.custom_id) AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
                 FROM t_std_device c
                 LEFT JOIN t_std_device e ON c.device_id = e.device_id)
         UNION ALL (
-		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,dm.custom_id AS upId,	d.custom_name AS upName,"devicemete" AS infoType
+		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,CONCAT(dm.device_id,dm.custom_id) AS upId,	d.custom_name AS upName,"devicemete" AS infoType
 		        FROM t_std_devicemete dm
-		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id
+		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id and dm.device_id = d.device_id
 		        where 1=1
         <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
@@ -650,13 +650,13 @@
                 FROM t_std_device b
                 LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
         UNION ALL (
-            SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+            SELECT DISTINCT CONCAT(c.device_id,c.custom_id) AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
                 FROM t_std_device c
                 LEFT JOIN t_std_device e ON c.device_id = e.device_id)
         UNION ALL (
-		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,dm.custom_id AS upId,	d.custom_name AS upName,"devicemete" AS infoType
+		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,CONCAT(dm.device_id,dm.custom_id) AS upId,	d.custom_name AS upName,"devicemete" AS infoType
 		        FROM t_std_devicemete dm
-		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id
+		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id and dm.device_id = d.device_id
                 where 1=1
                 <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
                 <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>)
@@ -681,13 +681,13 @@
                 FROM t_std_device b
                 LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
         UNION ALL (
-            SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+            SELECT DISTINCT CONCAT(c.device_id,c.custom_id) AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
                 FROM t_std_device c
                 LEFT JOIN t_std_device e ON c.device_id = e.device_id)
         UNION ALL (
-		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,dm.custom_id AS upId,	d.custom_name AS upName,"devicemete" AS infoType
+		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,CONCAT(dm.device_id,dm.custom_id) AS upId,	d.custom_name AS upName,"devicemete" AS infoType
 		        FROM t_std_devicemete dm
-		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id
+		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id and dm.device_id = d.device_id
                 where 1=1
                 <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
                 <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>)

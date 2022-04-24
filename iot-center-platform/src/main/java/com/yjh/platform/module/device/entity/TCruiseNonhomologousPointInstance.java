@@ -35,7 +35,7 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "关联机器人巡视点位id")
      @TableField(value = "robot_instance_id",updateStrategy = FieldStrategy.IGNORED)
-    private Long robotDeviceId;
+    private Long robotInstanceId;
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "关联视频巡视点位id")
@@ -45,7 +45,7 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
     @Max(value=32)
     @ApiModelProperty(value = "关联机器人巡视点位名称")
     @TableField(value = "robot_instance_name",updateStrategy = FieldStrategy.IGNORED)
-    private String robotDeviceName;
+    private String robotInstanceName;
 
     @Length(max = 32,message = "关联视频巡视点位名称")
     @ApiModelProperty(value = "关联视频巡视点位名称")

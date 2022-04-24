@@ -176,7 +176,7 @@ public class TCruiseNonhomologousPointInstanceController {
     }
 
     @ApiOperation(value = "主键查询")
-    @RequestMapping(value = "/selectWarnByPrimaryId", method = RequestMethod.POST)
+    @RequestMapping(value = "/selectWarnByPrimaryId", method = RequestMethod.GET)
     @Logs(title = "查询非同源告警详细数据",content = "根据用户传递的参数查询非同源告警详细数据",logType = 1)
     public Result selectWarnByPrimaryId(@RequestParam(value = "warnId", required = true) String warnId) {
         Result result = new Result();
