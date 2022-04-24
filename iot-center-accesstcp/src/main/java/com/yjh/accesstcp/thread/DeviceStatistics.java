@@ -32,9 +32,9 @@ public class DeviceStatistics {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private static String ROBOT_URL = "http://iot-center-platform/statistics/v1/robot?robotId={robotId}";
+    private static String ROBOT_URL = "http://iot-center-platform/statistics/v1/robot?id={robotId}&type={type}";
 
-    private static String CAMERA_URL = "http://iot-center-platform/statistics/v1/camera?cameraId={cameraId}";
+    private static String CAMERA_URL = "http://iot-center-platform/statistics/v1/camera?id={cameraId}";
 
 //    private static String VOICE_URL = "http://iot-center-platform/statistics/v1/voice?voice={voice}";
 
@@ -47,47 +47,64 @@ public class DeviceStatistics {
             List<Map<String,Object>> mapList = new ArrayList<>();
             HashMap<String,Object> paramMap = new HashMap<>();
             paramMap.put("robotId",robot.getId());
+            paramMap.put("type","robot");
             Result re = deviceStatistics(paramMap,ROBOT_URL);
             if (re != null) {
-                Map<String,Object> result = (Map<String,Object>)re.getData();
+                List<Map<String,Object>> reList = (List<Map<String,Object>>)re.getData();
+                Map<String,Object> result =null;
+                if(reList != null && reList.size()>0){
+                    result = reList.get(0);
+                }
                 if(result != null && !result.isEmpty()){
                     for (int i = 1; i <= 5 ; i++) {
                         mapList.add(dealType(robot,result,i));
                         sendToUpSystemServices.sendResponse("81","",stationCode,mapList);
+                        mapList = new ArrayList<>();
                     }
                 }
             }
         });
-        //无人机 todo 未完成
+        //无人机
         list = sendToUpSystemDao.selectDrone();
         list.forEach(robot->{
             List<Map<String,Object>> mapList = new ArrayList<>();
             HashMap<String,Object> paramMap = new HashMap<>();
             paramMap.put("robotId",robot.getId());
+            paramMap.put("type","drone");
             Result re = deviceStatistics(paramMap,ROBOT_URL);
             if (re != null) {
-                Map<String,Object> result = (Map<String,Object>)re.getData();
+                List<Map<String,Object>> reList = (List<Map<String,Object>>)re.getData();
+                Map<String,Object> result =null;
+                if(reList != null && reList.size()>0){
+                    result = reList.get(0);
+                }
                 if(result != null && !result.isEmpty()){
                     for (int i = 1; i <= 5 ; i++) {
                         mapList.add(dealType(robot,result,i));
                         sendToUpSystemServices.sendResponse("81","",stationCode,mapList);
+                        mapList = new ArrayList<>();
                     }
                 }
             }
         });
-        //摄像机 todo 未完成
+        //摄像机
         list = sendToUpSystemDao.selectCamera();
-        list.forEach(robot->{
+        list.forEach(camera->{
             List<Map<String,Object>> mapList = new ArrayList<>();
             HashMap<String,Object> paramMap = new HashMap<>();
-            paramMap.put("cameraId",robot.getId());
+            paramMap.put("cameraId",camera.getId());
             Result re = deviceStatistics(paramMap,CAMERA_URL);
             if (re != null) {
-                Map<String,Object> result = (Map<String,Object>)re.getData();
+                List<Map<String,Object>> reList = (List<Map<String,Object>>)re.getData();
+                Map<String,Object> result =null;
+                if(reList != null && reList.size()>0){
+                    result = reList.get(0);
+                }
                 if(result != null && !result.isEmpty()){
                     for (int i = 4; i <= 6 ; i++) {
-                        mapList.add(dealType(robot,result,i));
+                        mapList.add(dealType(camera,result,i));
                         sendToUpSystemServices.sendResponse("81","",stationCode,mapList);
+                        mapList = new ArrayList<>();
                     }
                 }
             }
@@ -103,28 +120,58 @@ public class DeviceStatistics {
         map.put("type",type.toString());
         switch (type){
             case 1:
-                map.put("value",result.get("duration"));
-                map.put("unit","小时");
+                if(result.get("duration") != null && !"".equals(result.get("duration"))){
+                    map.put("value",result.get("duration"));
+                    map.put("unit","小时");
+                }else {
+                    map.put("value","0");
+                    map.put("unit","小时");
+                }
                 break;
             case 2:
-                map.put("value",result.get("offLineCount"));
-                map.put("unit","天");
+                if(result.get("offLineCount") != null && !"".equals(result.get("offLineCount"))){
+                    map.put("value",result.get("offLineCount"));
+                    map.put("unit","次");
+                }else {
+                    map.put("value","0");
+                    map.put("unit","次");
+                }
                 break;
             case 3:
-                map.put("value",result.get("runDay"));
-                map.put("unit","天");
+                if(result.get("runDay") != null && !"".equals(result.get("runDay"))){
+                    map.put("value",result.get("runDay"));
+                    map.put("unit","天");
+                }else {
+                    map.put("value","0");
+                    map.put("unit","天");
+                }
                 break;
             case 4:
-                map.put("value",result.get("normalDay"));
-                map.put("unit","天");
+                if(result.get("normalDay") != null && !"".equals(result.get("normalDay"))){
+                    map.put("value",result.get("normalDay"));
+                    map.put("unit","天");
+                }else {
+                    map.put("value","0");
+                    map.put("unit","天");
+                }
                 break;
-            case 5:map.put("value",result.get("cruisePercent"));
-                map.put("unit","%");
-
+            case 5:
+                if(result.get("cruisePercent") != null && !"".equals(result.get("cruisePercent"))){
+                    map.put("value",String.valueOf(result.get("cruisePercent")).replace("%",""));
+                    map.put("unit","%");
+                }else {
+                    map.put("value","0");
+                    map.put("unit","%");
+                }
                 break;
             case 6:
-                map.put("value",result.get(""));
-                map.put("unit","%");
+                if(result.get("intactPercent") != null && !"".equals(result.get("intactPercent"))){
+                    map.put("value",String.valueOf(result.get("intactPercent")).replace("%",""));
+                    map.put("unit","%");
+                }else {
+                    map.put("value","0");
+                    map.put("unit","%");
+                }
                 break;
         }
         map.put("value_unit",map.get("value").toString()+map.get("unit").toString());
