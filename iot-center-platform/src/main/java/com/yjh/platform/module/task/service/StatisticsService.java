@@ -111,7 +111,7 @@ public class StatisticsService {
     Long duration = null;
     Long offLineCount = null;
     Number commissionDay = null;
-    Number taskDay = null;
+    Number cruiseDay = null;
     List<Map<String, Object>> list = null;
     if ("robot".equals(type)) {
       list = statisticsDao.selectStatisticsRobot(robotId);
@@ -141,11 +141,11 @@ public class StatisticsService {
         map.put("offLineCount", offLineCount);
         // 出勤率 投运期间累计正常巡检天数/总投运天数
         commissionDay = map.get("commissionDay") != null ? (Number) map.get("commissionDay") : 0;
-        taskDay = map.get("taskDay") != null ? (Number) map.get("taskDay") : 0;
+        cruiseDay = map.get("taskDay") != null ? (Number) map.get("cruiseDay") : 0;
         String cruiseAttend =
             commissionDay.intValue() == 0
                 ? "N/A"
-                : numberCover(taskDay.intValue(), commissionDay.intValue());
+                : numberCover(cruiseDay.intValue(), commissionDay.intValue());
         map.put("cruisePercent", cruiseAttend);
         robotId = (Long) map.get("robotId");
         String beginDate = (String) map.get("commissionDate");
@@ -171,17 +171,19 @@ public class StatisticsService {
    */
   public HashMap<String, Object> countInstanceLoss(
       String taskId, Long robotId, String startTime, String endTime) {
-    return dealCount(statisticsDao.countInstanceLoss(taskId, null, startTime, endTime));
+    return dealCount(statisticsDao.countInstanceLoss(taskId, robotId, startTime, endTime));
   }
 
   private HashMap<String, Object> dealCount(HashMap<String, Object> countMap) {
-    Double totalNum = Double.valueOf(countMap.get("totalNum").toString());
-    Double validNum = Double.valueOf(countMap.get("validNum").toString());
-    String percent = String.format("%.3f", validNum * 100 / totalNum);
     HashMap<String, Object> reMap = new HashMap<>();
-    reMap.put("total_num", totalNum);
-    reMap.put("valid_num", validNum);
-    reMap.put("percent", percent + "%");
+    if (countMap.get("totalNum") != null && countMap.get("validNum") != null) {
+      double totalNum = Double.parseDouble(countMap.get("totalNum").toString());
+      double validNum = Double.parseDouble(countMap.get("validNum").toString());
+      String percent = String.format("%.2f", validNum * 100 / totalNum);
+      reMap.put("total_num", totalNum);
+      reMap.put("valid_num", validNum);
+      reMap.put("percent", percent + "%");
+    }
     return reMap;
   }
 
@@ -190,33 +192,33 @@ public class StatisticsService {
    *
    * @return
    */
-  public List<Map<String, Object>> countCamera(Long cameraId) {
-    List<Map<String, Object>> mapList = statisticsDao.countCamera(cameraId);
+  public List<Map<String, Object>> countCamera(Long id) {
+    List<Map<String, Object>> mapList = statisticsDao.countCamera(id);
     Map<Long, Long> recordMap = new HashMap<Long, Long>(16);
     for (Map<String, Object> map : mapList) {
       double totalNum = Double.parseDouble(map.get("totalNum").toString());
       double lossNum = Double.parseDouble(map.get("lossNum").toString());
       if (totalNum != 0) {
-        String lossPercent = String.format("%.3f", lossNum * 100 / totalNum);
+        String lossPercent = String.format("%.2f", lossNum * 100 / totalNum);
         map.put("lossPercent", lossPercent + "%");
       }
 
       double commissionDay = Double.parseDouble(map.get("commissionDay").toString());
       double cruiseDay = Double.parseDouble(map.get("cruiseDay").toString());
       if (commissionDay != 0) {
-        String cruisePercent = String.format("%.3f", cruiseDay * 100 / commissionDay);
+        String cruisePercent = String.format("%.2f", cruiseDay * 100 / commissionDay);
         map.put("cruisePercent", cruisePercent + "%");
       }
 
       // 根据cameraId查询recordId，查询摄像机完整率
-      Long camera_id = (Long) map.get("camera_id");
-      Long recordId = statisticsDao.selectRecordByCamera(camera_id);
+      Long cameraId = (Long) map.get("cameraId");
+      Long recordId = statisticsDao.selectRecordByCamera(cameraId);
       map.put("recordId", recordId);
       if (recordId == null) {
-        log.error("相机cameraId={}无对应的录像机", camera_id);
+        log.error("相机cameraId={}无对应的录像机", cameraId);
         continue;
       }
-      recordMap.put(camera_id, recordId);
+      recordMap.put(cameraId, recordId);
     }
 
     Set<Long> set = new HashSet();
@@ -235,7 +237,7 @@ public class StatisticsService {
           mapData.get("intactTime") == null ? 0 : Integer.parseInt(mapData.get("intactTime"));
       log.info("录像机{}的完整率查询结果：{}", recordId, intactTime);
       if (intactTime != 0) {
-        String intactPercent = String.format("%.3f", intactTime / 100d);
+        String intactPercent = String.format("%.2f", intactTime / 100d);
         for (Map.Entry map : recordMap.entrySet()) {
           if (recordId.equals(map.getValue())) {
             percentMap.put((Long) map.getKey(), intactPercent + "%");
@@ -480,7 +482,7 @@ public class StatisticsService {
     if (statistics.getTotalNum() != null) {
       Double totalNum = Double.valueOf(statistics.getTotalNum());
       Double validNum = Double.valueOf(statistics.getValidNum());
-      String percent = String.format("%.3f", validNum * 100 / totalNum);
+      String percent = String.format("%.2f", validNum * 100 / totalNum);
       statistics.setPercent(percent + "%");
     }
   }

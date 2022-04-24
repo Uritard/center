@@ -18,7 +18,7 @@
         <if test="robotCode != null and robotCode != ''">and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
     </select>
     <select id="countCamera" resultType="java.util.HashMap">
-        SELECT tcp.`camera_id`,
+        SELECT tcp.`camera_id` cameraId,tci.camera_name cameraName,
         TO_DAYS(NOW()) - TO_DAYS(tci.commission_date) + 1 commissionDay,
         (SELECT COUNT(
         DISTINCT DATE_FORMAT(tcdr.`createtime`, '%Y-%m-%d')
@@ -40,17 +40,22 @@
         WHERE tci.`commission_date` IS TRUE
         and tci.`commission_date`  <![CDATA[<=]]> now()
         <if test="cameraId != null and cameraId != ''">and tcp.camera_id = #{cameraId, jdbcType=BIGINT}</if>
-        GROUP BY camera_id
+        GROUP BY cameraId
     </select>
     <select id="selectStatisticsRobot" resultType="java.util.Map">
         SELECT
         tr.robot_id robotId,
         tr.robot_code robotCode,
-        DATE_FORMAT(tr.commission_date,'%Y-%m-%d %H:%i:%s') commissionDate,
+        tr.robot_name robotName,
+        DATE_FORMAT(
+        tr.commission_date,
+        '%Y-%m-%d %H:%i:%s'
+        ) commissionDate,
         TO_DAYS(NOW()) - TO_DAYS(tr.`commission_date`) + 1 commissionDay,
+        (SELECT
         COUNT(
-        DISTINCT DATE_FORMAT(tcr.create_time, '%Y-%m-%d')
-        ) taskDay,
+        DISTINCT DATE_FORMAT(tcdr.`createtime`, '%Y-%m-%d')
+        )) cruiseDay,
         TO_DAYS(NOW()) - TO_DAYS(tr.`commission_date`) - COUNT(
         DISTINCT DATE_FORMAT(ta.alarm_time, '%Y-%m-%d')
         ) + 1 normalDay
@@ -62,12 +67,15 @@
         ta.alarm_time IS NULL
         OR ta.alarm_time >= tr.commission_date
         )
-        LEFT JOIN t_cruise_task tc
-        ON tc.`robot_id` = tr.`robot_id`
-        LEFT JOIN t_cruise_result tcr
-        ON tcr.`task_id` = tc.`task_id` AND tcr.execute_time <![CDATA[<=]]>NOW()
-        WHERE tr.commission_date IS TRUE AND tr.commission_date  <![CDATA[<=]]> NOW()
-        and tr.robot_type IS TRUE
+        LEFT JOIN t_robot_inspection tri
+        ON tri.robot_id = tr.robot_id
+        LEFT JOIN `t_cruise_point_instance` tcpi
+        ON tcpi.cruise_id = tri.inspection_id
+        LEFT JOIN `t_cruise_data_result` tcdr
+        ON tcdr.`cruise_id` = tcpi.`instance_id` AND tr.commission_date <![CDATA[<=]]> tcdr.`createtime`
+        WHERE tr.commission_date IS TRUE
+        AND tr.commission_date <![CDATA[<=]]> NOW()
+        AND tr.robot_type IS TRUE
         <if test="robotId != null and robotId != ''">and tr.robot_id = #{robotId, jdbcType=BIGINT}</if>
         GROUP BY robotId
     </select>
@@ -76,11 +84,16 @@
         SELECT
         tr.robot_id robotId,
         tr.robot_code robotCode,
-        DATE_FORMAT(tr.commission_date,'%Y-%m-%d %H:%i:%s') commissionDate,
+        tr.robot_name robotName,
+        DATE_FORMAT(
+        tr.commission_date,
+        '%Y-%m-%d %H:%i:%s'
+        ) commissionDate,
         TO_DAYS(NOW()) - TO_DAYS(tr.`commission_date`) + 1 commissionDay,
+        (SELECT
         COUNT(
-        DISTINCT DATE_FORMAT(tcr.create_time, '%Y-%m-%d')
-        ) taskDay,
+        DISTINCT DATE_FORMAT(tcdr.`createtime`, '%Y-%m-%d')
+        )) cruiseDay,
         TO_DAYS(NOW()) - TO_DAYS(tr.`commission_date`) - COUNT(
         DISTINCT DATE_FORMAT(ta.alarm_time, '%Y-%m-%d')
         ) + 1 normalDay
@@ -92,11 +105,14 @@
         ta.alarm_time IS NULL
         OR ta.alarm_time >= tr.commission_date
         )
-        LEFT JOIN t_cruise_task tc
-        ON tc.`robot_id` = tr.`robot_id`
-        LEFT JOIN t_cruise_result tcr
-        ON tcr.`task_id` = tc.`task_id` AND tcr.execute_time <![CDATA[<=]]>NOW()
-        WHERE tr.commission_date IS TRUE AND tr.commission_date  <![CDATA[<=]]> NOW()
+        LEFT JOIN t_robot_inspection tri
+        ON tri.robot_id = tr.robot_id
+        LEFT JOIN `t_cruise_point_instance` tcpi
+        ON tcpi.cruise_id = tri.inspection_id
+        LEFT JOIN `t_cruise_data_result` tcdr
+        ON tcdr.`cruise_id` = tcpi.`instance_id` AND tr.commission_date <![CDATA[<=]]> tcdr.`createtime`
+        WHERE tr.commission_date IS TRUE
+        AND tr.commission_date <![CDATA[<=]]> NOW()
         and tr.drone_type IS TRUE
         <if test="robotId != null and robotId != ''">and tr.robot_id = #{robotId, jdbcType=BIGINT}</if>
         GROUP BY robotId
