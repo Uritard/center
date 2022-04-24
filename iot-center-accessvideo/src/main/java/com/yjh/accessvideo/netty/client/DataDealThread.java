@@ -76,7 +76,7 @@ public class DataDealThread implements Runnable {
         if (usefulBody != "") {
             JSONObject jsonObject = JSON.parseObject(usefulBody);
             log.info("JSON对象1：" + jsonObject);
-            String reponseMessage=jsonObject.get("msgID").toString();
+            String reponseMessage=jsonObject.getString("msgID");
 
             if ("2".equals(jsonObject.getString("msgType"))) {
                 JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.getString("msgData")).getString("data")); //全量数据结果集
@@ -1040,18 +1040,19 @@ public class DataDealThread implements Runnable {
                         log.info("发送算法管理平台结束");
                     }
                 } catch (Exception e) {
-                    log.error("与算法管理平台交互失败" + e);
+                    log.info("与算法管理平台交互失败" + e);
                 }
 
                 //jeff: mqtt消息发个告警平台结束
 
-            } else if (jsonObject.get("msgType").toString().equals("6")) { //任务结束后发来的心跳信息
-                String taskId = JSON.parseObject(jsonObject.get("msgData").toString()).get("taskId").toString();
-                String instanceId = JSON.parseObject(jsonObject.get("msgData").toString()).get("instanceId").toString();
-                redisTemplate.opsForList().leftPush("analysisList:" + taskId, "-1");
-                log.info("心跳处理结束" + taskId);
-                //处理心跳线程私有变量 taskId赋值
-                TASKID = taskId;
+            } else if ("6".equals(jsonObject.getString("msgType"))) { //任务结束后发来的心跳信息
+
+                    String taskId = JSON.parseObject(jsonObject.getString("msgData")).getString("taskId");
+                    String instanceId = JSON.parseObject(jsonObject.getString("msgData")).getString("instanceId");
+                    redisTemplate.opsForList().leftPush("analysisList:" + taskId, "-1");
+                    log.info("心跳处理结束" + taskId);
+                    //处理心跳线程私有变量 taskId赋值
+                    TASKID = taskId;
             }
 
             if ("-1".equals(redisTemplate.opsForList().index("analysisList:" + TASKID, 0))) {  //满足插库条件

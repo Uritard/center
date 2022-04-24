@@ -98,7 +98,7 @@ public class Constant {
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
 
-    public static final String GET_LOW_TASK_GO_ON = "http://iot-center-platform-qh/tCruiseTask/v1/lowTaskGoOn";
+    public static final String GET_LOW_TASK_GO_ON = "http://iot-center-platform/tCruiseTask/v1/lowTaskGoOn";
 
     public static<T> Result otherServerList( List<T> list, String url) {
         Result re = new Result();

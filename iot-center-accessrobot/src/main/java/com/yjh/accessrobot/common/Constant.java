@@ -101,7 +101,7 @@ public class Constant {
     //删除
     public static final String DELETE_PLAN_LIST = "http://iot-center-platform/tCruisePlan/v1/deleteByPlanCode?planCode={planCode}";
 
-    public static final String GET_LOW_TASK_GO_ON = "http://iot-center-platform-qh/tCruiseTask/v1/lowTaskGoOn";
+    public static final String GET_LOW_TASK_GO_ON = "http://iot-center-platform/tCruiseTask/v1/lowTaskGoOn";
 
     public static Result restTemplatePost(String url, Map<String, Object> map) {
         return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
