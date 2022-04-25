@@ -250,6 +250,7 @@
         <if test="robotType != null">
             and a.robot_type = #{robotType, jdbcType=VARCHAR}
         </if>
+        AND a.drone_type IS NULL
     </select>
 
     <select id="selectDroneInfo" resultType="com.yjh.platform.module.device.entity.Robot">
@@ -277,6 +278,7 @@
         <if test="droneType != null">
             and a.drone_type = #{droneType, jdbcType=VARCHAR}
         </if>
+        AND a.robot_type IS NULL
     </select>
 
 

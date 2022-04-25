@@ -265,6 +265,204 @@ public class TRobotInspectionService{
         return re;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String,Object> selectDroneStatus(String robotCode){
+        Map<String,Object> re = new HashMap<>();
+        DecimalFormat df = new DecimalFormat("#0.00");
+        //获取状态信息
+        Map<String,Object> mapForCell  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":3");
+        if(mapForCell.size() != 0){
+            re.put("batteryLevel",mapForCell.get("valueUnit"));//电池电量
+        }else {
+            re.put("batteryLevel","");//电池电量
+        }
+
+        Map<String,Object> mapForelCurrent  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":11");
+        if(mapForCell.size() != 0){
+            re.put("chargeCurrent",mapForelCurrent.get("valueUnit")); // 充电电流
+        }else {
+            re.put("chargeCurrent",""); // 充电电流
+        }
+
+        Map<String,Object> mapForOnlineState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":2");
+        if(mapForOnlineState.size() != 0){
+            re.put("onlineState",mapForOnlineState.get("value"));//网络状态
+            //todo 通知前端停止调接口
+        }else {
+            re.put("onlineState","");//网络状态
+        }
+
+        Map<String,Object> mapForDroneCoordinate  = redisTemplate.opsForHash().entries("RobotCoordinate:"+robotCode);
+        //无人机经纬度
+        if(mapForDroneCoordinate.size() != 0){
+            re.put("droneCoordinate",mapForDroneCoordinate.get("coordinateGeography"));
+        }else {
+            re.put("droneCoordinate","0,0");
+        }
+        Map<String,Object> mapForMileage  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":2");
+        if(mapForMileage.size() != 0){
+            re.put("mileage",mapForMileage.get("valueUnit"));//里程
+        }else {
+            re.put("mileage","");//里程
+        }
+
+        Map<String,String> mapForSpeed  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":1");
+        if(mapForSpeed.size() != 0){
+            Double speed =Double.valueOf(mapForSpeed.get("value")) ;
+            re.put("speed",df.format(speed)+mapForSpeed.get("unit"));//速度
+        }else {
+            re.put("speed","");//速度
+        }
+
+        Map<String,String> mapForVerticalSpeed  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":4");
+        //垂直速度
+        if(mapForVerticalSpeed.size() != 0){
+            Double speed =Double.valueOf(mapForVerticalSpeed.get("value")) ;
+            re.put("verticalSpeed",df.format(speed)+mapForVerticalSpeed.get("unit"));
+        }else {
+            re.put("verticalSpeed","");
+        }
+
+        Map<String,String> mapForFlyDistance  = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":5");
+        //飞行距离
+        if(mapForFlyDistance.size() != 0){
+            Double speed =Double.valueOf(mapForFlyDistance.get("value")) ;
+            re.put("flyDistance",df.format(speed)+mapForFlyDistance.get("unit"));
+        }else {
+            re.put("flyDistance","");
+        }
+
+        Map<String,String> mapForFlyHeight = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":6");
+        //飞行高度
+        if(mapForFlyHeight.size() != 0){
+            Double speed =Double.valueOf(mapForFlyHeight.get("value")) ;
+            re.put("flyHeight",df.format(speed)+mapForFlyHeight.get("unit"));
+        }else {
+            re.put("flyHeight","");
+        }
+
+        Map<String,String> mapForFlyTime = redisTemplate.opsForHash().entries("RobotOperation:"+robotCode+":7");
+        //飞行时长
+        if(mapForFlyTime.size() != 0){
+            Double speed =Double.valueOf(mapForFlyTime.get("value")) ;
+            re.put("flyTime",df.format(speed)+mapForFlyTime.get("unit"));
+        }else {
+            re.put("flyTime","");
+        }
+
+
+        Map<String,Object> mapForCruiseMap  = redisTemplate.opsForHash().entries("RobotRoad:"+robotCode);
+        if(mapForCruiseMap.size() != 0){
+            re.put("cruiseMapPath",mapForCruiseMap.get("relativePath"));//巡视路径地图路径
+        }else {
+            re.put("cruiseMapPath","");//巡视路径地图路径
+        }
+
+        Map<String,Object> mapForRobotState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":41");
+        if(mapForRobotState.size() != 0){
+            re.put("robotState",mapForRobotState.get("value"));//机器人状态
+            if(! "2".equals(mapForRobotState.get("value"))){
+                re.put("cruiseMapPath","");//巡视路径地图路径
+            }
+        }else {
+            re.put("robotState","");//机器人状态
+        }
+
+        Map<String,String> mapForRobotDefeatState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":61");
+        if(mapForRobotDefeatState.size() != 0){
+            String value = mapForRobotDefeatState.get("value");
+            if("1".equals(value)){
+                re.put("modelType","任务模式");
+            }
+            if("2".equals(value)){
+                re.put("modelType","紧急定位模式");
+            }
+            if("3".equals(value)){
+                re.put("modelType","后台遥控模式");
+            }
+            if("4".equals(value)){
+                re.put("modelType","手持遥控模式");
+            }
+            if ("5".equals(value)){
+                re.put("modelType", "操作模式");
+            }
+        }else {
+            re.put("modelType","");//机器人状态
+        }
+
+        Map<String,String> mapForDroneDefeatState  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":201");
+        if(mapForDroneDefeatState.size() != 0){
+            String value = mapForDroneDefeatState.get("value");
+            if("1".equals(value)){
+                re.put("flyType","待命");
+            }
+            if("2".equals(value)){
+                re.put("flyType","准备起飞");
+            }
+            if("3".equals(value)){
+                re.put("flyType","飞行中");
+            }
+            if("4".equals(value)){
+                re.put("flyType","返航");
+            }
+            if ("5".equals(value)){
+                re.put("flyType", "着陆");
+            }
+        }else {
+            re.put("flyType","");//飞行状态
+        }
+
+        Map<String,String> mapForNestDefeatState  = redisTemplate.opsForHash().entries("nestStatus:"+robotCode+":1");
+        if(mapForNestDefeatState.size() != 0){
+            String value = mapForNestDefeatState.get("value");
+            if("0".equals(value)){
+                re.put("nestStatus","初始化");
+            }
+            if("1".equals(value)){
+                re.put("nestStatus","自检中");
+            }
+            if("2".equals(value)){
+                re.put("nestStatus","等待重置");
+            }
+            if("3".equals(value)){
+                re.put("nestStatus","重置中");
+            }
+            if ("4".equals(value)){
+                re.put("nestStatus", "待机");
+            }
+            if ("5".equals(value)){
+                re.put("nestStatus", "异常");
+            }
+        }else {
+            re.put("nestStatus","");//机巢状态
+        }
+
+        Map<String,String> mapForNestDoorState  = redisTemplate.opsForHash().entries("nestStatus:"+robotCode+":2");
+        if(mapForNestDoorState.size() != 0){
+            String value = mapForNestDoorState.get("value");
+            re.put("nestDoorStatus", value);
+        }else {
+            re.put("nestDoorStatus","");//舱门
+        }
+        Map<String,String> mapForNestTemperature  = redisTemplate.opsForHash().entries("nestOperation:"+robotCode+":2");
+        if(mapForNestTemperature.size() != 0){
+            String value = mapForNestDoorState.get("valueUnit");
+            re.put("nestTemperature", value);
+        }else {
+            re.put("nestTemperature","");//机巢温度
+        }
+
+        //0 开启状态 1 关闭状态
+        Map<String,String> mapForRobotStopStatus  = redisTemplate.opsForHash().entries("RobotStatus:"+robotCode+":102");
+        if(mapForRobotStopStatus.size() != 0){
+            re.put("stopFlag",mapForRobotStopStatus.get("value"));//急停状态
+        }else {
+            re.put("stopFlag","");//急停状态
+        }
+
+        return re;
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> selectRobotTaskProgress(Long robotId) throws Exception {

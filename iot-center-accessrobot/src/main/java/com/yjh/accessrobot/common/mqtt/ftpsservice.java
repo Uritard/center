@@ -2,6 +2,7 @@ package com.yjh.accessrobot.common.mqtt;
 
 
 import com.yjh.accessrobot.common.utils.FtpsUtil;
+import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Service
 @Data
@@ -33,19 +35,25 @@ public class ftpsservice {
 
     @Transactional(rollbackFor = Exception.class)
     public void uploadFile(String arlmtype, String filepath,String remotefilename) {
-        try {
-            Calendar cal = Calendar.getInstance();
-            String year =String.valueOf( cal.get(Calendar.YEAR));
-            String month = String.valueOf(cal.get(Calendar.MONTH) + 1);
-            if ("".equals(arlmtype)) {
-                return;
-            }
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Calendar cal = Calendar.getInstance();
+                    String year =String.valueOf( cal.get(Calendar.YEAR));
+                    String month = String.valueOf(cal.get(Calendar.MONTH) + 1);
+                    if ("".equals(arlmtype)) {
+                        return;
+                    }
 
-            FtpsUtil.putFile(filepath, remotefilename,
-                    serverip, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
-        } catch (Exception e) {
-            log.error("上传至ftps错误 " + e);
-        }
+                    FtpsUtil.putFile(filepath, remotefilename,
+                            serverip, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
+                } catch (Exception e) {
+                    log.error("上传至ftps错误 " + e);
+                }
+            }
+        };
+        TaskExecutePool.getInstance().execute(runnable);
     }
 
     public boolean fileExits(String filepath){

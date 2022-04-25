@@ -54,7 +54,7 @@ public class RobotController {
 
     @ApiOperation(value = "发送控制指令接口")
     @GetMapping(value = "/command")
-    @Logs(title = "控制机器人",content = "根据用户传递的参数控制机器人",logType = 5, authority = "1234,1235")
+    @Logs(title = "控制巡视设备",content = "根据用户传递的参数控制巡视设备",logType = 5, authority = "1234,1235")
     public Result feignRobotControl(HttpServletRequest request,
                                     @RequestParam(value = "robotCode") String robotCode,
                                     @RequestParam(value = "type") String type,
@@ -85,7 +85,7 @@ public class RobotController {
     }
     @ApiOperation(value = "发送模型同步指令接口")
     @GetMapping(value = "/fileTransfer")
-    @Logs(title = "模型同步",content = "根据用户传递的参数给机器人发送模型同步指令",logType = 5,authority = "1234")
+    @Logs(title = "模型同步",content = "根据用户传递的参数给巡视设备发送模型同步指令",logType = 5,authority = "1234")
     public Result feignRobotTransfer(@RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {
@@ -100,7 +100,7 @@ public class RobotController {
     }
     @ApiOperation(value = "发送任务指令接口")
     @PostMapping(value = "/taskIssued")
-    @Logs(title = "机器人下发任务",content = "根据用户传递的参数给机器人下发任务",logType = 10)
+    @Logs(title = "巡视设备下发任务",content = "根据用户传递的参数给巡视设备下发任务",logType = 10)
     public Result feignRobotTaskIssued(@RequestBody Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
         Result result = new Result();
         try {
@@ -116,7 +116,7 @@ public class RobotController {
     }
     @ApiOperation(value = "发送任务控制指令接口")
     @PostMapping(value = "/taskControl")
-    @Logs(title = "机器人任务控制",content = "根据用户传递的参数给机器人发送任务控制指令",logType = 11)
+    @Logs(title = "巡视设备任务控制",content = "根据用户传递的参数给巡视设备发送任务控制指令",logType = 11)
     public Result feignRobotTaskControl(@RequestBody Map<String, Object> robotTaskControlMap) {
         Result result = new Result();
         try {
@@ -164,9 +164,9 @@ public class RobotController {
         }
         return result;
     }
-    @ApiOperation(value = "巡视主机向机器人下发检修区域指令接口")
+    @ApiOperation(value = "巡视主机向巡视设备下发检修区域指令接口")
     @PostMapping(value = "/deviceMaintenanceIssued")
-    @Logs(title = "下发检修区域",content = "根据用户传递的参数给机器人下发检修区域指令",logType = 5)
+    @Logs(title = "下发检修区域",content = "根据用户传递的参数给巡视设备下发检修区域指令",logType = 5)
     public Result deviceMaintenanceIssued(@RequestBody Map<String,Object> resMap){
         Result result = new Result();
         try {
@@ -183,7 +183,7 @@ public class RobotController {
 
     @ApiOperation(value = "断开连接接口")
     @GetMapping(value = "/removeLink")
-    @Logs(title = "断开连接",content = "根据用户传递的参数断开该机器人的连接",logType = 5)
+    @Logs(title = "断开连接",content = "根据用户传递的参数断开该巡视设备的连接",logType = 5)
     public Result removeLink(@RequestParam(value = "robotCode")  String robotCode,
                              @RequestParam(value = "robotId")  Long robotId){
         Result result = new Result();

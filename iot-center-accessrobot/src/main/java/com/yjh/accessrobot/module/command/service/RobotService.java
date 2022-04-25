@@ -24,6 +24,7 @@ import com.yjh.accessrobot.module.command.dao.TRobotRegionDao;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.device.utils.StatisticsUtil;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
+import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -149,21 +150,32 @@ public class RobotService {
                 return zcz;
             }
         }
-//        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-//        params.set("logType", "5");
-//        params.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
-//        params.set("title", "控制机器人");
-//        params.set("state", 1);
-//        params.set("userId", userId);
-//        params.set("userName", userName);
-//        params.set("requestOrigin", request.getRequestURL());
-//        params.set("requestPath", request.getRequestURI());
-//        params.set("requestMethod", request.getMethod());
-//        /*String operationContent = selectContentByCommand(type,command,value);
-//        params.set("content",operationContent);*/
-//        params.set("content", content);
-//        LogsAspect logsAspect = new LogsAspect();
-//        logsAspect.post(params);
+        if ("3".equals(command) && "20001".equals(type)) { //无人机一键返航
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
+        } else if ("5".equals(command) && "20001".equals(type)) { //无人机控制模式
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
+        } else if ("6".equals(command) && "20001".equals(type)) { //无人机控制权获得
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
+        }else if ("8".equals(command) && "20001".equals(type)) { //无人机电源管理
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
+        } else if ("5".equals(command) && "20003".equals(type)) { //无人机云台重置
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password,request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
+        }
         List<Map<String, Object>> item = new LinkedList<>();
         Map<String, Object> map = new HashMap<>(3);
         if (StringUtils.isNotEmpty(value)) {
@@ -175,16 +187,16 @@ public class RobotService {
         item.add(map);
 
         if (StringUtils.isEmpty(robotCode)){
-            log.error("==========没有设置机器人编码==========");
+            log.error("==========没有设置巡视设备编码==========");
             scmap.put("code", 3);
-            scmap.put("result", "当前不存在机器人编码,请先添加");
+            scmap.put("result", "当前不存在该巡视设备编码,请先添加");
             return scmap;
         }
         String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
         if (StringUtils.equals(OFF_LINE, robotStatus)){
-            log.error("==========该机器人处于离线状态,没有成功将控制指令下发到机器人==========");
+            log.error("==========该巡视设备处于离线状态,没有成功将控制指令下发到巡视设备==========");
             scmap.put("code", 3);
-            scmap.put("result", "机器人不在线");
+            scmap.put("result", "巡视设备不在线");
             return scmap;
         }else {
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
@@ -204,9 +216,9 @@ public class RobotService {
             int robotType = tRobotInfoDao.selectRobotTypeByCode(robotCode);
             if (StringUtils.equals("2", robotTaskStatus) || StringUtils.equals("4", robotTaskStatus)) {
                 String returnMsg = robotTaskStatus.equals("2") ? "巡视状态" : "检修状态";
-                log.error("==========当前机器人处于" + returnMsg + ",无法操作==========");
+                log.error("==========当前巡视设备处于" + returnMsg + ",无法操作==========");
                 scmap.put("code", 3);
-                scmap.put("result", "当前机器人处于" + returnMsg + ",无法操作");
+                scmap.put("result", "当前巡视设备处于" + returnMsg + ",无法操作");
                 return scmap;
             }
             boolean flag = StringUtils.equals("1", robotPattern)
@@ -214,9 +226,9 @@ public class RobotService {
                     && !("1".equals(type) && "5".equals(command)) //切换模式
                     && !("1".equals(type) && "8".equals(command)); //急停
             if (Boolean.TRUE.equals(flag)){
-                log.error("==========当前机器人处于任务模式,请切换模式==========");
+                log.error("==========当前巡视设备处于任务模式,请切换模式==========");
                 scmap.put("code", 3);
-                scmap.put("result", "当前机器人处于任务模式,请切换模式");
+                scmap.put("result", "当前巡视设备处于任务模式,请切换模式");
             }else{
                 RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
 
@@ -254,7 +266,7 @@ public class RobotService {
     public boolean feignRobotTransfer(String robotCode)  {
         String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
         if (StringUtils.equals(OFF_LINE, robotStatus)){
-            log.error("==========该机器人处于离线状态,没有成功将模型文件同步指令下发到机器人==========");
+            log.error("==========该巡视设备处于离线状态,没有成功将模型文件同步指令下发到巡视设备==========");
             return false;
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
@@ -304,7 +316,7 @@ public class RobotService {
                 .setRobotStatus(robotStatus);
         StatisticsUtil.onlineDuration(tRobotInfo);
         int res = tRobotInfoDao.update(tRobotInfo);
-        log.info("robotCode为==={},robotId为==={}的机器人状态是==={},修改结果==={}", robotCode, robotId, tRobotInfo.getRobotStatus(), res);
+        log.info("robotCode为==={},robotId为==={}的巡视设备状态是==={},修改结果==={}", robotCode, robotId, tRobotInfo.getRobotStatus(), res);
         return res;
     }
 
@@ -356,14 +368,18 @@ public class RobotService {
         Object propertyFile = map.getOrDefault("propertyFile", "");
         XMLBaseModel deviceModel = getXmlMessage(filePathMap.get("content") + File.separator + deviceFile);
         List<Map<String, Object>> deviceMap = deviceModel.getItems();
-        XMLBaseModel robotModel = getXmlMessage(filePathMap.get("content") + File.separator + robotFile);
-        List<Map<String, Object>> robotMap = robotModel.getItems();
+
+        List<Map<String, Object>> robotMap = new ArrayList<>();
         List<Map<String, Object>> propertyMap= new ArrayList<>();
         if (!"".equals(propertyFile)) {
             XMLBaseModel propertyModel = getXmlMessage(filePathMap.get("content") + File.separator + propertyFile);
             propertyMap = propertyModel.getItems();
         }
-        if (CollectionUtils.isNotEmpty(deviceMap) && CollectionUtils.isNotEmpty(robotMap)) {
+        if (!"".equals(robotFile)) {
+            XMLBaseModel robotModel = getXmlMessage(filePathMap.get("content") + File.separator + robotFile);
+            robotMap = robotModel.getItems();
+        }
+        if (CollectionUtils.isNotEmpty(deviceMap)) {
             Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
             // Robot Model Info
             addRobotModel(robotMap, robotId);
@@ -382,22 +398,24 @@ public class RobotService {
      * @return void
      */
     public void addRobotModel( List<Map<String, Object>> robotMap, Long robotId){
-        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
-        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        if (CollectionUtils.isNotEmpty(robotMap)) {
+            Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+            Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+            Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
 
-        String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
-        log.info("图片路径为：{}", picPath);
+            String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
+            log.info("图片路径为：{}", picPath);
 
-        String[] splitArray = picPath.split("/");
-        String fileName = splitArray[splitArray.length - 1];
-        String developMap = absoluteImgMap.get("content") + "/Map";
-        copyFileToDevelop(picPath, developMap);
-        String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
-        TRobotInfo tRobotInfo = new TRobotInfo()
-                .setRobotId(robotId)
-                .setPhotePath(developRelativeUrl);
-        tRobotInfoDao.update(tRobotInfo);
+            String[] splitArray = picPath.split("/");
+            String fileName = splitArray[splitArray.length - 1];
+            String developMap = absoluteImgMap.get("content") + "/Map";
+            copyFileToDevelop(picPath, developMap);
+            String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
+            TRobotInfo tRobotInfo = new TRobotInfo()
+                    .setRobotId(robotId)
+                    .setPhotePath(developRelativeUrl);
+            tRobotInfoDao.update(tRobotInfo);
+        }
     }
     /**
      * 机器人设备点位文件信息处理
@@ -2257,13 +2275,19 @@ public class RobotService {
 
     @Transactional(rollbackFor = Exception.class)
     public void uploadFile(String localPath, String targetName) {
-        try {
-            if("".equals(localPath)) {return;}
-            FtpsUtil.putFile(ftpsLocalPath + "/" + localPath, targetName,
-                    serverUrl, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
-        } catch (Exception e) {
-            log.error("上传至ftps错误 " + e);
-        }
+        Runnable runnable =new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if("".equals(localPath)) {return;}
+                    FtpsUtil.putFile(ftpsLocalPath + "/" + localPath, targetName,
+                            serverUrl, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
+                } catch (Exception e) {
+                    log.error("上传至ftps错误 " + e);
+                }
+            }
+        };
+        TaskExecutePool.getInstance().execute(runnable);
     }
 
     /**

@@ -141,8 +141,9 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         String temporaryFilePath = filePathMap.get("content") + "/" + ftpFilePath;
         log.info("temporaryFilePath==={}",temporaryFilePath);
 
+        String fileType = item.get("file_type").toString();
         // 红外原图
-        if (item.containsKey("origin_file_path")) {
+        if (item.containsKey("origin_file_path") && Objects.equals("1",fileType)) {
             // 红外原图
             String ftpInfraredOriginPath = item.get("origin_file_path").toString();
             String[] sArray2 = ftpInfraredOriginPath.split("/");
@@ -180,7 +181,6 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         temporaryMap.put("ftpFileName", ftpFileName);
         temporaryMap.put("flag", flag);
 
-        String fileType = item.get("file_type").toString();
         // 1.红外 2.可见光 3.音频 4.视频
         if (Objects.equals("1",fileType)) {
             // 拷贝巡视结果图
