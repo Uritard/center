@@ -337,7 +337,7 @@ public class DataDealThread implements Runnable {
             log.info("--模型同步--");
             if("1".equals(xmlBaseModel.getCommand())){
                 //log.info("----");
-            sendToUpSystemServices.creatFile();
+//            sendToUpSystemServices.creatFile();
             List<Map<String,Object>> list =new ArrayList<>();
             Map<String,String> mapForGetPath = redisTemplate.opsForHash().entries("t_sys_param:modelRelativePath");
             String path = mapForGetPath.get("content");

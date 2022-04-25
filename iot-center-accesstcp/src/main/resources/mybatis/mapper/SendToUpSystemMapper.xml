@@ -225,4 +225,11 @@
         WHERE
             drone_type IS NOT NULL
     </select>
+    <select id="selectMapPath" resultType="java.lang.String">
+        select
+            phote_path
+        from t_robot_info
+        where phote_path is not null
+        limit 1
+    </select>
 </mapper>

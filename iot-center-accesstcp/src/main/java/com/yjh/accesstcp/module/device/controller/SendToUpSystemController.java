@@ -74,11 +74,11 @@ public class SendToUpSystemController {
         return result;
     }
     @ApiOperation(value = "模型同步")
-    @RequestMapping(value = "/creatFile", method = RequestMethod.GET)
-    public Result creatFile() {
+    @RequestMapping(value = "/creatModel", method = RequestMethod.GET)
+    public Result creatFile(@RequestParam(value = "type") String type) {
         Result result = new Result();
         try {
-            result.setData(sendToUpSystemService.creatFile());
+            result.setData(sendToUpSystemService.creatModel(type));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);

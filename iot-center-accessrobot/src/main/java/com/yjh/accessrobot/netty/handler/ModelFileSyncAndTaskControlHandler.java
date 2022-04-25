@@ -65,7 +65,7 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
             // robot model
             robotService.uploadFile(robotFile, robotFile);
             // 国网要求
-            robotService.upToCruise(xmlBaseModel);
+//            robotService.upToCruise(xmlBaseModel);
         } else if (xmlBaseModel.getItems().get(0).size() == 0) {
             log.info("机器人收到检修区域指令了,这是机器人的响应");
             // maintenance area was issued successfully

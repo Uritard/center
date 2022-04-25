@@ -599,19 +599,11 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             //6-声纹模型  同上
             //7-任务文件  任务模型 A.2.5
             //8-检修区域配置文件 检修区域模型 A.2.6
-            if("1".equals(xmlBaseModel.getCommand())){//机器人模型
-                //log.info("----");
-                Map<String,Object> map = sendToUpSystemServices.creatFile();
-                List<Map<String,Object>> list =new ArrayList<>();
-                list.add(map);
-                sendToUpSystemServices.sendResponse("251","3","100",list);
-//                //sendToUpSystemServices.sendResponse("251","3","200",list);//江苏要求
-//                Map<String,List<XMLBaseModel>> map = new HashMap<>();
-//                List<XMLBaseModel> taskList = new ArrayList<>();
-//                taskList.add(xmlBaseModel);
-//                map.put("list",taskList);
-////                Result re = Constant.otherServer(map,Constant.ROBOT_TASK_URL);//国网要求
-            }
+            //9-地图文件
+            Map<String,Object> map = sendToUpSystemServices.creatModel(xmlBaseModel.getCommand());
+            List<Map<String,Object>> list =new ArrayList<>();
+            list.add(map);
+            sendToUpSystemServices.sendResponse("251","3","200",list);
         }
 
         if ("81".equals(xmlBaseModel.getType())){

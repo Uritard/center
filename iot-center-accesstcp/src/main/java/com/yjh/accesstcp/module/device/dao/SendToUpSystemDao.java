@@ -36,4 +36,5 @@ public interface SendToUpSystemDao {
     List<DeviceStatisticsInfo>selectRobot();
     List<DeviceStatisticsInfo>selectCamera();
     List<DeviceStatisticsInfo>selectDrone();
+    String selectMapPath();
 }
