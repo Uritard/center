@@ -92,6 +92,8 @@ public class KeepWatchJob implements Runnable {
                                         new Thread(()->{
                                             move(moveMap);
                                         }).start();
+                                        map.put("lastTime",simpleDateFormat.format(new Date()));
+                                        redisTemplate.opsForHash().putAll(str,map);
                                     }
                                 }
 
