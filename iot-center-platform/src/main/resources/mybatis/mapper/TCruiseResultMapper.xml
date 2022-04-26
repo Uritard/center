@@ -346,6 +346,7 @@
         q.low_limit2,
         q.low_limit3,
         q.low_limit4,
+        q.unit,
         q.mete_kind,
         q.meter_type,
         q.mete_type,

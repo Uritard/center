@@ -104,8 +104,8 @@ public class KeepWatchJob implements Runnable {
 
             try {
                 Date End = new Date();
-                log.info("代码执行开始时间："+start);
-                log.info("代码执行结束时间："+End);
+//                log.info("代码执行开始时间："+start);
+//                log.info("代码执行结束时间："+End);
 
                 Thread.sleep(10*1000);//10秒查一次
             } catch (Exception e) {
