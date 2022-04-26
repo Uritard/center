@@ -39,13 +39,18 @@ public class StatisticsService {
     return re;
   }
 
-  /** 获取指定年指定月的开始天数和结束天数 */
-  public static Map<String, Object> getDateByMonth(int year, int month) {
+  /**
+   * type =1,获取月开始结束时间<br>
+   * type =2,获取年到当前时间的开始结束时间<br>
+   * type =3 ,获取年开始结束时间<br>
+   */
+  public static Map<String, Object> getDateByMonth(int type, int year, int month) {
     // 获取当前分区的日历信息
     Calendar calendar = Calendar.getInstance();
     // 设置年
     calendar.set(Calendar.YEAR, year);
-    if (month != 0) {
+
+    if (type == 1) {
       // 设置月，月份从0开始
       calendar.set(Calendar.MONTH, month - 1);
     } else {
@@ -79,12 +84,15 @@ public class StatisticsService {
     calendar.set(Calendar.MILLISECOND, 999);
     // 获取最后一天的时间
     Date end = calendar.getTime();
-    int endWeek = calendar.get(Calendar.WEEK_OF_YEAR);
     Map<String, Object> dateMap = new HashMap<>();
     dateMap.put("startTime", start);
-    dateMap.put("startWeek", startWeek);
     dateMap.put("endTime", end);
-    dateMap.put("endWeek", endWeek);
+    if (type == 2) {
+      calendar = Calendar.getInstance();
+      dateMap.put("startWeek", startWeek);
+      dateMap.put("endTime", calendar.getTime());
+      dateMap.put("endWeek", calendar.get(Calendar.WEEK_OF_YEAR));
+    }
     return dateMap;
   }
 
@@ -194,7 +202,7 @@ public class StatisticsService {
    */
   public List<Map<String, Object>> countCamera(Long id) {
     List<Map<String, Object>> mapList = statisticsDao.countCamera(id);
-    Map<Long, Long> recordMap = new HashMap<Long, Long>(16);
+    Map<Integer, Long> channelMap = new HashMap<Integer, Long>(16);
     for (Map<String, Object> map : mapList) {
       double totalNum = Double.parseDouble(map.get("totalNum").toString());
       double lossNum = Double.parseDouble(map.get("lossNum").toString());
@@ -212,42 +220,45 @@ public class StatisticsService {
 
       // 根据cameraId查询recordId，查询摄像机完整率
       Long cameraId = (Long) map.get("cameraId");
+      Integer channelNum = (Integer) map.get("channelNum");
       Long recordId = statisticsDao.selectRecordByCamera(cameraId);
       map.put("recordId", recordId);
       if (recordId == null) {
         log.error("相机cameraId={}无对应的录像机", cameraId);
         continue;
       }
-      recordMap.put(cameraId, recordId);
+      channelMap.put(channelNum, recordId);
     }
 
     Set<Long> set = new HashSet();
-    for (Map.Entry map : recordMap.entrySet()) {
+    for (Map.Entry map : channelMap.entrySet()) {
       Long recordId = (Long) map.getValue();
       set.add(recordId);
     }
-    Map<Long, String> percentMap = new HashMap<>(8);
+    Map<Integer, String> percentMap = new HashMap<>(8);
     for (Long recordId : set) {
       Result re = getNVRInfo(recordId);
       if (re == null) {
         continue;
       }
-      Map<String, String> mapData = (Map<String, String>) re.getData();
-      int intactTime =
-          mapData.get("intactTime") == null ? 0 : Integer.parseInt(mapData.get("intactTime"));
-      log.info("录像机{}的完整率查询结果：{}", recordId, intactTime);
-      if (intactTime != 0) {
-        String intactPercent = String.format("%.2f", intactTime / 100d);
-        for (Map.Entry map : recordMap.entrySet()) {
-          if (recordId.equals(map.getValue())) {
-            percentMap.put((Long) map.getKey(), intactPercent + "%");
+      Map<String, Object> mapData = (Map<String, Object>) re.getData();
+      List<Map<String, Object>> chanInfo = new ArrayList<>();
+      if (mapData.get("channel") == null) {
+        chanInfo = (List<Map<String, Object>>) mapData.get("channel");
+        for (Map<String, Object> mapChannel : chanInfo) {
+          int intactTime = (int) mapChannel.get("intactTime");
+          int ipChanNum = (int) mapChannel.get("ipChanNum");
+          if (intactTime != 0) {
+            String intactPercent = String.format("%.2f", intactTime / 100d);
+            percentMap.put(ipChanNum, intactPercent + "%");
           }
         }
       }
     }
     if (percentMap.size() > 0) {
       for (Map<String, Object> map : mapList) {
-        map.put("intactPercent", percentMap.get("camera_id"));
+        int ipChanNum = (int) map.get("channelNum");
+        map.put("intactPercent", percentMap.get(ipChanNum));
       }
     }
     return mapList;
@@ -260,7 +271,7 @@ public class StatisticsService {
    */
   public List<Statistics> countTask(Integer type, Integer year, Integer month) {
 
-    Map<String, Object> objectMap = getDateByMonth(year, month);
+    Map<String, Object> objectMap = getDateByMonth(type, year, month);
     Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
     List<Statistics> result = new ArrayList<>();
     switch (type) {
@@ -292,7 +303,7 @@ public class StatisticsService {
    * @return
    */
   public List<Statistics> countInstanceLoss(Integer type, Integer year, Integer month) {
-    Map<String, Object> objectMap = getDateByMonth(year, month);
+    Map<String, Object> objectMap = getDateByMonth(type, year, month);
     Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
     List<Statistics> result = new ArrayList<>();
 
@@ -371,7 +382,7 @@ public class StatisticsService {
    * @return
    */
   public List<Statistics> countWarnCheck(Integer type, Integer year, Integer month) {
-    Map<String, Object> objectMap = getDateByMonth(year, month);
+    Map<String, Object> objectMap = getDateByMonth(type, year, month);
     Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
     List<Statistics> result = new ArrayList<>();
     switch (type) {
@@ -403,7 +414,7 @@ public class StatisticsService {
    * @return
    */
   public List<Statistics> countWarnAccuracy(Integer type, Integer year, Integer month) {
-    Map<String, Object> objectMap = getDateByMonth(year, month);
+    Map<String, Object> objectMap = getDateByMonth(type, year, month);
     Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
     List<Statistics> result = new ArrayList<>();
 
@@ -435,7 +446,7 @@ public class StatisticsService {
    * @return
    */
   public List<Statistics> countResultCheck(Integer type, Integer year, Integer month) {
-    Map<String, Object> objectMap = getDateByMonth(year, month);
+    Map<String, Object> objectMap = getDateByMonth(type, year, month);
     Date startTime = (Date) objectMap.get("startTime"), endTime = (Date) objectMap.get("endTime");
     List<Statistics> result = new ArrayList<>();
 
