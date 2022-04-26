@@ -633,7 +633,7 @@
         UNION ALL (
 		    SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
 		    (case when cpi.cruise_type = 228 then "robotCruiseInspection"
-			when cpi.cruise_type = 229 then "videoCruiseInspection" END) AS infoType
+			when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection" END) AS infoType
 		    FROM  t_cruise_point_instance cpi
             LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
         where 1=1
@@ -663,7 +663,7 @@
         UNION ALL (
 		    SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
 		    (case when cpi.cruise_type = 228 then "robotCruiseInspection"
-			when cpi.cruise_type = 229 then "videoCruiseInspection" END) AS infoType
+			when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection" END) AS infoType
 		    FROM  t_cruise_point_instance cpi
             LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
             where cpi.cruise_type = 228
@@ -694,7 +694,7 @@
         UNION ALL (
 		    SELECT cpi.instance_id AS Id,cpi.cruise_name AS label,cpi.device_mete_id AS upId,dm.mete_name AS upName,
 		    (case when cpi.cruise_type = 228 then "robotCruiseInspection"
-			when cpi.cruise_type = 229 then "videoCruiseInspection" END) AS infoType
+			when cpi.cruise_type = 229 then "videoCruiseInspection" when cpi.cruise_type = 230 then "videoCruiseInspection" END) AS infoType
 		    FROM  t_cruise_point_instance cpi
             LEFT JOIN t_std_devicemete dm ON dm.device_mete_id = cpi.device_mete_id
             where cpi.cruise_type = 229
