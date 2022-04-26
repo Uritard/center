@@ -104,7 +104,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             TaskExecutePool.getInstance().execute(cruiseResultDealThread);
 
             //非同源告警处理
-            NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap, redisTemplate, websocketUrl);
+            NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap, redisTemplate, websocketUrl,1);
             TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
         }
 

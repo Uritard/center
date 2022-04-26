@@ -7,6 +7,7 @@ import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
+import com.yjh.accessrobot.netty.thread.NonhomologousWarnThread;
 import com.yjh.accessrobot.netty.thread.RobotInspectionWarnThread;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author YChen
@@ -61,6 +63,12 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
         log.info("机器人设备测点告警数据是：{}", warnResultMap);
         RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(warnResultMap, redisTemplate, websocketUrl);
         TaskExecutePool.getInstance().execute(robotWarnThread);
+
+        if(!Objects.isNull(warnResultMap.get("alarmType")) && (warnResultMap.get("alarmType").equals("3")||warnResultMap.get("alarmType").equals("4")||warnResultMap.get("alarmType").equals("9"))){
+            //非同源告警处理
+            NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(warnResultMap, redisTemplate, websocketUrl,0);
+            TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
+        }
 
         String alarmXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);

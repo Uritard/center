@@ -26,19 +26,21 @@ public class NonhomologousWarnThread implements Runnable{
     private Map<String,String> cruiseResultMap;
     private String webSocketUrl;
     private Boolean changeTaskStatus;
+    private int isResult;
     private static final String IS_AI_AlGORITHM = "on";
 
-    public NonhomologousWarnThread(Map<String,String> cruiseResultMap, RedisTemplate redisTemplate, String webSocketUrl){
+    public NonhomologousWarnThread(Map<String,String> cruiseResultMap, RedisTemplate redisTemplate, String webSocketUrl,int isResult){
         this.cruiseResultMap = cruiseResultMap;
         this.redisTemplate = redisTemplate;
         this.webSocketUrl = webSocketUrl;
+        this.isResult = isResult;
     }
 
     @Override
     public void run(){
         try {
             log.info("开始处理巡检结果并生成相应的非同源告警 >>>>>>> cruiseResultMap==={}", cruiseResultMap);
-            StaticContextAccessor.getBean(NonhomologousWarnService.class).insertNonhomologousWarn(cruiseResultMap,1);
+            StaticContextAccessor.getBean(NonhomologousWarnService.class).insertNonhomologousWarn(cruiseResultMap,isResult);
         } catch (Exception e) {
             log.error("巡检结果处理失败", e.getMessage());
             throw new RuntimeException("巡检结果处理失败");

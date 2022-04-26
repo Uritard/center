@@ -19,6 +19,7 @@ import java.util.*;
 import com.yjh.platform.module.user.entity.TSysParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -30,6 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 */
 @Service
 public class TSequentialConfService{
+
+    @Value("${sequential.videocfmresult}")
+    private String videocfmresultFile;
+
+    @Value("${sequential.returnlinkage}")
+    private String returnlinkageFile;
 
     @Autowired
     private TSequentialConfDao tSequentialConfDao;
@@ -183,19 +190,19 @@ public class TSequentialConfService{
 
             //Map<String,String> mapResult = this.sequentialInfo(meteId).get(0);
             TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
-            String devicePath = tSysParam.getContent()+"/"+"sequential.txt";
+            String devicePath = tSysParam.getContent()+"/"+videocfmresultFile;
             try{
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 File txt=new File(devicePath);
-
                 if(txt.exists()){
                     txt.delete();
                 }
                 if (!txt.exists()) {
                     txt.createNewFile();
                 }
-                FileWriter fw = new FileWriter(txt, true);
-                BufferedWriter bw = new BufferedWriter(fw);
+//                FileWriter fw = new FileWriter(txt, true);
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(txt,true), "UTF-8"));
                 bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间）!>\r\n");
                 bw.write("<DeviceInfo::设备状态>\r\n");
                 bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
@@ -203,7 +210,7 @@ public class TSequentialConfService{
                 bw.write("</DeviceInfo::设备状态>\r\n");
                 bw.flush();
                 bw.close();
-                fw.close();
+//                fw.close();
                 //将生成的顺控确认文件发送给主辅监控系统
                 Map<String,List<String>> mapForSend = new HashMap<>();
                 List<String> list = new ArrayList<>();
@@ -249,7 +256,7 @@ public class TSequentialConfService{
 
         TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
         TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
-        String devicePath = tSysParam.getContent()+"/"+"unionTask.txt";
+        String devicePath = tSysParam.getContent()+"/"+returnlinkageFile;
         try{
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             File txt=new File(devicePath);
