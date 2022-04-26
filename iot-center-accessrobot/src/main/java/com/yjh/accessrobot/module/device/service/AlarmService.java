@@ -9,6 +9,8 @@ import com.yjh.accessrobot.commons.result.Result;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+
 @Component
 public class AlarmService {
     public static final String HEART = "heart";
@@ -39,15 +41,18 @@ public class AlarmService {
         postBodyMsg=  new PostBodyMsg();
         postBodyMsg.setTopic(Topic);
         alarmMqttMsg.setMsg_type("alarm");
-        alarmMqttMsg.setProvince_name(provinceName);
-        alarmMqttMsg.setCity_name(cityName);
-        alarmMqttMsg.setStation_name(stationName);
+        alarmMqttMsg.setProvince_name(encode(provinceName));
+        alarmMqttMsg.setCity_name(encode(cityName));
+        alarmMqttMsg.setStation_name(encode(stationName));
         alarmMqttMsg.setSection_ip(sectionIP);
         alarmMqttMsg.setNode_id(nodeId);
         alarmMqttMsg.setVolt_level(voltLevel);
 
     }
 
+    private String encode(String str){
+        return new String(str.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
+    }
     /**
      * 转发给platform的mqtt/postMqttMsg接口。后续需要各模块统一一下，是否都走platform
      * @param alarm 告警具体内推，再这里根据alarm拼装mqqt的告警消息postBodyMsg

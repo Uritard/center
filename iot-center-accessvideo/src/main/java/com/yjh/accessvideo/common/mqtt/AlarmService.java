@@ -8,6 +8,8 @@ import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+
 @Component
 public class AlarmService {
     public static final String HEART = "heart";
@@ -38,13 +40,16 @@ public class AlarmService {
         postBodyMsg=  new PostBodyMsg();
         postBodyMsg.setTopic(Topic);
         alarmMqttMsg.setMsg_type("alarm");
-        alarmMqttMsg.setProvince_name(provinceName);
-        alarmMqttMsg.setCity_name(cityName);
-        alarmMqttMsg.setStation_name(stationName);
+        alarmMqttMsg.setProvince_name(encode(provinceName));
+        alarmMqttMsg.setCity_name(encode(cityName));
+        alarmMqttMsg.setStation_name(encode(stationName));
         alarmMqttMsg.setSection_ip(sectionIP);
         alarmMqttMsg.setNode_id(nodeId);
         alarmMqttMsg.setVolt_level(voltLevel);
 
+    }
+    private String encode(String str){
+        return new String(str.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
     }
 
     /**

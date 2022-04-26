@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -50,12 +51,16 @@ public class HeartBeatJob {
     private void initMssageInfo() {
         heartMsg = new HeartMessageInfo();
         heartMsg.setMsgType(HEART);
-        heartMsg.setProvinceName(provinceName);
-        heartMsg.setCityName(cityName);
-        heartMsg.setStationName(stationName);
+        heartMsg.setProvinceName(encode(provinceName));
+        heartMsg.setCityName(encode(cityName));
+        heartMsg.setStationName(encode(stationName));
         heartMsg.setTime(LocalDateTime.now().format(pattern));
         heartMsg.setSectionIp(sectionIP);
         heartMsg.setNodeId(nodeId);
         heartMsg.setVoltLevel(voltLevel);
+    }
+
+    private String encode(String str){
+        return new String(str.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
     }
 }
