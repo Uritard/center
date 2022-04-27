@@ -76,6 +76,9 @@ public class TVoiceDeviceService{
         }else {
             tVoiceDevice.setState("离线");
         }
+        if(tVoiceDevice.getVoiceCode() != null && !"".equals(tVoiceDevice.getVoiceCode())){
+            audioDeviceManager.registerAudioDevice(audioDeviceFactory.newAudioDevice(tVoiceDevice.getVoiceCode()));
+        }
         this.tVoiceDeviceDao.addConf(tVoiceDevice);
         return this.tVoiceDeviceDao.add(tVoiceDevice);
     }
@@ -103,6 +106,12 @@ public class TVoiceDeviceService{
              tVoiceDevice.setState("在线");
         }else {
              tVoiceDevice.setState("离线");
+        }
+        if(tVoiceDevice.getVoiceCode() != null && !"".equals(tVoiceDevice.getVoiceCode())){
+            VoiceDeviceAllInfoDetail old = this.selectByPrimaryId(tVoiceDevice.getVoiceDeviceId());
+            if(!old.getVoiceCode().equals(tVoiceDevice.getVoiceCode())){
+                audioDeviceManager.registerAudioDevice(audioDeviceFactory.newAudioDevice(tVoiceDevice.getVoiceCode()));
+            }
         }
         this.tVoiceDeviceDao.updateConf(tVoiceDevice);
         return this.tVoiceDeviceDao.update(tVoiceDevice);
