@@ -143,11 +143,12 @@
     <select id="countTask" resultType="java.util.HashMap">
         select count(1)                    as totalNum,
                (select count(1)
-                from t_cruise_task_result
-                where cruise_task_time BETWEEN #{startTime} and #{endTime}
-                  and cruise_result = 246) as validNum
-        from t_cruise_task_result
-        where cruise_task_time BETWEEN #{startTime} and #{endTime}
+                from t_cruise_result
+                where execute_time BETWEEN #{startTime} and #{endTime}
+                  and c_state = 240) as validNum
+        from t_cruise_result
+        where execute_time BETWEEN #{startTime} and #{endTime}
+          and c_state in (240,242,243,244)
     </select>
 
     <select id="countWarnCheck" resultType="java.util.HashMap">

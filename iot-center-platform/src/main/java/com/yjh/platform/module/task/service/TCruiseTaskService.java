@@ -1418,9 +1418,10 @@ public class TCruiseTaskService {
         }
     }
 
-    private Result sendTaskStateToUp(TCruiseTask tCruiseTask, Integer state) {
+    private void sendTaskStateToUp(TCruiseTask tCruiseTask, Integer state) {
         //任务状态上报站端
 
+        try{
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> items = new ArrayList<>();
         Map<String, Object> item = new HashMap<>();
@@ -1463,13 +1464,11 @@ public class TCruiseTaskService {
         Map<String, List<XMLBaseModel>> map = new HashMap<>();
         map.put("list", list);
         Result re = null;
-        try {
             log.info("信息上报：-" + map);
             re = Constant.otherServer(map, Constant.TCP_URL);//江苏要求
         } catch (Exception e) {
             log.info("上报出错" + e.getMessage());
         }
-        return re;
     }
 
     @Transactional(rollbackFor = Exception.class)
