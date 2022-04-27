@@ -142,47 +142,42 @@
         group by WEEK
     </select>
     <select id="countTaskByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
-        select DATE_FORMAT(cruise_task_time, '%Y-%m-%d') day,
-               count(1)                    as            totalNum,
+        select DATE_FORMAT(execute_time, '%Y-%m-%d') day,
+               count(1)              as              totalNum,
                (select count(1)
-                from t_cruise_task_result
-                where cruise_task_time BETWEEN #{startTime} and #{endTime}
-                  and cruise_result = 246) as            validNum
-        from t_cruise_task_result
-        where cruise_task_time BETWEEN #{startTime} and #{endTime}
+                from t_cruise_result
+                where execute_time BETWEEN #{startTime} and #{endTime}
+                  and c_state = 240) as              validNum
+        from t_cruise_result
+        where execute_time BETWEEN #{startTime} and #{endTime}
+          and c_state in (240, 242, 243, 244)
         group by day
     </select>
 
     <select id="countWarnCheckByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
-        SELECT DATE_FORMAT(t.`warn_time`, '%u') + 1 WEEK,
-               COUNT(1)           AS                totalNum,
-               COUNT(t.deal_type) AS                validNum
-        FROM (SELECT deal_type,
-                     warn_time
-              FROM t_warn_info
-              UNION
-                  ALL
-              (SELECT deal_type,
-                      defect_time warn_time
-               FROM t_defect_info)) t
-        WHERE t.warn_time BETWEEN #{startTime} and #{endTime}
+        select DATE_FORMAT(execute_time, '%u') + 1 WEEK,
+               count(1)              as            totalNum,
+               (select count(1)
+                from t_cruise_result
+                where execute_time BETWEEN #{startTime} and #{endTime}
+                  and c_state = 240) as            validNum
+        from t_cruise_result
+        where execute_time BETWEEN #{startTime} and #{endTime}
+          and c_state in (240, 242, 243, 244)
         GROUP BY WEEK
     </select>
 
 
     <select id="countWarnCheckByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
-        SELECT DATE_FORMAT(t.`warn_time`, '%Y-%m') MONTH,
-               COUNT(1)           AS               totalNum,
-               COUNT(t.deal_type) AS               validNum
-        FROM (SELECT deal_type,
-                     warn_time
-              FROM t_warn_info
-              UNION
-                  ALL
-              (SELECT deal_type,
-                      defect_time warn_time
-               FROM t_defect_info)) t
-        WHERE t.warn_time BETWEEN #{startTime} and #{endTime}
+        select DATE_FORMAT(execute_time, '%Y-%m') MONTH,
+               count(1)              as           totalNum,
+               (select count(1)
+                from t_cruise_result
+                where execute_time BETWEEN #{startTime} and #{endTime}
+                  and c_state = 240) as           validNum
+        from t_cruise_result
+        where execute_time BETWEEN #{startTime} and #{endTime}
+          and c_state in (240, 242, 243, 244)
         GROUP BY MONTH
     </select>
 

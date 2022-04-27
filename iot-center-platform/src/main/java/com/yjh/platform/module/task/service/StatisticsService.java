@@ -70,7 +70,7 @@ public class StatisticsService {
     Date start = calendar.getTime();
     int startWeek = calendar.get(Calendar.WEEK_OF_YEAR);
     // 设置日历天数为当前月实际天数的最大值，即指定月份的最后一天
-    if (month == 0) {
+    if (type == 3) {
       calendar.set(Calendar.MONTH, 11);
     }
     calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
