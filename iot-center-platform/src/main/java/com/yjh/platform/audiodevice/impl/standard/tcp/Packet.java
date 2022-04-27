@@ -85,6 +85,7 @@ public class Packet {
         if (in.remaining() < MINIMUM_PARSING_SIZE) {
             //数据长度不够解析(断包)，重置读位置，放弃此轮解析
             in.reset();
+            log.error("数据长度不够解析(断包)");
             return null;
         }
 
@@ -94,6 +95,7 @@ public class Packet {
                 in.reset();
                 //开始标志没检测到，跳过多余的字节字节
                 in.skip(i + 1);
+                log.error("开始标志没检测到");
                 return null;
             }
         }
@@ -105,13 +107,19 @@ public class Packet {
         //包格式版本
         byte version = in.get();
         int remainingLength = in.getInt();
+        log.info("size.len：{}",remainingLength);
+        int remaining = in.remaining();
         //剩下的数据不够，重置读位置，放弃此轮解析
-        if (in.remaining() < remainingLength) {
+        log.info("remaining:{}",remaining);
+        //剩下的数据不够，重置读位置，放弃此轮解析
+        if (remaining < remainingLength) {
             in.reset();
+            log.error("剩下的数据不够");
             return null;
         }
 
         if (!checkCrc(in.array(), in.position(), remainingLength - (2 + 1))) {
+            log.error("Crc校验失败");
 //            throw new IllegalArgumentException("Crc校验失败");
         }
 
@@ -126,6 +134,7 @@ public class Packet {
         packet.encoding = AudioEncoding.getInstance(in.get());
         int dataGroupSize = calcDataGroupSize(remainingLength);
         byte[] dataGroupBytes = new byte[dataGroupSize];
+        log.info("dataGroupBytes.len:{}",dataGroupBytes.length);
         in.get(dataGroupBytes);
         //调试作用，当version是0x7F时，认为每个通道数据是两个字节
         if (0x7F == version) {
@@ -139,9 +148,10 @@ public class Packet {
 
         byte eop0 = in.get();
         if (eop0 != END) {
+            log.error("Unexpected ending byte: 0X%2X");
             throw new IllegalArgumentException(String.format("Unexpected ending byte: 0X%2X", eop0));
         }
-
+        log.info("packet.parse success");
         return packet;
     }
 
