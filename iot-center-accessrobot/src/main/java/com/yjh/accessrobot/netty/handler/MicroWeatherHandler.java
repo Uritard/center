@@ -89,7 +89,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                     // info.put("precipitationUnit","mm");
                 }
                 if ("6".equals(weatherType)) {
-                    info.put("airPressure", decimalFormat.format(Double.valueOf(weatherMap.get("value")) / 10));
+                    info.put("airPressure", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
                     info.put("airPressureUnit", "kPa");
                 }
                 if ("7".equals(weatherType)) {
