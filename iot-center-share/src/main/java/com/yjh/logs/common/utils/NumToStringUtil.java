@@ -164,6 +164,9 @@ public class NumToStringUtil {
         if("27".equals(str)){
             return "IP地址异常";
         }
+        if("28".equals(str)){
+            return "用户绑定";
+        }
         return null;
     }
 

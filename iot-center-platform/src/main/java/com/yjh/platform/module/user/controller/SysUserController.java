@@ -804,7 +804,7 @@ public class SysUserController {
 
     @ApiOperation(value = "用户绑定获取")
     @RequestMapping(value = "/userBindList", method = RequestMethod.GET)
-    @Logs(title = "根据用户ID查询用户绑定", content = "根据用户传递的用户ID查询用户绑定的 IP 或 UKEY 信息", logType = 28)
+    @Logs(title = "查询用户绑定", content = "根据用户传递的用户ID查询用户绑定的 IP 或 UKEY 信息", logType = 28)
     public Result userBind(@RequestParam(value = "userId") Long userId, HttpServletRequest request) {
         Result result = new Result();
         try {
