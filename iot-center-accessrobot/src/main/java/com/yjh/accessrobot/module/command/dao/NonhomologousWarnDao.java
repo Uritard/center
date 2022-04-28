@@ -18,7 +18,7 @@ public interface NonhomologousWarnDao {
 
     int checkWarnExist(Map<String,Object> warnParam);
 
-    Map<String,Object> getNonhomologousInspections(Map<String,String> cruiseResultMap);
+    List<Map<String,Object>> getNonhomologousInspections(Map<String,String> cruiseResultMap);
 
     List<Map<String,Object>> selectWarnResults(Map<String,Object> intervalResultsParam);
 

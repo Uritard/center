@@ -113,6 +113,7 @@
         a.cruise_type,
         a.warn_threshold,
         a.warn_level,
+        a.interval_type,
         a.if_sy,
         a.sy_type
         from t_cruise_nonhomologous_point_instance a left join t_cruise_point_instance b on b.instance_id = a.robot_instance_id
@@ -140,10 +141,12 @@
         e.device_name,
         a.identify_type,
         a.identify_son_type,
+        d.mete_type,
         a.cruise_type,
         a.cruise_name,
         a.warn_threshold,
-        a.warn_level
+        a.warn_level,
+        a.interval_type
         from t_cruise_nonhomologous_point_instance a left join t_cruise_point_instance b on b.instance_id = a.robot_instance_id
         left join t_cruise_point_instance c on c.instance_id = a.video_preset_id
         left join t_std_devicemete d on d.device_mete_id = a.device_mete_id
@@ -162,6 +165,16 @@
         <if test="warnLevel != null and warnLevel != ''"> and a.warn_level = #{warnLevel, jdbcType=VARCHAR}</if>
     </select>
 
+    <select id="checkNonhomologousPointInstanceExist" parameterType="com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance" resultType="java.lang.Integer">
+        select count(m.instance_id) from
+        (select t.instance_id from t_cruise_nonhomologous_point_instance t where t.robot_instance_id = #{robotInstanceId, jdbcType=BIGINT} and t.cruise_type = #{cruiseType, jdbcType=INTEGER}
+        <if test="videoPresetId != null and videoPresetId != ''">
+            union
+            select r.instance_id from t_cruise_nonhomologous_point_instance r where r.video_preset_id = #{videoPresetId, jdbcType=BIGINT} and r.cruise_type = #{cruiseType, jdbcType=INTEGER}
+        </if>
+        ) m
+    </select>
+
     <select id="selectWarnByPage" parameterType="com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnInfo" resultType="com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnInfo">
         select
         a.warn_id,
@@ -175,6 +188,7 @@
         e.custom_name,
         e.device_name,
         e.device_type,
+        k.dict_note as device_type_name,
         a.warn_type,
         n.warn_level,
         j.camera_name,
@@ -188,6 +202,7 @@
         left join t_robot_info h on h.robot_id = g.robot_id
         left join t_camera_preset i on i.preset_id = c.cruise_id
         left join t_camera_info j on j.camera_id = i.camera_id
+        left join t_dict_business k on k.dict_code = e.device_type
         where 1 = 1
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="deviceType != null "> and f.device_name = #{deviceType, jdbcType=INTEGER}</if>

@@ -34,8 +34,9 @@
     </insert>
 
     <select id="checkWarnExist" parameterType="java.util.Map" resultType="java.lang.Integer">
-        select count(1) from t_cruise_nonhomologous_warn_inspection a
-        where a.task_id = #{taskId, jdbcType=VARCHAR} and a.inspection_id = #{instanceId, jdbcType=BIGINT}
+        select count(1) from t_cruise_nonhomologous_warn_inspection a inner join t_cruise_nonhomologous_warn b on a.warn_id = b.warn_id
+        inner join t_cruise_nonhomologous_point_instance c on c.instance_id = b.instance_id
+        where a.task_id = #{taskId, jdbcType=VARCHAR} and a.inspection_id = #{instanceId, jdbcType=BIGINT} and c.instance_id = #{nonInstanceId, jdbcType=BIGINT}
     </select>
 
     <select id="getNonhomologousInspections" parameterType="java.util.Map" resultType="java.util.Map">
@@ -48,7 +49,7 @@
         a.warn_threshold as warnThreshold,
         a.interval_type as intervalType,
         a.cruise_type as warnType
-        from t_cruise_nonhomologous_point_instance a left join t_cruise_nonhomologous_warn n on n.instance_id = a.instance_id
+        from t_cruise_nonhomologous_point_instance a
         left join t_cruise_point_instance b on b.instance_id = a.robot_instance_id
         left join t_cruise_point_instance c on c.instance_id = a.video_preset_id
         left join t_robot_inspection g on g.inspection_id = b.cruise_id
@@ -57,19 +58,18 @@
 
     <select id="selectWarnResults" parameterType="java.util.Map" resultType="java.util.Map">
         select
-        a.task_id as taskId,
-        a.inspection_id as inspectionId,
-        c.result_num as resultValue
-        from t_cruise_nonhomologous_warn_inspection a
-        left join t_cruise_point_instance b on a.inspection_id = b.instance_id
-        left join t_cruise_data_result c  on b.instance_id = c.cruise_id
-        where 1=1
-        and c.createtime is not null
+        b.task_id as taskId,
+        a.cruise_id as inspectionId,
+        a.result_num as resultValue
+        from t_cruise_data_result a
+        left join t_cruise_result b on a.cruise_result_id = b.task_result_id
+        where a.cruise_id = #{inspectionId}
+        and a.createtime is not null
         <if test="type == 6" >
-            and c.createtime between #{startTime,jdbcType=TIMESTAMP} and
+            and a.createtime between #{startTime,jdbcType=TIMESTAMP} and
             #{endTime,jdbcType=TIMESTAMP}
         </if>
-        order by c.createtime
+        order by a.createtime desc
         <if test="type == 7" >
             limit 4
         </if>

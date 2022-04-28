@@ -118,6 +118,11 @@ public class TCruiseNonhomologousWarnInfo implements Serializable {
     @TableField(value = "device_type",updateStrategy = FieldStrategy.IGNORED)
     private Integer deviceType;
 
+    @Max(value=32)
+    @ApiModelProperty(value = "设备类型名称")
+    @TableField(value = "device_type_name",updateStrategy = FieldStrategy.IGNORED)
+    private String deviceTypeName;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 

@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
 import com.yjh.platform.module.device.dao.TCruiseNonhomologousPointInstanceDao;
 import com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance;
@@ -34,7 +35,14 @@ public class TCruiseNonhomologousPointInstanceService {
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseNonhomologousPointInstance tCruiseNonhomologousPointInstance) {
-        return this.tCruiseNonhomologousPointInstanceDao.insert(tCruiseNonhomologousPointInstance);
+        int checkExist = tCruiseNonhomologousPointInstanceDao.checkNonhomologousPointInstanceExist(tCruiseNonhomologousPointInstance);
+        int result = 0;
+        if(checkExist>0){
+            throw new BusinessException("该非同源告警规则关联的巡视点已绑定其他非同源告警规则！");
+        }else{
+            result = this.tCruiseNonhomologousPointInstanceDao.insert(tCruiseNonhomologousPointInstance);
+        }
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)

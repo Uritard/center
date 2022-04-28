@@ -119,6 +119,11 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
     @TableField(value = "interval_type",updateStrategy = FieldStrategy.IGNORED)
     private Integer intervalType;
 
+    @Max(value=999999999)
+    @ApiModelProperty(value = "设备识别类型")
+    @TableField(value = "mete_type",updateStrategy = FieldStrategy.IGNORED)
+    private Integer meteType;
+
     private Integer pageNum=1;
 
     private Integer pageSize=0;
