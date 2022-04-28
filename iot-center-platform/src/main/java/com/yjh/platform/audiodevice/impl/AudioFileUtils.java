@@ -1,5 +1,6 @@
 package com.yjh.platform.audiodevice.impl;
 
+import java.io.File;
 import java.io.FileOutputStream;
 
 /**
@@ -20,7 +21,14 @@ public class AudioFileUtils {
      * @param contentByte
      */
     public static void writeWavAudioFile(String audioFilepath, byte[] headerByte, byte[] contentByte) {
-        try (FileOutputStream outStream = new FileOutputStream(audioFilepath)) {
+        File file = new File(audioFilepath);
+        try {
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+        } catch (Exception e) {
+            throw new RuntimeException("创建文件失败", e);
+        }
+        try (FileOutputStream outStream = new FileOutputStream(file)) {
             outStream.write(headerByte);
             outStream.write(contentByte);
         } catch (Exception e) {
