@@ -222,6 +222,8 @@ public class ReportManageService {
         Map<String, String> absoluteImgMap2 = redisTemplate.opsForHash().entries("t_sys_param:judgeResultImg");
         Map<String, String> relativeImgMap3 = redisTemplate.opsForHash().entries("t_sys_param:defectResultRealImg");
         Map<String, String> absoluteImgMap3 = redisTemplate.opsForHash().entries("t_sys_param:defectResultImg");
+        Map<String, String> relativeImgMap4 = redisTemplate.opsForHash().entries("t_sys_param:resultImgRealPath");
+        Map<String, String> absoluteImgMap4 = redisTemplate.opsForHash().entries("t_sys_param:resultImgPath");
 
         ReportData recordData = new ReportData();
         // 1.总体情况
@@ -249,6 +251,8 @@ public class ReportManageService {
                     }else if ("panbie".equals(type)){
                         // 判別
                         relativePath = relativePath.replace(relativeImgMap2.get("content"),absoluteImgMap2.get("content"));
+                    }else if ("resultImg".equals(type)){
+                        relativePath = relativePath.replace(relativeImgMap4.get("content"),absoluteImgMap4.get("content"));
                     }
                 }
             }else {

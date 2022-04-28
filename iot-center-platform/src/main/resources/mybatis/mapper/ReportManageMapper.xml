@@ -314,7 +314,7 @@
         d.task_count - task_wait as already,
         b.task_abnormal as abnormal,
         d.task_count -  b.task_abnormal as normal,
-        COUNT(ISNULL(e.check_user)) as unReview,
+        (SELECT count(1) from t_cruise_data_result WHERE e.check_user IS NULL)as unReview,
         MIN(f.cruise_time) as cruiseStartTime,
         MAX(f.end_time) as cruiseEndTime,
         d.check_user as reviewer,
