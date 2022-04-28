@@ -85,7 +85,7 @@ public class SysKeyService {
             redisTemplate.opsForSet().remove("sysKey:" + sysKey.getUserId() + ":" + sysKey.getBindType(), sysKey.getSerialNum());
         }
         int ret = sysKeyDao.deleteByPrimaryId(keyId);
-        logsRecord.LoginLogsSend(request, "28", "删除绑定", userName + "删除了" + names + "用户绑定" + bindName, userName, String.valueOf(userId), 1);
+        logsRecord.LoginLogsSend(request, "4", "删除绑定", userName + "删除了" + names + "用户绑定" + bindName, userName, String.valueOf(userId), 1);
         return ret;
     }
 
