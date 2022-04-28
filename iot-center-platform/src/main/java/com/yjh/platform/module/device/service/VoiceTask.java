@@ -124,7 +124,7 @@ public class VoiceTask implements Runnable{
                 tCruiseDataResult.setCruiseId(item.getInstanceId());
                 tCruiseDataResult.setCruiseType(item.getCruiseType());
                 tCruiseDataResult.setCruiseName(item.getCruiseName());
-
+                tCruiseDataResult.setIsWarn(0);
 
                 Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail, true));
                 String str = "t_cruise_task_result:" + taskId + ":" + item.getInstanceId();
@@ -138,7 +138,10 @@ public class VoiceTask implements Runnable{
                     tCruiseDataResult.setCruiseResult(246);
                     tCruiseDataResult.setResultNum("录音成功");
                     tCruiseDataResult.setVoicePath(voicePath);
+                    tCruiseDataResult.setPicpath(voicePath);
                     tCruiseTaskResultDetail.setCruiseStatus(252);
+                    tCruiseDataResult.setEvaluationState(257);
+                    tCruiseTaskResultDetail.setCruiseTime(new Date());
                 } else {
                     tCruiseDataResult.setCruiseResult(247);
                     tCruiseDataResult.setCruiseAbnormal(248);
