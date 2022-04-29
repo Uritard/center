@@ -8,6 +8,8 @@ import com.yjh.platform.common.mqtt.MqttUtilsServer;
 import com.yjh.platform.module.device.entity.AuidoOprInfo;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -126,9 +128,35 @@ public class StandardAudioDevice implements AudioDevice {
         // 生成文件头
         int totalAudioLen = getTotalAudioLen(packets);
         byte[] headerByte = getHeaderByte(totalAudioLen, packets);
-        byte[] contentByte = getContentByte(totalAudioLen, packets);
+//        byte[] contentByte = getContentByte(totalAudioLen, packets);
         log.info("写WAV文件({})", audioFilepath);
-        AudioFileUtils.writeWavAudioFile(audioFilepath, headerByte, contentByte);
+//        AudioFileUtils.writeWavAudioFile(audioFilepath, headerByte, contentByte);
+        writeWAVFile(audioFilepath, packets, headerByte);
+    }
+
+    private void writeWAVFile(String audioFilepath, List<Packet> packets, byte[] headerByte) {
+        File file = new File(audioFilepath);
+        try {
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+        } catch (Exception e) {
+            throw new RuntimeException("创建文件失败", e);
+        }
+
+        try (FileOutputStream outStream = new FileOutputStream(file)) {
+            outStream.write(headerByte);
+            for (Packet packet : packets) {
+                List<byte[]> audioDatas = packet.getDataGroup().getAudioDatas();
+                int dataLength = audioDatas.get(0).length;
+                for (int offset = 0; offset < dataLength; offset += 2) {
+                    for (byte[] audioData : audioDatas) {
+                        outStream.write(audioData, offset, 2);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("写WAV文件失败", e);
+        }
     }
 
     private byte[] getContentByte(int totalAudioLen, List<Packet> packets) {
