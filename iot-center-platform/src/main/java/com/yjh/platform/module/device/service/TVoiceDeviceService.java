@@ -147,11 +147,11 @@ public class TVoiceDeviceService{
         List<VoiceDeviceAllInfoDetail> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(voiceDeviceName,deviceType,list,upRegionId,
             voiceType, voiceModel, voiceFactory);
         for(VoiceDeviceAllInfoDetail item:tVoiceDeviceList){
-//            if(ping(item.getFtpUrl())){
-//                item.setState("在线");
-//            }else {
-//                item.setState("离线");
-//            }
+            if(ping(item.getFtpUrl())){
+                item.setState("在线");
+            }else {
+                item.setState("离线");
+            }
             Map<String,String> isOpen = redisTemplate.opsForHash().entries("is_record_open_state:"+item.getVoiceDeviceId());
             if(isOpen != null && isOpen.size()>0){
                 item.setOpenState(isOpen.get("openState"));
