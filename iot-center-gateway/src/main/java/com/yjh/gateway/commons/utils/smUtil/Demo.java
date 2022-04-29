@@ -1,6 +1,9 @@
 package com.yjh.gateway.commons.utils.smUtil;
 
+import com.yjh.gateway.commons.utils.gmhelper.SM2Util;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.engines.SM2Engine;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.math.ec.ECPoint;
@@ -10,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 
 /**
@@ -91,18 +93,26 @@ public class Demo {
 
     }
 
+    public static String decryptIdentifier(String pCode, String priks) {
+        try {
+            if(StringUtils.isNoneBlank(pCode)){
+                ECPrivateKeyParameters priKey = new ECPrivateKeyParameters(new BigInteger(Util.hexToByte(priks)), SM2Util.DOMAIN_PARAMS);
+                return new String(SM2Util.decrypt(SM2Engine.Mode.C1C2C3, priKey, Util.hexToByte("04" + pCode)));
+            }
+        } catch (Exception e) {
+            log.error("解密失败", e);
+        }
+        return  "";
+    }
+
     public static void main(String[] args) {
         try {
-            String webcode = "eaf1f58142c403aa0ccb61636acf9fcec5630164dc4c529b3625457443e2ba27";
-            String signStr = "MEUCIQDNG5HXr+LMuUmmZDNn74E8cjdZgAncQgLqGS/uw+SITAIgGU3JRN+1BfGzzt/J+6aqWo2hncsZ4L/5zqjDJsofOck=";
-            String sign64Str = "TUVVQ0lRRE5HNUhYcitMTXVVbW1aRE5uNzRFOGNqZFpnQW5jUWdMcUdTL3V3K1NJVEFJZ0dVM0pSTisxQmZHenp0L0orNmFxV28yaG5jc1o0TC81enFqREpzb2ZPY2s9";
-            String pubkey = "AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5y2lr0dZBzqaEy1qhn60/uemjXWUyW0/4RT/BClM1d4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHeH0SzmS3kElZnesFUHdoVErr+S0TglXcNbHk+E2EJf";
+            String pCode = "0652e5f8b5fa8dc537255c522c1f12741e4fd86ae750f6580924fd4dcdaecba2b29e00d1ad665a0eb8515b07594fbe506396e5690bb797e81e5b133a11b04f8062306d2eb76d0fc46882547ef8e0b4217202e8807253a55449874393ea19323d575d9b742cca03";
+            String priks = "00815EF5AD16531BC50172EEAC863FC2F816EC7BF9F5A17971785402B20CB99801";
 
-            String pubStr = Util.byteToHex(pubkey.getBytes("UTF-8"));
+            String pubStr = decryptIdentifier(pCode, priks);
             System.out.println(pubStr);
 
-            boolean st = verify(webcode, pubStr, pubkey);
-            System.out.println(st);
         } catch (Exception e) {
             log.error("验签失败", e);
         }

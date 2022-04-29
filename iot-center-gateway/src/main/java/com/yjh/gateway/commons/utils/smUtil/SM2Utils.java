@@ -66,8 +66,9 @@ public class SM2Utils {
 		ByteArrayInputStream bis = new ByteArrayInputStream(enc);
 		ASN1InputStream dis = new ASN1InputStream(bis);
 
-		ASN1Object derObj = dis.readObject();
-		ASN1Sequence asn1 = (ASN1Sequence) derObj;
+
+		ASN1Primitive derObj = dis.readObject();
+		ASN1Sequence asn1 =  ASN1Sequence.getInstance(derObj.getEncoded());
 		DERInteger x = (DERInteger) asn1.getObjectAt(0);
 		DERInteger y = (DERInteger) asn1.getObjectAt(1);
 		ECPoint c1 = sm2.ecc_curve.createPoint(x.getValue(), y.getValue());

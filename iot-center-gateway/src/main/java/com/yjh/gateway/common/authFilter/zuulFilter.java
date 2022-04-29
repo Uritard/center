@@ -120,7 +120,8 @@ public class zuulFilter extends ZuulFilter {
                                 !url.contains("/tCruiseTaskResult/v1/selectCruiseStatusCount") && !url.contains("/tCameraScreen/v1/selectCameraTreeWithRobot") &&
                                 !url.contains("/tCameraInfo/v1/selectByPage") && !url.contains("/tCameraRecorder/v1/selectByPage") &&
                                 !url.contains("/tRobotInfo/v1/selectByPage") && !url.contains("/videoIntercom/v1/selectByPage") &&
-                                !url.contains("/tVoiceDevice/v1/selectByPage") && !url.contains("/homePage/v1/warnInfo")
+                                !url.contains("/tVoiceDevice/v1/selectByPage") && !url.contains("/homePage/v1/warnInfo") &&
+                                !url.contains("/sysUser/v1/randomNumbers") && !url.contains("/sysUser/v1/getPubk")
                         ) {
                             redisTemplate.opsForHash().put("appKey:" + userId + ":" + token, "expireTime", String.valueOf(System.currentTimeMillis()));
                             if ("true".equals(isLogin)) {
@@ -144,7 +145,7 @@ public class zuulFilter extends ZuulFilter {
             userName = String.valueOf(paramMap.get("userName"));
         }
         if ("true".equals(isDecode)) {
-            if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")) {
+            if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/getPubk") && !url.contains("/sysUser/v1/login") && !url.contains("/sysUser/v1/loginChangePassword")) {
                 String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                 String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
                 if (StringUtils.isNoneBlank(userId)) {
@@ -160,7 +161,8 @@ public class zuulFilter extends ZuulFilter {
                         return false;
                     }
                 } else {
-                    log.error("无userId====================================================================================");
+                    log.error(
+                            "无userId====================================================================================");
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
                     return false;
@@ -177,9 +179,6 @@ public class zuulFilter extends ZuulFilter {
                         String number=referer.substring(0, referer.indexOf(":"));
                         String orig=origin.substring(origin.lastIndexOf('/') + 1);
                         String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
-                        if(StringUtils.isEmpty(userId)) {
-                            userId = (String)redisTemplate.opsForHash().get("userInfo:nameId", userName);
-                        }
                         String ym="yjh.biandian.com";
                         if(orig.contains(":")) {
                             String originIp = origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':'));
@@ -284,6 +283,12 @@ public class zuulFilter extends ZuulFilter {
         }
         String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
         if(StringUtils.isEmpty(userId)) {
+            if("true".equals(redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content"))){
+                String identifier = String.valueOf(paramMap.get("identifier"));
+                String priks = String.valueOf(redisTemplate.opsForHash().get("pubk:" + identifier, "prik"));
+                userName = Demo.decryptIdentifier(userName, priks);
+                log.info("用户参数: {}, 之后的: {}, identifier: {}", userName, priks, identifier);
+            }
             userId = (String)redisTemplate.opsForHash().get("userInfo:nameId", userName);
         }
         // 判断登录用户 ip 地址
@@ -295,7 +300,7 @@ public class zuulFilter extends ZuulFilter {
                 boolean ipValid = ips == null || ips.isEmpty() || ips.contains(ipAddr);
 
                 if (!ipValid || StringUtils.isEmpty(userId)) {
-                    log.error("IP 地址验证结果 - {}", ipValid);
+                    log.error("IP 地址验证失败 - {}-{} {}", userId, userName, ipValid);
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                     ctx.setResponseBody("{\"code\":401,\"message\":\"Unbound IP address!\"}");
@@ -314,7 +319,7 @@ public class zuulFilter extends ZuulFilter {
 
                 String pubkey = (String)redisTemplate.opsForHash().get("sysKey:" + userId + ":1", ukeyId);
                 if(StringUtils.isEmpty(pubkey)){
-                    log.error("序列号不正确------------------------ {}", ukeyId);
+                    log.error("序列号不正确------------------------{}-{} {}", userId, userName, ukeyId);
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                     ctx.setResponseBody("{\"code\":401,\"message\":\"Incorrect serial number!\"}");

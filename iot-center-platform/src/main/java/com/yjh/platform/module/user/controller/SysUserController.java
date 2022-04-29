@@ -594,8 +594,11 @@ public class SysUserController {
             if("true".equals(isUkey)){
                 try {
                     String ukeyId = httpServletRequest.getHeader("ukeyId") != null ? httpServletRequest.getHeader("ukeyId") : "";
-                    String xlh = Constant.UKEY_XLH.get(String.valueOf(userId));
+                    /*String xlh = Constant.UKEY_XLH.get(String.valueOf(userId));
                     if (!xlh.equals(ukeyId.substring(0, 16))) {
+                        throw new BusinessException(500, "当前用户与此ukey不匹配");
+                    }*/
+                    if (!redisTemplate.opsForHash().hasKey("sysKey:" + userId + ":1", ukeyId)){
                         throw new BusinessException(500, "当前用户与此ukey不匹配");
                     }
                 }catch (Exception e){
@@ -777,7 +780,8 @@ public class SysUserController {
             Map<String, Object> mapAppKey = new HashMap<>();
             mapAppKey.put("pubk", pubk);
             mapAppKey.put("prik", prik);
-            redisTemplate.opsForValue().set("pubk:"+nums,mapAppKey,10, TimeUnit.SECONDS);
+            redisTemplate.opsForHash().putAll("pubk:" + nums, mapAppKey);
+            redisTemplate.expire("pubk:" + nums, 10, TimeUnit.SECONDS);
             //redisTemplate.opsForHash().putAll("pubk:" + nums, mapAppKey);
             mapPubk.put("pubk",pubk);
             mapPubk.put("identifier",nums);

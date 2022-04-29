@@ -167,8 +167,11 @@ public class SysUserService {
                 if ("true".equals(isUkey)) {
                     try {
                         String ukeyId = request.getHeader("ukeyId") != null ? request.getHeader("ukeyId") : "";
-                        String xlh = Constant.UKEY_XLH.get(String.valueOf(sysUserLogin.getUserId()));
+                        /*String xlh = Constant.UKEY_XLH.get(String.valueOf(sysUserLogin.getUserId()));
                         if (!xlh.equals(ukeyId.substring(0, 16))) {
+                            throw new BusinessException(500, "当前用户与此ukey不匹配");
+                        }*/
+                        if (!redisTemplate.opsForHash().hasKey("sysKey:" + sysUserLogin.getUserId() + ":1", ukeyId)){
                             throw new BusinessException(500, "当前用户与此ukey不匹配");
                         }
                     } catch (Exception e) {

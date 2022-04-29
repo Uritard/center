@@ -93,8 +93,8 @@ public class Demo {
         ECPublicKeyParameters ecpub = (ECPublicKeyParameters) key.getPublic();
         BigInteger privateKey = ecpriv.getD();
         ECPoint publicKey = ecpub.getQ();
-        map.put("pubk",Util.byteToHex(publicKey.getEncoded()));
-        map.put("prik",Util.byteToHex(privateKey.toByteArray()));
+        map.put("pubk", Util.byteToHex(publicKey.getEncoded()));
+        map.put("prik", Util.byteToHex(privateKey.toByteArray()));
         return map;
     }
     /**
@@ -138,9 +138,9 @@ public class Demo {
      */
     public String decryptIdentifier(String pCode,String identifier) throws IOException {
         if(StringUtils.isNoneBlank(pCode)){
-            Map map=(HashMap)redisTemplate.opsForValue().get("pubk:" + identifier);
-            String priks = String.valueOf(map.get("prik"));
-            //String priks = String.valueOf(redisTemplate.opsForHash().get("pubk:" + identifier, "prik"));
+//            Map map=(HashMap)redisTemplate.opsForValue().get("pubk:" + identifier);
+//            String priks = String.valueOf(map.get("prik"));
+            String priks = String.valueOf(redisTemplate.opsForHash().get("pubk:" + identifier, "prik"));
             return new String(SM2Utils.decrypt(Util.hexToByte(priks), Util.hexToByte("04" + pCode)));
         }else {
             return  "";
