@@ -94,6 +94,10 @@ public class VoiceTask implements Runnable{
 
                     audioDevice.stopRecordingAndSave(voicePath);
                     isok = true;
+                    //文件替换
+                    String absVoicePath= String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content"));
+                    String relativeVoicePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:relativeVoicePath").get("content"));
+                    voicePath = voicePath.replace(absVoicePath,relativeVoicePath);
                 } catch (Exception e) {
                     log.warn("声纹设备录音出错", e);
 
