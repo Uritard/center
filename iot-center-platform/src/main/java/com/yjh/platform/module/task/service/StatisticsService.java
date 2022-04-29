@@ -242,8 +242,9 @@ public class StatisticsService {
         continue;
       }
       Map<String, Object> mapData = (Map<String, Object>) re.getData();
+
       List<Map<String, Object>> chanInfo = new ArrayList<>();
-      if (mapData.get("channel") == null) {
+      if (mapData.get("channel") != null) {
         chanInfo = (List<Map<String, Object>>) mapData.get("channel");
         for (Map<String, Object> mapChannel : chanInfo) {
           int intactTime = (int) mapChannel.get("intactTime");
