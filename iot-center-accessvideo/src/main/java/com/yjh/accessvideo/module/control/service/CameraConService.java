@@ -1271,7 +1271,7 @@ public class CameraConService {
                 int ipId = ipChans[i].byIPID;
                 if(ipId == 0){
                     // 通道未启用，跳出
-                    break;
+                    continue;
                 }
                 HCNetSDK.NET_DVR_TIME startTime = newDvrTime(startTimeI);
                 HCNetSDK.NET_DVR_TIME stopTime = newDvrTime(stopTimeI);
