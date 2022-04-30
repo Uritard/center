@@ -332,6 +332,7 @@
         g.identify_state,
         g.person_check,
         b.device_id,
+        q.device_point_id,
         g.cruise_data_id,
         g.cruise_result_id,
         b.instance_id,

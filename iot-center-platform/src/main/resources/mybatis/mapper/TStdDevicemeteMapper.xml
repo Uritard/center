@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         <id column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
         <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="device_point_id" jdbcType="BIGINT" property="devicePointId" />
         <result column="custom_id" jdbcType="VARCHAR" property="customId" />
         <result column="mete_id" jdbcType="BIGINT" property="meteId" />
         <result column="mete_kind" jdbcType="VARCHAR" property="meteKind" />
@@ -42,7 +43,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_mete_id, device_id, custom_id, mete_id, mete_kind, mete_name, device_type, inspection_type, position_type,analyse_type,is_ai,is_judge,unit, alarm_note, alarm
+        device_mete_id, device_id, device_point_id, custom_id, mete_id, mete_kind, mete_name, device_type, inspection_type, position_type,analyse_type,is_ai,is_judge,unit, alarm_note, alarm
         up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per,
         mete_type, modulus, remark,state_zero,state_one,alarm_state
     </sql>
@@ -52,6 +53,7 @@
         insert into t_std_devicemete(
             device_mete_id,
             device_id,
+            device_point_id,
             custom_id,
             mete_id,
             mete_kind,
@@ -91,6 +93,7 @@
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceId, jdbcType=BIGINT},
+                #{devicePointId, jdbcType=BIGINT},
                 #{customType, jdbcType=VARCHAR},
                 #{meteId, jdbcType=BIGINT},
                 #{meteKind, jdbcType=INTEGER},
@@ -143,6 +146,7 @@
         update t_std_devicemete a <set>
         <if test="deviceMeteId != null">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
         <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="devicePointId != null ">a.device_point_id = #{devicePointId, jdbcType=BIGINT},</if>
         <if test="customType != null">a.custom_id = #{customType},</if>
         <if test="meteId != null ">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         a.mete_kind = #{meteKind},
@@ -188,6 +192,7 @@
         select
         a.device_mete_id,
         a.device_id,
+        a.device_point_id,
         a.custom_id,
         a.mete_id,
         a.mete_kind,
@@ -230,6 +235,7 @@
         select DISTINCT
         a.device_mete_id,
         a.device_id,
+        a.device_point_id,
         a.custom_id as customType,
         a.mete_id,
         a.mete_kind,
@@ -287,6 +293,7 @@
         where 1=1
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="devicePointId != null and devicePointId != ''"> and a.device_point_id = #{devicePointId, jdbcType=BIGINT}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="meteKind != null  and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=VARCHAR}</if>
@@ -334,6 +341,7 @@
         select
         a.device_mete_id,
         a.device_id,
+        a.device_point_id,
         a.custom_id as customType,
         a.mete_id,
         a.mete_kind,
@@ -407,6 +415,7 @@
         insert into t_std_devicemete(
             device_mete_id,
             device_id,
+            device_point_id,
             custom_id,
             mete_id,
             mete_kind,
@@ -444,6 +453,7 @@
             (
                 #{TStdDevicemete.deviceMeteId, jdbcType=BIGINT},
                 #{TStdDevicemete.deviceId, jdbcType=BIGINT},
+                #{TStdDevicemete.devicePointId, jdbcType=BIGINT},
                 #{TStdDevicemete.customId, jdbcType=VARCHAR},
                 #{TStdDevicemete.meteId, jdbcType=BIGINT},
                 #{TStdDevicemete.meteKind, jdbcType=INTEGER},
@@ -483,6 +493,7 @@
     <select id="selectDevMeteByModelId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
         select
         a.device_id,
+        a.device_point_id,
         a.custom_id,
         c.mete_id,
         c.mete_kind,
@@ -529,6 +540,7 @@
     <select id="selectPreDeviceMete" resultType="com.yjh.platform.module.device.entity.TStdDeviceMete">
        SELECT
 	    a.device_id,
+	    a.device_point_id,
         a.custom_id as cruiseType,
         b.mete_id,
         b.mete_kind,
@@ -637,6 +649,7 @@
         SELECT DISTINCT
         f.device_mete_id,
         f.device_id,
+        f.device_point_id,
         f.mete_type,
         f.meter_type,
         g.device_type,
@@ -670,6 +683,7 @@
         b.instance_id,
         f.device_mete_id,
         f.device_id,
+        f.device_point_id,
         f.mete_type,
         f.meter_type,
         g.device_type,
@@ -710,6 +724,7 @@
         b.instance_id,
         f.device_mete_id,
         f.device_id,
+        f.device_point_id,
         f.mete_type,
         f.meter_type,
         g.device_type,

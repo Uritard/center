@@ -132,6 +132,7 @@ public class TStdDevicemeteController {
     @Logs(title = "查询标准设备测点",content = "根据用户传递的参数查询标准设备测点",logType = 1)
     public Result select(@RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
                          @RequestParam(value = "deviceId", required = false) Long deviceId,
+                         @RequestParam(value = "devicePointId", required = false) Long devicePointId,
                          @RequestParam(value = "customId", required = false) String customId,
                          @RequestParam(value = "meteId", required = false) Long meteId,
                          @RequestParam(value = "meteKind", required = false) String meteKind,
@@ -164,7 +165,7 @@ public class TStdDevicemeteController {
                          @RequestParam(value = "appearanceType", required = false) Integer appearanceType) {
         Result result = new Result();
         try {
-            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, customId, meteId, meteKind, meteType, meteName, deviceType, inspectionType, positionType, analyseType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark, stateZero, stateOne, alarmState, meterType, appearanceType);
+            List<TStdDeviceMete> list = tStdDevicemeteService.select(deviceMeteId, deviceId, devicePointId, customId, meteId, meteKind, meteType, meteName, deviceType, inspectionType, positionType, analyseType, unit, alarmNote, alarmType, upEffect, downEffect, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, alarmDelay, alarmCnt, thresholdAbs, thresholdPer, modulus, remark, stateZero, stateOne, alarmState, meterType, appearanceType);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
