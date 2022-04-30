@@ -40,6 +40,9 @@ public class AccessRobotApplication implements CommandLineRunner {
     @Value("${netty.server.robotCode}")
     private String robotCode;
 
+    @Value("${netty.server.name}")
+    private String sendCode;
+
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
@@ -68,6 +71,7 @@ public class AccessRobotApplication implements CommandLineRunner {
 //        String url = "192.168.40.71";
 
         Constant.robotCode = robotCode;
+        Constant.sendCode = sendCode;
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);
         nettyServer.start(address,redisTemplate, robotService);

@@ -214,16 +214,6 @@ public class ReportManageService {
     }
     @Transactional(rollbackFor = Exception.class)
     public String cruiseReportGenerate(String taskId){
-        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
-        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
-        Map<String, String> relativeImgMap1 = redisTemplate.opsForHash().entries("t_sys_param:meterResultRealImg");
-        Map<String, String> absoluteImgMap1 = redisTemplate.opsForHash().entries("t_sys_param:meterResultImg");
-        Map<String, String> relativeImgMap2 = redisTemplate.opsForHash().entries("t_sys_param:judgeResultRealImg");
-        Map<String, String> absoluteImgMap2 = redisTemplate.opsForHash().entries("t_sys_param:judgeResultImg");
-        Map<String, String> relativeImgMap3 = redisTemplate.opsForHash().entries("t_sys_param:defectResultRealImg");
-        Map<String, String> absoluteImgMap3 = redisTemplate.opsForHash().entries("t_sys_param:defectResultImg");
-        Map<String, String> relativeImgMap4 = redisTemplate.opsForHash().entries("t_sys_param:resultImgRealPath");
-        Map<String, String> absoluteImgMap4 = redisTemplate.opsForHash().entries("t_sys_param:resultImgPath");
 
         ReportData recordData = new ReportData();
         // 1.总体情况
@@ -234,41 +224,8 @@ public class ReportManageService {
         List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType2(taskId);
         recordData.setCpTypeItems(cpTypeItems);
         // 3.明细-所选设备的所有测点巡检结果详情
-        List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectTaskResult(taskId);
-        for (TCruiseDataResultDetail tcdr : tCDRDList){
-            String relativePath = tcdr.getPicPath();
-            if (!"228".equals(tcdr.getCruiseType().toString())){
-                if (Objects.nonNull(relativePath) && !"null".equals(relativePath) && !"--".equals(relativePath)){
-                    String aaa[] =  relativePath.split("/");
-                    String type = aaa[5];
-
-                    if ("defect".equals(type)){
-                        // 缺陷
-                        relativePath = relativePath.replace(relativeImgMap3.get("content"),absoluteImgMap3.get("content"));
-                    }else if ("meter".equals(type)){
-                        // 表計
-                        relativePath = relativePath.replace(relativeImgMap1.get("content"),absoluteImgMap1.get("content"));
-                    }else if ("panbie".equals(type)){
-                        // 判別
-                        relativePath = relativePath.replace(relativeImgMap2.get("content"),absoluteImgMap2.get("content"));
-                    }else if ("resultImg".equals(type)){
-                        relativePath = relativePath.replace(relativeImgMap4.get("content"),absoluteImgMap4.get("content"));
-                    }
-                }
-            }else {
-                if (Objects.nonNull(relativePath) && !"null".equals(relativePath)){
-                    relativePath = relativePath.replace(relativeImgMap.get("content"),absoluteImgMap.get("content"));
-                }
-            }
-
-            //相對路勁轉絕對路徑
-            /*String fName = relativePath.trim();
-            String fileName = fName.substring(fName.lastIndexOf("/") + 1);
-            log.info("fileName==="+fileName);*/
-
-            tcdr.setPicPath(relativePath);
-        }
-        recordData.setTCDRDList(tCDRDList);
+        List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  reportManageDao.selectTaskResult(taskId);
+        recordData.setTCDRDList(tCruiseDataResultDetailList);
 
         /*String taskName = recordData.getTaskVO().getTaskName();
         String cruiseDate = sdf.format(recordData.getTaskVO().getCruiseDate());

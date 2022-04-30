@@ -289,7 +289,7 @@ public class RobotServerHandler extends ChannelInboundHandlerAdapter {
         xmlBaseModelEmpty.setTime(DateTimeUtil.getDateTimeString(false));
         xmlBaseModelEmpty.setType("251");
         xmlBaseModelEmpty.setCode(flag ? "200" : "500");
-        xmlBaseModelEmpty.setSendCode("Server01");
+        xmlBaseModelEmpty.setSendCode(Constant.sendCode);
         xmlBaseModelEmpty.setReceiveCode(sendCode);
         return xmlBaseModelEmpty;
     }
