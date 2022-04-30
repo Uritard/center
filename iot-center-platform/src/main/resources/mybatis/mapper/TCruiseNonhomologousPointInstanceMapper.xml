@@ -89,6 +89,7 @@
         <if test="cruiseType != null ">a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
         <if test="warnThreshold != null ">a.warn_threshold = #{warnThreshold, jdbcType=VARCHAR},</if>
         <if test="warnLevel != null ">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
+        <if test="intervalType != null ">a.interval_type = #{intervalType, jdbcType=INTEGER},</if>
     </set>
         where a.instance_id = #{instanceId, jdbcType=BIGINT}
     </update>
@@ -193,7 +194,7 @@
         n.warn_level,
         j.camera_name,
         h.robot_name
-        from t_cruise_nonhomologous_warn a left join t_cruise_nonhomologous_point_instance n on n.instance_id = a.instance_id
+        from t_cruise_nonhomologous_warn a inner join t_cruise_nonhomologous_point_instance n on n.instance_id = a.instance_id
         left join t_cruise_point_instance b on b.instance_id = n.robot_instance_id
         left join t_cruise_point_instance c on c.instance_id = n.video_preset_id
         left join t_std_devicemete d on d.device_mete_id = n.device_mete_id

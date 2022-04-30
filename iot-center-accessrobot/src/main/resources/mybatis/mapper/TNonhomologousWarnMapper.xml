@@ -58,13 +58,14 @@
 
     <select id="selectWarnResults" parameterType="java.util.Map" resultType="java.util.Map">
         select
-        b.task_id as taskId,
+        c.task_id as taskId,
         a.cruise_id as inspectionId,
         a.result_num as resultValue
         from t_cruise_data_result a
-        left join t_cruise_result b on a.cruise_result_id = b.task_result_id
+        left join t_cruise_task_result_detail b on a.cruise_result_id = b.cruise_result_id
+        left join t_cruise_task_result c on c.task_result_id = b.task_result_id
         where a.cruise_id = #{inspectionId}
-        and a.createtime is not null
+        and a.createtime is not null and a.cruise_result=246
         <if test="type == 6" >
             and a.createtime between #{startTime,jdbcType=TIMESTAMP} and
             #{endTime,jdbcType=TIMESTAMP}

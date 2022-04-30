@@ -136,7 +136,7 @@ public class NonhomologousWarnService {
                                         warn.put("resultsInfo", insResults);
                                         insertNonhomologousWarnInfo(warn);
                                     } else {
-                                        log.info("robotInsResult为==={},videoInsResult为==={},位置状态非同源告警--结果不一致", robotInsResult, videoInsResult);
+                                        log.info("robotInsResult为==={},videoInsResult为==={},位置状态非同源告警--结果", robotInsResult, videoInsResult);
                                     }
                                 }else{
                                     log.info("非同源告警---结果为空或告警已存在,redismap==={}",redisInfoMap);
@@ -195,7 +195,7 @@ public class NonhomologousWarnService {
                                             warn.put("warnId",String.valueOf(UUID.randomUUID()).replace("-", ""));
                                             warn.put("warnType",4);
                                             warn.put("instanceId",Long.parseLong(nonhomologousInspections.get("instanceId").toString()));
-                                            warn.put("warnContent","指针类表计识别非同源结果差值超过阈值："+nonhomologousInspections.get("warnwarnThreshold").toString());
+                                            warn.put("warnContent","指针类表计识别非同源结果差值超过阈值："+nonhomologousInspections.get("warnThreshold").toString());
                                             List<Map<String,Object>> insResults = new ArrayList<>();
                                             Map<String,Object> robotWarn = new HashMap<>();
                                             robotWarn.put("taskId",cruiseResultMap.get("taskCode"));
@@ -281,7 +281,8 @@ public class NonhomologousWarnService {
                                         .collect(Collectors.reducing(
                                                 (x,y) -> Double.parseDouble(x.get("resultValue").toString()) < Double.parseDouble(y.get("resultValue").toString()) ? x:y));
                                 String warnThreshold = nonhomologousInspections.get("warnThreshold").toString();
-                                if(Double.parseDouble(maxValueResultInfo.get().get("resultValue").toString())-Double.parseDouble(minValueResultInfo.get().get("resultValue").toString())>Double.parseDouble(warnThreshold)){
+                                log.info("区间非同源判断：maxInsResult为==={},minInsResult为==={},阈值是==={}", maxValueResultInfo, minValueResultInfo,warnThreshold);
+                                if((Double.parseDouble(maxValueResultInfo.get().get("resultValue").toString())-Double.parseDouble(minValueResultInfo.get().get("resultValue").toString()))>Double.parseDouble(warnThreshold)){
                                     Map<String,Object> warn = new HashMap<>();
                                     warn.put("warnId",String.valueOf(UUID.randomUUID()).replace("-", ""));
                                     warn.put("warnType",6);
@@ -301,8 +302,8 @@ public class NonhomologousWarnService {
                                 fiveResultsParam.put("inspectionId",nonhomologousInspections.get("robotInstanceId"));
                                 //分时段查出历史结果
                                 List<Map<String,Object>> fiveResults = nonhomologousWarnDao.selectWarnResults(fiveResultsParam);
-                                if(fiveResults.size()==0){
-                                    log.info("最近五次非同源告警--历史数据为空");
+                                if(fiveResults.size()<4){
+                                    log.info("最近五次非同源告警--历史数据不足");
                                     break;
                                 }
                                 //加入当前结果对象
@@ -314,12 +315,12 @@ public class NonhomologousWarnService {
                                 fiveResults.add(latestResult);
 
                                 List<Map<String,Object>> distinctResults = fiveResults.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.get("resultValue").toString()))), ArrayList::new));
-                                if(distinctResults.size()>1){
+                                if(distinctResults.size()==1){
                                     Map<String,Object> warn = new HashMap<>();
                                     warn.put("warnId",String.valueOf(UUID.randomUUID()).replace("-", ""));
                                     warn.put("warnType",7);
                                     warn.put("instanceId",Long.parseLong(nonhomologousInspections.get("instanceId").toString()));
-                                    warn.put("warnContent","累计五次表计结果不一致");
+                                    warn.put("warnContent","累计五次表计结果一致");
                                     List<Map<String,Object>> insResults = new ArrayList<>();
                                     fiveResults.stream().forEach(i -> i.put("warnId",warn.get("warnId")));
                                     insResults.addAll(fiveResults);
@@ -353,6 +354,7 @@ public class NonhomologousWarnService {
     }
 
     private boolean insertNonhomologousWarnInfo(Map<String,Object> warn){
+        log.info("非同源告警---入库,warnmap==={}",warn);
         nonhomologousWarnDao.insertNonhomologousWarnInfo(warn);
         List<Map<String,Object>> insResults =(List<Map<String,Object>>) warn.get("resultsInfo");
         nonhomologousWarnDao.insertWarnInspections(insResults);
