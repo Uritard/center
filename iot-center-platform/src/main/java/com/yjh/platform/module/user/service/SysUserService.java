@@ -134,7 +134,7 @@ public class SysUserService {
         String number = (String) redisTemplate.opsForValue().get("number");
         String replayAvoid = userMap.get("replayAvoid");
         redisTemplate.delete("number");
-        if (!number.equals(replayAvoid)) {
+        if (!Objects.equals(number, replayAvoid)) {
             throw new BusinessException(500, "验证码错误");
         } else {
             if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("pCode"))) {

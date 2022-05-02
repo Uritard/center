@@ -298,6 +298,12 @@ public class zuulFilter extends ZuulFilter {
         // 判断登录用户 ip 地址
         if ("true".equals(isIpLogin)) {
             if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/sysUser/v1/getPubk")) {
+                if(StringUtils.isEmpty(userId)) {
+                    ctx.setSendZuulResponse(false);
+                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                    ctx.setResponseBody("{\"code\":401,\"message\":\"user is error，please try force refresh page (CTRL + F5)!\"}");
+                    return false;
+                }
                 String ipAddr = "\"" + IpUtil.getRemoteIP(request) + "\"";
                 Set<String> ips = redisTemplate.opsForSet().members("sysKey:" + userId + ":2");
 
@@ -319,6 +325,12 @@ public class zuulFilter extends ZuulFilter {
             String signStr = request.getHeader("signStr") != null ? request.getHeader("signStr") : "";
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
             if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/sysUser/v1/getPubk")) {
+                if(StringUtils.isEmpty(userId)) {
+                    ctx.setSendZuulResponse(false);
+                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                    ctx.setResponseBody("{\"code\":401,\"message\":\"user is error，please try force refresh page (CTRL + F5)!\"}");
+                    return false;
+                }
                 String ukeyId = request.getHeader("ukeyId") != null ? request.getHeader("ukeyId") : "";
                 // String xlh = ukeyId.substring(0,16);
 

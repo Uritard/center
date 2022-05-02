@@ -104,8 +104,9 @@ public class Demo {
      */
     public String decryptIdentifier(String pCode,String identifier) throws IOException {
         if(StringUtils.isNoneBlank(pCode)){
-            Map map=(HashMap)redisTemplate.opsForValue().get("pubk:" + identifier);
-            String priks = String.valueOf(map.get("prik"));
+//            Map map=(HashMap)redisTemplate.opsForValue().get("pubk:" + identifier);
+//            String priks = String.valueOf(map.get("prik"));
+            String priks = String.valueOf(redisTemplate.opsForHash().get("pubk:" + identifier, "prik"));
             return new String(SM2Utils.decrypt(Util.hexToByte(priks), Util.hexToByte("04" + pCode)));
         }else {
             return  "";
