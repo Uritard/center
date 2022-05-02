@@ -179,7 +179,7 @@
 
     <select id="countInstanceLoss" resultType="java.util.HashMap">
         SELECT count(1)                                AS totalNum,
-               sum(IF(detail.cruise_data_state = 254, 1, 0)) AS validNum
+               sum(IF(detail.cruise_status = 254, 1, 0)) AS validNum
         FROM t_cruise_task_result result
                  LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
         WHERE result.cruise_task_time BETWEEN #{startTime} and #{endTime}
