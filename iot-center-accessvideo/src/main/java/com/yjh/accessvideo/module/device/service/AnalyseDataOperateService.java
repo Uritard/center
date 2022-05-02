@@ -183,31 +183,31 @@ public class AnalyseDataOperateService {
             case "1":
             case "2":
                 if(flag==1){
-                  normal++;
+                    normal++;
                 }else {
-                  abnormal++;
+                    abnormal++;
                 }
                 break;
             case "-1":
             case "-2":
                 String temResult=redisTemplate.opsForHash().get(cruiseRedisKey,"temResult").toString();
                 if(flag==1){
-                   if(temResult.equals("1")){
-                       normal++;
-                   }else {
-                       abnormal++;
-                   }
+                    if(temResult.equals("1")){
+                        normal++;
+                    }else {
+                        abnormal++;
+                    }
                 }else {
-                   abnormal++;
+                    abnormal++;
                 }
                 break;
             case "0":
                 if(flag==1){
-                  // 临时值为正常点
-                  redisTemplate.opsForHash().put(cruiseRedisKey,"temResult","1");
+                    // 临时值为正常点
+                    redisTemplate.opsForHash().put(cruiseRedisKey,"temResult","1");
                 }else {
-                  // 临时值为异常点
-                  redisTemplate.opsForHash().put(cruiseRedisKey,"temResult","0");
+                    // 临时值为异常点
+                    redisTemplate.opsForHash().put(cruiseRedisKey,"temResult","0");
                 }
                 break;
             default:
@@ -243,7 +243,7 @@ public class AnalyseDataOperateService {
         if(abnormalType.equals("--")){
             abnormalTypeTem=abnormalType;
         }else {
-             abnormalTypeTem=selectDictCode("abnormal_type",abnormalType);
+            abnormalTypeTem=selectDictCode("abnormal_type",abnormalType);
         }
         switch (mode){
             case "0":
@@ -258,11 +258,11 @@ public class AnalyseDataOperateService {
                 if(redisTemplate.opsForHash().get(cruiseRedisKey,"resultNum").toString().contains("--")){
                     resultNum=resultValue;
                 }else {
-                   if(resultValue.contains("--")){
-                       resultNum=redisTemplate.opsForHash().get(cruiseRedisKey,"resultNum").toString();
-                   }else {
-                       resultNum=(redisTemplate.opsForHash().get(cruiseRedisKey,"resultNum").toString())+","+resultValue;
-                   }
+                    if(resultValue.contains("--")){
+                        resultNum=redisTemplate.opsForHash().get(cruiseRedisKey,"resultNum").toString();
+                    }else {
+                        resultNum=(redisTemplate.opsForHash().get(cruiseRedisKey,"resultNum").toString())+","+resultValue;
+                    }
                 }
                 if((redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseResult").toString()).equals(selectDictCode("cruise_result","正常"))){
                     cruiseResultFinal=cruiseResultTem;
@@ -274,11 +274,11 @@ public class AnalyseDataOperateService {
                 if(redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseAbnormal").toString().contains("--")){
                     abnormalTypeFinal=abnormalTypeTem;
                 }else {
-                   if(abnormalTypeTem.contains("--")){
-                       abnormalTypeFinal=redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseAbnormal").toString();
-                   }else {
-                       abnormalTypeFinal=(redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseAbnormal").toString())+","+abnormalTypeTem;
-                   }
+                    if(abnormalTypeTem.contains("--")){
+                        abnormalTypeFinal=redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseAbnormal").toString();
+                    }else {
+                        abnormalTypeFinal=(redisTemplate.opsForHash().get(cruiseRedisKey,"cruiseAbnormal").toString())+","+abnormalTypeTem;
+                    }
                 }
                 break;
             default:
@@ -466,11 +466,11 @@ public class AnalyseDataOperateService {
                 highLimit1+"*"+
                 lowLimit1+"*"+
                 highLimit2+"*"+
-                 lowLimit2+"*"+
-                 highLimit3+"*"+
-                 lowLimit3+"*"+
+                lowLimit2+"*"+
+                highLimit3+"*"+
+                lowLimit3+"*"+
                 highLimit4+"*"+
-               lowLimit4);
+                lowLimit4);
 
         Boolean emergency1 = false;
         Boolean emergency2 = false;
@@ -688,6 +688,56 @@ public class AnalyseDataOperateService {
                     break;
                 case "abnormal":
                     defectValue="图像有差异";
+                    flags.add("1");
+                    break;
+
+
+                case "dthtps":
+                    defectValue="导体护套破损";
+                    flags.add("1");
+                    break;
+                case "yxdghsg":
+                    defectValue="引线断股或松股";
+                    flags.add("1");
+                    break;
+                case "wpdaqs":
+                    defectValue="未佩戴安全绳";
+                    flags.add("1");
+                    break;
+                case "qmls":
+                    defectValue="墙面漏水";
+                    flags.add("1");
+                    break;
+                case "wdls":
+                    defectValue="屋顶漏水";
+                    flags.add("1");
+                    break;
+                case "ywzt_ywzsjyc":
+                    defectValue="油位指示计异常";
+                    flags.add("1");
+                    break;
+                case "hxq_yfps":
+                    defectValue="呼吸器油封破损";
+                    flags.add("1");
+                    break;
+                case "dxdg":
+                    defectValue="导线断股";
+                    flags.add("1");
+                    break;
+                case "sly_jhbyw":
+                    defectValue="套管胶合部油污";
+                    flags.add("1");
+                    break;
+                case "hkgnl":
+                    defectValue="汇控柜凝露";
+                    flags.add("1");
+                    break;
+                case "pzqcd":
+                    defectValue="膨胀器冲顶";
+                    flags.add("1");
+                    break;
+                case "drqgd":
+                    defectValue="电容器鼓肚";
                     flags.add("1");
                     break;
                 case "":

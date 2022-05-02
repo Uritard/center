@@ -15,6 +15,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.List;
 @SpringBootApplication(scanBasePackages = "com.yjh.accessvideo")
 @EnableDiscoveryClient
 @Slf4j
+@EnableAsync
 public class AccessVideoApplication implements CommandLineRunner {
 
     @Autowired

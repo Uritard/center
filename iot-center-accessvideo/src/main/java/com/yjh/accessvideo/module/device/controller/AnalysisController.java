@@ -35,7 +35,7 @@ public class AnalysisController {
     @Autowired
     private final IntelAnalysisService intelAnalysisService;
 
-    private Logger log = LoggerFactory.getLogger(AnalysisController.class);
+    private final Logger log = LoggerFactory.getLogger(AnalysisController.class);
 
     public AnalysisController(AnalysisService analysisService, IntelAnalysisService intelAnalysisService) {
         this.analysisService = analysisService;
@@ -54,6 +54,8 @@ public class AnalysisController {
     @Value("${netty.ai.port}")
     private int aiPort;
 
+    private static final String FLAG = "false";
+
     @Autowired
     private RedisTemplate redisTemplate;
 
@@ -70,7 +72,20 @@ public class AnalysisController {
             log.info("---------发送算法信息中");
             log.info("算法数据列表：{}", analysisList);
             log.info("端口号：{}", recognizePort);
-            result.setData(analysisService.feignAlgorithm(analysisList, recognizePort));
+            // 开关
+            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
+            if (StringUtils.equals(FLAG, flag)){
+                // 原来的socket协议
+                result.setData(analysisService.feignAlgorithm(analysisList, recognizePort));
+            }else {
+                // 调用智能分析主机接口进行分析
+                try {
+                    intelAnalysisService.picAnalyseNoDetection(analysisList);
+                }catch (Exception e){
+                    log.error("调用智能分析主机进行缺陷分析异常：{}", e.getMessage());
+                    log.error("exceptionDetails:{}", e.getStackTrace()[0]);
+                }
+            }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -94,8 +109,8 @@ public class AnalysisController {
             log.info("缺陷接口数据列表：{}", analysisList);
             log.info("端口号：{}", aiPort);
             // 开关
-            String flag = redisTemplate.opsForHash().get("t_sys_param:isIntelAnalysis","content").toString();
-            if (StringUtils.equals("false", flag)){
+            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis","content"));
+            if (StringUtils.equals(FLAG, flag)){
                 // 原来的socket协议
                 result.setData(analysisService.feignDefect(analysisList, aiPort));
             }else {
@@ -103,12 +118,10 @@ public class AnalysisController {
                 try {
                     intelAnalysisService.picAnalyseNoDetection(analysisList);
                 }catch (Exception e){
-                    log.error("调用智能分析主机进行缺陷分析异常："+e);
-                    log.error("exceptionDetails:"+e.getStackTrace()[0]);
+                    log.error("调用智能分析主机进行缺陷分析异常：{}", e.getMessage());
+                    log.error("exceptionDetails:{}", e.getStackTrace()[0]);
                 }
             }
-
-
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

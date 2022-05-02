@@ -951,4 +951,28 @@
         Limit 1
     </select>
 
+    <select id="selectInstanceInfo" resultType="java.util.Map">
+        SELECT
+            a.preset_id,
+            a.camera_id,
+            b.cruise_id,
+            b.instance_id,
+            b.custom_id,
+            b.device_id,
+            b.device_mete_id
+        FROM
+            t_camera_preset a,t_cruise_point_instance b
+        where a.preset_id = b.cruise_id
+          and a.preset_id = #{presetId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectAlgorithmInfo" resultType="com.yjh.accessvideo.module.device.entity.TAlgorithmInfo">
+        SELECT
+            a.analyse_type,
+            a.alias_name
+        FROM t_algorithm_info a
+        WHERE a.is_ai = 1
+          and a.alias_name = #{aliasName,jdbcType=VARCHAR}
+    </select>
+
 </mapper>

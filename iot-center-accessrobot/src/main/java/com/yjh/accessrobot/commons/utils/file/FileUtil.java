@@ -79,7 +79,7 @@ public class FileUtil {
 
 
     /**
-     * 根据不同浏览器返回不同的数据
+     * 文件复制
      *
      * @param sourcePath 文件源路径
      * @param descPath 文件目的路径

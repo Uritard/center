@@ -3,23 +3,44 @@ package com.yjh.accessvideo.module.device.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.yjh.accessvideo.common.utils.FtpsUtil;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessvideo.commons.utils.FileUtil;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
+import com.yjh.accessvideo.configuration.FtpsConfig;
+import com.yjh.accessvideo.configuration.IntelligentAlgorithmConfig;
 import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.Analysis;
+import com.yjh.accessvideo.module.device.entity.TAlgorithmInfo;
+import com.yjh.accessvideo.module.device.entity.TWarnInfo;
 import com.yjh.accessvideo.module.device.entity.interlanalysis.*;
 import com.yjh.accessvideo.netty.client.DataDealThread;
 import com.yjh.accessvideo.thread.TaskExecutePool;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -28,34 +49,26 @@ import java.util.*;
  */
 @Service
 public class IntelAnalysisService {
-
-    /**
-     * 分析结果反馈ip地址
-     */
-    @Value("${analysis.result.ip}")
-    private String analysisResultIp;
-    /**
-     * 分析结果返回端口
-     */
-    @Value("${analysis.result.port}")
-    private String analysisResultPort;
-    /**
-     * 请求图像分析路径
-     */
-    @Value("${intelligent.analysis.url}")
-    private String intelAnalysisUrl;
-    /**
-     * 请求算法更新路径
-     */
-    @Value("${update.model.url}")
-    private String updateModelUrl;
     /**
      * webSocket请求地址
      */
     @Value("${system.webSocket.url}")
     private String syncWebsocketUrl;
-
-    private Logger log = LoggerFactory.getLogger(IntelAnalysisService.class);
+    /**
+     * 27大类假数据读取来源
+     */
+    @Value("${conf.file.name}")
+    private String fileName;
+    /**
+     * 缺陷分析端口
+     */
+    @Value("${netty.ai.port}")
+    private int aiPort;
+    /**
+     * 表计识别分析端口
+     */
+    @Value("${netty.recognize.port}")
+    private int recognizePort;
 
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
@@ -63,6 +76,14 @@ public class IntelAnalysisService {
     private RedisTemplate redisTemplate;
     @Autowired
     private AnalyseDataOperateDao analyseDataOperateDao;
+    @Autowired
+    private FtpsConfig ftpsConfig;
+    @Autowired
+    private IntelligentAlgorithmConfig algorithmConfig;
+
+    private static final String FLAG = "true";
+
+    private final Logger log = LoggerFactory.getLogger(IntelAnalysisService.class);
 
     public IntelAnalysisService(AnalyseDataOperateService analyseDataOperateService) {
         this.analyseDataOperateService = analyseDataOperateService;
@@ -72,9 +93,9 @@ public class IntelAnalysisService {
      * 巡视主机请求图像分析--接口
      *
      * @param picAnalyseRequest 参数
-     * @return ResponseEntity<Response>
+     * @return Response
      */
-    public ResponseEntity<Response> picAnalyse(PicAnalyseRequest picAnalyseRequest){
+    public Response picAnalyse(PicAnalyseRequest picAnalyseRequest){
         Map<String, Object> param = new HashMap<>(16);
         param.put("requestHostIp", picAnalyseRequest.getRequestHostIp());
         param.put("requestHostPort", picAnalyseRequest.getRequestHostPort());
@@ -91,144 +112,39 @@ public class IntelAnalysisService {
         });
         param.put("objectList", objectList);
 
-        printJsonMsg(param);
+        JSONObject testJson = (JSONObject) JSONObject.toJSON(param);
+        printJsonMsg(testJson);
 
-        ResponseEntity<Response> response = null;
         try {
-            response = restTemplatePost(intelAnalysisUrl, param);
-            otherReturn(response);
+            String result = postUrlParams(algorithmConfig.getAnalysisUrl(), testJson.toJSONString());
+            log.info("result==={}", result);
+
+            if (StringUtils.isEmpty(result)){
+                return Response.basRequest();
+            }
+            JSONObject jsonObject = JSON.parseObject(result);
+            int code = Integer.parseInt(String.valueOf(jsonObject.get("code")));
+            return new Response(code);
         }catch (Exception e){
             log.error(e.getMessage());
+            return Response.serverError();
         }
-
-        return response;
     }
 
     /**
      * 巡视主机请求图像分析--功能
      *
      * @param analysisList 需要分析的对象
-     * @return ResponseEntity<Response>
+     * @return Response
      */
-    public ResponseEntity<Response> picAnalyseNoDetection(List<Analysis> analysisList){
-        PicAnalyseRequest request = formatTransition(analysisList);
-        ResponseEntity<Response> response = picAnalyse(request);
-        return response;
-    }
-
-    /**
-     * 巡视主机请求算法更新--接口
-     *
-     * @param request 参数
-     * @return ResponseEntity<Response>
-     */
-    public ResponseEntity<Response> algorithmUpdate(UpdateRequest request){
-        Map<String, Object> param = new HashMap<>(16);
-        param.put("requestHostIp", request.getRequestHostIp());
-        param.put("requestHostPort", request.getRequestHostPort());
-        param.put("requestId", request.getRequestId());
-        param.put("algorithmPath", request.getAlgorithmPath());
-
-        printJsonMsg(param);
-
-        ResponseEntity<Response> response = null;
-        try {
-            response = restTemplatePost(updateModelUrl, param);
-            otherReturn(response);
-        }catch (Exception e){
-            log.error(e.getMessage());
+    public List<Response> picAnalyseNoDetection(List<Analysis> analysisList){
+        List<Response> responseList = new ArrayList<>();
+        List<PicAnalyseRequest> list = formatTransition(analysisList);
+        for (PicAnalyseRequest request : list) {
+            Response response = picAnalyse(request);
+            responseList.add(response);
         }
-
-        return response;
-    }
-
-    /**
-     * 巡视主机请求算法更新--功能
-     *
-     * @param request 参数
-     * @return ResponseEntity<Response>
-     */
-    public ResponseEntity<Response> algorithmUpdateNoDetection(UpdateRequest request){
-        Map<String, Object> param = new HashMap<>(16);
-        param.put("requestHostIp", analysisResultIp);
-        param.put("requestHostPort", analysisResultPort);
-        param.put("requestId", String.valueOf(UUID.randomUUID()));
-        param.put("algorithmPath", request.getAlgorithmPath());
-
-        ResponseEntity<Response> response = null;
-        try {
-            response = restTemplatePost(updateModelUrl, param);
-            otherReturn(response);
-        }catch (Exception e){
-            log.error(e.getMessage());
-        }
-
-        return response;
-    }
-
-    /**
-     *  巡视主机收到分析结果开始解析
-     *
-     * @param response 参数
-     */
-    public void picAnalyseRetNotify(PicAnalyseResponse response){
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("msgID", String.valueOf(100000001));
-        jsonObject.put("msgType", "2");
-        JSONObject msgDataObject = new JSONObject();
-        msgDataObject.put("desNode", "clientSocket001");
-        msgDataObject.put("srcNode", "serverSocket");
-
-        String taskId = response.getRequestId().split("#")[1];
-        List<AnalyseResult> resultsList = response.getResultsList();
-
-        JSONObject resultInfoObject = new JSONObject();
-
-        int i = 1;
-        // 遍历多个点的分析结果,不同的巡视点
-        for (AnalyseResult analyseResult : resultsList) {
-            JSONObject resultDataObject = new JSONObject();
-            resultDataObject.put("taskId", taskId);
-            resultDataObject.put("instanceId", analyseResult.getObjectId());
-
-            List<AnalyseResultItem> results = analyseResult.getResults();
-            StringJoiner resultValue = new StringJoiner(",");
-            StringJoiner type = new StringJoiner(",");
-
-            // 遍历单个点的分析结果,不同的缺陷
-            for (AnalyseResultItem result : results) {
-                resultValue.add(result.getDesc());
-                type.add(result.getType());
-                resultDataObject.put("analyseResultImg", result.getResImageUrl());
-                resultDataObject.put("pictureCoordinate", result.getPos());
-
-                // 这是我们解析暂时用不到的字段值
-                resultDataObject.put("code", result.getCode());
-                resultDataObject.put("conf", result.getConf());
-                resultDataObject.put("value", result.getValue());
-
-            }
-            resultDataObject.put("type", type.toString());
-            resultDataObject.put("analyseType", 398);
-            resultDataObject.put("resultValue", resultValue.toString());
-            resultInfoObject.put("resultInfo" + i, resultDataObject);
-            i++;
-        }
-        msgDataObject.put("data", resultInfoObject);
-        jsonObject.put("msgData", msgDataObject);
-
-        String pretty = JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
-                SerializerFeature.WriteDateUseDateFormat);
-        System.out.println(pretty);
-
-        int remotePort = 13669;
-        try {
-            DataDealThread dataDealThread = new DataDealThread(jsonObject.toJSONString(), remotePort, redisTemplate, analyseDataOperateService, syncWebsocketUrl);
-            TaskExecutePool.getInstance().execute(dataDealThread);
-        }catch (Exception e){
-            log.error("算法结果处理异常：{}", e);
-            log.error("exceptionDetails:{}", e.getStackTrace()[0]);
-        }
+        return responseList;
     }
 
     /**
@@ -237,61 +153,450 @@ public class IntelAnalysisService {
      * @param analysisList 需要分析的对象
      * @return PicAnalyseRequest
      */
-    private PicAnalyseRequest formatTransition(List<Analysis> analysisList) {
-        PicAnalyseRequest picAnalyseRequest = new PicAnalyseRequest();
-
-        picAnalyseRequest.setRequestHostIp(analysisResultIp);
-        picAnalyseRequest.setRequestHostPort(analysisResultPort);
-        List<AnalyseObject> objectList = new ArrayList<>();
-        // 待分析图像的URL,可多选
-        List<String> imageUrlList = new ArrayList<>();
-        // 图像分析类型,可多选
-        List<String> typeList = new ArrayList<>();
-        AnalyseObject analyseObject = new AnalyseObject();
-        String taskId = "";
-        String instanceId = "";
-        String picPath = "";
-        String imageNormalUrlPath = "";
-
+    private List<PicAnalyseRequest> formatTransition(List<Analysis> analysisList) {
+        List<PicAnalyseRequest> list = new ArrayList<>();
         for (Analysis analysis: analysisList) {
-            taskId = analysis.getTaskId();
-            instanceId = String.valueOf(analysis.getInstanceId());
-            picPath = analysis.getPicPath().replaceAll(
-                    redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content").toString(),
-                    redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content").toString());
-            typeList.add(analysis.getAnalyseType());
-            analyseObject.setTypeList(typeList);
-            // 判别算法 需要判别基准图
-            if (analysis.getAnalyseType().equals("11")) {
-                 imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId());
+            AnalyseObject analyseObject = new AnalyseObject();
+            // 如果是缺陷识别 针对越线闯入和火焰烟雾再加两条请求
+            if (Objects.equals("398", analysis.getAnalyseType())){
+                List<String> crossLineTypeList = new ArrayList<>();
+                crossLineTypeList.add("yxcr");
+                analyseObject.setTypeList(crossLineTypeList);
+                list.add(packagePicAnalyseRequest(analysis, analyseObject));
+
+                List<String> fireSmokeTypeList = new ArrayList<>();
+                fireSmokeTypeList.add("fire");
+                fireSmokeTypeList.add("smoke");
+                analyseObject.setTypeList(fireSmokeTypeList);
+                list.add(packagePicAnalyseRequest(analysis, analyseObject));
             }
+            analyseObject = setAnalyseObject(analysis, analyseObject);
+            list.add(packagePicAnalyseRequest(analysis, analyseObject));
         }
+        return list;
+    }
+
+    /**
+     * 添加算法识别类型和判别图片信息
+     *
+     * @param analysis 算法信息
+     * @return AnalyseObject
+     */
+    private AnalyseObject setAnalyseObject(Analysis analysis, AnalyseObject analyseObject) {
+        List<String> typeList = new ArrayList<>();
+        String analyseType = analysis.getAnalyseType();
+        switch (analyseType){
+            // 判别算法 需要判别基准图
+            case "11":
+                // 判别基准图
+                String imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId());
+                imageNormalUrlPath = imageNormalUrlPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content")),
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content")));
+                String[] split = analysis.getPicPath().split("/");
+                String targetNamePath =  "/" + split[split.length - 2] + "/" + split[split.length - 1];
+                uploadFileToFtps(imageNormalUrlPath, targetNamePath);
+
+                analyseObject.setImageNormalUrlPath(targetNamePath);
+                String[] distinguishType = algorithmConfig.getDistinguishType().split(",");
+                Collections.addAll(typeList, distinguishType);
+                break;
+            // 缺陷识别
+            case "398":
+                String[] defectType = algorithmConfig.getDefectType().split(",");
+                Collections.addAll(typeList, defectType);
+                break;
+            // 设备状态识别
+            case "1":
+            case "2":
+            case "3":
+                typeList.add("meter");
+                break;
+            case "5":
+                typeList.add("light");
+                break;
+            case "6":
+                typeList.add("isolator");
+                break;
+            case "8":
+                typeList.add("qrcode");
+                break;
+            case "9":
+                typeList.add("infrared");
+                break;
+            case "10":
+                typeList.add("switch");
+                break;
+            case "13":
+                typeList.add("sound");
+                break;
+            // 静默监视告警识别
+            case "12":
+                String[] alarmType = algorithmConfig.getSilentMonitorType().split(",");
+                Collections.addAll(typeList, alarmType);
+                break;
+            default:
+                break;
+        }
+        analyseObject.setTypeList(typeList);
+        return analyseObject;
+    }
+
+    /**
+     * 组装要发给智能分析主机图像分析接口的请求参数
+     *
+     * @param analysis 算法信息
+     * @param analyseObject 点位具体信息
+     * @return PicAnalyseRequest
+     */
+    private PicAnalyseRequest packagePicAnalyseRequest(Analysis analysis, AnalyseObject analyseObject){
+        PicAnalyseRequest picAnalyseRequest = new PicAnalyseRequest();
+        List<AnalyseObject> objectList = new ArrayList<>();
+        List<String> imageUrlList = new ArrayList<>();
+        picAnalyseRequest.setRequestHostIp(algorithmConfig.getResultIp());
+        picAnalyseRequest.setRequestHostPort(algorithmConfig.getResultPort());
+        picAnalyseRequest.setRequestId(UUID.randomUUID() + "#" + analysis.getTaskId());
+        String instanceId = String.valueOf(analysis.getInstanceId());
         analyseObject.setObjectId(instanceId);
-        imageUrlList.add(picPath);
+
+        String[] split = analysis.getPicPath().split("/");
+        String targetNamePath =  "/" + split[split.length - 2] + "/" + split[split.length - 1];
+        uploadFileToFtps(analysis.getPicPath(), targetNamePath);
+
+        imageUrlList.add(targetNamePath);
         analyseObject.setImageUrlList(imageUrlList);
-        analyseObject.setImageNormalUrlPath(imageNormalUrlPath);
+
         objectList.add(analyseObject);
         picAnalyseRequest.setObjectList(objectList);
-        picAnalyseRequest.setRequestId(UUID.randomUUID() + "#" + taskId);
         return picAnalyseRequest;
     }
 
     /**
-     * 其他格式的输出
+     * 巡视主机请求算法更新--接口
      *
-     * @param response 请求参数
+     * @param request 参数
+     * @return Response
      */
-    private void otherReturn(ResponseEntity<Response> response) {
-        if (Objects.isNull(response.getBody())) {
-            return;
-        }else {
-            ResponseCodeEnum instance = ResponseCodeEnum.getInstance(response.getBody().getCode());
-            Map<String, Object> map = new HashMap<>(5);
-            assert instance != null;
-            map.put("code", instance.getCode());
-            map.put("description", instance.getValue());
-            log.info("返回结果:{}", map);
+    public Response algorithmUpdate(UpdateRequest request){
+        Map<String, Object> param = new HashMap<>(16);
+        param.put("requestHostIp", request.getRequestHostIp());
+        param.put("requestHostPort", request.getRequestHostPort());
+        param.put("requestId", request.getRequestId());
+
+        String[] split = request.getAlgorithmPath().split("/");
+        String targetNamePath =  "/" + split[split.length - 2] + "/" + split[split.length - 1];
+        uploadFileToFtps(request.getAlgorithmPath(), targetNamePath);
+
+        param.put("algorithmPath", targetNamePath);
+
+        JSONObject testJson = (JSONObject) JSONObject.toJSON(param);
+        printJsonMsg(testJson);
+
+        int code;
+        try {
+            String result = postUrlParams(algorithmConfig.getAnalysisUrl(), testJson.toJSONString());
+            log.info("result==={}", result);
+
+            if (StringUtils.isEmpty(result)){
+                return Response.basRequest();
+            }
+            JSONObject jsonObject = JSON.parseObject(result);
+            code = Integer.parseInt(String.valueOf(jsonObject.get("code")));
+        }catch (Exception e){
+            log.error(e.getMessage());
+            return Response.serverError();
         }
+        return new Response(code);
+    }
+
+
+    /**
+     *  巡视主机收到分析结果开始解析
+     *
+     * @param response 参数
+     */
+    @Async
+    public void picAnalyseRetNotify(PicAnalyseResponse response){
+        String flagId = response.getRequestId().split("#")[1];
+        // 静默监视结果
+        if (Objects.equals("jm", flagId)){
+            silentMonitorHandle(response);
+            return;
+        }
+        // 普通图像分析
+        sendToDataDealThread(response, flagId);
+    }
+
+    /**
+     *  静默监视产生告警处理
+     *
+     * @param response 参数
+     */
+    private void silentMonitorHandle(PicAnalyseResponse response) {
+        // 遍历多个点的分析结果
+        for (AnalyseResult  analyseResult : response.getResultsList()){
+            List<AnalyseResultItem> results = analyseResult.getResults();
+
+            if (results.isEmpty()){
+                // 没有识别出来任何缺陷 results为空
+                continue;
+            }
+            StringJoiner content = new StringJoiner(" ");
+            Map<String, Object> map = analyseDataOperateDao.selectInstanceInfo(Long.valueOf(analyseResult.getObjectId()));
+
+            for (AnalyseResultItem result : results){
+
+                if (!StringUtils.equals("2000", result.getCode())) {
+                    log.error("巡视点为{}的图像数据错误", map.get("instance_id"));
+                    continue;
+                }
+                content.add(result.getDesc());
+
+                String targetPath = copyFileFromFtps(result.getType(), result.getResImageUrl());
+                String defectResultRealImg = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content"));
+                String imagePath = targetPath.replace(targetPath, defectResultRealImg);
+
+                TWarnInfo tWarnInfo = new TWarnInfo()
+                        // 将静默监视产生的告级别警统一设置为预警
+                        .setWarnLevel(130)
+                        .setWarnTime(new Date())
+                        .setWarnName("静默监视告警数据")
+                        .setWarnContent(String.valueOf(content))
+                        .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
+                        .setCunstomId(String.valueOf(map.get("custom_id")))
+                        .setInstanceId(Long.valueOf(String.valueOf(map.get("instance_id"))))
+                        .setStdMeteId(Long.valueOf(String.valueOf(map.get("device_mete_id"))))
+                        .setConfMode(276)
+                        .setDefectModel(450)
+                        .setAlarmSource(689)
+                        .setImagePath(imagePath);
+                analyseDataOperateDao.insertWarnInfo(tWarnInfo);
+
+                //webSocket通知前端调用查询告警弹框的接口
+                Long warnId = analyseDataOperateDao.selectCurrentWarn();
+                Map<String, Object> jasonMaps = new HashMap<>(16);
+                jasonMaps.put("type", "alarmPopUp");
+                jasonMaps.put("warnId", warnId);
+                jasonMaps.put("defectModel", 450);
+                String json = JSON.toJSONString(jasonMaps);
+                log.info("发送给前端的消息：{}", json);
+                try {
+                    postUrl(syncWebsocketUrl,json);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 将结果推送给结果处理线程 DataDealThread
+     *
+     * @param response 返回结果
+     * @param taskId 任务id
+     */
+    private void sendToDataDealThread(PicAnalyseResponse response, String taskId) {
+        JSONObject jsonObject = packageObject(response, taskId);
+
+        printJsonMsg(jsonObject);
+
+        int port = aiPort;
+        // 开关
+        String algorithmFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
+        if (StringUtils.equals(FLAG, algorithmFlag)){
+            port = recognizePort;
+        }
+        try {
+            DataDealThread dataDealThread = new DataDealThread(jsonObject.toJSONString(), port, redisTemplate, analyseDataOperateService, syncWebsocketUrl);
+            TaskExecutePool.getInstance().execute(dataDealThread);
+        }catch (Exception e){
+            log.error(e.getMessage());
+            log.error("算法结果处理线程异常:{}", e.getStackTrace()[0]);
+        }
+    }
+
+    /**
+     * 组装要发给 DataDealThread 的 JSONObject对象
+     *
+     * @param response 返回结果
+     * @param taskId 任务id
+     */
+    private JSONObject packageObject(PicAnalyseResponse response, String taskId) {
+        JSONObject jsonObject = new JSONObject();
+        JSONObject resultInfoObject = new JSONObject();
+        JSONObject msgDataObject = new JSONObject();
+        try {
+            int i = 1;
+            // 遍历多个点的分析结果,不同的巡视点
+            for (AnalyseResult analyseResult : response.getResultsList()) {
+                JSONObject resultDataObject = new JSONObject();
+                StringJoiner resultValue = new StringJoiner(" ");
+                StringJoiner type = new StringJoiner(" ");
+
+                String instanceId = analyseResult.getObjectId();
+                resultDataObject.put("taskId", taskId);
+                resultDataObject.put("instanceId", instanceId);
+                String redisKeyName = "t_cruise_task_result:" + taskId + instanceId;
+                String picPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "picpath"));
+                String originPicPath = picPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));
+                // 判断该巡视点是否为27大类的点 若是  直接拿假数据  不要返回的结果
+                if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(instanceId)){
+                    resultValue.add(String.valueOf(generateMapFormat().get(instanceId)));
+                    resultDataObject.put("analyseType", 398);
+                    resultDataObject.put("type", String.valueOf(type.add("")));
+                    resultDataObject.put("resultValue", String.valueOf(resultValue));
+                    resultDataObject.put("analyseResultImg", originPicPath);
+                    resultInfoObject.put("resultInfo" + i, resultDataObject);
+                    i++;
+                    continue;
+                }
+                List<AnalyseResultItem> results = analyseResult.getResults();
+                // 没有识别出来任何缺陷 results为空  只有当缺陷识别才会这样，判别的results是有值的
+                if (results.isEmpty()){
+                    resultDataObject.put("analyseType", 398);
+                    resultDataObject.put("type", String.valueOf(type.add("")));
+                    resultDataObject.put("resultValue", String.valueOf(resultValue.add("")));
+                    resultDataObject.put("analyseResultImg", originPicPath);
+                    resultInfoObject.put("resultInfo" + i, resultDataObject);
+                    i++;
+                    continue;
+                }
+                // 非27大类的缺陷及判别类型的点  遍历单个点的分析结果,不同的缺陷
+                Map<String, String> map = new HashMap<>(5);
+                for (AnalyseResultItem result : results) {
+                    resultDataObject.put("pictureCoordinate", result.getPos());
+                    resultDataObject.put("conf", result.getConf());
+                    // 图像数据正确
+                    if (!Objects.equals("2000", result.getCode())) {
+                        log.error("巡视点为{}的图像数据错误", instanceId);
+                        continue;
+                    }
+                    map = setRecognizeResult(result, type, resultValue, resultDataObject, originPicPath);
+                }
+                resultDataObject.put("type", map.get("type"));
+                resultDataObject.put("resultValue", map.get("resultValue"));
+                resultInfoObject.put("resultInfo" + i, resultDataObject);
+                i++;
+            }
+            msgDataObject.put("desNode", "clientSocket001");
+            msgDataObject.put("srcNode", "serverSocket");
+            msgDataObject.put("data", resultInfoObject);
+            jsonObject.put("msgID", String.valueOf(100000001));
+            jsonObject.put("msgType", "2");
+            jsonObject.put("msgData", msgDataObject);
+        }catch (Exception e){
+            log.error("组装要发给 DataDealThread 的 JSONObject对象错误：{}", e.getMessage());
+        }
+        return jsonObject;
+    }
+
+    /**
+     * 读取配置文件的假数据转化为map格式
+     *
+     */
+    private Map<String, Object> generateMapFormat() {
+        String path = this.getClass().getClassLoader().getResource(fileName).toString();
+        path = path.replace("\\", "/");
+
+        if (path.contains(":")) {
+            // 1
+            /*path = path.substring(6);*/
+            // 2
+            path = path.replace("file:", "");
+        }
+        JSONObject jsonObject = null;
+        try {
+            String input = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8);
+            jsonObject = JSONObject.parseObject(input);
+        } catch (IOException e) {
+            log.error("json解析失败:{}", e.getMessage());
+        }
+        Map<String, Object> map = new HashMap<>(16);
+        if (Objects.nonNull(jsonObject)){
+            for (Map.Entry<String, Object> entry : jsonObject.entrySet()){
+                map.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return map;
+    }
+
+    /**
+     * 根据算法分析类型 获取识别结果 组装结果详情
+     *
+     * @param result 识别结果
+     * @param type 算法分析类型
+     * @param resultValue 算法分析结果
+     * @param resultDataObject 拼装给DataDealThread的对象
+     * @param originPicPath 拼装给DataDealThread的对象
+     * @return Map<String, String>
+     */
+    private Map<String, String> setRecognizeResult(AnalyseResultItem result, StringJoiner type, StringJoiner resultValue,
+                                                   JSONObject resultDataObject, String originPicPath){
+        Map<String, String> map = new HashMap<>(5);
+        String targetPath = "";
+        // 判别
+        if (Objects.isNull(result.getType())){
+            type.add("tx_pb");
+            if (Objects.equals("1", result.getValue())){
+                // 图像有差异 才会返回图片地址
+                resultValue.add("abnormal");
+                targetPath = copyFileFromFtps(result.getType(), result.getResImageUrl());
+            }else {
+                // 图像无差异 取原图
+                resultValue.add("normal");
+                targetPath = originPicPath;
+            }
+            resultDataObject.put("analyseType", 11);
+        }else {
+            // 根据返回的算法类型查询算法相关信息
+            TAlgorithmInfo algorithmInfo = analyseDataOperateDao.selectAlgorithmInfo(result.getType());
+            if (Objects.isNull(algorithmInfo)){
+                // 缺陷
+                type.add(result.getType());
+                resultDataObject.put("analyseType", 398);
+                resultValue.add(result.getDesc());
+            }else {
+                // 设备状态识别
+                type.add(result.getType());
+                resultDataObject.put("analyseType", Integer.valueOf(algorithmInfo.getAnalyseType()));
+                int resultType = Integer.parseInt(algorithmInfo.getAnalyseType() + result.getValue());
+                String resultDesc = RecogniseStatusEnum.getValueByCode(resultType).getValue();
+                resultValue.add(resultDesc);
+            }
+            targetPath = copyFileFromFtps(result.getType(), result.getResImageUrl());
+        }
+        resultDataObject.put("analyseResultImg", targetPath);
+        map.put("type", String.valueOf(type));
+        map.put("resultValue", String.valueOf(resultValue));
+        return map;
+    }
+
+    /**
+     * 将ftps的文件复制到指定目录
+     *
+     * @param type 类型
+     * @param sourcePath 源文件路径
+     * @return String
+     */
+    public String copyFileFromFtps(String type, String sourcePath){
+        String targetPath;
+        // 图片在ftps上的全路径
+        String resultAbsolutePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + sourcePath;
+        if (Objects.isNull(type)){
+            // 判别
+            targetPath = redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content") + sourcePath;
+        }else {
+            List<String> analyseType = new ArrayList<>();
+            if (analyseType.contains(type)){
+                // 表计识别(设备状态识别)
+                targetPath = redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content") +sourcePath;
+            }else {
+                // 缺陷
+                targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content") +sourcePath;
+            }
+        }
+        FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
+        return targetPath;
     }
 
     /**
@@ -301,41 +606,76 @@ public class IntelAnalysisService {
      * @param map 请求参数
      * @return String
      */
-    public ResponseEntity<Response> restTemplatePost(String url, Map<String, Object> map) {
-        ResponseEntity<Response> response = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, ResponseEntity.class);
-        return response;
+    public Response restTemplatePost(String url, Map<String, Object> map) {
+        return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Response.class);
+    }
+
+    /**
+     * 请求其他服务
+     * @param url 路径
+     * @param json 参数
+     * @return String
+     */
+    private String postUrlParams(String url, String json) {
+        HttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
+        try {
+            HttpResponse response = client.execute(httpPost);
+            return EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
      * 测试:json格式打印输入参数
      *
-     * @param param 请求参数
+     * @param jsonObject json数据
      */
-    private void printJsonMsg(Map<String, Object> param) {
-        JSONObject jsonObject = (JSONObject) JSONObject.toJSON(param);
-
+    private void printJsonMsg(JSONObject jsonObject) {
         String pretty = JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
                 SerializerFeature.WriteDateUseDateFormat);
-        System.out.println(pretty);
-
-        System.out.println("====================================================================================");
+        log.info(pretty);
     }
 
+    /**
+     * 请求webSocket发送数据
+     *
+     * @param url 请求地址
+     * @param json 发送内容
+     * @return String
+     */
+    public String postUrl(String url, String json) throws IOException, URISyntaxException {
+        log.info("webSocketUrl=={}", url);
+        CloseableHttpClient client = HttpClients.createDefault();
+        URI uri = new URIBuilder(url).setParameter("json", json).build();
+        HttpPost httpPost = new HttpPost(uri);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
+        CloseableHttpResponse response = client.execute(httpPost);
+        HttpEntity entity = response.getEntity();
+        return EntityUtils.toString(entity, "UTF-8");
+    }
 
     /**
      * 将文件上传至ftp服务器
      *
      * @param sourcePath 源文件地址
-     * @param targetName 目标文件名称
-     * @return void
+     * @param targetPathName 目标文件地址名称
      */
-//    public void uploadFile(String sourcePath, String targetName) {
-//        try {
-//            if("".equals(sourcePath)) {return;}
-//            FtpsUtil.putFile(sourcePath, ftpsLocalPath + "/" + targetName,
-//                    serverUrl, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
-//        } catch (Exception e) {
-//            log.error("上传至ftps错误 " + e);
-//        }
-//    }
+    private void uploadFileToFtps(String sourcePath, String targetPathName) {
+        try {
+            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(),
+                    ftpsConfig.getKeypw(), ftpsConfig.getUsername(), ftpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至ftp服务器错误:{}", e.getMessage());
+        }
+    }
+
 }

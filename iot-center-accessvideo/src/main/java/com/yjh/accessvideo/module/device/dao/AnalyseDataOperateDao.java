@@ -71,4 +71,7 @@ public interface AnalyseDataOperateDao {
     Long selectCurrentWarn();
     //查看当前最新的一条缺陷信息
     Long selectCurrentDefect();
+
+    Map<String, Object> selectInstanceInfo(@Param(value = "presetId")Long presetId);
+    TAlgorithmInfo selectAlgorithmInfo(@Param(value = "aliasName")String aliasName);
 }

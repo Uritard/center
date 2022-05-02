@@ -5,20 +5,19 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.user.service.TCameraPresetService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.MultiKeyCommands;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -28,12 +27,12 @@ import java.util.concurrent.TimeUnit;
  */
 @Component("SilentTaskScheduled")
 @Slf4j
+@RequiredArgsConstructor(onConstructor = @_(@Autowired))
+@ConditionalOnProperty(prefix = "scheduling", name = "enable", havingValue = "true")
 public class SilentTaskScheduled {
-    @Resource
-    private RedisTemplate redisTemplate;
 
-    @Resource
-    private TCameraPresetService tCameraPresetService;
+    private final RedisTemplate redisTemplate;
+    private final TCameraPresetService tCameraPresetService;
 
     /**
      * 调用相机转到预置位接口
@@ -43,88 +42,84 @@ public class SilentTaskScheduled {
      * 调用相机抓图接口
      */
     private static final String CAPTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePictureForTask?cameraId={cameraId}";
+    /**
+     * 调用智能分析主机图像分析接口
+     */
+    private static final String ANALYSE_URL = "http://iot-center-accessvideo/picAnalyseNoDetection";
 
-    private static final String msg = "success";
-
-    @PostConstruct
-    public void init(){
-        //TODO something
-    }
+    private static final String MSG = "success";
+    private static final String FLAG = "false";
 
     @Scheduled(cron = "0/${silent.task.interval} * * * * ?")
-    public void SilentTaskScheduled() {
+    public void silentTaskScheduled() {
+        log.info("定时任务");
+        // 开关
+        String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis","content"));
+        if (StringUtils.equals(FLAG, flag)){
+            return;
+        }
+        List<Map<String, Long>> list = tCameraPresetService.selectCameraBySilent();
+        for (Map<String, Long> map : list) {
+            String cameraId = String.valueOf(map.get("camera_id"));
+            String presetId = String.valueOf(map.get("preset_id"));
 
-//        log.info("定时任务");
-//        List<Map<String, Long>> list = tCameraPresetService.selectCameraBySilent();
-//        for (Map<String, Long> map : list) {
-//            String cameraId = String.valueOf(map.get("camera_id"));
-//            String presetId = String.valueOf(map.get("preset_id"));
-//
-//            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" +cameraId);
-//            String state = redisInfoMap.get("state");
-//
-//            // 相机状态为闲置(state为0闲置,为1占用)时,做静默任务
-//            if (StringUtils.equals("0", state) && StringUtils.isNotEmpty(presetId)){
-//                log.info("cameraId为{},presetId为{}的相机准备做静默任务", cameraId, presetId);
-//                try {
-//                    HashMap<String, Object> moveMap = new HashMap<>(5);
-//                    moveMap.put("cameraId", cameraId);
-//                    moveMap.put("presetId", presetId);
-//                    // 转预置位 先霸占相机
-//                    redisInfoMap.put("state", "1");
-//                    redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
-//                    moveToPreset(moveMap);
-//                    // 等待摄像头转到预置位
-//                    Map<String, Object> mapForWaitTime = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
-//                    Long waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
-//                    TimeUnit.MILLISECONDS.sleep(waitTime);
-//                    HashMap<String, Object> captureMap = new HashMap<>(3);
-//                    captureMap.put("cameraId", cameraId);
-//                    // 拍照
-//                    Result result = capturePicture(captureMap);
-//                    // 将相机状态置为闲置
-//                    redisInfoMap.put("state", "0");
-//                    redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
-//                    // 分析
-//                    analysePicture(result);
-//                }catch (Exception e) {
-//                    log.error("设置摄像机状态出错" + e);
-//                    redisInfoMap.put("state", "0");
-//                    redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
-//                }
-//            }
-//        }
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
+            String state = redisInfoMap.get("state");
+
+            // 相机状态为闲置(state为0闲置,为1占用)时,做静默任务
+            if (StringUtils.equals("0", state) && StringUtils.isNotEmpty(presetId)){
+                log.info("cameraId为{},presetId为{}的相机准备做静默任务", cameraId, presetId);
+                try {
+                    HashMap<String, Object> moveMap = new HashMap<>(5);
+                    moveMap.put("cameraId", cameraId);
+                    moveMap.put("presetId", presetId);
+                    // 转预置位 先霸占相机
+                    redisInfoMap.put("state", "1");
+                    redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
+                    moveToPreset(moveMap);
+                    // 等待摄像头转到预置位
+                    Long waitTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content")));
+                    TimeUnit.MILLISECONDS.sleep(waitTime);
+                    HashMap<String, Object> captureMap = new HashMap<>(3);
+                    captureMap.put("cameraId", cameraId);
+                    // 拍照
+                    Result result = capturePicture(captureMap);
+                    // 将相机状态置为闲置
+                    redisInfoMap.put("state", "0");
+                    redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
+
+                    // 分析
+                    analysePicture(result, Long.valueOf(presetId));
+                }catch (Exception e) {
+                    log.error("设置摄像机状态出错" + e.getMessage());
+                    redisInfoMap.put("state", "0");
+                    redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
+                }
+            }
+        }
     }
 
     /**
      * 根据相机拍照结果发送算法进行分析
      * @param result 相机抓图返回结果
-     * @return void
+     * @param presetId 预置位id  充当巡视点ID
      */
-    private void analysePicture(Result result){
-        String absPath = "";
-
-        if(Objects.nonNull(result) && Objects.equals(msg, result.getMessage())){
+    private void analysePicture(Result result, Long presetId){
+        if(Objects.nonNull(result) && Objects.equals(MSG, result.getMessage())){
             JSONObject jsonForRe = (JSONObject) JSON.toJSON(result.getData());
-            absPath = String.valueOf(jsonForRe.get("absPath"));
+            String absPath = String.valueOf(jsonForRe.get("absPath"));
             // 调用算法接口分析结果
-            PicAnalyseRequest request = new PicAnalyseRequest();
-            request.setRequestHostIp("123");
-            request.setRequestHostPort("456");
-            request.setRequestId(UUID.randomUUID() + "#jm");
-            AnalyseObject analyseObject = new AnalyseObject();
-            analyseObject.setObjectId("1");
-            ArrayList<String> typeList = new ArrayList<>();
-            typeList.add("");
-            analyseObject.setTypeList(typeList);
-            ArrayList<String> imageUrlList = new ArrayList<>();
-            imageUrlList.add(absPath);
-            analyseObject.setImageUrlList(imageUrlList);
-
-
+            List<Analysis> analysisList = new ArrayList<>();
+            Analysis analysis = new Analysis()
+                    // 暂定静默监视识别类型为12,没有实际意义
+                    .setAnalyseType("12")
+                    .setInstanceId(presetId)
+                    .setTaskId("jm")
+                    .setPicPath(absPath);
+            analysisList.add(analysis);
+            restTemplatePost(ANALYSE_URL, analysisList);
         }else {
             // 抓图失败 逻辑处理
-            // TODO something
             log.info("抓图失败");
         }
     }
@@ -166,4 +161,18 @@ public class SilentTaskScheduled {
         return re;
     }
 
+    /**
+     * 请求其他服务
+     *
+     * @param url 请求地址
+     * @param analysisList 请求参数
+     * @return String
+     */
+    public void restTemplatePost(String url, List<Analysis> analysisList ) {
+        try {
+            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForEntity(url, analysisList, List.class);
+        }catch (Exception e){
+            log.error(e.getMessage());
+        }
+    }
 }
