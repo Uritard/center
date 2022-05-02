@@ -440,8 +440,10 @@ public class IntelAnalysisService {
                 String originPicPath = picPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));
                 // 判断该巡视点是否为27大类的点 若是  直接拿假数据  不要返回的结果
-                if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(instanceId)){
-                    resultValue.add(String.valueOf(generateMapFormat().get(instanceId)));
+
+                Long deviceMeteId =  analyseDataOperateDao.selectDevicePointIdByInstanceId(Long.valueOf(instanceId));
+                if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(deviceMeteId))){
+                    resultValue.add(String.valueOf(generateMapFormat().get(deviceMeteId)));
                     resultDataObject.put("analyseType", 398);
                     resultDataObject.put("type", String.valueOf(type.add("")));
                     resultDataObject.put("resultValue", String.valueOf(resultValue));

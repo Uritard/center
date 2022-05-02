@@ -975,4 +975,11 @@
           and a.alias_name = #{aliasName,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectDevicePointIdByInstanceId" resultType="java.lang.Long">
+        SELECT
+            b.device_point_id
+        FROM t_cruise_point_info a,t_std_devicemete b
+        WHERE a.device_mete_id = b.device_mete_id
+          and a.instance_id = #{instanceId,jdbcType=BIGINT}
+    </select>
 </mapper>
