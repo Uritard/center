@@ -46,6 +46,7 @@ public class SysKeyService {
     public int insert(SysKey sysKey, HttpServletRequest request) throws IOException {
         String userIds = request.getHeader("userId");
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userIds, "userName"));
+        String identifier = request.getParameter("identifier");
 
         String name = (String)redisTemplate.opsForHash().get("userInfo:" + sysKey.getUserId(), "userName");
 
@@ -55,6 +56,10 @@ public class SysKeyService {
             throw new RuntimeException("绑定类型不正确！");
         }
         if(sysKey.getBindType() == SysKey.BindEnum.UKEY.getCode()) {
+            String dpkey = demo.decryptIdentifier(sysKey.getPubKey(), identifier);
+            if (StringUtils.isNotEmpty(dpkey)) {
+                sysKey.setPubKey(dpkey);
+            }
             redisTemplate.opsForHash().put("sysKey:" + sysKey.getUserId() + ":" + sysKey.getBindType(), sysKey.getSerialNum(), sysKey.getPubKey());
         } else {
             redisTemplate.opsForSet().add("sysKey:" + sysKey.getUserId() + ":" + sysKey.getBindType(), sysKey.getSerialNum());

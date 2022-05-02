@@ -833,7 +833,7 @@ public class SysUserController {
         return result;
     }
 
-    @ApiOperation(value = "删除用户绑定")
+    @ApiOperation(value = "redis存储用户绑定值")
     @RequestMapping(value = "/redisBindKey", method = RequestMethod.GET)
     public Result redisBindKey(@RequestParam(value = "userId") Long userId, HttpServletRequest request) {
         Result result = new Result();
