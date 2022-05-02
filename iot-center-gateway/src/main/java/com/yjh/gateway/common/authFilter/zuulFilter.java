@@ -143,6 +143,10 @@ public class zuulFilter extends ZuulFilter {
         String userName = "unknown";
         if (paramMap != null && paramMap.containsKey("userName")){
             userName = String.valueOf(paramMap.get("userName"));
+        }else {
+            String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
+            String token = request.getHeader("token") != null ? request.getHeader("token") : "";
+            userName = String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
         }
         if ("true".equals(isDecode)) {
             if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/getPubk") && !url.contains("/sysUser/v1/login") && !url.contains("/sysUser/v1/loginChangePassword")) {
@@ -304,6 +308,7 @@ public class zuulFilter extends ZuulFilter {
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                     ctx.setResponseBody("{\"code\":401,\"message\":\"Unbound IP address!\"}");
+                    ipAddr = ipAddr.replace("\"", "");
                     logsAspect.loginLogsSend(request, ipAddr, "27", "IP地址异常", "IP:" + ipAddr + "与用户" + userName + "未绑定", userName, userId, 2);
                     return false;
                 }
