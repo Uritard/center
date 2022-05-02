@@ -27,13 +27,14 @@
         <result column="latitude" jdbcType="VARCHAR" property="latitude" />
         <result column="longitude" jdbcType="VARCHAR" property="longitude" />
         <result column="address" jdbcType="VARCHAR" property="address" />
+        <result column="commission_date" jdbcType="TIMESTAMP" property="commissionDate" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
          camera_name, camera_model,pms_id,alias_name, record_id, up_region_id, channel_num, camera_num,sms_id,
          rms_id, monitor_id,vendor_id, stream_type, protocol_type, camera_ip,url, port,infread_port,camera_manager,camera_code ,camera_type,
-         is_control,latitude,longitude,address,unit
+         is_control,latitude,longitude,address,unit,commission_date
     </sql>
 
     <sql id="tongTong">
@@ -67,7 +68,8 @@
         a.longitude,
         a.unit,
         a.up_region_id,
-        f.region_name as up_region_name
+        f.region_name as up_region_name,
+        a.commission_date
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="cameraId" parameterType="com.yjh.platform.module.user.entity.TCameraInfo">
@@ -100,7 +102,8 @@
                 #{latitude, jdbcType=VARCHAR},
                 #{longitude, jdbcType=VARCHAR},
                 #{address, jdbcType=VARCHAR},
-                #{unit, jdbcType=VARCHAR}
+                #{unit, jdbcType=VARCHAR},
+                #{commissionDate, jdbcType=TIMESTAMP}
         )
     </insert>
 
@@ -160,6 +163,7 @@
            <if test="latitude != null">a.latitude = #{latitude, jdbcType=VARCHAR},</if>
            <if test="longitude != null ">a.longitude = #{longitude, jdbcType=VARCHAR},</if>
            a.unit = #{unit},
+           <if test="commissionDate != null ">a.commissionDate = #{commissionDate, jdbcType=TIMESTAMP},</if>
     </set>
         where a.camera_id = #{cameraId, jdbcType=BIGINT}
     </update>
@@ -226,6 +230,7 @@
         a.longitude,
         a.address,
         a.unit
+        a.commission_date
         from t_camera_info a
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>

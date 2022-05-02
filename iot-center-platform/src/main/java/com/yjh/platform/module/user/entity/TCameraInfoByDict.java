@@ -1,5 +1,7 @@
 package com.yjh.platform.module.user.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -7,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author YC
@@ -105,4 +108,8 @@ public class TCameraInfoByDict implements Serializable {
     private String cameraManager;
     @ApiModelProperty(value = "相机密码")
     private String cameraCode;
+    @ApiModelProperty(value = "投运日期", example = "2021-10-01")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @TableField(value = "commission_date")
+    private Date commissionDate;
 }
