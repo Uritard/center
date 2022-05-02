@@ -77,7 +77,7 @@ public class DataDealThread implements Runnable {
             JSONObject jsonObject = JSON.parseObject(usefulBody);
             log.info("JSON对象1：" + jsonObject);
             String reponseMessage=jsonObject.getString("msgID");
-
+            log.info("reponseMessage:{}",reponseMessage);
             if ("2".equals(jsonObject.getString("msgType"))) {
                 JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.getString("msgData")).getString("data")); //全量数据结果集
                 log.info("原生数据****：" + jsonObjectData);
@@ -895,155 +895,161 @@ public class DataDealThread implements Runnable {
 
                 }
 
-                try{
-                    //jeff: 每一次算法返回响应处理结束后，上传告警图片信息并发送告警信息到算法管理平台
-                    Set<String> differentList= redisScan( "msg:" + reponseMessage);  //标记告警，也就是判别告警
-                    Set<String> defectList=  redisScan("defect:" + reponseMessage);   //缺陷告警
-                    Alarm alarmDetail=new Alarm();
-                    ftpsservice ftpsservice= GetSpringUtil.getBean("ftpsservice");
-                    String flag= ftpsservice.getFlag();
-                    if(differentList.size()>0&&("1".equals(flag))){
-                        log.info("different类型:开始向算法管理平台发送图片和mqtt消息");
-                        String year=Integer.toString(LocalDate.now().getYear());
-                        String month=Integer.toString(LocalDate.now().getMonthValue());
-                        Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
-                        JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
-                        //,先取出算法平台返回的resultinfo中的结果图片路径
-                        String resultImagebak=jsonObjectResultbak.getString("analyseResultImg");
-                        String taskidbak=jsonObjectResultbak.getString("taskId");
-                        String  instanceId=jsonObjectResultbak.getString("instanceId");
-                        Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak+":"+instanceId);//读redis
-                        String devicename= String.valueOf(cruiseResult2.get("deviceName"));
-                        //,获取原始路径.并拼接算法管理平台对应远程文件路径
-                        String origpicpath=String.valueOf(cruiseResult2.get("origpic").toString());
-                        String[] str2=origpicpath.split("/");
-                        String origpcimagename=str2[str2.length-1];
-                        String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+origpcimagename;
-                        //,获取结果路径.并拼接算法管理平台对应远程文件路径
-                        String[] str=resultImagebak.split("/");
-                        String imagename=str[str.length-1];
-                        String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+imagename;
-                        //,获取基准路径.并拼接算法管理平台所需要的基准文件路径
-                        TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
-                        String Cruiseid=String.valueOf(tCruisePointInstance.getCruiseid());   //获取巡视点位id
-                        String judgeBaseImagepath= redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString();
-                        judgeBaseImagepath=judgeBaseImagepath+"/"+Cruiseid+"/"+Cruiseid+".jpg"; //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
-                        //拼接算法管理平台分析告警结果图片地址
-                        String remotebaseimagicpath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+Cruiseid+".jpg";
-                        Iterator it=differentList.iterator();
-                        List<Different> defectList1=new ArrayList<>();
-                        while (it.hasNext()){
-                            String key=it.next().toString();//所有的key
-                            Map<String, String>  differentlistmap= redisTemplate.opsForHash().entries(key);
-                            String resultinfo=differentlistmap.get("value");      //获取返回的resultvalue值,判别类是一个数值，缺陷类是坐标
-                            Different different= new Different();
-                            different.setX1(resultinfo);
-                            different.setY1("0");
-                            different.setX2("0");
-                            different.setY2("0");
-                            defectList1.add(different);
-                            alarmDetail.setBay_name("");
-                            alarmDetail.setDevice_name(devicename);
-                            alarmDetail.setTime(differentlistmap.get("warnTime"));
-                            alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
-                            alarmDetail.setPic_diff_base(remotebaseimagicpath);               //判别基准图路径
-                            alarmDetail.setPic_different(remotefilepath);               //判别告警图路径,判别结果图
-                            alarmDetail.setPic_defect("");      //缺陷告警图路径//
-                        }
-                        alarmDetail.setDifferent(defectList1);
-                        ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
-                        ftpsservice.uploadFile("判别告警",judgeBaseImagepath,remotebaseimagicpath);  //判别基准图片上传
-                        ftpsservice.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
-                        //可靠性 文件是否传输成功
-                        if( !ftpsservice.fileExits(remoteorigfilepath)){
-                           ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
-                        }
-                        if( !ftpsservice.fileExits(remotebaseimagicpath)){
-                            ftpsservice.uploadFile("判别告警",judgeBaseImagepath,remotebaseimagicpath);  //判别基准图片上传
-                        }
-                        if( !ftpsservice.fileExits(remotefilepath)){
-                            ftpsservice.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
-                        }
-                        AlarmService alarmService= GetSpringUtil.getBean("alarmService");
-                        alarmService.PushMsg(alarmDetail);
-                    }
-
-                    if(differentList.size()>0&&("1".equals(flag))){
-                        log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
-                        String year=Integer.toString(LocalDate.now().getYear());
-                        String month=Integer.toString(LocalDate.now().getMonthValue());
-                        Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
-                        JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
-                        //,先取出算法平台返回的resultinfo中的结果图片路径
-                        String resultImagebak=jsonObjectResultbak.getString("analyseResultImg"); //分析结果过
-                        String taskidbak=jsonObjectResultbak.getString("taskId");
-                        String  instanceId=jsonObjectResultbak.getString("instanceId");
-                        Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak+":"+instanceId);//读redis
-                        String devicename= String.valueOf(cruiseResult2.get("deviceName"));
-                        // 获取原始图路径
-                        String origpicpath=String.valueOf(cruiseResult2.get("origpic"));
-                        String[] str2=origpicpath.split("/");
-                        String origpcimagename=str2[str2.length-1];
-                        //拼接算法管理平台原始图片推送地址
-                        String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+"/"+month+"/"+origpcimagename;
-                        log.info("开始向算法管理平台发送图片和mqtt消息");
-                        String[] str=resultImagebak.split("/");
-                        String imagename=str[str.length-1];
-                        //拼接算法管理平台分析告警结果图片地址
-                        String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+"/"+month+"/"+imagename;
-                        Iterator it=defectList.iterator();
-                        while (it.hasNext()){
-                            String key=it.next().toString();//所有的key
-                            Map<String, String>  differenmap= redisTemplate.opsForHash().entries(key);
-                            String resultinfo=differenmap.get("value");      //获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
-                            String[] arr1 = resultinfo.split(",");   //目前格式："sly_dmyw,0,171,502,667,bj_bpps,745,143,724,923"
-                            List<Defect> defectList1=new ArrayList<>();
-                            for(int i=0;i<arr1.length;){
-                                Defect defect=new Defect();
-                                defect.setX1(arr1[i+1]);
-                                defect.setY1(arr1[i+2]);
-                                defect.setX2(arr1[i+3]);
-                                defect.setY2(arr1[i+4]);
-                                defect.setType(arr1[i]);
-                                defect.setDesc(differenmap.get("defectContent"));
-                                defect.setConfidence("");
-                                defectList1.add(defect);
-                                i=i+5;
+                if(reponseMessage != null && !"".equals(reponseMessage)){
+                    try{
+                        //jeff: 每一次算法返回响应处理结束后，上传告警图片信息并发送告警信息到算法管理平台
+                        Set<String> differentList= redisScan( "msg:" + reponseMessage);  //标记告警，也就是判别告警
+                        Set<String> defectList=  redisScan("defect:" + reponseMessage);   //缺陷告警
+                        Alarm alarmDetail=new Alarm();
+                        ftpsservice ftpsservice= GetSpringUtil.getBean("ftpsservice");
+                        String flag= ftpsservice.getFlag();
+                        if(differentList.size()>0&&("1".equals(flag))){
+                            log.info("different类型:开始向算法管理平台发送图片和mqtt消息");
+                            String year=Integer.toString(LocalDate.now().getYear());
+                            String month=Integer.toString(LocalDate.now().getMonthValue());
+                            Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
+                            JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
+                            //,先取出算法平台返回的resultinfo中的结果图片路径
+                            String resultImagebak=jsonObjectResultbak.getString("analyseResultImg");
+                            String taskidbak=jsonObjectResultbak.getString("taskId");
+                            String  instanceId=jsonObjectResultbak.getString("instanceId");
+                            Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak+":"+instanceId);//读redis
+                            String devicename= String.valueOf(cruiseResult2.get("deviceName"));
+                            //,获取原始路径.并拼接算法管理平台对应远程文件路径
+                            String origpicpath=String.valueOf(cruiseResult2.get("origpic").toString());
+                            String[] str2=origpicpath.split("/");
+                            String origpcimagename=str2[str2.length-1];
+                            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+origpcimagename;
+                            //,获取结果路径.并拼接算法管理平台对应远程文件路径
+                            String[] str=resultImagebak.split("/");
+                            String imagename=str[str.length-1];
+                            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+imagename;
+                            //,获取基准路径.并拼接算法管理平台所需要的基准文件路径
+                            TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
+                            String Cruiseid=String.valueOf(tCruisePointInstance.getCruiseid());   //获取巡视点位id
+                            String judgeBaseImagepath= redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString();
+                            judgeBaseImagepath=judgeBaseImagepath+"/"+Cruiseid+"/"+Cruiseid+".jpg"; //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
+                            //拼接算法管理平台分析告警结果图片地址
+                            String remotebaseimagicpath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+Cruiseid+".jpg";
+                            Iterator it=differentList.iterator();
+                            List<Different> defectList1=new ArrayList<>();
+                            while (it.hasNext()){
+                                String key=it.next().toString();//所有的key
+                                Map<String, String>  differentlistmap= redisTemplate.opsForHash().entries(key);
+                                String resultinfo=differentlistmap.get("value");      //获取返回的resultvalue值,判别类是一个数值，缺陷类是坐标
+                                Different different= new Different();
+                                different.setX1(resultinfo);
+                                different.setY1("0");
+                                different.setX2("0");
+                                different.setY2("0");
+                                defectList1.add(different);
+                                alarmDetail.setBay_name("");
+                                alarmDetail.setDevice_name(devicename);
+                                alarmDetail.setTime(differentlistmap.get("warnTime"));
+                                alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
+                                alarmDetail.setPic_diff_base(remotebaseimagicpath);               //判别基准图路径
+                                alarmDetail.setPic_different(remotefilepath);               //判别告警图路径,判别结果图
+                                alarmDetail.setPic_defect("");      //缺陷告警图路径//
                             }
-                            alarmDetail.setDefect(defectList1);
-                            alarmDetail.setBay_name("");
-                            alarmDetail.setDevice_name(devicename);  //需要修改位devicename
-                            alarmDetail.setTime(differenmap.get("defectTime"));
-                            alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
-                            alarmDetail.setPic_diff_base("");               //判别基准图路径
-                            alarmDetail.setPic_different("");               //判别告警图路径,即分析结果图
-                            alarmDetail.setPic_defect(remotefilepath);      //缺陷告警图路径//
-                        }
-                        ftpsservice.uploadFile("遥信告警",origpicpath,remoteorigfilepath);
-                        ftpsservice.uploadFile("遥信告警",resultImagebak,remotefilepath);
-                        if( !ftpsservice.fileExits(remoteorigfilepath)){
+                            alarmDetail.setDifferent(defectList1);
                             ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
-                        }
-                        if( !ftpsservice.fileExits(remotefilepath)){
-                            ftpsservice.uploadFile("遥信告警",resultImagebak,remotefilepath);
+                            ftpsservice.uploadFile("判别告警",judgeBaseImagepath,remotebaseimagicpath);  //判别基准图片上传
+                            ftpsservice.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
+                            log.info("判别预算法主机origpicpath{}， remoteorigfilepath{}",origpicpath,remoteorigfilepath);
+                            log.info("判别预算法主机judgeBaseImagepath{}， remotebaseimagicpath{}",judgeBaseImagepath,remotebaseimagicpath);
+                            log.info("判别预算法主机resultImagebak{}， remotefilepath{}",resultImagebak,remotefilepath);
+                            //可靠性 文件是否传输成功
+                            if( !ftpsservice.fileExits(remoteorigfilepath)){
+                                ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
+                            }
+                            if( !ftpsservice.fileExits(remotebaseimagicpath)){
+                                ftpsservice.uploadFile("判别告警",judgeBaseImagepath,remotebaseimagicpath);  //判别基准图片上传
+                            }
+                            if( !ftpsservice.fileExits(remotefilepath)){
+                                ftpsservice.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
+                            }
+                            AlarmService alarmService= GetSpringUtil.getBean("alarmService");
+                            alarmService.PushMsg(alarmDetail);
                         }
 
-                        log.info("巡视主机与智能分析主机：origpicpath:{}",origpicpath);
-                        log.info("巡视主机与智能分析主机：remoteorigfilepath:{}",remoteorigfilepath);
-                        log.info("巡视主机与智能分析主机：resultImagebak:{}",resultImagebak);
-                        log.info("巡视主机与智能分析主机：remotefilepath:{}",remotefilepath);
+                        if(differentList.size()>0&&("1".equals(flag))){
+                            log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
+                            String year=Integer.toString(LocalDate.now().getYear());
+                            String month=Integer.toString(LocalDate.now().getMonthValue());
+                            Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
+                            JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
+                            //,先取出算法平台返回的resultinfo中的结果图片路径
+                            String resultImagebak=jsonObjectResultbak.getString("analyseResultImg"); //分析结果过
+                            String taskidbak=jsonObjectResultbak.getString("taskId");
+                            String  instanceId=jsonObjectResultbak.getString("instanceId");
+                            Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak+":"+instanceId);//读redis
+                            String devicename= String.valueOf(cruiseResult2.get("deviceName"));
+                            // 获取原始图路径
+                            String origpicpath=String.valueOf(cruiseResult2.get("origpic"));
+                            String[] str2=origpicpath.split("/");
+                            String origpcimagename=str2[str2.length-1];
+                            //拼接算法管理平台原始图片推送地址
+                            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+"/"+month+"/"+origpcimagename;
+                            log.info("开始向算法管理平台发送图片和mqtt消息");
+                            String[] str=resultImagebak.split("/");
+                            String imagename=str[str.length-1];
+                            //拼接算法管理平台分析告警结果图片地址
+                            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+"/"+month+"/"+imagename;
+                            Iterator it=defectList.iterator();
+                            while (it.hasNext()){
+                                String key=it.next().toString();//所有的key
+                                Map<String, String>  differenmap= redisTemplate.opsForHash().entries(key);
+                                String resultinfo=differenmap.get("value");      //获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
+                                String[] arr1 = resultinfo.split(",");   //目前格式："sly_dmyw,0,171,502,667,bj_bpps,745,143,724,923"
+                                List<Defect> defectList1=new ArrayList<>();
+                                for(int i=0;i<arr1.length;){
+                                    Defect defect=new Defect();
+                                    defect.setX1(arr1[i+1]);
+                                    defect.setY1(arr1[i+2]);
+                                    defect.setX2(arr1[i+3]);
+                                    defect.setY2(arr1[i+4]);
+                                    defect.setType(arr1[i]);
+                                    defect.setDesc(differenmap.get("defectContent"));
+                                    defect.setConfidence("");
+                                    defectList1.add(defect);
+                                    i=i+5;
+                                }
+                                alarmDetail.setDefect(defectList1);
+                                alarmDetail.setBay_name("");
+                                alarmDetail.setDevice_name(devicename);  //需要修改位devicename
+                                alarmDetail.setTime(differenmap.get("defectTime"));
+                                alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
+                                alarmDetail.setPic_diff_base("");               //判别基准图路径
+                                alarmDetail.setPic_different("");               //判别告警图路径,即分析结果图
+                                alarmDetail.setPic_defect(remotefilepath);      //缺陷告警图路径//
+                            }
+                            ftpsservice.uploadFile("遥信告警",origpicpath,remoteorigfilepath);
+                            ftpsservice.uploadFile("遥信告警",resultImagebak,remotefilepath);
+                            if( !ftpsservice.fileExits(remoteorigfilepath)){
+                                ftpsservice.uploadFile("遥信告警",origpicpath,remoteorigfilepath);  //原始图片上传
+                            }
+                            if( !ftpsservice.fileExits(remotefilepath)){
+                                ftpsservice.uploadFile("遥信告警",resultImagebak,remotefilepath);
+                            }
+
+                            log.info("巡视主机与智能分析主机：origpicpath:{}",origpicpath);
+                            log.info("巡视主机与智能分析主机：remoteorigfilepath:{}",remoteorigfilepath);
+                            log.info("巡视主机与智能分析主机：resultImagebak:{}",resultImagebak);
+                            log.info("巡视主机与智能分析主机：remotefilepath:{}",remotefilepath);
 //                       ftp文件上传测试数据
 //                      String localpath="D://信息化工作.jpg";
 //                      ftpsservice.uploadFile("遥信告警",localpath,remotefilepath);
-                        AlarmService alarmService= GetSpringUtil.getBean("alarmService");
-                        alarmService.PushMsg(alarmDetail);
-                        log.info("发送算法管理平台结束");
+                            AlarmService alarmService= GetSpringUtil.getBean("alarmService");
+                            alarmService.PushMsg(alarmDetail);
+                            log.info("发送算法管理平台结束");
+                        }
+                    } catch (Exception e) {
+                        log.info("与算法管理平台交互失败" + e);
                     }
-                } catch (Exception e) {
-                    log.info("与算法管理平台交互失败" + e);
+
+                    //jeff: mqtt消息发个告警平台结束
                 }
 
-                //jeff: mqtt消息发个告警平台结束
 
             } else if ("6".equals(jsonObject.getString("msgType"))) { //任务结束后发来的心跳信息
 
