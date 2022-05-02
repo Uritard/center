@@ -295,6 +295,9 @@ public class zuulFilter extends ZuulFilter {
             }
             userId = (String)redisTemplate.opsForHash().get("userInfo:nameId", userName);
         }
+        if(StringUtils.isEmpty(userId)) {
+            userId = String.valueOf(paramMap.get("userId"));
+        }
         // 判断登录用户 ip 地址
         if ("true".equals(isIpLogin)) {
             if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/sysUser/v1/getPubk")) {

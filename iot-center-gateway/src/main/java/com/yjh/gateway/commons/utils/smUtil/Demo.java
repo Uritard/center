@@ -26,7 +26,7 @@ public class Demo {
     private static final String prik = "00AFB685CF8993EF80FF9B6F8DD92486710C719AB3820B9D48A13A12ED9FD6CFE1";
     //国密规范测试公钥
     private static final String pubk =  //"0461fb6367aefc6db728b8bd889349c25fac42c94a78c9d564af02feba1613d9cbb5f6a62151941873e5b2428033413ab7502b25dfde03c51bdcc4fb3027cb3bd0";
-                                       "048B2E251938FC25FC30F55A485F0FD91376B63CB4BCC863A11A59E59ACC6C802F628E48EA8FA63960956ED5BD817910AF5388E3D0D01379C0830FD789C7ECF47F";
+        "048B2E251938FC25FC30F55A485F0FD91376B63CB4BCC863A11A59E59ACC6C802F628E48EA8FA63960956ED5BD817910AF5388E3D0D01379C0830FD789C7ECF47F";
 
 
 
@@ -95,7 +95,7 @@ public class Demo {
 
     public static String decryptIdentifier(String pCode, String priks) {
         try {
-            if(StringUtils.isNoneBlank(pCode)){
+            if(StringUtils.isNoneBlank(pCode) && StringUtils.isNoneBlank(priks)){
                 ECPrivateKeyParameters priKey = new ECPrivateKeyParameters(new BigInteger(Util.hexToByte(priks)), SM2Util.DOMAIN_PARAMS);
                 return new String(SM2Util.decrypt(SM2Engine.Mode.C1C2C3, priKey, Util.hexToByte("04" + pCode)));
             }
