@@ -938,6 +938,7 @@ public class DataDealThread implements Runnable {
                                 String key=it.next().toString();//所有的key
                                 Map<String, String>  differentlistmap= redisTemplate.opsForHash().entries(key);
                                 String resultinfo=differentlistmap.get("value");      //获取返回的resultvalue值,判别类是一个数值，缺陷类是坐标
+                                log.info("判别结果：{}",resultinfo);
                                 Different different= new Different();
                                 different.setX1(resultinfo);
                                 different.setY1("0");
@@ -957,9 +958,9 @@ public class DataDealThread implements Runnable {
                             ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
                             ftpsservice.uploadFile("判别告警",judgeBaseImagepath,remotebaseimagicpath);  //判别基准图片上传
                             ftpsservice.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
-                            log.info("判别预算法主机origpicpath{}， remoteorigfilepath{}",origpicpath,remoteorigfilepath);
-                            log.info("判别预算法主机judgeBaseImagepath{}， remotebaseimagicpath{}",judgeBaseImagepath,remotebaseimagicpath);
-                            log.info("判别预算法主机resultImagebak{}， remotefilepath{}",resultImagebak,remotefilepath);
+                            log.info("判别预算法主机origpicpath:{}， remoteorigfilepath:{}",origpicpath,remoteorigfilepath);
+                            log.info("判别预算法主机judgeBaseImagepath:{}， remotebaseimagicpath:{}",judgeBaseImagepath,remotebaseimagicpath);
+                            log.info("判别预算法主机resultImagebak:{}， remotefilepath:{}",resultImagebak,remotefilepath);
                             //可靠性 文件是否传输成功
                             if( !ftpsservice.fileExits(remoteorigfilepath)){
                                 ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
@@ -1003,6 +1004,7 @@ public class DataDealThread implements Runnable {
                                 String key=it.next().toString();//所有的key
                                 Map<String, String>  differenmap= redisTemplate.opsForHash().entries(key);
                                 String resultinfo=differenmap.get("value");      //获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
+                                log.info("判别结果：{}",resultinfo);
                                 String[] arr1 = resultinfo.split(",");   //目前格式："sly_dmyw,0,171,502,667,bj_bpps,745,143,724,923"
                                 List<Defect> defectList1=new ArrayList<>();
                                 for(int i=0;i<arr1.length;){
@@ -1193,7 +1195,7 @@ public class DataDealThread implements Runnable {
                     log.info("两表结束插入");
                     cruiseKeys.clear();
                 } catch (Exception e) {
-                    log.error("插表错误", e);
+                    log.warn("插表错误", e);
                 }
 
                 // 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作
