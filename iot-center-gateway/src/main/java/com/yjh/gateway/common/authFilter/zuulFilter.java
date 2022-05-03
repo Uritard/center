@@ -309,7 +309,7 @@ public class zuulFilter extends ZuulFilter {
                 if(StringUtils.isEmpty(userId)) {
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    ctx.setResponseBody("{\"code\":401,\"message\":\"user is error，please try force refresh page (CTRL + F5)!\"}");
+                    ctx.setResponseBody("{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
                     return false;
                 }
                 String ipAddr = "\"" + IpUtil.getRemoteIP(request) + "\"";
@@ -321,9 +321,9 @@ public class zuulFilter extends ZuulFilter {
                     log.error("IP 地址验证失败 - {}-{} {}", userId, userName, ipValid);
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    ctx.setResponseBody("{\"code\":401,\"message\":\"Unbound IP address!\"}");
+                    ctx.setResponseBody("{\"code\":401,\"message\":\"未绑定的IP地址!\"}");
                     ipAddr = ipAddr.replace("\"", "");
-                    logsAspect.loginLogsSend(request, ipAddr, "27", "IP地址异常", "IP:" + ipAddr + "与用户" + userName + "未绑定", userName, userId, 2);
+                    logsAspect.loginLogsSend(request, ipAddr, "6", "登录", "IP:" + ipAddr + "与用户" + userName + "未绑定", userName, userId, 2);
                     return false;
                 }
             }
@@ -336,7 +336,7 @@ public class zuulFilter extends ZuulFilter {
                 if(StringUtils.isEmpty(userId)) {
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    ctx.setResponseBody("{\"code\":401,\"message\":\"user is error，please try force refresh page (CTRL + F5)!\"}");
+                    ctx.setResponseBody("{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
                     return false;
                 }
                 String ukeyId = request.getHeader("ukeyId") != null ? request.getHeader("ukeyId") : "";
@@ -347,7 +347,7 @@ public class zuulFilter extends ZuulFilter {
                     log.error("序列号不正确------------------------{}-{} {}", userId, userName, ukeyId);
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    ctx.setResponseBody("{\"code\":401,\"message\":\"Incorrect serial number!\"}");
+                    ctx.setResponseBody("{\"code\":401,\"message\":\"错误的序列号!\"}");
                     return false;
                 }
                 boolean status = SM2Verify_SKF.SM2Verify(pubkey, signStr, webcode, UKEY_USERID);
@@ -355,7 +355,7 @@ public class zuulFilter extends ZuulFilter {
                     log.error("签名验证结果 - {}", status);
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    ctx.setResponseBody("{\"code\":401,\"message\":\"Signature verification failed!\"}");
+                    ctx.setResponseBody("{\"code\":401,\"message\":\"签名验证失败!\"}");
                     return false;
                 }
             }

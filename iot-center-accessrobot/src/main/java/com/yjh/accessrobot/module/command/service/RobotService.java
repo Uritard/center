@@ -90,6 +90,8 @@ public class RobotService {
     private String ftpsLocalPath;
     @Value("${netty.server.name}")
     private String sendCode;
+    @Value("${stationCode}")
+    private String stationCode;
 
     @Value("${other.webSocketUrl}")
     private String websocketUrl;
@@ -270,7 +272,7 @@ public class RobotService {
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(sendCode)
                 .setReceiveCode(robotCode)
-                .setCode("变电站编码")
+                .setCode(stationCode)
                 .setTime(DateTimeUtil.format(new Date()))
                 .setType("61")
                 .setCommand("1");
@@ -975,7 +977,7 @@ public class RobotService {
                     .setType(type)
                     .setSendCode(sendCode)
                     .setReceiveCode(robotCode)
-                    .setCode("变电站编码")
+                    .setCode(stationCode)
                     .setTime(DateTimeUtil.format(new Date()))
                     .setCommand("1")
                     .setItems(mapList);
