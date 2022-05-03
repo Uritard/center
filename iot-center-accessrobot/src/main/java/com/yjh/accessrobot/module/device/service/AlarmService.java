@@ -45,7 +45,7 @@ public class AlarmService {
         alarmMqttMsg.setCity_name(encode(cityName));
         alarmMqttMsg.setStation_name(encode(stationName));
         alarmMqttMsg.setSection_ip(sectionIP);
-        alarmMqttMsg.setNode_id(nodeId);
+        alarmMqttMsg.setNode_id(encode(nodeId));
         alarmMqttMsg.setVolt_level(voltLevel);
 
     }
