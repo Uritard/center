@@ -56,15 +56,15 @@ public class IntelAnalysisController {
     public Response picAnalyseRetNotify(@Valid @RequestBody PicAnalyseResponse response) {
         log.info("< < < < < < 收到分析结果反馈：{}", response);
         try {
-            String defectFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis","content"));
-            if (StringUtils.equals(FLAG, defectFlag)){
+//            String defectFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis","content"));
+//            if (StringUtils.equals(FLAG, defectFlag)){
                 intelAnalysisService.picAnalyseRetNotify(response);
-            }
-
-            String algorithmFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
-            if (StringUtils.equals(FLAG, algorithmFlag)){
-                log.info("response==={}", response);
-            }
+//            }
+//
+//            String algorithmFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
+//            if (StringUtils.equals(FLAG, algorithmFlag)){
+//                log.info("response==={}", response);
+//            }
         }catch (Exception e){
             log.error(e.getMessage());
             return Response.serverError();

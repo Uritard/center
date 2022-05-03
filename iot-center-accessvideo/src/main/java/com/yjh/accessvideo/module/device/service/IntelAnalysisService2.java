@@ -4,9 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yjh.accessvideo.common.utils.FtpsUtil;
-import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.utils.FileUtil;
-import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.configuration.FtpsConfig;
 import com.yjh.accessvideo.configuration.IntelligentAlgorithmConfig;
 import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
@@ -30,7 +28,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -46,10 +43,11 @@ import java.util.stream.Collectors;
 
 /**
  * @author 丫C
- * @date 2022/4/11
+ * @date 2022/5/2
  */
 @Service
-public class IntelAnalysisService {
+public class IntelAnalysisService2{
+
     /**
      * webSocket请求地址
      */
@@ -71,22 +69,24 @@ public class IntelAnalysisService {
     @Value("${netty.recognize.port}")
     private int recognizePort;
 
-    @Autowired
-    private AnalyseDataOperateService analyseDataOperateService;
-    @Autowired
-    private RedisTemplate redisTemplate;
-    @Autowired
-    private AnalyseDataOperateDao analyseDataOperateDao;
-    @Autowired
-    private FtpsConfig ftpsConfig;
-    @Autowired
     private IntelligentAlgorithmConfig algorithmConfig;
-    @Autowired
-    private IntelAnalysisService2 intelAnalysisService2;
+    private AnalyseDataOperateDao analyseDataOperateDao;
+    private RedisTemplate redisTemplate;
+    private FtpsConfig ftpsConfig;
+    private AnalyseDataOperateService analyseDataOperateService;
 
+    private static final String FLAG = "true";
     private final Logger log = LoggerFactory.getLogger(IntelAnalysisService.class);
 
-    public IntelAnalysisService(AnalyseDataOperateService analyseDataOperateService) {
+    public IntelAnalysisService2(AnalyseDataOperateDao analyseDataOperateDao,
+                                 IntelligentAlgorithmConfig algorithmConfig,
+                                 RedisTemplate redisTemplate,
+                                 FtpsConfig ftpsConfig,
+                                 AnalyseDataOperateService analyseDataOperateService) {
+        this.analyseDataOperateDao = analyseDataOperateDao;
+        this.algorithmConfig = algorithmConfig;
+        this.redisTemplate = redisTemplate;
+        this.ftpsConfig = ftpsConfig;
         this.analyseDataOperateService = analyseDataOperateService;
     }
 
@@ -131,6 +131,7 @@ public class IntelAnalysisService {
             return Response.serverError();
         }
     }
+
 
     /**
      * 巡视主机请求图像分析--功能
@@ -199,8 +200,8 @@ public class IntelAnalysisService {
                 String[] split = analysis.getPicPath().split("/");
                 String targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
                 uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath);
-
                 analyseObject.setImageNormalUrlPath(targetNamePath);
+
                 String[] distinguishType = algorithmConfig.getDistinguishType().split(",");
                 Collections.addAll(typeList, distinguishType);
                 break;
@@ -275,43 +276,52 @@ public class IntelAnalysisService {
     }
 
     /**
-     * 巡视主机请求算法更新--接口
-     *
-     * @param request 参数
-     * @return Response
+     * 请求其他服务
+     * @param url 路径
+     * @param json 参数
+     * @return String
      */
-    public Response algorithmUpdate(UpdateRequest request){
-        Map<String, Object> param = new HashMap<>(16);
-        param.put("requestHostIp", request.getRequestHostIp());
-        param.put("requestHostPort", request.getRequestHostPort());
-        param.put("requestId", request.getRequestId());
-
-        String[] split = request.getAlgorithmPath().split("/");
-        String targetNamePath =  split[split.length - 2] + "/" + split[split.length - 1];
-        uploadFileToFtps(request.getAlgorithmPath(), "/" + targetNamePath);
-
-        param.put("algorithmPath", targetNamePath);
-
-        JSONObject testJson = (JSONObject) JSONObject.toJSON(param);
-        printJsonMsg(testJson);
-
-        int code;
+    private String postUrlParams(String url, String json) {
+        HttpClient client = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json");
+        httpPost.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
         try {
-            String result = postUrlParams(algorithmConfig.getAnalysisUrl(), testJson.toJSONString());
-            log.info("result==={}", result);
-
-            if (StringUtils.isEmpty(result)){
-                return Response.basRequest();
-            }
-            JSONObject jsonObject = JSON.parseObject(result);
-            code = Integer.parseInt(String.valueOf(jsonObject.get("code")));
-        }catch (Exception e){
-            log.error(e.getMessage());
-            return Response.serverError();
+            HttpResponse response = client.execute(httpPost);
+            return EntityUtils.toString(response.getEntity());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return new Response(code);
+        return null;
     }
 
+    /**
+     * 测试:json格式打印输入参数
+     *
+     * @param jsonObject json数据
+     */
+    private void printJsonMsg(JSONObject jsonObject) {
+        String pretty = JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
+                SerializerFeature.WriteDateUseDateFormat);
+        log.info(pretty);
+    }
+
+    /**
+     * 将文件上传至ftp服务器
+     *
+     * @param sourcePath 源文件地址
+     * @param targetPathName 目标文件地址名称
+     */
+    private void uploadFileToFtps(String sourcePath, String targetPathName) {
+        try {
+            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(),
+                    ftpsConfig.getKeypw(), ftpsConfig.getUsername(), ftpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至ftp服务器错误:{}", e.getMessage());
+        }
+    }
 
     /**
      *  巡视主机收到分析结果开始解析
@@ -323,11 +333,10 @@ public class IntelAnalysisService {
         String flagId = response.getRequestId().split("#")[1];
         // 静默监视结果
         if (Objects.equals("jm", flagId)){
-            intelAnalysisService2.silentMonitorHandle(response);
+            silentMonitorHandle(response);
             return;
         }
         // 普通图像分析
-//        intelAnalysisService2.sendToDataDealThread(response, flagId);
         sendToDataDealThread(response, flagId);
     }
 
@@ -336,27 +345,29 @@ public class IntelAnalysisService {
      *
      * @param response 参数
      */
-    private void silentMonitorHandle(PicAnalyseResponse response) {
+    public void silentMonitorHandle(PicAnalyseResponse response) {
         // 遍历多个点的分析结果
-        for (AnalyseResult  analyseResult : response.getResultsList()){
-            List<AnalyseResultItem> results = analyseResult.getResults();
-
-            if (results.isEmpty()){
-                // 没有识别出来任何缺陷 results为空
-                continue;
-            }
+        for (AnalyseResult analyseResult : response.getResultsList()){
             StringJoiner content = new StringJoiner(" ");
             Map<String, Object> map = analyseDataOperateDao.selectInstanceInfo(Long.valueOf(analyseResult.getObjectId()));
 
-            for (AnalyseResultItem result : results){
+            for (AnalyseResultItem result : analyseResult.getResults()){
+                String code = Optional.ofNullable(result.getCode()).orElse("");
+                String value = Optional.ofNullable(result.getValue()).orElse("");
+                String type = Optional.ofNullable(result.getType()).orElse("");
+                String desc = Optional.ofNullable(result.getDesc()).orElse("");
 
-                if (!StringUtils.equals("2000", result.getCode())) {
+                if (!StringUtils.equals("2000", code)) {
                     log.error("巡视点为{}的图像数据错误", map.get("instance_id"));
                     continue;
                 }
-                content.add(Optional.ofNullable(result.getDesc()).orElse(""));
+                if (StringUtils.equals("0", value)){
+                    log.info("巡视点为{}的图像无问题", map.get("instance_id"));
+                    continue;
+                }
 
-                String targetPath = copyFileFromFtps(result.getType(), result.getResImageUrl());
+                content.add(desc);
+                String targetPath = copyFileFromFtps(type, result.getResImageUrl());
                 String defectResultRealImg = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content"));
                 String imagePath = targetPath.replace(targetPath, defectResultRealImg);
 
@@ -399,14 +410,13 @@ public class IntelAnalysisService {
      * @param response 返回结果
      * @param taskId 任务id
      */
-    private void sendToDataDealThread(PicAnalyseResponse response, String taskId) {
+    public void sendToDataDealThread(PicAnalyseResponse response, String taskId) {
         JSONObject jsonObject = packageObject(response, taskId);
 
         printJsonMsg(jsonObject);
 
         JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.getString("msgData")).getString("data"));
         JSONObject jsonObject1 = JSON.parseObject(String.valueOf(jsonObjectData.get("resultInfo1")));
-
         String analyseType = jsonObject1.getString("analyseType");
 
         int port = recognizePort;
@@ -438,7 +448,7 @@ public class IntelAnalysisService {
             for (AnalyseResult analyseResult : response.getResultsList()) {
                 JSONObject resultDataObject = new JSONObject();
                 StringJoiner resultValue = new StringJoiner(" ");
-                StringJoiner type = new StringJoiner(" ");
+                StringJoiner resultType = new StringJoiner(" ");
                 StringJoiner resultImg = new StringJoiner(",");
 
                 String instanceId = analyseResult.getObjectId();
@@ -448,41 +458,18 @@ public class IntelAnalysisService {
                 String picPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "picpath"));
                 String originPicPath = picPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));
-                // 判断该巡视点是否为27大类的点 若是  直接拿假数据  不要返回的结果
-                Long devicePointId =  analyseDataOperateDao.selectDevicePointIdByInstanceId(Long.valueOf(instanceId));
-
-                if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
-                    resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
-                    resultDataObject.put("analyseType", 398);
-                    resultDataObject.put("type", String.valueOf(type.add("")));
-                    resultDataObject.put("resultValue", String.valueOf(resultValue));
-                    resultDataObject.put("analyseResultImg", originPicPath);
-                    resultInfoObject.put("resultInfo" + i, resultDataObject);
-                    i++;
-                    continue;
-                }
-                List<AnalyseResultItem> results = analyseResult.getResults();
-                // 没有识别出来任何缺陷 results为空  只有当缺陷识别才会这样，判别的results是有值的
-                if (results.isEmpty()){
-                    resultDataObject.put("analyseType", 398);
-                    resultDataObject.put("type", String.valueOf(type.add("")));
-                    resultDataObject.put("resultValue", String.valueOf(resultValue.add("")));
-                    resultDataObject.put("analyseResultImg", originPicPath);
-                    resultInfoObject.put("resultInfo" + i, resultDataObject);
-                    i++;
-                    continue;
-                }
-                // 非27大类的缺陷及判别类型的点  遍历单个点的分析结果,不同的缺陷
+                // 遍历单个点的分析结果,不同的结果
                 Map<String, String> map = new HashMap<>(5);
-                for (AnalyseResultItem result : results) {
+                for (AnalyseResultItem result : analyseResult.getResults()) {
                     resultDataObject.put("pictureCoordinate", Objects.nonNull(result.getPos()) ? result.getPos() : new ArrayList<Area>());
                     resultDataObject.put("conf", Objects.nonNull(result.getConf()) ? result.getConf() : 0.0);
-                    // 图像数据正确
-                    if (!Objects.equals("2000", result.getCode())) {
-                        log.error("巡视点为{}的图像数据错误", instanceId);
+
+                    String code = Optional.ofNullable(result.getCode()).orElse("");
+                    if (!StringUtils.equals("2000", code)) {
+                        log.error("巡视点为{}的图像数据错误", map.get("instance_id"));
                         continue;
                     }
-                    map = setRecognizeResult(result, type, resultValue, resultImg, resultDataObject, originPicPath, Long.valueOf(instanceId));
+                    map = setRecognizeResult(result, resultType, resultValue, resultImg, resultDataObject, originPicPath, Long.valueOf(instanceId));
                 }
 
                 if (Objects.equals("", map.get("resultValue").trim())){
@@ -495,8 +482,8 @@ public class IntelAnalysisService {
                     resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
                     resultDataObject.put("analyseResultImg",  resultImgList.get(0));
                 }
-                resultDataObject.put("type", Optional.ofNullable(map.get("type")).orElse(""));
                 resultDataObject.put("resultValue", Optional.ofNullable(map.get("resultValue")).orElse(""));
+                resultDataObject.put("type", Optional.ofNullable(map.get("resultType")).orElse(""));
                 resultInfoObject.put("resultInfo" + i, resultDataObject);
                 i++;
             }
@@ -556,71 +543,126 @@ public class IntelAnalysisService {
      */
     private Map<String, String> setRecognizeResult(AnalyseResultItem result, StringJoiner resultType, StringJoiner resultValue,
                                                    StringJoiner resultImg, JSONObject resultDataObject, String originPicPath, Long instanceId){
-        String type = result.getType();
-        String value = result.getValue();
+        String type = Optional.ofNullable(result.getType()).orElse("");
+        String value = Optional.ofNullable(result.getValue()).orElse("");
+        String desc = Optional.ofNullable(result.getDesc()).orElse("");
+
         Long devicePointId =  analyseDataOperateDao.selectDevicePointIdByInstanceId(instanceId);
         Map<String, String> map = new HashMap<>(5);
-        String targetPath = "";
-        // 判别
-        if (Objects.isNull(type) || Objects.equals("tx_pb", result.getType())){
-            resultType.add("tx_pb");
-            // 判断该巡视点是否为判别的点 若是  直接拿假数据  不要返回的结果
+        resultType.add(type);
+
+        if (Objects.equals("tx_pb", type)){
+            // 判别
+            Map<String, String> typeAndValueMap = getDistinguishResult(result, resultType, resultValue, resultImg, resultDataObject, originPicPath, type, value, devicePointId, map);
+            if (typeAndValueMap != null) return typeAndValueMap;
+        }else {
+            // 缺陷和设备状态识别
+            Map<String, String> typeAndValueMap = getDefectOrIdentification(result, resultType, resultValue,  resultImg, resultDataObject, originPicPath, type, value, desc, devicePointId, map);
+            if (typeAndValueMap != null) return typeAndValueMap;
+        }
+        return map;
+    }
+
+    private Map<String, String> getDefectOrIdentification(AnalyseResultItem result, StringJoiner resultType, StringJoiner resultValue,
+                                                          StringJoiner resultImg, JSONObject resultDataObject, String originPicPath, String type, String value, String desc, Long devicePointId, Map<String, String> map) {
+        String targetPath;
+        // 根据返回的算法类型查询算法相关信息
+        List<TAlgorithmInfo> list = analyseDataOperateDao.selectAlgorithmInfo(type);
+        if (list.isEmpty()){
+            /*
+            * 缺陷
+            * */
+            // 判断该巡视点是否为缺陷的点 若是  直接拿假数据  不要返回的结果
             if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
                 resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
-                resultDataObject.put("analyseType", 11);
-                if (Objects.equals("1", value)){
-                    // 图像有差异 才会返回图片地址
-                    targetPath = copyFileFromFtps(null, result.getResImageUrl());
-                }else {
-                    // 图像无差异 取原图
-                    targetPath = originPicPath;
-                }
-                resultDataObject.put("analyseResultImg", targetPath);
-                map.put("type", String.valueOf(resultType));
+                resultDataObject.put("analyseType", 398);
+//                resultDataObject.put("analyseResultImg", originPicPath);
+                map.put("resultType", String.valueOf(resultType));
                 map.put("resultValue", String.valueOf(resultValue));
                 return map;
             }
             if (Objects.equals("1", value)){
-                // 图像有差异 才会返回图片地址
-                resultValue.add("abnormal");
-                targetPath = copyFileFromFtps(null, result.getResImageUrl());
+                // 图像有缺陷
+                resultValue.add(desc);
+//            targetPath = copyFileFromFtps(type, result.getResImageUrl());
+                targetPath = "111111";
                 resultImg.add(targetPath);
             }else {
-                // 图像无差异 取原图
-                resultValue.add("normal");
+                // 图像无缺陷
+                resultValue.add("");
                 targetPath = originPicPath;
             }
-            resultDataObject.put("analyseType", 11);
+            resultDataObject.put("analyseType", 398);
+//            resultDataObject.put("analyseResultImg", targetPath);
         }else {
-            // 根据返回的算法类型查询算法相关信息
-            List<TAlgorithmInfo> list = analyseDataOperateDao.selectAlgorithmInfo(type);
-
-            if (list.isEmpty()){
-                // 缺陷
-                resultType.add(type);
-                resultDataObject.put("analyseType", 398);
-                resultValue.add(result.getDesc());
-            }else {
-                // 设备状态识别
-                resultType.add(type);
-                if (Objects.equals("meter", type) || Objects.equals("infrared", type) || Objects.equals("qrcode", type)){
-                    // 返回的直接就是值
-                    resultValue.add(value);
-                    resultDataObject.put("analyseType", 1);
-                }else {
-                    // 根据value获取对应的值
-                    int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
-                    String resultDesc = RecogniseStatusEnum.getValueByCode(typeValue).getValue();
-                    resultValue.add(resultDesc);
-                    resultDataObject.put("analyseType", list.get(0).getAnalyseType());
-                }
+            /*
+             * 设备状态识别
+             * */
+            // 判断该巡视点是否为表计的点 若是  直接拿假数据  不要返回的结果
+            if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
+                resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
+                resultDataObject.put("analyseType", 1);
+//                resultDataObject.put("analyseResultImg", originPicPath);
+                map.put("resultType", String.valueOf(resultType));
+                map.put("resultValue", String.valueOf(resultValue));
+                return map;
             }
-            targetPath = copyFileFromFtps(type, result.getResImageUrl());
+            if (Objects.equals("meter", type) || Objects.equals("infrared", type) || Objects.equals("qrcode", type)){
+                // 对于表计、红外、实物ID直接获取值
+                resultValue.add(value);
+            }else {
+                // 根据value获取对应的值
+                int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
+                String resultDesc = RecogniseStatusEnum.getValueByCode(typeValue).getValue();
+                resultValue.add(resultDesc);
+                resultDataObject.put("analyseType", list.get(0).getAnalyseType());
+            }
+//            targetPath = copyFileFromFtps(type, result.getResImageUrl());
+            targetPath = "111111";
             resultImg.add(targetPath);
+//            resultDataObject.put("analyseResultImg", targetPath);
         }
-        map.put("resultImg",String.valueOf(resultImg));
-        map.put("type", String.valueOf(resultType));
+        map.put("resultType", String.valueOf(resultType));
         map.put("resultValue", String.valueOf(resultValue));
+        map.put("resultImg", String.valueOf(resultImg));
+        return map;
+    }
+
+    private Map<String, String> getDistinguishResult(AnalyseResultItem result, StringJoiner resultType, StringJoiner resultValue,
+                                                     StringJoiner resultImg, JSONObject resultDataObject, String originPicPath, String type, String value, Long devicePointId, Map<String, String> map) {
+        String targetPath;
+        // 判断该巡视点是否为判别的点 若是  直接拿假数据  不要返回的结果
+        if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
+            resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
+            resultDataObject.put("analyseType", 11);
+            if (Objects.equals("1", value)){
+                // 图像有差异 才会返回图片地址
+                targetPath = copyFileFromFtps(type, result.getResImageUrl());
+            }else {
+                // 图像无差异 取原图
+                targetPath = originPicPath;
+            }
+//            resultDataObject.put("analyseResultImg", targetPath);
+            map.put("resultType", String.valueOf(resultType));
+            map.put("resultValue", String.valueOf(resultValue));
+            return map;
+        }
+        if (Objects.equals("1", value)){
+            // 图像有差异 才会返回图片地址
+            resultValue.add("abnormal");
+//            targetPath = copyFileFromFtps(type, result.getResImageUrl());
+            targetPath = "111111";
+            resultImg.add(targetPath);
+        }else {
+            // 图像无差异 取原图
+            resultValue.add("normal");
+            targetPath = originPicPath;
+        }
+        resultDataObject.put("analyseType", 11);
+//        resultDataObject.put("analyseResultImg", targetPath);
+        map.put("resultType", String.valueOf(resultType));
+        map.put("resultValue", String.valueOf(resultValue));
+        map.put("resultImg",String.valueOf(resultImg));
         return map;
     }
 
@@ -653,49 +695,6 @@ public class IntelAnalysisService {
     }
 
     /**
-     * 请求其他服务
-     *
-     * @param url 请求地址
-     * @param map 请求参数
-     * @return String
-     */
-    public Response restTemplatePost(String url, Map<String, Object> map) {
-        return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Response.class);
-    }
-
-    /**
-     * 请求其他服务
-     * @param url 路径
-     * @param json 参数
-     * @return String
-     */
-    private String postUrlParams(String url, String json) {
-        HttpClient client = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.addHeader("Content-type", "application/json;charset=utf-8");
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
-        try {
-            HttpResponse response = client.execute(httpPost);
-            return EntityUtils.toString(response.getEntity());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * 测试:json格式打印输入参数
-     *
-     * @param jsonObject json数据
-     */
-    private void printJsonMsg(JSONObject jsonObject) {
-        String pretty = JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
-                SerializerFeature.WriteDateUseDateFormat);
-        log.info(pretty);
-    }
-
-    /**
      * 请求webSocket发送数据
      *
      * @param url 请求地址
@@ -714,21 +713,4 @@ public class IntelAnalysisService {
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity, "UTF-8");
     }
-
-    /**
-     * 将文件上传至ftp服务器
-     *
-     * @param sourcePath 源文件地址
-     * @param targetPathName 目标文件地址名称
-     */
-    private void uploadFileToFtps(String sourcePath, String targetPathName) {
-        try {
-            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
-            FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(),
-                    ftpsConfig.getKeypw(), ftpsConfig.getUsername(), ftpsConfig.getPassword());
-        } catch (Exception e) {
-            log.error("将文件上传至ftp服务器错误:{}", e.getMessage());
-        }
-    }
-
 }

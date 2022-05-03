@@ -972,7 +972,13 @@
             a.alias_name
         FROM t_algorithm_info a
         WHERE a.is_ai = 1
-          and a.alias_name = #{aliasName,jdbcType=VARCHAR}
+        <if test="aliasName != null "> and a.alias_name = #{aliasName,jdbcType=VARCHAR}</if>
+    </select>
+    <select id="selectAlgorithmType" resultType="java.lang.String">
+        SELECT
+            a.alias_name
+        FROM t_algorithm_info a
+        WHERE a.is_ai = 1
     </select>
 
     <select id="selectDevicePointIdByInstanceId" resultType="java.lang.Long">
