@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @Component
-@ConfigurationProperties(prefix = "manager.server.ftps")
+@ConfigurationProperties(prefix = "intelligent.server.ftps")
 public class FtpsConfig {
     private String flag;
     private String ip;

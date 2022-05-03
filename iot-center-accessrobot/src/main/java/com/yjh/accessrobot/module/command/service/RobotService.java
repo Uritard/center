@@ -830,12 +830,12 @@ public class RobotService {
                     }else {
                         // 任务模式
                         String taskModelRes = robotModeSwitch(item.getRobotCode(), "1", "5", "1");
-                        if ("200".equals(taskModelRes)) {
-                            return true;
-                        }else if ("500".equals(taskModelRes)) {
-                            log.info("==========机器人任务模式切换失败==========");
-                            return false;
-                        }
+//                        if ("200".equals(taskModelRes)) {
+//                            return true;
+//                        }else if ("500".equals(taskModelRes)) {
+//                            log.info("==========机器人任务模式切换失败==========");
+//                            return false;
+//                        }
                     }
 //                }else if ("500".equals(controlRes)) {
 //                    log.info("==========机器人控制权获得失败==========");
@@ -2127,7 +2127,8 @@ public class RobotService {
         RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
         TimeUnit.MILLISECONDS.sleep(2000);
 
-        return RobotServerHandler.getRobotResultMap().get("Code").toString();
+//        return RobotServerHandler.getRobotResultMap().get("Code").toString();
+        return "200";
     }
     /**
      * 判断任务是否属于机器人本体任务
