@@ -349,9 +349,10 @@ public class IntelAnalysisService2{
         // 遍历多个点的分析结果
         for (AnalyseResult analyseResult : response.getResultsList()){
             StringJoiner content = new StringJoiner(" ");
-            Map<String, Object> map = analyseDataOperateDao.selectInstanceInfo(Long.valueOf(analyseResult.getObjectId()));
+            StringJoiner resultImg = new StringJoiner(" ");
 
-            for (AnalyseResultItem result : analyseResult.getResults()){
+            Map<String, Object> map = analyseDataOperateDao.selectInstanceInfo(Long.valueOf(analyseResult.getObjectId()));
+            for (AnalyseResultItem result : analyseResult.getResults()) {
                 String code = Optional.ofNullable(result.getCode()).orElse("");
                 String value = Optional.ofNullable(result.getValue()).orElse("");
                 String type = Optional.ofNullable(result.getType()).orElse("");
@@ -361,7 +362,7 @@ public class IntelAnalysisService2{
                     log.error("巡视点为{}的图像数据错误", map.get("instance_id"));
                     continue;
                 }
-                if (StringUtils.equals("0", value)){
+                if (StringUtils.equals("0", value)) {
                     log.info("巡视点为{}的图像无问题", map.get("instance_id"));
                     continue;
                 }
@@ -370,7 +371,13 @@ public class IntelAnalysisService2{
                 String targetPath = copyFileFromFtps(type, result.getResImageUrl());
                 String defectResultRealImg = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content"));
                 String imagePath = targetPath.replace(targetPath, defectResultRealImg);
+                resultImg.add(imagePath);
+            }
 
+            List<String> resultImgList = new ArrayList<>();
+            Collections.addAll(resultImgList, String.valueOf(resultImg).split(" "));
+            resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
+            if (StringUtils.isNotBlank(resultImgList.get(0))){
                 TWarnInfo tWarnInfo = new TWarnInfo()
                         // 将静默监视产生的告级别警统一设置为预警
                         .setWarnLevel(130)
@@ -384,7 +391,7 @@ public class IntelAnalysisService2{
                         .setConfMode(276)
                         .setDefectModel(450)
                         .setAlarmSource(689)
-                        .setImagePath(imagePath);
+                        .setImagePath(resultImgList.get(0));
                 analyseDataOperateDao.insertWarnInfo(tWarnInfo);
 
                 //webSocket通知前端调用查询告警弹框的接口
@@ -576,7 +583,6 @@ public class IntelAnalysisService2{
             if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
                 resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
                 resultDataObject.put("analyseType", 398);
-//                resultDataObject.put("analyseResultImg", originPicPath);
                 map.put("resultType", String.valueOf(resultType));
                 map.put("resultValue", String.valueOf(resultValue));
                 return map;
@@ -584,8 +590,7 @@ public class IntelAnalysisService2{
             if (Objects.equals("1", value)){
                 // 图像有缺陷
                 resultValue.add(desc);
-//            targetPath = copyFileFromFtps(type, result.getResImageUrl());
-                targetPath = "111111";
+            targetPath = copyFileFromFtps(type, result.getResImageUrl());
                 resultImg.add(targetPath);
             }else {
                 // 图像无缺陷
@@ -593,7 +598,6 @@ public class IntelAnalysisService2{
                 targetPath = originPicPath;
             }
             resultDataObject.put("analyseType", 398);
-//            resultDataObject.put("analyseResultImg", targetPath);
         }else {
             /*
              * 设备状态识别
@@ -602,7 +606,6 @@ public class IntelAnalysisService2{
             if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
                 resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
                 resultDataObject.put("analyseType", 1);
-//                resultDataObject.put("analyseResultImg", originPicPath);
                 map.put("resultType", String.valueOf(resultType));
                 map.put("resultValue", String.valueOf(resultValue));
                 return map;
@@ -617,10 +620,8 @@ public class IntelAnalysisService2{
                 resultValue.add(resultDesc);
                 resultDataObject.put("analyseType", list.get(0).getAnalyseType());
             }
-//            targetPath = copyFileFromFtps(type, result.getResImageUrl());
-            targetPath = "111111";
+            targetPath = copyFileFromFtps(type, result.getResImageUrl());
             resultImg.add(targetPath);
-//            resultDataObject.put("analyseResultImg", targetPath);
         }
         map.put("resultType", String.valueOf(resultType));
         map.put("resultValue", String.valueOf(resultValue));
@@ -642,7 +643,6 @@ public class IntelAnalysisService2{
                 // 图像无差异 取原图
                 targetPath = originPicPath;
             }
-//            resultDataObject.put("analyseResultImg", targetPath);
             map.put("resultType", String.valueOf(resultType));
             map.put("resultValue", String.valueOf(resultValue));
             return map;
@@ -650,8 +650,7 @@ public class IntelAnalysisService2{
         if (Objects.equals("1", value)){
             // 图像有差异 才会返回图片地址
             resultValue.add("abnormal");
-//            targetPath = copyFileFromFtps(type, result.getResImageUrl());
-            targetPath = "111111";
+            targetPath = copyFileFromFtps(type, result.getResImageUrl());
             resultImg.add(targetPath);
         }else {
             // 图像无差异 取原图
@@ -659,7 +658,6 @@ public class IntelAnalysisService2{
             targetPath = originPicPath;
         }
         resultDataObject.put("analyseType", 11);
-//        resultDataObject.put("analyseResultImg", targetPath);
         map.put("resultType", String.valueOf(resultType));
         map.put("resultValue", String.valueOf(resultValue));
         map.put("resultImg",String.valueOf(resultImg));
