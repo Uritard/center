@@ -113,8 +113,8 @@ public class TSysParamService{
     }
 
 
-    public List<Version> selectVersion(){
-        return tSysParamDao.selectVersion();
+    public List<Version> selectVersion(int type){
+        return tSysParamDao.selectVersion(type);
     }
 }
 

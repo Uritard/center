@@ -1994,6 +1994,17 @@ CREATE TABLE `t_std_device_type_model` (
   PRIMARY KEY (`device_type_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='设备类型模板表';
 
+DROP TABLE IF EXISTS `t_version`;
+CREATE TABLE `t_version` (
+  `version_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `system_type` tinyint NOT NULL DEFAULT 1 COMMENT '1: 系统版本 2: 算法版本',
+  `version_name` varchar(256) NOT NULL COMMENT '版本号',
+  `remark` varchar(512) NOT NULL COMMENT '版本描述',
+  `text` varchar(2000) NOT NULL COMMENT '版本详细说明',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`version_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统版本表';
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

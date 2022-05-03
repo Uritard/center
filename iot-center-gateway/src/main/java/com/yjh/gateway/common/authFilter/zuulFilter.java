@@ -180,14 +180,19 @@ public class zuulFilter extends ZuulFilter {
                     if ("true".equals(isIp)) {
                         String origin = request.getHeader("Origin") != null ? request.getHeader("Origin") : "";
                         String referer = request.getHeader("Referer") != null ? request.getHeader("Referer") : "";
-                        String number=referer.substring(0, referer.indexOf(":"));
+                        String refererHost = referer.substring(referer.indexOf(":") + 3);
+                        if (refererHost.contains(":")) {
+                            refererHost = refererHost.substring(0, referer.indexOf(":"));
+                        } else if(refererHost.contains("/")) {
+                            refererHost = refererHost.substring(0, referer.indexOf("/"));
+                        }
                         String orig=origin.substring(origin.lastIndexOf('/') + 1);
                         String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                         String ym="yjh.biandian.com";
                         if(orig.contains(":")) {
                             String originIp = origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':'));
-                            if (!IpUtil.getLocalIp().equals(originIp) || !IpUtil.getLocalIp().equals(referer.substring(number.length() + 3, referer.lastIndexOf(':')))) {
-                                if (!ym.equals(originIp) || !ym.equals(referer.substring(number.length() + 3, referer.lastIndexOf(':')))) {
+                            if (!IpUtil.getLocalIp().equals(originIp) || !IpUtil.getLocalIp().equals(refererHost)) {
+                                if (!ym.equals(originIp) || !ym.equals(refererHost)) {
                                     log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
                                     ctx.setSendZuulResponse(false);
                                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
@@ -197,8 +202,8 @@ public class zuulFilter extends ZuulFilter {
                             }
                         }else{
                             String originIp = origin.substring(origin.lastIndexOf('/') + 1);
-                            if (!IpUtil.getLocalIp().equals(originIp) || !IpUtil.getLocalIp().equals(referer.substring(number.length() + 3, referer.lastIndexOf('/')))) {
-                                if (!ym.equals(originIp) || !ym.equals(referer.substring(number.length() + 3, referer.lastIndexOf('/')))) {
+                            if (!IpUtil.getLocalIp().equals(originIp) || !IpUtil.getLocalIp().equals(refererHost)) {
+                                if (!ym.equals(originIp) || !ym.equals(refererHost)) {
                                     log.error("IP篡改: " + originIp + " ,之后的ip: " + originIp + ",本机IP: " + IpUtil.getLocalIp());
                                     ctx.setSendZuulResponse(false);
                                     ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);

@@ -49,5 +49,5 @@ public interface TSysParamDao {
     int updateByCode(@Param(value = "paramCode") String paramCode,
                      @Param(value = "content") String content);
 
-    List<Version> selectVersion();
+    List<Version> selectVersion(int type);
 }

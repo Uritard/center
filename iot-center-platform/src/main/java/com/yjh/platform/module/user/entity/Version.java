@@ -16,9 +16,13 @@ public class Version {
 
     private Long versionId;
 
+    private int systemType;
+
     private String versionName;
 
     private String remark;
+
+    private String text;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;

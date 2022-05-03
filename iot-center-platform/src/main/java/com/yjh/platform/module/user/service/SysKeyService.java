@@ -56,9 +56,13 @@ public class SysKeyService {
             throw new RuntimeException("绑定类型不正确！");
         }
         if(sysKey.getBindType() == SysKey.BindEnum.UKEY.getCode()) {
-            String dpkey = demo.decryptIdentifier(sysKey.getPubKey(), identifier);
-            if (StringUtils.isNotEmpty(dpkey)) {
-                sysKey.setPubKey(dpkey);
+            String isDecode = (String) redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content");
+            // 判断是否需要加解密
+            if ("true".equals(isDecode)) {
+                String dpkey = demo.decryptIdentifier(sysKey.getPubKey(), identifier);
+                if (StringUtils.isNotEmpty(dpkey)) {
+                    sysKey.setPubKey(dpkey);
+                }
             }
             redisTemplate.opsForHash().put("sysKey:" + sysKey.getUserId() + ":" + sysKey.getBindType(), sysKey.getSerialNum(), sysKey.getPubKey());
         } else {

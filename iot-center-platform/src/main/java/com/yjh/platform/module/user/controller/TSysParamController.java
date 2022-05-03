@@ -233,10 +233,23 @@ public class TSysParamController {
     public Result selectVersion() {
         Result result = new Result();
         try {
-            result.setData(this.tSysParamService.selectVersion());
+            result.setData(this.tSysParamService.selectVersion(1));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("将数据写入redis失败：" + e);
+            log.error("查询系统版本失败", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询算法版本")
+    @RequestMapping(value = "/algorithmVersion", method = RequestMethod.GET)
+    public Result algorithmVersion() {
+        Result result = new Result();
+        try {
+            result.setData(this.tSysParamService.selectVersion(2));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询算法版本失败", e);
         }
         return result;
     }
