@@ -790,5 +790,9 @@ public class AnalyseDataOperateService {
             Constant.otherServerList(lowTaskList,Constant.GET_LOW_TASK_GO_ON);
         }
     }
+
+    public HashMap<String,String> selectDeviceNameInfo(Long instanceId){
+        return analyseDataOperateDao.selectDeviceNameInfo(instanceId);
+    }
 }
 

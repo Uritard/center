@@ -982,4 +982,16 @@
         WHERE a.device_mete_id = b.device_mete_id
           and a.instance_id = #{instanceId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectDeviceNameInfo" resultType="java.util.HashMap">
+        SELECT DISTINCT
+            mete.mete_name as meteName,
+            tsd.device_name as deviceName,
+            tsd.up_region_name as upRegionName
+        FROM
+            t_cruise_point_instance tcpi
+                LEFT JOIN t_std_devicemete mete ON mete.device_mete_id = tcpi.device_mete_id
+                LEFT JOIN t_std_device tsd ON tcpi.device_id = tsd.device_id
+        WHERE tcpi.instanceId = #{instanceId}
+    </select>
 </mapper>

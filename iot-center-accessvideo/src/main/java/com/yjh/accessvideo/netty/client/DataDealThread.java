@@ -933,6 +933,7 @@ public class DataDealThread implements Runnable {
                             String remotebaseimagicpath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+Cruiseid+".jpg";
                             Iterator it=differentList.iterator();
                             List<Different> defectList1=new ArrayList<>();
+                            HashMap<String,String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
                             while (it.hasNext()){
                                 String key=it.next().toString();//所有的key
                                 Map<String, String>  differentlistmap= redisTemplate.opsForHash().entries(key);
@@ -943,8 +944,9 @@ public class DataDealThread implements Runnable {
                                 different.setX2("0");
                                 different.setY2("0");
                                 defectList1.add(different);
-                                alarmDetail.setBay_name("");
+                                alarmDetail.setBay_name(nameMap.get("upRegionName"));
                                 alarmDetail.setDevice_name(devicename);
+                                alarmDetail.setPoint_name(nameMap.get("meteName"));
                                 alarmDetail.setTime(differentlistmap.get("warnTime"));
                                 alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
                                 alarmDetail.setPic_diff_base(remotebaseimagicpath);               //判别基准图路径
@@ -972,7 +974,7 @@ public class DataDealThread implements Runnable {
                             alarmService.PushMsg(alarmDetail);
                         }
 
-                        if(differentList.size()>0&&("1".equals(flag))){
+                        if(defectList.size()>0&&("1".equals(flag))){
                             log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
                             String year=Integer.toString(LocalDate.now().getYear());
                             String month=Integer.toString(LocalDate.now().getMonthValue());
@@ -996,6 +998,7 @@ public class DataDealThread implements Runnable {
                             //拼接算法管理平台分析告警结果图片地址
                             String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+"/"+month+"/"+imagename;
                             Iterator it=defectList.iterator();
+                            HashMap<String,String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
                             while (it.hasNext()){
                                 String key=it.next().toString();//所有的key
                                 Map<String, String>  differenmap= redisTemplate.opsForHash().entries(key);
@@ -1015,8 +1018,9 @@ public class DataDealThread implements Runnable {
                                     i=i+5;
                                 }
                                 alarmDetail.setDefect(defectList1);
-                                alarmDetail.setBay_name("");
+                                alarmDetail.setBay_name(nameMap.get("upRegionName"));
                                 alarmDetail.setDevice_name(devicename);  //需要修改位devicename
+                                alarmDetail.setPoint_name(nameMap.get("meteName"));
                                 alarmDetail.setTime(differenmap.get("defectTime"));
                                 alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
                                 alarmDetail.setPic_diff_base("");               //判别基准图路径
@@ -1220,7 +1224,8 @@ public class DataDealThread implements Runnable {
 //                                tCruiseTaskResult.setCruiseTaskTime();
 
                         log.info("taskId-----------:" + tCruiseTaskResult.getTaskId());
-                        if (Objects.nonNull(analyseDataOperateService.selectLaterTaskCruiseResult(tCruiseTaskResult.getTaskId()))) {
+                        if (Objects.nonNull(analyseDataOperateService.selectLaterTaskCruiseResult(tCruiseTaskResult.getTaskId()))
+                        && tCruiseTaskResult.getTaskId() == null) {
                             log.info("TCTR已存在");
                         } else {
                             analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);

@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.security.PermitAll;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,4 +76,6 @@ public interface AnalyseDataOperateDao {
     Map<String, Object> selectInstanceInfo(@Param(value = "presetId")Long presetId);
     List<TAlgorithmInfo> selectAlgorithmInfo(@Param(value = "aliasName")String aliasName);
     Long selectDevicePointIdByInstanceId(@Param(value = "instanceId")Long instanceId);
+
+    HashMap<String,String> selectDeviceNameInfo(@Param(value = "instanceId") Long instanceId);
 }
