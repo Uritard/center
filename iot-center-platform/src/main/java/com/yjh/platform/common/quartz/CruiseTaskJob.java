@@ -887,6 +887,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultDetailMap);
 
                         if(voiceDeviceList.size() == 0 || !voiceDeviceList.contains(item.getCruiseId())){
+                            voiceDeviceList.add(item.getCruiseId());
                             String voicePath = redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content").toString();
                             long dateTime = System.currentTimeMillis();
                             Long maoForTime= Long.valueOf(redisTemplate.opsForHash().entries("t_sys_param:voiceDeviceTime").get("content").toString());
