@@ -998,6 +998,6 @@
             t_cruise_point_instance tcpi
                 LEFT JOIN t_std_devicemete mete ON mete.device_mete_id = tcpi.device_mete_id
                 LEFT JOIN t_std_device tsd ON tcpi.device_id = tsd.device_id
-        WHERE tcpi.instanceId = #{instanceId}
+        WHERE tcpi.instance_id = #{instanceId}
     </select>
 </mapper>

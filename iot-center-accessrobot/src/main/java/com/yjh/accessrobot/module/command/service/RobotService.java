@@ -838,6 +838,7 @@ public class RobotService {
 //                            log.info("==========机器人任务模式切换失败==========");
 //                            return false;
 //                        }
+                        return true;
                     }
 //                }else if ("500".equals(controlRes)) {
 //                    log.info("==========机器人控制权获得失败==========");
@@ -845,7 +846,6 @@ public class RobotService {
 //                }
             }
         }
-        return false;
     }
 
     /**

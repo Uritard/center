@@ -587,18 +587,37 @@ public class DataDealThread implements Runnable {
                                 // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形
                                 if (resultValue != null && !(resultValue.contains("device"))) {
                                     //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
-                                    Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "缺陷异常", resultValue);
-                                    cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
-                                    cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
-                                    cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
+                                    TStdDevicemete tStdDevicemeteM = new TStdDevicemete();
+                                    try {
+                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "缺陷异常", resultValue);
+                                        cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+                                        cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+                                        cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
 //                                    tAbnormal++;
-                                    tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
-                                    tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
+                                        tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
+                                        tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
 
-                                    TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
+                                         tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
 
-                                    //生成缺陷缓存信息（单一缺陷和多元缺陷）
-                                    log.info("--------____--------生成缺陷缓存");
+                                        //生成缺陷缓存信息（单一缺陷和多元缺陷）
+                                        log.info("--------____--------生成缺陷缓存");
+
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                        log.error(e.getMessage());
+                                    }
+//                                    Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "缺陷异常", resultValue);
+//                                    cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
+//                                    cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
+//                                    cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
+////                                    tAbnormal++;
+//                                    tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
+//                                    tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
+//
+//                                    TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
+//
+//                                    //生成缺陷缓存信息（单一缺陷和多元缺陷）
+//                                    log.info("--------____--------生成缺陷缓存");
                                     String[] resultArr = resultValue.split("\\s+");
                                     if (resultArr.length == 1) {
                                         log.info("--------____--------单一缺陷");
@@ -888,7 +907,7 @@ public class DataDealThread implements Runnable {
 
                         //修改缓存中任务算法巡视点List
                         redisTemplate.opsForList().remove("analysisList:" + cruiseResult.get("taskId"), 0, cruiseResult.get("instanceId"));
-                        redisTemplate.opsForList().leftPush("analysisList:" + cruiseResult.get("taskId"), "0");
+                        redisTemplate.opsForList().rightPush("analysisList:" + cruiseResult.get("taskId"), "0");
 
                         log.info("RedisList修改成功");
                     }
@@ -1067,6 +1086,8 @@ public class DataDealThread implements Runnable {
                     TASKID = taskId;
             }
 
+            log.info("TASKID============{}", TASKID);
+            log.info("判断:{}", redisTemplate.opsForList().index("analysisList:" + TASKID, 0));
             if ("-1".equals(redisTemplate.opsForList().index("analysisList:" + TASKID, 0))) {  //满足插库条件
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String finalCruiseKey = "instanceId";//最后修改任务表信息所需的redis KEY名
@@ -1227,7 +1248,7 @@ public class DataDealThread implements Runnable {
 
                         log.info("taskId-----------:" + tCruiseTaskResult.getTaskId());
                         if (Objects.nonNull(analyseDataOperateService.selectLaterTaskCruiseResult(tCruiseTaskResult.getTaskId()))
-                        && tCruiseTaskResult.getTaskId() == null) {
+                        && tCruiseTaskResult.getTaskResultId() == null) {
                             log.info("TCTR已存在");
                         } else {
                             analyseDataOperateService.insertCruiseTaskResult(tCruiseTaskResult);

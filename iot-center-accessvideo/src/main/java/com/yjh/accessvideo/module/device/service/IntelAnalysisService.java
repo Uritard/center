@@ -267,11 +267,11 @@ public class IntelAnalysisService {
             String instanceId = String.valueOf(analysis.getInstanceId());
             analyseObject.setObjectId(instanceId);
 
-//            String[] split = analysis.getPicPath().split("/");
-//            String targetNamePath =  split[split.length - 2] + "/" + split[split.length - 1];
-//            uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath);
+            String[] split = analysis.getPicPath().split("/");
+            String targetNamePath =  split[split.length - 2] + "/" + split[split.length - 1];
+            uploadFileToFtps(analysis.getPicPath(), "/" + targetNamePath);
 
-            imageUrlList.add("targetNamePath");
+            imageUrlList.add(targetNamePath);
             analyseObject.setImageUrlList(imageUrlList);
 
             objectList.add(analyseObject);
@@ -451,7 +451,7 @@ public class IntelAnalysisService {
             // 遍历多个点的分析结果,不同的巡视点
             for (AnalyseResult analyseResult : response.getResultsList()) {
                 JSONObject resultDataObject = new JSONObject();
-                StringJoiner resultValue = new StringJoiner(" ");
+                StringJoiner resultValue = new StringJoiner(",");
                 StringJoiner type = new StringJoiner(" ");
                 StringJoiner resultImg = new StringJoiner(" ");
 
@@ -482,7 +482,7 @@ public class IntelAnalysisService {
                 if (results.isEmpty()){
                     resultDataObject.put("analyseType", 398);
                     resultDataObject.put("type", String.valueOf(type.add("")));
-                    resultDataObject.put("resultValue", String.valueOf(resultValue.add("")));
+                    resultDataObject.put("resultValue", String.valueOf(type.add("")));
                     resultDataObject.put("analyseResultImg", originPicPath);
                     resultInfoObject.put("resultInfo" + i, resultDataObject);
                     i++;
@@ -492,7 +492,7 @@ public class IntelAnalysisService {
                 // 非27大类的缺陷及判别类型的点  遍历单个点的分析结果,不同的缺陷
                 Map<String, String> map = new HashMap<>(5);
                 for (AnalyseResultItem result : results) {
-                    resultDataObject.put("pictureCoordinate", Objects.nonNull(result.getPos()) ? result.getPos() : new ArrayList<Area>());
+//                    resultDataObject.put("pictureCoordinate", Objects.nonNull(result.getPos()) ? result.getPos() : new ArrayList<Area>());
                     resultDataObject.put("conf", Objects.nonNull(result.getConf()) ? result.getConf() : 0.0);
                     // 图像数据正确
                     if (!Objects.equals("2000", result.getCode())) {
@@ -618,7 +618,13 @@ public class IntelAnalysisService {
                     // 缺陷
                     resultType.add(type);
                     resultDataObject.put("analyseType", 398);
-                    resultValue.add(result.getDesc());
+                    resultValue.add(type);
+                    for (Area area : result.getPos()){
+                        for (Point point : area.getAreas()){
+                            resultValue.add(String.valueOf(point.getX()));
+                            resultValue.add(String.valueOf(point.getY()));
+                        }
+                    }
                 }else {
                     // 设备状态识别
                     resultType.add(type);

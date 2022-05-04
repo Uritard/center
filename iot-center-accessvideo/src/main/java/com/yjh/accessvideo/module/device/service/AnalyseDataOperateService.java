@@ -550,7 +550,7 @@ public class AnalyseDataOperateService {
      */
     //@Logs(title = "缺陷识别结果解析", code = "")
     @Transactional(rollbackFor = Exception.class)
-    public String resolveDefectResult(String resultValueOrigin) {
+    public  String resolveDefectResult(String resultValueOrigin) {
         String resultValue=resultValueOrigin.replaceAll(","," ");
         log.info("----缺陷识别结果解析---resultValue:" + resultValue);
         String defectValue = "";
@@ -558,7 +558,7 @@ public class AnalyseDataOperateService {
         String defectRealValue="1";
         List<String> flags=new ArrayList<>();
         String value = resultValue;
-        String finalValue = value.replaceAll("[0-9]", "");
+        String finalValue = value.replaceAll("[0-9]", "").replaceAll("\\.", "");
         String[] str2 = finalValue.split("\\s+");
         for (int i = 0; i < str2.length; i++) {
             switch (str2[i]) {
