@@ -752,7 +752,7 @@ public class RobotService {
         itemMap.put("end_time", resMap.get("endTime").toString());
         itemMap.put("device_level", resMap.get("deviceLevel").toString());
         String deviceList = resMap.get("deviceList").toString();
-        String deviceIdList = deviceList.substring(1, deviceList.length()-1);
+        String deviceIdList = deviceList.substring(1, deviceList.length()-1).replace(" ", "");
         itemMap.put("device_list", deviceIdList);
         itemList.add(itemMap);
 

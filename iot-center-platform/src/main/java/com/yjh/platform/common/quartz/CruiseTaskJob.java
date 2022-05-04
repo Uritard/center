@@ -126,7 +126,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 //模板图片路径
                 Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
                 picModelPath = (String) mapForPicModelPath.get("content");
-                //等待相机转到预置位时间systemRobotServices
+                //等待相机转到预置位时间
                 Map<String,Object> mapForWaitTime  = redisTemplate.opsForHash().entries("t_sys_param:waitTime");
                 waitTime = Long.valueOf((String) mapForWaitTime.get("content"));
                 //任务超期时间

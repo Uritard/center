@@ -62,7 +62,12 @@ public class TDeviceMaintenanceService{
             params.put("deviceList",deviceList);
             params.put("startTime",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
             params.put("endTime",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
-            params.put("deviceLevel",2);//目前只支持主设备
+            //目前只支持主设备
+            params.put("deviceLevel",2);
+            //配置编码
+            params.put("configCode", "");
+            //检修区域坐标框
+            params.put("coordinatePixel", "");
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
         List<TDeviceMaintenance> addList = new ArrayList<>();
@@ -104,6 +109,10 @@ public class TDeviceMaintenanceService{
             params.put("startTime",sdf.format(new Date()));
             params.put("endTime",sdf.format(new Date()));
             params.put("deviceLevel",2);
+            //配置编码
+            params.put("configCode", "");
+            //检修区域坐标框
+            params.put("coordinatePixel", "");
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
         return this.tDeviceMaintenanceDao.deleteByPrimaryId(maintenanceId);
@@ -136,6 +145,10 @@ public class TDeviceMaintenanceService{
             params.put("startTime",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
             params.put("endTime",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
             params.put("deviceLevel",2);
+            //配置编码
+            params.put("configCode", "");
+            //检修区域坐标框
+            params.put("coordinatePixel", "");
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
         return this.tDeviceMaintenanceDao.batchAdd(addList);
@@ -252,6 +265,10 @@ public class TDeviceMaintenanceService{
             params.put("startTime",sdf.format(new Date()));
             params.put("endTime",sdf.format(new Date()));
             params.put("deviceLevel",2);
+            //配置编码
+            params.put("configCode", "");
+            //检修区域坐标框
+            params.put("coordinatePixel", "");
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
     return this.tDeviceMaintenanceDao.batchDelete(list1);
