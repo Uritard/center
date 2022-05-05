@@ -348,7 +348,7 @@ public class IntelAnalysisService2{
     public void silentMonitorHandle(PicAnalyseResponse response) {
         // 遍历多个点的分析结果
         for (AnalyseResult analyseResult : response.getResultsList()){
-            StringJoiner content = new StringJoiner(" ");
+            StringJoiner content = new StringJoiner(",");
             StringJoiner resultImg = new StringJoiner(" ");
 
             Map<String, Object> map = analyseDataOperateDao.selectInstanceInfo(Long.valueOf(analyseResult.getObjectId()));
@@ -368,10 +368,10 @@ public class IntelAnalysisService2{
                 }
 
                 content.add(desc);
-                String targetPath = copyFileFromFtps(type, result.getResImageUrl());
-                String defectResultRealImg = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content"));
-                String imagePath = targetPath.replace(targetPath, defectResultRealImg);
-                resultImg.add(imagePath);
+//                String targetPath = copyFileFromFtps(type, result.getResImageUrl());
+//                String defectResultRealImg = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content"));
+//                String imagePath = targetPath.replace(targetPath, defectResultRealImg);
+                resultImg.add("imagePath");
             }
 
             List<String> resultImgList = new ArrayList<>();
@@ -454,9 +454,9 @@ public class IntelAnalysisService2{
             // 遍历多个点的分析结果,不同的巡视点
             for (AnalyseResult analyseResult : response.getResultsList()) {
                 JSONObject resultDataObject = new JSONObject();
-                StringJoiner resultValue = new StringJoiner(" ");
-                StringJoiner resultType = new StringJoiner(" ");
-                StringJoiner resultImg = new StringJoiner(",");
+                StringJoiner resultValue = new StringJoiner(",");
+                StringJoiner resultDesc = new StringJoiner(",");
+                StringJoiner resultImg = new StringJoiner(" ");
 
                 String instanceId = analyseResult.getObjectId();
                 resultDataObject.put("taskId", taskId);
@@ -468,7 +468,7 @@ public class IntelAnalysisService2{
                 // 遍历单个点的分析结果,不同的结果
                 Map<String, String> map = new HashMap<>(5);
                 for (AnalyseResultItem result : analyseResult.getResults()) {
-                    resultDataObject.put("pictureCoordinate", Objects.nonNull(result.getPos()) ? result.getPos() : new ArrayList<Area>());
+//                    resultDataObject.put("pictureCoordinate", Objects.nonNull(result.getPos()) ? result.getPos() : new ArrayList<Area>());
                     resultDataObject.put("conf", Objects.nonNull(result.getConf()) ? result.getConf() : 0.0);
 
                     String code = Optional.ofNullable(result.getCode()).orElse("");
@@ -476,7 +476,7 @@ public class IntelAnalysisService2{
                         log.error("巡视点为{}的图像数据错误", map.get("instance_id"));
                         continue;
                     }
-                    map = setRecognizeResult(result, resultType, resultValue, resultImg, resultDataObject, originPicPath, Long.valueOf(instanceId));
+                    map = setRecognizeResult(result, resultDesc, resultValue, resultImg, resultDataObject, originPicPath, Long.valueOf(instanceId));
                 }
 
                 if (Objects.equals("", map.get("resultValue").trim())){
@@ -485,12 +485,12 @@ public class IntelAnalysisService2{
                 }else {
                     log.info("识别出来了缺陷");
                     List<String> resultImgList = new ArrayList<>();
-                    Collections.addAll(resultImgList, map.get("resultImg").split(","));
+                    Collections.addAll(resultImgList, map.get("resultImg").split(" "));
                     resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
                     resultDataObject.put("analyseResultImg",  resultImgList.get(0));
                 }
                 resultDataObject.put("resultValue", Optional.ofNullable(map.get("resultValue")).orElse(""));
-                resultDataObject.put("type", Optional.ofNullable(map.get("resultType")).orElse(""));
+                resultDataObject.put("resultDesc", Optional.ofNullable(map.get("resultDesc")).orElse(""));
                 resultInfoObject.put("resultInfo" + i, resultDataObject);
                 i++;
             }
@@ -540,7 +540,7 @@ public class IntelAnalysisService2{
      * 根据算法分析类型 获取识别结果 组装结果详情
      *
      * @param result 识别结果
-     * @param resultType 算法分析类型
+     * @param resultDesc 算法分析类型描述
      * @param resultValue 算法分析结果
      * @param resultImg 算法分析图片
      * @param resultDataObject 拼装给DataDealThread的对象
@@ -548,7 +548,7 @@ public class IntelAnalysisService2{
      * @param instanceId 巡视点id
      * @return Map<String, String>
      */
-    private Map<String, String> setRecognizeResult(AnalyseResultItem result, StringJoiner resultType, StringJoiner resultValue,
+    private Map<String, String> setRecognizeResult(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue,
                                                    StringJoiner resultImg, JSONObject resultDataObject, String originPicPath, Long instanceId){
         String type = Optional.ofNullable(result.getType()).orElse("");
         String value = Optional.ofNullable(result.getValue()).orElse("");
@@ -556,21 +556,19 @@ public class IntelAnalysisService2{
 
         Long devicePointId =  analyseDataOperateDao.selectDevicePointIdByInstanceId(instanceId);
         Map<String, String> map = new HashMap<>(5);
-        resultType.add(type);
-
         if (Objects.equals("tx_pb", type)){
             // 判别
-            Map<String, String> typeAndValueMap = getDistinguishResult(result, resultType, resultValue, resultImg, resultDataObject, originPicPath, type, value, devicePointId, map);
+            Map<String, String> typeAndValueMap = getDistinguishResult(result, resultDesc, resultValue, resultImg, resultDataObject, originPicPath, type, value, devicePointId, map);
             if (typeAndValueMap != null) return typeAndValueMap;
         }else {
             // 缺陷和设备状态识别
-            Map<String, String> typeAndValueMap = getDefectOrIdentification(result, resultType, resultValue,  resultImg, resultDataObject, originPicPath, type, value, desc, devicePointId, map);
+            Map<String, String> typeAndValueMap = getDefectOrIdentification(result, resultDesc, resultValue,  resultImg, resultDataObject, originPicPath, type, value, desc, devicePointId, map);
             if (typeAndValueMap != null) return typeAndValueMap;
         }
         return map;
     }
 
-    private Map<String, String> getDefectOrIdentification(AnalyseResultItem result, StringJoiner resultType, StringJoiner resultValue,
+    private Map<String, String> getDefectOrIdentification(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue,
                                                           StringJoiner resultImg, JSONObject resultDataObject, String originPicPath, String type, String value, String desc, Long devicePointId, Map<String, String> map) {
         String targetPath;
         // 根据返回的算法类型查询算法相关信息
@@ -583,18 +581,26 @@ public class IntelAnalysisService2{
             if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
                 resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
                 resultDataObject.put("analyseType", 398);
-                map.put("resultType", String.valueOf(resultType));
+                map.put("resultDesc", String.valueOf(resultDesc));
                 map.put("resultValue", String.valueOf(resultValue));
                 return map;
             }
+
             if (Objects.equals("1", value)){
+                resultValue.add(type);
                 // 图像有缺陷
-                resultValue.add(desc);
-            targetPath = copyFileFromFtps(type, result.getResImageUrl());
-                resultImg.add(targetPath);
+                for (Area area : result.getPos()){
+                    for (Point point : area.getAreas()){
+                        resultValue.add(String.valueOf(point.getX()));
+                        resultValue.add(String.valueOf(point.getY()));
+                    }
+                }
+                resultDesc.add(desc);
+//                targetPath = copyFileFromFtps(type, result.getResImageUrl());
+                resultImg.add("targetPath");
             }else {
                 // 图像无缺陷
-                resultValue.add("");
+                resultDesc.add(type);
                 targetPath = originPicPath;
             }
             resultDataObject.put("analyseType", 398);
@@ -606,7 +612,7 @@ public class IntelAnalysisService2{
             if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
                 resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
                 resultDataObject.put("analyseType", 1);
-                map.put("resultType", String.valueOf(resultType));
+                map.put("resultDesc", String.valueOf(resultDesc));
                 map.put("resultValue", String.valueOf(resultValue));
                 return map;
             }
@@ -616,20 +622,21 @@ public class IntelAnalysisService2{
             }else {
                 // 根据value获取对应的值
                 int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
-                String resultDesc = RecogniseStatusEnum.getValueByCode(typeValue).getValue();
-                resultValue.add(resultDesc);
+                String resultDescTemp = RecogniseStatusEnum.getValueByCode(typeValue).getValue();
+                resultValue.add(resultDescTemp);
+                resultDesc.add(type);
                 resultDataObject.put("analyseType", list.get(0).getAnalyseType());
             }
-            targetPath = copyFileFromFtps(type, result.getResImageUrl());
-            resultImg.add(targetPath);
+//            targetPath = copyFileFromFtps(type, result.getResImageUrl());
+            resultImg.add("targetPath");
         }
-        map.put("resultType", String.valueOf(resultType));
+        map.put("resultDesc", String.valueOf(resultDesc));
         map.put("resultValue", String.valueOf(resultValue));
         map.put("resultImg", String.valueOf(resultImg));
         return map;
     }
 
-    private Map<String, String> getDistinguishResult(AnalyseResultItem result, StringJoiner resultType, StringJoiner resultValue,
+    private Map<String, String> getDistinguishResult(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue,
                                                      StringJoiner resultImg, JSONObject resultDataObject, String originPicPath, String type, String value, Long devicePointId, Map<String, String> map) {
         String targetPath;
         // 判断该巡视点是否为判别的点 若是  直接拿假数据  不要返回的结果
@@ -638,27 +645,28 @@ public class IntelAnalysisService2{
             resultDataObject.put("analyseType", 11);
             if (Objects.equals("1", value)){
                 // 图像有差异 才会返回图片地址
-                targetPath = copyFileFromFtps(type, result.getResImageUrl());
+//                targetPath = copyFileFromFtps(type, result.getResImageUrl());
+                resultImg.add("targetPath");
             }else {
                 // 图像无差异 取原图
                 targetPath = originPicPath;
             }
-            map.put("resultType", String.valueOf(resultType));
+            map.put("resultDesc", String.valueOf(resultDesc));
             map.put("resultValue", String.valueOf(resultValue));
             return map;
         }
         if (Objects.equals("1", value)){
             // 图像有差异 才会返回图片地址
             resultValue.add("abnormal");
-            targetPath = copyFileFromFtps(type, result.getResImageUrl());
-            resultImg.add(targetPath);
+//            targetPath = copyFileFromFtps(type, result.getResImageUrl());
+            resultImg.add("targetPath");
         }else {
             // 图像无差异 取原图
             resultValue.add("normal");
             targetPath = originPicPath;
         }
         resultDataObject.put("analyseType", 11);
-        map.put("resultType", String.valueOf(resultType));
+        map.put("resultDesc", String.valueOf(resultDesc.add("tx_pb")));
         map.put("resultValue", String.valueOf(resultValue));
         map.put("resultImg",String.valueOf(resultImg));
         return map;

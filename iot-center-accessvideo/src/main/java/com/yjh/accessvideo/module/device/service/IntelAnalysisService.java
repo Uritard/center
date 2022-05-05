@@ -331,6 +331,7 @@ public class IntelAnalysisService {
         String flagId = response.getRequestId().split("#")[1];
         // 静默监视结果
         if (Objects.equals("jm", flagId)){
+//            intelAnalysisService2.silentMonitorHandle(response);
             silentMonitorHandle(response);
             return;
         }
@@ -492,7 +493,7 @@ public class IntelAnalysisService {
                 // 非27大类的缺陷及判别类型的点  遍历单个点的分析结果,不同的缺陷
                 Map<String, String> map = new HashMap<>(5);
                 for (AnalyseResultItem result : results) {
-//                    resultDataObject.put("pictureCoordinate", Objects.nonNull(result.getPos()) ? result.getPos() : new ArrayList<Area>());
+                    /*resultDataObject.put("pictureCoordinate", Objects.nonNull(result.getPos()) ? result.getPos() : new ArrayList<Area>());*/
                     resultDataObject.put("conf", Objects.nonNull(result.getConf()) ? result.getConf() : 0.0);
                     // 图像数据正确
                     if (!Objects.equals("2000", result.getCode())) {
