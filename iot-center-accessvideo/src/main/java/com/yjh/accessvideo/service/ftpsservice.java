@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 
 @Service
@@ -49,5 +50,9 @@ public class ftpsservice {
 
     public boolean fileExits(String filepath){
         return FtpsUtil.isFTPFileExist(filepath,serverip,Integer.valueOf(ftpsPort),key,ftpsUserName, ftpsPassWord);
+    }
+
+    public String getFtpsRemotePath(){
+        return new String(this.ftpsRemotePath.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
     }
 }

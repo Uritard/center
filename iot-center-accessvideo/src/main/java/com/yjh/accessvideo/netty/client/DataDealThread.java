@@ -228,7 +228,6 @@ public class DataDealThread implements Runnable {
                                                 tStdDevicemeteM.getLowLimit4()) == 1) {
                                             //初始化告警信息redis表
                                             String warnName = "warnInfo:" + TASKID + String.valueOf(UUID.randomUUID()).replace("-", "");
-                                            String msgName = "msg:" + reponseMessage + ":" + String.valueOf(UUID.randomUUID()).replace("-", "");
                                             Map<String, String> warnMap = new HashMap<>();
 //                                            warnMap.put("warnType", tStdDevicemeteM.getAlarmType());
                                             warnMap.put("deviceId", String.valueOf(tCruisePointInstance.getDeviceId()));
@@ -269,7 +268,6 @@ public class DataDealThread implements Runnable {
                                                         log.info("告警MAP：" + warnMap);
                                                         try {
                                                             redisTemplate.opsForHash().putAll(warnName, warnMap);
-                                                            redisTemplate.opsForHash().putAll(msgName, warnMap);
                                                             cruiseResultMap.put("isWarn", "1");
                                                         } catch (Exception e) {
                                                             log.info("生成错误", e);
@@ -363,7 +361,6 @@ public class DataDealThread implements Runnable {
                                                         }
 
                                                         redisTemplate.opsForHash().putAll(warnName, warnMap);
-                                                        redisTemplate.opsForHash().putAll(msgName, warnMap);
                                                         cruiseResultMap.put("isWarn", "1");
                                                         log.info("告警Map:" + warnMap);
 
@@ -552,6 +549,12 @@ public class DataDealThread implements Runnable {
                                         cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
                                         cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
                                         cruiseResultMap.put("picpath",analyseResultImg);
+
+                                        //判别异常
+                                        String msgName = "msg:" + reponseMessage + ":" + String.valueOf(UUID.randomUUID()).replace("-", "");
+                                        Map<String,String> map = new HashMap<>();
+                                        map.put("value",jsonObjectResult.getString("resultValue"));
+                                        redisTemplate.opsForHash().putAll(msgName,map);
 
                                     }else {
 
@@ -959,15 +962,23 @@ public class DataDealThread implements Runnable {
                                 String resultinfo=differentlistmap.get("value");      //获取返回的resultvalue值,判别类是一个数值，缺陷类是坐标
                                 log.info("判别结果：{}",resultinfo);
                                 Different different= new Different();
-                                different.setX1(resultinfo);
-                                different.setY1("0");
-                                different.setX2("0");
-                                different.setY2("0");
+                                String[] re = resultinfo.split(",");
+                                if(re != null && re.length > 4){
+                                    different.setX1(re[1]);
+                                    different.setY1(re[2]);
+                                    different.setX2(re[3]);
+                                    different.setY2(re[4]);
+                                }else {
+                                    different.setX1(resultinfo);
+                                    different.setY1("0");
+                                    different.setX2("0");
+                                    different.setY2("0");
+                                }
                                 defectList1.add(different);
                                 alarmDetail.setBay_name(nameMap.get("upRegionName"));
                                 alarmDetail.setDevice_name(devicename);
                                 alarmDetail.setPoint_name(nameMap.get("meteName"));
-                                alarmDetail.setTime(differentlistmap.get("warnTime"));
+                                alarmDetail.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                                 alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
                                 alarmDetail.setPic_diff_base(remotebaseimagicpath);               //判别基准图路径
                                 alarmDetail.setPic_different(remotefilepath);               //判别告警图路径,判别结果图
@@ -1023,7 +1034,7 @@ public class DataDealThread implements Runnable {
                                 String key=it.next().toString();//所有的key
                                 Map<String, String>  differenmap= redisTemplate.opsForHash().entries(key);
                                 String resultinfo=differenmap.get("value");      //获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
-                                log.info("判别结果：{}",resultinfo);
+                                log.info("缺陷结果：{}",resultinfo);
                                 String[] arr1 = resultinfo.split(",");   //目前格式："sly_dmyw,0,171,502,667,bj_bpps,745,143,724,923"
                                 List<Defect> defectList1=new ArrayList<>();
                                 for(int i=0;i<arr1.length;){
@@ -1034,9 +1045,9 @@ public class DataDealThread implements Runnable {
                                     defect.setY2(arr1[i+4]);
                                     defect.setType(arr1[i]);
                                     defect.setDesc(differenmap.get("defectContent"));
-                                    defect.setConfidence("");
+                                    defect.setConfidence(arr1[i+5]);
                                     defectList1.add(defect);
-                                    i=i+5;
+                                    i=i+6;
                                 }
                                 alarmDetail.setDefect(defectList1);
                                 alarmDetail.setBay_name(nameMap.get("upRegionName"));

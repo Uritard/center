@@ -467,7 +467,7 @@ public class TVoiceDeviceService{
             }
         }
         voicePath = voicePath.replaceAll(realPath,absPath);
-        //voicePath = "D:/qh/bianyaqi-yinpin1";
+//        voicePath = "D:/code/qhTest/10/1/2021-02-05/11.wav";
         MultimediaObject multimediaObject = new MultimediaObject(new File(voicePath));
         MultimediaInfo info = multimediaObject.getInfo();
         Long playTime = info.getDuration();
@@ -489,7 +489,7 @@ public class TVoiceDeviceService{
         List<Integer> DBList = null;
         try {
             VoiceAnalyseUtil voiceAnalyseUtil = new VoiceAnalyseUtil(voicePath);
-            DBList = voiceAnalyseUtil.analyticalDecibelsPl();
+            DBList = voiceAnalyseUtil.analyticalDecibels();
         }catch (Exception e){
             throw new BusinessException(209,"音频文件读取异常");
         }
@@ -577,6 +577,7 @@ public class TVoiceDeviceService{
             }
         }
         frequencyPath = frequencyPath.replaceAll(realPath,absPath);
+//        frequencyPath= "D:/code/qhTest/10/1/2021-02-05/11.wav";
         MultimediaObject multimediaObject = new MultimediaObject(new File(frequencyPath));
         MultimediaInfo info = multimediaObject.getInfo();
         Long playTime = info.getDuration();
