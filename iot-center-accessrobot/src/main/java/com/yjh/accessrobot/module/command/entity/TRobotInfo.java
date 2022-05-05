@@ -119,4 +119,20 @@ public class TRobotInfo implements Serializable {
     private Long offLineCount;
 
 
+    @ApiModelProperty(value = "出厂日期", example = "2018-10-01")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @TableField(value = "made_date")
+    private Date madeDate;
+
+    @ApiModelProperty(value = "使用单位")
+    @TableField(value = "building_user", updateStrategy = FieldStrategy.IGNORED)
+    private String buildingUser;
+
+    @ApiModelProperty(value = "设备来源")
+    @TableField(value = "robot_source", updateStrategy = FieldStrategy.IGNORED)
+    private String robotSource;
+
+    @ApiModelProperty(value = "出场编号")
+    @TableField(value = "appearance_number", updateStrategy = FieldStrategy.IGNORED)
+    private String appearanceNumber;
 }

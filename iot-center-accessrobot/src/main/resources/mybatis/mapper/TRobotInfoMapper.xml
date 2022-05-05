@@ -134,6 +134,9 @@
         <if test="lastOnlineTime != null">a.last_online_time = #{lastOnlineTime},</if>
         <if test="duration != null">a.duration = #{duration},</if>
         <if test="offLineCount != null">a.off_line_count = #{offLineCount},</if>
+        <if test="madeDate != null">a.made_date = #{madeDate, jdbcType=TIMESTAMP},</if>
+        <if test="buildingUser != null ">a.building_user = #{buildingUser},</if>
+        <if test="robotSource != null ">a.robot_source = #{robotSource},</if>
     </set>
             where a.robot_id = #{robotId, jdbcType=BIGINT}
     </update>

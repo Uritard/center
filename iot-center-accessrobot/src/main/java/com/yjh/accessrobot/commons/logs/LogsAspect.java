@@ -28,9 +28,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @Description
@@ -88,10 +86,11 @@ public class LogsAspect {
             if(Constant.apiPermissions){
                 try {
                     if (!"".equals(annotation.authority())) {
-                        String[] ans = annotation.authority().split(",");
-                        for (String an : ans) {
+                        String ans = annotation.authority();
+//                        List<String> ans = new ArrayList<String>(annotation.authority().split(","));
+//                        for (String an : ans) {
                             assert userRole != null;
-                            if (!userRole.equals(an)) {
+                            if (!ans.contains(userRole)) {
                                 //todo 越权访问入日志
                                 params.set("logType", "24");
                                 params.set("ip", ip);
@@ -114,7 +113,7 @@ public class LogsAspect {
                                 re.setCode(209, "此用户无权限");
                                 return re;
                             }
-                        }
+//                        }
                     }
 
                 }catch (Exception e) {

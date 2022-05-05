@@ -405,13 +405,50 @@ public class RobotService {
             String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
             log.info("图片路径为：{}", picPath);
 
+            TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Map<String, Object> robotModelMap = robotMap.get(0);
+                //生产日期
+                String productionDate = String.valueOf(robotModelMap.get("production_pate"));
+                if(productionDate != null && !"".equals(productionDate)){
+                    tRobotInfo.setMadeDate(simpleDateFormat.parse(productionDate));
+                }
+                //生产编号
+                String productionCode = String.valueOf(robotModelMap.get("production_code"));
+                if(productionCode != null && !"".equals(productionCode)){
+                    tRobotInfo.setAppearanceNumber(productionCode);
+                }
+                //生产厂家
+                String manufacturer = String.valueOf(robotModelMap.get("manufacturer"));
+                if(manufacturer != null && !"".equals(manufacturer)){
+                    String robotFactory = tRobotInfoDao.selectDictCodeByNote(manufacturer,"robot_factory");
+                    if(robotFactory != null){
+                        tRobotInfo.setRobotFactory(robotFactory);
+                    }
+                }
+                //使用单位
+                String useUnit = String.valueOf(robotModelMap.get("use_unit"));
+                if(useUnit != null && !"".equals(useUnit)){
+                    tRobotInfo.setBuildingUser(useUnit);
+                }
+//                String istransport = String.valueOf(robotModelMap.get("istransport"));
+                //设备来源
+                String deviceSource = String.valueOf(robotModelMap.get("device_source"));
+                if(deviceSource != null && !"".equals(deviceSource)){
+                    tRobotInfo.setRobotSource(deviceSource);
+                }
+            }catch (Exception e){
+                log.warn("模型文件解析出错：{}",e);
+            }
+
             String[] splitArray = picPath.split("/");
             String fileName = splitArray[splitArray.length - 1];
             String developMap = absoluteImgMap.get("content") + "/Map";
             copyFileToDevelop(picPath, developMap);
             String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
-            TRobotInfo tRobotInfo = new TRobotInfo()
-                    .setRobotId(robotId)
+
+            tRobotInfo.setRobotId(robotId)
                     .setPhotePath(developRelativeUrl);
             tRobotInfoDao.update(tRobotInfo);
         }

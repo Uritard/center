@@ -61,9 +61,9 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
             }
 
             // device model
-            robotService.uploadFile(deviceFile, deviceFile);
+//            robotService.uploadFile(deviceFile, deviceFile);
             // robot model
-            robotService.uploadFile(robotFile, robotFile);
+//            robotService.uploadFile(robotFile, robotFile);
             // 国网要求
 //            robotService.upToCruise(xmlBaseModel);
         } else if (xmlBaseModel.getItems().get(0).size() == 0) {
