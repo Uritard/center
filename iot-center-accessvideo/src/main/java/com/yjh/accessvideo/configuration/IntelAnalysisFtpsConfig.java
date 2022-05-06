@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties(prefix = "intelligent.server.ftps")
-public class FtpsConfig {
+public class IntelAnalysisFtpsConfig {
     private String flag;
     private String ip;
     private Integer port;

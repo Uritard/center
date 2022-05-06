@@ -12,12 +12,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +35,9 @@ public class SilentTaskScheduled {
 
     private final RedisTemplate redisTemplate;
     private final TCameraPresetService tCameraPresetService;
+
+    @Value("${silent.task.interval}")
+    private int silentTaskTime;
 
     /**
      * 调用相机转到预置位接口
@@ -53,7 +58,7 @@ public class SilentTaskScheduled {
     @Scheduled(cron = "0/${silent.task.interval} * * * * ?")
     public void silentTaskScheduled() {
         log.info("定时任务");
-        // 开关
+        // 分析主机开关
         String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis","content"));
         if (StringUtils.equals(FLAG, flag)){
             return;
@@ -65,9 +70,25 @@ public class SilentTaskScheduled {
 
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
             String state = redisInfoMap.get("state");
+            String lastTime = redisInfoMap.get("lastTime");
 
+            Integer keepSilent = silentTaskTime * 1000;
             // 相机状态为闲置(state为0闲置,为1占用)时,做静默任务
             if (StringUtils.equals("0", state) && StringUtils.isNotEmpty(presetId)){
+
+                long oldTime = -1L;
+                try {
+                    if (lastTime != null && !"".equals(lastTime)) {
+                        oldTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(lastTime).getTime();
+                    }
+                } catch (Exception e) {
+                    log.info("摄像机id：{} 回到静默位错误：{}", cameraId, e);
+                }
+
+                if ((System.currentTimeMillis() - oldTime) < keepSilent) {
+                    log.info("cameraId为{}的相机在被控制", cameraId);
+                    continue;
+                }
                 log.info("cameraId为{},presetId为{}的相机准备做静默任务", cameraId, presetId);
                 try {
                     HashMap<String, Object> moveMap = new HashMap<>(5);
@@ -86,6 +107,7 @@ public class SilentTaskScheduled {
                     Result result = capturePicture(captureMap);
                     // 将相机状态置为闲置
                     redisInfoMap.put("state", "0");
+                    redisInfoMap.put("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                     redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
 
                     // 分析
