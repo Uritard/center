@@ -215,6 +215,54 @@
                 #{endTime,jdbcType=TIMESTAMP}
             </if>
         </if>
+        union all
+        select
+        a.warn_id,
+        a.instance_id,
+        a.warn_content,
+        a.warn_time,
+        m.device_mete_id,
+        m.custom_id,
+        m.device_id,
+        m.device_mete_name,
+        m.custom_name,
+        m.device_name,
+        m.device_type,
+        m.device_type_name,
+        a.warn_type,
+        2 as warn_level,
+        null as camera_name,
+        m.robot_name
+        from t_cruise_nonhomologous_warn a INNER join
+        (select
+        n.warn_id,
+        GROUP_CONCAT(distinct d.device_mete_id) as device_mete_id,
+        GROUP_CONCAT(distinct e.custom_id) as custom_id,
+        GROUP_CONCAT(distinct e.device_id) as device_id,
+        GROUP_CONCAT(distinct d.mete_name) as device_mete_name,
+        GROUP_CONCAT(distinct e.custom_name) as custom_name,
+        GROUP_CONCAT(distinct e.device_name) as device_name,
+        GROUP_CONCAT(distinct e.device_type) as device_type,
+        GROUP_CONCAT(distinct k.dict_note) as device_type_name,
+        GROUP_CONCAT(distinct h.robot_name) as robot_name
+        from t_cruise_nonhomologous_warn_inspection n
+        left join t_cruise_point_instance b on b.instance_id = n.inspection_id
+        left join t_std_devicemete d on d.device_mete_id = b.device_mete_id
+        left join t_std_device e on e.custom_id = b.custom_id and e.device_id = b.device_id
+        left join t_robot_inspection g on g.inspection_id = b.cruise_id
+        left join t_robot_info h on h.robot_id = g.robot_id
+        left join t_dict_business k on k.dict_code = e.device_type
+        GROUP BY n.warn_id) m  on m.warn_id = a.warn_id where 1=1
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="deviceType != null "> and m.device_name = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="deviceName != null and deviceName != ''"> and m.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%')</if>
+        <if test="deviceMeteName != null and deviceMeteName != ''"> and m.mete_name like concat('%',#{deviceMeteName, jdbcType=VARCHAR},'%') </if>
+        <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
+        <if test="startTime != null  ">
+            <if test="endTime != null ">and a.warn_time between #{startTime,jdbcType=TIMESTAMP} and
+                #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </if>
     </select>
 
     <select id="selectWarnByPrimaryId" parameterType="java.lang.String" resultType="java.util.Map">
@@ -230,13 +278,14 @@
         e.custom_name as customName,
         e.device_name as  deviceName,
         e.device_type as deviceType,
+        k.dict_note as deviceTypeName,
         f.region_name as delayName,
         f.region_id as delayId,
         h.robot_name as robotName,
         a.warn_type as warnType,
         n.warn_level as warnLevel,
         j.camera_name as cameraName
-        from t_cruise_nonhomologous_warn a left join t_cruise_nonhomologous_point_instance n on n.instance_id = a.instance_id
+        from t_cruise_nonhomologous_warn a inner join t_cruise_nonhomologous_point_instance n on n.instance_id = a.instance_id
         left join t_cruise_point_instance b on b.instance_id = n.robot_instance_id
         left join t_cruise_point_instance c on c.instance_id = n.video_preset_id
         left join t_std_devicemete d on d.device_mete_id = n.device_mete_id
@@ -246,7 +295,53 @@
         left join t_robot_info h on h.robot_id = g.robot_id
         left join t_camera_preset i on i.preset_id = c.cruise_id
         left join t_camera_info j on j.camera_id = i.camera_id
+        left join t_dict_business k on k.dict_code = e.device_type
         where 1 = 1
+        <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=VARCHAR}</if>
+
+        union all
+        select
+        a.warn_id as warnId,
+        a.instance_id as instanceId,
+        a.warn_content as  warnContent,
+        a.warn_time as warnTime,
+        m.device_mete_name as deviceMeteTime,
+        m.custom_id as customId,
+        m.device_id as deviceId,
+        m.device_mete_id as deviceMeteId,
+        m.custom_name as customName,
+        m.device_name as  deviceName,
+        m.device_type as deviceType,
+        m.device_type_name as deviceTypeName,
+        m.region_name as delayName,
+        m.region_id as delayId,
+        m.robot_name as robotName,
+        a.warn_type as warnType,
+        2 as warnLevel,
+        null as cameraName
+        from t_cruise_nonhomologous_warn a INNER join
+        (select
+        n.warn_id,
+        GROUP_CONCAT(distinct d.device_mete_id) as device_mete_id,
+        GROUP_CONCAT(distinct e.custom_id) as custom_id,
+        GROUP_CONCAT(distinct e.device_id) as device_id,
+        GROUP_CONCAT(distinct d.mete_name) as device_mete_name,
+        GROUP_CONCAT(distinct e.custom_name) as custom_name,
+        GROUP_CONCAT(distinct e.device_name) as device_name,
+        GROUP_CONCAT(distinct e.device_type) as device_type,
+        GROUP_CONCAT(distinct k.dict_note) as device_type_name,
+        GROUP_CONCAT(distinct f.region_name) as region_name,
+        GROUP_CONCAT(distinct f.region_id) as region_id,
+        GROUP_CONCAT(distinct h.robot_name) as robot_name
+        from t_cruise_nonhomologous_warn_inspection n
+        left join t_cruise_point_instance b on b.instance_id = n.inspection_id
+        left join t_std_devicemete d on d.device_mete_id = b.device_mete_id
+        left join t_std_device e on e.custom_id = b.custom_id and e.device_id = b.device_id
+        left join t_std_region f on e.up_region_id = f.region_id
+        left join t_robot_inspection g on g.inspection_id = b.cruise_id
+        left join t_robot_info h on h.robot_id = g.robot_id
+        left join t_dict_business k on k.dict_code = e.device_type
+        GROUP BY n.warn_id) m  on m.warn_id = a.warn_id where 1=1
         <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=VARCHAR}</if>
     </select>
 
