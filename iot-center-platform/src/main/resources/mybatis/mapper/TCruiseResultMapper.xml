@@ -360,7 +360,9 @@
         q.alarm_level,
         s.dict_note as alarm_level_name,
         n.device_type,
-        g.voice_path
+        g.voice_path,
+        conf.db_value as dbValue,
+        conf.f_value as fValue
         FROM t_cruise_result a
         LEFT JOIN t_cruise_task_result_detail b on a.task_result_id = b.task_result_id
         LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
@@ -377,6 +379,8 @@
         LEFT JOIN t_dict_business w on w.dict_code = g.identify_result and w.col_name ='identify_result'
         LEFT JOIN t_dict_business s on s.dict_code = q.alarm_level and s.col_name ='alarm_level'
         LEFT JOIN t_dict_business x ON x.dict_code = g.remark and x.col_name = 'abnormal_type'
+        left join t_voice_device voice on e.cruise_id = voice.voice_device_id
+        left join t_voice_config conf on voice.config_id = conf.config_id
         WHERE 1 = 1
         <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}</if>
 

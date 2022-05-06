@@ -119,6 +119,10 @@ public class CruiseResultDetail extends TStdDeviceMete {
 
     private String voicePath;
 
+    private String dbValue;//分贝告警值
+
+    private String fValue;//频率告警值
+
 
 }
 
