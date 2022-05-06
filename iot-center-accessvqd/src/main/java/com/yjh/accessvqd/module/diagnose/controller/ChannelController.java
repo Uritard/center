@@ -1,26 +1,19 @@
 package com.yjh.accessvqd.module.diagnose.controller;
 
-import com.google.gson.internal.$Gson$Preconditions;
 import com.yjh.accessvqd.commons.result.Result;
 import com.yjh.accessvqd.commons.result.ResultCodeEnum;
-import com.yjh.accessvqd.commons.utils.xmlAnalyse.DataServerXML;
-import com.yjh.accessvqd.commons.utils.xmlAnalyse.PlatformXMLUtil;
 import com.yjh.accessvqd.module.diagnose.entity.Channel;
 import com.yjh.accessvqd.module.diagnose.entity.DataServer;
 import com.yjh.accessvqd.module.diagnose.service.ChannelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.bind.annotation.*;
-import com.yjh.accessvqd.module.diagnose.entity.TestList;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Base64;
 
 
 /**

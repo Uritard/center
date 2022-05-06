@@ -21,10 +21,10 @@ public class FtpsUtil {
 
     private static String key_path = "D://ftp//apache-ftpserver-1.1.1//res//ftpserver.jks";
 
-    private static String host = "192.168.100.9";
-    private static int port = 10012;
-    private static String username = "jysp";
-    private static String password = "jydw";
+    // private static String host = "192.168.100.9";
+    // private static int port = 10012;
+    // private static String unConstans = "jysp";
+    // private static String pwConstans = "jydw";
 
 
     // FTP协议里面，规定文件名编码为iso-8859-1
@@ -53,7 +53,7 @@ public class FtpsUtil {
         return tm[0];
     }
 
-
+/*
     public static void putFileForList(List<byte[]> file,
                                       List<String> remoteFilename) throws NoSuchAlgorithmException {
         try {
@@ -67,7 +67,7 @@ public class FtpsUtil {
             if (FTPReply.isPositiveCompletion(reply)) {
 
                 // Login
-                if (ftpClient.login(username, password)) {
+                if (ftpClient.login(unConstans, pwConstans)) {
                     if (FTPReply.isPositiveCompletion(ftpClient.sendCommand(
                             "OPTS UTF8", "ON"))) {
                         // 开启服务器对UTF-8的支持，
@@ -97,7 +97,7 @@ public class FtpsUtil {
                         }
 
                         if (ftpClient.storeFile(fileName, is)) {
-                            log.info(username + "," + remoteFilename.get(i));
+                            log.info(unConstans + "," + remoteFilename.get(i));
                         } else {
                             log.info("Could not store file");
                         }
@@ -122,6 +122,7 @@ public class FtpsUtil {
             e.printStackTrace();
         }
     }
+*/
 
     public static void putFile(String filepath,
                                String remoteFilename,String host,int port,String key_pw,String username,String password) throws NoSuchAlgorithmException {
@@ -225,15 +226,15 @@ public class FtpsUtil {
         }
     }
 
-
+/*
     public static void putFileTest(String filepath,
                                String remoteFilename) throws NoSuchAlgorithmException {
         try {
             log.info("-------------------------------文件上传开始");
             host = "192.168.9.226";
             port = 10012;
-            username = "admin";
-            password = "1";
+            unConstans = "admin";
+            pwConstans = "1";
             File file = new File(filepath);
             try {
                 FileInputStream fis = new FileInputStream(file);
@@ -260,7 +261,7 @@ public class FtpsUtil {
                 if (FTPReply.isPositiveCompletion(reply)) {
 
                     // Login
-                    if (ftpClient.login(username, password)) {
+                    if (ftpClient.login(unConstans, pwConstans)) {
                         if (FTPReply.isPositiveCompletion(ftpClient.sendCommand(
                                 "OPTS UTF8", "ON"))) {
                             // 开启服务器对UTF-8的支持，
@@ -290,7 +291,7 @@ public class FtpsUtil {
                         }
 //                        ftpClient.enterLocalPassiveMode();
                         if (ftpClient.storeFile(fianlName, is)) {
-                            log.info(username + "," + remoteFilename);
+                            log.info(unConstans + "," + remoteFilename);
                         } else {
                             log.info("code :"+ftpClient.getReplyCode());
                             log.info("message :"+ftpClient.getReplyString());
@@ -318,6 +319,7 @@ public class FtpsUtil {
             log.error("FTPS上传文件参数有误"+e);
         }
     }
+*/
 
     public static boolean isFTPFileExist(String filePath,String host,int port,String key_pw,String username,String password) {
         try {
@@ -410,7 +412,7 @@ public class FtpsUtil {
             List<String> list2 = new ArrayList<String>();
             list1.add(data);
             list2.add(fileName);
-            FtpsUtil.putFileForList(list1, list2);
+            // FtpsUtil.putFileForList(list1, list2);
         } catch (Exception e) {
             e.printStackTrace();
         }

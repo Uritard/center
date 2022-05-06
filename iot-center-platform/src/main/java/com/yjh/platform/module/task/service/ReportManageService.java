@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
@@ -8,6 +9,7 @@ import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
 import com.yjh.platform.module.task.entity.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,12 +188,16 @@ public class ReportManageService {
         String fileName = reportManageDao.selectReportEnvId(reportId);
         String filePath = reportPath+"/"+fileName;
         log.info("filePath:"+filePath);
+        if(StringUtils.contains(filePath, "|")){
+            log.error("路径错误，含非法字符串！{}", fileName);
+            throw new BusinessException("路径错误，含非法字符串！");
+        }
         String url2 = "rm -f "+filePath;
         try {
             Process processForId = Runtime.getRuntime().exec(url2);
             processForId.waitFor();
         } catch (Exception e) {
-            e.getMessage();
+            log.error(e.getMessage(), e);
         }
         String url3 = "ls "+reportPath+" | wc -w";
         long count2 = 0;

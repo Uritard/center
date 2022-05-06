@@ -24,10 +24,10 @@ public class FtpsUtil {
 
     private static String key_path = "D://ftp//apache-ftpserver-1.1.1//res//ftpserver.jks";
 
-    private static String host = "192.168.100.9";
-    private static int port = 10012;
-    private static String username = "jysp";
-    private static String password = "jydw";
+    // private static String host = "192.168.100.9";
+    // private static int port = 10012;
+    // private static String username = "jysp";
+    // private static String password = "jydw";
 
 
     // FTP协议里面，规定文件名编码为iso-8859-1
@@ -56,7 +56,7 @@ public class FtpsUtil {
         return tm[0];
     }
 
-
+/*
     public static void putFileForList(List<byte[]> file,
                                       List<String> remoteFilename) throws NoSuchAlgorithmException {
         try {
@@ -125,6 +125,7 @@ public class FtpsUtil {
             e.printStackTrace();
         }
     }
+*/
 
 
 //    public static void putFile(String filepath,
@@ -316,7 +317,7 @@ public class FtpsUtil {
         }
     }
 
-
+/*
     public static void putFileTest(String filepath,
                                String remoteFilename) throws NoSuchAlgorithmException {
         try {
@@ -409,6 +410,7 @@ public class FtpsUtil {
             log.error("FTPS上传文件参数有误"+e);
         }
     }
+*/
 
 
     public static boolean isFTPFileExist(String filePath,String host,int port,String key_pw,String username,String password) {

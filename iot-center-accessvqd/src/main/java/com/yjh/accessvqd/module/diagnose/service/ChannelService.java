@@ -1,7 +1,5 @@
 package com.yjh.accessvqd.module.diagnose.service;
 
-
-import com.google.gson.internal.$Gson$Preconditions;
 import com.yjh.accessvqd.commons.logs.Logs;
 import com.yjh.accessvqd.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvqd.commons.utils.xmlAnalyse.ChannelsXML;
@@ -10,13 +8,11 @@ import com.yjh.accessvqd.commons.utils.xmlAnalyse.ResponseXML;
 import com.yjh.accessvqd.module.diagnose.entity.Channel;
 import com.yjh.accessvqd.module.diagnose.entity.DataServer;
 import com.yjh.accessvqd.module.diagnose.entity.TestList;
-import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
 import java.util.Base64;

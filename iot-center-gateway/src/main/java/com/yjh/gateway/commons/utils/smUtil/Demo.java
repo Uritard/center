@@ -107,11 +107,11 @@ public class Demo {
 
     public static void main(String[] args) {
         try {
-            String pCode = "0652e5f8b5fa8dc537255c522c1f12741e4fd86ae750f6580924fd4dcdaecba2b29e00d1ad665a0eb8515b07594fbe506396e5690bb797e81e5b133a11b04f8062306d2eb76d0fc46882547ef8e0b4217202e8807253a55449874393ea19323d575d9b742cca03";
-            String priks = "00815EF5AD16531BC50172EEAC863FC2F816EC7BF9F5A17971785402B20CB99801";
-
-            String pubStr = decryptIdentifier(pCode, priks);
-            System.out.println(pubStr);
+            // String pCode = "0652e5f8b5fa8dc537255c522c1f12741e4fd86ae750f6580924fd4dcdaecba2b29e00d1ad665a0eb8515b07594fbe506396e5690bb797e81e5b133a11b04f8062306d2eb76d0fc46882547ef8e0b4217202e8807253a55449874393ea19323d575d9b742cca03";
+            // String priks = "00815EF5AD16531BC50172EEAC863FC2F816EC7BF9F5A17971785402B20CB99801";
+            //
+            // String pubStr = decryptIdentifier(pCode, priks);
+            // System.out.println(pubStr);
 
         } catch (Exception e) {
             log.error("验签失败", e);

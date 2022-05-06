@@ -203,12 +203,13 @@ public class SM2Utils {
 //        boolean vs = SM2Utils.verifySign(userId.getBytes(), Util.hexToByte(publicKey), plainText.getBytes(), signBytes);
 //        System.out.println("签名验证结果 - " + vs);
 
-
+/*
         String privateKey = "00AFB685CF8993EF80FF9B6F8DD92486710C719AB3820B9D48A13A12ED9FD6CFE1";
         System.out.println("后端解密：" + new String(SM2Utils.decrypt(Util.hexToByte(privateKey), Util.hexToByte("04d958d8411ace8bd6c2fd236f357a6ef5f2d28be83e17446cc62e66caec6d86a85a6fe5c24795d092bfbb67f937a664229c3e281946b0be8ac74bb53d57ffd13c7bfacc5985d1a49c9f431aadb46309f96adee8d96f6a467d161dbcd60d79dcc5f541994a7a"))));
         String publicKey = "048B2E251938FC25FC30F55A485F0FD91376B63CB4BCC863A11A59E59ACC6C802F628E48EA8FA63960956ED5BD817910AF5388E3D0D01379C0830FD789C7ECF47F";
         String pCodeEncryption = SM2Utils.encrypt(Util.hexStringToBytes(publicKey), "admin".getBytes());
         System.out.println("加密：" + pCodeEncryption);
+*/
 
     }
 }

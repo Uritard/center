@@ -1,7 +1,6 @@
 package com.yjh.platform.configuration;
 
 import com.alibaba.druid.filter.config.ConfigTools;
-import com.yjh.platform.configuration.TripleDESEncrypt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

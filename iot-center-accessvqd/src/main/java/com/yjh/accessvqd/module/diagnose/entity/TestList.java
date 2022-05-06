@@ -39,7 +39,7 @@ public class TestList {
             SecretKeySpec skeySpec = new SecretKeySpec(encryptKey, "AES");
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, new IvParameterSpec(ivByte));
             byte[] encrypted = cipher.doFinal(originalContent);
-            System.out.println(Arrays.toString(encrypted));
+            // System.out.println(Arrays.toString(encrypted));
             return encrypted;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -86,12 +86,12 @@ public class TestList {
     }
 	
 	public static void main(String[] args) {
-		String pass = "12345";
-		String key = "ivms6@hikvision$";
-		String iv="8807599889957088";
-		TestList test = new TestList();
-		byte[] js = test.encrypt(pass.getBytes(),key.getBytes(),iv.getBytes());
-		System.out.println(Base64.getEncoder().encodeToString(js));
+		// String pass = "12345";
+		// String key = "ivms6@hikvision$";
+		// String iv="8807599889957088";
+		// TestList test = new TestList();
+		// byte[] js = test.encrypt(pass.getBytes(),key.getBytes(),iv.getBytes());
+		// System.out.println(Base64.getEncoder().encodeToString(js));
 	}
 
 }
