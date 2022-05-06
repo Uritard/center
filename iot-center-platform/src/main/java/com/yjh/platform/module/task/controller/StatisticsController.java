@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
+import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.task.entity.Statistics;
@@ -34,6 +35,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "机器人/无人机可靠性")
   @GetMapping(value = "/robot")
+  @Logs(title = "机器人/无人机可靠性",content = "根据用户传递的参数查询机器人/无人机可靠性",logType = 1, authority = "1234")
   public Result robot(
       @RequestParam(value = "id", required = false) Long id,
       @RequestParam(value = "type") String type) {
@@ -49,6 +51,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "摄像机可靠性")
   @GetMapping(value = "/camera")
+  @Logs(title = "摄像机可靠性",content = "根据用户传递的参数查询摄像机可靠性",logType = 1, authority = "1234")
   public Result camera(@RequestParam(value = "id", required = false) Long id) {
     Result result = new Result();
     try {
@@ -63,6 +66,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "巡视点位漏检率")
   @RequestMapping(value = "/instance", method = RequestMethod.GET)
+  @Logs(title = "巡视点位漏检率",content = "根据用户传递的参数查询巡视点位漏检率",logType = 1, authority = "1234")
   public Result instance(
       @RequestParam(value = "type") Integer type,
       @RequestParam(value = "year") Integer year,
@@ -77,7 +81,7 @@ public class StatisticsController {
     return result;
   }
 
-  @ApiOperation(value = "人工审核完成率")
+  @ApiOperation(value = "告警审核完成率")
   @ApiImplicitParams({
     @ApiImplicitParam(
         name = "type",
@@ -91,6 +95,7 @@ public class StatisticsController {
         dataType = "String")
   })
   @RequestMapping(value = "/warnCheck", method = RequestMethod.GET)
+  @Logs(title = "告警审核完成率",content = "根据用户传递的参数查询告警审核完成率",logType = 1, authority = "1234")
   public Result countWarnCheck(
       @RequestParam(value = "type") Integer type,
       @RequestParam(value = "year") Integer year,
@@ -109,6 +114,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "巡视告警准确率")
   @RequestMapping(value = "/warnAccuracy", method = RequestMethod.GET)
+  @Logs(title = "巡视告警准确率",content = "根据用户传递的参数查询巡视告警准确率",logType = 1, authority = "1234")
   public Result countWarnAccuracy(
       @RequestParam(value = "type") Integer type,
       @RequestParam(value = "year") Integer year,
@@ -126,6 +132,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "巡视结果人工审核完成率")
   @RequestMapping(value = "/resultCheck", method = RequestMethod.GET)
+  @Logs(title = "巡视结果人工审核完成率",content = "根据用户传递的参数查询巡视结果人工审核完成率",logType = 1, authority = "1234")
   public Result countResultCheck(
       @RequestParam(value = "type") Integer type,
       @RequestParam(value = "year") Integer year,
@@ -143,6 +150,7 @@ public class StatisticsController {
 
   @ApiOperation(value = "巡视任务闭环率")
   @RequestMapping(value = "/taskCheck", method = RequestMethod.GET)
+  @Logs(title = "巡视任务闭环率",content = "根据用户传递的参数查询巡视任务闭环率",logType = 1, authority = "1234")
   public Result taskCheck(
           @RequestParam(value = "type") Integer type,
           @RequestParam(value = "year") Integer year,

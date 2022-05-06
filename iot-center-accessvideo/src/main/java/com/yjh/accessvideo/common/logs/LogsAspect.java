@@ -86,32 +86,30 @@ public class LogsAspect {
             if(Constant.apiPermissions){
                 try {
                     if (!"".equals(annotation.authority())) {
-                        String[] ans = annotation.authority().split(",");
-                        for (String an : ans) {
-                            assert userRole != null;
-                            if (!userRole.equals(an)) {
-                                //todo 越权访问入日志
-                                params.set("logType", "24");
-                                params.set("ip", ip);
-                                params.set("title", annotation.title());
-                                params.set("state", 3);
-                                Map<String, String> jsonMap = new HashMap<>(8);
-                                jsonMap.put("type", "alarmPopUp");
-                                jsonMap.put("ip", ip);
-                                jsonMap.put("warningInfo", "越权访问告警！！！");
-                                jsonMap.put("userId", userId);
-                                jsonMap.put("logType", "24");
-                                jsonMap.put("userName", userName);
-                                jsonMap.put("title", annotation.title());
-                                jsonMap.put("content", String.valueOf(content));
-                                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
-                                content.append(";用户").append(userName).append("存在越权访问!");
-                                params.set("content", content.toString());
-                                post(params);
-                                Result re = new Result();
-                                re.setCode(209, "此用户无权限");
-                                return re;
-                            }
+                        String ans = annotation.authority();
+                        assert userRole != null;
+                        if (!ans.contains(userRole)) {
+                            //todo 越权访问入日志
+                            params.set("logType", "24");
+                            params.set("ip", ip);
+                            params.set("title", annotation.title());
+                            params.set("state", 3);
+                            Map<String, String> jsonMap = new HashMap<>(8);
+                            jsonMap.put("type", "alarmPopUp");
+                            jsonMap.put("ip", ip);
+                            jsonMap.put("warningInfo", "越权访问告警！！！");
+                            jsonMap.put("userId", userId);
+                            jsonMap.put("logType", "24");
+                            jsonMap.put("userName", userName);
+                            jsonMap.put("title", annotation.title());
+                            jsonMap.put("content", String.valueOf(content));
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
+                            content.append(";用户").append(userName).append("存在越权访问!");
+                            params.set("content", content.toString());
+                            post(params);
+                            Result re = new Result();
+                            re.setCode(209, "此用户无权限");
+                            return re;
                         }
                     }
                 }catch (Exception e) {

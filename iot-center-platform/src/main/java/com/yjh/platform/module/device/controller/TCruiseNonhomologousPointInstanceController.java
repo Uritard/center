@@ -43,7 +43,7 @@ public class TCruiseNonhomologousPointInstanceController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增非同源巡检点关系",content = "根据用户传递的参数新增非同源巡检点关系",logType = 2)
+    @Logs(title = "新增非同源巡检点关系",content = "根据用户传递的参数新增非同源巡检点关系",logType = 2, authority = "1234")
     public Result add(@Validated @RequestBody TCruiseNonhomologousPointInstance tCruiseNonhomologousPointInstance) {
         Result result = new Result();
         try {
@@ -59,7 +59,7 @@ public class TCruiseNonhomologousPointInstanceController {
 
     @ApiOperation(value = "根据主键删除")
     @RequestMapping(value = "/deleteByPrimaryId", method = RequestMethod.DELETE)
-    @Logs(title = "删除非同源巡检点数据",content = "根据用户传递的参数删除非同源巡检点数据",logType = 4)
+    @Logs(title = "删除非同源巡检点数据",content = "根据用户传递的参数删除非同源巡检点数据",logType = 4, authority = "1234")
     public Result deleteByPrimaryId(@RequestParam(value = "instanceId", required = true) Long instanceId) {
         Result result = new Result();
         try {
@@ -77,7 +77,7 @@ public class TCruiseNonhomologousPointInstanceController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    @Logs(title = "修改非同源巡检点数据",content = "根据用户传递的参数修改非同源巡检点数据",logType = 3)
+    @Logs(title = "修改非同源巡检点数据",content = "根据用户传递的参数修改非同源巡检点数据",logType = 3, authority = "1234")
     public Result update(@Validated @RequestBody TCruiseNonhomologousPointInstance tCruiseNonhomologousPointInstance) {
         Result result = new Result();
         try {
@@ -137,7 +137,7 @@ public class TCruiseNonhomologousPointInstanceController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询非同源巡检点数据",content = "根据用户传递的参数查询非同源巡检点数据",logType = 1)
+    @Logs(title = "查询非同源巡检点数据",content = "根据用户传递的参数查询非同源巡检点数据",logType = 1, authority = "1234")
     public Result selectByPage(@RequestBody TCruiseNonhomologousPointInstance tCruiseNonhomologousPointInstance
     ) {
         Result result = new Result();
@@ -157,7 +157,7 @@ public class TCruiseNonhomologousPointInstanceController {
 
     @ApiOperation(value = "告警分页查询")
     @RequestMapping(value = "/selectWarnByPage", method = RequestMethod.POST)
-    @Logs(title = "查询非同源告警数据",content = "根据用户传递的参数查询非同源告警数据",logType = 1)
+    @Logs(title = "查询非同源告警数据",content = "根据用户传递的参数查询非同源告警数据",logType = 1, authority = "1235")
     public Result selectWarnByPage(@RequestBody TCruiseNonhomologousWarnInfo tCruiseNonhomologousWarnInfo
     ) {
         Result result = new Result();
@@ -177,7 +177,7 @@ public class TCruiseNonhomologousPointInstanceController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectWarnByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询非同源告警详细数据",content = "根据用户传递的参数查询非同源告警详细数据",logType = 1)
+    @Logs(title = "查询非同源告警详细数据",content = "根据用户传递的参数查询非同源告警详细数据",logType = 1, authority = "1235")
     public Result selectWarnByPrimaryId(@RequestParam(value = "warnId", required = true) String warnId) {
         Result result = new Result();
         try {
