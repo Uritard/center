@@ -191,6 +191,13 @@ public class VoiceTask implements Runnable{
                     tCruiseResultDao.update(tCruiseResult);
 
                     taskGoOn(taskId);
+
+                    Map<String, String> jsonForLastMap = new HashMap<>();
+                    jsonForLastMap.put("type", "lastOneInstance");
+                    jsonForLastMap.put("taskId", taskId);
+                    String jsonForLast = JSON.toJSONString(jsonForLastMap);
+                    log.info("发送给前端的消息：" + jsonForLast);
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jsonForLastMap);
                 } else {
                     Map<String, String> mapForAbnormal = new HashMap<>();
                     mapForAbnormal.put("abnormal", abnormal.toString());
