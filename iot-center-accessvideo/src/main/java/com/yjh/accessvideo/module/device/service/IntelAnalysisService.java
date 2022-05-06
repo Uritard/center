@@ -524,12 +524,11 @@ public class IntelAnalysisService {
      *
      * @param map 巡视点信息
      * @param tWarnInfo 告警数据
-     * @return void
      */
     private void alarmToUpSystem(Map<String, Object> map, TWarnInfo tWarnInfo) {
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
-        Map<String, Object> xmlItem = new HashMap<>();
+        Map<String, Object> xmlItem = new HashMap<>(16);
         try {
             xmlBaseModel.setType("63");
             xmlItem.put("patroldevice_code", map.get("device_id"));
@@ -565,18 +564,18 @@ public class IntelAnalysisService {
             String targetNamePath = imgPath.replace(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")),
                     "");
-            uploadFileToUpFtps(imgPath, "/" + targetNamePath, upFtpsConfig);
+            uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
 
-            xmlItem.put("file_path", "/" + targetNamePath);
+            xmlItem.put("file_path",  targetNamePath);
             xmlItem.put("time", tWarnInfo.getWarnTime());
             xmlItem.put("content", tWarnInfo.getWarnContent());
             xmlItems.add(xmlItem);
             xmlBaseModel.setItems(xmlItems);
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
-            Map<String, List<XMLBaseModel>> alarmMap = new HashMap<>();
+            Map<String, List<XMLBaseModel>> alarmMap = new HashMap<>(3);
             alarmMap.put("list", list);
-            log.info("告警上报：-" + alarmMap);
+            log.info("告警上报：{}", alarmMap);
             Constant.otherServer(alarmMap, Constant.TCP_URL);
         }catch (Exception e){
             log.error("向上级系统上报静默监视告警出错:{}", e.getMessage());
@@ -981,7 +980,7 @@ public class IntelAnalysisService {
             FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(),
                     ftpsConfig.getKeypw(), ftpsConfig.getUsername(), ftpsConfig.getPassword());
         } catch (Exception e) {
-            log.error("将文件上传至ftp服务器错误:{}", e.getMessage());
+            log.error("将文件上传至巡视主机ftp服务器错误:{}", e.getMessage());
         }
     }
 
@@ -997,7 +996,7 @@ public class IntelAnalysisService {
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
                     upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
         } catch (Exception e) {
-            log.error("将文件上传至ftp服务器错误:{}", e.getMessage());
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e.getMessage());
         }
     }
 

@@ -192,9 +192,12 @@ public class DataDealThread implements Runnable {
                                     tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                 } else {
-                                    if (jsonObjectResult.getString("resultValue").matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+")) {
+                                    String resultString = jsonObjectResult.getString("resultValue");
+                                    // 红外会返回两个温度(如：12.3,2.3),所以需要这样取值
+                                    resultString = resultString.split(",")[0];
+                                    if (resultString.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+")) {
 
-                                        String alarmValue = jsonObjectResult.getString("resultValue");
+                                        String alarmValue = resultString;
                                         //判断是否为红外识别且获取FIR文件
                                         //  JsonObject中存在 firDocPath 则放入缓存中
                                         if(Objects.nonNull(jsonObjectResult.get("firDocPath"))){
@@ -235,7 +238,7 @@ public class DataDealThread implements Runnable {
                                             warnMap.put("instanceId", jsonObjectResult.getString("instanceId"));
                                             warnMap.put("stdMeteId", String.valueOf(tCruisePointInstance.getDeviceMeteId()));
                                             warnMap.put("taskId", jsonObjectResult.getString("taskId"));
-                                            warnMap.put("value", jsonObjectResult.getString("resultValue"));
+                                            warnMap.put("value", resultString);
                                             warnMap.put("imagePath", analyseResultPic);
                                             warnMap.put("confMode", "276");
                                             warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
@@ -246,7 +249,7 @@ public class DataDealThread implements Runnable {
 
                                             switch (tStdDevicemeteM.getMeteKind()) {
                                                 case "1":
-                                                    String resultValue = jsonObjectResult.getString("resultValue");
+                                                    String resultValue = resultString;
                                                     int warnRuleTeleSigning = analyseDataOperateService.warnJudgementTelesignaling(resultValue,
                                                             tStdDevicemeteM.getStateZero(),
                                                             tStdDevicemeteM.getStateOne(),
@@ -293,7 +296,7 @@ public class DataDealThread implements Runnable {
                                                     }
                                                     break;
                                                 case "2":
-                                                    Float resultValueMeter = NumberUtils.toFloat(jsonObjectResult.getString("resultValue"));
+                                                    Float resultValueMeter = NumberUtils.toFloat(resultString);
                                                     int warnRuleMeter = analyseDataOperateService.warnJudgement(resultValueMeter,
                                                             tStdDevicemeteM.getHighLimit1(),
                                                             tStdDevicemeteM.getLowLimit1(),
@@ -515,7 +518,7 @@ public class DataDealThread implements Runnable {
                                             tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
                                         }
                                     } else {
-                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", jsonObjectResult.getString("resultValue"));
+                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", resultString);
                                         cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
                                         cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
                                         cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));

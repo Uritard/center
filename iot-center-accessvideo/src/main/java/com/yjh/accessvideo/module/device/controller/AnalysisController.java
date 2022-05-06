@@ -87,21 +87,6 @@ public class AnalysisController {
             log.info("端口号：{}", recognizePort);
             if (analysisList.get(0).getInstanceId() == -1) {
                 result.setData(analysisService.feignAlgorithm(analysisList, recognizePort));
-//                // 直接构造返回结果
-//                JSONObject jsonObject = new JSONObject();
-//                JSONObject msgDataObject = new JSONObject();
-//                msgDataObject.put("instanceId", "-1");
-//                msgDataObject.put("taskId", analysisList.get(0).getTaskId());
-//                jsonObject.put("msgType", "6");
-//                jsonObject.put("msgData", msgDataObject);
-//                try {
-//                    DataDealThread dataDealThread = new DataDealThread(jsonObject.toJSONString(), recognizePort, redisTemplate, analyseDataOperateService, syncWebsocketUrl);
-//                    TaskExecutePool.getInstance().execute(dataDealThread);
-//                }catch (Exception e){
-//                    log.error(e.getMessage());
-//                    log.error("算法结果处理线程异常:{}", e.getStackTrace()[0]);
-//                }
-//                return result;
             }else {
                 // 开关
                 String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
