@@ -3,6 +3,10 @@ package com.yjh.accessvideo.module.device.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.yjh.accessvideo.common.mqtt.AlarmService;
+import com.yjh.accessvideo.common.mqtt.GetSpringUtil;
+import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Alarm;
+import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.common.utils.FtpsUtil;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
@@ -18,6 +22,7 @@ import com.yjh.accessvideo.module.device.entity.TWarnInfo;
 import com.yjh.accessvideo.module.device.entity.XMLBaseModel;
 import com.yjh.accessvideo.module.device.entity.interlanalysis.*;
 import com.yjh.accessvideo.netty.client.DataDealThread;
+import com.yjh.accessvideo.service.ftpsservice;
 import com.yjh.accessvideo.thread.TaskExecutePool;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +49,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -359,7 +366,7 @@ public class IntelAnalysisService {
                 continue;
             }
             Map<String, Object> map = analyseDataOperateDao.selectInstanceInfo(Long.valueOf(analyseResult.getObjectId()));
-
+            Boolean isHave = false;
             for (AnalyseResultItem result : results) {
                 String code = Optional.ofNullable(result.getCode()).orElse("");
                 String value = Optional.ofNullable(result.getValue()).orElse("");
@@ -380,6 +387,9 @@ public class IntelAnalysisService {
                 String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")),
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")));
                 resultImg.add(defectResultRealImg);
+                if ("1".equals(value)){
+                    isHave = true;
+                }
             }
 
             List<String> resultImgList = new ArrayList<>();
@@ -419,6 +429,93 @@ public class IntelAnalysisService {
                     e.printStackTrace();
                 }
             }
+
+            alarmToSFZJ(isHave,String.valueOf(map.get("custom_id")),results);
+        }
+    }
+
+    private void alarmToSFZJ(Boolean isHave,String instanceId,List<AnalyseResultItem> results
+                             ){
+        try{
+            ftpsservice ftpsservice= GetSpringUtil.getBean("ftpsservice");
+            String flag= ftpsservice.getFlag();
+            if("1".equals(flag) && isHave) {
+                log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
+                Alarm alarmDetail = new Alarm();
+                String year = Integer.toString(LocalDate.now().getYear());
+                String month = Integer.toString(LocalDate.now().getMonthValue());
+
+                // 获取原始图路径 resultImgRealPath
+                String origpicpath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content"))+instanceId+".jpg";
+                String[] str2 = origpicpath.split("/");
+                String origpcimagename = str2[str2.length - 1];
+                //拼接算法管理平台原始图片推送地址
+                String remoteorigfilepath = ftpsservice.getFtpsRemotePath() + "/" + "缺陷" + "/" + year + "/" + month + "/" + origpcimagename;
+                log.info("开始向算法管理平台发送图片和mqtt消息");
+                Iterator it = results.iterator();
+                HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
+                List<Defect> defectList1 = new ArrayList<>();
+                String targetPath= "";
+                for (AnalyseResultItem result : results) {
+                    String code = Optional.ofNullable(result.getCode()).orElse("");
+                    String value = Optional.ofNullable(result.getValue()).orElse("");
+                    String type = Optional.ofNullable(result.getType()).orElse("");
+                    String desc = Optional.ofNullable(result.getDesc()).orElse("");
+                    String conf = String.valueOf(result.getConf());
+                    targetPath = copyFileFromFtps(type, result.getResImageUrl());
+                    if("1".equals(value)){
+                        Defect defect = new Defect();
+                        defect.setX1(String.valueOf(result.getPos().get(0).getAreas().get(0).getX()));
+                        defect.setY1(String.valueOf(result.getPos().get(0).getAreas().get(0).getY()));
+                        defect.setX2(String.valueOf(result.getPos().get(0).getAreas().get(1).getX()));
+                        defect.setY2(String.valueOf(result.getPos().get(0).getAreas().get(1).getY()));
+                        defect.setType(type);
+                        defect.setDesc(desc);
+                        defect.setConfidence(conf);
+                        defectList1.add(defect);
+                    }
+
+                }
+
+                //,先取出算法平台返回的resultinfo中的结果图片路径
+                String resultImagebak = targetPath; //分析结果过
+                String[] str = resultImagebak.split("/");
+                String imagename = str[str.length - 1];
+                //拼接算法管理平台分析告警结果图片地址
+                String remotefilepath = ftpsservice.getFtpsRemotePath() + "/" + "缺陷" + "/" + year + "/" + month + "/" + imagename;
+
+
+                alarmDetail.setDefect(defectList1);
+                alarmDetail.setBay_name(nameMap.get("upRegionName"));
+                alarmDetail.setDevice_name(nameMap.get("deviceName"));  //需要修改位devicename
+                alarmDetail.setPoint_name(nameMap.get("meteName"));
+                alarmDetail.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
+                alarmDetail.setPic_diff_base("");               //判别基准图路径
+                alarmDetail.setPic_different("");               //判别告警图路径,即分析结果图
+                alarmDetail.setPic_defect(remotefilepath);      //缺陷告警图路径//
+                ftpsservice.uploadFile("遥信告警", origpicpath, remoteorigfilepath);
+                ftpsservice.uploadFile("遥信告警", resultImagebak, remotefilepath);
+                if (!ftpsservice.fileExits(remoteorigfilepath)) {
+                    ftpsservice.uploadFile("遥信告警", origpicpath, remoteorigfilepath);  //原始图片上传
+                }
+                if (!ftpsservice.fileExits(remotefilepath)) {
+                    ftpsservice.uploadFile("遥信告警", resultImagebak, remotefilepath);
+                }
+
+                log.info("巡视主机与智能分析主机：origpicpath:{}", origpicpath);
+                log.info("巡视主机与智能分析主机：remoteorigfilepath:{}", remoteorigfilepath);
+                log.info("巡视主机与智能分析主机：resultImagebak:{}", resultImagebak);
+                log.info("巡视主机与智能分析主机：remotefilepath:{}", remotefilepath);
+//                       ftp文件上传测试数据
+//                      String localpath="D://信息化工作.jpg";
+//                      ftpsservice.uploadFile("遥信告警",localpath,remotefilepath);
+                AlarmService alarmService = GetSpringUtil.getBean("alarmService");
+                alarmService.PushMsg(alarmDetail);
+                log.info("发送算法管理平台结束");
+            }
+        }catch (Exception e){
+            log.warn("发送给算法主机错误");
         }
     }
 

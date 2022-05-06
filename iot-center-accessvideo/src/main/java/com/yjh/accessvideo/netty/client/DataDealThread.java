@@ -1227,7 +1227,7 @@ public class DataDealThread implements Runnable {
                     log.info("两表结束插入");
                     cruiseKeys.clear();
                 } catch (Exception e) {
-                    log.warn("插表错误", e);
+//                    log.warn("插表错误", e);
                 }
 
                 // 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作
