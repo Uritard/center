@@ -115,12 +115,14 @@ public class RobotInspectionWarnThread implements Runnable{
         warnInfo.setConfMode(276);
         Integer warnFlag = Integer.valueOf(StaticContextAccessor.getBean(RobotService.class).selectDictCodeByNote("其他", "defect_model"));
         warnInfo.setDefectModel(warnFlag);
-        warnInfo.setAlarmSource(282);
+        warnInfo.setAlarmSource(279);
         warnInfo.setValue(warnResultMap.get("value"));
         warnInfo.setTaskId(taskId);
         Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(robotCode);
         warnInfo.setDeviceCode(robotId.toString());
         warnInfo.setWarnName(warnResultMap.get("content"));
+        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());
+        warnInfo.setImagePath(redisInfoMap.get("picpath"));
         if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmLevel"))) {
             int warnLevel = StaticContextAccessor.getBean(RobotService.class).selectDictCode("alarmLevel", warnResultMap.get("alarmLevel"), "alarm_level");
             warnInfo.setWarnLevel(warnLevel);
