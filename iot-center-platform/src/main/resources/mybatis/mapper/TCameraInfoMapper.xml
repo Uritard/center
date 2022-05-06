@@ -163,7 +163,7 @@
            <if test="latitude != null">a.latitude = #{latitude, jdbcType=VARCHAR},</if>
            <if test="longitude != null ">a.longitude = #{longitude, jdbcType=VARCHAR},</if>
            a.unit = #{unit},
-           <if test="commissionDate != null ">a.commissionDate = #{commissionDate, jdbcType=TIMESTAMP},</if>
+           <if test="commissionDate != null ">a.commission_date = #{commissionDate, jdbcType=TIMESTAMP},</if>
     </set>
         where a.camera_id = #{cameraId, jdbcType=BIGINT}
     </update>
