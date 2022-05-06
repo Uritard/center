@@ -34,7 +34,7 @@ public class CruiseResultDetail extends TStdDeviceMete {
     @ApiModelProperty(value = "设备id")
     private Long deviceId;
     @ApiModelProperty(value = "设备点位id")
-    private Long devicePointId;
+    private String devicePointId;
     @ApiModelProperty(value = "巡视设备")
     private String deviceName;
 

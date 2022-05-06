@@ -39,7 +39,7 @@ public class TStdDeviceMete implements Serializable {
 
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "设备点位ID")
-    private Long devicePointId;
+    private String devicePointId;
 
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "标准测点ID")

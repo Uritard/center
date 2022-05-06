@@ -24,7 +24,7 @@ public interface TStdDevicemeteDao {
     TStdDeviceMete selectByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
     List<TStdDeviceMete> select(@Param(value = "deviceMeteId") Long deviceMeteId,
                                 @Param(value = "deviceId") Long deviceId,
-                                @Param(value = "devicePointId") Long devicePointId,
+                                @Param(value = "devicePointId") String devicePointId,
                                 @Param(value = "customId") String customId,
                                 @Param(value = "meteId") Long meteId,
                                 @Param(value = "meteKind") String meteKind,

@@ -132,7 +132,7 @@ public class TStdDevicemeteController {
     @Logs(title = "查询标准设备测点",content = "根据用户传递的参数查询标准设备测点",logType = 1)
     public Result select(@RequestParam(value = "deviceMeteId", required = false) Long deviceMeteId,
                          @RequestParam(value = "deviceId", required = false) Long deviceId,
-                         @RequestParam(value = "devicePointId", required = false) Long devicePointId,
+                         @RequestParam(value = "devicePointId", required = false) String devicePointId,
                          @RequestParam(value = "customId", required = false) String customId,
                          @RequestParam(value = "meteId", required = false) Long meteId,
                          @RequestParam(value = "meteKind", required = false) String meteKind,

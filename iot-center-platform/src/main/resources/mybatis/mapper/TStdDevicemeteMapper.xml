@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdDeviceMeteDetail">
         <id column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
         <result column="device_id" jdbcType="BIGINT" property="deviceId" />
-        <result column="device_point_id" jdbcType="BIGINT" property="devicePointId" />
+        <result column="device_point_id" jdbcType="VARCHAR" property="devicePointId" />
         <result column="custom_id" jdbcType="VARCHAR" property="customId" />
         <result column="mete_id" jdbcType="BIGINT" property="meteId" />
         <result column="mete_kind" jdbcType="VARCHAR" property="meteKind" />
@@ -93,7 +93,7 @@
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceId, jdbcType=BIGINT},
-                #{devicePointId, jdbcType=BIGINT},
+                #{devicePointId, jdbcType=VARCHAR},
                 #{customType, jdbcType=VARCHAR},
                 #{meteId, jdbcType=BIGINT},
                 #{meteKind, jdbcType=INTEGER},
@@ -146,7 +146,7 @@
         update t_std_devicemete a <set>
         <if test="deviceMeteId != null">a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT},</if>
         <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="devicePointId != null ">a.device_point_id = #{devicePointId, jdbcType=BIGINT},</if>
+        <if test="devicePointId != null ">a.device_point_id = #{devicePointId, jdbcType=VARCHAR},</if>
         <if test="customType != null">a.custom_id = #{customType},</if>
         <if test="meteId != null ">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         a.mete_kind = #{meteKind},
@@ -293,7 +293,7 @@
         where 1=1
         <if test="deviceMeteId != null and deviceMeteId != ''"> and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}</if>
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="devicePointId != null and devicePointId != ''"> and a.device_point_id = #{devicePointId, jdbcType=BIGINT}</if>
+        <if test="devicePointId != null and devicePointId != ''"> and a.device_point_id = #{devicePointId, jdbcType=VARCHAR}</if>
         <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="meteId != null and meteId != ''"> and a.mete_id = #{meteId, jdbcType=BIGINT}</if>
         <if test="meteKind != null  and meteKind != ''"> and a.mete_kind = #{meteKind, jdbcType=VARCHAR}</if>
@@ -453,7 +453,7 @@
             (
                 #{TStdDevicemete.deviceMeteId, jdbcType=BIGINT},
                 #{TStdDevicemete.deviceId, jdbcType=BIGINT},
-                #{TStdDevicemete.devicePointId, jdbcType=BIGINT},
+                #{TStdDevicemete.devicePointId, jdbcType=VARCHAR},
                 #{TStdDevicemete.customId, jdbcType=VARCHAR},
                 #{TStdDevicemete.meteId, jdbcType=BIGINT},
                 #{TStdDevicemete.meteKind, jdbcType=INTEGER},

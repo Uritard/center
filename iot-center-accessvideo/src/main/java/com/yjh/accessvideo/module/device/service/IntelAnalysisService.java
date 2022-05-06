@@ -640,8 +640,8 @@ public class IntelAnalysisService {
 
                 List<AnalyseResultItem> results = analyseResult.getResults();
                 // 判断该巡视点是否为27大类的点 若是  直接拿假数据  不要返回的结果
-                Long devicePointId =  analyseDataOperateDao.selectDevicePointIdByInstanceId(Long.valueOf(instanceId));
-                if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
+                String devicePointId =  analyseDataOperateDao.selectDevicePointIdByInstanceId(Long.valueOf(instanceId));
+                if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(devicePointId)){
                     resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
                     resultDataObject.put("analyseType", 398);
                     resultDataObject.put("resultDesc", String.valueOf(resultDesc.add("")));
@@ -750,7 +750,7 @@ public class IntelAnalysisService {
         String value = Optional.ofNullable(result.getValue()).orElse("");
         String desc = Optional.ofNullable(result.getDesc()).orElse("");
 
-        Long devicePointId =  analyseDataOperateDao.selectDevicePointIdByInstanceId(instanceId);
+        String devicePointId =  analyseDataOperateDao.selectDevicePointIdByInstanceId(instanceId);
         Map<String, String> map = new HashMap<>(5);
 
         if (Objects.isNull(type) || Objects.equals("tx_pb",type)){
@@ -764,11 +764,11 @@ public class IntelAnalysisService {
     }
 
     private Map<String, String> getDistinguishResult(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
-                                                     JSONObject resultDataObject, String originPicPath, String type, String value, Long devicePointId, Map<String, String> map) {
+                                                     JSONObject resultDataObject, String originPicPath, String type, String value, String devicePointId, Map<String, String> map) {
         String targetPath;
         try {
             // 判断该巡视点是否为判别的点 若是  直接拿假数据  不要返回的结果
-            if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
+            if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(devicePointId)){
                 resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
                 resultDataObject.put("analyseType", 11);
                 if (Objects.equals("1", value)){
@@ -809,7 +809,7 @@ public class IntelAnalysisService {
     }
 
     private Map<String, String> getDefectOrIdentification(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
-                                           JSONObject resultDataObject, String type, String value, String desc, Long devicePointId, Map<String, String> map) {
+                                           JSONObject resultDataObject, String type, String value, String desc, String devicePointId, Map<String, String> map) {
         String targetPath;
         try {
             // 根据返回的算法类型查询算法相关信息
@@ -842,7 +842,7 @@ public class IntelAnalysisService {
                  * 设备状态识别
                  * */
                 // 判断该巡视点是否为表计的点 若是  直接拿假数据  不要返回的结果
-                if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(String.valueOf(devicePointId))){
+                if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(devicePointId)){
                     resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
                     resultDataObject.put("analyseType", 1);
                     map.put("resultDesc", String.valueOf(resultDesc));
