@@ -204,14 +204,32 @@ public class IntelAnalysisService {
                 // 判别算法 需要判别基准图
                 case "11":
                     // 判别基准图
-                    String imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId());
+                    // 拿提前拍好的预置位作为判别基准图
+                    /*String imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId());
                     imageNormalUrlPath = imageNormalUrlPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content")),
                             String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content")));
                     String[] split = analysis.getPicPath().split("/");
                     String targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
                     uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, intelAnalysisFtpsConfig);
+                    analyseObject.setImageNormalUrlPath(targetNamePath);*/
 
-                    analyseObject.setImageNormalUrlPath(targetNamePath);
+                    // 拿电科院给的图
+                    String devicePointId = analyseDataOperateDao.selectDevicePointIdByInstanceId(analysis.getInstanceId());
+                    String filePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:distinguishReferencePath","content"));
+                    String imageNormalUrlPath = "";
+                    File folder = new File(filePath);
+                    File[] listFiles = folder.listFiles();
+                    for (File direFile : listFiles){
+                        if (direFile.getName().contains(devicePointId)){
+                            imageNormalUrlPath = filePath + "/" + direFile.getName() + "/" + direFile.listFiles()[0].getName();
+                            log.info("文件名称:{}", imageNormalUrlPath);
+                        }
+                    }
+                    String targetNamePath = imageNormalUrlPath.replaceAll(
+                            String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content")),"");
+                    uploadFileToFtps(imageNormalUrlPath, targetNamePath, intelAnalysisFtpsConfig);
+                    analyseObject.setImageNormalUrlPath(targetNamePath.substring(1));
+
                     String[] distinguishType = algorithmConfig.getDistinguishType().split(",");
                     Collections.addAll(typeList, distinguishType);
                     break;

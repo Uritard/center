@@ -677,6 +677,7 @@
         select
         a.device_mete_id,
         a.device_id,
+        a.device_point_id,
         a.custom_id,
         a.mete_id,
         a.mete_kind,
@@ -985,10 +986,10 @@
         WHERE a.is_ai = 1
     </select>
 
-    <select id="selectDevicePointIdByInstanceId" resultType="java.lang.Long">
+    <select id="selectDevicePointIdByInstanceId" resultType="java.lang.String">
         SELECT
             b.device_point_id
-        FROM t_cruise_point_info a,t_std_devicemete b
+        FROM t_cruise_point_instance a,t_std_devicemete b
         WHERE a.device_mete_id = b.device_mete_id
           and a.instance_id = #{instanceId,jdbcType=BIGINT}
     </select>

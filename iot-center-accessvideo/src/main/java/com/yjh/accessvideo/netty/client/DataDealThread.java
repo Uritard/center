@@ -518,7 +518,7 @@ public class DataDealThread implements Runnable {
                                             tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 1, cruiseRedisName).get(1);
                                         }
                                     } else {
-                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", resultString);
+                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", jsonObjectResult.getString("resultValue"));
                                         cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
                                         cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
                                         cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
