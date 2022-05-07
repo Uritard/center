@@ -252,7 +252,7 @@
         left join t_robot_inspection g on g.inspection_id = b.cruise_id
         left join t_robot_info h on h.robot_id = g.robot_id
         left join t_dict_business k on k.dict_code = e.device_type
-        GROUP BY n.warn_id) m  on m.warn_id = a.warn_id where 1=1
+        GROUP BY n.warn_id) m  on m.warn_id = a.warn_id where a.warn_type=5
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="deviceType != null "> and m.device_name = #{deviceType, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and m.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%')</if>
@@ -341,7 +341,7 @@
         left join t_robot_inspection g on g.inspection_id = b.cruise_id
         left join t_robot_info h on h.robot_id = g.robot_id
         left join t_dict_business k on k.dict_code = e.device_type
-        GROUP BY n.warn_id) m  on m.warn_id = a.warn_id where 1=1
+        GROUP BY n.warn_id) m  on m.warn_id = a.warn_id where a.warn_type=5
         <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=VARCHAR}</if>
     </select>
 
