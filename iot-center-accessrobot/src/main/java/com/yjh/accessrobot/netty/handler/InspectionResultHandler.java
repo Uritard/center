@@ -133,88 +133,89 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, Object> item = xmlBaseModel.getItems().get(0);
 
-        String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code").toString() + "/";
-        String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code").toString() + "/";
-        // 可见光结果、红外fir、音频wav
-        String[] sArray = ftpFilePath.split("/");
-        String ftpFileName = sArray[sArray.length - 1];
-        String temporaryFilePath = filePathMap.get("content") + "/" + ftpFilePath;
-        log.info("temporaryFilePath==={}",temporaryFilePath);
+        try {
+            String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code").toString() + "/";
+            String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code").toString() + "/";
+            // 可见光结果、红外fir、音频wav
+            String[] sArray = ftpFilePath.split("/");
+            String ftpFileName = sArray[sArray.length - 1];
+            String temporaryFilePath = filePathMap.get("content") + "/" + ftpFilePath;
+            log.info("temporaryFilePath==={}",temporaryFilePath);
 
-        String fileType = item.get("file_type").toString();
-        // 红外原图
-        if (item.containsKey("origin_file_path") && Objects.equals("1",fileType)) {
+            String fileType = item.get("file_type").toString();
             // 红外原图
-            String ftpInfraredOriginPath = item.get("origin_file_path").toString();
-            String[] sArray2 = ftpInfraredOriginPath.split("/");
-            // 红外原图名称
-            String ftpInfraredOriginName = sArray2[sArray2.length - 1];
-            String temporaryInfraredOriginPath = filePathMap.get("content") + "/" + ftpInfraredOriginPath;
-            // 拷贝原图
-            copyFileToDevelop(temporaryInfraredOriginPath, developAbsoluteUrl + "InfraredOrigin");
-            cruiseResultMap.put("absolutePath", developAbsoluteUrl + "InfraredOrigin" + "/" + ftpInfraredOriginName);
-        }
-        String ftpOriginPath = null;
-        // 可见光原图、音频和红外结果
-        if (item.containsKey("origin_file_result_path")) {
-            // 可见光原图、红外结果
-            ftpOriginPath = item.get("origin_file_result_path").toString();
-        } else {
-            // 可见光原图、音频
-            ftpOriginPath = item.get("file_path").toString();
-        }
+            if (item.containsKey("origin_file_path") && Objects.equals("1",fileType)) {
+                // 红外原图
+                String ftpInfraredOriginPath = item.get("origin_file_path").toString();
+                String[] sArray2 = ftpInfraredOriginPath.split("/");
+                // 红外原图名称
+                String ftpInfraredOriginName = sArray2[sArray2.length - 1];
+                String temporaryInfraredOriginPath = filePathMap.get("content") + "/" + ftpInfraredOriginPath;
+                // 拷贝原图
+                copyFileToDevelop(temporaryInfraredOriginPath, developAbsoluteUrl + "InfraredOrigin");
+                cruiseResultMap.put("absolutePath", developAbsoluteUrl + "InfraredOrigin" + "/" + ftpInfraredOriginName);
+            }
+            String ftpOriginPath = null;
+            // 可见光原图、音频和红外结果
+            if (item.containsKey("origin_file_result_path")) {
+                // 可见光原图、红外结果
+                ftpOriginPath = item.get("origin_file_result_path").toString();
+            } else {
+                // 可见光原图、音频
+                ftpOriginPath = item.get("file_path").toString();
+            }
 
-        String[] sArray2 = ftpOriginPath.split("/");
-        // 原图文件名称
-        String ftpOriginName = sArray2[sArray2.length - 1];
-        String temporaryOriginPath = filePathMap.get("content") + "/" + ftpOriginPath;
-        log.info("temporaryOriginPath==={}",temporaryOriginPath);
+            String[] sArray2 = ftpOriginPath.split("/");
+            // 原图文件名称
+            String ftpOriginName = sArray2[sArray2.length - 1];
+            String temporaryOriginPath = filePathMap.get("content") + "/" + ftpOriginPath;
+            log.info("temporaryOriginPath==={}",temporaryOriginPath);
 
-        /*
-         * 针对2022过检
-         * 27大类、表计、缺陷、判别需要机器人,且需算法分析
-         * 这些都是可见光的图片
-         * 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path
-        * */
-        boolean flag = item.containsKey("file_path") && !item.containsKey("origin_file_result_path") && !item.containsKey("origin_file_path");
-        temporaryMap.put("temporaryOriginPath", temporaryOriginPath);
-        temporaryMap.put("ftpFileName", ftpFileName);
-        temporaryMap.put("flag", flag);
+            /*
+             * 针对2022过检
+             * 27大类、表计、缺陷、判别需要机器人,且需算法分析
+             * 这些都是可见光的图片
+             * 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path
+             * */
+            boolean flag = item.containsKey("file_path") && !item.containsKey("origin_file_result_path") && !item.containsKey("origin_file_path");
+            temporaryMap.put("temporaryOriginPath", temporaryOriginPath);
+            temporaryMap.put("ftpFileName", ftpFileName);
+            temporaryMap.put("flag", flag);
 
-        // 1.红外 2.可见光 3.音频 4.视频
-        if (Objects.equals("1",fileType)) {
-            // 拷贝巡视结果图
-            copyFileToDevelop(temporaryOriginPath, developAbsoluteUrl + "Infrared");
-            // 拷贝fir
-            copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "FIR");
-            cruiseResultMap.put("relativePath", developRelativeUrl + "Infrared" + "/" + ftpOriginName);
-            cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" + ftpFileName);
+            // 1.红外 2.可见光 3.音频 4.视频
+            if (Objects.equals("1",fileType)) {
+                // 拷贝巡视结果图
+                copyFileToDevelop(temporaryOriginPath, developAbsoluteUrl + "Infrared");
+                // 拷贝fir
+                copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "FIR");
+                cruiseResultMap.put("relativePath", developRelativeUrl + "Infrared" + "/" + ftpOriginName);
+                cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" + ftpFileName);
 
-            isAlarmMap.put("relativePath", developRelativeUrl + "Infrared" + "/" + ftpOriginName);
-            isAlarmMap.put("OriginPath",item.get("origin_file_path").toString());
-        } else if (Objects.equals("2",fileType) && Boolean.FALSE.equals(flag)) {
-            // 拷贝巡视结果图
-            copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "CCD");
-            // 拷贝原图
-            copyFileToDevelop(temporaryOriginPath, developAbsoluteUrl + "BigImg");
-            cruiseResultMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);
-            cruiseResultMap.put("absolutePath", developAbsoluteUrl + "BigImg" + "/" + ftpOriginName);
+                isAlarmMap.put("relativePath", developRelativeUrl + "Infrared" + "/" + ftpOriginName);
+                isAlarmMap.put("OriginPath",item.get("origin_file_path").toString());
+            } else if (Objects.equals("2",fileType) && Boolean.FALSE.equals(flag)) {
+                // 拷贝巡视结果图
+                copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "CCD");
+                // 拷贝原图
+                copyFileToDevelop(temporaryOriginPath, developAbsoluteUrl + "BigImg");
+                cruiseResultMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);
+                cruiseResultMap.put("absolutePath", developAbsoluteUrl + "BigImg" + "/" + ftpOriginName);
 
-            isAlarmMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);
-            isAlarmMap.put("OriginPath",item.get("origin_file_path").toString());
-        } else if (Objects.equals("3",fileType)) {
-            // 拷贝巡视结果图
-            copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Audio");
-            cruiseResultMap.put("relativePath", developRelativeUrl + "Audio" + "/" + ftpFileName);
-            cruiseResultMap.put("absolutePath", developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
-        }else if (Objects.equals("4", fileType)) {
-            // 拷贝巡视结果视频文件
-            copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Video");
-            cruiseResultMap.put("relativePath", developRelativeUrl + "Video" + "/" + ftpFileName);
-            cruiseResultMap.put("absolutePath", developAbsoluteUrl + "Video" + "/" + ftpOriginName);
-        }
+                isAlarmMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);
+                isAlarmMap.put("OriginPath",item.get("origin_file_path").toString());
+            } else if (Objects.equals("3",fileType)) {
+                // 拷贝巡视结果图
+                copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Audio");
+                cruiseResultMap.put("relativePath", developRelativeUrl + "Audio" + "/" + ftpFileName);
+                cruiseResultMap.put("absolutePath", developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
+            }else if (Objects.equals("4", fileType)) {
+                // 拷贝巡视结果视频文件
+                copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Video");
+                cruiseResultMap.put("relativePath", developRelativeUrl + "Video" + "/" + ftpFileName);
+                cruiseResultMap.put("absolutePath", developAbsoluteUrl + "Video" + "/" + ftpOriginName);
+            }
 
-        /// 新版的图片处理
+            /// 新版的图片处理
         /*String fileType = item.get("file_type").toString();
         String ftpFilePath = item.get("file_path").toString();
         String sArray[] = ftpFilePath.split("/");
@@ -249,18 +250,20 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             cruiseResultMap.put("absolutePath",developAbsoluteUrl + "Audio" + "/" + ftpOriginName);
         }*/
 
-        // 只对红外和可见光进行二次分析判断是否产生告警
-        isAlarmMap.put("robotCode", xmlBaseModel.getSendCode());
-        isAlarmMap.put("taskCode", item.get("task_code").toString());
-        isAlarmMap.put("deviceId", item.get("device_id").toString());
-        isAlarmMap.put("value", item.get("value").toString());
-        isAlarmMap.put("absolutePath",cruiseResultMap.get("absolutePath"));
-        isAlarmMap.put("deviceName", cruiseResultMap.get("device_name"));
-        //jeff add 把机器人任务结果图的物理路径传到isWarnAfterCruiseThread
-        // Start IsWarnAfterCruiseThread
-        IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate, websocketUrl);
-        TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
-
+            // 只对红外和可见光进行二次分析判断是否产生告警
+            isAlarmMap.put("robotCode", xmlBaseModel.getSendCode());
+            isAlarmMap.put("taskCode", item.get("task_code").toString());
+            isAlarmMap.put("deviceId", item.get("device_id").toString());
+            isAlarmMap.put("value", item.get("value").toString());
+            isAlarmMap.put("absolutePath",cruiseResultMap.get("absolutePath"));
+            isAlarmMap.put("deviceName", cruiseResultMap.get("device_name"));
+            //jeff add 把机器人任务结果图的物理路径传到isWarnAfterCruiseThread
+            // Start IsWarnAfterCruiseThread
+            IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate, websocketUrl);
+            TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
+        }catch (Exception e){
+            log.error("对机器人结果文件处理及判断结果是否告警出现错误:{}", e.getMessage());
+        }
         return temporaryMap;
     }
 

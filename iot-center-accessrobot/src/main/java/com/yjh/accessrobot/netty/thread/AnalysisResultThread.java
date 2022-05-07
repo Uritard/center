@@ -71,7 +71,7 @@ public class AnalysisResultThread implements Runnable{
             }
         }
         // 复制原图到算法分析指定的路径
-        String resultImagePath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content").toString() + "/" + ftpFileName;
+        String resultImagePath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content").toString() + ftpFileName;
         try {
             FileUtil.copyFileUsingStream(temporaryOriginPath, resultImagePath);
         } catch (IOException e) {
@@ -79,8 +79,7 @@ public class AnalysisResultThread implements Runnable{
         }
         // 标定文件
         String picModelPath = redisTemplate.opsForHash().get("t_sys_param:picModelPath", "content").toString() + "/" + inspectionCode;
-        // 判别基准图 暂时可能不用
-        String imagePath = "";
+
         // 测点信息
         TCruisePointInstanceDetail details = StaticContextAccessor.getBean(RobotService.class).selectForTask(instanceId);
         TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMete(details.getDeviceMeteId());

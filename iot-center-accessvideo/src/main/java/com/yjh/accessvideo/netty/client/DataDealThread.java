@@ -286,7 +286,7 @@ public class DataDealThread implements Runnable {
 
                                                     } else {
                                                         //未达到告警值(遥信)
-                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", alarmValue);
+                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", jsonObjectResult.getString("resultValue"));
                                                         cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
                                                         cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
                                                         cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
@@ -311,7 +311,7 @@ public class DataDealThread implements Runnable {
                                                         warnMap.put("warnTime", simpleDateFormat.format(new Date()));
                                                         log.info("数字结果告警判断结果：" + warnRuleMeter);
 
-                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "异常告警", alarmValue);
+                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "异常告警", jsonObjectResult.getString("resultValue"));
                                                         cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
                                                         cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
                                                         cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
@@ -372,7 +372,7 @@ public class DataDealThread implements Runnable {
                                                         tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                                     } else {
                                                         //未达到告警值（遥测）
-                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", alarmValue);
+                                                        Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", jsonObjectResult.getString("resultValue"));
                                                         cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
                                                         cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
                                                         cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
@@ -509,7 +509,7 @@ public class DataDealThread implements Runnable {
                                             }
 
                                         } else {
-                                            Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", alarmValue);
+                                            Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "正常", "--", jsonObjectResult.getString("resultValue"));
                                             cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
                                             cruiseResultMap.put("cruiseResult", doubleResultMap.get("cruiseResult"));
                                             cruiseResultMap.put("cruiseAbnormal", doubleResultMap.get("cruiseAbnormal"));
