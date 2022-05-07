@@ -188,13 +188,11 @@ public class TSequentialConfService{
 
             //todo 发给算法进行分析
 
+            //Map<String,String> mapResult = this.sequentialInfo(meteId).get(0);
+            TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
+            String devicePath = tSysParam.getContent()+"/"+videocfmresultFile;
             try{
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
-                //Map<String,String> mapResult = this.sequentialInfo(meteId).get(0);
-                TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
-                String devicePath = tSysParam.getContent()+"/"+videocfmresultFile.replace(".",simpleDateFormat2.format(new Date())+".");
-
                 File txt=new File(devicePath);
                 if(txt.exists()){
                     txt.delete();
@@ -256,13 +254,11 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public String unionTask(String cfgDeviceId,String order){
 
+        TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
+        TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
+        String devicePath = tSysParam.getContent()+"/"+returnlinkageFile;
         try{
-            TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
-            TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
-
-            String devicePath = tSysParam.getContent()+"/"+returnlinkageFile.replace(".",simpleDateFormat2.format(new Date())+".");
             File txt=new File(devicePath);
 
             if(txt.exists()){
