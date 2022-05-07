@@ -2,24 +2,18 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mchange.v1.util.ArrayUtils;
 import com.yjh.commons.DateUtils;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.quartz.CruiseTaskJob;
 import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
@@ -32,14 +26,9 @@ import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.*;
-import com.yjh.platform.module.user.entity.*;
-import io.swagger.models.auth.In;
-import lombok.Data;
-import lombok.NonNull;
+import com.yjh.platform.module.user.entity.SysUser;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
-import org.quartz.CronExpression;
-import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +42,6 @@ import org.springframework.util.MultiValueMap;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -728,7 +716,7 @@ public class TCruiseTaskService {
         Date now = new Date();
         for (TCruiseTaskCount tCruiseTaskCount : list) {
             Date starTime = tCruiseTaskCount.getStartTime();
-            if(DateUtils.compare(now, starTime) >= 0){
+            if(DateUtils.compare(now, starTime) < 0){
                 // 任务未到开始时间，忽略
                 continue;
             }

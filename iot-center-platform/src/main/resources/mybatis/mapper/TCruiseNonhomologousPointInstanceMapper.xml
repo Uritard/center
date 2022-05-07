@@ -206,7 +206,7 @@
         left join t_dict_business k on k.dict_code = e.device_type
         where 1 = 1
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="deviceType != null "> and f.device_name = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="deviceType != null "> and e.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and e.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%')</if>
         <if test="deviceMeteName != null and deviceMeteName != ''"> and d.mete_name like concat('%',#{deviceMeteName, jdbcType=VARCHAR},'%') </if>
         <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
@@ -254,7 +254,7 @@
         left join t_dict_business k on k.dict_code = e.device_type
         GROUP BY n.warn_id) m  on m.warn_id = a.warn_id where a.warn_type=5
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="deviceType != null "> and m.device_name = #{deviceType, jdbcType=INTEGER}</if>
+        <if test="deviceType != null "> and m.device_type = #{deviceType, jdbcType=INTEGER}</if>
         <if test="deviceName != null and deviceName != ''"> and m.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%')</if>
         <if test="deviceMeteName != null and deviceMeteName != ''"> and m.mete_name like concat('%',#{deviceMeteName, jdbcType=VARCHAR},'%') </if>
         <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>

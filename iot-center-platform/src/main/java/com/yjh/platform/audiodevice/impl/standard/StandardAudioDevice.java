@@ -4,6 +4,7 @@ import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.impl.AudioFileUtils;
 import com.yjh.platform.audiodevice.impl.standard.tcp.InboundMessage;
 import com.yjh.platform.audiodevice.impl.standard.tcp.Packet;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.MqttUtilsServer;
 import com.yjh.platform.module.device.entity.AuidoOprInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +46,9 @@ public class StandardAudioDevice implements AudioDevice {
             log.warn("非录音时段收到录音数据: {}", inboundMessage);
             return;
         }
-
-        log.info("准备处理录音数据: {}", inboundMessage);
+        if (Constant.isPacketLog()) {
+            log.info("准备处理录音数据: {}", inboundMessage);
+        }
         try {
             packetsLock.writeLock().lock();
             if (packets.size() > MAX_BUFFERED_PACKETS) {

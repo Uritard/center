@@ -1267,6 +1267,7 @@ public class CameraConService {
             HCNetSDK.NET_DVR_FILECOND_V40 fileCond = new HCNetSDK.NET_DVR_FILECOND_V40();
             fileCond.dwFileType = 0xff;
             fileCond.dwIsLocked = 0xff;
+            boolean nvrFileLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:nvrFileLog", "content"));
             for (int i = 0; i < ipChans.length; i++) {
                 int ipId = ipChans[i].byIPID;
                 if(ipId == 0){
@@ -1325,8 +1326,10 @@ public class CameraConService {
                         long speed = spTime - stTime;
                         // 计算录像时长
                         timeRecord += speed;
-                        log.info("找到文件, channel: {}, fileName: {}, time: [{}  {}]", ipChan.intValue(), new String(strFile.sFileName).trim(),
-                            strFile.struStartTime.toStringTime(), strFile.struStopTime.toStringTime());
+                        if(nvrFileLog) {
+                            log.info("找到文件, channel: {}, fileName: {}, time: [{}  {}]", ipChan.intValue(), new String(strFile.sFileName).trim(),
+                                strFile.struStartTime.toStringTime(), strFile.struStopTime.toStringTime());
+                        }
                         // 录像完整性视频段校验
                         recordCheck2(recordschedList, intact, strFile.struStartTime, preEndTime);
 

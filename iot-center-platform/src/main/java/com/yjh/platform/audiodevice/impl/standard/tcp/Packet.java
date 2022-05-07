@@ -4,6 +4,7 @@
 
 package com.yjh.platform.audiodevice.impl.standard.tcp;
 
+import com.yjh.platform.common.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.mina.core.buffer.IoBuffer;
 
@@ -107,14 +108,20 @@ public class Packet {
         //包格式版本
         byte version = in.get();
         int remainingLength = in.getInt();
-        log.info("size.len：{}",remainingLength);
+        if (Constant.isPacketLog()) {
+            log.info("size.len：{}", remainingLength);
+        }
         int remaining = in.remaining();
         //剩下的数据不够，重置读位置，放弃此轮解析
-        log.info("remaining:{}",remaining);
+        if (Constant.isPacketLog()) {
+            log.info("remaining:{}", remaining);
+        }
         //剩下的数据不够，重置读位置，放弃此轮解析
         if (remaining < remainingLength) {
             in.reset();
-            log.error("剩下的数据不够");
+            if (Constant.isPacketLog()) {
+                log.error("剩下的数据不够");
+            }
             return null;
         }
 

@@ -135,6 +135,8 @@ public class Constant {
 
     public static RedisTemplate redisTemplate;
 
+    public static Boolean packetLog;
+
     public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {
         //将websocket信息写入redis
         String json= JSON.toJSONString(map);
@@ -159,6 +161,17 @@ public class Constant {
         } catch (Exception e) {e.getMessage();}
         return result;
         //return "666";
+    }
+
+    public static boolean isPacketLog() {
+        if (packetLog == null) {
+            packetLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:packetLog", "content"));
+        }
+        return packetLog;
+    }
+
+    public static void refreshPacketLog() {
+        packetLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:packetLog", "content"));
     }
 
     public static ConcurrentHashMap<String,Integer> taskStateMap=new ConcurrentHashMap<>();
