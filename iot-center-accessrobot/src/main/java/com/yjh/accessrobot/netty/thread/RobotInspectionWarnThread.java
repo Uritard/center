@@ -93,7 +93,8 @@ public class RobotInspectionWarnThread implements Runnable{
                 }
             }
         }catch (Exception e){
-            log.error(e.getMessage());
+            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -115,7 +116,7 @@ public class RobotInspectionWarnThread implements Runnable{
         warnInfo.setConfMode(276);
         Integer warnFlag = Integer.valueOf(StaticContextAccessor.getBean(RobotService.class).selectDictCodeByNote("其他", "defect_model"));
         warnInfo.setDefectModel(warnFlag);
-        warnInfo.setAlarmSource(279);
+        warnInfo.setAlarmSource(282);
         warnInfo.setValue(warnResultMap.get("value"));
         warnInfo.setTaskId(taskId);
         Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(robotCode);

@@ -170,7 +170,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             log.info("巡视主机给机器人{}响应了", robotCode);
         }
         // 国网要求
-        // robotService.upToCruise(xmlBaseModel);
+         robotService.upToCruise(xmlBaseModel);
 
     }
 

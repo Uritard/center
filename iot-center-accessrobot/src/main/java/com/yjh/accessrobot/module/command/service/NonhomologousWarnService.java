@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class NonhomologousWarnService {
 
-    private Logger log = LoggerFactory.getLogger(NonhomologousWarnService.class);
+    private final Logger log = LoggerFactory.getLogger(NonhomologousWarnService.class);
 
     String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
     private static final String OFF_LINE = "离线";
@@ -56,7 +56,7 @@ public class NonhomologousWarnService {
 
 
     // 通过 -?[0-9]+(\\\\.[0-9]+)? 进行匹配是否为数字
-    private static Pattern pattern = Pattern.compile("-?[0-9]+(\\\\.[0-9]+)?");
+    private static final Pattern pattern = Pattern.compile("-?[0-9]+(\\\\.[0-9]+)?");
     /**
      * 非同源告警处理
      * @param cruiseResultMap 巡检结果
@@ -64,6 +64,7 @@ public class NonhomologousWarnService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertNonhomologousWarn(Map<String,String> cruiseResultMap,int isResult) {
+        String warnId = String.valueOf(UUID.randomUUID()).replace("-", "");
         if(1==isResult){
             //查询非同源告警规则
             List<Map<String,Object>> nonhomologousInstances = nonhomologousWarnDao.getNonhomologousInspections(cruiseResultMap);
@@ -73,7 +74,7 @@ public class NonhomologousWarnService {
                         // 红外
                         case 1:
                             if(!Objects.isNull(nonhomologousInspections.get("robotInspectionName"))&&!Objects.isNull(nonhomologousInspections.get("videoInspectionName"))){
-                                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + cruiseResultMap.get("taskCode").toString() + ":" + nonhomologousInspections.get("videoInstanceId").toString());
+                                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + cruiseResultMap.get("taskCode") + ":" + nonhomologousInspections.get("videoInstanceId").toString());
                                 if(redisInfoMap!=null&&redisInfoMap.get("cruiseResultId")!=null&&!checkWarnExist(nonhomologousInspections.get("robotInstanceId").toString(),cruiseResultMap.get("taskCode"),nonhomologousInspections.get("instanceId").toString())){
                                     String warnThreshold = nonhomologousInspections.get("warnThreshold").toString();
                                     String robotInsResult = cruiseResultMap.get("value");
@@ -81,7 +82,7 @@ public class NonhomologousWarnService {
                                     if(isNumeric(warnThreshold)&&isNumeric(robotInsResult)&&isNumeric(videoInsResult)){
                                         if(Math.abs(Double.parseDouble(robotInsResult)-Double.parseDouble(videoInsResult))>Double.parseDouble(warnThreshold)){
                                             Map<String,Object> warn = new HashMap<>();
-                                            warn.put("warnId",String.valueOf(UUID.randomUUID()).replace("-", ""));
+                                            warn.put("warnId", warnId);
                                             warn.put("warnType",1);
                                             warn.put("instanceId",Double.parseDouble(nonhomologousInspections.get("instanceId").toString()));
                                             warn.put("warnContent","红外测温非同源结果差值超过阈值："+nonhomologousInspections.get("warnThreshold").toString());
@@ -112,13 +113,13 @@ public class NonhomologousWarnService {
                         // 位置
                         case 2:
                             if(!Objects.isNull(nonhomologousInspections.get("robotInspectionName"))&&!Objects.isNull(nonhomologousInspections.get("videoInspectionName"))){
-                                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + cruiseResultMap.get("taskCode").toString() + ":" + nonhomologousInspections.get("videoInstanceId").toString());
+                                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + cruiseResultMap.get("taskCode") + ":" + nonhomologousInspections.get("videoInstanceId").toString());
                                 if(redisInfoMap!=null&&redisInfoMap.get("cruiseResultId")!=null&&!checkWarnExist(nonhomologousInspections.get("robotInstanceId").toString(),cruiseResultMap.get("taskCode"),nonhomologousInspections.get("instanceId").toString())) {
                                     String robotInsResult = cruiseResultMap.get("value");
                                     String videoInsResult = redisInfoMap.get("resultNum");
                                     if (!Objects.equals(robotInsResult, videoInsResult)) {
                                         Map<String, Object> warn = new HashMap<>();
-                                        warn.put("warnId", String.valueOf(UUID.randomUUID()).replace("-", ""));
+                                        warn.put("warnId", warnId);
                                         warn.put("warnType", 2);
                                         warn.put("instanceId", Long.parseLong(nonhomologousInspections.get("instanceId").toString()));
                                         warn.put("warnContent", "位置状态非同源结果不一致");
@@ -148,13 +149,13 @@ public class NonhomologousWarnService {
                         // 表计-数显
                         case 3:
                             if(!Objects.isNull(nonhomologousInspections.get("robotInspectionName"))&&!Objects.isNull(nonhomologousInspections.get("videoInspectionName"))){
-                                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + cruiseResultMap.get("taskCode").toString() + ":" + nonhomologousInspections.get("videoInstanceId").toString());
+                                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + cruiseResultMap.get("taskCode") + ":" + nonhomologousInspections.get("videoInstanceId").toString());
                                 if(redisInfoMap!=null&&redisInfoMap.get("cruiseResultId")!=null&&!checkWarnExist(nonhomologousInspections.get("robotInstanceId").toString(),cruiseResultMap.get("taskCode"),nonhomologousInspections.get("instanceId").toString())) {
                                     String robotInsResult = cruiseResultMap.get("value");
                                     String videoInsResult = redisInfoMap.get("resultNum");
                                     if (!Objects.equals(robotInsResult, videoInsResult)) {
                                         Map<String, Object> warn = new HashMap<>();
-                                        warn.put("warnId", String.valueOf(UUID.randomUUID()).replace("-", ""));
+                                        warn.put("warnId", warnId);
                                         warn.put("warnType", 3);
                                         warn.put("instanceId", Long.parseLong(nonhomologousInspections.get("instanceId").toString()));
                                         warn.put("warnContent", "数显类表计识别非同源结果不一致");
@@ -184,7 +185,7 @@ public class NonhomologousWarnService {
                         // 表计-指针
                         case 4:
                             if(!Objects.isNull(nonhomologousInspections.get("robotInspectionName"))&&!Objects.isNull(nonhomologousInspections.get("videoInspectionName"))){
-                                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + cruiseResultMap.get("taskCode").toString() + ":" + nonhomologousInspections.get("videoInstanceId").toString());
+                                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + cruiseResultMap.get("taskCode") + ":" + nonhomologousInspections.get("videoInstanceId").toString());
                                 if(redisInfoMap!=null&&redisInfoMap.get("cruiseResultId")!=null&&!checkWarnExist(nonhomologousInspections.get("robotInstanceId").toString(),cruiseResultMap.get("taskCode"),nonhomologousInspections.get("instanceId").toString())){
                                     String warnThreshold = nonhomologousInspections.get("warnThreshold").toString();
                                     String robotInsResult = cruiseResultMap.get("value");
@@ -192,7 +193,7 @@ public class NonhomologousWarnService {
                                     if(isNumeric(warnThreshold)&&isNumeric(robotInsResult)&&isNumeric(videoInsResult)){
                                         if(Math.abs(Double.parseDouble(robotInsResult)-Double.parseDouble(videoInsResult))>Double.parseDouble(warnThreshold)){
                                             Map<String,Object> warn = new HashMap<>();
-                                            warn.put("warnId",String.valueOf(UUID.randomUUID()).replace("-", ""));
+                                            warn.put("warnId", warnId);
                                             warn.put("warnType",4);
                                             warn.put("instanceId",Long.parseLong(nonhomologousInspections.get("instanceId").toString()));
                                             warn.put("warnContent","指针类表计识别非同源结果差值超过阈值："+nonhomologousInspections.get("warnThreshold").toString());
@@ -284,7 +285,7 @@ public class NonhomologousWarnService {
                                 log.info("区间非同源判断：maxInsResult为==={},minInsResult为==={},阈值是==={}", maxValueResultInfo, minValueResultInfo,warnThreshold);
                                 if((Double.parseDouble(maxValueResultInfo.get().get("resultValue").toString())-Double.parseDouble(minValueResultInfo.get().get("resultValue").toString()))>Double.parseDouble(warnThreshold)){
                                     Map<String,Object> warn = new HashMap<>();
-                                    warn.put("warnId",String.valueOf(UUID.randomUUID()).replace("-", ""));
+                                    warn.put("warnId", warnId);
                                     warn.put("warnType",6);
                                     warn.put("instanceId",Long.parseLong(nonhomologousInspections.get("instanceId").toString()));
                                     warn.put("warnContent","时间范围内表计识别结果差值超过阈值："+nonhomologousInspections.get("warnThreshold").toString());
@@ -317,7 +318,7 @@ public class NonhomologousWarnService {
                                 List<Map<String,Object>> distinctResults = fiveResults.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(o -> o.get("resultValue").toString()))), ArrayList::new));
                                 if(distinctResults.size()==1){
                                     Map<String,Object> warn = new HashMap<>();
-                                    warn.put("warnId",String.valueOf(UUID.randomUUID()).replace("-", ""));
+                                    warn.put("warnId", warnId);
                                     warn.put("warnType",7);
                                     warn.put("instanceId",Long.parseLong(nonhomologousInspections.get("instanceId").toString()));
                                     warn.put("warnContent","累计五次表计结果一致");
@@ -335,16 +336,16 @@ public class NonhomologousWarnService {
         }else{
             //机器人直接告警（三相）
             Map<String,Object> warnInfo = new HashMap<>();
-            warnInfo.put("warnId",String.valueOf(UUID.randomUUID()).replace("-", ""));
+            warnInfo.put("warnId", warnId);
             warnInfo.put("warnType",5);
             warnInfo.put("instanceId",null);
             warnInfo.put("warnContent","机器人相别告警："+cruiseResultMap.get("content"));
             List<Map<String,Object>> insResults = new ArrayList<>();
-            List<String> deviceIds= Arrays.asList(cruiseResultMap.get("deviceId").split(","));
+            String[] deviceIds= cruiseResultMap.get("deviceId").split(",");
             for(String s : deviceIds){
                 Map<String,Object> robotWarn = new HashMap<>();
                 robotWarn.put("taskId",cruiseResultMap.get("taskCode"));
-                robotWarn.put("inspectionId",nonhomologousWarnDao.getInstanceIdByDeviceId(s));
+                robotWarn.put("inspectionId",nonhomologousWarnDao.getInstanceIdByDeviceId(s,cruiseResultMap.get("taskCode")));
                 robotWarn.put("warnId",warnInfo.get("warnId"));
                 insResults.add(robotWarn);
             }

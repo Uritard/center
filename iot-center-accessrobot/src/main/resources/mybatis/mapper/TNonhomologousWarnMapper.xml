@@ -76,10 +76,12 @@
         </if>
     </select>
 
-    <select id="getInstanceIdByDeviceId" parameterType="java.lang.String" resultType="java.lang.Long">
+    <select id="getInstanceIdByDeviceId" resultType="java.lang.Long">
         select a.instance_id
         from t_cruise_point_instance a
         left join t_robot_inspection b on a.cruise_id = b.inspection_id
+        left join t_cruise_task_attr c ON c.instance_id = a.instance_id
         where b.inspection_code = #{deviceId, jdbcType=VARCHAR}
+        and c.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
 </mapper>

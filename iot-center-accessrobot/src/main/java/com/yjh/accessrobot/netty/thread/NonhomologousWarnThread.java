@@ -39,10 +39,10 @@ public class NonhomologousWarnThread implements Runnable{
     @Override
     public void run(){
         try {
-            log.info("开始处理巡检结果并生成相应的非同源告警 >>>>>>> cruiseResultMap==={}", cruiseResultMap);
+            log.info("开始处理巡检结果并生成相应的非同源告警 >>>>>>> cruiseResultMap==={}, isResult ==={}", cruiseResultMap, isResult);
             StaticContextAccessor.getBean(NonhomologousWarnService.class).insertNonhomologousWarn(cruiseResultMap,isResult);
         } catch (Exception e) {
-            log.error("巡检结果处理失败", e.getMessage());
+            log.error("巡检结果处理失败", e);
             throw new RuntimeException("巡检结果处理失败");
         }
     }
