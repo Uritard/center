@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mchange.v1.util.ArrayUtils;
+import com.yjh.commons.DateUtils;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
@@ -716,7 +717,7 @@ public class TCruiseTaskService {
             dayBefore = secondFormat.parse(map.get("firstDay"));
             dayAfter = secondFormat.parse(map.get("lastDay"));
         } catch (Exception e) {
-            e.getMessage();
+            log.error(e.getMessage(), e);
         }
         log.info("dayBefore：{}", dayBefore);
         log.info("dayAfter：{}", dayAfter);
@@ -724,8 +725,13 @@ public class TCruiseTaskService {
         List<TCruiseTaskCount> list = tCruiseTaskDao.taskCount(dayBefore, dayAfter);
         List<TCruiseTaskDel> listDel = tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
         List<Map<String, Object>> listTask = new ArrayList<>();
-
+        Date now = new Date();
         for (TCruiseTaskCount tCruiseTaskCount : list) {
+            Date starTime = tCruiseTaskCount.getStartTime();
+            if(DateUtils.compare(now, starTime) >= 0){
+                // 任务未到开始时间，忽略
+                continue;
+            }
             if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
                 List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
                 for (Date aTimeList : timeList) {
@@ -891,7 +897,7 @@ public class TCruiseTaskService {
         String lastDay= " ";
         if (Objects.equals(null, taskStartDate)) {
             Date date = new Date();
-            int year = date.getYear() + + 1900;
+            int year = date.getYear() + 1900;
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
 
@@ -911,7 +917,7 @@ public class TCruiseTaskService {
             map.put("lastDay", lastDay);
 
         } else {
-            int year = taskStartDate.getYear() + + 1900;
+            int year = taskStartDate.getYear() + 1900;
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(taskStartDate);
 
