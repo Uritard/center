@@ -3,6 +3,7 @@ package com.yjh.accessrobot.netty.scheduled;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
+import com.yjh.accessrobot.netty.server.StateGridAHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,7 +32,7 @@ public class HeartBeatCheckScheduled {
 
     @PostConstruct
     public void init(){
-        RobotServerHandler robotServerHandler = new RobotServerHandler();
+        StateGridAHandlerImpl robotServerHandler = new StateGridAHandlerImpl();
         robotServerHandler.setRedisTemplate(redisTemplate);
         robotServerHandler.setRobotService(robotService);
         this.robotServerHandler = robotServerHandler;

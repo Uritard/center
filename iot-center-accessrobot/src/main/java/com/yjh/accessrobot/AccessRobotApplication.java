@@ -54,6 +54,8 @@ public class AccessRobotApplication implements CommandLineRunner {
 
     @Value("${spring.interface.api}")
     private String interfaceApi;
+    @Value("${netty.handler.new:true}")
+    private boolean handlerNew;
 
     private NettyServer nettyServer = new NettyServer();
 
@@ -72,6 +74,7 @@ public class AccessRobotApplication implements CommandLineRunner {
 
         Constant.robotCode = robotCode;
         Constant.sendCode = sendCode;
+        Constant.handlerNew = handlerNew;
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);
         nettyServer.start(address,redisTemplate, robotService);
@@ -98,7 +101,7 @@ public class AccessRobotApplication implements CommandLineRunner {
             }
         } catch (SocketException ex) {
             ip = "127.0.0.1";
-            ex.getMessage();
+            log.error(ex.getMessage(), ex);
         }
         return ip;
     }

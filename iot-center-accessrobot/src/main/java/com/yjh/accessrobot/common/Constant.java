@@ -25,28 +25,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author YJH
  */
 public class Constant {
-    public static Map<String, ChannelHandlerContext> maps = new HashMap<>();
+    public static Map<String, ChannelHandlerContext> maps = new ConcurrentHashMap<>();
     /**
      * 巡视主机发送会话序列号
      */
     public static long sendSessionId = 0L;
+
+    public static AtomicLong AtomicSessionId = new AtomicLong(0);
     /**
      * 机器人注册次数
      */
-    public static Map<String, Integer> robotRegisterCounts = new HashMap<>();
+    public static Map<String, Integer> robotRegisterCounts = new ConcurrentHashMap<>();
     /**
      * 机器人是否注册标识
      */
-    public static Map<String, Boolean> robotRegisterFlag = new HashMap<>();
+    public static Map<String, Boolean> robotRegisterFlag = new ConcurrentHashMap<>();
     /**
      * 不同通道处理不同消息，key为机器人code，value为通道号
      */
-    public static Map<String, String> robotChannels = new HashMap<>();
+    public static Map<String, String> robotChannels = new ConcurrentHashMap<>();
     /**
      * 机器人收不到心跳次数
      */
@@ -54,13 +57,13 @@ public class Constant {
     /**
      * 心跳线程存活标识
      */
-    public static Map<String, Boolean> robotThreadFlag = new HashMap<>();
+    public static Map<String, Boolean> robotThreadFlag = new ConcurrentHashMap<>();
     /**
      * 机器人收到心跳次数
      */
-    public static Map<String, Integer> robotHeartBeatCounts = new HashMap<>();
+    public static Map<String, Integer> robotHeartBeatCounts = new ConcurrentHashMap<>();
 
-    public static Map<String, List<Long>> flagMap = new HashMap<>();
+    public static Map<String, List<Long>> flagMap = new ConcurrentHashMap<>();
 
     public static  ExpiringMap<String, String> map = ExpiringMap.builder()
             .maxSize(100)
@@ -139,4 +142,6 @@ public class Constant {
     public static String robotCode="";
 
     public static String sendCode="";
+
+    public static boolean handlerNew = true;
 }

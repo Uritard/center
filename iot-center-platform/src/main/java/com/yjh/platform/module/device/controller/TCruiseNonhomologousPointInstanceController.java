@@ -101,7 +101,7 @@ public class TCruiseNonhomologousPointInstanceController {
             TCruisePointInstance tCruisePointInstance = tCruiseNonhomologousPointInstanceService.selectByPrimaryId(instanceId);
             result.setData(tCruisePointInstance);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("巡检点实例查询失败描述：", e);
         }
         return result;
@@ -149,7 +149,7 @@ public class TCruiseNonhomologousPointInstanceController {
             resultMap.put("list", list);
             result.setData(resultMap);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("非同源巡检点实例分页查询失败描述：", e);
         }
         return result;
@@ -169,7 +169,7 @@ public class TCruiseNonhomologousPointInstanceController {
             resultMap.put("list", list);
             result.setData(resultMap);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("非同源告警分页查询失败描述：", e);
         }
         return result;
@@ -184,7 +184,7 @@ public class TCruiseNonhomologousPointInstanceController {
             Map<String,Object> tCruiseNonhomologousWarnInfo = tCruiseNonhomologousPointInstanceService.selectWarnByPrimaryId(warnId);
             result.setData(tCruiseNonhomologousWarnInfo);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("巡检点实例查询失败描述：", e);
         }
         return result;

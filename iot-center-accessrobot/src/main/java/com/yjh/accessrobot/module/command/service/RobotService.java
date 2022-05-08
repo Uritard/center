@@ -288,15 +288,16 @@ public class RobotService {
     * @return byte[]
     */
     public byte[] generateByteOrder(String xmlString, String robotCode) {
-        long sendSessionId = Constant.sendSessionId;
+        long sendSessionId = Constant.AtomicSessionId.addAndGet(1);
         ChannelHandlerContext context = RobotServerHandler.getChannelHandlerContextByRobot(robotCode);
         log.info("context是<start>{}<end>", context);
         if (context != null) {
             // 请求报文每次累加1
-            sendSessionId = sendSessionId + 1L;
+//            sendSessionId = Constant.AtomicSessionId.addAndGet(1);
             Constant.sendSessionId = sendSessionId;
         } else {
             Constant.sendSessionId = 0L;
+            Constant.AtomicSessionId.set(0);
         }
         log.info("-------------这是刚发命令的请求{}-------------", sendSessionId);
         return PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString);

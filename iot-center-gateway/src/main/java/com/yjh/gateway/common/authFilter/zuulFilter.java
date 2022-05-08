@@ -307,10 +307,7 @@ public class zuulFilter extends ZuulFilter {
         if ("true".equals(isIpLogin)) {
             if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/sysUser/v1/getPubk")) {
                 if(StringUtils.isEmpty(userId)) {
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    ctx.setResponseBody("{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
-                    return false;
+                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
                 }
                 String ipAddr = "\"" + IpUtil.getRemoteIP(request) + "\"";
                 Set<String> ips = redisTemplate.opsForSet().members("sysKey:" + userId + ":2");
@@ -319,12 +316,9 @@ public class zuulFilter extends ZuulFilter {
 
                 if (!ipValid || StringUtils.isEmpty(userId)) {
                     log.error("IP 地址验证失败 - {}-{} {}", userId, userName, ipValid);
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    ctx.setResponseBody("{\"code\":401,\"message\":\"未绑定的IP地址!\"}");
                     ipAddr = ipAddr.replace("\"", "");
                     logsAspect.loginLogsSend(request, ipAddr, "6", "登录", "IP:" + ipAddr + "与用户" + userName + "未绑定", userName, userId, 2);
-                    return false;
+                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"未绑定的IP地址!\"}");
                 }
             }
         }
@@ -334,10 +328,7 @@ public class zuulFilter extends ZuulFilter {
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
             if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/sysUser/v1/getPubk")) {
                 if(StringUtils.isEmpty(userId)) {
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    ctx.setResponseBody("{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
-                    return false;
+                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
                 }
                 String ukeyId = request.getHeader("ukeyId") != null ? request.getHeader("ukeyId") : "";
                 // String xlh = ukeyId.substring(0,16);
@@ -345,18 +336,14 @@ public class zuulFilter extends ZuulFilter {
                 String pubkey = (String)redisTemplate.opsForHash().get("sysKey:" + userId + ":1", ukeyId);
                 if(StringUtils.isEmpty(pubkey)){
                     log.error("序列号不正确------------------------{}-{} {}", userId, userName, ukeyId);
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    ctx.setResponseBody("{\"code\":401,\"message\":\"错误的序列号!\"}");
-                    return false;
+
+                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"错误的序列号!\"}");
                 }
                 boolean status = SM2Verify_SKF.SM2Verify(pubkey, signStr, webcode, UKEY_USERID);
                 if (!status) {
                     log.error("签名验证结果 - {}", status);
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                    ctx.setResponseBody("{\"code\":401,\"message\":\"签名验证失败!\"}");
-                    return false;
+
+                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"签名验证失败!\"}");
                 }
             }
         }
@@ -387,5 +374,13 @@ public class zuulFilter extends ZuulFilter {
         CloseableHttpResponse response = client.execute(httpPost);
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity, "UTF-8");
+    }
+
+    boolean errorRespnse(RequestContext ctx, int nStatusCode, String errorMsg){
+        ctx.setSendZuulResponse(false);
+        ctx.addZuulResponseHeader("Content-Type", "application/json;charset=UTF-8");
+        ctx.setResponseStatusCode(nStatusCode);
+        ctx.setResponseBody(errorMsg);
+        return false;
     }
 }
