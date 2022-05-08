@@ -210,7 +210,7 @@ public class IntelAnalysisService {
                         String imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId());
                         imageNormalUrlPath = imageNormalUrlPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content")),
                                 String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content")));
-                        String[] split = analysis.getPicPath().split("/");
+                        String[] split = imageNormalUrlPath.split("/");
                         String targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
                         uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, intelAnalysisFtpsConfig);
                         analyseObject.setImageNormalUrlPath(targetNamePath);
@@ -654,10 +654,11 @@ public class IntelAnalysisService {
                 String instanceId = analyseResult.getObjectId();
                 resultDataObject.put("taskId", taskId);
                 resultDataObject.put("instanceId", instanceId);
-                String redisKeyName = "t_cruise_task_result:" + taskId + instanceId;
-                String picPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "picpath"));
-                String originPicPath = picPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));
+                String redisKeyName = "t_cruise_task_result:" + taskId + ":" + instanceId;
+                String originPicPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "origpic"));
+                log.info("originPicPath===={}", originPicPath);
+//                String originPicPath = picPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
+//                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));
 
                 List<AnalyseResultItem> results = analyseResult.getResults();
                 // 判断该巡视点是否为27大类的点 若是  直接拿假数据  不要返回的结果
@@ -812,6 +813,7 @@ public class IntelAnalysisService {
             }else {
                 // 图像无差异 取原图
                 resultValue.add("normal");
+                resultImg.add(originPicPath);
             }
             for (Area area : result.getPos()){
                 for (Point point : area.getAreas()){
