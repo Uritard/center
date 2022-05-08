@@ -451,7 +451,7 @@ public class IntelAnalysisService {
                 }
             }
 
-            alarmToSFZJ(isHave,String.valueOf(map.get("custom_id")),results);
+//            alarmToSFZJ(isHave,String.valueOf(map.get("custom_id")),results);
         }
     }
 
