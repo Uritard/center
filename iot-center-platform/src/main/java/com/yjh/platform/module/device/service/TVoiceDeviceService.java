@@ -352,21 +352,21 @@ public class TVoiceDeviceService{
                                     channel.setInfoType("channel");
                                     //查询此文件夹下的所有文件
                                     List<VoiceDevice> dateList = new ArrayList<>();
-                                    File fileForDate = new File(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName());
-                                    File[] voiceDateList = fileForDate.listFiles();
-                                    if(voiceDateList != null && voiceDateList.length>0) {
-                                        for (int j = 0; j < voiceDateList.length; j++) {
-                                            if (voiceDateList[j].isDirectory()) {//日期文件夹
+//                                    File fileForDate = new File(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName());
+                                    List<File> voiceDateList = getFileSort(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName());
+                                    if(voiceDateList != null && voiceDateList.size()>0) {
+                                        for (int j = 0; j < voiceDateList.size(); j++) {
+                                            if (voiceDateList.get(j).isDirectory()) {//日期文件夹
                                                 VoiceDevice date = new VoiceDevice();
                                                 date.setUpId(channel.getId());
                                                 date.setUpName(channel.getLabel());
-                                                date.setLabel(voiceDateList[j].getName());
-                                                date.setId(voiceDateList[j].getName());
+                                                date.setLabel(voiceDateList.get(j).getName());
+                                                date.setId(voiceDateList.get(j).getName());
                                                 //date.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName());
                                                 date.setInfoType("date");
                                                 //查询此文件夹下的所有文件
                                                 List<VoiceDevice> fileList = new ArrayList<>();
-                                                String path = absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName();
+                                                String path = absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList.get(j).getName();
 //                                                File fileForFile = new File(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName());
 //                                                File[] voiceFileList = fileForFile.listFiles();
                                                 List<File> voiceFileList = getFileSort(path);
@@ -378,7 +378,7 @@ public class TVoiceDeviceService{
                                                             voiceFile.setUpName(date.getLabel());
                                                             voiceFile.setId(voiceFileList.get(k).getName());
                                                             voiceFile.setLabel(voiceFileList.get(k).getName());
-                                                            voiceFile.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName()+"/"+voiceFileList.get(k).getName());
+                                                            voiceFile.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList.get(j).getName()+"/"+voiceFileList.get(k).getName());
                                                             voiceFile.setInfoType("file");
                                                             fileList.add(voiceFile);
                                                         }
