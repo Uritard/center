@@ -1,7 +1,11 @@
 package com.yjh.platform.module.user.service;
 
+import com.alibaba.druid.sql.ast.statement.SQLForeignKeyImpl;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.dao.TCfgDeviceDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCfgDevice;
@@ -25,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.ObjectName;
+
 /**
 * @author lqh
 * @since 2021-01-21
@@ -37,6 +43,10 @@ public class TSequentialConfService{
 
     @Value("${sequential.returnlinkage}")
     private String returnlinkageFile;
+    @Value("${sequential.cameraCapture}")
+    private String cameraCapture;
+    @Value("${sequential.picRec}")
+    private String picRec;
 
     @Autowired
     private TSequentialConfDao tSequentialConfDao;
@@ -183,16 +193,156 @@ public class TSequentialConfService{
 //                    "state": "控合"
 //            }
 
-            Thread.sleep(20000);
-            //todo 生成一个巡视任务
+//            Thread.sleep(20000);
+//            //todo 生成一个巡视任务
+//
+//            //todo 发给算法进行分析
+//
+//            try{
+//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
+//                //Map<String,String> mapResult = this.sequentialInfo(meteId).get(0);
+//                TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
+//                String devicePath = tSysParam.getContent()+"/"+videocfmresultFile.replace(".",simpleDateFormat2.format(new Date())+".");
+//
+//                File txt=new File(devicePath);
+//                if(txt.exists()){
+//                    txt.delete();
+//                }
+//                if (!txt.exists()) {
+//                    txt.createNewFile();
+//                }
+////                FileWriter fw = new FileWriter(txt, true);
+//                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+//                        new FileOutputStream(txt,true), "UTF-8"));
+//                bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间）!>\r\n");
+//                bw.write("<DeviceInfo::设备状态>\r\n");
+//                bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
+//                bw.write("#1\t"+1+"\t"+meteId+"\t"+map.get("deviceName")+"\t"+map.get("state")+"\t"+simpleDateFormat.format(new Date())+"\r\n");
+//                bw.write("</DeviceInfo::设备状态>\r\n");
+//                bw.flush();
+//                bw.close();
+////                fw.close();
+//                //将生成的顺控确认文件发送给主辅监控系统
+//                Map<String,List<String>> mapForSend = new HashMap<>();
+//                List<String> list = new ArrayList<>();
+//                list.add(devicePath);
+//                mapForSend.put("list",list);
+//                Constant.otherServer(mapForSend,Constant.UDP_SEND);
+//            }catch (Exception e){log.info("生成顺控确认文件失败"+e.getMessage());}
+//
+//            Map<String, String> jasonMapsResult = new HashMap<>();
+//            jasonMapsResult.put("type", "newSequentialResult");
+//            jasonMapsResult.put("cfgDeviceId", meteId);
+//            jasonMapsResult.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
+//            jasonMapsResult.put("state", map.get("state").toString());
+//            jasonMapsResult.put("identifyResult", map.get("state").toString());
+//            String jsonResult = JSON.toJSONString(jasonMapsResult);
+//            log.info("发送给前端的消息：" + jsonResult);
+//            try{
+//                Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapsResult);
+//            }catch (Exception e){
+//                System.out.println("发送websocket出错");
+//            }
+//
+//            List<String> listSort = tSequentialConfDao.selectLastStep();
+//            if(listSort.get(listSort.size()-1).equals(meteId) ){
+//                //这是最后一个步骤
+//                TSysParam time = tSysParamDao.selectByParamType("cleanTime");
+//                Thread.sleep(Integer.valueOf(time.getContent())*1000);
+//                Constant.sequentialState.put("state",-1);
+//                Constant.sequentialState.put("cfgDeviceId","");
+//            }
+            //todo 生成顺控文件
+        }
+       return "ok";
+    }
 
-            //todo 发给算法进行分析
-
-            //Map<String,String> mapResult = this.sequentialInfo(meteId).get(0);
-            TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
-            String devicePath = tSysParam.getContent()+"/"+videocfmresultFile;
+    @Transactional(rollbackFor = Exception.class)
+    public String sequentialRec(String meteId) throws Exception{
+        {
+            Map<String,Object> map = this.sequentialInfo(meteId).get(0);
+            Map<String , Object> param = new HashMap<>();
+            //收到变位信号抓图
             try{
+                String services = HttpClientUtils.getInstance().getUrl(cameraCapture+ "?cameraId=" +  map.get("cameraId").toString(), null);
+                JSONObject jsonObject =JSONObject.parseObject(services);
+                Map<String,Object> re= (Map<String,Object>) jsonObject.get("data");
+                if(!Objects.isNull(re.get("absPath"))){
+                    param.put("picPath",re.get("absPath").toString());
+                }else{
+                    throw new BusinessException("一键顺控-变位信号-抓图地址为空");
+                }
+            }catch (Exception e){
+                log.error("一键顺控-变位信号-抓图失败",e.getMessage());
+            }
+            //todo 发给算法进行分析
+            try{
+                param.put("analyseType",map.get("analyseType"));
+                param.put("instanceId",map.get("instanceId"));
+                param.put("taskId",UUID.randomUUID()+"#yjsk#meteId="+meteId);
+                List<Map<String,Object>> analysis = new ArrayList<>();
+                analysis.add(param);
+                String services = HttpClientUtils.getInstance().getUrl(picRec, JSON.toJSONString(analysis));
+                JSONObject jsonObject =JSONObject.parseObject(services);
+                if(!Objects.isNull(jsonObject.get("code"))&&jsonObject.get("code").toString().equals("200")){
+                    log.info("一键顺控-变位信号-发送至算法识别主机成功");
+                }else{
+                    throw new BusinessException("一键顺控-变位信号-发送至算法识别主机失败"+jsonObject.toJSONString());
+                }
+            }catch (Exception e){
+                log.error("一键顺控-变位信号-调用算法识别主机失败",e.getMessage());
+            }
+        }
+        return "ok";
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String sequentialRecBack(Map<String,String> recBack) throws Exception{
+        {
+            Map<String,Object> map = this.sequentialInfo(recBack.get("meteId")).get(0);
+            Map<String , Object> param = new HashMap<>();
+            try{
+                if(!Objects.isNull(recBack.get("code"))&&recBack.get("code").equals("2000")){
+                    if(!Objects.isNull(recBack.get("desc"))){
+                        param.put("resultValue",recBack.get("desc"));
+                    }else{
+                        Map<String, String> jasonMapsResult = new HashMap<>();
+                        jasonMapsResult.put("type", "newSequentialResult");
+                        jasonMapsResult.put("cfgDeviceId", recBack.get("meteId"));
+                        jasonMapsResult.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
+                        jasonMapsResult.put("state", "算法识别失败");
+                        jasonMapsResult.put("identifyResult", "算法识别失败");
+                        String jsonResult = JSON.toJSONString(jasonMapsResult);
+                        log.info("发送给前端的消息：" + jsonResult);
+                        try{
+                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapsResult);
+                        }catch (Exception e){
+                            log.error("发送websocket出错",e.getMessage());
+                        }
+                        throw new BusinessException("一键顺控-变位信号-算法识别错误" + JSON.toJSONString(recBack));
+                    }
+                }else{
+                    Map<String, String> jasonMapsResult = new HashMap<>();
+                    jasonMapsResult.put("type", "newSequentialResult");
+                    jasonMapsResult.put("cfgDeviceId", recBack.get("meteId"));
+                    jasonMapsResult.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
+                    jasonMapsResult.put("state", "算法识别失败");
+                    jasonMapsResult.put("identifyResult", "算法识别失败");
+                    String jsonResult = JSON.toJSONString(jasonMapsResult);
+                    log.info("发送给前端的消息：" + jsonResult);
+                    try{
+                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapsResult);
+                    }catch (Exception e){
+                        log.error("发送websocket出错",e.getMessage());
+                    }
+                    throw new BusinessException("一键顺控-变位信号-识别主机返回结果处理失败");
+                }
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
+                TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
+                String devicePath = tSysParam.getContent()+"/"+videocfmresultFile.replace(".",simpleDateFormat2.format(new Date())+".");
+
                 File txt=new File(devicePath);
                 if(txt.exists()){
                     txt.delete();
@@ -206,7 +356,7 @@ public class TSequentialConfService{
                 bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间）!>\r\n");
                 bw.write("<DeviceInfo::设备状态>\r\n");
                 bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
-                bw.write("#1\t"+1+"\t"+meteId+"\t"+map.get("deviceName")+"\t"+map.get("state")+"\t"+simpleDateFormat.format(new Date())+"\r\n");
+                bw.write("#1\t"+1+"\t"+recBack.get("meteId")+"\t"+map.get("deviceName")+"\t"+param.get("resultValue")+"\t"+simpleDateFormat.format(new Date())+"\r\n");
                 bw.write("</DeviceInfo::设备状态>\r\n");
                 bw.flush();
                 bw.close();
@@ -221,7 +371,7 @@ public class TSequentialConfService{
 
             Map<String, String> jasonMapsResult = new HashMap<>();
             jasonMapsResult.put("type", "newSequentialResult");
-            jasonMapsResult.put("cfgDeviceId", meteId);
+            jasonMapsResult.put("cfgDeviceId", recBack.get("meteId"));
             jasonMapsResult.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
             jasonMapsResult.put("state", map.get("state").toString());
             jasonMapsResult.put("identifyResult", map.get("state").toString());
@@ -230,11 +380,11 @@ public class TSequentialConfService{
             try{
                 Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapsResult);
             }catch (Exception e){
-                System.out.println("发送websocket出错");
+                log.error("发送websocket出错",e.getMessage());
             }
 
             List<String> listSort = tSequentialConfDao.selectLastStep();
-            if(listSort.get(listSort.size()-1).equals(meteId) ){
+            if(listSort.get(listSort.size()-1).equals(recBack.get("meteId")) ){
                 //这是最后一个步骤
                 TSysParam time = tSysParamDao.selectByParamType("cleanTime");
                 Thread.sleep(Integer.valueOf(time.getContent())*1000);
@@ -243,7 +393,7 @@ public class TSequentialConfService{
             }
             //todo 生成顺控文件
         }
-       return "ok";
+        return "ok";
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -254,11 +404,13 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public String unionTask(String cfgDeviceId,String order){
 
-        TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
-        TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
-        String devicePath = tSysParam.getContent()+"/"+returnlinkageFile;
         try{
+            TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
+            TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
+
+            String devicePath = tSysParam.getContent()+"/"+returnlinkageFile.replace(".",simpleDateFormat2.format(new Date())+".");
             File txt=new File(devicePath);
 
             if(txt.exists()){

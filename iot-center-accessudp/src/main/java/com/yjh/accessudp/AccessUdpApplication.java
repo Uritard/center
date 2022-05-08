@@ -44,6 +44,8 @@ public class AccessUdpApplication implements CommandLineRunner {
     private String UNION_URL;
     @Value("${spring.sequence.url}")
     private String SEQUENCE_URL;
+    @Value("${spring.sequenceRec.url}")
+    private String SEQUENCEREC_URL;
     @Value("${spring.encoding.style}")
     private String encoding;
     @Value("${spring.union.file.sort}")
@@ -72,7 +74,7 @@ public class AccessUdpApplication implements CommandLineRunner {
         Constant.sort = Boolean.valueOf(sort);
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);
-        nettyServer.start(address, redisTemplate,tCfgMeteService,UNION_URL, SEQUENCE_URL);
+        nettyServer.start(address, redisTemplate,tCfgMeteService,UNION_URL, SEQUENCE_URL,SEQUENCEREC_URL);
     }
     public void loadDeviceInfo()throws IOException{
         //读取联动设备的信息

@@ -221,12 +221,38 @@ public class TSequentialConfController {
         return result;
     }
 
-    @ApiOperation(value = "触发顺控")
+    @ApiOperation(value = "触发顺控视频聚焦")
     @RequestMapping(value = "/sequential",method = RequestMethod.GET)
     public Result sequential(@RequestParam Map<String,String> meteId){
         Result result=new Result();
         try {
             result.setData(tSequentialConfService.sequential(meteId.get("meteId")));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "触发顺控抓图识别")
+    @RequestMapping(value = "/sequentialRec",method = RequestMethod.GET)
+    public Result sequentialRec(@RequestParam Map<String,String> meteId){
+        Result result=new Result();
+        try {
+            result.setData(tSequentialConfService.sequentialRec(meteId.get("meteId")));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "触发顺控抓图识别返回值处理")
+    @RequestMapping(value = "/sequentialRecBack",method = RequestMethod.GET)
+    public Result sequentialRecBack(@RequestParam Map<String,String> recBack){
+        Result result=new Result();
+        try {
+            result.setData(tSequentialConfService.sequentialRecBack(recBack));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

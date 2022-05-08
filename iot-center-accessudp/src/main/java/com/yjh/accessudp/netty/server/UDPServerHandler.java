@@ -44,11 +44,13 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
     private TCfgMeteService tCfgMeteService;
     private String UNION_URL;
     private String SEQUENCE_URL;
-    public UDPServerHandler(RedisTemplate redisTemplate,TCfgMeteService tCfgMeteService,String UNION_URL,String SEQUENCE_URL) {
+    private String SEQUENCEREC_URL;
+    public UDPServerHandler(RedisTemplate redisTemplate,TCfgMeteService tCfgMeteService,String UNION_URL,String SEQUENCE_URL,String SEQUENCEREC_URL) {
         this.redisTemplate = redisTemplate;
         this.tCfgMeteService = tCfgMeteService;
         this.UNION_URL=UNION_URL;
         this.SEQUENCE_URL =SEQUENCE_URL;
+        this.SEQUENCEREC_URL = SEQUENCEREC_URL;
     }
     private boolean isThreadStart = true;
     public boolean getIsThreadStart() { return isThreadStart; }
@@ -233,10 +235,11 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 if(meteKind == 3){
                     getUrl(SEQUENCE_URL,meteId.toString());
                     getUrl(UNION_URL,meteId.toString());
+                }else if(meteKind == 1 && value.equals("变位")){
+                    getUrl(SEQUENCEREC_URL,meteId.toString());
                 }else {
                     getUrl(UNION_URL,meteId.toString());
                 }
-
             }
 
         }else if ("43".equals(udp[4])){

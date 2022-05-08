@@ -12,6 +12,7 @@ import com.yjh.accessvideo.common.utils.FtpsUtil;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessvideo.commons.utils.FileUtil;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
+import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.configuration.IntelAnalysisFtpsConfig;
 import com.yjh.accessvideo.configuration.IntelligentAlgorithmConfig;
 import com.yjh.accessvideo.configuration.UpFtpsConfig;
@@ -80,6 +81,11 @@ public class IntelAnalysisService {
      */
     @Value("${netty.recognize.port}")
     private int recognizePort;
+    /**
+     * 一键顺控-变位结果返回
+     */
+    @Value("${sequential.picRecBack}")
+    private String picRecBack;
 
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
@@ -365,8 +371,29 @@ public class IntelAnalysisService {
             silentMonitorHandle(response);
             return;
         }
+        if (Objects.equals("yjsk", flagId)){
+            yjskHandle(response);
+            return;
+        }
         // 普通图像分析
         sendToDataDealThread(response, flagId);
+    }
+
+    private void yjskHandle(PicAnalyseResponse response){
+        try{
+            Map<String,String> recBack = new HashMap<>();
+            recBack.put("meteId",StringUtils.substringAfter(response.getRequestId(),"="));
+            recBack.put("code",response.getResultsList().get(0).getResults().get(0).getCode());
+            recBack.put("conf",String.valueOf(response.getResultsList().get(0).getResults().get(0).getConf()));
+            recBack.put("desc",response.getResultsList().get(0).getResults().get(0).getDesc());
+            recBack.put("resImageUrl",response.getResultsList().get(0).getResults().get(0).getResImageUrl());
+            recBack.put("type",response.getResultsList().get(0).getResults().get(0).getType());
+            recBack.put("value",response.getResultsList().get(0).getResults().get(0).getValue());
+            String services = HttpClientUtils.getInstance().getUrl(picRecBack, JSON.toJSONString(recBack));
+            log.info("一键顺控services：" + services);
+        }catch (Exception e){
+            log.error("一键顺控-变相信号-分析主机返回处理失败",e.getMessage());
+        }
     }
 
     /**
