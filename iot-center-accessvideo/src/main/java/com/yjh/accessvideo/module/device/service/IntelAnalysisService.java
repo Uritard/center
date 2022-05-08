@@ -173,7 +173,7 @@ public class IntelAnalysisService {
     private List<PicAnalyseRequest> formatTransition(List<Analysis> analysisList) {
         List<PicAnalyseRequest> list = new ArrayList<>();
         for (Analysis analysis: analysisList) {
-            // 如果是静默监视识别 针对越线闯入和火焰烟雾再加两条请求
+            // 如果是静默监视识别 只要求识别越线闯入、未穿工装和未带安全帽
             if (Objects.equals("12", analysis.getAnalyseType())) {
                 AnalyseObject analyseObject = new AnalyseObject();
                 List<String> crossLineTypeList = new ArrayList<>();
@@ -183,8 +183,8 @@ public class IntelAnalysisService {
 
                 AnalyseObject analyseObject2 = new AnalyseObject();
                 List<String> fireSmokeTypeList = new ArrayList<>();
-                fireSmokeTypeList.add("fire");
-                fireSmokeTypeList.add("smoke");
+                fireSmokeTypeList.add("wcaqm");
+                fireSmokeTypeList.add("wcgz");
                 analyseObject2.setTypeList(fireSmokeTypeList);
                 list.add(packagePicAnalyseRequest(analysis, analyseObject2));
             }else {
@@ -233,10 +233,10 @@ public class IntelAnalysisService {
                                 log.info("文件名称:{}", imageNormalUrlPath);
                             }
                         }
-                        String targetNamePath = imageNormalUrlPath.replaceAll(
-                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content")),"");
+                        String[] split = imageNormalUrlPath.split("/");
+                        String targetNamePath = split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
                         uploadFileToFtps(imageNormalUrlPath, targetNamePath, intelAnalysisFtpsConfig);
-                        analyseObject.setImageNormalUrlPath(targetNamePath.substring(1));
+                        analyseObject.setImageNormalUrlPath(targetNamePath);
                     }
 
                     String[] distinguishType = algorithmConfig.getDistinguishType().split(",");
@@ -444,12 +444,16 @@ public class IntelAnalysisService {
             Collections.addAll(resultImgList, String.valueOf(resultImg).split(" "));
             resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
             if (StringUtils.isNotBlank(resultImgList.get(0))){
+                String alarmContent = String.valueOf(content);
+                String defectModelName = analyseDataOperateService.selectDictCode("defect_model", alarmContent.split(" ")[0]);
+                String alarmLevel = analyseDataOperateService.selectAlgorithmDefectInfo(defectModelName);
+
                 TWarnInfo tWarnInfo = new TWarnInfo()
                         // 将静默监视产生的告级别警统一设置为预警
-                        .setWarnLevel(130)
+                        .setWarnLevel(Integer.valueOf(alarmLevel))
                         .setWarnTime(new Date())
                         .setWarnName("静默监视告警数据")
-                        .setWarnContent(String.valueOf(content))
+                        .setWarnContent(alarmContent)
                         .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
                         .setCunstomId(String.valueOf(map.get("custom_id")))
                         .setInstanceId(Long.valueOf(String.valueOf(map.get("instance_id"))))
@@ -597,12 +601,12 @@ public class IntelAnalysisService {
                 default:
                     break;
             }
-            if (tWarnInfo.getWarnContent().contains("越线")){
+            if (tWarnInfo.getWarnContent().contains("安全帽")){
+                xmlItem.put("monitor_type", 1);
+            }else if (tWarnInfo.getWarnContent().contains("越线")){
                 xmlItem.put("monitor_type", 2);
-            }else if (tWarnInfo.getWarnContent().contains("火")){
-                xmlItem.put("monitor_type", 101);
-            }else if (tWarnInfo.getWarnContent().contains("烟")){
-                xmlItem.put("monitor_type", 201);
+            }else if (tWarnInfo.getWarnContent().contains("工装")){
+                xmlItem.put("monitor_type", 3);
             }
             // 目前都是识别图片 所以是5
             xmlItem.put("file_type", 5);

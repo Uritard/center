@@ -531,6 +531,7 @@ public class DataDealThread implements Runnable {
                                 break;
                             case 13669:
 
+                                log.info("初始redis===={}", cruiseResult);
                                 String analyseResultImg =cruiseResult.get("picpath");//图片路径初始化
                                 if ("0".equals(recognitionMode)) {
                                     redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "recognitionMode", "-1");
@@ -581,7 +582,16 @@ public class DataDealThread implements Runnable {
                                 log.info("解析的缺陷数据：" + resultValue);
                                 //获取算法标定结果图片并放入缓存（已考虑双算法情况）
                                 if(Objects.nonNull(jsonObjectResult.get("analyseResultImg")) && !(jsonObjectResult.get("analyseResultImg").equals("")) ) {
-                                     analyseResultImg = jsonObjectResult.getString("analyseResultImg").replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
+                                    String objectResultString = jsonObjectResult.getString("analyseResultImg");
+                                    if (objectResultString.contains("analyseResultImg")){
+                                        analyseResultImg = objectResultString.replaceAll(
+                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")),
+                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
+                                    }else {
+                                        analyseResultImg = objectResultString.replaceAll(
+                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")),
+                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")));
+                                    }
                                     if ("-1".equals(recognitionMode) || "-2".equals(recognitionMode)) {
                                         log.info("双算法-第二算法图片生成-D");
                                         redisTemplate.opsForHash().put("t_cruise_task_result:" + redisName, "picpath", redisTemplate.opsForHash().get("t_cruise_task_result:" + redisName, "picpath") + "," + analyseResultImg);
@@ -591,7 +601,7 @@ public class DataDealThread implements Runnable {
                                 }
 
                                 // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形
-                                if (resultValue != null && !(resultValue.contains("device"))) {
+                                if (!"null".equals(resultValue ) && !(resultValue.contains("device"))) {
                                     //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
                                     TStdDevicemete tStdDevicemeteM = new TStdDevicemete();
                                     try {
@@ -843,6 +853,7 @@ public class DataDealThread implements Runnable {
                         // TODO: 2020/11/4 对算法识别结果进行判断并决定再redis中插入哪个值：identifyState- 识别正常&识别异常
                         // TODO: 2020/11/4 对实际结果进行判断并决定填入哪个初始值：identifyResult-正常&未采集图片&未识别图片&识别缺陷警告（加入IF判断）
 
+                        log.info("cruiseResultMap==={}", cruiseResultMap);
                         redisTemplate.opsForHash().putAll("t_cruise_task_result:" + redisName, cruiseResultMap);//修改redis
 
                         try{
@@ -1125,6 +1136,7 @@ public class DataDealThread implements Runnable {
                     finalCruiseKey = cruiseKeys.get(0);//挑选一名幸运Redis KEY值
                     for (String cruiseKey : cruiseKeys) {
                         Map<String, String> cruiseWorkedMap = redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
+                        log.info("cruiseWorkedMap==={}", cruiseWorkedMap);
                         //TCTRD
                         log.info("TCTRD开始");
                         TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
