@@ -899,7 +899,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                             //创建一个线程去处理声纹巡视
                             VoiceTask voiceTask = new VoiceTask(redisTemplate,item.getCruiseId(),voiceFilePath,taskId,item.getInstanceId()
                                     ,tCruiseDataResultDao,tCruiseTaskResultDetailDao,audioDeviceManager,tCruiseResult,item,tCruiseResultDao
-                                    ,tVoiceDeviceService,voiceinstanceList,tCruiseTaskResultDao,tCruiseTaskResult,tCruiseTaskService);
+                                    ,tVoiceDeviceService,voiceinstanceList,tCruiseTaskResultDao,tCruiseTaskResult,tCruiseTaskService
+                            ,tCruiseDataResultService);
                             Thread thread = new Thread(voiceTask);
                             thread.setDaemon(true);
                             thread.start();

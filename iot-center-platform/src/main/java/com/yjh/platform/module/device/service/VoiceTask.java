@@ -15,6 +15,7 @@ import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDetailDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.RunAtNowTask;
+import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import com.yjh.platform.module.task.service.TCruiseTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class VoiceTask implements Runnable{
     private TCruiseTaskResultDao tCruiseTaskResultDao;
     private TCruiseTaskResult tCruiseTaskResult;
     private TCruiseTaskService tCruiseTaskService;
+    private TCruiseDataResultService tCruiseDataResultService;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
 
@@ -56,7 +58,8 @@ public class VoiceTask implements Runnable{
                      TCruiseDataResultDao tCruiseDataResultDao,TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,
                      AudioDeviceManager audioDeviceManager,TCruiseResult tCruiseResult,TCruisePointInstanceNameDetail tCruisePointInstanceNameDetail,
                      TCruiseResultDao tCruiseResultDao,TVoiceDeviceService tVoiceDeviceService,Map<Long,List<TCruisePointInstanceNameDetail>> voiceinstanceList
-                    ,TCruiseTaskResultDao tCruiseTaskResultDao,TCruiseTaskResult tCruiseTaskResult,TCruiseTaskService tCruiseTaskService){
+                    ,TCruiseTaskResultDao tCruiseTaskResultDao,TCruiseTaskResult tCruiseTaskResult,
+                     TCruiseTaskService tCruiseTaskService,TCruiseDataResultService tCruiseDataResultService){
         this.redisTemplate = redisTemplate;
         this.voiceDeviceId = voiceDeviceId;
         this.audioDeviceManager = audioDeviceManager;
@@ -73,6 +76,7 @@ public class VoiceTask implements Runnable{
         this.tCruiseTaskResultDao = tCruiseTaskResultDao;
         this.tCruiseTaskResult = tCruiseTaskResult;
         this.tCruiseTaskService = tCruiseTaskService;
+        this.tCruiseDataResultService = tCruiseDataResultService;
     }
 
 
@@ -159,6 +163,9 @@ public class VoiceTask implements Runnable{
 
                 tCruiseDataResultDao.insert(tCruiseDataResult);
                 tCruiseTaskResultDetailDao.insert(tCruiseTaskResultDetail);
+                List<String> cruiseResultIdList = new ArrayList();
+                cruiseResultIdList.add(tCruiseDataResult.getCruiseResultId());
+                tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
 
                 String strForCountAbnormal = "countForAbnormal:" + taskId;
                 Map<String, String> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
