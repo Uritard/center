@@ -88,7 +88,7 @@ public class SysUserService {
         Long userIds = Long.valueOf(request.getHeader("userId"));
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userIds, "userName"));
         String userNames = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));
-        String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
+        String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userIds).get("roleId"));
         if(Constant.apiPermissions) {
             if (!"1234".equals(userRole)) {
                 //权限不够；
@@ -127,6 +127,11 @@ public class SysUserService {
         return this.sysUserDao.update(sysUser);
     }
 
+
+    @Transactional(rollbackFor = Exception.class)
+    public SysUserSelect selectByPrimaryIds(Long userId) {
+        return this.sysUserDao.selectByPrimaryIds(userId);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> userLogin(HttpServletRequest request, Map<String, String> userMap) throws ParseException, IOException {
@@ -210,6 +215,15 @@ public class SysUserService {
                     if (redisTemplate.hasKey(keys)) {//如果key存在
                         redisTemplate.delete(keys);
                     }
+                    if (sysUserLogin.getState() == 3) {
+                        logsRecord.LoginLogsSend(request, "6", "登录", userName + "账户密码超期登录失败，请联系管理员处理！", userName, String.valueOf(sysUserLogin.getUserId()), 2);
+                        logsRecord.LoginLogsSend(request, "6", "登录", "此用户账户长期未使用", userName, String.valueOf(sysUserLogin.getUserId()), 2);
+                        mapResult.put("errorCount", "密码超期登录失败，请联系管理员处理！");
+                        mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
+                        mapResult.put("info", ResultCodeEnum.CODE10108.getName());
+                        mapResult.put("userId", sysUserLogin.getUserId());
+                        return mapResult;
+                    }
                     if (sysUserLogin.getState().intValue() == 2) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.setTime(date);
@@ -220,7 +234,7 @@ public class SysUserService {
                         if (lockTime < Integer.valueOf(lockTimes.get("content")) * 60) { //如果锁定时间小于1200S
                             long surplusTime=(lockTime/60+1)!=(lockTimeOne+1)?(lockTime/60+1):lockTimeOne;
                             logsRecord.LoginLogsSend(request, "20", "用户锁定", "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 1);
-                         //   mapResult.put("errorCount", "账户已被锁定！");
+                            //   mapResult.put("errorCount", "账户已被锁定！");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                             mapResult.put("info", "账户已被锁定，剩余锁定时间"+(lockTimeOne-surplusTime+1)+"分钟");
                             return mapResult;
@@ -234,6 +248,7 @@ public class SysUserService {
                                 mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
                                 mapResult.put("info", ResultCodeEnum.CODE10108.getName());
                                 mapResult.put("userId", sysUserLogin.getUserId());
+                                changeUserState(sysUserLogin.getUserId(), 3);
                                 return mapResult;
                             }
                             List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -283,6 +298,7 @@ public class SysUserService {
                             mapResult.put("code", ResultCodeEnum.CODE10108.getCode());
                             mapResult.put("info", ResultCodeEnum.CODE10108.getName());
                             mapResult.put("userId", sysUserLogin.getUserId());
+                            changeUserState(sysUserLogin.getUserId(), 3);
                             return mapResult;
                         }
                         List<String> sysRoleMenuList = sysRoleMenuDao.selectByRoleId(sysUserLogin.getRoleId());
@@ -335,7 +351,7 @@ public class SysUserService {
                             logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 1);
                             logsRecord.LoginLogsSend(request, "6", "登录", "用户账户有泄漏风险", userName, String.valueOf(sysUserLogin.getUserId()), 2);
                             long surplusTime=(lockTime/60+1)!=(lockTimeOne+1)?(lockTime/60+1):lockTimeOne;
-                          //  mapResult.put("errorCount", "账户也被锁定，剩余锁定时间"+surplusTime+"分钟");
+                            //  mapResult.put("errorCount", "账户也被锁定，剩余锁定时间"+surplusTime+"分钟");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                             mapResult.put("info", "账户已被锁定，剩余锁定时间"+(lockTimeOne-surplusTime+1)+"分钟");
                             return mapResult;
@@ -409,11 +425,6 @@ public class SysUserService {
             }
         }
         return mapResult;
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public SysUserSelect selectByPrimaryIds(Long userId) {
-        return this.sysUserDao.selectByPrimaryIds(userId);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -542,7 +553,7 @@ public class SysUserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int changePassword(Long userId, Map<String, String> map, String userName, HttpServletRequest request) throws IOException {
+    public int changePassword(Long userId, Map<String, String> map, String userName, int currentState, HttpServletRequest request) throws IOException {
         Map linkedHashMap = new LinkedHashMap<>();
         linkedHashMap.put("userName", userName);
         SysUser sysUser = new SysUser();
@@ -559,6 +570,9 @@ public class SysUserService {
         sysUser.setUserId(userId);
         Date date = new Date();
         sysUser.setUpdateTime(date);
+        if (currentState == 3) {
+            sysUser.setState(1);
+        }
         SysUserBackUp sysUserBackUp = new SysUserBackUp();
         BeanUtils.copyProperties(sysUser, sysUserBackUp);
         sysUserBackUp.setVerfiCode(Demo.summary(linkedHashMap.toString()));
@@ -622,6 +636,20 @@ public class SysUserService {
     public List<SysUser> selectUserByUpdateTime() {
         List<SysUser> list = this.sysUserDao.selectUserByUpdateTime();
         return list;
+    }
+
+    /**
+     * 修改用户状态，为 3 表示用户账户过期，必须修改密码才可恢复
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public int changeUserState(Long userId, int state) {
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(userId);
+        sysUser.setState(state);
+        SysUserBackUp sysUserBackUp = new SysUserBackUp();
+        BeanUtils.copyProperties(sysUser, sysUserBackUp);
+        SysUserBackUpDao.update(sysUserBackUp);
+        return this.sysUserDao.update(sysUser);
     }
 }
 

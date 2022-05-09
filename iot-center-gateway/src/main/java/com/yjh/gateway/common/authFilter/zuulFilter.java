@@ -337,7 +337,7 @@ public class zuulFilter extends ZuulFilter {
                 if(StringUtils.isEmpty(pubkey)){
                     log.error("序列号不正确------------------------{}-{} {}", userId, userName, ukeyId);
 
-                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"错误的序列号!\"}");
+                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"请插入正确的ukey!\"}");
                 }
                 boolean status = SM2Verify_SKF.SM2Verify(pubkey, signStr, webcode, UKEY_USERID);
                 if (!status) {

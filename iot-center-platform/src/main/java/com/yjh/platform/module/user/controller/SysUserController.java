@@ -562,7 +562,7 @@ public class SysUserController {
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else {
-                    result.setData(sysUserService.changePassword(userId, map, sysUserCurrent.getUserName(), httpServletRequest));
+                    result.setData(sysUserService.changePassword(userId, map, sysUserCurrent.getUserName(), sysUserCurrent.getState(), httpServletRequest));
                 }
             } else {
                 Map<String, Object> mapResult = new HashMap<>();
@@ -638,7 +638,7 @@ public class SysUserController {
                     result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
                     return result;
                 } else {
-                    result.setData(sysUserService.changePassword(userId, map, sysUserCurrent.getUserName(), httpServletRequest));
+                    result.setData(sysUserService.changePassword(userId, map, sysUserCurrent.getUserName(), sysUserCurrent.getState(), httpServletRequest));
                 }
             } else {
                 Map<String, Object> mapResult = new HashMap<>();
