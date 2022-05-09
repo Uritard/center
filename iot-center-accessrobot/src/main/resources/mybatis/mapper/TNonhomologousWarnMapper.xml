@@ -65,7 +65,7 @@
         left join t_cruise_task_result_detail b on a.cruise_result_id = b.cruise_result_id
         left join t_cruise_task_result c on c.task_result_id = b.task_result_id
         where a.cruise_id = #{inspectionId}
-        and a.createtime is not null and a.cruise_result=246
+        and a.createtime is not null and (select (a.result_num REGEXP '[^0-9.]'))=0
         <if test="type == 6" >
             and a.createtime between #{startTime,jdbcType=TIMESTAMP} and
             #{endTime,jdbcType=TIMESTAMP}

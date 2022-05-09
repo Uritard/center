@@ -177,6 +177,7 @@
     </select>
 
     <select id="selectWarnByPage" parameterType="com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnInfo" resultType="com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnInfo">
+        select * from (
         select
         a.warn_id,
         a.instance_id,
@@ -194,7 +195,8 @@
         n.warn_level,
         j.camera_name,
         h.robot_name
-        from t_cruise_nonhomologous_warn a inner join t_cruise_nonhomologous_point_instance n on n.instance_id = a.instance_id
+        from t_cruise_nonhomologous_warn a inner join t_cruise_nonhomologous_point_instance n on n.instance_id =
+        a.instance_id
         left join t_cruise_point_instance b on b.instance_id = n.robot_instance_id
         left join t_cruise_point_instance c on c.instance_id = n.video_preset_id
         left join t_std_devicemete d on d.device_mete_id = n.device_mete_id
@@ -204,11 +206,13 @@
         left join t_camera_preset i on i.preset_id = c.cruise_id
         left join t_camera_info j on j.camera_id = i.camera_id
         left join t_dict_business k on k.dict_code = e.device_type
-        where 1 = 1
-        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        where 1 = 1<if test="instanceId != null and instanceId != ''">and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="deviceType != null "> and e.device_type = #{deviceType, jdbcType=INTEGER}</if>
-        <if test="deviceName != null and deviceName != ''"> and e.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%')</if>
-        <if test="deviceMeteName != null and deviceMeteName != ''"> and d.mete_name like concat('%',#{deviceMeteName, jdbcType=VARCHAR},'%') </if>
+        <if test="deviceName != null and deviceName != ''">and e.device_name like concat(
+            '%',#{deviceName, jdbcType=VARCHAR},'%')</if>
+        <if test="deviceMeteName != null and deviceMeteName != ''">and d.mete_name like
+            concat('%',#{deviceMeteName, jdbcType=VARCHAR},'%')
+        </if>
         <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.warn_time between #{startTime,jdbcType=TIMESTAMP} and
@@ -252,17 +256,21 @@
         left join t_robot_inspection g on g.inspection_id = b.cruise_id
         left join t_robot_info h on h.robot_id = g.robot_id
         left join t_dict_business k on k.dict_code = e.device_type
-        GROUP BY n.warn_id) m  on m.warn_id = a.warn_id where a.warn_type=5
-        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        GROUP BY n.warn_id) m on m .warn_id = a.warn_id where a.warn_type=5<if test="instanceId != null and instanceId != ''">and
+        a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="deviceType != null "> and m.device_type = #{deviceType, jdbcType=INTEGER}</if>
-        <if test="deviceName != null and deviceName != ''"> and m.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%')</if>
-        <if test="deviceMeteName != null and deviceMeteName != ''"> and m.mete_name like concat('%',#{deviceMeteName, jdbcType=VARCHAR},'%') </if>
+        <if test="deviceName != null and deviceName != ''">and m.device_name like concat(
+            '%',#{deviceName, jdbcType=VARCHAR},'%')</if>
+        <if test="deviceMeteName != null and deviceMeteName != ''">and m.mete_name like concat(
+            '%',#{deviceMeteName, jdbcType=VARCHAR},'%')
+        </if>
         <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
         <if test="startTime != null  ">
             <if test="endTime != null ">and a.warn_time between #{startTime,jdbcType=TIMESTAMP} and
                 #{endTime,jdbcType=TIMESTAMP}
             </if>
         </if>
+        ) warn order by warn.warn_time desc
     </select>
 
     <select id="selectWarnByPrimaryId" parameterType="java.lang.String" resultType="java.util.Map">

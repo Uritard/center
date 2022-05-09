@@ -171,7 +171,7 @@ public class TSequentialConfService{
             jasonMaps2.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
             Constant.sequentialState.put("state",((Double)map.get("sort")).intValue());
             Constant.sequentialState.put("cfgDeviceId",meteId);
-            jasonMaps2.put("state", map.get("state").toString());
+            jasonMaps2.put("state", "进行中");
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
             try{
@@ -373,8 +373,8 @@ public class TSequentialConfService{
             jasonMapsResult.put("type", "newSequentialResult");
             jasonMapsResult.put("cfgDeviceId", recBack.get("meteId"));
             jasonMapsResult.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
-            jasonMapsResult.put("state", map.get("state").toString());
-            jasonMapsResult.put("identifyResult", map.get("state").toString());
+            jasonMapsResult.put("state", param.get("resultValue").toString());
+            jasonMapsResult.put("identifyResult", param.get("resultValue").toString());
             String jsonResult = JSON.toJSONString(jasonMapsResult);
             log.info("发送给前端的消息：" + jsonResult);
             try{
