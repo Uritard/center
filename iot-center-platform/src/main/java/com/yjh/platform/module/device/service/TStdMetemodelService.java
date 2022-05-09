@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.service;
 
+import com.google.common.collect.Lists;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.ResultHandleUtils;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
@@ -7,7 +8,9 @@ import com.yjh.platform.module.device.dao.TStdMeteDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
@@ -28,6 +31,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CyclicBarrier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -139,53 +145,51 @@ public class TStdMetemodelService {
         return list2;
     }
 
-  @Transactional(rollbackFor = Exception.class)
-  public Long addModel(ModelCreator modelCreator){
-        TStdMeteModel m=new TStdMeteModel();
+    @Transactional(rollbackFor = Exception.class)
+    public Long addModel(ModelCreator modelCreator){
+        TStdMeteModel m = new TStdMeteModel();
         m.setDeviceType(modelCreator.getDeviceType());
         m.setModelName(modelCreator.getModelName());
         m.setRemark(modelCreator.getRemark());
         tStdMetemodelDao.add(m);
-        Long modelId=m.getModelId();
-      for (Long id:modelCreator.getMeteIds()) {
-
-          TStdMete mete=tStdMeteDao.selectByPrimaryId(id);
-          TStdMeteModelDetail detail=new TStdMeteModelDetail();
-          detail.setModelId(modelId);
-          detail.setMeteId(mete.getStdMeteId());
-          detail.setCustomId("101");
-          detail.setMeteName(mete.getMeteName());
-          detail.setMeteType(mete.getMeteType());
-          detail.setMeteKind(mete.getMeteKind());//插入meteKind
-          detail.setUnit(mete.getUnit());
-          detail.setAnalyseType(mete.getAnalyseType());
-          detail.setAlarmNote(mete.getAlarmNote());
-          detail.setAlarmExplain(mete.getAlarmExplain());
-          detail.setAlarmType(mete.getAlarmType());
-          detail.setUpEffect(mete.getUpEffect());
-          detail.setDownEffect(mete.getDownEffect());
-          detail.setAlarmLevel(mete.getAlarmLevel());
-          detail.setHighLimit1(mete.getHighLimit1());
-          detail.setLowLimit1(mete.getLowLimit1());
-          detail.setHighLimit2(mete.getHighLimit2());
-          detail.setLowLimit2(mete.getLowLimit2());
-          detail.setHighLimit3(mete.getHighLimit3());
-          detail.setLowLimit3(mete.getLowLimit3());
-          detail.setHighLimit4(mete.getHighLimit4());
-          detail.setLowLimit4(mete.getLowLimit4());
-          detail.setAlarmDelay(mete.getAlarmDelay());
-          detail.setAlarmCnt(mete.getAlarmCnt());
-          detail.setThresholdAbs(mete.getThresholdAbs());
-          detail.setThresholdPer(mete.getThresholdPer());
-          detail.setModulus(mete.getModulus());
-          detail.setStateZero(mete.getStateZero());
-          detail.setStateOne(mete.getStateOne());
-          tStdMetemodelDetailDao.add(detail);
-
-      }
+        Long modelId = m.getModelId();
+        List<Long> list = modelCreator.getMeteIds();
+        try {
+            dealTStdMeteModelDetail(list, modelId);
+        } catch (BrokenBarrierException | InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
         return m.getModelId();
-  }
+    }
 
+
+    /**
+     * 多线程处理
+     * @param list
+     * @param modelId
+     * @throws BrokenBarrierException
+     * @throws InterruptedException
+     */
+    private void dealTStdMeteModelDetail(List<Long> list, Long modelId) throws BrokenBarrierException, InterruptedException {
+        List<List<Long>> partitionList = Lists.partition(list, 2000);
+        //parties = 主线程+子线程
+        final CyclicBarrier barrier = new CyclicBarrier(partitionList.size() + 1);
+        partitionList.forEach(partition -> {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String meteStrList = StringUtils.join(partition, ',');
+                    tStdMetemodelDetailDao.batchAddModel(meteStrList, modelId);
+                    try {
+                        barrier.await();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        });
+        barrier.await();
+    }
     @Transactional(rollbackFor = Exception.class)
     public ModelInfo selectModel(Long modelId){
         ModelInfo mInfo=new ModelInfo();
@@ -203,129 +207,63 @@ public class TStdMetemodelService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int updateModel(ModelCreator modelCreator){
+    public int updateModel(ModelCreator modelCreator) {
 
         //修改模板名
-        TStdMeteModel meteModel=tStdMetemodelDao.selectByPrimaryId(modelCreator.getModelId());
+        TStdMeteModel meteModel = tStdMetemodelDao.selectByPrimaryId(modelCreator.getModelId());
         meteModel.setModelName(modelCreator.getModelName());
         meteModel.setRemark(modelCreator.getRemark());
-         tStdMetemodelDao.update(meteModel);
+        tStdMetemodelDao.update(meteModel);
 
 
-         //修改细节模板表
-         List<MeteInfo> mete1=tStdMetemodelDetailDao.selectMeteBlindModel(modelCreator.getModelId());//当前模板绑定的测点信息
+        //修改细节模板表
+        //当前模板绑定的测点信息
+        List<MeteInfo> mete1 = tStdMetemodelDetailDao.selectMeteBlindModel(modelCreator.getModelId());
+
+        List<Long> m1 = new ArrayList<>();
+        List<Long> m2 = modelCreator.getMeteIds();
+        List<Long> m3 = new ArrayList<>();
 
 
-         List<Long> m1=new ArrayList<>();
-         List<Long> m2=modelCreator.getMeteIds();
-         List<Long> m3=new ArrayList<>();
+        for (MeteInfo meteInfo1 : mete1) {
+            m1.add(meteInfo1.getMeteId());
+        }
 
-
-         for(MeteInfo meteInfo1:mete1){
-             m1.add(meteInfo1.getMeteId());
-         }
-
-        for(MeteInfo meteInfo1:mete1){
+        for (MeteInfo meteInfo1 : mete1) {
             m3.add(meteInfo1.getMeteId());
         }
 
-        if(m2.isEmpty()){
-            for(Long id:m3){
+        if (m2.isEmpty()) {
+            for (Long id : m3) {
                 tStdMetemodelDetailDao.deleteByMeteId(id);
             }
-        }
-         else if (m1.isEmpty()){
-            for(Long id:m2){
-                TStdMete mete=tStdMeteDao.selectByPrimaryId(id);
-                TStdMeteModelDetail detail=new TStdMeteModelDetail();
-                detail.setModelId(modelCreator.getModelId());
-                detail.setMeteId(mete.getStdMeteId());
-                detail.setCustomId("101");
-                detail.setMeteName(mete.getMeteName());
-                detail.setMeteType(mete.getMeteType());
-                detail.setMeteKind(mete.getMeteKind());//插入meteKind
-                detail.setUnit(mete.getUnit());
-                detail.setAlarmNote(mete.getAlarmNote());
-                detail.setAlarmExplain(mete.getAlarmExplain());
-                detail.setAlarmType(mete.getAlarmType());
-                detail.setUpEffect(mete.getUpEffect());
-                detail.setDownEffect(mete.getDownEffect());
-                detail.setAlarmLevel(mete.getAlarmLevel());
-                detail.setHighLimit1(mete.getHighLimit1());
-                detail.setLowLimit1(mete.getLowLimit1());
-                detail.setHighLimit2(mete.getHighLimit2());
-                detail.setLowLimit2(mete.getLowLimit2());
-                detail.setHighLimit3(mete.getHighLimit3());
-                detail.setLowLimit3(mete.getLowLimit3());
-                detail.setHighLimit4(mete.getHighLimit4());
-                detail.setLowLimit4(mete.getLowLimit4());
-                detail.setAlarmDelay(mete.getAlarmDelay());
-                detail.setAlarmCnt(mete.getAlarmCnt());
-                detail.setThresholdAbs(mete.getThresholdAbs());
-                detail.setThresholdPer(mete.getThresholdPer());
-                detail.setModulus(mete.getModulus());
-                detail.setStateZero(mete.getStateZero());
-                detail.setStateOne(mete.getStateOne());
-
-                tStdMetemodelDetailDao.add(detail);
-
+        } else if (m1.isEmpty()) {
+            Long modelId = meteModel.getModelId();
+            try {
+                dealTStdMeteModelDetail(m2, modelId);
+            } catch (BrokenBarrierException | InterruptedException e) {
+                log.error(e.getMessage(), e);
             }
-        }
-        else {
-            m1.retainAll(m2); //不变
-            if(m2.removeAll(m3) && !m2.isEmpty() ){ //增加
-                for(Long id:m2){
-                    TStdMete mete=tStdMeteDao.selectByPrimaryId(id);
-                    TStdMeteModelDetail detail=new TStdMeteModelDetail();
-                    detail.setModelId(modelCreator.getModelId());
-                    detail.setMeteId(mete.getStdMeteId());
-                    detail.setCustomId("101");
-                    detail.setMeteName(mete.getMeteName());
-                    detail.setMeteType(mete.getMeteType());
-                    detail.setMeteKind(mete.getMeteKind());//插入meteKind
-                    detail.setUnit(mete.getUnit());
-                    detail.setAlarmNote(mete.getAlarmNote());
-                    detail.setAlarmExplain(mete.getAlarmExplain());
-                    detail.setAlarmType(mete.getAlarmType());
-                    detail.setUpEffect(mete.getUpEffect());
-                    detail.setDownEffect(mete.getDownEffect());
-                    detail.setAlarmLevel(mete.getAlarmLevel());
-                    detail.setHighLimit1(mete.getHighLimit1());
-                    detail.setLowLimit1(mete.getLowLimit1());
-                    detail.setHighLimit2(mete.getHighLimit2());
-                    detail.setLowLimit2(mete.getLowLimit2());
-                    detail.setHighLimit3(mete.getHighLimit3());
-                    detail.setLowLimit3(mete.getLowLimit3());
-                    detail.setHighLimit4(mete.getHighLimit4());
-                    detail.setLowLimit4(mete.getLowLimit4());
-                    detail.setAlarmDelay(mete.getAlarmDelay());
-                    detail.setAlarmCnt(mete.getAlarmCnt());
-                    detail.setThresholdAbs(mete.getThresholdAbs());
-                    detail.setThresholdPer(mete.getThresholdPer());
-                    detail.setModulus(mete.getModulus());
-                    detail.setStateZero(mete.getStateZero());
-                    detail.setStateOne(mete.getStateOne());
-
-                    tStdMetemodelDetailDao.add(detail);
+        } else {
+            //不变
+            m1.retainAll(m2);
+            //增加
+            if (m2.removeAll(m3) && !m2.isEmpty()) {
+                Long modelId = meteModel.getModelId();
+                try {
+                    dealTStdMeteModelDetail(m2, modelId);
+                } catch (BrokenBarrierException | InterruptedException e) {
+                    log.error(e.getMessage(), e);
                 }
             }
-
-
-            if(m3.removeAll(m1) && !m3.isEmpty()){  //删除
-                for(Long id:m3){
+            //删除
+            if (m3.removeAll(m1) && !m3.isEmpty()) {
+                for (Long id : m3) {
                     tStdMetemodelDetailDao.deleteByMeteId(id);
                 }
             }
-
         }
-
-
-
-
-
-
-
-         return 1;
+        return 1;
     }
 
     @Transactional(rollbackFor = Exception.class)

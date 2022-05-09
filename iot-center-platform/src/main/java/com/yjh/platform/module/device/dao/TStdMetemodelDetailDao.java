@@ -59,6 +59,9 @@ public interface TStdMetemodelDetailDao {
 
     int batchAdd(List<TStdMeteModelDetail> list);
 
+    int batchAddModel(@Param(value = "meteStrList") String meteStrList,
+                      @Param(value = "modelId") Long modelId);
+
     List<MeteInfo> selectMeteBlindModel(@Param(value = "modelId")Long modelId);
     int deleteByMeteId(@Param(value ="meteId")Long meteId);
 
