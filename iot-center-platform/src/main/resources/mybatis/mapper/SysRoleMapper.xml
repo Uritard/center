@@ -103,7 +103,7 @@
         SELECT b.menu_code AS Id
         FROM sys_menu a
         LEFT JOIN sys_role_menu b ON a.menu_code = b.menu_code AND b.role_id = #{roleId, jdbcType=BIGINT}
-        WHERE a.up_id != -1 AND b.element_code != "halfChecked"
+        WHERE (a.up_id != -1  or a.menu_code='0001') AND b.element_code != "halfChecked"
     </select>
 
     <select id="selectRelationRegion" parameterType="java.lang.Long" resultType="java.util.Map">
