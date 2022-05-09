@@ -539,8 +539,17 @@ public class DataDealThread implements Runnable {
 
                                 //判别结果处理逻辑
                                 if("11".equals(analyseType)){
+                                    log.info("判别");
 
-                                    analyseResultImg=resultImage.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));
+                                    if (resultImage.contains("analyseResultImg")){
+                                        analyseResultImg = resultImage.replaceAll(
+                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
+                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));
+                                    }else {
+                                        analyseResultImg = resultImage.replaceAll(
+                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")),
+                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")));
+                                    }
                                     String resultValue = analyseDataOperateService.resolveDefectResult(jsonObjectResult.getString("resultValue"));
 
                                     if(jsonObjectResult.getString("resultValue").contains("abnormal")){

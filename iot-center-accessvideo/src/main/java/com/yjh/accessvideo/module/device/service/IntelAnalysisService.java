@@ -443,42 +443,43 @@ public class IntelAnalysisService {
             List<String> resultImgList = new ArrayList<>();
             Collections.addAll(resultImgList, String.valueOf(resultImg).split(" "));
             resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
+
             if (StringUtils.isNotBlank(resultImgList.get(0))){
                 String alarmContent = String.valueOf(content);
-                String defectModelName = analyseDataOperateService.selectDictCode("defect_model", alarmContent.split(" ")[0]);
-                String alarmLevel = analyseDataOperateService.selectAlgorithmDefectInfo(defectModelName);
-
-                TWarnInfo tWarnInfo = new TWarnInfo()
-                        // 将静默监视产生的告级别警统一设置为预警
-                        .setWarnLevel(Integer.valueOf(alarmLevel))
-                        .setWarnTime(new Date())
-                        .setWarnName("静默监视告警数据")
-                        .setWarnContent(alarmContent)
-                        .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
-                        .setCunstomId(String.valueOf(map.get("custom_id")))
-                        .setInstanceId(Long.valueOf(String.valueOf(map.get("instance_id"))))
-                        .setStdMeteId(Long.valueOf(String.valueOf(map.get("device_mete_id"))))
-                        .setConfMode(276)
-                        .setDefectModel(450)
-                        .setAlarmSource(689)
-                        .setImagePath(resultImgList.get(0));
-                analyseDataOperateDao.insertWarnInfo(tWarnInfo);
-
-                // 静默监视告警向上级系统上报
-                alarmToUpSystem(map, tWarnInfo);
-
-                //webSocket通知前端调用查询告警弹框的接口
-                Long warnId = analyseDataOperateDao.selectCurrentWarn();
-                Map<String, Object> jasonMaps = new HashMap<>(16);
-                jasonMaps.put("type", "alarmPopUp");
-                jasonMaps.put("warnId", warnId);
-                jasonMaps.put("defectModel", 450);
-                String json = JSON.toJSONString(jasonMaps);
-                log.info("发送给前端的消息：{}", json);
                 try {
+                    String defectModelName = analyseDataOperateService.selectDictCode("defect_model", alarmContent.split(" ")[0]);
+                    String alarmLevel = analyseDataOperateService.selectAlgorithmDefectInfo(defectModelName);
+
+                    TWarnInfo tWarnInfo = new TWarnInfo()
+                            .setWarnLevel(Integer.valueOf(alarmLevel))
+                            .setWarnTime(new Date())
+                            .setWarnName("静默监视告警数据")
+                            .setWarnContent(alarmContent)
+                            .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
+                            .setCunstomId(String.valueOf(map.get("custom_id")))
+                            .setInstanceId(Long.valueOf(String.valueOf(map.get("instance_id"))))
+                            .setStdMeteId(Long.valueOf(String.valueOf(map.get("device_mete_id"))))
+                            .setConfMode(276)
+                            .setDefectModel(450)
+                            .setAlarmSource(689)
+                            .setImagePath(resultImgList.get(0));
+                    analyseDataOperateDao.insertWarnInfo(tWarnInfo);
+
+                    // 静默监视告警向上级系统上报
+                    alarmToUpSystem(map, tWarnInfo);
+
+                    //webSocket通知前端调用查询告警弹框的接口
+                    Long warnId = analyseDataOperateDao.selectCurrentWarn();
+                    Map<String, Object> jasonMaps = new HashMap<>(16);
+                    jasonMaps.put("type", "alarmPopUp");
+                    jasonMaps.put("warnId", warnId);
+                    jasonMaps.put("defectModel", 450);
+                    String json = JSON.toJSONString(jasonMaps);
+                    log.info("发送给前端的消息：{}", json);
+
                     postUrl(syncWebsocketUrl, json);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("组装并存储告警信息出错：{}", e);
                 }
             }
 
@@ -630,7 +631,7 @@ public class IntelAnalysisService {
             log.info("告警上报：{}", alarmMap);
             Constant.otherServer(alarmMap, Constant.TCP_URL);
         }catch (Exception e){
-            log.error("向上级系统上报静默监视告警出错:{}", e.getMessage());
+            log.error("向上级系统上报静默监视告警出错:{}", e);
         }
     }
 
@@ -658,7 +659,7 @@ public class IntelAnalysisService {
             DataDealThread dataDealThread = new DataDealThread(jsonObject.toJSONString(), port, redisTemplate, analyseDataOperateService, syncWebsocketUrl);
             TaskExecutePool.getInstance().execute(dataDealThread);
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.error("算法结果处理线程异常:{}", e);
             log.error("算法结果处理线程异常:{}", e.getStackTrace()[0]);
         }
     }
@@ -688,8 +689,8 @@ public class IntelAnalysisService {
                 String redisKeyName = "t_cruise_task_result:" + taskId + ":" + instanceId;
                 String originPicPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "origpic"));
                 log.info("originPicPath===={}", originPicPath);
-//                String originPicPath = picPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
-//                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));
+                /*String originPicPath = picPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));*/
 
                 List<AnalyseResultItem> results = analyseResult.getResults();
                 // 判断该巡视点是否为27大类的点 若是  直接拿假数据  不要返回的结果
@@ -750,7 +751,7 @@ public class IntelAnalysisService {
             jsonObject.put("msgType", "2");
             jsonObject.put("msgData", msgDataObject);
         }catch (Exception e){
-            log.error("组装要发给 DataDealThread 的 JSONObject对象错误：{}", e.getMessage());
+            log.error("组装要发给 DataDealThread 的 JSONObject对象错误：{}", e);
         }
         return jsonObject;
     }
@@ -857,7 +858,7 @@ public class IntelAnalysisService {
             map.put("resultValue", String.valueOf(resultValue));
             map.put("resultImg",String.valueOf(resultImg));
         }catch (Exception e){
-            log.error("组装判别结果出错：{}", e.getMessage());
+            log.error("组装判别结果出错：{}", e);
         }
         return map;
     }
@@ -921,7 +922,7 @@ public class IntelAnalysisService {
             map.put("resultValue", String.valueOf(resultValue));
             map.put("resultImg", String.valueOf(resultImg));
         }catch (Exception e){
-            log.error("组装缺陷或设备状态识别结果出错：{}", e.getMessage());
+            log.error("组装缺陷或设备状态识别结果出错：{}", e);
         }
         return map;
     }
@@ -954,7 +955,7 @@ public class IntelAnalysisService {
             FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
             return targetPath;
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("将ftps的文件复制到指定目录：{}", e);
         }
         return null;
     }
@@ -1010,7 +1011,6 @@ public class IntelAnalysisService {
      * @return String
      */
     public String postUrl(String url, String json) throws IOException, URISyntaxException {
-        log.info("webSocketUrl=={}", url);
         CloseableHttpClient client = HttpClients.createDefault();
         URI uri = new URIBuilder(url).setParameter("json", json).build();
         HttpPost httpPost = new HttpPost(uri);
@@ -1034,7 +1034,7 @@ public class IntelAnalysisService {
             FtpsUtil.putFile(sourcePath, targetPathName, ftpsConfig.getIp(), ftpsConfig.getPort(),
                     ftpsConfig.getKeypw(), ftpsConfig.getUsername(), ftpsConfig.getPassword());
         } catch (Exception e) {
-            log.error("将文件上传至巡视主机ftp服务器错误:{}", e.getMessage());
+            log.error("将文件上传至巡视主机ftp服务器错误:{}", e);
         }
     }
 
@@ -1050,7 +1050,7 @@ public class IntelAnalysisService {
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
                     upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
         } catch (Exception e) {
-            log.error("将文件上传至上级系统ftp服务器错误:{}", e.getMessage());
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
         }
     }
 
