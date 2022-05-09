@@ -111,9 +111,11 @@ public class SystemInfoController {
             String[] secures=secureVerify.split(",");
             String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId"));
             for(String memory:secures){
-                if(userId!=10001){
-                    result.setCode(200,"");
-                    return result;
+                if(memory.equals("DiskFreeMin")) {
+                    if (userId != 10001) {
+                        result.setCode(200, "");
+                        return result;
+                    }
                 }
             }
             result.setData(systemInfoService.getSwap());
