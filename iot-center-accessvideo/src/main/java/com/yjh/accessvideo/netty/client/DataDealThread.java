@@ -1140,7 +1140,9 @@ public class DataDealThread implements Runnable {
                     List<TDefectInfo> defectList = new ArrayList<>();//TDI List对象
 
                     //从redisList中取出目前为止本任务中执行算法的所有巡视点
-                    List<String> cruiseKeys = redisTemplate.opsForList().range("cruiseKeys:" + TASKID, 0, redisTemplate.opsForList().size("cruiseKeys:" + TASKID) - 1);
+                    long size = redisTemplate.opsForList().size("cruiseKeys:" + TASKID) - 1;
+                    log.info("cruiseKeys size==={}", size);
+                    List<String> cruiseKeys = redisTemplate.opsForList().range("cruiseKeys:" + TASKID, 0, size);
                     log.info("cruisekeys:" + cruiseKeys);
                     finalCruiseKey = cruiseKeys.get(0);//挑选一名幸运Redis KEY值
                     for (String cruiseKey : cruiseKeys) {

@@ -136,6 +136,10 @@ public class AnalyseDataOperateService {
         return analyseDataOperateDao.selectDictNote(dictCode, colName);
     }
 
+    public String selectAlarmLevel(String colName, String dictNote){
+        return analyseDataOperateDao.selectAlarmLevel(colName, dictNote);
+    }
+
     //@Logs(title = "查询任务下所有巡视点", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePointInstance> selectCruiseByTask(String taskId) {

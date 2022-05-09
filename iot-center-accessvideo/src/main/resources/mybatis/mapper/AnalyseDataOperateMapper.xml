@@ -751,6 +751,24 @@
         AND col_name = #{colName,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectAlarmLevel" resultType="java.lang.String">
+        SELECT
+            defect_level
+        FROM
+            t_algorithm_info
+        WHERE is_ai = 0
+          AND  defect_type in
+               (
+                   SELECT
+                       dict_code
+                   FROM
+                       t_dict_business
+                   WHERE
+                       col_name = #{colName,jdbcType=VARCHAR}
+                     AND dict_note = #{dictNote,jdbcType=VARCHAR}
+               )
+    </select>
+
     <select id="selectCruiseByTaskId" parameterType="java.lang.String" resultType="com.yjh.accessvideo.module.device.entity.TCruisePointInstance">
         SELECT
 	       b.instance_id

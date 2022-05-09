@@ -431,7 +431,11 @@ public class IntelAnalysisService {
                 }
                 content.add(desc);
 
-                String targetPath = copyFileFromFtps(type, result.getResImageUrl());
+                // 因为算法端乱改乱改 所以就在这里截取了 不想改动后面的逻辑(拼接路径)
+                String resImageUrl = result.getResImageUrl().replaceAll(
+                        redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "");
+
+                String targetPath = copyFileFromFtps(type, resImageUrl);
                 String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")),
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")));
                 resultImg.add(defectResultRealImg);
@@ -445,46 +449,62 @@ public class IntelAnalysisService {
             resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
 
             if (StringUtils.isNotBlank(resultImgList.get(0))){
-                String alarmContent = String.valueOf(content);
-                try {
-                    String defectModelName = analyseDataOperateService.selectDictCode("defect_model", alarmContent.split(" ")[0]);
-                    String alarmLevel = analyseDataOperateService.selectAlgorithmDefectInfo(defectModelName);
+                String[] resultArr = String.valueOf(content).split("\\s+");
 
-                    TWarnInfo tWarnInfo = new TWarnInfo()
-                            .setWarnLevel(Integer.valueOf(alarmLevel))
-                            .setWarnTime(new Date())
-                            .setWarnName("静默监视告警数据")
-                            .setWarnContent(alarmContent)
-                            .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
-                            .setCunstomId(String.valueOf(map.get("custom_id")))
-                            .setInstanceId(Long.valueOf(String.valueOf(map.get("instance_id"))))
-                            .setStdMeteId(Long.valueOf(String.valueOf(map.get("device_mete_id"))))
-                            .setConfMode(276)
-                            .setDefectModel(450)
-                            .setAlarmSource(689)
-                            .setImagePath(resultImgList.get(0));
-                    analyseDataOperateDao.insertWarnInfo(tWarnInfo);
-
-                    // 静默监视告警向上级系统上报
-                    alarmToUpSystem(map, tWarnInfo);
-
-                    //webSocket通知前端调用查询告警弹框的接口
-                    Long warnId = analyseDataOperateDao.selectCurrentWarn();
-                    Map<String, Object> jasonMaps = new HashMap<>(16);
-                    jasonMaps.put("type", "alarmPopUp");
-                    jasonMaps.put("warnId", warnId);
-                    jasonMaps.put("defectModel", 450);
-                    String json = JSON.toJSONString(jasonMaps);
-                    log.info("发送给前端的消息：{}", json);
-
-                    postUrl(syncWebsocketUrl, json);
-                } catch (Exception e) {
-                    log.error("组装并存储告警信息出错：{}", e);
-                }
+                List<TWarnInfo> list = silentAlarmStore(resultArr, map, resultImgList);
+                alarmToUpSystem(map, list);
             }
 
 //            alarmToSFZJ(isHave,String.valueOf(map.get("custom_id")),results);
         }
+    }
+
+    /**
+     * 静默监视告警结果存储
+     *
+     * @param resultArr 告警内容
+     * @param map 巡视点信息
+     * @param resultImgList 结果图片
+     * @return TWarnInfo
+     */
+    private List<TWarnInfo> silentAlarmStore(String[] resultArr, Map<String, Object> map, List<String> resultImgList) {
+        List<TWarnInfo> list = new ArrayList<>();
+        try {
+            for (int i = 0; i < resultArr.length; i++) {
+                String alarmLevel = analyseDataOperateService.selectAlarmLevel("defect_model", resultArr[i]);
+                TWarnInfo tWarnInfo = new TWarnInfo()
+                        .setWarnLevel(Integer.valueOf(alarmLevel))
+                        .setWarnTime(new Date())
+                        .setWarnName("静默监视告警数据")
+                        .setWarnContent(resultArr[i])
+                        .setDeviceId(Long.valueOf(String.valueOf(map.get("device_id"))))
+                        .setCunstomId(String.valueOf(map.get("custom_id")))
+                        .setInstanceId(Long.valueOf(String.valueOf(map.get("instance_id"))))
+                        .setStdMeteId(Long.valueOf(String.valueOf(map.get("device_mete_id"))))
+                        .setConfMode(276)
+                        .setDefectModel(450)
+                        .setAlarmSource(689)
+                        .setImagePath(resultImgList.get(0));
+                analyseDataOperateDao.insertWarnInfo(tWarnInfo);
+
+                list.add(tWarnInfo);
+
+                //webSocket通知前端调用查询告警弹框的接口
+                Long warnId = analyseDataOperateDao.selectCurrentWarn();
+                Map<String, Object> jasonMaps = new HashMap<>(16);
+                jasonMaps.put("type", "alarmPopUp");
+                jasonMaps.put("warnId", warnId);
+                jasonMaps.put("defectModel", 450);
+                String json = JSON.toJSONString(jasonMaps);
+                log.info("发送给前端的消息：{}", json);
+
+                postUrl(syncWebsocketUrl, json);
+            }
+            return list;
+        } catch (Exception e) {
+            log.error("组装并存储告警信息出错：{}", e);
+        }
+       return null;
     }
 
     private void alarmToSFZJ(Boolean isHave,String instanceId,List<AnalyseResultItem> results
@@ -576,13 +596,14 @@ public class IntelAnalysisService {
      * 静默监视告警向上级系统上报
      *
      * @param map 巡视点信息
-     * @param tWarnInfo 告警数据
+     * @param tWarnInfoList 告警数据
      */
-    private void alarmToUpSystem(Map<String, Object> map, TWarnInfo tWarnInfo) {
-        XMLBaseModel xmlBaseModel = new XMLBaseModel();
-        List<Map<String, Object>> xmlItems = new ArrayList<>();
-        Map<String, Object> xmlItem = new HashMap<>(16);
-        try {
+    private void alarmToUpSystem(Map<String, Object> map, List<TWarnInfo> tWarnInfoList) {
+        for (TWarnInfo tWarnInfo : tWarnInfoList){
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String, Object>> xmlItems = new ArrayList<>();
+            Map<String, Object> xmlItem = new HashMap<>(16);
+
             xmlBaseModel.setType("63");
             xmlItem.put("patroldevice_code", map.get("device_id"));
             xmlItem.put("patroldevice_name", map.get("device_name"));
@@ -602,36 +623,38 @@ public class IntelAnalysisService {
                 default:
                     break;
             }
-            if (tWarnInfo.getWarnContent().contains("安全帽")){
-                xmlItem.put("monitor_type", 1);
-            }else if (tWarnInfo.getWarnContent().contains("越线")){
-                xmlItem.put("monitor_type", 2);
-            }else if (tWarnInfo.getWarnContent().contains("工装")){
-                xmlItem.put("monitor_type", 3);
-            }
-            // 目前都是识别图片 所以是5
-            xmlItem.put("file_type", 5);
-            String imgPath = tWarnInfo.getImagePath().replaceAll(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")));
-            String targetNamePath = imgPath.replace(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")),
-                    "");
-            uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
 
-            xmlItem.put("file_path",  targetNamePath);
-            xmlItem.put("time", tWarnInfo.getWarnTime());
-            xmlItem.put("content", tWarnInfo.getWarnContent());
-            xmlItems.add(xmlItem);
-            xmlBaseModel.setItems(xmlItems);
-            List<XMLBaseModel> list = new ArrayList<>();
-            list.add(xmlBaseModel);
-            Map<String, List<XMLBaseModel>> alarmMap = new HashMap<>(3);
-            alarmMap.put("list", list);
-            log.info("告警上报：{}", alarmMap);
-            Constant.otherServer(alarmMap, Constant.TCP_URL);
-        }catch (Exception e){
-            log.error("向上级系统上报静默监视告警出错:{}", e);
+            try {
+                if (tWarnInfo.getWarnContent().contains("安全帽")) {
+                    xmlItem.put("monitor_type", 1);
+                } else if (tWarnInfo.getWarnContent().contains("越线")) {
+                    xmlItem.put("monitor_type", 2);
+                } else if (tWarnInfo.getWarnContent().contains("工装")) {
+                    xmlItem.put("monitor_type", 3);
+                }
+                // 目前都是识别图片 所以是5
+                xmlItem.put("file_type", 5);
+                String imgPath = tWarnInfo.getImagePath().replaceAll(
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")),
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
+                String targetNamePath = imgPath.replace(
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "");
+                uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
+
+                xmlItem.put("file_path", targetNamePath);
+                xmlItem.put("time", tWarnInfo.getWarnTime());
+                xmlItem.put("content", tWarnInfo.getWarnContent());
+                xmlItems.add(xmlItem);
+                xmlBaseModel.setItems(xmlItems);
+                List<XMLBaseModel> list = new ArrayList<>();
+                list.add(xmlBaseModel);
+                Map<String, List<XMLBaseModel>> alarmMap = new HashMap<>(3);
+                alarmMap.put("list", list);
+                log.info("告警上报：{}", alarmMap);
+                Constant.otherServer(alarmMap, Constant.TCP_URL);
+            }catch (Exception e){
+                log.error("向上级系统上报静默监视告警出错:{}", e);
+            }
         }
     }
 
@@ -820,6 +843,8 @@ public class IntelAnalysisService {
     private Map<String, String> getDistinguishResult(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
                                                      JSONObject resultDataObject, String originPicPath, String type, String value, String devicePointId, Map<String, String> map) {
         String targetPath;
+        String resImageUrl = result.getResImageUrl().replaceAll(
+                redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "");
         try {
             // 判断该巡视点是否为判别的点 若是  直接拿假数据  不要返回的结果
             if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(devicePointId)){
@@ -827,7 +852,7 @@ public class IntelAnalysisService {
                 resultDataObject.put("analyseType", 11);
                 if (Objects.equals("1", value)){
                     // 图像有差异 才会返回图片地址
-                    targetPath = copyFileFromFtps(type, result.getResImageUrl());
+                    targetPath = copyFileFromFtps(type, resImageUrl);
                 }else {
                     // 图像无差异 取原图
                     targetPath = originPicPath;
@@ -840,7 +865,7 @@ public class IntelAnalysisService {
             if (Objects.equals("1", value)){
                 // 图像有差异 才会返回图片地址
                 resultValue.add("abnormal");
-                targetPath = copyFileFromFtps(type, result.getResImageUrl());
+                targetPath = copyFileFromFtps(type, resImageUrl);
                 resultImg.add(targetPath);
             }else {
                 // 图像无差异 取原图
@@ -866,6 +891,8 @@ public class IntelAnalysisService {
     private Map<String, String> getDefectOrIdentification(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
                                            JSONObject resultDataObject, String type, String value, String desc, String devicePointId, Map<String, String> map) {
         String targetPath;
+        String resImageUrl = result.getResImageUrl().replaceAll(
+                redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "");
         try {
             // 根据返回的算法类型查询算法相关信息
             List<TAlgorithmInfo> list = analyseDataOperateDao.selectAlgorithmInfo(type);
@@ -885,7 +912,7 @@ public class IntelAnalysisService {
                     }
                     resultValue.add(Optional.ofNullable(String.valueOf(result.getConf())).orElse("0.0"));
                     resultDesc.add(desc);
-                    targetPath = copyFileFromFtps(type, result.getResImageUrl());
+                    targetPath = copyFileFromFtps(type, resImageUrl);
                     resultImg.add(targetPath);
                 }else {
                     // 图像无缺陷
@@ -915,7 +942,7 @@ public class IntelAnalysisService {
                     resultValue.add(resultDescTemp);
                     resultDataObject.put("analyseType", list.get(0).getAnalyseType());
                 }
-                targetPath = copyFileFromFtps(type, result.getResImageUrl());
+                targetPath = copyFileFromFtps(type, resImageUrl);
                 resultImg.add(targetPath);
             }
             map.put("resultDesc", String.valueOf(resultDesc));
