@@ -598,7 +598,6 @@
         p.dict_note as defect_model_name,
         n.cruise_id as preset_id,
         b.up_region_name as regionName,
-        j.camera_id,
         null as low_limit1,
         null as low_limit2,
         null as low_limit3,
@@ -607,6 +606,7 @@
         null as high_limit2,
         null as high_limit3,
         null as high_limit4,
+        j.camera_id,
         '' AS video_camera_type
         FROM
         t_defect_info a
