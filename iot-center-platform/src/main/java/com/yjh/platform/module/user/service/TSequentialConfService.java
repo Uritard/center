@@ -4,6 +4,8 @@ import com.alibaba.druid.sql.ast.statement.SQLForeignKeyImpl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.dao.TCfgDeviceDao;
@@ -283,13 +285,21 @@ public class TSequentialConfService{
                 param.put("taskId",UUID.randomUUID()+"#yjsk#meteId="+meteId);
                 List<Map<String,Object>> analysis = new ArrayList<>();
                 analysis.add(param);
-                String services = HttpClientUtils.getInstance().getUrl(picRec, JSON.toJSONString(analysis));
-                JSONObject jsonObject =JSONObject.parseObject(services);
-                if(!Objects.isNull(jsonObject.get("code"))&&jsonObject.get("code").toString().equals("200")){
-                    log.info("一键顺控-变位信号-发送至算法识别主机成功");
-                }else{
-                    throw new BusinessException("一键顺控-变位信号-发送至算法识别主机失败"+jsonObject.toJSONString());
+                log.info("调用video算法识别接口param={},url={}",JSON.toJSONString(analysis),picRec);
+                Map<String,List<Map<String,Object>>> analysisList = new HashMap<>();
+                analysisList.put("list",analysis);
+                ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+                if (null != serviceRestTemplate) {
+                    serviceRestTemplate.postForObject(picRec, analysisList, String.class);
                 }
+//
+//                String services = HttpClientUtils.getInstance().postUrl(picRec, JSON.toJSONString(analysis));
+//                JSONObject jsonObject =JSONObject.parseObject(services);
+//                if(!Objects.isNull(jsonObject.get("code"))&&jsonObject.get("code").toString().equals("200")){
+//                    log.info("一键顺控-变位信号-发送至算法识别主机成功");
+//                }else{
+//                    throw new BusinessException("一键顺控-变位信号-发送至算法识别主机失败"+jsonObject.toJSONString());
+//                }
             }catch (Exception e){
                 log.error("一键顺控-变位信号-调用算法识别主机失败",e.getMessage());
             }
