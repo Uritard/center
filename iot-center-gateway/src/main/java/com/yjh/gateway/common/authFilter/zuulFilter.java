@@ -294,7 +294,7 @@ public class zuulFilter extends ZuulFilter {
         if(StringUtils.isEmpty(userId)) {
             if("true".equals(redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content"))){
                 String identifier = String.valueOf(paramMap.get("identifier"));
-                String priks = String.valueOf(redisTemplate.opsForHash().get("pubk:" + identifier, "prik"));
+                String priks = (String) redisTemplate.opsForHash().get("pubk:" + identifier, "prik");
                 userName = Demo.decryptIdentifier(userName, priks);
                 log.info("用户参数: {}, 之后的: {}, identifier: {}", userName, priks, identifier);
             }
@@ -343,7 +343,7 @@ public class zuulFilter extends ZuulFilter {
                 if (!status) {
                     log.error("签名验证结果 - {}", status);
 
-                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"签名验证失败!\"}");
+                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"签名验证失败，ukey 和用户不匹配!\"}");
                 }
             }
         }

@@ -3,6 +3,7 @@ package com.yjh.gateway.commons.utils.smUtil;
 import com.yjh.gateway.commons.utils.gmhelper.SM2Util;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.engines.SM2Engine;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
@@ -95,14 +96,15 @@ public class Demo {
 
     public static String decryptIdentifier(String pCode, String priks) {
         try {
-            if(StringUtils.isNoneBlank(pCode) && StringUtils.isNoneBlank(priks)){
+            if(StringUtils.isNoneBlank(pCode) && StringUtils.isNoneBlank(priks) && !"null".equals(priks)){
                 ECPrivateKeyParameters priKey = new ECPrivateKeyParameters(new BigInteger(Util.hexToByte(priks)), SM2Util.DOMAIN_PARAMS);
                 return new String(SM2Util.decrypt(SM2Engine.Mode.C1C2C3, priKey, Util.hexToByte("04" + pCode)));
             }
-        } catch (Exception e) {
-            log.error("解密失败", e);
+        } catch (IllegalArgumentException | InvalidCipherTextException e) {
+            log.error("解密失败：{}", e.getMessage());
+            log.error("解密参数， pCode: {}, priks: {}", pCode, priks);
         }
-        return  "";
+        return  pCode;
     }
 
     public static void main(String[] args) {
