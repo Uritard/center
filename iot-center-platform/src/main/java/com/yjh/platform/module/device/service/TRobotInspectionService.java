@@ -444,7 +444,7 @@ public class TRobotInspectionService{
         }else {
             re.put("nestDoorStatus","");//舱门
         }
-        Map<String,String> mapForNestTemperature  = redisTemplate.opsForHash().entries("nestOperation:"+robotCode+":2");
+        Map<String,String> mapForNestTemperature  = redisTemplate.opsForHash().entries("nestOperation:"+robotCode+":5");
         if(mapForNestTemperature.size() != 0){
             String value = mapForNestDoorState.get("valueUnit");
             re.put("nestTemperature", value);

@@ -108,7 +108,9 @@ public class LogsAspect {
                                 Constant.postUrl(Constant.WEBSOCKET_URL, JSON.toJSONString(jsonMap));
                                 content.append(";用户").append(userName).append("存在越权访问!");
                                 params.set("content", content.toString());
-                                post(params);
+                                if (!"控制巡视设备".equals(annotation.title())) {
+                                    post(params);
+                                }
                                 Result re = new Result();
                                 re.setCode(209, "此用户无权限");
                                 return re;
@@ -124,7 +126,9 @@ public class LogsAspect {
                 // 记录操作日志...谁..在什么时间..做了什么事情..
                 result = joinPoint.proceed();
                 params.set("content", content.toString());
-                post(params);
+                if (!"控制巡视设备".equals(annotation.title())) {
+                    post(params);
+                }
                 return result;
             } catch (BusinessException e) {
                 params.set("state", 2);

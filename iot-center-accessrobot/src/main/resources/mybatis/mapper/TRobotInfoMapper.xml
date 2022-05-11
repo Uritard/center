@@ -1118,7 +1118,16 @@
             WHERE 1=1 and a.robot_code = #{robotCode} )
     </select>
     <select id="selectRobotTypeByCode" resultType="java.lang.Integer">
-        SELECT a.robot_type FROM `t_robot_info` a WHERE a.robot_code =  #{robotCode, jdbcType=VARCHAR};
+        SELECT
+        CASE
+        WHEN a.robot_type IS NULL THEN
+        a.drone_type
+        ELSE
+        a.robot_type
+        END AS robotType
+        FROM
+        `t_robot_info` a
+        WHERE a.robot_code =  #{robotCode, jdbcType=VARCHAR};
     </select>
 
     <update id="updateTCruiseTask">
