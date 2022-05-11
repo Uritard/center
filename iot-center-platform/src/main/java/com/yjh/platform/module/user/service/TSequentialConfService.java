@@ -170,8 +170,8 @@ public class TSequentialConfService{
             Map<String, String> jasonMaps2 = new HashMap<>();
             jasonMaps2.put("type", "newSequential");
             jasonMaps2.put("cfgDeviceId", meteId);
-            jasonMaps2.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
-            Constant.sequentialState.put("state",((Double)map.get("sort")).intValue());
+            jasonMaps2.put("sort", /*String.valueOf(Double.valueOf(*/map.get("sort").toString()/*).intValue())*/);
+            Constant.sequentialState.put("state",((Long)map.get("sort")).intValue());
             Constant.sequentialState.put("cfgDeviceId",meteId);
             jasonMaps2.put("state", "进行中");
             String json = JSON.toJSONString(jasonMaps2);

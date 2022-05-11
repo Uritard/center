@@ -164,7 +164,7 @@
         i.analyse_type as analyseType
         FROM t_sequential_conf a
         left join t_cfg_data_current b on a.cfg_device_id = b.mete_id
-        left join (SELECT (@i:=@i+1) as sort,x.cfg_device_id FROM t_sequential_conf x,(Select @i:=-1) z) c on a.cfg_device_id = c.cfg_device_id
+        left join (SELECT CAST((@i:=@i+1) AS SIGNED) as sort,x.cfg_device_id FROM t_sequential_conf x,(Select @i:=-1) z) c on a.cfg_device_id = c.cfg_device_id
         left join t_camera_preset e on a.preset_id = e.preset_id
         left join t_camera_info f on a.camera_id = f.camera_id
         left join t_cfg_device g on a.cfg_device_id = g.device_id
