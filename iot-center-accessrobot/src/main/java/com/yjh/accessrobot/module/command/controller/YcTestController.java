@@ -1,10 +1,8 @@
 package com.yjh.accessrobot.module.command.controller;
 
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
-import com.yjh.accessrobot.netty.handler.InspectionResultHandler;
 import com.yjh.accessrobot.netty.thread.AnalysisResultThread;
 import com.yjh.accessrobot.netty.thread.InspectionResultThread;
-import com.yjh.accessrobot.netty.thread.IsWarnAfterCruiseThread;
 import com.yjh.accessrobot.netty.thread.NonhomologousWarnThread;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.swagger.annotations.Api;
@@ -49,22 +47,23 @@ public class YcTestController {
                                   @RequestParam(value = "taskName") String taskName,
                                   @RequestParam(value = "deviceId") String deviceId,
                                   @RequestParam(value = "taskCode") String taskCode,
-                                  @RequestParam(value = "sendCode") String sendCode) {
+                                  @RequestParam(value = "sendCode") String sendCode,
+                                  @RequestParam(value = "fileType") String fileType) {
 
         List<Map<String,Object>> Items = new ArrayList<>();
         Map<String,Object> map = new HashMap<>(16);
         map.put("robot_code", robotCode);// "E100-001"
         map.put("task_name",taskName );// "ydf211220220506211313"
-        map.put("file_path", filePath);// 1/2022/05/07/e63496ffe63c444cb7725bffee5966a2/FIR/2B07D364183C4163AE664C361DF02B57_E100-00120220507143446_result.jpg
+        map.put("file_path", filePath);// 1/2022/05/07/e63496ffe63c444cb7725bffee5966a2/FIR/E100-00120220507143446_result.jpg
         map.put("patroldevice_code", robotCode);// "E100-001"
         map.put("device_id", deviceId);// "2B07D364183C4163AE664C361DF02B57"
         map.put("patroldevice_name", robotCode);
-        map.put("task_code", taskCode);
+        map.put("task_code", taskCode);// "e63496ffe63c444cb7725bffee5966a2"
         map.put("valid", "1");
         map.put("device_name", "设备2-红外普测2");
         map.put("unit", "℃");
         map.put("recognition_type", "4");
-        map.put("file_type", "2");
+        map.put("file_type", fileType);// 2  3
         map.put("value_type", "0");
         map.put("value", "32.8");
         map.put("value_unit", "32.86℃");

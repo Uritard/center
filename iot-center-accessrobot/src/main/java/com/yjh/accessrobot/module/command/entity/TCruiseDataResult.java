@@ -124,5 +124,7 @@ public class TCruiseDataResult implements Serializable {
     private String firName;
     @ApiModelProperty(value = "红外FIR文件生成时间")
     private String firDate;
+    @ApiModelProperty(value = "声纹文件地址")
+    private String voicePath;
 
 }

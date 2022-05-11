@@ -1,14 +1,8 @@
 package com.yjh.accessrobot.netty.handler;
 
-import com.alibaba.druid.util.StringUtils;
-import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accessrobot.common.utils.StaticContextAccessor;
-import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
-import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
-import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -23,16 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.MultiKeyCommands;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -52,7 +40,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
     @Autowired
     private RobotService robotService;
 
-    private String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+    private final String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -67,24 +55,24 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         cruiseResultMap.put("patrolDeviceName", String.valueOf(item.get("patroldevice_name")));
         cruiseResultMap.put("patrolDeviceCode", String.valueOf(item.get("patroldevice_code")));
         cruiseResultMap.put("robotCode",robotCode);
-        cruiseResultMap.put("taskName", item.get("task_name").toString());
-        cruiseResultMap.put("taskCode", item.get("task_code").toString());
-        cruiseResultMap.put("deviceName", item.get("device_name").toString());
-        cruiseResultMap.put("deviceId", item.get("device_id").toString());
+        cruiseResultMap.put("taskName",  String.valueOf(item.get("task_name")));
+        cruiseResultMap.put("taskCode",  String.valueOf(item.get("task_code")));
+        cruiseResultMap.put("deviceName",  String.valueOf(item.get("device_name")));
+        cruiseResultMap.put("deviceId",  String.valueOf(item.get("device_id")));
         // 2022过检 新增字段value_type 0:默认值类型 11:局放放电频次 12:局放信号峰值 13:局放信号均值
-        cruiseResultMap.put("valueType", item.get("value_type").toString());
-        cruiseResultMap.put("value", item.get("value").toString());
-        cruiseResultMap.put("valueUnit", item.get("value_unit").toString());
-        cruiseResultMap.put("unit", item.get("unit").toString());
-        cruiseResultMap.put("time", item.get("time").toString());
-        cruiseResultMap.put("recognitionType", item.get("recognition_type").toString());
-        cruiseResultMap.put("fileType", item.get("file_type").toString());
-        cruiseResultMap.put("rectangle", item.get("rectangle").toString());
-        cruiseResultMap.put("taskPatrolledId", item.get("task_patrolled_id").toString());
+        cruiseResultMap.put("valueType",  String.valueOf(item.get("value_type")));
+        cruiseResultMap.put("value",  String.valueOf(item.get("value")));
+        cruiseResultMap.put("valueUnit",  String.valueOf(item.get("value_unit")));
+        cruiseResultMap.put("unit",  String.valueOf(item.get("unit")));
+        cruiseResultMap.put("time",  String.valueOf(item.get("time")));
+        cruiseResultMap.put("recognitionType",  String.valueOf(item.get("recognition_type")));
+        cruiseResultMap.put("fileType",  String.valueOf(item.get("file_type")));
+        cruiseResultMap.put("rectangle",  String.valueOf(item.get("rectangle")));
+        cruiseResultMap.put("taskPatrolledId",  String.valueOf(item.get("task_patrolled_id")));
         if (Objects.nonNull(item.get("valid"))) {
-            cruiseResultMap.put("valid", item.get("valid").toString());
+            cruiseResultMap.put("valid",  String.valueOf(item.get("valid")));
         }
-        String ftpFilePath = item.get("file_path").toString();
+        String ftpFilePath =  String.valueOf(item.get("file_path"));
         robotService.uploadFile(ftpFilePath, ftpFilePath);
 
         // 结果文件处理及判断结果是否告警
@@ -134,19 +122,19 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         Map<String, Object> item = xmlBaseModel.getItems().get(0);
 
         try {
-            String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code").toString() + "/";
-            String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code").toString() + "/";
+            String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code") + "/";
+            String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code") + "/";
             // 可见光结果、红外fir、音频wav
             String[] sArray = ftpFilePath.split("/");
             String ftpFileName = sArray[sArray.length - 1];
             String temporaryFilePath = filePathMap.get("content") + "/" + ftpFilePath;
             log.info("temporaryFilePath==={}",temporaryFilePath);
 
-            String fileType = item.get("file_type").toString();
+            String fileType = String.valueOf(item.get("file_type"));
             // 红外原图
             if (item.containsKey("origin_file_path") && Objects.equals("1",fileType)) {
                 // 红外原图
-                String ftpInfraredOriginPath = item.get("origin_file_path").toString();
+                String ftpInfraredOriginPath = String.valueOf(item.get("origin_file_path"));
                 String[] sArray2 = ftpInfraredOriginPath.split("/");
                 // 红外原图名称
                 String ftpInfraredOriginName = sArray2[sArray2.length - 1];
@@ -159,10 +147,10 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             // 可见光原图、音频和红外结果
             if (item.containsKey("origin_file_result_path")) {
                 // 可见光原图、红外结果
-                ftpOriginPath = item.get("origin_file_result_path").toString();
+                ftpOriginPath = String.valueOf(item.get("origin_file_result_path"));
             } else {
                 // 可见光原图、音频
-                ftpOriginPath = item.get("file_path").toString();
+                ftpOriginPath = String.valueOf(item.get("file_path"));
             }
 
             String[] sArray2 = ftpOriginPath.split("/");
@@ -174,7 +162,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             /*
              * 针对2022过检
              * 27大类、表计、缺陷、判别需要机器人,且需算法分析
-             * 这些都是可见光的图片
+             * 这些都是可见光的图片和一个声音
              * 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path
              * */
             boolean flag = item.containsKey("file_path") && !item.containsKey("origin_file_result_path") && !item.containsKey("origin_file_path");
@@ -192,8 +180,8 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
                 cruiseResultMap.put("resultPic", developRelativeUrl + "FIR" + "/" + ftpFileName);
 
                 isAlarmMap.put("relativePath", developRelativeUrl + "Infrared" + "/" + ftpOriginName);
-                isAlarmMap.put("OriginPath",item.get("origin_file_path").toString());
-            } else if (Objects.equals("2",fileType) && Boolean.FALSE.equals(flag)) {
+                isAlarmMap.put("OriginPath", String.valueOf(item.get("origin_file_path")));
+            } else if (Objects.equals("2", fileType) && Boolean.FALSE.equals(flag)) {
                 // 拷贝巡视结果图
                 copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "CCD");
                 // 拷贝原图
@@ -202,8 +190,8 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
                 cruiseResultMap.put("absolutePath", developAbsoluteUrl + "BigImg" + "/" + ftpOriginName);
 
                 isAlarmMap.put("relativePath", developRelativeUrl + "CCD" + "/" + ftpFileName);
-                isAlarmMap.put("OriginPath",item.get("origin_file_path").toString());
-            } else if (Objects.equals("3",fileType)) {
+                isAlarmMap.put("OriginPath", String.valueOf(item.get("origin_file_path")));
+            } else if (Objects.equals("3", fileType) && Boolean.FALSE.equals(flag)) {
                 // 拷贝巡视结果图
                 copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Audio");
                 cruiseResultMap.put("relativePath", developRelativeUrl + "Audio" + "/" + ftpFileName);
@@ -252,10 +240,10 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 
             // 只对红外和可见光进行二次分析判断是否产生告警
             isAlarmMap.put("robotCode", xmlBaseModel.getSendCode());
-            isAlarmMap.put("taskCode", item.get("task_code").toString());
-            isAlarmMap.put("deviceId", item.get("device_id").toString());
-            isAlarmMap.put("value", item.get("value").toString());
-            isAlarmMap.put("absolutePath",cruiseResultMap.get("absolutePath"));
+            isAlarmMap.put("taskCode", String.valueOf(item.get("task_code")));
+            isAlarmMap.put("deviceId", String.valueOf(item.get("device_id")));
+            isAlarmMap.put("value", String.valueOf(item.get("value")));
+            isAlarmMap.put("absolutePath", cruiseResultMap.get("absolutePath"));
             isAlarmMap.put("deviceName", cruiseResultMap.get("device_name"));
             //jeff add 把机器人任务结果图的物理路径传到isWarnAfterCruiseThread
             // Start IsWarnAfterCruiseThread
@@ -271,7 +259,6 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
      * 巡视点结果上报站端
      * @param xmlBaseModel xml格式的内容
      * @param robotCode 机器人唯一标识
-     * @return void
      */
     public void resultUpToStation(XMLBaseModel xmlBaseModel,String robotCode){
         Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("Robot_SPAndIN_Info:" + robotCode + ":" + xmlBaseModel.getCode());
@@ -307,7 +294,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             String url = "cp " + source + " "+aim;
             Runtime.getRuntime().exec(url);
         }catch (Exception e){
-            e.getMessage();
+            e.printStackTrace();
         }
     }
 

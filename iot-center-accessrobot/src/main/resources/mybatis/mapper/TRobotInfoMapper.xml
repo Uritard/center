@@ -554,7 +554,8 @@
         is_warn,
         fir_name,
         fir_date,
-        result_pic
+        result_pic,
+        voice_path
         )values
         <foreach collection="list" item="TCruiseDataResult" separator=",">
             (
@@ -585,7 +586,8 @@
             #{TCruiseDataResult.isWarn, jdbcType=INTEGER},
             #{TCruiseDataResult.firName, jdbcType=VARCHAR},
             #{TCruiseDataResult.firDate, jdbcType=TIMESTAMP},
-            #{TCruiseDataResult.resultPic, jdbcType=VARCHAR}
+            #{TCruiseDataResult.resultPic, jdbcType=VARCHAR},
+            #{TCruiseDataResult.voicePath, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
