@@ -351,7 +351,7 @@ public class TSequentialConfService{
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
                 TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
-                String devicePath = tSysParam.getContent()+"/"+videocfmresultFile.replace(".",simpleDateFormat2.format(new Date())+".");
+                String devicePath = tSysParam.getContent()+"/"+videocfmresultFile.replace("{{date}}",simpleDateFormat2.format(new Date()));
 
                 File txt=new File(devicePath);
                 if(txt.exists()){
@@ -420,7 +420,7 @@ public class TSequentialConfService{
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
 
-            String devicePath = tSysParam.getContent()+"/"+returnlinkageFile.replace(".",simpleDateFormat2.format(new Date())+".");
+            String devicePath = tSysParam.getContent()+"/"+returnlinkageFile.replace("{{date}}",simpleDateFormat2.format(new Date()));
             File txt=new File(devicePath);
 
             if(txt.exists()){

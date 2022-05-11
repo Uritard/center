@@ -345,7 +345,7 @@ public class zuulFilter extends ZuulFilter {
                 if (!status) {
                     log.error("签名验证结果 - {}", status);
 
-                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"签名验证失败，ukey 和用户不匹配!\"}");
+                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"签名验证失败，请重新请求或 ukey 和用户不匹配!\"}");
                 }
             }
         }
