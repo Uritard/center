@@ -134,7 +134,9 @@ public class LogsAspect {
                 // 记录操作日志...谁..在什么时间..做了什么事情..
                 result = joinPoint.proceed();
                 params.set("content", content.toString());
-                post(params);
+                if (!"修改系统用户数据".equals(annotation.title()) && !"删除系统用户数据".equals(annotation.title())) {
+                    post(params);
+                }
                 return result;
             } catch (BusinessException e) {
                 params.set("state", 2);

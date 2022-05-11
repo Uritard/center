@@ -133,6 +133,93 @@
         )
     </insert>
 
+    <insert id="batchAddTStdMeteModelDetail">
+        insert into t_std_devicemete(
+        device_mete_id,
+        device_id,
+        device_point_id,
+        custom_id,
+        mete_id,
+        mete_kind,
+        mete_type,
+        meter_type,
+        mete_name,
+        appearance_type,
+        device_type,
+        inspection_type,
+        position_type,
+        analyse_type,
+        is_ai,
+        is_judge,
+        unit,
+        alarm_note,
+        alarm_type,
+        up_effect,
+        down_effect,
+        alarm_level,
+        high_limit1,
+        low_limit1,
+        high_limit2,
+        low_limit2,
+        high_limit3,
+        low_limit3,
+        high_limit4,
+        low_limit4,
+        alarm_delay,
+        alarm_cnt,
+        threshold_abs,
+        threshold_per,
+        modulus,
+        remark,
+        state_zero,
+        state_one,
+        alarm_state
+        )values
+        <foreach collection="list" item="TStdMeteModelDetail" separator=",">
+            (
+            #{TStdMeteModelDetail.deviceMeteId, jdbcType=BIGINT},
+            #{deviceId, jdbcType=BIGINT},
+            #{TStdMeteModelDetail.devicePointId, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.customType, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.meteId, jdbcType=BIGINT},
+            #{TStdMeteModelDetail.meteKind, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.meteType, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.meterType, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.meteName, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.appearanceType, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.deviceType, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.inspectionType, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.positionType, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.analyseType, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.isAi, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.isJudge,jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.unit, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.alarmNote, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.alarmType, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.upEffect, jdbcType=REAL},
+            #{TStdMeteModelDetail.downEffect, jdbcType=REAL},
+            #{TStdMeteModelDetail.alarmLevel, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.highLimit1, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit1, jdbcType=REAL},
+            #{TStdMeteModelDetail.highLimit2, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit2, jdbcType=REAL},
+            #{TStdMeteModelDetail.highLimit3, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit3, jdbcType=REAL},
+            #{TStdMeteModelDetail.highLimit4, jdbcType=REAL},
+            #{TStdMeteModelDetail.lowLimit4, jdbcType=REAL},
+            #{TStdMeteModelDetail.alarmDelay, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.alarmCnt, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.thresholdAbs, jdbcType=NUMERIC},
+            #{TStdMeteModelDetail.thresholdPer, jdbcType=NUMERIC},
+            #{TStdMeteModelDetail.modulus, jdbcType=INTEGER},
+            #{TStdMeteModelDetail.remark, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.stateZero, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.stateOne, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.alarmState, jdbcType=INTEGER}
+            )
+        </foreach>
+    </insert>
+
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
         delete from t_std_devicemete
                 where device_mete_id = #{deviceMeteId, jdbcType=BIGINT}

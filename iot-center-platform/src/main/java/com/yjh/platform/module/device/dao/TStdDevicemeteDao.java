@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.dao;
 
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.device.entity.TStdDeviceMeteDetail;
+import com.yjh.platform.module.device.entity.TStdMeteModelDetail;
 import com.yjh.platform.module.task.entity.CruiseResultAnalMeteInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo;
 import org.apache.ibatis.annotations.Param;
@@ -18,6 +19,10 @@ import java.util.List;
 public interface TStdDevicemeteDao {
 
     int add(TStdDeviceMeteDetail tStdDeviceMeteDetail);
+
+    int batchAddTStdMeteModelDetail(@Param(value = "list") List<TStdMeteModelDetail> list,
+                       @Param(value = "deviceId") Long deviceId);
+
     int deleteByPrimaryId(@Param(value = "deviceMeteId") Long deviceMeteId);
     int deleteByDeviceId(@Param(value = "deviceId") Long deviceId);
     int update(TStdDeviceMeteDetail tStdDeviceMeteDetail);
