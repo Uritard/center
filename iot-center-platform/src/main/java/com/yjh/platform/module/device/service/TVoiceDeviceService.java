@@ -333,6 +333,8 @@ public class TVoiceDeviceService{
                     areaInfoTem.setLabel(areaInfoMap.getLabel());
                     areaInfoTem.setInfoType(areaInfoMap.getInfoType());
                     areaInfoTem.setUpName(areaInfoMap.getUpName());
+                    areaInfoTem.setDbValue(areaInfoMap.getDbValue());
+                    areaInfoTem.setFValue(areaInfoMap.getFValue());
                     List<VoiceDevice> channelList = new ArrayList<>();
                     if("device".equals(areaInfoTem.getInfoType())){
                         //todo 记得加上日期这一层级日期
@@ -350,10 +352,12 @@ public class TVoiceDeviceService{
                                     channel.setId(channelFileList[i].getName());
                                     //voiceDevice.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+tempList[i].getName());
                                     channel.setInfoType("channel");
+                                    channel.setDbValue(areaInfoTem.getDbValue());
+                                    channel.setFValue(areaInfoTem.getFValue());
                                     //查询此文件夹下的所有文件
                                     List<VoiceDevice> dateList = new ArrayList<>();
-//                                    File fileForDate = new File(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName());
-                                    List<File> voiceDateList = getFileSort(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName());
+                                    File fileForDate = new File(absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName());
+                                    List<File> voiceDateList = getFileDirectorySort(fileForDate);
                                     if(voiceDateList != null && voiceDateList.size()>0) {
                                         for (int j = 0; j < voiceDateList.size(); j++) {
                                             if (voiceDateList.get(j).isDirectory()) {//日期文件夹
@@ -364,6 +368,8 @@ public class TVoiceDeviceService{
                                                 date.setId(voiceDateList.get(j).getName());
                                                 //date.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList[j].getName());
                                                 date.setInfoType("date");
+                                                date.setDbValue(channel.getDbValue());
+                                                date.setFValue(channel.getFValue());
                                                 //查询此文件夹下的所有文件
                                                 List<VoiceDevice> fileList = new ArrayList<>();
                                                 String path = absPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList.get(j).getName();
@@ -380,6 +386,8 @@ public class TVoiceDeviceService{
                                                             voiceFile.setLabel(voiceFileList.get(k).getName());
                                                             voiceFile.setFilePath(realPath+"/"+areaInfoTem.getId()+"/"+channelFileList[i].getName()+"/"+voiceDateList.get(j).getName()+"/"+voiceFileList.get(k).getName());
                                                             voiceFile.setInfoType("file");
+                                                            voiceFile.setDbValue(date.getDbValue());
+                                                            voiceFile.setFValue(date.getFValue());
                                                             fileList.add(voiceFile);
                                                         }
                                                     }
@@ -411,6 +419,30 @@ public class TVoiceDeviceService{
     private List<File> getFileSort(String path) {
 
         List<File> list = getFiles(path, new ArrayList<File>());
+
+        if (list != null && list.size() > 0) {
+
+            Collections.sort(list, new Comparator<File>() {
+                public int compare(File file, File newFile) {
+                    if (file.lastModified() < newFile.lastModified()) {
+                        return 1;
+                    } else if (file.lastModified() == newFile.lastModified()) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+
+                }
+            });
+
+        }
+
+        return list;
+    }
+
+    private List<File> getFileDirectorySort(File file) {
+
+        List<File> list = Arrays.asList(file.listFiles());
 
         if (list != null && list.size() > 0) {
 

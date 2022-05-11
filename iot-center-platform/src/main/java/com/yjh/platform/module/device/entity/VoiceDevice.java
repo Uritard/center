@@ -41,4 +41,8 @@ public class VoiceDevice {
     private List<VoiceDevice> children;
 
     private String filePath;
+
+    private Integer dbValue;
+
+    private Integer fValue;
 }

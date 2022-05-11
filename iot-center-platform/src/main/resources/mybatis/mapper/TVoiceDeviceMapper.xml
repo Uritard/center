@@ -198,7 +198,8 @@
     </delete>
 
     <select id="selectAll" resultType="com.yjh.platform.module.device.entity.VoiceDevice">
-        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType
+        SELECT a.region_id AS Id, a.region_name AS label, a.up_region_id AS upId, b.region_name AS upName, "region" AS infoType,
+               "" as dbValue, "" as fvalue
         FROM t_std_region a
         LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
         UNION ALL (
@@ -207,9 +208,12 @@
             a.voice_device_name AS label,
             a.up_region_id AS upId,
             b.region_name as upName,
-            "device" AS infoType
+            "device" AS infoType,
+        c.db_value as dbValue,
+        c.f_value as fvalue
         FROM
-            t_voice_device a
+        t_voice_device a
+        left join t_voice_config c on a.config_id = c.config_id
             LEFT JOIN t_std_region b on a.up_region_id = b.region_id
         <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name like concat ('%',#{voiceDeviceName, jdbcType=VARCHAR},'%')</if>
     )
