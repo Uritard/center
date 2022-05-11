@@ -1640,6 +1640,31 @@ public class CameraConService {
         return newstru;
     }
 
+    /**
+     * 判断 NVR 是否掉线，如果掉线则重新注册
+     * @param recordId
+     */
+    public void reRegister(Long recordId) {
+        NativeLong iChanNumTem = new NativeLong(0);
+        if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
+
+            // 查询磁盘信息，判断NVR是否掉线
+            IntByReference ibrBytesReturned = new IntByReference(0);
+            HCNetSDK.NET_DVR_HDCFG m_struHDCfg = new HCNetSDK.NET_DVR_HDCFG();
+            m_struHDCfg.write();
+            Pointer lpPicConfig = m_struHDCfg.getPointer();
+            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_HDCFG, iChanNumTem, lpPicConfig,
+                    m_struHDCfg.size(), ibrBytesReturned)) {
+                log.info("NVR has offline, now beginning reregister: {}", recordId);
+                registerNVR(recordId);
+            }
+        } else {
+            log.info("NVR not register, now beginning register: {}", recordId);
+            registerNVR(recordId);
+        }
+    }
+
     //@Logs(title = "NVR注册", code = "NVRRegister")
     @Transactional(rollbackFor = Exception.class)
     public String registerNVR(Long recordId) {

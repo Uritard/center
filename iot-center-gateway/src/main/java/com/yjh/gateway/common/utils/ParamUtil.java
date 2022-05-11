@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.http.HttpServletRequestWrapper;
 import com.netflix.zuul.http.ServletInputStreamWrapper;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -65,15 +66,21 @@ public class ParamUtil {
                             param.put(entry.getKey(), entry.getValue().get(0));
                         }
                     }
-                } else if ("POST".equals(method.toUpperCase())) {
+                } else if ("POST".equals(method.toUpperCase()) || "PUT".equals(method.toUpperCase())) {
                     try (InputStream inputStream = ctx.getRequest().getInputStream()) {
                         String body = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
                         logger.info("***************原始参数：{}***************", body);
                         if (!"[]".equals(body)){
                             param = JSONObject.parseObject(body, LinkedHashMap.class, Feature.OrderedField);
                         }
+                        Map<String, List<String>> map = ctx.getRequestQueryParams();
+                        if (MapUtils.isNotEmpty(map)) {
+                            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+                                param.put(entry.getKey(), entry.getValue().get(0));
+                            }
+                        }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.error(e.getMessage(), e);
                     }
                 }
             }
@@ -118,7 +125,7 @@ public class ParamUtil {
                 buf = org.apache.commons.io.IOUtils.toByteArray(ins);//ins为InputStream流
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return buf;
     }

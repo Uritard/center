@@ -146,7 +146,7 @@ public class zuulFilter extends ZuulFilter {
         }else {
             String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
             String token = request.getHeader("token") != null ? request.getHeader("token") : "";
-            userName = String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
+            userName = (String) redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName");
         }
         if ("true".equals(isDecode)) {
             if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/getPubk") && !url.contains("/sysUser/v1/login") && !url.contains("/sysUser/v1/loginChangePassword")) {
@@ -301,7 +301,7 @@ public class zuulFilter extends ZuulFilter {
             userId = (String)redisTemplate.opsForHash().get("userInfo:nameId", userName);
         }
         if(StringUtils.isEmpty(userId)) {
-            userId = String.valueOf(paramMap.get("userId"));
+            userId = Objects.toString(paramMap.get("userId"));
         }
         // 判断登录用户 ip 地址
         if ("true".equals(isIpLogin)) {

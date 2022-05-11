@@ -399,7 +399,7 @@
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        ORDER BY b.instance_id asc,b.device_id, n.custom_id
+        ORDER BY b.cruise_time desc, b.instance_id asc, b.device_id asc, n.custom_id asc
     </select>
 
     <select id="selectAbnormalResult" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail" resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">

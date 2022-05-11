@@ -45,6 +45,7 @@ public class CameraConV2Controller {
     public Result getNVRStoreInfo(@RequestParam(value = "recordId") Long recordId) {
         Result result = new Result();
         try {
+            cameraConService.reRegister(recordId);
             result.setData(cameraConService.getNVRStoreAndChanle(recordId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -61,6 +62,7 @@ public class CameraConV2Controller {
         @RequestParam(value = "endTime", required = false) String endTime) {
         Result result = new Result();
         try {
+            cameraConService.reRegister(recordId);
             result.setData(cameraConService.getNVRIpparaCfg(recordId, startTime, endTime));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

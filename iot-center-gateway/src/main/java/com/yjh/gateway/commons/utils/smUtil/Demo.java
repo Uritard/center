@@ -96,7 +96,7 @@ public class Demo {
 
     public static String decryptIdentifier(String pCode, String priks) {
         try {
-            if(StringUtils.isNoneBlank(pCode) && StringUtils.isNoneBlank(priks) && !"null".equals(priks)){
+            if(StringUtils.isNoneBlank(pCode)  && !"null".equals(pCode) && StringUtils.isNoneBlank(priks) && !"null".equals(priks)){
                 ECPrivateKeyParameters priKey = new ECPrivateKeyParameters(new BigInteger(Util.hexToByte(priks)), SM2Util.DOMAIN_PARAMS);
                 return new String(SM2Util.decrypt(SM2Engine.Mode.C1C2C3, priKey, Util.hexToByte("04" + pCode)));
             }
