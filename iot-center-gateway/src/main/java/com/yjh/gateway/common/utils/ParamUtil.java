@@ -11,6 +11,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StreamUtils;
@@ -70,7 +71,7 @@ public class ParamUtil {
                     try (InputStream inputStream = ctx.getRequest().getInputStream()) {
                         String body = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
                         logger.info("***************原始参数：{}***************", body);
-                        if (!"[]".equals(body)){
+                        if (!"[]".equals(body) && StringUtils.isNotEmpty(body)){
                             param = JSONObject.parseObject(body, LinkedHashMap.class, Feature.OrderedField);
                         }
                         Map<String, List<String>> map = ctx.getRequestQueryParams();

@@ -298,7 +298,9 @@ public class zuulFilter extends ZuulFilter {
                 userName = Demo.decryptIdentifier(userName, priks);
                 log.info("用户参数: {}, 之后的: {}, identifier: {}", userName, priks, identifier);
             }
-            userId = (String)redisTemplate.opsForHash().get("userInfo:nameId", userName);
+            if(StringUtils.isNotEmpty(userName)) {
+                userId = (String) redisTemplate.opsForHash().get("userInfo:nameId", userName);
+            }
         }
         if(StringUtils.isEmpty(userId)) {
             userId = Objects.toString(paramMap.get("userId"));
