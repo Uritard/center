@@ -342,7 +342,7 @@ public class SysLogController {
             String token = request.getHeader("token");
             String userNames=String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
             String iP=request.getHeader("HTTP_X_FORWARDED_FOR");
-            this.insert("9",iP,"导出",1,"日志导出",userId,userNames,String.valueOf(request.getRequestURL()),request.getRequestURI(),request.getMethod());
+//            this.insert("9",iP,"导出",1,"日志导出",userId,userNames,String.valueOf(request.getRequestURL()),request.getRequestURI(),request.getMethod());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

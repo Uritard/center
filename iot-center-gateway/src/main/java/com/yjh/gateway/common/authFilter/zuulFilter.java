@@ -160,9 +160,9 @@ public class zuulFilter extends ZuulFilter {
                     String token = Demo.summary(sb.toString());
                     if (!token.equals(absCode)) {
                         log.error("参数篡改userId: " + userId + " ,之后的absCode: " + token + ",前端absCode: " + absCode);
-                        ctx.setSendZuulResponse(false);
-                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                        return false;
+//                        ctx.setSendZuulResponse(false);
+//                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                        return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"参数篡改，请联系管理员!\"}");
                     }
                 } else {
                     log.error(
@@ -182,33 +182,36 @@ public class zuulFilter extends ZuulFilter {
                         String referer = request.getHeader("Referer") != null ? request.getHeader("Referer") : "";
                         String refererHost = referer.substring(referer.indexOf(":") + 3);
                         if (refererHost.contains(":")) {
-                            refererHost = refererHost.substring(0, referer.indexOf(":"));
+                            refererHost = refererHost.substring(0, refererHost.indexOf(":"));
                         } else if(refererHost.contains("/")) {
-                            refererHost = refererHost.substring(0, referer.indexOf("/"));
+                            refererHost = refererHost.substring(0, refererHost.indexOf("/"));
                         }
                         String orig=origin.substring(origin.lastIndexOf('/') + 1);
                         String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                         String ym="yjh.biandian.com";
+                        String localIp = IpUtil.getLocalIp();
                         if(orig.contains(":")) {
                             String originIp = origin.substring(origin.lastIndexOf('/') + 1, origin.lastIndexOf(':'));
-                            if (!IpUtil.getLocalIp().equals(originIp) || !IpUtil.getLocalIp().equals(refererHost)) {
+                            if (!localIp.equals(originIp) || !localIp.equals(refererHost)) {
                                 if (!ym.equals(originIp) || !ym.equals(refererHost)) {
-                                    log.error("IP篡改: " + origin + " ,之后的ip: " + origin + ",本机IP: " + IpUtil.getLocalIp());
-                                    ctx.setSendZuulResponse(false);
-                                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                                    logsAspect.loginLogsSend(request, originIp, "27", "IP地址异常", "IP篡改: " + originIp + ",本机IP: " + IpUtil.getLocalIp() , userName , userId, 2);
-                                    return false;
+                                    log.error("IP篡改: " + referer + " ,之后的ip: " + origin + ",本机IP: " + localIp);
+//                                    ctx.setSendZuulResponse(false);
+//                                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                                    String logIp = !localIp.equals(originIp) && !ym.equals(originIp) ? originIp : refererHost;
+                                    logsAspect.loginLogsSend(request, originIp, "27", "IP地址异常", "IP篡改: " + logIp + ",本机IP: " + localIp , userName , userId, 2);
+                                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"IP地址异常，请联系管理员!\"}");
                                 }
                             }
                         }else{
                             String originIp = origin.substring(origin.lastIndexOf('/') + 1);
-                            if (!IpUtil.getLocalIp().equals(originIp) || !IpUtil.getLocalIp().equals(refererHost)) {
+                            if (!localIp.equals(originIp) || !localIp.equals(refererHost)) {
                                 if (!ym.equals(originIp) || !ym.equals(refererHost)) {
-                                    log.error("IP篡改: " + originIp + " ,之后的ip: " + originIp + ",本机IP: " + IpUtil.getLocalIp());
-                                    ctx.setSendZuulResponse(false);
-                                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                                    logsAspect.loginLogsSend(request, originIp, "27", "IP地址异常", "IP篡改: " + originIp + ",本机IP: " + IpUtil.getLocalIp() , userName, userId, 2);
-                                    return false;
+                                    log.error("IP篡改: " + refererHost + " ,之后的ip: " + originIp + ",本机IP: " + IpUtil.getLocalIp());
+//                                    ctx.setSendZuulResponse(false);
+//                                    ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                                    String logIp = !localIp.equals(originIp) && !ym.equals(originIp) ? originIp : refererHost;
+                                    logsAspect.loginLogsSend(request, originIp, "27", "IP地址异常", "IP篡改: " + logIp + ",本机IP: " + localIp , userName, userId, 2);
+                                    return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"IP地址异常，请联系管理员!\"}");
                                 }
                             }
                         }
@@ -237,9 +240,9 @@ public class zuulFilter extends ZuulFilter {
                         String token = Demo.summary(sb.toString());
                         if (!token.equals(webcode)) {
                             log.error("参数篡改" + filePaths + " ,之后的summary: " + token + ",前端summary: " + webcode);
-                            ctx.setSendZuulResponse(false);
-                            ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                            return false;
+//                            ctx.setSendZuulResponse(false);
+//                            ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                            return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"参数篡改，请联系管理员!\"}");
                         }
                         ctx.setRequest(multipartHttpServletRequest);
                     } else {
@@ -253,9 +256,9 @@ public class zuulFilter extends ZuulFilter {
                             String token = Demo.summary(sb.toString());
                             if (!token.equals(webcode)) {
                                 log.error("参数篡改" + body + " ,之后的summary: " + token + ",前端summary: " + webcode);
-                                ctx.setSendZuulResponse(false);
-                                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                                return false;
+//                                ctx.setSendZuulResponse(false);
+//                                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                                return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"参数篡改，请联系管理员!\"}");
                             }
                         }
                         ctx.setRequest(requestWrapper);
@@ -281,9 +284,9 @@ public class zuulFilter extends ZuulFilter {
                             String token = Demo.summary(sb.toString());
                             if (!token.equals(webcode)) {
                                 log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的summary: " + token + ",前端summary: " + webcode);
-                                ctx.setSendZuulResponse(false);
-                                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
-                                return false;
+//                                ctx.setSendZuulResponse(false);
+//                                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
+                                return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"参数篡改，请联系管理员!\"}");
                             }
                         }
                     }
