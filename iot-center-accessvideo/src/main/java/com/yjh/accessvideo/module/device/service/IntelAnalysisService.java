@@ -716,9 +716,18 @@ public class IntelAnalysisService {
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));*/
 
                 List<AnalyseResultItem> results = analyseResult.getResults();
+
+                Map<String, Object> algorithmTypeMap = analyseDataOperateDao.selectAlgorithmByInstanceId(Long.valueOf(instanceId));
+                boolean isDefect  =Objects.isNull(algorithmTypeMap.get("algorithm_id"));
+                boolean isJudge = Objects.equals("on", algorithmTypeMap.get("is_judge"));
+                boolean isAi = Objects.equals("on", algorithmTypeMap.get("is_ai"));
                 // 判断该巡视点是否为27大类的点 若是  直接拿假数据  不要返回的结果
                 String devicePointId =  analyseDataOperateDao.selectDevicePointIdByInstanceId(Long.valueOf(instanceId));
-                if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(devicePointId)){
+                boolean flag = isDefect
+                        && isAi
+                        && !generateMapFormat().isEmpty()
+                        && generateMapFormat().containsKey(devicePointId);
+                if (Boolean.TRUE.equals(flag)){
                     resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
                     resultDataObject.put("analyseType", 398);
                     resultDataObject.put("resultDesc", String.valueOf(resultDesc.add("")));
@@ -923,12 +932,15 @@ public class IntelAnalysisService {
                 /*
                  * 设备状态识别
                  * */
+                targetPath = copyFileFromFtps(type, resImageUrl);
+                resultImg.add(targetPath);
                 // 判断该巡视点是否为表计的点 若是  直接拿假数据  不要返回的结果
                 if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(devicePointId)){
                     resultValue.add(String.valueOf(generateMapFormat().get(devicePointId)));
-                    resultDataObject.put("analyseType", 1);
+                    resultDataObject.put("analyseType", list.get(0).getAnalyseType());
                     map.put("resultDesc", String.valueOf(resultDesc));
                     map.put("resultValue", String.valueOf(resultValue));
+                    map.put("resultImg", String.valueOf(resultImg));
                     return map;
                 }
                 if (Objects.equals("meter", type) || Objects.equals("infrared", type) || Objects.equals("qrcode", type)){
@@ -942,8 +954,6 @@ public class IntelAnalysisService {
                     resultValue.add(resultDescTemp);
                     resultDataObject.put("analyseType", list.get(0).getAnalyseType());
                 }
-                targetPath = copyFileFromFtps(type, resImageUrl);
-                resultImg.add(targetPath);
             }
             map.put("resultDesc", String.valueOf(resultDesc));
             map.put("resultValue", String.valueOf(resultValue));

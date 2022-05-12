@@ -1004,6 +1004,17 @@
         WHERE a.is_ai = 1
     </select>
 
+    <select id="selectAlgorithmByInstanceId" resultType="java.util.Map">
+        SELECT
+            d.algorithm_id,
+            b.is_ai,
+            b.is_judge
+        FROM
+            t_cruise_point_instance a
+        LEFT JOIN t_std_devicemete b on a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_algorithm_info d on b.analyse_type = d.analyse_type
+        where a.instance_id = #{instanceId,jdbcType=BIGINT}
+    </select>
     <select id="selectDevicePointIdByInstanceId" resultType="java.lang.String">
         SELECT
             b.device_point_id

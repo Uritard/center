@@ -79,6 +79,9 @@ public interface AnalyseDataOperateDao {
     Map<String, Object> selectInstanceInfo(@Param(value = "presetId")Long presetId);
     List<TAlgorithmInfo> selectAlgorithmInfo(@Param(value = "aliasName")String aliasName);
     List<String> selectAlgorithmType();
+
+    Map<String, Object> selectAlgorithmByInstanceId(@Param(value = "instanceId")Long instanceId);
+
     String selectDevicePointIdByInstanceId(@Param(value = "instanceId")Long instanceId);
 
     HashMap<String,String> selectDeviceNameInfo(@Param(value = "instanceId") Long instanceId);
