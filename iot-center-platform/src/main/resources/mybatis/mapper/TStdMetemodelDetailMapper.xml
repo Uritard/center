@@ -447,7 +447,7 @@
         ) SELECT
         #{modelId},
         std_mete_id,
-        '101',
+        '700',
         mete_name,
         mete_type,
         mete_kind,

@@ -106,7 +106,7 @@ public class TStdDevicemeteService{
                 List<TStdDevice> tStdDevices=tStdDeviceDao.selectByPrimaryId(deviceId);
                 tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
                 if(tStdDevices.size()==1){
-                tStdDevices.get(0).setCustomId("101");
+                tStdDevices.get(0).setCustomId("700");
                 tStdDevices.get(0).setCustomName("本体");
                 tStdDeviceDao.add(tStdDevices.get(0));
                 }
@@ -285,7 +285,7 @@ public class TStdDevicemeteService{
                     List<TStdDevice> tStdDevices=tStdDeviceDao.selectByPrimaryId(deviceId);
                     tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
                     if(tStdDevices.size()==1){
-                        tStdDevices.get(0).setCustomId("101");
+                        tStdDevices.get(0).setCustomId("700");
                         tStdDevices.get(0).setCustomName("本体");
                         tStdDeviceDao.add(tStdDevices.get(0));
                     }

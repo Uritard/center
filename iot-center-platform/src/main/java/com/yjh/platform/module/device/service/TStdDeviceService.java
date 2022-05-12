@@ -57,11 +57,17 @@ public class TStdDeviceService{
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdDevice tStdDevice) {
         if(tStdDevice.getCustomId() == null){
-            tStdDevice.setCustomId("101");
-            List<TDictBusiness> list = tDictBusinessDao.select(null,"101",null,null,null,null,null);
+            String customId = defaultPart();
+            tStdDevice.setCustomId(customId);
+            List<TDictBusiness> list = tDictBusinessDao.select(null,customId,null,null,null,null,null);
             tStdDevice.setCustomName(list.get(0).getDictNote());
         }
         return this.tStdDeviceDao.add(tStdDevice);
+    }
+
+    // 随机找出一个部位充当默认部位
+    private String defaultPart(){
+        return tStdDeviceDao.defaultPart();
     }
 
 
@@ -161,8 +167,9 @@ public class TStdDeviceService{
         tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
         if(tStdDevice.getCustomId() == null){
             //不传 设为本体，根据字典表查，暂定为101
-            tStdDevice.setCustomId("101");
-            List<TDictBusiness> list = tDictBusinessDao.select(null,"101",null,null,null,null,null);
+            String customId = defaultPart();
+            tStdDevice.setCustomId(customId);
+            List<TDictBusiness> list = tDictBusinessDao.select(null,customId,null,null,null,null,null);
             tStdDevice.setCustomName(list.get(0).getDictNote());
         }else{
             tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());

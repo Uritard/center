@@ -842,4 +842,15 @@
         </if>
     </select>
 
+    <select id="defaultPart" resultType="java.lang.String">
+        SELECT
+            a.dict_code
+        FROM
+            t_dict_business a
+        WHERE
+            a.col_name = 'custom_type'
+        ORDER BY a.dict_code
+            LIMIT 1
+    </select>
+
 </mapper>

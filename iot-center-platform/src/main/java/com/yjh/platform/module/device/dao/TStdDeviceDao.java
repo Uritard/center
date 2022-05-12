@@ -124,5 +124,6 @@ public interface TStdDeviceDao {
 
     List<Long> selectDeviceIdListByRegion(List<Long> list);
 
+    String defaultPart();
 
 }
