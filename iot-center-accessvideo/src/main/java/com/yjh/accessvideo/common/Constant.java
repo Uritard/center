@@ -7,6 +7,7 @@ import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import io.netty.bootstrap.Bootstrap;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -24,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class Constant {
 
     public static Map<String, Integer> maps = new ConcurrentHashMap<>();
@@ -109,4 +111,18 @@ public class Constant {
     }
 
     public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze?cruiseResultIdList";
+
+    public static final String picRecBack = "http://iot-center-platform/tSequentialConf/v1/sequentialRecBack";
+
+    public static void  otherServerMap( Map<String,String> map, String url) {
+        try{
+        Result re = new Result();
+        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
+        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url,map, Result.class);
+        }catch (Exception e){
+           log.info("一键顺控："+e);
+        }
+    }
+
 }

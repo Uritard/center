@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ public class TSequentialConfController {
 
     @Autowired
     private final TSequentialConfService tSequentialConfService;
+    @Value("${sequential.result.flag}")
+    private String flag;
 
     private Logger log = LoggerFactory.getLogger(TSequentialConfController.class);
 
@@ -248,10 +251,17 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "触发顺控抓图识别返回值处理")
-    @RequestMapping(value = "/sequentialRecBack",method = RequestMethod.GET)
-    public Result sequentialRecBack(@RequestParam Map<String,String> recBack){
+    @RequestMapping(value = "/sequentialRecBack",method = RequestMethod.POST)
+    public Result sequentialRecBack(@RequestBody Map<String,String> recBack){
         Result result=new Result();
         try {
+            log.info("一键顺控："+recBack);
+//            recBack.put("meteId","1001");
+//            recBack.put("code","200");
+//            recBack.put("desc","合");
+            if(flag != null && "1".equals(flag)){
+                recBack.put("desc",String.valueOf(Constant.sequentialState.get("meteResult")));
+            }
             result.setData(tSequentialConfService.sequentialRecBack(recBack));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

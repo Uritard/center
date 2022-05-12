@@ -33,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.ObjectName;
 
+import static com.yjh.platform.common.Constant.redisTemplate;
+
 /**
 * @author lqh
 * @since 2021-01-21
@@ -173,6 +175,7 @@ public class TSequentialConfService{
             jasonMaps2.put("sort", /*String.valueOf(Double.valueOf(*/map.get("sort").toString()/*).intValue())*/);
             Constant.sequentialState.put("state",((Long)map.get("sort")).intValue());
             Constant.sequentialState.put("cfgDeviceId",meteId);
+            Constant.sequentialState.put("meteResult",map.get("state"));
             jasonMaps2.put("state", "进行中");
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
@@ -280,8 +283,13 @@ public class TSequentialConfService{
             }
             //todo 发给算法进行分析
             try{
-                param.put("analyseType",map.get("analyseType"));
-                param.put("instanceId",map.get("instanceId"));
+                param.put("analyseType",6);
+                param.put("instanceId",meteId);
+                param.put("isAi",1);//模板图片路径
+                Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
+                String picModelPath = (String) mapForPicModelPath.get("content");
+
+                param.put("picModelPath",picModelPath+"/"+map.get("presetId"));
                 param.put("taskId",UUID.randomUUID()+"#yjsk#meteId="+meteId);
                 List<Map<String,Object>> analysis = new ArrayList<>();
                 analysis.add(param);
@@ -301,7 +309,7 @@ public class TSequentialConfService{
 //                    throw new BusinessException("一键顺控-变位信号-发送至算法识别主机失败"+jsonObject.toJSONString());
 //                }
             }catch (Exception e){
-                log.error("一键顺控-变位信号-调用算法识别主机失败",e.getMessage());
+                log.error("一键顺控-变位信号-调用算法识别主机失败:{}",e);
             }
         }
         return "ok";
@@ -313,7 +321,7 @@ public class TSequentialConfService{
             Map<String,Object> map = this.sequentialInfo(recBack.get("meteId")).get(0);
             Map<String , Object> param = new HashMap<>();
             try{
-                if(!Objects.isNull(recBack.get("code"))&&recBack.get("code").equals("2000")){
+                if(!Objects.isNull(recBack.get("code"))&&recBack.get("code").equals("200")){
                     if(!Objects.isNull(recBack.get("desc"))){
                         param.put("resultValue",recBack.get("desc"));
                     }else{

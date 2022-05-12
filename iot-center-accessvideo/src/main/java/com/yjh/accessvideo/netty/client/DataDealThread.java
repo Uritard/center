@@ -11,7 +11,9 @@ import com.yjh.accessvideo.common.mqtt.alarmMsgBody.AlarmMqttMsg;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Different;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Alarm;
+import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.module.device.entity.*;
+import com.yjh.accessvideo.module.device.entity.interlanalysis.PicAnalyseResponse;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.service.ftpsservice;
 import lombok.SneakyThrows;
@@ -65,6 +67,18 @@ public class DataDealThread implements Runnable {
         this.syncWebsocketUrl=syncWebsocketUrl;
         this.remotePort = remotePort;
     }
+    private void yjskHandle(JSONObject jsonObjectResult){
+        try{
+            Map<String,String> recBack = new HashMap<>();
+            recBack.put("meteId", jsonObjectResult.getString("instanceId"));
+            recBack.put("code","200");
+            recBack.put("desc",jsonObjectResult.getString("resultValue"));
+            Constant.otherServerMap(recBack,Constant.picRecBack);
+            log.info("一键顺控services：" + recBack);
+        }catch (Exception e){
+            log.error("一键顺控-变相信号-分析主机返回处理失败{}",e.getMessage());
+        }
+    }
 
     @SneakyThrows
     @Override
@@ -94,6 +108,12 @@ public class DataDealThread implements Runnable {
 
                     //初始化TASKID和INSTANCEID
                     TASKID = jsonObjectResult.getString("taskId");
+
+                    if (TASKID != null && TASKID.contains("yjsk")){
+                        //一键顺控结果处理
+                        yjskHandle(jsonObjectResult);
+                        return;
+                    }
                     INSTANCEID = jsonObjectResult.getString("instanceId");
                     String name = "t_cruise_task_result:" + TASKID + ":" + INSTANCEID;
                     //将每个任务下所需的正常点数、异常点数放入"任务常量Map"中
@@ -1195,7 +1215,7 @@ public class DataDealThread implements Runnable {
                         tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId") + cruiseWorkedMap.get("instanceId"));
                         tCruiseDataResult.setIsWarn(NumberUtils.toInt(cruiseWorkedMap.get("isWarn")));
                         if(Objects.nonNull(cruiseWorkedMap.get("firDocPath"))){
-                            tCruiseDataResult.setResultPic(cruiseWorkedMap.get("firDocPath"));
+                            tCruiseDataResult.setResultPic(cruiseWorkedMap.get("firDocPath").replace("dfir","fir"));
                         }else {
                             tCruiseDataResult.setResultPic("");
                         }
