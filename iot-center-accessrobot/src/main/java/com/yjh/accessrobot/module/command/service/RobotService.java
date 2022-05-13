@@ -1061,6 +1061,7 @@ public class RobotService {
                     String taskId = robotTaskControlMap.get("taskId").toString();
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
                     String taskPatrolledId = redisInfoMap.get("taskPatrolled_id");
+                    taskId = "1".equals(commandValue) ? taskId : taskPatrolledId;
                     List<Map<String, Object>> itemList = new ArrayList<>();
                     Map<String, Object> itemMap = new HashMap<>(1);
                     itemMap.put("task_patrolled_id", taskPatrolledId);

@@ -78,7 +78,7 @@ public class NonhomologousWarnService {
                                 if(redisInfoMap!=null&&redisInfoMap.get("cruiseResultId")!=null&&!checkWarnExist(nonhomologousInspections.get("robotInstanceId").toString(),cruiseResultMap.get("taskCode"),nonhomologousInspections.get("instanceId").toString())){
                                     String warnThreshold = nonhomologousInspections.get("warnThreshold").toString();
                                     String robotInsResult = cruiseResultMap.get("value");
-                                    String videoInsResult = redisInfoMap.get("resultNum");
+                                    String videoInsResult = StringUtils.substringBefore(redisInfoMap.get("resultNum"), ",");
                                     if(isNumeric(warnThreshold)&&isNumeric(robotInsResult)&&isNumeric(videoInsResult)){
                                         if(Math.abs(Double.parseDouble(robotInsResult)-Double.parseDouble(videoInsResult))>Double.parseDouble(warnThreshold)){
                                             Map<String,Object> warn = new HashMap<>();
