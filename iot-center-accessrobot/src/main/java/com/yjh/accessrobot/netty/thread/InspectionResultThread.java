@@ -397,9 +397,10 @@ public class InspectionResultThread implements Runnable{
         log.info("插tCTRD的条数:{},插tCDR的条数:{}", res1, res2);
 
         // 将已经做过的巡视点Map清空
-        if (StringUtils.isNotEmpty(Constant.flagMap.get(taskId).toString())){
+        if (CollectionUtils.isNotEmpty(Constant.flagMap.get(taskId))){
             log.info("将公共类的instanceIdList清空");
-            Constant.flagMap = new HashMap<>(16);
+//            Constant.flagMap = new HashMap<>(16);
+            Constant.flagMap.remove(taskId);
         }
 
         // 判断缓存中的异常点，如果机器人任务是最后执行，则更新缓存并更新表

@@ -719,7 +719,7 @@ public class RobotService {
         if (Constant.sendSessionId == receiveSessionId){
             log.info("-------------这是刚发命令的响应{}-------------", receiveSessionId);
             if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
-                RobotServerHandler.getRobotResultMap().put("Item", null);
+//                RobotServerHandler.getRobotResultMap().put("Item", null);
             }else{
                 RobotServerHandler.getRobotResultMap().put("Item", xmlBaseModel.getItems().get(0));
 
