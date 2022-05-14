@@ -48,6 +48,8 @@ public class AccessUdpApplication implements CommandLineRunner {
     private String SEQUENCEREC_URL;
     @Value("${spring.encoding.style}")
     private String encoding;
+    @Value("${spring.encoding.isBig}")
+    private String isBig;
     @Value("${spring.union.file.sort}")
     private String sort;
 
@@ -71,6 +73,7 @@ public class AccessUdpApplication implements CommandLineRunner {
         String url = getLocalIp();
         //loadDeviceInfo();
         Constant.encoding = encoding;
+        Constant.isBig = Boolean.valueOf(isBig);
         Constant.sort = Boolean.valueOf(sort);
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessudp is running, url is : " + url);

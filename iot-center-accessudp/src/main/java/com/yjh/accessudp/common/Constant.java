@@ -68,6 +68,7 @@ public class Constant {
     public static List<String> listAllByte = new ArrayList<>();
 
     public static String encoding="UTF-8";
+    public static Boolean isBig=true;
 
     public static Boolean sort=true;
 }

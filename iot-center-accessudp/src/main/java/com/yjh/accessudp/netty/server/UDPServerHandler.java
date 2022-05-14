@@ -246,14 +246,18 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             Integer doesHas = Integer.valueOf(new BigInteger(udp[7],16).toString());
             log.info("有无后续：  "+doesHas);
             if(doesHas == 1){
-                Integer xuHao = Integer.valueOf(new BigInteger(udp[8],16).toString());
-                log.info("帧序号：  "+xuHao);
+                Integer xuHao = 0;
+                if(Constant.isBig){
+                    xuHao = Integer.parseInt(arrayToString(udp,8,2,false));
+                }else {
+                    xuHao = Integer.parseInt(arrayToStringL(udp,8,2,false));
+                }
                 //其实传输位置 9-12
-                Integer valueLength = Integer.valueOf(new BigInteger(udp[13],16).toString());
+                Integer valueLength = Integer.valueOf(new BigInteger(udp[14],16).toString());
                 List<String> listByte = new ArrayList<>();
                 for(int i =0;i<valueLength;i++){
-                    listByte.add(udp[14+i]);
-                    Constant.listAllByte.add(udp[14+i]);
+                    listByte.add(udp[15+i]);
+                    Constant.listAllByte.add(udp[15+i]);
                 }
                 String weiZhi= arrayToString(udp,9,4,true);
                 //String neiRong= arrayToString(udp,14,valueLength,true);
@@ -261,14 +265,19 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 Constant.data.put(xuHao,listByte);
             }
             if(doesHas == 0){
-                Integer xuHao = Integer.valueOf(new BigInteger(udp[8],16).toString());
+                Integer xuHao = 0;
+                if(Constant.isBig){
+                    xuHao = Integer.parseInt(arrayToString(udp,8,2,false));
+                }else {
+                    xuHao = Integer.parseInt(arrayToStringL(udp,8,2,false));
+                }
                 log.info("帧序号：  "+xuHao);
                 //其实传输位置 9-12
-                Integer valueLength = Integer.valueOf(new BigInteger(udp[13],16).toString());
+                Integer valueLength = Integer.valueOf(new BigInteger(udp[14],16).toString());
                 List<String> listByte = new ArrayList<>();
                 for(int i =0;i<valueLength;i++){
-                    listByte.add(udp[14+i]);
-                    Constant.listAllByte.add(udp[14+i]);
+                    listByte.add(udp[15+i]);
+                    Constant.listAllByte.add(udp[15+i]);
                 }
                 Constant.data.put(xuHao,listByte);
 
@@ -305,7 +314,12 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                     SYAllInfo syAllInfo = new SYAllInfo();
                     syAllInfo.setStationId(strArray[1]);
                     String[] mete = strArray[3].split("/");
-                    String meteName = mete[mete.length-2]+"/"+mete[mete.length-1]+"-"+strArray[4];
+                    String meteName = "";
+                    if(mete.length > 1){
+                        meteName = mete[mete.length-2]+"/"+mete[mete.length-1]+"-"+strArray[4];
+                    }else {
+                        meteName = mete[mete.length-1]+"-"+strArray[4];
+                    }
                     syAllInfo.setMeteId(strArray[2]);
                     syAllInfo.setMeteName(meteName);
                     syAllInfo.setDeviceId(strArray[2]);
@@ -413,6 +427,18 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 //        }
         return str;
         //return hexToString(str);
+    }
+
+    public static String arrayToStringL(String[] udp,int start,int length,boolean flag)throws UnsupportedEncodingException{
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i = length-1; i >=0;i--){
+            stringBuilder.append(udp[start+i]);
+        }
+        String str =  stringBuilder.toString();
+        if(flag){
+            return toStringHex(str);
+        }
+        return str;
     }
 
     public String arrayToString(String[] udp,int start,int length,boolean flag)throws UnsupportedEncodingException{
