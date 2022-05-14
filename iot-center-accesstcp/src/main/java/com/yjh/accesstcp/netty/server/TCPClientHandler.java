@@ -389,11 +389,11 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             robotMap.put("list",list);
             Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//国网要求
             if(re == null){
-                sendToUpSystemServices.sendResponse("251","3","100",null);
+                sendToUpSystemServices.sendResponse("251","3","200",null);
             }else if(200 == re.getCode()){
                 sendToUpSystemServices.sendResponse("251","3","200",null);
             }else {
-                sendToUpSystemServices.sendResponse("251","3","500",null);
+                sendToUpSystemServices.sendResponse("251","3","200",null);
             }
             log.info("==控制响应=="+re);
         }
@@ -411,11 +411,11 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             robotMap.put("list",list);
             Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//国网要求
             if(re == null){
-                sendToUpSystemServices.sendResponse("251","3","100",null);
+                sendToUpSystemServices.sendResponse("251","3","200",null);
             }else if(200 == re.getCode()){
                 sendToUpSystemServices.sendResponse("251","3","200",null);
             }else {
-                sendToUpSystemServices.sendResponse("251","3","500",null);
+                sendToUpSystemServices.sendResponse("251","3","200",null);
             }
             log.info("==控制响应=="+re);
         }
@@ -433,11 +433,11 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             item.put("task_patrolled_id",xmlBaseModel.getCode());
             items.add(item);
             if(re == null){
-                sendToUpSystemServices.sendResponse("251","4","100",items);
+                sendToUpSystemServices.sendResponse("251","4","200",items);
             }else if(200 == re.getCode()){
                 sendToUpSystemServices.sendResponse("251","4","200",items);
             }else {
-                sendToUpSystemServices.sendResponse("251","4","500",items);
+                sendToUpSystemServices.sendResponse("251","4","200",items);
             }
             log.info("==任务控制响应=="+re);
 
@@ -524,11 +524,11 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     map.put("list",taskList);
                     Result re = Constant.otherServer(map,Constant.ROBOT_TASK_URL);//国网要求
                     if(re == null){
-                        sendToUpSystemServices.sendResponse("251","3","500",null);
+                        sendToUpSystemServices.sendResponse("251","3","200",null);
                     }else if(200 == re.getCode()){
                         sendToUpSystemServices.sendResponse("251","3","200",null);
                     }else {
-                        sendToUpSystemServices.sendResponse("251","3","100",null);
+                        sendToUpSystemServices.sendResponse("251","3","200",null);
                     }
                     log.info("--响应任务下发--"+re);
                 }
@@ -571,7 +571,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                         xmlItem.put("error_code","3");
                         xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(new Date()));
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse("251","4","100",xmlItems);
+                        sendToUpSystemServices.sendResponse("251","4","200",xmlItems);
                     }else if(200 == re.getCode()){
                         xmlItem.put("task_patrolled_id",re.getData());
                         xmlItem.put("error_code","0");
@@ -581,7 +581,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                         xmlItem.put("error_code","1");
                         xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(new Date()));
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse("251","4","500",xmlItems);
+                        sendToUpSystemServices.sendResponse("251","4","200",xmlItems);
                     }
                     log.info("--联动任务响应--"+re);
                 }
@@ -590,20 +590,25 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
         }
 
         if ("61".equals(xmlBaseModel.getType())){
-            log.info("--模型同步--");
-            //1-巡视主机模型 设备模型及设备点位模型文件中应至少包括设备信息及巡视点位信息 A.2.3
-            //2-机器人模型 巡视设备模型文件中应至少包括巡视主机、 智能分析主机、 机器人、 无人机、 高清视频、声纹的属性信息 A.2.4
-            //3-摄像机模型 同上
-            //4-点位模型 同上
-            //5-无人机模型  同上
-            //6-声纹模型  同上
-            //7-任务文件  任务模型 A.2.5
-            //8-检修区域配置文件 检修区域模型 A.2.6
-            //9-地图文件
-            Map<String,Object> map = sendToUpSystemServices.creatModel(xmlBaseModel.getCommand());
-            List<Map<String,Object>> list =new ArrayList<>();
-            list.add(map);
-            sendToUpSystemServices.sendResponse("251","3","200",list);
+            try {
+                log.info("--模型同步--");
+                //1-巡视主机模型 设备模型及设备点位模型文件中应至少包括设备信息及巡视点位信息 A.2.3
+                //2-机器人模型 巡视设备模型文件中应至少包括巡视主机、 智能分析主机、 机器人、 无人机、 高清视频、声纹的属性信息 A.2.4
+                //3-摄像机模型 同上
+                //4-点位模型 同上
+                //5-无人机模型  同上
+                //6-声纹模型  同上
+                //7-任务文件  任务模型 A.2.5
+                //8-检修区域配置文件 检修区域模型 A.2.6
+                //9-地图文件
+                Map<String, Object> map = sendToUpSystemServices.creatModel(xmlBaseModel.getCommand());
+                List<Map<String, Object>> list = new ArrayList<>();
+                list.add(map);
+                sendToUpSystemServices.sendResponse("251", "4", "200", list);
+            }catch (Exception e){
+                log.info("模型同步错误"+e);
+//                sendToUpSystemServices.sendResponse("251", "4", "200", list);
+            }
         }
 
         if ("81".equals(xmlBaseModel.getType())){
@@ -616,11 +621,11 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             Result re2 = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//下发给机器人
             log.info("--响应检修--"+re);
             if(re == null){
-                sendToUpSystemServices.sendResponse("251","3","100",null);
+                sendToUpSystemServices.sendResponse("251","3","200",null);
             }else if(200 == re.getCode()){
                 sendToUpSystemServices.sendResponse("251","3","200",null);
             }else {
-                sendToUpSystemServices.sendResponse("251","3","500",null);
+                sendToUpSystemServices.sendResponse("251","3","200",null);
             }
 
         }
@@ -642,7 +647,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             }
             List<Map<String,Object>> list = sendToUpSystemServices.resultStatistical(xmlBaseModel.getCommand(),startTime,endTime);
             if(list == null){
-                sendToUpSystemServices.sendResponse("251","3","100",null);
+                sendToUpSystemServices.sendResponse("251","4","100",null);
             }else {
                 sendToUpSystemServices.sendResponse("251","4","200",list);
             }

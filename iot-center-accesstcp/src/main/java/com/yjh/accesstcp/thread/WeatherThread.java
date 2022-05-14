@@ -43,6 +43,8 @@ public class WeatherThread implements Runnable{
                     Map<String, String> mapForWeather = redisTemplate.opsForHash().entries("weatherInfoForLastValue");
                     List<Map<String, Object>> list = new ArrayList<>();
                     Map<String, Object> map1 = new HashMap<>();
+                    map1.put("patroldevice_name","");
+                    map1.put("patroldevice_code","");
                     map1.put("time", now);
                     map1.put("type", 1);
                     map1.put("value", mapForWeather.get("humidity"));
@@ -51,6 +53,8 @@ public class WeatherThread implements Runnable{
                     list.add(map1);
 
                     Map<String, Object> map2 = new HashMap<>();
+                    map2.put("patroldevice_name","");
+                    map2.put("patroldevice_code","");
                     map2.put("time", now);
                     map2.put("type", 2);
                     map2.put("value", mapForWeather.get("temperature"));
@@ -59,6 +63,8 @@ public class WeatherThread implements Runnable{
                     list.add(map2);
 
                     Map<String, Object> map3 = new HashMap<>();
+                    map3.put("patroldevice_name","");
+                    map3.put("patroldevice_code","");
                     map3.put("time", now);
                     map3.put("type", 3);
                     map3.put("value", mapForWeather.get("windSpeed"));
@@ -67,6 +73,8 @@ public class WeatherThread implements Runnable{
                     list.add(map3);
 
                     Map<String, Object> map4 = new HashMap<>();
+                    map4.put("patroldevice_name","");
+                    map4.put("patroldevice_code","");
                     map4.put("time", now);
                     map4.put("type", 4);
                     map4.put("value", mapForWeather.get("precipitation"));
@@ -75,6 +83,8 @@ public class WeatherThread implements Runnable{
                     list.add(map4);
 
                     Map<String, Object> map5 = new HashMap<>();
+                    map5.put("patroldevice_name","");
+                    map5.put("patroldevice_code","");
                     map5.put("time", now);
                     map5.put("type", 5);
                     map5.put("value", mapForWeather.get("windDirection"));
@@ -83,6 +93,8 @@ public class WeatherThread implements Runnable{
                     list.add(map5);
 
                     Map<String, Object> map6 = new HashMap<>();
+                    map6.put("patroldevice_name","");
+                    map6.put("patroldevice_code","");
                     map6.put("time", now);
                     map6.put("type", 6);
                     map6.put("value", mapForWeather.get("airPressure"));
@@ -91,6 +103,8 @@ public class WeatherThread implements Runnable{
                     list.add(map6);
 
                     Map<String, Object> map7 = new HashMap<>();
+                    map7.put("patroldevice_name","");
+                    map7.put("patroldevice_code","");
                     map7.put("time", now);
                     map7.put("type", 7);
                     map7.put("value", mapForWeather.get("oxygen"));
@@ -99,6 +113,8 @@ public class WeatherThread implements Runnable{
                     list.add(map7);
 
                     Map<String, Object> map8 = new HashMap<>();
+                    map8.put("patroldevice_name","");
+                    map8.put("patroldevice_code","");
                     map8.put("time", now);
                     map8.put("type", 8);
                     map8.put("value", mapForWeather.get("sf6"));
@@ -106,7 +122,7 @@ public class WeatherThread implements Runnable{
                     map8.put("value_unit", mapForWeather.get("sf6") + mapForWeather.get("sf6Unit"));
                     list.add(map8);
 
-                    sendToUpSystemServices.sendResponse("21","3","",list);
+                    sendToUpSystemServices.sendResponse("21","",Constant.stationCode,list);
                     log.info("--天气信息已发送--");
                 }
 

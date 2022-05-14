@@ -250,8 +250,9 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 Integer xuHao = 0;
                 if(Constant.isBig){
                     xuHao = Integer.parseInt(arrayToString(udp,8,2,false));
+                    xuHao = Integer.valueOf(new BigInteger(arrayToStringL(udp,8,2,false),16).toString());;
                 }else {
-                    xuHao = Integer.parseInt(arrayToStringL(udp,8,2,false));
+                    xuHao = Integer.valueOf(new BigInteger(arrayToStringL(udp,8,2,false),16).toString());
                 }
                 //其实传输位置 9-12
                 Integer valueLength = Integer.valueOf(new BigInteger(udp[14],16).toString());
@@ -268,9 +269,9 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             if(doesHas == 0){
                 Integer xuHao = 0;
                 if(Constant.isBig){
-                    xuHao = Integer.parseInt(arrayToString(udp,8,2,false));
+                    xuHao = Integer.valueOf(new BigInteger(arrayToStringL(udp,8,2,false),16).toString());
                 }else {
-                    xuHao = Integer.parseInt(arrayToStringL(udp,8,2,false));
+                    xuHao = Integer.valueOf(new BigInteger(arrayToStringL(udp,8,2,false),16).toString());
                 }
                 log.info("帧序号：  "+xuHao);
                 //其实传输位置 9-12

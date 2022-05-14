@@ -1,5 +1,6 @@
 package com.yjh.accesstcp;
 
+import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.server.NettyClient;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,8 @@ public class AccessTcpApplication implements CommandLineRunner {
     private String cruise;
     @Value("${a.interface.flag}")
     private String flag;
+    @Value("${spring.union.stationCode}")
+    private String stationCode;
 
     @SuppressWarnings("rawtypes")
     @Autowired
@@ -59,6 +62,7 @@ public class AccessTcpApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
+        Constant.stationCode = stationCode;
         if("1".equals(flag)) {
             InetSocketAddress address = new InetSocketAddress(serverUrl, port);
             log.info("accesstcp is running, url is : " + url);

@@ -32,6 +32,10 @@ public class SendToUpSystemServices {
     private RedisTemplate redisTemplate;
     @Value("${spring.union.stationCode}")
     private String stationCode;
+    @Value("${spring.union.cruiseHost}")
+    private String sendCode;
+    @Value("${spring.union.upSystem}")
+    private String recvCode;
 
     @Autowired
     private FtpsUtil ftpsUtil;
@@ -53,8 +57,8 @@ public class SendToUpSystemServices {
             return -1;
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode(stationCode)
-                .setReceiveCode(Constant.paramMap.get("sendCode"))
+                .setSendCode(sendCode)
+                .setReceiveCode(recvCode)
                 .setType(type)
                 .setCommand(command)
                 .setCode(code)
@@ -123,7 +127,7 @@ public class SendToUpSystemServices {
                     break;
                 case "9":
                     String mapRealPath = sendToUpSystemDao.selectMapPath();
-                    String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath").get("content"));
+                    String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute").get("content"));
                     String filePathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative").get("content"));
                     String mapAbsPath = mapRealPath.replace(filePathMap,fileFtpPathMap);
                     String mapModelTargetPath = stationCode+mapRealPath.replace(filePathMap,"");
