@@ -177,6 +177,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             //获取meteKind
             Integer meteKind = Integer.valueOf(new BigInteger(udp[9],16).toString());
             if(meteKind == 0){
+                //吧同步过来的遥控0 改为我们的遥控3
                 meteKind = 3;
             }
             log.info("meteKind:  "+meteKind);

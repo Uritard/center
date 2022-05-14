@@ -266,7 +266,8 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public String sequentialRec(String meteId) throws Exception{
         {
-            Map<String,Object> map = this.sequentialInfo(meteId).get(0);
+
+            Map<String,Object> map = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId).get(0);
             Map<String , Object> param = new HashMap<>();
             //收到变位信号抓图
             try{
