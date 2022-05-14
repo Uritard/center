@@ -332,7 +332,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                     list.add(syAllInfo);
                     //list.add(str);
                 }
-                tCfgMeteService.deleteAll();
+                tCfgMeteService.deleteAll(list);
                 tCfgMeteService.insertForAll(list);
                 Constant.dataByDevice = data;
                 Constant.listAllByte = new ArrayList<>();

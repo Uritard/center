@@ -105,14 +105,14 @@ public class TCfgMeteService {
         return tCfgMeteDao.updateTCfgDataCurrent(tCfgDataCurrent);
     }
     @Transactional(rollbackFor = Exception.class)
-    public int deleteAll(){
+    public int deleteAll(List<SYAllInfo> list){
         int i = 0;
-        i = i+tCfgMeteDao.deleteForDeviceAll();
-        i = i+tCfgMeteDao.deleteForMeteAll();
-        i = i+tCfgMeteDao.deleteForTeleadjustAll();
-        i = i+tCfgMeteDao.deleteForTelecontrolAll();
-        i = i+tCfgMeteDao.deleteForTelemeterAll();
-        i = i+tCfgMeteDao.deleteForTelesignalAll();
+        i = i+tCfgMeteDao.deleteForDeviceAll(list);
+        i = i+tCfgMeteDao.deleteForMeteAll(list);
+        i = i+tCfgMeteDao.deleteForTeleadjustAll(list);
+        i = i+tCfgMeteDao.deleteForTelecontrolAll(list);
+        i = i+tCfgMeteDao.deleteForTelemeterAll(list);
+        i = i+tCfgMeteDao.deleteForTelesignalAll(list);
         return i;
     }
 

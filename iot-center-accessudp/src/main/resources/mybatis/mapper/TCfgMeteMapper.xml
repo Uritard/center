@@ -537,21 +537,45 @@
 
     <delete id="deleteForDeviceAll">
         delete from t_cfg_device
+        where device_id in
+        <foreach collection="list" item="SYAllInfo" open="(" separator="," close=")">
+            #{SYAllInfo.meteId, jdbcType=BIGINT}
+        </foreach>
     </delete>
     <delete id="deleteForMeteAll">
         delete from t_cfg_mete
+        where mete_id in
+        <foreach collection="list" item="SYAllInfo" open="(" separator="," close=")">
+            #{SYAllInfo.meteId, jdbcType=BIGINT}
+        </foreach>
     </delete>
     <delete id="deleteForTeleadjustAll">
         delete from t_cfg_teleadjust
+        where mete_id in
+        <foreach collection="list" item="SYAllInfo" open="(" separator="," close=")">
+            #{SYAllInfo.meteId, jdbcType=BIGINT}
+        </foreach>
     </delete>
     <delete id="deleteForTelecontrolAll">
         delete from t_cfg_telecontrol
+        where mete_id in
+        <foreach collection="list" item="SYAllInfo" open="(" separator="," close=")">
+            #{SYAllInfo.meteId, jdbcType=BIGINT}
+        </foreach>
     </delete>
     <delete id="deleteForTelemeterAll">
         delete from t_cfg_telemeter
+        where mete_id in
+        <foreach collection="list" item="SYAllInfo" open="(" separator="," close=")">
+            #{SYAllInfo.meteId, jdbcType=BIGINT}
+        </foreach>
     </delete>
     <delete id="deleteForTelesignalAll">
         delete from t_cfg_telesignal
+        where mete_id in
+        <foreach collection="list" item="SYAllInfo" open="(" separator="," close=")">
+            #{SYAllInfo.meteId, jdbcType=BIGINT}
+        </foreach>
     </delete>
 
     <insert id="insertIntoTHisSignalData" useGeneratedKeys="true" keyProperty="Id" parameterType="com.yjh.accessudp.module.device.entity.THisSignalData">

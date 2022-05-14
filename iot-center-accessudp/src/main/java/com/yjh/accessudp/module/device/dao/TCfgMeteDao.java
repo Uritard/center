@@ -38,12 +38,12 @@ public interface TCfgMeteDao {
     TCfgDataCurrent selectByPrimaryIdTCfgDataCurrent(Long meteId);
     int insertTCfgDataCurrent(TCfgDataCurrent tCfgDataCurrent);
     int updateTCfgDataCurrent(TCfgDataCurrent tCfgDataCurrent);
-    int deleteForDeviceAll();
-    int deleteForMeteAll();
-    int deleteForTeleadjustAll();
-    int deleteForTelecontrolAll();
-    int deleteForTelemeterAll();
-    int deleteForTelesignalAll();
+    int deleteForDeviceAll(List<SYAllInfo> list);
+    int deleteForMeteAll(List<SYAllInfo> list);
+    int deleteForTeleadjustAll(List<SYAllInfo> list);
+    int deleteForTelecontrolAll(List<SYAllInfo> list);
+    int deleteForTelemeterAll(List<SYAllInfo> list);
+    int deleteForTelesignalAll(List<SYAllInfo> list);
 
     int insertIntoTHisSignalData(THisSignalData tHisSignalData);
     int insertIntoTHisTelemeterData(THisTelemeterData tHisTelemeterData);

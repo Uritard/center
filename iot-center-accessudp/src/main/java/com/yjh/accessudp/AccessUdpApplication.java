@@ -71,7 +71,7 @@ public class AccessUdpApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
-        //loadDeviceInfo();
+//        loadDeviceInfo();
         Constant.encoding = encoding;
         Constant.isBig = Boolean.valueOf(isBig);
         Constant.sort = Boolean.valueOf(sort);
@@ -82,7 +82,7 @@ public class AccessUdpApplication implements CommandLineRunner {
     public void loadDeviceInfo()throws IOException{
         //读取联动设备的信息
         TSysParam tSysParam = tCfgMeteService.selectByParamType("unionDeviceInfoPath");
-        devicePath = tSysParam.getContent()+"/"+"efile.txt";
+        devicePath = "D:/testCdoe/tb.txt";
         log.info("设备文件路径：  "+devicePath);
         BufferedReader br = null;
         InputStreamReader in = null;
@@ -140,7 +140,7 @@ public class AccessUdpApplication implements CommandLineRunner {
             br.close();
             //reader.close();
             in.close();
-            tCfgMeteService.deleteAll();
+            tCfgMeteService.deleteAll(list);
             tCfgMeteService.insertForAll(list);
         } catch (IOException e) {
             log.info("读取联动设备错误: "+e);
