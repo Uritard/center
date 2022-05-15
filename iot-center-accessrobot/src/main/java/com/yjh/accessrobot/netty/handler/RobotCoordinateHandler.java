@@ -41,16 +41,20 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
             List<Map<String, String>> robotCoordinateList = new ArrayList<>();
             xmlBaseModel.getItems().forEach(res -> {
                 Map<String, String> robotCoordinateMap = new HashMap<>(16);
-                String filePath = res.get("file_path").toString();
+                if (res.containsKey("file_path")){
+                    String filePath = String.valueOf(res.get("file_path"));
+                    robotCoordinateMap.put("filePath", filePath);
+                    robotService.uploadFile(filePath, filePath);
+                }else {
+                    robotCoordinateMap.put("filePath", "");
+                }
                 // 2022过检 robot_name -> patroldevice_name
                 robotCoordinateMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
                 robotCoordinateMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
-                robotCoordinateMap.put("filePath", filePath);
-                robotService.uploadFile(filePath, filePath);
                 robotCoordinateMap.put("robotCode",robotCode);
-                robotCoordinateMap.put("time", res.get("time").toString());
-                robotCoordinateMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
-                robotCoordinateMap.put("coordinateGeography", res.get("coordinate_geography").toString());
+                robotCoordinateMap.put("time", String.valueOf(res.get("time")));
+                robotCoordinateMap.put("coordinatePixel", String.valueOf(res.get("coordinate_pixel")));
+                robotCoordinateMap.put("coordinateGeography", String.valueOf(res.get("coordinate_geography")));
                 robotCoordinateList.add(robotCoordinateMap);
             });
 

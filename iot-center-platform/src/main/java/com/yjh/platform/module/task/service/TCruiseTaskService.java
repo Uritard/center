@@ -715,11 +715,11 @@ public class TCruiseTaskService {
         List<Map<String, Object>> listTask = new ArrayList<>();
         Date now = new Date();
         for (TCruiseTaskCount tCruiseTaskCount : list) {
-            Date starTime = tCruiseTaskCount.getStartTime();
-            if(DateUtils.compare(now, starTime) < 0){
-                // 任务未到开始时间，忽略
-                continue;
-            }
+//            Date starTime = tCruiseTaskCount.getStartTime();
+//            if(DateUtils.compare(now, starTime) < 0){
+//                // 任务未到开始时间，忽略
+//                continue;
+//            }
             if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
                 List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
                 for (Date aTimeList : timeList) {
@@ -931,6 +931,37 @@ public class TCruiseTaskService {
     public List<TCruiseTaskList> selectPointStatus(String taskId) {
         List<TCruiseTaskList> tCruiseTaskList = tCruiseTaskDao.selectPointStatus(taskId);
         return tCruiseTaskList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int taskStart(String taskId) {
+
+        try {
+            List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+            log.info("机器人任务启动,robotCodeList:{}",robotCodeList);
+            if (robotCodeList != null && robotCodeList.size() > 0) {
+                Map<String, Object> robotTaskStatesMap = new HashMap<>();
+                robotTaskStatesMap.put("taskId", taskId);
+                robotTaskStatesMap.put("commandValue", 1);
+                robotTaskStatesMap.put("robotCodeList", robotCodeList);
+                robotTaskStates(robotTaskStatesMap);
+            }
+//            Map<String,String> jasonMapOnFinished=new HashMap<>();
+//            jasonMapOnFinished.put("type","taskStart");
+//            jasonMapOnFinished.put("taskId",taskId);
+//            String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
+//            log.info("发送给前端的消息："+jsonMessage);
+//            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
+        } catch (Exception e) {
+            log.error("任务启动异常: " + e);
+            e.printStackTrace();
+        }
+
+        //任务状态上报站端
+        TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+        sendTaskStateToUp(tCruiseTask, 2);
+
+        return 1;
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -6,7 +6,18 @@ import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -149,10 +160,37 @@ public class PlatformXMLUtil {
         // 必有
         Element childNode7 = rss.addElement("Command");
         childNode7.setText(xmlBaseModel.getCommand());
-        String xmlString = document.asXML();
+        String xmlString = null;
+        try {
+            xmlString = formatXML(document);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return xmlString;
     }
 
+    public static String formatXML(Document document) throws Exception {
+        String requestXML = null;
+        XMLWriter writer = null;
+        if (document != null) {
+            try {
+                StringWriter stringWriter = new StringWriter();
+                OutputFormat format = new OutputFormat("    ", true);
+                writer = new XMLWriter(stringWriter, format);
+                writer.write(document);
+                writer.flush();
+                requestXML = stringWriter.getBuffer().toString().replace("\n\n", "\n");
+            } finally {
+                if (writer != null) {
+                    try {
+                        writer.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
+        }
+        return requestXML;
+    }
 }
 

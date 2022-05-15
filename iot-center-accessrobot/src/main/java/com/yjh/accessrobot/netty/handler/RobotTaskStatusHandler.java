@@ -91,7 +91,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         }
 
         Map<String, Object> listMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
-        taskStatusMap.put("instanceList", listMap.get("instanceIdList"));
+        taskStatusMap.put("instanceList", Objects.isNull(listMap.get("instanceIdList")) ? "" : listMap.get("instanceIdList"));
         log.info("taskStatusMap==" + taskStatusMap);
         redisTemplate.opsForHash().putAll("RobotTaskStatus:" + robotCode + ":" + taskId, taskStatusMap);
 

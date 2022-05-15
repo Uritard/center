@@ -417,10 +417,10 @@ public class RobotService {
 
             TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Map<String, Object> robotModelMap = robotMap.get(0);
                 //生产日期
-                String productionDate = String.valueOf(robotModelMap.get("production_pate"));
+                String productionDate = String.valueOf(robotModelMap.get("production_date"));
                 if(productionDate != null && !"".equals(productionDate)){
                     tRobotInfo.setMadeDate(simpleDateFormat.parse(productionDate));
                 }
@@ -1062,18 +1062,18 @@ public class RobotService {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
                     String taskPatrolledId = redisInfoMap.get("taskPatrolled_id");
                     taskId = "1".equals(commandValue) ? taskId : taskPatrolledId;
-                    List<Map<String, Object>> itemList = new ArrayList<>();
-                    Map<String, Object> itemMap = new HashMap<>(1);
-                    itemMap.put("task_patrolled_id", taskPatrolledId);
-                    itemList.add(itemMap);
+//                    List<Map<String, Object>> itemList = new ArrayList<>();
+//                    Map<String, Object> itemMap = new HashMap<>(1);
+//                    itemMap.put("task_patrolled_id", taskPatrolledId);
+//                    itemList.add(itemMap);
                     XMLBaseModel xmlBaseModel = new XMLBaseModel()
                             .setType("41")
                             .setSendCode(sendCode)
                             .setReceiveCode(robotCode)
                             .setCode(taskId)
                             .setCommand(commandValue)
-                            .setTime(DateTimeUtil.format(new Date()))
-                            .setItems(itemList);
+                            .setTime(DateTimeUtil.format(new Date()));
+//                            .setItems(itemList);
                     String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
                     log.info("生成的任务控制xml是<start>{}<end>", xmlString);
 

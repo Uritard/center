@@ -9,6 +9,7 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.bcel.generic.IF_ACMPEQ;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -47,30 +48,35 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             Map<String, String> robotRoadMap = new HashMap<>(16);
             // 2022过检 robot_name -> patroldevice_name
             robotRoadMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
-            String filePath = res.get("file_path").toString();
-            robotService.uploadFile(filePath, filePath);
-            String[] splitArray = filePath.split("/");
-            String fileName = splitArray[splitArray.length - 1];
-            log.info("巡检路线图片名称==" + fileName);
-            String taskId = splitArray[splitArray.length - 3];
-
-            String temporaryPath = filePathMap.get("content") + "/" + filePath;
-            log.info("temporaryPath是===" + temporaryPath);
-
-            // 开发环境图片相对路径文件目录
-            String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + taskId + "/Road";
-            // 开发环境图片绝对路径文件目录
-            String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + taskId + "/Road";
-            // 将ftp服务器上的文件复制到开发环境
-            copyFileToDevelop(temporaryPath, developAbsoluteUrl);
-
-            robotRoadMap.put("relativePath", developRelativeUrl + "/" + fileName);
-            robotRoadMap.put("absolutePath", developAbsoluteUrl + "/" + fileName);
             robotRoadMap.put("patrolDeviceCode",  String.valueOf(res.get("patroldevice_code")));
+            if (res.containsKey("file_path")){
+                String filePath = String.valueOf(res.get("file_path"));
+                robotService.uploadFile(filePath, filePath);
+                String[] splitArray = filePath.split("/");
+                String fileName = splitArray[splitArray.length - 1];
+                log.info("巡检路线图片名称==" + fileName);
+                String taskId = splitArray[splitArray.length - 3];
+
+                String temporaryPath = filePathMap.get("content") + "/" + filePath;
+                log.info("temporaryPath是===" + temporaryPath);
+
+                // 开发环境图片相对路径文件目录
+                String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + taskId + "/Road";
+                // 开发环境图片绝对路径文件目录
+                String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + taskId + "/Road";
+                // 将ftp服务器上的文件复制到开发环境
+                copyFileToDevelop(temporaryPath, developAbsoluteUrl);
+
+                robotRoadMap.put("relativePath", developRelativeUrl + "/" + fileName);
+                robotRoadMap.put("absolutePath", developAbsoluteUrl + "/" + fileName);
+            }else {
+                robotRoadMap.put("relativePath", "");
+                robotRoadMap.put("absolutePath", "");
+            }
             robotRoadMap.put("robotCode", robotCode);
-            robotRoadMap.put("time", res.get("time").toString());
-            robotRoadMap.put("coordinatePixel", res.get("coordinate_pixel").toString());
-            robotRoadMap.put("coordinateGeography", res.get("coordinate_geography").toString());
+            robotRoadMap.put("time", String.valueOf(res.get("time")));
+            robotRoadMap.put("coordinatePixel", String.valueOf(res.get("coordinate_pixel")));
+            robotRoadMap.put("coordinateGeography", String.valueOf(res.get("coordinate_geography")));
             robotRoadList.add(robotRoadMap);
         });
 

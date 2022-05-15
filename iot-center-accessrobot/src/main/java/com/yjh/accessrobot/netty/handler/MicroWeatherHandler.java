@@ -66,19 +66,23 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 String weatherType = weatherMap.get("type");
                 if ("1".equals(weatherType)) {
                     info.put("temperature", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
-                    info.put("temperatureUnit", "℃");
+//                    info.put("temperatureUnit", "℃");
+                    info.put("temperatureUnit",weatherMap.get("unit"));
                 }
                 if ("2".equals(weatherType)) {
                     info.put("humidity", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
-                    info.put("humidityUnit", "%");
+//                    info.put("humidityUnit", "%");
+                    info.put("humidityUnit", weatherMap.get("unit"));
                 }
                 if ("3".equals(weatherType)) {
                     info.put("windSpeed", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
-                    info.put("windSpeedUnit", "m/s");
+//                    info.put("windSpeedUnit", "m/s");
+                    info.put("windSpeedUnit", weatherMap.get("unit"));
                 }
                 if ("4".equals(weatherType)) {
                     info.put("precipitation", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
-                    info.put("precipitationUnit", "mm");
+//                    info.put("precipitationUnit", "mm");
+                    info.put("precipitationUnit", weatherMap.get("unit"));
                 }
                 if ("5".equals(weatherType)) {
                     if ("".equals(weatherMap.get("value")) || null == weatherMap.get("value")) {
@@ -90,19 +94,22 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
                 }
                 if ("6".equals(weatherType)) {
                     info.put("airPressure", decimalFormat.format(Double.valueOf(weatherMap.get("value"))));
-                    info.put("airPressureUnit", "kPa");
+//                    info.put("airPressureUnit", "kPa");
+                    info.put("airPressureUnit", weatherMap.get("unit"));
                 }
                 if ("7".equals(weatherType)) {
-                    info.put("oxygen", decimalFormat.format(Double.valueOf(weatherMap.get("value")) / 10));
-                    info.put("oxygenUnit", "kPa");
+                    info.put("oxygen", weatherMap.get("value"));
+//                    info.put("oxygenUnit", "ppm");
+                    info.put("oxygenUnit", weatherMap.get("unit"));
                 }
                 if ("8".equals(weatherType)) {
-                    info.put("sf6", decimalFormat.format(Double.valueOf(weatherMap.get("value")) / 10));
-                    info.put("sf6Unit", "mPa");
+                    info.put("sf6", weatherMap.get("value"));
+                    info.put("sf6Unit", weatherMap.get("unit"));
                 }
+
                 //环控数据组装
-                String value = res.get("value").toString();
-                if (res.get("value_type") != null) {
+                String value = String.valueOf(res.get("value"));
+                if (res.containsKey("value_type")) {
                     EnvDeviceStatus env = new EnvDeviceStatus();
                     env.setRobotCode(robotCode);
                     env.setUnit(res.get("unit").toString());

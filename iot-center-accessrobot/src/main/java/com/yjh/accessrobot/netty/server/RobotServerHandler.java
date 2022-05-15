@@ -14,6 +14,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.util.HashMap;
@@ -71,7 +72,8 @@ public interface RobotServerHandler {
         xmlBaseModelEmpty.setCommand("3");
         xmlBaseModelEmpty.setTime(DateTimeUtil.getDateTimeString(false));
         xmlBaseModelEmpty.setType("251");
-        xmlBaseModelEmpty.setCode(flag ? "200" : "500");
+        xmlBaseModelEmpty.setCode("200");
+//        xmlBaseModelEmpty.setCode(flag ? "200" : "500");
         xmlBaseModelEmpty.setSendCode(Constant.sendCode);
         xmlBaseModelEmpty.setReceiveCode(sendCode);
         return xmlBaseModelEmpty;

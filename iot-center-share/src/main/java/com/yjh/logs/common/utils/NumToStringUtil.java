@@ -113,6 +113,9 @@ public class NumToStringUtil {
         if("10".equals(str)){
             return "任务下发";
         }
+        if("29".equals(str)){
+            return "任务启动";
+        }
         if("11".equals(str)){
             return "任务暂停";
         }

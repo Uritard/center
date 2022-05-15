@@ -296,6 +296,22 @@ public class TCruiseTaskController {
         return result;
     }
 
+    @ApiOperation(value = "任务启动")
+    @RequestMapping(value = "/taskStart", method = RequestMethod.GET)
+    @Logs(title = "任务启动",content = "任务启动",logType = 29,authority = "1235")
+    public Result taskStart(@RequestParam(value = "taskId") String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(tCruiseTaskService.taskStart(taskId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("任务启动异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务启动错误:", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "任务暂停")
     @RequestMapping(value = "/taskPause", method = RequestMethod.GET)
     @Logs(title = "任务暂停",content = "任务暂停",logType = 11,authority = "1235")
