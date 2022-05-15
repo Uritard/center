@@ -285,13 +285,13 @@ public class TSequentialConfService{
             //todo 发给算法进行分析
             try{
                 param.put("analyseType",6);
-                param.put("instanceId",meteId);
+                param.put("instanceId",map.get("cfgDeviceId"));
                 param.put("isAi",1);//模板图片路径
                 Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
                 String picModelPath = (String) mapForPicModelPath.get("content");
 
                 param.put("picModelPath",picModelPath+"/"+map.get("presetId"));
-                param.put("taskId",UUID.randomUUID()+"#yjsk#meteId="+meteId);
+                param.put("taskId",UUID.randomUUID()+"#yjsk#meteId="+map.get("cfgDeviceId"));
                 List<Map<String,Object>> analysis = new ArrayList<>();
                 analysis.add(param);
                 log.info("调用video算法识别接口param={},url={}",JSON.toJSONString(analysis),picRec);
