@@ -1,11 +1,13 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.commons.DateUtils;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.configuration.RedisAndYxsjUtil;
@@ -72,11 +74,12 @@ public class SysUserService {
         sysUser.setUpdateTime(date);
         map.put("userName", sysUser.getUserName());
         map.put("password", sysUser.getPassword());
+        map.put("updateTime", DateUtils.dateToString(date));
         sysUser.setPassword(Demo.encryption(sysUser.getPassword()));
         int total = sysUserDao.insert(sysUser);
         SysUserBackUp sysUserBackUp = new SysUserBackUp();
         BeanUtils.copyProperties(sysUser, sysUserBackUp);
-        sysUserBackUp.setVerfiCode(Demo.summary(map.toString()));
+        sysUserBackUp.setVerfiCode(Demo.summary(JSONUtil.toJSONString(map)));
         SysUserBackUpDao.insert(sysUserBackUp);
         logsRecord.LoginLogsSend(request, "25", "数据备份", userName + "备份了" + sysUser.getUserName() + "用户信息", userName, String.valueOf(userIds), 1);
         logsRecord.LoginLogsSend(request, "17", "新增用户", userName + "用户新增了" + sysUser.getUserName() + "用户", userName, String.valueOf(userIds), 1);
@@ -183,7 +186,28 @@ public class SysUserService {
                         throw new BusinessException(500, "当前用户与此ukey不匹配");
                     }
                 }
-                if (!Objects.equals(null, sysUserLogin) && Demo.decryptDB(sysUserBackUp.getPassword()).equals(password) && userName.equals(sysUserLogin.getUserName())) {
+
+                Map<String, String> linkedHashMap = new LinkedHashMap<>();
+                linkedHashMap.put("userName", userName);
+                linkedHashMap.put("password", Demo.decryptDB(sysUserLogin.getPassword()));
+                linkedHashMap.put("updateTime", DateUtils.dateToString(sysUserLogin.getUpdateTime()));
+                String vcode = Demo.summary(JSONUtil.toJSONString(linkedHashMap));
+                boolean isReChange = !vcode.equals(sysUserBackUp.getVerfiCode());
+                if (isReChange) {
+                    SysUser sysUsers = new SysUser();
+                    sysUsers.setPassword(sysUserBackUp.getPassword());
+                    sysUsers.setUserName(sysUserBackUp.getUserName());
+                    sysUsers.setUserId(sysUserLogin.getUserId());
+                    sysUsers.setUpdateTime(sysUserBackUp.getUpdateTime());
+                    sysUserDao.update(sysUsers);
+                    logsRecord.LoginLogsSend(request, "6", "登录", "用户信息被篡改", userName, String.valueOf(sysUserLogin.getUserId()), 2);
+                    logsRecord.LoginLogsSend(request, "26", "数据恢复", "恢复了"+ userName +"用户信息", userName, String.valueOf(sysUserLogin.getUserId()), 1);
+                    mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
+                    mapResult.put("info", "用户信息异常，已尝试恢复，请联系管理员确认！");
+                    mapResult.put("userId", sysUserLogin.getUserId());
+                    return mapResult;
+                }
+                if (!Objects.equals(null, sysUserLogin) && Demo.decryptDB(sysUserLogin.getPassword()).equals(password) && userName.equals(sysUserLogin.getUserName())) {
                     if ("true".equals(isLogin)) {
                         Map<String, String> appKeymap = redisTemplate.opsForHash().entries("user:" + sysUserLogin.getUserId());
                         if (appKeymap.size() != 0) {
@@ -193,16 +217,8 @@ public class SysUserService {
                                 throw new BusinessException(500, "用户已登录");
                             }
                         }
+                    }
 
-                    }
-                    if (!sysUserLogin.getPassword().equals(sysUserBackUp.getPassword())) {
-                        SysUser sysUsers = new SysUser();
-                        sysUsers.setPassword(sysUserBackUp.getPassword());
-                        sysUsers.setUserId(sysUserLogin.getUserId());
-                        sysUserDao.update(sysUsers);
-                        logsRecord.LoginLogsSend(request, "6", "登录", "用户信息被篡改", userName, String.valueOf(sysUserLogin.getUserId()), 2);
-                        logsRecord.LoginLogsSend(request, "26", "数据恢复", "恢复了"+ userName +"用户信息", userName, String.valueOf(sysUserLogin.getUserId()), 1);
-                    }
                     String appKey = getRandomNickname(10);
                     sysUserLogin.setAppkey(appKey);
                     String userIds = String.valueOf(sysUserLogin.getUserId());
@@ -560,7 +576,7 @@ public class SysUserService {
         Map<String, String> enmap = redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
         String isDecode = enmap.get("content");
         if ("true".equals(isDecode)) {
-            linkedHashMap.put("password", demo.decryptIdentifier(map.get("oldPCode"), map.get("identifier")));
+            linkedHashMap.put("password", demo.decryptIdentifier(map.get("newPCode"), map.get("identifier")));
             sysUser.setPassword(Demo.encryption(demo.decryptIdentifier(map.get("newPCode"), map.get("identifier"))));
             redisTemplate.delete("pubk:" + map.get("identifier"));
         } else {
@@ -573,9 +589,10 @@ public class SysUserService {
         if (currentState == 3) {
             sysUser.setState(1);
         }
+        linkedHashMap.put("updateTime", DateUtils.dateToString(date));
         SysUserBackUp sysUserBackUp = new SysUserBackUp();
         BeanUtils.copyProperties(sysUser, sysUserBackUp);
-        sysUserBackUp.setVerfiCode(Demo.summary(linkedHashMap.toString()));
+        sysUserBackUp.setVerfiCode(Demo.summary(JSONUtil.toJSONString(linkedHashMap)));
         SysUserBackUpDao.update(sysUserBackUp);
         logsRecord.LoginLogsSend(request, "19", "用户修改密码",  "用户修改密码", userName, String.valueOf(userId), 1);
         return this.sysUserDao.update(sysUser);
