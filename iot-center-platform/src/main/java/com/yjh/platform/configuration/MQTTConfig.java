@@ -19,6 +19,8 @@ import java.net.UnknownHostException;
 @Configuration
 public class MQTTConfig {
 
+    @Value("${audio.mqtt.host}")
+    private String voiceHost;
     @Value("${mqtt.host}")
     private String host;
     @Value("${spring.application.name}")
@@ -29,14 +31,20 @@ public class MQTTConfig {
     private String user;
     @Value("${mqtt.pwd}")
     private String pwd;
+    @Value("${audio.mqtt.user}")
+    private String voiceUser;
+    @Value("${audio.mqtt.pwd}")
+    private String voicePwd;
 
-    /**
-     * mqtt连接保证clientid唯一
-     * @return
-     */
-    @Bean
-    public MqttUtilsServer getMQTTServer() {
+
+    @Bean("algorithmMqtt")
+    public MqttUtilsServer getAlgorithmMQTTServer() {
         return new MqttUtilsServer(host, getIp() + "#" + appName + "#" + appPort, user, pwd);
+    }
+
+    @Bean("voiceMqtt")
+    public MqttUtilsServer getVoiceMQTTServer() {
+        return new MqttUtilsServer(voiceHost, getIp() + "#" + appName + "#" + appPort, voiceUser, voicePwd);
     }
 
     /**

@@ -15,6 +15,7 @@ import com.yjh.platform.audiodevice.impl.standard.StandardAudioDeviceMonitor;
 import com.yjh.platform.audiodevice.impl.standard.tcp.MessageCodec;
 import com.yjh.platform.audiodevice.impl.standard.tcp.PacketCodecFactory;
 import com.yjh.platform.common.mqtt.MqttUtilsServer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,7 +69,7 @@ public class AudioDeviceConfig {
     }
 
     @Bean
-    public AudioDeviceFactory audioDeviceFactory(MqttUtilsServer mqttUtilsServer) {
+    public AudioDeviceFactory audioDeviceFactory(@Qualifier("voiceMqtt") MqttUtilsServer mqttUtilsServer) {
         return deviceId -> new StandardAudioDevice(deviceId, mqttUtilsServer);
     }
 

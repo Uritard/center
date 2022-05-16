@@ -3,6 +3,7 @@ package com.yjh.platform.common.mqtt;
 import com.yjh.platform.common.mqtt.msg.HeartMessageInfo;
 import com.yjh.platform.common.mqtt.msg.PushMsgbody;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/mqtt")
 public class PushController {
 
+    @Qualifier("algorithmMqtt")
     @Autowired
     MqttUtilsServer mqttUtilsServer;
 

@@ -86,7 +86,7 @@ public class MqttUtilsServer {
         byte[] msgBytes = jsonStr.getBytes();
         message.setPayload(msgBytes);
         try {
-            log.info("发送MQTT消息, 话题:{}, 消息:{}", topic, jsonStr);
+            log.info("发送MQTT消息, 话题:{}, 消息:{},发送给：{}", topic, jsonStr,host);
             MqttTopic mqtttopic = this.mqttClient.getTopic(topic);
             MqttDeliveryToken token = mqtttopic.publish(message);
             token.waitForCompletion();

@@ -2,6 +2,7 @@ package com.yjh.platform.common.mqtt;
 
 import com.yjh.platform.common.mqtt.msg.HeartMessageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 public class HeartBeatJob {
 
     public static final String HEART = "heart";
+    @Qualifier("algorithmMqtt")
     @Autowired
     private MqttUtilsServer mqttUtilsServer;
 
