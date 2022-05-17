@@ -668,5 +668,24 @@ public class SysUserService {
         SysUserBackUpDao.update(sysUserBackUp);
         return this.sysUserDao.update(sysUser);
     }
+
+    public void updateVerfiCode(String userName) {
+        try {
+            SysUserLogin sysUserLogin = sysUserDao.selectByUserNameAndL(userName);
+            Map<String, String> linkedHashMap = new LinkedHashMap<>();
+
+            linkedHashMap.put("userName", userName);
+            linkedHashMap.put("password", Demo.decryptDB(sysUserLogin.getPassword()));
+            linkedHashMap.put("updateTime", DateUtils.dateToString(sysUserLogin.getUpdateTime()));
+            String vcode = Demo.summary(JSONUtil.toJSONString(linkedHashMap));
+            SysUserBackUp sysUserBackUp = new SysUserBackUp();
+            sysUserBackUp.setVerfiCode(vcode);
+            sysUserBackUp.setUserId(sysUserLogin.getUserId());
+
+            SysUserBackUpDao.update(sysUserBackUp);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }
 

@@ -581,6 +581,19 @@ public class SysUserController {
         return result;
     }
 
+    @RequestMapping(value = "/updateVerfiCode", method = RequestMethod.POST)
+    //@Logs(title = "用户修改密码", content = "用户修改密码", logType = 19)
+    public Result updateVerfiCode(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
+        Result result = new Result();
+        try {
+            String userName = map.get("verfyKey");
+            sysUserService.updateVerfiCode(userName);
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("更新用户摘要异常:", e);
+        }
+        return result;
+    }
 
     @ApiOperation(value = "用户修改密码")
     @RequestMapping(value = "/loginChangePassword", method = RequestMethod.PUT)
