@@ -183,7 +183,7 @@ public class InspectionResultThread implements Runnable{
         Integer totalNum = Integer.valueOf(abnormalCount.get("all").toString());
         Integer abnormalNum = Integer.valueOf(abnormalCount.get("abnormal").toString()) ;
         Integer normalNum  = Integer.valueOf(abnormalCount.get("normal").toString()) ;
-        log.info("taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是===", taskId, totalNum, abnormalNum, normalNum);
+        log.info("taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, totalNum, abnormalNum, normalNum);
         Integer abnormal = abnormalNum;
         Integer normal = normalNum;
 
