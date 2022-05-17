@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.module.device.controller;
 
+import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.common.mqtt.AlarmService;
 import com.yjh.accessvideo.common.mqtt.GetSpringUtil;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Alarm;
@@ -38,6 +39,8 @@ public class IntelAnalysisController {
     private RedisTemplate redisTemplate;
     @Autowired
     private com.yjh.accessvideo.service.ftpsservice ftpsservice;
+    @Autowired
+    private  AnalysisController analysisController;
 
     private static final String FLAG = "true";
 
@@ -225,6 +228,34 @@ public class IntelAnalysisController {
             log.error(e.getMessage());
             Response.serverError();
         }
+    }
+
+    /**
+     *  算法主机-缺陷告警
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping(value = "/algorithm-test")
+    public void algorithmTest(@RequestParam(value = "原图路径",required = false) String picPath,
+                       @RequestParam(value = "分析类型", required = false) String type,
+                       @RequestParam(value = "基准图片", required = false) String basePath
+
+    ) {
+        Analysis analysis = new Analysis();
+        analysis.setTaskId("666666");
+        analysis.setInstanceId(666666L);
+        analysis.setPicPath(picPath);
+        analysis.setAnalyseType(type);
+        analysis.setPicModelPath("");
+        analysis.setIsAi(0);
+        List<Analysis> analysisList = new ArrayList<>();
+        analysisList.add(analysis);
+        Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+        analysisMap.put("list",analysisList);
+        log.info("算法信息：    "+analysisMap);
+        Constant.algorithmTestPicPath = picPath;
+        Constant.algorithmTestBasePicPath = basePath;
+        analysisController.feignDefect(analysisMap);
     }
 
 }

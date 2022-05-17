@@ -924,7 +924,7 @@ public class DataDealThread implements Runnable {
                             Map<String, List<XMLBaseModel>> map = new HashMap<>();
                             map.put("list", list);
                             log.info("结果信息上报：-" + map);
-                            //Constant.otherServer(map, Constant.TCP_URL);//江苏要求
+                            Constant.otherServer(map, Constant.TCP_URL);//江苏要求
                         }catch (Exception e){
                             log.error("结果上报失败"+e);
                             log.error("异常原因："+e.getStackTrace()[0]);
@@ -970,35 +970,37 @@ public class DataDealThread implements Runnable {
                         String flag= ftpsservice.getFlag();
                         if(differentList.size()>0&&("1".equals(flag))){
                             log.info("different类型:开始向算法管理平台发送图片和mqtt消息");
-                            String year=Integer.toString(LocalDate.now().getYear());
-                            String month=Integer.toString(LocalDate.now().getMonthValue());
                             Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
                             JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
+                            String  instanceId=jsonObjectResultbak.getString("instanceId");
+                            HashMap<String,String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
+                            String picF = nameMap.get("upRegionName")+"_"+nameMap.get("devicename")+"_"+nameMap.get("meteName")+"_";
+
+                            String year=Integer.toString(LocalDate.now().getYear());
+                            String month=Integer.toString(LocalDate.now().getMonthValue());
                             //,先取出算法平台返回的resultinfo中的结果图片路径
                             String resultImagebak=jsonObjectResultbak.getString("analyseResultImg");
                             String taskidbak=jsonObjectResultbak.getString("taskId");
-                            String  instanceId=jsonObjectResultbak.getString("instanceId");
                             Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak+":"+instanceId);//读redis
                             String devicename= String.valueOf(cruiseResult2.get("deviceName"));
                             //,获取原始路径.并拼接算法管理平台对应远程文件路径
                             String origpicpath=String.valueOf(cruiseResult2.get("origpic").toString());
                             String[] str2=origpicpath.split("/");
                             String origpcimagename=str2[str2.length-1];
-                            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+origpcimagename;
+                            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+month+"/"+picF+"原图.jpg";
                             //,获取结果路径.并拼接算法管理平台对应远程文件路径
                             String[] str=resultImagebak.split("/");
                             String imagename=str[str.length-1];
-                            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+imagename;
+                            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+month+"/"+picF+"判别告警.jpg";
                             //,获取基准路径.并拼接算法管理平台所需要的基准文件路径
                             TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
                             String Cruiseid=String.valueOf(tCruisePointInstance.getCruiseid());   //获取巡视点位id
                             String judgeBaseImagepath= redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString();
                             judgeBaseImagepath=judgeBaseImagepath+"/"+Cruiseid+"/"+Cruiseid+".jpg"; //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
                             //拼接算法管理平台分析告警结果图片地址
-                            String remotebaseimagicpath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+"/"+month+"/"+Cruiseid+".jpg";
+                            String remotebaseimagicpath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+month+"/"+picF+"判别基准.jpg";
                             Iterator it=differentList.iterator();
                             List<Different> defectList1=new ArrayList<>();
-                            HashMap<String,String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
                             while (it.hasNext()){
                                 String key=it.next().toString();//所有的key
                                 Map<String, String>  differentlistmap= redisTemplate.opsForHash().entries(key);
@@ -1050,14 +1052,16 @@ public class DataDealThread implements Runnable {
 
                         if(defectList.size()>0&&("1".equals(flag))){
                             log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
-                            String year=Integer.toString(LocalDate.now().getYear());
-                            String month=Integer.toString(LocalDate.now().getMonthValue());
                             Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
                             JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
+                            String  instanceId=jsonObjectResultbak.getString("instanceId");
+                            HashMap<String,String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
+                            String picF = nameMap.get("upRegionName")+"_"+nameMap.get("devicename")+"_"+nameMap.get("meteName")+"_";
+                            String year=Integer.toString(LocalDate.now().getYear());
+                            String month=Integer.toString(LocalDate.now().getMonthValue());
                             //,先取出算法平台返回的resultinfo中的结果图片路径
                             String resultImagebak=jsonObjectResultbak.getString("analyseResultImg"); //分析结果过
                             String taskidbak=jsonObjectResultbak.getString("taskId");
-                            String  instanceId=jsonObjectResultbak.getString("instanceId");
                             Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak+":"+instanceId);//读redis
                             String devicename= String.valueOf(cruiseResult2.get("deviceName"));
                             // 获取原始图路径
@@ -1065,14 +1069,14 @@ public class DataDealThread implements Runnable {
                             String[] str2=origpicpath.split("/");
                             String origpcimagename=str2[str2.length-1];
                             //拼接算法管理平台原始图片推送地址
-                            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+"/"+month+"/"+origpcimagename;
+                            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+month+"/"+picF+"原图.jpg";
                             log.info("开始向算法管理平台发送图片和mqtt消息");
                             String[] str=resultImagebak.split("/");
                             String imagename=str[str.length-1];
                             //拼接算法管理平台分析告警结果图片地址
-                            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+"/"+month+"/"+imagename;
+                            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+month+"/"+picF+"缺陷告警.jpg";
                             Iterator it=defectList.iterator();
-                            HashMap<String,String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
+
                             while (it.hasNext()){
                                 String key=it.next().toString();//所有的key
                                 Map<String, String>  differenmap= redisTemplate.opsForHash().entries(key);

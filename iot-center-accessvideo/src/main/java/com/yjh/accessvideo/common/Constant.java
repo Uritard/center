@@ -125,4 +125,7 @@ public class Constant {
         }
     }
 
+    public static String algorithmTestPicPath= "";
+    public static String algorithmTestBasePicPath= "";
+
 }
