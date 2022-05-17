@@ -214,7 +214,7 @@ public class InspectionResultThread implements Runnable{
                     tCruiseTaskResultMap.put("cruiseResult", "246");
                     tCruiseTaskResultMap.put("cruiseAbnormal", "null");
                     normal = normal + 1;
-                    log.info("taskId为{}的该点结果正常,这次变化的normal是==={}", taskId, normal);
+                    log.info("taskId为{},instanceId为{}的该点结果正常,这次变化的normal是==={}", taskId, instanceId, normal);
                 }else {
                     // value无值且resultNum为--，若结果非音频文件，则为异常情况
                     tCruiseTaskResultMap.put("resultNum", "--");
@@ -222,12 +222,12 @@ public class InspectionResultThread implements Runnable{
                         tCruiseTaskResultMap.put("cruiseResult", "246");
                         tCruiseTaskResultMap.put("cruiseAbnormal","null");
                         normal = normal + 1;
-                        log.info("taskId为{}的该点结果正常,这次变化的normal是==={}", taskId, normal);
+                        log.info("taskId为{},instanceId为{}的该点结果正常,这次变化的normal是==={}", taskId, instanceId, normal);
                     }else {
                         tCruiseTaskResultMap.put("cruiseResult","247");
                         tCruiseTaskResultMap.put("cruiseAbnormal","249");
                         abnormal = abnormal + 1;
-                        log.info("taskId为{}的该点结果异常,这次变化的abnormal是===", taskId, normal);
+                        log.info("taskId为{},instanceId为{}的该点结果异常,这次变化的abnormal是===", taskId, instanceId, normal);
                     }
                 }
                 tCruiseTaskResultMap.put("picpath", cruiseResultMap.get("relativePath"));
