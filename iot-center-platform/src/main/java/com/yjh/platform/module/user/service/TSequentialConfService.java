@@ -403,7 +403,7 @@ public class TSequentialConfService{
             }
 
             List<String> listSort = tSequentialConfDao.selectLastStep();
-            if(listSort.get(listSort.size()-1).equals(recBack.get("meteId")) ){
+            if(listSort.get(listSort.size()-1).equals(map.get("meteId")) ){
                 //这是最后一个步骤
                 TSysParam time = tSysParamDao.selectByParamType("cleanTime");
                 Thread.sleep(Integer.valueOf(time.getContent())*1000);
