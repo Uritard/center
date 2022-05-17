@@ -39,6 +39,5 @@ public interface TCruisePlanAttrDao {
     int deleteByInstanceId(@Param(value = "list") List<Long> list);
     List<Long> selectByPlanId(@Param(value = "planId") Long planId);
 
-    List<String> selectPlanRunningTask(@Param(value = "planId")Long planId,
-                                       @Param(value = "taskLevel")Integer taskLevel);
+    List<String> selectPlanRunningTask(@Param(value = "taskLevel")Integer taskLevel);
 }

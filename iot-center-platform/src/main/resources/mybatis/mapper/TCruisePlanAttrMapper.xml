@@ -265,16 +265,11 @@
     </select>
 
     <select id="selectPlanRunningTask" resultType="java.lang.String">
-        SELECT
-            distinct
-            result.task_id
-        FROM
-            t_cruise_plan_attr planAttr
-        join t_cruise_point_instance planPoint on planAttr.instance_id = planPoint.instance_id
-        join t_cruise_result result on (result.c_state = 239  or result.c_state = 241)
-        join t_cruise_task task on task.task_id = result.task_id and task.task_level &lt; #{taskLevel}
-        join t_cruise_task_attr taskAttr on taskAttr.task_id = result.task_id
-        join t_cruise_point_instance taskPoint on taskAttr.instance_id = taskPoint.instance_id and planPoint.cruise_id = taskPoint.cruise_id
-        WHERE planAttr.plan_id = #{planId}
+        select
+        distinct
+        result.task_id
+        from t_cruise_result result
+        left join t_cruise_task task on task.task_id = result.task_id and task.task_level &lt; #{taskLevel}
+        where result.c_state = 239  or result.c_state = 241
     </select>
 </mapper>

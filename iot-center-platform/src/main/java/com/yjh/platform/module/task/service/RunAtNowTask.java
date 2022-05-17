@@ -197,7 +197,7 @@ public class RunAtNowTask implements Runnable{
             try{
                 if(tCruiseTask.getPlanId() !=null && tCruiseTask.getTaskLevel() !=null) {
                     //任务开始前 判断任务优先级 找到优先级比当前任务小的任务
-                    List<String> lowTaskList = tCruisePlanAttrDao.selectPlanRunningTask(tCruiseTask.getPlanId(), tCruiseTask.getTaskLevel());
+                    List<String> lowTaskList = tCruisePlanAttrDao.selectPlanRunningTask(tCruiseTask.getTaskLevel());
                     //将此任务暂停的任务放入 redis
                     if (lowTaskList != null && lowTaskList.size()>0) {
                         String lowTaskKey = "lowTask:"+taskId;
