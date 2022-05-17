@@ -22,12 +22,13 @@ import java.util.*;
 
 
 /**
+ * 接口测试
  * @author 丫C
  * @date 2022/5/7
  */
 @RestController
-@RequestMapping("/test/v1")
-@Api(value = "/test", tags = "YC测试")
+@RequestMapping("/interface/v1")
+@Api(value = "/interface", tags = "YC测试")
 public class YcTestController {
 
     @Value("${other.webSocketUrl}")
@@ -39,6 +40,7 @@ public class YcTestController {
     private String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
     private final Logger log = LoggerFactory.getLogger(YcTestController.class);
+
 
     @ApiOperation(value = "测试机器人模拟装置上报结果")
     @GetMapping(value = "/testMoNiZhuangZhi")

@@ -71,21 +71,21 @@ public class TCameraPresetController {
 
                 if (resultNum != 0) {
                     //操作预置位
-                    TCameraPreset tCameraPreset1 =  tCameraPresetService.selectLastOne();
+//                    TCameraPreset tCameraPreset1 =  tCameraPresetService.selectLastOne();
 
                     HashMap<String,Long> params = new HashMap<>();
-                    params.put("cameraId",tCameraPreset1.getCameraId());
-                    params.put("presetId",tCameraPreset1.getPresetId());
+                    params.put("cameraId",tCameraPreset.getCameraId());
+                    params.put("presetId",tCameraPreset.getPresetId());
 
                     Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
                     if (response1.getData().equals(true)) {
                         Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
                         JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
-                        tCameraPreset1.setPresetImg((String) json.get("urlPath"));
-                        tCameraPresetService.update(tCameraPreset1);//存图
+                        tCameraPreset.setPresetImg((String) json.get("urlPath"));
+                        tCameraPresetService.update(tCameraPreset);//存图
                         result.setData(resultNum);
                     } else {
-                        tCameraPresetDao.deleteByPrimaryId(tCameraPreset1.getPresetId());
+                        tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
                         resultNum = 0;
                         result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
                         result.setData(resultNum);
