@@ -9,6 +9,7 @@ import com.yjh.accesstcp.module.device.entity.MaintenanceModel;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,7 @@ import java.util.*;
  * @since 2021/1/12
  */
 @Service
+@Slf4j
 public class SendToUpSystemServices {
 
     @Value("${netty.server.port}")
@@ -64,6 +66,7 @@ public class SendToUpSystemServices {
                 .setCode(code)
                 .setItems(items);
         String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
+        log.info("发送给上级系统的消息：{}",xml);
         bytes = PlatformPacketUtil.createPacket(sendSessionId,Constant.receiveSessionId,true,xml);
         tcpClientHandler.send(bytes);
         return 1;

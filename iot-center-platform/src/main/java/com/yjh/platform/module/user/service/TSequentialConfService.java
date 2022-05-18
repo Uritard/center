@@ -418,6 +418,8 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> sequentialInfo(String cfgDeviceId){
         //todo 写入识别结果
+        TSequentialConf sequentialConf = this.selectByPrimaryId(cfgDeviceId);
+        this.update(sequentialConf);
          return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
     }
     @Transactional(rollbackFor = Exception.class)

@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -452,6 +453,15 @@ public class DataDealThread implements Runnable {
                                                         Map<String, Object> info = analyseDataOperateService.selectWarnInfo(NumberUtils.toLong(deviceMeteId));
                                                         xmlItem.put("alarm_type", (null == info.get("alarm_type") ? "" : info.get("alarm_type")));
                                                         xmlItem.put("recognition_type", (null == info.get("recognition_type") ? "" : info.get("recognition_type")));
+                                                        xmlItem.put("file_type", "2");
+
+                                                        String imgPath = cruiseResult.get("picpath");
+                                                        String[] str2=imgPath.split("/");
+                                                        String imgName=str2[str2.length-1];
+                                                        String tagPath = taskId+"/"+imgName;
+                                                        analyseDataOperateService.uploadFileToUpFtps(imgPath,tagPath);
+                                                        xmlItem.put("file_path", tagPath);
+
                                                         xmlItem.put("value", tWarnInfo.getValue());
                                                         xmlItem.put("unit", (null == info.get("unit") ? "" : info.get("unit")));
                                                         xmlItem.put("value_unit", tWarnInfo.getValue() + xmlItem.get("unit"));
@@ -897,6 +907,7 @@ public class DataDealThread implements Runnable {
                             xmlItem.put("device_name", cruiseResult.get("instanceName"));
                             xmlItem.put("device_id", cruiseResult.get("instanceId"));
                             xmlItem.put("material_id", cruiseResult.get("realCode"));
+                            xmlItem.put("value_type", "0");
                             xmlItem.put("value", "");
                             xmlItem.put("value_unit", cruiseResultMap.get("resultNum"));
                             xmlItem.put("unit", "");
@@ -904,10 +915,17 @@ public class DataDealThread implements Runnable {
                             //todo
                             xmlItem.put("recognition_type", "");
                             xmlItem.put("file_type", "2");
-                            xmlItem.put("file_path", cruiseResult.get("picpath"));
+
+                            String imgPath = cruiseResult.get("origpic");
+                            String[] str2=imgPath.split("/");
+                            String imgName=str2[str2.length-1];
+                            String tagPath = taskId+"/"+imgName;
+                            analyseDataOperateService.uploadFileToUpFtps(imgPath,tagPath);
+                            xmlItem.put("file_path", tagPath);
                             xmlItem.put("rectangle", "");
-                            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-//                            xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(cruiseResult.get("cruiseTime")));
+                            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddHHmmss");
+                            xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(
+                                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(cruiseResult.get("cruiseTime"))));
                             xmlItem.put("data_type", "0x01");
                             String valid = "";
                             if ("--".equals(cruiseResultMap.get("resultNum")) || "null".equals(cruiseResultMap.get("resultNum"))) {
@@ -968,16 +986,21 @@ public class DataDealThread implements Runnable {
                         Alarm alarmDetail=new Alarm();
                         ftpsservice ftpsservice= GetSpringUtil.getBean("ftpsservice");
                         String flag= ftpsservice.getFlag();
+
+                        SimpleDateFormat ym = new SimpleDateFormat("yyyyMM");
+                        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                        String yearMonth = ym.format(new Date());
+                        String nowTime = timeFormat.format(new Date());
                         if(differentList.size()>0&&("1".equals(flag))){
                             log.info("different类型:开始向算法管理平台发送图片和mqtt消息");
+
+
                             Map.Entry entrybak= jsonObjectData.entrySet().iterator().next();
                             JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
                             String  instanceId=jsonObjectResultbak.getString("instanceId");
                             HashMap<String,String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
-                            String picF = nameMap.get("upRegionName")+"_"+nameMap.get("devicename")+"_"+nameMap.get("meteName")+"_";
+                            String picF = nowTime+"_"+nameMap.get("upRegionName")+"_"+nameMap.get("deviceName")+"_"+nameMap.get("meteName")+"_";
 
-                            String year=Integer.toString(LocalDate.now().getYear());
-                            String month=Integer.toString(LocalDate.now().getMonthValue());
                             //,先取出算法平台返回的resultinfo中的结果图片路径
                             String resultImagebak=jsonObjectResultbak.getString("analyseResultImg");
                             String taskidbak=jsonObjectResultbak.getString("taskId");
@@ -987,18 +1010,18 @@ public class DataDealThread implements Runnable {
                             String origpicpath=String.valueOf(cruiseResult2.get("origpic").toString());
                             String[] str2=origpicpath.split("/");
                             String origpcimagename=str2[str2.length-1];
-                            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+month+"/"+picF+"原图.jpg";
+                            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"原图.jpg";
                             //,获取结果路径.并拼接算法管理平台对应远程文件路径
                             String[] str=resultImagebak.split("/");
                             String imagename=str[str.length-1];
-                            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+month+"/"+picF+"判别告警.jpg";
+                            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别告警.jpg";
                             //,获取基准路径.并拼接算法管理平台所需要的基准文件路径
                             TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
                             String Cruiseid=String.valueOf(tCruisePointInstance.getCruiseid());   //获取巡视点位id
                             String judgeBaseImagepath= redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString();
                             judgeBaseImagepath=judgeBaseImagepath+"/"+Cruiseid+"/"+Cruiseid+".jpg"; //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
                             //拼接算法管理平台分析告警结果图片地址
-                            String remotebaseimagicpath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+month+"/"+picF+"判别基准.jpg";
+                            String remotebaseimagicpath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别基准.jpg";
                             Iterator it=differentList.iterator();
                             List<Different> defectList1=new ArrayList<>();
                             while (it.hasNext()){
@@ -1056,9 +1079,8 @@ public class DataDealThread implements Runnable {
                             JSONObject jsonObjectResultbak=JSON.parseObject(entrybak.getValue().toString());
                             String  instanceId=jsonObjectResultbak.getString("instanceId");
                             HashMap<String,String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
-                            String picF = nameMap.get("upRegionName")+"_"+nameMap.get("devicename")+"_"+nameMap.get("meteName")+"_";
-                            String year=Integer.toString(LocalDate.now().getYear());
-                            String month=Integer.toString(LocalDate.now().getMonthValue());
+                            String picF = nowTime+"_"+ nameMap.get("upRegionName")+"_"+nameMap.get("deviceName")+"_"+nameMap.get("meteName")+"_";
+
                             //,先取出算法平台返回的resultinfo中的结果图片路径
                             String resultImagebak=jsonObjectResultbak.getString("analyseResultImg"); //分析结果过
                             String taskidbak=jsonObjectResultbak.getString("taskId");
@@ -1069,12 +1091,12 @@ public class DataDealThread implements Runnable {
                             String[] str2=origpicpath.split("/");
                             String origpcimagename=str2[str2.length-1];
                             //拼接算法管理平台原始图片推送地址
-                            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+month+"/"+picF+"原图.jpg";
+                            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+picF+"原图.jpg";
                             log.info("开始向算法管理平台发送图片和mqtt消息");
                             String[] str=resultImagebak.split("/");
                             String imagename=str[str.length-1];
                             //拼接算法管理平台分析告警结果图片地址
-                            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+month+"/"+picF+"缺陷告警.jpg";
+                            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+picF+"缺陷告警.jpg";
                             Iterator it=defectList.iterator();
 
                             while (it.hasNext()){
@@ -1091,8 +1113,15 @@ public class DataDealThread implements Runnable {
                                     defect.setX2(arr1[i+3]);
                                     defect.setY2(arr1[i+4]);
                                     defect.setType(arr1[i]);
-                                    defect.setDesc(differenmap.get("defectContent"));
-                                    defect.setConfidence(arr1[i+5]);
+                                    DecimalFormat df =  new DecimalFormat("0%");
+                                    String confidence = df.format(Double.valueOf(arr1[i+5]));
+                                    defect.setConfidence(confidence);
+                                    defect.setDesc(differenmap.get("defectContent")+"(坐标位置 "+defect.getX1()+","+
+                                            defect.getY1()+","+
+                                            defect.getX2()+","+
+                                            defect.getY2()+";"+
+                                            "置信度 "+ confidence
+                                            +"%)");
                                     defectList1.add(defect);
                                     i=i+6;
                                 }

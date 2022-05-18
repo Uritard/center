@@ -43,7 +43,7 @@ public class PlatformXMLUtil {
             List<Element> list = rootElt.elements();
 
             if (rootElt.getName().equals("Device_Model") || rootElt.getName().equals("Robot_Model") || rootElt.getName().equals("Task_Model")
-                    || rootElt.getName().equals("Property_Model") || rootElt.getName().equals("PatrolDevcie_Model")) {
+                    || rootElt.getName().equals("Property_Model") || rootElt.getName().equals("PatrolDevice_Model")) {
                 for (Element element : list) {
                     if (element.getName().equals("Item")) {
                         Map<String, Object> map = new HashMap<String, Object>();

@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -283,7 +284,7 @@ public class IntelAnalysisService {
                     break;
             }
         }catch (Exception e){
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         analyseObject.setTypeList(typeList);
         return analyseObject;
@@ -317,7 +318,7 @@ public class IntelAnalysisService {
             objectList.add(analyseObject);
             picAnalyseRequest.setObjectList(objectList);
         }catch (Exception e){
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return picAnalyseRequest;
     }
@@ -389,37 +390,41 @@ public class IntelAnalysisService {
     private void algorithmTestHandle(PicAnalyseResponse response){
         //判断是缺陷还是判别
         String analyseType = response.getResultsList().get(0).getResults().get(0).getType();
-        if("11".equals(analyseType)){
+        SimpleDateFormat ym = new SimpleDateFormat("yyyyMM");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String yearMonth = ym.format(new Date());
+        String nowTime = timeFormat.format(new Date());
+        if("tx_pb".equals(analyseType) || "".equals(analyseType)){
+
             //判别
-            String year=Integer.toString(LocalDate.now().getYear());
-            String month=Integer.toString(LocalDate.now().getMonthValue());
 
 //            String[] str2=Constant.algorithmTestPicPath.split("/");
 //            String origpcimagename=str2[str2.length-1];
-            String origpcimagename="测试间隔_测试设备_测试测点_原图.jpg";
+            String origpcimagename=nowTime +"_测试间隔_测试设备_测试测点_原图.jpg";
             //拼接算法管理平台原始图片推送地址
-            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+month+"/"+origpcimagename;
+            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+origpcimagename;
 
 //            String[] str=response.getResultsList().get(0).getResults().get(0).getResImageUrl().split("/");
             String resImageUrl = response.getResultsList().get(0).getResults().get(0).getResImageUrl().replaceAll(
                     redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "");
 
 //            String imagename=str[str.length-1];
-            String imgF = "测试间隔_测试设备_测试测点_判别告警.jpg";
+            String imgF = nowTime+"_测试间隔_测试设备_测试测点_判别告警.jpg";
             //拼接算法管理平台分析告警结果图片地址
-            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+month+"/"+imgF;
+            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+imgF;
 
-            String imgBase = "测试间隔_测试设备_测试测点_判别基准.jpg";
+            String imgBase =nowTime+ "_测试间隔_测试设备_测试测点_判别基准.jpg";
             //拼接算法管理平台分析告警结果图片地址
-            String remoteBaseFilePath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+year+month+"/"+imgBase;
+            String remoteBaseFilePath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+imgBase;
 
             Alarm alarmDetail=new Alarm();
 
             try {
                 //发送websocket给前端
 
+                //https://192.168.1.66/imgs/analyseResultImg/defect//alg_result/2022-05-18/24ead564-d6ab-11ec-98ad-5c647a04dded.jpg
                 String targetPath = copyFileFromFtps(response.getResultsList().get(0).getResults().get(0).getType(), resImageUrl);
-                String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")),
+                String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content"))+"/",
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")));
 
                 Map<String, Object> jasonMaps = new HashMap<>(16);
@@ -462,25 +467,26 @@ public class IntelAnalysisService {
             alarmService.PushMsg(alarmDetail);
             log.info("发送算法管理平台结束");
         }
-        if("398".equals(analyseType)){
+        List<TAlgorithmInfo> list = analyseDataOperateDao.selectAlgorithmInfo(analyseType);
+
+        if (list.isEmpty()){
             //缺陷
-            String year=Integer.toString(LocalDate.now().getYear());
-            String month=Integer.toString(LocalDate.now().getMonthValue());
+
 
 //            String[] str2=Constant.algorithmTestPicPath.split("/");
 //            String origpcimagename=str2[str2.length-1];
-            String origpcimagename="测试间隔_测试设备_测试测点_原图.jpg";
+            String origpcimagename=nowTime +"_测试间隔_测试设备_测试测点_原图.jpg";
             //拼接算法管理平台原始图片推送地址
-            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+month+"/"+origpcimagename;
+            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+origpcimagename;
 
 //            String[] str=response.getResultsList().get(0).getResults().get(0).getResImageUrl().split("/");
             String resImageUrl = response.getResultsList().get(0).getResults().get(0).getResImageUrl().replaceAll(
                     redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "");
 
 //            String imagename=str[str.length-1];
-            String imgF = "测试间隔_测试设备_测试测点_缺陷告警.jpg";
+            String imgF = nowTime +"_测试间隔_测试设备_测试测点_缺陷告警.jpg";
             //拼接算法管理平台分析告警结果图片地址
-            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+year+month+"/"+imgF;
+            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+imgF;
 
             Alarm alarmDetail=new Alarm();
 
@@ -488,7 +494,7 @@ public class IntelAnalysisService {
                 //发送websocket给前端
 
                 String targetPath = copyFileFromFtps(response.getResultsList().get(0).getResults().get(0).getType(), resImageUrl);
-                String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")),
+                String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content"))+"/",
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")));
 
                 Map<String, Object> jasonMaps = new HashMap<>(16);
@@ -509,8 +515,15 @@ public class IntelAnalysisService {
                 defect.setY1(String.valueOf(item.getPos().get(0).getAreas().get(0).getY()));
                 defect.setX2(String.valueOf(item.getPos().get(0).getAreas().get(1).getX()));
                 defect.setY2(String.valueOf(item.getPos().get(0).getAreas().get(1).getY()));
-                defect.setDesc(item.getDesc());
-                defect.setConfidence(String.valueOf(item.getConf()));
+                DecimalFormat df =  new DecimalFormat("0%");
+                String confidence = df.format(Double.valueOf(item.getConf()));
+                defect.setConfidence(confidence);
+                defect.setDesc(item.getDesc()+"(坐标位置 "+defect.getX1()+","+
+                        defect.getY1()+","+
+                        defect.getX2()+","+
+                        defect.getY2()+";"+
+                        "置信度 "+ confidence
+                        +"%)");
                 defect.setType(item.getType());
                 defectList1.add(defect);
             }
@@ -795,8 +808,10 @@ public class IntelAnalysisService {
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")),
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
                 String targetNamePath = imgPath.replace(
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "");
-                uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "")
+                        .substring(2);
+                log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
+                uploadFileToUpFtps(imgPath, "jm/" + targetNamePath, upFtpsConfig);
 
                 xmlItem.put("file_path", targetNamePath);
                 xmlItem.put("time", tWarnInfo.getWarnTime());
@@ -1181,7 +1196,7 @@ public class IntelAnalysisService {
             HttpResponse response = client.execute(httpPost);
             return EntityUtils.toString(response.getEntity());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return null;
     }

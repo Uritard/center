@@ -2,10 +2,13 @@ package com.yjh.accessvideo.module.device.service;
 
 
 import com.yjh.accessvideo.common.Constant;
+import com.yjh.accessvideo.common.utils.FtpsUtil;
+import com.yjh.accessvideo.configuration.UpFtpsConfig;
 import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.*;
 import io.swagger.models.auth.In;
 import net.bytebuddy.asm.Advice;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,8 @@ public class AnalyseDataOperateService {
 
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private UpFtpsConfig upFtpsConfig;
 
     private Logger log = LoggerFactory.getLogger(AnalyseDataOperateService.class);
 
@@ -797,6 +802,22 @@ public class AnalyseDataOperateService {
 
     public HashMap<String,String> selectDeviceNameInfo(Long instanceId){
         return analyseDataOperateDao.selectDeviceNameInfo(instanceId);
+    }
+
+    /**
+     * 将文件上传至上级系统ftp服务器
+     *
+     * @param sourcePath 源文件地址
+     * @param targetPathName 目标文件地址名称
+     */
+    public void uploadFileToUpFtps(String sourcePath, String targetPathName) {
+        try {
+            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
+                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+        }
     }
 }
 
