@@ -1227,4 +1227,11 @@ public class DateTimeUtil {
             return changedTime;
         }
     }
+
+    public static Date currentDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTime();
+    }
 }

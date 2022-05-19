@@ -69,7 +69,7 @@ public class SysUserService {
         Long userIds = Long.valueOf(request.getHeader("userId"));
         String userName = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userIds, "userName"));
         Map map = new LinkedHashMap<>();
-        Date date = new Date();
+        Date date = DateTimeUtil.currentDate();
         sysUser.setCreateTime(date);
         sysUser.setUpdateTime(date);
         map.put("userName", sysUser.getUserName());
@@ -584,7 +584,7 @@ public class SysUserService {
             sysUser.setPassword(Demo.encryption(map.get("newPCode")));
         }
         sysUser.setUserId(userId);
-        Date date = new Date();
+        Date date = DateTimeUtil.currentDate();
         sysUser.setUpdateTime(date);
         if (currentState == 3) {
             sysUser.setState(1);
