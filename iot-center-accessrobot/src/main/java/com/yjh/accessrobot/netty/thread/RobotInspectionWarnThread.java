@@ -107,53 +107,57 @@ public class RobotInspectionWarnThread implements Runnable{
      * @return void
      */
     private void storeWarnInfo(TStdDeviceMete tStdDevicemete, Long instanceId, String taskId, String robotCode){
-        TWarnInfo warnInfo = new TWarnInfo();
-        warnInfo.setWarnTime(new Date());
-        warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
-        warnInfo.setCunstomId(tStdDevicemete.getCustomId());
-        warnInfo.setInstanceId(instanceId);
-        warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
-        warnInfo.setConfMode(276);
-        Integer warnFlag = Integer.valueOf(StaticContextAccessor.getBean(RobotService.class).selectDictCodeByNote("其他", "defect_model"));
-        warnInfo.setDefectModel(warnFlag);
-        warnInfo.setAlarmSource(282);
-        warnInfo.setValue(warnResultMap.get("value"));
-        warnInfo.setTaskId(taskId);
-        Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(robotCode);
-        warnInfo.setDeviceCode(robotId.toString());
-        warnInfo.setWarnName(warnResultMap.get("content"));
-        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());
-        warnInfo.setImagePath(redisInfoMap.get("picpath"));
-        if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmLevel"))) {
-            int warnLevel = StaticContextAccessor.getBean(RobotService.class).selectDictCode("alarmLevel", warnResultMap.get("alarmLevel"), "alarm_level");
-            warnInfo.setWarnLevel(warnLevel);
-        }
-        warnInfo.setWarnContent(warnResultMap.get("content"));
-        if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmType"))) {
-            int warnType = StaticContextAccessor.getBean(RobotService.class).selectDictCode("pointAlarmType", warnResultMap.get("alarmType"), "point_alarm_type");
-            warnInfo.setWarnType(warnType);
-        }
-        log.info("要插库的告警数据是==={}", warnInfo);
+        try {
+            TWarnInfo warnInfo = new TWarnInfo();
+            warnInfo.setWarnTime(new Date());
+            warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
+            warnInfo.setCunstomId(tStdDevicemete.getCustomId());
+            warnInfo.setInstanceId(instanceId);
+            warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
+            warnInfo.setConfMode(276);
+            Integer warnFlag = Integer.valueOf(StaticContextAccessor.getBean(RobotService.class).selectDictCodeByNote("其他", "defect_model"));
+            warnInfo.setDefectModel(warnFlag);
+            warnInfo.setAlarmSource(282);
+            warnInfo.setValue(warnResultMap.get("value"));
+            warnInfo.setTaskId(taskId);
+            Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(robotCode);
+            warnInfo.setDeviceCode(robotId.toString());
+            warnInfo.setWarnName(warnResultMap.get("content"));
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());
+            warnInfo.setImagePath(redisInfoMap.get("picpath"));
+            if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmLevel"))) {
+                int warnLevel = StaticContextAccessor.getBean(RobotService.class).selectDictCode("alarmLevel", warnResultMap.get("alarmLevel"), "alarm_level");
+                warnInfo.setWarnLevel(warnLevel);
+            }
+            warnInfo.setWarnContent(warnResultMap.get("content"));
+            if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmType"))) {
+                int warnType = StaticContextAccessor.getBean(RobotService.class).selectDictCode("pointAlarmType", warnResultMap.get("alarmLevel"), "point_alarm_type");
+                warnInfo.setWarnType(warnType);
+            }
+            log.info("要插库的告警数据是==={}", warnInfo);
 
-        String warnName = "warnInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
-        Map<String, String> warnMap = new HashMap<>(16);
-        warnMap.put("deviceId", warnInfo.getDeviceId().toString());
-        warnMap.put("customId", warnInfo.getCunstomId());
-        warnMap.put("instanceId", warnInfo.getInstanceId().toString());
-        warnMap.put("stdMeteId", warnInfo.getStdMeteId().toString());
-        warnMap.put("taskId", warnInfo.getTaskId());
-        warnMap.put("value", warnInfo.getValue());
-        warnMap.put("confMode", "276");
-        warnMap.put("alarmSource", warnInfo.getAlarmSource().toString());
-        warnMap.put("defectModel", warnInfo.getDefectModel().toString());
-        warnMap.put("warnLevel", warnInfo.getWarnLevel().toString());
-        warnMap.put("warnName", warnInfo.getWarnName());
-        warnMap.put("warnTime", new SimpleDateFormat().format(warnInfo.getWarnTime()));
-        warnMap.put("warnContent", warnInfo.getWarnContent());
-        log.info("warnMap===" + warnMap);
-        redisTemplate.opsForHash().putAll(warnName, warnMap);
+            String warnName = "warnInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
+            Map<String, String> warnMap = new HashMap<>(16);
+            warnMap.put("deviceId", warnInfo.getDeviceId().toString());
+            warnMap.put("customId", warnInfo.getCunstomId());
+            warnMap.put("instanceId", warnInfo.getInstanceId().toString());
+            warnMap.put("stdMeteId", warnInfo.getStdMeteId().toString());
+            warnMap.put("taskId", warnInfo.getTaskId());
+            warnMap.put("value", warnInfo.getValue());
+            warnMap.put("confMode", "276");
+            warnMap.put("alarmSource", warnInfo.getAlarmSource().toString());
+            warnMap.put("defectModel", warnInfo.getDefectModel().toString());
+            warnMap.put("warnLevel", warnInfo.getWarnLevel().toString());
+            warnMap.put("warnName", warnInfo.getWarnName());
+            warnMap.put("warnTime", new SimpleDateFormat().format(warnInfo.getWarnTime()));
+            warnMap.put("warnContent", warnInfo.getWarnContent());
+            log.info("warnMap===" + warnMap);
+            redisTemplate.opsForHash().putAll(warnName, warnMap);
 
-        StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
+            StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 
     /**

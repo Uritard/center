@@ -227,7 +227,7 @@ public class InspectionResultThread implements Runnable{
                         tCruiseTaskResultMap.put("cruiseResult","247");
                         tCruiseTaskResultMap.put("cruiseAbnormal","249");
                         abnormal = abnormal + 1;
-                        log.info("taskId为{},instanceId为{}的该点结果异常,这次变化的abnormal是===", taskId, instanceId, normal);
+                        log.info("taskId为{},instanceId为{}的该点结果异常,这次变化的abnormal是==={}", taskId, instanceId, normal);
                     }
                 }
                 tCruiseTaskResultMap.put("picpath", cruiseResultMap.get("relativePath"));

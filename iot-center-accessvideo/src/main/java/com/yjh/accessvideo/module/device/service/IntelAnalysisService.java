@@ -901,6 +901,7 @@ public class IntelAnalysisService {
                 List<AnalyseResultItem> results = analyseResult.getResults();
 
                 Map<String, Object> algorithmTypeMap = analyseDataOperateDao.selectAlgorithmByInstanceId(Long.valueOf(instanceId));
+                log.info("algorithmTypeMap==={}", algorithmTypeMap);
                 boolean isDefect  =Objects.isNull(algorithmTypeMap.get("algorithm_id"));
                 boolean isJudge = Objects.equals("on", algorithmTypeMap.get("is_judge"));
                 boolean isAi = Objects.equals("on", algorithmTypeMap.get("is_ai"));
@@ -1066,8 +1067,8 @@ public class IntelAnalysisService {
             }
             for (Area area : result.getPos()){
                 for (Point point : area.getAreas()){
-                    resultValue.add(String.valueOf(point.getX()));
-                    resultValue.add(String.valueOf(point.getY()));
+                    resultValue.add(point.getX() > 0 ? String.valueOf(point.getX()) : "0.0");
+                    resultValue.add(point.getY() > 0 ? String.valueOf(point.getY()) : "0.0");
                 }
             }
             resultDataObject.put("analyseType", 11);
@@ -1098,8 +1099,8 @@ public class IntelAnalysisService {
                     // 图像有缺陷
                     for (Area area : result.getPos()){
                         for (Point point : area.getAreas()){
-                            resultValue.add(String.valueOf(point.getX()));
-                            resultValue.add(String.valueOf(point.getY()));
+                            resultValue.add(point.getX() > 0 ? String.valueOf(point.getX()) : "0.0");
+                            resultValue.add(point.getY() > 0 ? String.valueOf(point.getY()) : "0.0");
                         }
                     }
                     resultValue.add(Optional.ofNullable(String.valueOf(result.getConf())).orElse("0.0"));
