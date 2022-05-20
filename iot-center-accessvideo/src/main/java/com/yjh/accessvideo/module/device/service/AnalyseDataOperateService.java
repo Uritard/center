@@ -58,8 +58,8 @@ public class AnalyseDataOperateService {
 
     //@Logs(title = "巡视任务结果单查", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
-    public TCruiseResult selectByPrimaryIdCruiseResult(String taskResultId) {
-        return this.analyseDataOperateDao.selectByPrimaryIdCruiseResult(taskResultId);
+    public TCruiseResult selectByPrimaryIdCruiseResult(String taskResultId,String taskId) {
+        return this.analyseDataOperateDao.selectByPrimaryIdCruiseResult(taskResultId,taskId);
     }
 
     //@Logs(title = "巡视任务结果修改", code = "")
@@ -567,7 +567,9 @@ public class AnalyseDataOperateService {
         String defectRealValue="1";
         List<String> flags=new ArrayList<>();
         String value = resultValue;
-        String finalValue = value.replaceAll("[0-9]", "").replaceAll("\\.", "");
+        String finalValue = value.replaceAll("[0-9]", "")
+                .replaceAll("\\.", "")
+                .replace("-","");
         String[] str2 = finalValue.split("\\s+");
         for (int i = 0; i < str2.length; i++) {
             switch (str2[i]) {

@@ -20,7 +20,8 @@ public interface AnalyseDataOperateDao {
 
     int batchInsertVideoAnalyseResult(List<TVideoAnalyseResult> list);
 
-    TCruiseResult selectByPrimaryIdCruiseResult(@Param(value = "taskResultId") String taskResultId);
+    TCruiseResult selectByPrimaryIdCruiseResult(@Param(value = "taskResultId") String taskResultId,
+                                                @Param(value = "taskId") String taskId);
 
     int updateCruiseResult(TCruiseResult tCruiseResult);
 

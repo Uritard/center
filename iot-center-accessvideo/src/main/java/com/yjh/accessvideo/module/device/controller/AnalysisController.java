@@ -294,15 +294,20 @@ public class AnalysisController {
     @GetMapping(value = "/algorithm-test")
     public void algorithmTest(@RequestParam(value = "picPath",required = false) String picPath,
                               @RequestParam(value = "type", required = false) String type,
-                              @RequestParam(value = "basePath", required = false) String basePath
+                              @RequestParam(value = "instanceId", required = false) Long instanceId
 
     ) {
         Analysis analysis = new Analysis();
         analysis.setTaskId("666666");
-        analysis.setInstanceId(666666L);
+        if (instanceId == null){
+            analysis.setInstanceId(666666L);
+        }else {
+            analysis.setInstanceId(instanceId);
+        }
+
         analysis.setPicPath(picPath);
         analysis.setAnalyseType(type);
-        analysis.setPicModelPath(basePath);
+        analysis.setPicModelPath("");
         analysis.setIsAi(0);
         List<Analysis> analysisList = new ArrayList<>();
         analysisList.add(analysis);
@@ -310,7 +315,6 @@ public class AnalysisController {
         analysisMap.put("list",analysisList);
         log.info("算法信息：    "+analysisMap);
         Constant.algorithmTestPicPath = picPath;
-        Constant.algorithmTestBasePicPath = basePath;
         this.feignDefect(analysisMap);
     }
 

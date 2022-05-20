@@ -1014,6 +1014,17 @@ public class TCruiseTaskService {
     @Transactional(rollbackFor = Exception.class)
     public int taskGoOn(String taskId) throws Exception {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
+
+        //机器人任务继续
+        List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+        log.info("机器人任务继续,robotCodeList:{}",robotCodeList);
+        if (robotCodeList != null && robotCodeList.size() > 0) {
+            Map<String, Object> robotTaskStatesMap = new HashMap<>();
+            robotTaskStatesMap.put("taskId", taskId);
+            robotTaskStatesMap.put("commandValue", 3);
+            robotTaskStatesMap.put("robotCodeList", robotCodeList);
+            robotTaskStates(robotTaskStatesMap);
+        }
         if (tCruiseResult.getCState() == 240 || tCruiseResult.getCState() == 239) {
             return 1;
         }
@@ -1040,16 +1051,6 @@ public class TCruiseTaskService {
         thread.setDaemon(true);
         thread.start();
 
-        //机器人任务继续
-        List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
-        log.info("机器人任务继续,robotCodeList:{}",robotCodeList);
-        if (robotCodeList != null && robotCodeList.size() > 0) {
-            Map<String, Object> robotTaskStatesMap = new HashMap<>();
-            robotTaskStatesMap.put("taskId", taskId);
-            robotTaskStatesMap.put("commandValue", 3);
-            robotTaskStatesMap.put("robotCodeList", robotCodeList);
-            robotTaskStates(robotTaskStatesMap);
-        }
 
         Map<String,String> jasonMapOnFinished=new HashMap<>();
         jasonMapOnFinished.put("type","taskChange");

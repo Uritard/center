@@ -458,7 +458,7 @@ public class DataDealThread implements Runnable {
                                                         String imgPath = cruiseResult.get("picpath");
                                                         String[] str2=imgPath.split("/");
                                                         String imgName=str2[str2.length-1];
-                                                        String tagPath = taskId+"/"+imgName;
+                                                        String tagPath = "warn/"+taskId+"/"+imgName;
                                                         analyseDataOperateService.uploadFileToUpFtps(imgPath,tagPath);
                                                         xmlItem.put("file_path", tagPath);
 
@@ -919,7 +919,7 @@ public class DataDealThread implements Runnable {
                             String imgPath = cruiseResult.get("origpic");
                             String[] str2=imgPath.split("/");
                             String imgName=str2[str2.length-1];
-                            String tagPath = taskId+"/"+imgName;
+                            String tagPath = "task/"+taskId+"/"+imgName;
                             analyseDataOperateService.uploadFileToUpFtps(imgPath,tagPath);
                             xmlItem.put("file_path", tagPath);
                             xmlItem.put("rectangle", "");
@@ -1174,6 +1174,12 @@ public class DataDealThread implements Runnable {
             }
 
             log.info("TASKID============{}", TASKID);
+            if(TASKID == null){
+                TASKID = JSON.parseObject(jsonObject.getString("msgData")).getString("taskId");
+                log.info("TASKID为空后重新复制{}", TASKID);
+            }
+
+
             log.info("判断:{}", redisTemplate.opsForList().index("analysisList:" + TASKID, 0));
             if ("-1".equals(redisTemplate.opsForList().index("analysisList:" + TASKID, 0))) {  //满足插库条件
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1347,7 +1353,8 @@ public class DataDealThread implements Runnable {
 
                         //TCR开始
                         log.info("TCR开始");
-                        TCruiseResult tCruiseResult = analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId"));
+                        log.info("==="+cruiseResult.get("taskResultId"));
+                        TCruiseResult tCruiseResult = analyseDataOperateService.selectByPrimaryIdCruiseResult(cruiseResult.get("taskResultId"),TASKID);
                         tCruiseResult.setCState(NumberUtils.toInt(analyseDataOperateService.selectDictCode("task_state", "执行完成")));
                         tCruiseResult.setTaskWait(0);
                         analyseDataOperateService.updateCruiseResult(tCruiseResult);
