@@ -409,7 +409,7 @@ public class IntelAnalysisService {
                     response.getResultsList().get(0).getResults().get(0).getResImageUrl());
             log.info("resImageUrl:"+resImageUrl);
 
-            resImageUrl = resImageUrl.replace("///","/");
+            resImageUrl = resImageUrl.replace("//","/");
             log.info("home路径："+resImageUrl);
 
 //            String imagename=str[str.length-1];
@@ -613,8 +613,9 @@ public class IntelAnalysisService {
                 content.add(desc);
 
                 // 因为算法端乱改乱改 所以就在这里截取了 不想改动后面的逻辑(拼接路径)
-                String resImageUrl = result.getResImageUrl()/*.replaceAll(
-                        redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "")*/;
+                String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
+                /*.replaceAll(
+                redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "")*/;
 
                 String targetPath = copyFileFromFtps(type, resImageUrl);
                 String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")),
@@ -895,8 +896,6 @@ public class IntelAnalysisService {
                 String redisKeyName = "t_cruise_task_result:" + taskId + ":" + instanceId;
                 String originPicPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "origpic"));
                 log.info("originPicPath===={}", originPicPath);
-                /*String originPicPath = picPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")),
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")));*/
 
                 List<AnalyseResultItem> results = analyseResult.getResults();
 
@@ -1036,8 +1035,9 @@ public class IntelAnalysisService {
     private Map<String, String> getDistinguishResult(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
                                                      JSONObject resultDataObject, String originPicPath, String type, String value, String devicePointId, Map<String, String> map) {
         String targetPath;
-        String resImageUrl = result.getResImageUrl()/*.replaceAll(
-                redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "")*/;
+        String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
+        /*.replaceAll(
+        redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "")*/;
         try {
             // 判断该巡视点是否为判别的点 若是  直接拿假数据  不要返回的结果
             if (!generateMapFormat().isEmpty() && generateMapFormat().containsKey(devicePointId)){
@@ -1084,8 +1084,9 @@ public class IntelAnalysisService {
     private Map<String, String> getDefectOrIdentification(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
                                            JSONObject resultDataObject, String type, String value, String desc, String devicePointId, Map<String, String> map) {
         String targetPath;
-        String resImageUrl = result.getResImageUrl()/*.replaceAll(
-                redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "")*/;
+        String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
+        /*.replaceAll(
+        redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "")*/;
         try {
             // 根据返回的算法类型查询算法相关信息
             List<TAlgorithmInfo> list = analyseDataOperateDao.selectAlgorithmInfo(type);
@@ -1275,5 +1276,14 @@ public class IntelAnalysisService {
         }
     }
 
+    public void algorithmUpdateResult(UpdateResponse response) throws Exception{
+        Map<String, Object> jasonMaps = new HashMap<>(16);
+        jasonMaps.put("type", "algorithmUpdateTest");
+        jasonMaps.put("result", StringUtils.equals("1", response.getResult()) ? "成功" : "失败");
+        String json = JSON.toJSONString(jasonMaps);
+        log.info("发送给前端的消息：{}", json);
+
+        postUrl(syncWebsocketUrl, json);
+    }
 
 }

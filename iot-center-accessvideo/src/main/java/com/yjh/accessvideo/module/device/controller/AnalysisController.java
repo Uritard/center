@@ -10,8 +10,10 @@ import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Different;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
+import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.module.device.entity.Analysis;
 import com.yjh.accessvideo.module.device.entity.interlanalysis.Response;
+import com.yjh.accessvideo.module.device.entity.interlanalysis.UpdateRequest;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.module.device.service.AnalysisService;
 import com.yjh.accessvideo.module.device.service.IntelAnalysisService;
@@ -316,6 +318,19 @@ public class AnalysisController {
         log.info("算法信息：    "+analysisMap);
         Constant.algorithmTestPicPath = picPath;
         this.feignDefect(analysisMap);
+    }
+
+    /**
+     *  算法主机-算法更新
+     */
+    @GetMapping(value = "/algorithm-update")
+    public void algorithmUpdateTest(@RequestParam(value = "filePath") String filePath){
+        UpdateRequest request = new UpdateRequest()
+                .setRequestHostIp("192.168.1.66")
+                .setRequestHostPort("18715")
+                .setRequestId("test666")
+                .setAlgorithmPath(filePath);
+        StaticContextAccessor.getBean(IntelAnalysisService.class).algorithmUpdate(request);
     }
 
 }

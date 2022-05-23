@@ -95,6 +95,9 @@ public class IntelAnalysisController {
     public Response algorithmUpdateResult(@Valid @RequestBody UpdateResponse response) {
         try {
             log.info("< < < < < < 收到算法更新结果反馈：{}", response);
+            if (StringUtils.equals("test666", response.getRequestId())){
+                intelAnalysisService.algorithmUpdateResult(response);
+            }
         }catch (Exception e){
             log.error(e.getMessage());
             Response.serverError();
