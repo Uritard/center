@@ -184,6 +184,13 @@ public class TSequentialConfService{
             }catch (Exception e){
                 System.out.println("发送websocket出错");
             }
+
+            if(meteId != null && !"".equals(meteId)){
+                TSequentialConf sequentialConf = this.selectByPrimaryId(meteId);
+                if(sequentialConf != null && sequentialConf.getPresetId() != null){
+                    this.update(sequentialConf);
+                }
+            }
             //结果
 //            {"type": "newSequentialResult",
 //                    "cfgDeviceId": "1001",
@@ -418,9 +425,7 @@ public class TSequentialConfService{
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> sequentialInfo(String cfgDeviceId){
         //todo 写入识别结果
-        TSequentialConf sequentialConf = this.selectByPrimaryId(cfgDeviceId);
-        this.update(sequentialConf);
-         return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
+        return tSequentialConfDao.selectForSequenceInfo(cfgDeviceId);
     }
     @Transactional(rollbackFor = Exception.class)
     public String unionTask(String cfgDeviceId,String order){
