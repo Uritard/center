@@ -949,17 +949,17 @@ public class RobotService {
                 Integer planType = null;
                 switch (item.getCruiseType()) {
                     // 全面
-                    case 213: planType = 1;break;
+                    case 213: planType = 4;break;
                     // 例行
-                    case 214: planType = 2;break;
+                    case 214: planType = 1;break;
                     // 熄灯
                     case 215:
                     // 专项
-                    case 217:
+                    case 217: planType = 3;break;
                     // 自定义
-                    case 218: planType = 3;break;
+                    case 218: planType = 4;break;
                     // 特殊
-                    case 216: planType = 4;break;
+                    case 216: planType = 2;break;
                     //操作
                     case 456: //操作票
                     case 508: //单设备
@@ -1163,14 +1163,17 @@ public class RobotService {
         redisTemplate.opsForHash().putAll("RobotConfirmMsg:" + robotCode + ":" + taskId, robotConfirmMsg);
         return result;
     }
+
     /**
      * 更新任务状态及已做巡检点结果
-     * @param taskId 任务id
+     * @param taskIdTemp 任务执行id
      * @param taskStatus 任务状态
      * @return void
      */
     @Transactional(rollbackFor = Exception.class)
-    public void modifyTaskResult(String taskId, Integer taskStatus)  {
+    public void modifyTaskResult(String taskIdTemp, Integer taskStatus)  {
+        // taskPatrolled_id格式： taskId_20220202020202
+        String taskId = taskIdTemp.substring(0, taskIdTemp.length() - 15);
         List<TCruiseDataResult> tcdrList = new ArrayList<>();
         List<TCruiseTaskResultDetail> tctrdList = new ArrayList<>();
         List<String> cruiseResultIdList = new ArrayList<>();
@@ -1246,9 +1249,9 @@ public class RobotService {
         }
 
         Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
-        Integer totalNum = Integer.valueOf(abnormalCount.get("all").toString());
-        Integer abnormalNum = Integer.valueOf(abnormalCount.get("abnormal").toString()) ;
-        Integer normalNum  = Integer.valueOf(abnormalCount.get("normal").toString()) ;
+        Integer totalNum = Integer.valueOf(String.valueOf(abnormalCount.get("all")));
+        Integer abnormalNum = Integer.valueOf(String.valueOf(abnormalCount.get("abnormal")));
+        Integer normalNum  = Integer.valueOf(String.valueOf(abnormalCount.get("normal")));
         log.info("taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, totalNum, abnormalNum, normalNum);
         Integer abnormal = abnormalNum;
         Integer normal = normalNum;
