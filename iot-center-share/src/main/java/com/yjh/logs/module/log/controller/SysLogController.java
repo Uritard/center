@@ -303,7 +303,7 @@ public class SysLogController {
 
     @ApiOperation(value = "导出")
     @RequestMapping(value = "/export", method = RequestMethod.GET)
-    @Logs(title = "日志导出", content = "根据用户传递的参数导出日志", logType = 8, authority = "1236")
+    @Logs(title = "日志导出", content = "根据用户传递的参数导出日志", logType = 9, authority = "1236")
     public Result export(@RequestParam(value = "userName", required = false) String userName,
                          @RequestParam(value = "title", required = false) String title,
                          @RequestParam(value = "logType", required = false) String logType,
