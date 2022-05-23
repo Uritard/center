@@ -578,9 +578,9 @@ public class TRobotInspectionService {
                     re.put("robotState", "");
                     break;
             }
-            if (!"2".equals(mapForRobotState.get("value"))) {
-                re.put("cruiseMapPath", "");
-            }
+//            if (!"2".equals(mapForRobotState.get("value"))) {
+//                re.put("cruiseMapPath", "");
+//            }
         } else {
             re.put("robotState", "");
         }
@@ -736,9 +736,12 @@ public class TRobotInspectionService {
 
         //巡视路径地图路径
         Map<String, Object> mapForCruiseMap = redisTemplate.opsForHash().entries("RobotRoad:" + robotCode);
-        if (mapForCruiseMap.size() != 0 && Optional.ofNullable(mapForCruiseMap.get("coordinatePixel")).isPresent()) {
+        if ("2".equals(mapForRobotState.get("value"))) {
+                re.put("cruiseMapPath", mapForCruiseMap.get("relativePath"));
+        }
+        /*if (mapForCruiseMap.size() != 0 && Optional.ofNullable(mapForCruiseMap.get("coordinatePixel")).isPresent()) {
             re.put("cruiseMapPath", mapForCruiseMap.get("relativePath"));
-        } else {
+        }*/ else {
             re.put("cruiseMapPath", "");
         }
 
