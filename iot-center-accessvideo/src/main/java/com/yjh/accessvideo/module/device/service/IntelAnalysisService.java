@@ -337,7 +337,7 @@ public class IntelAnalysisService {
 
         String[] split = request.getAlgorithmPath().split("/");
         String targetNamePath =  split[split.length - 2] + "/" + split[split.length - 1];
-        uploadFileToFtps(request.getAlgorithmPath(), "/" + targetNamePath, intelAnalysisFtpsConfig);
+//        uploadFileToFtps(request.getAlgorithmPath(), "/" + targetNamePath, intelAnalysisFtpsConfig);
 
         param.put("algorithmPath", targetNamePath);
 
@@ -589,7 +589,7 @@ public class IntelAnalysisService {
             StringJoiner resultImg = new StringJoiner(" ");
 
             List<AnalyseResultItem> results = analyseResult.getResults();
-            if (results.isEmpty()){
+            if (StringUtils.isEmpty(results.get(0).getType())){
                 // 没有识别出来任何缺陷 results为空
                 log.info("没有识别出来任何缺陷 results为空");
                 continue;
@@ -921,7 +921,7 @@ public class IntelAnalysisService {
                     continue;
                 }
                 // 没有识别出来任何缺陷 results为空  只有当缺陷识别才会这样，判别的results是有值的
-                if (results.isEmpty()){
+                if (StringUtils.isEmpty(results.get(0).getType())){
                     resultDataObject.put("analyseType", 398);
                     resultDataObject.put("resultDesc", String.valueOf(resultDesc.add("")));
                     resultDataObject.put("resultValue", String.valueOf(resultValue.add("")));

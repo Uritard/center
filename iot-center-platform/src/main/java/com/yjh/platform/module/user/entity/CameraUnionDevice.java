@@ -34,4 +34,6 @@ public class CameraUnionDevice implements Serializable {
     private Long recordId;
     @ApiModelProperty(value = "相机名称")
     private String cameraName;
+    @ApiModelProperty(value = "预置位名称")
+    private String presetName;
 }

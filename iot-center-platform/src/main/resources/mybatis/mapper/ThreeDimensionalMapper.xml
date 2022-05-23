@@ -82,6 +82,7 @@
             d.instance_id,
             d.cruise_id,
             e.camera_id,
+            e.preset_name,
             f.camera_name,
             f.record_id
         FROM
@@ -97,6 +98,7 @@
         and b.device_mete_id = d.device_mete_id
         and d.cruise_id = e.preset_id
         and e.camera_id = f.camera_id
+        GROUP BY e.preset_id
     </select>
     <select id="statisticsAlarmInfo" resultType="com.yjh.platform.module.task.entity.StatisticalTools">
         SELECT
