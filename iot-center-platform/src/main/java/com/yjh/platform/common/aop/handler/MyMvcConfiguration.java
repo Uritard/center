@@ -3,6 +3,7 @@ package com.yjh.platform.common.aop.handler;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
@@ -44,6 +45,11 @@ public class MyMvcConfiguration extends WebMvcConfigurationSupport {
                 .addResourceLocations("file:/home/yjh_iot_center/iot-center-accessvideo-1.0.0/picture/");
     }
 
-    
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer.setUseSuffixPatternMatch(false)    //设置是否是后缀模式匹配,即:/test.*
+//                .setUseTrailingSlashMatch(false)     //设置是否自动后缀路径模式匹配,即：/test/
+                .setUseRegisteredSuffixPatternMatch(true);  //开启路径后缀匹配
+    }
     
 }
