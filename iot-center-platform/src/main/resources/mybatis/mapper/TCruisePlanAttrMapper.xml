@@ -269,7 +269,7 @@
         distinct
         result.task_id
         from t_cruise_result result
-        left join t_cruise_task task on task.task_id = result.task_id and task.task_level &lt; #{taskLevel}
-        where result.c_state = 239  or result.c_state = 241
+        left join t_cruise_task task on task.task_id = result.task_id
+        where result.c_state = 239  and task.task_level &lt; #{taskLevel}
     </select>
 </mapper>
