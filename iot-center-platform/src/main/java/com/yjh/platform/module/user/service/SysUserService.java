@@ -429,7 +429,8 @@ public class SysUserService {
                             num = num + 1;
                         }
                         logsRecord.LoginLogsSend(request, "6", "登录", "用户名或密码错误登录失败", userName, String.valueOf(sysUserList.get(0).getUserId()), 2);
-                        mapResult.put("info", "密码错误,已输入错误"+num+"次！");
+//                        mapResult.put("info", "密码错误,已输入错误"+num+"次！");
+                        mapResult.put("info", ResultCodeEnum.CODE10101.getName());
                         mapResult.put("code", ResultCodeEnum.CODE10101.getCode());
                         return mapResult;
                     }
