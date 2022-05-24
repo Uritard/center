@@ -11,6 +11,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author hyh
@@ -32,6 +35,8 @@ import java.util.Objects;
 public class ParamUtil {
 
     private static Logger logger = LoggerFactory.getLogger(ParamUtil.class);
+
+    private static Pattern paramPattern = Pattern.compile("[~!$%^&*+<>?\"{}();']+");
 
     public static Map<String, Object> getRequestParams(RequestContext ctx) {
         String method = ctx.getRequest().getMethod();
@@ -71,7 +76,7 @@ public class ParamUtil {
                     try (InputStream inputStream = ctx.getRequest().getInputStream()) {
                         String body = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
                         logger.info("***************原始参数：{}***************", body);
-                        if (!"[]".equals(body) && StringUtils.isNotEmpty(body)){
+                        if (!"[]".equals(body) && StringUtils.isNotEmpty(body)) {
                             param = JSONObject.parseObject(body, LinkedHashMap.class, Feature.OrderedField);
                         }
                         Map<String, List<String>> map = ctx.getRequestQueryParams();
@@ -131,4 +136,24 @@ public class ParamUtil {
         return buf;
     }
 
+
+    public static String validated(Map<String, Object> paramMap) {
+
+        for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
+            String key = entry.getKey();
+            Object val = entry.getValue();
+            // 对密码不进行校验
+            if (StringUtils.endsWithIgnoreCase(key, "PCode") || ArrayUtils.contains(new String[]{"password", "ruleContent"}, key)) {
+                continue;
+            }
+            if (val instanceof String && StringUtils.isNotEmpty((String) val)) {
+                Matcher matcher = paramPattern.matcher((String) val);
+                if (matcher.find()) {
+                    return "参数校验失败，请勿传入非法字符【~!$%^&*+<>?\"{}();'】";
+                }
+            }
+        }
+
+        return "";
+    }
 }

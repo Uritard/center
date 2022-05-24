@@ -338,7 +338,7 @@ public class SysLogService {
     public List<Map<String,String>> logAnalyze(){
         List<LongAnalyseDetail> listForAna = this.sysLogDao.logAnalyze();
         List<Map<String,String>> listForRe = new ArrayList<>();
-        for(int i = 0; i < 14;i++){
+        for(int i = 0; i < 29;i++){
             Map<String,String> map = new HashMap<>();
             String count = "0";
             for(LongAnalyseDetail item:listForAna){
@@ -346,9 +346,12 @@ public class SysLogService {
                     count = item.getCount();
                 }
             }
-            map.put("logType",NumToStringUtil.findType(String.valueOf(i)));
-            map.put("count",count);
-            listForRe.add(map);
+            // 如果数据为0，则不返回给前端
+            if(!"0".equals(count)){
+                map.put("logType",NumToStringUtil.findType(String.valueOf(i)));
+                map.put("count",count);
+                listForRe.add(map);
+            }
         }
         //List<Map<String,Integer>> listForAna = this.sysLogDao.logAnalyze(list);
         return listForRe;

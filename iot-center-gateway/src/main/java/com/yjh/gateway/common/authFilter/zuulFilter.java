@@ -140,6 +140,14 @@ public class zuulFilter extends ZuulFilter {
 
         Map<String, Object>  paramMap = ParamUtil.getRequestParams(ctx);
         log.info("paramMap {}", paramMap);
+        String needValid = (String) redisTemplate.opsForHash().get("t_sys_param:paramsValidate", "content");
+        // 统一验证参数，不允许【~!$%^&*+<>?"{}();'】
+        if ("true".equals(needValid)) {
+            String validatStr = ParamUtil.validated(paramMap);
+            if (StringUtils.isNotEmpty(validatStr)) {
+                return errorRespnse(ctx, HttpStatus.SC_BAD_REQUEST, "{\"code\":400,\"message\":\"" + validatStr + "\"}");
+            }
+        }
         String userName = "unknown";
         if (paramMap != null && paramMap.containsKey("userName")){
             userName = String.valueOf(paramMap.get("userName"));
@@ -165,11 +173,10 @@ public class zuulFilter extends ZuulFilter {
                         return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"参数篡改，请联系管理员!\"}");
                     }
                 } else {
-                    log.error(
-                            "无userId====================================================================================");
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
-                    return false;
+                    log.error("无userId====================================================================================");
+//                    ctx.setSendZuulResponse(false);
+//                    ctx.setResponseStatusCode(HttpStatus.SC_FORBIDDEN);
+                    return errorRespnse(ctx, HttpStatus.SC_BAD_REQUEST, "{\"code\":400,\"message\":\"参数错误，请刷新页面或联系管理员处理!\"}");
                 }
             }
             MyRequestWrapper requestWrapper = null;

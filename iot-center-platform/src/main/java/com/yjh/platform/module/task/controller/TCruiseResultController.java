@@ -319,7 +319,7 @@ public class TCruiseResultController {
 
     @ApiOperation(value = "分页查询--识别异常点位")
     @GetMapping(value = "/selectAbnormalResult")
-    @Logs(title = "识别异常点位查询",content = "根据用户传递的参数查询识别异常点位",logType = 1, authority = "1235")
+//    @Logs(title = "识别异常点位查询",content = "根据用户传递的参数查询识别异常点位",logType = 1, authority = "1235")
     public Result selectAbnormalResult(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
@@ -335,6 +335,11 @@ public class TCruiseResultController {
         Map<String, Object> resultMap = new HashMap<>();
 
         try {
+            if(pageSize==0){
+                logsRecord.LogsSend(request,"9","导出","巡视结果异常点位导出");
+            }else{
+                logsRecord.LogsSend(request,"1","识别异常点位查询","根据用户传递的参数查询识别异常点位");
+            }
 //            logsRecord.LogsSend(request,"1","识别异常点位查询","根据用户传递的参数查询识别异常点位");
 
             if (Objects.isNull(startTime) || "".equals(startTime)){
