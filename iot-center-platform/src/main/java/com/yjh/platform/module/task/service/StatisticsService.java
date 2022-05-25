@@ -148,12 +148,10 @@ public class StatisticsService {
         // 离线次数
         map.put("offLineCount", offLineCount);
         // 出勤率 投运期间累计正常巡检天数/总投运天数
-        commissionDay = map.get("commissionDay") != null ? (Number) map.get("commissionDay") : 0;
-        cruiseDay = map.get("taskDay") != null ? (Number) map.get("cruiseDay") : 0;
-        String cruiseAttend =
-            commissionDay.intValue() == 0
-                ? "N/A"
-                : numberCover(cruiseDay.intValue(), commissionDay.intValue());
+        commissionDay = (Number) map.getOrDefault("commissionDay", 0);
+        cruiseDay = (Number) map.getOrDefault("cruiseDay", 0);
+        String cruiseAttend = commissionDay.intValue() == 0
+                ? "N/A" : numberCover(cruiseDay.intValue(), commissionDay.intValue());
         map.put("cruisePercent", cruiseAttend);
         robotId = (Long) map.get("robotId");
         String beginDate = (String) map.get("commissionDate");
