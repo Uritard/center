@@ -820,8 +820,7 @@ public class IntelAnalysisService {
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")),
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
                 String targetNamePath = imgPath.replace(
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "")
-                        .substring(2);
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")), "").substring(1);
                 log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
                 uploadFileToUpFtps(imgPath, "jm/" + targetNamePath, upFtpsConfig);
 

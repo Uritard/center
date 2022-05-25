@@ -423,6 +423,7 @@ public class RunAtNowTask implements Runnable{
                         tCruiseDataResult.setEvaluationState(257);
                         tCruiseDataResult.setIsWarn(0);
                         tCruiseDataResult.setPicpath("--");
+                        tCruiseDataResult.setCreatetime(new Date());
                         //tCruiseDataResultDao.insert(tCruiseDataResult);
                         TCDRList.add(tCruiseDataResult);
                         tCruiseTaskResultDetail.setCruiseStatus(255);

@@ -786,7 +786,7 @@ public class TRobotInspectionService {
             }
 //            Integer re = (int) ((new BigDecimal((float) i / instanceIdList.length).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()) * 100);
             Map<String,Object> mapTaskProgress  = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
-            String re = String.valueOf(Optional.ofNullable(mapTaskProgress.get("taskProgress")).orElse(null));
+            String re = String.valueOf(Optional.ofNullable(mapTaskProgress.get("taskProgress")).orElse("0"));
             TCruiseResult tc = tCruiseResultDao.selectForTaskId(taskId);
             if (tc == null) {
                 reMap.put("taskProgress", 0);
