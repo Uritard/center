@@ -7,15 +7,20 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.mqtt.GetSpringUtil;
 import com.yjh.accessrobot.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.accessrobot.common.mqtt.ftpsservice;
+import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.TCruiseTask;
 import com.yjh.accessrobot.module.command.entity.TStdDeviceMete;
 import com.yjh.accessrobot.module.command.entity.TWarnInfo;
+import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.service.AlarmService;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -40,6 +45,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
     private RedisTemplate redisTemplate;
     private String webSocketUrl;
+
+    private UpFtpsConfig upFtpsConfig;
 
     public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate, String webSocketUrl) {
         this.threadMap = threadMap;
@@ -224,6 +231,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
             redisTemplate.opsForValue().set("currentWarn", currentWarnInfo, 3, TimeUnit.MINUTES);
 
+            // 将产生的告警上送至上级系统
+             alarmToUpSystem(warnInfo, tStdDevicemete);
 
             //jeff add send mqtt message
            try{
@@ -273,6 +282,93 @@ public class IsWarnAfterCruiseThread implements Runnable {
         }
     }
 
+    /**
+     * 将产生的告警上送至上级系统
+     *
+     * @param warnInfo 告警信息
+     * @param tStdDevicemete 测点信息
+     * @return void
+     */
+    private void alarmToUpSystem( TWarnInfo warnInfo, TStdDeviceMete tStdDevicemete){
+        try {
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String, Object>> xmlItems = new ArrayList<>();
+            Map<String, Object> xmlItem = new HashMap<>(16);
+            xmlBaseModel.setType("62");
+            xmlItem.put("patroldevice_code", threadMap.getOrDefault("robotCode", ""));
+            String robotName = StaticContextAccessor.getBean(RobotService.class).selectRobotNameByCode(threadMap.get("robotCode"));
+            xmlItem.put("patroldevice_name", robotName);
+            String taskName = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(warnInfo.getTaskId()).getTaskName();
+            xmlItem.put("task_name", taskName);
+            xmlItem.put("task_code", warnInfo.getTaskId());
+            xmlItem.put("device_name", threadMap.get("deviceName"));
+            xmlItem.put("device_id", String.valueOf(warnInfo.getInstanceId()));
+            switch (warnInfo.getWarnLevel()){
+                case 130:
+                    xmlItem.put("alarm_level", "1");
+                    break;
+                case 131:
+                    xmlItem.put("alarm_level", "2");
+                    break;
+                case 132:
+                    xmlItem.put("alarm_level", "3");
+                    break;
+                case 133:
+                    xmlItem.put("alarm_level", "4");
+                    break;
+                default:
+                    break;
+            }
+            // 因为该线程判断的都是表计结果是否告警
+            xmlItem.put("alarm_type", "7");
+            xmlItem.put("recognition_type", "1");
+            xmlItem.put("file_type", "2");
+
+            String imgPath = warnInfo.getImagePath().replaceAll(
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content")),
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content")));
+            String targetNamePath = imgPath.replace(
+                            String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content")), "").substring(1);
+            log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
+            uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
+            xmlItem.put("file_path", targetNamePath);
+
+            xmlItem.put("value", warnInfo.getValue());
+            xmlItem.put("unit", Optional.ofNullable(tStdDevicemete.getUnit()).orElse(""));
+            xmlItem.put("value_unit", warnInfo.getValue() + xmlItem.get("unit"));
+            xmlItem.put("time", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()));
+            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+            xmlItem.put("task_patrolled_id", warnInfo.getTaskId()+"_"+simpleDateFormat2.format(warnInfo.getWarnTime()));
+            xmlItem.put("content", warnInfo.getWarnContent());
+
+            xmlItems.add(xmlItem);
+            xmlBaseModel.setItems(xmlItems);
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            Map<String, List<XMLBaseModel>> map = new HashMap<>();
+            map.put("list", list);
+            log.info("告警上报：-" + map);
+            Constant.otherServer(map, Constant.TCP_URL);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 将文件上传至上级系统ftp服务器
+     *
+     * @param sourcePath 源文件地址
+     * @param targetPathName 目标文件地址名称
+     */
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+        try {
+            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
+                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+        }
+    }
 
     public Result sendPostRequest(String url, Map<String, Object> params) {
         return StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class, params);

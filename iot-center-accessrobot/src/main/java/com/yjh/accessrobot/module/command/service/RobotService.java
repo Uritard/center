@@ -1618,16 +1618,16 @@ public class RobotService {
         } else if (valueName.equals("pointAlarmType")) {
             switch (value) {
                 case "1":
-                    dictNote = "超温报警";
+                    dictNote = "超温告警";
                     break;
                 case "2":
-                    dictNote = "温升报警";
+                    dictNote = "温升告警";
                     break;
                 case "3":
-                    dictNote = "三相温差报警";
+                    dictNote = "三相温差告警";
                     break;
                 case "4":
-                    dictNote = "三相对比报警";
+                    dictNote = "三相对比告警";
                     break;
                 case "5":
                     dictNote = "声音异常";
@@ -1636,16 +1636,16 @@ public class RobotService {
                     dictNote = "外观异常";
                     break;
                 case "7":
-                    dictNote = "仪表越限报警";
+                    dictNote = "仪表越限告警";
                     break;
                 case "8":
-                    dictNote = "仪表超量程报警";
+                    dictNote = "仪表超量程告警";
                     break;
                 case "9":
                     dictNote = "仪表三相对比";
                     break;
                 case "10":
-                    dictNote = "变位报警";
+                    dictNote = "变位告警";
                     break;
                 case "11":
                     dictNote = "操作告警";

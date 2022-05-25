@@ -46,6 +46,8 @@ public class AnalysisResultThread implements Runnable{
     private RedisTemplate redisTemplate;
     private String webSocketUrl;
 
+    private static final byte[] LOCK_FLAG = new byte[0];
+
     public AnalysisResultThread(Map<String, String> cruiseResultMap, String temporaryOriginPath, String ftpFileName, String webSocketUrl, RedisTemplate redisTemplate){
         this.cruiseResultMap = cruiseResultMap;
         this.temporaryOriginPath = temporaryOriginPath;
@@ -77,7 +79,7 @@ public class AnalysisResultThread implements Runnable{
         try {
             FileUtil.copyFileUsingStream(temporaryOriginPath, resultImagePath);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         // 如果是音频文件，单独再复制一份到指定文件夹
         String voicePath = "null";
@@ -88,7 +90,7 @@ public class AnalysisResultThread implements Runnable{
             try {
                 FileUtil.copyFileUsingStream(temporaryOriginPath, resultVoicePath);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         }
         // 标定文件
@@ -267,25 +269,29 @@ public class AnalysisResultThread implements Runnable{
         try {
             Constant.postUrl(webSocketUrl, json);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
-        String strForCountAbnormal = "countForAbnormal:" + taskId;
-        Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
-        Integer totalNum = Integer.valueOf(abnormalCount.get("all").toString());
-        Integer abnormalNum = Integer.valueOf(abnormalCount.get("abnormal").toString());
-        Integer normalNum = Integer.valueOf(abnormalCount.get("normal").toString());
-        log.info("taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, totalNum, abnormalNum, normalNum);
+        Integer totalNum;
+        Integer abnormalNum;
+        Integer normalNum;
+        synchronized (LOCK_FLAG){
+            String strForCountAbnormal = "countForAbnormal:" + taskId;
+            Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
+             totalNum = Integer.valueOf(abnormalCount.get("all").toString());
+             abnormalNum = Integer.valueOf(abnormalCount.get("abnormal").toString());
+             normalNum = Integer.valueOf(abnormalCount.get("normal").toString());
+            log.info("taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, totalNum, abnormalNum, normalNum);
 
-        normalNum = normalNum + 1;
-        log.info("taskId为{}的该点结果正常,这次变化的normal是==={}", taskId, normalNum);
-        Map<String, String> mapForAbnormal = new HashMap<>(5);
-        mapForAbnormal.put("abnormal", abnormalNum.toString());
-        mapForAbnormal.put("normal", normalNum.toString());
-        redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
-
+            normalNum = normalNum + 1;
+            log.info("taskId为{}的该点结果正常,这次变化的normal是==={}", taskId, normalNum);
+            Map<String, String> mapForAbnormal = new HashMap<>(5);
+            mapForAbnormal.put("abnormal", abnormalNum.toString());
+            mapForAbnormal.put("normal", normalNum.toString());
+            redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
+        }
         // 存库
         storeCruiseResult(str);
 
@@ -317,7 +323,7 @@ public class AnalysisResultThread implements Runnable{
                 try {
                     Thread.sleep(10000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
 
                 TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult()
@@ -351,7 +357,7 @@ public class AnalysisResultThread implements Runnable{
                 try {
                     Constant.postUrl(webSocketUrl, json2);
                 } catch (IOException | URISyntaxException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
 
                 StaticContextAccessor.getBean(RobotService.class).updateIsWarn(taskId, instanceId, tCruiseTaskResultMap.get("cruiseResultId"));

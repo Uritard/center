@@ -791,16 +791,16 @@ public class IntelAnalysisService {
             xmlItem.put("patroldevice_name", map.get("device_name"));
             switch (tWarnInfo.getWarnLevel()){
                 case 130:
-                    xmlItem.put("alarm_level", 1);
+                    xmlItem.put("alarm_level", "1");
                     break;
                 case 131:
-                    xmlItem.put("alarm_level", 2);
+                    xmlItem.put("alarm_level", "2");
                     break;
                 case 132:
-                    xmlItem.put("alarm_level", 3);
+                    xmlItem.put("alarm_level", "3");
                     break;
                 case 133:
-                    xmlItem.put("alarm_level", 4);
+                    xmlItem.put("alarm_level", "4");
                     break;
                 default:
                     break;
@@ -808,14 +808,14 @@ public class IntelAnalysisService {
 
             try {
                 if (tWarnInfo.getWarnContent().contains("安全帽")) {
-                    xmlItem.put("monitor_type", 1);
+                    xmlItem.put("monitor_type", "1");
                 } else if (tWarnInfo.getWarnContent().contains("越线")) {
-                    xmlItem.put("monitor_type", 2);
+                    xmlItem.put("monitor_type", "2");
                 } else if (tWarnInfo.getWarnContent().contains("工装")) {
-                    xmlItem.put("monitor_type", 3);
+                    xmlItem.put("monitor_type", "3");
                 }
                 // 目前都是识别图片 所以是5
-                xmlItem.put("file_type", 5);
+                xmlItem.put("file_type", "5");
                 String imgPath = tWarnInfo.getImagePath().replaceAll(
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")),
                         String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")));
@@ -921,7 +921,7 @@ public class IntelAnalysisService {
                     continue;
                 }
                 // 没有识别出来任何缺陷 results为空  只有当缺陷识别才会这样，判别的results是有值的
-                if (StringUtils.isEmpty(results.get(0).getType())){
+                if (StringUtils.isEmpty(results.get(0).getType()) && isAi){
                     resultDataObject.put("analyseType", 398);
                     resultDataObject.put("resultDesc", String.valueOf(resultDesc.add("")));
                     resultDataObject.put("resultValue", String.valueOf(resultValue.add("")));

@@ -45,6 +45,8 @@ public class InspectionResultThread implements Runnable{
     private Boolean changeTaskStatus;
     private static final String IS_AI_AlGORITHM = "on";
 
+    private static final byte[] LOCK_FLAG = new byte[0];
+
     public InspectionResultThread(Map<String,String> cruiseResultMap, RedisTemplate redisTemplate, String webSocketUrl, boolean changeTaskStatus){
         this.cruiseResultMap = cruiseResultMap;
         this.redisTemplate = redisTemplate;
@@ -177,92 +179,98 @@ public class InspectionResultThread implements Runnable{
      * @param tCruiseResult 任务结果初始信息
      * @return void
      */
-    private void platformTask(String robotCode, String taskId, TCruiseResult tCruiseResult) throws Exception{
-        String strForCountAbnormal = "countForAbnormal:" + taskId;
-        Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
-        Integer totalNum = Integer.valueOf(abnormalCount.get("all").toString());
-        Integer abnormalNum = Integer.valueOf(abnormalCount.get("abnormal").toString()) ;
-        Integer normalNum  = Integer.valueOf(abnormalCount.get("normal").toString()) ;
-        log.info("从redis获取的taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, totalNum, abnormalNum, normalNum);
-        Integer abnormal = abnormalNum;
-        Integer normal = normalNum;
+    private void platformTask(String robotCode, String taskId, TCruiseResult tCruiseResult){
+        try {
+            synchronized (LOCK_FLAG){
+                String strForCountAbnormal = "countForAbnormal:" + taskId;
+                Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                Integer totalNum = Integer.valueOf(abnormalCount.get("all").toString());
+                Integer abnormalNum = Integer.valueOf(abnormalCount.get("abnormal").toString()) ;
+                Integer normalNum  = Integer.valueOf(abnormalCount.get("normal").toString()) ;
+                log.info("从redis获取的taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, totalNum, abnormalNum, normalNum);
+                Integer abnormal = abnormalNum;
+                Integer normal = normalNum;
 
-        Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + taskId);
-        Map<String,String> tCruiseTaskResultMap = new HashMap<>(16);
-        // 上报结果的巡视点,即已经做过的点
-        List<Long> instanceIdList = Optional.ofNullable(Constant.flagMap.get(taskId)).orElse(new ArrayList<>());
-        // 遍历在下任务时提前组装好的巡检点信息
-        for (String key : robotInfoKeys){
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-            if (Objects.equals(robotCode, redisInfoMap.get("robotCode"))
-                    && Objects.equals(taskId, redisInfoMap.get("taskId"))
-                    && Objects.equals(cruiseResultMap.get("deviceId"), redisInfoMap.get("inspectionCode"))) {
-                String instanceId = redisInfoMap.get("instanceId");
-                instanceIdList.add(Long.valueOf(instanceId));
+                Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + taskId);
+                Map<String,String> tCruiseTaskResultMap = new HashMap<>(16);
+                // 上报结果的巡视点,即已经做过的点
+                List<Long> instanceIdList = Optional.ofNullable(Constant.flagMap.get(taskId)).orElse(new ArrayList<>());
+                // 遍历在下任务时提前组装好的巡检点信息
+                for (String key : robotInfoKeys){
+                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+                    if (Objects.equals(robotCode, redisInfoMap.get("robotCode"))
+                            && Objects.equals(taskId, redisInfoMap.get("taskId"))
+                            && Objects.equals(cruiseResultMap.get("deviceId"), redisInfoMap.get("inspectionCode"))) {
+                        String instanceId = redisInfoMap.get("instanceId");
+                        instanceIdList.add(Long.valueOf(instanceId));
 
-                tCruiseTaskResultMap.put("cruiseTime", cruiseResultMap.get("time"));
-                tCruiseTaskResultMap.put("cruiseTaskTime", redisInfoMap.get("cruiseTime"));
-                tCruiseTaskResultMap.put("taskResultId", tCruiseResult.getTaskResultId());
-                tCruiseTaskResultMap.put("taskName", tCruiseResult.getTaskName());
-                tCruiseTaskResultMap.put("endTime", cruiseResultMap.get("time"));
-                tCruiseTaskResultMap.put("cruiseStatus", "252");
-                if (Objects.equals("1", cruiseResultMap.get("fileType"))){
-                    tCruiseTaskResultMap.put("resultPic", cruiseResultMap.get("resultPic"));
-                }
-                if (StringUtils.isNotEmpty(cruiseResultMap.get("value"))){
-                    tCruiseTaskResultMap.put("resultNum", cruiseResultMap.get("value"));
-                    tCruiseTaskResultMap.put("cruiseResult", "246");
-                    tCruiseTaskResultMap.put("cruiseAbnormal", "null");
-                    normal = normal + 1;
-                    log.info("taskId为{},instanceId为{}的该点结果正常,这次变化的normal是==={}", taskId, instanceId, normal);
-                }else {
-                    // value无值且resultNum为--，若结果非音频文件，则为异常情况
-                    tCruiseTaskResultMap.put("resultNum", "--");
-                    if ("3".equals(cruiseResultMap.get("fileType"))){
-                        tCruiseTaskResultMap.put("cruiseResult", "246");
-                        tCruiseTaskResultMap.put("cruiseAbnormal","null");
-                        normal = normal + 1;
-                        log.info("taskId为{},instanceId为{}的该点结果正常,这次变化的normal是==={}", taskId, instanceId, normal);
-                    }else {
-                        tCruiseTaskResultMap.put("cruiseResult","247");
-                        tCruiseTaskResultMap.put("cruiseAbnormal","249");
-                        abnormal = abnormal + 1;
-                        log.info("taskId为{},instanceId为{}的该点结果异常,这次变化的abnormal是==={}", taskId, instanceId, normal);
+                        tCruiseTaskResultMap.put("cruiseTime", cruiseResultMap.get("time"));
+                        tCruiseTaskResultMap.put("cruiseTaskTime", redisInfoMap.get("cruiseTime"));
+                        tCruiseTaskResultMap.put("taskResultId", tCruiseResult.getTaskResultId());
+                        tCruiseTaskResultMap.put("taskName", tCruiseResult.getTaskName());
+                        tCruiseTaskResultMap.put("endTime", cruiseResultMap.get("time"));
+                        tCruiseTaskResultMap.put("cruiseStatus", "252");
+                        if (Objects.equals("1", cruiseResultMap.get("fileType"))){
+                            tCruiseTaskResultMap.put("resultPic", cruiseResultMap.get("resultPic"));
+                        }
+                        if (StringUtils.isNotEmpty(cruiseResultMap.get("value"))){
+                            tCruiseTaskResultMap.put("resultNum", cruiseResultMap.get("value"));
+                            tCruiseTaskResultMap.put("cruiseResult", "246");
+                            tCruiseTaskResultMap.put("cruiseAbnormal", "null");
+                            normal = normal + 1;
+                            log.info("taskId为{},instanceId为{}的该点结果正常,这次变化的normal是==={}", taskId, instanceId, normal);
+                        }else {
+                            // value无值且resultNum为--，若结果非音频文件，则为异常情况
+                            tCruiseTaskResultMap.put("resultNum", "--");
+                            if ("3".equals(cruiseResultMap.get("fileType"))){
+                                tCruiseTaskResultMap.put("cruiseResult", "246");
+                                tCruiseTaskResultMap.put("cruiseAbnormal","null");
+                                normal = normal + 1;
+                                log.info("taskId为{},instanceId为{}的该点结果正常,这次变化的normal是==={}", taskId, instanceId, normal);
+                            }else {
+                                tCruiseTaskResultMap.put("cruiseResult","247");
+                                tCruiseTaskResultMap.put("cruiseAbnormal","249");
+                                abnormal = abnormal + 1;
+                                log.info("taskId为{},instanceId为{}的该点结果异常,这次变化的abnormal是==={}", taskId, instanceId, normal);
+                            }
+                        }
+                        tCruiseTaskResultMap.put("picpath", cruiseResultMap.get("relativePath"));
+                        if (cruiseResultMap.containsKey("absolutePath")){
+                            tCruiseTaskResultMap.put("origpic", cruiseResultMap.get("absolutePath"));
+                        }
+                        if(cruiseResultMap.containsKey("confirmRelativePath")){
+                            tCruiseTaskResultMap.put("confirmPicPath", cruiseResultMap.get("confirmRelativePath"));
+                        }
+                        if (cruiseResultMap.containsKey("confirmAbsolutePath")){
+                            tCruiseTaskResultMap.put("origConfirmPicPath", cruiseResultMap.get("confirmAbsolutePath"));
+                        }
+                        tCruiseTaskResultMap.put("evaluationState", "257");
+                        tCruiseTaskResultMap.put("createtime", cruiseResultMap.get("time"));
+                        tCruiseTaskResultMap.put("isWarn", "0");
+                        redisTemplate.opsForHash().putAll("t_cruise_task_result:" + taskId + ":" + instanceId, tCruiseTaskResultMap);
+
+                        /*reanalysisResult(instanceId,tCruiseTaskResultMap,taskId,inspectionCode);*/
+                        Map<String, Object> jasonMap = new HashMap<>(2);
+                        jasonMap.put("type", "finishedOneInstance");
+                        jasonMap.put("taskId", taskId);
+                        String json = JSON.toJSONString(jasonMap);
+                        log.info("做完一个点-前端推送：" + json);
+                        Constant.postUrl(webSocketUrl, json);
+
+                        Constant.flagMap.put(taskId, instanceIdList);
                     }
                 }
-                tCruiseTaskResultMap.put("picpath", cruiseResultMap.get("relativePath"));
-                if (cruiseResultMap.containsKey("absolutePath")){
-                    tCruiseTaskResultMap.put("origpic", cruiseResultMap.get("absolutePath"));
-                }
-                if(cruiseResultMap.containsKey("confirmRelativePath")){
-                    tCruiseTaskResultMap.put("confirmPicPath", cruiseResultMap.get("confirmRelativePath"));
-                }
-                if (cruiseResultMap.containsKey("confirmAbsolutePath")){
-                    tCruiseTaskResultMap.put("origConfirmPicPath", cruiseResultMap.get("confirmAbsolutePath"));
-                }
-                tCruiseTaskResultMap.put("evaluationState", "257");
-                tCruiseTaskResultMap.put("createtime", cruiseResultMap.get("time"));
-                tCruiseTaskResultMap.put("isWarn", "0");
-                redisTemplate.opsForHash().putAll("t_cruise_task_result:" + taskId + ":" + instanceId, tCruiseTaskResultMap);
+                log.info("taskId为{}的任务,准备更新的abnormal是:{},准备更新的normal是:{}", taskId, abnormal, normal);
+                Map<String, String> mapForAbnormal = new HashMap<>(5);
+                mapForAbnormal.put("abnormal", abnormal.toString());
+                mapForAbnormal.put("normal", normal.toString());
+                redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
 
-                /*reanalysisResult(instanceId,tCruiseTaskResultMap,taskId,inspectionCode);*/
-                Map<String, Object> jasonMap = new HashMap<>(2);
-                jasonMap.put("type", "finishedOneInstance");
-                jasonMap.put("taskId", taskId);
-                String json = JSON.toJSONString(jasonMap);
-                log.info("做完一个点-前端推送：" + json);
-                Constant.postUrl(webSocketUrl, json);
-
-                Constant.flagMap.put(taskId, instanceIdList);
+                taskIsFinished(taskId, robotCode, totalNum, abnormal, normal, tCruiseTaskResultMap, tCruiseResult);
             }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
-        log.info("taskId为{}的任务,准备更新的abnormal是:{},准备更新的normal是:{}", taskId, abnormal, normal);
-        Map<String, String> mapForAbnormal = new HashMap<>(5);
-        mapForAbnormal.put("abnormal", abnormal.toString());
-        mapForAbnormal.put("normal", normal.toString());
-        redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
-
-        taskIsFinished(taskId, robotCode, totalNum, abnormal, normal, tCruiseTaskResultMap, tCruiseResult);
     }
 
     /**
@@ -282,33 +290,37 @@ public class InspectionResultThread implements Runnable{
                                 Integer abnormal,
                                 Integer normal,
                                 Map<String,String> tCruiseTaskResultMap,
-                                TCruiseResult tCruiseResult) throws Exception{
-        // 统计机器人返回任务结果的大小
-        List<String> resultList = new ArrayList<>();
-        Set<String> cruiseKey = redisScan("t_cruise_task_result:" + taskId);
-        for (String key : cruiseKey) {
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-            Boolean flag = StringUtils.equals("228", redisInfoMap.get("cruiseType")) && (StringUtils.equals("246", redisInfoMap.get("cruiseResult")) || StringUtils.equals("247", redisInfoMap.get("cruiseResult")));
-            if (Boolean.TRUE.equals(flag)){
-                resultList.add(redisInfoMap.get("instanceId"));
+                                TCruiseResult tCruiseResult){
+        try {
+            // 统计机器人返回任务结果的大小
+            List<String> resultList = new ArrayList<>();
+            Set<String> cruiseKey = redisScan("t_cruise_task_result:" + taskId);
+            for (String key : cruiseKey) {
+                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+                Boolean flag = StringUtils.equals("228", redisInfoMap.get("cruiseType")) && (StringUtils.equals("246", redisInfoMap.get("cruiseResult")) || StringUtils.equals("247", redisInfoMap.get("cruiseResult")));
+                if (Boolean.TRUE.equals(flag)){
+                    resultList.add(redisInfoMap.get("instanceId"));
+                }
             }
-        }
-        log.info("机器人任务为{}返回结果个数===={}", taskId, resultList.size());
+            log.info("机器人任务为{}返回结果个数===={}", taskId, resultList.size());
 
-        // 统计巡视主机下发给机器人的巡检点大小
-        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
-        String instanceList = redisInfoMap.get("instanceIdList");
-        instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
-        String[] instanceIdArray = instanceList.split(", ");
-        List<String> allInstanceIdList = new ArrayList<>();
-        for (String instanceId : instanceIdArray){
-            allInstanceIdList.add(instanceId);
-        }
-        log.info("巡视主机下发给机器人任务为{}的巡检点个数===={}", taskId, allInstanceIdList.size());
+            // 统计巡视主机下发给机器人的巡检点大小
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
+            String instanceList = redisInfoMap.get("instanceIdList");
+            instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
+            String[] instanceIdArray = instanceList.split(", ");
+            List<String> allInstanceIdList = new ArrayList<>();
+            for (String instanceId : instanceIdArray){
+                allInstanceIdList.add(instanceId);
+            }
+            log.info("巡视主机下发给机器人任务为{}的巡检点个数===={}", taskId, allInstanceIdList.size());
 
-        if(Objects.equals(allInstanceIdList.size(), resultList.size())) {
-            log.info("-------------------TaskId为{}的任务Finished-------------------", taskId);
-            completionOfTask(taskId, totalNum, abnormal, normal, tCruiseTaskResultMap, tCruiseResult);
+            if(Objects.equals(allInstanceIdList.size(), resultList.size())) {
+                log.info("-------------------TaskId为{}的任务Finished-------------------", taskId);
+                completionOfTask(taskId, totalNum, abnormal, normal, tCruiseTaskResultMap, tCruiseResult);
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
     }
     /**
@@ -326,7 +338,7 @@ public class InspectionResultThread implements Runnable{
                                    Integer abnormal ,
                                    Integer normal,
                                    Map<String,String> tCruiseTaskResultMap,
-                                   TCruiseResult tCruiseResult) throws Exception{
+                                   TCruiseResult tCruiseResult){
         List<TCruiseDataResult> tcdrList = new ArrayList<>();
         List<TCruiseTaskResultDetail> tctrdList = new ArrayList<>();
         List<String> cruiseResultIdList = new ArrayList<>();
@@ -403,57 +415,61 @@ public class InspectionResultThread implements Runnable{
             Constant.flagMap.remove(taskId);
         }
 
-        // 判断缓存中的异常点，如果机器人任务是最后执行，则更新缓存并更新表
-        if (abnormal + normal == totalCheckPoint){
-            log.info("机器人巡检点是最后一个点");
-            Thread.sleep(15000);
+        try {
+            // 判断缓存中的异常点，如果机器人任务是最后执行，则更新缓存并更新表
+            if (abnormal + normal == totalCheckPoint){
+                log.info("机器人巡检点是最后一个点");
+                Thread.sleep(15000);
 
-            TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult()
-                    .setTaskId(taskId)
-                    .setTaskName(tCruiseTaskResultMap.get("taskName"))
-                    .setTaskAlarm(0)
-                    .setTaskAbnormal(abnormal)
-                    .setRunExecute(tCruiseTaskResultMap.get("if_run"))
-                    .setCruiseTaskTime(DateTimeUtil.parse(tCruiseTaskResultMap.get("cruiseTaskTime")))
-                    .setTaskResultId(tCruiseTaskResultMap.get("taskResultId"));
-            log.info("任务为{}的tCruiseTaskResult内容是==={}", taskId, tCruiseTaskResult);
-            StaticContextAccessor.getBean(RobotService.class).insertTCruiseTaskResult(tCruiseTaskResult);
+                TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult()
+                        .setTaskId(taskId)
+                        .setTaskName(tCruiseTaskResultMap.get("taskName"))
+                        .setTaskAlarm(0)
+                        .setTaskAbnormal(abnormal)
+                        .setRunExecute(tCruiseTaskResultMap.get("if_run"))
+                        .setCruiseTaskTime(DateTimeUtil.parse(tCruiseTaskResultMap.get("cruiseTaskTime")))
+                        .setTaskResultId(tCruiseTaskResultMap.get("taskResultId"));
+                log.info("任务为{}的tCruiseTaskResult内容是==={}", taskId, tCruiseTaskResult);
+                StaticContextAccessor.getBean(RobotService.class).insertTCruiseTaskResult(tCruiseTaskResult);
 
-            Integer taskWait = totalCheckPoint - normal - abnormal;
-            tCruiseResult.setTaskWait(taskWait);
-            if (changeTaskStatus){ //操作类任务不更新任务状态
-                tCruiseResult.setCState(240);
-                tCruiseResult.setTaskCode(taskId);
-                tCruiseResult.setCreateTime(DateTimeUtil.parse(tCruiseTaskResultMap.get("cruiseTaskTime")));
-                log.info("任务为{}的tCruiseResult内容是==={}", taskId, tCruiseResult);
-                // 更新TCR表
-                int res = StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
-                log.info("更新TCR的条数====" + res);
-                {
-                    //低优先任务继续
-                    StaticContextAccessor.getBean(RobotService.class).lowTaskGoOn(taskId);
+                Integer taskWait = totalCheckPoint - normal - abnormal;
+                tCruiseResult.setTaskWait(taskWait);
+                if (changeTaskStatus){ //操作类任务不更新任务状态
+                    tCruiseResult.setCState(240);
+                    tCruiseResult.setTaskCode(taskId);
+                    tCruiseResult.setCreateTime(DateTimeUtil.parse(tCruiseTaskResultMap.get("cruiseTaskTime")));
+                    log.info("任务为{}的tCruiseResult内容是==={}", taskId, tCruiseResult);
+                    // 更新TCR表
+                    int res = StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+                    log.info("更新TCR的条数====" + res);
+                    {
+                        //低优先任务继续
+                        StaticContextAccessor.getBean(RobotService.class).lowTaskGoOn(taskId);
+                    }
                 }
-            }
 
-            // webSocket通知前端调用巡视监控的接口（任务完成）
-            Map<String, Object> jasonMap = new HashMap<>(2);
-            jasonMap.put("type", "lastOneInstance");
-            jasonMap.put("taskId", taskId);
-            String json = JSON.toJSONString(jasonMap);
-            log.info("最后一个点-前端推送：" + json);
-            Constant.postUrl(webSocketUrl,json);
+                // webSocket通知前端调用巡视监控的接口（任务完成）
+                Map<String, Object> jasonMap = new HashMap<>(2);
+                jasonMap.put("type", "lastOneInstance");
+                jasonMap.put("taskId", taskId);
+                String json = JSON.toJSONString(jasonMap);
+                log.info("最后一个点-前端推送：" + json);
+                Constant.postUrl(webSocketUrl,json);
 
-            for (TCruiseTaskResultDetail tctrd : tctrdList){
-                StaticContextAccessor.getBean(RobotService.class).updateIsWarn(taskId, tctrd.getInstanceId(), tctrd.getCruiseResultId());
+                for (TCruiseTaskResultDetail tctrd : tctrdList){
+                    StaticContextAccessor.getBean(RobotService.class).updateIsWarn(taskId, tctrd.getInstanceId(), tctrd.getCruiseResultId());
+                }
+            }else{
+                log.info("机器人巡检点不是最后一个点");
+                Integer taskWait = totalCheckPoint - normal - abnormal;
+                tCruiseResult.setTaskWait(taskWait);
+                tCruiseResult.setCState(239);
+                tCruiseResult.setTaskCode(taskId);
+                log.info("任务为{}的tCruiseResult内容是==={}", taskId, tCruiseResult);
+                StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
             }
-        }else{
-            log.info("机器人巡检点不是最后一个点");
-            Integer taskWait = totalCheckPoint - normal - abnormal;
-            tCruiseResult.setTaskWait(taskWait);
-            tCruiseResult.setCState(239);
-            tCruiseResult.setTaskCode(taskId);
-            log.info("任务为{}的tCruiseResult内容是==={}", taskId, tCruiseResult);
-            StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
     }
 

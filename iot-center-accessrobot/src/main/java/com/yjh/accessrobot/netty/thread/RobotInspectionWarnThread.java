@@ -4,9 +4,12 @@ import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.TStdDeviceMete;
 import com.yjh.accessrobot.module.command.entity.TWarnInfo;
+import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -30,6 +33,7 @@ public class RobotInspectionWarnThread implements Runnable{
     private Map<String,String> warnResultMap;
     private RedisTemplate redisTemplate;
     private String webSocketUrl;
+    private UpFtpsConfig upFtpsConfig;
 
     public RobotInspectionWarnThread(Map<String,String> warnResultMap, RedisTemplate redisTemplate, String webSocketUrl){
         this.warnResultMap = warnResultMap;
@@ -59,6 +63,7 @@ public class RobotInspectionWarnThread implements Runnable{
                     TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);
 
                     storeWarnInfo(tStdDevicemete, instanceId, taskId, robotCode);
+
                     Long warnId = StaticContextAccessor.getBean(RobotService.class).selectWarnId(taskId, instanceId);
                     log.info("warnId===" + warnId);
 
@@ -131,7 +136,7 @@ public class RobotInspectionWarnThread implements Runnable{
             }
             warnInfo.setWarnContent(warnResultMap.get("content"));
             if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmType"))) {
-                int warnType = StaticContextAccessor.getBean(RobotService.class).selectDictCode("pointAlarmType", warnResultMap.get("alarmLevel"), "point_alarm_type");
+                int warnType = StaticContextAccessor.getBean(RobotService.class).selectDictCode("pointAlarmType", warnResultMap.get("alarmType"), "point_alarm_type");
                 warnInfo.setWarnType(warnType);
             }
             log.info("要插库的告警数据是==={}", warnInfo);
@@ -155,8 +160,100 @@ public class RobotInspectionWarnThread implements Runnable{
             redisTemplate.opsForHash().putAll(warnName, warnMap);
 
             StaticContextAccessor.getBean(RobotService.class).insertWarn(warnInfo);
+
+            // 将产生的告警上送至上级系统
+            alarmToUpSystem(warnInfo, tStdDevicemete);
+
         }catch (Exception e){
             log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 将产生的告警上送至上级系统
+     *
+     * @param warnInfo 告警信息
+     * @param tStdDevicemete 测点信息
+     * @return void
+     */
+    private void alarmToUpSystem( TWarnInfo warnInfo, TStdDeviceMete tStdDevicemete){
+        try {
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String, Object>> xmlItems = new ArrayList<>();
+            Map<String, Object> xmlItem = new HashMap<>(16);
+            xmlBaseModel.setType("62");
+            xmlItem.put("patroldevice_code", warnResultMap.getOrDefault("robotCode", ""));
+            String robotName = StaticContextAccessor.getBean(RobotService.class).selectRobotNameByCode(warnResultMap.get("robotCode"));
+            xmlItem.put("patroldevice_name", robotName);
+            String taskName = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(warnInfo.getTaskId()).getTaskName();
+            xmlItem.put("task_name", taskName);
+            xmlItem.put("task_code", warnInfo.getTaskId());
+            xmlItem.put("device_name", warnResultMap.get("deviceName"));
+            xmlItem.put("device_id", String.valueOf(warnInfo.getInstanceId()));
+            switch (warnInfo.getWarnLevel()){
+                case 130:
+                    xmlItem.put("alarm_level", "1");
+                    break;
+                case 131:
+                    xmlItem.put("alarm_level", "2");
+                    break;
+                case 132:
+                    xmlItem.put("alarm_level", "3");
+                    break;
+                case 133:
+                    xmlItem.put("alarm_level", "4");
+                    break;
+                default:
+                    break;
+            }
+            // 因为该线程判断的都是外观
+            xmlItem.put("alarm_type", "6");
+            xmlItem.put("recognition_type", "3");
+            xmlItem.put("file_type", "5");
+
+            String imgPath = warnInfo.getImagePath().replaceAll(
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content")),
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content")));
+            String targetNamePath = imgPath.replace(
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content")), "").substring(1);
+            log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
+            uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
+            xmlItem.put("file_path", targetNamePath);
+
+            xmlItem.put("value", warnInfo.getValue());
+            xmlItem.put("unit", Optional.ofNullable(tStdDevicemete.getUnit()).orElse(""));
+            xmlItem.put("value_unit", warnInfo.getValue() + xmlItem.get("unit"));
+            xmlItem.put("time", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()));
+            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+            xmlItem.put("task_patrolled_id", warnInfo.getTaskId()+"_"+simpleDateFormat2.format(warnInfo.getWarnTime()));
+            xmlItem.put("content", warnInfo.getWarnContent());
+
+            xmlItems.add(xmlItem);
+            xmlBaseModel.setItems(xmlItems);
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            Map<String, List<XMLBaseModel>> map = new HashMap<>();
+            map.put("list", list);
+            log.info("告警上报：-" + map);
+            Constant.otherServer(map, Constant.TCP_URL);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 将文件上传至上级系统ftp服务器
+     *
+     * @param sourcePath 源文件地址
+     * @param targetPathName 目标文件地址名称
+     */
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+        try {
+            if(org.apache.commons.lang3.StringUtils.isEmpty(sourcePath) || org.apache.commons.lang3.StringUtils.isEmpty(targetPathName)) {return;}
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
+                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
         }
     }
 
