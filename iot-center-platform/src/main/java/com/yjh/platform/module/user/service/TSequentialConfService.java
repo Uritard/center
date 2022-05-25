@@ -8,6 +8,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.HttpClientUtils;
+import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.module.device.dao.TCfgDeviceDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCfgDevice;
@@ -410,7 +411,8 @@ public class TSequentialConfService{
             }
 
             List<String> listSort = tSequentialConfDao.selectLastStep();
-            if(listSort.get(listSort.size()-1).equals(map.get("meteId")) ){
+            log.info("顺控执行完毕， {}-{}", JSONUtil.toJSONString(listSort), JSONUtil.toJSONString(map));
+            if(listSort.get(listSort.size()-1).equals(map.get("cfgDeviceId")) ){
                 //这是最后一个步骤
                 TSysParam time = tSysParamDao.selectByParamType("cleanTime");
                 Thread.sleep(Integer.valueOf(time.getContent())*1000);

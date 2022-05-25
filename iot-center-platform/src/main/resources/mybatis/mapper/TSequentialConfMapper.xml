@@ -157,6 +157,7 @@
         IFNULL(b.record_time,"") as recordTime,
         IFNULL(b.mete_value,"") as state,
         a.camera_id as cameraId,
+        a.record_time as recordTime,
         f.camera_name as cameraName,
         a.preset_id as presetId,
         e.preset_name as presetName,

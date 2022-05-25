@@ -237,7 +237,7 @@
     </select>
 
     <select id="countInstanceLossByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
-        SELECT DATE_FORMAT(result.cruise_task_time, '%Y-%m') MONTH,
+        SELECT DATE_FORMAT(detail.cruise_time, '%Y-%m') MONTH,
                count(1)                                  AS totalNum,
                SUM(IF(detail.cruise_status = 252, 0, 1)) AS validNum
         FROM t_cruise_task_result result
@@ -245,12 +245,12 @@
                  LEFT JOIN t_cruise_data_result tcdr ON detail.cruise_result_id = tcdr.cruise_result_id
                  LEFT JOIN t_cruise_task tct
                            ON tct.task_id = result.`task_id`
-        WHERE result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+        WHERE detail.cruise_time BETWEEN #{startTime} and #{endTime}
         group by MONTH
     </select>
 
     <select id="countInstanceLossByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
-        SELECT DATE_FORMAT(result.cruise_task_time, '%u') + 1 WEEK,
+        SELECT DATE_FORMAT(detail.cruise_time, '%u') + 1 WEEK,
                count(1)                                  AS   totalNum,
                SUM(IF(detail.cruise_status = 252, 0, 1)) AS   validNum
         FROM t_cruise_task_result result
@@ -258,12 +258,12 @@
                  LEFT JOIN t_cruise_data_result tcdr ON detail.cruise_result_id = tcdr.cruise_result_id
                  LEFT JOIN t_cruise_task tct
                            ON tct.task_id = result.`task_id`
-        WHERE result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+        WHERE detail.cruise_time BETWEEN #{startTime} and #{endTime}
         group by WEEK
     </select>
 
     <select id="countInstanceLossByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
-        SELECT DATE_FORMAT(result.cruise_task_time, '%Y-%m-%d') day,
+        SELECT DATE_FORMAT(detail.cruise_time, '%Y-%m-%d') day,
                count(1)                                  AS totalNum,
                SUM(IF(detail.cruise_status = 252, 0, 1)) AS validNum
         FROM t_cruise_task_result result
@@ -271,7 +271,7 @@
                  LEFT JOIN t_cruise_data_result tcdr ON detail.cruise_result_id = tcdr.cruise_result_id
                  LEFT JOIN t_cruise_task tct
                            ON tct.task_id = result.`task_id`
-        WHERE result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+        WHERE detail.cruise_time BETWEEN #{startTime} and #{endTime}
         group by day
     </select>
 
@@ -286,7 +286,7 @@
         LEFT JOIN t_cruise_task tct
         ON tct.task_id= result.`task_id`
         WHERE
-        result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+        detail.cruise_time BETWEEN #{startTime} and #{endTime}
         <if test="taskId != null and taskId != ''">and result.task_id = #{taskId}</if>
         <if test="robotId != null and robotId != ''">and tct.robot_id = #{robotId, jdbcType=BIGINT}</if>
     </select>
