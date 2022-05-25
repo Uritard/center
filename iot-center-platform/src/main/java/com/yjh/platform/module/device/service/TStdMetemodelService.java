@@ -1,7 +1,9 @@
 package com.yjh.platform.module.device.service;
 
 import com.google.common.collect.Lists;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.ResultHandleUtils;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdMeteDao;
@@ -419,6 +421,9 @@ public class TStdMetemodelService {
     }
 
     private String excelDataImport(MultipartFile file) {
+        if(!FileUtil.checkFileName(file.getOriginalFilename())){
+            throw new BusinessException("请上传指定文件");
+        }
         Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
         String path = (String) mapForPicModelPath.get("content");
         //path = "D:/code/qhTest";
@@ -442,6 +447,10 @@ public class TStdMetemodelService {
             result.setCode(209);
             if(file == null){
                 result.setCode(209,"文件错误，文件为null");
+                return result;
+            }
+            if (!FileUtil.checkFileName(file.getOriginalFilename())){
+                result.setCode(209,"请上传指定文件");
                 return result;
             }
             String pathName = excelDataImport(file);

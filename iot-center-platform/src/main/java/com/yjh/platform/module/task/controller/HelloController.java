@@ -583,18 +583,18 @@ public class HelloController {
         return result;
     }
 
-    @ApiOperation(value = "上传预置位图片")
-    @GetMapping(value = "/upload")
-    public Result upload(@RequestParam(value="file", required=false) MultipartFile file) {
-        Result result = new Result();
-        try {
-            result.setData(tCameraPresetService.upload(file));
-        } catch (Exception e) {
-            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("查询预置位树失败：" + e);
-        }
-        return result;
-    }
+//    @ApiOperation(value = "上传预置位图片")
+//    @GetMapping(value = "/upload")
+//    public Result upload(@RequestParam(value="file", required=false) MultipartFile file) {
+//        Result result = new Result();
+//        try {
+//            result.setData(tCameraPresetService.upload(file));
+//        } catch (Exception e) {
+//            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+//            log.error("查询预置位树失败：" + e);
+//        }
+//        return result;
+//    }
     @ApiOperation(value = "main")
     @GetMapping(value = "/main")
     public Result main() {

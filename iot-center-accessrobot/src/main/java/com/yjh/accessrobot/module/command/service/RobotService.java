@@ -17,6 +17,7 @@ import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
+import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.SysUserDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
@@ -2283,6 +2284,12 @@ public class RobotService {
                 result.setData(0);
                 return result;
             }
+
+            if (!FileUtil.checkFileName(file.getOriginalFilename(),"xml")){
+                result.setCode(209,"请上传指定的文件");
+                result.setData(0);
+                return result;
+            }
             String fileName = "copy-robotModel.xml";
             String pathName = excelDataImport(file, fileName);
             // 解析xml文件
@@ -2307,6 +2314,11 @@ public class RobotService {
         try{
             if(file == null){
                 result.setCode(209,"文件错误，文件为null");
+                result.setData(0);
+                return result;
+            }
+            if (!FileUtil.checkFileName(file.getOriginalFilename(),"xml")){
+                result.setCode(209,"请上传指定的文件");
                 result.setData(0);
                 return result;
             }

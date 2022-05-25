@@ -1,6 +1,8 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
@@ -296,6 +298,9 @@ public class TCameraPresetService {
 
     @Transactional(rollbackFor = Exception.class)
     public int upload(MultipartFile file) {
+        if (!FileUtil.checkFileName(file.getOriginalFilename())){
+            throw new BusinessException("请上传指定的文件");
+        }
         Map<String,String> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
         String path =  mapForPicModelPath.get("content");///home/yjh_iot_center/iot-picture/zip
 
