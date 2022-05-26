@@ -1011,6 +1011,44 @@ public class TCruiseTaskService {
         return tCruiseResultDao.update(tCruiseResult);
     }
 
+    public int taskPauseWithoutRobot(String taskId) {
+        //任务暂停 不用给机器人发
+        TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);
+        tCruiseResult.setCState(241);
+        try {
+            //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+//            //给算法暂停
+//            Analysis analysis = new Analysis();
+//            analysis.setTaskId(tCruiseTask.getTaskId());
+//            analysis.setInstanceId(-1L);
+//            List<Analysis> analysisList = new ArrayList<>();
+//            analysisList.add(analysis);
+//            Map<String, List<Analysis>> analysisMap  = new HashMap<>();
+//            analysisMap.put("list",analysisList);
+//            log.info("算法信息：    "+analysisMap);
+//            analysis(analysisMap);
+//            log.info("任务暂停"+tCruiseTask.getTaskId());
+
+            //Thread.sleep(10000);
+            //机器人任务暂停
+            Map<String,String> jasonMapOnFinished=new HashMap<>();
+            jasonMapOnFinished.put("type","taskChange");
+            jasonMapOnFinished.put("taskId",taskId);
+            String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
+            log.info("发送给前端的消息："+jsonMessage);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
+        } catch (Exception e) {
+            log.error("任务暂停异常: " + e);
+            e.printStackTrace();
+        }
+
+        //任务状态上报站端
+        TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+        sendTaskStateToUp(tCruiseTask, 3);
+
+        return tCruiseResultDao.update(tCruiseResult);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public int taskGoOn(String taskId) throws Exception {
         TCruiseResult tCruiseResult = tCruiseResultDao.selectForTaskId(taskId);

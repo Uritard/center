@@ -204,7 +204,7 @@ public class RunAtNowTask implements Runnable{
                         redisTemplate.opsForList().leftPushAll(lowTaskKey,lowTaskList);
                         //将低优先任务暂停
                         lowTaskList.forEach(lowTask -> {
-                            tCruiseTaskService.taskPause(lowTask);
+                            tCruiseTaskService.taskPauseWithoutRobot(lowTask);
                         });
                     }
                 }
