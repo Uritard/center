@@ -262,8 +262,13 @@ public class CruiseTaskJob extends QuartzJobBean {
                     robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
 
                     log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
-                    //让机器人做任务
-                    robotTask(robotTaskInfoMap);
+                    //模板任务上层控制下发
+                    if (Objects.nonNull(tCruiseTask.getDateType())) {
+                        robotTemplateTask(robotTaskInfoMap);
+                    } else {
+                        //让机器人做任务
+                        robotTask(robotTaskInfoMap);
+                    }
                 }
 
 
@@ -1108,6 +1113,18 @@ public class CruiseTaskJob extends QuartzJobBean {
 //        } catch (Exception e) {
 //            log.error(e.getMessage(), e);
 //        }
+    }
+
+    //让机器人做任务
+    private void robotTemplateTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     //红外相机抓图

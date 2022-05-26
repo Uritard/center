@@ -10,6 +10,7 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.task.controller.HelloController;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
@@ -692,21 +693,17 @@ public class TCruiseTaskResultService {
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, String> PictureCompare(String taskId, Long instanceId) {
-        String collectPic = null;
         String preImg = tCameraPresetDao.selectPreImgByCruiseId(instanceId);
-        System.out.println(preImg);
-        Set<String> cruiseKeys = redisScan("t_cruise_task_result:" + taskId);
-        for (String key : cruiseKeys) {
-            Map<String, Object> cruiseInfo = redisTemplate.opsForHash().entries(key);
-            String InstanceId = instanceId.toString();
-            if (cruiseInfo.get("cruiseId").equals(InstanceId)) {
-                Object collectedPic = cruiseInfo.get("picpath");
-                collectPic = collectedPic.toString();
-            }
+        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());
+        String meteType = "";
+        if (Objects.nonNull(redisInfoMap.get("device_mete_id"))) {
+            TStdDeviceMete tStdDeviceMete = tStdDevicemeteDao.selectByPrimaryId(Long.parseLong(redisInfoMap.get("device_mete_id")));
+            meteType = tStdDeviceMete.getMeteType();
         }
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<>(3);
         map.put("preImg", preImg);
-        map.put("collectPic", collectPic);
+        map.put("collectPic", redisInfoMap.get("picpath"));
+        map.put("meteType", meteType);
         return map;
     }
 

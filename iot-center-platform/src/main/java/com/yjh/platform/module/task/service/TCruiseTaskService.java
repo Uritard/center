@@ -226,11 +226,19 @@ public class TCruiseTaskService {
         }
         log.info("robotCruiseList   :" +robotCruiseList);
         List<Long> robotTaskInstanceList = new ArrayList<>();
-        if(robotCruiseList.size() > 0) {
+        //模板任务走上层定时任务逻辑
+        if(robotCruiseList.size() > 0 && Objects.isNull(tCruiseTask.getDateType())) {
             List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
             List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
             log.info("robotCode   :" + robotCode);
             for (String item : robotCode) {
+                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
+                Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
+                String robotTaskStatus = robotTaskStatusMap.get("value");
+                String robotPattern = robotStatusMap.get("value");
+                if ("1".equals(robotTaskStatus) && "5".equals(robotPattern)){
+                    return "机器人" + robotCode + "正在执行操作任务,无法下发巡检任务！";
+                }
                 RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
                 robotTaskInfo.setCruiseType(tCruiseTask.getType());
                 robotTaskInfo.setTaskId(tCruiseTask.getTaskId());
@@ -256,7 +264,7 @@ public class TCruiseTaskService {
                             }else{
                                 robotTaskInfo.setCycleMonth(tCruiseTaskAdd.getDayOfMonth());
                                 String cycleExecuteTime = null;
-                                if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 12){
+                                if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 10){
                                     cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
                                 }else {
                                     cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";
@@ -281,7 +289,7 @@ public class TCruiseTaskService {
                                     String dayOfWeek = StringUtils.join(Arrays.asList(dayOfWeekTemp), ",");
                                     robotTaskInfo.setCycleWeek(dayOfWeek);
                                     String cycleExecuteTime = null;
-                                    if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 12){
+                                    if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 10){
                                         cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
                                     }else {
                                         cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";
@@ -307,7 +315,7 @@ public class TCruiseTaskService {
                                     robotTaskInfo.setIntervalNumber("1");
                                     robotTaskInfo.setIntervalType("2");
                                     String cycleExecuteTime = null;
-                                    if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 12){
+                                    if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 10){
                                         cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
                                     }else {
                                         cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";

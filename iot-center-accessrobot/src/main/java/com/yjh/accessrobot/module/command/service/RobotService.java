@@ -842,14 +842,17 @@ public class RobotService {
         for (RobotTaskInstanceInfo item : robotTaskInfoList) {
             boolean robotStatus = checkRobotStatus(item);
             if (robotStatus) {
-                Thread thread = new Thread(() -> {
-                    try {
-                        feignRobotTask(itemMap);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            feignRobotTask(itemMap);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                });
-                thread.start();
+                };
+                TaskExecutePool.getInstance().execute(runnable);
             }
         }
     }
