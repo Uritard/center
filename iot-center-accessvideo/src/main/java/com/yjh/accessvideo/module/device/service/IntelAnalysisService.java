@@ -69,6 +69,11 @@ public class IntelAnalysisService {
     @Value("${system.webSocket.url}")
     private String syncWebsocketUrl;
     /**
+     * 变电站编码
+     */
+    @Value("${station.code}")
+    private String stationCode;
+    /**
      * 27大类假数据读取来源
      */
     @Value("${conf.file.name}")
@@ -862,7 +867,8 @@ public class IntelAnalysisService {
             port = aiPort;
         }
         try {
-            DataDealThread dataDealThread = new DataDealThread(jsonObject.toJSONString(), port, redisTemplate, analyseDataOperateService, syncWebsocketUrl);
+            DataDealThread dataDealThread = new DataDealThread(jsonObject.toJSONString(), port, redisTemplate, analyseDataOperateService,
+                    syncWebsocketUrl, stationCode);
             TaskExecutePool.getInstance().execute(dataDealThread);
         }catch (Exception e){
             log.error("算法结果处理线程异常:{}", e);

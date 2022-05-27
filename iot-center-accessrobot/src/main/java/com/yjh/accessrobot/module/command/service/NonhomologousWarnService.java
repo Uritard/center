@@ -346,6 +346,7 @@ public class NonhomologousWarnService {
                 Map<String,Object> robotWarn = new HashMap<>();
                 robotWarn.put("taskId",cruiseResultMap.get("taskCode"));
                 robotWarn.put("inspectionId",nonhomologousWarnDao.getInstanceIdByDeviceId(s,cruiseResultMap.get("taskCode")));
+//                robotWarn.put("inspectionId",nonhomologousWarnDao.getInspectionIdByDeviceId(s));
                 robotWarn.put("warnId",warnInfo.get("warnId"));
                 insResults.add(robotWarn);
             }

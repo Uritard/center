@@ -174,16 +174,16 @@ public class TaskShutDownJob extends QuartzJobBean {
                         tCruiseTaskResultDetail.setInstanceId(Long.valueOf(mapForCruise.get("instanceId").toString()));
                         tCruiseTaskResultDetail.setInstanceName(mapForCruise.get("instanceName"));
                         tCruiseTaskResultDetail.setDeviceName(mapForCruise.get("deviceName"));
-                    if(mapForCruise.get("cruiseTime").equals("null")){
-                        tCruiseTaskResultDetail.setCruiseTime(new Date());
-                        mapForCruise.put("cruiseTime",simpleDateFormat.format(new Date()));
-                    }else {
-                        tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(mapForCruise.get("cruiseTime").toString()));
-                    }
+                        if(mapForCruise.get("cruiseTime").equals("null")){
+                            tCruiseTaskResultDetail.setCruiseTime(new Date());
+                            mapForCruise.put("cruiseTime",simpleDateFormat.format(new Date()));
+                        }else {
+                            tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(mapForCruise.get("cruiseTime").toString()));
+                        }
 
                         //tCruiseTaskResultDetail.setEndTime(new Date());
                         //mapForCruise.put("endTime",simpleDateFormat.format(new Date()));
-                        tCruiseTaskResultDetail.setCruiseStatus(253);
+                        tCruiseTaskResultDetail.setCruiseStatus(Integer.valueOf(mapForCruise.get("cruiseStatus")));
                         tCruiseTaskResultDetail.setRemark(mapForCruise.get("remark").toString());
                         TCTRDList.add(tCruiseTaskResultDetail);
                         cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());

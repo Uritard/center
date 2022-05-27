@@ -25,4 +25,6 @@ public interface NonhomologousWarnDao {
 
     Long getInstanceIdByDeviceId(@Param(value = "deviceId") String deviceId,
                                  @Param(value = "taskId") String taskId);
+
+    Long getInspectionIdByDeviceId(@Param(value = "deviceId") String deviceId);
 }

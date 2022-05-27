@@ -56,6 +56,11 @@ public class AccessVideoApplication implements CommandLineRunner {
 
     @Value("${spring.interface.api}")
     private String interfaceApi;
+    /**
+     * 变电站编码
+     */
+    @Value("${station.code}")
+    private String stationCode;
 
     private int lUserID;//用户句柄
     //设备登录信息
@@ -82,7 +87,7 @@ public class AccessVideoApplication implements CommandLineRunner {
         register();
         InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
-        nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate,analyseDataOperateService,syncWebsocketUrl);
+        nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate,analyseDataOperateService,syncWebsocketUrl, stationCode);
     }
 
     private void setSDKCom() {

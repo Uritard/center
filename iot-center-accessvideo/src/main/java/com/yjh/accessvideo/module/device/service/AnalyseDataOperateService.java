@@ -812,7 +812,7 @@ public class AnalyseDataOperateService {
      * @param sourcePath 源文件地址
      * @param targetPathName 目标文件地址名称
      */
-    public void uploadFileToUpFtps(String sourcePath, String targetPathName) {
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
         try {
             if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
@@ -820,6 +820,14 @@ public class AnalyseDataOperateService {
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误:{}", e);
         }
+    }
+
+    public static void main(String[] args) {
+        String imgPath = "http://192.168.1.66:10086/imgs/ftpImg/2022/05/03/5d7cc57c87764e2b8cca2ab81e5ce58c/Infrared/2B07D364183C4163AE664C361DF02B57_E100-00120220503162139_result.bmp";
+        String[] str2=imgPath.split("/");
+        String imgName=str2[str2.length-1];
+        String tagPath = "warn/"+"taskId"+"/"+imgName;
+        System.out.println(tagPath);
     }
 }
 

@@ -215,7 +215,7 @@ public class RobotInspectionWarnThread implements Runnable{
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content")));
             String targetNamePath = imgPath.replace(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content")), "").substring(1);
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content")), "").substring(1);
             log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
             uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
             xmlItem.put("file_path", targetNamePath);

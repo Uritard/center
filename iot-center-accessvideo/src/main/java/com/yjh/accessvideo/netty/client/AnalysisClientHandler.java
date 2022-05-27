@@ -57,11 +57,13 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     private RedisTemplate redisTemplate;
     private AnalyseDataOperateService analyseDataOperateService;
     private String syncWebsocketUrl;
+    private String stationCode;
 
-    public AnalysisClientHandler(RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService,String syncWebsocketUrl) {
+    public AnalysisClientHandler(RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService,String syncWebsocketUrl, String stationCode) {
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateService = analyseDataOperateService;
         this.syncWebsocketUrl=syncWebsocketUrl;
+        this. stationCode = stationCode;
     }
 
     private static Map<Integer, AnalysisClientHandler> analysisClientHandlerHashMap = new HashMap<>();
@@ -126,7 +128,8 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
             String remoteAdds = ctx.channel().remoteAddress().toString();
             int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));
             if(usefulBody !="") {
-                DataDealThread dataDealThread = new DataDealThread(usefulBody, remotePort, redisTemplate, analyseDataOperateService, syncWebsocketUrl);
+                DataDealThread dataDealThread = new DataDealThread(usefulBody, remotePort, redisTemplate, analyseDataOperateService,
+                        syncWebsocketUrl, stationCode);
                 TaskExecutePool.getInstance().execute(dataDealThread);
 //            handlerData(body); //单线程数据处理
             }

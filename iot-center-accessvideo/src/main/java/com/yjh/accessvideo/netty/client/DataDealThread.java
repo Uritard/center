@@ -56,17 +56,20 @@ public class DataDealThread implements Runnable {
     private String TASKID;
     private String INSTANCEID;
     private String syncWebsocketUrl;
+    private String stationCode;
     /**
      * 服务端口
      */
     private final int remotePort;
 
-    public DataDealThread(String body, int remotePort, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, String syncWebsocketUrl) {
+    public DataDealThread(String body, int remotePort, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService,
+                          String syncWebsocketUrl, String stationCode) {
         this.analyseDataOperateService = analyseDataOperateService;
         this.redisTemplate = redisTemplate;
         this.body = body;
         this.syncWebsocketUrl=syncWebsocketUrl;
         this.remotePort = remotePort;
+        this.stationCode = stationCode;
     }
     private void yjskHandle(JSONObject jsonObjectResult){
         try{
@@ -444,6 +447,7 @@ public class DataDealThread implements Runnable {
                                                         Map<String, Object> xmlItem = new HashMap<>();
                                                         xmlBaseModel.setType("62");
                                                         xmlItem.put("patroldevice_code", cruiseResult.get("instanceId"));
+                                                        xmlItem.put("patroldevice_name", cruiseResult.get("instanceName"));
                                                         xmlItem.put("task_name", cruiseResult.get("taskName"));
                                                         xmlItem.put("task_code", cruiseResult.get("taskCode"));
                                                         xmlItem.put("device_name", cruiseResult.get("instanceName"));
@@ -459,7 +463,7 @@ public class DataDealThread implements Runnable {
                                                         String[] str2=imgPath.split("/");
                                                         String imgName=str2[str2.length-1];
                                                         String tagPath = "warn/"+taskId+"/"+imgName;
-                                                        analyseDataOperateService.uploadFileToUpFtps(imgPath,tagPath);
+//                                                        analyseDataOperateService.uploadFileToUpFtps(imgPath,tagPath);
                                                         xmlItem.put("file_path", tagPath);
 
                                                         xmlItem.put("value", tWarnInfo.getValue());
@@ -469,7 +473,6 @@ public class DataDealThread implements Runnable {
                                                         SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
                                                         xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(simpleDateFormat2.parse(cruiseResult.get("cruiseTime"))));
                                                         xmlItem.put("content", tWarnInfo.getWarnContent());
-
 
                                                         xmlItems.add(xmlItem);
                                                         xmlBaseModel.setItems(xmlItems);
@@ -920,7 +923,7 @@ public class DataDealThread implements Runnable {
                             String[] str2=imgPath.split("/");
                             String imgName=str2[str2.length-1];
                             String tagPath = "task/"+taskId+"/"+imgName;
-                            analyseDataOperateService.uploadFileToUpFtps(imgPath,tagPath);
+//                            analyseDataOperateService.uploadFileToUpFtps(imgPath,tagPath);
                             xmlItem.put("file_path", tagPath);
                             xmlItem.put("rectangle", "");
                             SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -1204,6 +1207,7 @@ public class DataDealThread implements Runnable {
                     List<String> cruiseKeys = redisTemplate.opsForList().range("cruiseKeys:" + TASKID, 0, size);
                     log.info("cruisekeys:" + cruiseKeys);
                     finalCruiseKey = cruiseKeys.get(0);//挑选一名幸运Redis KEY值
+                    log.info("finalCruiseKey===={}",  finalCruiseKey);
                     for (String cruiseKey : cruiseKeys) {
                         Map<String, String> cruiseWorkedMap = redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
                         log.info("cruiseWorkedMap==={}", cruiseWorkedMap);
@@ -1317,6 +1321,7 @@ public class DataDealThread implements Runnable {
 
                 // 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作
                 Map<String, String> cruiseResult = redisTemplate.opsForHash().entries(finalCruiseKey);
+                log.info("cruiseResult==={}", cruiseResult);
                 String strForCountAbnormal = "countForAbnormal:" + TASKID;
                 Map<String, String> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
                 Integer total = NumberUtils.toInt(abnormalCount.get("all"));

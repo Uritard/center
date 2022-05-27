@@ -25,16 +25,16 @@ public class testdetedealthreadserverice {
 
     //缺陷类消息
     public void senddatadeal(Object resposneobj){
-        String usefulBody=JSONObject.toJSONString(resposneobj);
-        DataDealThread dataDealThread = new DataDealThread(usefulBody,13669,redisTemplate, analyseDataOperateService,syncWebsocketUrl);
-        TaskExecutePool.getInstance().execute(dataDealThread);
+//        String usefulBody=JSONObject.toJSONString(resposneobj);
+//        DataDealThread dataDealThread = new DataDealThread(usefulBody,13669,redisTemplate, analyseDataOperateService,syncWebsocketUrl);
+//        TaskExecutePool.getInstance().execute(dataDealThread);
     }
 
    //判别类消息
     public void senddatadeal2(Object resposneobj){
-        String usefulBody=JSONObject.toJSONString(resposneobj);
-        DataDealThread dataDealThread = new DataDealThread(usefulBody,13668,redisTemplate, analyseDataOperateService,syncWebsocketUrl);
-        TaskExecutePool.getInstance().execute(dataDealThread);
+//        String usefulBody=JSONObject.toJSONString(resposneobj);
+//        DataDealThread dataDealThread = new DataDealThread(usefulBody,13668,redisTemplate, analyseDataOperateService,syncWebsocketUrl);
+//        TaskExecutePool.getInstance().execute(dataDealThread);
     }
 
 

@@ -84,4 +84,10 @@
         where b.inspection_code = #{deviceId, jdbcType=VARCHAR}
         and c.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
+
+    <select id="getInspectionIdByDeviceId" resultType="java.lang.Long">
+        select inspection_id
+        from  t_robot_inspection
+        where inspection_code = #{deviceId, jdbcType=VARCHAR}
+    </select>
 </mapper>
