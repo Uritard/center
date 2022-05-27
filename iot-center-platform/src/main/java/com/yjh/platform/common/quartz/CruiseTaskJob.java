@@ -344,6 +344,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                             Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                             tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                             tCruiseTaskResultDetailMap.put("taskId",taskId);
+                            tCruiseTaskResultDetailMap.put("taskResultId", tCruiseResult.getTaskResultId());
                             tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
                             tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
                             tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());
@@ -371,6 +372,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
                     tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                     tCruiseTaskResultDetailMap.put("taskId",taskId);
+                    tCruiseTaskResultDetailMap.put("taskResultId", tCruiseResult.getTaskResultId());
                     tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
                     tCruiseTaskResultDetailMap.put("if_run",tCruiseTask.getIfRun().toString());
                     tCruiseTaskResultDetailMap.put("device_mete_id",item.getDeviceMeteId().toString());

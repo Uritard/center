@@ -99,7 +99,7 @@ public class AnalysisService {
                 // 算法超时
                 redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseAbnormal","251");
                 //已执行
-                redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseStatus","252");
+                redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseStatus","254");
         //        redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"","");
             }
         }
