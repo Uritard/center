@@ -302,7 +302,7 @@ public class TCfgDataCurrentService {
             tCruiseTaskAdd.setTaskName(tCruisePlan.getPlanName()+simpleDateFormat.format(new Date()));
             tCruiseTaskAdd.setIfRun(173);
             tCruiseTaskAdd.setStartTime(new Date());
-            tCruiseTaskAdd.setTaskType(218);
+//            tCruiseTaskAdd.setTaskType(218);
             tCruiseTaskAdd.setUnionTaskStatus("1");
             // 联动任务优先级
             tCruiseTaskAdd.setTaskLevel(4);

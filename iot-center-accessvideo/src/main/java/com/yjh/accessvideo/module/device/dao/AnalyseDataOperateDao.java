@@ -86,4 +86,6 @@ public interface AnalyseDataOperateDao {
     String selectDevicePointIdByInstanceId(@Param(value = "instanceId")Long instanceId);
 
     HashMap<String,String> selectDeviceNameInfo(@Param(value = "instanceId") Long instanceId);
+
+    String selectPMSByCameraId(@Param(value = "cameraId") Long cameraId);
 }

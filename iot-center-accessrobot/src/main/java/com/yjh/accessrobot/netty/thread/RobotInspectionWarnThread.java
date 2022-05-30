@@ -4,6 +4,9 @@ import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.mqtt.GetSpringUtil;
+import com.yjh.accessrobot.common.mqtt.alarmMsgBody.Alarm;
+import com.yjh.accessrobot.common.mqtt.ftpsservice;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.configuration.UpFtpsConfig;
@@ -19,6 +22,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -34,11 +38,13 @@ public class RobotInspectionWarnThread implements Runnable{
     private RedisTemplate redisTemplate;
     private String webSocketUrl;
     private UpFtpsConfig upFtpsConfig;
+    private String stationCode;
 
-    public RobotInspectionWarnThread(Map<String,String> warnResultMap, RedisTemplate redisTemplate, String webSocketUrl){
+    public RobotInspectionWarnThread(Map<String,String> warnResultMap, RedisTemplate redisTemplate, String webSocketUrl, String stationCode){
         this.warnResultMap = warnResultMap;
         this.redisTemplate = redisTemplate;
         this.webSocketUrl = webSocketUrl;
+        this.stationCode = stationCode;
     }
 
     @Override
@@ -164,6 +170,11 @@ public class RobotInspectionWarnThread implements Runnable{
             // 将产生的告警上送至上级系统
             alarmToUpSystem(warnInfo, tStdDevicemete);
 
+            // 若是缺陷，上报至算法管理平台    识别类型是3即设备外观查看
+            if (Objects.equals("3", warnResultMap.get("recognitionType"))){
+                alarmToAlgorithmManagement(warnInfo, tStdDevicemete);
+            }
+
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
@@ -185,40 +196,37 @@ public class RobotInspectionWarnThread implements Runnable{
             xmlItem.put("patroldevice_code", warnResultMap.getOrDefault("robotCode", ""));
             String robotName = StaticContextAccessor.getBean(RobotService.class).selectRobotNameByCode(warnResultMap.get("robotCode"));
             xmlItem.put("patroldevice_name", robotName);
-            String taskName = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(warnInfo.getTaskId()).getTaskName();
-            xmlItem.put("task_name", taskName);
-            xmlItem.put("task_code", warnInfo.getTaskId());
+            xmlItem.put("task_name", warnResultMap.get("taskName"));
+            xmlItem.put("task_code", warnResultMap.get("taskCode"));
             xmlItem.put("device_name", warnResultMap.get("deviceName"));
-            xmlItem.put("device_id", String.valueOf(warnInfo.getInstanceId()));
-            switch (warnInfo.getWarnLevel()){
-                case 130:
-                    xmlItem.put("alarm_level", "1");
-                    break;
-                case 131:
-                    xmlItem.put("alarm_level", "2");
-                    break;
-                case 132:
-                    xmlItem.put("alarm_level", "3");
-                    break;
-                case 133:
-                    xmlItem.put("alarm_level", "4");
-                    break;
-                default:
-                    break;
+            xmlItem.put("device_id", warnResultMap.get("deviceId"));
+            xmlItem.put("alarm_level", warnResultMap.get("alarmLevel"));
+            xmlItem.put("alarm_type", warnResultMap.get("alarmType"));
+            xmlItem.put("recognition_type", warnResultMap.get("recognitionType"));
+
+            String recognitionType = warnResultMap.get("recognitionType");
+            String fileNamePath = "";
+            String fileType = "";
+            switch (recognitionType){
+                case "1":
+                case "3": fileType = "2"; fileNamePath = "/CCD/"; break;
+                case "2": fileType = "5"; fileNamePath = "/CCD/"; break;
+                case "4": fileType = "1"; fileNamePath = "/FIR/"; break;
+                case "5": fileType = "3"; fileNamePath = "/Audio/"; break;
+                default: break;
             }
-            // 因为该线程判断的都是外观
-            xmlItem.put("alarm_type", "6");
-            xmlItem.put("recognition_type", "3");
-            xmlItem.put("file_type", "5");
+            xmlItem.put("file_type", fileType);
 
             String imgPath = warnInfo.getImagePath().replaceAll(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content")));
-            String targetNamePath = imgPath.replace(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content")), "").substring(1);
-            log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
-            uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
-            xmlItem.put("file_path", targetNamePath);
+            String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(warnInfo.getWarnTime());
+            // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR或Audio/设备点位ID_编码_时间.jpg
+            String tagPath = "robotAlarm/" + stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
+                    + "/" + warnInfo.getTaskId() + fileNamePath + warnResultMap.get("deviceId") + "_" + warnResultMap.get("robotCode") + "_" + timeFormat + ".jpg";
+            log.info("tagPath==={}", tagPath);
+            uploadFileToUpFtps(imgPath, "/" + tagPath, upFtpsConfig);
+            xmlItem.put("file_path", tagPath);
 
             xmlItem.put("value", warnInfo.getValue());
             xmlItem.put("unit", Optional.ofNullable(tStdDevicemete.getUnit()).orElse(""));
@@ -241,6 +249,31 @@ public class RobotInspectionWarnThread implements Runnable{
         }
     }
 
+    /**
+     * 将产生的缺陷上送至算法管理平台
+     *
+     * @param warnInfo 告警信息
+     * @param tStdDevicemete 测点信息
+     * @return void
+     */
+    private void alarmToAlgorithmManagement(TWarnInfo warnInfo, TStdDeviceMete tStdDevicemete){
+        try {
+            ftpsservice ftpsservice= GetSpringUtil.getBean("ftpsservice");
+            String flag= ftpsservice.getFlag();
+            if("1".equals(flag)) {
+                log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
+                Alarm alarmDetail = new Alarm();
+                String year = Integer.toString(LocalDate.now().getYear());
+                String month = Integer.toString(LocalDate.now().getMonthValue());
+
+                String redisKeyName = "t_cruise_task_result:" + warnInfo.getTaskId() + ":" + warnInfo.getInstanceId();
+                String originPicPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "origpic"));
+
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+    }
     /**
      * 将文件上传至上级系统ftp服务器
      *

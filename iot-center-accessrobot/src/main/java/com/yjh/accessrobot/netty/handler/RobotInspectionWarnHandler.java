@@ -32,6 +32,8 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
 
     @Value("${other.webSocketUrl}")
     private String websocketUrl;
+    @Value("${stationCode}")
+    private String stationCode;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -61,7 +63,7 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
         warnResultMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
 
         log.info("机器人设备测点告警数据是：{}", warnResultMap);
-        RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(warnResultMap, redisTemplate, websocketUrl);
+        RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(warnResultMap, redisTemplate, websocketUrl, stationCode);
         TaskExecutePool.getInstance().execute(robotWarnThread);
 
         if(!Objects.isNull(warnResultMap.get("alarmType")) && (warnResultMap.get("alarmType").equals("3")||warnResultMap.get("alarmType").equals("4")||warnResultMap.get("alarmType").equals("9"))){

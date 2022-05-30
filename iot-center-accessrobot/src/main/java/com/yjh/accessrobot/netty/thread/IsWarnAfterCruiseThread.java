@@ -47,11 +47,14 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private String webSocketUrl;
 
     private UpFtpsConfig upFtpsConfig;
+    private String stationCode;
+    private SimpleDateFormat timeFormatTemp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate, String webSocketUrl) {
+    public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate, String webSocketUrl, String stationCode) {
         this.threadMap = threadMap;
         this.redisTemplate = redisTemplate;
         this.webSocketUrl = webSocketUrl;
+        this.stationCode = stationCode;
     }
 
     @Override
@@ -299,10 +302,10 @@ public class IsWarnAfterCruiseThread implements Runnable {
             String robotName = StaticContextAccessor.getBean(RobotService.class).selectRobotNameByCode(threadMap.get("robotCode"));
             xmlItem.put("patroldevice_name", robotName);
             String taskName = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(warnInfo.getTaskId()).getTaskName();
-            xmlItem.put("task_name", taskName);
-            xmlItem.put("task_code", warnInfo.getTaskId());
-            xmlItem.put("device_name", threadMap.get("deviceName"));
-            xmlItem.put("device_id", String.valueOf(warnInfo.getInstanceId()));
+            xmlItem.put("task_name", Optional.ofNullable(taskName).orElse(""));
+            xmlItem.put("task_code", Optional.ofNullable(warnInfo.getTaskId()).orElse(""));
+            xmlItem.put("device_name", Optional.ofNullable(threadMap.get("deviceName")).orElse(""));
+            xmlItem.put("device_id", Optional.ofNullable(threadMap.get("deviceId")).orElse(""));
             switch (warnInfo.getWarnLevel()){
                 case 130:
                     xmlItem.put("alarm_level", "1");
@@ -319,19 +322,44 @@ public class IsWarnAfterCruiseThread implements Runnable {
                 default:
                     break;
             }
-            // 因为该线程判断的都是表计结果是否告警
-            xmlItem.put("alarm_type", "7");
-            xmlItem.put("recognition_type", "1");
-            xmlItem.put("file_type", "2");
+            // 存在可见光的表计和红外测温和刀闸
+            String recognitionType = threadMap.get("recognitionType");
+            switch (recognitionType){
+                case "1":
+                    xmlItem.put("alarm_type", "7"); break;
+                case "2":
+                    xmlItem.put("alarm_type", "10"); break;
+                case "3":
+                    xmlItem.put("alarm_type", "6"); break;
+                case "4":
+                    xmlItem.put("alarm_type", "1"); break;
+                default: break;
+            }
+            xmlItem.put("recognition_type", threadMap.get("recognitionType"));
+            String fileType = threadMap.get("fileType");
+            String fileNamePath = "";
+            switch (fileType){
+                case "1": fileNamePath = "/FIR/"; break;
+                case "2": fileNamePath = "/CCD/"; break;
+                case "3": fileNamePath = "/Audio/"; break;
+                default: break;
+            }
+            xmlItem.put("file_type", fileType);
 
+            String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(
+                    timeFormatTemp.parse(threadMap.get("time")));
             String imgPath = warnInfo.getImagePath().replaceAll(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content")));
-            String targetNamePath = imgPath.replace(
-                            String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content")), "").substring(1);
-            log.info("imgPath:{},targetNamePath:{}",imgPath,targetNamePath);
-            uploadFileToUpFtps(imgPath, targetNamePath, upFtpsConfig);
-            xmlItem.put("file_path", targetNamePath);
+            // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR或Audio/设备点位ID_编码_时间.jpg
+            String tagPath = "robotAlarm/" + stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
+                    + "/" + warnInfo.getTaskId() + fileNamePath + threadMap.get("deviceId") + "_" + threadMap.get("robotCode") + "_" + timeFormat + ".jpg";
+            log.info("tagPath==={}", tagPath);
+//            String targetNamePath = imgPath.replace(
+//                            String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content")), "").substring(1);
+            log.info("imgPath:{},tagPath:{}",imgPath,tagPath);
+            uploadFileToUpFtps(imgPath, "/" + tagPath, upFtpsConfig);
+            xmlItem.put("file_path", tagPath);
 
             xmlItem.put("value", warnInfo.getValue());
             xmlItem.put("unit", Optional.ofNullable(tStdDevicemete.getUnit()).orElse(""));

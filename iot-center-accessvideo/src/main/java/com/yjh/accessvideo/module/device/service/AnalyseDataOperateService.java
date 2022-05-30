@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -812,7 +815,7 @@ public class AnalyseDataOperateService {
      * @param sourcePath 源文件地址
      * @param targetPathName 目标文件地址名称
      */
-    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+    public void uploadFileToUpFtps(String sourcePath, String targetPathName) {
         try {
             if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
@@ -822,12 +825,8 @@ public class AnalyseDataOperateService {
         }
     }
 
-    public static void main(String[] args) {
-        String imgPath = "http://192.168.1.66:10086/imgs/ftpImg/2022/05/03/5d7cc57c87764e2b8cca2ab81e5ce58c/Infrared/2B07D364183C4163AE664C361DF02B57_E100-00120220503162139_result.bmp";
-        String[] str2=imgPath.split("/");
-        String imgName=str2[str2.length-1];
-        String tagPath = "warn/"+"taskId"+"/"+imgName;
-        System.out.println(tagPath);
+    public String selectPMSByCameraId(Long cameraId){
+        return analyseDataOperateDao.selectPMSByCameraId(cameraId);
     }
 }
 

@@ -24,6 +24,7 @@ import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.*;
+import org.apache.commons.lang3.ArrayUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1022,7 +1023,7 @@ public class RunAtNowTask implements Runnable{
                 Map<String,String> mapForGet  = redisTemplate.opsForHash().entries(strForCountAbnormal);
                 TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(tCruiseTask.getTaskId());
                 Long taskEndTime = new Date().getTime();
-                if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
+                if(!ArrayUtils.contains(new int[]{239,240,243}, tCruiseResultIsPause.getCState())){
                     if(tCruiseResultIsPause.getCState() == 242){
                         Map<String,String> jsonMap=new HashMap<>();
                         jsonMap.put("type","newTask");

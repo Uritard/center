@@ -36,8 +36,8 @@ public class SilentTaskScheduled {
     private final RedisTemplate redisTemplate;
     private final TCameraPresetService tCameraPresetService;
 
-    @Value("${silent.task.interval}")
-    private int silentTaskTime;
+    @Value("${silent.task.cron}")
+    private String silentTaskTime;
 
     /**
      * 调用相机转到预置位接口
@@ -55,7 +55,7 @@ public class SilentTaskScheduled {
     private static final String MSG = "success";
     private static final String FLAG = "false";
 
-    @Scheduled(cron = "0/${silent.task.interval} * * * * ?")
+    @Scheduled(cron = "${silent.task.cron}")
     public void silentTaskScheduled() {
         log.info("定时任务");
         // 分析主机开关
@@ -72,7 +72,7 @@ public class SilentTaskScheduled {
             String state = redisInfoMap.get("state");
             String lastTime = redisInfoMap.get("lastTime");
 
-            Integer keepSilent = silentTaskTime * 1000;
+            Integer keepSilent = Integer.parseInt(silentTaskTime.substring(4,5)) * 60 * 1000;
             // 相机状态为闲置(state为0闲置,为1占用)时,做静默任务
             if (StringUtils.equals("0", state) && StringUtils.isNotEmpty(presetId)){
 

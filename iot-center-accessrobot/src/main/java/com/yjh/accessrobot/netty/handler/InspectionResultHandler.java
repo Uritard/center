@@ -1,8 +1,10 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -14,6 +16,7 @@ import com.yjh.accessrobot.netty.thread.NonhomologousWarnThread;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,9 +37,12 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 
     @Value("${other.webSocketUrl}")
     private String websocketUrl;
+    @Value("${stationCode}")
+    private String stationCode;
 
     @Autowired
     private RedisTemplate redisTemplate;
+    private UpFtpsConfig upFtpsConfig;
     @Autowired
     private RobotService robotService;
 
@@ -102,7 +108,9 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         RobotServerHandler.send(cruiseResultProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
 
-        resultUpToStation(xmlBaseModel,robotCode);
+        resultToUpSystem(xmlBaseModel);
+
+//        resultUpToStation(xmlBaseModel,robotCode);
     }
 
     /**
@@ -244,10 +252,13 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             isAlarmMap.put("deviceId", String.valueOf(item.get("device_id")));
             isAlarmMap.put("value", String.valueOf(item.get("value")));
             isAlarmMap.put("absolutePath", cruiseResultMap.get("absolutePath"));
-            isAlarmMap.put("deviceName", cruiseResultMap.get("device_name"));
+            isAlarmMap.put("deviceName", cruiseResultMap.get("deviceName"));
+            isAlarmMap.put("recognitionType",  String.valueOf(item.get("recognition_type")));
+            isAlarmMap.put("fileType",  String.valueOf(item.get("file_type")));
+            isAlarmMap.put("time",  String.valueOf(item.get("time")));
             //jeff add 把机器人任务结果图的物理路径传到isWarnAfterCruiseThread
             // Start IsWarnAfterCruiseThread
-            IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate, websocketUrl);
+            IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate, websocketUrl, stationCode);
             TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
         }catch (Exception e){
             log.error("对机器人结果文件处理及判断结果是否告警出现错误:{}", e.getMessage());
@@ -279,6 +290,43 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 //        Constant.otherServer(cruiseResult,Constant.TCP_URL);
         // 国网要求
         robotService.upToCruise(xmlBaseModel);
+    }
+
+    /**
+     * 巡视结果上报上级系统
+     * @param xmlBaseModel xml格式的内容
+     */
+    private void resultToUpSystem(XMLBaseModel xmlBaseModel){
+        try {
+            Map<String, Object> item = xmlBaseModel.getItems().get(0);
+            // 这是机器人放在巡视主机ftps服务下的路径
+            String value = String.valueOf(item.get("file_path"));
+            String tagPath = "robotTask/" + value;
+            log.info("tagPath==={}", tagPath);
+            String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/" + item.get("file_path");
+            uploadFileToUpFtps(imgPath, "/" + tagPath, upFtpsConfig);
+            xmlBaseModel.getItems().get(0).put("file_path", tagPath);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+        log.info("准备上报上级系统的机器人巡视结果是==={}", xmlBaseModel);
+        robotService.upToCruise(xmlBaseModel);
+    }
+
+    /**
+     * 将文件上传至上级系统ftp服务器
+     *
+     * @param sourcePath 源文件地址
+     * @param targetPathName 目标文件地址名称
+     */
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+        try {
+            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
+                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+        }
     }
 
     /**

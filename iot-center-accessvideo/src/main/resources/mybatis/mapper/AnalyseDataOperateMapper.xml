@@ -1035,4 +1035,11 @@
                 LEFT JOIN t_std_device tsd ON tcpi.device_id = tsd.device_id
         WHERE tcpi.instance_id = #{instanceId}
     </select>
+
+    <select id="selectPMSByCameraId" resultType="java.lang.String">
+        SELECT a.pms_id
+        FROM
+            t_camera_info a
+        where a.camera_id = #{cameraId,jdbcType=BIGINT}
+    </select>
 </mapper>
