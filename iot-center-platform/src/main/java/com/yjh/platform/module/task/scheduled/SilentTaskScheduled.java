@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 @Component("SilentTaskScheduled")
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @_(@Autowired))
-@ConditionalOnProperty(prefix = "scheduling", name = "enable", havingValue = "true")
 public class SilentTaskScheduled {
 
     private final RedisTemplate redisTemplate;
@@ -58,6 +57,12 @@ public class SilentTaskScheduled {
     @Scheduled(cron = "${silent.task.cron}")
     public void silentTaskScheduled() {
         log.info("定时任务");
+        // 静默任务开关
+        String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask","content"));
+        if (StringUtils.equals(FLAG, silentFlag)){
+            return;
+        }
+
         // 分析主机开关
         String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis","content"));
         if (StringUtils.equals(FLAG, flag)){
@@ -72,23 +77,23 @@ public class SilentTaskScheduled {
             String state = redisInfoMap.get("state");
             String lastTime = redisInfoMap.get("lastTime");
 
-            Integer keepSilent = Integer.parseInt(silentTaskTime.substring(4,5)) * 60 * 1000;
+//            Integer keepSilent = Integer.parseInt(silentTaskTime.substring(4,5)) * 60 * 1000;
             // 相机状态为闲置(state为0闲置,为1占用)时,做静默任务
             if (StringUtils.equals("0", state) && StringUtils.isNotEmpty(presetId)){
 
-                long oldTime = -1L;
-                try {
-                    if (lastTime != null && !"".equals(lastTime)) {
-                        oldTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(lastTime).getTime();
-                    }
-                } catch (Exception e) {
-                    log.info("摄像机id：{} 回到静默位错误：{}", cameraId, e);
-                }
-
-                if ((System.currentTimeMillis() - oldTime) < keepSilent) {
-                    log.info("cameraId为{}的相机在被控制", cameraId);
-                    continue;
-                }
+//                long oldTime = -1L;
+//                try {
+//                    if (lastTime != null && !"".equals(lastTime)) {
+//                        oldTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(lastTime).getTime();
+//                    }
+//                } catch (Exception e) {
+//                    log.info("摄像机id：{} 回到静默位错误：{}", cameraId, e);
+//                }
+//
+//                if ((System.currentTimeMillis() - oldTime) < keepSilent) {
+//                    log.info("cameraId为{}的相机在被控制", cameraId);
+//                    continue;
+//                }
                 log.info("cameraId为{},presetId为{}的相机准备做静默任务", cameraId, presetId);
                 try {
                     HashMap<String, Object> moveMap = new HashMap<>(5);

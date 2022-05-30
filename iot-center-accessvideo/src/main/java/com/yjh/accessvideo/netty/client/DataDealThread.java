@@ -25,6 +25,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
@@ -55,6 +56,8 @@ public class DataDealThread implements Runnable {
     private String INSTANCEID;
     private String syncWebsocketUrl;
     private String stationCode;
+
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     /**
      * 服务端口
      */
@@ -155,7 +158,7 @@ public class DataDealThread implements Runnable {
 
                     Map<String, String> cruiseResultMap = new HashMap<>();//修改redis的巡检点结果map
 
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 
 
                     //处理判别结果
@@ -437,77 +440,8 @@ public class DataDealThread implements Runnable {
                                                     currentWarnInfo.put("defectModel","450");
                                                     currentWarnInfo.put("isPop","false");
 
-                                                    try{
-
-                                                        //告警上报站端
-                                                        XMLBaseModel xmlBaseModel = new XMLBaseModel();
-                                                        List<Map<String, Object>> xmlItems = new ArrayList<>();
-                                                        Map<String, Object> xmlItem = new HashMap<>();
-                                                        xmlBaseModel.setType("62");
-                                                        xmlItem.put("patroldevice_code", Optional.ofNullable(cruiseResult.get("instanceId")).orElse(""));
-                                                        xmlItem.put("patroldevice_name", Optional.ofNullable(cruiseResult.get("instanceName")).orElse(""));
-                                                        xmlItem.put("task_name", Optional.ofNullable(cruiseResult.get("taskName")).orElse(""));
-                                                        xmlItem.put("task_code", Optional.ofNullable(cruiseResult.get("taskCode")).orElse(""));
-                                                        xmlItem.put("device_name", Optional.ofNullable(cruiseResult.get("cruiseName")).orElse(""));
-                                                        xmlItem.put("device_id",Optional.ofNullable(cruiseResult.get("device_mete_id")).orElse(""));
-                                                        xmlItem.put("alarm_level", Optional.ofNullable(alarm_level).orElse(""));
-                                                        String deviceMeteId = cruiseResult.get("device_mete_id");
-                                                        Map<String, Object> info = analyseDataOperateService.selectWarnInfo(NumberUtils.toLong(deviceMeteId));
-                                                        log.info("info==={}", info);
-                                                        xmlItem.put("alarm_type", Optional.ofNullable(info.get("alarm_type")).orElse(""));
-                                                        String recognitionType = "";
-                                                        String fileNamePath = "";
-                                                        String fileType = "";
-                                                        String analyseTypeTemp = jsonObjectResult.getString("analyseType");
-                                                        switch (analyseTypeTemp){
-                                                            case "1":
-                                                            case "2":
-                                                            case "3": recognitionType = "1"; fileNamePath = "/CCD/"; fileType = "2"; break;
-                                                            case "4":
-                                                            case "6":
-                                                            case "11": recognitionType = "2"; fileNamePath = "/CCD/"; fileType = "2"; break;
-                                                            case "5": recognitionType = "6"; fileNamePath = "/CCD/"; fileType = "5"; break;
-                                                            case "7": recognitionType = "3"; fileNamePath = "/CCD/"; fileType = "2"; break;
-                                                            case "8": recognitionType = "3"; fileNamePath = "/CCD/"; fileType = "5"; break;
-                                                            case "9": recognitionType = "4"; fileNamePath = "/FIR/"; fileType = "1"; break;
-                                                            case "10": recognitionType = "2"; fileNamePath = "/CCD/"; fileType = "5"; break;
-                                                            case "13": recognitionType = "5"; fileNamePath = "/Audio/"; fileType = "3"; break;
-                                                            default: break;
-                                                        }
-                                                        xmlItem.put("file_type", fileType);
-                                                        xmlItem.put("recognition_type", recognitionType);
-
-                                                        String imgPath = cruiseResult.get("picpath");
-                                                        imgPath = imgPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
-                                                                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")));
-                                                        String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-                                                        String cameraPmS = analyseDataOperateService.selectPMSByCameraId(Long.valueOf(cruiseResult.get("cameraId")));
-                                                        // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD/设备点位ID_编码_时间.jpg
-                                                        String tagPath = "alarm/" + stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
-                                                                + "/" + taskId + fileNamePath + deviceMeteId + "_" + cameraPmS + "_" + timeFormat + ".jpg";
-                                                        log.info("tagPath==={}", tagPath);
-                                                        analyseDataOperateService.uploadFileToUpFtps(imgPath, "/" + tagPath);
-                                                        xmlItem.put("file_path", tagPath);
-
-                                                        xmlItem.put("value", tWarnInfo.getValue());
-                                                        xmlItem.put("unit", Optional.ofNullable(info.get("unit")).orElse(""));
-                                                        xmlItem.put("value_unit", tWarnInfo.getValue() + xmlItem.get("unit"));
-                                                        xmlItem.put("time", simpleDateFormat.format(new Date()));
-                                                        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-                                                        xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(simpleDateFormat2.parse(cruiseResult.get("cruiseTime"))));
-                                                        xmlItem.put("content", tWarnInfo.getWarnContent());
-
-                                                        xmlItems.add(xmlItem);
-                                                        xmlBaseModel.setItems(xmlItems);
-                                                        List<XMLBaseModel> list = new ArrayList<>();
-                                                        list.add(xmlBaseModel);
-                                                        Map<String, List<XMLBaseModel>> map = new HashMap<>();
-                                                        map.put("list", list);
-                                                        log.info("告警上报：-" + map);
-                                                        Constant.otherServer(map, Constant.TCP_URL);//江苏要求
-                                                    }catch (Exception e){
-                                                        log.error("告警上报出错：", e);
-                                                    }
+                                                    // 告警上报站端
+                                                    alarmAndResultToUpSystem(jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult, alarm_level, tWarnInfo);
 
                                                     // webSocket通知前端刷新告警统计数量
                                                     Map<String, Object> jasonMaps = new HashMap<>();
@@ -912,81 +846,8 @@ public class DataDealThread implements Runnable {
                         log.info("cruiseResultMap==={}", JSON.toJSONString(cruiseResultMap));
                         redisTemplate.opsForHash().putAll(cruiseRedisName, cruiseResultMap);//修改redis
 
-                        try{
-                            //巡视点结果上报站端
-                            XMLBaseModel xmlBaseModel = new XMLBaseModel();
-                            List<Map<String, Object>> xmlItems = new ArrayList<>();
-                            Map<String, Object> xmlItem = new HashMap<>();
-                            xmlBaseModel.setType("61");
-                            xmlItem.put("patroldevice_code", Optional.ofNullable(cruiseResult.get("instanceId")).orElse(""));
-                            xmlItem.put("patroldevice_name", Optional.ofNullable(cruiseResult.get("instanceName")).orElse(""));
-                            xmlItem.put("task_name", Optional.ofNullable(cruiseResult.get("taskName")).orElse(""));
-                            xmlItem.put("task_code", Optional.ofNullable(cruiseResult.get("taskCode")).orElse(""));
-                            xmlItem.put("device_name", Optional.ofNullable(cruiseResult.get("cruiseName")).orElse(""));
-                            xmlItem.put("device_id", Optional.ofNullable(cruiseResult.get("device_mete_id")).orElse(""));
-                            xmlItem.put("material_id", Optional.ofNullable(cruiseResult.get("realCode")).orElse(""));
-                            xmlItem.put("value_type", "0");
-                            xmlItem.put("value", "");
-                            xmlItem.put("value_unit", Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse(""));
-                            xmlItem.put("unit", "");
-                            xmlItem.put("time", simpleDateFormat.format(new Date()));
-
-                            String recognitionType = "";
-                            String fileNamePath = "";
-                            String fileType = "";
-                            String analyseTypeTemp = jsonObjectResult.getString("analyseType");
-                            switch (analyseTypeTemp){
-                                case "1":
-                                case "2":
-                                case "3": recognitionType = "1"; fileNamePath = "/CCD/"; fileType = "2"; break;
-                                case "4":
-                                case "6":
-                                case "11": recognitionType = "2"; fileNamePath = "/CCD/"; fileType = "2"; break;
-                                case "5": recognitionType = "6"; fileNamePath = "/CCD/"; fileType = "5"; break;
-                                case "7": recognitionType = "3"; fileNamePath = "/CCD/"; fileType = "2"; break;
-                                case "8": recognitionType = "3"; fileNamePath = "/CCD/"; fileType = "5"; break;
-                                case "9": recognitionType = "4"; fileNamePath = "/FIR/"; fileType = "1"; break;
-                                case "10": recognitionType = "2"; fileNamePath = "/CCD/"; fileType = "5"; break;
-                                case "13": recognitionType = "5"; fileNamePath = "/Audio/"; fileType = "3"; break;
-                                default: break;
-                            }
-                            xmlItem.put("file_type", fileType);
-                            xmlItem.put("recognition_type", recognitionType);
-
-                            String imgPath = cruiseResult.get("origpic");
-                            String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-                            String cameraPmS = analyseDataOperateService.selectPMSByCameraId(Long.valueOf(cruiseResult.get("cameraId")));
-                            // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-                            String tagPath = "task/" + stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
-                                    + "/" + taskId + fileNamePath + cruiseResult.get("device_mete_id") + "_" + cameraPmS + "_" + timeFormat + ".jpg";
-                            log.info("tagPath==={}", tagPath);
-                            analyseDataOperateService.uploadFileToUpFtps(imgPath, "/" + tagPath);
-                            xmlItem.put("file_path", tagPath);
-
-                            xmlItem.put("rectangle", "");
-                            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddHHmmss");
-                            xmlItem.put("task_patrolled_id", cruiseResult.get("taskId")+"_"+simpleDateFormat2.format(
-                                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(cruiseResult.get("cruiseTime"))));
-                            xmlItem.put("data_type", "0x01");
-                            String valid = "";
-                            if ("--".equals(cruiseResultMap.get("resultNum")) || "null".equals(cruiseResultMap.get("resultNum"))) {
-                                valid = "0";
-                            } else {
-                                valid = "1";
-                            }
-                            xmlItem.put("valid", valid);
-
-                            xmlItems.add(xmlItem);
-                            xmlBaseModel.setItems(xmlItems);
-                            List<XMLBaseModel> list = new ArrayList<>();
-                            list.add(xmlBaseModel);
-                            Map<String, List<XMLBaseModel>> map = new HashMap<>();
-                            map.put("list", list);
-                            log.info("结果信息上报：-" + map);
-                            Constant.otherServer(map, Constant.TCP_URL);//江苏要求
-                        }catch (Exception e){
-                            log.error("结果上报失败", e);
-                        }
+                        // 巡视点结果上报站端
+                        alarmAndResultToUpSystem(jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult,null, null);
 
                         log.info("Border_______---------______________________________________________________________________________________________");
                         lock.lock();
@@ -1459,6 +1320,155 @@ public class DataDealThread implements Runnable {
 
 
         }
+    }
+
+    /**
+     * 告警或结果上报站端
+     *
+     * @param analyseType 分析类型
+     * @param cruiseResultMap 巡视结果map
+     * @param cruiseResult 巡视结果map
+     * @param alarmLevel 告警等级
+     * @param tWarnInfo 告警信息
+     */
+    @Async
+    private XMLBaseModel alarmAndResultToUpSystem(String analyseType, Map<String, String> cruiseResultMap, Map<String, String> cruiseResult, String alarmLevel, TWarnInfo tWarnInfo){
+        log.info("cruiseResultMap==={}", cruiseResultMap);
+        log.info("cruiseResult==={}", cruiseResult);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        List<Map<String, Object>> xmlItems = new ArrayList<>();
+        Map<String, Object> xmlItem = new HashMap<>(16);
+        try {
+            xmlItem.put("patroldevice_code", Optional.ofNullable(cruiseResult.get("instanceId")).orElse(""));
+            xmlItem.put("patroldevice_name", Optional.ofNullable(cruiseResult.get("instanceName")).orElse(""));
+            xmlItem.put("task_name", Optional.ofNullable(cruiseResult.get("taskName")).orElse(""));
+            xmlItem.put("task_code", Optional.ofNullable(cruiseResult.get("taskCode")).orElse(""));
+            xmlItem.put("device_name", Optional.ofNullable(cruiseResult.get("cruiseName")).orElse(""));
+            xmlItem.put("device_id", Optional.ofNullable(cruiseResult.get("device_mete_id")).orElse(""));
+            xmlItem.put("time", simpleDateFormat.format(new Date()));
+            // 识别类型、文件类型、文件名命名
+            String recognitionType = "";
+            String fileNamePath = "";
+            String fileType = "";
+            switch (analyseType){
+                case "1":
+                case "2":
+                case "3": recognitionType = "1"; fileNamePath = "/CCD/"; fileType = "2"; break;
+                case "4":
+                case "6":
+                case "11": recognitionType = "2"; fileNamePath = "/CCD/"; fileType = "2"; break;
+                case "5": recognitionType = "6"; fileNamePath = "/CCD/"; fileType = "5"; break;
+                case "7": recognitionType = "3"; fileNamePath = "/CCD/"; fileType = "2"; break;
+                case "8": recognitionType = "3"; fileNamePath = "/CCD/"; fileType = "5"; break;
+                case "9": recognitionType = "4"; fileNamePath = "/FIR/"; fileType = "1"; break;
+                case "10": recognitionType = "2"; fileNamePath = "/CCD/"; fileType = "5"; break;
+                case "13": recognitionType = "5"; fileNamePath = "/Audio/"; fileType = "3"; break;
+                default: break;
+            }
+            xmlItem.put("file_type", fileType);
+            xmlItem.put("recognition_type", recognitionType);
+            // 根据相机id获取相机pms编码 （仿照机器人编码）
+            String cameraPmS = analyseDataOperateService.selectPMSByCameraId(Long.valueOf(cruiseResult.get("cameraId")));
+            String deviceMeteId = cruiseResult.get("device_mete_id");
+            String taskId = cruiseResult.get("taskId");
+            // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
+            String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            String tagPath = stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
+                    + "/" + taskId + fileNamePath + deviceMeteId + "_" + cameraPmS + "_" + timeFormat + ".jpg";
+            String imgPath = "";
+
+            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddHHmmss");
+            xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat2.format(simpleDateFormat2.parse(cruiseResult.get("cruiseTime"))));
+
+            if (Objects.isNull(tWarnInfo)){
+                // 巡视结果
+                tagPath = packageCruiseResultInfo(cruiseResultMap, cruiseResult, xmlBaseModel, xmlItem, tagPath);
+                imgPath = cruiseResult.get("picpath").replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content")));
+            }else {
+                // 告警
+                tagPath = packageAlarmInfo(alarmLevel, tWarnInfo, xmlBaseModel, xmlItem, deviceMeteId, tagPath);
+                imgPath = tWarnInfo.getImagePath().replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content")));
+            }
+            log.info("imgPath==={},tagPath==={}", imgPath, tagPath);
+            analyseDataOperateService.uploadFileToUpFtps(imgPath, "/" + tagPath);
+
+            xmlItems.add(xmlItem);
+            xmlBaseModel.setItems(xmlItems);
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            Map<String, List<XMLBaseModel>> map = new HashMap<>();
+            map.put("list", list);
+            log.info("信息上报==={}", map);
+            Constant.otherServer(map, Constant.TCP_URL);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+        return xmlBaseModel;
+    }
+
+    /**
+     * 组装告警信息
+     *
+     * @param alarmLevel 告警等级
+     * @param tWarnInfo 告警信息
+     * @param xmlBaseModel
+     * @param xmlItem
+     * @param deviceMeteId
+     * @param tagPath
+     * @return String
+     */
+    private String packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, XMLBaseModel xmlBaseModel, Map<String, Object> xmlItem, String deviceMeteId, String tagPath) {
+        try {
+            tagPath = "alarm/" + tagPath;
+            xmlBaseModel.setType("62");
+            xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));
+            Map<String, Object> info = analyseDataOperateService.selectWarnInfo(NumberUtils.toLong(deviceMeteId));
+            log.info("info==={}", info);
+            xmlItem.put("alarm_type", Optional.ofNullable(info.get("alarm_type")).orElse(""));
+            xmlItem.put("value", Optional.ofNullable(tWarnInfo.getValue()).orElse(""));
+            xmlItem.put("unit", Optional.ofNullable(info.get("unit")).orElse(""));
+            xmlItem.put("value_unit", tWarnInfo.getValue() + xmlItem.get("unit"));
+            xmlItem.put("content", tWarnInfo.getWarnContent());
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+        return tagPath;
+    }
+
+    /**
+     * 组装巡视结果信息
+     *
+     * @param cruiseResultMap
+     * @param cruiseResult
+     * @param xmlBaseModel
+     * @param xmlItem
+     * @param tagPath
+     * @return String
+     */
+    private String packageCruiseResultInfo(Map<String, String> cruiseResultMap, Map<String, String> cruiseResult, XMLBaseModel xmlBaseModel, Map<String, Object> xmlItem, String tagPath) {
+        try {
+            tagPath = "task/" + tagPath;
+            xmlBaseModel.setType("61");
+            xmlItem.put("material_id", Optional.ofNullable(cruiseResult.get("realCode")).orElse(""));
+            xmlItem.put("value", "");
+            xmlItem.put("unit", "");
+            xmlItem.put("value_unit", Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse(""));
+            xmlItem.put("value_type", "0");
+            xmlItem.put("rectangle", "");
+            xmlItem.put("data_type", "0x01");
+            String valid = "";
+            if ("--".equals(cruiseResultMap.get("resultNum")) || "null".equals(cruiseResultMap.get("resultNum"))) {
+                valid = "0";
+            } else {
+                valid = "1";
+            }
+            xmlItem.put("valid", valid);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+        return tagPath;
     }
 
     /**

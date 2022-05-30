@@ -42,6 +42,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
     private UpFtpsConfig upFtpsConfig;
     @Autowired
     private RobotService robotService;

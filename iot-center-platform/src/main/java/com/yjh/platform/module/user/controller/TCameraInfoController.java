@@ -273,6 +273,7 @@ public class TCameraInfoController {
                                 @RequestParam(value = "unit", required = false) String unit,
                                @RequestParam(value = "address", required = false) String address,
                                @RequestParam(value = "cameraVendor", required = false) String cameraVendor,
+                               @RequestParam(value = "cameraType", required = false) Integer cameraType,
                                @RequestParam(value = "cameraModel", required = false) Integer cameraModel,
                                @RequestParam(value = "cameraName", required = false) String cameraName,
                                @RequestParam(value = "regionId", required = false) Long regionId,
@@ -284,7 +285,7 @@ public class TCameraInfoController {
 //            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tCameraInfo.getUpRegionId());
             List<Long> regionIdList =  tStdRegionDao.selectDownId(regionId);
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TCameraInfoByDict> list = tCameraInfoService.selectByPage(aliasName,unit,address,cameraVendor,cameraModel,cameraName,regionIdList);
+            List<TCameraInfoByDict> list = tCameraInfoService.selectByPage(cameraType,aliasName,unit,address,cameraVendor,cameraModel,cameraName,regionIdList);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

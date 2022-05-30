@@ -63,7 +63,8 @@ public interface TRobotInfoDao {
                                 @Param(value = "repairRecord") String repairRecord,
                                 @Param(value = "exitPutIntoRecord") String exitPutIntoRecord,
                                 @Param(value = "remarks") String remarks);
-    List<TRobotInfo> selectRobotByPage(@Param(value = "robotName") String robotName,
+    List<TRobotInfo> selectRobotByPage(@Param(value = "robotPosition")Integer robotPosition,
+                                @Param(value = "robotName") String robotName,
                                 @Param(value = "buildingUser") String buildingUser,
                                   @Param(value = "robotFactory") Integer robotFactory,
                                   @Param(value = "robotType") Integer robotType,

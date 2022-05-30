@@ -411,6 +411,7 @@
         <if test="robotType != -1"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
         <if test="buildingUser != null and buildingUser != '' ">and a.building_user LIKE CONCAT('%',#{buildingUser, jdbcType=VARCHAR},'%')</if>
         <if test="robotFactory != -1 ">and a.robot_factory = #{robotFactory,jdbcType=INTEGER}</if>
+        <if test="robotPosition != -1 ">and a.robot_position = #{robotPosition,jdbcType=INTEGER}</if>
         <if test="robotSource != null and robotSource != '' ">and a.robot_source LIKE CONCAT('%',#{robotSource, jdbcType=VARCHAR},'%')</if>
         <if test="isUse != -1 ">and a.is_use = #{isUse,jdbcType=INTEGER}</if>
         <if test="address != null and address != '' ">and a.address LIKE CONCAT('%',#{address, jdbcType=VARCHAR},'%')</if>

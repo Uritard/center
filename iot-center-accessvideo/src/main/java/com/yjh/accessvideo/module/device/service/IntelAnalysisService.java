@@ -11,6 +11,7 @@ import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Different;
 import com.yjh.accessvideo.common.utils.FtpsUtil;
 import com.yjh.accessvideo.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.commons.utils.FileUtil;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
@@ -830,7 +831,7 @@ public class IntelAnalysisService {
                 uploadFileToUpFtps(imgPath, "jm/" + targetNamePath, upFtpsConfig);
 
                 xmlItem.put("file_path", targetNamePath);
-                xmlItem.put("time", tWarnInfo.getWarnTime());
+                xmlItem.put("time", DateTimeUtil.format(tWarnInfo.getWarnTime()));
                 xmlItem.put("content", tWarnInfo.getWarnContent());
                 xmlItems.add(xmlItem);
                 xmlBaseModel.setItems(xmlItems);

@@ -215,6 +215,7 @@ public class TRobotInfoController {
                                @RequestParam(value = "robotFactory", required = false) Integer robotFactory,
                                @RequestParam(value = "robotType", required = false) Integer robotType,
                                @RequestParam(value = "droneType", required = false) Integer droneType,
+                               @RequestParam(value = "robotPosition", required = false) Integer robotPosition,
                                @RequestParam(value = "robotSource", required = false) String robotSource,
                                @RequestParam(value = "isUse", required = false) Integer isUse,
                                @RequestParam(value = "address", required = false) String address,
@@ -227,7 +228,7 @@ public class TRobotInfoController {
 //            List<Long> upRegionIds = tStdDeviceService.selectRegionIdTree(tRobotInfo.getUpRegionId());
             List<Long> regionIdList =  tStdRegionDao.selectDownId(upRegionId);
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<TRobotInfo> list = tRobotInfoService.selectByPage(robotName,buildingUser, robotFactory,robotType,droneType,robotSource,isUse,address,type,regionIdList);
+            List<TRobotInfo> list = tRobotInfoService.selectByPage(robotPosition,robotName,buildingUser, robotFactory,robotType,droneType,robotSource,isUse,address,type,regionIdList);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

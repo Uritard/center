@@ -99,8 +99,8 @@ public class TCameraRecorderService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraRecorderByDict> selectByPage(String aliasName,String unit,Integer vendorId, Integer recorderModel,String recordName) {
-        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.selectByPage(aliasName,unit,vendorId,recorderModel,recordName);
+    public List<TCameraRecorderByDict> selectByPage(Integer recordType,String aliasName,String unit,Integer vendorId, Integer recorderModel,String recordName) {
+        List<TCameraRecorderByDict> tCameraRecorderByDictList = tCameraRecorderDao.selectByPage(recordType,aliasName,unit,vendorId,recorderModel,recordName);
 
         for(TCameraRecorderByDict res : tCameraRecorderByDictList) {
             HashMap<String, Object> recordIdMap = new HashMap<>();

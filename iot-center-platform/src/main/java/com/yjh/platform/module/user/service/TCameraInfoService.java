@@ -222,9 +222,9 @@ public class TCameraInfoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TCameraInfoByDict> selectByPage(String aliasName,String unit,String address,String cameraVendor,
+    public List<TCameraInfoByDict> selectByPage(Integer cameraType,String aliasName,String unit,String address,String cameraVendor,
                                                 Integer cameraModel,String cameraName,List<Long> regionIdList) {
-        List<TCameraInfoByDict> tCameraInfoByDict = tCameraInfoDao.selectByPage(aliasName,unit,address,cameraVendor,cameraModel,cameraName,regionIdList);
+        List<TCameraInfoByDict> tCameraInfoByDict = tCameraInfoDao.selectByPage(cameraType,aliasName,unit,address,cameraVendor,cameraModel,cameraName,regionIdList);
 
         Map<String,String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();

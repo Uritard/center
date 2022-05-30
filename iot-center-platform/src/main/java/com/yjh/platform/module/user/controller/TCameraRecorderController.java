@@ -194,6 +194,7 @@ public class TCameraRecorderController {
                                @RequestParam(value = "unit", required = false) String unit,
                                @RequestParam(value = "vendorId", required = false) Integer vendorId,
                                @RequestParam(value = "recorderModel", required = false) Integer recorderModel,
+                               @RequestParam(value = "recordType", required = false) Integer recordType,
                                @RequestParam(value = "recordName", required = false) String recordName,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {
@@ -201,7 +202,7 @@ public class TCameraRecorderController {
         Map<String, Object> resultMap = new HashMap<>();
         try {
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TCameraRecorderByDict> list = tCameraRecorderService.selectByPage(aliasName,unit,vendorId,recorderModel,recordName);
+            List<TCameraRecorderByDict> list = tCameraRecorderService.selectByPage(recordType,aliasName,unit,vendorId,recorderModel,recordName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);

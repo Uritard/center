@@ -159,6 +159,9 @@
         where 1=1
         <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name like concat ('%',#{voiceDeviceName, jdbcType=VARCHAR},'%')</if>
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
+        <if test="voiceType != -1"> and a.voice_type = #{voiceType, jdbcType=INTEGER}</if>
+        <if test="voiceModel != -1"> and a.voice_model = #{voiceModel, jdbcType=INTEGER}</if>
+        <if test="voiceFactory != -1"> and a.voice_factory = #{voiceFactory, jdbcType=INTEGER}</if>
         <if test="upRegionId != null"> and a.up_region_id in <foreach collection="list" item="upRegionId" open="(" separator="," close=")">
             #{upRegionId, jdbcType=BIGINT}</foreach></if>
     </select>

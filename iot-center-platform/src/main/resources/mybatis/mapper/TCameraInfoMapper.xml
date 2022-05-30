@@ -274,6 +274,7 @@
         where 1 = 1
         <if test="cameraName != null and cameraName != ''"> and a.camera_name like concat('%',#{cameraName, jdbcType=VARCHAR},'%')</if>
         <if test="cameraModel != -1 "> and a.camera_model = #{cameraModel, jdbcType=INTEGER}</if>
+        <if test="cameraType != -1 "> and a.camera_type = #{cameraType, jdbcType=INTEGER}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name like concat('%',#{aliasName, jdbcType=VARCHAR},'%')</if>
         <if test="regionIdList != null and regionIdList.size() > 0 ">
          and a.up_region_id in

@@ -55,6 +55,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
         this.redisTemplate = redisTemplate;
         this.webSocketUrl = webSocketUrl;
         this.stationCode = stationCode;
+        this.upFtpsConfig = StaticContextAccessor.getBean(UpFtpsConfig.class);
     }
 
     @Override

@@ -40,7 +40,8 @@ public interface TCameraRecorderDao {
                                        @Param(value = "bufferDay") Integer bufferDay,
                                        @Param(value = "timeLong") Integer timeLong,
                                        @Param(value = "unit") String unit);
-    List<TCameraRecorderByDict> selectByPage(@Param(value = "aliasName") String aliasName,
+    List<TCameraRecorderByDict> selectByPage(@Param(value = "recordType") Integer recordType,
+                                            @Param(value = "aliasName") String aliasName,
                                              @Param(value = "unit") String unit,
                                              @Param(value = "vendorId") Integer vendorId,
                                              @Param(value = "recorderModel") Integer recorderModel,

@@ -52,7 +52,8 @@ public interface TCameraInfoDao {
                              @Param(value = "longitude") String longitude,
                              @Param(value = "address") String address,
                              @Param(value = "unit") String unit);
-    List<TCameraInfoByDict> selectByPage(@Param(value = "aliasName") String aliasName,
+    List<TCameraInfoByDict> selectByPage(@Param(value = "cameraType") Integer cameraType,
+                                        @Param(value = "aliasName") String aliasName,
                                          @Param(value = "unit") String unit,
                                          @Param(value = "address") String address,
                                          @Param(value = "cameraVendor") String cameraVendor,

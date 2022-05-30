@@ -1,8 +1,10 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -10,6 +12,7 @@ import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.bcel.generic.IF_ACMPEQ;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -29,6 +32,8 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private UpFtpsConfig upFtpsConfig;
     @Autowired
     private RobotService robotService;
 
@@ -69,6 +74,8 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
                 robotRoadMap.put("relativePath", developRelativeUrl + "/" + fileName);
                 robotRoadMap.put("absolutePath", developAbsoluteUrl + "/" + fileName);
+
+                roadToUpSystem(xmlBaseModel);
             }else {
                 robotRoadMap.put("relativePath", "");
                 robotRoadMap.put("absolutePath", "");
@@ -89,8 +96,44 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
         RobotServerHandler.send( roadProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
         // 国网要求
-        robotService.upToCruise(xmlBaseModel);
+//        robotService.upToCruise(xmlBaseModel);
+    }
 
+    /**
+     * 巡视路线上报上级系统
+     * @param xmlBaseModel xml格式的内容
+     */
+    private void roadToUpSystem(XMLBaseModel xmlBaseModel){
+        try {
+            Map<String, Object> item = xmlBaseModel.getItems().get(0);
+            // 这是机器人放在巡视主机ftps服务下的路径
+            String value = String.valueOf(item.get("file_path"));
+            String tagPath = "robotRoad/" + value;
+            log.info("tagPath==={}", tagPath);
+            String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/" + item.get("file_path");
+            uploadFileToUpFtps(imgPath, "/" + tagPath, upFtpsConfig);
+            xmlBaseModel.getItems().get(0).put("file_path", tagPath);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+        log.info("准备上报上级系统的机器人巡视路线是==={}", xmlBaseModel);
+        robotService.upToCruise(xmlBaseModel);
+    }
+
+    /**
+     * 将文件上传至上级系统ftp服务器
+     *
+     * @param sourcePath 源文件地址
+     * @param targetPathName 目标文件地址名称
+     */
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+        try {
+            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
+                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+        }
     }
 
     /**
