@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.mqtt.GetSpringUtil;
 import com.yjh.accessrobot.common.mqtt.alarmMsgBody.Alarm;
+import com.yjh.accessrobot.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.accessrobot.common.mqtt.ftpsservice;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
@@ -14,6 +15,7 @@ import com.yjh.accessrobot.module.command.entity.TStdDeviceMete;
 import com.yjh.accessrobot.module.command.entity.TWarnInfo;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
+import com.yjh.accessrobot.module.device.service.AlarmService;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -21,6 +23,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -263,12 +266,76 @@ public class RobotInspectionWarnThread implements Runnable{
             if("1".equals(flag)) {
                 log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
                 Alarm alarmDetail = new Alarm();
-                String year = Integer.toString(LocalDate.now().getYear());
-                String month = Integer.toString(LocalDate.now().getMonthValue());
+                SimpleDateFormat ym = new SimpleDateFormat("yyyyMM");
+                SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                String yearMonth = ym.format(new Date());
+                String nowTime = timeFormat.format(new Date());
 
                 String redisKeyName = "t_cruise_task_result:" + warnInfo.getTaskId() + ":" + warnInfo.getInstanceId();
                 String originPicPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "origpic"));
 
+                // 间隔名称  设备名称  测点名称
+                String picF = nowTime+"_"+"间隔名称"+"_"+"设备名称"+"_"+"测点名称"+"_";
+
+                String origpicpath = ""; //原图地址  /home 开头
+
+                String resultImagebak = ""; //结果图地址  /home 开头
+
+                //原图目标地址
+                String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+picF+"原图.jpg";
+
+                //告警目标地址
+                String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"缺陷"+"/"+yearMonth+"/"+picF+"缺陷告警.jpg";
+
+
+                List<Defect> defectList=new ArrayList<>();
+
+                for (int i=0;i<0 ; i++) {//构建坐标
+                    Defect defect=new Defect();
+                    defect.setX1("坐标1");
+                    defect.setY1("坐标2");
+                    defect.setX2("坐标3");
+                    defect.setY2("坐标4");
+                    defect.setType("拼音缩写 例：wcaqm");
+                    DecimalFormat df =  new DecimalFormat("0%");
+                    String confidence = df.format(0d);//置信度 0-100之间
+                    defect.setConfidence(confidence);
+                    // 描述 未穿工装(坐标位置 11,22,55,66;置信度 70%)
+                    defect.setDesc("缺陷中文描述 例：未穿安全帽"+"(坐标位置 "+
+                            defect.getX1()+","+
+                            defect.getY1()+","+
+                            defect.getX2()+","+
+                            defect.getY2()+";"+
+                            "置信度 "+ confidence
+                            +"%)");
+                    defectList.add(defect);
+                }
+                alarmDetail.setDefect(defectList);
+                alarmDetail.setBay_name("间隔名称");
+                alarmDetail.setDevice_name("设备名");  //需要修改位devicename
+                alarmDetail.setPoint_name("测点名称");
+                alarmDetail.setTime("告警时间");
+                alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
+                alarmDetail.setPic_diff_base("");               //判别基准图路径
+                alarmDetail.setPic_different("");               //判别告警图路径,即分析结果图
+                alarmDetail.setPic_defect(remotefilepath);      //缺陷告警图路径//
+
+                ftpsservice.uploadFile("缺陷告警",origpicpath,remoteorigfilepath);
+                ftpsservice.uploadFile("缺陷告警",resultImagebak,remotefilepath);
+                if( !ftpsservice.fileExits(remoteorigfilepath)){
+                    ftpsservice.uploadFile("缺陷告警",origpicpath,remoteorigfilepath);  //原始图片上传
+                }
+                if( !ftpsservice.fileExits(remotefilepath)){
+                    ftpsservice.uploadFile("缺陷告警",resultImagebak,remotefilepath);
+                }
+
+                log.info("巡视主机与智能分析主机：origpicpath:{}",origpicpath);
+                log.info("巡视主机与智能分析主机：remoteorigfilepath:{}",remoteorigfilepath);
+                log.info("巡视主机与智能分析主机：resultImagebak:{}",resultImagebak);
+                log.info("巡视主机与智能分析主机：remotefilepath:{}",remotefilepath);
+                AlarmService alarmService= GetSpringUtil.getBean("alarmService");
+                alarmService.PushMsg(alarmDetail);
+                log.info("发送算法管理平台结束");
             }
         }catch (Exception e){
             log.error(e.getMessage(), e);
