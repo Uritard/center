@@ -6,13 +6,10 @@ import com.google.common.collect.Sets;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.common.mqtt.AlarmService;
 import com.yjh.accessvideo.common.mqtt.GetSpringUtil;
-import com.yjh.accessvideo.common.mqtt.alarmMsgBody.AlarmMqttMsg;
+import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Different;
-import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Alarm;
-import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.module.device.entity.*;
-import com.yjh.accessvideo.module.device.entity.interlanalysis.PicAnalyseResponse;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.service.ftpsservice;
 import lombok.SneakyThrows;
@@ -40,9 +37,10 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 //import static com.yjh.accessvideo.common.Constant.INSTANCEID;
 //import static com.yjh.accessvideo.common.Constant.TASKID;
@@ -61,6 +59,8 @@ public class DataDealThread implements Runnable {
      * 服务端口
      */
     private final int remotePort;
+
+    private static ReentrantLock lock = new ReentrantLock();
 
     public DataDealThread(String body, int remotePort, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService,
                           String syncWebsocketUrl, String stationCode) {
@@ -989,14 +989,21 @@ public class DataDealThread implements Runnable {
                         }
 
                         log.info("Border_______---------______________________________________________________________________________________________");
-                        //若本任务上一次有巡视数据，则正常或异常点数要进行加和
-                        if (redisTemplate.opsForHash().entries("taskConstant:" + TASKID).size() != 0) {
-                            tNormal = NumberUtils.toInt(String.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tNormal"))) + tNormal;
-                            tAbnormal = NumberUtils.toInt(String.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tAbnormal"))) + tAbnormal;
+                        lock.lock();
+                        try {
+                            //若本任务上一次有巡视数据，则正常或异常点数要进行加和
+                            if (redisTemplate.opsForHash().entries("taskConstant:" + TASKID).size() != 0) {
+                                tNormal = NumberUtils.toInt(String.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tNormal"))) + tNormal;
+                                tAbnormal = NumberUtils.toInt(String.valueOf(redisTemplate.opsForHash().entries("taskConstant:" + TASKID).get("tAbnormal"))) + tAbnormal;
+                            }
+                            taskConstant.put("tNormal", String.valueOf(tNormal));
+                            taskConstant.put("tAbnormal", String.valueOf(tAbnormal));
+                            redisTemplate.opsForHash().putAll("taskConstant:" + TASKID, taskConstant);//插入任务常量Map
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        } finally {
+                            lock.unlock();
                         }
-                        taskConstant.put("tNormal", String.valueOf(tNormal));
-                        taskConstant.put("tAbnormal", String.valueOf(tAbnormal));
-                        redisTemplate.opsForHash().putAll("taskConstant:" + TASKID, taskConstant);//插入任务常量Map
                         log.info("任务常量配置完成");
 
 //                NORMAL = NORMAL + 1;
@@ -1225,12 +1232,6 @@ public class DataDealThread implements Runnable {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String finalCruiseKey = "instanceId";//最后修改任务表信息所需的redis KEY名
                 log.info("任务结束-开始数据存储");
-                //插库时从redis中取出正常、异常点数
-                Map<String, String> taskConstant = redisTemplate.opsForHash().entries("taskConstant:" + TASKID);
-                Integer tAbnormal = NumberUtils.toInt(taskConstant.get("tAbnormal"));
-                Integer tNormal = NumberUtils.toInt(taskConstant.get("tNormal"));
-                log.info("正常点数：" + tNormal);
-                log.info("异常点数：" + tAbnormal);
                 List<String> cruiseResultIds = new ArrayList<>();//cruiseResultIds
                 try {
                     //满足条件先插巡视点数据
@@ -1241,8 +1242,8 @@ public class DataDealThread implements Runnable {
                     //从redisList中取出目前为止本任务中执行算法的所有巡视点
                     long size = redisTemplate.opsForList().size("cruiseKeys:" + TASKID) - 1;
                     log.info("cruiseKeys size==={}", size);
-                    List<String> cruiseKeys = redisTemplate.opsForList().range("cruiseKeys:" + TASKID, 0, size);
-                    log.info("cruisekeys:" + cruiseKeys);
+                    List<String> cruiseKeys = redisTemplate.opsForList().range("cruiseKeys:" + TASKID, 0, -1);
+                    log.info("cruisekeys: {}", JSON.toJSONString(cruiseKeys));
                     finalCruiseKey = cruiseKeys.get(0);//挑选一名幸运Redis KEY值
                     log.info("finalCruiseKey===={}",  finalCruiseKey);
                     for (String cruiseKey : cruiseKeys) {
@@ -1306,7 +1307,8 @@ public class DataDealThread implements Runnable {
                         }
                         log.info("TCDR内容：" + tCruiseDataResult);
                         dataList.add(tCruiseDataResult);
-
+                        // 删除相应入库点位缓存
+                        redisTemplate.opsForList().remove("cruiseKeys:" + TASKID, 0, cruiseKey);
                     }
 
 
@@ -1337,7 +1339,7 @@ public class DataDealThread implements Runnable {
                     log.info("------------点结果插入后调用updateCruiseResultIds----------------------");
                     Constant.otherServerList(cruiseResultIds, Constant.TASK_FINISH);
                     log.info("----------------------------------");
-                    redisTemplate.delete("cruiseKeys:" + TASKID);
+//                    redisTemplate.delete("cruiseKeys:" + TASKID);
                     log.info("Loading........清空本任务至此的巡视点");
 //                if (warnList.size() > 0) {
 //                    analyseDataOperateService.batchInsertWarnInfo(warnList);
@@ -1356,24 +1358,41 @@ public class DataDealThread implements Runnable {
                     log.error("插表错误", e);
                 }
 
-                // 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作
-                Map<String, String> cruiseResult = redisTemplate.opsForHash().entries(finalCruiseKey);
-                log.info("cruiseResult==={}", cruiseResult);
+                lock.lock();
                 String strForCountAbnormal = "countForAbnormal:" + TASKID;
-                Map<String, String> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
-                Integer total = NumberUtils.toInt(abnormalCount.get("all"));
-                Integer abnormal = NumberUtils.toInt(abnormalCount.get("abnormal"));
-                Integer normal = NumberUtils.toInt(abnormalCount.get("normal"));
-                log.info("All：" + total);
-                //判断最后一个执行完成的巡视点是否是算法点--T:插TCTR库表和修改TCR库表；F：更新异常、正常点数量
-                tAbnormal = tAbnormal + abnormal;
-                tNormal = tNormal + normal;
+                Integer total = null;
+                int tAbnormal = 0;
+                int tNormal = 0;
+                try {
+                    //插库时从redis中取出正常、异常点数
+                    Map<String, String> taskConstant = redisTemplate.opsForHash().entries("taskConstant:" + TASKID);
+                    tAbnormal = NumberUtils.toInt(taskConstant.get("tAbnormal"));
+                    tNormal = NumberUtils.toInt(taskConstant.get("tNormal"));
+                    log.info("正常点数：" + tNormal);
+                    log.info("异常点数：" + tAbnormal);
+
+                    Map<String, String> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
+                    total = NumberUtils.toInt(abnormalCount.get("all"));
+                    Integer abnormal = NumberUtils.toInt(abnormalCount.get("abnormal"));
+                    Integer normal = NumberUtils.toInt(abnormalCount.get("normal"));
+                    log.info("All：" + total);
+                    //判断最后一个执行完成的巡视点是否是算法点--T:插TCTR库表和修改TCR库表；F：更新异常、正常点数量
+                    tAbnormal = tAbnormal + abnormal;
+                    tNormal = tNormal + normal;
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
                 if (tAbnormal + tNormal == total) {
+                    // 提前解锁
+                    lock.unlock();
                     //TCTR开始
-
-                    Thread.sleep(10000);
-
                     try {
+                        Thread.sleep(10000);
+
+                        // 判断异常点缓存，算法是否为最后一点，决定是否执行TCTR插库操作和TCR库修改操作
+                        Map<String, String> cruiseResult = redisTemplate.opsForHash().entries(finalCruiseKey);
+                        log.info("cruiseResult==={}", cruiseResult);
+
                         log.info("TCTR开始");
                         TCruiseTaskResult tCruiseTaskResult = new TCruiseTaskResult();
                         tCruiseTaskResult.setTaskResultId(cruiseResult.get("taskResultId"));
@@ -1420,14 +1439,20 @@ public class DataDealThread implements Runnable {
                     }
 
                 } else {       // 修改异常点数缓存
-                    log.info("不满足修改任务条件，对正常异常点数进行修改...............");
-                    redisTemplate.delete("taskConstant:" + TASKID);//清楚当前-1阶段所有点数
-                    Map<String, String> mapForAbnormal = new HashMap<>();
-                    mapForAbnormal.put("abnormal", String.valueOf(tAbnormal));
-                    mapForAbnormal.put("normal", String.valueOf(tNormal));
-                    redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
-                    log.info("修改后的abnormal：" + tAbnormal);
-                    log.info("修改后的normal：" + tNormal);
+                    try {
+                        log.info("不满足修改任务条件，对正常异常点数进行修改...............");
+                        redisTemplate.delete("taskConstant:" + TASKID);//清楚当前-1阶段所有点数
+                        Map<String, String> mapForAbnormal = new HashMap<>();
+                        mapForAbnormal.put("abnormal", String.valueOf(tAbnormal));
+                        mapForAbnormal.put("normal", String.valueOf(tNormal));
+                        redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
+                        log.info("修改后的abnormal：" + tAbnormal);
+                        log.info("修改后的normal：" + tNormal);
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                    } finally {
+                        lock.unlock();
+                    }
                 }
 
             }

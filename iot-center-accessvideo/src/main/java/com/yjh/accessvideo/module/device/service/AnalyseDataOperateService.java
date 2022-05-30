@@ -8,6 +8,7 @@ import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.*;
 import io.swagger.models.auth.In;
 import net.bytebuddy.asm.Advice;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +100,10 @@ public class AnalyseDataOperateService {
     //@Logs(title = "巡视点详细结果信息批量插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseTaskResultDetail(List<TCruiseTaskResultDetail> list) {
-        return this.analyseDataOperateDao.batchInsertCruiseTaskResultDetail(list);
+        if (CollectionUtils.isNotEmpty(list)) {
+            return this.analyseDataOperateDao.batchInsertCruiseTaskResultDetail(list);
+        }
+        return -1;
     }
 
     //@Logs(title = "巡视数据结果信息插入", code = "Analysis")
@@ -111,7 +115,10 @@ public class AnalyseDataOperateService {
     //@Logs(title = "巡视数据结果信息批量插入", code = "Analysis")
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertCruiseDataResult(List<TCruiseDataResult> list) {
-        return this.analyseDataOperateDao.batchInsertCruiseDataResult(list);
+        if (CollectionUtils.isNotEmpty(list)) {
+            return this.analyseDataOperateDao.batchInsertCruiseDataResult(list);
+        }
+        return -1;
     }
 
     //@Logs(title = "标准测点信息查询", code = "Analysis")
