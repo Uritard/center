@@ -13,6 +13,7 @@ import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
 import com.yjh.accessvideo.service.ftpsservice;
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -197,9 +198,6 @@ public class DataDealThread implements Runnable {
                                         redisTemplate.opsForHash().put(cruiseRedisName, "picpath", analyseResultPic);
                                     }
                                 }
-
-
-
 
                                 if ("NULL_Model".equals(jsonObjectResult.get("resultValue"))) {
                                     Map<String, String> doubleHandelMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "数据异常", "缺少标定文件");
@@ -846,8 +844,6 @@ public class DataDealThread implements Runnable {
                         log.info("cruiseResultMap==={}", JSON.toJSONString(cruiseResultMap));
                         redisTemplate.opsForHash().putAll(cruiseRedisName, cruiseResultMap);//修改redis
 
-                        // 巡视点结果上报站端
-                        alarmAndResultToUpSystem(jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult,null, null);
 
                         log.info("Border_______---------______________________________________________________________________________________________");
                         lock.lock();
@@ -860,12 +856,16 @@ public class DataDealThread implements Runnable {
                             taskConstant.put("tNormal", String.valueOf(tNormal));
                             taskConstant.put("tAbnormal", String.valueOf(tAbnormal));
                             redisTemplate.opsForHash().putAll("taskConstant:" + TASKID, taskConstant);//插入任务常量Map
+                            log.info("任务常量配置完成: {}", JSON.toJSONString(taskConstant));
                         } catch (Exception e) {
                             log.error(e.getMessage(), e);
                         } finally {
                             lock.unlock();
                         }
-                        log.info("任务常量配置完成");
+
+                        // 巡视点结果上报站端
+                        alarmAndResultToUpSystem(jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult,null, null);
+
 
 //                NORMAL = NORMAL + 1;
 
@@ -1091,7 +1091,7 @@ public class DataDealThread implements Runnable {
             log.info("判断:{}", redisTemplate.opsForList().index("analysisList:" + TASKID, 0));
             if ("-1".equals(redisTemplate.opsForList().index("analysisList:" + TASKID, 0))) {  //满足插库条件
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String finalCruiseKey = "instanceId";//最后修改任务表信息所需的redis KEY名
+                String finalCruiseKey = "t_cruise_task_result:" + TASKID + ":" + INSTANCEID;//最后修改任务表信息所需的redis KEY名
                 log.info("任务结束-开始数据存储");
                 List<String> cruiseResultIds = new ArrayList<>();//cruiseResultIds
                 try {
@@ -1105,72 +1105,85 @@ public class DataDealThread implements Runnable {
                     log.info("cruiseKeys size==={}", size);
                     List<String> cruiseKeys = redisTemplate.opsForList().range("cruiseKeys:" + TASKID, 0, -1);
                     log.info("cruisekeys: {}", JSON.toJSONString(cruiseKeys));
-                    finalCruiseKey = cruiseKeys.get(0);//挑选一名幸运Redis KEY值
-                    log.info("finalCruiseKey===={}",  finalCruiseKey);
-                    for (String cruiseKey : cruiseKeys) {
-                        Map<String, String> cruiseWorkedMap = redisTemplate.opsForHash().entries(cruiseKey);//取出缓存中该任务下的巡视点
-                        log.info("cruiseWorkedMap==={}", cruiseWorkedMap);
-                        //TCTRD
-                        log.info("TCTRD开始");
-                        TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
-                        tCruiseTaskResultDetail.setCruiseResultId(cruiseWorkedMap.get("taskResultId") + cruiseWorkedMap.get("instanceId"));
-                        tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId"));
-                        tCruiseTaskResultDetail.setDeviceId(NumberUtils.toLong(cruiseWorkedMap.get("deviceId")));
-                        tCruiseTaskResultDetail.setDeviceName(cruiseWorkedMap.get("deviceName"));
-                        tCruiseTaskResultDetail.setInstanceId(NumberUtils.toLong(cruiseWorkedMap.get("instanceId")));
-                        tCruiseTaskResultDetail.setInstanceName(cruiseWorkedMap.get("instanceName"));
-                        tCruiseTaskResultDetail.setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime")));
-                        tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime")));
-                        tCruiseTaskResultDetail.setCruiseStatus(NumberUtils.toInt(cruiseWorkedMap.get("cruiseStatus")));
-                        tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark"));
-                        log.info("TCDRD内容：" + tCruiseTaskResultDetail);
-                        detailList.add(tCruiseTaskResultDetail);
-                        cruiseResultIds.add(tCruiseTaskResultDetail.getCruiseResultId());
+                    if(CollectionUtils.isNotEmpty(cruiseKeys)) {
+                        finalCruiseKey = cruiseKeys.get(0);//挑选一名幸运Redis KEY值
+                        log.info("finalCruiseKey===={}", finalCruiseKey);
+                        for (String cruiseKey : cruiseKeys) {
+                            Map<String, String> cruiseWorkedMap = redisTemplate.opsForHash()
+                                    .entries(cruiseKey);//取出缓存中该任务下的巡视点
+                            log.info("cruiseWorkedMap==={}", cruiseWorkedMap);
+                            //TCTRD
+                            log.info("TCTRD开始");
+                            TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail();
+                            tCruiseTaskResultDetail.setCruiseResultId(
+                                    cruiseWorkedMap.get("taskResultId") + cruiseWorkedMap.get("instanceId"));
+                            tCruiseTaskResultDetail.setTaskResultId(cruiseWorkedMap.get("taskResultId"));
+                            tCruiseTaskResultDetail.setDeviceId(NumberUtils.toLong(cruiseWorkedMap.get("deviceId")));
+                            tCruiseTaskResultDetail.setDeviceName(cruiseWorkedMap.get("deviceName"));
+                            tCruiseTaskResultDetail
+                                    .setInstanceId(NumberUtils.toLong(cruiseWorkedMap.get("instanceId")));
+                            tCruiseTaskResultDetail.setInstanceName(cruiseWorkedMap.get("instanceName"));
+                            tCruiseTaskResultDetail
+                                    .setCruiseTime(simpleDateFormat.parse(cruiseWorkedMap.get("cruiseTime")));
+                            tCruiseTaskResultDetail.setEndTime(simpleDateFormat.parse(cruiseWorkedMap.get("endTime")));
+                            tCruiseTaskResultDetail
+                                    .setCruiseStatus(NumberUtils.toInt(cruiseWorkedMap.get("cruiseStatus")));
+                            tCruiseTaskResultDetail.setRemark(cruiseWorkedMap.get("remark"));
+                            log.info("TCDRD内容：" + tCruiseTaskResultDetail);
+                            detailList.add(tCruiseTaskResultDetail);
+                            cruiseResultIds.add(tCruiseTaskResultDetail.getCruiseResultId());
 
-                        //TCDR
-                        log.info("TCDR开始");
-                        TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
-                        tCruiseDataResult.setCruiseId(NumberUtils.toLong(cruiseWorkedMap.get("instanceId")));
-                        tCruiseDataResult.setCruiseName(cruiseWorkedMap.get("cruiseName"));
-                        tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath"));
-                        tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum"));
-                        tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc"));
-                        tCruiseDataResult.setCruiseType(NumberUtils.toInt(cruiseWorkedMap.get("cruiseType")));
-                        tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum"));
-                        tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic"));
-                        tCruiseDataResult.setEvaluationState(NumberUtils.toInt(analyseDataOperateService.selectDictCode("evaluation_state", "未审核")));
-                        tCruiseDataResult.setCruiseResult(NumberUtils.toInt(cruiseWorkedMap.get("cruiseResult")));
-                        if ("--".equals(cruiseWorkedMap.get("cruiseAbnormal"))) {
-                            tCruiseDataResult.setCruiseAbnormal(null);
-                        } else {
-                            if (cruiseWorkedMap.get("cruiseAbnormal").contains(",")) {
-                                String[] abnormalArr = cruiseWorkedMap.get("cruiseAbnormal").split(",");
-                                tCruiseDataResult.setCruiseAbnormal(NumberUtils.toInt(abnormalArr[0]));
-                                tCruiseDataResult.setRemark(abnormalArr[1]);
+                            //TCDR
+                            log.info("TCDR开始");
+                            TCruiseDataResult tCruiseDataResult = new TCruiseDataResult();
+                            tCruiseDataResult.setCruiseId(NumberUtils.toLong(cruiseWorkedMap.get("instanceId")));
+                            tCruiseDataResult.setCruiseName(cruiseWorkedMap.get("cruiseName"));
+                            tCruiseDataResult.setPicpath(cruiseWorkedMap.get("picpath"));
+                            tCruiseDataResult.setResultNum(cruiseWorkedMap.get("resultNum"));
+                            tCruiseDataResult.setResultDesc(cruiseWorkedMap.get("resultDesc"));
+                            tCruiseDataResult.setCruiseType(NumberUtils.toInt(cruiseWorkedMap.get("cruiseType")));
+                            tCruiseDataResult.setModifyNum(cruiseWorkedMap.get("modifyNum"));
+                            tCruiseDataResult.setOrigpic(cruiseWorkedMap.get("origpic"));
+                            tCruiseDataResult.setEvaluationState(NumberUtils
+                                    .toInt(analyseDataOperateService.selectDictCode("evaluation_state", "未审核")));
+                            tCruiseDataResult.setCruiseResult(NumberUtils.toInt(cruiseWorkedMap.get("cruiseResult")));
+                            if ("--".equals(cruiseWorkedMap.get("cruiseAbnormal"))) {
+                                tCruiseDataResult.setCruiseAbnormal(null);
                             } else {
-                                tCruiseDataResult.setCruiseAbnormal(NumberUtils.toInt(cruiseWorkedMap.get("cruiseAbnormal")));
-                            }
+                                if (cruiseWorkedMap.get("cruiseAbnormal").contains(",")) {
+                                    String[] abnormalArr = cruiseWorkedMap.get("cruiseAbnormal").split(",");
+                                    tCruiseDataResult.setCruiseAbnormal(NumberUtils.toInt(abnormalArr[0]));
+                                    tCruiseDataResult.setRemark(abnormalArr[1]);
+                                } else {
+                                    tCruiseDataResult.setCruiseAbnormal(
+                                            NumberUtils.toInt(cruiseWorkedMap.get("cruiseAbnormal")));
+                                }
 
+                            }
+                            tCruiseDataResult
+                                    .setEvaluationState(NumberUtils.toInt(cruiseWorkedMap.get("evaluationState")));
+                            tCruiseDataResult.setCreatetime(new Date());
+                            tCruiseDataResult.setCruiseResultId(
+                                    cruiseWorkedMap.get("taskResultId") + cruiseWorkedMap.get("instanceId"));
+                            tCruiseDataResult.setIsWarn(NumberUtils.toInt(cruiseWorkedMap.get("isWarn")));
+                            if (Objects.nonNull(cruiseWorkedMap.get("firDocPath"))) {
+                                tCruiseDataResult
+                                        .setResultPic(cruiseWorkedMap.get("firDocPath").replace("dfir", "fir"));
+                            } else {
+                                tCruiseDataResult.setResultPic("");
+                            }
+                            if (Objects.nonNull(cruiseWorkedMap.get("firName")) && !("null"
+                                    .equals(cruiseWorkedMap.get("firName")))) {
+                                tCruiseDataResult.setFirName(cruiseWorkedMap.get("firName"));
+                                tCruiseDataResult.setFirDate(new SimpleDateFormat("yyyyMMddHHmmssSSS")
+                                        .parse(tCruiseDataResult.getFirName()));
+                                // TODO: 2021/3/25 FIR文件名与时间赋值
+                            }
+                            log.info("TCDR内容：" + tCruiseDataResult);
+                            dataList.add(tCruiseDataResult);
+                            // 删除相应入库点位缓存
+                            redisTemplate.opsForList().remove("cruiseKeys:" + TASKID, 0, cruiseKey);
                         }
-                        tCruiseDataResult.setEvaluationState(NumberUtils.toInt(cruiseWorkedMap.get("evaluationState")));
-                        tCruiseDataResult.setCreatetime(new Date());
-                        tCruiseDataResult.setCruiseResultId(cruiseWorkedMap.get("taskResultId") + cruiseWorkedMap.get("instanceId"));
-                        tCruiseDataResult.setIsWarn(NumberUtils.toInt(cruiseWorkedMap.get("isWarn")));
-                        if(Objects.nonNull(cruiseWorkedMap.get("firDocPath"))){
-                            tCruiseDataResult.setResultPic(cruiseWorkedMap.get("firDocPath").replace("dfir","fir"));
-                        }else {
-                            tCruiseDataResult.setResultPic("");
-                        }
-                        if(Objects.nonNull(cruiseWorkedMap.get("firName")) && !("null".equals(cruiseWorkedMap.get("firName")))){
-                            tCruiseDataResult.setFirName(cruiseWorkedMap.get("firName"));
-                            tCruiseDataResult.setFirDate(new SimpleDateFormat("yyyyMMddHHmmssSSS").parse(tCruiseDataResult.getFirName()));
-                            // TODO: 2021/3/25 FIR文件名与时间赋值
-                        }
-                        log.info("TCDR内容：" + tCruiseDataResult);
-                        dataList.add(tCruiseDataResult);
-                        // 删除相应入库点位缓存
-                        redisTemplate.opsForList().remove("cruiseKeys:" + TASKID, 0, cruiseKey);
-                    }
 
 
 //                    Set<String> defectKey = redisScan("defectInfo:" + TASKID);
@@ -1192,16 +1205,16 @@ public class DataDealThread implements Runnable {
 //                        defectList.add(tDefectInfo);
 //                    }
 
-                    //批量插入两表
+                        //批量插入两表
 
-                    log.info("两表开始插入");
-                    analyseDataOperateService.batchInsertCruiseTaskResultDetail(detailList);
-                    analyseDataOperateService.batchInsertCruiseDataResult(dataList);
-                    log.info("------------点结果插入后调用updateCruiseResultIds----------------------");
-                    Constant.otherServerList(cruiseResultIds, Constant.TASK_FINISH);
-                    log.info("----------------------------------");
+                        log.info("两表开始插入");
+                        analyseDataOperateService.batchInsertCruiseTaskResultDetail(detailList);
+                        analyseDataOperateService.batchInsertCruiseDataResult(dataList);
+                        log.info("------------点结果插入后调用updateCruiseResultIds----------------------");
+                        Constant.otherServerList(cruiseResultIds, Constant.TASK_FINISH);
+                        log.info("----------------------------------");
 //                    redisTemplate.delete("cruiseKeys:" + TASKID);
-                    log.info("Loading........清空本任务至此的巡视点");
+                        log.info("Loading........清空本任务至此的巡视点");
 //                if (warnList.size() > 0) {
 //                    analyseDataOperateService.batchInsertWarnInfo(warnList);
 //                    //清空redis中的告警信息
@@ -1213,8 +1226,9 @@ public class DataDealThread implements Runnable {
 //                    if (defectList.size() > 0) {
 //                        analyseDataOperateService.batchInsertDefectInfo(defectList);
 //                    }
-                    log.info("两表结束插入");
-                    cruiseKeys.clear();
+                        log.info("两表结束插入");
+                        cruiseKeys.clear();
+                    }
                 } catch (Exception e) {
                     log.error("插表错误", e);
                 }

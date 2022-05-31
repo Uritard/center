@@ -338,7 +338,7 @@ public class zuulFilter extends ZuulFilter {
         if ("true".equals(isUkey)) {
             String signStr = request.getHeader("signStr") != null ? request.getHeader("signStr") : "";
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
-            if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/sysUser/v1/getPubk")) {
+            if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/sysUser/v1/getPubk")&&!url.contains("/sysUser/v1/logout")) {
                 if(StringUtils.isEmpty(userId)) {
                     return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
                 }
