@@ -13,6 +13,7 @@ import com.yjh.platform.module.user.entity.AlarmAndMeteInfo;
 import com.yjh.platform.module.user.entity.CameraUnionDevice;
 import com.yjh.platform.module.user.entity.ModelNameAndName;
 import com.yjh.platform.module.user.entity.RoutePlan;
+import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,11 +100,18 @@ public class ThreeDimensionalService {
     }
     @Transactional(rollbackFor = Exception.class)
     public List<CameraUnionDevice> viewCameraInfo(String modelName){
-        //通过模型名称找出设备id
-        Long deviceId = threeDimensionalDao.selectDeviceIdByModelName(modelName);
-        //关联的摄像机只能是通过设备下的某个测点配置了预置位成为巡检点才能找到。
-        List<CameraUnionDevice> cameraUnionDeviceList = threeDimensionalDao.selectCameraByDeviceId(deviceId);
-
+        //通过模型名称查询相关信息
+        Map<String,Object> map = threeDimensionalDao.selectDeviceInfoByModelName(modelName);
+        Long deviceId = NumberUtils.toLong(String.valueOf(map.get("id")));
+        List<CameraUnionDevice> cameraUnionDeviceList = new ArrayList<>();
+        if (map.containsKey("is_camera") && Objects.equals(1, map.get("is_camera"))){
+            // 该模型就是摄像机  直接查询所有的预置位点
+            cameraUnionDeviceList = threeDimensionalDao.selectCameraByCameraId(deviceId);
+        }else {
+            //关联的摄像机只能是通过设备下的某个测点配置了预置位成为巡检点才能找到。
+            cameraUnionDeviceList = threeDimensionalDao.selectCameraByDeviceId(deviceId);
+        }
+        
         /*Map<String,String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for(Long recordId : recordIdList){

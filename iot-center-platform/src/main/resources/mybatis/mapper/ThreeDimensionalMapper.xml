@@ -74,6 +74,13 @@
         <if test="modelName != null and modelName != ''">and model_name = #{modelName,jdbcType=VARCHAR}</if>
     </select>
 
+    <select id="selectDeviceInfoByModelName" resultType="java.util.Map">
+        SELECT id,is_camera
+        from three_dimensional_relevancy
+        where 1 = 1
+        <if test="modelName != null and modelName != ''">and model_name = #{modelName,jdbcType=VARCHAR}</if>
+    </select>
+
     <select id="selectCameraByDeviceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.CameraUnionDevice">
         SELECT
             a.device_id,
@@ -99,6 +106,19 @@
         and d.cruise_id = e.preset_id
         and e.camera_id = f.camera_id
         GROUP BY e.preset_id
+    </select>
+    <select id="selectCameraByCameraId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.CameraUnionDevice">
+        SELECT
+            b.preset_id as cruise_id,
+            a.camera_id,
+            a.record_id,
+            a.camera_name,
+            b.preset_name
+        FROM
+            t_camera_info a,
+            t_camera_preset b
+        WHERE a.camera_id = b.camera_id
+          and a.camera_id = #{cameraId,jdbcType = BIGINT}
     </select>
     <select id="statisticsAlarmInfo" resultType="com.yjh.platform.module.task.entity.StatisticalTools">
         SELECT

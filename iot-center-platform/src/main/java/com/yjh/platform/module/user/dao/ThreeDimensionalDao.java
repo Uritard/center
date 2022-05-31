@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YChen
@@ -35,11 +36,23 @@ public interface ThreeDimensionalDao {
      */
     Long selectDeviceIdByModelName(@Param("modelName") String modelName);
     /**
+     * 通过模型名称查找相关信息
+     * @param modelName 模型名称
+     * @return Long
+     */
+    Map<String,Object> selectDeviceInfoByModelName(@Param("modelName") String modelName);
+    /**
      * 通过设备id查找设备下对应的摄像机信息
      * @param deviceId 设备id
      * @return CameraUnionDevice
      */
     List<CameraUnionDevice> selectCameraByDeviceId(@Param("deviceId")Long deviceId);
+    /**
+     * 通过相机id查找设备下对应的摄像机信息
+     * @param cameraId 相机id
+     * @return CameraUnionDevice
+     */
+    List<CameraUnionDevice> selectCameraByCameraId(@Param("cameraId")Long cameraId);
     /**
      * 告警信息统计
      * @return StatisticalTools
