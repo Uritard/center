@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +55,7 @@ public class SilentTaskScheduled {
     private static final String MSG = "success";
     private static final String FLAG = "false";
 
+    @Async
     @Scheduled(cron = "${silent.task.cron}")
     public void silentTaskScheduled() {
         log.info("定时任务");
