@@ -9,8 +9,11 @@ import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -25,9 +28,12 @@ import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.*;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +69,7 @@ public class RunAtNowTask implements Runnable{
     private TCruiseTaskService tCruiseTaskService;
     private TVoiceDeviceService tVoiceDeviceService;
     private AudioDeviceManager audioDeviceManager;
+    private UpFtpsConfig upFtpsConfig;
 
     private Logger log = LoggerFactory.getLogger(RunAtNowTask.class);
 
@@ -84,6 +91,7 @@ public class RunAtNowTask implements Runnable{
     private Long waitTime;
     //任务超期天数
     private Float tasksAreTime;
+    private String stationCode;
 
     private TCruiseTask tCruiseTask;
 
@@ -92,7 +100,7 @@ public class RunAtNowTask implements Runnable{
                         TAlgorithmInfoDao tAlgorithmInfoDao,TCruisePlanAttrDao tCruisePlanAttrDao,TCruiseDataResultDao tCruiseDataResultDao,
                         TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,TCruiseTaskResultDao tCruiseTaskResultDao,Boolean isGoOn,Float tasksAreTime,
                         TRobotInspectionDao tRobotInspectionDao,TAlgorithmConfBakDao tAlgorithmConfBakDao,TCruiseTaskService tCruiseTaskService,
-                        TVoiceDeviceService tVoiceDeviceService,AudioDeviceManager audioDeviceManager) {
+                        TVoiceDeviceService tVoiceDeviceService,AudioDeviceManager audioDeviceManager,String stationCode) {
         this.tCruiseTask = tCruiseTask;
         this.waitTime = waitTime;
         this.picModelPath = picModelPath;
@@ -113,6 +121,8 @@ public class RunAtNowTask implements Runnable{
         this.tCruiseTaskService = tCruiseTaskService;
         this.tVoiceDeviceService = tVoiceDeviceService;
         this.audioDeviceManager = audioDeviceManager;
+        this.upFtpsConfig = StaticContextAccessor.getBean(UpFtpsConfig.class);
+        this.stationCode = stationCode;
     }
 
     //相机抓图
@@ -896,39 +906,55 @@ public class RunAtNowTask implements Runnable{
                             Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
 
                             {
-                                //巡视点结果上报站端
-                                XMLBaseModel xmlBaseModel = new XMLBaseModel();
-                                List<Map<String,Object>> xmlItems = new ArrayList<>();
-                                Map<String,Object> xmlItem = new HashMap<>();
-                                xmlBaseModel.setType("61");
-                                xmlItem.put("patroldevice_code",item);
-                                xmlItem.put("task_name",tCruiseTask.getTaskName());
-                                xmlItem.put("task_code",tCruiseTask.getTaskCode());
-                                xmlItem.put("device_name",item.getCruiseName());
-                                xmlItem.put("device_id",item.getInstanceId());
-                                xmlItem.put("material_id",item.getRealCode());
-                                xmlItem.put("value","");
-                                xmlItem.put("value_unit","");
-                                xmlItem.put("unit","");
-                                xmlItem.put("time",cruiseTime);
-                                //todo
-                                xmlItem.put("recognition_type","");
-                                xmlItem.put("file_type","2");
-                                xmlItem.put("file_path",urlPath);
-                                xmlItem.put("rectangle","");
-                                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-                                xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
-                                xmlItem.put("data_type","0x01");
-                                xmlItem.put("valid","1");
+                                try {
+                                    //巡视点结果上报站端
+                                    XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                                    List<Map<String,Object>> xmlItems = new ArrayList<>();
+                                    Map<String,Object> xmlItem = new HashMap<>();
+                                    xmlBaseModel.setType("61");
+                                    xmlItem.put("patroldevice_code", Optional.ofNullable(String.valueOf(item.getInstanceId())).orElse(""));
+                                    xmlItem.put("patroldevice_name", Optional.ofNullable(item.getInstanceName()).orElse(""));
+                                    xmlItem.put("task_name",tCruiseTask.getTaskName());
+                                    xmlItem.put("task_code",tCruiseTask.getTaskCode());
+                                    xmlItem.put("device_name",item.getCruiseName());
+                                    xmlItem.put("device_id", Optional.ofNullable(String.valueOf(item.getDeviceMeteId())).orElse(""));
+                                    xmlItem.put("material_id",item.getRealCode());
+                                    xmlItem.put("value","");
+                                    xmlItem.put("value_unit","已拍照");
+                                    xmlItem.put("unit","");
+                                    xmlItem.put("time", cruiseTime);
+                                    xmlItem.put("recognition_type","3");
+                                    xmlItem.put("file_type","2");
 
-                                xmlItems.add(xmlItem);
-                                xmlBaseModel.setItems(xmlItems);
-                                List<XMLBaseModel> list = new ArrayList<>();
-                                list.add(xmlBaseModel);
-                                Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
-                                cruiseResult.put("list",list);
-                                log.info("信息上报：-"+cruiseResult);
-                                Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+                                    // 根据相机id获取相机pms编码 （仿照机器人编码）
+                                    String cameraPmS = tCameraPresetDao.selectPMSByCameraId(tCameraPreset.getCameraId());
+                                    String deviceMeteId = String.valueOf(item.getDeviceMeteId());
+                                    // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
+                                    String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                                    String tagPath =  "task/" + stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
+                                            + "/" + taskId + "/CCD/" + deviceMeteId + "_" + cameraPmS + "_" + timeFormat + ".jpg";
+                                    log.info("imgPath==={},tagPath==={}", absPath, tagPath);
+                                    uploadFileToUpFtps(absPath, "/" + tagPath);
+                                    xmlItem.put("file_path",tagPath);
+
+                                    xmlItem.put("rectangle","");
+                                    SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                                    xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(tCruiseTask.getStartTime()));
+                                    xmlItem.put("data_type","0x01");
+                                    xmlItem.put("valid","1");
+
+                                    xmlItems.add(xmlItem);
+                                    xmlBaseModel.setItems(xmlItems);
+                                    List<XMLBaseModel> list = new ArrayList<>();
+                                    list.add(xmlBaseModel);
+                                    Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+                                    cruiseResult.put("list",list);
+                                    log.info("信息上报：-"+cruiseResult);
+                                    Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+                                }catch (Exception e){
+                                    log.error(e.getMessage(), e);
+                                }
+
                             }
 
                         }
@@ -1226,4 +1252,19 @@ public class RunAtNowTask implements Runnable{
             }
     }
 
+    /**
+     * 将文件上传至上级系统ftp服务器
+     *
+     * @param sourcePath 源文件地址
+     * @param targetPathName 目标文件地址名称
+     */
+    public void uploadFileToUpFtps(String sourcePath, String targetPathName) {
+        try {
+            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
+                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+        }
+    }
 }

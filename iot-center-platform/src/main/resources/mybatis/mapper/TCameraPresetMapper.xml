@@ -380,4 +380,11 @@
         WHERE a.camera_id = b.camera_id
           and b.is_keep_watch_task = 1
     </select>
+
+    <select id="selectPMSByCameraId" resultType="java.lang.String">
+        SELECT a.pms_id
+        FROM
+            t_camera_info a
+        where a.camera_id = #{cameraId,jdbcType=BIGINT}
+    </select>
 </mapper>

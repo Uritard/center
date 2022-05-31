@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -108,7 +109,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             Map<String, Object> item = xmlBaseModel.getItems().get(0);
             // 这是机器人放在巡视主机ftps服务下的路径
             String value = String.valueOf(item.get("file_path"));
-            String tagPath = "robotRoad/" + value;
+            String tagPath = "robotTask/" + value;
             log.info("tagPath==={}", tagPath);
             String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/" + item.get("file_path");
             uploadFileToUpFtps(imgPath, "/" + tagPath, upFtpsConfig);
@@ -126,7 +127,8 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
      * @param sourcePath 源文件地址
      * @param targetPathName 目标文件地址名称
      */
-    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
+    @Async
+    public void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
         try {
             if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),

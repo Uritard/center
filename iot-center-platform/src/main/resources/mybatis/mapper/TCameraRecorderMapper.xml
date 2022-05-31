@@ -241,7 +241,7 @@
         <if test="recordName != null and recordName != ''"> and a.record_name LIKE concat('%',#{recordName, jdbcType=VARCHAR},'%')</if>
         <if test="recorderModel != -1 "> and a.recorder_model = #{recorderModel, jdbcType=INTEGER}</if>
         <if test="vendorId != -1 "> and a.vendor_id = #{vendorId, jdbcType=INTEGER}</if>
-        <if test="recordType != -1 "> and a.record_type = #{recordType, jdbcType=INTEGER}</if>
+        <if test="recordType != -1 "> and a.recorder_type = #{recordType, jdbcType=INTEGER}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name like concat('%',#{aliasName, jdbcType=VARCHAR},'%')</if>
         <if test="unit != null and unit != ''">and a.unit like concat('%',#{unit, jdbcType=VARCHAR},'%')</if>
         ORDER BY record_id

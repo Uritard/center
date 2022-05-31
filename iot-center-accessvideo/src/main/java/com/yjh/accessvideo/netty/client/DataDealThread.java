@@ -9,8 +9,10 @@ import com.yjh.accessvideo.common.mqtt.GetSpringUtil;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Different;
+import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
+import com.yjh.accessvideo.service.ProcessResultToUpSystem;
 import com.yjh.accessvideo.service.ftpsservice;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
@@ -439,7 +441,8 @@ public class DataDealThread implements Runnable {
                                                     currentWarnInfo.put("isPop","false");
 
                                                     // 告警上报站端
-                                                    alarmAndResultToUpSystem(jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult, alarm_level, tWarnInfo);
+                                                    StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
+                                                            jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult, alarm_level, tWarnInfo);
 
                                                     // webSocket通知前端刷新告警统计数量
                                                     Map<String, Object> jasonMaps = new HashMap<>();
@@ -844,7 +847,6 @@ public class DataDealThread implements Runnable {
                         log.info("cruiseResultMap==={}", JSON.toJSONString(cruiseResultMap));
                         redisTemplate.opsForHash().putAll(cruiseRedisName, cruiseResultMap);//修改redis
 
-
                         log.info("Border_______---------______________________________________________________________________________________________");
                         lock.lock();
                         try {
@@ -864,7 +866,8 @@ public class DataDealThread implements Runnable {
                         }
 
                         // 巡视点结果上报站端
-                        alarmAndResultToUpSystem(jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult,null, null);
+                        StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
+                                jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult,null, null);
 
 
 //                NORMAL = NORMAL + 1;
@@ -979,6 +982,10 @@ public class DataDealThread implements Runnable {
                             }
                             AlarmService alarmService= GetSpringUtil.getBean("alarmService");
                             alarmService.PushMsg(alarmDetail);
+
+//                            // 判别结果上报站端
+//                            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
+//                                    jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult, alarm_level, tWarnInfo);
                         }
 
                         if(defectList.size()>0&&("1".equals(flag))){
@@ -1336,154 +1343,7 @@ public class DataDealThread implements Runnable {
         }
     }
 
-    /**
-     * 告警或结果上报站端
-     *
-     * @param analyseType 分析类型
-     * @param cruiseResultMap 巡视结果map
-     * @param cruiseResult 巡视结果map
-     * @param alarmLevel 告警等级
-     * @param tWarnInfo 告警信息
-     */
-    @Async
-    private XMLBaseModel alarmAndResultToUpSystem(String analyseType, Map<String, String> cruiseResultMap, Map<String, String> cruiseResult, String alarmLevel, TWarnInfo tWarnInfo){
-        log.info("cruiseResultMap==={}", cruiseResultMap);
-        log.info("cruiseResult==={}", cruiseResult);
-        XMLBaseModel xmlBaseModel = new XMLBaseModel();
-        List<Map<String, Object>> xmlItems = new ArrayList<>();
-        Map<String, Object> xmlItem = new HashMap<>(16);
-        try {
-            xmlItem.put("patroldevice_code", Optional.ofNullable(cruiseResult.get("instanceId")).orElse(""));
-            xmlItem.put("patroldevice_name", Optional.ofNullable(cruiseResult.get("instanceName")).orElse(""));
-            xmlItem.put("task_name", Optional.ofNullable(cruiseResult.get("taskName")).orElse(""));
-            xmlItem.put("task_code", Optional.ofNullable(cruiseResult.get("taskCode")).orElse(""));
-            xmlItem.put("device_name", Optional.ofNullable(cruiseResult.get("cruiseName")).orElse(""));
-            xmlItem.put("device_id", Optional.ofNullable(cruiseResult.get("device_mete_id")).orElse(""));
-            xmlItem.put("time", simpleDateFormat.format(new Date()));
-            // 识别类型、文件类型、文件名命名
-            String recognitionType = "";
-            String fileNamePath = "";
-            String fileType = "";
-            switch (analyseType){
-                case "1":
-                case "2":
-                case "3": recognitionType = "1"; fileNamePath = "/CCD/"; fileType = "2"; break;
-                case "4":
-                case "6":
-                case "11": recognitionType = "2"; fileNamePath = "/CCD/"; fileType = "2"; break;
-                case "5": recognitionType = "6"; fileNamePath = "/CCD/"; fileType = "5"; break;
-                case "7": recognitionType = "3"; fileNamePath = "/CCD/"; fileType = "2"; break;
-                case "8": recognitionType = "3"; fileNamePath = "/CCD/"; fileType = "5"; break;
-                case "9": recognitionType = "4"; fileNamePath = "/FIR/"; fileType = "1"; break;
-                case "10": recognitionType = "2"; fileNamePath = "/CCD/"; fileType = "5"; break;
-                case "13": recognitionType = "5"; fileNamePath = "/Audio/"; fileType = "3"; break;
-                default: break;
-            }
-            xmlItem.put("file_type", fileType);
-            xmlItem.put("recognition_type", recognitionType);
-            // 根据相机id获取相机pms编码 （仿照机器人编码）
-            String cameraPmS = analyseDataOperateService.selectPMSByCameraId(Long.valueOf(cruiseResult.get("cameraId")));
-            String deviceMeteId = cruiseResult.get("device_mete_id");
-            String taskId = cruiseResult.get("taskId");
-            // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-            String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-            String tagPath = stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
-                    + "/" + taskId + fileNamePath + deviceMeteId + "_" + cameraPmS + "_" + timeFormat + ".jpg";
-            String imgPath = "";
 
-            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddHHmmss");
-            xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat2.format(simpleDateFormat2.parse(cruiseResult.get("cruiseTime"))));
-
-            if (Objects.isNull(tWarnInfo)){
-                // 巡视结果
-                tagPath = packageCruiseResultInfo(cruiseResultMap, cruiseResult, xmlBaseModel, xmlItem, tagPath);
-                imgPath = cruiseResult.get("picpath").replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content")));
-            }else {
-                // 告警
-                tagPath = packageAlarmInfo(alarmLevel, tWarnInfo, xmlBaseModel, xmlItem, deviceMeteId, tagPath);
-                imgPath = tWarnInfo.getImagePath().replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
-                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content")));
-            }
-            log.info("imgPath==={},tagPath==={}", imgPath, tagPath);
-            analyseDataOperateService.uploadFileToUpFtps(imgPath, "/" + tagPath);
-
-            xmlItems.add(xmlItem);
-            xmlBaseModel.setItems(xmlItems);
-            List<XMLBaseModel> list = new ArrayList<>();
-            list.add(xmlBaseModel);
-            Map<String, List<XMLBaseModel>> map = new HashMap<>();
-            map.put("list", list);
-            log.info("信息上报==={}", map);
-            Constant.otherServer(map, Constant.TCP_URL);
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }
-        return xmlBaseModel;
-    }
-
-    /**
-     * 组装告警信息
-     *
-     * @param alarmLevel 告警等级
-     * @param tWarnInfo 告警信息
-     * @param xmlBaseModel
-     * @param xmlItem
-     * @param deviceMeteId
-     * @param tagPath
-     * @return String
-     */
-    private String packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, XMLBaseModel xmlBaseModel, Map<String, Object> xmlItem, String deviceMeteId, String tagPath) {
-        try {
-            tagPath = "alarm/" + tagPath;
-            xmlBaseModel.setType("62");
-            xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));
-            Map<String, Object> info = analyseDataOperateService.selectWarnInfo(NumberUtils.toLong(deviceMeteId));
-            log.info("info==={}", info);
-            xmlItem.put("alarm_type", Optional.ofNullable(info.get("alarm_type")).orElse(""));
-            xmlItem.put("value", Optional.ofNullable(tWarnInfo.getValue()).orElse(""));
-            xmlItem.put("unit", Optional.ofNullable(info.get("unit")).orElse(""));
-            xmlItem.put("value_unit", tWarnInfo.getValue() + xmlItem.get("unit"));
-            xmlItem.put("content", tWarnInfo.getWarnContent());
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }
-        return tagPath;
-    }
-
-    /**
-     * 组装巡视结果信息
-     *
-     * @param cruiseResultMap
-     * @param cruiseResult
-     * @param xmlBaseModel
-     * @param xmlItem
-     * @param tagPath
-     * @return String
-     */
-    private String packageCruiseResultInfo(Map<String, String> cruiseResultMap, Map<String, String> cruiseResult, XMLBaseModel xmlBaseModel, Map<String, Object> xmlItem, String tagPath) {
-        try {
-            tagPath = "task/" + tagPath;
-            xmlBaseModel.setType("61");
-            xmlItem.put("material_id", Optional.ofNullable(cruiseResult.get("realCode")).orElse(""));
-            xmlItem.put("value", "");
-            xmlItem.put("unit", "");
-            xmlItem.put("value_unit", Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse(""));
-            xmlItem.put("value_type", "0");
-            xmlItem.put("rectangle", "");
-            xmlItem.put("data_type", "0x01");
-            String valid = "";
-            if ("--".equals(cruiseResultMap.get("resultNum")) || "null".equals(cruiseResultMap.get("resultNum"))) {
-                valid = "0";
-            } else {
-                valid = "1";
-            }
-            xmlItem.put("valid", valid);
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }
-        return tagPath;
-    }
 
     /**
      * 请求webSocket发送方法

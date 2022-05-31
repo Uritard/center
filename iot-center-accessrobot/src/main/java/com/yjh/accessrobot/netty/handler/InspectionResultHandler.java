@@ -21,6 +21,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -297,7 +298,8 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
      * 巡视结果上报上级系统
      * @param xmlBaseModel xml格式的内容
      */
-    private void resultToUpSystem(XMLBaseModel xmlBaseModel){
+    @Async
+    public void resultToUpSystem(XMLBaseModel xmlBaseModel){
         try {
             Map<String, Object> item = xmlBaseModel.getItems().get(0);
             // 这是机器人放在巡视主机ftps服务下的路径

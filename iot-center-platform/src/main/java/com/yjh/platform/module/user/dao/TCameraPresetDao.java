@@ -59,4 +59,6 @@ public interface TCameraPresetDao {
                                       );
 
     List<Map<String, Long>> selectCameraBySilent();
+    String selectPMSByCameraId(@Param(value = "cameraId") Long cameraId);
+
 }

@@ -105,6 +105,11 @@ public class TCruiseTaskService {
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
+    /**
+     * 变电站编码
+     */
+    @Value("${station.code}")
+    private String stationCode;
     //任务超期时间
     private Float tasksAreTime;
     //算法接口
@@ -372,7 +377,7 @@ public class TCruiseTaskService {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                             tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                             tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                            tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager);
+                            tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager, stationCode);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();
@@ -1092,7 +1097,7 @@ public class TCruiseTaskService {
         RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                 tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                 tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, true, tasksAreTime,
-                tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager);
+                tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager, stationCode);
         Thread thread = new Thread(runAtNowTask);
         thread.setDaemon(true);
         thread.start();
@@ -1574,7 +1579,7 @@ public class TCruiseTaskService {
                 RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                         tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                         tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                        tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager);
+                        tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager, stationCode);
                 Thread thread = new Thread(runAtNowTask);
                 thread.setDaemon(true);
                 thread.start();
@@ -1657,7 +1662,7 @@ public class TCruiseTaskService {
                     RunAtNowTask runAtNowTask = new RunAtNowTask(tCruiseTask, waitTime, picModelPath, redisTemplate,
                             tCruisePointInstanceDao, tCameraPresetDao, tCruiseResultDao, tAlgorithmConfDao, tAlgorithmInfoDao, tCruisePlanAttrDao,
                             tCruiseDataResultDao, tCruiseTaskResultDetailDao, tCruiseTaskResultDao, false, tasksAreTime,
-                            tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager);
+                            tRobotInspectionDao, tAlgorithmConfBakDao,this,tVoiceDeviceService,audioDeviceManager, stationCode);
                     Thread thread = new Thread(runAtNowTask);
                     thread.setDaemon(true);
                     thread.start();
