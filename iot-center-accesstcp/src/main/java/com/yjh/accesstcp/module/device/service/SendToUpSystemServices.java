@@ -79,6 +79,7 @@ public class SendToUpSystemServices {
             Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
 //            String path = mapForPath.get("content")+"/"+stationCode+"/Model";
             String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model":mapForPath.get("content")+"/"+stationCode+"/Model";
+            log.info("模型文件路径："+path);
 
             switch (type){
                 case "1":
@@ -155,6 +156,7 @@ public class SendToUpSystemServices {
             Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
             String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model":mapForPath.get("content")+"/"+stationCode+"/Model";
 
+            log.info("模型文件路径："+path);
             switch (type){
                 case "1":
                     //点位模型

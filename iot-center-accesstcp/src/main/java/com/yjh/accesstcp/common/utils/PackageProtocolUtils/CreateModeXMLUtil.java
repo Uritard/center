@@ -39,6 +39,10 @@ public class CreateModeXMLUtil {
         }
         OutputFormat format = OutputFormat.createPrettyPrint();
         format.setEncoding("UTF-8");
+        File dir = new File(failPath);
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
         File file = new File(failPath+"/"+fileName);
         if(file.exists()){
             deleteDir(new File(failPath + "/"+fileName));
