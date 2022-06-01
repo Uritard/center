@@ -9,6 +9,7 @@ import com.yjh.accessvideo.common.mqtt.GetSpringUtil;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.accessvideo.common.mqtt.alarmMsgBody.Different;
+import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.commons.utils.StaticContextAccessor;
 import com.yjh.accessvideo.module.device.entity.*;
 import com.yjh.accessvideo.module.device.service.AnalyseDataOperateService;
@@ -28,7 +29,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
@@ -983,9 +983,8 @@ public class DataDealThread implements Runnable {
                             AlarmService alarmService= GetSpringUtil.getBean("alarmService");
                             alarmService.PushMsg(alarmDetail);
 
-//                            // 判别结果上报站端
-//                            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
-//                                    jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult, alarm_level, tWarnInfo);
+                            // 判别上报站端
+                            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).defectAndDistinguishToUpSystem(jsonObjectResultbak, differentList);
                         }
 
                         if(defectList.size()>0&&("1".equals(flag))){
@@ -1069,6 +1068,9 @@ public class DataDealThread implements Runnable {
                             AlarmService alarmService= GetSpringUtil.getBean("alarmService");
                             alarmService.PushMsg(alarmDetail);
                             log.info("发送算法管理平台结束");
+
+                            // 缺陷上报站端
+                            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).defectAndDistinguishToUpSystem(jsonObjectResultbak, defectList);
                         }
                     } catch (Exception e) {
                         log.info("与算法管理平台交互失败" + e);
@@ -1342,8 +1344,6 @@ public class DataDealThread implements Runnable {
 
         }
     }
-
-
 
     /**
      * 请求webSocket发送方法

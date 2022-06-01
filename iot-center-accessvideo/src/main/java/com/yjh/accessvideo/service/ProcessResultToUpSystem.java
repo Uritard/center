@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.module.device.entity.TWarnInfo;
@@ -37,6 +38,7 @@ public class ProcessResultToUpSystem{
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
 
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     private final Logger log = LoggerFactory.getLogger(ProcessResultToUpSystem.class);
 
     /**
@@ -90,12 +92,11 @@ public class ProcessResultToUpSystem{
             String deviceMeteId = cruiseResult.get("device_mete_id");
             String taskId = cruiseResult.get("taskId");
             // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-            String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            String timeFormat = simpleDateFormat.format(new Date());
             String tagPath = stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
                     + "/" + taskId + fileNamePath + deviceMeteId + "_" + cameraPmS + "_" + timeFormat + ".jpg";
 
-            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddHHmmss");
-            xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat2.format(simpleDateFormat2.parse(cruiseResult.get("cruiseTime"))));
+            xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat.format(simpleDateFormat.parse(cruiseResult.get("cruiseTime"))));
             Map<String, String> resMap = new HashMap<>(5);
 
             if (Objects.isNull(tWarnInfo)){
@@ -215,5 +216,99 @@ public class ProcessResultToUpSystem{
         resultPathMap.put("imgPath", imgPath);
         resultPathMap.put("tagPath", tagPath);
         return resultPathMap;
+    }
+
+    /**
+     * 缺陷及判别结果上报站端
+     *
+     * @param jsonObjectResult 算法返回结果
+     * @param resultList 缺陷或判别结果
+     * @return void
+     */
+    @Async
+    public void defectAndDistinguishToUpSystem(JSONObject jsonObjectResult, Set<String> resultList){
+        try {
+            String resultImg = jsonObjectResult.getString("analyseResultImg");
+            String taskId = jsonObjectResult.getString("taskId");
+            String instanceId = jsonObjectResult.getString("instanceId");
+
+            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
+
+            for (String key : resultList){
+                XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                List<Map<String, Object>> xmlItems = new ArrayList<>();
+                Map<String, Object> xmlItem = new HashMap<>(16);
+                xmlBaseModel.setType("62");
+                xmlItem.put("patroldevice_code", Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse(""));
+                xmlItem.put("patroldevice_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
+                xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
+                xmlItem.put("task_code", Optional.ofNullable(cruiseResultMap.get("taskCode")).orElse(""));
+                xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("cruiseName")).orElse(""));
+                xmlItem.put("device_id", Optional.ofNullable(cruiseResultMap.get("device_mete_id")).orElse(""));
+                xmlItem.put("time", DateTimeUtil.format(new Date()));
+                // 缺陷属于外观异常告警类型,识别类型为设备外观查看,告警文件类型为识别图片  所以都是固定值
+                xmlItem.put("alarm_type", "6");
+                xmlItem.put("file_type", "5");
+                xmlItem.put("recognition_type", "3");
+                xmlItem.put("value", "");
+                xmlItem.put("unit", "");
+                // 根据相机id获取相机pms编码 （仿照机器人编码）
+                String cameraPmS = analyseDataOperateService.selectPMSByCameraId(Long.valueOf(cruiseResultMap.get("cameraId")));
+                String deviceMeteId = cruiseResultMap.get("device_mete_id");
+                // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD/设备点位ID_编码_时间.jpg
+                String timeFormat = simpleDateFormat.format(new Date());
+                String tagPath = "alarm/" + stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
+                        + "/" + taskId + "/CCD/" + deviceMeteId + "_" + cameraPmS + "_" + timeFormat + ".jpg";
+                xmlItem.put("file_path", tagPath);
+                log.info("imgPath==={},tagPath==={}", resultImg, tagPath);
+                analyseDataOperateService.uploadFileToUpFtps(resultImg, "/" + tagPath);
+                xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat.format(simpleDateFormat.parse(cruiseResultMap.get("cruiseTime"))));
+                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+                String value = redisInfoMap.get("value");
+                if (value.contains("abnormal")){
+                    // 判别
+                    xmlItem.put("value_unit", "图像有差异");
+                    xmlItem.put("content", "图像有差异");
+                    // 判别告警等级暂定为一般
+                    xmlItem.put("alarm_level", "2");
+                }else {
+                    // 缺陷
+                    xmlItem.put("value_unit", Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
+                    xmlItem.put("content", Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
+                    String defectLevel = redisInfoMap.get("defectContent");
+                    switch (defectLevel){
+                        case "130":
+                            xmlItem.put("alarm_level", "1");
+                            break;
+                        case "131":
+                            xmlItem.put("alarm_level", "2");
+                            break;
+                        case "132":
+                            xmlItem.put("alarm_level", "3");
+                            break;
+                        case "133":
+                            xmlItem.put("alarm_level", "4");
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                xmlItems.add(xmlItem);
+                xmlBaseModel.setItems(xmlItems);
+                List<XMLBaseModel> list = new ArrayList<>();
+                list.add(xmlBaseModel);
+                Map<String, List<XMLBaseModel>> map = new HashMap<>();
+                map.put("list", list);
+                log.info("信息上报==={}", map);
+                try {
+                    Constant.otherServer(map, Constant.TCP_URL);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 }

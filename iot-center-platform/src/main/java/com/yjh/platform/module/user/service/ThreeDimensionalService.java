@@ -111,7 +111,6 @@ public class ThreeDimensionalService {
             //关联的摄像机只能是通过设备下的某个测点配置了预置位成为巡检点才能找到。
             cameraUnionDeviceList = threeDimensionalDao.selectCameraByDeviceId(deviceId);
         }
-        
         /*Map<String,String> map = new HashMap<>();
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
         for(Long recordId : recordIdList){

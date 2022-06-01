@@ -77,6 +77,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         cruiseResultMap.put("fileType",  String.valueOf(item.get("file_type")));
         cruiseResultMap.put("rectangle",  String.valueOf(item.get("rectangle")));
         cruiseResultMap.put("taskPatrolledId",  String.valueOf(item.get("task_patrolled_id")));
+        cruiseResultMap.put("filePath",  String.valueOf(item.get("file_path")));
         if (Objects.nonNull(item.get("valid"))) {
             cruiseResultMap.put("valid",  String.valueOf(item.get("valid")));
         }

@@ -75,8 +75,6 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
                 robotRoadMap.put("relativePath", developRelativeUrl + "/" + fileName);
                 robotRoadMap.put("absolutePath", developAbsoluteUrl + "/" + fileName);
-
-                roadToUpSystem(xmlBaseModel);
             }else {
                 robotRoadMap.put("relativePath", "");
                 robotRoadMap.put("absolutePath", "");
@@ -98,6 +96,8 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
         log.info("巡视主机给机器人{}响应了", robotCode);
         // 国网要求
 //        robotService.upToCruise(xmlBaseModel);
+
+        roadToUpSystem(xmlBaseModel);
     }
 
     /**

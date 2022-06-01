@@ -400,6 +400,13 @@ public class IntelAnalysisService {
         SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String yearMonth = ym.format(new Date());
         String nowTime = timeFormat.format(new Date());
+        if (Objects.equals("666666", response.getResultsList().get(0).getObjectId())){
+            if (StringUtils.isEmpty(analyseType)){
+                log.info("没有识别出来任何缺陷");
+                return;
+            }
+        }
+
         if("tx_pb".equals(analyseType) || Objects.isNull(analyseType)){
 
             //判别

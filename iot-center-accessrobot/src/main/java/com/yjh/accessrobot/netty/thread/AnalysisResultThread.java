@@ -20,6 +20,7 @@ import redis.clients.jedis.ScanResult;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -259,6 +260,49 @@ public class AnalysisResultThread implements Runnable{
         }
         String str = "t_cruise_task_result:" + taskId + ":" + details.getInstanceId();
         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
+
+        // 巡视结果上报站端
+
+        try {
+            //巡视点结果上报站端
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String,Object>> xmlItems = new ArrayList<>();
+            Map<String,Object> xmlItem = new HashMap<>();
+            xmlBaseModel.setType("61");
+            xmlItem.put("patroldevice_code", Optional.ofNullable(cruiseResultMap.get("patrolDeviceName")).orElse(""));
+            xmlItem.put("patroldevice_name", Optional.ofNullable(cruiseResultMap.get("patrolDeviceCode")).orElse(""));
+            xmlItem.put("task_name", Optional.ofNullable(tCruiseTaskResultMap.get("task_name")).orElse(""));
+            xmlItem.put("task_code", Optional.ofNullable(tCruiseTaskResultMap.get("taskId")).orElse(""));
+            xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse(""));
+            xmlItem.put("device_id", Optional.ofNullable(cruiseResultMap.get("deviceId")).orElse(""));
+//            xmlItem.put("material_id", );
+            xmlItem.put("value","");
+            xmlItem.put("value_unit", Optional.ofNullable(tCruiseTaskResultMap.get("resultNum")).orElse(""));
+            xmlItem.put("unit","");
+            xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("time")).orElse(""));
+            xmlItem.put("recognition_type", Optional.ofNullable(cruiseResultMap.get("recognitionType")).orElse(""));
+            xmlItem.put("file_type", Optional.ofNullable(cruiseResultMap.get("fileType")).orElse(""));
+            String tagPath = "task/"+ cruiseResultMap.get("filePath");
+            log.info("imgPath==={},tagPath==={}", temporaryOriginPath, tagPath);
+//            uploadFileToUpFtps(temporaryOriginPath, "/" + tagPath);
+            xmlItem.put("file_path", tagPath);
+
+            xmlItem.put("rectangle","");
+            xmlItem.put("task_patrolled_id", cruiseResultMap.get("task_patrolled_id"));
+            xmlItem.put("data_type","0x01");
+            xmlItem.put("valid","1");
+
+            xmlItems.add(xmlItem);
+            xmlBaseModel.setItems(xmlItems);
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+            cruiseResult.put("list",list);
+            log.info("信息上报：-"+cruiseResult);
+            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
 
         // webSocket通知前端调用巡视监控的接口
         Map<String, Object> jasonMap = new HashMap<>(2);

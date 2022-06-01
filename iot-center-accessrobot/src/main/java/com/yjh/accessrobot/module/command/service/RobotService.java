@@ -1266,8 +1266,10 @@ public class RobotService {
         TCruiseResult tCruiseResult = selectTaskResultId(taskId);
         tCruiseResult.setTaskWait(taskWait);
         if (taskStatus == 2) {
+            // 暂停
             tCruiseResult.setCState(241);
         }else if (taskStatus == 4) {
+            // 终止
             tCruiseResult.setCState(242);
         }
         tCruiseResult.setTaskCode(taskId);
