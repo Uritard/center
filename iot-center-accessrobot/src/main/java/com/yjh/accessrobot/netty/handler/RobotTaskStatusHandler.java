@@ -101,20 +101,20 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         log.info("巡视主机给机器人{}响应了", robotCode);
 
         //任务已执行和任务终止 更新任务结束时间
-        if ("1".equals(taskState) || "4".equals(taskState)){
-            Map<String, Object> taskMap = new HashMap<>();
-            taskMap.put("taskId", taskId);
-            taskMap.put("endTime", new Date());
-            StaticContextAccessor.getBean(RobotService.class).updateTCruiseTask(taskMap);
-            TCruiseResult tCruiseResult = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
-            if ("1".equals(taskState)){
-                tCruiseResult.setCState(240); //任务已执行
-            }else {
-                tCruiseResult.setCState(242); //任务终止
-            }
-            int res = StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
-            log.info("更新TCR的条数====" + res);
-        }
+//        if ("1".equals(taskState) || "4".equals(taskState)){
+//            Map<String, Object> taskMap = new HashMap<>();
+//            taskMap.put("taskId", taskId);
+//            taskMap.put("endTime", new Date());
+//            StaticContextAccessor.getBean(RobotService.class).updateTCruiseTask(taskMap);
+//            TCruiseResult tCruiseResult = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
+//            if ("1".equals(taskState)){
+//                tCruiseResult.setCState(240); //任务已执行
+//            }else {
+//                tCruiseResult.setCState(242); //任务终止
+//            }
+//            int res = StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
+//            log.info("更新TCR的条数====" + res);
+//        }
 
         // 任务根本没做或者没有完成,但是上报任务状态信息进度为100%(E机器人出现过,里面有很多重复代码,未优化)
         if (Objects.equals("1",taskState)) {
@@ -143,6 +143,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             if (resultList.isEmpty()) {
                 neverDone(taskId, allInstanceIdList, taskName);
             }else if (resultList.size() < allInstanceIdList.size()){
+                log.info("Patrol points haven't been fully reported yet!!!This is abnormal status!!!");
                 unFinished(taskId, allInstanceIdList, taskName);
             }
         }
@@ -335,12 +336,13 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
 
         List<Long> instanceIdList = Constant.flagMap.get(taskId);
         log.info("已经做过的巡视点====" + instanceIdList);
-        if (CollectionUtils.isNotEmpty(instanceIdList)) {
-            for (Long instanceId : instanceIdList) {
-                allInstanceIdList.remove(instanceId.toString());
-            }
-        }
-        log.info("删除已经做过的巡视点后===" + allInstanceIdList);
+        log.info("先插入这些数据");
+//        if (CollectionUtils.isNotEmpty(instanceIdList)) {
+//            for (Long instanceId : instanceIdList) {
+//                allInstanceIdList.remove(instanceId.toString());
+//            }
+//        }
+//        log.info("删除已经做过的巡视点后===" + allInstanceIdList);
 
         List<Long> isFinishedInstanceList = StaticContextAccessor.getBean(RobotService.class).selectInstanceForTaskGoOn(taskId);
         log.info("已经入库的巡视点===" + isFinishedInstanceList);
@@ -462,12 +464,10 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         }
         log.info("插tCTRD的条数: " + res1 + ",插tCDR的条数: " + res2);
 
-        // 将公共类的instanceIdList清空
-        if (Constant.flagMap.get(taskId) != null && !Constant.flagMap.get(taskId).isEmpty()) {
-            log.info("进来了？？？");
-            for (Long instancedId : Constant.flagMap.get(taskId)) {
-                allInstanceIdList.remove(instancedId.toString());
-            }
+        // 将已经做过的巡视点Map清空
+        if (CollectionUtils.isNotEmpty(Constant.flagMap.get(taskId))){
+            log.info("将公共类的instanceIdList清空");
+            Constant.flagMap.remove(taskId);
         }
 
         /*

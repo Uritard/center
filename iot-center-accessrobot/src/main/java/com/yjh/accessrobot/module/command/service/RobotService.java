@@ -822,12 +822,12 @@ public class RobotService {
             RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
         }
 
-        String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
+//        String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
 
-        if ("200".equals(code)){
-            return "true";
-        }
-        return "false";
+//        if ("200".equals(code)){
+//            return "true";
+//        }
+        return "true";
     }
     /**
      * 判断机器人是否正常运作之后再下发任务

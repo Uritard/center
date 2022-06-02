@@ -9,7 +9,7 @@ public enum HandlerEnum {
     REGISTER("2511","register"),
     // 心跳指令
     HEART_BEAT("2512","heartBeat"),
-    // 模型同步和任务控制
+    // 模型同步和任务控制和联动任务下发
     MODEL_SYNC("2514","modelSync"),
     // 机器人控制和任务下发
     TASK_CONTROLLER("2513","taskController"),
@@ -44,7 +44,9 @@ public enum HandlerEnum {
     // 无人机机巢状态数据
     NEST_STATUS("20001","nestStatus"),
     // 无人机机巢运行数据
-    NEST_RUN_DATA("10004","nestRunData");
+    NEST_RUN_DATA("10004","nestRunData"),
+    // 巡视报告数据
+    ROBOT_CRUISE_REPORT("63", "robotCruiseReport");
 
     /**
      * 状态值

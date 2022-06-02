@@ -27,13 +27,14 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
-        if (xmlBaseModel.getItems().get(0).size() == 1) {
+        Map<String, Object> resultMap = xmlBaseModel.getItems().get(0);
+        if (resultMap.size() == 1) {
             // task control
-            if (xmlBaseModel.getItems().get(0).containsKey("task_patrolled_id")) {
-                String taskId = xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString();
+            if (resultMap.containsKey("task_patrolled_id")) {
+                String taskId = resultMap.get("task_patrolled_id").toString();
                 log.info("机器人收到任务控制指令了,这是机器人响应的巡视任务执行Id==={}", taskId);
-            } else if (xmlBaseModel.getItems().get(0).containsKey("error_code")) {
-                switch (xmlBaseModel.getItems().get(0).get("error_code").toString()) {
+            } else if (resultMap.containsKey("error_code")) {
+                switch (resultMap.get("error_code").toString()) {
                     case "0": log.info("成功");break;
                     case "1": log.info("机器人异常");break;
                     case "2": log.info("无权限（或高优先级任务存在");break;
@@ -41,14 +42,27 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                     default: break;
                 }
             }
-        } else if (xmlBaseModel.getItems().get(0).size() >= 2) {
+            return;
+        } else if (resultMap.size() >= 2 && resultMap.containsKey("error_code")) {
+            // link task
+            switch (resultMap.get("error_code").toString()) {
+                case "0": log.info("成功");break;
+                case "1": log.info("机器人异常");break;
+                case "2": log.info("无权限（或高优先级任务存在");break;
+                case "3": log.info("其它异常");break;
+                default: break;
+            }
+            String taskPatrolledId = String.valueOf(resultMap.getOrDefault("task_patrolled_id", ""));
+            log.info("机器人收到联动任务指令了,这是机器人响应的巡视任务执行Id==={}", taskPatrolledId);
+            return;
+        } else if (resultMap.size() >= 2) {
             log.info("机器人收到模型指令了,这是机器人的响应");
             // model file sync
-            String deviceFile = xmlBaseModel.getItems().get(0).get("device_file_path").toString();
-            String robotFile = xmlBaseModel.getItems().get(0).get("robot_file_path").toString();
+            String deviceFile = resultMap.get("device_file_path").toString();
+            String robotFile = resultMap.get("robot_file_path").toString();
             String propertyFile = "";
-            if(xmlBaseModel.getItems().get(0).containsKey("property_file_path")){
-                propertyFile = xmlBaseModel.getItems().get(0).get("property_file_path").toString();
+            if (resultMap.containsKey("property_file_path")) {
+                propertyFile = resultMap.get("property_file_path").toString();
             }
             log.info("模型同步的文件路径信息,deviceFile:{},robotFile:{},propertyFile:{}", deviceFile, robotFile, propertyFile);
             if (StringUtils.isNotEmpty(deviceFile) && StringUtils.isNotEmpty(robotFile)) {
@@ -66,7 +80,8 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
 //            robotService.uploadFile(robotFile, robotFile);
             // 国网要求
 //            robotService.upToCruise(xmlBaseModel);
-        } else if (xmlBaseModel.getItems().get(0).size() == 0) {
+            return;
+        } else if (resultMap.size() == 0) {
             log.info("机器人收到检修区域指令了,这是机器人的响应");
             // maintenance area was issued successfully
             robotService.receivingResponse(xmlBaseModel, receiveSessionId);

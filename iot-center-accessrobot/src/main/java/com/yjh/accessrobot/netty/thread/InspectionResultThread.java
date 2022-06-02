@@ -411,7 +411,6 @@ public class InspectionResultThread implements Runnable{
         // 将已经做过的巡视点Map清空
         if (CollectionUtils.isNotEmpty(Constant.flagMap.get(taskId))){
             log.info("将公共类的instanceIdList清空");
-//            Constant.flagMap = new HashMap<>(16);
             Constant.flagMap.remove(taskId);
         }
 

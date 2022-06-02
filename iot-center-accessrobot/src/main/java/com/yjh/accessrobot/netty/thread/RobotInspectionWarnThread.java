@@ -72,9 +72,7 @@ public class RobotInspectionWarnThread implements Runnable{
                     Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
                     TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);
 
-                    storeWarnInfo(tStdDevicemete, instanceId, taskId, robotCode);
-
-                    Long warnId = StaticContextAccessor.getBean(RobotService.class).selectWarnId(taskId, instanceId);
+                    Long warnId = storeWarnInfo(tStdDevicemete, instanceId, taskId, robotCode);
                     log.info("warnId===" + warnId);
 
                     Map<String, String> currentWarnInfo = new HashMap<>(16);
@@ -119,9 +117,9 @@ public class RobotInspectionWarnThread implements Runnable{
      * @param instanceId 巡检点id
      * @param taskId 任务id
      * @param robotCode 机器人唯一标识
-     * @return void
+     * @return Long
      */
-    private void storeWarnInfo(TStdDeviceMete tStdDevicemete, Long instanceId, String taskId, String robotCode){
+    private Long storeWarnInfo(TStdDeviceMete tStdDevicemete, Long instanceId, String taskId, String robotCode){
         try {
             TWarnInfo warnInfo = new TWarnInfo();
             warnInfo.setWarnTime(new Date());
@@ -179,9 +177,12 @@ public class RobotInspectionWarnThread implements Runnable{
                 alarmToAlgorithmManagement(warnInfo, tStdDevicemete);
             }
 
+            return warnInfo.getWarnId();
+
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
+        return null;
     }
 
     /**
