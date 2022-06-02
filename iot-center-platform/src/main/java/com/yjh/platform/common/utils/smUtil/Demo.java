@@ -154,9 +154,13 @@ public class Demo {
      * @return 密码
      * @throws Exception 异常
      */
-    public static String decryptDB(String pCode) throws IOException {
+    public static String decryptDB(String pCode) {
         if(StringUtils.isNoneBlank(pCode)) {
-            return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte(pCode)));
+            try {
+                return new String(SM2Utils.decrypt(Util.hexToByte(prik), Util.hexToByte(pCode)));
+            } catch (IOException | IllegalArgumentException e) {
+                throw new IllegalArgumentException("解密失败，请检查加密后字符", e);
+            }
         }else {
             return  "";
         }

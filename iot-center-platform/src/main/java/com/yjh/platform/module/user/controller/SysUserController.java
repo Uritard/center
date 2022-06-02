@@ -338,8 +338,11 @@ public class SysUserController {
         try {
             Map resultHasLogin = this.sysUserService.userLogin(request, userMap);
             result.setData(resultHasLogin);
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("登录失败:", e);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("登录失败:", e);
         }
         return result;
@@ -355,7 +358,7 @@ public class SysUserController {
             String token = request.getHeader("token");
             result.setData(this.sysUserService.userLogout(userId, token));
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("登出失败:", e);
         }
         return result;
@@ -373,7 +376,7 @@ public class SysUserController {
         try {
             result.setData(this.sysUserService.userLogoutGateWay(userId, token, ip, userName));
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("登出失败:", e);
         }
         return result;
@@ -770,7 +773,7 @@ public class SysUserController {
             redisTemplate.opsForValue().set("number", random);
             result.setData(random);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("生成验证码失败:", e);
         }
         return result;
@@ -800,7 +803,7 @@ public class SysUserController {
             mapPubk.put("identifier",nums);
             result.setData(mapPubk);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("获取公钥失败:", e);
         }
         return result;
@@ -812,8 +815,11 @@ public class SysUserController {
         Result result = new Result();
         try {
             result.setData(sysKeyService.insert(sysKey, request));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.PARAMERROR.getCode(), e.getMessage());
+            log.error("用户绑定{}失败:", sysKey.getBindName(), e);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.PARAMERROR.getCode(), e.getMessage());
+            result.setCode(ResultCodeEnum.PARAMERROR.getCode(), ResultCodeEnum.PARAMERROR.getName());
             log.error("用户绑定{}失败:", sysKey.getBindName(), e);
         }
         return result;
@@ -827,7 +833,7 @@ public class SysUserController {
         try {
             result.setData(sysKeyService.getUserKeys(userId));
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.PARAMERROR.getCode(), e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("获取用户绑定列表失败:", e);
         }
         return result;
@@ -839,8 +845,11 @@ public class SysUserController {
         Result result = new Result();
         try {
             result.setData(sysKeyService.deleteByPrimaryId(keyId, request));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("获取用户绑定列表失败:", e);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.PARAMERROR.getCode(), e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("用户绑定删除失败: {}", keyId, e);
         }
         return result;
@@ -854,7 +863,7 @@ public class SysUserController {
             Set<String> ips = redisTemplate.opsForSet().members("sysKey:" + userId + ":2");
             result.setData(ips);
         } catch (Exception e) {
-            result.setCode(ResultCodeEnum.PARAMERROR.getCode(), e.getMessage());
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("获取Redis中用户绑定数据失败: {}", userId, e);
         }
         return result;

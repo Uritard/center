@@ -11,9 +11,11 @@ import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +76,6 @@ public class SendToUpSystemServices {
         return 1;
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> creatModel(String type){
         try{
             Map<String,Object> map = new HashMap<>();
@@ -140,17 +141,19 @@ public class SendToUpSystemServices {
                     ftpsUtil.putFile(mapAbsPath,mapModelTargetPath);
                     map.put("map_file_path",mapModelTargetPath);
                     break;
+                default:
+                    break;
             }
 
 
             return map;
         }catch (Exception e) {
-        e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return null;
     }
 
-
+    @Async
     public void creatFile(String type){
         try{
             List<Map<String,Object>> list = new ArrayList<>();
@@ -218,12 +221,14 @@ public class SendToUpSystemServices {
                     ftpsUtil.putFile(mapAbsPath,mapModelTargetPath);
                     map.put("map_file_path",mapModelTargetPath);
                     break;
+                default:
+                    break;
             }
             sendResponse("11","",stationCode,list);
 
 
         }catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -419,14 +424,16 @@ public class SendToUpSystemServices {
             case "5":
                 resultStatistical.add(countInstanceLoss(startTime,endTime));
                 break;
+            default:
+                break;
         }
         return resultStatistical;
     }
 
     private HashMap<String,Object> dealCount(HashMap<String,Object> countMap){
-        Double totalNum = Double.valueOf(countMap.get("totalNum").toString());
-        Double validNum = Double.valueOf(countMap.get("validNum").toString());
-        String percent =String.format("%.3f",validNum*100/totalNum);
+        double totalNum = NumberUtils.toDouble(countMap.get("totalNum").toString());
+        double validNum = NumberUtils.toDouble(countMap.get("validNum").toString());
+        String percent = totalNum > 0 ? String.format("%.3f",validNum * 100 / totalNum) : "0.00";
         HashMap<String,Object> reMap = new HashMap<>();
         reMap.put("total_num",totalNum);
         reMap.put("valid_num",validNum);

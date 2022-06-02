@@ -5,6 +5,8 @@
 package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.logs.LogsRecord;
+import com.yjh.platform.common.result.BusinessException;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.user.dao.SysKeyDao;
 import com.yjh.platform.module.user.entity.SysKey;
@@ -53,7 +55,7 @@ public class SysKeyService {
         String bindName = sysKey.getBindName();
         if (StringUtils.isEmpty(bindName)) {
             log.error("绑定类型不正确, {}, {}", sysKey.getBindType(), sysKey.getBindName());
-            throw new RuntimeException("绑定类型不正确！");
+            throw new BusinessException(ResultCodeEnum.PARAMERROR.getCode(), "绑定类型不正确！");
         }
         if(sysKey.getBindType() == SysKey.BindEnum.UKEY.getCode()) {
             String isDecode = (String) redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content");
@@ -82,7 +84,7 @@ public class SysKeyService {
         SysKey sysKey = sysKeyDao.selectByPrimaryId(keyId);
         if (sysKey == null) {
             log.error("用户绑定不存在, {}", keyId);
-            throw new RuntimeException("用户绑定不存在！");
+            throw new BusinessException(ResultCodeEnum.PARAMERROR.getCode(), "用户绑定不存在！");
         }
         Long userId = sysKey.getUserId();
         String names = String.valueOf(redisTemplate.opsForHash().get("userInfo:" + userId, "userName"));

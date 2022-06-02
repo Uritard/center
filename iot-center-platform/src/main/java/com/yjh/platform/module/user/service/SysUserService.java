@@ -188,11 +188,16 @@ public class SysUserService {
                 }
 
                 Map<String, String> linkedHashMap = new LinkedHashMap<>();
-                linkedHashMap.put("userName", userName);
-                linkedHashMap.put("password", Demo.decryptDB(sysUserLogin.getPassword()));
-                linkedHashMap.put("updateTime", DateUtils.dateToString(sysUserLogin.getUpdateTime()));
-                String vcode = Demo.summary(JSONUtil.toJSONString(linkedHashMap));
-                boolean isReChange = !vcode.equals(sysUserBackUp.getVerfiCode());
+                String vcode = null;
+                try {
+                    linkedHashMap.put("userName", userName);
+                    linkedHashMap.put("password", Demo.decryptDB(sysUserLogin.getPassword()));
+                    linkedHashMap.put("updateTime", DateUtils.dateToString(sysUserLogin.getUpdateTime()));
+                    vcode = Demo.summary(JSONUtil.toJSONString(linkedHashMap));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+                boolean isReChange = !Objects.equals(vcode, sysUserBackUp.getVerfiCode());
                 if (isReChange) {
                     SysUser sysUsers = new SysUser();
                     sysUsers.setPassword(sysUserBackUp.getPassword());
