@@ -87,13 +87,16 @@ public class Constant {
 
     public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
     public static void modelUpload(String type){
-        try {
-            Map<String, Object> param = new HashMap<>();
-            param.put("type", type);
-            StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);//江苏要求
-        }catch (Exception e){
-            log.info("模型文件上传失败"+e);
-        }
+        new Thread(() ->{
+            try {
+                Map<String, Object> param = new HashMap<>();
+                param.put("type", type);
+                StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);//江苏要求
+            }catch (Exception e){
+                log.info("模型文件上传失败"+e);
+            }
+        });
+
     }
 
     public static Map<String,String> userInfo= new HashMap<>();

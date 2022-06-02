@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
@@ -11,12 +12,12 @@ import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,6 +35,7 @@ public class SendToUpSystemServices {
     private RedisTemplate redisTemplate;
     @Value("${spring.union.stationCode}")
     private String stationCode;
+
     @Value("${spring.union.cruiseHost}")
     private String sendCode;
     @Value("${spring.union.upSystem}")
@@ -235,15 +237,45 @@ public class SendToUpSystemServices {
         Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:stationName");
         list.forEach(item->{
             item.put("station_code",stationCode);
-            item.put("station_name",mapForPath.get("content"));
+            item.put("station_name", getStationName());
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("device_code","");
+            jsonObject.put("device_pos","");
+            jsonObject.put("robot_code","");
+            jsonObject.put("robot_pos","");
+            jsonObject.put("uav_code","");
+            jsonObject.put("uav_pos","");
+            if (item.get("cruise_type").equals(228)){// 机器人
+                item.put("save_type_list","jpg");
+                item.put("date_type","01");
+                jsonObject.put("robot_code",item.get("robot_code"));
+            } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)){//视屏 红外
+                item.put("save_type_list","jpg");
+                item.put("date_type","1");
+                jsonObject.put("device_code",item.get("camera_id"));
+                jsonObject.put("device_pos",item.get("preset_id"));
+            }else if (item.get("cruise_type").equals(232)){//声纹
+                item.put("save_type_list","wav");
+                item.put("date_type","0001");
+            }else if (item.get("cruise_type").equals(524)){// 无人机
+                item.put("save_type_list","jpg");
+                item.put("date_type","001");
+            }
+            item.put("video_pos",jsonObject.toString());
         });
         return CreateModeXMLUtil.createXmlFile(list,path,"device_model.xml","Device_Model");
+    }
+
+    private String getStationName(){
+        Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:stationName");
+        return mapForPath.get("content");
     }
     public String createRobotModel(String path) throws Exception{
         //机器人模型
         List<Map<String,Object>> list = sendToUpSystemDao.selectRobotInfo();
         list.forEach(item->{
             item.put("station_code",stationCode);
+            item.put("station_name", getStationName());
         });
         return CreateModeXMLUtil.createXmlFile(list,path,"robot_model.xml","PatrolDevice _Model");
 
@@ -253,24 +285,27 @@ public class SendToUpSystemServices {
         List<Map<String,Object>> list  = sendToUpSystemDao.selectCameraInfo();
         list.forEach(item->{
             item.put("station_code",stationCode);
+            item.put("station_name", getStationName());
         });
         return CreateModeXMLUtil.createXmlFile(list,path,"video_model.xml","PatrolDevice _Model");
 
     }
     public String createDroneModel(String path) throws Exception{
         //无人机模型
-        List<Map<String,Object>> list = new ArrayList<>();
+        List<Map<String,Object>> list = sendToUpSystemDao.selectDroneInfo();
         list.forEach(item->{
             item.put("station_code",stationCode);
+            item.put("station_name", getStationName());
         });
         return CreateModeXMLUtil.createXmlFile(list,path,"drone_model.xml","PatrolDevice _Model");
 
     }
     public String createVoiceModel(String path) throws Exception{
         //声纹模型
-        List<Map<String,Object>> list  = new ArrayList<>();
+        List<Map<String,Object>> list  = sendToUpSystemDao.selectVoiceInfo();
         list.forEach(item->{
             item.put("station_code",stationCode);
+            item.put("station_name", getStationName());
         });
         return CreateModeXMLUtil.createXmlFile(list,path,"voice_model.xml","PatrolDevice _Model");
 
@@ -283,30 +318,28 @@ public class SendToUpSystemServices {
             String taskId = item.get("task_code").toString();
             List<Long> instanceIdList = sendToUpSystemDao.selectInstanceId(taskId);
             item.put("device_list",instanceIdList.toString().replaceFirst("\\[","").replace("]","").replace(" ",""));
-            if(!"".equals(item.get("time"))){
-                //计算 todo 内容不完整
-                String time = item.get("time").toString();
-                //SimpleDateFormat s = new SimpleDateFormat("HH:mm:ss");
-                //String s = Pattern.compile("[^0-9]").matcher(str).replaceAll("");
-
-//                    item.put("cycle_month", CornUtil.translateToChinese(time,1));
-//                    item.put("cycle_week",CornUtil.translateToChinese(time,2));
-//                    item.put("cycle_execute_time",CornUtil.translateToChinese(time,4));
-
-                item.put("cycle_start_time",simpleDateFormat.format(new Date()));
-                item.put("cycle_end_time","2025-01-01 00:00:00");
-                item.put("interval_number","1");
-                item.put("interval_type","2");
-                item.put("interval_execute_time","00:00:00");
-                item.put("interval_start_time",simpleDateFormat.format(new Date()));
-                item.put("interval_end_time","2025-01-01 00:00:00");
-                if("1".equals(item.get("isenable"))){
-                    item.put("invalid_start_time",simpleDateFormat.format(new Date()));
-                    item.put("invalid_end_time",simpleDateFormat.format(new Date()));
-                }
-
-
-            }
+//            if(!"".equals(item.get("time"))){
+//                //计算 todo 内容不完整
+//                String time = item.get("time").toString();
+//                //SimpleDateFormat s = new SimpleDateFormat("HH:mm:ss");
+//                //String s = Pattern.compile("[^0-9]").matcher(str).replaceAll("");
+//
+//                    item.put("cycle_month", "");
+//                    item.put("cycle_week","");
+//                    item.put("cycle_execute_time","");
+//
+//                item.put("cycle_start_time",simpleDateFormat.format(new Date()));
+//                item.put("cycle_end_time","2025-01-01 00:00:00");
+//                item.put("interval_number","1");
+//                item.put("interval_type","2");
+//                item.put("interval_execute_time","00:00:00");
+//                item.put("interval_start_time",simpleDateFormat.format(new Date()));
+//                item.put("interval_end_time","2025-01-01 00:00:00");
+//                item.put("station_name",stationName);
+//                item.put("station_code",stationCode);
+//                item.put("invalid_start_time","");
+//                item.put("invalid_end_time","");
+//            }
         }
         return CreateModeXMLUtil.createXmlFile(list,path,"task_model.xml","Task_Model");
 
@@ -318,7 +351,7 @@ public class SendToUpSystemServices {
         infoList.forEach(item ->{
             Map<String,Object> maintenanceMap = new HashMap<>();
             maintenanceMap.put("config_code",item.getConfigCode());
-            maintenanceMap.put("enable",item.getEnable());
+            maintenanceMap.put("enable","1");
             maintenanceMap.put("start_time",item.getStartTime());
             maintenanceMap.put("end_time",item.getEndTime());
             maintenanceMap.put("device_level","3 ");
@@ -335,6 +368,8 @@ public class SendToUpSystemServices {
         //巡视主机模型
         List<Map<String, Object>> finalList = new ArrayList<>();
             Map<String, Object> host = new HashMap<>();
+            host.put("station_name", getStationName());
+            host.put("station_code",stationCode);
             host.put("patroldevice_name","巡视主机");
             host.put("patroldevice_code","YJH-001");
             host.put("device_model","YJH");
