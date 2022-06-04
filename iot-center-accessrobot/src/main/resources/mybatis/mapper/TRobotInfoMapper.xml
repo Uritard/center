@@ -424,7 +424,7 @@
         FROM t_cruise_point_instance a,t_robot_inspection b
         where  1 = 1
         and a.cruise_id = b.inspection_id
-        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=VARCHAR}</if>
+        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
     </select>
     <!--查询机器人相关信息-->
     <select id="selectTaskResultId" resultType="com.yjh.accessrobot.module.command.entity.TCruiseResult">
@@ -433,6 +433,15 @@
         FROM t_cruise_result a
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectRealCodeByInstanceId" resultType="java.lang.String">
+        SELECT
+            b.real_code
+        FROM
+            t_cruise_point_instance a,t_std_device_attr b
+        WHERE a.device_id = b.device_id
+        <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
     </select>
     <!--查询机器人相关信息2-->
     <select id="selectTCruiseTask" parameterType="java.lang.String" resultType="com.yjh.accessrobot.module.command.entity.TCruiseTask">

@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.module.command.controller;
 
+import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.netty.thread.AnalysisResultThread;
 import com.yjh.accessrobot.netty.thread.InspectionResultThread;
@@ -36,6 +37,8 @@ public class YcTestController {
 
     @Autowired
     RedisTemplate redisTemplate;
+    @Autowired
+    UpFtpsConfig upFtpsConfig;
 
     private String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
@@ -108,7 +111,7 @@ public class YcTestController {
             // Start AnalysisResultThread
             String resultPath = String.valueOf(mapsss.get("temporaryOriginPath"));
             String ftpFileName = String.valueOf(mapsss.get("ftpFileName"));
-            AnalysisResultThread analysisResultThread = new AnalysisResultThread(cruiseResultMap, resultPath, ftpFileName, websocketUrl, redisTemplate);
+            AnalysisResultThread analysisResultThread = new AnalysisResultThread(upFtpsConfig,cruiseResultMap, resultPath, ftpFileName, websocketUrl, redisTemplate);
             TaskExecutePool.getInstance().execute(analysisResultThread);
         }else {
             // Start CruiseResultDealThread

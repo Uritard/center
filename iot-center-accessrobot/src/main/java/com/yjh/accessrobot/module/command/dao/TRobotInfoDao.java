@@ -134,6 +134,12 @@ public interface TRobotInfoDao {
      */
     TCruiseResult selectTaskResultId(@Param(value = "taskId") String taskId);
     /**
+     * 根据巡视点id查询实物id
+     * @param instanceId 巡视点id
+     * @return String
+     */
+    String selectRealCodeByInstanceId(@Param(value = "instanceId") Long instanceId);
+    /**
      * 根据任务id查询任务数据
      * @param taskId 任务id
      * @return TCruiseTask

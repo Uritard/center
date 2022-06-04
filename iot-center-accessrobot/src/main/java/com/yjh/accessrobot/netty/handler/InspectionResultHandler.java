@@ -93,7 +93,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             // Start AnalysisResultThread
             String resultPath = String.valueOf(map.get("temporaryOriginPath"));
             String ftpFileName = String.valueOf(map.get("ftpFileName"));
-            AnalysisResultThread analysisResultThread = new AnalysisResultThread(cruiseResultMap, resultPath, ftpFileName, websocketUrl, redisTemplate);
+            AnalysisResultThread analysisResultThread = new AnalysisResultThread(upFtpsConfig, cruiseResultMap, resultPath, ftpFileName, websocketUrl, redisTemplate);
             TaskExecutePool.getInstance().execute(analysisResultThread);
         }else {
             // Start CruiseResultDealThread

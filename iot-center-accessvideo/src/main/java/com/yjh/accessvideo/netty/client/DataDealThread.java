@@ -847,6 +847,9 @@ public class DataDealThread implements Runnable {
                         log.info("cruiseResultMap==={}", JSON.toJSONString(cruiseResultMap));
                         redisTemplate.opsForHash().putAll(cruiseRedisName, cruiseResultMap);//修改redis
 
+                        // 巡视点结果上报站端
+                        StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
+                                jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult,null, null);
                         log.info("Border_______---------______________________________________________________________________________________________");
                         lock.lock();
                         try {
@@ -1344,7 +1347,6 @@ public class DataDealThread implements Runnable {
 
         }
     }
-
     /**
      * 请求webSocket发送方法
      *

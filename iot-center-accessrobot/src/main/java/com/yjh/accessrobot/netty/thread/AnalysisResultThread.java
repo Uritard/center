@@ -1,16 +1,18 @@
 package com.yjh.accessrobot.netty.thread;
 
-import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
+import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -20,7 +22,6 @@ import redis.clients.jedis.ScanResult;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -46,15 +47,17 @@ public class AnalysisResultThread implements Runnable{
     private String ftpFileName;
     private RedisTemplate redisTemplate;
     private String webSocketUrl;
+    private UpFtpsConfig upFtpsConfig;
 
     private static final byte[] LOCK_FLAG = new byte[0];
 
-    public AnalysisResultThread(Map<String, String> cruiseResultMap, String temporaryOriginPath, String ftpFileName, String webSocketUrl, RedisTemplate redisTemplate){
+    public AnalysisResultThread(UpFtpsConfig upFtpsConfig, Map<String, String> cruiseResultMap, String temporaryOriginPath, String ftpFileName, String webSocketUrl, RedisTemplate redisTemplate){
         this.cruiseResultMap = cruiseResultMap;
         this.temporaryOriginPath = temporaryOriginPath;
         this.ftpFileName = ftpFileName;
         this.redisTemplate = redisTemplate;
         this.webSocketUrl = webSocketUrl;
+        this.upFtpsConfig = upFtpsConfig;
     }
 
     @Override
@@ -102,8 +105,10 @@ public class AnalysisResultThread implements Runnable{
         TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMete(details.getDeviceMeteId());
 
         TCruiseResult tCruiseResult = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
+        String realCode = StaticContextAccessor.getBean(RobotService.class).selectRealCodeByInstanceId(instanceId);
         Map<String, String> tCruiseTaskResultMap = new HashMap<>(16);
         try {
+            tCruiseTaskResultMap.put("realCode", realCode);
             tCruiseTaskResultMap.put("instanceId", String.valueOf(instanceId));
             tCruiseTaskResultMap.put("cruiseTime", cruiseResultMap.get("time"));
             tCruiseTaskResultMap.put("taskResultId", tCruiseResult.getTaskResultId());
@@ -262,47 +267,7 @@ public class AnalysisResultThread implements Runnable{
         redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
         // 巡视结果上报站端
-
-        try {
-            //巡视点结果上报站端
-            XMLBaseModel xmlBaseModel = new XMLBaseModel();
-            List<Map<String,Object>> xmlItems = new ArrayList<>();
-            Map<String,Object> xmlItem = new HashMap<>();
-            xmlBaseModel.setType("61");
-            xmlItem.put("patroldevice_code", Optional.ofNullable(cruiseResultMap.get("patrolDeviceName")).orElse(""));
-            xmlItem.put("patroldevice_name", Optional.ofNullable(cruiseResultMap.get("patrolDeviceCode")).orElse(""));
-            xmlItem.put("task_name", Optional.ofNullable(tCruiseTaskResultMap.get("task_name")).orElse(""));
-            xmlItem.put("task_code", Optional.ofNullable(tCruiseTaskResultMap.get("taskId")).orElse(""));
-            xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse(""));
-            xmlItem.put("device_id", Optional.ofNullable(cruiseResultMap.get("deviceId")).orElse(""));
-//            xmlItem.put("material_id", );
-            xmlItem.put("value","");
-            xmlItem.put("value_unit", Optional.ofNullable(tCruiseTaskResultMap.get("resultNum")).orElse(""));
-            xmlItem.put("unit","");
-            xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("time")).orElse(""));
-            xmlItem.put("recognition_type", Optional.ofNullable(cruiseResultMap.get("recognitionType")).orElse(""));
-            xmlItem.put("file_type", Optional.ofNullable(cruiseResultMap.get("fileType")).orElse(""));
-            String tagPath = "task/"+ cruiseResultMap.get("filePath");
-            log.info("imgPath==={},tagPath==={}", temporaryOriginPath, tagPath);
-//            uploadFileToUpFtps(temporaryOriginPath, "/" + tagPath);
-            xmlItem.put("file_path", tagPath);
-
-            xmlItem.put("rectangle","");
-            xmlItem.put("task_patrolled_id", cruiseResultMap.get("task_patrolled_id"));
-            xmlItem.put("data_type","0x01");
-            xmlItem.put("valid","1");
-
-            xmlItems.add(xmlItem);
-            xmlBaseModel.setItems(xmlItems);
-            List<XMLBaseModel> list = new ArrayList<>();
-            list.add(xmlBaseModel);
-            Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
-            cruiseResult.put("list",list);
-            log.info("信息上报：-"+cruiseResult);
-            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }
+        cruiseResultToUpSystem(tCruiseTaskResultMap);
 
         // webSocket通知前端调用巡视监控的接口
         Map<String, Object> jasonMap = new HashMap<>(2);
@@ -345,6 +310,69 @@ public class AnalysisResultThread implements Runnable{
         map.put("normalNum", normalNum);
 
         return map;
+    }
+
+    /**
+     * 巡视结果上报站端
+     *
+     * @param tCruiseTaskResultMap 巡视结果
+     */
+    private void cruiseResultToUpSystem(Map<String, String> tCruiseTaskResultMap) {
+        try {
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String,Object>> xmlItems = new ArrayList<>();
+            Map<String,Object> xmlItem = new HashMap<>();
+            xmlBaseModel.setType("61");
+            xmlItem.put("patroldevice_code", Optional.ofNullable(cruiseResultMap.get("patrolDeviceName")).orElse(""));
+            xmlItem.put("patroldevice_name", Optional.ofNullable(cruiseResultMap.get("patrolDeviceCode")).orElse(""));
+            xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
+            xmlItem.put("task_code", Optional.ofNullable(cruiseResultMap.get("taskCode")).orElse(""));
+            xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse(""));
+            xmlItem.put("device_id", Optional.ofNullable(cruiseResultMap.get("deviceId")).orElse(""));
+            xmlItem.put("material_id", Optional.ofNullable(tCruiseTaskResultMap.get("realCode")).orElse(""));
+            xmlItem.put("value","");
+            xmlItem.put("value_unit", Optional.ofNullable(tCruiseTaskResultMap.get("resultNum")).orElse(""));
+            xmlItem.put("unit","");
+            xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("time")).orElse(""));
+            xmlItem.put("recognition_type", Optional.ofNullable(cruiseResultMap.get("recognitionType")).orElse(""));
+            xmlItem.put("file_type", Optional.ofNullable(cruiseResultMap.get("fileType")).orElse(""));
+            String tagPath = "task/"+ cruiseResultMap.get("filePath");
+            log.info("imgPath==={},tagPath==={}", temporaryOriginPath, tagPath);
+            uploadFileToUpFtps(temporaryOriginPath, "/" + tagPath);
+            xmlItem.put("file_path", tagPath);
+
+            xmlItem.put("rectangle", Optional.ofNullable(cruiseResultMap.get("rectangle")).orElse(""));
+            xmlItem.put("task_patrolled_id", Optional.ofNullable(cruiseResultMap.get("taskPatrolledId")).orElse(""));
+            xmlItem.put("data_type","0x01");
+            xmlItem.put("valid","1");
+
+            xmlItems.add(xmlItem);
+            xmlBaseModel.setItems(xmlItems);
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+            cruiseResult.put("list",list);
+            log.info("信息上报：-"+cruiseResult);
+            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 将文件上传至上级系统ftp服务器
+     *
+     * @param sourcePath 源文件地址
+     * @param targetPathName 目标文件地址名称
+     */
+    private void uploadFileToUpFtps(String sourcePath, String targetPathName) {
+        try {
+            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
+                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+        }
     }
 
     /**

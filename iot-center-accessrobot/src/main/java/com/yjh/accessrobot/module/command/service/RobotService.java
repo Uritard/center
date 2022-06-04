@@ -1291,6 +1291,10 @@ public class RobotService {
         return tRobotInfoDao.selectTaskResultId(taskId);
     }
     @Transactional(rollbackFor = Exception.class)
+    public String selectRealCodeByInstanceId(Long instanceId) {
+        return tRobotInfoDao.selectRealCodeByInstanceId(instanceId);
+    }
+    @Transactional(rollbackFor = Exception.class)
     public TCruiseTask selectTCruiseTask(String taskId) {
         return tRobotInfoDao.selectTCruiseTask(taskId);
     }
