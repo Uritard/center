@@ -52,8 +52,8 @@ public class RobotServerChannelInitializer extends ChannelInitializer<SocketChan
             channel.pipeline().addLast(group, robotServerHandler);
         }
         //添加心跳检查包
-        ChannelPipeline pipeline = channel.pipeline();
-        pipeline.addLast(new IdleStateHandler(5,0,0, TimeUnit.SECONDS));
+//        ChannelPipeline pipeline = channel.pipeline();
+//        pipeline.addLast(new IdleStateHandler(5,0,0, TimeUnit.SECONDS));
     }
 
     @Override

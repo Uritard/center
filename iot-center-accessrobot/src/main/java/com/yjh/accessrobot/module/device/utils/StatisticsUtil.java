@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 可靠性统计工具类
@@ -24,6 +26,7 @@ public class StatisticsUtil {
   private static final String ON_LINE = "在线";
   private static final String OFF_LINE = "离线";
   private static TRobotInfoDao staticDao;
+  private static final Map<Long, Long> LAST_ONLINE_TIME_MAP = new ConcurrentHashMap<>();
 
   @Autowired private TRobotInfoDao tRobotInfoDao;
   /**
@@ -134,7 +137,42 @@ public class StatisticsUtil {
         }
       }
     } catch (Exception e) {
-      log.error("定时查询在线状态定时任务发生异常{}", e.getMessage());
+      log.error("定时查询在线状态定时任务发生异常", e);
+    }
+  }
+
+  /**
+   * 启动后延迟30秒，然后每隔10分支统计一次
+   * 如果最后上线时间没有变化则不增加离线次数
+   * 有一个小问题，如果服务器重启，离线时间在 4~4.5 小时的机器人离线次数会再次加一
+   */
+  @Scheduled(initialDelay = 30000, fixedDelay=600000)
+  public void offlineDuration() {
+    long currTime = System.currentTimeMillis();
+    Date now = new Date(currTime);
+    try {
+      List<TRobotInfo> robotInfoList = tRobotInfoDao.selectByCommission();
+
+      // 对投运时间后+最后登录时间不为空+间隔超过4小时的
+      for (TRobotInfo robotInfo : robotInfoList) {
+        if (ON_LINE.equals(robotInfo.getRobotStatus())
+                || robotInfo.getLastOnlineTime() == null
+                || robotInfo.getCommissionDate().after(now)) {
+          continue;
+        }
+        long offlineTime = currTime - robotInfo.getLastOnlineTime();
+        boolean greaterFour = offlineTime > 4 * 60 * 60 * 1000L && offlineTime < 45 * 6 * 60 * 1000L
+            && robotInfo.getLastOnlineTime() > LAST_ONLINE_TIME_MAP.getOrDefault(robotInfo.getRobotId(), 0L);
+        if (greaterFour) {
+          TRobotInfo tRobotInfo = new TRobotInfo()
+                  .setRobotId(robotInfo.getRobotId());
+          robotInfo.setOffLineCount(robotInfo.getOffLineCount() + 1);
+          LAST_ONLINE_TIME_MAP.put(robotInfo.getRobotId(), robotInfo.getLastOnlineTime());
+          tRobotInfoDao.update(tRobotInfo);
+        }
+      }
+    } catch (Exception e) {
+      log.error("定时查询在线状态定时任务发生异常", e);
     }
   }
 

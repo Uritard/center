@@ -8,6 +8,7 @@ import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.Message;
 import com.yjh.accessrobot.netty.handler.MessageHandlerStrategy;
 import com.yjh.accessrobot.netty.handler.MessageHandlerStrategyFactory;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -124,6 +125,52 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         log.info("mapsAfterAdded: " + maps);
         log.info("id: " + ctx.channel().id() + " connected," + "Onlinesize: " + maps.size());
     }
+
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        // channel失效处理,客户端下线或者强制退出等任何情况都触发这个方法
+        log.info("channelInactive----->" + ctx);
+        Channel channel = ctx.channel();
+        ChannelId id = channel.id();
+        if (id != null) {
+            maps.remove(id.toString());
+            log.info("mapsAfterRemoved: " + maps);
+        }
+
+        try {
+            ctx.close().sync();
+            ctx.flush();
+            super.channelInactive(ctx);
+        } catch (Exception e) {
+            log.error("clientDisconnect: " + e.getMessage());
+        }
+
+        for (Map.Entry<String, String> vo : Constant.robotChannels.entrySet()) {
+            log.info("当前的robotChannels的key为" + vo.getKey());
+            String robotCode = vo.getKey();
+            String channelId = Constant.robotChannels.get(robotCode);
+
+            if (channelId.equals(String.valueOf(id))) {
+                robotService.updateRobotInfo(robotCode, "离线");
+                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":2");
+                // abnormal
+                robotStatusMap.put("value", "1");
+                // Update Robot Network Status
+                redisTemplate.opsForHash().putAll("RobotStatus:" + robotCode + ":2", robotStatusMap);
+                Constant.robotChannels.remove(robotCode);
+                Constant.robotThreadFlag.put(robotCode, false);
+                Constant.robotRegisterFlag.put(robotCode, false);
+                log.info("id: " + channel.id() + ", robotCode: " + robotCode + " left," + "onlineSize: " + maps.size());
+            }
+        }
+
+        log.info("channel.isActive(): " + channel.isActive());
+        log.info("此时的packet=====" + channelPacket.get(channel.id().toString()));
+        channelPacket.put(channel.id().toString(), "");
+
+    }
+
 
     /**
      * 成功收到心跳指令,发送响应并更新机器人状态
