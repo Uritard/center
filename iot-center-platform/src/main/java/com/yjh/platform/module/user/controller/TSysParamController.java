@@ -67,7 +67,7 @@ public class TSysParamController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除系统参数", content = "根据用户传递的参数删除系统参数", logType = 4)
     public Result delete(@RequestParam(value = "paramId", required = true) Integer paramId) {
         Result result = new Result();

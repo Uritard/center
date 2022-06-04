@@ -72,7 +72,7 @@ public class TCruiseResultController {
     }
 
     @ApiOperation(value = "删除")
-    @DeleteMapping(value = "/delete")
+    @PostMapping(value = "/delete")
     @Logs(title = "删除巡检任务结果数据",content = "根据用户传递的参数删除巡检任务结果数据",logType = 4)
     public Result delete(@RequestParam(value = "taskResultId", required = true) String taskResultId) {
         Result result = new Result();

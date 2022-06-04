@@ -72,7 +72,7 @@ public class TPeriodModelController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除周期任务模版",content = "根据用户传递的参数删除周期任务模版数据",logType = 4)
     public Result delete(@RequestParam(value = "periodId", required = true) Long periodId) {
         Result result = new Result();

@@ -149,7 +149,7 @@ public class TCruiseTaskController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除巡检任务",content = "根据用户传递的参数删除巡检任务数据",logType = 4)
     public Result delete(@RequestParam(value = "taskId", required = true) String taskId,
                          @RequestParam(value = "startTime", required = false) String startTime) {

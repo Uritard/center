@@ -58,7 +58,7 @@ public class TDefectInfoController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除陷信息数据",content = "根据用户传递的参数删除缺陷信息数据",logType = 4)
     public Result delete(@RequestParam(value = "defectId", required = true) Long defectId) {
         Result result = new Result();

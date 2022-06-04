@@ -56,7 +56,7 @@ public class TCfgAlarmCurrentController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除活动告警数据",content = "根据用户传递的参数删除活动告警数据",logType = 4)
     public Result delete(@RequestParam(value = "alarmNo", required = true) Long alarmNo) {
         Result result = new Result();

@@ -75,7 +75,7 @@ public class TStdDevicemeteController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除标准设备测点",content = "根据用户传递的参数删除标准设备测点",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "deviceMeteId") Long deviceMeteId) {
         Result result = new Result();
@@ -249,7 +249,7 @@ public class TStdDevicemeteController {
     }
 
     @ApiOperation(value = "根据设备Id删除设备测点")
-    @RequestMapping(value = "/deleteByDevId", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteByDevId", method = RequestMethod.POST)
     @Logs(title = "删除标准设备测点",content = "根据用户传递的参数删除标准设备测点",logType = 4)
     public Result deleteByDevId(@RequestParam(value = "deviceId") Long deviceId) {
         Result result = new Result();
@@ -310,7 +310,7 @@ public class TStdDevicemeteController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     @Logs(title = "批量删除设备测点",content = "根据用户传递的参数批量删除设备测点",logType = 4)
     public Result batchDelete(@RequestParam(value = "deviceMeteIds") String deviceMeteIds) {
         Result result = new Result();

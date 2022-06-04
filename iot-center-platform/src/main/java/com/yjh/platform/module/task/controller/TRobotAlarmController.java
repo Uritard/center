@@ -64,7 +64,7 @@ public class TRobotAlarmController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除机器人本体告警表",content = "根据用户传递的参数删除机器人本体告警数据",logType = 4)
     public Result delete(@RequestParam(value = "robotAlarmId", required = true) Long robotAlarmId) {
         Result result = new Result();

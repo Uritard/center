@@ -57,7 +57,7 @@ public class TCruiseTypeController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除巡视类型关联实例点数据",content = "根据用户传递的参数删除巡视类型关联实例点数据",logType = 4)
     public Result delete(@RequestParam(value = "subType", required = false) Integer subType) {
         Result result = new Result();
@@ -167,7 +167,7 @@ public class TCruiseTypeController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     @Logs(title = "批量删除巡视类型关联实例点数据",content = "根据用户传递的参数批量删除巡视类型关联实例点数据",logType = 4)
     public Result batchDelete(@RequestParam(value = "subTypes") String subTypes) {
     Result result = new Result();

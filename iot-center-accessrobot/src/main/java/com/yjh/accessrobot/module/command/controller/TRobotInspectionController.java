@@ -54,7 +54,7 @@ public class TRobotInspectionController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public Result delete(@RequestParam(value = "inspectionId", required = true) Long inspectionId) {
         Result result = new Result();
         try {

@@ -58,7 +58,7 @@ public class TCruiseNonhomologousPointInstanceController {
     }
 
     @ApiOperation(value = "根据主键删除")
-    @RequestMapping(value = "/deleteByPrimaryId", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteByPrimaryId", method = RequestMethod.POST)
     @Logs(title = "删除非同源巡检点数据",content = "根据用户传递的参数删除非同源巡检点数据",logType = 4, authority = "1234")
     public Result deleteByPrimaryId(@RequestParam(value = "instanceId", required = true) Long instanceId) {
         Result result = new Result();

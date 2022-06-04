@@ -66,7 +66,7 @@ public class TStdMetemodelDetailController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除系统测点模版详细数据",content = "根据用户传递的参数删除系统测点模版详细数据",logType = 4)
     public Result delete(@RequestParam(value = "modelId", required = true) Long modelId,
                          @RequestParam(value = "meteId", required = true) Long meteId) {

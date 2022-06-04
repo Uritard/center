@@ -70,7 +70,7 @@ public class TVoiceDeviceController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除声纹设备数据", content = "根据用户传递的参数删除声纹设备数据", logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "voiceDeviceId", required = true) Long voiceDeviceId) {
         Result result = new Result();
@@ -190,7 +190,7 @@ public class TVoiceDeviceController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     @Logs(title = "删除声纹设备数据", content = "根据用户传递的参数批量删除声纹设备", logType = 4)
     public Result batchDelete(@RequestParam(value = "voiceDeviceIds") String voiceDeviceIds) {
         Result result = new Result();

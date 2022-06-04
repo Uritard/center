@@ -72,7 +72,7 @@ public class TRobotCameraPresetController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public Result delete(HttpServletRequest request,@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
         try {
@@ -183,7 +183,7 @@ public class TRobotCameraPresetController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     public Result batchDelete(@RequestParam(value = "presetIds") String presetIds) {
     Result result = new Result();
     try {

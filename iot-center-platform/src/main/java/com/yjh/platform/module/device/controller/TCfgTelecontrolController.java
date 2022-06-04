@@ -56,7 +56,7 @@ public class TCfgTelecontrolController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除遥控数据",content = "根据用户传递的参数删除遥控数据",logType = 4)
     public Result delete(@RequestParam(value = "deviceId", required = true) String deviceId) {
         Result result = new Result();

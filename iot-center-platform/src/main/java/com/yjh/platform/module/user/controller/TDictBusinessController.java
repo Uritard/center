@@ -67,7 +67,7 @@ public class TDictBusinessController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除业务字典信息",content = "根据用户传递的参数删除业务字典信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "dictId", required = true) Integer dictId) {
         Result result = new Result();

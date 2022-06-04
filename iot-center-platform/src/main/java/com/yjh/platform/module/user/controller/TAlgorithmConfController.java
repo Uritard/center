@@ -58,7 +58,7 @@ public class TAlgorithmConfController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除算法配置数据",content = "根据用户传递的参数删除算法配置数据",logType = 4)
     public Result delete(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();

@@ -129,7 +129,7 @@ public class ReportManageController {
         return result;
     }
     @ApiOperation(value = "删除报表")
-    @DeleteMapping(value = "/reportDelete")
+    @PostMapping(value = "/reportDelete")
     @Logs(title = "删除报表",content = "根据用户传递的参数删除报表",logType = 4)
     public Result reportDelete(@RequestParam(value = "reportId") String reportId) {
         Result result = new Result();
@@ -144,7 +144,7 @@ public class ReportManageController {
         return result;
     }
     //    @ApiOperation(value = "批量删除报表")
-//    @RequestMapping(value = "/reportBatchDelete", method = RequestMethod.DELETE)
+//    @RequestMapping(value = "/reportBatchDelete", method = RequestMethod.POST)
 //    public Result reportBatchDelete(@RequestBody List<TReportInfo> fileNameList) {
 //        Result result = new Result();
 //        try {

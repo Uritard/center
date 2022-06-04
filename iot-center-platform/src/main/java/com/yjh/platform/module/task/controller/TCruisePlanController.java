@@ -61,7 +61,7 @@ public class TCruisePlanController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除预案",content = "根据用户传递的参数删除巡检预案属性数据",logType = 4,authority = "1235")
     public Result delete(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
@@ -145,7 +145,7 @@ public class TCruisePlanController {
     }
 
     @ApiOperation(value = "根据planCode删除")
-    @RequestMapping(value = "/deleteByPlanCode", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteByPlanCode", method = RequestMethod.POST)
     @Logs(title = "删除操作票",content = "根据用户传递的参数删除巡检预案属性数据",logType = 4,authority = "1235")
     public Result deleteByPlanCode(@RequestParam(value = "planCode", required = true) String planCode) {
         Result result = new Result();

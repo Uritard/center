@@ -39,7 +39,7 @@ public class TRecordFileInfoController {
     }
 
     @ApiOperation(value = "删除")
-    @DeleteMapping(value = "/delete")
+    @PostMapping(value = "/delete")
     @Logs(title = "删除录像文件", content = "根据用户传递的参数删除录像文件", logType = 4, authority = "1235")
     public Result delete(@RequestParam(value = "id", required = true) Long id) {
         Result result = new Result();

@@ -94,7 +94,7 @@ public class SysUserController {
 
 
     @ApiOperation(value = "系统用户表删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除系统用户数据", content = "根据用户传递的参数删除系统用户数据", logType = 4, authority = "1234")
     public Result delete(@RequestParam(value = "userId", required = true) Long userId,HttpServletRequest request) {
         Result result = new Result();
@@ -840,7 +840,7 @@ public class SysUserController {
     }
 
     @ApiOperation(value = "删除用户绑定")
-    @RequestMapping(value = "/userBindDel", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/userBindDel", method = RequestMethod.POST)
     public Result userBindDel(@RequestParam(value = "keyId") Long keyId, HttpServletRequest request) {
         Result result = new Result();
         try {

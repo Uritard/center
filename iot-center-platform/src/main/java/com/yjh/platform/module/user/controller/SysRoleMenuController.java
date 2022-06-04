@@ -57,7 +57,7 @@ public class SysRoleMenuController {
     }
 
     @ApiOperation(value = "角色菜单表删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除角色菜单数据",content = "根据用户传递的参数删除角色菜单数据",logType = 4)
     public Result delete(@RequestParam(value = "rpId", required = true) Long rpId) {
         Result result = new Result();
@@ -74,7 +74,7 @@ public class SysRoleMenuController {
     }
 
     @ApiOperation(value = "根据角色ID删除角色菜单")
-    @RequestMapping(value = "/deleteByRoleId", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteByRoleId", method = RequestMethod.POST)
     @Logs(title = "删除角色菜单数据",content = "根据用户传递的参数删除角色菜单",logType = 4)
     public Result deleteByRoleId(@RequestParam(value = "RoleId", required = true) Long RoleId) {
         Result result = new Result();

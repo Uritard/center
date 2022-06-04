@@ -54,7 +54,7 @@ public class TRobotRegionController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public Result delete(@RequestParam(value = "regionId", required = true) String regionId) {
         Result result = new Result();
         try {

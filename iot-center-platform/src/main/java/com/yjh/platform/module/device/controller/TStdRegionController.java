@@ -63,7 +63,7 @@ public class TStdRegionController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除区域",content = "根据用户传递的参数删除标准区域数据",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "regionId", required = true) Long regionId) {
         Result result = new Result();

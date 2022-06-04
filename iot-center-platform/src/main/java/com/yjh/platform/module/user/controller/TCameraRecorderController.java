@@ -69,7 +69,7 @@ public class TCameraRecorderController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除录像服务器信息",content = "根据用户传递的参数删除录像服务器信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "recordId", required = true) Long recordId) {
         Result result = new Result();
@@ -91,7 +91,7 @@ public class TCameraRecorderController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/deleteSelectedRecord", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteSelectedRecord", method = RequestMethod.POST)
     @Logs(title = "批量删除录像服务器信息",content = "根据用户传递的参数批量删除录像服务器信息",logType = 4,authority = "1234")
     public Result deleteSelectedRecord(@RequestParam(value = "recordIds", required = true) String recordIds) {
         Result result = new Result();

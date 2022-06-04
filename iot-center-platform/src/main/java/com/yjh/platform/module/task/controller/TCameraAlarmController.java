@@ -66,7 +66,7 @@ public class TCameraAlarmController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除可视设备本体告警数据",content = "根据用户传递的参数删除可视设备本体告警数据",logType = 4)
     public Result delete(@RequestParam(value = "cameraAlarmId", required = true) Long cameraAlarmId) {
         Result result = new Result();

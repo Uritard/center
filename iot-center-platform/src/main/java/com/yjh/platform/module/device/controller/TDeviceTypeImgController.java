@@ -55,7 +55,7 @@ public class TDeviceTypeImgController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public Result delete(@RequestParam(value = "typeId", required = true) String typeId) {
         Result result = new Result();
         try {
@@ -154,7 +154,7 @@ public class TDeviceTypeImgController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     public Result batchDelete(@RequestParam(value = "typeIds") String typeIds) {
     Result result = new Result();
     try {

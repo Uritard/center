@@ -70,7 +70,7 @@ public class TStdMeteController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除系统测点",content = "根据用户传递的参数删除系统测点",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "stdMeteId", required = true) Long stdMeteId) {
         Result result = new Result();
@@ -273,7 +273,7 @@ public class TStdMeteController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     @Logs(title = "删除系统测点",content = "根据用户传递的参数删除系统测点",logType = 4)
     public Result batchDelete(@RequestParam(value = "stdMeteIds") String stdMeteIds) {
         Result result = new Result();

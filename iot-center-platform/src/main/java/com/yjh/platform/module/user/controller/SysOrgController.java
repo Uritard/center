@@ -66,7 +66,7 @@ public class SysOrgController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除组织机构",content = "根据用户传递的参数删除组织机构数据",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "orgId", required = true) Long orgId) {
         Result result = new Result();

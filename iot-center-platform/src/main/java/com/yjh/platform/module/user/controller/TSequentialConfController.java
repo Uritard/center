@@ -68,7 +68,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除顺控配置信息",content = "根据用户传递的参数删除顺控配置信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "cfgDeviceId", required = true) String cfgDeviceId) {
         Result result = new Result();
@@ -176,7 +176,7 @@ public class TSequentialConfController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     @Logs(title = "批量删除顺控配置信息",content = "根据用户传递的参数批量删除顺控配置信息",logType = 4)
     public Result batchDelete(@RequestParam(value = "cfgDeviceIds") String cfgDeviceIds) {
     Result result = new Result();

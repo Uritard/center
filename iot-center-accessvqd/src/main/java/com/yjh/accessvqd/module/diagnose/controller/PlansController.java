@@ -122,7 +122,7 @@ public class PlansController {
     }
 
     @ApiOperation(value = "任务删除")
-    @RequestMapping(value = "/diagnosePlanDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/diagnosePlanDelete", method = RequestMethod.POST)
     public Result diagnosePlanDelete(@RequestParam List<String> planIds,HttpServletRequest request ) {
         Result result = new Result();
         try {

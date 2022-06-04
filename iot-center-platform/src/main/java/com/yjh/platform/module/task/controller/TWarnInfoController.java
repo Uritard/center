@@ -72,7 +72,7 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "删除")
-    @DeleteMapping(value = "/delete")
+    @PostMapping(value = "/delete")
     @Logs(title = "删除告警信息数据",content = "根据用户传递的参数删除告警信息数据",logType = 4)
     public Result delete(@RequestParam(value = "warnId", required = true) Long warnId) {
         Result result = new Result();

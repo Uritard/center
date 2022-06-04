@@ -56,7 +56,7 @@ public class TStdDeviceAttrController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除标准化设备参数",content = "根据用户传递的参数删除标准化设备参数",logType = 4)
     public Result delete(@RequestParam(value = "deviceId", required = true) Long deviceId) {
         Result result = new Result();

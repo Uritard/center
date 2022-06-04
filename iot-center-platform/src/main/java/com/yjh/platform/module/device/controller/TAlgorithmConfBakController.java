@@ -56,7 +56,7 @@ public class TAlgorithmConfBakController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除算法配置信息",content = "根据用户传递的参数删除算法配置信息",logType = 4)
     public Result delete(@RequestParam(value = "deviceMeteId", required = true) Long deviceMeteId) {
         Result result = new Result();
@@ -166,7 +166,7 @@ public class TAlgorithmConfBakController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     @Logs(title = "批量删除算法配置信息",content = "根据用户传递的参数批量删除算法配置信息",logType = 4)
     public Result batchDelete(@RequestParam(value = "deviceMeteIds") String deviceMeteIds) {
     Result result = new Result();

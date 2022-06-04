@@ -118,7 +118,7 @@ public class ChannelController {
     }
 
     @ApiOperation(value = "删除数据服务器")
-    @RequestMapping(value = "deleteDataServers",method = RequestMethod.DELETE)
+    @RequestMapping(value = "deleteDataServers",method = RequestMethod.POST)
     public Result deleteDataServers(@RequestParam String serverId,
                                     HttpServletRequest request ){
         Result result=new Result();
@@ -205,7 +205,7 @@ public class ChannelController {
     }
 
     @ApiOperation(value = "删除单个监测点")
-    @RequestMapping(value = "/deleteChannel",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteChannel",method = RequestMethod.POST)
     public Result deleteChannel(@RequestParam String channelId,
                                 HttpServletRequest request ){
         Result result=new Result();

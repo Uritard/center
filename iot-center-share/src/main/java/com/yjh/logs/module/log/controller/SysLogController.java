@@ -94,7 +94,7 @@ public class SysLogController {
 
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public Result delete(@RequestParam(value = "logId", required = true) Long logId) {
         Result result = new Result();
         try {

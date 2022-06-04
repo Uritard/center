@@ -56,7 +56,7 @@ public class TCruisePointAttrController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除巡检点数据",content = "根据用户传递的参数删除巡检点数据",logType = 4)
     public Result delete(@RequestParam(value = "instanceId", required = true) Long instanceId) {
         Result result = new Result();
@@ -159,7 +159,7 @@ public class TCruisePointAttrController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     @Logs(title = "批量删除巡检点数据",content = "根据用户传递的参数批量删除巡检点数据",logType = 4)
     public Result batchDelete(@RequestParam(value = "instanceIds") String instanceIds) {
     Result result = new Result();

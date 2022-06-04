@@ -60,7 +60,7 @@ public class TCameraScreenController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除分屏配置信息",content = "根据用户传递的参数删除分屏配置信息",logType = 4)
     public Result delete(@RequestParam(value = "userId", required = true) Long userId) {
         Result result = new Result();
@@ -162,7 +162,7 @@ public class TCameraScreenController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     @Logs(title = "批量删除分屏配置信息",content = "根据用户传递的参数批量删除分屏配置信息",logType = 4)
     public Result batchDelete(@RequestParam(value = "userIds") String userIds) {
     Result result = new Result();

@@ -60,7 +60,7 @@ public class TStdMetemodelController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除系统测点模版",content = "根据用户传递的参数删除系统测点模版",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "modelId") Long modelId) {
         Result result = new Result();
@@ -190,7 +190,7 @@ public class TStdMetemodelController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete",method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete",method = RequestMethod.POST)
     @Logs(title = "批量删除模版测点",content = "根据用户传递的参数批量删除数据",logType = 4)
     public Result batchDetele(@RequestParam(value = "list")List<String> list){
         Result result=new Result();

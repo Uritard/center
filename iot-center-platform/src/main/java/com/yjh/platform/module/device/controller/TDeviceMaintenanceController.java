@@ -64,7 +64,7 @@ public class TDeviceMaintenanceController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除设备检修区域",content = "根据用户传递的参数删除设备检修区域",logType = 4)
     public Result delete(@RequestParam(value = "maintenanceId", required = true) Long maintenanceId) {
         Result result = new Result();
@@ -176,7 +176,7 @@ public class TDeviceMaintenanceController {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/batchDelete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
     @Logs(title = "批量删除设备检修区域",content = "根据用户传递的参数批量删除设备检修区域",logType = 4)
     public Result batchDelete(@RequestParam(value = "maintenanceIds") String maintenanceIds) {
     Result result = new Result();
