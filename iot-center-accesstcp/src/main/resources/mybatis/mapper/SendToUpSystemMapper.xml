@@ -3,7 +3,7 @@
 <mapper namespace="com.yjh.accesstcp.module.device.dao.SendToUpSystemDao">
 
 
-    <select id="selectDeviceModel" resultType="java.util.Map">
+    <select id="selectDeviceModel" resultType="java.util.LinkedHashMap">
         SELECT
             region.region_id   as area_id,
             region.region_name as area_name,
@@ -35,7 +35,7 @@
                 when 419 then '9'
                 end as meter_type,
 --                b.meter_type,
-            b.appearance_type,
+            (b.appearance_type - 419)  as appearance_type,
             ""               as save_type_list,
             k.dict_note      as recognition_type_list,
             ""               as phase,
@@ -44,8 +44,7 @@
             ""               as lower_value,
             ""               as upper_value,
             ""               as video_pos,
-            ""               as appearance_type,
-            a.cruise_type ,
+            a.cruise_type,
             c.inspection_id,
             d.preset_id,
             robot.robot_code,
@@ -62,77 +61,75 @@
                  left join t_dict_business k on a.cruise_type = k.dict_code
     </select>
 
-    <select id="selectRobotInfo" resultType="java.util.Map">
-        select a.robot_name                as patroldevice_name,
-               a.robot_code                as patroldevice_code,
-               b.dict_note                 as device_model,
-               c.dict_note                 as manufacturer,
-               a.building_user             as use_unit,
-               c.dict_note                 as device_source,
-               DATE_FORMAT(a.commission_date, '%Y-%c-%d %h:%i:%s')           as production_date,
-               a.appearance_number         as production_code,
-               if(b.dict_code = 399, 0, 1) as istransport,
-               ''                        as use_mode,
-               (CASE
-                    WHEN a.light_ip is null AND a.lnferad_IP is null THEN ''
-                    WHEN locate('.', a.light_ip) > 0 and locate('.', a.lnferad_IP) = 0 THEN '2'
-                    WHEN locate('.', a.light_ip) = 0 and locate('.', a.lnferad_IP) > 0 THEN '1'
-                    WHEN locate('.', a.light_ip) AND locate('.', a.lnferad_IP) THEN '3'
-                    else ''
-                   end)                    as video_mode,
-               ''                          as place,
-               (CASE
-                    WHEN a.robot_position = 155 THEN '2'
-                    WHEN a.robot_position = 156 THEN '1'
-                    WHEN a.robot_position = 399 THEN '3'
-                   end)                    as type,
-               ''                          as patroldevcie_info,
-               ''                          as robots_code
+    <select id="selectRobotInfo" resultType="java.util.LinkedHashMap">
+        select a.robot_name             as patroldevice_name,
+            a.robot_code                as patroldevice_code,
+            b.dict_note                 as device_model,
+            c.dict_note                 as manufacturer,
+            a.building_user             as use_unit,
+            a.robot_source              as device_source,
+            DATE_FORMAT(a.commission_date, '%Y-%m-%d %H:%i:%s')           as production_date,
+            a.appearance_number         as production_code,
+            if(b.dict_code = 399, 0, 1) as istransport,
+            ''                          as use_mode,
+            (CASE
+            WHEN a.light_ip is null AND a.lnferad_IP is null THEN ''
+            WHEN locate('.', a.light_ip) > 0 and locate('.', a.lnferad_IP) = 0 THEN '2'
+            WHEN locate('.', a.light_ip) = 0 and locate('.', a.lnferad_IP) > 0 THEN '1'
+            WHEN locate('.', a.light_ip) AND locate('.', a.lnferad_IP) THEN '3'
+            else ''
+            end)                        as video_mode,
+            a.address                   as place,
+            (CASE
+            WHEN a.robot_position = 155 THEN '2'
+            WHEN a.robot_position = 156 THEN '1'
+            WHEN a.robot_position = 399 THEN '3'
+            end)                    as type,
+            a.remarks                   as patroldevice_info,
+            ''                          as robots_code
         from t_robot_info a
-                 left join t_dict_business b on a.robot_type = b.dict_code
-                 left join t_dict_business c on a.robot_factory = c.dict_code
+            left join t_dict_business b on a.robot_type = b.dict_code
+            left join t_dict_business c on a.robot_factory = c.dict_code
         where a.robot_type is not null
     </select>
 
-    <select id="selectDroneInfo" resultType="java.util.Map">
+    <select id="selectDroneInfo" resultType="java.util.LinkedHashMap">
         select a.robot_name                as patroldevice_name,
                a.robot_code                as patroldevice_code,
                b.dict_note                 as device_model,
                c.dict_note                 as manufacturer,
                a.building_user             as use_unit,
-               c.dict_note                 as device_source,
-               DATE_FORMAT(a.commission_date, '%Y-%c-%d %h:%i:%s')           as production_date,
+               a.robot_source                 as device_source,
+               DATE_FORMAT(a.commission_date, '%Y-%m-%d %H:%i:%s')           as production_date,
                a.appearance_number         as production_code,
                if(b.dict_code = 399, 0, 1) as istransport,
-               ''                        as use_mode,
+               ''                           as use_mode,
                (CASE
                     WHEN a.light_ip is null AND a.lnferad_IP is null THEN ''
                     WHEN locate('.', a.light_ip) > 0 and locate('.', a.lnferad_IP) = 0 THEN '2'
                     WHEN locate('.', a.light_ip) = 0 and locate('.', a.lnferad_IP) > 0 THEN '1'
                     WHEN locate('.', a.light_ip) AND locate('.', a.lnferad_IP) THEN '3'
                     else ''
-                   end)                    as video_mode,
-               ''                          as place,
+                   end)                     as video_mode,
+                a.address                   as place,
                (CASE
-                    WHEN a.robot_position = 155 THEN '2'
-                    WHEN a.robot_position = 156 THEN '1'
-                    WHEN a.robot_position = 399 THEN '3'
+                    WHEN a.drone_position = 674 THEN '13'
                    end)                    as type,
-               ''                          as patroldevcie_info,
+               ''                          as patroldevice_info,
                ''                          as robots_code
         from t_robot_info a
-                 left join t_dict_business b on a.robot_type = b.dict_code
+                 left join t_dict_business b on a.drone_type = b.dict_code
                  left join t_dict_business c on a.robot_factory = c.dict_code
         where a.drone_type is not null
     </select>
 
-    <select id="selectVoiceInfo" resultType="java.util.Map">
-        select a.voice_device_name                as patroldevice_name,
+    <select id="selectVoiceInfo" resultType="java.util.LinkedHashMap">
+        select a.voice_device_name         as patroldevice_name,
                a.voice_code                as patroldevice_code,
                b.dict_note                 as device_model,
                c.dict_note                 as manufacturer,
-               '亿嘉和'             as use_unit,
-               '亿嘉和'                 as device_source,
+               '亿嘉和'                    as use_unit,
+               '亿嘉和'                    as device_source,
                ''           as production_date,
                ''         as production_code,
                ''       as istransport,
@@ -140,21 +137,21 @@
                ''                    as video_mode,
                ''                          as place,
                '14'                    as type,
-               ''                          as patroldevcie_info,
+               ''                          as patroldevice_info,
                ''                          as robots_code
         from t_voice_device a
         left join t_dict_business b on a.voice_type = b.dict_code
         left join t_dict_business c on a.voice_factory = c.dict_code
     </select>
 
-    <select id="selectCameraInfo" resultType="java.util.Map">
+    <select id="selectCameraInfo" resultType="java.util.LinkedHashMap">
         select a.camera_name                    as patroldevice_name,
                a.camera_id                      as patroldevice_code,
                b.dict_note                      as device_model,
                c.dict_note                      as manufacturer,
-               ""                               as use_unit,
+               a.unit                           as use_unit,
                c.dict_note                      as device_source,
-               ''                               as production_date,
+                DATE_FORMAT(a.commission_date, '%Y-%m-%d %H:%i:%s')           as production_date,
                ''                               as production_code,
                ''                               as istransport,
                if(a.is_control = 1, '11', '10') as use_mode,
@@ -171,7 +168,7 @@
                  left join t_dict_business c on a.vendor_id = c.dict_code
     </select>
 
-    <select id="selectTaskInfo" resultType="java.util.Map">
+    <select id="selectTaskInfo" resultType="java.util.LinkedHashMap">
         SELECT b.up_dict                            as type,
                a.task_id                            as task_code,
                a.task_name,
@@ -188,12 +185,12 @@
 		"" as interval_execute_time,
         "" as interval_start_time,
         "" as interval_end_time,
-        "" as invaild_start_time,
-        "" as invaild_end_time,
+        "" as invalid_start_time,
+        "" as invalid_end_time,
 		'0' isenable,
 		u.user_name as creator,
-		DATE_FORMAT(a.start_time, '%Y-%c-%d %h:%i:%s')  as fixed_start_time,
-		"" as create_time
+		DATE_FORMAT(a.start_time, '%Y-%m-%d %H:%i:%s')  as fixed_start_time,
+        DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') as create_time
         from t_cruise_task a
             left join sys_user u on a.create_user_id = u.user_id
         left join t_dict_business b
@@ -221,12 +218,12 @@
             maintenance_name,
             device_id,
             is_valid ,
-            DATE_FORMAT(maintenance_start, '%Y-%c-%d %h:%i:%s') as maintenance_start,
-            DATE_FORMAT(maintenance_stop, '%Y-%c-%d %h:%i:%s') as maintenance_stop
+            DATE_FORMAT(maintenance_start, '%Y-%m-%d %H:%i:%s') as maintenance_start,
+            DATE_FORMAT(maintenance_stop, '%Y-%m-%d %H:%i:%s') as maintenance_stop
         from t_device_maintenance
     </select>
 
-    <select id="countTask" resultType="java.util.HashMap">
+    <select id="countTask" resultType="java.util.LinkedHashMap">
         select count(1)                    as totalNum,
                (select count(1)
                 from t_cruise_result
@@ -237,7 +234,7 @@
           and c_state in (240,242,243,244)
     </select>
 
-    <select id="countWarnCheck" resultType="java.util.HashMap">
+    <select id="countWarnCheck" resultType="java.util.LinkedHashMap">
         SELECT count(1)           as totalNum,
                count(t.deal_type) as validNum
         FROM (select deal_type, warn_time
@@ -250,7 +247,7 @@
         where t.warn_time BETWEEN #{startTime} and #{endTime}
     </select>
 
-    <select id="countWarnAccuracy" resultType="java.util.HashMap">
+    <select id="countWarnAccuracy" resultType="java.util.LinkedHashMap">
         SELECT count(1)                         as totalNum,
                sum(if(t.deal_type = 286, 1, 0)) as validNum
         FROM (select deal_type, warn_time
@@ -263,7 +260,7 @@
         where t.warn_time BETWEEN #{startTime} and #{endTime}
     </select>
 
-    <select id="countInstanceLoss" resultType="java.util.HashMap">
+    <select id="countInstanceLoss" resultType="java.util.LinkedHashMap">
         SELECT count(1)                                AS totalNum,
                sum(IF(detail.cruise_status = 252, 0, 1)) AS validNum
         FROM t_cruise_task_result result
@@ -271,7 +268,7 @@
         WHERE result.cruise_task_time BETWEEN #{startTime} and #{endTime}
     </select>
 
-    <select id="countResultCheck" resultType="java.util.HashMap">
+    <select id="countResultCheck" resultType="java.util.LinkedHashMap">
         SELECT count(1)                      AS totalNum,
                count(result.identify_result) AS validNum
         FROM t_cruise_data_result result

@@ -77,7 +77,8 @@ public class TRobotInfoController {
             }else {
                 result.setData(tRobotInfoService.insert(tRobotInfo,userId));
                 //有变动 同步模型
-                Constant.modelUpload("3");
+                String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
+                Constant.modelUpload(modelType);
             }
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -89,7 +90,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "删除")
-    @DeleteMapping(value = "/delete")
+    @PostMapping(value = "/delete")
     @Logs(title = "删除机器人信息",content = "根据用户传递的参数删除机器人信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "robotId", required = true) Long robotId) {
         Result result = new Result();
@@ -100,7 +101,7 @@ public class TRobotInfoController {
             }else {
                 result.setData(re);
                 //有变动 同步模型
-                Constant.modelUpload("3");
+                Constant.modelUpload(String.valueOf(re));
             }
             //result.setData(tRobotInfoService.deleteByPrimaryId(robotId));
         } catch (BusinessException e) {
@@ -114,7 +115,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "更新")
-    @PutMapping(value = "/update")
+    @PostMapping(value = "/update")
     @Logs(title = "修改机器人信息",content = "根据用户传递的参数修改机器人信息",logType = 3,authority = "1234")
     public Result update(HttpServletRequest request,@Validated @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
@@ -127,7 +128,8 @@ public class TRobotInfoController {
                 Long userId = Long.valueOf(request.getHeader("userId"));
                 result.setData(tRobotInfoService.update(tRobotInfo,userId));
                 //有变动 同步模型
-                Constant.modelUpload("3");
+                String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
+                Constant.modelUpload(modelType);
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
@@ -285,7 +287,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "批量删除")
-    @DeleteMapping(value = "/batchDelete")
+    @PostMapping(value = "/batchDelete")
     @Logs(title = "批量删除机器人信息",content = "根据用户传递的参数批量删除机器人信息",logType = 4)
     public Result batchDelete(@RequestParam(value = "robotIds", required = true) String robotIds) {
         Result result = new Result();

@@ -87,7 +87,7 @@ public class TRobotInfoService{
             sendPostRequest(ROBOT_REMOVE_LINK,map);
         }
 
-        return res;
+        return tRobotInfo.getDroneType() != null ? 5 : 3;
     }
 
     @Transactional(rollbackFor = Exception.class)

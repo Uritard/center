@@ -252,20 +252,25 @@ public class SendToUpSystemServices {
             jsonObject.put("uav_pos","");
             if (item.get("cruise_type").equals(228)){// 机器人
                 item.put("save_type_list","jpg");
-                item.put("date_type","01");
+                item.put("data_type","01");
                 jsonObject.put("robot_code",item.get("robot_code"));
             } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)){//视屏 红外
                 item.put("save_type_list","jpg");
-                item.put("date_type","1");
+                item.put("data_type","1");
                 jsonObject.put("device_code",item.get("camera_id"));
                 jsonObject.put("device_pos",item.get("preset_id"));
             }else if (item.get("cruise_type").equals(232)){//声纹
                 item.put("save_type_list","wav");
-                item.put("date_type","0001");
+                item.put("data_type","0001");
             }else if (item.get("cruise_type").equals(524)){// 无人机
                 item.put("save_type_list","jpg");
-                item.put("date_type","001");
+                item.put("data_type","001");
             }
+            item.remove("cruise_type");
+            item.remove("camera_id");
+            item.remove("preset_id");
+            item.remove("robot_code");
+            item.remove("inspection_id");
             item.put("video_pos",jsonObject.toString());
         });
         return CreateModeXMLUtil.createXmlFile(list,path,"device_model.xml","Device_Model");
@@ -282,7 +287,7 @@ public class SendToUpSystemServices {
             item.put("station_code",stationCode);
             item.put("station_name", getStationName());
         });
-        return CreateModeXMLUtil.createXmlFile(list,path,"robot_model.xml","PatrolDevice _Model");
+        return CreateModeXMLUtil.createXmlFile(list,path,"robot_model.xml","PatrolDevice_Model");
 
     }
     public String createCameraModel(String path) throws Exception{
@@ -292,7 +297,7 @@ public class SendToUpSystemServices {
             item.put("station_code",stationCode);
             item.put("station_name", getStationName());
         });
-        return CreateModeXMLUtil.createXmlFile(list,path,"video_model.xml","PatrolDevice _Model");
+        return CreateModeXMLUtil.createXmlFile(list,path,"video_model.xml","PatrolDevice_Model");
 
     }
     public String createDroneModel(String path) throws Exception{
@@ -302,7 +307,7 @@ public class SendToUpSystemServices {
             item.put("station_code",stationCode);
             item.put("station_name", getStationName());
         });
-        return CreateModeXMLUtil.createXmlFile(list,path,"drone_model.xml","PatrolDevice _Model");
+        return CreateModeXMLUtil.createXmlFile(list,path,"drone_model.xml","PatrolDevice_Model");
 
     }
     public String createVoiceModel(String path) throws Exception{
@@ -312,7 +317,7 @@ public class SendToUpSystemServices {
             item.put("station_code",stationCode);
             item.put("station_name", getStationName());
         });
-        return CreateModeXMLUtil.createXmlFile(list,path,"voice_model.xml","PatrolDevice _Model");
+        return CreateModeXMLUtil.createXmlFile(list,path,"voice_model.xml","PatrolDevice_Model");
 
     }
     public String createTaskModel(String path) throws Exception{
@@ -322,6 +327,8 @@ public class SendToUpSystemServices {
         for (Map<String,Object> item:list) {
             String taskId = item.get("task_code").toString();
             List<Long> instanceIdList = sendToUpSystemDao.selectInstanceId(taskId);
+            item.put("station_code",stationCode);
+            item.put("station_name", getStationName());
             item.put("device_list",instanceIdList.toString().replaceFirst("\\[","").replace("]","").replace(" ",""));
 //            if(!"".equals(item.get("time"))){
 //                //计算 todo 内容不完整
@@ -355,6 +362,8 @@ public class SendToUpSystemServices {
         List<Map<String, Object>> finalList = new ArrayList<>();
         infoList.forEach(item ->{
             Map<String,Object> maintenanceMap = new HashMap<>();
+            maintenanceMap.put("station_code",stationCode);
+            maintenanceMap.put("station_name", getStationName());
             maintenanceMap.put("config_code",item.getConfigCode());
             maintenanceMap.put("enable","1");
             maintenanceMap.put("start_time",item.getStartTime());
@@ -363,6 +372,7 @@ public class SendToUpSystemServices {
             maintenanceMap.put("device_list",item.getDeviceIds().toString().replace("[","")
                     .replace("]","")
                     .replace(" ",""));
+            maintenanceMap.put("coordinate_pixel","");
             finalList.add(maintenanceMap);
         });
         return CreateModeXMLUtil.createXmlFile(finalList,path,"overhaularea_model.xml","Effect_Config");
@@ -391,7 +401,7 @@ public class SendToUpSystemServices {
             host.put("patroldevice_info","");
             host.put("robots_code","");
         finalList.add(host);
-        return CreateModeXMLUtil.createXmlFile(finalList,path,"host_model.xml","PatrolDevice _Model");
+        return CreateModeXMLUtil.createXmlFile(finalList,path,"host_model.xml","PatrolDevice_Model");
     }
     public String createMapModel(){
         String mapRealPath = sendToUpSystemDao.selectMapPath();
