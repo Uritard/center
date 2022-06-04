@@ -70,7 +70,7 @@ public class TRobotRegionController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     public Result update(@RequestBody TRobotRegion tRobotRegion) {
         Result result = new Result();
         try {

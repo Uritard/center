@@ -110,7 +110,7 @@ public class SysLogController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     public Result update(@RequestBody SysLog sysLog) {
         Result result = new Result();
         try {

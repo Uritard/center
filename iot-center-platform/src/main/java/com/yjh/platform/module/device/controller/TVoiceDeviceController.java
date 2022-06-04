@@ -89,7 +89,7 @@ public class TVoiceDeviceController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改声纹设备数据", content = "根据用户传递的参数修改声纹设备数据", logType = 3,authority = "1234")
     public Result update(@Validated @RequestBody VoiceDeviceAllInfoDetail tVoiceDevice) {
         Result result = new Result();

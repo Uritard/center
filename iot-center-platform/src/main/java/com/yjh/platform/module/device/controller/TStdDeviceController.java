@@ -119,7 +119,7 @@ public class TStdDeviceController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改标准化设备",content = "根据用户传递的参数修改标准化设备",logType = 3)
     public Result update(@Validated @RequestBody TStdDevice tStdDevice) {
         Result result = new Result();
@@ -136,7 +136,7 @@ public class TStdDeviceController {
     }
 
     @ApiOperation(value = "更新设备及属性")
-    @RequestMapping(value = "/updateAll", method = RequestMethod.PUT)
+    @RequestMapping(value = "/updateAll", method = RequestMethod.POST)
     @Logs(title = "修改标准化设备",content = "根据用户传递的参数修改标准化设备",logType = 3,authority = "1234")
     public Result updateAll(@RequestBody TStdDeviceDetail tStdDeviceDetail) {
         Result result = new Result();
@@ -411,7 +411,7 @@ public class TStdDeviceController {
         return result;
     }
     @ApiOperation(value = "根据设备ID和部位ID修改设备的模板ID")
-    @RequestMapping(value = "/updateModelIdByDevCus",method = RequestMethod.PUT)
+    @RequestMapping(value = "/updateModelIdByDevCus",method = RequestMethod.POST)
     @Logs(title = "修改设备的模板",content = "根据用户传递的参数修改设备的模板",logType = 3)
     public Result updateModelIdByDevCus(@RequestParam(value = "deviceId")Long deviceId,
                                         @RequestParam(value = "customId")Long customId,

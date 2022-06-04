@@ -74,7 +74,7 @@ public class TCfgDeviceController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改设备数据",content = "根据用户传递的参数更新设备数据",logType = 3)
     public Result update(@Validated @RequestBody TCfgDevice tCfgDevice) {
         Result result = new Result();

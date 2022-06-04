@@ -91,7 +91,7 @@ public class ChanResultController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     public Result update(@RequestBody ChanResult chanResult,
                          HttpServletRequest request) {
         Result result = new Result();

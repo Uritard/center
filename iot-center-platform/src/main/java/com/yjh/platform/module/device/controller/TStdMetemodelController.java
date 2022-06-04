@@ -77,7 +77,7 @@ public class TStdMetemodelController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改系统测点模版",content = "根据用户传递的参数修改系统测点模版",logType = 3,authority = "1234")
     public Result update(@Validated @RequestBody TStdMeteModel tStdMeteModel) {
         Result result = new Result();
@@ -263,7 +263,7 @@ public class TStdMetemodelController {
 
 
     @ApiOperation(value = "修改当前模板信息")
-    @RequestMapping(value = "updateModel",method = RequestMethod.PUT)
+    @RequestMapping(value = "updateModel",method = RequestMethod.POST)
     @Logs(title = "修改当前模板信息",content = "根据用户传递的参数修改数据",logType = 3,authority = "1234")
     public Result updateModel (@RequestBody ModelCreator modelCreator){
         Result result =new Result();

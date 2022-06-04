@@ -187,7 +187,7 @@ public class TCameraPresetController {
         return result;
     }
     @ApiOperation(value = "更新")
-    @PutMapping(value = "/update")
+    @PostMapping(value = "/update")
     @Logs(title = "修改新增预置位信息",content = "根据用户传递的参数修改预置位信息",logType = 3,authority = "1234")
     public Result update(@Validated @RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();

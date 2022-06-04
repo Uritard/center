@@ -72,7 +72,7 @@ public class FormatController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     public Result update(@RequestBody Format format) {
         Result result = new Result();
         try {

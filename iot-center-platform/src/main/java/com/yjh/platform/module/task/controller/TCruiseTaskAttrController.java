@@ -73,7 +73,7 @@ public class TCruiseTaskAttrController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改任务关联数据",content = "根据用户传递的参数修改任务关联数据",logType = 3)
     public Result update(@Validated @RequestBody TCruiseTaskAttr tCruiseTaskAttr) {
         Result result = new Result();

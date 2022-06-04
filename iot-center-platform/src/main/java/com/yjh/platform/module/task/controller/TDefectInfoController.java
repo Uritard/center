@@ -75,7 +75,7 @@ public class TDefectInfoController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改陷信息数据",content = "根据用户传递的参数修改缺陷信息数据",logType = 3)
     public Result update(@Validated @RequestBody TDefectInfo tDefectInfo) {
         Result result = new Result();
@@ -260,7 +260,7 @@ public class TDefectInfoController {
         return result;
     }
     @ApiOperation(value = "进行缺陷处理")
-    @RequestMapping(value = "/defectProcess", method = RequestMethod.PUT)
+    @RequestMapping(value = "/defectProcess", method = RequestMethod.POST)
     @Logs(title = "进行缺陷处理",content = "进行缺陷处理",logType = 5)
     public Result defectProcess(@RequestBody TDefectInfo tDefectInfo,HttpServletRequest request){
         Result result = new Result();

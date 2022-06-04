@@ -71,7 +71,7 @@ public class TDeviceTypeImgController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     public Result update( @Validated @RequestBody TDeviceTypeImg tDeviceTypeImg) {
         Result result = new Result();
         try {

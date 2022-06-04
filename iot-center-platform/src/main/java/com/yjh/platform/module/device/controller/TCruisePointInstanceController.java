@@ -78,7 +78,7 @@ public class TCruisePointInstanceController {
 
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改巡检点数据",content = "根据用户传递的参数修改巡检点数据",logType = 3)
     public Result update(@Validated @RequestBody TCruisePointInstance tCruisePointInstance) {
         Result result = new Result();
@@ -211,7 +211,7 @@ public class TCruisePointInstanceController {
     }
 
     @ApiOperation(value = "巡检点关联配置")
-    @RequestMapping(value = "/instanceUpdate", method = RequestMethod.PUT)
+    @RequestMapping(value = "/instanceUpdate", method = RequestMethod.POST)
     @Logs(title = "巡检点关联配置",content = "巡检点关联配置",logType = 2,authority = "1234")
     public Result instanceUnionUpdate(@RequestBody TCruisePointInstanceDetail tCruisePointInstanceDetail){
         Result result = new Result();
@@ -235,7 +235,7 @@ public class TCruisePointInstanceController {
 
 
     @ApiOperation(value = "告警配置")
-    @RequestMapping(value = "/warnInspectUpdate", method = RequestMethod.PUT)
+    @RequestMapping(value = "/warnInspectUpdate", method = RequestMethod.POST)
     @Logs(title = "告警配置",content = "告警配置",logType = 2)
     public Result warnInspectUpdate(@RequestBody TCruisePointInstanceDetail tCruisePointInstanceDetail){
         Result result = new Result();

@@ -115,7 +115,7 @@ public class SysUserController {
 
 
     @ApiOperation(value = "系统用户表更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改系统用户数据", content = "根据用户传递的参数修改系统用户数据", logType = 3, authority = "1234")
     public Result update(@Validated @RequestBody SysUser sysUser, HttpServletRequest request) {
         Result result = new Result();
@@ -436,7 +436,7 @@ public class SysUserController {
     }
 
     @ApiOperation(value = "用户帐号解锁")
-    @RequestMapping(value = "/unlockUserAccount", method = RequestMethod.PUT)
+    @RequestMapping(value = "/unlockUserAccount", method = RequestMethod.POST)
    // @Logs(title = "用户帐号解锁", content = "用户账号解锁", logType = 5)
     public Result unlockUserAccount(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
@@ -526,7 +526,7 @@ public class SysUserController {
     }
 
     @ApiOperation(value = "用户修改密码")
-    @RequestMapping(value = "/changePassword", method = RequestMethod.PUT)
+    @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
     //@Logs(title = "用户修改密码", content = "用户修改密码", logType = 19)
     public Result changePassword(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();
@@ -599,7 +599,7 @@ public class SysUserController {
     }
 
     @ApiOperation(value = "用户修改密码")
-    @RequestMapping(value = "/loginChangePassword", method = RequestMethod.PUT)
+    @RequestMapping(value = "/loginChangePassword", method = RequestMethod.POST)
     //  @Logs(title = "用户修改密码", content = "用户修改密码", logType = 19)
     public Result loginChangePassword(HttpServletRequest httpServletRequest, @RequestBody Map<String, String> map) {
         Result result = new Result();

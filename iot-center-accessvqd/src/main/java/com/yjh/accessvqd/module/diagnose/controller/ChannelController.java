@@ -96,7 +96,7 @@ public class ChannelController {
     }
 
     @ApiOperation(value = "修改数据服务器")
-    @RequestMapping(value = "/updateDataServers",method = RequestMethod.PUT)
+    @RequestMapping(value = "/updateDataServers",method = RequestMethod.POST)
     public Result update(@RequestBody DataServer dataServer,
                          HttpServletRequest request ){
         Result result=new Result();

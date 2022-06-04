@@ -92,7 +92,7 @@ public class TStdDevicemeteController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改标准设备测点",content = "根据用户传递的参数修改标准设备测点",logType = 3,authority = "1234")
     public Result update(@Validated @RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail, HttpServletRequest request) {
         Result result = new Result();

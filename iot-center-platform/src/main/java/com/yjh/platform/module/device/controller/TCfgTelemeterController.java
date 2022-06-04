@@ -73,7 +73,7 @@ public class TCfgTelemeterController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "更新遥测数据",content = "根据用户传递的参数更新遥测数据",logType = 3)
     public Result update(@Validated @RequestBody TCfgTelemeter tCfgTelemeter) {
         Result result = new Result();

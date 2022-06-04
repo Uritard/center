@@ -78,7 +78,7 @@ public class TCruisePlanController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改预案",content = "根据用户传递的参数修改巡检预案属性数据",logType = 3,authority = "1235")
     public Result update(@RequestBody Map<String, Object> planDetailMap) {
         Result result = new Result();

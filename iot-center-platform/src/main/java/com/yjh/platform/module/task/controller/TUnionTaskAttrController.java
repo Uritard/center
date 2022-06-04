@@ -73,7 +73,7 @@ public class TUnionTaskAttrController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改联合巡视预案属性数据",content = "根据用户传递的参数修改联合巡视预案属性数据",logType = 3)
     public Result update(@Validated @RequestBody TUnionTaskAttr tUnionTaskAttr) {
         Result result = new Result();

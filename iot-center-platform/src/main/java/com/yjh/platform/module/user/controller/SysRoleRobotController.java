@@ -75,7 +75,7 @@ public class SysRoleRobotController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改角色和机器人关联数据",content = "根据用户传递的参数修改角色和机器人关联数据",logType = 3)
     public Result update(@Validated @RequestBody SysRoleRobot sysRoleRobot) {
         Result result = new Result();

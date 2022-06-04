@@ -89,7 +89,7 @@ public class TCruiseResultController {
     }
 
     @ApiOperation(value = "更新")
-    @PutMapping(value = "/update")
+    @PostMapping(value = "/update")
     @Logs(title = "修改巡检任务结果数据",content = "根据用户传递的参数修改巡检任务结果数据",logType = 3)
     public Result update(@Validated @RequestBody TCruiseResult tCruiseResult) {
         Result result = new Result();
@@ -376,7 +376,7 @@ public class TCruiseResultController {
     }
 
     @ApiOperation(value = "人工复核")
-    @PutMapping(value = "/manualReview")
+    @PostMapping(value = "/manualReview")
     @Logs(title = "人工复核",content = "人工复核",logType = 5,authority = "1235")
     public Result manualReview(@RequestBody CruiseManualReview cruiseManualReview,HttpServletRequest request) {
 

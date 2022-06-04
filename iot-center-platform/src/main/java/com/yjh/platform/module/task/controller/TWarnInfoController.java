@@ -89,7 +89,7 @@ public class TWarnInfoController {
     }
 
     @ApiOperation(value = "更新")
-    @PutMapping(value = "/update")
+    @PostMapping(value = "/update")
     @Logs(title = "修改告警信息数据",content = "根据用户传递的参数修改告警信息数据",logType = 3)
     public Result update(@Validated @RequestBody TWarnInfo tWarnInfo) {
         Result result = new Result();
@@ -401,7 +401,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "进行告警处理")
-    @PutMapping(value = "/alarmProcess")
+    @PostMapping(value = "/alarmProcess")
     @Logs(title = "进行告警处理",content = "进行告警处理",logType = 5)
     public Result alarmProcess(@RequestBody TWarnInfo tWarnInfo, HttpServletRequest request){
         Result result = new Result();
@@ -418,7 +418,7 @@ public class TWarnInfoController {
         return result;
     }
     @ApiOperation(value = "告警核查")
-    @PutMapping(value = "/alarmAndDefectProcess")
+    @PostMapping(value = "/alarmAndDefectProcess")
     @Logs(title = "告警核查",content = "告警核查",logType = 5,authority = "1235")
     public Result alarmAndDefectProcess(@RequestBody AlarmAndDefectProcess alarmAndDefectProcess, HttpServletRequest request){
         Result result = new Result();

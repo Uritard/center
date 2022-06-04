@@ -114,7 +114,7 @@ public class TCameraRecorderController {
     }
 
     @ApiOperation(value = "更新")
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     @Logs(title = "修改录像服务器信息",content = "根据用户传递的参数修改录像服务器信息",logType = 3,authority = "1234")
     public Result update(@Validated @RequestBody TCameraRecorder tCameraRecorder) {
         Result result = new Result();
