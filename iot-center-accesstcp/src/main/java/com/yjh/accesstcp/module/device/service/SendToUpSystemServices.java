@@ -254,6 +254,7 @@ public class SendToUpSystemServices {
                 item.put("save_type_list","jpg");
                 item.put("data_type","01");
                 jsonObject.put("robot_code",item.get("robot_code"));
+                jsonObject.put("robot_pos",item.get("inspection_id"));
             } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)){//视屏 红外
                 item.put("save_type_list","jpg");
                 item.put("data_type","1");
@@ -265,6 +266,8 @@ public class SendToUpSystemServices {
             }else if (item.get("cruise_type").equals(524)){// 无人机
                 item.put("save_type_list","jpg");
                 item.put("data_type","001");
+                jsonObject.put("robot_code",item.get("robot_code"));
+                jsonObject.put("robot_pos",item.get("inspection_id"));
             }
             item.remove("cruise_type");
             item.remove("camera_id");

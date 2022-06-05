@@ -1,6 +1,8 @@
 package com.yjh.gateway.common.authFilter;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.gateway.common.utils.Decode;
+import com.yjh.gateway.common.utils.MultisMap;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ReadListener;
@@ -79,6 +81,17 @@ public class MyRequestWrapper extends HttpServletRequestWrapper {
     public String getBody() {
         return this.body;
     }
+
+    public String getQueryMapsString() {
+        String str = super.getQueryString();
+        MultisMap multiMap = new MultisMap();
+        Decode.decodeTo(str, multiMap, "UTF-8");
+        JSONObject jsonModel = new JSONObject(true);
+        jsonModel.putAll(multiMap);
+
+        return jsonModel.isEmpty() ? "" : jsonModel.toJSONString();
+    }
+
     @Override
     public String getParameter(String name) {
         return super.getParameter(name);

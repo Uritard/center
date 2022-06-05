@@ -99,6 +99,8 @@ public class ManageDataSourceConfig {
         //mybatis 下划线转驼峰
         org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
         configuration.setMapUnderscoreToCamelCase(true);
+        // 为空也返回
+        configuration.setCallSettersOnNulls(true);
         bean.setConfiguration(configuration);
         //mybatis 分页插件
         PageHelper pageHelper = new PageHelper();
