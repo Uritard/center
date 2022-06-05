@@ -90,7 +90,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "删除")
-    @PostMapping(value = "/delete")
+    @DeleteMapping(value = "/delete")
     @Logs(title = "删除机器人信息",content = "根据用户传递的参数删除机器人信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "robotId", required = true) Long robotId) {
         Result result = new Result();
@@ -115,7 +115,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "更新")
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/update")
     @Logs(title = "修改机器人信息",content = "根据用户传递的参数修改机器人信息",logType = 3,authority = "1234")
     public Result update(HttpServletRequest request,@Validated @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
@@ -287,7 +287,7 @@ public class TRobotInfoController {
     }
 
     @ApiOperation(value = "批量删除")
-    @PostMapping(value = "/batchDelete")
+    @DeleteMapping(value = "/batchDelete")
     @Logs(title = "批量删除机器人信息",content = "根据用户传递的参数批量删除机器人信息",logType = 4)
     public Result batchDelete(@RequestParam(value = "robotIds", required = true) String robotIds) {
         Result result = new Result();
