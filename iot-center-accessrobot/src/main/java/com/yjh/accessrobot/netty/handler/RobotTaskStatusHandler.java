@@ -140,12 +140,12 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             Collections.addAll(allInstanceIdList, instanceIdArray);
             log.info("巡视主机下发给机器人任务为{}的巡检点个数===={}", taskId, allInstanceIdList.size());
 
-            if (resultList.isEmpty()) {
-                neverDone(taskId, allInstanceIdList, taskName);
-            }else if (resultList.size() < allInstanceIdList.size()){
-                log.info("Patrol points haven't been fully reported yet!!!This is abnormal status!!!");
-                unFinished(taskId, allInstanceIdList, taskName);
-            }
+//            if (resultList.isEmpty()) {
+//                neverDone(taskId, allInstanceIdList, taskName);
+//            }else if (resultList.size() < allInstanceIdList.size()){
+//                log.info("Patrol points haven't been fully reported yet!!!This is abnormal status!!!");
+//                unFinished(taskId, resultList, taskName);
+//            }
         }
         // 国网要求
         robotService.upToCruise(xmlBaseModel);
@@ -318,11 +318,11 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
     /**
      * 任务没有完成,但是上报任务进度为100%
      * @param taskId 任务id
-     * @param allInstanceIdList 巡视主机下发给机器人的巡检点
+     * @param resultList 巡视主机下发给机器人的巡检点
      * @param taskName 任务名称
      * @return void
      */
-    private void unFinished(String taskId,List<String> allInstanceIdList,String taskName) throws Exception{
+    private void unFinished(String taskId,List<String> resultList,String taskName) throws Exception{
         String strForCountAbnormal = "countForAbnormal:" + taskId;
         Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
         Integer totalNum = Integer.valueOf(abnormalCount.get("all").toString());
@@ -348,17 +348,17 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         log.info("已经入库的巡视点===" + isFinishedInstanceList);
         if (CollectionUtils.isNotEmpty(isFinishedInstanceList)) {
             for (Long instanceIdInTable : isFinishedInstanceList) {
-                allInstanceIdList.remove(instanceIdInTable.toString());
+                resultList.remove(instanceIdInTable.toString());
             }
         }
-        log.info("删除已经入库的巡视点后===" + allInstanceIdList);
-        log.info("准备遍历的点是===" + allInstanceIdList);
+        log.info("删除已经入库的巡视点后===" + resultList);
+        log.info("准备遍历的点是===" + resultList);
 
         List<TCruiseDataResult> tcdrList = new ArrayList<>();
         List<TCruiseTaskResultDetail> tctrdList = new ArrayList<>();
         List<String> cruiseResultIdList = new ArrayList<>();
 
-        for (String instanceId : allInstanceIdList) {
+        for (String instanceId : resultList) {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
             // 缓存中该巡检点有结果
             if (!Objects.equals("设备检修中",redisInfoMap.get("resultNum"))) {
