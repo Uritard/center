@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.module.device.utils;
 
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.entity.TRobotAlarm;
 import com.yjh.accessrobot.module.command.entity.TRobotInfo;
@@ -152,21 +153,27 @@ public class StatisticsUtil {
     Date now = new Date(currTime);
     try {
       List<TRobotInfo> robotInfoList = tRobotInfoDao.selectByCommission();
+      log.info("离线次数统计定时器计数成功, size: {}", robotInfoList.size());
 
       // 对投运时间后+最后登录时间不为空+间隔超过4小时的
       for (TRobotInfo robotInfo : robotInfoList) {
         if (ON_LINE.equals(robotInfo.getRobotStatus())
                 || robotInfo.getLastOnlineTime() == null
                 || robotInfo.getCommissionDate().after(now)) {
+          log.info("离线次数统计不符合离线条件，robotId: {}, status: {}, lastOnline: {}, commissionDate: {}",
+                  robotInfo.getRobotId(), robotInfo.getRobotStatus(), robotInfo.getLastOnlineTime(), DateTimeUtil.format(robotInfo.getCommissionDate()));
           continue;
         }
         long offlineTime = currTime - robotInfo.getLastOnlineTime();
         boolean greaterFour = offlineTime > 4 * 60 * 60 * 1000L && offlineTime < 45 * 6 * 60 * 1000L
             && robotInfo.getLastOnlineTime() > LAST_ONLINE_TIME_MAP.getOrDefault(robotInfo.getRobotId(), 0L);
+        log.info("离线次数统计，greater: {}, robotId: {}, lastOnline: {}, offlineTime: {}, preLastOnline: {}",
+                greaterFour, robotInfo.getRobotId(), robotInfo.getLastOnlineTime(), offlineTime, LAST_ONLINE_TIME_MAP.getOrDefault(robotInfo.getRobotId(), 0L));
         if (greaterFour) {
           TRobotInfo tRobotInfo = new TRobotInfo()
                   .setRobotId(robotInfo.getRobotId());
-          robotInfo.setOffLineCount(robotInfo.getOffLineCount() + 1);
+          long offLine = robotInfo.getOffLineCount() == null ? 0 : robotInfo.getOffLineCount();
+          tRobotInfo.setOffLineCount(offLine + 1);
           LAST_ONLINE_TIME_MAP.put(robotInfo.getRobotId(), robotInfo.getLastOnlineTime());
           tRobotInfoDao.update(tRobotInfo);
         }
