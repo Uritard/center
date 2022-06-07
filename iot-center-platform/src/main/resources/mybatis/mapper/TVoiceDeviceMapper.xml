@@ -148,14 +148,20 @@
         c.device_name,
         d.dict_note as deviceTypeName,
         a.voice_type,
+        k.dict_note as voiceTypeName,
         a.voice_model,
-        a.voice_factory
+        m.dict_note as voiceModelName,
+        a.voice_factory,
+        n.dict_note as voiceFactoryName
         FROM
         t_voice_device a
         left join t_std_region b on a.up_region_id = b.region_id
         left join t_std_device c on a.std_device_id = c.device_id
         left join t_dict_business d on a.device_type = d.dict_code and d.col_name="device_type"
         left join t_voice_config e on a.config_id = e.config_id
+        LEFT JOIN t_dict_business k on a.voice_type = k.dict_code
+        LEFT JOIN t_dict_business m on a.voice_model = m.dict_code
+        LEFT JOIN t_dict_business n on a.voice_factory = n.dict_cod
         where 1=1
         <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name like concat ('%',#{voiceDeviceName, jdbcType=VARCHAR},'%')</if>
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>

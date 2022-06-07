@@ -56,7 +56,7 @@ public class TCameraPresetController {
 
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
-    @Logs(title = "新增新增预置位信息",content = "根据用户传递的参数新增预置位信息",logType = 2,authority = "1234")
+    @Logs(title = "新增预置位信息",content = "根据用户传递的参数新增预置位信息",logType = 2,authority = "1234")
     public Result insert( @Validated @RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
@@ -100,12 +100,12 @@ public class TCameraPresetController {
         }
         return result;
     }
-
     @ApiOperation(value = "删除")
     @PostMapping(value = "/delete")
     @Logs(title = "删除新增预置位信息",content = "根据用户传递的参数删除预置位信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "presetId", required = true) Long presetId) {
         Result result = new Result();
+        Map<String, Object> mapResult = new HashMap<>();
         try {
             TCameraPreset tCameraPreset = tCameraPresetService.selectByPrimaryId(presetId);
             int resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
@@ -125,7 +125,13 @@ public class TCameraPresetController {
 //                    log.info("nvr删除预置位成功");
 //                }
                 //resultNum = tCameraPresetService.deleteByPrimaryId(presetId);
-                result.setData(resultNum);
+                if (1 == resultNum){
+                    mapResult.put("code", 200);
+                }else {
+                    mapResult.put("code", 209);
+                }
+                mapResult.put("data", resultNum);
+                result.setData(mapResult);
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
