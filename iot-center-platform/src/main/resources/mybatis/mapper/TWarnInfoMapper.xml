@@ -899,7 +899,8 @@
             d.high_limit1,
             d.high_limit2,
             d.high_limit3,
-            d.high_limit4
+            d.high_limit4,
+        b.up_region_name as region_name
         FROM t_warn_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
         LEFT JOIN t_std_devicemete d on a.std_mete_id = d.device_mete_id

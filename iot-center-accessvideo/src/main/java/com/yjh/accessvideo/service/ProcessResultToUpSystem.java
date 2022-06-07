@@ -96,7 +96,7 @@ public class ProcessResultToUpSystem{
             String tagPath = stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
                     + "/" + taskId + fileNamePath + deviceMeteId + "_" + cameraPmS + "_" + timeFormat + ".jpg";
 
-            xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat.format(simpleDateFormat.parse(cruiseResult.get("cruiseTime"))));
+            xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat.format(new Date()));
             Map<String, String> resMap = new HashMap<>(5);
 
             if (Objects.isNull(tWarnInfo)){

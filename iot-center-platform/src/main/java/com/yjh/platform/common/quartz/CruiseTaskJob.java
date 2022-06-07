@@ -928,7 +928,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                                     +new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date(dateTimeAfter));
                             String voiceFilePath = voicePath+"/"+item.getCruiseId()+"/1/"+timeAfterTem+"/"+voiceName + ".wav";
                             //创建一个线程去处理声纹巡视
-                            VoiceTask voiceTask = new VoiceTask(redisTemplate,item.getCruiseId(),voiceFilePath,taskId,item.getInstanceId()
+                            VoiceTask voiceTask = new VoiceTask(stationCode,redisTemplate,item.getCruiseId(),voiceFilePath,taskId,item.getInstanceId()
                                     ,tCruiseDataResultDao,tCruiseTaskResultDetailDao,audioDeviceManager,tCruiseResult,item,tCruiseResultDao
                                     ,tVoiceDeviceService,voiceinstanceList,tCruiseTaskResultDao,tCruiseTaskResult,tCruiseTaskService
                             ,tCruiseDataResultService);

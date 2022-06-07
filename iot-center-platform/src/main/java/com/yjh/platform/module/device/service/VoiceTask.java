@@ -4,7 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.device.entity.TVoiceDevice;
@@ -17,6 +21,7 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.RunAtNowTask;
 import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import com.yjh.platform.module.task.service.TCruiseTaskService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -51,15 +56,19 @@ public class VoiceTask implements Runnable{
     private TCruiseTaskResult tCruiseTaskResult;
     private TCruiseTaskService tCruiseTaskService;
     private TCruiseDataResultService tCruiseDataResultService;
+    private String stationCode;
+    private UpFtpsConfig upFtpsConfig;
+
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//注意月份是MM
 
-    public VoiceTask(RedisTemplate redisTemplate,Long voiceDeviceId,String voicePath,String taskId,Long instanceId,
+    public VoiceTask(String stationCode, RedisTemplate redisTemplate,Long voiceDeviceId,String voicePath,String taskId,Long instanceId,
                      TCruiseDataResultDao tCruiseDataResultDao,TCruiseTaskResultDetailDao tCruiseTaskResultDetailDao,
                      AudioDeviceManager audioDeviceManager,TCruiseResult tCruiseResult,TCruisePointInstanceNameDetail tCruisePointInstanceNameDetail,
                      TCruiseResultDao tCruiseResultDao,TVoiceDeviceService tVoiceDeviceService,Map<Long,List<TCruisePointInstanceNameDetail>> voiceinstanceList
                     ,TCruiseTaskResultDao tCruiseTaskResultDao,TCruiseTaskResult tCruiseTaskResult,
                      TCruiseTaskService tCruiseTaskService,TCruiseDataResultService tCruiseDataResultService){
+        this.stationCode = stationCode;
         this.redisTemplate = redisTemplate;
         this.voiceDeviceId = voiceDeviceId;
         this.audioDeviceManager = audioDeviceManager;
@@ -77,6 +86,7 @@ public class VoiceTask implements Runnable{
         this.tCruiseTaskResult = tCruiseTaskResult;
         this.tCruiseTaskService = tCruiseTaskService;
         this.tCruiseDataResultService = tCruiseDataResultService;
+        this.upFtpsConfig = StaticContextAccessor.getBean(UpFtpsConfig.class);
     }
 
 
@@ -167,6 +177,9 @@ public class VoiceTask implements Runnable{
                 cruiseResultIdList.add(tCruiseDataResult.getCruiseResultId());
                 tCruiseDataResultService.updateCruiseAnalyze(cruiseResultIdList);
 
+                // 巡视结果上报上级系统
+                cruiseResultToUpSystem(voiceDevice, item, tCruiseDataResult);
+
                 String strForCountAbnormal = "countForAbnormal:" + taskId;
                 Map<String, String> abnormalCount = redisTemplate.opsForHash().entries(strForCountAbnormal);
                 Integer total = Integer.valueOf(abnormalCount.get("all"));
@@ -226,6 +239,75 @@ public class VoiceTask implements Runnable{
         }
     }
 
+    /**
+     * 结果上报上级系统
+     *
+     * @param voiceDevice 声纹设备信息
+     * @param item 结果信息
+     * @param tCruiseDataResult 巡视点结果
+     * @return void
+     */
+    private void cruiseResultToUpSystem(VoiceDeviceAllInfoDetail voiceDevice, TCruisePointInstanceNameDetail item, TCruiseDataResult tCruiseDataResult) {
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        List<Map<String,Object>> xmlItems = new ArrayList<>();
+        Map<String,Object> xmlItem = new HashMap<>();
+        try {
+            xmlBaseModel.setType("61");
+            xmlItem.put("patroldevice_code", Optional.ofNullable(String.valueOf(item.getInstanceId())).orElse(""));
+            xmlItem.put("patroldevice_name", Optional.ofNullable(item.getInstanceName()).orElse(""));
+            xmlItem.put("task_name", Optional.ofNullable(tCruiseResult.getTaskName()).orElse(""));
+            xmlItem.put("task_code", Optional.ofNullable(taskId).orElse(""));
+            xmlItem.put("device_name", Optional.ofNullable(item.getCruiseName()).orElse(""));
+            xmlItem.put("device_id", Optional.ofNullable(String.valueOf(item.getDeviceMeteId())).orElse(""));
+            xmlItem.put("material_id", Optional.ofNullable(item.getRealCode()).orElse(""));
+            xmlItem.put("value","");
+            xmlItem.put("value_unit", Optional.ofNullable(tCruiseDataResult.getResultNum()).orElse(""));
+            xmlItem.put("unit","");
+            xmlItem.put("time", DateTimeUtil.format(new Date()));
+            // 识别类型为声音检测
+            xmlItem.put("recognition_type","5");
+            // 采集文件类型为音频
+            xmlItem.put("file_type","2");
+
+            if (Objects.equals("--", tCruiseDataResult.getVoicePath())){
+                xmlItem.put("file_path", "");
+            }else {
+                // 声纹设备编码 （仿照机器人编码）
+                String voiceCode = voiceDevice.getVoiceCode();
+                String deviceMeteId = String.valueOf(item.getDeviceMeteId());
+                // 声纹音频文件路径
+                String absPath = voicePath.replaceAll(
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:relativeVoicePath","content")),
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:absVoicePath","content")));
+
+                // 文件格式：变电站编码/年/月/日/巡视任务编码/Audio/设备点位ID_编码_时间.jpg
+                String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                String tagPath =  "task/" + stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
+                        + "/" + taskId + "/Audio/" + deviceMeteId + "_" + voiceCode + "_" + timeFormat + ".wav";
+                log.info("imgPath==={},tagPath==={}", absPath, tagPath);
+                uploadFileToUpFtps(absPath, "/" + tagPath);
+                xmlItem.put("file_path",tagPath);
+            }
+
+            xmlItem.put("rectangle","");
+            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+            xmlItem.put("task_patrolled_id",taskId+"_"+simpleDateFormat2.format(new Date()));
+            xmlItem.put("data_type","0x04");
+            xmlItem.put("valid","1");
+
+            xmlItems.add(xmlItem);
+            xmlBaseModel.setItems(xmlItems);
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+            cruiseResult.put("list",list);
+            log.info("信息上报：-"+cruiseResult);
+            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+    }
+
     private void taskGoOn(String taskId){
         String lowTaskKey = "lowTask:" + taskId;
         List<String> lowTaskList = redisTemplate.opsForList().range(lowTaskKey, 0, -1);
@@ -239,4 +321,21 @@ public class VoiceTask implements Runnable{
             });
         }
     }
+
+    /**
+     * 将文件上传至上级系统ftp服务器
+     *
+     * @param sourcePath 源文件地址
+     * @param targetPathName 目标文件地址名称
+     */
+    public void uploadFileToUpFtps(String sourcePath, String targetPathName) {
+        try {
+            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
+                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+        }
+    }
+
 }

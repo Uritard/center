@@ -79,7 +79,7 @@ public class InspectionResultThread implements Runnable{
                 platformTask(robotCode, taskId, tCruiseResult);
             }
         } catch (Exception e) {
-            log.error("巡检结果处理失败", e.getMessage());
+            log.error(e.getMessage(), e);
             throw new RuntimeException("巡检结果处理失败");
         }
     }
