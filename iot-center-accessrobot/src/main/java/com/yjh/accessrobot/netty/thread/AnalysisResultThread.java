@@ -444,7 +444,7 @@ public class AnalysisResultThread implements Runnable{
                 StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
             }
         }catch (Exception e){
-            log.error("最后一个巡视点结果处理出错：{}", e);
+            log.error(e.getMessage(), e);
         }
     }
 

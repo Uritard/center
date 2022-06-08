@@ -274,6 +274,18 @@ public interface TRobotInfoDao {
      */
     TStdDeviceMete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
     /**
+     * 查询当前任务的告警数
+     * @param taskId 任务id
+     * @return int
+     */
+    int selectAlarmNumByTaskId(@Param(value = "taskId")String taskId);
+    /**
+     * 更新异常点位数量
+     * @param updateResult
+     * @return int
+     */
+    int updateTCruiseTaskResult(TCruiseTaskResult updateResult);
+    /**
      * 判断任务是否属于机器人本体任务
      * @param taskId 任务id
      * @return Long

@@ -168,6 +168,10 @@ public class TSequentialConfService{
 
     @Transactional(rollbackFor = Exception.class)
     public String sequential(String meteId) throws Exception{
+        List<Map<String, Object>> list = sequentialInfo(meteId);
+        if (list.isEmpty()){
+            return "ok";
+        }
         {
             Map<String,Object> map = this.sequentialInfo(meteId).get(0);
             Map<String, String> jasonMaps2 = new HashMap<>();

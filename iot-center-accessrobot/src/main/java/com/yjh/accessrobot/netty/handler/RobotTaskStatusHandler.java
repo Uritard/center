@@ -100,6 +100,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         RobotServerHandler.send(taskStatusProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
 
+        /// 本来好好的  由于机器人端乱上报消息  就不进行具体处理了
         //任务已执行和任务终止 更新任务结束时间
 //        if ("1".equals(taskState) || "4".equals(taskState)){
 //            Map<String, Object> taskMap = new HashMap<>();
@@ -115,38 +116,38 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
 //            int res = StaticContextAccessor.getBean(RobotService.class).updateTCruiseResult(tCruiseResult);
 //            log.info("更新TCR的条数====" + res);
 //        }
-
-        // 任务根本没做或者没有完成,但是上报任务状态信息进度为100%(E机器人出现过,里面有很多重复代码,未优化)
-        if (Objects.equals("1",taskState)) {
-
-            // 统计机器人返回任务结果的大小
-            List<String> resultList = new ArrayList<>();
-            Set<String> cruiseKey = redisScan("t_cruise_task_result:" + taskId);
-            for (String key : cruiseKey) {
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-                Boolean flag = org.apache.commons.lang3.StringUtils.equals("228",redisInfoMap.get("cruiseType")) && (org.apache.commons.lang3.StringUtils.equals("246",redisInfoMap.get("cruiseResult"))|| org.apache.commons.lang3.StringUtils.equals("247",redisInfoMap.get("cruiseResult")));
-                if (Boolean.TRUE.equals(flag)){
-                    resultList.add(redisInfoMap.get("instanceId"));
-                }
-            }
-            log.info("机器人任务为{}返回结果个数===={}", taskId, resultList.size());
-
-            // 统计巡视主机下发给机器人的巡检点大小
-            Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
-            String instanceList = redisInfoMap2.get("instanceIdList");
-            instanceList = instanceList.replaceAll("\\[", "").replaceAll("]", "");
-            String[] instanceIdArray = instanceList.split(", ");
-            List<String> allInstanceIdList = new ArrayList<>();
-            Collections.addAll(allInstanceIdList, instanceIdArray);
-            log.info("巡视主机下发给机器人任务为{}的巡检点个数===={}", taskId, allInstanceIdList.size());
-
+//
+//        // 任务根本没做或者没有完成,但是上报任务状态信息进度为100%(E机器人出现过,里面有很多重复代码,未优化)
+//        if (Objects.equals("1",taskState)) {
+//
+//            // 统计机器人返回任务结果的大小
+//            List<String> resultList = new ArrayList<>();
+//            Set<String> cruiseKey = redisScan("t_cruise_task_result:" + taskId);
+//            for (String key : cruiseKey) {
+//                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+//                Boolean flag = org.apache.commons.lang3.StringUtils.equals("228",redisInfoMap.get("cruiseType")) && (org.apache.commons.lang3.StringUtils.equals("246",redisInfoMap.get("cruiseResult"))|| org.apache.commons.lang3.StringUtils.equals("247",redisInfoMap.get("cruiseResult")));
+//                if (Boolean.TRUE.equals(flag)){
+//                    resultList.add(redisInfoMap.get("instanceId"));
+//                }
+//            }
+//            log.info("机器人任务为{}返回结果个数===={}", taskId, resultList.size());
+//
+//            // 统计巡视主机下发给机器人的巡检点大小
+//            Map<String, String> redisInfoMap2 = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
+//            String instanceList = redisInfoMap2.get("instanceIdList");
+//            instanceList = instanceList.replaceAll("\\[", "").replaceAll("]", "");
+//            String[] instanceIdArray = instanceList.split(", ");
+//            List<String> allInstanceIdList = new ArrayList<>();
+//            Collections.addAll(allInstanceIdList, instanceIdArray);
+//            log.info("巡视主机下发给机器人任务为{}的巡检点个数===={}", taskId, allInstanceIdList.size());
+//
 //            if (resultList.isEmpty()) {
 //                neverDone(taskId, allInstanceIdList, taskName);
 //            }else if (resultList.size() < allInstanceIdList.size()){
 //                log.info("Patrol points haven't been fully reported yet!!!This is abnormal status!!!");
 //                unFinished(taskId, resultList, taskName);
 //            }
-        }
+//        }
         // 国网要求
         robotService.upToCruise(xmlBaseModel);
     }
@@ -299,9 +300,16 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             log.info("最后一个点-前端推送：" + json);
             Constant.postUrl(websocketUrl, json);
 
-            for (TCruiseTaskResultDetail tctrd : tctrdList) {
-                StaticContextAccessor.getBean(RobotService.class).updateIsWarn(taskId,tctrd.getInstanceId(),tctrd.getCruiseResultId());
+            for (TCruiseTaskResultDetail tctrd : tctrdList){
+                StaticContextAccessor.getBean(RobotService.class).updateIsWarn(taskId, tctrd.getInstanceId(), tctrd.getCruiseResultId());
             }
+
+            int taskAbnormal = StaticContextAccessor.getBean(RobotService.class).selectAlarmNumByTaskId(taskId);
+            // 最后在更新一下异常数
+            TCruiseTaskResult updateResult = new TCruiseTaskResult();
+            updateResult.setTaskId(taskId);
+            updateResult.setTaskAbnormal(taskAbnormal);
+            StaticContextAccessor.getBean(RobotService.class).updateTCruiseTaskResult(updateResult);
 
         } else {
             log.info("机器人巡检点不是最后一个点");
@@ -504,9 +512,16 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             log.info("最后一个点-前端推送：" + json);
             Constant.postUrl(websocketUrl, json);
 
-            for (TCruiseTaskResultDetail tctrd : tctrdList) {
-                StaticContextAccessor.getBean(RobotService.class).updateIsWarn(taskId,tctrd.getInstanceId(),tctrd.getCruiseResultId());
+            for (TCruiseTaskResultDetail tctrd : tctrdList){
+                StaticContextAccessor.getBean(RobotService.class).updateIsWarn(taskId, tctrd.getInstanceId(), tctrd.getCruiseResultId());
             }
+
+            int taskAbnormal = StaticContextAccessor.getBean(RobotService.class).selectAlarmNumByTaskId(taskId);
+            // 最后在更新一下异常数
+            TCruiseTaskResult updateResult = new TCruiseTaskResult();
+            updateResult.setTaskId(taskId);
+            updateResult.setTaskAbnormal(taskAbnormal);
+            StaticContextAccessor.getBean(RobotService.class).updateTCruiseTaskResult(updateResult);
 
         } else {
             log.info("机器人巡检点不是最后一个点");

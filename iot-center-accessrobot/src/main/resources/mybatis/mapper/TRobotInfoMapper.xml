@@ -949,6 +949,31 @@
         on b.device_mete_id=a.device_mete_id
         where b.instance_id=#{instanceId,jdbcType=BIGINT}
     </select>
+    <select id="selectAlarmNumByTaskId" resultType="java.lang.Integer">
+        SELECT count(*)
+        from
+            (SELECT DISTINCT
+                 instance_id
+             from t_warn_info
+             where a.task_id = #{taskId, jdbcType=VARCHAR}
+            ) t
+    </select>
+    <update id="updateTCruiseTaskResult">
+        update t_cruise_task_result a <set>
+        <if test="taskResultId != null ">a.task_result_id = #{taskResultId},</if>
+        <if test="taskId != null">a.task_id = #{taskId},</if>
+        <if test="taskName != null ">a.task_name = #{taskName},</if>
+        <if test="taskAbnormal != null">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
+        <if test="taskAlarm != null">a.task_alarm = #{taskAlarm, jdbcType=INTEGER},</if>
+        <if test="runExecute != null">a.run_execute = #{runExecute},</if>
+        a.cruise_task_time = #{cruiseTaskTime, jdbcType=TIMESTAMP},
+        <if test="taskStatus != null">a.task_status = #{taskStatus, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="remark != null">a.remark = #{remark},</if>
+    </set>
+        where a.task_id = #{taskId, jdbcType=VARCHAR}
+    </update>
+
     <insert id="insertWarn" useGeneratedKeys="true" keyProperty="warnId" parameterType="com.yjh.accessrobot.module.command.entity.TWarnInfo">
         insert into t_warn_info(
             warn_id,

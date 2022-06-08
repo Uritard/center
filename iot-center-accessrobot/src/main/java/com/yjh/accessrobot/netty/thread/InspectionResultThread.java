@@ -67,16 +67,18 @@ public class InspectionResultThread implements Runnable{
             }
 
             TCruiseTask tCruiseTask = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(taskId);
-            Integer taskType = tCruiseTask.getTaskType();
-            log.info("taskId是: {}的任务类型是:{}", taskId, taskType);
-            TCruiseResult tCruiseResult = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
-            //机器人本体任务和巡视主机下发的任务分情况处理
-            boolean isSelfTask = Objects.nonNull(taskType) && Objects.equals(271, taskType);
+            if (Objects.nonNull(tCruiseTask)){
+                Integer taskType = tCruiseTask.getTaskType();
+                log.info("taskId是: {}的任务类型是:{}", taskId, taskType);
+                TCruiseResult tCruiseResult = StaticContextAccessor.getBean(RobotService.class).selectTaskResultId(taskId);
+                //机器人本体任务和巡视主机下发的任务分情况处理
+                boolean isSelfTask = Objects.nonNull(taskType) && Objects.equals(271, taskType);
 
-            if (isSelfTask) {
-                robotSelfTask(robotCode, taskId, tCruiseResult);
-            }else {
-                platformTask(robotCode, taskId, tCruiseResult);
+                if (isSelfTask) {
+                    robotSelfTask(robotCode, taskId, tCruiseResult);
+                }else {
+                    platformTask(robotCode, taskId, tCruiseResult);
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -456,8 +458,15 @@ public class InspectionResultThread implements Runnable{
                 Constant.postUrl(webSocketUrl,json);
 
                 for (TCruiseTaskResultDetail tctrd : tctrdList){
-                    StaticContextAccessor.getBean(RobotService.class).updateIsWarn(taskId, tctrd.getInstanceId(), tctrd.getCruiseResultId());
+                   StaticContextAccessor.getBean(RobotService.class).updateIsWarn(taskId, tctrd.getInstanceId(), tctrd.getCruiseResultId());
                 }
+
+                int taskAbnormal = StaticContextAccessor.getBean(RobotService.class).selectAlarmNumByTaskId(taskId);
+                // 最后在更新一下异常数
+                TCruiseTaskResult updateResult = new TCruiseTaskResult();
+                updateResult.setTaskId(taskId);
+                updateResult.setTaskAbnormal(taskAbnormal);
+                StaticContextAccessor.getBean(RobotService.class).updateTCruiseTaskResult(updateResult);
             }else{
                 log.info("机器人巡检点不是最后一个点");
                 Integer taskWait = totalCheckPoint - normal - abnormal;

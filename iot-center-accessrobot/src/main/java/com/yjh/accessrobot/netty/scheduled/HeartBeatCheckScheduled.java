@@ -46,7 +46,8 @@ public class HeartBeatCheckScheduled {
                 heartNum++;
                 log.info("robotCode:{},heartNum:{}", robotCode, heartNum);
                 Constant.robotRemoveCounts.put(robotCode, heartNum);
-                if (heartNum > 4) {
+//                if (heartNum > 4) {
+                if (heartNum > 3) {
                     robotServerHandler.heartBeatFailAfter(robotCode, robotStatusMap);
                 }
             });

@@ -1281,6 +1281,13 @@ public class RobotService {
         for (TCruiseTaskResultDetail tctrd : tctrdList){
             updateIsWarn(taskId, tctrd.getInstanceId(), tctrd.getCruiseResultId());
         }
+
+        int taskAbnormal = selectAlarmNumByTaskId(taskId);
+        // 最后在更新一下异常数
+        TCruiseTaskResult updateResult = new TCruiseTaskResult();
+        updateResult.setTaskId(taskId);
+        updateResult.setTaskAbnormal(taskAbnormal);
+        updateTCruiseTaskResult(updateResult);
     }
     @Transactional(rollbackFor = Exception.class)
     public Result otherServer(List<String > cruiseResultIdList) {
@@ -2080,8 +2087,17 @@ public class RobotService {
         int isWarnFlag = tRobotInfoDao.selectIsWarn(instanceId, taskId);
         if (isWarnFlag > 0){
             tRobotInfoDao.updateIsWarn(cruiseResultId);
+            return 1;
         }
-        return isWarnFlag;
+        return 0;
+    }
+    /**
+     * 查询当前任务的告警数
+     * @param taskId 任务id
+     * @return int
+     */
+    public int selectAlarmNumByTaskId(String taskId){
+        return tRobotInfoDao.selectAlarmNumByTaskId(taskId);
     }
     /**
      * 根据巡视点id查询该测点信息
@@ -2090,6 +2106,14 @@ public class RobotService {
      */
     public TStdDeviceMete selectDeviceMeteInfo(Long instanceId){
         return tRobotInfoDao.selectDeviceMeteInfo(instanceId);
+    }
+    /**
+     * 更新异常点位数量
+     * @param updateResult
+     * @return int
+     */
+    public int updateTCruiseTaskResult(TCruiseTaskResult updateResult){
+        return tRobotInfoDao.updateTCruiseTaskResult(updateResult);
     }
    /**
     * 下发获得机器人控制权及任务模式切换的指令
