@@ -65,6 +65,8 @@ public class CameraConController {
 
     @Value("${srs.stop.url}")
     private String srsStopUrl;//srs停止播流
+    @Value("${give.pic}")
+    private String givePic;
 
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
@@ -637,7 +639,12 @@ public class CameraConController {
     public Result givePicFir(@RequestParam(value = "presetId",required = false) Long presetId,
                                @RequestParam(value = "cameraId",required = false) Long cameraId) {
         Result result = new Result();
-        Map<String,String> map=cameraConService.givePicFir2(cameraId,presetId);
+        Map<String,String> map;
+        if ("1".equals(givePic)){
+            map = cameraConService.givePicFir(cameraId,presetId);
+        }else {
+            map = cameraConService.givePicFir2(cameraId,presetId);
+        }
         if (map.size()>0)
         {
             result.setData(map);
@@ -650,23 +657,6 @@ public class CameraConController {
         return result;
     }
 
-    @ApiOperation(value = "获取红外文件_back")
-    @RequestMapping(value = "/givePicFir2", method = RequestMethod.GET)
-    public Result givePicFir2(@RequestParam(value = "presetId",required = false) Long presetId,
-                             @RequestParam(value = "cameraId",required = false) Long cameraId) {
-        Result result = new Result();
-        Map<String,String> map=cameraConService.givePicFir(cameraId,presetId);
-        if (map.size()>0)
-        {
-            result.setData(map);
-            result.setMessage("success");
-        }else
-        {
-            result.setData("获取文件失败");
-        }
-
-        return result;
-    }
     @ApiOperation(value = "开启可视对讲")
     @RequestMapping(value = "/startVoiceTalk", method = RequestMethod.GET)
     public Result startVoiceTalk( @RequestParam(value = "videoIntercomId",required = false) Long videoIntercomId)

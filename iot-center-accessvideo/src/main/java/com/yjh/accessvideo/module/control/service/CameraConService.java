@@ -2379,7 +2379,7 @@ public class CameraConService {
                 try {
 
                     //测温图片
-                    String picPath = hotPic + newName + ".jpeg";
+                    String picPath = hotPic + newName + ".jpg";
                     log.info("hotPic地址：" + picPath);
                     fout = new FileOutputStream(picPath);
                     long offsetPic = 419;
@@ -2389,8 +2389,8 @@ public class CameraConService {
                     picBuffers.get(picBytes);
                     fout.write(picBytes);
                     fout.close();
-                    map.put("picPath", hotPicshow + newName + ".jpeg");
-                    log.info("hotPicshow地址：" + hotPicshow + newName + ".jpeg");
+                    map.put("picPath", hotPicshow + newName + ".jpg");
+                    log.info("hotPicshow地址：" + hotPicshow + newName + ".jpg");
 
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
                     String date = sdf.format(new Date());
