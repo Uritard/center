@@ -149,7 +149,8 @@ public class ParamUtil {
             if (val instanceof String && StringUtils.isNotEmpty((String) val)) {
                 Matcher matcher = paramPattern.matcher((String) val);
                 if (matcher.find()) {
-                    return "参数校验失败，请勿传入非法字符【~!$%^&*+<>?\"{}();'】";
+//                    return "参数校验失败，请勿传入非法字符【~!$%^&*+<>?\"{}();'】";
+                    return "参数校验失败，请勿传入非法字符";
                 }
             }
         }

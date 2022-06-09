@@ -147,8 +147,8 @@
             where a.mete_kind = #{meteKind, jdbcType=INTEGER}
         <if test="cfgDeviceName != null and cfgDeviceName != ''"> and c.device_name like concat('%',#{cfgDeviceName, jdbcType=VARCHAR},'%')</if>
     </select>
-    
-    
+
+
     <select id="selectForSequenceInfo" resultType="java.util.Map">
         SELECT
         c.sort,
@@ -173,6 +173,7 @@
         left join t_std_devicemete i on i.device_mete_id = h.device_mete_id
         where 1=1
         <if test="cfgDeviceId != null and cfgDeviceId != ''"> and c.cfg_device_id =#{cfgDeviceId, jdbcType=VARCHAR}</if>
+        GROUP BY a.preset_id
     </select>
 
     <select id="selectForSequenceInfoByMeteId" resultType="java.util.Map">

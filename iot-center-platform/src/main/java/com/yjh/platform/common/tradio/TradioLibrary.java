@@ -19,7 +19,7 @@ public interface TradioLibrary extends Library {
 //    public static final String JNA_LIBRARY_NAME = "E:\\project\\IotCenter\\IotCenter\\iot-center-platform\\src\\main\\resources\\lib\\TradioCp.dll";
 //    public static final String JNA_LIBRARY_NAME = "D:\\code\\zhihui\\IotCenter\\iot-center-platform\\src\\main\\resources\\lib\\TradioCp.dll";
 //    public static final String JNA_LIBRARY_NAME = "D:\\IOT\\IotCenter\\iot-center-platform\\src\\main\\resources\\lib\\TradioCp.dll";
-  //    public static final String JNA_LIBRARY_NAME = "D:\\MyDocuments\\workspace_idea\\IotCenterDev\\IotCenter\\iot-center-platform\\src\\main\\resources\\lib\\TradioCp.dll";
+//      public static final String JNA_LIBRARY_NAME = "D:\\MyDocuments\\workspace_idea\\IotCenterDev\\IotCenter\\iot-center-platform\\src\\main\\resources\\lib\\TradioCp.dll";
     public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(TradioLibrary.JNA_LIBRARY_NAME);
     public static final TradioLibrary INSTANCE = (TradioLibrary)Native.loadLibrary(TradioLibrary.JNA_LIBRARY_NAME, TradioLibrary.class);
     /**
