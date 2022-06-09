@@ -955,7 +955,7 @@
             (SELECT DISTINCT
                  instance_id
              from t_warn_info
-             where a.task_id = #{taskId, jdbcType=VARCHAR}
+             where task_id = #{taskId, jdbcType=VARCHAR}
             ) t
     </select>
     <update id="updateTCruiseTaskResult">

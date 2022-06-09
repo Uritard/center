@@ -737,7 +737,7 @@
         WHERE
         a.task_id = #{taskId, jdbcType=VARCHAR}
         and a.instance_id = #{instanceId,jdbcType = BIGINT}
-
+        and a.out_range is NOT NULL
     </update>
     <update id="updateWarnInfo2">
         UPDATE t_warn_info a <set>
@@ -750,6 +750,7 @@
         WHERE
         a.task_id = #{taskId, jdbcType=VARCHAR}
         and a.instance_id = #{instanceId,jdbcType = BIGINT}
+        and a.out_range is NOT NULL
     </update>
     <update id="updateWarnInfo3">
         UPDATE t_warn_info a <set>
@@ -776,6 +777,7 @@
         WHERE
         a.task_id = #{taskId, jdbcType=VARCHAR}
         and a.instance_id = #{instanceId,jdbcType = BIGINT}
+        and a.out_range is NOT NULL
     </select>
 
     <select id="selectForTaskId" resultType="com.yjh.platform.module.task.entity.TCruiseResult">
