@@ -84,11 +84,12 @@ public class MyRequestWrapper extends HttpServletRequestWrapper {
 
     public String getQueryMapsString() {
         String str = super.getQueryString();
-        MultisMap multiMap = new MultisMap();
-        Decode.decodeTo(str, multiMap, "UTF-8");
         JSONObject jsonModel = new JSONObject(true);
-        jsonModel.putAll(multiMap);
-
+        if (StringUtils.isNotBlank(str)) {
+            MultisMap multiMap = new MultisMap();
+            Decode.decodeTo(str, multiMap, "UTF-8");
+            jsonModel.putAll(multiMap);
+        }
         return jsonModel.isEmpty() ? "" : jsonModel.toJSONString();
     }
 
