@@ -317,6 +317,23 @@ public class ByteUtil {
         }
         return b2;
     }
+    /**
+     * byte转int
+     * 网上抄的
+     * @param input
+     * @param offset
+     * @param littleEndian
+     * @return
+     */
+    public static int unintFrom2Bytes(byte[] input, int offset, boolean littleEndian) {
+        int value = 0;
+        // 循环读取每个字节通过移位运算完成long的8个字节拼装
+        for (int count = 0; count < 2; ++count) {
+            int shift = (littleEndian ? count : (1 - count)) << 3;
+            value |= ((long) 0xff << shift) & ((long) input[offset + count] << shift);
+        }
+        return value;
+    }
 
     //字符串转十六进制
     public static String stringToHex(String str) {

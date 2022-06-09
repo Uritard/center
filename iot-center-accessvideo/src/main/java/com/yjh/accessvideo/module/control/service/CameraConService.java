@@ -7,6 +7,7 @@ import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
+import com.yjh.accessvideo.commons.utils.ByteUtil;
 import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.hik.HCNetSDK;
@@ -17,8 +18,10 @@ import com.yjh.accessvideo.thread.TaskExecutePool;
 import com.yjh.accessvideo.threads.RecordFileThread;
 import com.yjh.accessvideo.threads.TranscodeThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
+import javafx.scene.input.DataFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -2248,6 +2253,224 @@ public class CameraConService {
         return map;
     }
 
+    public static final int ISAPI_DATA_LEN = 2 * 1024 * 1024;
+    public static final int ISAPI_STATUS_LEN = 2 * 1024 * 1024;
+    public static final int BYTE_ARRAY_LEN = 1024;
+
+    /**
+     * dlt664红外抓图
+     * @param cameraId
+     * @param presetId
+     * @return
+     */
+    public Map<String, String> givePicFir2(long cameraId, Long presetId) {
+        Map<String, String> map = new HashMap<String, String>();
+
+        try {
+            CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+            log.info("通道号：" + cameraConInfo.getChannelNum());
+            log.info("getRecordId:" + cameraConInfo.getRecordId());
+            String userName = cameraConInfo.getCameraManager();
+            log.info("userName" + userName);
+            String password = cameraConInfo.getCameraCode();
+            log.info("password" + password);
+            String cameraIp = cameraConInfo.getCameraIp();
+            log.info("cameraIp" + cameraIp);
+            String port = cameraConInfo.getInfreadPort().toString();
+            log.info("port:>>>" + port);
+           /* if (!hCNetSDK.NET_DVR_Init()) {
+                log.info("初始化失败");
+            }*/
+            log.info("开始登录。。。。。");
+            m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+            System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
+            m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+            System.arraycopy(userName.getBytes(), 0, m_strLoginInfo.sUserName, 0, userName.length());
+            m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+            System.arraycopy(password.getBytes(), 0, m_strLoginInfo.sPassword, 0, password.length());
+            m_strLoginInfo.wPort = Short.parseShort(port);
+            m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
+            m_strLoginInfo.write();
+            log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
+            lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+            log.info("NET_DVR_Login_V40:返回值" + lUserID);
+            lUserIDLong = new NativeLong(lUserID);
+            //转到预置点
+            boolean Preset = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, 2, HCNetSDK.GOTO_PRESET, cameraConInfo.getPresetNum());
+            if (Preset) {
+                log.info("转到预置点成功：Preset->" + Preset);
+            } else {
+                log.info("转到预置点信息Preset->" + Preset);
+                int iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.info("转到预置点失败错误码" + iErr);
+            }
+
+            try {
+                Long waitTime = Long.valueOf(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content").toString());
+                log.info("waitTime:----------" + waitTime);
+                Thread.sleep(waitTime);
+            } catch (Exception e) {
+                log.error("error----" + e);
+            }
+
+            m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+            System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
+            m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+            System.arraycopy(userName.getBytes(), 0, m_strLoginInfo.sUserName, 0, userName.length());
+            m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+            System.arraycopy(password.getBytes(), 0, m_strLoginInfo.sPassword, 0, password.length());
+            m_strLoginInfo.wPort = Short.parseShort(port);
+            m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
+            m_strLoginInfo.write();
+            log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
+            lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+            log.info("NET_DVR_Login_V40:返回值" + lUserID);
+            lUserIDLong = new NativeLong(lUserID);
+            //透传url
+            String strURL = "POST /ISAPI/Thermal/channels/2/thermometry/jpegPicWithAppendData?format=json";
+            HCNetSDK.BYTE_ARRAY ptrUrl = new HCNetSDK.BYTE_ARRAY(BYTE_ARRAY_LEN);
+            ptrUrl.byValue = strURL.getBytes();
+            ptrUrl.write();
+            //透传json standard 标准模式
+            String buf = "{\n" +
+                    "\t\"JpegPicWithAppendDataParam\":\n" +
+                    "\t{\n" +
+                    "\t\t\"captureMode\":\"standard\"\n" +
+                    "\t}\n" +
+                    "}";
+            HCNetSDK.BYTE_ARRAY pbuf = new HCNetSDK.BYTE_ARRAY(BYTE_ARRAY_LEN);
+            pbuf.byValue = buf.getBytes();
+            pbuf.write();
+
+            HCNetSDK.NET_DVR_XML_CONFIG_INPUT struXMLInput = new HCNetSDK.NET_DVR_XML_CONFIG_INPUT();
+            struXMLInput.read();
+            struXMLInput.dwSize = struXMLInput.size();
+            struXMLInput.lpRequestUrl = ptrUrl.getPointer();
+            struXMLInput.dwRequestUrlLen = ptrUrl.byValue.length;
+            struXMLInput.lpInBuffer = pbuf.getPointer();
+            struXMLInput.dwInBufferSize = buf.length();
+            struXMLInput.write();
+
+            HCNetSDK.BYTE_ARRAY ptrStatusByte = new HCNetSDK.BYTE_ARRAY(ISAPI_STATUS_LEN);
+            ptrStatusByte.read();
+
+            HCNetSDK.BYTE_ARRAY ptrOutByte = new HCNetSDK.BYTE_ARRAY(ISAPI_DATA_LEN);
+            ptrOutByte.read();
+
+            HCNetSDK.NET_DVR_XML_CONFIG_OUTPUT struXMLOutput = new HCNetSDK.NET_DVR_XML_CONFIG_OUTPUT();
+            struXMLOutput.read();
+            struXMLOutput.dwSize = struXMLOutput.size();
+            struXMLOutput.lpOutBuffer = ptrOutByte.getPointer();
+            struXMLOutput.dwOutBufferSize = ptrOutByte.size();
+            struXMLOutput.lpStatusBuffer = ptrStatusByte.getPointer();
+            struXMLOutput.dwStatusSize = ptrStatusByte.size();
+            struXMLOutput.write();
+
+            if (!hCNetSDK.NET_DVR_STDXMLConfig(lUserID, struXMLInput, struXMLOutput)) {
+                int iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.error("NET_DVR_STDXMLConfig失败，错误号：" + iErr);
+            } else {
+                struXMLOutput.read();
+                ptrOutByte.read();
+                ptrStatusByte.read();
+                FileOutputStream fout;
+                String newName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+                try {
+
+                    //测温图片
+                    String picPath = hotPic + newName + ".jpeg";
+                    log.info("hotPic地址：" + picPath);
+                    fout = new FileOutputStream(picPath);
+                    long offsetPic = 419;
+                    ByteBuffer picBuffers = ptrOutByte.getPointer().getByteBuffer(offsetPic, (struXMLOutput.dwReturnedXMLSize - offsetPic));
+                    byte[] picBytes = new byte[struXMLOutput.dwReturnedXMLSize - Integer.parseInt(String.valueOf(offsetPic + 16))];
+                    picBuffers.rewind();
+                    picBuffers.get(picBytes);
+                    fout.write(picBytes);
+                    fout.close();
+                    map.put("picPath", hotPicshow + newName + ".jpeg");
+                    log.info("hotPicshow地址：" + hotPicshow + newName + ".jpeg");
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                    String date = sdf.format(new Date());
+                    date = ByteUtil.stringToHex(date);
+                    String picString = ByteUtil.toHexString(picBytes);
+                    //时间位置
+                    assert date != null;
+                    int a = picString.indexOf(date) + 28;
+                    //拍摄时间之前的字节
+                    String realPic = picString.substring(0, a);
+                    //拍摄时间之前的字节长度
+                    long size1 = ByteUtil.hex2byte(realPic.getBytes()).length;
+                    //红外温度值点阵数据
+                    String dataStr = picString.substring(a, a + 2621440);
+                    //红外温度值点阵数据长度
+                    long size2 = ByteUtil.hex2byte(dataStr.getBytes()).length;
+                    //起始位置
+                    long size3 = picBytes.length - size2 - size1;
+                    //测温数据data
+                    String datPath = hotFir + newName + ".data";
+                    log.info("hotFirdata地址：" + datPath);
+                    fout = new FileOutputStream(datPath);
+                    //将字节写入文件
+                    long offset = offsetPic + size1;
+                    ByteBuffer buffers = ptrOutByte.getPointer().getByteBuffer(offset, struXMLOutput.dwReturnedXMLSize - offset);
+                    byte[] bytes = new byte[struXMLOutput.dwReturnedXMLSize - Integer.parseInt(String.valueOf(size3 + offset + 16))];
+                    buffers.rewind();
+                    buffers.get(bytes);
+                    fout.write(bytes);
+                    fout.close();
+                    map.put("dataPath", hotFirShow + newName + ".data");
+                    log.info("hotFirShowdata地址：" + hotFirShow + newName + ".data");
+
+                    int b = picString.indexOf(date);
+                    String hs = picString.substring(b - 8, b - 4);
+                    byte[] heightByte = ByteUtil.hex2byte(hs.getBytes());
+                    String ws = picString.substring(b - 4, b);
+                    byte[] widthByte = ByteUtil.hex2byte(ws.getBytes());
+                    //矩阵高度
+                    int height = ByteUtil.unintFrom2Bytes(heightByte, 0, true);
+                    log.info("矩阵高度 {} ", height);
+                    //矩阵宽度
+                    int width = ByteUtil.unintFrom2Bytes(widthByte, 0, true);
+                    log.info("矩阵宽度 {} ", width);
+
+                    String csvPath = hotFir + newName + ".csv";
+                    log.info("hotFircsv地址：" + csvPath);
+                    FileWriter fos = new FileWriter(csvPath);
+
+                    HCNetSDK.BYTE_ARRAY byte_array = new HCNetSDK.BYTE_ARRAY(Integer.parseInt(String.valueOf(size2)));
+                    byte_array.byValue = bytes;
+                    byte_array.write();
+                    byte_array.read();
+
+                    for (int i = 1; i <= width; i++) {
+                        for (int j = 1; j <= height; j++) {
+                            byte[] sourceData = byte_array.getPointer().getByteArray((i - 1) * width * 4 + (j - 1) * 4, 4);
+                            int ss = sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
+                            fos.write(String.valueOf(Float.intBitsToFloat(ss)));
+                            fos.write(",");
+                        }
+                        fos.append('\n');
+                    }
+                    fos.flush();
+                    fos.close();
+                    map.put("csvPath", hotFirShow + newName + ".csv");
+                    log.info("hotFirShowcsv地址：" + hotFirShow + newName + ".csv");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            int iErr = hCNetSDK.NET_DVR_GetLastError();
+            log.info("系统异常" + iErr);
+            log.error("红外图片抓取异常", e);
+        } finally {
+            hCNetSDK.NET_DVR_Logout(lUserID);
+        }
+        return map;
+    }
     /**
      * 语音对讲开始
      *

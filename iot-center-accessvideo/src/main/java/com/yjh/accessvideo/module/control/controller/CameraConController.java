@@ -632,12 +632,12 @@ public class CameraConController {
 //        return result;
 //    }
 
-    @ApiOperation(value = "获取文件")
+    @ApiOperation(value = "获取红外文件_dlt664")
     @RequestMapping(value = "/givePicFir", method = RequestMethod.GET)
     public Result givePicFir(@RequestParam(value = "presetId",required = false) Long presetId,
                                @RequestParam(value = "cameraId",required = false) Long cameraId) {
         Result result = new Result();
-        Map<String,String> map=cameraConService.givePicFir(cameraId,presetId);
+        Map<String,String> map=cameraConService.givePicFir2(cameraId,presetId);
         if (map.size()>0)
         {
             result.setData(map);
@@ -646,6 +646,24 @@ public class CameraConController {
             {
                 result.setData("获取文件失败");
             }
+
+        return result;
+    }
+
+    @ApiOperation(value = "获取红外文件_back")
+    @RequestMapping(value = "/givePicFir2", method = RequestMethod.GET)
+    public Result givePicFir2(@RequestParam(value = "presetId",required = false) Long presetId,
+                             @RequestParam(value = "cameraId",required = false) Long cameraId) {
+        Result result = new Result();
+        Map<String,String> map=cameraConService.givePicFir(cameraId,presetId);
+        if (map.size()>0)
+        {
+            result.setData(map);
+            result.setMessage("success");
+        }else
+        {
+            result.setData("获取文件失败");
+        }
 
         return result;
     }
