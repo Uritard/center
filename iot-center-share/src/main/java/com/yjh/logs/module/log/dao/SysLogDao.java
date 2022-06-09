@@ -48,4 +48,13 @@ public interface SysLogDao {
                                     @Param(value = "endTime") Date endTime,
                                     @Param(value = "logType") String logType,
                                     @Param(value = "state") String state);
+
+    List<SysLogDetail> selectByPageSort(@Param(value = "userName") String userName,
+            @Param(value = "title") String title,
+            @Param(value = "startTime") Date startTime,
+            @Param(value = "endTime") Date endTime,
+            @Param(value = "logType") String logType,
+            @Param(value = "state") String state,
+            @Param(value = "sortField") String sortField,
+            @Param(value = "sortOrder") String sortOrder);
 }

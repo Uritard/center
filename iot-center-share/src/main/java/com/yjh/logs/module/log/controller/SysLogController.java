@@ -179,6 +179,7 @@ public class SysLogController {
                                @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                @RequestParam(value = "sortFlag", required = false) int sortFlag,
                                @RequestParam(value = "state", required = false) String state,
+                               @RequestParam(value = "sortField", required = false) String sortField,
                                @RequestParam(value = "pageNum", required = false, defaultValue = "0") int pageNum,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,HttpServletRequest request) {
         Result result = new Result();
@@ -200,16 +201,27 @@ public class SysLogController {
                 logType = "";
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            if(sortFlag==1){
-                List<SysLogDetail> list = sysLogService.selectByPageAsc(userName, title, startTime, endTime, logType, state);
+            if (StringUtils.isNotEmpty(sortField)) {
+                String sortOrder = sortFlag == 1 ? "asc" : "desc";
+                List<SysLogDetail> list = sysLogService
+                        .selectByPageSort(userName, title, startTime, endTime, logType, state, sortField, sortOrder);
                 resultMap.put("count", page.getTotal());
                 resultMap.put("list", list);
                 result.setData(resultMap);
-            }else{
-                List<SysLogDetail> list = sysLogService.selectByPage(userName, title, startTime, endTime, logType, state);
-                resultMap.put("count", page.getTotal());
-                resultMap.put("list", list);
-                result.setData(resultMap);
+            } else{
+                if (sortFlag == 1) {
+                    List<SysLogDetail> list = sysLogService
+                            .selectByPageAsc(userName, title, startTime, endTime, logType, state);
+                    resultMap.put("count", page.getTotal());
+                    resultMap.put("list", list);
+                    result.setData(resultMap);
+                } else {
+                    List<SysLogDetail> list = sysLogService
+                            .selectByPage(userName, title, startTime, endTime, logType, state);
+                    resultMap.put("count", page.getTotal());
+                    resultMap.put("list", list);
+                    result.setData(resultMap);
+                }
             }
             //Long userId = Long.valueOf(request.getHeader("userId"));
             String userNames=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));

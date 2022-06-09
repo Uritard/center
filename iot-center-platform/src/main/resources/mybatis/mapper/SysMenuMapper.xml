@@ -128,7 +128,8 @@
         a.link_type,
         a.url,
         a.creator_id,
-        a.sys_state
+        a.sys_state,
+        a.role_id
         from sys_menu a
         where 1 = 1
         <if test="menuId != null and menuId != ''"> and a.menu_id = #{menuId, jdbcType=BIGINT}</if>

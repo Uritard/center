@@ -49,7 +49,7 @@ public class SysRoleMenu implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "角色id")
-     @TableField(value = "role_id",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "role_id",updateStrategy = FieldStrategy.IGNORED)
     private Long roleId;
 
     private Integer pageNum = 1;

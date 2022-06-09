@@ -145,6 +145,7 @@ public class SysUserService {
         if (!Objects.equals(number, replayAvoid)) {
             throw new BusinessException(500, "验证码错误");
         } else {
+            String ip = request.getHeader("HTTP_X_FORWARDED_FOR");
             if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("pCode"))) {
                 String userName = null;
                 String password = null;
@@ -411,6 +412,7 @@ public class SysUserService {
                             num = num + 1;
                             logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 1);
                             logsRecord.LoginLogsSend(request, "6", "登录", "用户账户有泄漏风险", userName, String.valueOf(sysUserLogin.getUserId()), 2);
+                            sendToWs(ip, userId, userName);
                             mapResult.put("info","账户已被锁定，剩余锁定时间"+lockTimeOne+"分钟");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                             return mapResult;
@@ -447,6 +449,22 @@ public class SysUserService {
             }
         }
         return mapResult;
+    }
+
+    private void sendToWs(String ip, String userId, String userName){
+        try {
+            Map<String, String> jsonMap = new HashMap<>(16);
+            jsonMap.put("type", "alarmPopUp");
+            jsonMap.put("ip", ip);
+            jsonMap.put("warningInfo", "账户锁定");
+            jsonMap.put("userId", userId);
+            jsonMap.put("logType", "20");
+            jsonMap.put("userName", userName);
+            jsonMap.put("content", "用户[" + userName + "]连续登陆失败多次，账户锁定!");
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jsonMap);
+        } catch (Exception e) {
+            log.error("发送 webSocket 异常", e);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

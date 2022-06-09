@@ -1,6 +1,7 @@
 package com.yjh.logs.module.log.service;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.CaseFormat;
 import com.yjh.logs.common.utils.NumToStringUtil;
 import com.yjh.logs.commons.result.Result;
 import com.yjh.logs.commons.result.ResultCodeEnum;
@@ -8,6 +9,7 @@ import com.yjh.logs.module.log.dao.SysLogDao;
 import com.yjh.logs.module.log.entity.LongAnalyseDetail;
 import com.yjh.logs.module.log.entity.SysLog;
 import com.yjh.logs.module.log.entity.SysLogDetail;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -327,7 +329,35 @@ public class SysLogService {
         return sysOperateLogList;
     }
 
+    public List<SysLogDetail> selectByPageSort(String userName, String title, Date startTime, Date endTime,String logType, String state, String field, String sortOrder) {
+        // 驼峰转下划线
+        String sortField = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, field);
 
+        List<SysLogDetail> sysOperateLogList = sysLogDao.selectByPageSort(userName,title,startTime,endTime,logType, state, sortField, sortOrder);
+        for (SysLogDetail item:sysOperateLogList) {
+            String type = item.getLogType();
+            if(type != null && !"".equals(type)){
+                type = NumToStringUtil.findType(type);
+                if(type != null){
+                    item.setLogType(type);
+                }
+            }
+            String states = item.getState();
+            if(states != null && !"".equals(states)){
+                if("1".equals(states)){
+                    states = "成功";
+                }
+                if("2".equals(states)){
+                    states = "失败";
+                }
+                if("3".equals(states)){
+                    states = "异常";
+                }
+                item.setState(states);
+            }
+        }
+        return sysOperateLogList;
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<SysLog> list) {

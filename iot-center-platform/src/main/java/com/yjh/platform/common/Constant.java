@@ -158,7 +158,9 @@ public class Constant {
             CloseableHttpResponse response = client.execute(httpGet);
             HttpEntity entity = response.getEntity();
             result = EntityUtils.toString(entity, "UTF-8");
-        } catch (Exception e) {e.getMessage();}
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
         return result;
         //return "666";
     }

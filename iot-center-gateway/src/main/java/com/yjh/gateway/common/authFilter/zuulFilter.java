@@ -6,6 +6,7 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.yjh.gateway.common.Constant;
 import com.yjh.gateway.common.utils.*;
+import com.yjh.gateway.common.websocket.WebSocketServer;
 import com.yjh.gateway.commons.restTemplate.LogsAspect;
 import com.yjh.gateway.commons.utils.gmhelper.SM2Verify_SKF;
 import com.yjh.gateway.commons.utils.http.IPUtil;
@@ -332,6 +333,15 @@ public class zuulFilter extends ZuulFilter {
                 if (!ipValid || StringUtils.isEmpty(userId)) {
                     log.error("IP 地址验证失败 - {}-{} {}", userId, userName, ipValid);
                     ipAddr = ipAddr.replace("\"", "");
+                    JSONObject jsonMap = new JSONObject();
+                    jsonMap.put("type", "alarmPopUp");
+                    jsonMap.put("ip", ipAddr);
+                    jsonMap.put("warningInfo", "未绑定的IP地址");
+                    jsonMap.put("userId", userId);
+                    jsonMap.put("logType", "6");
+                    jsonMap.put("userName", userName);
+                    jsonMap.put("content", "用户[" + userName + "]在未绑定的IP地址访问系统!");
+                    WebSocketServer.sendMsg(jsonMap.toJSONString());
                     logsAspect.loginLogsSend(request, ipAddr, "6", "登录", "IP:" + ipAddr + "与用户" + userName + "未绑定", userName, userId, 2);
                     return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"未绑定的IP地址!\"}");
                 }

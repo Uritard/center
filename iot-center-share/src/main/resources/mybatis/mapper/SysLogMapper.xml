@@ -147,6 +147,27 @@
          order by a.create_time desc
     </select>
 
+    <select id="selectByPageSort"  resultType="com.yjh.logs.module.log.entity.SysLogDetail">
+        select
+        a.log_id as logId,
+        a.user_name as userName,
+        a.title,
+        a.ip,
+        a.state,
+        a.log_type as logType,
+        a.content,
+        a.create_time as createTime
+        from sys_logs a
+        where 1 = 1
+        <if test="state != null and state != ''"> and a.state = #{state, jdbcType=VARCHAR}</if>
+        <if test="title != null and title != ''"> and a.title like concat('%',#{title, jdbcType=VARCHAR},'%') </if>
+        <if test="userName != null and userName != ''"> and a.user_name like CONCAT('%',#{userName, jdbcType=VARCHAR},'%')</if>
+        <if test="logType != null and logType != ''"> and a.log_type = #{logType, jdbcType=VARCHAR}</if>
+        <if test="startTime != null and endTime != null"> and  a.create_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="sortField == 'create_time'"> order by a.create_time ${sortOrder}</if>
+        <if test="sortField != null and sortField != 'create_time'"> order by a.${sortField} ${sortOrder},a.create_time desc</if>
+    </select>
+
 
     <select id="selectByPageAsc"  resultType="com.yjh.logs.module.log.entity.SysLogDetail">
         select

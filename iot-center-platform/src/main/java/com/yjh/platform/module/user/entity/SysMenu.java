@@ -98,6 +98,11 @@ public class SysMenu implements Serializable {
     @ApiModelProperty(value = "系统状态（0系统，1 非系统）")
     private Integer sysState;
 
+    @Max(value=999999999999999999L)
+    @TableField(value = "role_id",updateStrategy = FieldStrategy.IGNORED)
+    @ApiModelProperty(value = "角色所属默认角色")
+    private Integer roleId;
+
     private Integer pageNum=1;
 
     private Integer pageSize=0;
