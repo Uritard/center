@@ -161,7 +161,7 @@
         left join t_voice_config e on a.config_id = e.config_id
         LEFT JOIN t_dict_business k on a.voice_type = k.dict_code
         LEFT JOIN t_dict_business m on a.voice_model = m.dict_code
-        LEFT JOIN t_dict_business n on a.voice_factory = n.dict_cod
+        LEFT JOIN t_dict_business n on a.voice_factory = n.dict_code
         where 1=1
         <if test="voiceDeviceName != null and voiceDeviceName != ''"> and a.voice_device_name like concat ('%',#{voiceDeviceName, jdbcType=VARCHAR},'%')</if>
         <if test="deviceType != null and deviceType != ''"> and a.device_type = #{deviceType, jdbcType=VARCHAR}</if>
