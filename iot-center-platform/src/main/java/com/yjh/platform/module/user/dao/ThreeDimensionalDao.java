@@ -1,6 +1,8 @@
 package com.yjh.platform.module.user.dao;
 
 import com.yjh.platform.module.task.entity.StatisticalTools;
+import com.yjh.platform.module.task.entity.TCruisePlan;
+import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
 import com.yjh.platform.module.user.entity.AlarmAndMeteInfo;
 import com.yjh.platform.module.user.entity.CameraUnionDevice;
 import org.apache.ibatis.annotations.Param;
@@ -68,4 +70,11 @@ public interface ThreeDimensionalDao {
      * @return List<String>
      */
     List<String> selectAllName();
+
+    /**
+     * 根据 3D 模版查询巡检预案
+     * @param cruisePlanMap 查询条件
+     * @return List<TCruisePlanCountByPage>
+     */
+    List<TCruisePlanCountByPage> selectByPlanPage(Map<String, Object> cruisePlanMap);
 }

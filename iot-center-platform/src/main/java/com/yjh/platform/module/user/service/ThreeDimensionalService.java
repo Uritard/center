@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.task.entity.StatisticalTools;
+import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.ThreeDimensionalDao;
 import com.yjh.platform.module.user.entity.AlarmAndMeteInfo;
@@ -160,6 +161,12 @@ public class ThreeDimensionalService {
         modelNameAndName.setNameList(nameList);
         return modelNameAndName;
     }
+
+    public List<TCruisePlanCountByPage> selectByPlanPage(Map<String, Object> planMap){
+
+        return threeDimensionalDao.selectByPlanPage(planMap);
+    }
+
     //Redis数据库批量查询Key值游标
     public Set<String> redisScan(String key) {
         return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {

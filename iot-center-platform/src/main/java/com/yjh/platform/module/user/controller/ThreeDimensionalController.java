@@ -1,9 +1,12 @@
 package com.yjh.platform.module.user.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
 import com.yjh.platform.module.user.entity.RoutePlan;
 import com.yjh.platform.module.user.service.ThreeDimensionalService;
 import io.swagger.annotations.Api;
@@ -13,8 +16,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 /**
  * @author YChen
@@ -144,6 +148,28 @@ public class ThreeDimensionalController {
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
             log.error("三维浏览-查询所有模型名称发生错误");
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "三维浏览-查询巡检计划")
+    @PostMapping(value = "/selectByPlanPage")
+    @Logs(title = "三维巡检计划查询",content = "根据三维模版查询巡检计划",logType = 1)
+    public Result selectByPlanPage (@RequestBody Map<String, Object> planMap){
+        Result result = new Result();
+        try {
+            Map<String, Object> resultMap = new HashMap<>();
+            Page page = PageHelper.startPage((int)planMap.getOrDefault("pageNum", 1), (int)planMap.getOrDefault("pageSize", 0),true,null,true);
+            List<TCruisePlanCountByPage> list = threeDimensionalService.selectByPlanPage(planMap);
+            resultMap.put("count", page.getTotal());
+            resultMap.put("list", list);
+            result.setData(resultMap);
+        }catch (BusinessException e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
+            log.error("三维浏览-搜索定位聚焦发生异常");
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("三维浏览-搜索定位聚焦发生错误");
         }
         return result;
     }
