@@ -175,21 +175,22 @@ public class TCruiseResultService{
 
             //判断该点是否已在告警表
             if (afterManualReviewInfo.getIsWarn() == 1) {
-                Long warnId = tCruiseResultDao.selectWarnId(afterManualReviewInfo.getTaskId(),afterManualReviewInfo.getInstanceId());
-                //存在
-                //判断该点是否产生告警以及告警信息
-                if (Boolean.TRUE.equals(isWarN)){//触发告警
-                    // 修改告警信息表
-                    tCruiseResultDao.updateWarnInfo(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId(),
-                            map.get("warnName").toString(),
-                            Integer.valueOf(map.get("warnLevel").toString()),
-                            map.get("warnContent").toString(),
-                            outRange,userId,date);
-                    sendWebSocket(warnId);
-                }else {
-                    tCruiseResultDao.updateWarnInfo2(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId(),
-                            userId,date);
-                    sendWebSocket(warnId);
+                List<Long> warnIdList = tCruiseResultDao.selectWarnId(afterManualReviewInfo.getTaskId(),afterManualReviewInfo.getInstanceId());
+                for(Long warnId : warnIdList){
+                    //存在
+                    //判断该点是否产生告警以及告警信息
+                    if (Boolean.TRUE.equals(isWarN)){//触发告警
+                        // 修改告警信息表
+                        tCruiseResultDao.updateWarnInfo(warnId,
+                                map.get("warnName").toString(),
+                                Integer.valueOf(map.get("warnLevel").toString()),
+                                map.get("warnContent").toString(),
+                                outRange,userId,date);
+                        sendWebSocket(warnId);
+                    }else {
+                        tCruiseResultDao.updateWarnInfo2(warnId,userId,date);
+                        sendWebSocket(warnId);
+                    }
                 }
             }else {
                 //不存在
@@ -393,9 +394,11 @@ public class TCruiseResultService{
             AfterManualReviewInfo afterManualReviewInfo = tCruiseResultDao.selectJudgeCondition(res.getCruiseDataId());
             //若该点生成告警,则核查为属实
             if (afterManualReviewInfo.getIsWarn() == 1) {
-                Long warnId = tCruiseResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
-                tCruiseResultDao.updateWarnInfo3(warnId,userId,date);
-                sendWebSocket(warnId);
+                List<Long> warnIdList = tCruiseResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
+                for (Long warnId : warnIdList) {
+                    tCruiseResultDao.updateWarnInfo3(warnId,userId,date);
+                    sendWebSocket(warnId);
+                }
             }
         }
         //自动生成巡视报告

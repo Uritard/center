@@ -64,7 +64,7 @@ public interface ThreeDimensionalDao {
      * 查询所有模型名称
      * @return List<String>
      */
-    List<String> selectAllModelName();
+    List<Map<String, String>> selectAllModelName();
     /**
      * 查询所有名称
      * @return List<String>

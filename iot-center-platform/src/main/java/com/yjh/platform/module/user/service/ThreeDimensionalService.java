@@ -155,7 +155,7 @@ public class ThreeDimensionalService {
     @Transactional(rollbackFor = Exception.class)
     public ModelNameAndName selectAllModelNameAndName(){
         ModelNameAndName modelNameAndName = new ModelNameAndName();
-        List<String> modelNameList = threeDimensionalDao.selectAllModelName();
+        List<Map<String, String>> modelNameList = threeDimensionalDao.selectAllModelName();
         modelNameAndName.setModelNameList(modelNameList);
         List<String> nameList = threeDimensionalDao.selectAllName();
         modelNameAndName.setNameList(nameList);

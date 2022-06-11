@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author YChen
@@ -19,7 +20,7 @@ import java.util.List;
 public class ModelNameAndName {
 
     @ApiModelProperty(value = "模型名称列表")
-    private List<String> modelNameList;
+    private List<Map<String, String>> modelNameList;
     @ApiModelProperty(value = "名称列表")
     private List<String> nameList;
 }

@@ -1187,6 +1187,15 @@ public class RobotService {
         List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);
         log.info("任务为{}已经做过的巡视点===={}", taskId, instanceIdDoneList);
 
+        List<Long> inDataBaseInstanceList = StaticContextAccessor.getBean(RobotService.class).selectInstanceForTaskGoOn(taskId);
+        log.info("已经入库的巡视点==={}", inDataBaseInstanceList);
+        if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
+            for (Long instanceIdInTable : inDataBaseInstanceList) {
+                instanceIdDoneList.remove(instanceIdInTable.toString());
+            }
+        }
+        log.info("删除已经入库的巡视点后==={}", instanceIdDoneList);
+
         if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
             for (Long instanceId : instanceIdDoneList) {
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());

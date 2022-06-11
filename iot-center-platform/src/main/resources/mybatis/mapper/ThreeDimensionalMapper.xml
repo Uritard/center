@@ -153,8 +153,11 @@
         WHERE
             b.col_name = 'alarm_level'
     </select>
-    <select id="selectAllModelName" resultType="java.lang.String">
-        SELECT a.model_name FROM three_dimensional_relevancy a
+    <select id="selectAllModelName" resultType="java.util.Map">
+        SELECT
+            a.model_name as modelName,
+            a.`name` as titleName
+        FROM three_dimensional_relevancy a
     </select>
     <select id="selectAllName" resultType="java.lang.String">
         SELECT a.name FROM three_dimensional_relevancy a

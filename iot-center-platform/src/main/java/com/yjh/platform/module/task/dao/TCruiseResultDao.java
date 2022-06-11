@@ -70,23 +70,21 @@ public interface TCruiseResultDao {
     AfterManualReviewInfo selectJudgeCondition(@Param(value = "cruiseDataId")Long cruiseDataId);
     TStdDevicemete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
 
-    int updateWarnInfo(@Param(value = "taskId")String taskId,
-                       @Param(value = "instanceId")Long instanceId,
+    int updateWarnInfo(@Param(value = "warnId")Long warnId,
                        @Param(value = "warnName")String warnName,
                        @Param(value = "warnLevel")Integer warnLevel,
                        @Param(value = "warnContent")String warnContent,
                        @Param(value = "outRange")String outRange,
                        @Param(value = "dealPersonId")String dealPersonId,
                        @Param(value = "dealTime")Date dealTime);
-    int updateWarnInfo2(@Param(value = "taskId")String taskId,
-                        @Param(value = "instanceId")Long instanceId,
+    int updateWarnInfo2(@Param(value = "warnId")Long warnId,
                         @Param(value = "dealPersonId")String dealPersonId,
                         @Param(value = "dealTime")Date dealTime);
     int updateWarnInfo3(@Param(value = "warnId")Long warnId,
                         @Param(value = "dealPersonId")String dealPersonId,
                         @Param(value = "dealTime")Date dealTime);
     int updateIsWarn(@Param(value = "cruiseDataId")Long cruiseDataId);
-    Long selectWarnId(@Param(value = "taskId")String taskId,
+    List<Long> selectWarnId(@Param(value = "taskId")String taskId,
                       @Param(value = "instanceId")Long instanceId);
     int batchInsert(List<TCruiseResult> list);
 
