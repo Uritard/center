@@ -25,6 +25,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -48,7 +49,12 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
     @Autowired
     private RobotService robotService;
 
-    private final String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+    private static ThreadLocal<String> threadLocal = new ThreadLocal<String>(){
+        @Override
+        protected String initialValue() {
+            return new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+        }
+    };
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -133,8 +139,8 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         Map<String, Object> item = xmlBaseModel.getItems().get(0);
 
         try {
-            String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code") + "/";
-            String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + item.get("task_code") + "/";
+            String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + threadLocal.get() + "/" + item.get("task_code") + "/";
+            String developRelativeUrl = relativeImgMap.get("content") + "/" + threadLocal.get() + "/" + item.get("task_code") + "/";
             // 可见光结果、红外fir、音频wav
             String[] sArray = ftpFilePath.split("/");
             String ftpFileName = sArray[sArray.length - 1];

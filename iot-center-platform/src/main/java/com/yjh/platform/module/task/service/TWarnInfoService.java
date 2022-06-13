@@ -456,6 +456,8 @@ public class TWarnInfoService{
             Long presetId = tWarnInfoDao.selectPresetId(Long.valueOf(defectMap.get("instanceId")));
             Long cameraId = tWarnInfoDao.selectCameraId(Long.valueOf(defectMap.get("instanceId")));
 
+            String regionName = tWarnInfoDao.selectRegionNameByDeviceId(Long.valueOf(defectMap.get("deviceId")));
+            tWarnInfoDetail.setRegionName(regionName);
             tWarnInfoDetail.setThresholdValue("");
             tWarnInfoDetail.setWarnContent(defectMap.get("defectContent"));
             tWarnInfoDetail.setAlarmTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(defectMap.get("defectTime")));

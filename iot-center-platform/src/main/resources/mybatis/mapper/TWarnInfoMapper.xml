@@ -966,6 +966,14 @@
         <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
     </select>
 
+    <select id="selectRegionNameByDeviceId" resultType="java.lang.String">
+        SELECT a.up_region_name
+        FROM
+            t_std_device a
+        WHERE 1 = 1
+        <if test="deviceId != null "> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+    </select>
+
     <select id="selectOperationWarn" resultType="java.util.HashMap">
         SELECT
             a.warn_id AS warnId,
