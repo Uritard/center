@@ -11,6 +11,7 @@ import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.TCruiseTask;
 import com.yjh.accessrobot.module.command.entity.TStdDeviceMete;
@@ -114,7 +115,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
                             //组装告警基本信息
                             TWarnInfo warnInfo = new TWarnInfo();
-                            warnInfo.setWarnTime(new Date());
+                            warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
                             warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
                             warnInfo.setCunstomId(tStdDevicemete.getCustomId());
                             warnInfo.setInstanceId(instanceId);

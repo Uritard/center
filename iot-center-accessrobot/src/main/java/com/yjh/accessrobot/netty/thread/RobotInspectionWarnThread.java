@@ -10,6 +10,7 @@ import com.yjh.accessrobot.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.accessrobot.common.mqtt.ftpsservice;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.TStdDeviceMete;
 import com.yjh.accessrobot.module.command.entity.TWarnInfo;
@@ -122,7 +123,7 @@ public class RobotInspectionWarnThread implements Runnable{
     private Long storeWarnInfo(TStdDeviceMete tStdDevicemete, Long instanceId, String taskId, String robotCode){
         try {
             TWarnInfo warnInfo = new TWarnInfo();
-            warnInfo.setWarnTime(new Date());
+            warnInfo.setWarnTime(DateTimeUtil.parse(warnResultMap.get("time")));
             warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
             warnInfo.setCunstomId(tStdDevicemete.getCustomId());
             warnInfo.setInstanceId(instanceId);
