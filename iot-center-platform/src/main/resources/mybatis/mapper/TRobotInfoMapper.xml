@@ -182,11 +182,11 @@
         <if test="lightIp != null ">a.light_ip = #{lightIp},</if>
         <if test="lightPort != null ">a.light_port = #{lightPort},</if>
         <if test="identityManager != null ">a.identity_manager = #{identityManager},</if>
-        <if test="identityCode != null ">a.identity_code = #{identityCode},</if>
+        <if test="identityCode != null and identityCode != '••••••'">a.identity_code = #{identityCode},</if>
         <if test="lnferadIp != null ">a.lnferad_IP = #{lnferadIp},</if>
         a.Inferad_Port = #{inferadPort, jdbcType=INTEGER},
         <if test="inferadUsername != null">a.Inferad_username = #{inferadUsername},</if>
-        <if test="inferadPassword != null ">a.Inferad_password = #{inferadPassword},</if>
+        <if test="inferadPassword != null and inferadPassword != '••••••'">a.Inferad_password = #{inferadPassword},</if>
         <if test="photePath != null ">a.phote_path = #{photePath},</if>
         <if test="createBy != null">a.create_by = #{createBy},</if>
         <if test="createDate != null">a.create_date = #{createDate, jdbcType=TIMESTAMP},</if>
@@ -280,11 +280,11 @@
         a.light_ip,
         a.light_port,
         a.identity_manager,
-        a.identity_code,
+        IF(IFNULL(a.identity_code, '') = '', a.identity_code, '••••••') AS identity_code,
         a.lnferad_IP,
         a.Inferad_Port,
         a.Inferad_username,
-        a.Inferad_password,
+        IF(IFNULL(a.Inferad_password, '') = '', a.Inferad_password, '••••••') AS Inferad_password,
         a.phote_path,
         a.create_by,
         a.create_date,
@@ -363,11 +363,11 @@
         a.light_ip,
         a.light_port,
         a.identity_manager,
-        a.identity_code,
+        IF(IFNULL(a.identity_code, '') = '', a.identity_code, '••••••') AS identity_code,
         a.lnferad_IP,
         a.Inferad_Port,
         a.Inferad_username,
-        a.Inferad_password,
+        IF(IFNULL(a.Inferad_password, '') = '', a.Inferad_password, '••••••') AS Inferad_password,
         a.phote_path,
         a.create_by,
         a.create_date,
@@ -439,11 +439,11 @@
         a.light_ip,
         a.light_port,
         a.identity_manager,
-        a.identity_code,
+        IF(IFNULL(a.identity_code, '') = '', a.identity_code, '••••••') AS identity_code,
         a.lnferad_IP,
         a.Inferad_Port,
         a.Inferad_username,
-        a.Inferad_password,
+        IF(IFNULL(a.Inferad_password, '') = '', a.Inferad_password, '••••••') AS Inferad_password,
         a.phote_path,
         a.create_by,
         a.create_date,

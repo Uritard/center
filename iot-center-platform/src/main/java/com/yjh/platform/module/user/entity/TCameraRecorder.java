@@ -74,7 +74,6 @@ public class TCameraRecorder implements Serializable {
      @TableField(value = "identity_manager",updateStrategy = FieldStrategy.IGNORED)
     private String identityManager;
 
-    @Length(max = 50,message = "pwd长度必须小于等于50")
     @ApiModelProperty(value = "密码")
     @TableField(value = "identity_code",updateStrategy = FieldStrategy.IGNORED)
     private String identityCode;
@@ -111,4 +110,6 @@ public class TCameraRecorder implements Serializable {
      @TableField(value = "pms_id",updateStrategy = FieldStrategy.IGNORED)
     private String pmsId;
 
+    @ApiModelProperty(value = "秘钥标识符", hidden=true)
+    private String identifier;
 }

@@ -2,8 +2,10 @@ package com.yjh.platform.module.user.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.utils.HttpClientUtils;
+import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.user.dao.VideoIntercomDao;
 import com.yjh.platform.module.user.entity.VideoIntercom;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +28,7 @@ public class VideoIntercomService {
 
     public int insert(VideoIntercom videoIntercom)
     {
+        ModelDecodeUtil.decodeField(videoIntercom, "ownerCode");
         return videoIntercomDao.insert(videoIntercom);
     }
 
@@ -36,6 +39,8 @@ public class VideoIntercomService {
 
     public int update(VideoIntercom videoIntercom)
     {
+        ModelDecodeUtil.decodeField(videoIntercom, "ownerCode");
+
         return videoIntercomDao.update(videoIntercom);
     }
 

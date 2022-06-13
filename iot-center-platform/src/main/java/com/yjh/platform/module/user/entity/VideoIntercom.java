@@ -94,5 +94,6 @@ public class VideoIntercom implements Serializable {
     @ApiModelProperty(value = "在线状态 0 在在线  1 离线")
     private Integer state=0;
 
-
+    @ApiModelProperty(value = "秘钥标识符", hidden=true)
+    private String identifier;
 }

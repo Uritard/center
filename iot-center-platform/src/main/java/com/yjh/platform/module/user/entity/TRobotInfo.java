@@ -95,7 +95,6 @@ public class TRobotInfo implements Serializable {
     @TableField(value = "identity_manager", updateStrategy = FieldStrategy.IGNORED)
     private String identityManager;
 
-    @Length(max = 15, message = "lightPassword长度必须小于等于15")
     @ApiModelProperty(value = "可见光密码")
     @TableField(value = "identity_code", updateStrategy = FieldStrategy.IGNORED)
     private String identityCode;
@@ -115,7 +114,6 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "红外用户名")
     private String inferadUsername;
 
-    @Length(max = 15, message = "inferadPassword长度必须小于等于15")
     @TableField(value = "Inferad_password", updateStrategy = FieldStrategy.IGNORED)
     @ApiModelProperty(value = "红外密码")
     private String inferadPassword;
@@ -242,4 +240,7 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "离线次数")
     @TableField(value = "off_line_count",updateStrategy = FieldStrategy.IGNORED)
     private Long offLineCount;
+
+    @ApiModelProperty(value = "秘钥标识符", hidden=true)
+    private String identifier;
 }

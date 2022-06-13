@@ -62,7 +62,7 @@
         a.port,
         a.infread_port,
         a.camera_manager,
-        a.camera_code ,
+        IF(IFNULL(a.camera_code, '') = '', a.camera_code, '••••••') AS camera_code,
         a.is_control,
         a.latitude,
         a.longitude,
@@ -156,7 +156,7 @@
            <if test="port != null">a.port = #{port, jdbcType=INTEGER},</if>
            a.infread_port = #{infreadPort, jdbcType=INTEGER},
            <if test="cameraManager != null">a.camera_manager = #{cameraManager, jdbcType=VARCHAR},</if>
-           <if test="cameraCode != null">a.camera_code = #{cameraCode, jdbcType=VARCHAR},</if>
+           <if test="cameraCode != null and cameraCode != '••••••'">a.camera_code = #{cameraCode, jdbcType=VARCHAR},</if>
            <if test="cameraType != null">a.camera_type = #{cameraType, jdbcType=INTEGER},</if>
            <if test="isControl != null">a.is_control = #{isControl, jdbcType=INTEGER},</if>
            <if test="address != null ">a.address = #{address},</if>

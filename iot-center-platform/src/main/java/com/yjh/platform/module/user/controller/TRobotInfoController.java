@@ -21,11 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 /**
  * @author tt
@@ -65,9 +61,9 @@ public class TRobotInfoController {
                     result.setCode(ResultCodeEnum.CODE10104.getCode(), ResultCodeEnum.CODE10104.getName());
                 }
             }
-            if (tRobotInfo.getRobotPort() != null && !"".equals(tRobotInfo.getRobotPort())) {
-                String robotPort = tRobotInfo.getRobotPort().toString();
-                if (!robotPort.matches("^([1-9]|[1-9]\\d{1,3}|[1-6][0-5][0-5][0-3][0-5])$")) {
+            Integer robotPort = tRobotInfo.getRobotPort();
+            if (Objects.nonNull(robotPort)) {
+                if (robotPort < 1 || robotPort > 65535) {
                     result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
                 }
             }
@@ -126,6 +122,20 @@ public class TRobotInfoController {
                     result.setMessage(209, "机器人编码已存在，不可重复");
             }else {
                 Long userId = Long.valueOf(request.getHeader("userId"));
+
+                if (tRobotInfo.getRobotIp() != null && !"".equals(tRobotInfo.getRobotIp())) {
+                    String robotIp = tRobotInfo.getRobotIp();
+                    if (!robotIp.matches("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}")) {
+                        result.setCode(ResultCodeEnum.CODE10104.getCode(), ResultCodeEnum.CODE10104.getName());
+                    }
+                }
+                Integer robotPort = tRobotInfo.getRobotPort();
+                if (Objects.nonNull(robotPort)) {
+                    if (robotPort < 1 || robotPort > 65535) {
+                        result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
+                    }
+                }
+
                 result.setData(tRobotInfoService.update(tRobotInfo,userId));
                 //有变动 同步模型
                 String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";

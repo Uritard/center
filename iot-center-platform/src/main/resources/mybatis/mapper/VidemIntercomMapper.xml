@@ -35,7 +35,7 @@
         a.camera_name,
         a.camera_ip,
         a.owner,
-        a.owner_code,
+        IF(IFNULL(a.owner_code, '') = '', a.owner_code, '••••••') AS owner_code,
         a.channel_num,
         a.camera_type,
         a.up_region_id,
@@ -115,7 +115,7 @@
         <if test="cameraName != null">a.camera_name = #{cameraName},</if>
         <if test="cameraIp != null">a.camera_ip = #{cameraIp},</if>
         <if test="owner != null">a.owner = #{owner},</if>
-        <if test="ownerCode != null">a.owner_code = #{ownerCode},</if>
+        <if test="ownerCode != null and ownerCode != '••••••'">a.owner_code = #{ownerCode},</if>
         <if test="channelNum != null">a.channel_num = #{channelNum},</if>
         <if test="cameraType != null">a.camera_type = #{cameraType},</if>
         <if test="upRegionId != null">a.up_region_id = #{upRegionId},</if>

@@ -1,15 +1,12 @@
 package com.yjh.platform.module.user.service;
 
-import com.alibaba.fastjson.JSON;
-import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
-import io.swagger.models.auth.In;
-import org.apache.tomcat.jni.Thread;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -54,6 +51,10 @@ public class TRobotInfoService{
         tRobotInfo.setCreateBy(userName);
         tRobotInfo.setCreateDate(new Date());
         tRobotInfo.setRobotStatus("离线");
+
+        // 对加密口令进行解密
+        ModelDecodeUtil.decodeField(tRobotInfo, "identityCode", "inferadPassword");
+
         int res = this.tRobotInfoDao.insert(tRobotInfo);
         if (res > 0){
             Long robotId = tRobotInfoDao.selectRobotIdByCode(tRobotInfo.getRobotCode());
@@ -97,10 +98,14 @@ public class TRobotInfoService{
         tRobotInfo.setUpdateDate(new Date());
         TRobotInfo tRobotInfoPri = tRobotInfoDao.selectByPrimaryId(tRobotInfo.getRobotId());
 
+        // 对加密口令进行解密
+        ModelDecodeUtil.decodeField(tRobotInfo, "identityCode", "inferadPassword");
+
         int res = this.tRobotInfoDao.update(tRobotInfo);
         if (res > 0){
             redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
         }
+
         //判断修改前的robotCode是否存在管道连接(在线),若存在，则断开连接
         if (!tRobotInfoPri.getRobotCode().equals(tRobotInfo.getRobotCode()) && tRobotInfoPri.getRobotStatus().equals("在线")){
             HashMap<String,String> map = new HashMap<>();

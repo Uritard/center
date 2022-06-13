@@ -6,6 +6,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.quartz.KeepWatchJob;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
 import org.apache.commons.lang.RandomStringUtils;
@@ -85,6 +86,7 @@ public class TCameraInfoService {
 //        }
         Channel channel=acrossAddMonitor(tCameraInfo);
         tCameraInfo.setMonitorId(channel.getId());
+        ModelDecodeUtil.decodeField(tCameraInfo, "cameraCode");
         this.tCameraInfoDao.insert(tCameraInfo);
         return this.intoRedis();
     }
@@ -190,6 +192,7 @@ public class TCameraInfoService {
             log.error("监测点修改失败："+e);
             return 0;
         }finally {
+            ModelDecodeUtil.decodeField(tCameraInfo, "cameraCode");
             return this.tCameraInfoDao.update(tCameraInfo);
         }
 

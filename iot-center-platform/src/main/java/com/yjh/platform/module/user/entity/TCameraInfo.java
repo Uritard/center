@@ -137,4 +137,7 @@ public class TCameraInfo implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @TableField(value = "commission_date")
     private Date commissionDate;
+
+    @ApiModelProperty(value = "秘钥标识符", hidden=true)
+    private String identifier;
 }

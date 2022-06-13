@@ -44,7 +44,7 @@
 		a.trans_port,
 		a.rtsp_port,
 		a.identity_manager,
-        a.identity_code,
+        IF(IFNULL(a.identity_code, '') = '', a.identity_code, '••••••') AS identity_code,
         a.protocol_url,
         a.max_channel,
         a.hdd_size,
@@ -145,7 +145,7 @@
         <if test="transPort != null ">a.trans_port = #{transPort, jdbcType=INTEGER},</if>
         <if test="rtspPort != null ">a.rtsp_port = #{rtspPort, jdbcType=INTEGER},</if>
         <if test="identityManager != null ">a.identity_manager = #{identityManager},</if>
-        <if test="identityCode != null ">a.identity_code = #{identityCode},</if>
+        <if test="identityCode != null and identityCode != '••••••'">a.identity_code = #{identityCode},</if>
         <if test="protocolUrl != null ">a.protocol_url = #{protocolUrl},</if>
         a.max_channel = #{maxChannel, jdbcType=INTEGER},
         a.hdd_size = #{hddSize, jdbcType=INTEGER},

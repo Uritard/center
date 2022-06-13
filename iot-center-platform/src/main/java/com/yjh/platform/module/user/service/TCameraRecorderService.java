@@ -8,6 +8,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.user.dao.TCameraRecorderDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
@@ -51,6 +52,7 @@ public class TCameraRecorderService {
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCameraRecorder tCameraRecorder) {
+        ModelDecodeUtil.decodeField(tCameraRecorder, "identityCode");
         return this.tCameraRecorderDao.insert(tCameraRecorder);
     }
 
@@ -84,6 +86,7 @@ public class TCameraRecorderService {
         if (CollectionUtils.isNotEmpty(cameraList)) {
             cameraList.forEach(cameraId -> tCameraInfoService.stopStream(cameraId));
         }
+        ModelDecodeUtil.decodeField(tCameraRecorder, "identityCode");
         return this.tCameraRecorderDao.update(tCameraRecorder);
     }
 

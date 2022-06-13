@@ -1,5 +1,6 @@
 package com.yjh.platform.common.utils.smUtil;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
@@ -20,6 +21,7 @@ import java.util.Map;
  * @Description: TODO(国密SM2签名验签 / SM3报文摘要)
  */
 @Component
+@Slf4j
 public class Demo {
 
     // 国密规范测试用户ID
@@ -144,6 +146,15 @@ public class Demo {
             return new String(SM2Utils.decrypt(Util.hexToByte(priks), Util.hexToByte("04" + pCode)));
         }else {
             return  "";
+        }
+    }
+
+    public String decryptIdentifierNoExp(String pCode,String identifier) {
+        try {
+            return decryptIdentifier(pCode, identifier);
+        } catch (Exception e) {
+            log.error("解密失败，pCode: {}, identifier: {}", pCode, identifier);
+            return pCode;
         }
     }
 
