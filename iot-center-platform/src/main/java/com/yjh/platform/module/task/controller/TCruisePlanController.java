@@ -204,7 +204,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "分页查询操作模型(操作票)")
     @RequestMapping(value = "/selectTicketPlanPage", method = RequestMethod.POST)
-    @Logs(title = "查询操作票", content = "根据用户传递的参数分页查询操作票信息", logType = 1, authority = "1234")
+    @Logs(title = "查询操作票", content = "根据用户传递的参数分页查询操作票信息", logType = 1, authority = "1234,1235")
     public Result selectTicketPlanPage(@RequestBody Map<String, Object> ticketMap) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();

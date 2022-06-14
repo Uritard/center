@@ -232,7 +232,7 @@ public class TCruiseTaskService {
         log.info("robotCruiseList   :" +robotCruiseList);
         List<Long> robotTaskInstanceList = new ArrayList<>();
         //模板任务走上层定时任务逻辑
-        if(robotCruiseList.size() > 0 && Objects.isNull(tCruiseTask.getDateType())) {
+        if(robotCruiseList.size() > 0 && Objects.isNull(tCruiseTaskAdd.getPeriodId())) {
             List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
             List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
             log.info("robotCode   :" + robotCode);
