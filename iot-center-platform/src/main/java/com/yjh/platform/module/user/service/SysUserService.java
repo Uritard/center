@@ -417,6 +417,7 @@ public class SysUserService {
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                             return mapResult;
                         } else if (num + 1 > Integer.valueOf(loginNum.get("content"))) {
+                            redisTemplate.opsForValue().set("lockUser" + sysUserList.get(0).getUserId(), sysUserList.get(0));
                             SysUser user = new SysUser();
                             user.setState(2);
                             Date date = new Date();
@@ -427,6 +428,7 @@ public class SysUserService {
                             num = num + 1;
                             logsRecord.LoginLogsSend(request, "20", "用户锁定", userName + "账户已被锁定！", userName, String.valueOf(sysUserLogin.getUserId()), 1);
                             logsRecord.LoginLogsSend(request, "6", "登录", "用户账户有泄漏风险", userName, String.valueOf(sysUserLogin.getUserId()), 2);
+                            sendToWs(ip, userId, userName);
                             mapResult.put("errorCount", "账户已被锁定！");
                             mapResult.put("code", ResultCodeEnum.CODE10102.getCode());
                             mapResult.put("info", ResultCodeEnum.CODE10102.getName());
