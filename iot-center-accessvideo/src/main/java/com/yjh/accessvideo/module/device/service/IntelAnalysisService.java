@@ -343,7 +343,7 @@ public class IntelAnalysisService {
 
         String[] split = request.getAlgorithmPath().split("/");
         String targetNamePath =  split[split.length - 2] + "/" + split[split.length - 1];
-//        uploadFileToFtps(request.getAlgorithmPath(), "/" + targetNamePath, intelAnalysisFtpsConfig);
+        uploadFileToFtps(request.getAlgorithmPath(), "/" + targetNamePath, intelAnalysisFtpsConfig);
 
         param.put("algorithmPath", targetNamePath);
 
@@ -352,7 +352,7 @@ public class IntelAnalysisService {
 
         int code;
         try {
-            String result = postUrlParams(algorithmConfig.getAnalysisUrl(), testJson.toJSONString());
+            String result = postUrlParams(algorithmConfig.getUpdateUrl(), testJson.toJSONString());
             log.info("result==={}", result);
 
             if (StringUtils.isEmpty(result)){

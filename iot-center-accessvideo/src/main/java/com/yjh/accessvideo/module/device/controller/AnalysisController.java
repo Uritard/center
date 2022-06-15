@@ -328,7 +328,7 @@ public class AnalysisController {
         UpdateRequest request = new UpdateRequest()
                 .setRequestHostIp("192.168.1.66")
                 .setRequestHostPort("18715")
-                .setRequestId("test666")
+                .setRequestId(String.valueOf(UUID.randomUUID()))
                 .setAlgorithmPath(filePath);
         StaticContextAccessor.getBean(IntelAnalysisService.class).algorithmUpdate(request);
     }
