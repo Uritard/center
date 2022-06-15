@@ -41,6 +41,8 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
     private String websocketUrl;
     @Value("${stationCode}")
     private String stationCode;
+    @Value("${inspect.flag}")
+    private boolean inspectFlag;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -182,7 +184,12 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
              * 这些都是可见光的图片和一个声音
              * 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path
              * */
-            boolean flag = item.containsKey("file_path") && !item.containsKey("origin_file_result_path") && !item.containsKey("origin_file_path");
+            boolean flag;
+            if (inspectFlag) {
+                flag = item.containsKey("file_path") && !item.containsKey("origin_file_result_path") && !item.containsKey("origin_file_path");
+            }else {
+                flag = false;
+            }
             temporaryMap.put("temporaryOriginPath", temporaryOriginPath);
             temporaryMap.put("ftpFileName", ftpFileName);
             temporaryMap.put("flag", flag);

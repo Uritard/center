@@ -95,6 +95,8 @@ public class RobotService {
     private String sendCode;
     @Value("${stationCode}")
     private String stationCode;
+    @Value("${inspect.flag}")
+    private boolean flag;
 
     @Value("${other.webSocketUrl}")
     private String websocketUrl;
@@ -1066,8 +1068,8 @@ public class RobotService {
                 }else {
                     String taskId = robotTaskControlMap.get("taskId").toString();
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
-                    String taskPatrolledId = redisInfoMap.get("taskPatrolled_id");
-                    taskId = "1".equals(commandValue) ? taskId : taskPatrolledId;
+                    String tasSkPatrolledId = redisInfoMap.get("taskPatrolled_id");
+                    String code = flag ? "1".equals(commandValue) ? taskId : tasSkPatrolledId : taskId;
 //                    List<Map<String, Object>> itemList = new ArrayList<>();
 //                    Map<String, Object> itemMap = new HashMap<>(1);
 //                    itemMap.put("task_patrolled_id", taskPatrolledId);
@@ -1076,7 +1078,7 @@ public class RobotService {
                             .setType("41")
                             .setSendCode(sendCode)
                             .setReceiveCode(robotCode)
-                            .setCode(taskId)
+                            .setCode(code)
                             .setCommand(commandValue)
                             .setTime(DateTimeUtil.format(new Date()));
 //                            .setItems(itemList);
