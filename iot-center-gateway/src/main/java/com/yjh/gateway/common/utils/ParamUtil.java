@@ -16,15 +16,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.ServletInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,10 +40,10 @@ public class ParamUtil {
     private static Pattern paramPattern = Pattern.compile("[~!$%^&*+<>?\"{}();']+");
 
     public static Map<String, Object> getRequestParams(RequestContext ctx) {
-        String method = ctx.getRequest().getMethod();
+        String method = ctx.getRequest().getMethod().toUpperCase();
         String uri = ctx.getRequest().getRequestURI();
         //判断是POST请求还是GET请求（不同请求获取参数方式不同）
-        LinkedHashMap param = new LinkedHashMap<>();
+        Map<String, Object> param = new LinkedHashMap<>();
         try {
             if (uri.startsWith("/zuul")) {
                 byte[] requestByte = saveaIns(ctx.getRequest().getInputStream());
@@ -64,7 +65,7 @@ public class ParamUtil {
                 }
                 rewriteRequest(ctx, requestByte);
             } else {
-                if ("GET".equals(method.toUpperCase())) {
+                if ("GET".equals(method)) {
                     Map<String, List<String>> map = ctx.getRequestQueryParams();
                     if (!(Objects.isNull(map) || map.isEmpty())) {
                         param = Maps.newLinkedHashMap();
@@ -72,21 +73,39 @@ public class ParamUtil {
                             param.put(entry.getKey(), entry.getValue().get(0));
                         }
                     }
-                } else if ("POST".equals(method.toUpperCase()) || "PUT".equals(method.toUpperCase())) {
-                    try (InputStream inputStream = ctx.getRequest().getInputStream()) {
-                        String body = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
-                        logger.info("***************原始参数：{}***************", body);
-                        if (!"[]".equals(body) && StringUtils.isNotEmpty(body)) {
-                            param = JSONObject.parseObject(body, LinkedHashMap.class, Feature.OrderedField);
-                        }
-                        Map<String, List<String>> map = ctx.getRequestQueryParams();
-                        if (MapUtils.isNotEmpty(map)) {
-                            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+                } else if ("POST".equals(method) || "PUT".equals(method)) {
+                    String contentType = ctx.getRequest().getContentType();
+                    if(StringUtils.contains(contentType, "multipart/form-data")){
+                        Map<String, List<String>> parMap = ctx.getRequestQueryParams();
+                        if (MapUtils.isNotEmpty(parMap)) {
+                            for (Map.Entry<String, List<String>> entry : parMap.entrySet()) {
                                 param.put(entry.getKey(), entry.getValue().get(0));
                             }
                         }
-                    } catch (IOException e) {
-                        logger.error(e.getMessage(), e);
+
+                        MultipartResolver resolver = new CommonsMultipartResolver(ctx.getRequest().getServletContext());
+                        MultipartHttpServletRequest multipartRequest = resolver.resolveMultipart(ctx.getRequest());
+                        Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+                        for(Map.Entry<String, MultipartFile> entry : fileMap.entrySet()){
+                            MultipartFile mFile = entry.getValue();
+                            param.put(mFile.getName(), mFile.getOriginalFilename());
+                        }
+                    } else {
+                        try (InputStream inputStream = ctx.getRequest().getInputStream()) {
+                            String body = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+                            logger.info("***************原始参数：{}***************", body);
+                            if (!"[]".equals(body) && StringUtils.isNotEmpty(body)) {
+                                param = JSONObject.parseObject(body, LinkedHashMap.class, Feature.OrderedField);
+                            }
+                            Map<String, List<String>> map = ctx.getRequestQueryParams();
+                            if (MapUtils.isNotEmpty(map)) {
+                                for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+                                    param.put(entry.getKey(), entry.getValue().get(0));
+                                }
+                            }
+                        } catch (IOException e) {
+                            logger.error(e.getMessage(), e);
+                        }
                     }
                 }
             }
