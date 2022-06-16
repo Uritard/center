@@ -541,6 +541,7 @@ public class SysUserService {
 
     @Transactional(rollbackFor = Exception.class)
     public int userLogout(String userId, String token) {
+        log.info("用户退出登录， userId: {}, token: {}", userId, token);
         SysUser sysUserParams = new SysUser();
         sysUserParams.setLastLogin(new Date());
         long userIdLong = Long.valueOf(userId);

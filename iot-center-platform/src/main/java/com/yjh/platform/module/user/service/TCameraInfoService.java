@@ -106,8 +106,8 @@ public class TCameraInfoService {
             try {
                 Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
             }catch (Exception e){
-                log.error("调用vqd服务异常"+e);
-                return -2;
+                log.error("调用vqd服务异常", e);
+                // return -2;
             }
         }
         this.tCameraInfoDao.deleteByPrimaryId(cameraId);
@@ -129,8 +129,8 @@ public class TCameraInfoService {
                 try {
                     Constant.crossServerDelete(Constant.DIAGNOSE_CHANNEL_DELETE, channelMap);
                 }catch (Exception e){
-                    log.error("调用vqd服务异常"+e);
-                    return -2;
+                    log.error("调用vqd服务异常", e);
+                    // return -2;
                 }
             }
         }
@@ -189,7 +189,7 @@ public class TCameraInfoService {
                 tCameraInfo.setMonitorId(channel.getId());
             }
         }catch (Exception e){
-            log.error("监测点修改失败："+e);
+            log.error("监测点修改失败：", e);
             return 0;
         }finally {
             ModelDecodeUtil.decodeField(tCameraInfo, "cameraCode");
