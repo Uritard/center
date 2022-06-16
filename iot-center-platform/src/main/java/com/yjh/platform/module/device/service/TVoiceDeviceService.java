@@ -25,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ws.schild.jave.MultimediaInfo;
@@ -36,6 +38,8 @@ import java.nio.LongBuffer;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 
 /**
  * @author lqh
@@ -58,6 +62,8 @@ public class TVoiceDeviceService{
     private AudioDeviceManager audioDeviceManager;
     @Autowired
     private AudioDeviceFactory audioDeviceFactory;
+    @Autowired
+    private TVoiceAsyncService tVoiceAsyncService;
 
     private Logger log = LoggerFactory.getLogger(TVoiceDeviceService.class);
 
@@ -146,12 +152,11 @@ public class TVoiceDeviceService{
         Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
         List<VoiceDeviceAllInfoDetail> tVoiceDeviceList = tVoiceDeviceDao.selectByPage(voiceDeviceName,deviceType,list,upRegionId,
             voiceType, voiceModel, voiceFactory);
+        List<Future<VoiceDeviceAllInfoDetail>> futureList = new ArrayList<>();
         for(VoiceDeviceAllInfoDetail item:tVoiceDeviceList){
-            if(ping(item.getFtpUrl())){
-                item.setState("在线");
-            }else {
-                item.setState("离线");
-            }
+            // 异步线程执行判断声纹是否在线
+            futureList.add(tVoiceAsyncService.syncVoiceState(item));
+
             Map<String,String> isOpen = redisTemplate.opsForHash().entries("is_record_open_state:"+item.getVoiceDeviceId());
             if(isOpen != null && isOpen.size()>0){
                 item.setOpenState(isOpen.get("openState"));
@@ -159,6 +164,25 @@ public class TVoiceDeviceService{
                 item.setOpenState("关闭");
             }
         }
+
+        // 等待子线程执行完
+        try {
+            while (true) {
+                Thread.sleep(800);
+                boolean isAllDone = true;
+                for (Future<VoiceDeviceAllInfoDetail> future : futureList) {
+                    if (null == future || !future.isDone()) {
+                        isAllDone = false;
+                    }
+                }
+                if (isAllDone) {
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
+
         resultMap.put("count", page.getTotal());
         resultMap.put("list", tVoiceDeviceList);
         result.setData(resultMap);

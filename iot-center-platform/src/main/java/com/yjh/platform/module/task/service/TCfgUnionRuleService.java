@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,7 +86,9 @@ public class TCfgUnionRuleService{
                     String str = item.getRuleForShow();
                     TCfgMete tCfgMete = tCfgMeteDao.selectByPrimaryId(item1);
                     StringBuilder stringBuilder = new StringBuilder("id:");
-                    item.setRuleForShow(str.replace(stringBuilder.append(item1),tCfgMete.getMeteName()));
+                    if (Objects.nonNull(tCfgMete) && Objects.nonNull(str)) {
+                        item.setRuleForShow(str.replace(stringBuilder.append(item1), tCfgMete.getMeteName()));
+                    }
                 }
 
             }

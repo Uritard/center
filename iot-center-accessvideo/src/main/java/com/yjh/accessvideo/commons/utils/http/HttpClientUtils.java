@@ -31,7 +31,7 @@ import java.util.Map.Entry;
 public class HttpClientUtils {
 
     private static HttpClientUtils instance;
-
+    private static CloseableHttpClient client;
     private static final Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
 
     private HttpClientUtils() {
@@ -40,6 +40,7 @@ public class HttpClientUtils {
     public static synchronized HttpClientUtils getInstance() {
         if (instance == null) {
             instance = new HttpClientUtils();
+            client = HttpClients.createDefault();
         }
         return instance;
     }
@@ -145,7 +146,7 @@ public class HttpClientUtils {
     }
 
     public String getUrl(String url, String json) throws IOException {
-        CloseableHttpClient client = HttpClients.createDefault();
+        // CloseableHttpClient client = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(url);
         httpGet.addHeader("Content-type", "application/json;charset=utf-8");
         httpGet.setHeader("Accept", "application/json");
@@ -156,7 +157,7 @@ public class HttpClientUtils {
     }
 
     public String postUrl(String url, String json) throws IOException {
-        CloseableHttpClient client = HttpClients.createDefault();
+        // CloseableHttpClient client = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(url);
         httpPost.addHeader("Content-type", "application/json;charset=utf-8");
         httpPost.setHeader("Accept", "application/json");
@@ -168,6 +169,16 @@ public class HttpClientUtils {
 
     public CloseableHttpClient getHttpClient() {
         return HttpClients.createDefault();
+    }
+
+    public void close() {
+        try {
+            if (client != null) {
+                client.close();
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     private void closeHttpClient(CloseableHttpClient client) throws IOException {

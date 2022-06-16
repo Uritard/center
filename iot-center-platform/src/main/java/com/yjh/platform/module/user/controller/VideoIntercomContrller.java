@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author prozac.G
@@ -57,7 +55,7 @@ public class VideoIntercomContrller {
         return result;
     }
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除信息",content = "根据用户传递的参数删除信息",logType = 4,authority = "1234")
     public Result delete(@RequestParam(value = "videoIntercomId", required = true) Long videoIntercomId) {
         Result result = new Result();
@@ -77,7 +75,7 @@ public class VideoIntercomContrller {
     }
 
     @ApiOperation(value = "批量删除")
-    @RequestMapping(value = "/deleteVideoIntercom", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteVideoIntercom", method = RequestMethod.POST)
     @Logs(title = "批量删除信息",content = "根据用户传递的参数批量删除信息",logType = 4,authority = "1234")
     public Result deleteVideoIntercom(@RequestParam(value = "videoIntercomIdS", required = true) String videoIntercomIdS) {
         Result result = new Result();

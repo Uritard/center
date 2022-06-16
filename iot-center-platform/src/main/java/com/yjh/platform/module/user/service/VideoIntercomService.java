@@ -5,6 +5,7 @@ import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.user.dao.VideoIntercomDao;
 import com.yjh.platform.module.user.entity.VideoIntercom;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class VideoIntercomService {
 
     @Autowired
@@ -75,17 +78,8 @@ public class VideoIntercomService {
           {
 
               VideoIntercom videoIntercom=new VideoIntercom();
-              String url = videoUrl + "?videoIntercomId=" +  t.getVideoIntercomId();
-              String services = HttpClientUtils.getInstance().getUrl(url, null);
-              JSONObject jsonObject = JSONObject.parseObject(services);
-              String re =jsonObject.get("data").toString();
-              if (Integer.parseInt(re)==0)
-              {
-                  videoIntercom.setState(0);
-              }else
-              {
-                  videoIntercom.setState(1);
-              }
+              int state = videoState(videoIntercom.getVideoIntercomId());
+              videoIntercom.setState(state);
               videoIntercom.setVideoIntercomId(t.getVideoIntercomId());
               videoIntercom.setOwner(t.getOwner());
               videoIntercom.setAddress(t.getAddress());
@@ -106,12 +100,25 @@ public class VideoIntercomService {
               lists.add(videoIntercom);
 
           }
-      }catch (Exception e)
-      {
-          e.getMessage();
+      } catch (Exception e) {
+          log.error(e.getMessage(), e);
       }
       return lists;
 
       //return videoIntercomDao.selectByPage(cameraName,regionIdList);
    }
+
+    public int videoState(Long intercomId) {
+        int ret = 1;
+        try {
+            String url = videoUrl + "?videoIntercomId=" +  intercomId;
+            String services = HttpClientUtils.getInstance().getUrl(url, null);
+            JSONObject jsonObject = JSONObject.parseObject(services);
+            Integer res =jsonObject.getInteger("data");
+            ret = res == null ? 1 : res;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return ret;
+    }
 }

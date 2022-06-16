@@ -48,6 +48,8 @@ public class TSequentialConfService{
 
     @Value("${sequential.returnlinkage}")
     private String returnlinkageFile;
+    @Value("${sequential.fileCharset:GB2312}")
+    private String fileCharset;
     @Value("${sequential.cameraCapture}")
     private String cameraCapture;
     @Value("${sequential.picRec}")
@@ -383,7 +385,7 @@ public class TSequentialConfService{
                 }
 //                FileWriter fw = new FileWriter(txt, true);
                 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                        new FileOutputStream(txt,true), "UTF-8"));
+                        new FileOutputStream(txt,true), fileCharset));
                 bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间）!>\r\n");
                 bw.write("<DeviceInfo::设备状态>\r\n");
                 bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
@@ -455,7 +457,7 @@ public class TSequentialConfService{
             //BufferedWriter bw = new BufferedWriter(fw,"UTF-8");
             BufferedWriter bw = new BufferedWriter(
                     new OutputStreamWriter(
-                            new FileOutputStream(txt), "UTF-8"));
+                            new FileOutputStream(txt), fileCharset));
 
             bw.write("<!Entity=反向联动请求\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间)!>\r\n");
             bw.write("<DeviceInfo::控制状态信息>\r\n");
