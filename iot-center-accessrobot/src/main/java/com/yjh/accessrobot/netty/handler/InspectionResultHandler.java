@@ -141,6 +141,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         Map<String, Object> item = xmlBaseModel.getItems().get(0);
 
         try {
+            log.info("当前时间==={},格式化后的时间==={}", new Date(), threadLocal.get());
             String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + threadLocal.get() + "/" + item.get("task_code") + "/";
             String developRelativeUrl = relativeImgMap.get("content") + "/" + threadLocal.get() + "/" + item.get("task_code") + "/";
             // 可见光结果、红外fir、音频wav

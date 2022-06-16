@@ -52,8 +52,8 @@ public class ProcessResultToUpSystem{
      */
     @Async
     public XMLBaseModel alarmAndResultToUpSystem(String analyseType, Map<String, String> cruiseResultMap, Map<String, String> cruiseResult, String alarmLevel, TWarnInfo tWarnInfo){
-        log.info("cruiseResultMap==={}", cruiseResultMap);
-        log.info("cruiseResult==={}", cruiseResult);
+//        log.info("cruiseResultMap==={}", cruiseResultMap);
+//        log.info("cruiseResult==={}", cruiseResult);
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
         Map<String, Object> xmlItem = new HashMap<>(16);

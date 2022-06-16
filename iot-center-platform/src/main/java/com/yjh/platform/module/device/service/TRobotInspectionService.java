@@ -752,6 +752,11 @@ public class TRobotInspectionService {
         } else {
             re.put("stopFlag", "");
         }
+
+        // 机器人建站地图
+        String mapPath = tRobotInfoDao.selectMapPathByCode(robotCode);
+        re.put("mapPath", mapPath);
+
         return re;
     }
 

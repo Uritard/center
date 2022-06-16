@@ -127,7 +127,7 @@ public class FtpsUtil {
     public static void putFile(String filepath,
                                String remoteFilename,String host,int port,String key_pw,String username,String password) throws NoSuchAlgorithmException {
         try {
-            log.info("-------------------------------文件上传开始");
+            log.info("-------------------------------文件往{}:{}上传开始", host, port);
             File file = new File(filepath);
             try {
                 FileInputStream fis = new FileInputStream(file);

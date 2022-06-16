@@ -105,4 +105,6 @@ public interface TRobotInfoDao {
 
     //查询当前机器人执行当前巡视点时使用的有效工作摄像头类型
     String selectRobotRunningCamera(@Param(value = "robotId")Long robotId,@Param(value = "instanceId")Long instanceId);
+
+    String selectMapPathByCode(@Param(value = "robotCode") String robotCode);
 }

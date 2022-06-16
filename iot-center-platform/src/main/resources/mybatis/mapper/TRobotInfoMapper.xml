@@ -701,4 +701,10 @@
         a.instance_id = #{instanceId,jdbcType=BIGINT}
     AND b.robot_id = #{robotId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectMapPathByCode" resultType="java.lang.String">
+        select a.phote_path
+        FROM t_robot_info a
+        WHERE a.robot_code = #{robotCode,jdbcType=VARCHAR}
+    </select>
 </mapper>
