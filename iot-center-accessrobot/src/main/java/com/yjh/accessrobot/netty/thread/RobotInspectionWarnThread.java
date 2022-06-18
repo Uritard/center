@@ -64,11 +64,12 @@ public class RobotInspectionWarnThread implements Runnable{
                 throw new RuntimeException("机器人编码为空");
             }
 
-            Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + taskId);
+            String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+            Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId);
             for (String key : robotInfoKeys) {
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
                 if (Objects.equals(robotCode,redisInfoMap.get("robotCode"))
-                        && Objects.equals(taskId,redisInfoMap.get("taskId"))
+                        && Objects.equals(robotTaskId,redisInfoMap.get("taskId"))
                         && Objects.equals(warnResultMap.get("deviceId"),redisInfoMap.get("inspectionCode"))) {
                     Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
                     TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);

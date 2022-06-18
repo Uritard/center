@@ -4,6 +4,7 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
@@ -72,7 +73,11 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         cruiseResultMap.put("patrolDeviceCode", String.valueOf(item.get("patroldevice_code")));
         cruiseResultMap.put("robotCode",robotCode);
         cruiseResultMap.put("taskName",  String.valueOf(item.get("task_name")));
-        cruiseResultMap.put("taskCode",  String.valueOf(item.get("task_code")));
+        String taskCode = String.valueOf(item.get("task_code"));
+        // 通过机器人上报的任务id查询巡视主机上的任务id
+        String taskId = StaticContextAccessor.getBean(RobotService.class).selectRealTaskId(taskCode);
+        log.info("taskCode==={},taskId===={}", taskCode, taskId);
+        cruiseResultMap.put("taskCode",  taskId);
         cruiseResultMap.put("deviceName",  String.valueOf(item.get("device_name")));
         cruiseResultMap.put("deviceId",  String.valueOf(item.get("device_id")));
         // 2022过检 新增字段value_type 0:默认值类型 11:局放放电频次 12:局放信号峰值 13:局放信号均值
@@ -142,8 +147,8 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 
         try {
             log.info("当前时间==={},格式化后的时间==={}", new Date(), threadLocal.get());
-            String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + threadLocal.get() + "/" + item.get("task_code") + "/";
-            String developRelativeUrl = relativeImgMap.get("content") + "/" + threadLocal.get() + "/" + item.get("task_code") + "/";
+            String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + threadLocal.get() + "/" + cruiseResultMap.get("taskCode") + "/";
+            String developRelativeUrl = relativeImgMap.get("content") + "/" + threadLocal.get() + "/" + cruiseResultMap.get("taskCode") + "/";
             // 可见光结果、红外fir、音频wav
             String[] sArray = ftpFilePath.split("/");
             String ftpFileName = sArray[sArray.length - 1];
@@ -265,7 +270,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 
             // 只对红外和可见光进行二次分析判断是否产生告警
             isAlarmMap.put("robotCode", xmlBaseModel.getSendCode());
-            isAlarmMap.put("taskCode", String.valueOf(item.get("task_code")));
+            isAlarmMap.put("taskCode", cruiseResultMap.get("taskCode"));
             isAlarmMap.put("deviceId", String.valueOf(item.get("device_id")));
             isAlarmMap.put("value", String.valueOf(item.get("value")));
             isAlarmMap.put("absolutePath", cruiseResultMap.get("absolutePath"));

@@ -540,7 +540,7 @@ public class IntelAnalysisService {
                 defect.setX2(String.valueOf(item.getPos().get(0).getAreas().get(1).getX()));
                 defect.setY2(String.valueOf(item.getPos().get(0).getAreas().get(1).getY()));
                 DecimalFormat df =  new DecimalFormat("0%");
-                String confidence = df.format(Double.valueOf(item.getConf())).replace("%","");
+                String confidence = df.format(Double.valueOf(item.getConf()));
                 defect.setConfidence(confidence);
                 defect.setDesc(item.getDesc()+"(坐标位置 "+defect.getX1()+","+
                         defect.getY1()+","+

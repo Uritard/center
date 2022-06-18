@@ -140,6 +140,18 @@ public interface TRobotInfoDao {
      */
     String selectRealCodeByInstanceId(@Param(value = "instanceId") Long instanceId);
     /**
+     * 通过机器人上报的任务id查询巡视主机上的任务id
+     * @param robotTaskId 任务id
+     * @return String
+     */
+    String selectRealTaskId(@Param(value = "robotTaskId")String robotTaskId);
+    /**
+     * 通过巡视主机上的任务id查询机器人上报的任务id
+     * @param robotTaskId 任务id
+     * @return String
+     */
+    String selectTaskId(@Param(value = "robotTaskId") String robotTaskId);
+    /**
      * 根据任务id查询任务数据
      * @param taskId 任务id
      * @return TCruiseTask

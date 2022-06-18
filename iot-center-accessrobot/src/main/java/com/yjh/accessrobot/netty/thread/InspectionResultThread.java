@@ -193,7 +193,9 @@ public class InspectionResultThread implements Runnable{
                 Integer abnormal = abnormalNum;
                 Integer normal = normalNum;
 
-                Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + taskId);
+                String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+                log.info("robotTaskId==={}", robotTaskId);
+                Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId);
                 Map<String,String> tCruiseTaskResultMap = new HashMap<>(16);
                 // 上报结果的巡视点,即已经做过的点
                 List<Long> instanceIdList = Optional.ofNullable(Constant.flagMap.get(taskId)).orElse(new ArrayList<>());
@@ -201,7 +203,7 @@ public class InspectionResultThread implements Runnable{
                 for (String key : robotInfoKeys){
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
                     if (Objects.equals(robotCode, redisInfoMap.get("robotCode"))
-                            && Objects.equals(taskId, redisInfoMap.get("taskId"))
+                            && Objects.equals(robotTaskId, redisInfoMap.get("taskId"))
                             && Objects.equals(cruiseResultMap.get("deviceId"), redisInfoMap.get("inspectionCode"))) {
                         String instanceId = redisInfoMap.get("instanceId");
                         instanceIdList.add(Long.valueOf(instanceId));
@@ -250,7 +252,7 @@ public class InspectionResultThread implements Runnable{
                         tCruiseTaskResultMap.put("createtime", cruiseResultMap.get("time"));
                         tCruiseTaskResultMap.put("isWarn", "0");
                         redisTemplate.opsForHash().putAll("t_cruise_task_result:" + taskId + ":" + instanceId, tCruiseTaskResultMap);
-                        log.info("taskId为{}巡视点instanceId为{}的点位已更新redis");
+                        log.info("taskId为{}巡视点instanceId为{}的点位已更新redis",taskId,instanceId);
 
                         /*reanalysisResult(instanceId,tCruiseTaskResultMap,taskId,inspectionCode);*/
                         Map<String, Object> jasonMap = new HashMap<>(2);
@@ -308,7 +310,8 @@ public class InspectionResultThread implements Runnable{
             log.info("机器人任务为{}返回结果个数===={}", taskId, resultList.size());
 
             // 统计巡视主机下发给机器人的巡检点大小
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
+            String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + robotTaskId);
             String instanceList = redisInfoMap.get("instanceIdList");
             instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
             String[] instanceIdArray = instanceList.split(", ");

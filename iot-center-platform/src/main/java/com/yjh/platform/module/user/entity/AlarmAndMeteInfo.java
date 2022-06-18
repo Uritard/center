@@ -42,4 +42,17 @@ public class AlarmAndMeteInfo implements Serializable {
     private Long cruiseType;
     @ApiModelProperty(value = "数据来源-字典表")
     private String cruiseTypeName;
+    @ApiModelProperty(value = "部位名称")
+    private String customName;
+    @ApiModelProperty(value = "测点名称")
+    private String meteName;
+    @ApiModelProperty(value = "告警来源")
+    private Integer alarmSource;
+    @ApiModelProperty(value = "告警来源-字典表")
+    private String alarmSourceName;
+    @ApiModelProperty(value = "告警内容")
+    private String warnContent;
+    @ApiModelProperty(value = "告警时间")
+    private String warnTime;
+
 }

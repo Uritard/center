@@ -1067,30 +1067,36 @@ public class RobotService {
                     return result;
                 }else {
                     String taskId = robotTaskControlMap.get("taskId").toString();
-                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
+                    String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + robotTaskId);
                     String tasSkPatrolledId = redisInfoMap.get("taskPatrolled_id");
                     String code = flag ? "1".equals(commandValue) ? taskId : tasSkPatrolledId : taskId;
-//                    List<Map<String, Object>> itemList = new ArrayList<>();
-//                    Map<String, Object> itemMap = new HashMap<>(1);
-//                    itemMap.put("task_patrolled_id", taskPatrolledId);
-//                    itemList.add(itemMap);
-                    XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                            .setType("41")
-                            .setSendCode(sendCode)
-                            .setReceiveCode(robotCode)
-                            .setCode(code)
-                            .setCommand(commandValue)
-                            .setTime(DateTimeUtil.format(new Date()));
-//                            .setItems(itemList);
-                    String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-                    log.info("生成的任务控制xml是<start>{}<end>", xmlString);
+                    log.info("taskId=={},robotTaskId=={},tasSkPatrolledId=={},code=={}", taskId, robotTaskId, tasSkPatrolledId, code);
+                    if (Objects.nonNull(code)) {
+    //                    List<Map<String, Object>> itemList = new ArrayList<>();
+    //                    Map<String, Object> itemMap = new HashMap<>(1);
+    //                    itemMap.put("task_patrolled_id", taskPatrolledId);
+    //                    itemList.add(itemMap);
+                        XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                                .setType("41")
+                                .setSendCode(sendCode)
+                                .setReceiveCode(robotCode)
+                                .setCode(code)
+                                .setCommand(commandValue)
+                                .setTime(DateTimeUtil.format(new Date()));
+    //                            .setItems(itemList);
+                        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+                        log.info("生成的任务控制xml是<start>{}<end>", xmlString);
 
-                    RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
+                        RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
 
-                    if (Objects.equals("2", commandValue) || Objects.equals("4", commandValue)) {
-                        modifyTaskResult(taskId, Integer.valueOf(commandValue));
+                        if (Objects.equals("2", commandValue) || Objects.equals("4", commandValue)) {
+                            modifyTaskResult(code, Integer.valueOf(commandValue));
+                        }
+                        result.setMessage(200, "该机器人处于离线状态,没有成功将任务控制下发到机器人......");
+                    }else {
+                        log.info("机器人未上报任务状态信息,无法获取当前巡视任务id");
                     }
-                    result.setMessage(200,"该机器人处于离线状态,没有成功将任务控制下发到机器人......");
                 }
             }
         }
@@ -1181,6 +1187,7 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public void modifyTaskResult(String taskIdTemp, Integer taskStatus)  {
         // taskPatrolled_id格式： taskId_20220202020202
+        log.info("taskIdTemp==={}", taskIdTemp);
         String taskId = taskIdTemp.substring(0, taskIdTemp.length() - 15);
         List<TCruiseDataResult> tcdrList = new ArrayList<>();
         List<TCruiseTaskResultDetail> tctrdList = new ArrayList<>();
@@ -1311,6 +1318,13 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public String selectRealCodeByInstanceId(Long instanceId) {
         return tRobotInfoDao.selectRealCodeByInstanceId(instanceId);
+    }
+
+    public String selectRealTaskId(String robotTaskId){
+        return tRobotInfoDao.selectRealTaskId(robotTaskId);
+    }
+    public String selectTaskId(String robotTaskId){
+        return tRobotInfoDao.selectTaskId(robotTaskId);
     }
     @Transactional(rollbackFor = Exception.class)
     public TCruiseTask selectTCruiseTask(String taskId) {

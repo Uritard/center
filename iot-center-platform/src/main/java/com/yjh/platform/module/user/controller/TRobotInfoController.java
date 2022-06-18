@@ -4,22 +4,26 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.service.TRobotInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.auth.In;
+import org.omg.CORBA.PUBLIC_MEMBER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -37,6 +41,11 @@ public class TRobotInfoController {
     @Autowired
     private TStdRegionDao tStdRegionDao;
 
+    @Resource
+    private LogsRecord logsRecord;
+    @Autowired
+    private  SysUserService sysUserService;
+
     @Autowired
     private final TStdDeviceService tStdDeviceService;
 
@@ -49,7 +58,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
-    @Logs(title = "新增机器人信息",content = "根据用户传递的参数新增机器人信息",logType = 2,authority = "1234")
+//    @Logs(title = "新增机器人信息",content = "根据用户传递的参数新增机器人信息",logType = 2,authority = "1234")
     public Result insert(HttpServletRequest request, @Validated @RequestBody  TRobotInfo tRobotInfo) {
 
         Result result = new Result();
@@ -72,6 +81,12 @@ public class TRobotInfoController {
                 result.setMessage(209, "机器人编码已存在，不可重复");
             }else {
                 result.setData(tRobotInfoService.insert(tRobotInfo,userId));
+                String userName = selectUserName(userId);
+                if (Objects.isNull(tRobotInfo.getDroneType())){
+                    logsRecord.LoginLogsSend(request, "2", "新增机器人信息", "根据用户传递的参数新增机器人信息", userName, String.valueOf(userId), 1);
+                }else {
+                    logsRecord.LoginLogsSend(request, "2", "新增无人机信息", "根据用户传递的参数新增无人机信息", userName, String.valueOf(userId), 1);
+                }
                 //有变动 同步模型
                 String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
                 Constant.modelUpload(modelType);
@@ -87,15 +102,25 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "删除")
     @PostMapping(value = "/delete")
-    @Logs(title = "删除机器人信息",content = "根据用户传递的参数删除机器人信息",logType = 4,authority = "1234")
-    public Result delete(@RequestParam(value = "robotId", required = true) Long robotId) {
+//    @Logs(title = "删除机器人信息",content = "根据用户传递的参数删除机器人信息",logType = 4,authority = "1234")
+    public Result delete(@RequestParam(value = "robotId", required = true) Long robotId,HttpServletRequest request
+                         ) {
         Result result = new Result();
         try {
+            Long userId = Long.valueOf(request.getHeader("userId"));
+
+            TRobotInfo tRobotInfo = tRobotInfoService.selectByPrimaryId(robotId);
             int re = tRobotInfoService.deleteByPrimaryId(robotId);
             if(re == -1){
                 result.setCode(209,"此机器人下存在测点或巡视点");
             }else {
                 result.setData(re);
+                String userName = selectUserName(userId);
+                if (Objects.isNull(tRobotInfo.getDroneType())){
+                    logsRecord.LoginLogsSend(request, "4", "删除机器人信息", "根据用户传递的参数删除机器人信息", userName, String.valueOf(userId), 1);
+                }else {
+                    logsRecord.LoginLogsSend(request, "4", "删除无人机信息", "根据用户传递的参数删除无人机信息", userName, String.valueOf(userId), 1);
+                }
                 //有变动 同步模型
                 Constant.modelUpload(String.valueOf(re));
             }
@@ -112,7 +137,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "更新")
     @PostMapping(value = "/update")
-    @Logs(title = "修改机器人信息",content = "根据用户传递的参数修改机器人信息",logType = 3,authority = "1234")
+//    @Logs(title = "修改机器人信息",content = "根据用户传递的参数修改机器人信息",logType = 3,authority = "1234")
     public Result update(HttpServletRequest request,@Validated @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
@@ -137,6 +162,12 @@ public class TRobotInfoController {
                 }
 
                 result.setData(tRobotInfoService.update(tRobotInfo,userId));
+                String userName = selectUserName(userId);
+                if (Objects.isNull(tRobotInfo.getDroneType())){
+                    logsRecord.LoginLogsSend(request, "3", "修改机器人信息", "根据用户传递的参数修改机器人信息", userName, String.valueOf(userId), 1);
+                }else {
+                    logsRecord.LoginLogsSend(request, "3", "修改无人机信息", "根据用户传递的参数修改无人机信息", userName, String.valueOf(userId), 1);
+                }
                 //有变动 同步模型
                 String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
                 Constant.modelUpload(modelType);
@@ -351,5 +382,9 @@ public class TRobotInfoController {
             log.error("发生错误:", e);
         }
         return result;
+    }
+
+    public String selectUserName(Long userId){
+        return sysUserService.selectByPrimaryId(userId).getUserName();
     }
 }

@@ -103,6 +103,36 @@ public class ThreeDimensionalController {
         }
         return result;
     }
+    @ApiOperation(value = "三维交互-测点信息查看2")
+    @GetMapping(value = "/viewPointInfo")
+    public Result viewPointInfo (@RequestParam(value = "modelName") String modelName){
+        Result result = new Result();
+        try {
+            result.setData(threeDimensionalService.viewPointInfo(modelName));
+        }catch (BusinessException e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
+            log.error("三维交互-测点信息查看发生异常");
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("三维交互-测点信息查看发生错误");
+        }
+        return result;
+    }
+    @ApiOperation(value = "三维交互-告警信息查看")
+    @GetMapping(value = "/viewAlarmInfo")
+    public Result viewAlarmInfo (@RequestParam(value = "modelName") String modelName){
+        Result result = new Result();
+        try {
+            result.setData(threeDimensionalService.viewAlarmInfo(modelName));
+        }catch (BusinessException e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
+            log.error("三维交互-告警信息查看发生异常");
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("三维交互-告警信息查看发生错误");
+        }
+        return result;
+    }
     @ApiOperation(value = "三维交互-设备台账详情查看")
     @GetMapping(value = "/viewCameraInfo")
     @Logs(title = "三维设备台账详情查看",content = "设备台账详情查看",logType = 1)
@@ -116,6 +146,22 @@ public class ThreeDimensionalController {
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
             log.error("三维交互-设备台账详情查看发生错误");
+        }
+        return result;
+    }
+    @ApiOperation(value = "三维交互-设备台账信息查看")
+    @GetMapping(value = "/viewDeviceInfo")
+    @Logs(title = "设备台账信息查看",content = "设备台账信息",logType = 1)
+    public Result viewDeviceInfo (@RequestParam(value = "modelName") String modelName){
+        Result result = new Result();
+        try {
+            result.setData(threeDimensionalService.viewDeviceInfo(modelName));
+        }catch (BusinessException e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
+            log.error("三维交互-设备台账信息查看发生异常");
+        }catch (Exception e){
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("三维交互-设备台账信息查看发生错误");
         }
         return result;
     }

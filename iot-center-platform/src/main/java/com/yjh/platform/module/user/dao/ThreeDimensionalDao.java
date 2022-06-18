@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.dao;
 
+import com.yjh.platform.module.device.entity.TStdDeviceDetail;
 import com.yjh.platform.module.task.entity.StatisticalTools;
 import com.yjh.platform.module.task.entity.TCruisePlan;
 import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
@@ -31,6 +32,24 @@ public interface ThreeDimensionalDao {
      * @return AlarmAndMeteInfo
      */
     List<AlarmAndMeteInfo> viewPointInformation(@Param("modelName") String modelName);
+    /**
+     * 通过模型名称查找相关的点位信息
+     * @param modelName 模型名称
+     * @return AlarmAndMeteInfo
+     */
+    List<AlarmAndMeteInfo> viewPointInfo(@Param("modelName") String modelName);
+    /**
+     * 通过模型名称查找相关的告警信息
+     * @param modelName 模型名称
+     * @return AlarmAndMeteInfo
+     */
+    List<AlarmAndMeteInfo> viewAlarmInfo(@Param("modelName") String modelName);
+    /**
+     * 通过模型名称查找设备台账
+     * @param modelName 模型名称
+     * @return TStdDeviceDetail
+     */
+    TStdDeviceDetail viewDeviceInfo(@Param("modelName") String modelName);
     /**
      * 通过模型名称查找对应的设备id
      * @param modelName 模型名称

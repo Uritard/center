@@ -3,6 +3,7 @@ package com.yjh.accessrobot.netty.handler;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -49,7 +50,11 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
         String robotCode = xmlBaseModel.getSendCode();
         warnResultMap.put("robotCode", robotCode);
         warnResultMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
-        warnResultMap.put("taskCode", xmlBaseModel.getItems().get(0).get("task_code").toString());
+        String taskCode = xmlBaseModel.getItems().get(0).get("task_code").toString();
+        // 通过机器人上报的任务id查询巡视主机上的任务id
+        String taskId = StaticContextAccessor.getBean(RobotService.class).selectRealTaskId(taskCode);
+        log.info("taskCode==={},taskId===={}", taskCode, taskId);
+        warnResultMap.put("taskCode", taskId);
         warnResultMap.put("deviceName", xmlBaseModel.getItems().get(0).get("device_name").toString());
         warnResultMap.put("deviceId", xmlBaseModel.getItems().get(0).get("device_id").toString());
         warnResultMap.put("alarmLevel", xmlBaseModel.getItems().get(0).get("alarm_level").toString());

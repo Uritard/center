@@ -1038,7 +1038,7 @@ public class DataDealThread implements Runnable {
                                             defect.getX2()+","+
                                             defect.getY2()+";"+
                                             "置信度 "+ confidence
-                                            +"%)");
+                                            +")");
                                     defectList1.add(defect);
                                     i=i+6;
                                 }

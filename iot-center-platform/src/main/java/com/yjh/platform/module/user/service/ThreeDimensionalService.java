@@ -6,6 +6,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.module.device.entity.TStdDeviceDetail;
 import com.yjh.platform.module.task.entity.StatisticalTools;
 import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
@@ -98,6 +99,18 @@ public class ThreeDimensionalService {
     @Transactional(rollbackFor = Exception.class)
     public List<AlarmAndMeteInfo> viewPointInformation(String modelName){
         return threeDimensionalDao.viewPointInformation(modelName);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public List<AlarmAndMeteInfo> viewPointInfo(String modelName){
+        return threeDimensionalDao.viewPointInfo(modelName);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public List<AlarmAndMeteInfo> viewAlarmInfo(String modelName){
+        return threeDimensionalDao.viewAlarmInfo(modelName);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public TStdDeviceDetail viewDeviceInfo(String modelName){
+        return threeDimensionalDao.viewDeviceInfo(modelName);
     }
     @Transactional(rollbackFor = Exception.class)
     public List<CameraUnionDevice> viewCameraInfo(String modelName){
