@@ -2,26 +2,33 @@ package com.yjh.gateway.common.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.HashMap;
-
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author tt
  */
-@ServerEndpoint("/ws/{userId}")
+@ServerEndpoint("/ws/{userId}/{token}")
 @Component
 public class WebSocketServer {
 
-    private Logger log = LoggerFactory.getLogger(WebSocketServer.class);
+    private static Logger log = LoggerFactory.getLogger(WebSocketServer.class);
+
+    @Resource
+    private RedisTemplate redisTemplate;
+
     /**静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。*/
     private static int onlineCount = 0;
     /**concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。*/
@@ -31,6 +38,8 @@ public class WebSocketServer {
     private Session session;
     /**接收userId*/
     private String userId="";
+    /**接收tokenId*/
+    private String token="";
 
     //初始化类
     private final static WebSocketServer webSocketServer = new WebSocketServer();
@@ -41,26 +50,28 @@ public class WebSocketServer {
     /**
      * 连接建立成功调用的方法*/
     @OnOpen
-    public void onOpen(Session session,@PathParam("userId") String userId) {
+    public void onOpen(Session session, @PathParam("userId") String userId, @PathParam("token") String token) {
         this.session = session;
-        this.userId=userId;
-        if(webSocketMap.containsKey(userId)){
-            webSocketMap.remove(userId);
-            webSocketMap.put(userId,this);
+        this.userId = userId;
+        this.token = token;
+        String key = userId + "_" + token;
+        if(webSocketMap.containsKey(key)){
+            webSocketMap.remove(key);
+            webSocketMap.put(key,this);
             //加入set中
         }else{
-            webSocketMap.put(userId,this);
+            webSocketMap.put(key,this);
             //加入set中
             addOnlineCount();
             //在线数加1
         }
-
-        log.info("用户连接:"+userId+",当前在线人数为:" + getOnlineCount());
+        UserStatusChange.logIn(userId, token);
+        log.info("用户连接: {},当前在线人数为: {}", userId, getOnlineCount());
 
         try {
             sendMessage("连接成功");
         } catch (IOException e) {
-            log.error("用户:"+userId+",网络异常!!!!!!");
+            log.error("用户: {},网络异常!!!!!!", userId);
         }
     }
 
@@ -69,12 +80,13 @@ public class WebSocketServer {
      */
     @OnClose
     public void onClose() {
-        if(webSocketMap.containsKey(userId)){
-            webSocketMap.remove(userId);
+        if(webSocketMap.containsKey(userId + "_" + token)){
+            webSocketMap.remove(userId + "_" + token);
             //从set中删除
             subOnlineCount();
         }
-        log.info("用户退出:"+userId+",当前在线人数为:" + getOnlineCount());
+        UserStatusChange.logOut(userId, token);
+        log.info("用户退出: {},当前在线人数为: {}", userId, getOnlineCount());
     }
 
     /**
@@ -87,7 +99,8 @@ public class WebSocketServer {
         //可以群发消息
         //消息保存到数据库、redis
         if(StringUtils.isNotBlank(message)){
-            if("ping".equals(message)){
+            if(StringUtils.startsWith(message, "ping")){
+                UserStatusChange.logIn(userId, token);
                 return;
             }
             try {
@@ -104,7 +117,7 @@ public class WebSocketServer {
                     //否则不在这个服务器上，发送到mysql或者redis
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -117,7 +130,7 @@ public class WebSocketServer {
     @OnError
     public void onError(Session session, Throwable error) {
         log.error("用户错误:"+this.userId+",原因:"+error.getMessage());
-        error.printStackTrace();
+        log.error(error.getMessage(), error);
     }
     /**
      * 实现服务器主动推送
@@ -137,12 +150,22 @@ public class WebSocketServer {
     /**
      * 发送自定义消息
      * */
-    public static void sendInfo(String message,@PathParam("userId") String userId) throws IOException {
-        System.out.println("发送消息到:"+userId+"，报文:"+message);
-        if(StringUtils.isNotBlank(userId)&&webSocketMap.containsKey(userId)){
-            webSocketMap.get(userId).sendMessage(message);
-        }else{
-            System.out.println("用户"+userId+",不在线！");
+    public static void sendInfo(String message, @PathParam("userId") String uid) throws IOException {
+        log.info("发送消息到: {}，报文: {}", uid, message);
+        if(StringUtils.isNotBlank(uid)){
+            AtomicBoolean b = new AtomicBoolean(true);
+            String uidPre = uid + "_";
+            webSocketMap.forEach((k,v) ->{
+                if(StringUtils.startsWith(k, uidPre)){
+                    v.session.getAsyncRemote().sendText(message);
+                    b.set(false);
+                }
+            });
+            if(b.get()){
+                log.info("用户 {} 不在线！", uid);
+            }
+        } else {
+            log.info("用户 {} 不在线！", uid);
         }
     }
 
@@ -157,4 +180,5 @@ public class WebSocketServer {
     public static synchronized void subOnlineCount() {
         WebSocketServer.onlineCount--;
     }
+
 }

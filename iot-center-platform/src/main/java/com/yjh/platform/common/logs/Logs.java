@@ -20,4 +20,6 @@ public @interface Logs {
 
     String authority() default "";
 
+    String codeName() default "";
+
 }

@@ -89,8 +89,10 @@ public class TSysParamController {
     public Result update(@Validated @RequestBody TSysParam tSysParam, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Long userId = Long.valueOf(request.getHeader("userId"));
-            String secureVerify = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:secureVerify", "content"));
+            String userId = request.getHeader("userId");
+            /*Map<String, String> appKeymap = redisTemplate.opsForHash().entries("t_sys_param:secureVerify");
+            String secureVerify = appKeymap.get("content");
+            String ruleStr = appKeymap.get("remark");
             String[] secures = secureVerify.split(",");
             if (tSysParam.getParamCode().equals("cpuFreeMin")) {
                 for (String memory : secures) {
@@ -127,8 +129,11 @@ public class TSysParamController {
                     result.setCode(209, "当前用户无权限修改安全参数配置");
                     return result;
                 }
+            }*/
+            boolean verify = tSysParamService.secureVerify(tSysParam, userId, result);
+            if (verify){
+                result.setData(tSysParamService.update(tSysParam));
             }
-            result.setData(tSysParamService.update(tSysParam));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新系统参数异常:", e);

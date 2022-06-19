@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
@@ -21,6 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -40,6 +42,9 @@ public class TRobotInfoService{
     private RedisTemplate redisTemplate;
     @Autowired
     private TCameraInfoService tCameraInfoService;
+    @Autowired
+    private LogsRecord logsRecord;
+
     private String ROBOT_REMOVE_LINK =  "http://iot-center-accessrobot/robot/v1/removeLink?robotCode={robotCode}&robotId={robotId}";
 
     private Logger log = LoggerFactory.getLogger(TRobotInfoService.class);
@@ -64,13 +69,13 @@ public class TRobotInfoService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(Long robotId) {
-        {//机器人有测点或巡视点
-            List<Long> list = tRobotInfoDao.selectHaveIns(robotId);
-            if(list != null && list.size()>0){
-                return -1;
-            }
+    public int deleteByPrimaryId(Long robotId, HttpServletRequest request) {
+        //机器人有测点或巡视点
+        List<Long> list = tRobotInfoDao.selectHaveIns(robotId);
+        if(list != null && list.size()>0){
+            return -1;
         }
+
         TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
         int res = this.tRobotInfoDao.deleteByPrimaryId(robotId)
                 + this.tRobotInfoDao.deleteInstance(robotId)
@@ -87,7 +92,13 @@ public class TRobotInfoService{
             log.info("删除前的robotCode==="+map);
             sendPostRequest(ROBOT_REMOVE_LINK,map);
         }
-
+        if (request != null) {
+            String logName = "机器人";
+            if (tRobotInfo.getDroneType() != null) {
+                logName = "无人机";
+            }
+            logsRecord.LogsSend(request, "4", "删除" + logName + "信息", "根据用户传递的参数删除" + logName + "信息");
+        }
         return tRobotInfo.getDroneType() != null ? 5 : 3;
     }
 
@@ -364,7 +375,7 @@ public class TRobotInfoService{
         int i = 0;
         List<String> robotIdList= Arrays.asList(robotIds.split(","));
         for (String item: robotIdList) {
-            int j =this.deleteByPrimaryId(Long.valueOf(item));
+            int j =this.deleteByPrimaryId(Long.valueOf(item), null);
             if(j == -1){
                 return -1;
             }

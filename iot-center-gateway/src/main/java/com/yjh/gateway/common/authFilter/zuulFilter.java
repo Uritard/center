@@ -85,8 +85,9 @@ public class zuulFilter extends ZuulFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
         String url = request.getRequestURI();
-        log.info("tt-url: " + IPUtil.getRemoteIP(request));
-        ctx.getZuulRequestHeaders().put("HTTP_X_FORWARDED_FOR", IPUtil.getRemoteIP(request));
+        String remoteIp = IPUtil.getRemoteIP(request);
+        log.info("tt-url: {}", remoteIp);
+        ctx.getZuulRequestHeaders().put("HTTP_X_FORWARDED_FOR", remoteIp);
         if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")) {
             String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
             String token = request.getHeader("token") != null ? request.getHeader("token") : "";
@@ -99,12 +100,12 @@ public class zuulFilter extends ZuulFilter {
                     ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                     return false;
                 } else {
-                    Long expireTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "expireTime")));
+                    Long expireTime = Long.valueOf(appKeymap.get("expireTime"));
                     int logoutTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
                     if (System.currentTimeMillis() - expireTime > 60000 * logoutTime) {
                         log.error("token已失效===========================================================================");
-                        String userName = String.valueOf(redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName"));
-                        this.postUrl(token, IPUtil.getRemoteIP(request), userId, userName);
+                        String userName = appKeymap.get("userName");
+                        this.postUrl(token, remoteIp, userId, userName);
                         ctx.setSendZuulResponse(false);
                         ctx.setResponseStatusCode(HttpStatus.SC_USE_PROXY);
                         return false;

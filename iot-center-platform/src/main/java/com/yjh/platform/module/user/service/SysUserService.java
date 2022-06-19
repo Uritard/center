@@ -344,6 +344,7 @@ public class SysUserService {
                         mapAppKey.put("roleId", String.valueOf(sysUserLogin.getRoleId()));
                         mapAppKey.put("appKey", appKey);
                         mapAppKey.put("expireTime", String.valueOf(System.currentTimeMillis()));
+                        mapAppKey.put("remoteIp", ip);
                         redisTemplate.opsForHash().putAll("appKey:" + userId + ":" + appKey, mapAppKey);
                         if ("true".equals(isLogin)) {
                             Map<String, Object> mapUser = new HashMap<>();
@@ -360,6 +361,11 @@ public class SysUserService {
                     String key = Constant.account_lock_time.replace("userAccountID", userId);
                     Integer num = (Integer) redisTemplate.opsForValue().get(key);
                     if (sysUser.getState().intValue() == 2) {
+                        if (num == null) {
+                            // 特殊情况下 null 会为空
+                            num = Integer.valueOf(loginNum.get("content"));
+                            redisTemplate.opsForValue().set(key, num);
+                        }
                         String timeStr1 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         Date date = sdf.parse(timeStr1);

@@ -4,26 +4,21 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TRobotInfo;
-import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.service.TRobotInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
-import org.omg.CORBA.PUBLIC_MEMBER;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -41,11 +36,6 @@ public class TRobotInfoController {
     @Autowired
     private TStdRegionDao tStdRegionDao;
 
-    @Resource
-    private LogsRecord logsRecord;
-    @Autowired
-    private  SysUserService sysUserService;
-
     @Autowired
     private final TStdDeviceService tStdDeviceService;
 
@@ -58,7 +48,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
-//    @Logs(title = "新增机器人信息",content = "根据用户传递的参数新增机器人信息",logType = 2,authority = "1234")
+    @Logs(title = "新增机器人信息",content = "根据用户传递的参数新增机器人信息",logType = 2,authority = "1234", codeName="droneType")
     public Result insert(HttpServletRequest request, @Validated @RequestBody  TRobotInfo tRobotInfo) {
 
         Result result = new Result();
@@ -81,12 +71,6 @@ public class TRobotInfoController {
                 result.setMessage(209, "机器人编码已存在，不可重复");
             }else {
                 result.setData(tRobotInfoService.insert(tRobotInfo,userId));
-                String userName = selectUserName(userId);
-                if (Objects.isNull(tRobotInfo.getDroneType())){
-                    logsRecord.LoginLogsSend(request, "2", "新增机器人信息", "根据用户传递的参数新增机器人信息", userName, String.valueOf(userId), 1);
-                }else {
-                    logsRecord.LoginLogsSend(request, "2", "新增无人机信息", "根据用户传递的参数新增无人机信息", userName, String.valueOf(userId), 1);
-                }
                 //有变动 同步模型
                 String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
                 Constant.modelUpload(modelType);
@@ -102,25 +86,15 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "删除")
     @PostMapping(value = "/delete")
-//    @Logs(title = "删除机器人信息",content = "根据用户传递的参数删除机器人信息",logType = 4,authority = "1234")
-    public Result delete(@RequestParam(value = "robotId", required = true) Long robotId,HttpServletRequest request
-                         ) {
+    // @Logs(title = "删除机器人信息",content = "根据用户传递的参数删除机器人信息",logType = 4,authority = "1234", codeName="droneType")
+    public Result delete(@RequestParam(value = "robotId", required = true) Long robotId, HttpServletRequest request) {
         Result result = new Result();
         try {
-            Long userId = Long.valueOf(request.getHeader("userId"));
-
-            TRobotInfo tRobotInfo = tRobotInfoService.selectByPrimaryId(robotId);
-            int re = tRobotInfoService.deleteByPrimaryId(robotId);
+            int re = tRobotInfoService.deleteByPrimaryId(robotId, request);
             if(re == -1){
                 result.setCode(209,"此机器人下存在测点或巡视点");
             }else {
                 result.setData(re);
-                String userName = selectUserName(userId);
-                if (Objects.isNull(tRobotInfo.getDroneType())){
-                    logsRecord.LoginLogsSend(request, "4", "删除机器人信息", "根据用户传递的参数删除机器人信息", userName, String.valueOf(userId), 1);
-                }else {
-                    logsRecord.LoginLogsSend(request, "4", "删除无人机信息", "根据用户传递的参数删除无人机信息", userName, String.valueOf(userId), 1);
-                }
                 //有变动 同步模型
                 Constant.modelUpload(String.valueOf(re));
             }
@@ -137,7 +111,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "更新")
     @PostMapping(value = "/update")
-//    @Logs(title = "修改机器人信息",content = "根据用户传递的参数修改机器人信息",logType = 3,authority = "1234")
+    @Logs(title = "修改机器人信息",content = "根据用户传递的参数修改机器人信息",logType = 3,authority = "1234", codeName="droneType")
     public Result update(HttpServletRequest request,@Validated @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
@@ -162,12 +136,6 @@ public class TRobotInfoController {
                 }
 
                 result.setData(tRobotInfoService.update(tRobotInfo,userId));
-                String userName = selectUserName(userId);
-                if (Objects.isNull(tRobotInfo.getDroneType())){
-                    logsRecord.LoginLogsSend(request, "3", "修改机器人信息", "根据用户传递的参数修改机器人信息", userName, String.valueOf(userId), 1);
-                }else {
-                    logsRecord.LoginLogsSend(request, "3", "修改无人机信息", "根据用户传递的参数修改无人机信息", userName, String.valueOf(userId), 1);
-                }
                 //有变动 同步模型
                 String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
                 Constant.modelUpload(modelType);
@@ -184,7 +152,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "主键查询")
     @GetMapping(value = "/selectByPrimaryId")
-    @Logs(title = "查询机器人信息",content = "根据用户传递的参数查询机器人信息",logType = 1,authority = "1234")
+    @Logs(title = "查询巡检设备信息",content = "根据用户传递的参数查询巡检设备信息",logType = 1,authority = "1234")
     public Result selectByPrimaryId(@RequestParam(value = "robotId", required = true) Long robotId) {
         Result result = new Result();
         try {
@@ -199,7 +167,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "查询")
     @GetMapping(value = "/select")
-    @Logs(title = "查询机器人信息",content = "根据用户传递的参数查询机器人信息",logType = 1)
+    @Logs(title = "查询巡检设备信息",content = "根据用户传递的参数查询巡检设备信息",logType = 1)
     public Result select(@RequestParam(value = "robotId", required = false) Long robotId,
                          @RequestParam(value = "robotCode", required = false) String robotCode,
                          @RequestParam(value = "robotName", required = false) String robotName,
@@ -251,7 +219,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "分页模糊查询")
     @GetMapping(value = "/selectByPage")
-    @Logs(title = "查询机器人信息",content = "根据用户传递的参数分页查询机器人信息",logType = 1,authority = "1234")
+    @Logs(title = "查询机器人信息",content = "根据用户传递的参数分页查询机器人信息",logType = 1,authority = "1234", codeName="type")
     public Result selectByPage(@RequestParam(value = "robotName", required = false) String robotName,
                                 @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                                @RequestParam(value = "buildingUser", required = false) String buildingUser,
@@ -283,36 +251,36 @@ public class TRobotInfoController {
     }
     @ApiOperation(value = "从PMS系统同步机器人信息")
     @GetMapping(value = "/synchronizeFromPMS")
-    @Logs(title = "从PMS系统同步机器人信息",content = "从pms系统同步机器人信息",logType = 5,authority = "1234")
+    @Logs(title = "从PMS系统同步巡检设备信息",content = "从pms系统同步巡检设备信息",logType = 5,authority = "1234")
     public Result synchronizeFromPMS(@RequestParam(value = "robotCode") String robotCode,HttpServletRequest request) {
         Result result = new Result();
         try {
 //            Long userId = Long.valueOf(request.getHeader("userId"));
-            Long userId = 10l;
+            Long userId = 10L;
             result.setData(tRobotInfoService.synchronizeFromPMS(robotCode,userId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("从PMS系统同步机器人信息失败描述：" + e);
+            log.error("从PMS系统同步巡检设备信息失败描述：", e);
         }
         return result;
     }
     @ApiOperation(value = "批量插入")
     @PostMapping(value = "/batchInsert")
-    @Logs(title = "批量插入机器人信息",content = "根据用户传递的参数批量插入机器人信息",logType = 2)
+    @Logs(title = "批量插入巡检设备信息",content = "根据用户传递的参数批量插入巡检设备信息",logType = 2)
     public Result batchInsert(@RequestBody List<TRobotInfo> list) {
         Result result = new Result();
         try {
             result.setData(tRobotInfoService.batchInsert(list));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("批量插入失败：" + e);
+            log.error("批量插入失败：", e);
         }
         return result;
     }
 
     @ApiOperation(value = "查询所有机器人巡检点信息树 inspectionType: 1-巡检点 2-操作点")
     @GetMapping(value = "/selectInspectionTree")
-    @Logs(title = "查询所有机器人巡检点信息树",content = "根据用户传递的参数查询机器人巡检点树",logType = 1,authority = "1234")
+    @Logs(title = "查询所有机器人巡检点信息树",content = "根据用户传递的参数查询机器人巡检点树",logType = 1,authority = "1234", codeName="type")
     public Result selectInspectionTree(@RequestParam(value = "inspectionType", required = false) Integer inspectionType,
                                        @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                                        @RequestParam(value = "type", required = true) Integer type) {
@@ -329,7 +297,7 @@ public class TRobotInfoController {
 
     @ApiOperation(value = "批量删除")
     @PostMapping(value = "/batchDelete")
-    @Logs(title = "批量删除机器人信息",content = "根据用户传递的参数批量删除机器人信息",logType = 4)
+    @Logs(title = "批量删除巡检设备信息",content = "根据用户传递的参数批量删除巡检设备信息",logType = 4)
     public Result batchDelete(@RequestParam(value = "robotIds", required = true) String robotIds) {
         Result result = new Result();
         try {
@@ -351,9 +319,9 @@ public class TRobotInfoController {
         }
         return result;
     }
-    @ApiOperation(value = "从PMS系统同步机器人台账信息2")
+    @ApiOperation(value = "从PMS系统同步巡检设备台账信息2")
     @GetMapping(value = "/synchronizeFromPMS2")
-    @Logs(title = "从PMS系统同步机器人台账信息",content = "从pms系统同步机器人台账信息",logType = 5,authority = "1234")
+    @Logs(title = "从PMS系统同步机器人台账信息",content = "从pms系统同步巡检设备台账信息",logType = 5,authority = "1234")
     public Result synchronizeFromPMS2() {
         Result result = new Result();
         try {
@@ -382,9 +350,5 @@ public class TRobotInfoController {
             log.error("发生错误:", e);
         }
         return result;
-    }
-
-    public String selectUserName(Long userId){
-        return sysUserService.selectByPrimaryId(userId).getUserName();
     }
 }

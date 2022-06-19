@@ -1,10 +1,19 @@
 package com.yjh.platform.common.logs;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.parser.Feature;
+import com.google.common.collect.Maps;
+import com.netflix.zuul.context.RequestContext;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.IPUtil;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,15 +28,24 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * @Description
@@ -58,6 +76,8 @@ public class LogsAspect {
     @Around("selectAspect()")
     public Object checkSecurity(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Annotation[][] paramAnnotations = signature.getMethod().getParameterAnnotations();
+        Object[] args = joinPoint.getArgs();
         Logs annotation = signature.getMethod().getAnnotation(Logs.class);
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         StringBuilder content = new StringBuilder("");
@@ -77,7 +97,24 @@ public class LogsAspect {
         log.info("ttIp: "+ip);
         Object result = null;
         if (annotation != null) {
-            content.append(annotation.content());
+            String contentStr = annotation.content();
+            String title = annotation.title();
+            String codeName = annotation.codeName();
+            String replyStr = null;
+            if(StringUtils.isNotEmpty(codeName)){
+                JSONObject parameters = getRequestParams(request, args, paramAnnotations);
+                String kind = parameters.getString(codeName);
+                boolean isDrone = ("droneType".equals(codeName) && StringUtils.isNotEmpty(kind)) || ("type".equals(codeName) && "2".equals(kind));
+                if (isDrone) {
+                    replyStr = "无人机";
+                }
+                if (replyStr != null) {
+                    contentStr = contentStr.replace("机器人", replyStr);
+                    title = title.replace("机器人", replyStr);
+                }
+            }
+
+            content.append(contentStr);
             params.set("userId", userId);
             params.set("userName", userName);
             params.set("requestOrigin", request.getRequestURL());
@@ -125,7 +162,7 @@ public class LogsAspect {
 //                serviceId = logsConfig.getName();
                 params.set("logType", annotation.logType());
                 params.set("ip", ip);
-                params.set("title", annotation.title());
+                params.set("title", title);
                 params.set("state", 1);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
@@ -134,7 +171,7 @@ public class LogsAspect {
                 // 记录操作日志...谁..在什么时间..做了什么事情..
                 result = joinPoint.proceed();
                 params.set("content", content.toString());
-                if (!"修改系统用户数据".equals(annotation.title()) && !"删除系统用户数据".equals(annotation.title())) {
+                if (!"修改系统用户数据".equals(title) && !"删除系统用户数据".equals(title)) {
                     post(params);
                 }
                 return result;
@@ -192,4 +229,45 @@ public class LogsAspect {
             return "";
         }
     }
+
+    private JSONObject getRequestParams(HttpServletRequest request, Object[] args, Annotation[][] paramAnnotations) {
+        String method = request.getMethod().toUpperCase();
+        //判断是POST请求还是GET请求（不同请求获取参数方式不同）
+        JSONObject paramJson = new JSONObject();
+        try {
+            Map<String, String[]> map = request.getParameterMap();
+            if (!(Objects.isNull(map) || map.isEmpty())) {
+                for (Map.Entry<String, String[]> entry : map.entrySet()) {
+                    if(StringUtils.isNotEmpty(entry.getValue()[0])) {
+                        paramJson.put(entry.getKey(), entry.getValue()[0]);
+                    }
+                }
+            }
+            if(ArrayUtils.isEmpty(paramAnnotations)){
+                return paramJson;
+            }
+            int idx = -1;
+            outside:
+            for (int i = 0; i < paramAnnotations.length; i++) {
+                Annotation[] anns = paramAnnotations[i];
+                if(ArrayUtils.isEmpty(anns)){
+                    continue;
+                }
+                for (int j = 0; j < anns.length; j++) {
+                    Annotation annotation = anns[j];
+                    if(annotation instanceof RequestBody){
+                        idx = i;
+                        break outside;
+                    }
+                }
+            }
+            JSONObject bodyParams = (JSONObject)JSONObject.toJSON(args[idx]);
+            paramJson.putAll(bodyParams);
+
+        } catch (Exception e) {
+            log.error("***************getRequestParams throw Exception：***************", e);
+        }
+        return paramJson;
+    }
+
 }
