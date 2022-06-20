@@ -568,6 +568,21 @@ public class IntelAnalysisService {
             AlarmService alarmService= GetSpringUtil.getBean("alarmService");
             alarmService.PushMsg(alarmDetail);
             log.info("发送算法管理平台结束");
+        }else {
+            String value = response.getResultsList().get(0).getResults().get(0).getValue();
+            Map<String, Object> jasonMaps = new HashMap<>(16);
+            jasonMaps.put("type", "algorithmTest");
+            jasonMaps.put("value", value);
+            String json = JSON.toJSONString(jasonMaps);
+            log.info("发送给前端的消息：{}", json);
+
+            try {
+                postUrl(syncWebsocketUrl, json);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
         }
 
 

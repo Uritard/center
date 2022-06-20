@@ -452,6 +452,7 @@
         WHERE a.task_id = b.task_id
           and a.task_code = #{robotTaskId, jdbcType=VARCHAR}
         ORDER BY b.execute_time desc
+            LIMIT 1
     </select>
 
     <select id="selectTaskId" resultType="java.lang.String">
@@ -462,6 +463,7 @@
         WHERE a.task_id = b.task_id
           and a.task_id = #{robotTaskId, jdbcType=VARCHAR}
         ORDER BY b.execute_time desc
+            LIMIT 1
     </select>
     <!--查询机器人相关信息2-->
     <select id="selectTCruiseTask" parameterType="java.lang.String" resultType="com.yjh.accessrobot.module.command.entity.TCruiseTask">

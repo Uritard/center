@@ -308,7 +308,15 @@ public class AnalysisController {
         }
 
         analysis.setPicPath(picPath);
-        analysis.setAnalyseType(type);
+        if (Objects.equals("-1", type) && Objects.nonNull(instanceId)){
+            // 设备状态识别
+            String analyseType = analysisService.selectAnalyseType(instanceId);
+            analysis.setAnalyseType(analyseType);
+        }else {
+            // 缺陷和判别
+            analysis.setAnalyseType(type);
+        }
+
         analysis.setPicModelPath("");
         analysis.setIsAi(0);
         List<Analysis> analysisList = new ArrayList<>();
@@ -317,7 +325,11 @@ public class AnalysisController {
         analysisMap.put("list",analysisList);
         log.info("算法信息：    "+analysisMap);
         Constant.algorithmTestPicPath = picPath;
-        this.feignDefect(analysisMap);
+        if (Objects.equals("-1", type)){
+            feignAlgorithm(analysisMap);
+        }else{
+         this.feignDefect(analysisMap);
+        }
     }
 
     /**

@@ -294,6 +294,8 @@ public class TCruiseTaskService {
                                     }
                                     String dayOfWeek = StringUtils.join(Arrays.asList(dayOfWeekTemp), ",");
                                     robotTaskInfo.setCycleWeek(dayOfWeek);
+                                    String cycleMonth = "1,2,3,4,5,6,7,8,9,10,11,12";
+                                    robotTaskInfo.setCycleMonth(cycleMonth);
                                     String cycleExecuteTime = null;
                                     if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 10){
                                         cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";

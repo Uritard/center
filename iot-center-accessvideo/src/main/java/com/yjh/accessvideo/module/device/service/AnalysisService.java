@@ -165,5 +165,9 @@ public class AnalysisService {
         return "success";
     }
 
+    public String selectAnalyseType(Long instanceId){
+        return analyseDataOperateDao.selectAnalyseType(instanceId);
+    }
+
 }
 
