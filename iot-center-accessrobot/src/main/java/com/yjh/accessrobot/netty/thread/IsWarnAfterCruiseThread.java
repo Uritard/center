@@ -81,7 +81,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
                 for (String key : robotInfoKeys) {
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
                     if (Objects.equals(robotCode, redisInfoMap.get("robotCode"))
-                            && Objects.equals(taskId, redisInfoMap.get("taskId"))
+                            && Objects.equals(robotTaskId, redisInfoMap.get("taskId"))
                             && Objects.equals(threadMap.get("deviceId"), redisInfoMap.get("inspectionCode"))) {
                         Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
                         TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);

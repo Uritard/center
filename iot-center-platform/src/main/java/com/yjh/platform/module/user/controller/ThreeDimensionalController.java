@@ -207,6 +207,7 @@ public class ThreeDimensionalController {
             Map<String, Object> resultMap = new HashMap<>();
             Page page = PageHelper.startPage((int)planMap.getOrDefault("pageNum", 1), (int)planMap.getOrDefault("pageSize", 0),true,null,true);
             List<TCruisePlanCountByPage> list = threeDimensionalService.selectByPlanPage(planMap);
+            log.info("list==={}", list);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
