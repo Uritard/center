@@ -19,6 +19,7 @@ import com.yjh.accessvideo.threads.RecordFileThread;
 import com.yjh.accessvideo.threads.TranscodeThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
 import javafx.scene.input.DataFormat;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.openqa.selenium.By;
@@ -2390,6 +2391,8 @@ public class CameraConService {
                     fout.write(picBytes);
                     fout.close();
                     map.put("picPath", hotPicshow + newName + ".jpg");
+                    map.put("urlPath", hotPicshow + newName + ".jpg");
+                    map.put("absPath", picPath);
                     log.info("hotPicshow地址：" + hotPicshow + newName + ".jpg");
 
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -2398,13 +2401,25 @@ public class CameraConService {
                     String picString = ByteUtil.toHexString(picBytes);
                     //时间位置
                     assert date != null;
+                    int b = picString.indexOf(date);
+                    String hs = picString.substring(b - 8, b - 4);
+                    byte[] heightByte = ByteUtil.hex2byte(hs.getBytes());
+                    String ws = picString.substring(b - 4, b);
+                    byte[] widthByte = ByteUtil.hex2byte(ws.getBytes());
+                    //矩阵高度
+                    int height = ByteUtil.unintFrom2Bytes(heightByte, 0, true);
+                    log.info("矩阵高度 {} ", height);
+                    //矩阵宽度
+                    int width = ByteUtil.unintFrom2Bytes(widthByte, 0, true);
+                    log.info("矩阵宽度 {} ", width);
+
                     int a = picString.indexOf(date) + 28;
                     //拍摄时间之前的字节
                     String realPic = picString.substring(0, a);
                     //拍摄时间之前的字节长度
                     long size1 = ByteUtil.hex2byte(realPic.getBytes()).length;
                     //红外温度值点阵数据
-                    String dataStr = picString.substring(a, a + 2621440);
+                    String dataStr = picString.substring(a, a + (width * height * 8));
                     //红外温度值点阵数据长度
                     long size2 = ByteUtil.hex2byte(dataStr.getBytes()).length;
                     //起始位置
@@ -2424,18 +2439,6 @@ public class CameraConService {
                     map.put("dataPath", hotFirShow + newName + ".data");
                     log.info("hotFirShowdata地址：" + hotFirShow + newName + ".data");
 
-                    int b = picString.indexOf(date);
-                    String hs = picString.substring(b - 8, b - 4);
-                    byte[] heightByte = ByteUtil.hex2byte(hs.getBytes());
-                    String ws = picString.substring(b - 4, b);
-                    byte[] widthByte = ByteUtil.hex2byte(ws.getBytes());
-                    //矩阵高度
-                    int height = ByteUtil.unintFrom2Bytes(heightByte, 0, true);
-                    log.info("矩阵高度 {} ", height);
-                    //矩阵宽度
-                    int width = ByteUtil.unintFrom2Bytes(widthByte, 0, true);
-                    log.info("矩阵宽度 {} ", width);
-
                     String csvPath = hotFir + newName + ".csv";
                     log.info("hotFircsv地址：" + csvPath);
                     FileWriter fos = new FileWriter(csvPath);
@@ -2445,17 +2448,28 @@ public class CameraConService {
                     byte_array.write();
                     byte_array.read();
 
+                    float max = 0;
+                    float min = 0;
                     for (int i = 1; i <= width; i++) {
                         for (int j = 1; j <= height; j++) {
                             byte[] sourceData = byte_array.getPointer().getByteArray((i - 1) * width * 4 + (j - 1) * 4, 4);
                             int ss = sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
-                            fos.write(String.valueOf(Float.intBitsToFloat(ss)));
+                            float value = Float.intBitsToFloat(ss);
+                            max = max == 0 ? value : max;
+                            min = min == 0 ? value : min;
+                            max = Math.max(max, value);
+                            min = Math.min(min, value);
+                            fos.write(String.valueOf(value));
                             fos.write(",");
                         }
                         fos.append('\n');
                     }
+                    log.info("max {}", max);
+                    log.info("min {}", min);
                     fos.flush();
                     fos.close();
+                    DecimalFormat df = new DecimalFormat("##0.00");
+                    map.put("resultNum", df.format(max) + "," + df.format(min));
                     map.put("csvPath", hotFirShow + newName + ".csv");
                     log.info("hotFirShowcsv地址：" + hotFirShow + newName + ".csv");
                 } catch (IOException e) {

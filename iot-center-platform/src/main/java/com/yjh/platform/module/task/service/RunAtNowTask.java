@@ -612,6 +612,7 @@ public class RunAtNowTask implements Runnable{
                     String picPath = "";
                     String csvPath = "";
                     String dataPath = "";
+                    String resultNum = "";
                     TStdDeviceMete tStdDevicemete = tAlgorithmInfoDao.selectDeviceMete(item.getDeviceMeteId());
                     if(tCameraPreset != null){
                         //1.转到预置位
@@ -666,6 +667,7 @@ public class RunAtNowTask implements Runnable{
                                     picPath = (String) jsonForRe.get("picPath");
                                     csvPath = (String) jsonForRe.get("csvPath");
                                     dataPath = (String) jsonForRe.get("dataPath");
+                                    resultNum = (String) jsonForRe.get("resultNum");
                                     isOk = re.getMessage();
                                 }
 
@@ -764,6 +766,7 @@ public class RunAtNowTask implements Runnable{
 
                     }else {
                         if(item.getAnalyseType() != null || "on".equals(item.getIsAi()) || "on".equals(item.getIsJudge())){//配置了算法
+                            tCruiseDataResult.setResultNum(resultNum);
                             tCruiseDataResult.setPicpath(urlPath);
                             tCruiseDataResult.setOrigpic(absPath);
                             tCruiseTaskResultDetail.setCruiseStatus(253);

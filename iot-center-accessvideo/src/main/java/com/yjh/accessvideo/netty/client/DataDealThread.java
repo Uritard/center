@@ -158,7 +158,8 @@ public class DataDealThread implements Runnable {
                     log.info("读取到的redis：{}", JSON.toJSONString(cruiseResult));
                     String recognitionMode = cruiseResult.get("recognitionMode");
                     log.info("recognitionMode----识别模式 ：-------" + recognitionMode);
-
+                    boolean dltFlag = NumberUtils.toInt(cruiseResult.get("cruiseType")) == 230 &&
+                            Objects.nonNull(cruiseResult.get("resultNum")) && !Objects.equals("null", cruiseResult.get("resultNum"));
                     Map<String, String> cruiseResultMap = new HashMap<>();//修改redis的巡检点结果map
 
 
@@ -193,11 +194,16 @@ public class DataDealThread implements Runnable {
                                          (String)redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content"), (String)redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content"));
                                     log.info("表计识别图片-------------------------------"+analyseResultPic);
                                     log.info("缓存地址-----------------------"+redisName);
-                                    if("-1".equals(recognitionMode) || "-2".equals(recognitionMode)) {
-                                        log.info("双算法-第二算法图片生成-M");
-                                        redisTemplate.opsForHash().put(cruiseRedisName, "picpath", redisTemplate.opsForHash().get(cruiseRedisName, "picpath") + "," + analyseResultPic);
+
+                                    if (dltFlag){
+                                        log.info("dltFlag {}, dlt664抓图", dltFlag);
                                     }else {
-                                        redisTemplate.opsForHash().put(cruiseRedisName, "picpath", analyseResultPic);
+                                        if ("-1".equals(recognitionMode) || "-2".equals(recognitionMode)) {
+                                            log.info("双算法-第二算法图片生成-M");
+                                            redisTemplate.opsForHash().put(cruiseRedisName, "picpath", redisTemplate.opsForHash().get(cruiseRedisName, "picpath") + "," + analyseResultPic);
+                                        } else {
+                                            redisTemplate.opsForHash().put(cruiseRedisName, "picpath", analyseResultPic);
+                                        }
                                     }
                                 }
 
@@ -216,7 +222,12 @@ public class DataDealThread implements Runnable {
                                     tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
                                     tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
                                 } else {
-                                    String resultString = jsonObjectResult.getString("resultValue");
+                                    String resultString;
+                                    if (dltFlag) {
+                                        resultString = String.valueOf(cruiseResult.get("resultNum"));
+                                    } else {
+                                        resultString = jsonObjectResult.getString("resultValue");
+                                    }
                                     // 红外会返回两个温度(如：12.3,2.3),所以需要这样取值
                                     resultString = resultString.split(",")[0];
                                     if (resultString.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+")) {
