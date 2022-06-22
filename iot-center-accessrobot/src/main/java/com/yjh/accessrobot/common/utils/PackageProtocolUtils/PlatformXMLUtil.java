@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.common.utils.PackageProtocolUtils;
 
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -25,6 +26,7 @@ import java.util.*;
  * @author YC
  * @date 2020/11/13 - 16:02
  */
+@Slf4j
 public class PlatformXMLUtil {
 
     public static String XMLROOTNAME = "PatrolDevice";
@@ -108,7 +110,7 @@ public class PlatformXMLUtil {
                 }
             }
         }  catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return xmlBaseModel;
     }
@@ -164,7 +166,7 @@ public class PlatformXMLUtil {
         try {
             xmlString = formatXML(document);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         return xmlString;

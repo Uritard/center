@@ -32,7 +32,7 @@ public class AlarmService {
     private String nodeId;
 
     @Value("${mqtt.volt_level}")
-    private String voltLevel;
+    private int voltLevel;
     private AlarmMqttMsg alarmMqttMsg;
     private PostBodyMsg postBodyMsg;
     private void  getMessgerInfo() {

@@ -28,6 +28,7 @@ import com.yjh.accessvideo.netty.client.DataDealThread;
 import com.yjh.accessvideo.service.ftpsservice;
 import com.yjh.accessvideo.thread.TaskExecutePool;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -465,10 +466,10 @@ public class IntelAnalysisService {
             List<Different> differentList=new ArrayList<>();
             for (AnalyseResultItem item :response.getResultsList().get(0).getResults()){
                 Different different = new Different();
-                different.setX1(String.valueOf(item.getPos().get(0).getAreas().get(0).getX()));
-                different.setY1(String.valueOf(item.getPos().get(0).getAreas().get(0).getY()));
-                different.setX2(String.valueOf(item.getPos().get(0).getAreas().get(1).getX()));
-                different.setY2(String.valueOf(item.getPos().get(0).getAreas().get(1).getY()));
+                different.setX1((int)item.getPos().get(0).getAreas().get(0).getX());
+                different.setY1((int)item.getPos().get(0).getAreas().get(0).getY());
+                different.setX2((int)item.getPos().get(0).getAreas().get(1).getX());
+                different.setY2((int)item.getPos().get(0).getAreas().get(1).getY());
 
                 differentList.add(different);
             }
@@ -480,8 +481,8 @@ public class IntelAnalysisService {
             alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
             alarmDetail.setPic_diff_base(remoteBaseFilePath);
             alarmDetail.setPic_different(remotefilepath);
-            alarmDetail.setPic_height("1080");
-            alarmDetail.setPic_width("1920");
+            alarmDetail.setPic_height(1080);
+            alarmDetail.setPic_width(1920);
             log.info("判别消息：{}",alarmDetail);
 
             ftpsservice.uploadFile("原图",Constant.algorithmTestPicPath,remoteorigfilepath);
@@ -535,19 +536,20 @@ public class IntelAnalysisService {
             List<Defect> defectList1=new ArrayList<>();
             for (AnalyseResultItem item :response.getResultsList().get(0).getResults()){
                 Defect defect= new Defect();
-                defect.setX1(String.valueOf(item.getPos().get(0).getAreas().get(0).getX()));
-                defect.setY1(String.valueOf(item.getPos().get(0).getAreas().get(0).getY()));
-                defect.setX2(String.valueOf(item.getPos().get(0).getAreas().get(1).getX()));
-                defect.setY2(String.valueOf(item.getPos().get(0).getAreas().get(1).getY()));
-                DecimalFormat df =  new DecimalFormat("0%");
-                String confidence = df.format(Double.valueOf(item.getConf()));
+                defect.setX1((int)item.getPos().get(0).getAreas().get(0).getX());
+                defect.setY1((int)item.getPos().get(0).getAreas().get(0).getY());
+                defect.setX2((int)item.getPos().get(0).getAreas().get(1).getX());
+                defect.setY2((int)item.getPos().get(0).getAreas().get(1).getY());
+                // DecimalFormat df =  new DecimalFormat("0%");
+                // String confidence = df.format(Double.valueOf(item.getConf()));
+                int confidence = (int)item.getConf();
                 defect.setConfidence(confidence);
                 defect.setDesc(item.getDesc()+"(坐标位置 "+defect.getX1()+","+
                         defect.getY1()+","+
                         defect.getX2()+","+
                         defect.getY2()+";"+
                         "置信度 "+ confidence
-                        +")");
+                        +"%)");
                 defect.setType(item.getType());
                 defectList1.add(defect);
             }
@@ -558,8 +560,8 @@ public class IntelAnalysisService {
             alarmDetail.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
             alarmDetail.setPic_defect(remotefilepath);
-            alarmDetail.setPic_height("1080");
-            alarmDetail.setPic_width("1920");
+            alarmDetail.setPic_height(1080);
+            alarmDetail.setPic_width(1920);
             log.info("缺陷测试消息：{}",alarmDetail);
 
             ftpsservice.uploadFile("原图",Constant.algorithmTestPicPath,remoteorigfilepath);
@@ -744,14 +746,14 @@ public class IntelAnalysisService {
                     String value = Optional.ofNullable(result.getValue()).orElse("");
                     String type = Optional.ofNullable(result.getType()).orElse("");
                     String desc = Optional.ofNullable(result.getDesc()).orElse("");
-                    String conf = String.valueOf(result.getConf());
+                    int conf = (int)result.getConf();
                     targetPath = copyFileFromFtps(type, result.getResImageUrl());
                     if("1".equals(value)){
                         Defect defect = new Defect();
-                        defect.setX1(String.valueOf(result.getPos().get(0).getAreas().get(0).getX()));
-                        defect.setY1(String.valueOf(result.getPos().get(0).getAreas().get(0).getY()));
-                        defect.setX2(String.valueOf(result.getPos().get(0).getAreas().get(1).getX()));
-                        defect.setY2(String.valueOf(result.getPos().get(0).getAreas().get(1).getY()));
+                        defect.setX1((int)result.getPos().get(0).getAreas().get(0).getX());
+                        defect.setY1((int)result.getPos().get(0).getAreas().get(0).getY());
+                        defect.setX2((int)result.getPos().get(0).getAreas().get(1).getX());
+                        defect.setY2((int)result.getPos().get(0).getAreas().get(1).getY());
                         defect.setType(type);
                         defect.setDesc(desc);
                         defect.setConfidence(conf);

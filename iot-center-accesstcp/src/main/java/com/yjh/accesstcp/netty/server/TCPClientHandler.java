@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.netty.server;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -297,7 +298,8 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
         if (xmlRes.getSendCode() == null) {
             log.info("连接可能断了，等待重连.....");
         } else {
-            doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
+            MessageThread.doProcessMessage(xmlRes, sendSessionId, this, sendToUpSystemServices, redisTemplate);
+            // doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
         }
 
     }
@@ -395,7 +397,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             }else {
                 sendToUpSystemServices.sendResponse("251","3","200",null);
             }
-            log.info("==控制响应=="+re);
+            log.info("==控制响应== {}", JSON.toJSONString(re));
         }
         if("20001".equals(xmlBaseModel.getType())
            || "20002".equals(xmlBaseModel.getType())
@@ -417,7 +419,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             }else {
                 sendToUpSystemServices.sendResponse("251","3","200",null);
             }
-            log.info("==控制响应=="+re);
+            log.info("==控制响应== {}", JSON.toJSONString(re));
         }
         if ("41".equals(xmlBaseModel.getType())){
             log.info("--响应控制--");
@@ -439,7 +441,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             }else {
                 sendToUpSystemServices.sendResponse("251","4","200",items);
             }
-            log.info("==任务控制响应=="+re);
+            log.info("==任务控制响应== {}", JSON.toJSONString(re));
 
 
         }
@@ -530,7 +532,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                     }else {
                         sendToUpSystemServices.sendResponse("251","3","200",null);
                     }
-                    log.info("--响应任务下发--"+re);
+                    log.info("--响应任务下发-- {}", JSON.toJSONString(re));
                 }
 
             }
@@ -583,7 +585,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse("251","4","200",xmlItems);
                     }
-                    log.info("--联动任务响应--"+re);
+                    log.info("--联动任务响应-- {}", JSON.toJSONString(re));
                 }
 
             }
@@ -619,7 +621,7 @@ public class TCPClientHandler extends SimpleChannelInboundHandler<DatagramPacket
             robotMap.put("list",list);
             Result re = Constant.otherServer(robotMap,Constant.MAINTENANCE_URL);//platfrom设置
             Result re2 = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);//下发给机器人
-            log.info("--响应检修--"+re);
+            log.info("--响应检修-- {}", JSON.toJSONString(re));
             if(re == null){
                 sendToUpSystemServices.sendResponse("251","3","200",null);
             }else if(200 == re.getCode()){

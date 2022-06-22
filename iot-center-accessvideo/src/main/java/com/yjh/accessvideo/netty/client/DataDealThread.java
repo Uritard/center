@@ -957,15 +957,15 @@ public class DataDealThread implements Runnable {
                                 Different different= new Different();
                                 String[] re = resultinfo.split(",");
                                 if(re != null && re.length > 4){
-                                    different.setX1(re[1]);
-                                    different.setY1(re[2]);
-                                    different.setX2(re[3]);
-                                    different.setY2(re[4]);
+                                    different.setX1(NumberUtils.toInt(re[1]));
+                                    different.setY1(NumberUtils.toInt(re[2]));
+                                    different.setX2(NumberUtils.toInt(re[3]));
+                                    different.setY2(NumberUtils.toInt(re[4]));
                                 }else {
-                                    different.setX1(resultinfo);
-                                    different.setY1("0");
-                                    different.setX2("0");
-                                    different.setY2("0");
+                                    different.setX1(NumberUtils.toInt(resultinfo));
+                                    different.setY1(0);
+                                    different.setX2(0);
+                                    different.setY2(0);
                                 }
                                 defectList1.add(different);
                                 alarmDetail.setBay_name(nameMap.get("upRegionName"));
@@ -1036,20 +1036,21 @@ public class DataDealThread implements Runnable {
                                 List<Defect> defectList1=new ArrayList<>();
                                 for(int i=0;i<arr1.length;){
                                     Defect defect=new Defect();
-                                    defect.setX1(arr1[i+1]);
-                                    defect.setY1(arr1[i+2]);
-                                    defect.setX2(arr1[i+3]);
-                                    defect.setY2(arr1[i+4]);
+                                    defect.setX1(NumberUtils.toInt(arr1[i+1]));
+                                    defect.setY1(NumberUtils.toInt(arr1[i+2]));
+                                    defect.setX2(NumberUtils.toInt(arr1[i+3]));
+                                    defect.setY2(NumberUtils.toInt(arr1[i+4]));
                                     defect.setType(arr1[i]);
-                                    DecimalFormat df =  new DecimalFormat("0%");
-                                    String confidence = df.format(Double.valueOf(arr1[i+5]));
+                                    // DecimalFormat df =  new DecimalFormat("0%");
+                                    // String confidence = df.format(Double.valueOf(arr1[i+5]));
+                                    int confidence = (int)NumberUtils.toDouble(arr1[i+5]);
                                     defect.setConfidence(confidence);
                                     defect.setDesc(differenmap.get("defectContent")+"(坐标位置 "+defect.getX1()+","+
                                             defect.getY1()+","+
                                             defect.getX2()+","+
                                             defect.getY2()+";"+
                                             "置信度 "+ confidence
-                                            +")");
+                                            +"%)");
                                     defectList1.add(defect);
                                     i=i+6;
                                 }

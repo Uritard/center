@@ -193,10 +193,10 @@ public class AnalysisController {
 
             List<Different> defectList1=new ArrayList<>();
             Different different= new Different();
-            different.setX1("11");
-            different.setY1("11");
-            different.setX2("22");
-            different.setY2("22");
+            different.setX1(11);
+            different.setY1(11);
+            different.setX2(22);
+            different.setY2(22);
             defectList1.add(different);
             alarmDetail.setBay_name(bayName);
             alarmDetail.setDevice_name(devicename);
@@ -206,8 +206,8 @@ public class AnalysisController {
             alarmDetail.setPic_diff_base(remotebaseimagicpath);               //判别基准图路径
             alarmDetail.setPic_different(remotefilepath);               //判别告警图路径,判别结果图
             alarmDetail.setPic_defect("");
-            alarmDetail.setPic_height("1080");
-            alarmDetail.setPic_width("1920");
+            alarmDetail.setPic_height(1080);
+            alarmDetail.setPic_width(1920);
             alarmDetail.setDifferent(defectList1);
             log.info("判别消息：{}",alarmDetail);
             ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
@@ -235,7 +235,7 @@ public class AnalysisController {
                        @RequestParam(value = "原图", required = false) String origpicpath,
                        @RequestParam(value = "缺陷名称", required = false) String defectValue,
                        @RequestParam(value = "缺陷名称拼音首字母", required = false) String defectValueF,
-                       @RequestParam(value = "置信度", required = false) String confdence,
+                       @RequestParam(value = "置信度", required = false) int confdence,
                        @RequestParam(value = "缺陷结果图", required = false) String resultImagebak
     ) {
         try {
@@ -257,10 +257,10 @@ public class AnalysisController {
 
             List<Defect> defectList1=new ArrayList<>();
             Defect defect= new Defect();
-            defect.setX1("11");
-            defect.setY1("11");
-            defect.setX2("22");
-            defect.setY2("22");
+            defect.setX1(11);
+            defect.setY1(11);
+            defect.setX2(22);
+            defect.setY2(22);
             defect.setDesc(defectValue);
             defect.setConfidence(confdence);
             defect.setType(defectValueF);
@@ -272,8 +272,8 @@ public class AnalysisController {
             alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
             alarmDetail.setPic_defect(remotefilepath);
             alarmDetail.setDefect(defectList1);
-            alarmDetail.setPic_height("1080");
-            alarmDetail.setPic_width("1920");
+            alarmDetail.setPic_height(1080);
+            alarmDetail.setPic_width(1920);
             log.info("判别消息：{}",alarmDetail);
 
             ftpsservice.uploadFile("遥信告警",origpicpath,remoteorigfilepath);
