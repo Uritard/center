@@ -41,6 +41,20 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                     case "3": log.info("其它异常");break;
                     default: break;
                 }
+            }else if (resultMap.containsKey("device_file_path")){
+                //2022送检 模型同步指令
+                log.info("送检机器人收到模型指令了,这是机器人的响应");
+                // model file sync
+                String deviceFile = resultMap.get("device_file_path").toString();
+                log.info("模型同步的文件路径信息,deviceFile:{}", deviceFile);
+                if (StringUtils.isNotEmpty(deviceFile)) {
+                    Map<String, String> map = new HashMap<>(5);
+                    map.put("robotFile", "");
+                    map.put("deviceFile", deviceFile);
+                    map.put("propertyFile", "");
+                    map.put("robotCode", xmlBaseModel.getSendCode());
+                    robotService.addRobotFile(map);
+                }
             }
             return;
         } else if (resultMap.size() >= 2 && resultMap.containsKey("error_code")) {

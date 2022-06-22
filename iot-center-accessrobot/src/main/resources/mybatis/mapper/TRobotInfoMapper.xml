@@ -1208,4 +1208,22 @@
         from t_robot_info a
         where commission_date IS TRUE
     </select>
+    <select id="selectIsDrone" resultType="java.lang.String">
+        SELECT
+        a.drone_type
+        FROM
+        t_robot_info a
+        WHERE
+        robot_code = #{robotCode, jdbcType=VARCHAR}
+    </select>
+    <select id="selectMaterialId" resultType="java.lang.String">
+        SELECT
+        c.real_code
+        FROM
+        t_robot_inspection a
+        LEFT JOIN t_cruise_point_instance b ON a.inspection_id = b.cruise_id
+        LEFT JOIN t_std_device_attr c ON b.device_id = c.device_id
+        WHERE
+        a.inspection_code = #{deviceId, jdbcType=VARCHAR}
+    </select>
 </mapper>

@@ -124,7 +124,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         RobotServerHandler.send(cruiseResultProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
 
-        resultToUpSystem(xmlBaseModel);
+        resultToUpSystem(xmlBaseModel,robotCode);
 
 //        resultUpToStation(xmlBaseModel,robotCode);
     }
@@ -319,7 +319,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
      * @param xmlBaseModel xml格式的内容
      */
     @Async
-    public void resultToUpSystem(XMLBaseModel xmlBaseModel){
+    public void resultToUpSystem(XMLBaseModel xmlBaseModel, String robotCode){
         try {
             Map<String, Object> item = xmlBaseModel.getItems().get(0);
             // 这是机器人放在巡视主机ftps服务下的路径
@@ -328,6 +328,10 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             log.info("tagPath==={}", tagPath);
             String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/" + item.get("file_path");
             uploadFileToUpFtps(imgPath, "/" + tagPath, upFtpsConfig);
+            String materialId = robotService.selectMaterialId(String.valueOf(item.get("device_id")));
+            xmlBaseModel.getItems().get(0).put("material_id", materialId);
+            String dataType = robotService.selectIsDrone(robotCode) ? "0x03" : "0x02";
+            xmlBaseModel.getItems().get(0).put("data_type", dataType);
             xmlBaseModel.getItems().get(0).put("file_path", tagPath);
         }catch (Exception e){
             log.error(e.getMessage(), e);

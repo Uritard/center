@@ -364,6 +364,24 @@ public class RobotService {
     }
 
     /**
+     * 查询是否是无人机
+     * @return List<String>
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean selectIsDrone(String robotCode) {
+        return Objects.nonNull(tRobotInfoDao.selectIsDrone(robotCode));
+    }
+
+    /**
+     * 查询实物ID
+     * @return List<String>
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public String selectMaterialId(String deviceId) {
+        return tRobotInfoDao.selectMaterialId(deviceId);
+    }
+
+    /**
      * 处理机器人返回的模型文件
      * @param map 机器人返回的模型文件相关信息
      * @return void

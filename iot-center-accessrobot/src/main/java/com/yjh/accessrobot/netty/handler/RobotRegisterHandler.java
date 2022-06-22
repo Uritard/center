@@ -81,8 +81,10 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
         items.put("patroldevice_run_interval", patroldeviceRunInterval);
         //环境数据间隔 2022过检  weather interval 修改为 env_interval
         items.put("env_interval", envInterval);
-        //2022过检新增 无人机机巢运行数据间隔
-        items.put("nest_run_interval", nestRunInterval);
+        if (robotService.selectIsDrone(robotCode)) {
+            //2022过检新增 无人机机巢运行数据间隔
+            items.put("nest_run_interval", nestRunInterval);
+        }
 
         itemsList.add(items);
         XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()

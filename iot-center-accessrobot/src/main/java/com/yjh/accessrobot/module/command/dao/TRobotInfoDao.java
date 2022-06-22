@@ -66,6 +66,20 @@ public interface TRobotInfoDao {
      * @return List<String>
      */
     List<String> selectAllRobotCode();
+
+    /**
+     * 查询是否是无人机
+     * @param robotCode 设备编码
+     * @return 无人机类型
+     */
+    String selectIsDrone(String robotCode);
+
+    /**
+     * 查询实物ID
+     * @param deviceId 机器人测点id
+     * @return 实物ID
+     */
+    String selectMaterialId(String deviceId);
     /**
      * 查询所有在线的机器人
      * @return List<String>
