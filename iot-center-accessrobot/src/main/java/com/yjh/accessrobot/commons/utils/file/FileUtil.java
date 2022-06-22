@@ -104,7 +104,7 @@ public class FileUtil {
         }
     }
     public static boolean checkFileName(String fileName,String type){
-        String name = StringUtils.substringAfterLast(fileName,".").toUpperCase();
+        String name = StringUtils.substringAfterLast(fileName,".");
         if (name.equals(type)){
             return true;
         }

@@ -1063,7 +1063,10 @@ public class IntelAnalysisService {
     private Map<String, String> getDistinguishResult(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
                                                      JSONObject resultDataObject, String originPicPath, String type, String value, String devicePointId, Map<String, String> map) {
         String targetPath;
-        String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
+        String resImageUrl = result.getResImageUrl();
+        if (Objects.isNull(resImageUrl)) {
+             resImageUrl = resImageUrl.startsWith("/") ? resImageUrl.substring(1) : resImageUrl;
+        }
         /*.replaceAll(
         redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/", "")*/;
         try {

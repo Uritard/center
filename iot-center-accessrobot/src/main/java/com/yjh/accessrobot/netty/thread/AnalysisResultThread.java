@@ -130,7 +130,7 @@ public class AnalysisResultThread implements Runnable{
            log.error("往redis插入值错误：{}", e);
        }
 
-        if ( "on".equals(details.getIsAi())) {
+        if ( "on".equals(details.getIsAi()) || "on".equals(details.getIsJudge())) {
             // 配置了缺陷算法
 
             // 测点配置的算法类型

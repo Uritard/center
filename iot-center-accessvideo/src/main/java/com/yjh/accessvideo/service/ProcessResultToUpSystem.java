@@ -88,7 +88,8 @@ public class ProcessResultToUpSystem{
             xmlItem.put("file_type", fileType);
             xmlItem.put("recognition_type", recognitionType);
             // 根据相机id获取相机pms编码 （仿照机器人编码）
-            String cameraPmS = analyseDataOperateService.selectPMSByCameraId(Long.valueOf(cruiseResult.get("cameraId")));
+            Long cameraId = NumberUtils.toLong(cruiseResult.get("cameraId"));
+            String cameraPmS = analyseDataOperateService.selectPMSByCameraId(cameraId);
             String deviceMeteId = cruiseResult.get("device_mete_id");
             String taskId = cruiseResult.get("taskId");
             // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
