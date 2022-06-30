@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -39,6 +40,8 @@ public class YcTestController {
     RedisTemplate redisTemplate;
     @Autowired
     UpFtpsConfig upFtpsConfig;
+    private static ReentrantLock lock = new ReentrantLock();
+
 
     private String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
@@ -50,77 +53,93 @@ public class YcTestController {
     public void testMoNiZhuangZhi(@RequestParam(value = "filePath") String filePath,
                                   @RequestParam(value = "robotCode") String robotCode,
                                   @RequestParam(value = "taskName") String taskName,
-                                  @RequestParam(value = "deviceId") String deviceId,
+                                  @RequestParam(value = "deviceIds") String deviceIds,
                                   @RequestParam(value = "taskCode") String taskCode,
                                   @RequestParam(value = "sendCode") String sendCode,
+                                  @RequestParam(value = "recognitionType") String recognitionType,
                                   @RequestParam(value = "fileType") String fileType) {
 
         List<Map<String,Object>> Items = new ArrayList<>();
-        Map<String,Object> map = new HashMap<>(16);
-        map.put("robot_code", robotCode);// "E100-001"
-        map.put("task_name",taskName );// "ydf211220220506211313"
-        map.put("file_path", filePath);// 1/2022/05/07/e63496ffe63c444cb7725bffee5966a2/FIR/E100-00120220507143446_result.jpg
-        map.put("patroldevice_code", robotCode);// "E100-001"
-        map.put("device_id", deviceId);// "2B07D364183C4163AE664C361DF02B57"
-        map.put("patroldevice_name", robotCode);
-        map.put("task_code", taskCode);// "e63496ffe63c444cb7725bffee5966a2"
-        map.put("valid", "1");
-        map.put("device_name", "设备2-红外普测2");
-        map.put("unit", "℃");
-        map.put("recognition_type", "4");
-        map.put("file_type", fileType);// 2  3
-        map.put("value_type", "0");
-        map.put("value", "32.8");
-        map.put("value_unit", "32.86℃");
-        map.put("time", "2022-05-06 21:14:18");
-        map.put("rectangle", "");
-        map.put("task_patrolled_id", "e63496ffe63c444cb7725bffee5966a2_20220507143303");
-        Items.add(map);
+        String[] split = deviceIds.split(",");
+        for (int i = 0; i < split.length; i++) {
+            Map<String,Object> map = new HashMap<>(16);
+            map.put("robot_code", robotCode);// "E100-001"
+            map.put("task_name",taskName );// "ydf211220220506211313"
+            map.put("file_path", filePath);// 1/2022/05/07/e63496ffe63c444cb7725bffee5966a2/FIR/E100-00120220507143446_result.jpg
+            map.put("patroldevice_code", robotCode);// "E100-001"
+            map.put("device_id", split[i]);// "2B07D364183C4163AE664C361DF02B57"
+            map.put("patroldevice_name", robotCode);
+            map.put("task_code", taskCode);// "e63496ffe63c444cb7725bffee5966a2"
+            map.put("valid", "1");
+            map.put("device_name", "设备2-红外普测2");
+            map.put("unit", "℃");
+            map.put("recognition_type", recognitionType);
+            map.put("file_type", fileType);// 2  3
+            map.put("value_type", i);
+            map.put("value", "");
+            map.put("value_unit", "");
+            map.put("time", "2022-05-06 21:14:18");
+            map.put("rectangle", "");
+            map.put("task_patrolled_id", taskCode + "_20220507143303");
+            Items.add(map);
+        }
+
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(sendCode) // "192.168.1.15"
                 .setItems(Items);
 
-        Map<String, String> cruiseResultMap = new HashMap<>(16);
-        Map<String, Object> item = xmlBaseModel.getItems().get(0);
-        cruiseResultMap.put("patrolDeviceName", String.valueOf(item.get("patroldevice_name")));
-        cruiseResultMap.put("patrolDeviceCode", String.valueOf(item.get("patroldevice_code")));
-        cruiseResultMap.put("robotCode", xmlBaseModel.getSendCode());
-        cruiseResultMap.put("taskName", item.get("task_name").toString());
-        cruiseResultMap.put("taskCode", item.get("task_code").toString());
-        cruiseResultMap.put("deviceName", item.get("device_name").toString());
-        cruiseResultMap.put("deviceId", item.get("device_id").toString());
-        // 2022过检 新增字段value_type 0:默认值类型 11:局放放电频次 12:局放信号峰值 13:局放信号均值
-        cruiseResultMap.put("valueType", item.get("value_type").toString());
-        cruiseResultMap.put("value", item.get("value").toString());
-        cruiseResultMap.put("valueUnit", item.get("value_unit").toString());
-        cruiseResultMap.put("unit", item.get("unit").toString());
-        cruiseResultMap.put("time", item.get("time").toString());
-        cruiseResultMap.put("recognitionType", item.get("recognition_type").toString());
-        cruiseResultMap.put("fileType", item.get("file_type").toString());
-        cruiseResultMap.put("rectangle", item.get("rectangle").toString());
-        cruiseResultMap.put("taskPatrolledId", item.get("task_patrolled_id").toString());
-        if (Objects.nonNull(item.get("valid"))) {
-            cruiseResultMap.put("valid", item.get("valid").toString());
-        }
-        String ftpFilePath = item.get("file_path").toString();
-        Map<String, Object> mapsss =  resultFileHandler(xmlBaseModel, ftpFilePath, cruiseResultMap);
+        log.info("xmlBaseModel==={}", xmlBaseModel);
 
-        log.info("机器人巡视结果数据是：{}" , cruiseResultMap);
+        for (Map<String, Object> item : xmlBaseModel.getItems()) {
+            Map<String, String> cruiseResultMap = new HashMap<>(16);
+            cruiseResultMap.put("patrolDeviceName", String.valueOf(item.get("patroldevice_name")));
+            cruiseResultMap.put("patrolDeviceCode", String.valueOf(item.get("patroldevice_code")));
+            cruiseResultMap.put("robotCode", xmlBaseModel.getSendCode());
+            cruiseResultMap.put("taskName", item.get("task_name").toString());
+            cruiseResultMap.put("taskCode", item.get("task_code").toString());
+            cruiseResultMap.put("deviceName", item.get("device_name").toString());
+            cruiseResultMap.put("deviceId", item.get("device_id").toString());
+            // 2022过检 新增字段value_type 0:默认值类型 11:局放放电频次 12:局放信号峰值 13:局放信号均值
+            cruiseResultMap.put("valueType", item.get("value_type").toString());
+            cruiseResultMap.put("value", item.get("value").toString());
+            cruiseResultMap.put("valueUnit", item.get("value_unit").toString());
+            cruiseResultMap.put("unit", item.get("unit").toString());
+            cruiseResultMap.put("time", item.get("time").toString());
+            cruiseResultMap.put("recognitionType", item.get("recognition_type").toString());
+            cruiseResultMap.put("fileType", item.get("file_type").toString());
+            cruiseResultMap.put("rectangle", item.get("rectangle").toString());
+            cruiseResultMap.put("taskPatrolledId", item.get("task_patrolled_id").toString());
+            if (Objects.nonNull(item.get("valid"))) {
+                cruiseResultMap.put("valid", item.get("valid").toString());
+            }
+            String ftpFilePath = item.get("file_path").toString();
+            Map<String, Object> mapsss = resultFileHandler(xmlBaseModel, ftpFilePath, cruiseResultMap);
 
-        if (Boolean.TRUE.equals(mapsss.get("flag"))){
-            // Start AnalysisResultThread
-            String resultPath = String.valueOf(mapsss.get("temporaryOriginPath"));
-            String ftpFileName = String.valueOf(mapsss.get("ftpFileName"));
-            AnalysisResultThread analysisResultThread = new AnalysisResultThread(upFtpsConfig,cruiseResultMap, resultPath, ftpFileName, websocketUrl, redisTemplate);
-            TaskExecutePool.getInstance().execute(analysisResultThread);
-        }else {
-            // Start CruiseResultDealThread
-            InspectionResultThread cruiseResultDealThread = new InspectionResultThread(cruiseResultMap, redisTemplate, websocketUrl, true);
-            TaskExecutePool.getInstance().execute(cruiseResultDealThread);
+            log.info("机器人巡视结果数据是：{}", cruiseResultMap);
 
-            //非同源告警处理
-            NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap, redisTemplate, websocketUrl,1);
-            TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
+            lock.lock();
+            try {
+            if (Boolean.TRUE.equals(mapsss.get("flag"))) {
+                // Start AnalysisResultThread
+                String resultPath = String.valueOf(mapsss.get("temporaryOriginPath"));
+                String ftpFileName = String.valueOf(mapsss.get("ftpFileName"));
+                log.info("deviceID:{}===cruiseResultMap:{}", item.get("device_id"),cruiseResultMap);
+                AnalysisResultThread analysisResultThread = new AnalysisResultThread(upFtpsConfig, cruiseResultMap, resultPath, ftpFileName, websocketUrl, redisTemplate);
+                TaskExecutePool.getInstance().execute(analysisResultThread);
+            } else {
+                // Start CruiseResultDealThread
+                InspectionResultThread cruiseResultDealThread = new InspectionResultThread(cruiseResultMap, redisTemplate, websocketUrl, true);
+                TaskExecutePool.getInstance().execute(cruiseResultDealThread);
+
+                //非同源告警处理
+                NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap, redisTemplate, websocketUrl, 1);
+                TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
+            }
+            }catch (Exception e){
+                log.error(e.getMessage(), e);
+            }finally {
+                lock.unlock();
+            }
         }
     }
 

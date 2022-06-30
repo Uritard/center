@@ -65,10 +65,10 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 
         // Deal with robot task result data
         String robotCode = xmlBaseModel.getSendCode();
-        Map<String, String> cruiseResultMap = new HashMap<>(16);
-        Map<String, Object> item = xmlBaseModel.getItems().get(0);
-
-        // 2022过检 robot_name -> patroldevice_name
+//        Map<String, Object> item = xmlBaseModel.getItems().get(0);
+        for(Map<String, Object> item : xmlBaseModel.getItems()){
+            Map<String, String> cruiseResultMap = new HashMap<>(16);
+            // 2022过检 robot_name -> patroldevice_name
         cruiseResultMap.put("patrolDeviceName", String.valueOf(item.get("patroldevice_name")));
         cruiseResultMap.put("patrolDeviceCode", String.valueOf(item.get("patroldevice_code")));
         cruiseResultMap.put("robotCode",robotCode);
@@ -116,6 +116,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             //非同源告警处理
             NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap, redisTemplate, websocketUrl,1);
             TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
+        }
         }
 
 

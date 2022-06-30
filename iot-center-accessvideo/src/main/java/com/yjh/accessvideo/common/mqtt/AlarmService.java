@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class AlarmService {
@@ -59,7 +61,9 @@ public class AlarmService {
     public void PushMsg(Alarm alarm ){
         getMessgerInfo();
         System.out.println("cityname---:"+alarmMqttMsg.getCity_name());
-        alarmMqttMsg.setAlarm(alarm);
+        List<Alarm> alarmList = new ArrayList<>();
+        alarmList.add(alarm);
+        alarmMqttMsg.setAlarm(alarmList);
         final String MQTT_URL = "http://iot-center-platform/mqtt/postMqttMsg";
         ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
         postBodyMsg.setObject(alarmMqttMsg);

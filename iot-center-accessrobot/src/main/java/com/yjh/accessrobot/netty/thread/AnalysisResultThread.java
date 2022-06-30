@@ -118,6 +118,7 @@ public class AnalysisResultThread implements Runnable{
             tCruiseTaskResultMap.put("evaluationState", "257");
             tCruiseTaskResultMap.put("createtime", cruiseResultMap.get("time"));
             tCruiseTaskResultMap.put("isWarn", "0");
+            tCruiseTaskResultMap.put("cameraId", "40001");
             tCruiseTaskResultMap.put("taskId", taskId);
             tCruiseTaskResultMap.put("cruiseType", "228");
             tCruiseTaskResultMap.put("remark", "null");
