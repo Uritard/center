@@ -2,6 +2,9 @@ package com.yjh.accessrobot.common.mqtt.alarmMsgBody;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public class AlarmMqttMsg {
     String province_name;
@@ -11,6 +14,12 @@ public class AlarmMqttMsg {
     String section_ip;
     String node_id;
     String msg_type;
-    Alarm alarm;
+    List<Alarm> alarm;
 
+    public void addAlarm(Alarm alm){
+        if(alarm == null){
+            alarm = new ArrayList<>();
+        }
+        alarm.add(alm);
+    }
 }

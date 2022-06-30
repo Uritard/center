@@ -2,6 +2,7 @@ package com.yjh.accessvideo.common.mqtt.alarmMsgBody;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -15,4 +16,10 @@ public class AlarmMqttMsg {
     String msg_type;
     List<Alarm> alarm;
 
+    public void addAlarm(Alarm alm){
+        if(alarm == null){
+            alarm = new ArrayList<>();
+        }
+        alarm.add(alm);
+    }
 }

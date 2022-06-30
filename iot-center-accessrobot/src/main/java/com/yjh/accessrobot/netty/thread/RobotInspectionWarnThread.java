@@ -294,15 +294,15 @@ public class RobotInspectionWarnThread implements Runnable{
 
                 List<Defect> defectList=new ArrayList<>();
 
-                for (int i=0;i<0 ; i++) {//构建坐标
+                for (int i=0;i<1 ; i++) {//构建坐标
                     Defect defect=new Defect();
-                    defect.setX1("坐标1");
-                    defect.setY1("坐标2");
-                    defect.setX2("坐标3");
-                    defect.setY2("坐标4");
+                    defect.setX1(11);
+                    defect.setY1(22);
+                    defect.setX2(33);
+                    defect.setY2(44);
                     defect.setType("拼音缩写 例：wcaqm");
                     DecimalFormat df =  new DecimalFormat("0%");
-                    String confidence = df.format(0d);//置信度 0-100之间
+                    int confidence = 0;//置信度 0-100之间
                     defect.setConfidence(confidence);
                     // 描述 未穿工装(坐标位置 11,22,55,66;置信度 70%)
                     defect.setDesc("缺陷中文描述 例：未穿安全帽"+"(坐标位置 "+

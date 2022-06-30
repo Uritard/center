@@ -10,8 +10,8 @@ public class Alarm {
      String  device_name;
      String  point_name;
      String  time;
-     String  pic_width;
-     String  pic_height;
+     int  pic_width = 1920;
+     int  pic_height= 1080;
      String  pic_raw;
      String  pic_defect;
      String  pic_different;

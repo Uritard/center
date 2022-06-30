@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class Different {
-    String x1;
-    String y1;
-    String x2;
-    String y2;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
 }

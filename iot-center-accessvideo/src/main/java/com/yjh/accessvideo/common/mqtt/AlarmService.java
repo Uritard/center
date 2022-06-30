@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class AlarmService {
@@ -48,7 +47,7 @@ public class AlarmService {
         alarmMqttMsg.setSection_ip(sectionIP);
         alarmMqttMsg.setNode_id(nodeId);
         alarmMqttMsg.setVolt_level(voltLevel);
-
+        alarmMqttMsg.setAlarm(new ArrayList<>());
     }
     private String encode(String str){
         return new String(str.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8);
@@ -61,9 +60,7 @@ public class AlarmService {
     public void PushMsg(Alarm alarm ){
         getMessgerInfo();
         System.out.println("cityname---:"+alarmMqttMsg.getCity_name());
-        List<Alarm> alarmList = new ArrayList<>();
-        alarmList.add(alarm);
-        alarmMqttMsg.setAlarm(alarmList);
+        alarmMqttMsg.addAlarm(alarm);
         final String MQTT_URL = "http://iot-center-platform/mqtt/postMqttMsg";
         ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
         postBodyMsg.setObject(alarmMqttMsg);
