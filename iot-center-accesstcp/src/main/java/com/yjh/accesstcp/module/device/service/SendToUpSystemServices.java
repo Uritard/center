@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.service;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
@@ -243,6 +244,7 @@ public class SendToUpSystemServices {
         list.forEach(item->{
             item.put("station_code",stationCode);
             item.put("station_name", getStationName());
+            JSONArray jsonArray = new JSONArray();
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("device_code","");
             jsonObject.put("device_pos","");
@@ -274,7 +276,8 @@ public class SendToUpSystemServices {
             item.remove("preset_id");
             item.remove("robot_code");
             item.remove("inspection_id");
-            item.put("video_pos",jsonObject.toString());
+            jsonArray.add(jsonObject);
+            item.put("video_pos",jsonArray.toJSONString());
         });
         return CreateModeXMLUtil.createXmlFile(list,path,"device_model.xml","Device_Model");
     }

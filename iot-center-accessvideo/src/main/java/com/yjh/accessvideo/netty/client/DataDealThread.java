@@ -1043,7 +1043,7 @@ public class DataDealThread implements Runnable {
                                     defect.setType(arr1[i]);
                                     // DecimalFormat df =  new DecimalFormat("0%");
                                     // String confidence = df.format(Double.valueOf(arr1[i+5]));
-                                    int confidence = (int)NumberUtils.toDouble(arr1[i+5]);
+                                    int confidence = (int)(NumberUtils.toDouble(arr1[i+5]) * 100);
                                     defect.setConfidence(confidence);
                                     defect.setDesc(differenmap.get("defectContent")+"(坐标位置 "+defect.getX1()+","+
                                             defect.getY1()+","+

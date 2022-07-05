@@ -542,7 +542,7 @@ public class IntelAnalysisService {
                 defect.setY2((int)item.getPos().get(0).getAreas().get(1).getY());
                 // DecimalFormat df =  new DecimalFormat("0%");
                 // String confidence = df.format(Double.valueOf(item.getConf()));
-                int confidence = (int)item.getConf();
+                int confidence = (int)(item.getConf() * 100);
                 defect.setConfidence(confidence);
                 defect.setDesc(item.getDesc()+"(坐标位置 "+defect.getX1()+","+
                         defect.getY1()+","+
@@ -746,7 +746,7 @@ public class IntelAnalysisService {
                     String value = Optional.ofNullable(result.getValue()).orElse("");
                     String type = Optional.ofNullable(result.getType()).orElse("");
                     String desc = Optional.ofNullable(result.getDesc()).orElse("");
-                    int conf = (int)result.getConf();
+                    int conf = (int)(result.getConf() * 100);
                     targetPath = copyFileFromFtps(type, result.getResImageUrl());
                     if("1".equals(value)){
                         Defect defect = new Defect();
