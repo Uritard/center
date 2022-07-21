@@ -374,11 +374,11 @@ public class SendToUpSystemServices {
             maintenanceMap.put("enable","1");
             maintenanceMap.put("start_time",item.getStartTime());
             maintenanceMap.put("end_time",item.getEndTime());
-            maintenanceMap.put("device_level","3 ");
+            maintenanceMap.put("device_level",item.getDeviceLevel());
             maintenanceMap.put("device_list",item.getDeviceIds().toString().replace("[","")
                     .replace("]","")
                     .replace(" ",""));
-            maintenanceMap.put("coordinate_pixel","");
+            maintenanceMap.put("coordinate_pixel",item.getColocoordinatePixel());
             finalList.add(maintenanceMap);
         });
         return CreateModeXMLUtil.createXmlFile(finalList,path,"overhaularea_model.xml","Effect_Config");

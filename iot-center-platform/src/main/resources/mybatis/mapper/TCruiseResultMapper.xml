@@ -299,6 +299,8 @@
         <if test="meteType != -1 ">and k.mete_type = #{meteType, jdbcType=VARCHAR}</if>
 
         <if test="customId != -1 and customId != null">and m.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="isCheck != null and isCheck == 1"> and a.check_user is null</if>
+        <if test="isCheck != null and isCheck == 2"> and a.check_user is not null</if>
 
         and a.c_state != 239 and a.c_state != 241
         GROUP BY task_result_id

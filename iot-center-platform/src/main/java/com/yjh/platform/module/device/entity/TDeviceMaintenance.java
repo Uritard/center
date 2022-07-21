@@ -73,4 +73,8 @@ public class TDeviceMaintenance implements Serializable {
 
     private List<Long> deviceIdList;
 
+    private String coordinatePixel;
+
+    private String deviceLevel;
+
 }

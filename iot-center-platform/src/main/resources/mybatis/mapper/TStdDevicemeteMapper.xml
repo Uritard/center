@@ -89,7 +89,8 @@
             remark,
             state_zero,
             state_one,
-            alarm_state
+            alarm_state,
+            redundant_type
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
                 #{deviceId, jdbcType=BIGINT},
@@ -129,7 +130,8 @@
                 #{remark, jdbcType=VARCHAR},
                 #{stateZero, jdbcType=VARCHAR},
                 #{stateOne, jdbcType=VARCHAR},
-                #{alarmState, jdbcType=INTEGER}
+                #{alarmState, jdbcType=INTEGER},
+                #{redundantType, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -270,7 +272,7 @@
         a.state_zero = #{stateZero},
         a.state_one = #{stateOne},
         a.alarm_state = #{alarmState, jdbcType=INTEGER},
-
+        a.redundant_type = #{redundant_type},
     </set>
             where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </update>

@@ -106,7 +106,9 @@
             device_id,
             is_valid,
             maintenance_start,
-            maintenance_stop
+            maintenance_stop,
+        colocoordinate_pixel,
+        device_level
         )values
         <foreach collection="list" item="TDeviceMaintenance" separator=",">
             (
@@ -115,7 +117,9 @@
                 #{TDeviceMaintenance.deviceId, jdbcType=BIGINT},
                 #{TDeviceMaintenance.isValid, jdbcType=INTEGER},
                 #{TDeviceMaintenance.maintenanceStart, jdbcType=TIMESTAMP},
-                #{TDeviceMaintenance.maintenanceStop, jdbcType=TIMESTAMP}
+                #{TDeviceMaintenance.maintenanceStop, jdbcType=TIMESTAMP},
+                #{TDeviceMaintenance.coordinatePixel, jdbcType=VARCHAR},
+                #{TDeviceMaintenance.deviceLevel, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

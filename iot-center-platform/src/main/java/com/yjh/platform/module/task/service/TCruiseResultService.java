@@ -79,10 +79,10 @@ public class TCruiseResultService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TCruiseResultExpand> selectTaskByPage(String taskName,Integer cState, Integer cType,Integer deviceType,String startTime,String endTime,List<Long> deviceIdList,Integer meteType,String customId) {
+    public List<TCruiseResultExpand> selectTaskByPage(String taskName,Integer cState, Integer cType,Integer deviceType,String startTime,String endTime,List<Long> deviceIdList,Integer meteType,String customId,Integer isCheck) {
         List<TCruiseResultExpand> list =new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()){
-            list = tCruiseResultDao.selectTaskByPage(taskName,cState,cType,deviceType,startTime,endTime,deviceIdList,meteType,customId);
+            list = tCruiseResultDao.selectTaskByPage(taskName,cState,cType,deviceType,startTime,endTime,deviceIdList,meteType,customId,isCheck);
         }
         return list;
     }

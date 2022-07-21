@@ -63,11 +63,11 @@ public class TDeviceMaintenanceService{
             params.put("startTime",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
             params.put("endTime",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
             //目前只支持主设备
-            params.put("deviceLevel",2);
+            params.put("deviceLevel",tDeviceMaintenance.getDeviceLevel());
             //配置编码
             params.put("configCode", "");
             //检修区域坐标框
-            params.put("coordinatePixel", "");
+            params.put("coordinatePixel", tDeviceMaintenance.getCoordinatePixel());
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
         List<TDeviceMaintenance> addList = new ArrayList<>();
@@ -102,17 +102,18 @@ public class TDeviceMaintenanceService{
         //给机器人下发检修区域指令
         {
             List<Long> list = tDeviceMaintenanceDao.selectDeviceIds(maintenanceId);
+            TDeviceMaintenance tDeviceMaintenance = this.selectByPrimaryId(maintenanceId).get(0);
             List<String> deviceList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
             HashMap<String,Object> params = new HashMap<>();
             params.put("enable",0);
             params.put("deviceList",deviceList);
             params.put("startTime",sdf.format(new Date()));
             params.put("endTime",sdf.format(new Date()));
-            params.put("deviceLevel",2);
+            params.put("deviceLevel",tDeviceMaintenance.getDeviceLevel());
             //配置编码
             params.put("configCode", "");
             //检修区域坐标框
-            params.put("coordinatePixel", "");
+            params.put("coordinatePixel", tDeviceMaintenance.getCoordinatePixel());
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
         return this.tDeviceMaintenanceDao.deleteByPrimaryId(maintenanceId);

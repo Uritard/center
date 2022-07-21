@@ -44,7 +44,8 @@ public interface TCruiseResultDao {
                                                @Param(value = "endDate") String endDate,
                                                @Param(value = "list") List<Long> list,
                                                @Param(value = "meteType") Integer meteType,
-                                               @Param(value = "customId") String customId
+                                               @Param(value = "customId") String customId,
+                                               @Param(value = "isCheck") Integer isCheck
                                                );
     List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskResultId") String taskResultId,
                                                 @Param(value = "cruiseType") Integer cruiseType,

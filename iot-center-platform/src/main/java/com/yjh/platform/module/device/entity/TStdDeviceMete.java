@@ -193,4 +193,6 @@ public class TStdDeviceMete implements Serializable {
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
+
+    private String redundantType;
 }
