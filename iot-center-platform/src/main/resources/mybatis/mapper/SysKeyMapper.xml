@@ -57,4 +57,11 @@
             <include refid="Base_Column_List"/> from sys_key
     </select>
 
+    <insert id="insertUser" parameterType="java.lang.String">
+        insert into sys_unique_user(unique_user)values(#{uniqueUser, jdbcType=VARCHAR})
+    </insert>
+
+    <select id="countUser" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(id) from sys_unique_user where unique_user = #{uniqueUser, jdbcType=VARCHAR}
+    </select>
 </mapper>

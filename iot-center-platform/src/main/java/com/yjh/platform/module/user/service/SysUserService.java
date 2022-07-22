@@ -57,6 +57,8 @@ public class SysUserService {
     private SysUserBackUpDao SysUserBackUpDao;
     @Resource
     private LogsRecord logsRecord;
+    @Autowired
+    private SysKeyService sysKeyService;
 
 //    @Resource
 //    private RedisAndYxsjUtil redisAndYxsjUtil;
@@ -81,6 +83,10 @@ public class SysUserService {
         BeanUtils.copyProperties(sysUser, sysUserBackUp);
         sysUserBackUp.setVerfiCode(Demo.summary(JSONUtil.toJSONString(map)));
         SysUserBackUpDao.insert(sysUserBackUp);
+        // 用户唯一，删除后也不可创建同名用户
+        if ("true".equals(redisTemplate.opsForHash().get("t_sys_param:uniqueUser", "content"))) {
+            sysKeyService.insertUser(sysUser.getUserName());
+        }
         logsRecord.LoginLogsSend(request, "25", "数据备份", userName + "备份了" + sysUser.getUserName() + "用户信息", userName, String.valueOf(userIds), 1);
         logsRecord.LoginLogsSend(request, "17", "新增用户", userName + "用户新增了" + sysUser.getUserName() + "用户", userName, String.valueOf(userIds), 1);
         return total;

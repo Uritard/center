@@ -29,4 +29,8 @@ public interface SysKeyDao {
     List<SysKey> selectByUserId(@Param(value = "userId") Long userId);
 
     List<SysKey> selectAll();
+
+    int insertUser(String uniqueUser);
+
+    int countUser(String uniqueUser);
 }

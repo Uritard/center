@@ -7,6 +7,7 @@ package com.yjh.platform.module.user.service;
 import com.yjh.platform.common.logs.LogsRecord;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.user.dao.SysKeyDao;
 import com.yjh.platform.module.user.entity.SysKey;
@@ -32,17 +33,19 @@ import java.util.*;
  */
 @Service
 public class SysKeyService {
+    private static final Logger log = LoggerFactory.getLogger(SysKeyService.class);
+
     @Autowired
     private SysKeyDao sysKeyDao;
     @Autowired
     private Demo demo;
     @Resource
     private RedisTemplate redisTemplate;
-
     @Resource
     private LogsRecord logsRecord;
 
-    private static final Logger log = LoggerFactory.getLogger(SysKeyService.class);
+    private static final String MOTLEY_CODE = "eWlqaWFoZQ";
+
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysKey sysKey, HttpServletRequest request) throws IOException {
@@ -127,5 +130,16 @@ public class SysKeyService {
             }
         });
         return userKeyList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int insertUser(String userName) {
+        String uniqueUser = Demo.summary(MOTLEY_CODE + userName);
+        return sysKeyDao.insertUser(uniqueUser);
+    }
+
+    public int countUser(String userName) throws IOException {
+        String uniqueUser = Demo.summary(MOTLEY_CODE + userName);
+        return sysKeyDao.countUser(uniqueUser);
     }
 }

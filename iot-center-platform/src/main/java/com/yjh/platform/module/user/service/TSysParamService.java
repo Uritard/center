@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TSysParam;
 import com.yjh.platform.module.user.entity.Version;
@@ -27,6 +28,8 @@ public class TSysParamService{
     private TSysParamDao tSysParamDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private SysParamConfig sysParamConfig;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -56,15 +59,20 @@ public class TSysParamService{
         String secureVerify = appKeymap.get("content");
         String ruleStr = appKeymap.get("remark");
         // 判断开关是否打开
-        if (!"true".equals(secureVerify)) {
+        /*if (!"true".equals(secureVerify)) {
            return true;
+        }*/
+        String paramCode = tSysParam.getParamCode();
+        if ("secureVerify".equals(paramCode) && !"10001".equals(userId)) {
+            result.setCode(209, "仅系统默认管理员可修改[安全标记]");
+            return false;
         }
         // 获取用户名
         String userName = (String) redisTemplate.opsForHash().entries("userInfo:"+userId).get("userName");
         String[] rules = StringUtils.split(ruleStr, "\n");
         boolean verified = true;
         boolean  selfChecked = false;
-        String paramCode = tSysParam.getParamCode();
+
         outside:
         for (String rule : rules){
             // 解析用户匹配规则 manager:MemoryFreeMin,cpuFreeMin,DiskFreeMin,!loginKeepByWs
@@ -116,7 +124,7 @@ public class TSysParamService{
             }
         }
         if(!verified){
-            result.setCode(209, "当前用户无权限修改[" + tSysParam.getParamName()+"]");
+            result.setCode(209, "当前用户无权限修改[" + tSysParam.getParamName() + "]");
         }
         return verified;
     }
@@ -155,6 +163,8 @@ public class TSysParamService{
             String str = "t_sys_param:"+item.getParamCode();
             redisTemplate.opsForHash().putAll(str, map);
         }
+        log.info("load secure param to redis...");
+        sysParamConfig.putToRedis();
         return 1;
     }
 

@@ -403,6 +403,7 @@ public class SysUserController {
                 sysUser.setPassword(demo.decryptIdentifier(sysUser.getPassword(),sysUser.getIdentifier()));
                 redisTemplate.delete("pubk:" + sysUser.getIdentifier());
             }
+            boolean unicode = "true".equals(redisTemplate.opsForHash().get("t_sys_param:uniqueUser", "content"));
             if (sysUser.getUserName().contains("admin") || sysUser.getUserName().contains("administrator")) {
                 sendPost(request);
                 result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
@@ -418,6 +419,10 @@ public class SysUserController {
             } else if (!sysUser.getPassword().matches(PW_PATTERN)) {
                 sendPost(request);
                 result.setCode(ResultCodeEnum.CODE20017.getCode(), ResultCodeEnum.CODE20017.getName());
+                return result;
+            } else if (unicode && sysKeyService.countUser(sysUser.getUserName()) > 0) {
+                sendPost(request);
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "用户名重复");
                 return result;
             } else {
                 sysUserService.insert(sysUser,request);
