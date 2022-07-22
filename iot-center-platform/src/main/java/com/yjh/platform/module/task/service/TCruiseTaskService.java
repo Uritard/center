@@ -110,6 +110,8 @@ public class TCruiseTaskService {
      */
     @Value("${station.code}")
     private String stationCode;
+    @Value("${taskToRobot}")
+    private boolean taskToRobot;
     //任务超期时间
     private Float tasksAreTime;
     //算法接口
@@ -352,9 +354,17 @@ public class TCruiseTaskService {
             robotTaskInfoMap.put("robotTaskInfoList", robotTaskInfoList);
 
             log.info("robotTaskInfoMap   :" + robotTaskInfoMap);
-            //让机器人做任务
-            Result result = robotTask(robotTaskInfoMap);
-            log.info("让机器人做任务 result {}", result);
+            if (taskToRobot) {
+                //任务机器人控制
+                Result result = robotTask(robotTaskInfoMap);
+                log.info("让机器人做任务 result {}", result);
+            } else { //任务平台控制
+                //立即任务让机器人做任务
+                if (tCruiseTaskAdd.getIfRun() == 173) {
+                    Result result = robotTask(robotTaskInfoMap);
+                    log.info("让机器人做任务 result {}", result);
+                }
+            }
         }
 
         this.tCruiseTaskDao.insert(tCruiseTask);

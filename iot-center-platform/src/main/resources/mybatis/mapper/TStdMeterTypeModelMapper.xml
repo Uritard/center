@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.platform.module.device.dao.TStdDeviceTypeModelDao">
+<mapper namespace="com.yjh.platform.module.device.dao.TStdMeterTypeModelDao">
 
-    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdDeviceTypeModel">
-        <id column="id" jdbcType="BIGINT" property="deviceTypeId"/>
-        <result column="custom_id" jdbcType="VARCHAR" property="customType"/>
-        <result column="mete_kind" jdbcType="VARCHAR" property="meteKind"/>
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdMeterTypeModel">
+        <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="meter_type" jdbcType="VARCHAR" property="meterType"/>
-        <result column="analyse_type" jdbcType="INTEGER" property="analyseType"/>
-        <result column="is_ai" jdbcType="VARCHAR" property="isAi"/>
-        <result column="is_judge" jdbcType="VARCHAR" property="isJudge"/>
+        <result column="device_type" jdbcType="VARCHAR" property="deviceType"/>
+        <result column="mete_kind" jdbcType="VARCHAR" property="meteKind"/>
         <result column="unit" jdbcType="VARCHAR" property="unit"/>
         <result column="alarm_note" jdbcType="VARCHAR" property="alarmNote"/>
         <result column="alarm_type" jdbcType="VARCHAR" property="alarmType"/>
@@ -24,7 +21,6 @@
         <result column="alarm_cnt" jdbcType="INTEGER" property="alarmCnt"/>
         <result column="threshold_abs" jdbcType="NUMERIC" property="thresholdAbs"/>
         <result column="threshold_per" jdbcType="NUMERIC" property="thresholdPer"/>
-        <result column="mete_type" jdbcType="VARCHAR" property="meteType"/>
         <result column="modulus" jdbcType="INTEGER" property="modulus"/>
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
         <result column="stateZero" jdbcType="VARCHAR" property="stateZero"/>
@@ -34,54 +30,44 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_type_id, custom_id, mete_kind, meter_type, analyse_type, is_ai, is_judge, unit, alarm_note, alarm
-        up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per,
-        mete_type, modulus, remark,state_zero,state_one,alarm_state
+        id,
+        meter_type,
+        device_type,
+        mete_kind,
+        unit,
+        alarm_note,
+        alarm_type,
+        up_effect,
+        down_effect,
+        alarm_level,
+        high_limit1,
+        low_limit1,
+        high_limit2,
+        low_limit2,
+        high_limit3,
+        low_limit3,
+        high_limit4,
+        low_limit4,
+        alarm_delay,
+        alarm_cnt,
+        threshold_abs,
+        threshold_per,
+        modulus,
+        remark,
+        state_zero,
+        state_one,
+        alarm_state
     </sql>
 
 
-    <insert id="add"  useGeneratedKeys="true" keyProperty="deviceMeteId" parameterType="com.yjh.platform.module.device.entity.TStdDeviceTypeModel">
-        insert into t_std_device_type_model(
-            device_type_id,
-            custom_id,
-            mete_kind,
-            mete_type,
-            meter_type,
-            analyse_type,
-            is_ai,
-            is_judge,
-            unit,
-            alarm_note,
-            alarm_type,
-            up_effect,
-            down_effect,
-            alarm_level,
-            high_limit1,
-            low_limit1,
-            high_limit2,
-            low_limit2,
-            high_limit3,
-            low_limit3,
-            high_limit4,
-            low_limit4,
-            alarm_delay,
-            alarm_cnt,
-            threshold_abs,
-            threshold_per,
-            modulus,
-            remark,
-            state_zero,
-            state_one,
-            alarm_state
+    <insert id="add"  useGeneratedKeys="true" keyProperty="meterTypeId" parameterType="com.yjh.platform.module.device.entity.TStdMeterTypeModel">
+        insert into t_std_meter_type_model(
+        <include refid="Base_Column_List"/>
         )values(
-                   #{deviceTypeId, jdbcType=BIGINT},
-                   #{customType, jdbcType=VARCHAR},
+                   #{id, jdbcType=BIGINT},
+                   #{meterType, jdbcType=BIGINT},
+                   #{deviceType, jdbcType=BIGINT},
                    #{meteKind, jdbcType=INTEGER},
-                   #{meteType, jdbcType=VARCHAR},
-                   #{meterType, jdbcType=INTEGER},
-                   #{analyseType, jdbcType=INTEGER},
-                   #{isAi, jdbcType=VARCHAR},
-                   #{isJudge,jdbcType=VARCHAR},
                    #{unit, jdbcType=VARCHAR},
                    #{alarmNote, jdbcType=VARCHAR},
                    #{alarmType, jdbcType=VARCHAR},
@@ -109,14 +95,11 @@
     </insert>
 
     <update id="update">
-        update t_std_device_type_model a <set>
-        <if test="deviceTypeId != null">a.device_type_id = #{deviceTypeId, jdbcType=BIGINT},</if>
-        <if test="customType != null">a.custom_id = #{customType},</if>
+        update t_std_meter_type_model a <set>
+        <if test="id != null">a.id = #{id, jdbcType=BIGINT},</if>
+        a.meter_type = #{meterType, jdbcType=BIGINT},
+        a.device_type = #{deviceType, jdbcType=BIGINT},
         a.mete_kind = #{meteKind},
-        a.meter_type = #{meterType, jdbcType=INTEGER},
-        a.analyse_type = #{analyseType, jdbcType=INTEGER},
-        <if test="isAi != null ">a.is_ai = #{isAi,jdbcType=VARCHAR},</if>
-        <if test="isJudge != null ">a.is_judge = #{isJudge,jdbcType=VARCHAR},</if>
         <if test="unit != null ">a.unit = #{unit},</if>
         <if test="alarmNote != null ">a.alarm_note = #{alarmNote},</if>
         a.alarm_type = #{alarmType},
@@ -135,7 +118,6 @@
         a.alarm_cnt = #{alarmCnt, jdbcType=INTEGER},
         a.threshold_abs = #{thresholdAbs, jdbcType=NUMERIC},
         a.threshold_per = #{thresholdPer, jdbcType=NUMERIC},
-        <if test="meteType != null ">a.mete_type = #{meteType},</if>
         a.modulus = #{modulus, jdbcType=INTEGER},
         <if test="remark != null ">a.remark = #{remark},</if>
         a.state_zero = #{stateZero},
@@ -143,50 +125,20 @@
         a.alarm_state = #{alarmState, jdbcType=INTEGER},
 
     </set>
-        where a.device_type_id = #{deviceTypeId, jdbcType=BIGINT}
+        where a.meter_type_id = #{meterTypeId, jdbcType=BIGINT}
     </update>
 
     <delete id="deleteByPrimaryId">
-        delete from t_std_device_type_model
-        where device_type_id = #{deviceTypeId, jdbcType=BIGINT}
+        delete from t_std_meter_type_model
+        where id = #{id, jdbcType=BIGINT}
     </delete>
 
-    <select id="selectByPrimaryId" resultType="com.yjh.platform.module.device.entity.TStdDeviceTypeModel">
+    <select id="selectByPrimaryId" resultType="com.yjh.platform.module.device.entity.TStdMeterTypeModel">
         select
-            a.device_type_id,
-            a.custom_id as customType,
-            a.mete_kind,
-            a.meter_type,
-            a.analyse_type,
-            a.is_ai,
-            a.is_judge,
-            a.unit,
-            a.alarm_note,
-            a.alarm_type,
-            a.up_effect,
-            a.down_effect,
-            a.alarm_level,
-            a.high_limit1,
-            a.low_limit1,
-            a.high_limit2,
-            a.low_limit2,
-            a.high_limit3,
-            a.low_limit3,
-            a.high_limit4,
-            a.low_limit4,
-            a.alarm_delay,
-            a.alarm_cnt,
-            a.threshold_abs,
-            a.threshold_per,
-            a.mete_type,
-            a.modulus,
-            a.remark,
-            state_zero,
-            state_one,
-            alarm_state
-        from t_std_device_type_model a
+        <include refid="Base_Column_List"/>
+        from t_std_meter_type_model a
         where 1 = 1
-        and a.device_type_id = #{deviceTypeId, jdbcType=BIGINT}
+        and a.id = #{id, jdbcType=BIGINT}
         limit 1
     </select>
 </mapper>

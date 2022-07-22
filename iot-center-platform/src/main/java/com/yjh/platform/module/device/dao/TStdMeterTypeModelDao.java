@@ -1,6 +1,6 @@
 package com.yjh.platform.module.device.dao;
 
-import com.yjh.platform.module.device.entity.TStdDeviceTypeModel;
+import com.yjh.platform.module.device.entity.TStdMeterTypeModel;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,14 +12,14 @@ import java.util.List;
  * @since 2022/4/15
  **/
 @Repository
-public interface TStdDeviceTypeModelDao {
+public interface TStdMeterTypeModelDao {
 
     /**
      * 新增设备类型模型
-     * @param tStdDeviceTypeModel
+     * @param tStdMeterTypeModel
      * @return
      */
-    int add(TStdDeviceTypeModel tStdDeviceTypeModel);
+    int add(TStdMeterTypeModel tStdMeterTypeModel);
 
     /**
      * 删除设备类型模型
@@ -30,15 +30,15 @@ public interface TStdDeviceTypeModelDao {
 
     /**
      * 更新设备类型模型
-     * @param tStdDeviceTypeModel
+     * @param tStdMeterTypeModel
      * @return
      */
-    int update(TStdDeviceTypeModel tStdDeviceTypeModel);
+    int update(TStdMeterTypeModel tStdMeterTypeModel);
 
     /**
      * 查询设备类型模型
-     * @param deviceTypeId
+     * @param id
      * @return
      */
-    TStdDeviceTypeModel selectByPrimaryId(Long deviceTypeId);
+    TStdMeterTypeModel selectByPrimaryId(Long id);
 }

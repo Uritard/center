@@ -83,6 +83,8 @@ public class CruiseTaskJob extends QuartzJobBean {
     @Autowired
     private UpFtpsConfig upFtpsConfig;
 
+    @Value("${taskToRobot}")
+    private boolean taskToRobot;
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(CruiseTaskJob.class);
 
@@ -265,6 +267,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                         List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
                         robotTaskInfo.setInstanceList(robotTaskInstanceList);
                         robotTaskInfo.setRobotCode(item);
+                        robotTaskInfo.setFixedStartTime(simpleDateFormat.format(new Date()));
                         robotTaskInfoList.add(robotTaskInfo);
                     }
                     Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>();
@@ -272,7 +275,9 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                     log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
                     //让机器人做任务
-                    robotTask(robotTaskInfoMap);
+                    if (!taskToRobot){
+                        robotTask(robotTaskInfoMap);
+                    }
                 }
 
 
@@ -1129,14 +1134,14 @@ public class CruiseTaskJob extends QuartzJobBean {
 
     //让机器人做任务
     private void robotTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
-//        try {
-//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-//            if (null != serviceRestTemplate) {
-//                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
-//            }
-//        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
-//        }
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     //红外相机抓图

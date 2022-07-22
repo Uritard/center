@@ -1955,44 +1955,39 @@ CREATE TABLE `t_record_file` (
 )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='录制文件表';
 
 
-/*Table structure for table `t_std_device_type_model` */
+/*Table structure for table `t_std_meter_type_model` */
 
-DROP TABLE IF EXISTS `t_std_device_type_model`;
-
-CREATE TABLE `t_std_device_type_model` (
-  `device_type_id` bigint(8) NOT NULL DEFAULT '1' COMMENT '设备类型ID',
-  `custom_id` varchar(50) DEFAULT '' COMMENT '部位ID',
-  `mete_kind` varchar(20) DEFAULT '' COMMENT '测点类型:0-遥信，1-遥测',
-  `mete_type` varchar(50) DEFAULT '' COMMENT '巡检类型',
-  `meter_type` int(8) DEFAULT '1' COMMENT '表计类型',
-  `analyse_type` int(11) DEFAULT '1' COMMENT '算法类型',
-  `is_ai` varchar(20) DEFAULT 'off' COMMENT '是否缺陷 on-是 off-不是',
-  `is_judge` varchar(20) DEFAULT 'off' COMMENT '是否判别--“on”是--“off”不是',
-  `unit` varchar(50) DEFAULT '' COMMENT '单位',
-  `alarm_note` varchar(50) DEFAULT '' COMMENT '是否生成告警提示 1-生成 0-不生成',
-  `alarm_type` varchar(50) DEFAULT '' COMMENT '告警分类',
-  `up_effect` float DEFAULT '1' COMMENT '有效上限',
-  `down_effect` float DEFAULT '1' COMMENT '有效下限',
-  `state_zero` varchar(20) DEFAULT '' COMMENT '状态一描述',
-  `state_one` varchar(20) DEFAULT '' COMMENT '状态二描述',
-  `alarm_state` int(8) DEFAULT '1' COMMENT '告警关联信号',
-  `alarm_level` int(11) DEFAULT '1' COMMENT '告警级别',
-  `high_limit1` float DEFAULT '1' COMMENT '告警上限1',
-  `low_limit1` float DEFAULT '1' COMMENT '告警下限1',
-  `high_limit2` float DEFAULT '1' COMMENT '告警上限2',
-  `low_limit2` float DEFAULT '1' COMMENT '告警下限2',
-  `high_limit3` float DEFAULT '1',
-  `low_limit3` float DEFAULT '1',
-  `high_limit4` float DEFAULT '1',
-  `low_limit4` float DEFAULT '1',
-  `alarm_delay` int(11) DEFAULT '1' COMMENT '告警延时',
-  `alarm_cnt` int(11) DEFAULT '1' COMMENT '告警次数',
-  `threshold_abs` decimal(10,0) DEFAULT '0' COMMENT '绝对阀值',
-  `threshold_per` decimal(5,0) DEFAULT '0' COMMENT '百分比阀值',
-  `modulus` int(11) DEFAULT '1' COMMENT '系数',
-  `remark` varchar(128) DEFAULT '' COMMENT '信号说明',
-  PRIMARY KEY (`device_type_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='设备类型模板表';
+DROP TABLE IF EXISTS `t_std_meter_type_model`;
+CREATE TABLE `t_std_meter_type_model`(
+    `id`            int(8) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+    `meter_type`    int(8) DEFAULT '1' COMMENT '表计类型',
+    `device_type`   int(8) DEFAULT '1' COMMENT '设备类型',
+    `mete_kind`     varchar(20)    DEFAULT '' COMMENT '测点类型:0-遥信，1-遥测',
+    `unit`          varchar(50)    DEFAULT '' COMMENT '单位',
+    `alarm_note`    varchar(50)    DEFAULT '' COMMENT '是否生成告警提示 1-生成 0-不生成',
+    `alarm_type`    varchar(50)    DEFAULT '' COMMENT '告警分类',
+    `up_effect`     float          DEFAULT '1' COMMENT '有效上限',
+    `down_effect`   float          DEFAULT '1' COMMENT '有效下限',
+    `state_zero`    varchar(20)    DEFAULT '' COMMENT '状态一描述',
+    `state_one`     varchar(20)    DEFAULT '' COMMENT '状态二描述',
+    `alarm_state`   int(8) DEFAULT '1' COMMENT '告警关联信号',
+    `alarm_level`   int(11) DEFAULT '1' COMMENT '告警级别',
+    `high_limit1`   float          DEFAULT '1' COMMENT '告警上限1',
+    `low_limit1`    float          DEFAULT '1' COMMENT '告警下限1',
+    `high_limit2`   float          DEFAULT '1' COMMENT '告警上限2',
+    `low_limit2`    float          DEFAULT '1' COMMENT '告警下限2',
+    `high_limit3`   float          DEFAULT '1',
+    `low_limit3`    float          DEFAULT '1',
+    `high_limit4`   float          DEFAULT '1',
+    `low_limit4`    float          DEFAULT '1',
+    `alarm_delay`   int(11) DEFAULT '1' COMMENT '告警延时',
+    `alarm_cnt`     int(11) DEFAULT '1' COMMENT '告警次数',
+    `threshold_abs` decimal(10, 0) DEFAULT '0' COMMENT '绝对阀值',
+    `threshold_per` decimal(5, 0)  DEFAULT '0' COMMENT '百分比阀值',
+    `modulus`       int(11) DEFAULT '1' COMMENT '系数',
+    `remark`        varchar(128)   DEFAULT '' COMMENT '信号说明',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=182412 DEFAULT CHARSET=utf8 COMMENT='表计类型模板表';
 
 DROP TABLE IF EXISTS `t_version`;
 CREATE TABLE `t_version` (

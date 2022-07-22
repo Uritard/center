@@ -22,17 +22,23 @@ import java.math.BigDecimal;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "TStdDeviceTypeModel", description = "设备类型模板表")
-public class TStdDeviceTypeModel {
+@ApiModel(value = "TStdMeterTypeModel", description = "表计类型模板表")
+public class TStdMeterTypeModel {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "设备测点实例ID")
-    @TableId(value = "device_type_id")
-    private Long deviceTypeId;
+    @ApiModelProperty(value = "ID")
+    @TableId(value = "id")
+    private Long id;
 
-    @Length(max = 50, message = "customId长度必须小于等于50")
-    private String customType;
+
+    @ApiModelProperty(value = "表计类型")
+    @TableId(value = "meter_type")
+    private Long meterType;
+
+    @ApiModelProperty(value = "表计类型ID")
+    @TableId(value = "device_type")
+    private Long deviceType;
 
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
     @TableField(value = "mete_kind",updateStrategy = FieldStrategy.IGNORED)
@@ -40,13 +46,6 @@ public class TStdDeviceTypeModel {
 
     @Length(max = 50, message = "meteKindName长度必须小于等于50")
     private String meteKindName;
-
-    @ApiModelProperty(value = "表计类型")
-    private Integer meterType;
-
-    private Integer analyseType;
-
-    private String isAi;
 
     @Length(max = 50, message = "unit长度必须小于等于50")
     @ApiModelProperty(value = "单位")
@@ -108,10 +107,6 @@ public class TStdDeviceTypeModel {
     @ApiModelProperty(value = "百分比阀值")
     private BigDecimal thresholdPer;
 
-    @Length(max = 50, message = "meteType长度必须小于等于50")
-    @TableField(value = "mete_type",updateStrategy = FieldStrategy.IGNORED)
-    private String meteType;
-
     @ApiModelProperty(value = "系数")
     private Integer modulus;
 
@@ -131,6 +126,4 @@ public class TStdDeviceTypeModel {
     private String stateOne;
 
     private Integer alarmState;
-
-    private String isJudge;
 }

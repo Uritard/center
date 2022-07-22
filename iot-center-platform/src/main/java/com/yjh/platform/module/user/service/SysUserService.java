@@ -151,7 +151,7 @@ public class SysUserService {
         if (!Objects.equals(number, replayAvoid)) {
             throw new BusinessException(500, "验证码错误");
         } else {
-            String ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+            String ip = String.valueOf(request.getHeader("HTTP_X_FORWARDED_FOR"));
             if (userMap.size() > 0 && !Objects.equals(null, userMap.get("userName")) && !Objects.equals(null, userMap.get("pCode"))) {
                 String userName = null;
                 String password = null;
