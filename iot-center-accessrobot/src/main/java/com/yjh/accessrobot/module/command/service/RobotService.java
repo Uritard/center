@@ -210,15 +210,19 @@ public class RobotService {
             scmap.put("result", "巡视设备不在线");
             return scmap;
         }else {
+            String robotNumber = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:robotNumber", "content"));
+            String droneNumber = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneNumber", "content"));
+            boolean isDrone = selectIsDrone(robotCode);
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(sendCode)
                     .setReceiveCode(robotCode)
-                    .setCode(robotCode)
+                    .setCode(isDrone ? droneNumber : robotNumber)
                     .setTime(DateTimeUtil.format(new Date()))
                     .setType(type)
                     .setCommand(command)
                     .setItems(item);
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+            log.info("生成的控制指令xml是<start>{}<end>", xmlString);
 
             Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
             Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
@@ -290,6 +294,7 @@ public class RobotService {
                 .setType("61")
                 .setCommand("1");
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+        log.info("生成的模型文件同步指令xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
         return true;
     }
@@ -820,7 +825,7 @@ public class RobotService {
         itemMap.put("enable", Integer.valueOf(resMap.get("enable").toString()));
         itemMap.put("start_time", resMap.get("startTime").toString());
         itemMap.put("end_time", resMap.get("endTime").toString());
-        itemMap.put("device_level", resMap.get("deviceLevel").toString());
+        itemMap.put("device_level", Integer.valueOf(resMap.get("deviceLevel").toString()));
         String deviceList = resMap.get("deviceList").toString();
         String deviceIdList = deviceList.substring(1, deviceList.length()-1).replace(" ", "");
         itemMap.put("device_list", deviceIdList);
@@ -833,12 +838,12 @@ public class RobotService {
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(sendCode)
                     .setReceiveCode(robotCode)
-                    .setCode(robotCode)
+                    .setCode(stationCode)
                     .setType("81")
                     .setCommand("4")
                     .setItems(itemList);
             String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-            log.info("生成的机器人下发检修区域指令xml是<start>{}<end>", xmlString);
+            log.info("生成的检修区域指令xml是<start>{}<end>", xmlString);
             RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
         }
 
@@ -2175,10 +2180,13 @@ public class RobotService {
         }
         item.add(map);
 
+        String robotNumber = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:robotNumber", "content"));
+        String droneNumber = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneNumber", "content"));
+        boolean isDrone = selectIsDrone(robotCode);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(sendCode)
                 .setReceiveCode(robotCode)
-                .setCode(robotCode)
+                .setCode(isDrone ? droneNumber : robotNumber)
                 .setTime(DateTimeUtil.format(new Date()))
                 .setType(type)
                 .setCommand(command)
@@ -2215,121 +2223,6 @@ public class RobotService {
      */
     public List<Long> selectInstanceForTaskGoOn(String taskId){
         return tRobotInfoDao.selectInstanceForTaskGoOn(taskId);
-    }
-    /**
-     * 根据type和command获取日志记录内容
-     * @param type 类型
-     * @param command 命令
-     * @param value 值
-     * @return String
-     */
-    public String selectContentByCommand(String type, String command, String value) {
-        if ("1".equals(type)) {
-            switch (command) {
-                case "1": return "机器人远方复位";
-                case "2": return "机器人系统自检";
-                case "3": return "机器人一键返航";
-                case "4": return "机器人手动充电";
-                case "5":
-                    if ("1".equals(value)) { return "机器人控制模式切换为任务模式";
-                    } else if ("2".equals(value)) { return "机器人控制模式切换为紧急定位模式";
-                    } else if ("3".equals(value)) { return "机器人控制模式切换为后台遥控模式";
-                    } else if ("4".equals(value)) { return "机器人控制模式切换为手持遥控模式";
-                    }
-                    break;
-                case "6": return "机器人控制权获得";
-                case "7": return "机器人控制权释放";
-                default: break;
-            }
-        } else if ("2".equals(type)) {
-            switch (command) {
-                case "1": return "机器人前进";
-                case "2": return "机器人后退";
-                case "3": return "机器人左转";
-                case "4": return "机器人右转";
-                case "5":
-                    if ("1".equals(value)) { return "机器人左转弯";
-                    } else if ("2".equals(value)) { return "机器人右转弯";
-                    }
-                    break;
-                case "6": return "机器人停止";
-                default: break;
-            }
-        } else if ("3".equals(type)) {
-            switch (command) {
-                case "1": return "机器人云台上仰";
-                case "2": return "机器人云台下俯";
-                case "3": return "机器人云台左转";
-                case "4": return "机器人云台右转";
-                case "5": return "机器人云台上升";
-                case "6": return "机器人云台下降";
-                case "7": return "机器人云台预置位调用";
-                case "8": return "机器人云台停止";
-                case "9": return "机器人云台复位";
-                case "10": return "机器人云台预置位新增";
-                case "11": return "机器人云台预置位修改";
-                case "12": return "机器人云台预置位删除";
-                default: break;
-            }
-        } else if ("4".equals(type)) {
-            switch (command) {
-                case "1":
-                    if ("1".equals(value)) {
-                        return "打开机器人红外电源";
-                    } else if ("2".equals(value)) {
-                        return "关闭机器人红外电源";
-                    }
-                    break;
-                case "2":
-                    if ("1".equals(value)) {
-                        return "打开机器人雨刷";
-                    } else if ("2".equals(value)) {
-                        return "关闭机器人雨刷";
-                    }
-                    break;
-                case "3":
-                    if ("1".equals(value)) {
-                        return "打开机器人超声";
-                    } else if ("2".equals(value)) {
-                        return "关闭机器人超声";
-                    }
-                    break;
-                case "4":
-                    if ("1".equals(value)) {
-                        return "打开机器人红外射灯";
-                    } else if ("2".equals(value)) {
-                        return "关闭机器人红外射灯";
-                    }
-                    break;
-                default:
-                    break;
-            }
-        } else if ("21".equals(type)) {
-            switch (command) {
-                case "1": return "机器人可见光摄像机镜头拉近";
-                case "2": return "机器人可见光摄像机镜头拉远";
-                case "3": return "机器人可见光摄像机镜头拉焦停止";
-                case "4": return "机器人可见光摄像机焦距增加";
-                case "5": return "机器人可见光摄像机焦距减少";
-                case "6": return "机器人可见光摄像机自动聚焦";
-                case "7": return "机器人可见光摄像机抓图";
-                case "8": return "机器人可见光摄像机重启";
-                case "9": return "机器人可见光摄像机启动录像";
-                case "10": return "机器人可见光摄像机停止录像";
-                case "11": return "机器人可见光摄像机倍率值设置";
-                case "12": return "机器人可见光摄像机聚焦值设置";
-                default: break;
-            }
-        } else if ("22".equals(type)) {
-            switch (command) {
-                case "5": return "机器人红外热像仪设定焦距值";
-                case "6": return "机器人红外热像仪自动聚焦";
-                case "7": return "机器人红外热像仪抓图";
-                case "8": return "机器人红外热像仪重启";
-                default: break;
-            }
-        }
-        return "";
     }
 
     @Transactional(rollbackFor = Exception.class)
