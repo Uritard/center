@@ -13,7 +13,6 @@ import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import io.netty.util.concurrent.EventExecutorGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import sun.rmi.runtime.RuntimeUtil;
 
 import java.util.concurrent.TimeUnit;
 

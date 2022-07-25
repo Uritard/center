@@ -272,7 +272,7 @@
         a.state_zero = #{stateZero},
         a.state_one = #{stateOne},
         a.alarm_state = #{alarmState, jdbcType=INTEGER},
-        a.redundant_type = #{redundant_type},
+        a.redundant_type = #{redundantType},
     </set>
             where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </update>
