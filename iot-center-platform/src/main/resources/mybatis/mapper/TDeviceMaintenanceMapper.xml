@@ -25,14 +25,18 @@
             device_id,
             is_valid,
             maintenance_start,
-            maintenance_stop
+            maintenance_stop,
+            colocoordinate_pixel,
+            device_level
         )values(
                 #{maintenanceId, jdbcType=BIGINT},
                 #{maintenanceName, jdbcType=VARCHAR},
                 #{deviceId, jdbcType=BIGINT},
                 #{isValid, jdbcType=INTEGER},
                 #{maintenanceStart, jdbcType=TIMESTAMP},
-                #{maintenanceStop, jdbcType=TIMESTAMP}
+                #{maintenanceStop, jdbcType=TIMESTAMP},
+                #{coordinatePixel, jdbcType=VARCHAR},
+                #{deviceLevel, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -49,6 +53,8 @@
         <if test="isValid != null ">a.is_valid = #{isValid, jdbcType=INTEGER},</if>
         <if test="maintenanceStart != null ">a.maintenance_start = #{maintenanceStart, jdbcType=TIMESTAMP},</if>
         <if test="maintenanceStop != null ">a.maintenance_stop = #{maintenanceStop, jdbcType=TIMESTAMP},</if>
+        <if test="coordinatePixel != null ">a.colocoordinate_pixel = #{coordinatePixel},</if>
+        <if test="deviceLevel != null ">a.device_level = #{deviceLevel},</if>
     </set>
             where a.maintenance_id = #{maintenanceId, jdbcType=BIGINT}
     </update>
@@ -60,7 +66,9 @@
         a.device_id,
         a.is_valid,
         a.maintenance_start,
-        a.maintenance_stop
+        a.maintenance_stop,
+        a.colocoordinate_pixel,
+        a.device_level
         from t_device_maintenance a
         where 1 = 1
             and a.maintenance_id = #{maintenanceId, jdbcType=BIGINT}
@@ -73,7 +81,9 @@
         a.device_id,
         a.is_valid,
         a.maintenance_start,
-        a.maintenance_stop
+        a.maintenance_stop,
+        a.colocoordinate_pixel,
+        a.device_level
         from t_device_maintenance a
         where 1 = 1
         <if test="maintenanceId != null and maintenanceId != ''"> and a.maintenance_id = #{maintenanceId, jdbcType=BIGINT}</if>
@@ -92,7 +102,9 @@
         a.device_id,
         a.is_valid,
         a.maintenance_start,
-        a.maintenance_stop
+        a.maintenance_stop,
+        a.colocoordinate_pixel,
+        a.device_level
         from t_device_maintenance a
         where 1 = 1
         <if test="maintenanceName != null and maintenanceName != ''"> and a.maintenance_name LIKE CONCAT('%',#{maintenanceName, jdbcType=VARCHAR},'%') </if>
