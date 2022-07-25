@@ -1,11 +1,15 @@
 package com.yjh.accesstcp.netty.server;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioDatagramChannel;
+import io.netty.util.NettyRuntime;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.netty.util.concurrent.EventExecutorGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -19,19 +23,27 @@ public class TCPClientChannelInitializer extends ChannelInitializer<SocketChanne
     private SendToUpSystemServices sendToUpSystemServices;
     private String server;
     private String cruise;
+    private EventExecutorGroup group;
     public TCPClientChannelInitializer(RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices,String server,String cruise) {
         this.redisTemplate =redisTemplate;
         this.sendToUpSystemServices = sendToUpSystemServices;
         this.server =server;
         this.cruise = cruise;
+        this.group = new DefaultEventExecutorGroup(NettyRuntime.availableProcessors() * 2,
+            new ThreadFactoryBuilder().setNameFormat("tcp-service-handler-group-%d").build());
     }
 
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         ChannelPipeline p = socketChannel.pipeline();
-        //p.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
-        //p.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
-        p.addLast(new TCPClientHandler(redisTemplate, sendToUpSystemServices, server, cruise));
+        if (Constant.handlerNew) {
+            p.addLast(new StateGridADecoder());
+            StateGridAHandlerImpl robotServerHandler = new StateGridAHandlerImpl(redisTemplate, sendToUpSystemServices, server, cruise);
+            p.addLast(group, robotServerHandler);
+        } else {
+            TCPClientHandlerImpl robotServerHandler = new TCPClientHandlerImpl(redisTemplate, sendToUpSystemServices, server, cruise);
+            p.addLast(robotServerHandler);
+        }
     }
 
     @Override

@@ -162,7 +162,7 @@ public class ParamUtil {
             String key = entry.getKey();
             Object val = entry.getValue();
             // 对密码不进行校验
-            if (StringUtils.endsWithIgnoreCase(key, "PCode") || ArrayUtils.contains(new String[]{"password", "ruleContent"}, key)) {
+            if (StringUtils.endsWithIgnoreCase(key, "PCode") || ArrayUtils.contains(new String[]{"password", "ruleContent", "colocoordinatePixel"}, key)) {
                 continue;
             }
             if (val instanceof String && StringUtils.isNotEmpty((String) val)) {

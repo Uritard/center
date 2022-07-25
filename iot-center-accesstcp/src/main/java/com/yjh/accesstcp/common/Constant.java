@@ -1,18 +1,16 @@
 package com.yjh.accesstcp.common;
 
 import com.yjh.accesstcp.common.utils.StaticContextAccessor;
-import com.yjh.accesstcp.commons.logs.SpringBeanUtils;
 import com.yjh.accesstcp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelHandlerContext;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Constant {
 
@@ -70,8 +68,8 @@ public class Constant {
 
     public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
 
-    public static long sendSessionId = 0L;//发送会话序列号
-    public static long receiveSessionId = 0L;//接受序列号
+    public static AtomicLong sendSessionId = new AtomicLong(0L);//发送会话序列号
+    // public static long receiveSessionId = 0L;//接受序列号
 
     public static String Packet = "";
 
@@ -99,4 +97,5 @@ public class Constant {
     public static  XMLBaseModel weatherXmlModel = null;
 
     public static String stationCode="";
+    public static boolean handlerNew = true;
 }

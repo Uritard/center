@@ -52,15 +52,16 @@ public class SendToUpSystemServices {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Transactional(rollbackFor = Exception.class)
-    public int sendResponse(String type,String command,String code,List<Map<String,Object>> items){
+    public int sendResponse(long receiveSessionId, String type, String command, String code, List<Map<String,Object>> items){
         byte[] bytes = new byte[]{};
-        long sendSessionId = Constant.sendSessionId;
+        long sendSessionId;
         TCPClientHandler tcpClientHandler = TCPClientHandler.getTCPClientHandlerHashMap().get(port);
         if(tcpClientHandler != null){
-            sendSessionId = sendSessionId + 1L;//请求报文每次累加1
-            Constant.sendSessionId = sendSessionId;//刷新sendSessionId
+            sendSessionId = Constant.sendSessionId.incrementAndGet();
         }else {
-            Constant.sendSessionId = 0L;//刷新sendSessionId
+            // 刷新sendSessionId
+            log.error("服务未连接，请重试，port: {}", port);
+            Constant.sendSessionId.set(0L);
             return -1;
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
@@ -71,8 +72,8 @@ public class SendToUpSystemServices {
                 .setCode(code)
                 .setItems(items);
         String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
-        log.info("发送给上级系统的消息：{}",xml);
-        bytes = PlatformPacketUtil.createPacket(sendSessionId,Constant.receiveSessionId,true,xml);
+        log.info("发送给上级系统的消息：{}", xml);
+        bytes = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId,true, xml);
         tcpClientHandler.send(bytes);
         return 1;
     }
@@ -225,7 +226,7 @@ public class SendToUpSystemServices {
                 default:
                     break;
             }
-            sendResponse("11","",stationCode,list);
+            sendResponse(0L, "11","", stationCode, list);
 
 
         }catch (Exception e) {
@@ -235,7 +236,7 @@ public class SendToUpSystemServices {
 
     @Transactional(rollbackFor = Exception.class)
     public int sendXML(XMLBaseModel xmlBaseModel){
-        return this.sendResponse(xmlBaseModel.getType(),xmlBaseModel.getCommand(),xmlBaseModel.getCode(),xmlBaseModel.getItems());
+        return this.sendResponse(0L, xmlBaseModel.getType(), xmlBaseModel.getCommand(), xmlBaseModel.getCode(), xmlBaseModel.getItems());
     }
 
     public String createDeviceModel(String path) throws Exception{

@@ -35,7 +35,7 @@ public class Constant {
     /**
      * 巡视主机发送会话序列号
      */
-    public static long sendSessionId = 0L;
+    public static volatile long sendSessionId = 0L;
 
     public static AtomicLong AtomicSessionId = new AtomicLong(0);
     /**

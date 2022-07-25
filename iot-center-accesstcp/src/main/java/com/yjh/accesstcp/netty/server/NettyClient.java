@@ -29,13 +29,7 @@ public class NettyClient {
                     .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .handler(new TCPClientChannelInitializer(redisTemplate, sendToUpSystemServices,server, cruise) {
-                        @Override
-                        public void initChannel(SocketChannel ch) throws Exception {
-                            ChannelPipeline p = ch.pipeline();
-                            p.addLast(new TCPClientHandler(redisTemplate, sendToUpSystemServices, server, cruise));
-                        }
-                    });
+                    .handler(new TCPClientChannelInitializer(redisTemplate, sendToUpSystemServices,server, cruise));
 
             Constant.bootstrapHashMap.put(1, bootstrap);
             bootstrap.connect(address).addListener((ChannelFuture futureListener) -> {

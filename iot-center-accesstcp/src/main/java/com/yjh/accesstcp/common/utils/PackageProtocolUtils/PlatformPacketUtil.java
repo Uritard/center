@@ -1,11 +1,14 @@
 package com.yjh.accesstcp.common.utils.PackageProtocolUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.UnsupportedEncodingException;
 
 /**
  * @author YC
  * @date 2020/11/13 - 13:40
  */
+@Slf4j
 public class PlatformPacketUtil {
     private final static byte[] hex = "0123456789ABCDEF".getBytes();
     private String packet = "";
@@ -103,6 +106,34 @@ public class PlatformPacketUtil {
                 ((long)src[7] << 56 & 0xFF00000000000000L);
         return value;
     }
+
+    /**
+     * 10进制转字节数组
+     * 小端
+     * @return
+     */
+    public static byte[] int2Bytes(int i) {
+        byte[] src = new byte[4];
+        src[0] = (byte) (i & 0xff);
+        src[1] = (byte) (i >> 8 & 0xff);
+        src[2] = (byte) (i >> 16 & 0xff);
+        src[3] = (byte) (i >> 24 & 0xff);
+        return src;
+    }
+
+    /**
+     * 长整形转换成网络传输的字节流（字节数组）型数据
+     * 小端
+     */
+    public static byte[] long2Bytes(long num) {
+        byte[] bytes = new byte[8];
+        for (int i = 0; i < 8; i++)
+        {
+            bytes[i] = (byte) (0xff & (num >> (i * 8)));
+        }
+        return bytes;
+    }
+
     //数组倒序后，转成十六进制字符串，再转成10进制数
     public static long reserve( byte[] arr ){
 //        StringBuilder Str2 = new StringBuilder();
@@ -205,10 +236,8 @@ public class PlatformPacketUtil {
             soc[index++] = (byte)0xEB;
             soc[index++] = (byte)0x90;
 
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }catch (Exception e){
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
         return soc;
     }

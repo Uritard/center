@@ -98,7 +98,7 @@ public class DataDealThread implements Runnable {
         System.arraycopy(bytes, 2, sendSessionIdByte, 0, 8);
         System.arraycopy(bytes, 10, receiveSessionIdByte, 0, 8);
         long sendSessionId = PlatformPacketUtil.bytesToLong(sendSessionIdByte);//发送会话序列号
-        Constant.receiveSessionId = sendSessionId;
+        // Constant.receiveSessionId = sendSessionId;
         long receiveSessionId = PlatformPacketUtil.bytesToLong(receiveSessionIdByte);//接收会话序列号
         if (xmlRes.getSendCode() == null) {
             log.info("连接可能断了，等待重连.....");
@@ -181,11 +181,11 @@ public class DataDealThread implements Runnable {
             robotMap.put("list",list);
             Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);
             if(re == null){
-                sendToUpSystemServices.sendResponse("251","3","100",null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","3","100",null);
             }else if("success".equals(re.getData().toString())){
-                sendToUpSystemServices.sendResponse("251","3","200",null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","3","200",null);
             }else {
-                sendToUpSystemServices.sendResponse("251","3","500",null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","3","500",null);
             }
             log.info("==控制响应==");
         }
@@ -202,11 +202,11 @@ public class DataDealThread implements Runnable {
             item.put("task_patrolled_id",xmlBaseModel.getCode());
             items.add(item);
             if(re == null){
-                sendToUpSystemServices.sendResponse("251","4","100",items);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","4","100",items);
             }else if("1".equals(re.getData().toString())){
-                sendToUpSystemServices.sendResponse("251","4","200",items);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","4","200",items);
             }else {
-                sendToUpSystemServices.sendResponse("251","4","500",items);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","4","500",items);
             }
             log.info("==任务控制响应==");
 
@@ -275,11 +275,11 @@ public class DataDealThread implements Runnable {
                     map.put("list",taskList);
                     Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);
                     if(re == null){
-                    sendToUpSystemServices.sendResponse("251","3","500",null);
+                    sendToUpSystemServices.sendResponse(sendSessionId, "251","3","500",null);
                     }else if("200".equals(re.getCode())){
-                        sendToUpSystemServices.sendResponse("251","3","200",null);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251","3","200",null);
                     }else {
-                        sendToUpSystemServices.sendResponse("251","3","100",null);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251","3","100",null);
                     }
                     log.info("--响应任务下发--");
                 }
@@ -316,17 +316,17 @@ public class DataDealThread implements Runnable {
                         xmlItem.put("error_code","3");
                         xmlItem.put("task_patrolled_id",taskId);
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse("251","4","100",xmlItems);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251","4","100",xmlItems);
                     }else if("200".equals(re.getCode())){
                         xmlItem.put("task_patrolled_id",re.getData());
                         xmlItem.put("error_code","0");
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse("251","4","200",xmlItems);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251","4","200",xmlItems);
                     }else {
                         xmlItem.put("error_code","1");
                         xmlItem.put("task_patrolled_id",taskId);
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse("251","4","500",xmlItems);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251","4","500",xmlItems);
                     }
 
                 }
@@ -353,7 +353,7 @@ public class DataDealThread implements Runnable {
             mapForDevice.put("task_file_path",path+"/"+"task_file.xml");
             list.add(mapForTask);
 
-            sendToUpSystemServices.sendResponse("251","3","200",list);
+            sendToUpSystemServices.sendResponse(sendSessionId, "251","3","200",list);
 
             }
         }
@@ -366,7 +366,7 @@ public class DataDealThread implements Runnable {
             robotMap.put("list",list);
             Result re = Constant.otherServer(robotMap,Constant.MAINTENANCE_URL);
             log.info("--响应检修--");
-            sendToUpSystemServices.sendResponse("251","4","200",null);
+            sendToUpSystemServices.sendResponse(sendSessionId, "251","4","200",null);
         }
 
     }

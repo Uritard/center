@@ -59,7 +59,7 @@ public class DeviceStatistics {
                     for (int i = 1; i <= 5 ; i++) {
                         mapList.add(dealType(robot,result,i));
                         log.info("可靠性：{}",mapList);
-                        sendToUpSystemServices.sendResponse("81","",stationCode,mapList);
+                        sendToUpSystemServices.sendResponse(0L, "81","",stationCode,mapList);
                         mapList = new ArrayList<>();
                     }
                 }
@@ -83,7 +83,7 @@ public class DeviceStatistics {
                     for (int i = 1; i <= 5 ; i++) {
                         mapList.add(dealType(robot,result,i));
                         log.info("可靠性：{}",mapList);
-                        sendToUpSystemServices.sendResponse("81","",stationCode,mapList);
+                        sendToUpSystemServices.sendResponse(0L, "81","",stationCode,mapList);
                         mapList = new ArrayList<>();
                     }
                 }
@@ -106,7 +106,7 @@ public class DeviceStatistics {
                     for (int i = 4; i <= 6 ; i++) {
                         mapList.add(dealType(camera,result,i));
                         log.info("可靠性：{}",mapList);
-                        sendToUpSystemServices.sendResponse("81","",stationCode,mapList);
+                        sendToUpSystemServices.sendResponse(0L, "81","",stationCode,mapList);
                         mapList = new ArrayList<>();
                     }
                 }

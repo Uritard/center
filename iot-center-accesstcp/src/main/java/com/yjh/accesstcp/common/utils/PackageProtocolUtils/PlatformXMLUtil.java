@@ -85,15 +85,20 @@ public class PlatformXMLUtil {
             childNode2.setText(xmlBaseModel.getReceiveCode());
         }
 
-
         Element childNode3 = rss.addElement("Type");//必有
         if (StringUtils.isNotEmpty(xmlBaseModel.getType())){
             childNode3.setText(xmlBaseModel.getType());
         }
 
-
         Element childNode4 = rss.addElement("Code");//非必有
-        if (StringUtils.isNotEmpty(xmlBaseModel.getCode())){ childNode4.setText(xmlBaseModel.getCode()); }
+        if (StringUtils.isNotEmpty(xmlBaseModel.getCode())){
+            childNode4.setText(xmlBaseModel.getCode());
+        }
+
+        Element childNode7 = rss.addElement("Command");//必有
+        if (StringUtils.isNotEmpty(xmlBaseModel.getCommand())){
+            childNode7.setText(xmlBaseModel.getCommand());
+        }
 
         Element childNode5 = rss.addElement("Time");//必有
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -107,10 +112,6 @@ public class PlatformXMLUtil {
                     childNode61.addAttribute(key, String.valueOf(item.get(key)));
                 }
             }
-        }
-        Element childNode7 = rss.addElement("Command");//必有
-        if (StringUtils.isNotEmpty(xmlBaseModel.getCommand())){
-            childNode7.setText(xmlBaseModel.getCommand());
         }
 
         String xmlString = document.asXML();

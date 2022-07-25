@@ -46,6 +46,8 @@ public class AccessTcpApplication implements CommandLineRunner {
     private String flag;
     @Value("${spring.union.stationCode}")
     private String stationCode;
+    @Value("${netty.handler.new:true}")
+    private boolean handlerNew;
 
     @SuppressWarnings("rawtypes")
     @Autowired
@@ -63,6 +65,7 @@ public class AccessTcpApplication implements CommandLineRunner {
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
         Constant.stationCode = stationCode;
+        Constant.handlerNew = handlerNew;
         if("1".equals(flag)) {
             InetSocketAddress address = new InetSocketAddress(serverUrl, port);
             log.info("accesstcp is running, url is : " + url);
