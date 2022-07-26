@@ -260,93 +260,95 @@ public class TCruiseTaskService {
                 robotTaskInfo.setRobotCode(item);
                 robotTaskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
                 robotTaskInfo.setIsOcr(tCruiseTaskAdd.getIsOcr());
-                switch (tCruiseTaskAdd.getIfRun().toString()){
-                    // 周期和间隔任务
-                    case "172":
-                        // 周期：月
-                        if (!"".equals(tCruiseTaskAdd.getDayOfMonth())){
-                            String temp[] = tCruiseTaskAdd.getHour().split(",");
-                            if (temp.length > 1){
-                                log.info("这种不支持A接口的方式......球球你别发了");
-                                return "啥也不是";
-                            }else{
-                                robotTaskInfo.setCycleMonth(tCruiseTaskAdd.getDayOfMonth());
-                                String cycleExecuteTime = null;
-                                if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 10){
-                                    cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
-                                }else {
-                                    cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";
-                                }
-                                robotTaskInfo.setCycleExecuteTime(cycleExecuteTime);
-                                robotTaskInfo.setCycleStartTime(format.format(new Date()));
-                                robotTaskInfo.setCycleEndTime(tCruiseTaskAdd.getEndTime());
-                            }
-                        }else {
-                            //周期：周
-                            if (!"".equals(tCruiseTaskAdd.getDayOfWeek())){
-                                String temp2[] = tCruiseTaskAdd.getHour().split(",");
-                                if (temp2.length > 1){
+                if (taskToRobot) {
+                    switch (tCruiseTaskAdd.getIfRun().toString()) {
+                        // 周期和间隔任务
+                        case "172":
+                            // 周期：月
+                            if (!"".equals(tCruiseTaskAdd.getDayOfMonth())) {
+                                String temp[] = tCruiseTaskAdd.getHour().split(",");
+                                if (temp.length > 1) {
                                     log.info("这种不支持A接口的方式......球球你别发了");
                                     return "啥也不是";
-                                }else {
-                                    String temp[] = tCruiseTaskAdd.getDayOfWeek().split(",");
-                                    String dayOfWeekTemp[] =new String[temp.length];
-                                    for (int i = 0; i < temp.length; i++) {
-                                        dayOfWeekTemp[i] = Integer.valueOf(temp[i]) - 1 + "";
-                                    }
-                                    String dayOfWeek = StringUtils.join(Arrays.asList(dayOfWeekTemp), ",");
-                                    robotTaskInfo.setCycleWeek(dayOfWeek);
-                                    String cycleMonth = "1,2,3,4,5,6,7,8,9,10,11,12";
-                                    robotTaskInfo.setCycleMonth(cycleMonth);
+                                } else {
+                                    robotTaskInfo.setCycleMonth(tCruiseTaskAdd.getDayOfMonth());
                                     String cycleExecuteTime = null;
-                                    if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 10){
+                                    if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 10) {
                                         cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
-                                    }else {
+                                    } else {
                                         cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";
                                     }
                                     robotTaskInfo.setCycleExecuteTime(cycleExecuteTime);
                                     robotTaskInfo.setCycleStartTime(format.format(new Date()));
                                     robotTaskInfo.setCycleEndTime(tCruiseTaskAdd.getEndTime());
                                 }
-                            }else{
-                                //周期：天（间隔）
-                                String temp2[] = tCruiseTaskAdd.getHour().split(",");
-                                if (temp2.length > 1){
-                                    log.info("这种不支持A接口的方式......球球你别发了");
-                                    return "啥也不是";
-                                }else {
-                                    String temp[] = tCruiseTaskAdd.getDayOfWeek().split(",");
-                                    String hourTemp[] =new String[temp.length-1];
+                            } else {
+                                //周期：周
+                                if (!"".equals(tCruiseTaskAdd.getDayOfWeek())) {
+                                    String temp2[] = tCruiseTaskAdd.getHour().split(",");
+                                    if (temp2.length > 1) {
+                                        log.info("这种不支持A接口的方式......球球你别发了");
+                                        return "啥也不是";
+                                    } else {
+                                        String temp[] = tCruiseTaskAdd.getDayOfWeek().split(",");
+                                        String dayOfWeekTemp[] = new String[temp.length];
+                                        for (int i = 0; i < temp.length; i++) {
+                                            dayOfWeekTemp[i] = Integer.valueOf(temp[i]) - 1 + "";
+                                        }
+                                        String dayOfWeek = StringUtils.join(Arrays.asList(dayOfWeekTemp), ",");
+                                        robotTaskInfo.setCycleWeek(dayOfWeek);
+                                        String cycleMonth = "1,2,3,4,5,6,7,8,9,10,11,12";
+                                        robotTaskInfo.setCycleMonth(cycleMonth);
+                                        String cycleExecuteTime = null;
+                                        if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 10) {
+                                            cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
+                                        } else {
+                                            cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";
+                                        }
+                                        robotTaskInfo.setCycleExecuteTime(cycleExecuteTime);
+                                        robotTaskInfo.setCycleStartTime(format.format(new Date()));
+                                        robotTaskInfo.setCycleEndTime(tCruiseTaskAdd.getEndTime());
+                                    }
+                                } else {
+                                    //周期：天（间隔）
+                                    String temp2[] = tCruiseTaskAdd.getHour().split(",");
+                                    if (temp2.length > 1) {
+                                        log.info("这种不支持A接口的方式......球球你别发了");
+                                        return "啥也不是";
+                                    } else {
+                                        String temp[] = tCruiseTaskAdd.getDayOfWeek().split(",");
+                                        String hourTemp[] = new String[temp.length - 1];
 //                                    for (int i = 0; i < temp.length-1 ; i++) {
 //                                        hourTemp[i] = Integer.valueOf(temp[i+1]) - Integer.valueOf(temp[i]) + "";
 //                                    }
 //                                    for (int i = 0; i < hourTemp.length-1; i++) {
 //                                        if (hourTemp[i].equals(hourTemp[i+1]))  {
-                                    robotTaskInfo.setIntervalNumber("1");
-                                    robotTaskInfo.setIntervalType("2");
-                                    String cycleExecuteTime = null;
-                                    if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 10){
-                                        cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
-                                    }else {
-                                        cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";
+                                        robotTaskInfo.setIntervalNumber("1");
+                                        robotTaskInfo.setIntervalType("2");
+                                        String cycleExecuteTime = null;
+                                        if (Integer.valueOf(tCruiseTaskAdd.getHour()) < 10) {
+                                            cycleExecuteTime = "0" + tCruiseTaskAdd.getHour() + ":00:00";
+                                        } else {
+                                            cycleExecuteTime = tCruiseTaskAdd.getHour() + ":00:00";
+                                        }
+                                        robotTaskInfo.setIntervalExecuteTime(cycleExecuteTime);
+                                        robotTaskInfo.setIntervalStartTime(format.format(new Date()));
+                                        robotTaskInfo.setIntervalEndTime(tCruiseTaskAdd.getEndTime());
                                     }
-                                    robotTaskInfo.setIntervalExecuteTime(cycleExecuteTime);
-                                    robotTaskInfo.setIntervalStartTime(format.format(new Date()));
-                                    robotTaskInfo.setIntervalEndTime(tCruiseTaskAdd.getEndTime());
                                 }
                             }
-                        }
-                        break;
-                    //立即任务
-                    case "173":
-                        robotTaskInfo.setFixedStartTime(format.format(new Date()));
-                        break;
-                    //定时任务
-                    case "174":
-                        robotTaskInfo.setFixedStartTime(format.format(tCruiseTaskAdd.getStartTime()));
-                        break;
-                    default:
-                        break;
+                            break;
+                        //立即任务
+                        case "173":
+                            robotTaskInfo.setFixedStartTime(format.format(new Date()));
+                            break;
+                        //定时任务
+                        case "174":
+                            robotTaskInfo.setFixedStartTime(format.format(tCruiseTaskAdd.getStartTime()));
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 robotTaskInfoList.add(robotTaskInfo);
             }

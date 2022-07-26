@@ -1987,7 +1987,7 @@ CREATE TABLE `t_std_meter_type_model`(
     `modulus`       int(11) DEFAULT '1' COMMENT '系数',
     `remark`        varchar(128)   DEFAULT '' COMMENT '信号说明',
     PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=182412 DEFAULT CHARSET=utf8 COMMENT='表计类型模板表';
+) ENGINE=InnoDB AUTO_INCREMENT=182412 DEFAULT CHARSET=utf8 COMMENT='告警设置模板表';
 
 DROP TABLE IF EXISTS `t_version`;
 CREATE TABLE `t_version` (
