@@ -208,7 +208,7 @@
         <result column="is_valid" property="enable"/>
         <result column="maintenance_start" property="startTime"/>
         <result column="maintenance_stop" property="endTime"/>
-        <result column="colocoordinate_pixel" property="colocoordinatePixel"/>
+        <result column="coordinate_pixel" property="coordinatePixel"/>
         <result column="device_level" property="deviceLevel"/>
         <collection property="deviceIds" ofType="java.lang.String">
             <id column="device_id"/>
@@ -222,7 +222,7 @@
             is_valid ,
             DATE_FORMAT(maintenance_start, '%Y-%m-%d %H:%i:%s') as maintenance_start,
             DATE_FORMAT(maintenance_stop, '%Y-%m-%d %H:%i:%s') as maintenance_stop,
-            colocoordinate_pixel,
+            coordinate_pixel,
             device_level
         from t_device_maintenance
     </select>

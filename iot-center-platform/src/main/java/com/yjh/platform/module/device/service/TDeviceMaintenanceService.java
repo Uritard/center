@@ -1,7 +1,6 @@
 package com.yjh.platform.module.device.service;
 
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
@@ -65,7 +64,7 @@ public class TDeviceMaintenanceService{
             //目前只支持主设备
             params.put("deviceLevel",tDeviceMaintenance.getDeviceLevel());
             //配置编码
-            params.put("configCode", "");
+            params.put("configCode", tDeviceMaintenance.getMaintenanceId());
             //检修区域坐标框
             params.put("coordinatePixel", tDeviceMaintenance.getCoordinatePixel());
             sendPostRequest(Constant.Maintenance_Issued,params);
@@ -78,6 +77,8 @@ public class TDeviceMaintenanceService{
                     .setIsValid(tDeviceMaintenance.getIsValid())
                     .setMaintenanceStart(tDeviceMaintenance.getMaintenanceStart())
                     .setMaintenanceId(id)
+                    .setDeviceLevel(tDeviceMaintenance.getDeviceLevel())
+                    .setCoordinatePixel(tDeviceMaintenance.getCoordinatePixel())
                     .setMaintenanceStop(tDeviceMaintenance.getMaintenanceStop());
             addList.add(deviceMaintenanceItem);
         }
@@ -111,7 +112,7 @@ public class TDeviceMaintenanceService{
             params.put("endTime",sdf.format(new Date()));
             params.put("deviceLevel",tDeviceMaintenance.getDeviceLevel());
             //配置编码
-            params.put("configCode", "");
+            params.put("configCode", tDeviceMaintenance.getMaintenanceId());
             //检修区域坐标框
             params.put("coordinatePixel", tDeviceMaintenance.getCoordinatePixel());
             sendPostRequest(Constant.Maintenance_Issued,params);
@@ -134,6 +135,8 @@ public class TDeviceMaintenanceService{
                     .setIsValid(tDeviceMaintenance.getIsValid())
                     .setMaintenanceStart(tDeviceMaintenance.getMaintenanceStart())
                     .setMaintenanceId(tDeviceMaintenance.getMaintenanceId())
+                    .setDeviceLevel(tDeviceMaintenance.getDeviceLevel())
+                    .setCoordinatePixel(tDeviceMaintenance.getCoordinatePixel())
                     .setMaintenanceStop(tDeviceMaintenance.getMaintenanceStop());
             addList.add(deviceMaintenanceItem);
         }
@@ -145,11 +148,11 @@ public class TDeviceMaintenanceService{
             params.put("deviceList",deviceList);
             params.put("startTime",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
             params.put("endTime",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
-            params.put("deviceLevel",2);
+            params.put("deviceLevel",tDeviceMaintenance.getDeviceLevel());
             //配置编码
-            params.put("configCode", "");
+            params.put("configCode", tDeviceMaintenance.getMaintenanceId());
             //检修区域坐标框
-            params.put("coordinatePixel", "");
+            params.put("coordinatePixel", tDeviceMaintenance.getCoordinatePixel());
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
         return this.tDeviceMaintenanceDao.batchAdd(addList);
@@ -260,6 +263,7 @@ public class TDeviceMaintenanceService{
         {
             List<Long> list = tDeviceMaintenanceDao.selectDeviceIds2(list1);
             List<String> deviceList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+
             HashMap<String,Object> params = new HashMap<>();
             params.put("enable",0);
             params.put("deviceList",deviceList);
@@ -305,6 +309,7 @@ public class TDeviceMaintenanceService{
              String end_time = item.get("end_time").toString();
              String device_level = item.get("device_level").toString();
              String device_list = item.get("device_list").toString();
+             String coordinate_pixel = item.get("coordinate_pixel").toString();
              String[] dd = device_list.split(",");
              List<Long> idList = new ArrayList<>();
              for (String str:dd) {
@@ -332,6 +337,8 @@ public class TDeviceMaintenanceService{
                      tDeviceMaintenance.setMaintenanceStart(simpleDateFormat.parse(start_time));
                      tDeviceMaintenance.setMaintenanceStop(simpleDateFormat.parse(end_time));
                      tDeviceMaintenance.setDeviceIdList(deviceIdLst);
+                     tDeviceMaintenance.setDeviceLevel(device_level);
+                     tDeviceMaintenance.setCoordinatePixel(coordinate_pixel);
                      this.add(tDeviceMaintenance);
                  }
                  if("0".equals(enable)){

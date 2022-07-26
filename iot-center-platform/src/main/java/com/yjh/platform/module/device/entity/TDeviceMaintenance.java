@@ -19,7 +19,6 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Past;
 
 /**
  * @author lqh

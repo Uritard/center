@@ -313,7 +313,8 @@
         a.remark,
         state_zero,
         state_one,
-        alarm_state
+        alarm_state,
+        a.redundant_type
         from t_std_devicemete a
         where 1 = 1
             and a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
@@ -360,6 +361,7 @@
         state_zero,
         state_one,
         alarm_state,
+        a.redundant_type,
         g.dict_note as alarmLevelName,
         f.dict_note as alarmTypeName,
         i.dict_note as customTypeName,
@@ -466,6 +468,7 @@
         a.state_zero,
         a.state_one,
         a.alarm_state,
+        a.redundant_type,
         g.dict_note as alarmLevelName,
         f.dict_note as alarmTypeName,
         i.dict_note as customTypeName,

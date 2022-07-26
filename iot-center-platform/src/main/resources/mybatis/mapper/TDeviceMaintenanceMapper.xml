@@ -26,7 +26,7 @@
             is_valid,
             maintenance_start,
             maintenance_stop,
-            colocoordinate_pixel,
+            coordinate_pixel,
             device_level
         )values(
                 #{maintenanceId, jdbcType=BIGINT},
@@ -53,7 +53,7 @@
         <if test="isValid != null ">a.is_valid = #{isValid, jdbcType=INTEGER},</if>
         <if test="maintenanceStart != null ">a.maintenance_start = #{maintenanceStart, jdbcType=TIMESTAMP},</if>
         <if test="maintenanceStop != null ">a.maintenance_stop = #{maintenanceStop, jdbcType=TIMESTAMP},</if>
-        <if test="coordinatePixel != null ">a.colocoordinate_pixel = #{coordinatePixel},</if>
+        <if test="coordinatePixel != null ">a.coordinate_pixel = #{coordinatePixel},</if>
         <if test="deviceLevel != null ">a.device_level = #{deviceLevel},</if>
     </set>
             where a.maintenance_id = #{maintenanceId, jdbcType=BIGINT}
@@ -67,7 +67,7 @@
         a.is_valid,
         a.maintenance_start,
         a.maintenance_stop,
-        a.colocoordinate_pixel,
+        a.coordinate_pixel,
         a.device_level
         from t_device_maintenance a
         where 1 = 1
@@ -82,7 +82,7 @@
         a.is_valid,
         a.maintenance_start,
         a.maintenance_stop,
-        a.colocoordinate_pixel,
+        a.coordinate_pixel,
         a.device_level
         from t_device_maintenance a
         where 1 = 1
@@ -103,7 +103,7 @@
         a.is_valid,
         a.maintenance_start,
         a.maintenance_stop,
-        a.colocoordinate_pixel,
+        a.coordinate_pixel,
         a.device_level
         from t_device_maintenance a
         where 1 = 1
@@ -119,7 +119,7 @@
             is_valid,
             maintenance_start,
             maintenance_stop,
-        colocoordinate_pixel,
+        coordinate_pixel,
         device_level
         )values
         <foreach collection="list" item="TDeviceMaintenance" separator=",">

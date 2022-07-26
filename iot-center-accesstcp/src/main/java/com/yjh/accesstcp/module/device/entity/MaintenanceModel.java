@@ -23,5 +23,5 @@ public class MaintenanceModel {
     private String deviceLevel;//设备层级
     private List<String> deviceIds;
     private String deviceList;//检修设备列表
-    private String colocoordinatePixel;//坐标框
+    private String coordinatePixel;//坐标框
 }

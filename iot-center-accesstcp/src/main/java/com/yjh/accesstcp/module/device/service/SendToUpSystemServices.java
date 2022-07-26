@@ -20,7 +20,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -381,7 +380,7 @@ public class SendToUpSystemServices {
             maintenanceMap.put("device_list",item.getDeviceIds().toString().replace("[","")
                     .replace("]","")
                     .replace(" ",""));
-            maintenanceMap.put("coordinate_pixel",item.getColocoordinatePixel());
+            maintenanceMap.put("coordinate_pixel",item.getCoordinatePixel());
             finalList.add(maintenanceMap);
         });
         return CreateModeXMLUtil.createXmlFile(finalList,path,"overhaularea_model.xml","Effect_Config");
