@@ -25,8 +25,8 @@ public class TStdMeterTypeModelService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int deleteByPrimaryId(Long meterTypeId) {
-        return this.tStdMeterTypeModelDao.deleteByPrimaryId(meterTypeId);
+    public int deleteByPrimaryId(Long id) {
+        return this.tStdMeterTypeModelDao.deleteByPrimaryId(id);
     }
 
     @Transactional(rollbackFor = Exception.class)

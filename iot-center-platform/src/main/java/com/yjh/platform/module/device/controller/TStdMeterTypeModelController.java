@@ -51,10 +51,10 @@ public class TStdMeterTypeModelController {
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @Logs(title = "删除设备类型模型",content = "根据用户传递的参数删除设备类型模型",logType = 4,authority = "1234")
-    public Result delete(@RequestParam(value = "meterTypeId") Long meterTypeId) {
+    public Result delete(@RequestParam(value = "id") Long id) {
         Result result = new Result();
         try {
-            result.setData(tStdMeterTypeModelService.deleteByPrimaryId(meterTypeId));
+            result.setData(tStdMeterTypeModelService.deleteByPrimaryId(id));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("设备类型模型删除异常:", e);

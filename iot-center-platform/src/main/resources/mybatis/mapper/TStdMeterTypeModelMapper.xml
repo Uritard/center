@@ -60,7 +60,7 @@
     </sql>
 
 
-    <insert id="add"  useGeneratedKeys="true" keyProperty="meterTypeId" parameterType="com.yjh.platform.module.device.entity.TStdMeterTypeModel">
+    <insert id="add"  useGeneratedKeys="true" keyProperty="id" parameterType="com.yjh.platform.module.device.entity.TStdMeterTypeModel">
         insert into t_std_meter_type_model(
         <include refid="Base_Column_List"/>
         )values(
@@ -125,7 +125,7 @@
         a.alarm_state = #{alarmState, jdbcType=INTEGER},
 
     </set>
-        where a.meter_type_id = #{meterTypeId, jdbcType=BIGINT}
+        where a.id = #{id, jdbcType=BIGINT}
     </update>
 
     <delete id="deleteByPrimaryId">

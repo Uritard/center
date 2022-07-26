@@ -26,7 +26,7 @@ public interface TStdMeterTypeModelDao {
      * @param deviceTypeId
      * @return
      */
-    int deleteByPrimaryId(Long deviceTypeId);
+    int deleteByPrimaryId(Long id);
 
     /**
      * 更新设备类型模型
