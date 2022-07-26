@@ -59,16 +59,16 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         this.ctx = ctx;
 
         Document document = null;
+        long sendSessionId = msg.getSendSessionId();
+        long receiveSessionId = msg.getReceiveSessionId();
         try {
             String content = new String(msg.getContent(), StandardCharsets.UTF_8);
-            log.info("准备解析的xml=={}", content);
+            log.info("准备解析的xml=={}\nsendSessionId:{}, receiveSessionId:{}", content, sendSessionId, receiveSessionId);
             document = DocumentHelper.parseText(content);
         } catch (DocumentException e) {
             log.error("parse xml error", e);
         }
         XMLBaseModel xmlRes = PlatformXMLUtil.readStringXmlOut(document);
-        long sendSessionId = msg.getSendSessionId();
-        long receiveSessionId = msg.getReceiveSessionId();
         if (xmlRes.getSendCode() == null) {
             log.info("客户端 {} 与服务端连接可能断了，等待重连.....", ctx.channel().remoteAddress());
         } else {

@@ -57,6 +57,9 @@ public class Constant {
     public static String isDecode;
 
     public static String isUkey;
+
+    public static String[] FIELDS_NOT_VALIDAT;
+
     /**
      * ukey序列号
      */

@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.http.HttpServletRequestWrapper;
 import com.netflix.zuul.http.ServletInputStreamWrapper;
+import com.yjh.gateway.common.Constant;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -162,7 +163,7 @@ public class ParamUtil {
             String key = entry.getKey();
             Object val = entry.getValue();
             // 对密码不进行校验
-            if (StringUtils.endsWithIgnoreCase(key, "PCode") || ArrayUtils.contains(new String[]{"password", "ruleContent", "colocoordinatePixel"}, key)) {
+            if (StringUtils.endsWithIgnoreCase(key, "PCode") || ArrayUtils.contains(Constant.FIELDS_NOT_VALIDAT, key)) {
                 continue;
             }
             if (val instanceof String && StringUtils.isNotEmpty((String) val)) {

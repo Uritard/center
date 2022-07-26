@@ -1,4 +1,4 @@
-package com.gateway.etl.configuration;
+package com.yjh.gateway.configuration;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -20,7 +20,7 @@ public class CommonConfig {
      */
     private String serverPath;
 
-
+    private String fieldsNotValidat;
 
 
 
