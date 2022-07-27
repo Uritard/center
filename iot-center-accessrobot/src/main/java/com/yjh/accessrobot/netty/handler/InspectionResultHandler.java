@@ -76,6 +76,10 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         String taskCode = String.valueOf(item.get("task_code"));
         // 通过机器人上报的任务id查询巡视主机上的任务id
         String taskId = StaticContextAccessor.getBean(RobotService.class).selectRealTaskId(taskCode);
+        if(StringUtils.isEmpty(taskId)){
+            taskId = taskCode;
+            log.info("taskId is empty, use taskCode as taskId");
+        }
         log.info("taskCode==={},taskId===={}", taskCode, taskId);
         cruiseResultMap.put("taskCode",  taskId);
         cruiseResultMap.put("deviceName",  String.valueOf(item.get("device_name")));

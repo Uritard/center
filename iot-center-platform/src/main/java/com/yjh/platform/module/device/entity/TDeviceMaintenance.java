@@ -72,6 +72,7 @@ public class TDeviceMaintenance implements Serializable {
 
     private List<Long> deviceIdList;
 
+    @Length(max = 256, message = "coordinatePixel长度必须小于等于256")
     private String coordinatePixel;
 
     private String deviceLevel;

@@ -1090,7 +1090,10 @@ public class RobotService {
                     return result;
                 }else {
                     String taskId = robotTaskControlMap.get("taskId").toString();
-                    String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+                    String robotTaskId = taskId;
+                    if ("true".equals(redisTemplate.opsForValue().get("RobotTask.taskToRobot"))) {
+                        robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+                    }
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + robotTaskId);
                     String tasSkPatrolledId = redisInfoMap.get("taskPatrolled_id");
                     String code = flag ? "1".equals(commandValue) ? taskId : tasSkPatrolledId : taskId;

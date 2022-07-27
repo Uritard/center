@@ -3,12 +3,16 @@ package com.yjh.platform.module.device.service;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TDeviceMaintenanceDao;
 import com.yjh.platform.module.device.entity.IdAndNameDetail;
 import com.yjh.platform.module.device.entity.TDeviceMaintenance;
 import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
 * @author lqh
@@ -30,7 +35,7 @@ public class TDeviceMaintenanceService{
     private Logger log = LoggerFactory.getLogger(TDeviceMaintenanceService.class);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-
+    private static final Pattern PATTERN = Pattern.compile("^((([1-9]\\d{0,4},?){0,2}([1-9]\\d{0,4});?){0,3}([1-9]\\d{0,4},?){0,2}([1-9]\\d{0,4}))$");
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TDeviceMaintenance tDeviceMaintenance) {
@@ -43,6 +48,7 @@ public class TDeviceMaintenanceService{
 //                "maintenanceStart": "2021-01-11 06:36:54.759Z",
 //                "maintenanceStop": "2021-02-11 06:36:54.759Z"
 //        }
+        checkParam(tDeviceMaintenance);
         tDeviceMaintenance.setDeviceId(tDeviceMaintenance.getDeviceIdList().get(0));
         this.tDeviceMaintenanceDao.add(tDeviceMaintenance);
         Long id = tDeviceMaintenance.getMaintenanceId();
@@ -122,6 +128,7 @@ public class TDeviceMaintenanceService{
 
     @Transactional(rollbackFor = Exception.class)
     public int update(TDeviceMaintenance tDeviceMaintenance) {
+        checkParam(tDeviceMaintenance);
         List<Long> list = tDeviceMaintenance.getDeviceIdList();
         List<TDeviceMaintenance> addList = new ArrayList<>();
         this.deleteByPrimaryId(tDeviceMaintenance.getMaintenanceId());
@@ -156,6 +163,22 @@ public class TDeviceMaintenanceService{
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
         return this.tDeviceMaintenanceDao.batchAdd(addList);
+    }
+
+    /**
+     * 参数校验
+     */
+    private void checkParam(TDeviceMaintenance maintenance){
+        if(StringUtils.isAnyEmpty(maintenance.getCoordinatePixel(), maintenance.getDeviceLevel())){
+            throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "设备层级或坐标不可为空");
+        }
+        int level = NumberUtils.toInt(maintenance.getDeviceLevel());
+        if (level < 1 || level > 4) {
+            throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "设备层级错误(1-4)");
+        }
+        if (!PATTERN.matcher(maintenance.getCoordinatePixel()).matches()) {
+            throw new BusinessException(ResultCodeEnum.CODE20017.getCode(), "坐标格式错误(x1,y1,z1;x2,y2,z2;x3,y3,z3;x4,y4,z4)，单个坐标最长5位");
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

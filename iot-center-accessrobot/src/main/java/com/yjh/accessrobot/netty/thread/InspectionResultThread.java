@@ -193,7 +193,10 @@ public class InspectionResultThread implements Runnable{
                 Integer abnormal = abnormalNum;
                 Integer normal = normalNum;
 
-                String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+                String robotTaskId = taskId;
+                if ("true".equals(redisTemplate.opsForValue().get("RobotTask.taskToRobot"))) {
+                    robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+                }
                 log.info("robotTaskId==={}", robotTaskId);
                 Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId);
                 Map<String,String> tCruiseTaskResultMap = new HashMap<>(16);
@@ -310,7 +313,10 @@ public class InspectionResultThread implements Runnable{
             log.info("机器人任务为{}返回结果个数===={}", taskId, resultList.size());
 
             // 统计巡视主机下发给机器人的巡检点大小
-            String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+            String robotTaskId = taskId;
+            if ("true".equals(redisTemplate.opsForValue().get("RobotTask.taskToRobot"))) {
+                robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+            }
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + robotTaskId);
             String instanceList = redisInfoMap.get("instanceIdList");
             instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");

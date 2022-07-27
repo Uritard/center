@@ -71,7 +71,7 @@ public class SendToUpSystemServices {
                 .setCode(code)
                 .setItems(items);
         String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
-        log.info("发送给上级系统的消息：{}", xml);
+        log.info("发送给上级系统的消息：{}\nsendSessionId:{}, receiveSessionId:{}", xml, sendSessionId, receiveSessionId);
         bytes = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId,true, xml);
         tcpClientHandler.send(bytes);
         return 1;
@@ -161,12 +161,13 @@ public class SendToUpSystemServices {
             Map<String,Object> map = new HashMap<>();
             Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
             String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model":mapForPath.get("content")+"/"+stationCode+"/Model";
+            list.add(map);
 
             log.info("模型文件路径："+path);
             switch (type){
                 case "1":
                     //点位模型
-                    map.put("device_file_path",createDeviceModel(path));
+                    // map.put("device_file_path",createDeviceModel(path));
                     String deviceModelTargetPath = String.format(stationCode + "/Model/device_model.xml");
                     ftpsUtil.putFile(createDeviceModel(path),deviceModelTargetPath);
                     map.put("device_file_path",deviceModelTargetPath);
@@ -449,12 +450,14 @@ public class SendToUpSystemServices {
     }
 
     private HashMap<String,Object> dealCount(HashMap<String,Object> countMap){
-        double totalNum = NumberUtils.toDouble(countMap.get("totalNum").toString());
-        double validNum = NumberUtils.toDouble(countMap.get("validNum").toString());
-        String percent = totalNum > 0 ? String.format("%.3f",validNum * 100 / totalNum) : "0.00";
+        String totalNumStr = countMap.get("totalNum").toString();
+        String validNumStr = countMap.get("validNum").toString();
+        double totalNum = NumberUtils.toDouble(totalNumStr);
+        double validNum = NumberUtils.toDouble(validNumStr);
+        String percent = totalNum > 0 ? String.format("%.3f",validNum * 100 / totalNum) : "0.000";
         HashMap<String,Object> reMap = new HashMap<>();
-        reMap.put("total_num",totalNum);
-        reMap.put("valid_num",validNum);
+        reMap.put("total_num",totalNumStr);
+        reMap.put("valid_num",validNumStr);
         reMap.put("percent",percent+"%");
         return reMap;
     }

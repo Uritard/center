@@ -125,8 +125,10 @@ public class CruiseTaskJob extends QuartzJobBean {
             Date date = null;
             try {
                 date = simpleDateFormat.parse(taskDate);
-            } catch (Exception e) { e.getMessage(); }
-            List<TCruiseTaskDel> tCruiseTaskDelList =tCruiseTaskDelDao.select(taskId,date,null);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+            List<TCruiseTaskDel> tCruiseTaskDelList =tCruiseTaskDelDao.select(taskId, date,null);
 
             if(tCruiseTaskDelList != null && tCruiseTaskDelList.size()>0){
                 //不需要执行任务
@@ -275,7 +277,7 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                     log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
                     //让机器人做任务
-                    if (!taskToRobot){
+                    if (!taskToRobot && tCruiseTask.getIfRun() == 172){
                         robotTask(robotTaskInfoMap);
                     }
                 }

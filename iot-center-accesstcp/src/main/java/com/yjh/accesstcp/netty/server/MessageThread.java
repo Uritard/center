@@ -4,6 +4,7 @@
 
 package com.yjh.accesstcp.netty.server;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
@@ -380,7 +381,7 @@ public class MessageThread {
         }
 
         if ("121".equals(xmlBaseModel.getType())) {
-            log.info("巡视结果统计查询：{}", xmlBaseModel);
+            log.info("巡视结果统计查询：{}", JSON.toJSONString(xmlBaseModel));
             String startTime = "";
             String endTime = "";
             if (xmlBaseModel.getItems() != null && xmlBaseModel.getItems().size() > 0) {
