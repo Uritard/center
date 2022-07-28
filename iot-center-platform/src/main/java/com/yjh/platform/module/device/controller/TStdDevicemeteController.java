@@ -187,15 +187,16 @@ public class TStdDevicemeteController {
 //            if (upRegionIds.size() == 0) {
 //                upRegionIds.add(tStdDeviceMeteDetail.getUpRegionId());
 //            }
-            Page page = PageHelper.startPage(tStdDeviceMeteDetail.getPageNum()!=null?tStdDeviceMeteDetail.getPageNum():1, tStdDeviceMeteDetail.getPageSize()!=null?tStdDeviceMeteDetail.getPageSize():0, true, null, true);
+//            Page page = PageHelper.startPage(tStdDeviceMeteDetail.getPageNum()!=null?tStdDeviceMeteDetail.getPageNum():1, tStdDeviceMeteDetail.getPageSize()!=null?tStdDeviceMeteDetail.getPageSize():0, true, null, true);
             List<Long> listForPage=tStdDevicemeteService.selectForPage(tStdDeviceMeteDetail);
-            List<TStdDeviceMeteDetail> list = new ArrayList<>();
-            if(listForPage != null &&listForPage.size()>0){
-                list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,listForPage);
-            }
-            resultMap.put("count", page.getTotal());
-            resultMap.put("list", list);
-            result.setData(resultMap);
+//            List<TStdDeviceMeteDetail> list = new ArrayList<>();
+//            if(listForPage != null &&listForPage.size()>0){
+//                list = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,listForPage);
+//            }
+//            resultMap.put("count", page.getTotal());
+//            resultMap.put("list", list);
+//            result.setData(resultMap);
+            result = tStdDevicemeteService.selectByPage(tStdDeviceMeteDetail,listForPage);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("标准设备测点分页查询失败描述：", e);
@@ -325,6 +326,4 @@ public class TStdDevicemeteController {
         }
         return result;
     }
-
-
 }

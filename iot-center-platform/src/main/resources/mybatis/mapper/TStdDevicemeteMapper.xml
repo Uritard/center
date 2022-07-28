@@ -477,8 +477,11 @@
         e.device_name as deviceName,
         e.up_region_id,
         a.analyse_type,
-        l.dict_note as analyseTypeName
+        l.dict_note as analyseTypeName,
+        a.redundant_type,
+        k.cruise_type
         from t_std_devicemete a
+        LEFT JOIN t_cruise_point_instance k on a.device_mete_id = k.device_mete_id
         left join  t_dict_business g on a.alarm_level= g.dict_code
         left join t_dict_business f on a.alarm_type= f.dict_code
         left join t_dict_business b on a.mete_type= b.dict_code
@@ -489,10 +492,14 @@
         where 1=1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=VARCHAR}</if>
         <if test="meteName != null and meteName != ''"> and a.mete_name like concat('%',#{meteName, jdbcType=VARCHAR},'%') </if>
-        <if test="pageSize != 0">  and a.device_mete_id in
+          and a.device_mete_id in
             <foreach collection="list" item="deviceMeteId"  separator="," open="(" close=")"  >
                 #{deviceMeteId,jdbcType=BIGINT}
-            </foreach></if>
+            </foreach>
+        <if test="redundantType != -1"> and a.redundant_type = #{redundantType, jdbcType=VARCHAR}</if>
+        GROUP BY a.device_mete_id
+        <if test="isRedundant == 0"> HAVING k.cruise_type = 228 and count(1) &gt;= 2</if>
+        <if test="isRedundant == 1"> HAVING k.cruise_type = 228 and count(1) &lt; 2</if>
          order by a.device_mete_id desc
     </select>
     <select id="selectForPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceMete" resultType="java.lang.Long">
@@ -878,5 +885,13 @@
         select a.instance_id
         from t_cruise_point_instance a
         where a.device_id = #{deviceId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectAllDeviceMeteIdAndCruiseType"  resultType="java.util.Map">
+        select
+            a.device_mete_id, a.cruise_type
+        FROM
+            t_cruise_point_instance a
+        WHERE 1 = 1
     </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.service;
 
+import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
@@ -202,7 +203,8 @@ public class TStdDevicemeteService{
         return tStdDevicemeteDao.selectForPage(tStdDeviceMeteDetail);
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceMeteDetail> selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail,List<Long> listForPage) {
+    public Result selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail,List<Long> listForPage) {
+        Result result = new Result();
 //        if(tStdDeviceMeteDetail.getDeviceId() == null) {
 //            if (ids.size() != 0) {
 //                tStdDeviceMeteDetail.setIds(ids);
@@ -217,8 +219,40 @@ public class TStdDevicemeteService{
 //            tStdDeviceMeteDetail.setIds(ids);
 //            tStdDeviceMeteDetail.setUpRegionId(Long.valueOf(1));
 //        }
-        return tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail.getMeteName(),tStdDeviceMeteDetail.getDeviceId(),
-                tStdDeviceMeteDetail.getPageSize(),listForPage);
+        Integer isRedundant = tStdDeviceMeteDetail.getIsRedundant();
+        Integer pageNum = tStdDeviceMeteDetail.getPageNum();
+        Integer pageSize = tStdDeviceMeteDetail.getPageSize();
+        List<TStdDeviceMeteDetail> list = tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(),
+                tStdDeviceMeteDetail.getRedundantType(), isRedundant,  listForPage);
+        List<TStdDeviceMeteDetail> resIsRedundantList = new ArrayList<>();
+        List<TStdDeviceMeteDetail> resIsNotRedundantList = new ArrayList<>();
+        List<TStdDeviceMeteDetail> allList = new ArrayList<>();
+        for (TStdDeviceMeteDetail detail : list){
+            if (Objects.equals(0, isRedundant)){
+                detail.setIsRedundant(0);
+                resIsRedundantList.add(detail);
+            }else if (Objects.equals(1, isRedundant)){
+                detail.setIsRedundant(1);
+                resIsNotRedundantList.add(detail);
+            }else {
+                detail.setIsRedundant(-1);
+                allList.add(detail);
+            }
+        }
+        if (Objects.equals(-1, isRedundant)){
+            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(allList, pageNum, pageSize);
+            result.setData(dataResult);
+            return result;
+        }
+        if (Objects.equals(0, isRedundant)){
+            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(resIsRedundantList, pageNum, pageSize);
+            result.setData(dataResult);
+            return result;
+        }
+        StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(resIsNotRedundantList, pageNum, pageSize);
+        result.setData(dataResult);
+        return result;
+
     }
 
     @Transactional(rollbackFor = Exception.class)

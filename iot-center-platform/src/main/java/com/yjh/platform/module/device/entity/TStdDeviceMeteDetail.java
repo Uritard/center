@@ -49,5 +49,7 @@ public class TStdDeviceMeteDetail extends TStdDeviceMete{
     private String isAi;//是否配置缺陷算法
     private String isJudge;//是否配置判别算法
 
+    private Integer isRedundant;//是否冗余配置
+
 }
 

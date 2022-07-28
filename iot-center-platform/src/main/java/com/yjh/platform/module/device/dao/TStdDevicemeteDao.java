@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -65,7 +66,8 @@ public interface TStdDevicemeteDao {
                                 );
     List<TStdDeviceMeteDetail> selectByPage(@Param(value = "meteName") String meteName,
                                             @Param(value = "deviceId") Long deviceId,
-                                            @Param(value = "pageSize") Integer pageSize,
+                                            @Param(value = "redundantType") String redundantType,
+                                            @Param(value = "isRedundant") Integer isRedundant,
                                             @Param(value = "list") List<Long> list
     );
 
@@ -102,5 +104,5 @@ public interface TStdDevicemeteDao {
     List<Long> selectHaveInstanceId(@Param(value = "deviceId")Long deviceId);
     List<Long>selectForPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
 
-
+    List<Map<String, String>> selectAllDeviceMeteIdAndCruiseType();
 }
