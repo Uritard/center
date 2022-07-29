@@ -104,5 +104,5 @@ public interface TStdDevicemeteDao {
     List<Long> selectHaveInstanceId(@Param(value = "deviceId")Long deviceId);
     List<Long>selectForPage(TStdDeviceMeteDetail tStdDeviceMeteDetail);
 
-    List<Map<String, String>> selectAllDeviceMeteIdAndCruiseType();
+    List<Map<String, Object>> selectAllDeviceMeteIdAndCruiseType();
 }

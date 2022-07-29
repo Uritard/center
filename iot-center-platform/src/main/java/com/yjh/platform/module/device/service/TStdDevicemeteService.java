@@ -12,18 +12,17 @@ import java.util.*;
 
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
-import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
-import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 /**
 * @author tt
@@ -223,36 +222,55 @@ public class TStdDevicemeteService{
         Integer pageNum = tStdDeviceMeteDetail.getPageNum();
         Integer pageSize = tStdDeviceMeteDetail.getPageSize();
         List<TStdDeviceMeteDetail> list = tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(),
-                tStdDeviceMeteDetail.getRedundantType(), isRedundant,  listForPage);
-        List<TStdDeviceMeteDetail> resIsRedundantList = new ArrayList<>();
-        List<TStdDeviceMeteDetail> resIsNotRedundantList = new ArrayList<>();
-        List<TStdDeviceMeteDetail> allList = new ArrayList<>();
+                tStdDeviceMeteDetail.getRedundantType(), isRedundant, listForPage);
+
+        // 查询当前配置了巡检方式的测点
+        List<Map<String, Object>> mapList = tStdDevicemeteDao.selectAllDeviceMeteIdAndCruiseType();
+        MultiValueMap<Long, String> multiValueMap = new LinkedMultiValueMap<>();
+        for (Map<String, Object> map : mapList){
+            multiValueMap.add(Long.valueOf(String.valueOf(map.get("device_mete_id"))), String.valueOf(map.get("cruise_type")));
+        }
+        // 配置了视频巡检且还配置了其他类型的为冗余配置
         for (TStdDeviceMeteDetail detail : list){
-            if (Objects.equals(0, isRedundant)){
-                detail.setIsRedundant(0);
-                resIsRedundantList.add(detail);
-            }else if (Objects.equals(1, isRedundant)){
-                detail.setIsRedundant(1);
-                resIsNotRedundantList.add(detail);
+            Long deviceMeteId = detail.getDeviceMeteId();
+            if (multiValueMap.containsKey(deviceMeteId)){
+                List<String> cruiseTypeList = multiValueMap.get(deviceMeteId);
+
+                if (cruiseTypeList.size() >= 2 && cruiseTypeList.contains("229")){
+                    detail.setIsRedundant(0);
+                }else {
+                    detail.setIsRedundant(1);
+                }
             }else {
-                detail.setIsRedundant(-1);
-                allList.add(detail);
+                detail.setIsRedundant(1);
             }
         }
-        if (Objects.equals(-1, isRedundant)){
-            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(allList, pageNum, pageSize);
-            result.setData(dataResult);
-            return result;
+
+        // 冗余与非冗余分类
+        List<TStdDeviceMeteDetail> resIsRedundantList = new ArrayList<>();
+        List<TStdDeviceMeteDetail> resIsNotRedundantList = new ArrayList<>();
+        for (TStdDeviceMeteDetail detail : list){
+            if (Objects.equals(0, detail.getIsRedundant())){
+                resIsRedundantList.add(detail);
+            }else {
+                resIsNotRedundantList.add(detail);
+            }
         }
+
+        // 响应满足条件的测点列表数据
         if (Objects.equals(0, isRedundant)){
             StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(resIsRedundantList, pageNum, pageSize);
             result.setData(dataResult);
             return result;
+        }else if (Objects.equals(1, isRedundant)){
+            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(resIsNotRedundantList, pageNum, pageSize);
+            result.setData(dataResult);
+            return result;
+        }else {
+            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(list, pageNum, pageSize);
+            result.setData(dataResult);
+            return result;
         }
-        StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(resIsNotRedundantList, pageNum, pageSize);
-        result.setData(dataResult);
-        return result;
-
     }
 
     @Transactional(rollbackFor = Exception.class)
