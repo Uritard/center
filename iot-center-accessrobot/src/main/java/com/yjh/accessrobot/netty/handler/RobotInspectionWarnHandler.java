@@ -13,6 +13,7 @@ import com.yjh.accessrobot.netty.thread.RobotInspectionWarnThread;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +54,10 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
         String taskCode = xmlBaseModel.getItems().get(0).get("task_code").toString();
         // 通过机器人上报的任务id查询巡视主机上的任务id
         String taskId = StaticContextAccessor.getBean(RobotService.class).selectRealTaskId(taskCode);
+        if(StringUtils.isEmpty(taskId)){
+            taskId = taskCode;
+            log.info("taskId is empty, use taskCode as taskId");
+        }
         log.info("taskCode==={},taskId===={}", taskCode, taskId);
         warnResultMap.put("taskCode", taskId);
         warnResultMap.put("deviceName", xmlBaseModel.getItems().get(0).get("device_name").toString());

@@ -204,6 +204,17 @@ public class TStdDevicemeteService{
     @Transactional(rollbackFor = Exception.class)
     public Result selectByPage(TStdDeviceMeteDetail tStdDeviceMeteDetail,List<Long> listForPage) {
         Result result = new Result();
+
+        List<TStdDeviceMeteDetail> list = new ArrayList<>();
+        Integer pageNum = tStdDeviceMeteDetail.getPageNum();
+        Integer pageSize = tStdDeviceMeteDetail.getPageSize();
+
+        if(listForPage.isEmpty()){
+            StdDeviceMeteDataResult dataResult = new StdDeviceMeteDataResult(list, pageNum, pageSize);
+            result.setData(dataResult);
+            return result;
+        }
+
 //        if(tStdDeviceMeteDetail.getDeviceId() == null) {
 //            if (ids.size() != 0) {
 //                tStdDeviceMeteDetail.setIds(ids);
@@ -219,9 +230,7 @@ public class TStdDevicemeteService{
 //            tStdDeviceMeteDetail.setUpRegionId(Long.valueOf(1));
 //        }
         Integer isRedundant = tStdDeviceMeteDetail.getIsRedundant();
-        Integer pageNum = tStdDeviceMeteDetail.getPageNum();
-        Integer pageSize = tStdDeviceMeteDetail.getPageSize();
-        List<TStdDeviceMeteDetail> list = tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(),
+        list = tStdDevicemeteDao.selectByPage(tStdDeviceMeteDetail.getMeteName(), tStdDeviceMeteDetail.getDeviceId(),
                 tStdDeviceMeteDetail.getRedundantType(), isRedundant, listForPage);
 
         // 查询当前配置了巡检方式的测点
