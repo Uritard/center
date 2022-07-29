@@ -44,7 +44,7 @@ public class SendToUpSystemController {
                        @RequestParam(value = "code", required = false) String code) {
         Result result = new Result();
         try {
-            sendToUpSystemService.sendResponse(0L, type,command,code,list);
+            sendToUpSystemService.sendResponse(0L, type,command,code,list, true);
             result.setData(1);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

@@ -423,7 +423,7 @@ public class SysUserController {
                 return result;
             } else if (unicode && sysKeyService.countUser(sysUser.getUserName()) > 0) {
                 sendPost(request);
-                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "用户名重复");
+                result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "用户名已存在或已被删除，不可使用");
                 return result;
             } else {
                 sysUserService.insert(sysUser,request);

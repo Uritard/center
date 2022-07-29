@@ -145,11 +145,11 @@ public class MessageThread {
             robotMap.put("list", list);
             Result re = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);//国网要求
             if (re == null) {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             } else if (200 == re.getCode()) {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             } else {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             }
             log.info("==控制响应== {}", re);
         }
@@ -163,11 +163,11 @@ public class MessageThread {
             robotMap.put("list", list);
             Result re = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);//国网要求
             if (re == null) {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             } else if (200 == re.getCode()) {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             } else {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             }
             log.info("==控制响应==" + re);
         }
@@ -185,11 +185,11 @@ public class MessageThread {
             item.put("task_patrolled_id", xmlBaseModel.getCode());
             items.add(item);
             if (re == null) {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", items);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", items, false);
             } else if (200 == re.getCode()) {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", items);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", items, false);
             } else {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", items);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", items, false);
             }
             log.info("==任务控制响应==" + re);
 
@@ -274,11 +274,11 @@ public class MessageThread {
                     map.put("list", taskList);
                     Result re = Constant.otherServer(map, Constant.ROBOT_TASK_URL);//国网要求
                     if (re == null) {
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
                     } else if (200 == re.getCode()) {
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
                     } else {
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
                     }
                     log.info("--响应任务下发--" + re);
                 }
@@ -321,17 +321,17 @@ public class MessageThread {
                         xmlItem.put("error_code", "3");
                         xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat2.format(new Date()));
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
                     } else if (200 == re.getCode()) {
                         xmlItem.put("task_patrolled_id", re.getData());
                         xmlItem.put("error_code", "0");
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
                     } else {
                         xmlItem.put("error_code", "1");
                         xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat2.format(new Date()));
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
                     }
                     log.info("--联动任务响应--" + re);
                 }
@@ -354,7 +354,7 @@ public class MessageThread {
                 Map<String, Object> map = sendToUpSystemServices.creatModel(xmlBaseModel.getCommand());
                 List<Map<String, Object>> list = new ArrayList<>();
                 list.add(map);
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", list);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", list, false);
             } catch (Exception e) {
                 log.info("模型同步错误" + e);
                 //                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", list);
@@ -371,11 +371,11 @@ public class MessageThread {
             Result re2 = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);//下发给机器人
             log.info("--响应检修--" + re);
             if (re == null) {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             } else if (200 == re.getCode()) {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             } else {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             }
 
         }
@@ -397,9 +397,9 @@ public class MessageThread {
             }
             List<Map<String, Object>> list = sendToUpSystemServices.resultStatistical(xmlBaseModel.getCommand(), startTime, endTime);
             if (list == null) {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "100", null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "100", null, false);
             } else {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", list);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", list, false);
             }
         }
 

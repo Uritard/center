@@ -6,6 +6,7 @@ import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.dao.SendToUpSystemDao;
 import com.yjh.accesstcp.module.device.entity.MaintenanceModel;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
@@ -51,7 +52,7 @@ public class SendToUpSystemServices {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Transactional(rollbackFor = Exception.class)
-    public int sendResponse(long receiveSessionId, String type, String command, String code, List<Map<String,Object>> items){
+    public int sendResponse(long receiveSessionId, String type, String command, String code, List<Map<String,Object>> items, boolean isSend){
         byte[] bytes = new byte[]{};
         long sendSessionId;
         TCPClientHandler tcpClientHandler = TCPClientHandler.getTCPClientHandlerHashMap().get(port);
@@ -72,7 +73,7 @@ public class SendToUpSystemServices {
                 .setItems(items);
         String xml = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("发送给上级系统的消息：{}\nsendSessionId:{}, receiveSessionId:{}", xml, sendSessionId, receiveSessionId);
-        bytes = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId,true, xml);
+        bytes = PlatformPacketUtil.createPacket(sendSessionId, receiveSessionId, isSend, xml);
         tcpClientHandler.send(bytes);
         return 1;
     }
@@ -163,6 +164,8 @@ public class SendToUpSystemServices {
             String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model":mapForPath.get("content")+"/"+stationCode+"/Model";
             list.add(map);
 
+            map.put("time", DateTimeUtil.getDateTimeString());
+            map.put("type", type);
             log.info("模型文件路径："+path);
             switch (type){
                 case "1":
@@ -170,49 +173,49 @@ public class SendToUpSystemServices {
                     // map.put("device_file_path",createDeviceModel(path));
                     String deviceModelTargetPath = String.format(stationCode + "/Model/device_model.xml");
                     ftpsUtil.putFile(createDeviceModel(path),deviceModelTargetPath);
-                    map.put("device_file_path",deviceModelTargetPath);
+                    map.put("file_path",deviceModelTargetPath);
                     break;
                 case "2":
                     //巡视主机模型
                     String hostModelTargetPath = String.format(stationCode + "/Model/host_model.xml");
                     ftpsUtil.putFile(createHostModel(path),hostModelTargetPath);
-                    map.put("host_file_path",hostModelTargetPath);
+                    map.put("file_path",hostModelTargetPath);
                     break;
                 case "3":
                     //机器人模型
                     String robotModelTargetPath = String.format(stationCode + "/Model/robot_model.xml");
                     ftpsUtil.putFile(createRobotModel(path),robotModelTargetPath);
-                    map.put("robot_file_path",robotModelTargetPath);
+                    map.put("file_path",robotModelTargetPath);
                     break;
                 case "4":
                     //摄像机模型
                     String videoModelTargetPath = String.format(stationCode + "/Model/video_model.xml");
                     ftpsUtil.putFile(createCameraModel(path),videoModelTargetPath);
-                    map.put("video_file_path",videoModelTargetPath);
+                    map.put("file_path",videoModelTargetPath);
                     break;
                 case "5":
                     //无人机
                     String droneModelTargetPath = String.format(stationCode + "/Model/drone_model.xml");
                     ftpsUtil.putFile(createDroneModel(path),droneModelTargetPath);
-                    map.put("drone_file_path",droneModelTargetPath);
+                    map.put("file_path",droneModelTargetPath);
                     break;
                 case "6":
                     //声纹模型
                     String voiceModelTargetPath = String.format(stationCode + "/Model/voice_model.xml");
                     ftpsUtil.putFile(createVoiceModel(path),voiceModelTargetPath);
-                    map.put("voice_file_path",voiceModelTargetPath);
+                    map.put("file_path",voiceModelTargetPath);
                     break;
                 case "7":
                     //任务模型
                     String taskModelTargetPath = String.format(stationCode + "/Model/task_model.xml");
                     ftpsUtil.putFile(createTaskModel(path),taskModelTargetPath);
-                    map.put("task_file_path",taskModelTargetPath);
+                    map.put("file_path",taskModelTargetPath);
                     break;
                 case "8":
                     //检修区域模型
                     String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
                     ftpsUtil.putFile(createMaintenanceModel(path),overhaulareaModelTargetPath);
-                    map.put("overhaularea_file_path",overhaulareaModelTargetPath);
+                    map.put("file_path",overhaulareaModelTargetPath);
                     break;
                 case "9":
                     String mapRealPath = sendToUpSystemDao.selectMapPath();
@@ -221,12 +224,12 @@ public class SendToUpSystemServices {
                     String mapAbsPath = mapRealPath.replace(filePathMap,fileFtpPathMap);
                     String mapModelTargetPath = stationCode+mapRealPath.replace(filePathMap,"");
                     ftpsUtil.putFile(mapAbsPath,mapModelTargetPath);
-                    map.put("map_file_path",mapModelTargetPath);
+                    map.put("file_path",mapModelTargetPath);
                     break;
                 default:
                     break;
             }
-            sendResponse(0L, "11","", stationCode, list);
+            sendResponse(0L, "11","", stationCode, list, true);
 
 
         }catch (Exception e) {
@@ -236,7 +239,7 @@ public class SendToUpSystemServices {
 
     @Transactional(rollbackFor = Exception.class)
     public int sendXML(XMLBaseModel xmlBaseModel){
-        return this.sendResponse(0L, xmlBaseModel.getType(), xmlBaseModel.getCommand(), xmlBaseModel.getCode(), xmlBaseModel.getItems());
+        return this.sendResponse(0L, xmlBaseModel.getType(), xmlBaseModel.getCommand(), xmlBaseModel.getCode(), xmlBaseModel.getItems(), true);
     }
 
     public String createDeviceModel(String path) throws Exception{

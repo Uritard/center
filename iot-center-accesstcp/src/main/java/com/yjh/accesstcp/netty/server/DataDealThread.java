@@ -181,11 +181,11 @@ public class DataDealThread implements Runnable {
             robotMap.put("list",list);
             Result re = Constant.otherServer(robotMap,Constant.ROBOT_TASK_URL);
             if(re == null){
-                sendToUpSystemServices.sendResponse(sendSessionId, "251","3","100",null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","3","100",null, false);
             }else if("success".equals(re.getData().toString())){
-                sendToUpSystemServices.sendResponse(sendSessionId, "251","3","200",null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","3","200",null, false);
             }else {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251","3","500",null);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","3","500",null, false);
             }
             log.info("==控制响应==");
         }
@@ -202,11 +202,11 @@ public class DataDealThread implements Runnable {
             item.put("task_patrolled_id",xmlBaseModel.getCode());
             items.add(item);
             if(re == null){
-                sendToUpSystemServices.sendResponse(sendSessionId, "251","4","100",items);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","4","100",items, false);
             }else if("1".equals(re.getData().toString())){
-                sendToUpSystemServices.sendResponse(sendSessionId, "251","4","200",items);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","4","200",items, false);
             }else {
-                sendToUpSystemServices.sendResponse(sendSessionId, "251","4","500",items);
+                sendToUpSystemServices.sendResponse(sendSessionId, "251","4","500",items, false);
             }
             log.info("==任务控制响应==");
 
@@ -275,11 +275,11 @@ public class DataDealThread implements Runnable {
                     map.put("list",taskList);
                     Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);
                     if(re == null){
-                    sendToUpSystemServices.sendResponse(sendSessionId, "251","3","500",null);
+                    sendToUpSystemServices.sendResponse(sendSessionId, "251","3","500",null, false);
                     }else if("200".equals(re.getCode())){
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251","3","200",null);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251","3","200",null, false);
                     }else {
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251","3","100",null);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251","3","100",null, false);
                     }
                     log.info("--响应任务下发--");
                 }
@@ -316,17 +316,17 @@ public class DataDealThread implements Runnable {
                         xmlItem.put("error_code","3");
                         xmlItem.put("task_patrolled_id",taskId);
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251","4","100",xmlItems);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251","4","100",xmlItems, false);
                     }else if("200".equals(re.getCode())){
                         xmlItem.put("task_patrolled_id",re.getData());
                         xmlItem.put("error_code","0");
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251","4","200",xmlItems);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251","4","200",xmlItems, false);
                     }else {
                         xmlItem.put("error_code","1");
                         xmlItem.put("task_patrolled_id",taskId);
                         xmlItems.add(xmlItem);
-                        sendToUpSystemServices.sendResponse(sendSessionId, "251","4","500",xmlItems);
+                        sendToUpSystemServices.sendResponse(sendSessionId, "251","4","500",xmlItems, false);
                     }
 
                 }
@@ -353,7 +353,7 @@ public class DataDealThread implements Runnable {
             mapForDevice.put("task_file_path",path+"/"+"task_file.xml");
             list.add(mapForTask);
 
-            sendToUpSystemServices.sendResponse(sendSessionId, "251","3","200",list);
+            sendToUpSystemServices.sendResponse(sendSessionId, "251","3","200",list, false);
 
             }
         }
@@ -366,7 +366,7 @@ public class DataDealThread implements Runnable {
             robotMap.put("list",list);
             Result re = Constant.otherServer(robotMap,Constant.MAINTENANCE_URL);
             log.info("--响应检修--");
-            sendToUpSystemServices.sendResponse(sendSessionId, "251","4","200",null);
+            sendToUpSystemServices.sendResponse(sendSessionId, "251","4","200",null, false);
         }
 
     }

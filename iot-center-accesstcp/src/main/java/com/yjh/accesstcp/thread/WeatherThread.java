@@ -122,7 +122,7 @@ public class WeatherThread implements Runnable{
                     map8.put("value_unit", mapForWeather.get("sf6") + mapForWeather.get("sf6Unit"));
                     list.add(map8);
 
-                    sendToUpSystemServices.sendResponse(0L, "21","",Constant.stationCode,list);
+                    sendToUpSystemServices.sendResponse(0L, "21","",Constant.stationCode,list, true);
                     log.info("--天气信息已发送--");
                 }
 
