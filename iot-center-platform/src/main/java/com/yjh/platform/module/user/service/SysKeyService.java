@@ -65,6 +65,9 @@ public class SysKeyService {
             // 判断是否需要加解密
             if ("true".equals(isDecode)) {
                 String dpkey = demo.decryptIdentifier(sysKey.getPubKey(), identifier);
+                if(dpkey.length() > 512) {
+                    throw new BusinessException(ResultCodeEnum.PARAMERROR.getCode(), "公钥长度必须小于512位");
+                }
                 if (StringUtils.isNotEmpty(dpkey)) {
                     sysKey.setPubKey(dpkey);
                 }

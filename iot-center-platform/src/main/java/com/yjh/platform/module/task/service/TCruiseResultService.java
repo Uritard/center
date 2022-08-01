@@ -148,10 +148,13 @@ public class TCruiseResultService{
             Result result = sendPostRequest(Constant.WARN_JUDGE,params);
             Map<String,Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
             log.info("object转map的东西==="+map);
-            Boolean isWarN = (Boolean)map.get("isWarn");
+            Boolean isWarN = false;
             String outRange = null;
-            if (Objects.nonNull(map.get("outRange"))){
-                outRange = map.get("outRange").toString();
+            if(Objects.nonNull(map)){
+                isWarN = (Boolean)map.get("isWarn");
+                if (Objects.nonNull(map.get("outRange"))){
+                    outRange = map.get("outRange").toString();
+                }
             }
 
             //组装告警基本信息
