@@ -354,4 +354,11 @@ public interface TRobotInfoDao {
      */
     List<TRobotInfo> selectByCommission();
 
+    /**
+     * 根据机器人实物id查询机器人信息
+     * @param robotCode 机器人实物id
+     * @return TRobotInfo 机器人信息
+     */
+    TRobotInfo selectRobotInfoByCode(@Param(value = "robotCode") String robotCode);
+
 }

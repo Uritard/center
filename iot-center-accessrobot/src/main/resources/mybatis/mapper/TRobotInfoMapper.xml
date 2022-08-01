@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TRobotInfo">
         <id column="robot_id" jdbcType="BIGINT" property="robotId" />
         <result column="robot_code" jdbcType="VARCHAR" property="robotCode" />
+        <result column="robot_num" jdbcType="INTEGER" property="robotNum" />
         <result column="robot_name" jdbcType="VARCHAR" property="robotName" />
         <result column="robot_status" jdbcType="VARCHAR" property="robotStatus" />
         <result column="robot_type" jdbcType="INTEGER" property="robotType" />
@@ -36,7 +37,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        robot_id, robot_code, robot_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, light_username, light_password, lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date, robot_factory, is_use, commission_date, up_region_id, robot_position, remarks,last_online_time,off_line_count,duration
+        robot_id, robot_code, robot_num, robot_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, light_username, light_password, lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date, robot_factory, is_use, commission_date, up_region_id, robot_position, remarks,last_online_time,off_line_count,duration
     </sql>
 
 
@@ -44,6 +45,7 @@
         insert into t_robot_info(
             robot_id,
             robot_code,
+            robot_num,
             robot_name,
             robot_status,
             robot_type,
@@ -71,6 +73,7 @@
         )values(
                 #{robotId, jdbcType=BIGINT},
                 #{robotCode, jdbcType=VARCHAR},
+                #{robotNum, jdbcType=INTEGER},
                 #{robotName, jdbcType=VARCHAR},
                 #{robotStatus, jdbcType=VARCHAR},
                 #{robotType, jdbcType=INTEGER},
@@ -107,6 +110,7 @@
         update t_robot_info a <set>
         <if test="robotId != null">a.robot_id = #{robotId},</if>
         <if test="robotCode != null ">a.robot_code = #{robotCode},</if>
+        <if test="robotNum != null "> a.robot_num = #{robotNum},</if>
         <if test="robotName != null ">a.robot_name = #{robotName},</if>
         <if test="robotStatus != null">a.robot_status = #{robotStatus},</if>
         <if test="robotType != null">a.robot_type = #{robotType},</if>
@@ -145,6 +149,7 @@
         select
         a.robot_id,
         a.robot_code,
+        a.robot_num,
         a.robot_name,
         a.robot_status,
         a.robot_type,
@@ -179,6 +184,7 @@
         select
         a.robot_id,
         a.robot_code,
+        a.robot_num,
         a.robot_name,
         a.robot_status,
         a.robot_type,
@@ -210,6 +216,7 @@
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+        <if test="robotNum != null"> and a.robot_num = #{robotNum, jdbcType=INTEGER}</if>
         <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
         <if test="robotStatus != null and robotStatus != ''"> and a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
         <if test="robotType != null and robotType != ''"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
@@ -240,6 +247,7 @@
         select
         a.robot_id,
         a.robot_code,
+        a.robot_num,
         a.robot_name,
         a.robot_status,
         a.robot_type,
@@ -271,6 +279,7 @@
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+        <if test="robotNum != null"> and a.robot_num = #{robotNum, jdbcType=INTEGER}</if>
         <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
         <if test="robotStatus != null and robotStatus != ''"> and a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
         <if test="robotType != null and robotType != ''"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
@@ -301,6 +310,7 @@
         insert into t_robot_info(
             robot_id,
             robot_code,
+            robot_num,
             robot_name,
             robot_status,
             robot_type,
@@ -330,6 +340,7 @@
             (
                 #{TRobotInfo.robotId, jdbcType=BIGINT},
                 #{TRobotInfo.robotCode, jdbcType=VARCHAR},
+                #{TRobotInfo.robotNum, jdbcType=INTEGER},
                 #{TRobotInfo.robotName, jdbcType=VARCHAR},
                 #{TRobotInfo.robotStatus, jdbcType=VARCHAR},
                 #{TRobotInfo.robotType, jdbcType=INTEGER},
@@ -1225,5 +1236,55 @@
         LEFT JOIN t_std_device_attr c ON b.device_id = c.device_id
         WHERE
         a.inspection_code = #{deviceId, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectRobotInfoByCode" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        select
+            a.robot_id,
+            a.robot_code,
+            a.robot_num,
+            a.robot_name,
+            a.nest_code,
+            a.nest_name,
+            a.robot_status,
+            a.robot_type,
+            a.drone_type,
+            a.robot_ip,
+            a.robot_port,
+            a.light_ip,
+            a.light_port,
+            a.identity_manager,
+            a.identity_code,
+            a.lnferad_IP,
+            a.Inferad_Port,
+            a.Inferad_username,
+            a.Inferad_password,
+            a.phote_path,
+            a.create_by,
+            a.create_date,
+            a.update_by,
+            a.update_date,
+            a.robot_factory,
+            a.made_in,
+            a.made_date,
+            a.is_use,
+            a.commission_date,
+            a.up_region_id,
+            a.robot_position,
+            a.drone_position,
+            a.robot_source,
+            a.address,
+            a.building_user,
+            a.appearance_number,
+            a.defect_record,
+            a.repair_record,
+            a.exit_putInto_record,
+            a.remarks,
+            a.record_id,
+            a.channel_num_light,
+            a.channel_num_inferad
+        from t_robot_info a
+        where 1 = 1
+          and a.robot_code = #{robotCode, jdbcType=VARCHAR}
     </select>
 </mapper>

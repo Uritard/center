@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -135,4 +136,9 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "出场编号")
     @TableField(value = "appearance_number", updateStrategy = FieldStrategy.IGNORED)
     private String appearanceNumber;
+
+    @Max(value = 99999999)
+    @ApiModelProperty(value = "机器人/无人机编号编码")
+    @TableField(value = "robot_num", updateStrategy = FieldStrategy.IGNORED)
+    private Integer robotNum;
 }

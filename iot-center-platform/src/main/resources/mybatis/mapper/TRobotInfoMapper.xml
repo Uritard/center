@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TRobotInfo">
         <id column="robot_id" jdbcType="BIGINT" property="robotId" />
         <result column="robot_code" jdbcType="VARCHAR" property="robotCode" />
+        <result column="robot_num" jdbcType="INTEGER" property="robotNum" />
         <result column="robot_name" jdbcType="VARCHAR" property="robotName" />
         <result column="nest_code" jdbcType="VARCHAR" property="nestCode" />
         <result column="nest_name" jdbcType="VARCHAR" property="nestName" />
@@ -45,7 +46,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        robot_id, robot_code, robot_name, nest_code,nest_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, identity_manager, identity_code,
+        robot_id, robot_code, robot_num, robot_name, nest_code,nest_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, identity_manager, identity_code,
         lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date,
         robot_factory, made_in, made_date, is_use, commission_date, up_region_id, robot_position, drone_position, remarks
     </sql>
@@ -55,6 +56,7 @@
         insert into t_robot_info(
             robot_code,
             robot_name,
+            robot_num,
             nest_code,
             nest_name,
             robot_status,
@@ -96,6 +98,7 @@
             channel_num_inferad
         )values(
                 #{robotCode, jdbcType=VARCHAR},
+                #{robotNum, jdbcType=INTEGER},
                 #{robotName, jdbcType=VARCHAR},
                 #{nestCode, jdbcType=VARCHAR},
                 #{nestName, jdbcType=VARCHAR},
@@ -171,6 +174,7 @@
         update t_robot_info a <set>
         <if test="robotId != null "> a.robot_id = #{robotId},</if>
         <if test="robotCode != null "> a.robot_code = #{robotCode},</if>
+        <if test="robotNum != null "> a.robot_num = #{robotNum},</if>
         <if test="robotName != null ">a.robot_name = #{robotName},</if>
         <if test="nestCode != null ">a.nest_code = #{nestCode},</if>
         <if test="nestName != null ">a.nest_code = #{nestName},</if>
@@ -219,6 +223,7 @@
         select
         a.robot_id,
         a.robot_code,
+        a.robot_num,
         a.robot_name,
         a.nest_code,
         a.nest_name,
@@ -269,6 +274,7 @@
         select
         a.robot_id,
         a.robot_code,
+        a.robot_num,
         a.robot_name,
         a.nest_code,
         a.nest_name,
@@ -313,6 +319,7 @@
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+        <if test="robotNum != null"> and a.robot_num = #{robotNum, jdbcType=INTEGER}</if>
         <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
         <if test="nestCode != null and nestCode != ''"> and a.nest_code = #{nestCode, jdbcType=VARCHAR}</if>
         <if test="nestName != null and nestName != ''"> and a.nest_name = #{nestName, jdbcType=VARCHAR}</if>
@@ -354,6 +361,7 @@
         select
         a.robot_id,
         a.robot_code,
+        a.robot_num,
         a.robot_name,
         a.robot_status,
         a.robot_type,
@@ -428,6 +436,7 @@
         select
         a.robot_id,
         a.robot_code,
+        a.robot_num,
         a.robot_name,
         a.nest_code,
         a.nest_name,
@@ -503,6 +512,7 @@
         insert into t_robot_info(
         robot_code,
             robot_name,
+            robot_num,
             nest_code,
             nest_name,
             robot_status,
@@ -546,6 +556,7 @@
         <foreach collection="list" item="TRobotInfo" separator=",">
             (
             #{TRobotInfo.robotCode, jdbcType=VARCHAR},
+            #{TRobotInfo.robotNum, jdbcType=INTEGER},
                 #{TRobotInfo.robotName, jdbcType=VARCHAR},
                 #{TRobotInfo.nestCode, jdbcType=VARCHAR},
                 #{TRobotInfo.nestName, jdbcType=VARCHAR},
@@ -706,5 +717,11 @@
         select a.phote_path
         FROM t_robot_info a
         WHERE a.robot_code = #{robotCode,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectAllRobotNum" resultType="java.lang.Integer">
+        select
+            a.robot_num
+        FROM t_robot_info a
     </select>
 </mapper>

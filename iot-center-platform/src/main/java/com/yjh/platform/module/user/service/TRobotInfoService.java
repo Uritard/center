@@ -72,7 +72,7 @@ public class TRobotInfoService{
     public int deleteByPrimaryId(Long robotId, HttpServletRequest request) {
         //机器人有测点或巡视点
         List<Long> list = tRobotInfoDao.selectHaveIns(robotId);
-        if(list != null && list.size()>0){
+        if(list != null && !list.isEmpty()){
             return -1;
         }
 
@@ -85,7 +85,7 @@ public class TRobotInfoService{
             redisTemplate.opsForHash().delete("AllRobotCode",tRobotInfo.getRobotId().toString());
         }
         //判断删除前的robotCode是否存在管道连接(在线),若存在，则断开连接
-        if (tRobotInfo.getRobotStatus().equals("在线")){
+        if (Objects.equals("在线", tRobotInfo.getRobotStatus())){
             HashMap<String,String> map = new HashMap<>();
             map.put("robotCode",tRobotInfo.getRobotCode());
             map.put("robotId",tRobotInfo.getRobotId().toString());
@@ -149,14 +149,14 @@ public class TRobotInfoService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInfo> select(Long robotId, String robotCode, String robotName, String robotStatus, Integer robotType, String robotIp, Integer robotPort,
+    public List<TRobotInfo> select(Long robotId, String robotCode, Integer robotNum, String robotName, String robotStatus, Integer robotType, String robotIp, Integer robotPort,
                                     String upRegionName, String lightIp, String lightPort, String identityManager, String identityCode,
                                    String lnferadIp, Integer inferadPort, String inferadUsername, String inferadPassword, String photePath,
                                    String createBy, Date createDate, String updateBy, Date updateDate, String robotFactory,String isUse,
                                    Date commissionDateString, Long upRegionId, String robotPosition, String robotSource,
                                    String address,String buildingUser,String appearanceNumber,String defectRecord,String repairRecord,
                                    String exitPutIntoRecord,String remarks) {
-        return tRobotInfoDao.select(robotId, robotCode, robotName, robotStatus, robotType, robotIp, robotPort,
+        return tRobotInfoDao.select(robotId, robotCode, robotNum, robotName, robotStatus, robotType, robotIp, robotPort,
                 upRegionName, lightIp, lightPort, identityManager, identityCode, lnferadIp, inferadPort, inferadUsername, inferadPassword,
                 photePath, createBy, createDate, updateBy, updateDate, robotFactory, isUse, commissionDateString, upRegionId, robotPosition,
                 robotSource,address,buildingUser,appearanceNumber,defectRecord,repairRecord,exitPutIntoRecord,remarks);
@@ -181,7 +181,7 @@ public class TRobotInfoService{
     public int batchInsert(List<TRobotInfo> list) {
         int res = tRobotInfoDao.batchInsert(list);
         for (TRobotInfo tRobotInfo : list){
-            redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
+            redisTemplate.opsForHash().put("AllRobotCode", String.valueOf(tRobotInfo.getRobotId()), tRobotInfo.getRobotCode());
         }
         return res;
     }
@@ -520,5 +520,10 @@ public class TRobotInfoService{
     @Transactional(rollbackFor = Exception.class)
     public List<String> selectAllRobotCode2() {
         return tRobotInfoDao.selectAllRobotCode2();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<Integer> selectAllRobotNum(){
+        return tRobotInfoDao.selectAllRobotNum();
     }
 }

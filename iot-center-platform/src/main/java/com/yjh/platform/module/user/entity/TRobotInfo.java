@@ -11,7 +11,6 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -243,4 +242,9 @@ public class TRobotInfo implements Serializable {
 
     @ApiModelProperty(value = "秘钥标识符", hidden=true)
     private String identifier;
+
+    @Max(value = 99999999)
+    @ApiModelProperty(value = "机器人/无人机编号编码")
+    @TableField(value = "robot_num", updateStrategy = FieldStrategy.IGNORED)
+    private Integer robotNum;
 }

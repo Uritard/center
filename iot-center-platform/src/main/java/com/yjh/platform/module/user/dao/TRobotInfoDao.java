@@ -31,6 +31,7 @@ public interface TRobotInfoDao {
     TRobotInfo selectByPrimaryId(@Param(value = "robotId") Long robotId);
     List<TRobotInfo> select(@Param(value = "robotId") Long robotId,
                             @Param(value = "robotCode") String robotCode,
+                            @Param(value = "robotNum") Integer robotNum,
                                 @Param(value = "robotName") String robotName,
                                 @Param(value = "robotStatus") String robotStatus,
                                 @Param(value = "robotType") Integer robotType,
@@ -107,4 +108,6 @@ public interface TRobotInfoDao {
     String selectRobotRunningCamera(@Param(value = "robotId")Long robotId,@Param(value = "instanceId")Long instanceId);
 
     String selectMapPathByCode(@Param(value = "robotCode") String robotCode);
+
+    List<Integer> selectAllRobotNum();
 }

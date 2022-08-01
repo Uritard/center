@@ -68,13 +68,18 @@ public class TRobotInfoController {
             }
             List<String> allRobotCodeList = tRobotInfoService.selectAllRobotCode2();
             if (allRobotCodeList.contains(tRobotInfo.getRobotCode())){
-                result.setMessage(209, "机器人编码已存在，不可重复");
-            }else {
-                result.setData(tRobotInfoService.insert(tRobotInfo,userId));
-                //有变动 同步模型
-                String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
-                Constant.modelUpload(modelType);
+                result.setMessage(209, "该实物ID已存在，不可重复");
+                return result;
             }
+            List<Integer> allRobotNumList = tRobotInfoService.selectAllRobotNum();
+            if (allRobotNumList.contains(tRobotInfo.getRobotNum())){
+                result.setMessage(209, "该设备编码已存在，不可重复");
+                return result;
+            }
+            result.setData(tRobotInfoService.insert(tRobotInfo,userId));
+            //有变动 同步模型
+            String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
+            Constant.modelUpload(modelType);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -115,31 +120,37 @@ public class TRobotInfoController {
     public Result update(HttpServletRequest request,@Validated @RequestBody TRobotInfo tRobotInfo) {
         Result result = new Result();
         try {
-            String robotCode = tRobotInfoService.selectRobotCodeById(tRobotInfo.getRobotId());
+            TRobotInfo robotInfoTemp = tRobotInfoService.selectByPrimaryId(tRobotInfo.getRobotId());
             List<String> allRobotCodeList = tRobotInfoService.selectAllRobotCode2();
-            if (!tRobotInfo.getRobotCode().equals(robotCode) && allRobotCodeList.contains(tRobotInfo.getRobotCode())){
-                    result.setMessage(209, "机器人编码已存在，不可重复");
-            }else {
-                Long userId = Long.valueOf(request.getHeader("userId"));
-
-                if (tRobotInfo.getRobotIp() != null && !"".equals(tRobotInfo.getRobotIp())) {
-                    String robotIp = tRobotInfo.getRobotIp();
-                    if (!robotIp.matches("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}")) {
-                        result.setCode(ResultCodeEnum.CODE10104.getCode(), ResultCodeEnum.CODE10104.getName());
-                    }
-                }
-                Integer robotPort = tRobotInfo.getRobotPort();
-                if (Objects.nonNull(robotPort)) {
-                    if (robotPort < 1 || robotPort > 65535) {
-                        result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
-                    }
-                }
-
-                result.setData(tRobotInfoService.update(tRobotInfo,userId));
-                //有变动 同步模型
-                String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
-                Constant.modelUpload(modelType);
+            if (!Objects.equals(robotInfoTemp.getRobotCode(), tRobotInfo.getRobotCode()) && allRobotCodeList.contains(tRobotInfo.getRobotCode())){
+                result.setMessage(209, "该实物ID已存在，不可重复");
+                return result;
             }
+            List<Integer> allRobotNumList = tRobotInfoService.selectAllRobotNum();
+            if (!Objects.equals(robotInfoTemp.getRobotNum(), tRobotInfo.getRobotNum()) && allRobotNumList.contains(tRobotInfo.getRobotNum())){
+                result.setMessage(209, "该设备编码已存在，不可重复");
+                return result;
+            }
+            Long userId = Long.valueOf(request.getHeader("userId"));
+
+            if (tRobotInfo.getRobotIp() != null && !"".equals(tRobotInfo.getRobotIp())) {
+                String robotIp = tRobotInfo.getRobotIp();
+                if (!robotIp.matches("([1-9]|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])(\\.(\\d|[1-9]\\d|1\\d{2}|2[0-4]\\d|25[0-5])){3}")) {
+                    result.setCode(ResultCodeEnum.CODE10104.getCode(), ResultCodeEnum.CODE10104.getName());
+                }
+            }
+            Integer robotPort = tRobotInfo.getRobotPort();
+            if (Objects.nonNull(robotPort)) {
+                if (robotPort < 1 || robotPort > 65535) {
+                    result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
+                }
+            }
+
+            result.setData(tRobotInfoService.update(tRobotInfo,userId));
+            //有变动 同步模型
+            String modelType = tRobotInfo.getDroneType() != null ? "5" : "3";
+            Constant.modelUpload(modelType);
+
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新机器人异常:", e);
@@ -170,6 +181,7 @@ public class TRobotInfoController {
     @Logs(title = "查询巡检设备信息",content = "根据用户传递的参数查询巡检设备信息",logType = 1)
     public Result select(@RequestParam(value = "robotId", required = false) Long robotId,
                          @RequestParam(value = "robotCode", required = false) String robotCode,
+                         @RequestParam(value = "robotNum", required = false) Integer robotNum,
                          @RequestParam(value = "robotName", required = false) String robotName,
                          @RequestParam(value = "robotStatus", required = false) String robotStatus,
                          @RequestParam(value = "robotType", required = false) Integer robotType,
@@ -204,7 +216,7 @@ public class TRobotInfoController {
                          @RequestParam(value = "remarks", required = false) String remarks) {
         Result result = new Result();
         try {
-            List<TRobotInfo> list = tRobotInfoService.select(robotId, robotCode, robotName, robotStatus, robotType,
+            List<TRobotInfo> list = tRobotInfoService.select(robotId, robotCode, robotNum, robotName, robotStatus, robotType,
                     robotIp, robotPort, upRegionName, lightIp, lightPort, identityManager, identityCode, lnferadIp,
                     inferadPort, inferadUsername, inferadPassword, photePath, createBy, createDate, updateBy,
                     updateDate, robotFactory, isUse, commissionDate, upRegionId, robotPosition,robotSource,
@@ -255,8 +267,7 @@ public class TRobotInfoController {
     public Result synchronizeFromPMS(@RequestParam(value = "robotCode") String robotCode,HttpServletRequest request) {
         Result result = new Result();
         try {
-//            Long userId = Long.valueOf(request.getHeader("userId"));
-            Long userId = 10L;
+            Long userId = Long.valueOf(request.getHeader("userId"));
             result.setData(tRobotInfoService.synchronizeFromPMS(robotCode,userId));
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -304,11 +315,11 @@ public class TRobotInfoController {
             int re = tRobotInfoService.batchDelete(robotIds);
             if(re == -1){
                 result.setCode(209,"此机器人下存在测点或巡视点");
-            }else {
-                result.setData(re);
-                //有变动 同步模型
-                Constant.modelUpload("3");
+                return result;
             }
+            result.setData(re);
+            //有变动 同步模型
+            Constant.modelUpload("3");
             //result.setData(tRobotInfoService.batchDelete(robotIds));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());

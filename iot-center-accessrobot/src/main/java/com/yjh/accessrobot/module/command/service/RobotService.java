@@ -10,7 +10,6 @@ import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
-import com.yjh.accessrobot.commons.logs.LogsAspect;
 import com.yjh.accessrobot.commons.logs.LogsRecord;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
@@ -36,8 +35,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -210,13 +207,11 @@ public class RobotService {
             scmap.put("result", "巡视设备不在线");
             return scmap;
         }else {
-            String robotNumber = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:robotNumber", "content"));
-            String droneNumber = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneNumber", "content"));
-            boolean isDrone = selectIsDrone(robotCode);
+            TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(sendCode)
                     .setReceiveCode(robotCode)
-                    .setCode(isDrone ? droneNumber : robotNumber)
+                    .setCode(String.valueOf(tRobotInfo.getRobotNum()))
                     .setTime(DateTimeUtil.format(new Date()))
                     .setType(type)
                     .setCommand(command)
@@ -2183,13 +2178,11 @@ public class RobotService {
         }
         item.add(map);
 
-        String robotNumber = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:robotNumber", "content"));
-        String droneNumber = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneNumber", "content"));
-        boolean isDrone = selectIsDrone(robotCode);
+        TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(sendCode)
                 .setReceiveCode(robotCode)
-                .setCode(isDrone ? droneNumber : robotNumber)
+                .setCode(String.valueOf(tRobotInfo.getRobotNum()))
                 .setTime(DateTimeUtil.format(new Date()))
                 .setType(type)
                 .setCommand(command)
