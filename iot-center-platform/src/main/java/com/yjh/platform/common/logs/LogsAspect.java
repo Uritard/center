@@ -1,17 +1,11 @@
 package com.yjh.platform.common.logs;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.parser.Feature;
-import com.google.common.collect.Maps;
-import com.netflix.zuul.context.RequestContext;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.IPUtil;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -28,24 +22,17 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @Description
@@ -235,6 +222,7 @@ public class LogsAspect {
         //判断是POST请求还是GET请求（不同请求获取参数方式不同）
         JSONObject paramJson = new JSONObject();
         try {
+            // 获取 get 方式传入参数，传入数组只获取第一个
             Map<String, String[]> map = request.getParameterMap();
             if (!(Objects.isNull(map) || map.isEmpty())) {
                 for (Map.Entry<String, String[]> entry : map.entrySet()) {
@@ -243,6 +231,7 @@ public class LogsAspect {
                     }
                 }
             }
+            // 判断是否存在注解
             if(ArrayUtils.isEmpty(paramAnnotations)){
                 return paramJson;
             }
@@ -255,14 +244,18 @@ public class LogsAspect {
                 }
                 for (int j = 0; j < anns.length; j++) {
                     Annotation annotation = anns[j];
+                    // 判断 @RequestBody 注解是第几个参数
                     if(annotation instanceof RequestBody){
                         idx = i;
                         break outside;
                     }
                 }
             }
-            JSONObject bodyParams = (JSONObject)JSONObject.toJSON(args[idx]);
-            paramJson.putAll(bodyParams);
+            // 获取参数，然后存入 json
+            if(idx >= 0) {
+                JSONObject bodyParams = (JSONObject)JSONObject.toJSON(args[idx]);
+                paramJson.putAll(bodyParams);
+            }
 
         } catch (Exception e) {
             log.error("***************getRequestParams throw Exception：***************", e);
