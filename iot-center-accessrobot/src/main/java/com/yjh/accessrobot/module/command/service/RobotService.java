@@ -316,6 +316,12 @@ public class RobotService {
         return PlatformPacketUtil.createPacket(sendSessionId, 0, true, xmlString);
     }
 
+    public static void main(String[] args) {
+        Integer i = 1;
+        Integer k = 1;
+        System.out.println(i.equals(k));
+    }
+
     /**
      * 更新机器人的在线状态
      * @param robotCode 机器人唯一标识

@@ -79,7 +79,6 @@ public class VideoIntercom implements Serializable {
     @TableField(value = "rtspPort",updateStrategy = FieldStrategy.IGNORED)
     private Integer rtspPort;
 
-    @Length(max = 32,message = "address长度必须小于等于128")
     @ApiModelProperty(value = "安装地址")
     @TableField(value = "address",updateStrategy = FieldStrategy.IGNORED)
     private String address;
