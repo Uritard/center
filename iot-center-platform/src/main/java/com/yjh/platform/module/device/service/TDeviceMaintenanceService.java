@@ -35,7 +35,7 @@ public class TDeviceMaintenanceService{
     private Logger log = LoggerFactory.getLogger(TDeviceMaintenanceService.class);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private static final Pattern PATTERN = Pattern.compile("^((([1-9]\\d{0,4},?){0,2}([1-9]\\d{0,4});?){0,3}([1-9]\\d{0,4},?){0,2}([1-9]\\d{0,4}))$");
+    private static final Pattern PATTERN = Pattern.compile("^((([1-9]\\d{0,4},){0,2}([1-9]\\d{0,4});){0,3}([1-9]\\d{0,4},){0,2}([1-9]\\d{0,4}))$");
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TDeviceMaintenance tDeviceMaintenance) {

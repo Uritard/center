@@ -74,7 +74,7 @@ public class TDeviceMaintenanceController {
             Constant.modelUpload("8");
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
-            log.error("删除异常:", e);
+            // log.error("删除异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("删除错误:", e);
@@ -93,7 +93,7 @@ public class TDeviceMaintenanceController {
             Constant.modelUpload("8");
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("更新异常:", e);
+            // log.error("更新异常:", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("更新错误:", e);
