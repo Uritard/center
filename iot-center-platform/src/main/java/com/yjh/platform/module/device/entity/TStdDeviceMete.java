@@ -28,20 +28,20 @@ public class TStdDeviceMete implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "设备测点实例ID")
     @TableId(value = "device_mete_id", type = IdType.AUTO)
     private Long deviceMeteId;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "设备ID")
     private Long deviceId;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "设备点位ID")
     private String devicePointId;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "标准测点ID")
     @TableField(value = "mete_id",updateStrategy = FieldStrategy.IGNORED)
     private Long meteId;
@@ -49,7 +49,7 @@ public class TStdDeviceMete implements Serializable {
     @Length(max = 50, message = "customId长度必须小于等于50")
     private String customId;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
     @TableField(value = "mete_kind",updateStrategy = FieldStrategy.IGNORED)
     private Integer meteKind;
@@ -70,7 +70,7 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "外观类型")
     private Integer appearanceType;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "设备类型")
     private Integer deviceType;
 

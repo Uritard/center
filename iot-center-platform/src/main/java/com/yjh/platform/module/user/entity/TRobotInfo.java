@@ -27,7 +27,7 @@ public class TRobotInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "机器人id")
     @TableField(value = "robot_id", updateStrategy = FieldStrategy.IGNORED)
     private Long robotId;
@@ -65,7 +65,6 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "无人机型号")
     private Integer droneType;
 
-    //    @Length(max = 255, message = "robotTypeName长度必须小于等于255")
     private String robotTypeName;
 
     private String droneTypeName;
@@ -95,6 +94,7 @@ public class TRobotInfo implements Serializable {
     private String identityManager;
 
     @ApiModelProperty(value = "可见光密码")
+    @Length(max = 15, message = "identity_code长度必须小于等于15")
     @TableField(value = "identity_code", updateStrategy = FieldStrategy.IGNORED)
     private String identityCode;
 
@@ -114,6 +114,7 @@ public class TRobotInfo implements Serializable {
     private String inferadUsername;
 
     @TableField(value = "Inferad_password", updateStrategy = FieldStrategy.IGNORED)
+    @Length(max = 15, message = "Inferad_password长度必须小于等于15")
     @ApiModelProperty(value = "红外密码")
     private String inferadPassword;
 
@@ -147,7 +148,6 @@ public class TRobotInfo implements Serializable {
     @TableField(value = "robotFactory", updateStrategy = FieldStrategy.IGNORED)
     private String robotFactory;
 
-    //    @Length(max = 100, message = "robotFactoryName长度必须小于等于100")
     private String robotFactoryName;
 
     @Length(max = 28, message = "madeIn长度必须小于等于28")
@@ -165,15 +165,13 @@ public class TRobotInfo implements Serializable {
     @TableField(value = "is_use", updateStrategy = FieldStrategy.IGNORED)
     private String isUse;
 
-    //    @Length(max = 64, message = "robotCode长度必须小于等于32")
     private String isUseName;
-
 
     @ApiModelProperty(value = "投运时间", example = "2020-08-01")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date commissionDate;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "区域ID")
     @TableField(value = "upRegionId", updateStrategy = FieldStrategy.IGNORED)
     private Long upRegionId;
@@ -201,24 +199,37 @@ public class TRobotInfo implements Serializable {
 
 
     @ApiModelProperty(value = "设备来源")
+    @Length(max = 255, message = "设备来源长度必须小于等于255")
     @TableField(value = "robot_source", updateStrategy = FieldStrategy.IGNORED)
     private String robotSource;
+
+    @Length(max = 255, message = "安装位置长度必须小于等于255")
     @ApiModelProperty(value = "安装位置")
     @TableField(value = "address", updateStrategy = FieldStrategy.IGNORED)
     private String address;
+
     @ApiModelProperty(value = "使用单位")
+    @Length(max = 255, message = "使用单位长度必须小于等于255")
     @TableField(value = "building_user", updateStrategy = FieldStrategy.IGNORED)
     private String buildingUser;
+
     @ApiModelProperty(value = "出场编号")
+    @Length(max = 255, message = "出场编号长度必须小于等于255")
     @TableField(value = "appearance_number", updateStrategy = FieldStrategy.IGNORED)
     private String appearanceNumber;
+
     @ApiModelProperty(value = "缺陷记录")
+    @Length(max = 512, message = "缺陷记录长度必须小于等于512")
     @TableField(value = "defect_record", updateStrategy = FieldStrategy.IGNORED)
     private String defectRecord;
+
     @ApiModelProperty(value = "大修记录")
+    @Length(max = 512, message = "缺陷记录长度必须小于等于512")
     @TableField(value = "repair_record", updateStrategy = FieldStrategy.IGNORED)
     private String repairRecord;
+
     @ApiModelProperty(value = "退出再重放记录")
+    @Length(max = 512, message = "退出再重放记录长度必须小于等于512")
     @TableField(value = "exit_putInto_record", updateStrategy = FieldStrategy.IGNORED)
     private String exitPutIntoRecord;
 

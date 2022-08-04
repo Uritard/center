@@ -28,12 +28,12 @@ public class TCameraPreset implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "预置位id")
     @TableField(value = "preset_id",updateStrategy = FieldStrategy.IGNORED)
     private Long presetId;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "摄像头id")
     @TableField(value = "camera_id",updateStrategy = FieldStrategy.IGNORED)
     private Long cameraId ;
@@ -62,7 +62,7 @@ public class TCameraPreset implements Serializable {
     private Integer isUse ;
 
     @Length(max = 255,message = "presetImg长度必须小于等于255")
-    @ApiModelProperty(value = "啥也不是啊")
+    @ApiModelProperty(value = "预置位图片地址")
      @TableField(value = "preset_img",updateStrategy = FieldStrategy.IGNORED)
     private String presetImg ;
 

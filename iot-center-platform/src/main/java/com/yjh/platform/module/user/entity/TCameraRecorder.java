@@ -26,7 +26,7 @@ public class TCameraRecorder implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "录像机ID")
     @TableId(value = "record_id", type = IdType.AUTO)
     @TableField(value = "record_id",updateStrategy = FieldStrategy.IGNORED)
@@ -75,6 +75,7 @@ public class TCameraRecorder implements Serializable {
     private String identityManager;
 
     @ApiModelProperty(value = "密码")
+    @Length(max = 50,message = "密码长度必须小于等于50")
     @TableField(value = "identity_code",updateStrategy = FieldStrategy.IGNORED)
     private String identityCode;
 
@@ -99,14 +100,21 @@ public class TCameraRecorder implements Serializable {
     @ApiModelProperty(value = "录制文件时长 单位秒")
     private Integer timeLong;
 
+    @Max(value=999999999)
     @ApiModelProperty(value = "录像机型号")
     private Integer recorderModel;
+
+    @Length(max = 255,message = "单位长度必须小于等于255")
     @ApiModelProperty(value = "单位")
     @TableField(value = "unit",updateStrategy = FieldStrategy.IGNORED)
     private String unit;
+
+    @Max(value=999999999)
     @ApiModelProperty(value = "生产厂家")
     private Integer vendorId;
+
     @ApiModelProperty(value = "PMS ID")
+    @Length(max = 32,message = "PMS ID长度必须小于等于32")
      @TableField(value = "pms_id",updateStrategy = FieldStrategy.IGNORED)
     private String pmsId;
 

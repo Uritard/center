@@ -62,42 +62,54 @@ public class VoiceDeviceAllInfoDetail{
     private String voiceFactory;
     private String voiceFactoryName;
 
+    @Length(max = 255, message = "ftp地址长度必须小于等于255")
     @ApiModelProperty(value = "ftp地址")
     private String ftpUrl;
 
+    @Length(max = 32, message = "所属电站长度必须小于等于32")
     @ApiModelProperty(value = "所属电站")
     private String stationId;
 
+    @Length(max = 255, message = "owner长度必须小于等于255")
     @ApiModelProperty(value = "用户名")
     private String owner;
 
+    @Length(max = 255, message = "ownerCode长度必须小于等于255")
     @ApiModelProperty(value = "登陆密码")
     private String ownerCode;
 
+    @Max(value = 999999)
     @ApiModelProperty(value = "端口号")
     private Integer port;
 
+    @Length(max = 255, message = "Ftp声纹绝对路径长度必须小于等于255")
     @ApiModelProperty(value = "Ftp声纹绝对路径")
     @TableField("absoluPath")
     private String absoluPath;
 
+    @Length(max = 255, message = "Ftp声纹相对路径长度必须小于等于255")
     @ApiModelProperty(value = "Ftp声纹相对路径")
     @TableField("relativePath")
     private String relativePath;
 
+    @Length(max = 11, message = "分贝告警值长度必须小于等于11")
     @ApiModelProperty(value = "分贝告警值")
     @TableField("dbValue")
     private String dbValue;
 
+    @Length(max = 11, message = "频率限值长度必须小于等于11")
     @ApiModelProperty(value = "频率限值")
     private String fValue;
 
+    @Length(max = 11, message = "幅值限值长度必须小于等于11")
     private String mpValue;
 
+    @Length(max = 255, message = "算法配置文件路径长度必须小于等于255")
     @ApiModelProperty(value = "算法配置文件路径")
     @TableField("filePath")
     private String filePath;
 
+    @Length(max = 32, message = "channelNum长度必须小于等于32")
     private String channelNum;
 
     private String regionName;
@@ -106,6 +118,7 @@ public class VoiceDeviceAllInfoDetail{
 
     private String deviceTypeName;
 
+    @Length(max = 30, message = "PMS ID长度必须小于等于30")
     private String pmsId;
 
     public String getOpenState() {

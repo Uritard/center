@@ -30,7 +30,7 @@ public class TCameraInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "主键")
     private Long cameraId;
 
@@ -44,12 +44,12 @@ public class TCameraInfo implements Serializable {
      @TableField(value = "alias_name",updateStrategy = FieldStrategy.IGNORED)
     private String aliasName;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "录像机ID")
      @TableField(value = "record_id",updateStrategy = FieldStrategy.IGNORED)
     private Long recordId;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "上级区域ID")
      @TableField(value = "up_region_id",updateStrategy = FieldStrategy.IGNORED)
     private Long upRegionId;
@@ -117,19 +117,33 @@ public class TCameraInfo implements Serializable {
 
     @ApiModelProperty(value = "摄像机型号")
     private Integer cameraModel;
+
+    @Length(max = 255,message = "单位长度必须小于等于255")
     @ApiModelProperty(value = "单位")
     private String unit;
+
     @ApiModelProperty(value = "PMS ID")
+    @Length(max = 32,message = "PMS ID长度必须小于等于32")
     @TableField(value = "pms_id",updateStrategy = FieldStrategy.IGNORED)
     private String pmsId;
+
+    @Length(max = 32,message = "检测点ID长度必须小于等于32")
     @ApiModelProperty(value = "检测点ID")
     private String monitorId;
+
+    @Max(value=999999999)
     @ApiModelProperty(value = "相机本身通道")
     private Integer cameraNum;
+
+    @Max(value=999999999)
     @ApiModelProperty(value = "红外测温端口")
     private Integer infreadPort;
+
+    @Length(max = 68,message = "相机用户名长度必须小于等于32")
     @ApiModelProperty(value = "相机用户名")
     private String cameraManager;
+
+    @Length(max = 28,message = "相机密码长度必须小于等于32")
     @ApiModelProperty(value = "相机密码")
     private String cameraCode;
 

@@ -26,18 +26,18 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "非同源巡检点实例ID")
     @TableId(value = "instance_id", type = IdType.AUTO)
     @TableField(value = "instance_id",updateStrategy = FieldStrategy.IGNORED)
     private Long instanceId;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "关联机器人巡视点位id")
      @TableField(value = "robot_instance_id",updateStrategy = FieldStrategy.IGNORED)
     private Long robotInstanceId;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "关联视频巡视点位id")
      @TableField(value = "video_preset_id",updateStrategy = FieldStrategy.IGNORED)
     private Long videoPresetId;
@@ -52,12 +52,12 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
     @TableField(value = "video_preset_name",updateStrategy = FieldStrategy.IGNORED)
     private String videoPresetName;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "关联设备id")
     @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
     private Long deviceId;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "关联部件id")
     @TableField(value = "custom_id",updateStrategy = FieldStrategy.IGNORED)
     private Long customId;
@@ -72,7 +72,7 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
     @TableField(value = "custom_name",updateStrategy = FieldStrategy.IGNORED)
     private String customName;
 
-    @Max(value=999999999999999999l)
+    @Max(value=999999999999999999L)
     @ApiModelProperty(value = "关联设备点位id")
     @TableField(value = "device_mete_id",updateStrategy = FieldStrategy.IGNORED)
     private Long deviceMeteId;
