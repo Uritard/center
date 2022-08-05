@@ -55,8 +55,8 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="robotId" parameterType="com.yjh.platform.module.user.entity.TRobotInfo">
         insert into t_robot_info(
             robot_code,
-            robot_name,
             robot_num,
+            robot_name,
             nest_code,
             nest_name,
             robot_status,

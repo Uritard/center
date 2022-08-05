@@ -75,7 +75,7 @@ public class TCameraRecorder implements Serializable {
     private String identityManager;
 
     @ApiModelProperty(value = "密码")
-    @Length(max = 50,message = "密码长度必须小于等于50")
+    @Length(max = 300,message = "密码长度必须小于等于300")
     @TableField(value = "identity_code",updateStrategy = FieldStrategy.IGNORED)
     private String identityCode;
 

@@ -36,25 +36,25 @@ public class VideoIntercom implements Serializable {
     private String cameraIp;
 
     @ApiModelProperty(value = "门口机用户名")
-    @Length(max = 255, message = "camera_ip长度必须小于等于255")
+    @Length(max = 255, message = "owner长度必须小于等于255")
     @TableField(value = "owner",updateStrategy = FieldStrategy.IGNORED)
     private String owner;
 
     @ApiModelProperty(value = "门口机密码")
-    @Length(max = 255, message = "camera_ip长度必须小于等于255")
+    @Length(max = 255, message = "owner_code长度必须小于等于255")
     @TableField(value = "owner_code",updateStrategy = FieldStrategy.IGNORED)
     private String ownerCode;
 
 
     @ApiModelProperty(value = "通道号")
-    @Length(max = 255, message = "camera_ip长度必须小于等于255")
+    @Max(value = 999999999)
     @TableField(value = "channel_num",updateStrategy = FieldStrategy.IGNORED)
     private Integer channelNum;
 
     @ApiModelProperty(value = "门口机类型")
-    @Length(max = 255, message = "camera_ip长度必须小于等于255")
+    @Length(max = 255, message = "camera_type长度必须小于等于255")
     @TableField(value = "camera_type",updateStrategy = FieldStrategy.IGNORED)
-    private int cameraType;
+    private String cameraType;
 
     @ApiModelProperty(value = "上级区域ID")
     @Max(value = 999999999999999999L)
@@ -66,7 +66,7 @@ public class VideoIntercom implements Serializable {
     private String regionName;
 
     @ApiModelProperty(value = "厂家ID")
-    @Max(value = 999999)
+    @Max(value = 999999999)
     @TableField(value = "vendor_id",updateStrategy = FieldStrategy.IGNORED)
     private Integer vendorId;
 
@@ -77,16 +77,16 @@ public class VideoIntercom implements Serializable {
 
     @ApiModelProperty(value = "接入协议 0-SDK 1-onvif 2-rtsp 3-GB 4-SG")
     @TableField(value = "protocol_type",updateStrategy = FieldStrategy.IGNORED)
-    @Max(value = 999999)
+    @Max(value = 999999999)
     private Integer protocolType;
 
     @ApiModelProperty(value = "相机端口")
     @TableField(value = "port",updateStrategy = FieldStrategy.IGNORED)
-    @Max(value = 999999)
+    @Max(value = 999999999)
     private Integer port;
 
     @ApiModelProperty(value = "相机端口")
-    @Max(value = 999999)
+    @Max(value = 999999999)
     @TableField(value = "rtspPort",updateStrategy = FieldStrategy.IGNORED)
     private Integer rtspPort;
 

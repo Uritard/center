@@ -143,7 +143,7 @@ public class TCameraInfo implements Serializable {
     @ApiModelProperty(value = "相机用户名")
     private String cameraManager;
 
-    @Length(max = 28,message = "相机密码长度必须小于等于32")
+    @Length(max = 300,message = "相机密码长度必须小于等于300")
     @ApiModelProperty(value = "相机密码")
     private String cameraCode;
 

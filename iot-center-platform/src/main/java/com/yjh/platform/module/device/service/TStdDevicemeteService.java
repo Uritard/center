@@ -239,13 +239,18 @@ public class TStdDevicemeteService{
         for (Map<String, Object> map : mapList){
             multiValueMap.add(Long.valueOf(String.valueOf(map.get("device_mete_id"))), String.valueOf(map.get("cruise_type")));
         }
-        // 配置了视频巡检且还配置了其他类型的为冗余配置
+        // 冗余配置:摄像机(可见光、红外)、机器人、无人机、声纹两两及以上组合方式均为冗余配置
         for (TStdDeviceMeteDetail detail : list){
             Long deviceMeteId = detail.getDeviceMeteId();
             if (multiValueMap.containsKey(deviceMeteId)){
                 List<String> cruiseTypeList = multiValueMap.get(deviceMeteId);
 
-                if (cruiseTypeList.size() >= 2 && cruiseTypeList.contains("229")){
+                if (cruiseTypeList.contains("229") && cruiseTypeList.contains("230") && cruiseTypeList.size() ==2){
+                    detail.setIsRedundant(1);
+                    continue;
+                }
+
+                if (cruiseTypeList.size() >= 2){
                     detail.setIsRedundant(0);
                 }else {
                     detail.setIsRedundant(1);

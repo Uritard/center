@@ -94,7 +94,7 @@ public class TRobotInfo implements Serializable {
     private String identityManager;
 
     @ApiModelProperty(value = "可见光密码")
-    @Length(max = 15, message = "identity_code长度必须小于等于15")
+    @Length(max = 300, message = "identity_code长度必须小于等于300")
     @TableField(value = "identity_code", updateStrategy = FieldStrategy.IGNORED)
     private String identityCode;
 
@@ -114,7 +114,7 @@ public class TRobotInfo implements Serializable {
     private String inferadUsername;
 
     @TableField(value = "Inferad_password", updateStrategy = FieldStrategy.IGNORED)
-    @Length(max = 15, message = "Inferad_password长度必须小于等于15")
+    @Length(max = 300, message = "Inferad_password长度必须小于等于300")
     @ApiModelProperty(value = "红外密码")
     private String inferadPassword;
 

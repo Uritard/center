@@ -31,13 +31,13 @@ public class TStdMete implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Max(value = 999999999999999999l)
+    @Max(value = 999999999999999999L)
     @ApiModelProperty(value = "测点ID")
     @TableId(value = "std_mete_id", type = IdType.AUTO)
     @TableField(value = "std_mete_id",updateStrategy = FieldStrategy.IGNORED)
     private Long stdMeteId;
 
-    @Max(value = 99999999)
+    @Max(value = 999999999)
     @ApiModelProperty(value = "设备类型")
 
     private Integer deviceType;
@@ -45,7 +45,6 @@ public class TStdMete implements Serializable {
     @Length(max = 20, message = "meteType长度必须小于等于20")
     @TableField(value = "mete_type",updateStrategy = FieldStrategy.IGNORED)
     @ApiModelProperty(value = "测点类型")
-
     private String meteType;
 
     @Max(value = 999999999)
@@ -154,7 +153,7 @@ public class TStdMete implements Serializable {
     @ApiModelProperty(value = "告警次数")
     private Integer alarmCnt;
 
-    @Max(value = 9999999999l)
+    @Max(value = 999999999)
     @ApiModelProperty(value = "绝对阀值")
     @TableField(value = "threshold_abs",updateStrategy = FieldStrategy.IGNORED)
     private BigDecimal thresholdAbs;
@@ -168,7 +167,7 @@ public class TStdMete implements Serializable {
     @ApiModelProperty(value = "系数")
     private Integer modulus;
 
-    @Length(max = 128, message = "remark长度必须小于等于128")
+    @Length(max = 125, message = "remark长度必须小于等于125")
     @ApiModelProperty(value = "备注")
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
