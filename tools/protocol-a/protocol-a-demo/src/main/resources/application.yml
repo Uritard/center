@@ -1,0 +1,26 @@
+logging:
+  level:
+    ROOT: info
+    com.yjh: info
+  file:
+    name: ${user.home}/log/ainterface.log
+
+spring:
+  application:
+    name: demo
+  profiles:
+    active: prod
+
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: true
+    context-path: /demo
+  port: 18088
+
+platform:
+  ip: 192.168.20.11
+  port: 10011
+  send-code: Client01
+  receive-code: Server01
