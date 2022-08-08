@@ -60,7 +60,8 @@
         a.param_type,
         a.param_name,
         a.content,
-        a.remark
+        a.remark,
+        a.rules
         from t_sys_param a
         where 1 = 1
             and a.param_id = #{paramId, jdbcType=INTEGER}
@@ -74,7 +75,8 @@
         a.param_type,
         a.param_name,
         a.content,
-        a.remark
+        a.remark,
+        a.rules
         from t_sys_param a
         where 1 = 1
         <if test="paramId != null "> and a.param_id = #{paramId, jdbcType=INTEGER}</if>
@@ -93,14 +95,15 @@
         b.dict_note as paramTypeName,
         a.param_name,
         a.content,
-        a.remark
+        a.remark,
+        a.rules
         from t_sys_param a
         left join t_dict_business b on a.param_type = b.dict_code and b.col_name = "param_type"
         where 1 = 1
         <if test="paramId != null "> and a.param_id = #{paramId, jdbcType=INTEGER}</if>
         <if test="paramCode != null and paramCode != ''"> and a.param_code = #{paramCode, jdbcType=VARCHAR}</if>
         <if test="paramType != null "> and a.param_type = #{paramType, jdbcType=INTEGER}</if>
-        <if test="paramName != null and paramName != ''"> and a.param_name LIKE CONCAT('%',#{paramName, jdbcType=VARCHAR},'%')</if>
+        <if test="paramName != null and paramName != ''"> and (a.param_name LIKE CONCAT('%',#{paramName, jdbcType=VARCHAR},'%') or a.param_code LIKE CONCAT('%',#{paramName, jdbcType=VARCHAR},'%'))</if>
         <if test="content != null and content != ''"> and a.content = #{content, jdbcType=VARCHAR}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
          order by a.param_type,a.param_code,a.param_id
@@ -152,7 +155,8 @@
         a.param_type,
         a.param_name,
         a.content,
-        a.remark
+        a.remark,
+        a.rules
         from t_sys_param a
         where a.param_code in
         <foreach item="item" index="index" collection="params" open="(" separator="," close=")">

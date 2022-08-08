@@ -58,5 +58,6 @@ public class TSysParam implements Serializable {
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
-
+    @TableField(value = "rules",updateStrategy = FieldStrategy.IGNORED)
+    private String rules;
 }

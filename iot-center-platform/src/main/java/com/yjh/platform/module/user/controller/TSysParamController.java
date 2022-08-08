@@ -90,46 +90,6 @@ public class TSysParamController {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
-            /*Map<String, String> appKeymap = redisTemplate.opsForHash().entries("t_sys_param:secureVerify");
-            String secureVerify = appKeymap.get("content");
-            String ruleStr = appKeymap.get("remark");
-            String[] secures = secureVerify.split(",");
-            if (tSysParam.getParamCode().equals("cpuFreeMin")) {
-                for (String memory : secures) {
-                    if (memory.equals("cpuFreeMin")) {
-                        if (userId != 10001) {
-                            result.setCode(209, "当前用户无权限修改cpu信息");
-                            return result;
-                        }
-                    }
-                }
-            }
-            if (tSysParam.getParamCode().equals("DiskFreeMin")) {
-                for (String memory : secures) {
-                    if (memory.equals("DiskFreeMin")) {
-                        if (userId != 10001) {
-                            result.setCode(209, "当前用户无权限修改磁盘信息");
-                            return result;
-                        }
-                    }
-                }
-            }
-            if (tSysParam.getParamCode().equals("MemoryFreeMin")) {
-                for (String memory : secures) {
-                    if (memory.equals("MemoryFreeMin")) {
-                        if (userId != 10001) {
-                            result.setCode(209, "当前用户无权限修改内存信息");
-                            return result;
-                        }
-                    }
-                }
-            }
-            if(tSysParam.getParamCode().equals("secureVerify")){
-                if(userId!=10001){
-                    result.setCode(209, "当前用户无权限修改安全参数配置");
-                    return result;
-                }
-            }*/
             boolean verify = tSysParamService.secureVerify(tSysParam, userId, result);
             if (verify){
                 result.setData(tSysParamService.update(tSysParam));

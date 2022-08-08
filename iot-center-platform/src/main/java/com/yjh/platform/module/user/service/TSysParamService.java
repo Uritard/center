@@ -1,6 +1,9 @@
 package com.yjh.platform.module.user.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.user.dao.TSysParamDao;
@@ -62,7 +65,23 @@ public class TSysParamService{
         /*if (!"true".equals(secureVerify)) {
            return true;
         }*/
+
         String paramCode = tSysParam.getParamCode();
+        String sysRules = (String)redisTemplate.opsForHash().get("t_sys_param:" + paramCode, "rules");
+        if (StringUtils.isNotEmpty(sysRules)) {
+            try {
+                JSONObject ruleObj = JSON.parseObject(sysRules);
+                String prule = ruleObj.getString("rule");
+                String pmsg = ruleObj.getString("msg");
+                if (!StringUtils.isAnyEmpty(prule, pmsg) && !tSysParam.getContent().matches(prule)) {
+                    result.setCode(209, pmsg);
+                    return false;
+                }
+            } catch (Exception e) {
+                log.error("{} 配置规则不正确，不是 JSON 格式，rules: {}", paramCode, sysRules);
+            }
+        }
+
         if ("secureVerify".equals(paramCode) && !"10001".equals(userId)) {
             result.setCode(209, "仅系统默认管理员可修改[安全标记]");
             return false;
@@ -155,16 +174,21 @@ public class TSysParamService{
         return this.insertIntoRedis();
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public int insertIntoRedis(){
+        return insertIntoRedis(false);
+    }
+
+    public int insertIntoRedis(boolean putSysProp){
         List<TSysParam> list = this.tSysParamDao.selectAll();
         for (TSysParam item:list) {
             Map map = Object2Map.toStringMap(Object2Map.objectToMap(item,true));
             String str = "t_sys_param:"+item.getParamCode();
             redisTemplate.opsForHash().putAll(str, map);
         }
-        log.info("load secure param to redis...");
-        sysParamConfig.putToRedis();
+        if(putSysProp) {
+            log.info("load secure param to redis...");
+            sysParamConfig.putToRedis();
+        }
         return 1;
     }
 

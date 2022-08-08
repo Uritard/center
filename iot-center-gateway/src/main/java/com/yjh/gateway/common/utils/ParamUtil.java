@@ -38,7 +38,7 @@ public class ParamUtil {
 
     private static Logger logger = LoggerFactory.getLogger(ParamUtil.class);
 
-    private static Pattern paramPattern = Pattern.compile("[~$%^&*+<>?\"{}();']+");
+    private static Pattern paramPattern = Pattern.compile("[`$%^&*+<>?\"{}();']+");
 
     public static Map<String, Object> getRequestParams(RequestContext ctx) {
         String method = ctx.getRequest().getMethod().toUpperCase();

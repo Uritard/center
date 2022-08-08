@@ -82,7 +82,7 @@ public class PlatformApplication  implements CommandLineRunner {
 //        jobManager.addJob(quartzTask);
         redisTemplate.delete("AllRobotCode");
         sysKeyService.loadKeysToRedis();
-        tSysParamService.insertIntoRedis();
+        tSysParamService.insertIntoRedis(true);
         tCameraInfoService.intoRedis();
         tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
         sysUserService.insertIntoRedis();
