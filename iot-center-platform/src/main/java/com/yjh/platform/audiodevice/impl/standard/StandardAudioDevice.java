@@ -126,7 +126,7 @@ public class StandardAudioDevice implements AudioDevice {
         }
     }
 
-    private void genAudioFile(String audioFilepath, List<Packet> packets) {
+    public void genAudioFile(String audioFilepath, List<Packet> packets) {
         // 生成文件头
         int totalAudioLen = getTotalAudioLen(packets);
         byte[] headerByte = getHeaderByte(totalAudioLen, packets);

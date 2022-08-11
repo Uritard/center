@@ -99,14 +99,15 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
     @TableField(value = "cruise_type",updateStrategy = FieldStrategy.IGNORED)
     private Integer cruiseType;
 
-    @Length(max = 256,message = "warn_threshold长度必须小于等于256")
-    @ApiModelProperty(value = "告警阈值")
+    @Length(max = 10,message = "非同源告警名称长度必须小于等于10")
+    @ApiModelProperty(value = "非同源告警名称")
     @TableField(value = "cruise_name",updateStrategy = FieldStrategy.IGNORED)
     private String cruiseName;
 
-    @Length(max = 256,message = "warn_threshold长度必须小于等于256")
+    @Length(max = 12,message = "告警阈值长度必须小于等于12")
+    @Max(value=9999999)
     @ApiModelProperty(value = "告警阈值")
-     @TableField(value = "warn_threshold",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "warn_threshold",updateStrategy = FieldStrategy.IGNORED)
     private String warnThreshold;
 
     @Max(value=999999999)
