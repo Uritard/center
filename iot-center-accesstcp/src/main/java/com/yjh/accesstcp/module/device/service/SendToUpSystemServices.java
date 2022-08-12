@@ -245,8 +245,6 @@ public class SendToUpSystemServices {
     public String createDeviceModel(String path) throws Exception{
         List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel();
         Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:stationName");
-        String robotNumber = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:robotNumber", "content"));
-        String droneNumber = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:droneNumber", "content"));
         list.forEach(item->{
             item.put("station_code",stationCode);
             item.put("station_name", getStationName());
@@ -261,7 +259,7 @@ public class SendToUpSystemServices {
             if (item.get("cruise_type").equals(228)){// 机器人
                 item.put("save_type_list","jpg");
                 item.put("data_type","01");
-                jsonObject.put("robot_code", robotNumber);
+                jsonObject.put("robot_code", item.get("robot_num"));
                 jsonObject.put("robot_pos",item.get("inspection_id"));
             } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)){//视屏 红外
                 item.put("save_type_list","jpg");
@@ -274,7 +272,7 @@ public class SendToUpSystemServices {
             }else if (item.get("cruise_type").equals(524)){// 无人机
                 item.put("save_type_list","jpg");
                 item.put("data_type","001");
-                jsonObject.put("robot_code", droneNumber);
+                jsonObject.put("robot_code", item.get("robot_num"));
                 jsonObject.put("robot_pos",item.get("inspection_id"));
             }
             item.remove("cruise_type");
