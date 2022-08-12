@@ -11,7 +11,10 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 /**
@@ -104,8 +107,7 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
     @TableField(value = "cruise_name",updateStrategy = FieldStrategy.IGNORED)
     private String cruiseName;
 
-    @Length(max = 12,message = "告警阈值长度必须小于等于12")
-    @Max(value=9999999)
+    @Length(max = 10,message = "告警阈值长度必须小于等于10")
     @ApiModelProperty(value = "告警阈值")
     @TableField(value = "warn_threshold",updateStrategy = FieldStrategy.IGNORED)
     private String warnThreshold;

@@ -12,6 +12,7 @@ import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -344,6 +345,15 @@ public class TCruisePointInstanceService{
         tCruisePointInstance.setStationName(tStdRegion.getStationName());
         List<Long> cruiseIdList = tCruisePointInstanceDao.selectCruiseId(tCruisePointInstanceDetail);//已经有了的巡检点
         Integer cruiseType = tCruisePointInstanceDetail.getCruiseType();
+        // 如果是可见光或者是红外需要将可见光和红外的巡检点全部查出来
+        if(cruiseType == 229 || cruiseType == 230){
+            int ctype = cruiseType == 229 ? 230 : 229;
+            tCruisePointInstanceDetail.setCruiseType(ctype);
+            List<Long> otherCruiseIdList = tCruisePointInstanceDao.selectCruiseId(tCruisePointInstanceDetail);
+            if(CollectionUtils.isNotEmpty(otherCruiseIdList)){
+                cruiseIdList.addAll(otherCruiseIdList);
+            }
+        }
         int result = -1;
 
         //巡检点配置

@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
 import java.math.BigDecimal;
 
@@ -62,51 +63,67 @@ public class TStdMeterTypeModel {
     @TableField(value = "alarm_type",updateStrategy = FieldStrategy.IGNORED)
     private String alarmType;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "有效上限")
     private Float upEffect;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "有效下限")
     private Float downEffect;
 
+    @Max(value = 9999)
     @ApiModelProperty(value = "告警级别")
     private Integer alarmLevel;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警上限1")
     private Float highLimit1;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警下限1")
     private Float lowLimit1;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警上限2")
     private Float highLimit2;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警下限2")
     private Float lowLimit2;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警上限3")
     private Float highLimit3;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警下限3")
     private Float lowLimit3;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警上限4")
     private Float highLimit4;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警下限4")
     private Float lowLimit4;
 
+    @Max(value = 999999999)
     @ApiModelProperty(value = "告警延时")
     private Integer alarmDelay;
 
+    @Max(value = 999999999)
     @ApiModelProperty(value = "告警次数")
     private Integer alarmCnt;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "绝对阀值")
     private BigDecimal thresholdAbs;
 
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "百分比阀值")
     private BigDecimal thresholdPer;
 
+    @Max(value = 999999999)
     @ApiModelProperty(value = "系数")
     private Integer modulus;
 

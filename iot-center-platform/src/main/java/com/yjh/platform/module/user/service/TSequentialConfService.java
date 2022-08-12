@@ -338,7 +338,13 @@ public class TSequentialConfService{
             try{
                 if(!Objects.isNull(recBack.get("code"))&&recBack.get("code").equals("200")){
                     if(!Objects.isNull(recBack.get("desc"))){
-                        param.put("resultValue",recBack.get("desc"));
+                        String ret = recBack.get("desc");
+                        String orc = (String)Constant.sequentialState.get("meteResult");
+                        if("unknown".equals(ret) || !ret.equals(orc)){
+                            param.put("resultValue",orc + "异常");
+                        } else {
+                            param.put("resultValue", ret);
+                        }
                     }else{
                         Map<String, String> jasonMapsResult = new HashMap<>();
                         jasonMapsResult.put("type", "newSequentialResult");

@@ -11,8 +11,8 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -98,68 +98,56 @@ public class TStdDeviceMete implements Serializable {
     @TableField(value = "alarm_note",updateStrategy = FieldStrategy.IGNORED)
     private String alarmNote;
 
-    @Length(max = 50, message = "alarmType长度必须小于等于50")
+    @Length(max = 10, message = "alarmType长度必须小于等于10")
     @ApiModelProperty(value = "告警分类")
     @TableField(value = "alarm_type",updateStrategy = FieldStrategy.IGNORED)
     private String alarmType;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "有效上限")
     private Float upEffect;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "有效下限")
     private Float downEffect;
 
     @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
     @ApiModelProperty(value = "告警级别")
     private Integer alarmLevel;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警上限1")
     private Float highLimit1;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警下限1")
     private Float lowLimit1;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警上限2")
     private Float highLimit2;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警下限2")
     private Float lowLimit2;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警上限3")
     private Float highLimit3;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警下限3")
     private Float lowLimit3;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警上限4")
     private Float highLimit4;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "告警下限4")
     private Float lowLimit4;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Max(value = 999999)
     @ApiModelProperty(value = "告警延时")
     private Integer alarmDelay;
 
@@ -167,17 +155,15 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "告警次数")
     private Integer alarmCnt;
 
-    @Max(value = 9999)
-    @Length(max = 8, message = "长度必须小于等于8位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "绝对阀值")
     private BigDecimal thresholdAbs;
 
-    @Max(value = 100)
-    @Length(max = 5, message = "长度必须小于等于5位")
+    @Digits(integer = 4, fraction = 3)
     @ApiModelProperty(value = "百分比阀值")
     private BigDecimal thresholdPer;
 
-    @Length(max = 50, message = "meteType长度必须小于等于50")
+    @Length(max = 10, message = "meteType长度必须小于等于10")
     @TableField(value = "mete_type",updateStrategy = FieldStrategy.IGNORED)
     private String meteType;
 
