@@ -73,7 +73,7 @@ public class TStdMete implements Serializable {
     @TableField(value = "alarm_type",updateStrategy = FieldStrategy.IGNORED)
     private String alarmType;
 
-    @Length(max = 50, message = "unit长度必须小于等于50")
+    @Length(max = 10, message = "unit长度必须小于等于10")
     @ApiModelProperty(value = "单位")
     @TableField(value = "unit",updateStrategy = FieldStrategy.IGNORED)
     private String unit;

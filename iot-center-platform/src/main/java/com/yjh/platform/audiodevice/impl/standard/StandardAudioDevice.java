@@ -1,5 +1,6 @@
 package com.yjh.platform.audiodevice.impl.standard;
 
+import cn.hutool.core.util.HexUtil;
 import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.impl.AudioFileUtils;
 import com.yjh.platform.audiodevice.impl.standard.tcp.InboundMessage;
@@ -8,10 +9,14 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.MqttUtilsServer;
 import com.yjh.platform.module.device.entity.AuidoOprInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -128,36 +133,87 @@ public class StandardAudioDevice implements AudioDevice {
 
     public void genAudioFile(String audioFilepath, List<Packet> packets) {
         // 生成文件头
-        int totalAudioLen = getTotalAudioLen(packets);
-        byte[] headerByte = getHeaderByte(totalAudioLen, packets);
+        long[] totalAudioLen = getTotalAudioLen(packets);
+        byte[][] headersByte = getHeaderByte(totalAudioLen, packets);
 //        byte[] contentByte = getContentByte(totalAudioLen, packets);
-        log.info("写WAV文件({})", audioFilepath);
+        log.info("写WAV文件({}), heard: {}", audioFilepath, HexUtil.encodeHexStr(headersByte[0]));
 //        AudioFileUtils.writeWavAudioFile(audioFilepath, headerByte, contentByte);
-        writeWAVFile(audioFilepath, packets, headerByte);
+        writeWAVFile(audioFilepath, packets, headersByte);
     }
 
-    private void writeWAVFile(String audioFilepath, List<Packet> packets, byte[] headerByte) {
-        File file = new File(audioFilepath);
-        try {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
-        } catch (Exception e) {
-            throw new RuntimeException("创建文件失败", e);
+    private void writeWAVFile(String audioFilepath, List<Packet> packets, byte[][] headersByte) {
+        FileOutputStream[] outStreams = new FileOutputStream[headersByte.length];
+        // 创建多个通道文件
+        int idx = audioFilepath.lastIndexOf(".");
+        String fileName = audioFilepath.substring(0, idx);
+        String fileExt = audioFilepath.substring(idx);
+        for (int i = 0; i < headersByte.length; i++) {
+            String filePath = fileName + (i == 0 ? "" : "_" + (i + 1)) + fileExt;
+            File file = new File(filePath);
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+
+                outStreams[i] = new FileOutputStream(file);
+                outStreams[i].write(headersByte[i]);
+            } catch (Exception e) {
+                throw new RuntimeException("创建文件失败", e);
+            }
         }
 
-        try (FileOutputStream outStream = new FileOutputStream(file)) {
-            outStream.write(headerByte);
-            for (Packet packet : packets) {
+        // 将声音数据写入文件
+        ByteBuffer[] byteBuffers = null;
+        for (Packet packet : packets) {
+            try {
                 List<byte[]> audioDatas = packet.getDataGroup().getAudioDatas();
-                int dataLength = audioDatas.get(0).length;
-                for (int offset = 0; offset < dataLength; offset += 2) {
-                    for (byte[] audioData : audioDatas) {
-                        outStream.write(audioData, offset, 2);
+                if (Constant.voiceChtype() == 0) {
+                    int dataLength = audioDatas.get(0).length;
+                    int block = packet.getDataGroup().getBits() / 8;
+                    for (int offset = 0; offset < dataLength; offset += 2) {
+                        for (byte[] audioData : audioDatas) {
+                            outStreams[0].write(audioData, offset, 2);
+                        }
+                    }
+                } else if (Constant.voiceChtype() == 1) {
+                    int j = 0;
+                    for (byte[] dates : audioDatas) {
+                        outStreams[j++].write(dates);
+                    }
+                } else if (Constant.voiceChtype() == -1) {
+                    for (byte[] dates : audioDatas) {
+                        outStreams[0].write(dates);
+                    }
+                } else {
+                    if (byteBuffers == null) {
+                        byteBuffers = new ByteBuffer[audioDatas.size()];
+                    }
+                    int j = 0;
+                    for (byte[] dates : audioDatas) {
+                        if (byteBuffers[j] == null) {
+                            byteBuffers[j] = ByteBuffer.allocate(MAX_BUFFERED_PACKETS * 1024);
+                        }
+                        byteBuffers[j++].put(dates);
                     }
                 }
+            } catch (Exception e) {
+                throw new RuntimeException("写WAV文件失败", e);
             }
-        } catch (Exception e) {
-            throw new RuntimeException("写WAV文件失败", e);
+        }
+        if (byteBuffers != null) {
+            for (ByteBuffer buffer : byteBuffers) {
+                try {
+                    outStreams[0].write(buffer.array(), 0, buffer.position());
+                    buffer.clear();
+                } catch (IOException e) {
+                    throw new RuntimeException("写WAV文件失败", e);
+                }
+            }
+            Arrays.fill(byteBuffers, null);
+        }
+
+        // 关闭文件流
+        for (FileOutputStream outStream : outStreams) {
+            IOUtils.closeQuietly(outStream);
         }
     }
 
@@ -174,6 +230,17 @@ public class StandardAudioDevice implements AudioDevice {
         return contentByte;
     }
 
+    byte[][] getHeaderByte(long[] totalAudioLens, List<Packet> packets) {
+        long sampleRate = packets.get(0).getDataGroup().getSampleRate();
+        int channels = packets.get(0).getDataGroup().getChannels();
+        long audioFormat = packets.get(0).getDataGroup().getBits();
+        byte[][] headersByte = new byte[totalAudioLens.length][];
+        for (int i = 0; i < totalAudioLens.length; i++) {
+            headersByte[i] = AudioFileUtils.getWaveFileHeader(totalAudioLens[i], sampleRate, channels, audioFormat);
+        }
+        return headersByte;
+    }
+
     byte[] getHeaderByte(long totalAudioLen, List<Packet> packets) {
         long sampleRate = packets.get(0).getDataGroup().getSampleRate();
         int channels = packets.get(0).getDataGroup().getChannels();
@@ -181,14 +248,24 @@ public class StandardAudioDevice implements AudioDevice {
         return AudioFileUtils.getWaveFileHeader(totalAudioLen, sampleRate, channels, audioFormat);
     }
 
-    private int getTotalAudioLen(List<Packet> packets) {
-        int totalLen = 0;
+    private long[] getTotalAudioLen(List<Packet> packets) {
+        long[] totalLens = null;
         for (Packet packet : packets) {
             List<byte[]> list = packet.getDataGroup().getAudioDatas();
-            for (byte[] b : list) {
-                totalLen += b.length;
+            if (totalLens == null) {
+                totalLens = new long[Constant.voiceChannelOne() ? list.size() : 1];
+            }
+            if (Constant.voiceChannelOne()) {
+                int i = 0;
+                for (byte[] b : list) {
+                    totalLens[i++] += b.length;
+                }
+            } else {
+                for (byte[] b : list) {
+                    totalLens[0] += b.length;
+                }
             }
         }
-        return totalLen;
+        return totalLens;
     }
 }

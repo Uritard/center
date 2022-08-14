@@ -131,7 +131,6 @@ public class SysMenuController {
         try {
             List<SysMenu> list = sysMenuService.select(menuId, menuName, menuCode, upId, iconCode, iconUrl, menuType, menuLevel, elementCode, state, sort, linkType, url, creatorId, sysState);
             result.setData(list);
-            Constant.refreshPacketLog();
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

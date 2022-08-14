@@ -1,32 +1,29 @@
 package com.yjh.platform.common;
 
 import com.alibaba.fastjson.JSON;
-import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.StaticContextAccessor;
-import com.yjh.platform.common.websocket.WebSocketServer;
-import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.entity.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import javax.validation.constraints.Max;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -167,9 +164,36 @@ public class Constant {
 
     public static boolean isPacketLog() {
         if (packetLog == null) {
-            packetLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:packetLog", "content"));
+            try {
+                packetLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:packetLog", "content"));
+            } catch (Exception e) {
+                packetLog = true;
+            }
         }
         return packetLog;
+    }
+
+    /**
+     * 0: 默认多通道
+     * -1: 单通道，拆分拼接
+     * 1: 单通道，只获取一个通道数据
+     */
+    public static int voiceChtype() {
+        int chtype = -2;
+        try {
+            chtype = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:voiceChtype", "content"), chtype);
+        } catch (Exception e) {
+            log.warn("voiceChtype not setting, voiceChtype: {} ", chtype);
+        }
+        return chtype;
+    }
+
+    /**
+     * 是否只获取单通道数据
+     */
+    public static boolean voiceChannelOne() {
+
+        return Constant.voiceChtype() > 0;
     }
 
     public static void refreshPacketLog() {

@@ -2,6 +2,7 @@ package com.yjh.platform.module.user.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -94,6 +95,8 @@ public class TSysParamController {
             if (verify){
                 result.setData(tSysParamService.update(tSysParam));
             }
+            // 更新声纹日志开关
+            Constant.refreshPacketLog();
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新系统参数异常:", e);

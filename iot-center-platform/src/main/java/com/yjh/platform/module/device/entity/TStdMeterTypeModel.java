@@ -48,7 +48,7 @@ public class TStdMeterTypeModel {
     @Length(max = 50, message = "meteKindName长度必须小于等于50")
     private String meteKindName;
 
-    @Length(max = 50, message = "unit长度必须小于等于50")
+    @Length(max = 10, message = "unit长度必须小于等于10")
     @ApiModelProperty(value = "单位")
     @TableField(value = "unit",updateStrategy = FieldStrategy.IGNORED)
     private String unit;

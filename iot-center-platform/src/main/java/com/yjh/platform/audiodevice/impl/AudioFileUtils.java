@@ -1,5 +1,7 @@
 package com.yjh.platform.audiodevice.impl;
 
+import com.yjh.platform.common.Constant;
+
 import java.io.File;
 import java.io.FileOutputStream;
 
@@ -44,10 +46,12 @@ public class AudioFileUtils {
      * @param audioFormat  采样精度; 譬如 16bit
      * @return
      */
-    public static byte[] getWaveFileHeader(long totalAudioLen, long sampleRate, int channels,
-                                            long audioFormat) {
+    public static byte[] getWaveFileHeader(long totalAudioLen, long sampleRate, int channels, long audioFormat) {
         long totalDataLen = totalAudioLen + 36;
         byte[] header = new byte[AUDIO_HEADER_LENGTH];
+        if(Constant.voiceChtype() != 0) {
+            channels = 1;
+        }
         long byteRate = (sampleRate * audioFormat * channels) / 8;
 
         // RIFF/WAVE header
@@ -91,7 +95,7 @@ public class AudioFileUtils {
         header[30] = (byte) ((byteRate >> 16) & 0xff);
         header[31] = (byte) ((byteRate >> 24) & 0xff);
         // block align
-        header[32] = (byte) (2 * channels);
+        header[32] = (byte) (audioFormat/8 * channels);
         header[33] = 0;
         header[34] = (byte) audioFormat;
         header[35] = 0;
