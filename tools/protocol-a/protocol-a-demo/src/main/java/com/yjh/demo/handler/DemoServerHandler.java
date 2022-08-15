@@ -28,7 +28,7 @@ public class DemoServerHandler extends BaseMessageHandler {
     private final SimpleMessageSender wsMessageSender;
 
     public DemoServerHandler(ExecutorService serverMsgProcessingExecutor, RxBus serverRxBus
-    ,SimpleMessageSender wsMessageSender) {
+            , SimpleMessageSender wsMessageSender) {
         super(serverMsgProcessingExecutor, serverRxBus);
         this.wsMessageSender = wsMessageSender;
         subscribeInbound(ExtPeerState.class, InboundMessage.class);
@@ -41,11 +41,15 @@ public class DemoServerHandler extends BaseMessageHandler {
         sessionId = inboundMessage.getSessionId();
         log.info("接收到客户端的内容: \n{}\n", new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8));
         log.info("接收到客户端的sessionId: {}", sessionId);
-        AInterfaceMessage.AInterfaceData data = new AInterfaceMessage.AInterfaceData(new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8));
+        AInterfaceMessage.AInterfaceData data = new AInterfaceMessage.AInterfaceData(
+                "发送会话序列号：" + inboundMessage.getPacket().getSendSessionId() + "        " +
+                        "接收会话序列号：" + inboundMessage.getPacket().getReceiveSessionId() + "        " +
+                        "会话源标识：0x0" + inboundMessage.getPacket().getSessionType() + "        " +
+                        "xml内容：" + new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8) + "\n");
         wsMessageSender.send(new AInterfaceMessage(data));
     }
 
-    public long getSessionId(){
+    public long getSessionId() {
         return sessionId;
     }
 }

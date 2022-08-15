@@ -61,7 +61,11 @@ public class DemoClientHandler extends BaseMessageHandler {
             this.sessionId = inboundMessage.getSessionId();
             log.info("接收到服务端的内容: \n{}\n", new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8));
             log.info("接收到服务端的sessionId: {}", sessionId);
-            AInterfaceMessage.AInterfaceData data = new AInterfaceMessage.AInterfaceData(new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8));
+            AInterfaceMessage.AInterfaceData data = new AInterfaceMessage.AInterfaceData(
+                    "发送会话序列号：" + inboundMessage.getPacket().getSendSessionId() + "        " +
+                    "接收会话序列号：" + inboundMessage.getPacket().getReceiveSessionId() + "        " +
+                    "会话源标识：0x0" + inboundMessage.getPacket().getSessionType()+ "        " +
+                    "xml内容：" + new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8)+ "\n");
             wsMessageSender.send(new AInterfaceMessage(data));
         }
     }
