@@ -33,6 +33,7 @@ public class SysKey implements Serializable {
     @ApiModelProperty(value = "绑定类型，1-Ukey 2-ip")
     private Integer bindType;
 
+    @Length(max = 512,message = "serialNum 长度必须小于等于512")
     @ApiModelProperty(value = "公钥")
     private String pubKey;
 
@@ -43,6 +44,7 @@ public class SysKey implements Serializable {
     @ApiModelProperty(value = "序列号/ip")
     private String serialNum;
 
+    @Length(max = 32,message = "remark 长度必须小于等于32")
     @ApiModelProperty(value = "备注")
     private String remark;
 
