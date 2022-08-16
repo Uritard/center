@@ -363,9 +363,8 @@
         a.recognition_type_list,
         a.phase,
         a.device_info
-        from t_robot_inspection a,t_robot_region b
+        from t_robot_inspection a
         where 1 = 1
-            and a.robot_id = b.robot_id
             and a.inspection_id = #{inspectionId, jdbcType=BIGINT}
         limit 1
     </select>
