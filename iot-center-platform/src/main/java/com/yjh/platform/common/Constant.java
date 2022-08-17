@@ -179,7 +179,7 @@ public class Constant {
      * 1: 单通道，只获取一个通道数据
      */
     public static int voiceChtype() {
-        int chtype = -2;
+        int chtype = 0;
         try {
             chtype = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:voiceChtype", "content"), chtype);
         } catch (Exception e) {
