@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.yjh.platform.module.user.entity.TSysParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,6 +55,12 @@ public class TSequentialConfService{
     private String cameraCapture;
     @Value("${sequential.picRec}")
     private String picRec;
+
+    @Value("${sequential.startRecordVideo}")
+    private String startRecordVideo;
+    @Value("${sequential.endRecordVideo}")
+    private String endRecordVideo;
+
 
     @Autowired
     private TSequentialConfDao tSequentialConfDao;
@@ -198,6 +205,21 @@ public class TSequentialConfService{
                     this.update(sequentialConf);
                 }
             }
+
+            // 开关
+            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
+            if (StringUtils.equals("true", flag)){
+                // 收到聚焦信号停止录视频
+                try {
+                    String services = HttpClientUtils.getInstance().getUrl(startRecordVideo+ "?cameraId=" +  map.get("cameraId").toString(), null);
+                    JSONObject jsonObject =JSONObject.parseObject(services);
+                    String result = String.valueOf(jsonObject.get("data"));
+                    Constant.filePath = result;
+                }catch (Exception e){
+                    log.error(e.getMessage(), e);
+                }
+            }
+
             //结果
 //            {"type": "newSequentialResult",
 //                    "cfgDeviceId": "1001",
@@ -283,19 +305,37 @@ public class TSequentialConfService{
 
             Map<String,Object> map = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId).get(0);
             Map<String , Object> param = new HashMap<>();
-            //收到变位信号抓图
-            try{
-                String services = HttpClientUtils.getInstance().getUrl(cameraCapture+ "?cameraId=" +  map.get("cameraId").toString(), null);
-                JSONObject jsonObject =JSONObject.parseObject(services);
-                Map<String,Object> re= (Map<String,Object>) jsonObject.get("data");
-                if(!Objects.isNull(re.get("absPath"))){
-                    param.put("picPath",re.get("absPath").toString());
-                }else{
-                    throw new BusinessException("一键顺控-变位信号-抓图地址为空");
+            // 开关
+            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
+            if (StringUtils.equals("true", flag)){
+                // 收到变位信号停止录视频
+                try {
+                    String filePath = Constant.filePath;
+                    HttpClientUtils.getInstance().getUrl(endRecordVideo+ "?fileName=" +  filePath, null);
+                    if(StringUtils.isNotEmpty(filePath)){
+                        param.put("picPath", filePath);
+                    }else{
+                        throw new BusinessException("一键顺控-变位信号-录像地址为空");
+                    }
+                }catch (Exception e){
+                    log.error(e.getMessage(), e);
                 }
-            }catch (Exception e){
-                log.error("一键顺控-变位信号-抓图失败",e.getMessage());
+            }else{
+                //收到变位信号抓图
+                try{
+                    String services = HttpClientUtils.getInstance().getUrl(cameraCapture+ "?cameraId=" +  map.get("cameraId").toString(), null);
+                    JSONObject jsonObject =JSONObject.parseObject(services);
+                    Map<String,Object> re= (Map<String,Object>) jsonObject.get("data");
+                    if(!Objects.isNull(re.get("absPath"))){
+                        param.put("picPath",re.get("absPath").toString());
+                    }else{
+                        throw new BusinessException("一键顺控-变位信号-抓图地址为空");
+                    }
+                }catch (Exception e){
+                    log.error("一键顺控-变位信号-抓图失败",e.getMessage());
+                }
             }
+
             //todo 发给算法进行分析
             try{
                 param.put("analyseType",6);

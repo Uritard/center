@@ -1760,6 +1760,55 @@ public class CameraConService {
         }
     }
 
+    public String startRecordVideo(long cameraId) {
+        //返回结果
+        String judge = "";
+        NativeLong lRealPlayHandle;
+        int iErr = 0;
+        try {
+            CameraConInfo cameraConInfo = new CameraConInfo();
+            cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
+            cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
+            //生成文件名
+            Date date = new Date();
+            String fileName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(date) + ".h264";
+            log.info("生成文件名" + fileName);
+            //保存文件地址
+            createDirectory(videoPath);
+            String path = videoPath + fileName;
+            log.info("保存文件地址：" + path);
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            HCNetSDK.NET_DVR_PREVIEWINFO struPlayInfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
+            struPlayInfo.lChannel = new NativeLong(cameraConInfo.getChannelNum());
+            struPlayInfo.dwStreamType = 0;
+            lRealPlayHandle = hCNetSDK.NET_DVR_RealPlay_V40(lUserIDLong, struPlayInfo, null, null);
+            if (lRealPlayHandle.longValue() < 0) {
+                iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.error("get camera video NET_DVR_RealPlay_V40, error code: " + iErr);
+            }
+            hCNetSDK.NET_DVR_SaveRealData(lRealPlayHandle, path);
+            Constant.recordLongMap.put(fileName, lRealPlayHandle);
+
+            judge = fileName;
+        }catch (Exception e){
+            iErr = hCNetSDK.NET_DVR_GetLastError();
+            log.info("获取视频方发异常：" + iErr);
+            log.info(e.getMessage());
+        }
+        return judge;
+    }
+
+    public void endRecordVideo(String fileName) {
+        try {
+            NativeLong lRealPlayHandle = Constant.recordLongMap.get(fileName);
+            hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
+            String url = "chmod 777 " + videoPath + fileName;
+            Runtime.getRuntime().exec(url);
+        }catch (Exception ignored){
+            log.info("录制失败");
+        }
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public String startDvrToPlace(long cameraId){
         //返回结果

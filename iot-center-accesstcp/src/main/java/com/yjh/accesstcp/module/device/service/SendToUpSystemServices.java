@@ -83,7 +83,7 @@ public class SendToUpSystemServices {
             Map<String,Object> map = new HashMap<>();
             Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
 //            String path = mapForPath.get("content")+"/"+stationCode+"/Model";
-            String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model":mapForPath.get("content")+"/"+stationCode+"/Model";
+            String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "D:\\testform\\robotTemplate":mapForPath.get("content")+"/"+stationCode+"/Model";
             log.info("模型文件路径："+path);
 
             switch (type){
@@ -161,7 +161,7 @@ public class SendToUpSystemServices {
             List<Map<String,Object>> list = new ArrayList<>();
             Map<String,Object> map = new HashMap<>();
             Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
-            String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model":mapForPath.get("content")+"/"+stationCode+"/Model";
+            String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "D:\\testform\\robotTemplate":mapForPath.get("content")+"/"+stationCode+"/Model";
             list.add(map);
 
             map.put("time", DateTimeUtil.getDateTimeString());
@@ -272,8 +272,8 @@ public class SendToUpSystemServices {
             }else if (item.get("cruise_type").equals(524)){// 无人机
                 item.put("save_type_list","jpg");
                 item.put("data_type","001");
-                jsonObject.put("robot_code", item.get("robot_num"));
-                jsonObject.put("robot_pos",item.get("inspection_id"));
+                jsonObject.put("uav_code", item.get("robot_num"));
+                jsonObject.put("uav_pos",item.get("inspection_id"));
             }
             item.remove("cruise_type");
             item.remove("camera_id");

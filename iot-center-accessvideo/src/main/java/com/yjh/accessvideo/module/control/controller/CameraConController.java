@@ -745,4 +745,34 @@ public class CameraConController {
         return result;
     }
 
+    @ApiOperation(value = "开始录制视频-视频简易处理")
+    @RequestMapping(value = "/startRecordVideo", method = RequestMethod.GET)
+    public Result startRecordVideo(@RequestParam(value = "cameraId") Long cameraId)  {
+        Result result = new Result();
+        try {
+            String fileName = cameraConService.startRecordVideo(cameraId);
+            log.info("startRecordVideo service返回值：{}", fileName);
+            if(null!=fileName) {
+                result.setData(fileName);
+            } else { result.setData("开始录制失败"); }
+        } catch (Exception e) {
+            result.setData(ResultCodeEnum.SYSTEMERROR);
+            log.error("视频上传服务器失败",e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "结束录制视频-视频简易处理")
+    @GetMapping(value = "/endRecordVideo")
+    public Result endRecordVideo(@RequestParam(value = "fileName") String fileName)  {
+        Result result = new Result();
+        try {
+            cameraConService.endRecordVideo(fileName);
+        } catch (Exception e) {
+            result.setData(ResultCodeEnum.SYSTEMERROR);
+            log.error("视频上传服务器失败",e);
+        }
+        return result;
+    }
+
 }

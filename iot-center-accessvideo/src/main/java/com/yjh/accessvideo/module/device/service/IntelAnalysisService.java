@@ -382,10 +382,10 @@ public class IntelAnalysisService {
             silentMonitorHandle(response);
             return;
         }
-        if (Objects.equals("yjsk", flagId)){
-            yjskHandle(response);
-            return;
-        }
+//        if (Objects.equals("yjsk", flagId)){
+//            yjskHandle(response);
+//            return;
+//        }
         if (Objects.equals("666666", flagId)){
             algorithmTestHandle(response);
             return;
