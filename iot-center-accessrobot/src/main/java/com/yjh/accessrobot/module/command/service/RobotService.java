@@ -27,7 +27,9 @@ import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1238,7 +1240,7 @@ public class RobotService {
                     TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail()
                             .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
                             .setTaskResultId(redisInfoMap.get("taskResultId"))
-                            .setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")))
+                            .setInstanceId(MapUtils.getLong(redisInfoMap,"instanceId"))
                             .setInstanceName(redisInfoMap.get("instanceName"))
                             .setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
                             .setEndTime(DateTimeUtil.parse(redisInfoMap.get("endTime")))

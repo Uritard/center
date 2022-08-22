@@ -95,8 +95,8 @@ public class PlatformXMLUtil {
             childNode4.setText(xmlBaseModel.getCode());
         }
 
+        Element childNode7 = rss.addElement("Command");//非必有
         if (StringUtils.isNotEmpty(xmlBaseModel.getCommand())){
-            Element childNode7 = rss.addElement("Command");//非必有
             childNode7.setText(xmlBaseModel.getCommand());
         }
 
