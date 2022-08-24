@@ -390,8 +390,8 @@ public class MessageThread {
                     if (item.get("begin_time") != null) {
                         startTime = item.get("begin_time").toString();
                     }
-                    if (item.get("endTime") != null) {
-                        endTime = item.get("endTime").toString();
+                    if (item.get("end_time") != null) {
+                        endTime = item.get("end_time").toString();
                     }
                 }
             }
