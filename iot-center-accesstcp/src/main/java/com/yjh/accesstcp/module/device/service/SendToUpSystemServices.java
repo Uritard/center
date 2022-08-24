@@ -13,6 +13,7 @@ import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -451,8 +452,8 @@ public class SendToUpSystemServices {
     }
 
     private HashMap<String,Object> dealCount(HashMap<String,Object> countMap){
-        String totalNumStr = countMap.get("totalNum").toString();
-        String validNumStr = countMap.get("validNum").toString();
+        String totalNumStr = MapUtils.getString(countMap,"totalNum");
+        String validNumStr = MapUtils.getString(countMap,"validNum");
         double totalNum = NumberUtils.toDouble(totalNumStr);
         double validNum = NumberUtils.toDouble(validNumStr);
         String percent = totalNum > 0 ? String.format("%.3f",validNum * 100 / totalNum) : "0.000";
