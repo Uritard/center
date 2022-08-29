@@ -41,6 +41,11 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     implementation 'com.yjh:protocol-a-core:0.2-SNAPSHOT'
+
+    implementation 'commons-net:commons-net:3.6'
+
+    implementation 'com.alibaba:fastjson:1.2.49'
+
 }
 
 test {
