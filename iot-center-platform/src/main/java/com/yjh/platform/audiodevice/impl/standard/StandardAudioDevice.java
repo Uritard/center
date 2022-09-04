@@ -163,27 +163,58 @@ public class StandardAudioDevice implements AudioDevice {
 
         // 将声音数据写入文件
         ByteBuffer[] byteBuffers = null;
+        ByteBuffer channelBuffer = null;
+        boolean reverse = Constant.voiceByteReverse();
+        int chtype = Constant.voiceChtype();
         for (Packet packet : packets) {
             try {
                 List<byte[]> audioDatas = packet.getDataGroup().getAudioDatas();
-                if (Constant.voiceChtype() == 0) {
+                if (chtype == 0) {
+                    // 默认多通道 0.1 0.2 0.1 0.2 0.1 0.2
                     int dataLength = audioDatas.get(0).length;
                     int block = packet.getDataGroup().getBits() / 8;
+                    if (channelBuffer == null) {
+                        channelBuffer = ByteBuffer.allocate(MAX_BUFFERED_PACKETS * 1024);
+                    }
                     for (int offset = 0; offset < dataLength; offset += 2) {
                         for (byte[] audioData : audioDatas) {
-                            outStreams[0].write(audioData, offset, 2);
+                            // outStreams[0].write(audioData, offset, 2);
+                            if (reverse) {
+                                channelBuffer.put(audioData, offset + 1, 1);
+                                channelBuffer.put(audioData, offset, 1);
+                            } else {
+                                channelBuffer.put(audioData, offset, 2);
+                            }
                         }
                     }
-                } else if (Constant.voiceChtype() == 1) {
+                } else if (chtype == 1) {
+                    // 单通道，只获取一个通道数据，写入多个文件 111
                     int j = 0;
                     for (byte[] dates : audioDatas) {
-                        outStreams[j++].write(dates);
+                        if (reverse) {
+                            for (int offset = 0; offset < dates.length; offset += 2) {
+                                outStreams[j].write(dates, offset + 1, 1);
+                                outStreams[j].write(dates, offset, 1);
+                            }
+                            j++;
+                        } else {
+                            outStreams[j++].write(dates);
+                        }
                     }
-                } else if (Constant.voiceChtype() == -1) {
+                } else if (chtype == -1) {
+                    // 单通道或多通道，多个通道数据 121212 写入
                     for (byte[] dates : audioDatas) {
-                        outStreams[0].write(dates);
+                        if (reverse) {
+                            for (int offset = 0; offset < dates.length; offset += 2) {
+                                outStreams[0].write(dates, offset + 1, 1);
+                                outStreams[0].write(dates, offset, 1);
+                            }
+                        } else {
+                            outStreams[0].write(dates);
+                        }
                     }
-                } else {
+                } else if(chtype == -2){
+                    // 单通道，通道1写完写通道2， 111222 写入
                     if (byteBuffers == null) {
                         byteBuffers = new ByteBuffer[audioDatas.size()];
                     }
@@ -192,10 +223,27 @@ public class StandardAudioDevice implements AudioDevice {
                         if (byteBuffers[j] == null) {
                             byteBuffers[j] = ByteBuffer.allocate(MAX_BUFFERED_PACKETS * 1024);
                         }
-                        byteBuffers[j++].put(dates);
+                        if (reverse) {
+                            for (int offset = 0; offset < dates.length; offset += 2) {
+                                byteBuffers[j].put(dates, offset + 1, 1);
+                                byteBuffers[j].put(dates, offset, 1);
+                            }
+                            j++;
+                        } else {
+                            byteBuffers[j++].put(dates);
+                        }
+
                     }
                 }
             } catch (Exception e) {
+                throw new RuntimeException("写WAV文件失败", e);
+            }
+        }
+        if (channelBuffer != null) {
+            try {
+                outStreams[0].write(channelBuffer.array(), 0, channelBuffer.position());
+                channelBuffer.clear();
+            } catch (IOException e) {
                 throw new RuntimeException("写WAV文件失败", e);
             }
         }

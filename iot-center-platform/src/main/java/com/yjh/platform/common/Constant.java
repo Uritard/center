@@ -134,6 +134,8 @@ public class Constant {
 
     public static Boolean packetLog;
 
+    public static Boolean hasEncoding;
+
     public static String websocketSendMsg(String url, Map<String,String>map) throws IOException {
         //将websocket信息写入redis
         String json= JSON.toJSONString(map);
@@ -173,10 +175,23 @@ public class Constant {
         return packetLog;
     }
 
+    public static boolean hasEncoding() {
+        if (hasEncoding == null) {
+            try {
+                hasEncoding = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceNeedEncoding", "content"));
+            } catch (Exception e) {
+                hasEncoding = true;
+            }
+        }
+        return hasEncoding;
+    }
+
     /**
-     * 0: 默认多通道
-     * -1: 单通道，拆分拼接
-     * 1: 单通道，只获取一个通道数据
+     * 0: 默认多通道 0.1 0.2 0.1 0.2 0.1 0.2
+     * -1: 单通道，拆分拼接，121212
+     * -2: 强制单声道，通道1写完写通道2，111222
+     * 1: 单通道，只获取一个通道数据 111
+     * 2: 多声道，拆分拼接，121212
      */
     public static int voiceChtype() {
         int chtype = 0;
@@ -186,6 +201,19 @@ public class Constant {
             log.warn("voiceChtype not setting, voiceChtype: {} ", chtype);
         }
         return chtype;
+    }
+
+    /**
+     * 声纹采样前后字段反转，500 声纹接口采样需前后反转
+     */
+    public static boolean voiceByteReverse() {
+        boolean reverse = false;
+        try {
+            reverse = "true".equals(redisTemplate.opsForHash().get("t_sys_param:voiceByteReverse", "content"));
+        } catch (Exception e) {
+            log.warn("voiceByteReverse not setting, voiceByteReverse: {} ", reverse);
+        }
+        return reverse;
     }
 
     /**
