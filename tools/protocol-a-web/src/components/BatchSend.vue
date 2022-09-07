@@ -114,7 +114,6 @@ export default {
         threadCount: this.threadCount,
         taskCount: this.taskCount
       }).then(res => {
-        this.$message.success('发送成功!!!')
       })
     },
     queryResult() {

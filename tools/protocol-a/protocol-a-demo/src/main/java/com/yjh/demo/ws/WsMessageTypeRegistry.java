@@ -6,6 +6,7 @@
 package com.yjh.demo.ws;
 
 import com.yjh.demo.ws.message.AInterfaceMessage;
+import com.yjh.demo.ws.message.BatchTaskMessage;
 import com.yjh.messager.api.msg.BaseMessage;
 import com.yjh.messager.api.msg.MessageTypeRegistry;
 
@@ -34,6 +35,8 @@ public class WsMessageTypeRegistry implements MessageTypeRegistry {
 
     static {
         MSG_TYPE_CLASS_MAP.put("0003", AInterfaceMessage.class);
+        MSG_TYPE_CLASS_MAP.put("0004", BatchTaskMessage.class);
+
         MSG_TYPE_CLASS_MAP.forEach((robotMsgType, aClass) -> {
             CLASS_MSG_TYPE_MAP.put(aClass, robotMsgType);
         });

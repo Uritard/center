@@ -81,7 +81,7 @@ public class SendTask implements Runnable {
         String realRmoteFileName = fileName[0] + suffix + "." + fileName[1];
         log.info("realRmoteFileName=" + realRmoteFileName);
         //上传文件
-//        FtpsUtil.putFile(data,realRmoteFileName,ip,ftpPort, keyPw,username,password);
+        FtpsUtil.putFile(data, realRmoteFileName, ip, ftpPort, keyPw, username, password);
         long uploadFileEndTime = System.currentTimeMillis();
         //发送消息
         sendMsg();
