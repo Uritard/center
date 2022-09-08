@@ -1,5 +1,6 @@
 package com.yjh.demo.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.commons.rxbus.RxBus;
 import com.yjh.demo.controller.DemoClientTaskContoller;
 import com.yjh.demo.util.XmlToMessageUtil;
@@ -14,12 +15,8 @@ import com.yjh.protocol_a.MessageSender;
 import com.yjh.protocol_a.OutboundMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
@@ -62,7 +59,7 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
 
     @Override
     protected void handleMessage(BaseMessage baseMsg) {
-        log.info("sendCode:{}   sessionId:{}   index:{}  Recv Msg: {}", sendCode, sessionId, index, baseMsg);
+        log.info("接收消息:sendCode:{}   sessionId:{}   index:{}  Recv Msg: {}", sendCode, sessionId, index, baseMsg);
         if (baseMsg instanceof ExtPeerState) {
             ExtPeerState peerState = (ExtPeerState) baseMsg;
             if (peerState.getData().isConnected()) {
@@ -132,10 +129,13 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
             for (String deviceId : deviceArray) {
                 taskResponseItem.put("device_id", deviceId);
                 taskResponseItem.put("task_patrolled_id", taskPatrolledId.getAndIncrement());
-                OutboundMessage outboundMessage = new OutboundMessage(taskResponseMsg);
+                //深复制 防止消息错误
+                String jsonStr = JSON.toJSONString(taskResponseMsg);
+                Message taskResponseMsgClone = JSON.parseObject(jsonStr, Message.class);
+                OutboundMessage outboundMessage = new OutboundMessage(taskResponseMsgClone);
                 outboundMessage.setSessionId(sessionId);
                 sender.send(outboundMessage);
-                log.info("任务发送响应：taskResponse:{}", taskResponseMsg);
+                log.info("任务发送响应：taskResponse:{}", taskResponseMsgClone);
             }
         }
     }

@@ -1,10 +1,8 @@
 <template>
   <div class="bg">
-
-
     <div class="send">
-      <el-form :inline="true" style="padding: 10px">
-        <el-form-item label="WebSocket IP:">
+      <el-form :inline="true" style="margin-top: 10px">
+        <el-form-item label="WebSocket 地址:">
           <el-input v-model="wsIp"></el-input>
         </el-form-item>
         <el-form-item>
@@ -13,11 +11,10 @@
       </el-form>
 
       <el-form :inline="true">
-
-        <el-form-item label="客户端IP">
+        <el-form-item label="IP">
           <el-input v-model="ip"></el-input>
         </el-form-item>
-        <el-form-item label="客户端端口">
+        <el-form-item label="端口">
           <el-input v-model="port"></el-input>
         </el-form-item>
         <el-form-item label="sendCode(多个逗号隔开)">
@@ -28,7 +25,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="createClient">创建客户端</el-button>
+          <el-button type="primary" @click="createClient">批量创建客户端</el-button>
           <el-button type="primary" @click="destroyClient">销毁客户端</el-button>
           <el-button type="primary" @click="batchSendTest">批量发送消息</el-button>
           <el-button type="primary" @click="resetData">重置发送报文</el-button>
@@ -126,12 +123,14 @@ export default {
         sendCodeList: this.sendCode.split(","),
         receiveCode: this.receiveCode
       }).then((res) => {
-        this.$message.success('发送成功!!!')
+        this.$message.success(res.result)
       })
     },
     destroyClient() {
-      this.$http.windPost('/demo/demo-client-task/destroy').then(res => {
-        this.$message.success(res);
+      this.$http.windGet('/demo/demo-client-task/destroy').then(res => {
+        this.$message.success(res.result);
+        this.resultList = [];
+
       })
     },
 
@@ -139,7 +138,7 @@ export default {
       this.$http.windPost(`/demo/demo-client-task/batchsend`, {
         xml: this.xml,
       }).then(res => {
-        this.$message.success('发送成功!!!')
+        this.$message.success(res.result)
       })
     },
     resetData() {
@@ -148,7 +147,7 @@ export default {
           '\t<SendCode>Client01</SendCode>\n' +
           '\t<ReceiveCode>Server01</ReceiveCode>\n' +
           '\t<Type>251</Type>\n' +
-          '\t<Command>1</Command>\n' +
+          '\t<Command>2</Command>\n' +
           '\t<Time>2022-07-22 14:36:36</Time>\n' +
           '\t<Items>\n' +
           '\t\t<Item/></Items>\t\n' +
@@ -163,7 +162,7 @@ export default {
       this.$http.windPost(`/demo/demo-client-task/settaskresult`, {
         xml: this.taskXml,
       }).then(res => {
-        this.$message.success('发送成功!!!')
+        this.$message.success(res.result);
       })
 
     }

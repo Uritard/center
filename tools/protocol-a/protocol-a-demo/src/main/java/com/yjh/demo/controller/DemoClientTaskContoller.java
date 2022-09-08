@@ -3,6 +3,7 @@ package com.yjh.demo.controller;
 import com.yjh.commons.rxbus.RxBus;
 import com.yjh.demo.entity.BatchClientParam;
 import com.yjh.demo.entity.MessageParam;
+import com.yjh.demo.entity.ResultBean;
 import com.yjh.demo.handler.DemoBatchTaskHandler;
 import com.yjh.demo.util.XmlToMessageUtil;
 import com.yjh.messager.api.channel.MsgChannel;
@@ -58,24 +59,8 @@ public class DemoClientTaskContoller {
     @Autowired
     private SimpleMessageSender wsMessageSender;
 
-    public static void main(String[] args) {
-        ExecutorService clientBatchOutboundExecutor = Executors.newSingleThreadExecutor();
-        for (int i = 0; i < 5; i++) {
-            RxBus rxBus = new RxBus();
-            MsgChannel msgChannel = new RxBusMsgChannel(
-                    rxBus,
-                    msg -> msg instanceof Msg.Outbound,
-                    new MessageCodec("PatrolDevice", true),
-                    clientBatchOutboundExecutor
-            );
-            BaseSocketClient socketClient = new BaseSocketClient(msgChannel, "192.168.33.20", 10011, new Timer(), new PacketCodecFactory());
-            socketClient.start();
-        }
-        System.out.println("ok");
-    }
-
     @PostMapping(value = "/create")
-    public String createClient(@RequestBody BatchClientParam batchClientParam) {
+    public ResultBean createClient(@RequestBody BatchClientParam batchClientParam) {
         baseSocketClientList.forEach(BaseSocketClient::stop);
         baseSocketClientList.clear();
         messageSenderList.clear();
@@ -119,11 +104,11 @@ public class DemoClientTaskContoller {
             DemoBatchTaskHandler demoBatchTaskHandler = new DemoBatchTaskHandler(clientBatchOutboundExecutor, rxBus, messageSender, wsMessageSender, sendCode, receiveCode, i);
             demoBatchTaskHandlerList.add(demoBatchTaskHandler);
         }
-        return "ok";
+        return new ResultBean(200, "创建客户端成功");
     }
 
-    @GetMapping(value = "/destroy")
-    public String destroyClient() {
+    @RequestMapping(value = "/destroy")
+    public ResultBean destroyClient() {
         if (!baseSocketClientList.isEmpty()) {
             for (BaseSocketClient socketClient : baseSocketClientList) {
                 socketClient.stop();
@@ -133,19 +118,19 @@ public class DemoClientTaskContoller {
         messageSenderList.clear();
         sendCodeList.clear();
         demoBatchTaskHandlerList.clear();
-        return "ok";
+        return new ResultBean(200, "销毁客户端成功");
     }
 
 
     @PostMapping("/batchsend")
-    public String sendMsg(@RequestBody MessageParam messageParam) {
+    public ResultBean sendMsg(@RequestBody MessageParam messageParam) {
         //设置请求消息
         Message message = null;
         try {
             message = XmlToMessageUtil.decode(messageParam.getXml());
         } catch (Exception e) {
             log.error("xml格式有误", e);
-            return "error";
+            return new ResultBean(200, "xml格式错误");
         }
         for (int i = 0; i < messageSenderList.size(); i++) {
             Message sendMessage = new Message();
@@ -161,13 +146,13 @@ public class DemoClientTaskContoller {
             MessageSender messageSender = messageSenderList.get(i);
             messageSender.send(outboundMessage);
         }
-        return "ok";
+        return new ResultBean(200, "发送消息成功！");
     }
 
     @PostMapping("/settaskresult")
-    public String setTaskResult(@RequestBody MessageParam messageParam) {
+    public ResultBean setTaskResult(@RequestBody MessageParam messageParam) {
         taskXml = messageParam.getXml();
-        return "ok";
+        return new ResultBean(200, "设置任务返回报文成功！");
     }
 
 
