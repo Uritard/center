@@ -28,6 +28,8 @@ public interface SysKeyDao {
 
     List<SysKey> selectByUserId(@Param(value = "userId") Long userId);
 
+    SysKey selectBySerialNum(@Param(value = "serialNum") String serialNum);
+
     List<SysKey> selectAll();
 
     int insertUser(String uniqueUser);

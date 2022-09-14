@@ -45,6 +45,13 @@
         where a.key_id = #{keyId, jdbcType=BIGINT}
     </select>
 
+    <select id="selectBySerialNum" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.SysKey">
+        select
+        <include refid="Base_Column_List"/>
+        from sys_key a
+        where a.serial_num = #{serialNum, jdbcType=VARCHAR}
+    </select>
+
     <select id="selectByUserId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysKey">
         select
             <include refid="Base_Column_List"/>

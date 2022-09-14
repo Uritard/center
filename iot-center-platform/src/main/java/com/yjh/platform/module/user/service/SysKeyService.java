@@ -61,16 +61,21 @@ public class SysKeyService {
             throw new BusinessException(ResultCodeEnum.PARAMERROR.getCode(), "绑定类型不正确！");
         }
         if(sysKey.getBindType() == SysKey.BindEnum.UKEY.getCode()) {
+            SysKey sk = sysKeyDao.selectBySerialNum(sysKey.getSerialNum());
+            if (sk != null) {
+                log.error("Ukey 重复绑定, {}, {}", sk.getUserId(), sk.getSerialNum());
+                throw new BusinessException(ResultCodeEnum.PARAMERROR.getCode(), "每个 UKey 只可绑定一个用户！");
+            }
             String isDecode = (String) redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content");
             // 判断是否需要加解密
             if ("true".equals(isDecode)) {
                 String dpkey = demo.decryptIdentifier(sysKey.getPubKey(), identifier);
-                if(dpkey.length() > 512) {
-                    throw new BusinessException(ResultCodeEnum.PARAMERROR.getCode(), "公钥长度必须小于512位");
-                }
                 if (StringUtils.isNotEmpty(dpkey)) {
                     sysKey.setPubKey(dpkey);
                 }
+            }
+            if(StringUtils.length(sysKey.getPubKey()) > 512) {
+                throw new BusinessException(ResultCodeEnum.PARAMERROR.getCode(), "公钥长度必须小于512位");
             }
             redisTemplate.opsForHash().put("sysKey:" + sysKey.getUserId() + ":" + sysKey.getBindType(), sysKey.getSerialNum(), sysKey.getPubKey());
         } else {
