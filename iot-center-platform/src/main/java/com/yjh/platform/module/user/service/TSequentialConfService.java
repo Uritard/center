@@ -364,7 +364,7 @@ public class TSequentialConfService{
 //                    throw new BusinessException("一键顺控-变位信号-发送至算法识别主机失败"+jsonObject.toJSONString());
 //                }
             }catch (Exception e){
-                log.error("一键顺控-变位信号-调用算法识别主机失败:{}",e);
+                log.error("一键顺控-变位信号-调用算法识别主机失败:",e);
             }
         }
         return "ok";
@@ -374,48 +374,47 @@ public class TSequentialConfService{
     public String sequentialRecBack(Map<String,String> recBack) throws Exception{
         {
             Map<String,Object> map = this.sequentialInfo(recBack.get("meteId")).get(0);
-            Map<String , Object> param = new HashMap<>();
+            Map<String , String> param = new HashMap<>();
             try{
-                if(!Objects.isNull(recBack.get("code"))&&recBack.get("code").equals("200")){
-                    if(!Objects.isNull(recBack.get("desc"))){
+                if(!Objects.isNull(recBack.get("code")) && StringUtils.equalsAny(recBack.get("code"), "200", "2000")){
+                    String orcMete = (String)Constant.sequentialState.get("meteResult");
+                    String orc;
+                    if (StringUtils.contains(orcMete, "分")){
+                        orc = "分";
+                    } else {
+                        orc = "合";
+                    }
+                    if("200".equals(recBack.get("code")) && !Objects.isNull(recBack.get("desc"))) {
                         String ret = recBack.get("desc");
-                        String orc = (String)Constant.sequentialState.get("meteResult");
+                        log.info("传入信号量: {}, 分合: {}, 识别信号量: {}", orcMete, orc, ret);
                         if("unknown".equals(ret) || !ret.equals(orc)){
-                            param.put("resultValue",orc + "异常");
+                            param.put("resultValue", orc + "闸异常");
+                            param.put("resultState", orc + "不到位");
                         } else {
-                            param.put("resultValue", ret);
+                            param.put("resultValue", orc + "闸正常");
+                            param.put("resultState", orc + "位");
                         }
-                    }else{
-                        Map<String, String> jasonMapsResult = new HashMap<>();
-                        jasonMapsResult.put("type", "newSequentialResult");
-                        jasonMapsResult.put("cfgDeviceId", recBack.get("meteId"));
-                        jasonMapsResult.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
-                        jasonMapsResult.put("state", "算法识别失败");
-                        jasonMapsResult.put("identifyResult", "算法识别失败");
-                        String jsonResult = JSON.toJSONString(jasonMapsResult);
-                        log.info("发送给前端的消息：" + jsonResult);
-                        try{
-                            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapsResult);
-                        }catch (Exception e){
-                            log.error("发送websocket出错",e.getMessage());
+                    } else if ("2000".equals(recBack.get("code")) && !Objects.isNull(recBack.get("value"))) {
+                        String ret = recBack.get("value");
+                        log.info("传入信号量: {}, 分合: {}, 识别信号量: {}", orcMete, orc, ret);
+                        if ("1".equals(ret) && "分".equals(orc)) {
+                            param.put("resultValue", "分闸正常");
+                            param.put("resultState", orc + "位");
+                        } else if ("2".equals(ret) && "合".equals(orc)) {
+                            param.put("resultValue", "合闸正常");
+                            param.put("resultState", orc + "位");
+                        } else {
+                            // 识别返回 3 和 4
+                            param.put("resultValue", orc + "闸异常");
+                            param.put("resultState", orc + "不到位");
                         }
-                        throw new BusinessException("一键顺控-变位信号-算法识别错误" + JSON.toJSONString(recBack));
+                    } else {
+                        param.put("resultValue", "分析失败");
+                        param.put("resultState", "无效状态");
                     }
-                }else{
-                    Map<String, String> jasonMapsResult = new HashMap<>();
-                    jasonMapsResult.put("type", "newSequentialResult");
-                    jasonMapsResult.put("cfgDeviceId", recBack.get("meteId"));
-                    jasonMapsResult.put("sort", String.valueOf(Double.valueOf(map.get("sort").toString()).intValue()));
-                    jasonMapsResult.put("state", "算法识别失败");
-                    jasonMapsResult.put("identifyResult", "算法识别失败");
-                    String jsonResult = JSON.toJSONString(jasonMapsResult);
-                    log.info("发送给前端的消息：" + jsonResult);
-                    try{
-                        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapsResult);
-                    }catch (Exception e){
-                        log.error("发送websocket出错",e.getMessage());
-                    }
-                    throw new BusinessException("一键顺控-变位信号-识别主机返回结果处理失败");
+                } else {
+                    param.put("resultValue", "分析失败");
+                    param.put("resultState", "无效状态");
                 }
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
@@ -435,7 +434,7 @@ public class TSequentialConfService{
                 bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间）!>\r\n");
                 bw.write("<DeviceInfo::设备状态>\r\n");
                 bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
-                bw.write("#1\t"+1+"\t"+recBack.get("meteId")+"\t"+map.get("deviceName")+"\t"+param.get("resultValue")+"\t"+simpleDateFormat.format(new Date())+"\r\n");
+                bw.write("#1\t"+1+"\t"+recBack.get("meteId")+"\t"+map.get("deviceName")+"\t"+param.get("resultState")+"\t"+simpleDateFormat.format(new Date())+"\r\n");
                 bw.write("</DeviceInfo::设备状态>\r\n");
                 bw.flush();
                 bw.close();

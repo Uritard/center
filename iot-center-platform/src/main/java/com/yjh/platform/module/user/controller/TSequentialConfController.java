@@ -260,6 +260,7 @@ public class TSequentialConfController {
 //            recBack.put("code","200");
 //            recBack.put("desc","合");
             if(flag != null && "1".equals(flag)){
+                recBack.put("code","200");
                 recBack.put("desc",String.valueOf(Constant.sequentialState.get("meteResult")));
             }
             result.setData(tSequentialConfService.sequentialRecBack(recBack));
