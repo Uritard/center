@@ -452,8 +452,8 @@ public class SendToUpSystemServices {
     }
 
     private HashMap<String,Object> dealCount(HashMap<String,Object> countMap){
-        String totalNumStr = MapUtils.getString(countMap,"totalNum");
-        String validNumStr = MapUtils.getString(countMap,"validNum");
+        String totalNumStr = MapUtils.getString(countMap, "totalNum","0");
+        String validNumStr = MapUtils.getString(countMap, "validNum","0");
         double totalNum = NumberUtils.toDouble(totalNumStr);
         double validNum = NumberUtils.toDouble(validNumStr);
         String percent = totalNum > 0 ? String.format("%.3f",validNum * 100 / totalNum) : "0.000";
@@ -483,7 +483,4 @@ public class SendToUpSystemServices {
         // 巡视结果人工审核完成率
         return dealCount(sendToUpSystemDao.countResultCheck(startTime,endTime));
     }
-
-
-
 }
