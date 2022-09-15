@@ -3,6 +3,7 @@ package com.yjh.accesstcp.thread;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
@@ -37,6 +38,9 @@ public class WeatherThread implements Runnable{
                     log.info("Thread stop success!");
                 }
                 {
+                    String s = Constant.paramMap.get("env_interval");
+
+                    Thread.sleep(NumberUtils.toLong(s,30) *1000L);
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     String now = simpleDateFormat.format(new Date());
                     //获取redis的天气信息
@@ -126,11 +130,6 @@ public class WeatherThread implements Runnable{
                     log.info("--天气信息已发送--");
                 }
 
-                String s = Constant.paramMap.get("env_interval");
-                if(s == null){
-                    s= "30";
-                }
-                Thread.sleep(Long.valueOf(s)*1000L);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
