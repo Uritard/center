@@ -654,7 +654,7 @@ public class TStdDeviceService{
             List<AreaInfo> childrenList = new ArrayList<>();
             for(Iterator<AreaInfo> it = listTree.iterator();it.hasNext();){
                 AreaInfo areaInfoMap = it.next();
-                if (Objects.equals(areaInfo.getId(), areaInfoMap.getUpId())) {
+                if (Objects.equals(areaInfo.getId(), areaInfoMap.getUpId()) && !Objects.equals(areaInfo.getUpId(), areaInfoMap.getUpId())) {
                     AreaInfo areaInfoTem = new AreaInfo();
                     areaInfoTem.setId(areaInfoMap.getId());
                     areaInfoTem.setUpId(areaInfoMap.getUpId());
