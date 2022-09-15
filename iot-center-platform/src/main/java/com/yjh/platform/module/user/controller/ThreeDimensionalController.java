@@ -6,7 +6,9 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo;
 import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
+import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import com.yjh.platform.module.user.entity.RoutePlan;
 import com.yjh.platform.module.user.service.ThreeDimensionalService;
 import io.swagger.annotations.Api;
@@ -33,9 +35,12 @@ public class ThreeDimensionalController {
 
     private Logger log = LoggerFactory.getLogger(ThreeDimensionalController.class);
 
+    private final TCruiseDataResultService tCruiseDataResultService;
+
     @Autowired
-    public ThreeDimensionalController(ThreeDimensionalService threeDimensionalService) {
+    public ThreeDimensionalController(ThreeDimensionalService threeDimensionalService, TCruiseDataResultService tCruiseDataResultService) {
         this.threeDimensionalService = threeDimensionalService;
+        this.tCruiseDataResultService = tCruiseDataResultService;
     }
 
     @ApiOperation(value = "三维浏览-搜索定位聚焦")
@@ -120,7 +125,7 @@ public class ThreeDimensionalController {
     }
     @ApiOperation(value = "三维交互-告警信息查看")
     @GetMapping(value = "/viewAlarmInfo")
-    public Result viewAlarmInfo (@RequestParam(value = "modelName") String modelName){
+    public Result viewAlarmInfo (@RequestParam(value = "modelName",required = false) String modelName){
         Result result = new Result();
         try {
             result.setData(threeDimensionalService.viewAlarmInfo(modelName));
@@ -133,19 +138,20 @@ public class ThreeDimensionalController {
         }
         return result;
     }
-    @ApiOperation(value = "三维交互-设备台账详情查看")
+    @ApiOperation(value = "三维交互-相机设备信息查看")
     @GetMapping(value = "/viewCameraInfo")
     @Logs(title = "三维设备台账详情查看",content = "设备台账详情查看",logType = 1)
-    public Result viewCameraInfo (@RequestParam(value = "modelName") String modelName){
+    public Result viewCameraInfo (@RequestParam(value = "modelName",required = false) String modelName,
+                                  @RequestParam(value = "cameraName",required = false)String cameraName){
         Result result = new Result();
         try {
-            result.setData(threeDimensionalService.viewCameraInfo(modelName));
+            result.setData(threeDimensionalService.viewCameraInfo(cameraName,modelName));
         }catch (BusinessException e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),e.getMessage());
-            log.error("三维交互-设备台账详情查看发生异常");
+            log.error("三维交互-设备台账详情查看发生异常:",e);
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("三维交互-设备台账详情查看发生错误");
+            log.error("三维交互-设备台账详情查看发生错误:",e);
         }
         return result;
     }
@@ -161,7 +167,7 @@ public class ThreeDimensionalController {
             log.error("三维交互-设备台账信息查看发生异常");
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("三维交互-设备台账信息查看发生错误");
+            log.error("三维交互-设备台账信息查看发生错误:",e);
         }
         return result;
     }
@@ -205,7 +211,7 @@ public class ThreeDimensionalController {
         Result result = new Result();
         try {
             Map<String, Object> resultMap = new HashMap<>();
-            Page page = PageHelper.startPage((int)planMap.getOrDefault("pageNum", 1), (int)planMap.getOrDefault("pageSize", 0),true,null,true);
+            Page page = PageHelper.startPage(Integer.valueOf(planMap.getOrDefault("pageNum", 1).toString()), Integer.valueOf(planMap.getOrDefault("pageSize", 0).toString()),true,null,true);
             List<TCruisePlanCountByPage> list = threeDimensionalService.selectByPlanPage(planMap);
             log.info("list==={}", list);
             resultMap.put("count", page.getTotal());
@@ -216,8 +222,44 @@ public class ThreeDimensionalController {
             log.error("三维浏览-搜索定位聚焦发生异常");
         }catch (Exception e){
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("三维浏览-搜索定位聚焦发生错误");
+            log.error("三维浏览-搜索定位聚焦发生错误:",e);
         }
         return result;
     }
+
+    @ApiOperation(value = "三维浏览-查询巡检点历史巡视数据")
+    @GetMapping(value = "/selectCruiseHistoryResultByPage")
+    @Logs(title = "三维巡检查询巡检点历史结果数据",content = "三维巡检查询巡检点历史结果数据",logType = 1)
+    public Result selectCruiseHistoryResultByPage(@RequestParam(value = "modelName",required = false)String modelName){
+        Result result = new Result();
+        try{
+            Long deviceMeteId = modelName != null?Long.valueOf(modelName):null;
+            List<CruiseResultAnalyzeInfo>  list = tCruiseDataResultService.selectCruiseDataResultByList2(-1, -1, deviceMeteId, "-1",-1,null, null,-1,-1);
+            result.setData(list);
+        }catch (Exception e){
+            log.error("三维浏览-历史巡检结果数据查询失败",e);
+            result.setMessage(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "三维浏览-巡视设备台账查询")
+    @GetMapping(value = "/selectCruiseDeviceInfo")
+    @Logs(title = "三维巡视设备台账信息查询",content = "三维巡视设备台账信息查询",logType = 1)
+    public Result selectCruiseDeviceInfo(@RequestParam(value = "deviceType",required = false)Integer deviceType,
+                                         @RequestParam(value = "cameraName", required = false)String cameraName){
+        Result result = new Result();
+        try{
+            if(deviceType != null){
+                result.setData(threeDimensionalService.selectInspectionDeviceInfo(deviceType));
+            }else if(cameraName != null && cameraName != ""){
+                result.setData(threeDimensionalService.selectCameraInfo(cameraName));
+            }
+        }catch (Exception e){
+            log.error("巡视设备台账查询失败：",e);
+            result.setMessage(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+        }
+        return result;
+    }
+
 }

@@ -6,15 +6,13 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.entity.TStdDeviceDetail;
 import com.yjh.platform.module.task.entity.StatisticalTools;
 import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.ThreeDimensionalDao;
-import com.yjh.platform.module.user.entity.AlarmAndMeteInfo;
-import com.yjh.platform.module.user.entity.CameraUnionDevice;
-import com.yjh.platform.module.user.entity.ModelNameAndName;
-import com.yjh.platform.module.user.entity.RoutePlan;
+import com.yjh.platform.module.user.entity.*;
 import org.apache.commons.lang.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,48 +103,27 @@ public class ThreeDimensionalService {
         return threeDimensionalDao.viewPointInfo(modelName);
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<AlarmAndMeteInfo> viewAlarmInfo(String modelName){
-        return threeDimensionalDao.viewAlarmInfo(modelName);
+    public List<AlarmAndMeteInfo> viewAlarmInfo(String deviceMeteId){
+        return threeDimensionalDao.viewAlarmInfo(deviceMeteId);
     }
     @Transactional(rollbackFor = Exception.class)
-    public TStdDeviceDetail viewDeviceInfo(String modelName){
-        return threeDimensionalDao.viewDeviceInfo(modelName);
+    public TStdDeviceDetail viewDeviceInfo(String deviceMeteId){
+        return threeDimensionalDao.viewDeviceInfo(deviceMeteId);
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<CameraUnionDevice> viewCameraInfo(String modelName){
+    public List<CameraUnionDevice> viewCameraInfo(String cameraName, String modelName){
         //通过模型名称查询相关信息
-        Map<String,Object> map = threeDimensionalDao.selectDeviceInfoByModelName(modelName);
-        Long deviceId = NumberUtils.toLong(String.valueOf(map.get("id")));
-        List<CameraUnionDevice> cameraUnionDeviceList = new ArrayList<>();
-        if (map.containsKey("is_camera") && Objects.equals(1, map.get("is_camera"))){
-            // 该模型就是摄像机  直接查询所有的预置位点
-            cameraUnionDeviceList = threeDimensionalDao.selectCameraByCameraId(deviceId);
-        }else {
-            //关联的摄像机只能是通过设备下的某个测点配置了预置位成为巡检点才能找到。
-            cameraUnionDeviceList = threeDimensionalDao.selectCameraByDeviceId(deviceId);
-        }
-        /*Map<String,String> map = new HashMap<>();
-        List<Long> recordIdList = tCameraScreenDao.selectRecordId();
-        for(Long recordId : recordIdList){
-            HashMap<String, Object> recordIdMap = new HashMap<>();
-            recordIdMap.put("recordId",recordId );
-            Result re = cameraStates(recordIdMap);
-            if (Objects.nonNull(re)){
-                map.putAll((Map<String,String>)re.getData());
-            }
-        }
-
-        for (CameraUnionDevice xi : cameraUnionDeviceList){
-            if (map.containsKey(xi.getCameraId().toString())){
-                if ("0".equals(map.get(xi.getCameraId().toString()))){
-                    cameraUnionDeviceList.remove(xi);
-                }
-            }else {
-                cameraUnionDeviceList.remove(xi);
-            }
-        }*/
-
-        return cameraUnionDeviceList;
+//        Map<String,Object> map = threeDimensionalDao.selectDeviceInfoByModelName(modelName);
+//        Long deviceId = NumberUtils.toLong(String.valueOf(map.get("id")));
+//        List<CameraUnionDevice> cameraUnionDeviceList = new ArrayList<>();
+//        if (map.containsKey("is_camera") && Objects.equals(1, map.get("is_camera"))){
+//            // 该模型就是摄像机  直接查询所有的预置位点
+//            cameraUnionDeviceList = threeDimensionalDao.selectCameraByCameraId(deviceId);
+//        }else {
+//            //关联的摄像机只能是通过设备下的某个测点配置了预置位成为巡检点才能找到。
+//            cameraUnionDeviceList = threeDimensionalDao.selectCameraByDeviceId(deviceId);
+//        }
+      return threeDimensionalDao.selectCameraDeviceByName(cameraName, modelName);
     }
     private static Result cameraStates(HashMap map) {
         Result re = null;
@@ -179,6 +156,15 @@ public class ThreeDimensionalService {
 
         return threeDimensionalDao.selectByPlanPage(planMap);
     }
+
+    public TRobotInfo selectInspectionDeviceInfo(Integer deviceType){
+        return threeDimensionalDao.selectCruiseDeviceByType(deviceType);
+    }
+
+    public TCameraInfoByDict selectCameraInfo(String cameraName){
+        return threeDimensionalDao.selectCameraInfoByName(cameraName);
+    }
+
 
     //Redis数据库批量查询Key值游标
     public Set<String> redisScan(String key) {

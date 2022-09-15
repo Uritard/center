@@ -9,6 +9,41 @@
         <if test="deviceType != null ">and a.device_type = #{deviceType,jdbcType=INTEGER}</if>
     </select>
 
+    <sql id="tongTong">
+        a.address,
+        a.camera_id,
+        a.camera_model,
+        a.pms_id,
+        e.dict_note as camera_model_name,
+        a.camera_name,
+        a.alias_name,
+        a.record_id,
+        a.monitor_id,
+        a.vendor_id ,
+        b.dict_note as vendorName ,
+        a.camera_type,
+        d.dict_note as camera_type_name,
+        a.channel_num,
+        a.camera_num,
+        a.sms_id,
+        a.rms_id,
+        a.stream_type,
+        a.protocol_type,
+        a.camera_ip,
+        a.url,
+        a.port,
+        a.infread_port,
+        a.camera_manager,
+        IF(IFNULL(a.camera_code, '') = '', a.camera_code, '••••••') AS camera_code,
+        a.is_control,
+        a.latitude,
+        a.longitude,
+        a.unit,
+        a.up_region_id,
+        f.region_name as up_region_name,
+        a.commission_date
+    </sql>
+
     <select id="viewPointInformation" resultType="com.yjh.platform.module.user.entity.AlarmAndMeteInfo">
         select
             a.device_id,
@@ -114,14 +149,7 @@
                 LEFT JOIN t_camera_preset f on d.cruise_id = f.preset_id
                 LEFT JOIN t_dict_business g on g.dict_code = d.cruise_type
         WHERE
-                a.device_id = (
-                SELECT
-                    id
-                FROM
-                    three_dimensional_relevancy
-                WHERE
-                    model_name = #{modelName,jdbcType=VARCHAR}
-            )
+               b.device_mete_id = #{modelName, jdbcType = VARCHAR}
           and d.cruise_type is not NULL
     </select>
 
@@ -147,16 +175,11 @@
                 LEFT JOIN t_dict_business e ON e.dict_code = d.alarm_source
                 LEFT JOIN t_dict_business f ON f.dict_code = d.warn_level
         WHERE
-                a.device_id = (
-                SELECT
-                    id
-                FROM
-                    three_dimensional_relevancy
-                WHERE
-                    model_name = #{modelName,jdbcType=VARCHAR}
-            )
-          AND d.std_mete_id = b.device_mete_id
-
+           d.std_mete_id = b.device_mete_id
+        <if test="deviceMeteId != null and deviceMeteId != ''">
+            AND
+            b.device_mete_id = #{deviceMeteId, jdbcType= VARCHAR}
+        </if>
     </select>
 
     <select id="viewDeviceInfo" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
@@ -207,7 +230,7 @@
             k.region_name as upRegionName,
             preset.preset_name as presetName,
             info.camera_name as cameraName
-        from t_std_device a
+        from  t_std_devicemete std LEFT JOIN  t_std_device a ON std.device_id = a.device_id
                  left join t_std_device_attr b on a.device_id = b.device_id
                  left join t_dict_business e on device_model = e.dict_code
                  left join t_dict_business f on device_vendor=f.dict_code
@@ -218,8 +241,7 @@
                  left join t_device_type_img l on a.device_type = l.type_id
                  left join t_camera_preset preset on a.preset_id = preset.preset_id
                  left join t_camera_info info on a.camera_id = info.camera_id
-                 LEFT JOIN three_dimensional_relevancy ss on ss.id = a.device_id
-        where 1=1 and ss.model_name = #{modelName,jdbcType=VARCHAR}
+        where 1=1 and std.device_mete_id = #{deviceMeteId, jdbcType = VARCHAR}
     </select>
 
     <select id="selectDeviceIdByModelName" resultType="java.lang.Long">
@@ -351,15 +373,130 @@
                 LEFT JOIN t_std_devicemete h ON h.device_mete_id = e.device_mete_id
                 WHERE
                 e.device_id IS NOT NULL and
-                e.device_id = (
-                SELECT
-                id
-                FROM
-                three_dimensional_relevancy
-                WHERE
-                model_name = #{modelName,jdbcType=VARCHAR})
+                h.device_mete_id= #{modelName,jdbcType=VARCHAR}
                 )
             </if>
             order by a.create_time desc
     </select>
+    <select id="selectCameraDeviceByName" resultType="com.yjh.platform.module.user.entity.CameraUnionDevice">
+                    SELECT
+            b.preset_id AS cruise_id,
+            a.camera_id,
+            a.record_id,
+            a.camera_name,
+            b.preset_name
+        FROM
+            t_camera_info a,
+            t_camera_preset b
+        WHERE
+            a.camera_id = b.camera_id
+        <if test="cameraName != null and cameraName != ''">
+        AND a.camera_name = #{cameraName, jdbcType= VARCHAR}
+        </if>
+        <if test="modelName != null and modelName != ''">
+            limit 1
+        </if>
+    </select>
+
+    <select id="selectCameraInfoByName" parameterType="java.lang.String" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
+        select<include refid="tongTong"></include>
+        from t_camera_info a
+        left JOIN t_dict_business b on a.vendor_id = b.dict_code and b.col_name = 'camera_vendor'
+        LEFT JOIN t_dict_business d on a.camera_type = d.dict_code and d.col_name = 'camera_type'
+        LEFT JOIN t_dict_business e on a.camera_model = e.dict_code and e.col_name = 'camera_model'
+        LEFT JOIN t_std_region f on a.up_region_id = f.region_id
+        where 1 = 1
+        <if test="cameraName != null and cameraName != ''"> and a.camera_name = #{cameraName, jdbcType= VARCHAR}</if>
+        order by a.camera_id
+        limit 1
+
+    </select>
+
+    <select id="selectCruiseDeviceByType" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+        SELECT
+        a.robot_id,
+        a.robot_code,
+        a.robot_num,
+        a.robot_name,
+        a.nest_code,
+        a.nest_name,
+        a.robot_status,
+        a.drone_type,
+        d.dict_note AS drone_type_name,
+        a.robot_ip,
+        a.robot_port,
+        a.light_ip,
+        a.light_port,
+        a.identity_manager,
+
+        IF (
+        IFNULL(a.identity_code, '') = '',
+        a.identity_code,
+        '••••••'
+        ) AS identity_code,
+        a.lnferad_IP,
+        a.Inferad_Port,
+        a.Inferad_username,
+
+        IF (
+        IFNULL(a.Inferad_password, '') = '',
+        a.Inferad_password,
+        '••••••'
+        ) AS Inferad_password,
+        a.phote_path,
+        a.create_by,
+        a.create_date,
+        a.update_by,
+        a.update_date,
+        b.dict_note AS robot_factory_name,
+        a.robot_factory,
+        a.made_in,
+        a.made_date,
+        c.dict_note AS is_use_name,
+        a.is_use,
+        a.commission_date,
+        a.up_region_id,
+        f.region_name,
+        e.dict_note AS robot_position_name,
+        a.robot_position,
+        h.dict_note AS drone_position_name,
+        a.drone_position,
+        a.robot_source,
+        a.address,
+        a.building_user,
+        a.appearance_number,
+        a.defect_record,
+        a.repair_record,
+        a.exit_putInto_record,
+        a.remarks,
+        a.record_id,
+        a.channel_num_light,
+        a.channel_num_inferad,
+        g.record_name
+        FROM
+        t_robot_info a
+        JOIN t_dict_business d ON a.robot_type = d.dict_code
+        AND d.col_name = 'robot_type'
+        <if test="deviceType != null and deviceType == 2">
+            JOIN t_dict_business d ON a.drone_type = d.dict_code
+            AND d.col_name = 'drone_type'
+        </if>
+        LEFT JOIN t_dict_business b ON a.robot_factory = b.dict_code
+        AND b.col_name = 'robot_factory'
+        LEFT JOIN t_dict_business c ON a.is_use = c.dict_code
+        AND c.col_name = 'robot_use'
+        LEFT JOIN t_dict_business e ON a.robot_position = e.dict_code
+        AND e.col_name = 'robot_position'
+        LEFT JOIN t_dict_business h ON a.drone_position = h.dict_code
+        AND h.col_name = 'drone_position'
+        LEFT JOIN t_std_region f ON f.region_id = a.up_region_id
+        LEFT JOIN t_camera_recorder g ON a.record_id = g.record_id
+        WHERE
+        1 = 1
+        AND a.robot_status = '在线'
+        ORDER BY
+        robot_id
+        LIMIT 1
+    </select>
+
 </mapper>

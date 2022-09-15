@@ -4,8 +4,7 @@ import com.yjh.platform.module.device.entity.TStdDeviceDetail;
 import com.yjh.platform.module.task.entity.StatisticalTools;
 import com.yjh.platform.module.task.entity.TCruisePlan;
 import com.yjh.platform.module.task.entity.TCruisePlanCountByPage;
-import com.yjh.platform.module.user.entity.AlarmAndMeteInfo;
-import com.yjh.platform.module.user.entity.CameraUnionDevice;
+import com.yjh.platform.module.user.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -40,16 +39,16 @@ public interface ThreeDimensionalDao {
     List<AlarmAndMeteInfo> viewPointInfo(@Param("modelName") String modelName);
     /**
      * 通过模型名称查找相关的告警信息
-     * @param modelName 模型名称
+     * @param deviceMeteId 模型测点ID
      * @return AlarmAndMeteInfo
      */
-    List<AlarmAndMeteInfo> viewAlarmInfo(@Param("modelName") String modelName);
+    List<AlarmAndMeteInfo> viewAlarmInfo(@Param("deviceMeteId") String deviceMeteId);
     /**
-     * 通过模型名称查找设备台账
-     * @param modelName 模型名称
+     * 通过测点查找设备台账
+     * @param deviceMeteId 测点ID
      * @return TStdDeviceDetail
      */
-    TStdDeviceDetail viewDeviceInfo(@Param("modelName") String modelName);
+    TStdDeviceDetail viewDeviceInfo(@Param("deviceMeteId") String deviceMeteId);
     /**
      * 通过模型名称查找对应的设备id
      * @param modelName 模型名称
@@ -96,4 +95,16 @@ public interface ThreeDimensionalDao {
      * @return List<TCruisePlanCountByPage>
      */
     List<TCruisePlanCountByPage> selectByPlanPage(Map<String, Object> cruisePlanMap);
+
+    /**
+     * 通过相机名称或测点 查询对应相机设备关联属性
+     * @param cameraName
+     * @return
+     */
+    List<CameraUnionDevice> selectCameraDeviceByName(@Param(value = "cameraName")String cameraName,
+                                                     @Param(value = "modelName")String modelName);
+
+    TCameraInfoByDict selectCameraInfoByName(@Param(value = "cameraName")String cameraName);
+
+    TRobotInfo selectCruiseDeviceByType(@Param(value = "deviceType")Integer deviceType);
 }
