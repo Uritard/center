@@ -14,6 +14,7 @@ import com.yjh.accesstcp.thread.MyThreadFactory;
 import com.yjh.accesstcp.thread.TaskExecutePool;
 import com.yjh.accesstcp.thread.WeatherThread;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
@@ -182,7 +183,12 @@ public class MessageThread {
             re = Constant.otherServer(map, Constant.ROBOT_TASK_URL);//国网要求
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item = new HashMap<>();
-            item.put("task_patrolled_id", xmlBaseModel.getCode());
+            if (StringUtils.equals("1", xmlBaseModel.getCommand())){
+                String time = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+                item.put("task_patrolled_id", xmlBaseModel.getCode() + "_" + time);
+            }else{
+                item.put("task_patrolled_id", xmlBaseModel.getCode());
+            }
             items.add(item);
             if (re == null) {
                 sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", items, false);
