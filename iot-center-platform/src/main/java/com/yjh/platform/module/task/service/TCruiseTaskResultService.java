@@ -188,7 +188,7 @@ public class TCruiseTaskResultService {
                 }else { videoInfo.put("videoCameraType", "1"); }
 //                log.info("redis-robotId==:" + resultMap.get("robotId"));
                 //拉机器人的红外和可见光的视频流
-                if (!"".equals(resultMap.get("robotId").toString())) {
+                if (resultMap.containsKey("robotId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("robotId")))) {
                     //判断当前机器人巡视点的采集设备为 红外或可见光
 //                    String runningCameraFlag = tRobotInfoDao.selectRobotRunningCamera(Long.valueOf(resultMap.get("robotId").toString()), Long.valueOf(resultMap.get("instanceId").toString()));
                     String runningCameraFlag = cruiseInspectResult.getSaveTypeList();
@@ -239,7 +239,7 @@ public class TCruiseTaskResultService {
                 }
                 //todo 摄像机的没写
                 //拉机器人的红外和可见光的视频流
-                if (!"".equals(resultMap.get("cameraId").toString())){
+                if (resultMap.containsKey("cameraId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("cameraId")))){
                     HashMap<String, Long> cameraId = new HashMap<>();
                     cameraId.put("cameraId", Long.valueOf(resultMap.get("cameraId").toString()));
                     Result result = sendGetRequest(Constant.START_CAMERA_URL, cameraId);

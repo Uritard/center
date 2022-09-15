@@ -52,8 +52,6 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
                 robotStatusMap.put("unit", res.get("unit").toString());
                 robotStatusList.add(robotStatusMap);
 
-                // 国网要求
-                robotService.upToCruise(xmlBaseModel);
             });
             log.info("机器人状态数据是：" + robotStatusList);
 
@@ -65,6 +63,9 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
             byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
             RobotServerHandler.send(statusProtocol, robotCode);
             log.info("巡视主机给机器人{}响应了", robotCode);
+
+            // 国网要求
+            robotService.upToCruise(xmlBaseModel);
         }
     }
 
