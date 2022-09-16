@@ -9,8 +9,10 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -31,11 +33,16 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
     private RedisTemplate redisTemplate;
     @Autowired
     private RobotService robotService;
+    @Value("${stationCode}")
+    private String stationCode;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到机器人运行数据了+++++++++++++++++");
         // Deal with robot operation data
+        if(StringUtils.isBlank(xmlBaseModel.getCode())){
+            xmlBaseModel.setCode(stationCode);
+        }
         String robotCode = xmlBaseModel.getSendCode();
         if (Constant.robotRegisterFlag.getOrDefault(robotCode, false)) {
             List<Map<String, String>> robotOperationList = new ArrayList<>();
