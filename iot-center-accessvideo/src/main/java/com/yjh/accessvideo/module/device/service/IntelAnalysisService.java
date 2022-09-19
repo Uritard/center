@@ -968,7 +968,7 @@ public class IntelAnalysisService {
                     // 图像数据正确
                     if (!Objects.equals("2000", result.getCode())) {
                         log.error("巡视点为{}的图像数据错误", instanceId);
-                        continue;
+//                        continue;
                     }
                     log.info("进入map放置");
                     map = setRecognizeResult(result, resultDesc, resultValue, resultImg, resultDataObject, originPicPath, Long.valueOf(instanceId));
