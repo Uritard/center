@@ -361,4 +361,12 @@ public interface TRobotInfoDao {
      */
     TRobotInfo selectRobotInfoByCode(@Param(value = "robotCode") String robotCode);
 
+    /**
+     * 根据col_name 和up_dict查询code
+     * @param colName
+     * @param upDict
+     * @return
+     */
+    String selectDictCodeByUpdict(@Param(value = "colName") String colName,
+                                  @Param(value = "upDict") String upDict);
 }

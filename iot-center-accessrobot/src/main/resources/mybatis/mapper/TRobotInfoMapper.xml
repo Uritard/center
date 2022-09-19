@@ -1287,4 +1287,15 @@
         where 1 = 1
           and a.robot_code = #{robotCode, jdbcType=VARCHAR}
     </select>
+
+    <select id="selectDictCodeByUpdict" resultType="java.lang.String">
+        SELECT
+        dict_code
+        FROM
+        t_dict_business
+        WHERE
+        col_name = #{colName, jdbcType = VARCHAR}
+        AND
+        up_dict = #{upDict, jdbcType = VARCHAR}
+    </select>
 </mapper>
