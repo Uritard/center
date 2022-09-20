@@ -6,6 +6,7 @@ import com.yjh.accessvideo.module.control.service.CameraConService;
 import com.yjh.accessvideo.module.device.dao.AnalyseDataOperateDao;
 import com.yjh.accessvideo.module.device.entity.Analysis;
 import com.yjh.accessvideo.netty.client.AnalysisClientHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -130,7 +132,26 @@ public class AnalysisService {
                     normalPictureDataObject.put("modelPath", analysis.getPicModelPath());
                     normalPictureDataObject.put("taskId", analysis.getTaskId());
                     normalPictureDataObject.put("instanceId", analysis.getInstanceId().toString());
-                    normalPictureDataObject.put("imagePath",analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId()).replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString()));
+
+                    String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isEPRI","content"));
+                    if (StringUtils.equals("false", flag)){
+                        // 拿提前拍好的预置位作为判别基准图
+                        normalPictureDataObject.put("imagePath",analyseDataOperateDao.selectPresetImgByCruise(analysis.getInstanceId()).replaceAll(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString()));
+                    }else {
+                        // 拿电科院给的图
+                        String devicePointId = analyseDataOperateDao.selectDevicePointIdByInstanceId(analysis.getInstanceId());
+                        String filePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:distinguishReferencePath","content"));
+                        String imageNormalUrlPath = "";
+                        File folder = new File(filePath);
+                        File[] listFiles = folder.listFiles();
+                        for (File direFile : listFiles){
+                            if (direFile.getName().contains(devicePointId)){
+                                imageNormalUrlPath = filePath + "/" + direFile.getName() + "/" + direFile.listFiles()[0].getName();
+                                log.info("文件名称:{}", imageNormalUrlPath);
+                            }
+                        }
+                        normalPictureDataObject.put("imagePath", imageNormalUrlPath);
+                    }
                     pictureInfoObject.put("pictureInfo"+i,normalPictureDataObject);
                     i++;
                 }

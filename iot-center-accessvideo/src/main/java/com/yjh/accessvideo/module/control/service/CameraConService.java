@@ -1789,7 +1789,7 @@ public class CameraConService {
             hCNetSDK.NET_DVR_SaveRealData(lRealPlayHandle, path);
             Constant.recordLongMap.put(fileName, lRealPlayHandle);
 
-            judge = fileName;
+            judge = path;
         }catch (Exception e){
             iErr = hCNetSDK.NET_DVR_GetLastError();
             log.info("获取视频方发异常：" + iErr);
@@ -1800,6 +1800,8 @@ public class CameraConService {
 
     public void endRecordVideo(String fileName) {
         try {
+            log.info("停止录制视频");
+            fileName = fileName.replace(videoPath, "");
             NativeLong lRealPlayHandle = Constant.recordLongMap.get(fileName);
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
             String url = "chmod 777 " + videoPath + fileName;

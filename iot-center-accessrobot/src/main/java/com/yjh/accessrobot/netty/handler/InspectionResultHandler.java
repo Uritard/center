@@ -334,7 +334,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/" + item.get("file_path");
             uploadFileToUpFtps(imgPath, "/" + tagPath, upFtpsConfig);
             String materialId = robotService.selectMaterialId(String.valueOf(item.get("device_id")));
-            xmlBaseModel.getItems().get(0).put("material_id", materialId);
+            xmlBaseModel.getItems().get(0).put("material_id", Optional.ofNullable(materialId).orElse(""));
             String dataType = robotService.selectIsDrone(robotCode) ? "0x03" : "0x02";
             xmlBaseModel.getItems().get(0).put("data_type", dataType);
             xmlBaseModel.getItems().get(0).put("file_path", tagPath);

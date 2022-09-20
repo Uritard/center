@@ -745,8 +745,9 @@ public class RobotService {
             log.info("-------------这是刚发命令的响应{}-------------", receiveSessionId);
             if (Objects.isNull(xmlBaseModel.getItems()) || xmlBaseModel.getItems().isEmpty()){
 //                RobotServerHandler.getRobotResultMap().put("Item", null);
-            }else{
-                RobotServerHandler.getRobotResultMap().put("Item", xmlBaseModel.getItems().get(0));
+            }else {
+                Map<String, Object> map = xmlBaseModel.getItems().get(0);
+                RobotServerHandler.getRobotResultMap().put("Item", map);
 
                 Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
                 Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
@@ -754,31 +755,34 @@ public class RobotService {
 
                 // 文件在ftp服务器上的绝对路径
                 String temporaryPath = filePathMap.get("content");
-                String ftpFilePath = xmlBaseModel.getItems().get(0).get("file_path").toString();
-                String[] sArray = ftpFilePath.split("/");
-                // 抓图结果文件名称
-                String ftpFileName = sArray[sArray.length - 1];
-                temporaryPath  = temporaryPath + "/" + ftpFilePath;
-                String developAbsoluteUrl = absoluteImgMap.get("content") + "/"+ todayTime  + "/CameraLib/";
-                String developRelativeUrl = relativeImgMap.get("content")+ "/" + todayTime  + "/CameraLib/";
 
-                if (ftpFileName.endsWith(".jpg")){
-                    developAbsoluteUrl = developAbsoluteUrl + "BigImg/";
-                    developRelativeUrl = developRelativeUrl + "BigImg/";
-                }else if (ftpFileName.endsWith(".bmp")){
-                    developAbsoluteUrl = developAbsoluteUrl + "Infrared/";
-                    developRelativeUrl = developRelativeUrl + "Infrared/";
-                }else if (ftpFileName.endsWith(".mp4")){
-                    developAbsoluteUrl = developAbsoluteUrl + "Video/";
-                    developRelativeUrl = developRelativeUrl + "Video/";
+                if (map.containsKey("file_path")) {
+                    String ftpFilePath = String.valueOf(map.get("file_path"));
+                    String[] sArray = ftpFilePath.split("/");
+                    // 抓图结果文件名称
+                    String ftpFileName = sArray[sArray.length - 1];
+                    temporaryPath = temporaryPath + "/" + ftpFilePath;
+                    String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/CameraLib/";
+                    String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/CameraLib/";
+
+                    if (ftpFileName.endsWith(".jpg")) {
+                        developAbsoluteUrl = developAbsoluteUrl + "BigImg/";
+                        developRelativeUrl = developRelativeUrl + "BigImg/";
+                    } else if (ftpFileName.endsWith(".bmp")) {
+                        developAbsoluteUrl = developAbsoluteUrl + "Infrared/";
+                        developRelativeUrl = developRelativeUrl + "Infrared/";
+                    } else if (ftpFileName.endsWith(".mp4")) {
+                        developAbsoluteUrl = developAbsoluteUrl + "Video/";
+                        developRelativeUrl = developRelativeUrl + "Video/";
+                    }
+
+                    log.info("developAbsoluteUrl是: {} ------developRelativeUrl是: {}", developAbsoluteUrl, developRelativeUrl);
+
+                    // 将机器人摄像机抓图结果从ftp服务器上的复制到开发环境
+                    copyFileToDevelop(temporaryPath, developAbsoluteUrl);
+                    RobotServerHandler.getRobotResultMap().put("developAbsoluteUrl", developAbsoluteUrl);
+                    RobotServerHandler.getRobotResultMap().put("developRelativeUrl", developRelativeUrl);
                 }
-
-                log.info("developAbsoluteUrl是: {} ------developRelativeUrl是: {}", developAbsoluteUrl, developRelativeUrl);
-
-                // 将机器人摄像机抓图结果从ftp服务器上的复制到开发环境
-                copyFileToDevelop(temporaryPath, developAbsoluteUrl);
-                RobotServerHandler.getRobotResultMap().put("developAbsoluteUrl", developAbsoluteUrl);
-                RobotServerHandler.getRobotResultMap().put("developRelativeUrl", developRelativeUrl);
             }
         }else{
             log.info("-------------这不是刚发命令的响应{}-------------", receiveSessionId);
@@ -868,9 +872,9 @@ public class RobotService {
                     @Override
                     public void run() {
                         try {
-                            feignRobotTask(itemMap);
+                            feignRobotTask(item);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            log.error(e.getMessage(), e);
                         }
                     }
                 };
@@ -925,22 +929,26 @@ public class RobotService {
 
     /**
      * 正常任务及联动任务下发
-     * @param itemMap 传来的机器人任务相关信息
+     * @param item 传来的机器人任务相关信息
      * @return void
      */
     @Transactional(rollbackFor = Exception.class)
-    public void feignRobotTask(Map<String, List<RobotTaskInstanceInfo>> itemMap) {
-        List<RobotTaskInstanceInfo> robotTaskInfoList = itemMap.get("robotTaskInfoList");
+    public void feignRobotTask(RobotTaskInstanceInfo item) {
+        log.info("*****Start building information about the ROBOT task*****");
+
+        String robotCode = item.getRobotCode();
+        String taskId = item.getTaskId();
+
+        StringJoiner str = new StringJoiner(",");
+        // 机器人任务临时信息存放至redis
+        putInfoToRedisForRobot(robotCode, taskId, str, item.getInstanceList());
+
+        packageXMLBaseModel(item, robotCode, taskId, str);
+    }
+
+    private void putInfoToRedisForRobot(String robotCode, String taskId, StringJoiner str, List<Long> instanceIdList) {
         List<Map<String, String>> redisInfoList = new ArrayList<>();
-        log.info("这才开始构建关于机器人任务的相关信息......");
-
-        for (RobotTaskInstanceInfo item : robotTaskInfoList) {
-            String robotCode = item.getRobotCode();
-            String taskId = item.getTaskId();
-
-            StringJoiner str = new StringJoiner(",");
-            List<Long> instanceIdList = item.getInstanceList();
-
+        try {
             // 将instanceIdList放缓存，以备后续使用
             Map<String, Object> instanceListMap = new HashMap<>(5);
             instanceListMap.put("instanceIdList", String.valueOf(instanceIdList));
@@ -964,40 +972,79 @@ public class RobotService {
                 redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
                         + ":" + redisInfoList.get(i).get("taskId") + ":" + redisInfoList.get(i).get("instanceId"), redisInfoList.get(i));
             }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+    }
 
-            String deviceIdList = str.toString();
-            List<Map<String, Object>> mapList = new ArrayList<>();
-            Map<String, Object> map = new HashMap<>(16);
-            String type = "";
+    /**
+     * 组装任务XML内容并下发
+     *
+     * @param uniqueFlag 唯一标识
+     * @param item 任务信息
+     * @param taskId 任务id
+     * @param str 点位id
+     */
+    private void packageXMLBaseModel(RobotTaskInstanceInfo item, String uniqueFlag, String taskId, StringJoiner str) {
+        Map<String, Object> resMap = packageItem(str, item, taskId);
 
+        XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                .setType(String.valueOf(resMap.get("type")))
+                .setSendCode(sendCode)
+                .setReceiveCode(uniqueFlag)
+                .setCode(stationCode)
+                .setTime(DateTimeUtil.format(new Date()))
+                .setCommand("1")
+                .setItems((List<Map<String, Object>>) resMap.get("mapList"));
+        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+        log.info("生成的任务的xml是<start>{}<end>", xmlString);
+        RobotServerHandler.send(generateByteOrder(xmlString, uniqueFlag), uniqueFlag);
+    }
+
+    /**
+     * 组装任务下发item内容
+     *
+     * @param str 点位id
+     * @param item 任务信息
+     * @param taskId 任务id
+     * @return Map<String, Object>
+     */
+    private Map<String, Object> packageItem(StringJoiner str, RobotTaskInstanceInfo item, String taskId){
+        Map<String, Object> taskItemMap = new HashMap<>();
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>(16);
+
+        String deviceIdList = str.toString();
+
+        try {
             if (Objects.isNull(item.getUnionTaskStatus())) {
                 log.info("这是正常的任务！！！！！！！！！！！！！");
-                type = "101";
                 // 巡视类型
                 Integer planType = null;
                 switch (item.getCruiseType()) {
                     // 全面
-                    case 213: planType = 4;break;
+                    case 213:
+                        // 自定义
+                    case 218: planType = 4;break;
                     // 例行
                     case 214: planType = 1;break;
                     // 熄灯
                     case 215:
-                    // 专项
+                        // 专项
                     case 217: planType = 3;break;
-                    // 自定义
-                    case 218: planType = 4;break;
                     // 特殊
                     case 216: planType = 2;break;
-                    //操作
-                    case 456: //操作票
-                    case 508: //单设备
-                    case 509: //紧急分合闸
-                        planType = 5;break;
+                    // 操作-操作票
+                    case 456:
+                        // 操作-单设备
+                    case 508:
+                        // 操作-紧急分合闸
+                    case 509: planType = 5;break;
                     default: break;
                 }
                 map.put("type", planType);
                 map.put("task_code", taskId);
-                map.put("plan_code", item.getPlanCode());
+//                map.put("plan_code", item.getPlanCode());
                 map.put("task_name", item.getTaskName());
                 map.put("priority", item.getPriority());
                 map.put("device_level", item.getDeviceLevel());
@@ -1019,7 +1066,7 @@ public class RobotService {
                 // 定期和立即任务参数
                 else{
                     map.put("fixed_start_time", item.getFixedStartTime());
-                    map.put("isocr", item.getIsOcr());
+//                    map.put("isocr", item.getIsOcr());
                     map.put("cycle_month", "");
                     map.put("cycle_week", "");
                     map.put("cycle_execute_time", "");
@@ -1035,31 +1082,27 @@ public class RobotService {
                 map.put("invalid_end_time", "");
                 map.put("isenable", "0");
                 map.put("creator", "1");
-                map.put("create_time", "");
+                map.put("create_time", DateTimeUtil.format(new Date()));
                 mapList.add(map);
+
+                taskItemMap.put("type", "101");
+                taskItemMap.put("mapList", mapList);
             } else {
                 log.info("这是联动任务！！！！！！！！！！！！！");
-                type = "102";
                 map.put("task_code", taskId);
                 map.put("task_name", item.getTaskName());
                 map.put("priority", 4);
                 map.put("device_level", 3);
                 map.put("device_list", deviceIdList);
                 mapList.add(map);
-            }
 
-            XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                    .setType(type)
-                    .setSendCode(sendCode)
-                    .setReceiveCode(robotCode)
-                    .setCode(stationCode)
-                    .setTime(DateTimeUtil.format(new Date()))
-                    .setCommand("1")
-                    .setItems(mapList);
-            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-            log.info("生成的机器人任务的xml是<start>{}<end>", xmlString);
-            RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
+                taskItemMap.put("type", "102");
+                taskItemMap.put("mapList", mapList);
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
+        return taskItemMap;
     }
 
     /**
@@ -1159,7 +1202,7 @@ public class RobotService {
                 try {
                     Constant.postUrl(websocketUrl, jsons);
                 } catch (IOException | URISyntaxException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
                 flag =true;
             }

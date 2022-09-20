@@ -1228,7 +1228,7 @@
         robot_code = #{robotCode, jdbcType=VARCHAR}
     </select>
     <select id="selectMaterialId" resultType="java.lang.String">
-        SELECT
+        SELECT DISTINCT
         c.real_code
         FROM
         t_robot_inspection a

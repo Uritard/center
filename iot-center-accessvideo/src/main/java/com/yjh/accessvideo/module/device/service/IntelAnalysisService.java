@@ -382,10 +382,10 @@ public class IntelAnalysisService {
             silentMonitorHandle(response);
             return;
         }
-//        if (Objects.equals("yjsk", flagId)){
-//            yjskHandle(response);
-//            return;
-//        }
+        if (Objects.equals("yjsk", flagId)){
+            yjskHandle(response);
+            return;
+        }
         if (Objects.equals("666666", flagId)){
             algorithmTestHandle(response);
             return;
@@ -600,7 +600,7 @@ public class IntelAnalysisService {
             recBack.put("resImageUrl",response.getResultsList().get(0).getResults().get(0).getResImageUrl());
             recBack.put("type",response.getResultsList().get(0).getResults().get(0).getType());
             recBack.put("value",response.getResultsList().get(0).getResults().get(0).getValue());
-            String services = HttpClientUtils.getInstance().getUrl(picRecBack, JSON.toJSONString(recBack));
+            String services = HttpClientUtils.getInstance().postUrl(picRecBack, JSON.toJSONString(recBack));
             log.info("一键顺控services：" + services);
         }catch (Exception e){
             log.error("一键顺控-变相信号-分析主机返回处理失败",e.getMessage());
