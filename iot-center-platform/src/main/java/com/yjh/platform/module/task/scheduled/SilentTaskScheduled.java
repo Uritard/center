@@ -46,7 +46,7 @@ public class SilentTaskScheduled {
     /**
      * 调用相机抓图接口
      */
-    private static final String CAPTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePictureForTask?cameraId={cameraId}";
+    private static final String CAPTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePictureForTask?cameraId={cameraId}&meteName={meteName}";
     /**
      * 调用智能分析主机图像分析接口
      */
@@ -70,10 +70,11 @@ public class SilentTaskScheduled {
         if (StringUtils.equals(FLAG, flag)){
             return;
         }
-        List<Map<String, Long>> list = tCameraPresetService.selectCameraBySilent();
-        for (Map<String, Long> map : list) {
+        List<Map<String, Object>> list = tCameraPresetService.selectCameraBySilent();
+        for (Map<String, Object> map : list) {
             String cameraId = String.valueOf(map.get("camera_id"));
             String presetId = String.valueOf(map.get("preset_id"));
+            String presetName = String.valueOf(map.get("preset_name"));
 
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
             String state = redisInfoMap.get("state");
@@ -110,6 +111,7 @@ public class SilentTaskScheduled {
                     TimeUnit.MILLISECONDS.sleep(waitTime);
                     HashMap<String, Object> captureMap = new HashMap<>(3);
                     captureMap.put("cameraId", cameraId);
+                    captureMap.put("meteName", presetName);
                     // 拍照
                     Result result = capturePicture(captureMap);
                     // 将相机状态置为闲置

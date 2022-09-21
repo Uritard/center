@@ -292,7 +292,8 @@ public class CameraConController {
     @ApiOperation(value = "相机抓图")
     @RequestMapping(value = "/capturePicture", method = RequestMethod.GET)
 //    @Logs(title = "相机抓图",content = "根据用户传递的参数控制相机抓图",logType = 5, authority = "1234,1235")
-    public Result capturePicture(@RequestParam(value = "cameraId") Long cameraId) {
+    public Result capturePicture(@RequestParam(value = "cameraId") Long cameraId,
+                                 @RequestParam(value = "meteName", required = false) String meteName) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -303,7 +304,7 @@ public class CameraConController {
             String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpg";
             String filePath = captureResultPath + filePathTem;
             log.info("filePath: "+filePath);
-            String message = cameraConService.capturePicture(filePath, cameraId);
+            String message = cameraConService.capturePicture(filePath, cameraId, meteName);
             String urlPath = capturePath+filePathTem;
             resultMap.put("urlPath", urlPath);
             resultMap.put("absPath", filePath);
@@ -323,7 +324,8 @@ public class CameraConController {
 
     @ApiOperation(value = "任务中相机抓图")
     @RequestMapping(value = "/capturePictureForTask", method = RequestMethod.GET)
-    public Result capturePictureForTask(@RequestParam(value = "cameraId") Long cameraId) {
+    public Result capturePictureForTask(@RequestParam(value = "cameraId") Long cameraId,
+                                        @RequestParam(value = "meteName", required = false) String meteName) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -333,7 +335,7 @@ public class CameraConController {
             String filePathTem = "/" + formatter.format(new Date())+ ran + ".jpg";
             String filePath = captureResultPath + filePathTem;
             log.info("filePath: "+filePath);
-            String message = cameraConService.capturePicture(filePath, cameraId);
+            String message = cameraConService.capturePicture(filePath, cameraId, meteName);
             String urlPath = capturePath+filePathTem;
             resultMap.put("urlPath", urlPath);
             resultMap.put("absPath", filePath);
@@ -354,7 +356,8 @@ public class CameraConController {
     @ApiOperation(value = "预置位抓图")
     @RequestMapping(value = "/capturePresetPicture", method = RequestMethod.GET)
     public Result capturePresetPicture(@RequestParam(value = "presetId") Long presetId,
-                                 @RequestParam(value = "cameraId") Long cameraId) {
+                                       @RequestParam(value = "cameraId") Long cameraId,
+                                       @RequestParam(value = "meteName", required = false) String meteName) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
@@ -366,7 +369,7 @@ public class CameraConController {
             Runtime.getRuntime().exec(mkdir);
             Thread.sleep(2000);
             log.info("filePath: "+filePath);
-            String message = cameraConService.capturePicture(filePath, cameraId);
+            String message = cameraConService.capturePicture(filePath, cameraId, meteName);
             String urlPath = capturePathPreset+filePathTem;
             resultMap.put("urlPath", urlPath);
             String url = "chmod 777 "+ filePath;

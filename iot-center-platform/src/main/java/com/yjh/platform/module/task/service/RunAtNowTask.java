@@ -74,7 +74,7 @@ public class RunAtNowTask implements Runnable{
     private Logger log = LoggerFactory.getLogger(RunAtNowTask.class);
 
     //相机抓图
-    private static final String PICTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePictureForTask?cameraId={cameraId}";
+    private static final String PICTURE_URL = "http://iot-center-accessvideo/camera/v1/capturePictureForTask?cameraId={cameraId}&meteName={meteName}";
     //相机转到预置位
     private static final String MOVE_URL = "http://iot-center-accessvideo/camera/v1/moveToPresetForTask?presetId={presetId}&cameraId={cameraId}";
     //算法接口
@@ -647,6 +647,7 @@ public class RunAtNowTask implements Runnable{
                                 Result re = null;
                                 HashMap<String, Object> map2 = new HashMap<>();
                                 map2.put("cameraId", tCameraPreset.getCameraId());
+                                map2.put("meteName", tCruisePointInstanceDao.selectMeteNameByInstanceId(item.getInstanceId()));
                                 if(item.getCruiseType().equals(230)){//红外专属拍照方法
                                     re = redPicture(map);
                                 }else {

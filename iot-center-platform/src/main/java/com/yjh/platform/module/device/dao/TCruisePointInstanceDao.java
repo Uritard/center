@@ -89,4 +89,6 @@ public interface TCruisePointInstanceDao {
     List<Long> selectTimeIsIn(@Param(value = "time") Date time);
     List<Map<Object,Object>>selectCameraByDeviceMeteId(@Param(value = "deviceMeteId")Long deviceMeteId);
     List<Map<Object,Object>>selectRobotByDeviceMeteId(@Param(value = "deviceMeteId")Long deviceMeteId);
+
+    String selectMeteNameByInstanceId(@Param("instanceId") Long instanceId);
 }

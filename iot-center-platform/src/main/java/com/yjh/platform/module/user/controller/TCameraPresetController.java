@@ -73,9 +73,10 @@ public class TCameraPresetController {
                     //操作预置位
 //                    TCameraPreset tCameraPreset1 =  tCameraPresetService.selectLastOne();
 
-                    HashMap<String,Long> params = new HashMap<>();
+                    HashMap<String, Object> params = new HashMap<>();
                     params.put("cameraId",tCameraPreset.getCameraId());
                     params.put("presetId",tCameraPreset.getPresetId());
+                    params.put("meteName",tCameraPreset.getPresetName());
 
                     Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
                     if (response1.getData().equals(true)) {
@@ -113,7 +114,7 @@ public class TCameraPresetController {
                 result.setCode(209,"此预置位已被配置到巡视点");
             }else {
                 //操作预置位
-                HashMap<String, Long> params = new HashMap<>();
+                HashMap<String, Object> params = new HashMap<>();
 
                 params.put("cameraId", tCameraPreset.getCameraId());
                 params.put("presetId", tCameraPreset.getPresetId());
@@ -142,7 +143,7 @@ public class TCameraPresetController {
         }
         return result;
     }
-    public Result sendPostRequest(String url,HashMap<String,Long> params) {
+    public Result sendPostRequest(String url,HashMap<String, Object> params) {
         Result response = null;
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
@@ -165,7 +166,7 @@ public class TCameraPresetController {
             TCameraPreset tCameraPreset =  tCameraPresetService.selectByPrimaryId(pr1);
 
             for (int i = 0;i<presetIdArray.length;i++){
-                HashMap<String,Long> params = new HashMap<>();
+                HashMap<String, Object> params = new HashMap<>();
                 params.put("cameraId",tCameraPreset.getCameraId());
                 params.put("presetId",Long.valueOf(presetIdArray[i]));
                 Result response = sendPostRequest(Constant.CANCEL_PRESET_URL,params);

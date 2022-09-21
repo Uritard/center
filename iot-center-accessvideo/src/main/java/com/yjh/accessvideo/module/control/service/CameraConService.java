@@ -32,7 +32,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -43,6 +46,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 
 import static com.yjh.accessvideo.commons.utils.FileUtil.createDirectory;
 
@@ -889,7 +893,7 @@ public class CameraConService {
 
     //@Logs(title = "相机抓图", code = "capturePicture")
     @Transactional(rollbackFor = Exception.class)
-    public String capturePicture(String filePath, Long cameraId) {
+    public String capturePicture(String filePath, Long cameraId, String meteName) {
         CameraConInfo cameraConInfo = new CameraConInfo();
         if (String.valueOf(cameraId).contains("9901") || String.valueOf(cameraId).contains("9902")) {
             long robotId;
@@ -978,12 +982,60 @@ public class CameraConService {
                     int iErr = hCNetSDK.NET_DVR_GetLastError();
                     log.error("capture picture fail(NET_DVR_CaptureJPEGPicture), error code: {}", iErr);
                     return "capture picture fail(NET_DVR_CaptureJPEGPicture), error code: " + iErr;
+                } else {
+                    if (StringUtils.isNotEmpty(meteName)) {
+                        pictureWaterMark(filePath, DateTimeUtil.format(new Date()) + "--" + meteName);
+                    }
                 }
             }
             return "success";
         } else {
             return "userID is null";
         }
+    }
+
+    /**
+     * 给图片设置水印
+     * @param filePath 图片地址
+     * @param waterMarkContent 水印内容
+     */
+    private void pictureWaterMark(String filePath, String waterMarkContent){
+        try {
+            File file = new File(filePath);
+            BufferedImage image = ImageIO.read(file);
+            //获取图片的宽
+            int srcImgWidth = image.getWidth();
+            //获取图片的高
+            int srcImgHeight = image.getHeight();
+
+            // 创建画笔
+            Graphics2D pen = image.createGraphics();
+            // 设置画笔颜色
+            pen.setColor(new Color(179, 250, 233, 200));
+            // 设置画笔字体样式
+            pen.setFont(new Font("微软雅黑", Font.BOLD, 30));
+
+            //设置水印的坐标(为原图片右下角)
+            int x = srcImgWidth - getWatermarkLength(waterMarkContent, pen) -20;
+            int y = srcImgHeight - 20;
+
+            // 写上水印文字和坐标
+            pen.drawString(waterMarkContent, x, y);
+            FileImageOutputStream fos = new FileImageOutputStream(file);
+            ImageIO.write(image, "jpg", fos);
+        } catch (Exception e) {
+            log.error("图片设置水印错误: ", e);
+        }
+    }
+
+    /**
+     * 获取水印文字的长度
+     * @param waterMarkContent
+     * @param g
+     * @return
+     */
+    private static int getWatermarkLength(String waterMarkContent, Graphics2D g) {
+        return g.getFontMetrics(g.getFont()).charsWidth(waterMarkContent.toCharArray(), 0, waterMarkContent.length());
     }
 
     //@Logs(title = "预置点调用", code = "presetAction")

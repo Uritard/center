@@ -664,4 +664,14 @@
         where a.device_mete_id = b.device_mete_id and b.cruise_id = e.inspection_id and e.robot_id = f.robot_id
         and a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectMeteNameByInstanceId" resultType="java.lang.String">
+        SELECT
+            tsd.mete_name AS meteName
+        FROM
+            t_cruise_point_instance tcpi
+        LEFT JOIN t_std_devicemete tsd ON tsd.device_mete_id = tcpi.device_mete_id
+        WHERE
+            tcpi.instance_id = #{instanceId}
+    </select>
 </mapper>

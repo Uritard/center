@@ -353,7 +353,7 @@ public class TCameraPresetService {
      *
      * @return Long
      */
-    public List<Map<String, Long>> selectCameraBySilent(){
+    public List<Map<String, Object>> selectCameraBySilent(){
         return tCameraPresetDao.selectCameraBySilent();
     }
 

@@ -374,7 +374,8 @@
     <select id="selectCameraBySilent" resultType="java.util.Map">
         SELECT DISTINCT
             a.camera_id,
-            b.preset_id
+            b.preset_id,
+            b.preset_name
         FROM
             t_camera_info a, t_camera_preset b
         WHERE a.camera_id = b.camera_id
