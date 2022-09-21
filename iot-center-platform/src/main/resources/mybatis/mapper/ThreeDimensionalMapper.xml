@@ -379,22 +379,30 @@
             order by a.create_time desc
     </select>
     <select id="selectCameraDeviceByName" resultType="com.yjh.platform.module.user.entity.CameraUnionDevice">
-                    SELECT
-            b.preset_id AS cruise_id,
-            a.camera_id,
-            a.record_id,
-            a.camera_name,
-            b.preset_name
+        SELECT
+        b.preset_id AS cruise_id,
+        a.camera_id,
+        a.record_id,
+        a.camera_name,
+        b.preset_name
         FROM
-            t_camera_info a,
-            t_camera_preset b
+        t_camera_info a,
+        t_camera_preset b
         WHERE
-            a.camera_id = b.camera_id
+        a.camera_id = b.camera_id
+        <if test="modelName != null and modelName != ''">
+        AND b.preset_id IN (
+        SELECT
+        tcp.preset_id
+        FROM
+        t_cruise_point_instance tcpi
+        LEFT JOIN t_camera_preset tcp ON tcpi.cruise_id = tcp.preset_id
+        WHERE
+        tcpi.device_mete_id = #{modelName, jdbcType = VARCHAR}
+        )
+        </if>
         <if test="cameraName != null and cameraName != ''">
         AND a.camera_name = #{cameraName, jdbcType= VARCHAR}
-        </if>
-        <if test="modelName != null and modelName != ''">
-            limit 1
         </if>
     </select>
 
