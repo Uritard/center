@@ -439,6 +439,14 @@ public class TSequentialConfService{
                     param.put("resultValue", "分析失败");
                     param.put("resultState", "无效状态");
                 }*/
+
+                // 一键顺控是否使用自定义结果 true-是
+                String sequentialFlag = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialFlag").get("content"));
+                if (StringUtils.equals("true", sequentialFlag)){
+                    String sequentialResult = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialResult").get("content"));
+                    recBack.put("value", sequentialResult);
+                }
+
                 if(!Objects.isNull(recBack.get("code")) && "2000".equals(recBack.get("code"))){
                     if(!Objects.isNull(recBack.get("value"))){
                         String ret = recBack.get("value");
