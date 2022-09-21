@@ -78,7 +78,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "更新")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    @Logs(title = "修改分屏配置信息",content = "根据用户传递的参数修改分屏配置信息",logType = 3,authority = "1235")
+    @Logs(title = "修改分屏配置信息",content = "根据用户传递的参数修改分屏配置信息",logType = 3,authority = "1235,1237")
     public Result update(HttpServletRequest request,@Validated @RequestBody TCameraScreen tCameraScreen) {
         Result result = new Result();
         try {
@@ -96,7 +96,7 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "主键查询")
     @RequestMapping(value = "/selectByPrimaryId", method = RequestMethod.GET)
-    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询分屏配置信息",logType = 1,authority = "1235")
+    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询分屏配置信息",logType = 1,authority = "1235,1237")
     public Result selectByPrimaryId(HttpServletRequest request) {
         Result result = new Result();
         try {
@@ -180,13 +180,15 @@ public class TCameraScreenController {
 
     @ApiOperation(value = "摄像机状态树")
     @RequestMapping(value = "/cameraStateTree", method = RequestMethod.GET)
-    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1,authority = "1235")
+    @Logs(title = "查询分屏配置信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1,authority = "1235,1237")
     public Result cameraStateTree(@RequestParam(value = "cameraName",required = false) String cameraName,
-                                  @RequestParam(value = "flag",required = false) Integer flag) {
+                                  @RequestParam(value = "flag",required = false) Integer flag,
+                                  HttpServletRequest request) {
         Result result = new Result();
         try {
+              Long userId=Long.valueOf(request.getHeader("userId"));
 //            result.setData(tCameraScreenService.cameraStateTree(cameraName,flag));
-              result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag, "1"));
+              result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag, "1",userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -198,10 +200,11 @@ public class TCameraScreenController {
     @RequestMapping(value = "/selectCameraTreeWithRobot", method = RequestMethod.GET)
     @Logs(title = "查询摄像机状态树信息",content = "根据用户传递的参数查询摄像机状态树",logType = 1,authority = "1234")
     public Result selectCameraTreeWithRobot(@RequestParam(value = "cameraName",required = false) String cameraName,
-                                  @RequestParam(value = "flag",required = false) Integer flag) {
+                                  @RequestParam(value = "flag",required = false) Integer flag, HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag, null));
+            Long userId=Long.valueOf(request.getHeader("userId"));
+            result.setData(tCameraScreenService.selectCameraTreeWithRobot(cameraName,flag, null,userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -224,4 +227,18 @@ public class TCameraScreenController {
         return result;
     }
 
+
+    @ApiOperation(value = "查询区域监控设备树")
+    @RequestMapping(value = "/getRegionMonitorDeviceTree", method = RequestMethod.GET)
+    @Logs(title = "查询区域监控设备树",content = "查询区域监控设备树",logType = 1,authority = "1234")
+    public Result getRegionMonitorDeviceTree(){
+        Result result = new Result();
+        try{
+            result.setData(tCameraScreenService.selectRegionMonitorDeviceTree());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("获取区域监视设备树异常:",e);
+        }
+        return result;
+    }
 }

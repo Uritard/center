@@ -175,4 +175,34 @@
         where a.role_id = #{roleId, jdbcType=BIGINT}
     </update>
 
+    <select id="selectMonitorDeviceIdByRoleId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select
+        a.monitor_device_id
+        from sys_role_monitor_device a
+        where
+        <if test="roleId != null and roleId != ''"> a.role_id = #{roleId, jdbcType=BIGINT}</if>
+    </select>
+
+    <delete id="deleteMonitorDeviceRelationByRoleId" parameterType="java.lang.Long">
+        delete from
+        sys_role_monitor_device
+        where role_id = #{roleId, jdbcType=BIGINT}
+    </delete>
+
+    <insert id="batchInsertMonitorDeviceRelation" parameterType="com.yjh.platform.module.user.entity.SysRoleMonitorDevice">
+        insert into sys_role_monitor_device(
+           id,
+           role_id,
+           monitor_device_id
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+           #{item.id, jdbcType=BIGINT},
+           #{item.roleId, jdbcType=BIGINT},
+           #{item.monitorDeviceId, jdbcType=BIGINT}
+            )
+        </foreach>
+
+    </insert>
 </mapper>

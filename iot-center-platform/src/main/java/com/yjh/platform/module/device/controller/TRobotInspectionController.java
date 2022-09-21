@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.result.Result;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.Page;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 
@@ -177,7 +179,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "机器人任务数据")
     @RequestMapping(value = "/selectRobotTaskMessage", method = RequestMethod.GET)
-    @Logs(title = "机器人任务数据",content = "根据用户传递的参数查询机器人任务数据",logType = 1,authority = "1235")
+    @Logs(title = "机器人任务数据",content = "根据用户传递的参数查询机器人任务数据",logType = 1,authority = "1235,1237")
     public Result selectRobotTaskMessage(@RequestParam(value = "robotId") Long robotId){
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
@@ -205,7 +207,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "机器人操作任务数据")
     @RequestMapping(value = "/selectRobotOperationTask", method = RequestMethod.GET)
-    @Logs(title = "机器人操作任务数据",content = "根据用户传递的参数查询机器人操作任务数据",logType = 1,authority = "1235")
+    @Logs(title = "机器人操作任务数据",content = "根据用户传递的参数查询机器人操作任务数据",logType = 1,authority = "1235,1237")
     public Result selectRobotOperationTask(@RequestParam(value = "robotId") Long robotId){
         Result result = new Result();
         try {
@@ -220,10 +222,12 @@ public class TRobotInspectionController {
     @ApiOperation(value = "查询机器人信息")
     @RequestMapping(value = "/selectRobotInfo", method = RequestMethod.GET)
     @Logs(title = "查询机器人信息",content = "查询机器人信息",logType = 1)
-    public Result selectRobotInfo(@RequestParam(value = "robotType", required = false) Integer robotType) {
+    public Result selectRobotInfo(@RequestParam(value = "robotType", required = false) Integer robotType,
+                                  HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(tRobotInspectionService.selectRobotInfo(robotType));
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            result.setData(tRobotInspectionService.selectRobotInfo(robotType,userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询机器人信息失败描述：", e);
@@ -233,7 +237,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询机器人状态信息")
     @RequestMapping(value = "/selectRobotStatus", method = RequestMethod.GET)
-    @Logs(title = "查询机器人状态信息",content = "根据用户传递的参数查询机器人状态信息",logType = 1,authority = "1235")
+    @Logs(title = "查询机器人状态信息",content = "根据用户传递的参数查询机器人状态信息",logType = 1,authority = "1235,1237")
     public Result selectRobotStatus(@RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {
@@ -247,7 +251,7 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询无人机状态信息")
     @RequestMapping(value = "/selectDroneStatus", method = RequestMethod.GET)
-    @Logs(title = "查询无人机状态信息",content = "根据用户传递的参数查询无人机状态信息",logType = 1,authority = "1235")
+    @Logs(title = "查询无人机状态信息",content = "根据用户传递的参数查询无人机状态信息",logType = 1,authority = "1235,1237")
     public Result selectDroneStatus(@RequestParam(value = "robotCode") String robotCode) {
         Result result = new Result();
         try {
@@ -261,11 +265,13 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询机器人树")
     @RequestMapping(value = "/robotTree", method = RequestMethod.GET)
-    @Logs(title = "查询机器人树",content = "根据用户传递的参数查询机器人树",logType = 1,authority = "1235")
-    public Result robotTree(@RequestParam(value = "robotType", required = false) Integer robotType) {
+    @Logs(title = "查询机器人树",content = "根据用户传递的参数查询机器人树",logType = 1,authority = "1235,1237")
+    public Result robotTree(@RequestParam(value = "robotType", required = false) Integer robotType,
+                            HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(tRobotInspectionService.robotTree(robotType));
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            result.setData(tRobotInspectionService.robotTree(robotType,userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询机器人状态信息失败描述：", e);
@@ -275,11 +281,13 @@ public class TRobotInspectionController {
 
     @ApiOperation(value = "查询无人机树")
     @RequestMapping(value = "/droneTree", method = RequestMethod.GET)
-    @Logs(title = "查询机器人树",content = "根据用户传递的参数查询无人机树",logType = 1,authority = "1235")
-    public Result droneTree(@RequestParam(value = "droneType", required = false) Integer droneType) {
+    @Logs(title = "查询机器人树",content = "根据用户传递的参数查询无人机树",logType = 1,authority = "1235,1237")
+    public Result droneTree(@RequestParam(value = "droneType", required = false) Integer droneType,
+                            HttpServletRequest request) {
         Result result = new Result();
         try {
-            result.setData(tRobotInspectionService.droneTree(droneType));
+            Long userId = Long.valueOf(request.getHeader("userId"));
+            result.setData(tRobotInspectionService.droneTree(droneType,userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询无人机状态信息失败描述：", e);

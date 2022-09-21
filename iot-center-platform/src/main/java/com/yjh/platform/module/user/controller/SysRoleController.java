@@ -255,4 +255,33 @@ public class SysRoleController {
         return result;
     }
 
+    @ApiOperation(value = "根据角色Id查询关联的监视设备信息")
+    @RequestMapping(value = "/selectMonitorDeviceRelationByRole", method = RequestMethod.GET)
+    @Logs(title = "根据角色Id查询关联的监视设备信息",content = "根据角色Id查询关联的监视设备信息",logType = 1,authority = "1234")
+    public Result selectMonitorDeviceRelationByRole(@RequestParam(value = "roleId", required = true) Long roleId){
+        Result result = new Result();
+        try{
+            result.setData(sysRoleService.selectCheckedMonitorDeviceByRole(roleId));
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("角色关联监控设备查询失败：",e);
+        }
+        return  result;
+    }
+
+    @ApiOperation(value = "根据角色Id修改关联的监视设备信息")
+    @RequestMapping(value = "/updateMonitorDeviceRelationByRole", method = RequestMethod.POST)
+    @Logs(title = "根据角色Id修改关联的监视设备信息",content = "根据角色Id修改关联的监视设备信息",logType = 1,authority = "1234")
+    public Result updateMonitorDeviceRelationByRole(@RequestBody Map<String,Object> req){
+        Result result = new Result();
+        try{
+             result.setData(sysRoleService.updateMonitorDeviceByRole(req));
+        }catch (Exception e){
+            log.error("监视设备关联关系修改失败：",e);
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+        }
+        return result;
+    }
+
+
 }

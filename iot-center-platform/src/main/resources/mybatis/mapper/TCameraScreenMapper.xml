@@ -145,13 +145,27 @@
             UNION ALL (
             SELECT e.robot_id AS Id, e.robot_name AS label, e.up_region_id AS upId, b.region_name AS upName, "robot" AS infoType
             FROM  t_robot_info e
-            LEFT JOIN t_std_region b ON e.up_region_id = b.region_id)
+            LEFT JOIN t_std_region b ON e.up_region_id = b.region_id
+            WHERE e.robot_id NOT IN (
+            SELECT
+            monitor_device_id
+            FROM sys_role_monitor_device srmd LEFT JOIN sys_user su ON srmd.role_id = su.role_id
+            WHERE su.user_id = #{userId, jdbcType = BIGINT}
+            )
+            )
         </if>
         UNION ALL (
         SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType
         FROM t_camera_info d
         LEFT JOIN t_std_region b ON d.up_region_id = b.region_id
         where 1=1
+        and
+        d.camera_id NOT IN (
+        SELECT
+        monitor_device_id
+        FROM sys_role_monitor_device srmd LEFT JOIN sys_user su ON srmd.role_id = su.role_id
+        WHERE su.user_id = #{userId, jdbcType = BIGINT}
+        )
         <if test="cameraName != null and cameraName != ''"> and d.camera_name like CONCAT('%',#{cameraName, jdbcType=VARCHAR},'%')</if>);
     </select>
 
@@ -166,5 +180,53 @@
         LEFT JOIN t_std_region b ON d.up_region_id = b.region_id
         where 1=1 and d.camera_type=206
         <if test="cameraName != null and cameraName != ''"> and d.camera_name like CONCAT('%',#{cameraName, jdbcType=VARCHAR},'%')</if>);
+    </select>
+
+    <select id="selectRegionMonitorDevice" resultType="com.yjh.platform.module.user.entity.AreaInfoOfMonitorDevice">
+             SELECT
+        a.region_id AS Id,
+        a.region_name AS label,
+        a.up_region_id AS upId,
+        b.region_name AS upName,
+        "region" AS infoType
+    FROM
+        t_std_region a
+    LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
+    UNION ALL
+        (
+            SELECT
+                e.robot_id AS Id,
+                e.robot_name AS label,
+                e.up_region_id AS upId,
+                b.region_name AS upName,
+                "robot" AS infoType
+            FROM
+                t_robot_info e
+            LEFT JOIN t_std_region b ON e.up_region_id = b.region_id
+        )
+    UNION ALL
+        (
+            SELECT
+                d.camera_id AS Id,
+                d.camera_name AS label,
+                d.up_region_id AS upId,
+                b.region_name AS upName,
+                "camera" AS infoType
+            FROM
+                t_camera_info d
+            LEFT JOIN t_std_region b ON d.up_region_id = b.region_id
+        )
+    UNION ALL
+        (
+            SELECT
+                tvd.voice_device_id AS Id,
+                tvd.voice_device_name AS label,
+                tvd.up_region_id AS upId,
+                str.region_name AS upName,
+                "voice" AS infoType
+            FROM
+                t_voice_device tvd
+            LEFT JOIN t_std_region str ON tvd.up_region_id = region_id
+        )
     </select>
 </mapper>

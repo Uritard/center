@@ -7,6 +7,7 @@ import java.util.Map;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.SysOrg;
 import com.yjh.platform.module.user.entity.SysRole;
+import com.yjh.platform.module.user.entity.SysRoleMonitorDevice;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -34,4 +35,7 @@ public interface SysRoleDao {
     List<Map<String, Object>> selectRelationDevice(@Param(value = "roleId") Long roleId);
     List<AreaInfo> selectRelationAuthor(@Param(value = "roleId") Long roleId);
     int updateRoleDevice(List<AreaInfo> list, Long roleId);
+    List<Long> selectMonitorDeviceIdByRoleId(@Param(value = "roleId") Long roleId);
+    Integer deleteMonitorDeviceRelationByRoleId(@Param(value = "roleId") Long roleId);
+    Integer batchInsertMonitorDeviceRelation(List<SysRoleMonitorDevice> list);
 }

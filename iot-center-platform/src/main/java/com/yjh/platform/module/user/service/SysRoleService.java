@@ -1,10 +1,16 @@
 package com.yjh.platform.module.user.service;
 
+import cn.hutool.core.map.MapUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -296,6 +302,38 @@ public class SysRoleService{
         if (sysRoleMenuList.size()>0) return this.sysRoleMenuDao.batchInsert(sysRoleMenuList);
         return 0;
     }
+
+
+    public List<Long>selectCheckedMonitorDeviceByRole(Long roleId){
+        return sysRoleDao.selectMonitorDeviceIdByRoleId(roleId);
+    }
+
+    public Integer updateMonitorDeviceByRole(Map<String,Object> param){
+
+        if(StringUtils.isEmpty(MapUtils.getString(param, "roleId")) || StringUtils.isEmpty(MapUtils.getString(param, "deviceIds"))){
+            return -1;
+        }
+        Long roleId = NumberUtils.toLong(MapUtils.getString(param, "roleId"));
+        List<String> originList=JSONArray.parseArray(param.get("deviceIds").toString(),String.class);
+        List<SysRoleMonitorDevice> validDataList = new ArrayList<>();
+
+        List<Long> deviceIds = originList.stream()
+                .filter(Objects::nonNull)
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+         for(Long deviceId:deviceIds){
+            SysRoleMonitorDevice monitorDeviceRelation = new SysRoleMonitorDevice()
+                    .setRoleId(roleId)
+                    .setMonitorDeviceId(deviceId);
+             validDataList.add(monitorDeviceRelation);
+        }
+        sysRoleDao.deleteMonitorDeviceRelationByRoleId(roleId);
+        if(deviceIds.size()==0){
+            return -1;
+        }
+        return sysRoleDao.batchInsertMonitorDeviceRelation(validDataList);
+    }
+
 
 //    @Transactional(rollbackFor = Exception.class)
 //    public List<String> selectRelationMenu(Long roleId) {

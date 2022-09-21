@@ -222,9 +222,9 @@ public class TCameraScreenService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<AreaInfoDetail> selectCameraTreeWithRobot(String cameraName,Integer flag, String robotFlag) {
+    public List<AreaInfoDetail> selectCameraTreeWithRobot(String cameraName, Integer flag, String robotFlag, Long userId) {
         List<AreaInfoDetail> listTree = new ArrayList<>();
-        listTree = tCameraScreenDao.selectCameraTreeWithRobot(cameraName, robotFlag);
+        listTree = tCameraScreenDao.selectCameraTreeWithRobot(cameraName, robotFlag, userId);
         List<AreaInfoDetail> areaInfoCountryList = new ArrayList<>();
         for(Iterator<AreaInfoDetail> it = listTree.iterator(); it.hasNext();){
             AreaInfoDetail areaInfoMap = it.next();
@@ -400,5 +400,44 @@ public class TCameraScreenService{
         return areaInfoCountryList;
     }
 
+    public List<AreaInfoOfMonitorDevice> selectRegionMonitorDeviceTree() {
+        List<AreaInfoOfMonitorDevice> originList = tCameraScreenDao.selectRegionMonitorDevice();
+        List<AreaInfoOfMonitorDevice> loopList = new ArrayList<>();
+        for (AreaInfoOfMonitorDevice monitorDevice:originList) {
+            if (Objects.nonNull(monitorDevice.getUpId()) && monitorDevice.getUpId() == -1) {
+                AreaInfoOfMonitorDevice areaInfoCountry = new AreaInfoOfMonitorDevice();
+                areaInfoCountry.setId(monitorDevice.getId());
+                areaInfoCountry.setLabel(monitorDevice.getLabel());
+                areaInfoCountry.setInfoType(monitorDevice.getInfoType());
+                loopList.add(areaInfoCountry);
+            }
+        }
+          recursionTree(loopList, originList);
+        return loopList;
+    }
+
+    private void recursionTree(List<AreaInfoOfMonitorDevice> loopList, List<AreaInfoOfMonitorDevice> originList) {
+        for (AreaInfoOfMonitorDevice originItem : loopList) {
+            List<AreaInfoOfMonitorDevice> childList = new ArrayList<>();
+            for (AreaInfoOfMonitorDevice monitorDevice:originList) {
+                if (Objects.equals(originItem.getId(), monitorDevice.getUpId())) {
+                    AreaInfoOfMonitorDevice areaInfoTem = new AreaInfoOfMonitorDevice();
+                    areaInfoTem.setId(monitorDevice.getId());
+                    areaInfoTem.setUpId(monitorDevice.getUpId());
+                    areaInfoTem.setLabel(monitorDevice.getLabel());
+                    areaInfoTem.setInfoType(monitorDevice.getInfoType());
+                    areaInfoTem.setUpName(monitorDevice.getUpName());
+
+                    childList.add(areaInfoTem);
+                }
+            }
+            if (childList.size()>0 ) {
+                originItem.setChildren(childList);
+                recursionTree(childList,originList);
+            }
+
+        }
+
+    }
 }
 

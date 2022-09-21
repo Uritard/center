@@ -154,8 +154,8 @@ public class TRobotInspectionService {
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Robot> selectRobotInfo(Integer robotType) {
-        return this.tRobotInspectionDao.selectRobotInfo(robotType);
+    public List<Robot> selectRobotInfo(Integer robotType, Long userId) {
+        return this.tRobotInspectionDao.selectRobotInfo(robotType, userId);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -870,13 +870,13 @@ public class TRobotInspectionService {
 
     //机器人树
     @Transactional(rollbackFor = Exception.class)
-    public List<Robot> robotTree(Integer robotType) {
+    public List<Robot> robotTree(Integer robotType, Long userId) {
         List<Robot> reList = new ArrayList<>();
         Robot node = new Robot();
         node.setId(1L);
         node.setLabel("机器人树");
         node.setInfoType("tree");
-        List<Robot> robotList = this.selectRobotInfo(robotType);
+        List<Robot> robotList = this.selectRobotInfo(robotType, userId);
         for (Robot robot : robotList) {
             robot.setId(robot.getRobotId());
             robot.setLabel(robot.getRobotName());
@@ -891,13 +891,13 @@ public class TRobotInspectionService {
 
     //无人机树
     @Transactional(rollbackFor = Exception.class)
-    public List<Robot> droneTree(Integer droneType) {
+    public List<Robot> droneTree(Integer droneType, Long userId) {
         List<Robot> reList = new ArrayList<>();
         Robot node = new Robot();
         node.setId(1L);
         node.setLabel("无人机树");
         node.setInfoType("tree");
-        List<Robot> robotList = this.tRobotInspectionDao.selectDroneInfo(droneType);
+        List<Robot> robotList = this.tRobotInspectionDao.selectDroneInfo(droneType, userId);
         for (Robot robot : robotList) {
             robot.setId(robot.getRobotId());
             robot.setLabel(robot.getRobotName());

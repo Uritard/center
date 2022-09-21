@@ -42,9 +42,11 @@ public interface TRobotInspectionDao {
                                          @Param(value = "robotCode") String robotCode);
     List<TCruisePointAttr> selectRobotTaskMessage(@Param(value = "list") String[] list);
 
-    List<Robot> selectRobotInfo(@Param(value = "robotType") Integer robotType);
+    List<Robot> selectRobotInfo(@Param(value = "robotType") Integer robotType,
+                                @Param(value = "userId")Long userId);
 
-    List<Robot> selectDroneInfo(@Param(value = "droneType") Integer droneType);
+    List<Robot> selectDroneInfo(@Param(value = "droneType") Integer droneType,
+                                @Param(value = "userId")Long userId);
 
     List<ConfirmImmediately> selectRobotInspectionIds();
 

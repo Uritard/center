@@ -211,11 +211,13 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "查询音频设备树")
     @RequestMapping(value = "/selectVoiceDeviceTree", method = RequestMethod.GET)
-    @Logs(title = "查询音频设备树", content = "音频设备树查询", logType = 1, authority = "1235")
-    public Result selectVoiceDeviceTree(@RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName) {
+    @Logs(title = "查询音频设备树", content = "音频设备树查询", logType = 1, authority = "1235,1237")
+    public Result selectVoiceDeviceTree(@RequestParam(value = "voiceDeviceName", required = false) String voiceDeviceName,
+                                        HttpServletRequest request) {
         Result result = new Result();
         try {
-            List<VoiceDevice> list = tVoiceDeviceService.selectVoiceDeviceTree(voiceDeviceName);
+            Long userId=Long.valueOf(request.getHeader("userId"));
+            List<VoiceDevice> list = tVoiceDeviceService.selectVoiceDeviceTree(voiceDeviceName,userId);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -271,7 +273,7 @@ public class TVoiceDeviceController {
 
     @ApiOperation(value = "频率分析")
     @RequestMapping(value = "/frequencyAnalyse", method = RequestMethod.GET)
-    @Logs(title = "频率分析",content = "频率分析",logType = 5,authority = "1235")
+    @Logs(title = "频率分析",content = "频率分析",logType = 5,authority = "1235,1237")
     public Result frequencyAnalyse(@RequestParam(value = "frequencyPath") String frequencyPath) {
         Result result = new Result();
         try {

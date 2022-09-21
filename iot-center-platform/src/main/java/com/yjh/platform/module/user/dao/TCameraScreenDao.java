@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.dao;
 
 import com.yjh.platform.module.user.entity.AreaInfoDetail;
+import com.yjh.platform.module.user.entity.AreaInfoOfMonitorDevice;
 import com.yjh.platform.module.user.entity.TCameraScreen;
 import com.yjh.platform.module.user.entity.TCameraScreenDetail;
 import org.apache.ibatis.annotations.Param;
@@ -33,5 +34,8 @@ public interface TCameraScreenDao {
     List<Long> selectRecordId();
     List<Long> selectRecordId2();
     List<AreaInfoDetail> selectCameraTreeWithRobot(@Param(value = "cameraName") String cameraName,
-                                                   @Param(value = "robotFlag") String robotFlag);
+                                                   @Param(value = "robotFlag") String robotFlag,
+                                                   @Param(value = "userId")Long userId);
+
+    List<AreaInfoOfMonitorDevice> selectRegionMonitorDevice();
 }

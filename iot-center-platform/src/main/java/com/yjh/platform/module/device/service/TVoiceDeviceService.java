@@ -307,7 +307,7 @@ public class TVoiceDeviceService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<VoiceDevice> selectVoiceDeviceTree(String voiceDeviceName) {
+    public List<VoiceDevice> selectVoiceDeviceTree(String voiceDeviceName, Long userId) {
 //        List<VoiceDevice> re = new ArrayList<>();
 //        VoiceDevice voiceDeviceTree = new VoiceDevice();
 //        voiceDeviceTree.setInfoType("tree");
@@ -328,7 +328,7 @@ public class TVoiceDeviceService{
 //        re.add(voiceDeviceTree);
 //        return re;
         List<VoiceDevice> listTree = new ArrayList<>();
-        listTree = tVoiceDeviceDao.selectAll(voiceDeviceName);
+        listTree = tVoiceDeviceDao.selectAll(voiceDeviceName, userId);
         List<VoiceDevice> areaInfoCountryList = new ArrayList<>();
         for(Iterator<VoiceDevice> it = listTree.iterator(); it.hasNext();){
             VoiceDevice areaInfoMap = it.next();
