@@ -965,7 +965,7 @@ public class CameraConService {
                     log.error("capture picture fail(PlayM4_GetJPEG), error code: " + iErr);
                     return "capture picture fail(PlayM4_GetJPEG), error code: " + iErr;
                 }
-                byteToImage(sJpgPicBuffer, filePath);
+                byteToImage(sJpgPicBuffer, filePath, meteName);
                 //关闭测温信息
 //                if (!playCtrl.PlayM4_RenderPrivateData(iChanNum, 0x20, 0)) {
 //                    int iErr = playCtrl.PlayM4_GetLastError();
@@ -1001,6 +1001,8 @@ public class CameraConService {
      */
     private void pictureWaterMark(String filePath, String waterMarkContent){
         try {
+            String suffix = filePath.substring(filePath.lastIndexOf(".") + 1);
+
             File file = new File(filePath);
             BufferedImage image = ImageIO.read(file);
             //获取图片的宽
@@ -1022,7 +1024,7 @@ public class CameraConService {
             // 写上水印文字和坐标
             pen.drawString(waterMarkContent, x, y);
             FileImageOutputStream fos = new FileImageOutputStream(file);
-            ImageIO.write(image, "jpg", fos);
+            ImageIO.write(image, suffix, fos);
         } catch (Exception e) {
             log.error("图片设置水印错误: ", e);
         }
@@ -1782,7 +1784,7 @@ public class CameraConService {
     }
 
     //byte数组到图片
-    private void byteToImage(byte[] data, String path) {
+    private void byteToImage(byte[] data, String path, String meteName) {
         if (data.length < 3 || path.equals("")) return;
         try {
             FileImageOutputStream imageOutput = new FileImageOutputStream(new File(path));
@@ -1790,6 +1792,11 @@ public class CameraConService {
             imageOutput.flush();
             imageOutput.close();
             log.info("Make Picture success,Please find image in {}", path);
+            // 红外图片添加水印的开关
+            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared","content"));
+            if (StringUtils.isNotEmpty(meteName) && StringUtils.equals("true", flag)) {
+                pictureWaterMark(path, DateTimeUtil.format(new Date()) + "--" + meteName);
+            }
         } catch (Exception ex) {
             log.info("Exception: " + ex);
             ex.getMessage();
