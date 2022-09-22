@@ -9,6 +9,7 @@ import com.yjh.accessvideo.module.device.entity.*;
 import io.swagger.models.auth.In;
 import net.bytebuddy.asm.Advice;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -531,7 +532,7 @@ public class AnalyseDataOperateService {
 
     }
 
-    //@Logs(title = "表计识别-告警判断-文字结果判断", code = "")
+    //@Logs(title = "表计识别-告警判断-文字结果判断, code = "")
     @Transactional(rollbackFor = Exception.class)
     public int warnJudgementTelesignaling(String value, String stateOne, String stateTwo, Integer alarmState) {
         log.info("value" + value);
@@ -560,7 +561,6 @@ public class AnalyseDataOperateService {
     }
 
     // TODO: 2020/11/21 表计识别结果告警判断--文字结果判断
-
 
     /**
      * -----缺陷识别结果解析（标签数据转化文字描述）------

@@ -957,12 +957,12 @@ public class DataDealThread implements Runnable {
                                 Different different= new Different();
                                 String[] re = resultinfo.split(",");
                                 if(re != null && re.length > 4){
-                                    different.setX1(NumberUtils.toInt(re[1]));
-                                    different.setY1(NumberUtils.toInt(re[2]));
-                                    different.setX2(NumberUtils.toInt(re[3]));
-                                    different.setY2(NumberUtils.toInt(re[4]));
+                                    different.setX1((int) NumberUtils.toDouble(re[1]));
+                                    different.setY1((int) NumberUtils.toDouble(re[2]));
+                                    different.setX2((int) NumberUtils.toDouble(re[3]));
+                                    different.setY2((int) NumberUtils.toDouble(re[4]));
                                 }else {
-                                    different.setX1(NumberUtils.toInt(resultinfo));
+                                    different.setX1((int) NumberUtils.toDouble(resultinfo));
                                     different.setY1(0);
                                     different.setX2(0);
                                     different.setY2(0);
@@ -1036,10 +1036,10 @@ public class DataDealThread implements Runnable {
                                 List<Defect> defectList1=new ArrayList<>();
                                 for(int i=0;i<arr1.length;){
                                     Defect defect=new Defect();
-                                    defect.setX1(NumberUtils.toInt(arr1[i+1]));
-                                    defect.setY1(NumberUtils.toInt(arr1[i+2]));
-                                    defect.setX2(NumberUtils.toInt(arr1[i+3]));
-                                    defect.setY2(NumberUtils.toInt(arr1[i+4]));
+                                    defect.setX1((int)NumberUtils.toDouble(arr1[i+1]));
+                                    defect.setY1((int)NumberUtils.toDouble(arr1[i+2]));
+                                    defect.setX2((int)NumberUtils.toDouble(arr1[i+3]));
+                                    defect.setY2((int)NumberUtils.toDouble(arr1[i+4]));
                                     defect.setType(arr1[i]);
                                     // DecimalFormat df =  new DecimalFormat("0%");
                                     // String confidence = df.format(Double.valueOf(arr1[i+5]));
