@@ -180,6 +180,7 @@
             AND
             b.device_mete_id = #{deviceMeteId, jdbcType= VARCHAR}
         </if>
+        ORDER BY warn_time DESC
     </select>
 
     <select id="viewDeviceInfo" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
@@ -483,8 +484,10 @@
         g.record_name
         FROM
         t_robot_info a
+        <if test="deviceType == null or deviceType == 1">
         JOIN t_dict_business d ON a.robot_type = d.dict_code
         AND d.col_name = 'robot_type'
+        </if>
         <if test="deviceType != null and deviceType == 2">
             JOIN t_dict_business d ON a.drone_type = d.dict_code
             AND d.col_name = 'drone_type'
