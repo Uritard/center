@@ -398,73 +398,96 @@ public class TSequentialConfService{
         {
             Map<String,Object> map = this.sequentialInfo(recBack.get("meteId")).get(0);
             Map<String , String> param = new HashMap<>();
-            try{
-                /*if(!Objects.isNull(recBack.get("code")) && StringUtils.equalsAny(recBack.get("code"), "200", "2000")){
-                    String orcMete = (String)Constant.sequentialState.get("meteResult");
-                    String orc;
-                    if (StringUtils.contains(orcMete, "分")){
-                        orc = "分";
-                    } else {
-                        orc = "合";
-                    }
-                    if("200".equals(recBack.get("code")) && !Objects.isNull(recBack.get("desc"))) {
-                        String ret = recBack.get("desc");
-                        log.info("传入信号量: {}, 分合: {}, 识别信号量: {}", orcMete, orc, ret);
-                        if("unknown".equals(ret) || !ret.equals(orc)){
-                            param.put("resultValue", orc + "闸异常");
-                            param.put("resultState", orc + "不到位");
+            try {
+                // 开关
+                String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis", "content"));
+                if (StringUtils.equals("false", flag)) {
+                    String value = "";
+                    if (!Objects.isNull(recBack.get("code")) && StringUtils.equalsAny(recBack.get("code"), "200", "2000")) {
+                        String orcMete = (String) Constant.sequentialState.get("meteResult");
+                        String orc;
+                        if (StringUtils.contains(orcMete, "分")) {
+                            orc = "分";
                         } else {
-                            param.put("resultValue", orc + "闸正常");
-                            param.put("resultState", orc + "位");
+                            orc = "合";
                         }
-                    } else if ("2000".equals(recBack.get("code")) && !Objects.isNull(recBack.get("value"))) {
-                        String ret = recBack.get("value");
-                        log.info("传入信号量: {}, 分合: {}, 识别信号量: {}", orcMete, orc, ret);
-                        if ("1".equals(ret) && "分".equals(orc)) {
-                            param.put("resultValue", "分闸正常");
-                            param.put("resultState", orc + "位");
-                        } else if ("2".equals(ret) && "合".equals(orc)) {
-                            param.put("resultValue", "合闸正常");
-                            param.put("resultState", orc + "位");
+                        if ("200".equals(recBack.get("code")) && !Objects.isNull(recBack.get("desc"))) {
+                            String ret = recBack.get("desc");
+                            log.info("传入信号量: {}, 分合: {}, 识别信号量: {}", orcMete, orc, ret);
+                            if ("unknown".equals(ret) || !ret.equals(orc)) {
+                                param.put("resultValue", orc + "闸异常");
+                                param.put("resultState", orc + "不到位");
+                                if (StringUtils.equals("分", orc)){
+                                    value = "3";
+                                }else{
+                                    value = "4";
+                                }
+                            } else {
+                                param.put("resultValue", orc + "闸正常");
+                                param.put("resultState", orc + "位");
+                                if (StringUtils.equals("分", orc)){
+                                    value = "1";
+                                }else{
+                                    value = "2";
+                                }
+                            }
+                        } else if ("2000".equals(recBack.get("code")) && !Objects.isNull(recBack.get("value"))) {
+                            String ret = recBack.get("value");
+                            log.info("传入信号量: {}, 分合: {}, 识别信号量: {}", orcMete, orc, ret);
+                            if ("1".equals(ret) && "分".equals(orc)) {
+                                param.put("resultValue", "分闸正常");
+                                value = "1";
+                                param.put("resultState", orc + "位");
+                            } else if ("2".equals(ret) && "合".equals(orc)) {
+                                param.put("resultValue", "合闸正常");
+                                value = "2";
+                                param.put("resultState", orc + "位");
+                            } else {
+                                // 识别返回 3 和 4
+                                param.put("resultValue", orc + "闸异常");
+                                param.put("resultState", orc + "不到位");
+                                if (StringUtils.equals("分", orc)){
+                                    value = "3";
+                                }else{
+                                    value = "4";
+                                }
+                            }
                         } else {
-                            // 识别返回 3 和 4
-                            param.put("resultValue", orc + "闸异常");
-                            param.put("resultState", orc + "不到位");
+                            param.put("resultValue", "分析失败");
+                            param.put("resultState", "无效状态");
                         }
                     } else {
                         param.put("resultValue", "分析失败");
                         param.put("resultState", "无效状态");
                     }
-                } else {
-                    param.put("resultValue", "分析失败");
-                    param.put("resultState", "无效状态");
-                }*/
+                    upToMonitorSystem(recBack, map, value);
+                }else{
+                    // 一键顺控是否使用自定义结果 true-是
+                    String sequentialFlag = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialFlag").get("content"));
+                    if (StringUtils.equals("true", sequentialFlag)){
+                        String sequentialResult = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialResult").get("content"));
+                        recBack.put("value", sequentialResult);
+                    }
 
-                // 一键顺控是否使用自定义结果 true-是
-                String sequentialFlag = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialFlag").get("content"));
-                if (StringUtils.equals("true", sequentialFlag)){
-                    String sequentialResult = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sequentialResult").get("content"));
-                    recBack.put("value", sequentialResult);
-                }
-
-                if(!Objects.isNull(recBack.get("code")) && "2000".equals(recBack.get("code"))){
-                    if(!Objects.isNull(recBack.get("value"))){
-                        String ret = recBack.get("value");
-                        switch (ret){
-                            case "1": param.put("resultValue", "分闸正常"); break;
-                            case "2": param.put("resultValue", "合闸正常"); break;
-                            case "3": param.put("resultValue", "分闸异常"); break;
-                            case "4": param.put("resultValue", "合闸异常"); break;
-                            default: break;
+                    if(!Objects.isNull(recBack.get("code")) && "2000".equals(recBack.get("code"))){
+                        if(!Objects.isNull(recBack.get("value"))){
+                            String ret = recBack.get("value");
+                            switch (ret){
+                                case "1": param.put("resultValue", "分闸正常"); break;
+                                case "2": param.put("resultValue", "合闸正常"); break;
+                                case "3": param.put("resultValue", "分闸异常"); break;
+                                case "4": param.put("resultValue", "合闸异常"); break;
+                                default: break;
+                            }
+                        }else{
+                            param.put("resultValue", "分析失败");
                         }
                     }else{
                         param.put("resultValue", "分析失败");
                     }
-                }else{
-                    param.put("resultValue", "分析失败");
-                }
 
-                upToMonitorSystem(recBack, map, recBack.get("value"));
+                    upToMonitorSystem(recBack, map, recBack.get("value"));
+                }
             }catch (Exception e){
                 log.error(e.getMessage(), e);
             }
