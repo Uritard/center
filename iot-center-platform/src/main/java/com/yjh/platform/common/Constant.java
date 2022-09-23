@@ -262,4 +262,12 @@ public class Constant {
 
 
     public static String filePath;
+
+    public static final String TCP_MODEL_DOWNLOAD_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelDownload";
+
+    public static<T> Result mapToOtherServer(Map<String, Object> map, String url) throws Exception{
+        Result re = new Result();
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+        return re;
+    }
 }

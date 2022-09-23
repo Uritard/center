@@ -483,4 +483,66 @@ public class SendToUpSystemServices {
         // 巡视结果人工审核完成率
         return dealCount(sendToUpSystemDao.countResultCheck(startTime,endTime));
     }
+
+    public String downloadFile(String type){
+        try{
+            List<Map<String,Object>> list = new ArrayList<>();
+            Map<String,Object> map = new HashMap<>();
+            Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
+            String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model":mapForPath.get("content")+"/"+stationCode+"/Model";
+            list.add(map);
+
+            map.put("time", DateTimeUtil.getDateTimeString());
+            map.put("type", type);
+            log.info("模型文件路径："+path);
+            switch (type){
+                case "4":
+                    //点位模型
+                    // map.put("device_file_path",createDeviceModel(path));
+                    String deviceModelTargetPath = String.format(stationCode + "/Model/device_model.xml");
+                    return createDeviceModel(path);
+                case "1":
+                    //巡视主机模型
+                    String hostModelTargetPath = String.format(stationCode + "/Model/host_model.xml");
+                    return createHostModel(path);
+                case "2":
+                    //机器人模型
+                    String robotModelTargetPath = String.format(stationCode + "/Model/robot_model.xml");
+                    return createRobotModel(path);
+                case "3":
+                    //摄像机模型
+                    String videoModelTargetPath = String.format(stationCode + "/Model/video_model.xml");
+                    return createCameraModel(path);
+                case "5":
+                    //无人机
+                    String droneModelTargetPath = String.format(stationCode + "/Model/drone_model.xml");
+                    return createDroneModel(path);
+                case "6":
+                    //声纹模型
+                    String voiceModelTargetPath = String.format(stationCode + "/Model/voice_model.xml");
+                    return createVoiceModel(path);
+                case "7":
+                    //任务模型
+                    String taskModelTargetPath = String.format(stationCode + "/Model/task_model.xml");
+                    return createTaskModel(path);
+                case "8":
+                    //检修区域模型
+                    String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
+                    return createMaintenanceModel(path);
+                case "9":
+                    String mapRealPath = sendToUpSystemDao.selectMapPath();
+                    String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath").get("content"));
+                    String filePathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative").get("content"));
+                    String mapAbsPath = mapRealPath.replace(filePathMap,fileFtpPathMap);
+                    String mapModelTargetPath = stationCode+mapRealPath.replace(filePathMap,"");
+                    return mapAbsPath;
+                default:
+                    break;
+            }
+
+        }catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return "";
+    }
 }

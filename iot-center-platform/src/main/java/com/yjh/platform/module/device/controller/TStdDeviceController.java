@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -449,6 +450,26 @@ public class TStdDeviceController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("删除设备错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "导出模型文件")
+    @RequestMapping(value = "/downloadModel",method = RequestMethod.GET)
+    @Logs(title = "导出模型文件",content = "导出模型文件",logType = 4)
+    public Result downloadModel(@RequestParam(value="type")String type){
+        Result result=new Result();
+        try{
+            Map<String,Object> map = new HashMap<>();
+            map.put("type",type);
+            result = Constant.mapToOtherServer(map,Constant.TCP_MODEL_DOWNLOAD_URL);
+//            result.setData("http://192.168.33.19:10086/files/tcpFiles//01/Model/host_model.zip");
+        }catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("导出模型文件:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("导出模型文件:", e);
         }
         return result;
     }

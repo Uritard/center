@@ -13,8 +13,10 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +31,8 @@ public class SendToUpSystemController {
 
     @Autowired
     private final SendToUpSystemServices sendToUpSystemService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(SendToUpSystemController.class);
 
@@ -113,5 +117,27 @@ public class SendToUpSystemController {
         }
         return result;
     }
+
+    @ApiOperation(value = "模型下载")
+    @RequestMapping(value = "/modelDownload", method = RequestMethod.POST)
+    public Result modelDownload(@RequestBody Map<String,Object> map) {
+        Result result = new Result();
+        try {
+            Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
+            String abspath = mapForPath.get("content");
+            mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelRelativePath");
+            String realPath = mapForPath.get("content");
+            String path  = sendToUpSystemService.downloadFile(String.valueOf(map.get("type")));
+//            String path  = sendToUpSystemService.downloadFile("1");
+            File file = cn.hutool.core.util.ZipUtil.zip(path);
+            path = file.getPath();
+            result.setData(path.replace(abspath,realPath));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
+
 
 }
