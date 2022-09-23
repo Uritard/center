@@ -123,8 +123,12 @@ public class SysUserService {
                 //return -1;
             }
         }
+
         SysUser sysUserCurrent = sysUserDao.selectByPrimaryId(sysUser.getUserId());
         Long roleId = sysUser.getRoleId();
+        if (sysUser.getUserId() == 10001L && !Objects.equals(sysUserCurrent.getRoleId(), roleId)) {
+            throw new BusinessException(10008, "默认管理员角色不可修改");
+        }
         if (roleId != null) {
             redisTemplate.opsForHash().put("userInfo:" + sysUser.getUserId(), "roleId", String.valueOf(sysUser.getRoleId()));
         }

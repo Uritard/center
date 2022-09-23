@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +72,12 @@ public class RobotController {
             Map<String,String> map= redisTemplate.opsForHash().entries("t_sys_param:isEncryption");
             String isDecode =map.get("content");
             if("true".equals(isDecode)) {
-                password= demo.decryptIdentifier(password,identifier);
-                redisTemplate.delete("pubk:" + identifier);
+                try {
+                    password= demo.decryptIdentifier(password,identifier);
+                    redisTemplate.delete("pubk:" + identifier);
+                } catch (Exception e) {
+                    result.setCode(2, "用户密码错误，请重新输入");
+                }
             }
             result.setData(robotService.feignRobotControl(robotCode, type, command, value, direction, key, userId, password, request, content));
         } catch (BusinessException b) {

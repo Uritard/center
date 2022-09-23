@@ -28,6 +28,7 @@ import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -1456,17 +1457,17 @@ public class RobotService {
         } else if (StringUtils.isEmpty(key) && StringUtils.isNoneBlank(password) && keys == null) {
             logsRecord.LoginLogsSend(request, "5", "控制巡视设备", "未输入密钥", sysUserCurrent.getUserName(), String.valueOf(userId), 2);
             map.put("code", 2);
-            map.put("result", "请输入密钥");
+            map.put("result", "密钥不正确");
             return map;
         } else if (keys == null && StringUtils.isNoneBlank(key) && StringUtils.isNoneBlank(password)) {
             logsRecord.LoginLogsSend(request, "5", "控制巡视设备", "密钥已过期", sysUserCurrent.getUserName(), String.valueOf(userId), 2);
             map.put("code", 2);
-            map.put("result", "密钥已过期");
+            map.put("result", "密钥不正确");
             return map;
         } else if (!key.equals(keys)) {
             logsRecord.LoginLogsSend(request, "5", "控制巡视设备", "密钥不正确", sysUserCurrent.getUserName(), String.valueOf(userId), 2);
             map.put("code", 2);
-            map.put("result", "密钥不正确,请重新输入");
+            map.put("result", "密钥不正确");
             return map;
         } else if (!Demo.decryptDB(sysUserCurrent.getPassword()).equals(password)) {
             logsRecord.LoginLogsSend(request, "5", "控制巡视设备", "密码错误", sysUserCurrent.getUserName(), String.valueOf(userId), 2);
@@ -1474,6 +1475,7 @@ public class RobotService {
             map.put("result", "用户密码错误，请重新输入");
             return map;
         }
+        Constant.map.remove(String.valueOf(userId));
         return map;
     }
     /**
@@ -2303,6 +2305,7 @@ public class RobotService {
      */
     public Result upLoadRobotModel(MultipartFile file, String robotCode){
         Result result = new Result();
+        String pathName = null;
         try{
             if(file == null){
                 result.setCode(209,"文件错误，文件为null");
@@ -2316,15 +2319,26 @@ public class RobotService {
                 return result;
             }
             String fileName = "copy-robotModel.xml";
-            String pathName = excelDataImport(file, fileName);
+            pathName = excelDataImport(file, fileName);
             // 解析xml文件
             XMLBaseModel robotModel = getXmlMessage(pathName);
             List<Map<String,Object>> robotMap = robotModel.getItems();
+            if (CollectionUtils.isEmpty(robotMap)) {
+                log.error("文件未解析到正确内容，请确认文件内容是否正确");
+                result.setCode(209,"请上传指定格式的文件");
+                result.setData(0);
+                return result;
+            }
             Long robotId = selectRobotIdByCode(robotCode);
             // 机器人模型信息入库
             addRobotModel(robotMap, robotId);
         }catch (Exception e){
-            log.info(e.getMessage());
+            log.info(e.getMessage(), e);
+            result.setCode(209,"请上传指定格式的文件");
+            result.setData(0);
+            return result;
+        } finally {
+            deleteTmpFile(pathName);
         }
         return result;
     }
@@ -2336,6 +2350,7 @@ public class RobotService {
      */
     public Result upLoadRobotDevice(MultipartFile file, String robotCode){
         Result result = new Result();
+        String pathName = null;
         try{
             if(file == null){
                 result.setCode(209,"文件错误，文件为null");
@@ -2343,24 +2358,45 @@ public class RobotService {
                 return result;
             }
             if (!FileUtil.checkFileName(file.getOriginalFilename(),"xml")){
-                result.setCode(209,"请上传指定的文件");
+                result.setCode(209,"请上传指定格式的文件");
                 result.setData(0);
                 return result;
             }
             String fileName = "copy-robotDevice.xml";
-            String pathName = excelDataImport(file,fileName);
+            pathName = excelDataImport(file,fileName);
             // 解析xml文件
             XMLBaseModel robotDevice = getXmlMessage(pathName);
             List<Map<String,Object>> deviceMap = robotDevice.getItems();
+            if (CollectionUtils.isEmpty(deviceMap)) {
+                log.error("文件未解析到正确内容，请确认文件内容是否正确");
+                result.setCode(209,"请上传指定格式的文件");
+                result.setData(0);
+                return result;
+            }
             Long robotId = selectRobotIdByCode(robotCode);
             // 机器人设备点位入库
             addDevicePoint(deviceMap, robotId);
             addDevicePointRegion(deviceMap, robotId);
         }catch (Exception e){
-            log.info(e.getMessage());
+            log.error(e.getMessage(), e);
+            result.setCode(209,"请上传指定格式的文件");
+            result.setData(0);
+            return result;
+        } finally {
+            deleteTmpFile(pathName);
         }
         return result;
     }
+
+    public void deleteTmpFile(String pathName){
+        if (StringUtils.isNotEmpty(pathName)) {
+            boolean clear = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:tempReflectClear", "content"));
+            if (clear) {
+                FileUtils.deleteQuietly(new File(pathName));
+            }
+        }
+    }
+
     /**
      * 将上传文件写入临时文件
      * @param file 文件
@@ -2375,7 +2411,7 @@ public class RobotService {
             deleteDir(new File(path + File.separator + fileName));
             file.transferTo(new File(path + File.separator + fileName));
         }catch (NullPointerException | IOException e) {
-            e.getMessage();
+            log.error(e.getMessage(), e);
         }
         return path +"/"+ fileName;
     }

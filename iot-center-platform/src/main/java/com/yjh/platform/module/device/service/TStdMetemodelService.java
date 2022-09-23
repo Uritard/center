@@ -443,6 +443,7 @@ public class TStdMetemodelService {
         HSSFWorkbook wb = null;
         Result result = new Result();
         List<Integer> insertRetList = new ArrayList<>();
+        String pathName = null;
         try {
             result.setCode(209);
             if(file == null){
@@ -453,7 +454,7 @@ public class TStdMetemodelService {
                 result.setCode(209,"请上传指定文件");
                 return result;
             }
-            String pathName = excelDataImport(file);
+            pathName = excelDataImport(file);
             //获取字典表的值pathName
             ResultHandleUtils<String, String> resultHandler = new ResultHandleUtils<>();
             tStdMetemodelDetailDao.selectForDictNote(resultHandler);
@@ -930,8 +931,22 @@ public class TStdMetemodelService {
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
+            deleteTmpFile(pathName);
         }
         return result;
+    }
+
+    public void deleteTmpFile(String pathName){
+        if (StringUtils.isNotEmpty(pathName)) {
+            boolean clear = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:tempReflectClear", "content"));
+            if (clear) {
+                try {
+                    FileUtils.forceDelete(new File(pathName));
+                } catch (IOException e) {
+                    log.error("删除临时文件失败: {}", pathName, e);
+                }
+            }
+        }
     }
 
     private boolean isIn(List<TStdMete> meteList,TStdMete tStdMete){
