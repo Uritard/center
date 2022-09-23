@@ -1483,9 +1483,18 @@ public class RobotService {
      */
     @Transactional(rollbackFor = Exception.class)
     public String upSystemCommand(XMLBaseModel xmlBaseModel){
-        xmlBaseModel
-                .setSendCode(sendCode)
-                .setReceiveCode(Constant.robotCode);
+        //上级下发的 code 是robotNum
+        String robotCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode());
+        if (StringUtils.isEmpty(robotCode)){
+            xmlBaseModel
+                    .setSendCode(sendCode)
+                    .setReceiveCode(robotCode);
+        }else {
+            xmlBaseModel
+                    .setSendCode(sendCode)
+                    .setReceiveCode(Constant.robotCode);
+        }
+
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("生成的机器人控制xml是<start>{}<end>", xmlString);
         RobotServerHandler.send( generateByteOrder(xmlString, Constant.robotCode), Constant.robotCode);

@@ -369,4 +369,6 @@ public interface TRobotInfoDao {
      */
     String selectDictCodeByUpdict(@Param(value = "colName") String colName,
                                   @Param(value = "upDict") String upDict);
+    String selectRobotCodeByRobotNum(@Param(value = "robotNum") String robotNum);
+
 }

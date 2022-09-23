@@ -111,7 +111,10 @@ public class CheckTaskAreJob extends QuartzJobBean {
         List<TCruiseTaskResultDetail> TCTRDList = new ArrayList();
             List<TCruiseDataResult> TCDRList = new ArrayList();
             List<String> cruiseResultIdList = new ArrayList<>();
-            List<TCruisePointInstanceNameDetail> instancesList = tCruisePointInstanceDao.selectForTask(instanceIdList);
+            List<TCruisePointInstanceNameDetail> instancesList = new ArrayList<>();
+            if (instanceIdList.size() > 0) {
+                instancesList  = tCruisePointInstanceDao.selectForTask(instanceIdList);
+            }
         for(TCruisePointInstanceNameDetail item:instancesList){
             Map<String,String> mapForCruise  = redisTemplate.opsForHash().entries("t_cruise_task_result:"+taskId+":"+item.getInstanceId());
             if(mapForCruise.size()>0){
