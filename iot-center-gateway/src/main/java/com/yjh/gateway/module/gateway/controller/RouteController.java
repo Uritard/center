@@ -1,5 +1,7 @@
 package com.yjh.gateway.module.gateway.controller;
 
+import com.netflix.zuul.ZuulFilter;
+import com.yjh.gateway.common.authFilter.zuulFilter;
 import com.yjh.gateway.common.websocket.WebSocketServer;
 import com.yjh.gateway.commons.result.BusinessException;
 import com.yjh.gateway.commons.result.Result;
@@ -47,6 +49,23 @@ public class RouteController {
         try {
             WebSocketServer.sendMsg(json);
             result.setData("同步到websocket");
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("同步到websocket异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("同步到websocket错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "刷新安全标记")
+    @RequestMapping(value = "/reloadSecureSigns", method = RequestMethod.GET)
+    public Result reloadSecureSigns() {
+        Result result = new Result();
+        try {
+            zuulFilter.reloadSecureSigns();
+            result.setData("刷新安全标识");
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("同步到websocket异常:", e);

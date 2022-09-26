@@ -4,14 +4,19 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import com.yjh.gateway.common.Constant;
-import com.yjh.gateway.common.utils.*;
+import com.yjh.gateway.common.utils.Decode;
+import com.yjh.gateway.common.utils.IpUtil;
+import com.yjh.gateway.common.utils.MultisMap;
+import com.yjh.gateway.common.utils.ParamUtil;
 import com.yjh.gateway.common.websocket.WebSocketServer;
 import com.yjh.gateway.commons.restTemplate.LogsAspect;
 import com.yjh.gateway.commons.utils.gmhelper.SM2Verify_SKF;
 import com.yjh.gateway.commons.utils.http.IPUtil;
 import com.yjh.gateway.commons.utils.smUtil.Demo;
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -27,9 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartResolver;
@@ -37,11 +39,9 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -53,10 +53,12 @@ public class zuulFilter extends ZuulFilter {
     // 国密规范测试用户ID
     private static final String UKEY_USERID ="1234567812345678";
 
+    private static volatile Map<String, String[]> SECURE_SIGNS;
+
     @Value("${spring.logout.path}")
     private String LOGOUT_GATEWAY_URL;
-    @Resource
-    private RedisTemplate redisTemplate;
+
+    private static RedisTemplate redisTemplate;
 
     @Resource
     private LogsAspect logsAspect;
@@ -88,9 +90,10 @@ public class zuulFilter extends ZuulFilter {
         String remoteIp = IPUtil.getRemoteIP(request);
         log.info("tt-url: {}", remoteIp);
         ctx.getZuulRequestHeaders().put("HTTP_X_FORWARDED_FOR", remoteIp);
+
+        String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
+        String token = request.getHeader("token") != null ? request.getHeader("token") : "";
         if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")) {
-            String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
-            String token = request.getHeader("token") != null ? request.getHeader("token") : "";
             if (StringUtils.isNoneBlank(token)) {
                 Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + userId + ":" + token);
                 String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
@@ -154,22 +157,24 @@ public class zuulFilter extends ZuulFilter {
         if (paramMap != null && paramMap.containsKey("userName")){
             userName = String.valueOf(paramMap.get("userName"));
         }else {
-            String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
-            String token = request.getHeader("token") != null ? request.getHeader("token") : "";
             userName = (String) redisTemplate.opsForHash().get("appKey:" + userId + ":" + token, "userName");
         }
+
+        if (!secureSignsVerify(url, userId, userName)) {
+            return errorRespnse(ctx, HttpStatus.SC_FORBIDDEN, "{\"code\":403,\"message\":\"缺少当前资源访问权限，请联系管理员!\"}");
+        }
+
         if ("true".equals(isDecode)) {
             if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/getPubk") && !url.contains("/sysUser/v1/login") && !url.contains("/sysUser/v1/loginChangePassword")) {
-                String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                 String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
                 if (StringUtils.isNoneBlank(userId)) {
                     StringBuilder sb = new StringBuilder();
                     for (char c : userId.toCharArray()) {
                         sb.append(Integer.toUnsignedString(c, 10));
                     }
-                    String token = Demo.summary(sb.toString());
-                    if (!token.equals(absCode)) {
-                        log.error("参数篡改userId: " + userId + " ,之后的absCode: " + token + ",前端absCode: " + absCode);
+                    String absToken = Demo.summary(sb.toString());
+                    if (!absToken.equals(absCode)) {
+                        log.error("参数篡改userId: " + userId + " ,之后的absCode: " + absToken + ",前端absCode: " + absCode);
 //                        ctx.setSendZuulResponse(false);
 //                        ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                         return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"参数篡改，请联系管理员!\"}");
@@ -196,7 +201,6 @@ public class zuulFilter extends ZuulFilter {
                             refererHost = refererHost.substring(0, refererHost.indexOf("/"));
                         }
                         String orig=origin.substring(origin.lastIndexOf('/') + 1);
-                        String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
                         String ym="yjh.biandian.com";
                         String localIp = IpUtil.getLocalIp();
                         if(orig.contains(":")) {
@@ -246,9 +250,9 @@ public class zuulFilter extends ZuulFilter {
                                 sb.append(Integer.toUnsignedString(c, 10));
                             }
                         }
-                        String token = Demo.summary(sb.toString());
-                        if (!token.equals(webcode)) {
-                            log.error("参数篡改" + filePaths + " ,之后的summary: " + token + ",前端summary: " + webcode);
+                        String webToken = Demo.summary(sb.toString());
+                        if (!webToken.equals(webcode)) {
+                            log.error("参数篡改" + filePaths + " ,之后的summary: " + webToken + ",前端summary: " + webcode);
 //                            ctx.setSendZuulResponse(false);
 //                            ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                             return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"参数篡改，请联系管理员!\"}");
@@ -265,9 +269,9 @@ public class zuulFilter extends ZuulFilter {
                             for (char c : body.toCharArray()) {
                                 sb.append(Integer.toUnsignedString(c, 10));
                             }
-                            String token = Demo.summary(sb.toString());
-                            if (!token.equals(webcode)) {
-                                log.error("参数篡改" + body + " ,之后的summary: " + token + ",前端summary: " + webcode);
+                            String webToken = Demo.summary(sb.toString());
+                            if (!webToken.equals(webcode)) {
+                                log.error("参数篡改" + body + " ,之后的summary: " + webToken + ",前端summary: " + webcode);
 //                                ctx.setSendZuulResponse(false);
 //                                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                                 return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"参数篡改，请联系管理员!\"}");
@@ -293,9 +297,9 @@ public class zuulFilter extends ZuulFilter {
                                     sb.append(Integer.toUnsignedString(c, 10));
                                 }
                             }
-                            String token = Demo.summary(sb.toString());
-                            if (!token.equals(webcode)) {
-                                log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的summary: " + token + ",前端summary: " + webcode);
+                            String webToken = Demo.summary(sb.toString());
+                            if (!webToken.equals(webcode)) {
+                                log.error("参数篡改" + jsonModel.toJSONString() + " ,之后的summary: " + webToken + ",前端summary: " + webcode);
 //                                ctx.setSendZuulResponse(false);
 //                                ctx.setResponseStatusCode(HttpStatus.SC_UNAUTHORIZED);
                                 return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"参数篡改，请联系管理员!\"}");
@@ -305,7 +309,7 @@ public class zuulFilter extends ZuulFilter {
                 }
             }
         }
-        String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
+
         if(StringUtils.isEmpty(userId)) {
             if("true".equals(redisTemplate.opsForHash().get("t_sys_param:isEncryption", "content"))){
                 String identifier = String.valueOf(paramMap.get("identifier"));
@@ -377,6 +381,63 @@ public class zuulFilter extends ZuulFilter {
 
     }
 
+    private boolean secureSignsVerify(String url, String userId, String username) {
+        loadSecureSigns();
+        if (MapUtils.isEmpty(SECURE_SIGNS)) {
+            return true;
+        }
+        String uri = StringUtils.substringBefore(url, "?");
+        // 判断当前 uri 是否在安全标识范围内
+        boolean flag = false;
+        for (String[] pathValues : SECURE_SIGNS.values()) {
+            if (StringUtils.endsWithAny(uri, pathValues)) {
+                flag = true;
+                break;
+            }
+        }
+        // 不在安全标识范围，直接返回 true
+        if (!flag) {
+            return true;
+        }
+        // 在安全标识范围内，判断当前用户安全标识
+        String[] pathSigns = SECURE_SIGNS.containsKey(userId) ? SECURE_SIGNS.get(userId) : SECURE_SIGNS.get(username);
+        // 当前用户无安全标识，返回 false
+        if (ArrayUtils.isEmpty(pathSigns)) {
+            return false;
+        }
+        // 当前用户有安全标识，判断当前连接是否属于当前用户的安全标识
+        return StringUtils.endsWithAny(uri, pathSigns);
+    }
+
+    private static void loadSecureSigns() {
+        if (SECURE_SIGNS == null) {
+            synchronized (UKEY_USERID) {
+                if (SECURE_SIGNS == null) {
+                    String secureSigns = (String)redisTemplate.opsForHash().get("t_sys_param:secureSigns", "content");
+                    log.info("安全标识配置: {}", secureSigns);
+                    if (StringUtils.isEmpty(secureSigns)) {
+                        return;
+                    }
+                    SECURE_SIGNS = new HashMap<>(16);
+                    // user1:path1,path2;user2:path3,path4
+                    String[] userSigns = secureSigns.split(";");
+                    for (String sign : userSigns) {
+                        if (!StringUtils.contains(sign, ":")) {
+                            continue;
+                        }
+                        String[] userSign = sign.split(":", 2);
+                        SECURE_SIGNS.put(userSign[0], StringUtils.split(userSign[1], ","));
+                    }
+                }
+            }
+        }
+    }
+
+    public static void reloadSecureSigns() {
+        SECURE_SIGNS = null;
+        loadSecureSigns();
+    }
+
     @Override
     public Object run() {
         RequestContext ctx = RequestContext.getCurrentContext();
@@ -408,5 +469,10 @@ public class zuulFilter extends ZuulFilter {
         ctx.setResponseStatusCode(nStatusCode);
         ctx.setResponseBody(errorMsg);
         return false;
+    }
+
+    @Resource
+    public void setRedisTemplate(RedisTemplate redisTemplate) {
+        zuulFilter.redisTemplate = redisTemplate;
     }
 }
