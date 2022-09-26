@@ -8,13 +8,30 @@
         <el-form-item>
           <el-button type="primary" @click="onConnect">连接</el-button>
         </el-form-item>
+        <el-form-item label="FTP端口">
+          <el-input v-model="ftpPort"></el-input>
+        </el-form-item>
+        <el-form-item label="FTP用户名">
+          <el-input v-model="username"></el-input>
+        </el-form-item>
+        <el-form-item label="FTP密码">
+          <el-input v-model="password"></el-input>
+        </el-form-item>
+        <el-form-item label="本地文件路径">
+          <el-input v-model="localFilePath"></el-input>
+        </el-form-item>
+        <el-form-item label="Ftp服务Local root " v-show="false">
+          <el-input v-model="remoteRootPath"></el-input>
+        </el-form-item>
+        <el-form-item label="key_Pw">
+          <el-input v-model="keyPw"></el-input>
+        </el-form-item>
       </el-form>
-
       <el-form :inline="true">
         <el-form-item label="IP">
           <el-input v-model="ip"></el-input>
         </el-form-item>
-        <el-form-item label="端口">
+        <el-form-item label="socket端口">
           <el-input v-model="port"></el-input>
         </el-form-item>
         <el-form-item label="sendCode(多个逗号隔开)">
@@ -23,14 +40,13 @@
         <el-form-item label="receviceCode">
           <el-input v-model="receiveCode"></el-input>
         </el-form-item>
-
         <el-form-item>
           <el-button type="primary" @click="createClient">批量创建客户端</el-button>
           <el-button type="primary" @click="destroyClient">销毁客户端</el-button>
           <el-button type="primary" @click="batchSendTest">批量发送消息</el-button>
           <el-button type="primary" @click="resetData">重置发送报文</el-button>
           <el-button type="primary" @click="resetResult">重置接收报文</el-button>
-          <el-button type="primary" @click="setTaskResult">设置任务响应报文</el-button>
+          <el-button type="primary" @click="setTaskResult">设置任务响应报文/FTP/图片</el-button>
         </el-form-item>
       </el-form>
       <el-form>
@@ -66,8 +82,14 @@ export default {
   data() {
     return {
       wsIp: 'ws://192.168.20.71:18088/demo/message',
-      ip: "192.168.33.19",
+      ip: "192.168.9.40",
       port: 10011,
+      ftpPort: 10012,
+      username: "tgy",
+      password: "tt123456tt",
+      localFilePath: "d://1.jpg",
+      remoteRootPath:"/home/yjh_iot_center/ftps",
+      keyPw: "1",
       xml: '<?xmlversion="1.0"encoding="UTF-8"?>\n' +
           '<PatrolDevice>\n' +
           '\t<SendCode>Client01</SendCode>\n' +
@@ -79,7 +101,7 @@ export default {
           '\t\t<Item/></Items>\t\n' +
           '</PatrolDevice >',
       textReceptionList: [],
-      sendCode: "Client5001,Client1002",
+      sendCode: "192.168.1.21,client01,12.3.3.3,192.168.1.15",
       receiveCode: "server01",
       resultList: [],
       taskXml: "<PatrolHost>\n" +
@@ -161,6 +183,12 @@ export default {
     setTaskResult() {
       this.$http.windPost(`/demo/demo-client-task/settaskresult`, {
         xml: this.taskXml,
+        ftpPort: this.ftpPort,
+        username: this.username,
+        password: this.password,
+        localFilePath: this.localFilePath,
+        remoteRootPath:this.remoteRootPath,
+        keyPw: this.keyPw
       }).then(res => {
         this.$message.success(res.result);
       })

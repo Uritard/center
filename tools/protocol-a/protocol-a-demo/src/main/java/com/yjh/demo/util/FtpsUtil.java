@@ -240,7 +240,8 @@ public class FtpsUtil {
     public static void putFile(byte[] data,
                                String remoteFilename, String host, int port, String key_pw, String username, String password) {
         try {
-            log.info("-------------------------------文件上传开始");
+            long start=System.currentTimeMillis();
+            log.info("-文件上传开始  remoteFilename:{} host:{} port:{}  key_pw:{},username:{}, password:{}",remoteFilename,host,port,key_pw,username,password);
             try {
                 FTPSClient ftpClient = null;
                 if (key_pw.equals("1") || key_pw.equals("2")) {
@@ -296,6 +297,7 @@ public class FtpsUtil {
                             ftpClient.mkd(dirs[i]);
                             ftpClient.changeWorkingDirectory(dirs[i]);
                         }
+                        log.info("begin to store");
 //                        ftpClient.enterLocalPassiveMode();
                         if (ftpClient.storeFile(fianlName, is)) {
                             log.info(username + "," + remoteFilename);
@@ -308,23 +310,25 @@ public class FtpsUtil {
 
                         // Logout
                         ftpClient.logout();
+                        log.info("文件上传完成  执行时间:{}ms",System.currentTimeMillis()-start);
+
                     } else {
-                        log.info("FTP login failed---登录失败");
+                        log.info("FTP login failed---登录失败 ");
                     }
 
                     // Disconnect
                     ftpClient.disconnect();
                     log.info("上传结束");
                 } else {
-                    log.info("FTP connect to host failed---连接失败");
+                    log.info("FTP connect to host failed---连接失败 reply={}",reply);
                 }
             } catch (IOException ioe) {
-                log.error("FTPS上传文件失败" + ioe);
+                log.error("FTPS上传文件失败" , ioe);
             } catch (Exception e) {
-                log.error("FTPS上传文件错误" + e);
+                log.error("FTPS上传文件错误" , e);
             }
         } catch (Exception e) {
-            log.error("FTPS上传文件参数有误" + e);
+            log.error("FTPS上传文件参数有误" , e);
         }
     }
 

@@ -3,6 +3,7 @@ package com.yjh.demo.handler;
 import com.alibaba.fastjson.JSON;
 import com.yjh.commons.rxbus.RxBus;
 import com.yjh.demo.controller.DemoClientTaskContoller;
+import com.yjh.demo.util.FtpsUtil;
 import com.yjh.demo.util.XmlToMessageUtil;
 import com.yjh.demo.ws.message.BatchTaskMessage;
 import com.yjh.messager.api.msg.BaseMessage;
@@ -14,11 +15,20 @@ import com.yjh.protocol_a.Message;
 import com.yjh.protocol_a.MessageSender;
 import com.yjh.protocol_a.OutboundMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -43,7 +53,7 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
 
     private SimpleMessageSender wsMessageSender;
 
-
+    public static ExecutorService executorService = Executors.newFixedThreadPool(20);
     long sessionId = 0l;
 
     public DemoBatchTaskHandler(Executor messageProcessingExecutor, RxBus bus, MessageSender sender, SimpleMessageSender wsMessageSender, String sendCode, String receiveCode, int index) {
@@ -111,6 +121,19 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
             log.error("xml 解析失败", e);
             return;
         }
+        String[] fileName = org.springframework.util.StringUtils.split(DemoClientTaskContoller.localFilePath, ".");
+        if (fileName == null || fileName.length <= 1) {
+            log.error("文件名错误  Filename=" + DemoClientTaskContoller.localFilePath);
+            return;
+        }
+        byte[] data;
+        try {
+            data = IOUtils.toByteArray(Files.newInputStream(Paths.get(DemoClientTaskContoller.localFilePath)));
+        } catch (Exception e) {
+            log.error("文件 解析失败", e);
+            return;
+        }
+
         //设置返回 receiveCode  sendCode
         taskResponseMsg.setReceiveCode(receiveCode);
         taskResponseMsg.setSendCode(sendCode);
@@ -126,16 +149,22 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
             taskResponseItem.put("task_code", taskCode);
             taskResponseItem.put("task_name", taskName);
 
+            byte[] finalData = data;
             for (String deviceId : deviceArray) {
                 taskResponseItem.put("device_id", deviceId);
                 taskResponseItem.put("task_patrolled_id", taskPatrolledId.getAndIncrement());
+                taskResponseItem.put("file_path",taskCode + "/" + deviceId + "." + fileName[1]);
                 //深复制 防止消息错误
                 String jsonStr = JSON.toJSONString(taskResponseMsg);
                 Message taskResponseMsgClone = JSON.parseObject(jsonStr, Message.class);
                 OutboundMessage outboundMessage = new OutboundMessage(taskResponseMsgClone);
                 outboundMessage.setSessionId(sessionId);
-                sender.send(outboundMessage);
-                log.info("任务发送响应：taskResponse:{}", taskResponseMsgClone);
+                executorService.submit(() -> {
+                    FtpsUtil.putFile(finalData, taskCode + "/" + deviceId + "." + fileName[1], DemoClientTaskContoller.ip, DemoClientTaskContoller.ftpPort, DemoClientTaskContoller.keyPw, DemoClientTaskContoller.username, DemoClientTaskContoller.password);
+                    sender.send(outboundMessage);
+                    log.info("任务发送响应：taskResponse:{}", taskResponseMsgClone);
+                });
+
             }
         }
     }

@@ -35,7 +35,21 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class DemoClientTaskContoller {
 
+    public static String  ip;
+
     public static String taskXml;
+
+    public static int  ftpPort;
+
+    public static String username;
+
+    public static  String password;
+
+    public static  String localFilePath;
+
+    public static  String remoteRootPath;
+
+    public static  String keyPw;
 
     private List<BaseSocketClient> baseSocketClientList = new ArrayList<>();
 
@@ -48,12 +62,6 @@ public class DemoClientTaskContoller {
     private String receiveCode;
 
     @Autowired
-    private RxBus clientBatchRxBus;
-
-    @Autowired
-    private MsgChannel clientBatchMsgChannel;
-
-    @Autowired
     private ExecutorService clientBatchOutboundExecutor;
 
     @Autowired
@@ -61,6 +69,7 @@ public class DemoClientTaskContoller {
 
     @PostMapping(value = "/create")
     public ResultBean createClient(@RequestBody BatchClientParam batchClientParam) {
+        ip= batchClientParam.getIp();
         baseSocketClientList.forEach(BaseSocketClient::stop);
         baseSocketClientList.clear();
         messageSenderList.clear();
@@ -152,7 +161,13 @@ public class DemoClientTaskContoller {
     @PostMapping("/settaskresult")
     public ResultBean setTaskResult(@RequestBody MessageParam messageParam) {
         taskXml = messageParam.getXml();
-        return new ResultBean(200, "设置任务返回报文成功！");
+        ftpPort=messageParam.getFtpPort();
+        username=messageParam.getUsername();
+        password=messageParam.getPassword();
+        localFilePath=messageParam.getLocalFilePath();
+        remoteRootPath=messageParam.getRemoteRootPath();
+        keyPw=messageParam.getKeyPw();
+        return new ResultBean(200, "设置成功！");
     }
 
 
