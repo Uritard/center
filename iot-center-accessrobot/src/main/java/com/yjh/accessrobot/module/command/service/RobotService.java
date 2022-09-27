@@ -2325,7 +2325,7 @@ public class RobotService {
             List<Map<String,Object>> robotMap = robotModel.getItems();
             if (CollectionUtils.isEmpty(robotMap)) {
                 log.error("文件未解析到正确内容，请确认文件内容是否正确");
-                result.setCode(209,"请上传指定格式的文件");
+                result.setCode(209,"请上传指定格式及模版的文件");
                 result.setData(0);
                 return result;
             }
@@ -2334,7 +2334,7 @@ public class RobotService {
             addRobotModel(robotMap, robotId);
         }catch (Exception e){
             log.info(e.getMessage(), e);
-            result.setCode(209,"请上传指定格式的文件");
+            result.setCode(209,"请上传指定格式及模版的文件");
             result.setData(0);
             return result;
         } finally {
@@ -2369,7 +2369,7 @@ public class RobotService {
             List<Map<String,Object>> deviceMap = robotDevice.getItems();
             if (CollectionUtils.isEmpty(deviceMap)) {
                 log.error("文件未解析到正确内容，请确认文件内容是否正确");
-                result.setCode(209,"请上传指定格式的文件");
+                result.setCode(209,"请上传指定格式及模版的文件");
                 result.setData(0);
                 return result;
             }
@@ -2379,7 +2379,7 @@ public class RobotService {
             addDevicePointRegion(deviceMap, robotId);
         }catch (Exception e){
             log.error(e.getMessage(), e);
-            result.setCode(209,"请上传指定格式的文件");
+            result.setCode(209,"请上传指定格式及模版的文件");
             result.setData(0);
             return result;
         } finally {

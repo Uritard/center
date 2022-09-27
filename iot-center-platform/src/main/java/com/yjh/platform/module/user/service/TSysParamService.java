@@ -85,6 +85,9 @@ public class TSysParamService{
         if ("secureVerify".equals(paramCode) && !"10001".equals(userId)) {
             result.setCode(209, "仅系统默认管理员可修改[安全标记]");
             return false;
+        } else if ("secureVerify".equals(paramCode)) {
+            // 如果是安全标记项，且是默认管理员，则可以修改此参数，不需向后校验
+            return true;
         }
         // 获取用户名
         String userName = (String) redisTemplate.opsForHash().entries("userInfo:"+userId).get("userName");

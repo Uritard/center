@@ -239,7 +239,7 @@ public class RobotController {
                                     @RequestParam(value="robotCode", required=false) String robotCode){
         Result result = new Result();
         try {
-            robotService.upLoadRobotDevice(file, robotCode);
+            result = robotService.upLoadRobotDevice(file, robotCode);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

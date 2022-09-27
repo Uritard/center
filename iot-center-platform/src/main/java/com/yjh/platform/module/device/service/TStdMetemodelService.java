@@ -451,7 +451,7 @@ public class TStdMetemodelService {
                 return result;
             }
             if (!FileUtil.checkFileName(file.getOriginalFilename())){
-                result.setCode(209,"请上传指定文件");
+                result.setCode(209,"请上传指定格式文件");
                 return result;
             }
             pathName = excelDataImport(file);
@@ -918,7 +918,7 @@ public class TStdMetemodelService {
             deleteDir(new File(pathName));
             return result;
         }catch (Exception e){
-            result.setCode(209,"导入文件失败");
+            result.setCode(209,"请上传指定格式及模版的文件");
             log.error("导入文件失败", e);
         }finally {
             try {
