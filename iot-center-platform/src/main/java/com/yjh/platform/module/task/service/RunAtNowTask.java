@@ -84,7 +84,7 @@ public class RunAtNowTask implements Runnable{
     //机器人任务路径
     private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
     //红外相机拍图
-    private static final String RED_MOVE_URL = "http://iot-center-accessvideo/camera/v1/givePicFir?presetId={presetId}&cameraId={cameraId}";
+    private static final String RED_MOVE_URL = "http://iot-center-accessvideo/camera/v1/givePicFir?presetId={presetId}&cameraId={cameraId}&meteName={meteName}";
     //模板图片路径
     private String picModelPath;
     //等待相机转到预置位时间
@@ -649,6 +649,7 @@ public class RunAtNowTask implements Runnable{
                                 map2.put("cameraId", tCameraPreset.getCameraId());
                                 map2.put("meteName", tCruisePointInstanceDao.selectMeteNameByInstanceId(item.getInstanceId()));
                                 if(item.getCruiseType().equals(230)){//红外专属拍照方法
+                                    map.put("meteName", tCruisePointInstanceDao.selectMeteNameByInstanceId(item.getInstanceId()));
                                     re = redPicture(map);
                                 }else {
                                     move(map);

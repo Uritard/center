@@ -640,13 +640,14 @@ public class CameraConController {
     @ApiOperation(value = "获取红外文件_dlt664")
     @RequestMapping(value = "/givePicFir", method = RequestMethod.GET)
     public Result givePicFir(@RequestParam(value = "presetId",required = false) Long presetId,
-                               @RequestParam(value = "cameraId",required = false) Long cameraId) {
+                             @RequestParam(value = "cameraId",required = false) Long cameraId,
+                             @RequestParam(value = "meteName",required = false) String meteName) {
         Result result = new Result();
         Map<String,String> map;
         if ("1".equals(givePic)){
-            map = cameraConService.givePicFir(cameraId,presetId);
+            map = cameraConService.givePicFir(cameraId,presetId,meteName);
         }else {
-            map = cameraConService.givePicFir2(cameraId,presetId);
+            map = cameraConService.givePicFir2(cameraId,presetId,meteName);
         }
         if (map.size()>0)
         {

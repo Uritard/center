@@ -2221,7 +2221,7 @@ public class CameraConService {
      * @param cameraId 摄像头id
      * @param presetId 预置位id
      */
-    public Map<String, String> givePicFir(long cameraId, Long presetId) {
+    public Map<String, String> givePicFir(long cameraId, Long presetId, String meteName) {
         Map<String, String> map = new HashMap<String, String>();
 
         try {
@@ -2298,6 +2298,12 @@ public class CameraConService {
                     buffers.get(bytes);
                     fout.write(bytes);
                     fout.close();
+                    // 红外图片添加水印的开关
+                    String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared","content"));
+                    if (StringUtils.isNotEmpty(meteName) && StringUtils.equals("true", flag)) {
+                        log.info("红外图片，添加水印，路径：" + path);
+                        pictureWaterMark(path, DateTimeUtil.format(new Date()) + "--" + meteName);
+                    }
                     map.put("picPath", hotPicshow + newName + ".jpg");
                     log.info("hotPicshow地址：" + hotPicshow + newName + ".jpg");
                 } else {
@@ -2374,7 +2380,7 @@ public class CameraConService {
      * @param presetId
      * @return
      */
-    public Map<String, String> givePicFir2(long cameraId, Long presetId) {
+    public Map<String, String> givePicFir2(long cameraId, Long presetId, String meteName) {
         Map<String, String> map = new HashMap<String, String>();
 
         try {
@@ -2500,6 +2506,12 @@ public class CameraConService {
                     picBuffers.get(picBytes);
                     fout.write(picBytes);
                     fout.close();
+                    // 红外图片添加水印的开关
+                    String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared","content"));
+                    if (StringUtils.isNotEmpty(meteName) && StringUtils.equals("true", flag)) {
+                        log.info("红外图片，添加水印，路径：" + picPath);
+                        pictureWaterMark(picPath, DateTimeUtil.format(new Date()) + "--" + meteName);
+                    }
                     map.put("picPath", hotPicshow + newName + ".jpg");
                     map.put("urlPath", hotPicshow + newName + ".jpg");
                     map.put("absPath", picPath);
