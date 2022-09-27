@@ -20,11 +20,11 @@
         <el-form-item label="本地文件路径">
           <el-input v-model="localFilePath"></el-input>
         </el-form-item>
-        <el-form-item label="Ftp服务Local root " v-show="false">
-          <el-input v-model="remoteRootPath"></el-input>
-        </el-form-item>
-        <el-form-item label="key_Pw">
+          <el-form-item label="key_Pw">
           <el-input v-model="keyPw"></el-input>
+        </el-form-item>
+        <el-form-item label="任务休眠时间(ms) ">
+          <el-input v-model="sleepTime"></el-input>
         </el-form-item>
       </el-form>
       <el-form :inline="true">
@@ -46,7 +46,7 @@
           <el-button type="primary" @click="batchSendTest">批量发送消息</el-button>
           <el-button type="primary" @click="resetData">重置发送报文</el-button>
           <el-button type="primary" @click="resetResult">重置接收报文</el-button>
-          <el-button type="primary" @click="setTaskResult">设置任务响应报文/FTP/图片</el-button>
+          <el-button type="primary" @click="setTaskResult">设置任务响应/FTP/图片/休眠时间</el-button>
         </el-form-item>
       </el-form>
       <el-form>
@@ -63,7 +63,6 @@
     </div>
     <div class="reception">
       <el-scrollbar style="width: 1920px;height: 600px;">
-
         <ul v-for="(item,index) in resultList" :key="index">
           <li style=" font-size: 16px ;color: #3ae4ef;margin: 10px">SendCode: {{ item.sendCode }}</li>
           <div v-for="response in item.responseList" class="text-reception" v-text="response"></div>
@@ -88,7 +87,7 @@ export default {
       username: "tgy",
       password: "tt123456tt",
       localFilePath: "d://1.jpg",
-      remoteRootPath:"/home/yjh_iot_center/ftps",
+      sleepTime:0,
       keyPw: "1",
       xml: '<?xmlversion="1.0"encoding="UTF-8"?>\n' +
           '<PatrolDevice>\n' +
@@ -188,7 +187,8 @@ export default {
         password: this.password,
         localFilePath: this.localFilePath,
         remoteRootPath:this.remoteRootPath,
-        keyPw: this.keyPw
+        keyPw: this.keyPw,
+        sleepTime:this.sleepTime
       }).then(res => {
         this.$message.success(res.result);
       })

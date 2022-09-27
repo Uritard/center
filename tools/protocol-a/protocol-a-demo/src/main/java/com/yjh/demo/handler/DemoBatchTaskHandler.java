@@ -15,13 +15,9 @@ import com.yjh.protocol_a.Message;
 import com.yjh.protocol_a.MessageSender;
 import com.yjh.protocol_a.OutboundMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -41,20 +37,20 @@ import java.util.concurrent.atomic.AtomicLong;
 public class DemoBatchTaskHandler extends BaseMessageHandler {
 
 
-    public AtomicLong taskPatrolledId = new AtomicLong(1000000000l);
+    public AtomicLong taskPatrolledId = new AtomicLong(1000000000L);
 
-    private int index;
+    private final int index;
 
-    private String sendCode;
+    private final String sendCode;
 
-    private String receiveCode;
+    private final String receiveCode;
 
-    private MessageSender sender;
+    private final MessageSender sender;
 
-    private SimpleMessageSender wsMessageSender;
+    private final SimpleMessageSender wsMessageSender;
 
     public static ExecutorService executorService = Executors.newFixedThreadPool(20);
-    long sessionId = 0l;
+    long sessionId = 0L;
 
     public DemoBatchTaskHandler(Executor messageProcessingExecutor, RxBus bus, MessageSender sender, SimpleMessageSender wsMessageSender, String sendCode, String receiveCode, int index) {
         super(messageProcessingExecutor, bus);
@@ -87,8 +83,7 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
             this.sessionId = inboundMessage.getSessionId();
             log.info("接收到服务端的sessionId :{} sendCode {}  接收到服务端的内容: \n{}\n", sessionId, sendCode, new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8));
             String xml = new String(inboundMessage.getPacket().getPayload(), StandardCharsets.UTF_8);
-            String msg =
-                    "发送会话序列号：" + inboundMessage.getPacket().getSendSessionId() + "        " +
+            String msg = "发送会话序列号：" + inboundMessage.getPacket().getSendSessionId() + "        " +
                             "接收会话序列号：" + inboundMessage.getPacket().getReceiveSessionId() + "        " +
                             "会话源标识：0x0" + inboundMessage.getPacket().getSessionType() + "        " +
                             "xml内容：" + xml + "\n";
@@ -104,6 +99,7 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
                 log.error("xml 格式解析失败 xml=" + xml, e);
                 return;
             }
+            //如果是任务需要返回
             if (StringUtils.equals("101", message.getType()) && StringUtils.equals("1", message.getCommand())) {
                 sendTaskResult(message);
             }
@@ -121,7 +117,7 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
             log.error("xml 解析失败", e);
             return;
         }
-        String[] fileName = org.springframework.util.StringUtils.split(DemoClientTaskContoller.localFilePath, ".");
+        String[] fileName =StringUtils.split(DemoClientTaskContoller.localFilePath, ".");
         if (fileName == null || fileName.length <= 1) {
             log.error("文件名错误  Filename=" + DemoClientTaskContoller.localFilePath);
             return;
@@ -151,22 +147,34 @@ public class DemoBatchTaskHandler extends BaseMessageHandler {
 
             byte[] finalData = data;
             for (String deviceId : deviceArray) {
+                String remoteFile = taskCode + "/" + deviceId + "." + fileName[1];
                 taskResponseItem.put("device_id", deviceId);
                 taskResponseItem.put("task_patrolled_id", taskPatrolledId.getAndIncrement());
-                taskResponseItem.put("file_path",taskCode + "/" + deviceId + "." + fileName[1]);
+                taskResponseItem.put("file_path", remoteFile);
                 //深复制 防止消息错误
                 String jsonStr = JSON.toJSONString(taskResponseMsg);
                 Message taskResponseMsgClone = JSON.parseObject(jsonStr, Message.class);
                 OutboundMessage outboundMessage = new OutboundMessage(taskResponseMsgClone);
                 outboundMessage.setSessionId(sessionId);
                 executorService.submit(() -> {
-                    FtpsUtil.putFile(finalData, taskCode + "/" + deviceId + "." + fileName[1], DemoClientTaskContoller.ip, DemoClientTaskContoller.ftpPort, DemoClientTaskContoller.keyPw, DemoClientTaskContoller.username, DemoClientTaskContoller.password);
-                    sender.send(outboundMessage);
-                    log.info("任务发送响应：taskResponse:{}", taskResponseMsgClone);
+                    uplaodAndResponse(remoteFile, taskCode, finalData, deviceId, taskResponseMsgClone, outboundMessage);
                 });
 
             }
         }
+    }
+
+    private void uplaodAndResponse(String remoteFile, String taskCode, byte[] finalData, String deviceId, Message taskResponseMsgClone, OutboundMessage outboundMessage) {
+        if (DemoClientTaskContoller.sleepTime > 0) {
+            try {
+                Thread.sleep(DemoClientTaskContoller.sleepTime);
+            } catch (InterruptedException e) {
+                log.error("sleep error", e);
+            }
+        }
+        FtpsUtil.putFile(finalData, remoteFile, DemoClientTaskContoller.ip, DemoClientTaskContoller.ftpPort, DemoClientTaskContoller.keyPw, DemoClientTaskContoller.username, DemoClientTaskContoller.password);
+        sender.send(outboundMessage);
+        log.info("任务发送响应：taskResponse:{}", taskResponseMsgClone);
     }
 
     public Long getSessionId() {

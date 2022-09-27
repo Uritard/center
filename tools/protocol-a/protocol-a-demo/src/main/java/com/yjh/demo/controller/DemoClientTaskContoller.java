@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @ClassName: DemoClientTaskContoller
@@ -51,6 +50,7 @@ public class DemoClientTaskContoller {
 
     public static  String keyPw;
 
+    public static long sleepTime;
     private List<BaseSocketClient> baseSocketClientList = new ArrayList<>();
 
 
@@ -167,6 +167,7 @@ public class DemoClientTaskContoller {
         localFilePath=messageParam.getLocalFilePath();
         remoteRootPath=messageParam.getRemoteRootPath();
         keyPw=messageParam.getKeyPw();
+        sleepTime=messageParam.getSleepTime();
         return new ResultBean(200, "设置成功！");
     }
 

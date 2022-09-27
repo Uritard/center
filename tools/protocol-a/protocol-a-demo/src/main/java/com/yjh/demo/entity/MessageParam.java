@@ -28,4 +28,6 @@ public class MessageParam {
     private String remoteRootPath;
 
     private String keyPw;
+
+    private long sleepTime;
 }
