@@ -21,6 +21,7 @@ import redis.clients.jedis.ScanResult;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author YC
@@ -266,6 +267,12 @@ public class InspectionResultThread implements Runnable{
                         Constant.postUrl(webSocketUrl, json);
 
                         Constant.flagMap.put(taskId, instanceIdList);
+
+                        Integer flag = StaticContextAccessor.getBean(RobotService.class).selectIsAlarmByTask(taskId, instanceId);
+                        if (flag > 0){
+                            log.info("该点产生了告警。。。。");
+                            StaticContextAccessor.getBean(RobotService.class).updatePicPath(taskId, instanceId, cruiseResultMap.get("relativePath"));
+                        }
                     }
                 }
                 log.info("taskId为{}的任务,准备更新的abnormal是:{},准备更新的normal是:{}", taskId, abnormal, normal);
@@ -274,7 +281,7 @@ public class InspectionResultThread implements Runnable{
                 mapForAbnormal.put("normal", normal.toString());
                 redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
 
-                taskIsFinished(taskId, robotCode, totalNum, abnormal, normal, tCruiseTaskResultMap, tCruiseResult);
+                taskIsFinished(taskId, totalNum, abnormal, normal, tCruiseTaskResultMap, tCruiseResult);
             }
         }catch (Exception e){
             log.error(e.getMessage(), e);
@@ -284,7 +291,6 @@ public class InspectionResultThread implements Runnable{
     /**
      * 判断机器人是否完成任务,依据为返回结果大小与下发点数大小是否相等相等
      * @param taskId 任务id
-     * @param robotCode 机器人唯一标识
      * @param totalNum 总巡检点数
      * @param abnormal 异常巡检点数
      * @param normal 正常巡检点数
@@ -293,7 +299,6 @@ public class InspectionResultThread implements Runnable{
      * @return void
      */
     private void taskIsFinished(String taskId,
-                                String robotCode,
                                 Integer totalNum,
                                 Integer abnormal,
                                 Integer normal,
@@ -317,14 +322,18 @@ public class InspectionResultThread implements Runnable{
             if ("true".equals(redisTemplate.opsForValue().get("RobotTask.taskToRobot"))) {
                 robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
             }
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + robotTaskId);
-            String instanceList = redisInfoMap.get("instanceIdList");
-            instanceList = instanceList.replaceAll("\\[","").replaceAll("]","");
-            String[] instanceIdArray = instanceList.split(", ");
+            // 统计巡视主机下发给机器人的巡检点大小
             List<String> allInstanceIdList = new ArrayList<>();
-            for (String instanceId : instanceIdArray){
-                allInstanceIdList.add(instanceId);
-            }
+            log.info("taskRobotMap {} ", Constant.taskRobotMap.get(taskId));
+            String finalRobotTaskId = robotTaskId;
+            Constant.taskRobotMap.get(taskId).forEach((robotCode, taskStatus) -> {
+                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + finalRobotTaskId);
+                String instanceList = redisInfoMap.get("instanceIdList");
+                instanceList = instanceList.replaceAll("\\[", "").replaceAll("]", "");
+                String[] instanceIdArray = instanceList.split(", ");
+                allInstanceIdList.addAll(Arrays.stream(instanceIdArray).distinct().collect(Collectors.toList()));
+            });
+            log.info("allInstanceIdList {}" , allInstanceIdList);
             log.info("巡视主机下发给机器人任务为{}的巡检点个数===={}", taskId, allInstanceIdList.size());
 
             if(Objects.equals(allInstanceIdList.size(), resultList.size())) {

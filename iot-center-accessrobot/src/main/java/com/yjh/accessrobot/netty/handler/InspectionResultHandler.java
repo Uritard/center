@@ -196,8 +196,13 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
              * 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path
              * */
             boolean flag;
+            Integer robotType = StaticContextAccessor.getBean(RobotService.class).selectRobotType(xmlBaseModel.getSendCode());
             if (inspectFlag) {
-                flag = item.containsKey("file_path") && !item.containsKey("origin_file_result_path") && !item.containsKey("origin_file_path");
+                flag = item.containsKey("file_path")
+                        && !item.containsKey("origin_file_result_path")
+                        && !item.containsKey("origin_file_path")
+                        // 且是E机器人
+                        && Objects.equals(159,robotType);
             }else {
                 flag = false;
             }

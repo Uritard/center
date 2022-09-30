@@ -65,6 +65,11 @@ public class Constant {
 
     public static Map<String, List<Long>> flagMap = new ConcurrentHashMap<>();
 
+    /**
+     * 任务与机器人对应集合（一条任务  多个机器人执行）
+     */
+    public static Map<String, Map<String, String>> taskRobotMap = new ConcurrentHashMap<>();
+
     public static  ExpiringMap<String, String> map = ExpiringMap.builder()
             .maxSize(100)
             .expiration(120000, TimeUnit.MILLISECONDS)

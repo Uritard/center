@@ -142,10 +142,20 @@ public class RobotInspectionWarnThread implements Runnable{
             warnInfo.setDeviceCode(robotId.toString());
             warnInfo.setWarnName(warnResultMap.get("content"));
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());
+            log.info("taskId是：{}，instanceId是：{}的 redisInfoMap：{}", taskId, instanceId, redisInfoMap);
             warnInfo.setImagePath(redisInfoMap.get("picpath"));
             if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmLevel"))) {
                 int warnLevel = StaticContextAccessor.getBean(RobotService.class).selectDictCode("alarmLevel", warnResultMap.get("alarmLevel"), "alarm_level");
                 warnInfo.setWarnLevel(warnLevel);
+            }else {
+                String alarmLevel = warnResultMap.get("alarmLevel");
+                switch (alarmLevel){
+                    case "1": warnInfo.setWarnLevel(130); break;
+                    case "2": warnInfo.setWarnLevel(131); break;
+                    case "3": warnInfo.setWarnLevel(132); break;
+                    case "4": warnInfo.setWarnLevel(133); break;
+                    default: break;
+                }
             }
             warnInfo.setWarnContent(warnResultMap.get("content"));
             if (Objects.nonNull(warnResultMap.get("alarmType")) && !StringUtils.isEmpty(warnResultMap.get("alarmType"))) {
@@ -253,7 +263,7 @@ public class RobotInspectionWarnThread implements Runnable{
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             map.put("list", list);
             log.info("告警上报：-" + map);
-            Constant.otherServer(map, Constant.TCP_URL);
+//            Constant.otherServer(map, Constant.TCP_URL);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }

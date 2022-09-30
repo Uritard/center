@@ -55,8 +55,8 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
                 robotStatusMap.put("time", res.get("time").toString());
                 robotStatusMap.put("type", res.get("type").toString());
                 robotStatusMap.put("value", res.get("value").toString());
-                robotStatusMap.put("valueUnit", res.get("value_unit").toString());
-                robotStatusMap.put("unit", res.get("unit").toString());
+                robotStatusMap.put("valueUnit", res.containsKey("value_unit") ? String.valueOf(res.get("value_unit")) : "");
+                robotStatusMap.put("unit", res.containsKey("unit") ? String.valueOf(res.get("unit")) : "");
                 robotStatusList.add(robotStatusMap);
 
             });

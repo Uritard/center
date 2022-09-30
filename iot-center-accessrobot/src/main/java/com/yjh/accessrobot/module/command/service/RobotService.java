@@ -447,17 +447,17 @@ public class RobotService {
                 Map<String, Object> robotModelMap = robotMap.get(0);
                 //生产日期
                 String productionDate = String.valueOf(robotModelMap.get("production_date"));
-                if(productionDate != null && !"".equals(productionDate)){
+                if(StringUtils.isNotEmpty(productionDate) && !"null".equals(productionDate)){
                     tRobotInfo.setMadeDate(simpleDateFormat.parse(productionDate));
                 }
                 //生产编号
                 String productionCode = String.valueOf(robotModelMap.get("production_code"));
-                if(productionCode != null && !"".equals(productionCode)){
+                if(StringUtils.isNotEmpty(productionCode) && !"null".equals(productionCode)){
                     tRobotInfo.setAppearanceNumber(productionCode);
                 }
                 //生产厂家
                 String manufacturer = String.valueOf(robotModelMap.get("manufacturer"));
-                if(manufacturer != null && !"".equals(manufacturer)){
+                if(StringUtils.isNotEmpty(manufacturer) && !"null".equals(manufacturer)){
                     String robotFactory = tRobotInfoDao.selectDictCodeByNote(manufacturer,"robot_factory");
                     if(robotFactory != null){
                         tRobotInfo.setRobotFactory(robotFactory);
@@ -465,13 +465,13 @@ public class RobotService {
                 }
                 //使用单位
                 String useUnit = String.valueOf(robotModelMap.get("use_unit"));
-                if(useUnit != null && !"".equals(useUnit)){
+                if(StringUtils.isNotEmpty(useUnit) && !"null".equals(useUnit)){
                     tRobotInfo.setBuildingUser(useUnit);
                 }
 //                String istransport = String.valueOf(robotModelMap.get("istransport"));
                 //设备来源
                 String deviceSource = String.valueOf(robotModelMap.get("device_source"));
-                if(deviceSource != null && !"".equals(deviceSource)){
+                if(StringUtils.isNotEmpty(deviceSource) && !"null".equals(deviceSource)){
                     tRobotInfo.setRobotSource(deviceSource);
                 }
             }catch (Exception e){
@@ -1255,7 +1255,8 @@ public class RobotService {
     public void modifyTaskResult(String taskIdTemp, Integer taskStatus)  {
         // taskPatrolled_id格式： taskId_20220202020202
         log.info("taskIdTemp==={}", taskIdTemp);
-        String taskId = taskIdTemp.substring(0, taskIdTemp.length() - 15);
+        String taskId = taskIdTemp.contains("_") ?
+                taskIdTemp.substring(0, taskIdTemp.length() - 15) : taskIdTemp.substring(0, taskIdTemp.length() - 14);
         List<TCruiseDataResult> tcdrList = new ArrayList<>();
         List<TCruiseTaskResultDetail> tctrdList = new ArrayList<>();
         List<String> cruiseResultIdList = new ArrayList<>();
@@ -2627,6 +2628,18 @@ public class RobotService {
             params.put("lowTaskIdList", lowTaskList);
             Constant.otherServerList(lowTaskList,Constant.GET_LOW_TASK_GO_ON);
         }
+    }
+
+    public Integer selectRobotType(String robotCode){
+        return tRobotInfoDao.selectRobotType(robotCode);
+    }
+
+    public Integer selectIsAlarmByTask(String taskId, String instanceId){
+        return tRobotInfoDao.selectIsAlarmByTask(taskId, Long.valueOf(instanceId));
+    }
+
+    public Integer updatePicPath(String taskId, String instanceId, String imagePath){
+        return tRobotInfoDao.updatePicPath(taskId, Long.valueOf(instanceId), imagePath);
     }
 }
 
