@@ -36,16 +36,17 @@ public class HeartBeatHandler implements MessageHandlerStrategy, InitializingBea
         Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":2");
 
         Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
+        log.info("Registered robot is：{}", Constant.robotRegisterFlag);
         if (Constant.robotRegisterFlag.getOrDefault(robotCode, false) &&  allRobotCodeMap.containsValue(robotCode)){
-            log.info("缓存有,发送心跳响应");
+            log.info("缓存有,机器人{}发送心跳响应", robotCode);
             robotServerHandler.heartBeatSuccessAfter( ctx, robotCode, sendSessionId, robotStatusMap);
         }else {
             List<String> robotCodeList = robotService.selectAllRobotCode();
             if (Constant.robotRegisterFlag.getOrDefault(robotCode, false) && robotCodeList.contains(robotCode)) {
-                log.info("缓存无,表中有,发送心跳相应");
+                log.info("缓存无,表中有,机器人{}发送心跳相应", robotCode);
                 robotServerHandler.heartBeatSuccessAfter(ctx,robotCode, sendSessionId, robotStatusMap);
             } else {
-                log.info("缓存无,表中无,断开连接");
+                log.info("缓存无,表中无,机器人{}断开连接", robotCode);
                 robotServerHandler.heartBeatFailAfter(robotCode, robotStatusMap);
             }
         }

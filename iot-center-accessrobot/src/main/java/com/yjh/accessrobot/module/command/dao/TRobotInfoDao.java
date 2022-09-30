@@ -371,4 +371,13 @@ public interface TRobotInfoDao {
                                   @Param(value = "upDict") String upDict);
     String selectRobotCodeByRobotNum(@Param(value = "robotNum") String robotNum);
 
+    Integer selectRobotType(@Param(value = "robotCode") String robotCode);
+
+    Integer selectIsAlarmByTask(@Param(value = "taskId") String taskId,
+                                @Param(value = "instanceId") Long instanceId);
+
+    Integer updatePicPath(@Param(value = "taskId") String taskId,
+                          @Param(value = "instanceId") Long instanceId,
+                          @Param(value = "imagePath") String imagePath);
+
 }

@@ -65,8 +65,10 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         String startTime = xmlBaseModel.getItems().get(0).get("start_time").toString();
         taskStatusMap.put("startTime", DateTimeUtil.format(DateTimeUtil.parse(startTime)));
         taskStatusMap.put("taskProgress", xmlBaseModel.getItems().get(0).get("task_progress").toString());
-        taskStatusMap.put("taskEstimatedTime", xmlBaseModel.getItems().get(0).get("task_estimated_time").toString());
-        taskStatusMap.put("description", xmlBaseModel.getItems().get(0).get("description").toString());
+        taskStatusMap.put("taskEstimatedTime", xmlBaseModel.getItems().get(0).containsKey("task_estimated_time") ?
+                xmlBaseModel.getItems().get(0).get("task_estimated_time").toString() : "");
+        taskStatusMap.put("description", xmlBaseModel.getItems().get(0).containsKey("description") ?
+                xmlBaseModel.getItems().get(0).get("description").toString() : "");
 
         // 判断任务是否属于机器人本体任务
         Long robotId = robotService.selectIsRobotTask(taskId);
@@ -99,6 +101,14 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, taskStatusXmlString);
         RobotServerHandler.send(taskStatusProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
+
+        Map<String, String> robotTaskStatus = new HashMap<>();
+        if (Objects.nonNull(Constant.taskRobotMap.get(taskId))){
+            robotTaskStatus = Constant.taskRobotMap.get(taskId);
+        }
+        robotTaskStatus.put(robotCode, taskState);
+        Constant.taskRobotMap.put(taskId, robotTaskStatus);
+        log.info("taskRobotMap Put {}", Constant.taskRobotMap.get(taskId));
 
         /// 本来好好的  由于机器人端乱上报消息  就不进行具体处理了
         //任务已执行和任务终止 更新任务结束时间
