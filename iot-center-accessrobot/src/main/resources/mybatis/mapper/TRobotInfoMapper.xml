@@ -1306,4 +1306,24 @@
         where 1 = 1
           and a.robot_num = #{robotNum}
     </select>
+
+    <select id="selectRobotType" resultType="java.lang.Integer">
+        SELECT robot_type from t_robot_info where robot_code = #{robotCode}
+    </select>
+
+    <select id="selectIsAlarmByTask" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_warn_info a
+        WHERE a.task_id = #{taskId} AND a.instance_id = #{instanceId}
+    </select>
+
+    <update id="updatePicPath" >
+        UPDATE t_warn_info a
+        <set>
+            a.image_path = #{imagePath, jdbcType=TIMESTAMP}
+        </set>
+        WHERE
+        a.task_id = #{taskId, jdbcType=VARCHAR}
+        AND a.instance_id = #{instanceId}
+    </update>
 </mapper>

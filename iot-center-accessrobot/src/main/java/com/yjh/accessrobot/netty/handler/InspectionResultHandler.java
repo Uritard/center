@@ -196,8 +196,13 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
              * 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path
              * */
             boolean flag;
+            Integer robotType = StaticContextAccessor.getBean(RobotService.class).selectRobotType(xmlBaseModel.getSendCode());
             if (inspectFlag) {
-                flag = item.containsKey("file_path") && !item.containsKey("origin_file_result_path") && !item.containsKey("origin_file_path");
+                flag = item.containsKey("file_path")
+                        && !item.containsKey("origin_file_result_path")
+                        && !item.containsKey("origin_file_path")
+                        // 且是E机器人
+                        && Objects.equals(159,robotType);
             }else {
                 flag = false;
             }
@@ -314,7 +319,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         cruiseResult.put("list", list);
         log.info("信息上报：-" + cruiseResult);
         // 江苏要求
-//        Constant.otherServer(cruiseResult,Constant.TCP_URL);
+        Constant.otherServer(cruiseResult,Constant.TCP_URL);
         // 国网要求
         robotService.upToCruise(xmlBaseModel);
     }
