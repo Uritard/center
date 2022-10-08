@@ -864,7 +864,7 @@ public class IntelAnalysisService {
                 Map<String, List<XMLBaseModel>> alarmMap = new HashMap<>(3);
                 alarmMap.put("list", list);
                 log.info("告警上报：{}", alarmMap);
-                Constant.otherServer(alarmMap, Constant.TCP_URL);
+//                Constant.otherServer(alarmMap, Constant.TCP_URL);
             }catch (Exception e){
                 log.error("向上级系统上报静默监视告警出错:{}", e);
             }

@@ -263,7 +263,7 @@ public class RobotInspectionWarnThread implements Runnable{
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             map.put("list", list);
             log.info("告警上报：-" + map);
-            Constant.otherServer(map, Constant.TCP_URL);
+//            Constant.otherServer(map, Constant.TCP_URL);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }

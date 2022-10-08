@@ -354,7 +354,7 @@ public class AnalysisResultThread implements Runnable{
             Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
             cruiseResult.put("list",list);
             log.info("信息上报：-"+cruiseResult);
-            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+//            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }

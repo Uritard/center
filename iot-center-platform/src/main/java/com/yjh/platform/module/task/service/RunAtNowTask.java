@@ -595,7 +595,7 @@ public class RunAtNowTask implements Runnable{
                             Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                             cruiseResult.put("list",list);
 //                            log.info("信息上报：-"+cruiseResult);
-                            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+//                            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                         }
                     }
                     //机器人维
@@ -762,7 +762,7 @@ public class RunAtNowTask implements Runnable{
                             Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                             cruiseResult.put("list",list);
                             log.info("信息上报：-"+cruiseResult);
-                            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+//                            Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                         }
 
 
@@ -955,7 +955,7 @@ public class RunAtNowTask implements Runnable{
                                     Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
                                     cruiseResult.put("list",list);
                                     log.info("信息上报：-"+cruiseResult);
-                                    Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+//                                    Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
                                 }catch (Exception e){
                                     log.error(e.getMessage(), e);
                                 }
@@ -1236,7 +1236,7 @@ public class RunAtNowTask implements Runnable{
         Result re = null;
         try{
             log.info("信息上报：-"+map);
-            re = Constant.otherServer(map,Constant.TCP_URL);//江苏要求
+//            re = Constant.otherServer(map,Constant.TCP_URL);//江苏要求
         }catch (Exception e){
             log.info("上报出错"+e.getMessage());
         }
