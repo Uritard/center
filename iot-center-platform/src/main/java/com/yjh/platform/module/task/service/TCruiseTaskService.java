@@ -225,11 +225,16 @@ public class TCruiseTaskService {
         /*
          * 新版的机器人任务下发
          * */
-//        List<Long> instanceIdList = tCruisePlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());//所有点
-        List<TCruisePointInstanceNameDetail> instancesList = tCruisePointInstanceDao.selectForTask(instanceList);//巡检点
+        // 所有点
+//        List<Long> instanceIdList = tCruisePlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());
+        // 巡检点
+        List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(instanceList);
 
-        //找出机器人做任务的巡检点
-        List<Long> robotCruiseList = new ArrayList<>();
+        // 找出机器人和无人机做任务的巡检点
+        String res = taskToRobot(tCruiseTask, tCruiseTaskAdd, format, detailList);
+        if (StringUtils.isNotEmpty(res)) { return res; }
+
+        /*List<Long> robotCruiseList = new ArrayList<>();
         List<Long> robotInstanceList = new ArrayList<>();
         for (TCruisePointInstance item : instancesList) {
             if (228 == item.getCruiseType()) {
@@ -376,7 +381,7 @@ public class TCruiseTaskService {
                     log.info("让机器人做任务 result {}", result);
                 }
             }
-        }
+        }*/
 
         this.tCruiseTaskDao.insert(tCruiseTask);
         this.tCruiseTaskAttrDao.batchInsert(tCruiseTaskAttrList);
@@ -437,6 +442,136 @@ public class TCruiseTaskService {
 
         return tCruiseTask.getTaskId();
     }
+
+    /**
+     * 找出机器人和无人机的点让其做任务
+     *
+     * @param tCruiseTask 任务信息
+     * @param tCruiseTaskAdd 任务关联信息
+     * @param format 时间格式
+     * @param detailList 区域巡视主机上的巡视点信息
+     * @return String
+     */
+    private String taskToRobot(TCruiseTask tCruiseTask, TCruiseTaskAdd tCruiseTaskAdd,  DateFormat format, List<TCruisePointInstanceNameDetail> detailList){
+        try {
+            // 找出机器人和无人机做任务的巡检点
+            List<Long> robotCruiseList = new ArrayList<>();
+            List<Long> robotInstanceList = new ArrayList<>();
+            for (TCruisePointInstanceNameDetail item : detailList) {
+                if ((228 == item.getCruiseType() || 524 == item.getCruiseType())) {
+                    robotCruiseList.add(item.getCruiseId());
+                    robotInstanceList.add(item.getInstanceId());
+                }
+            }
+            log.info("robotCruiseList : {}", robotCruiseList);
+
+            if (robotCruiseList.isEmpty()){
+                log.info("There are no instanceId for robot or drone to do！！！");
+                return "";
+            }
+
+            List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
+            log.info("robotCode : {}", robotCode);
+            List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+
+            for (String item : robotCode) {
+                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
+                Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
+                String robotTaskStatus = robotTaskStatusMap.get("value");
+                String robotPattern = robotStatusMap.get("value");
+                if ("1".equals(robotTaskStatus) && "5".equals(robotPattern)) {
+                    return "机器人" + robotCode + "正在执行操作任务,无法下发巡检任务！";
+                }
+                RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
+                robotTaskInfo.setCruiseType(tCruiseTask.getType());
+                robotTaskInfo.setTaskId(tCruiseTask.getTaskId());
+                robotTaskInfo.setPlanCode(tCruiseTask.getPlanCode());
+                // 从巡视主机下发至机器人的任务等级都暂定3级
+                robotTaskInfo.setPriority(3);
+                robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
+                List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
+                robotTaskInfo.setInstanceList(robotTaskInstanceList);
+                String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
+                robotTaskInfo.setIfRun(ifFun);
+                robotTaskInfo.setRobotCode(item);
+                robotTaskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
+                robotTaskInfo.setIsOcr(tCruiseTaskAdd.getIsOcr());
+
+                // 根据任务信息及协议组装任务信息
+                packageTaskProtocolInfo(tCruiseTaskAdd, format, robotTaskInfo, ifFun);
+
+                robotTaskInfoList.add(robotTaskInfo);
+            }
+
+            Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+            robotTaskInfoMap.put("robotTaskInfoList", robotTaskInfoList);
+            log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
+
+            // 调用robot服务下发任务
+            Result result = robotTask(robotTaskInfoMap);
+
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+        return "";
+    }
+
+    /**
+     * 根据任务信息及协议组装任务信息
+     *
+     * @param tCruiseTaskAdd 任务关联信息
+     * @param format 时间格式
+     * @param taskInfo 任务信息
+     * @param ifFun 任务执行类型
+     */
+    private void packageTaskProtocolInfo(TCruiseTaskAdd tCruiseTaskAdd, DateFormat format, RobotTaskInstanceInfo taskInfo, String ifFun) {
+        try {
+            switch (ifFun) {
+                //立即任务
+                case "173":
+                    taskInfo.setFixedStartTime(format.format(new Date()));
+                    break;
+                //定时任务
+                case "174":
+                    taskInfo.setFixedStartTime(format.format(tCruiseTaskAdd.getStartTime()));
+                    break;
+                // 周期和间隔任务
+                case "172":
+                    taskInfo.setFixedStartTime("");
+                    taskInfo.setCycleMonth(Optional.of(tCruiseTaskAdd.getCycleMonth()).orElse(""));
+                    taskInfo.setCycleWeek(Optional.of(tCruiseTaskAdd.getCycleWeek()).orElse(""));
+                    String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
+
+                    if (StringUtils.isNotEmpty(cycleExecuteTime)){
+                        if (Integer.parseInt(tCruiseTaskAdd.getCycleExecuteTime()) < 10) {
+                            cycleExecuteTime = "0" + tCruiseTaskAdd.getCycleExecuteTime() + ":00:00";
+                        } else {
+                            cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime() + ":00:00";
+                        }
+                    }
+                    taskInfo.setCycleExecuteTime(cycleExecuteTime);
+
+                    taskInfo.setIntervalType(Optional.of(tCruiseTaskAdd.getIntervalType()).orElse(""));
+                    taskInfo.setIntervalNumber(Optional.of(tCruiseTaskAdd.getIntervalNumber()).orElse(""));
+
+                    String intervalExecuteTime = tCruiseTaskAdd.getIntervalExecuteTime();
+                    intervalExecuteTime = StringUtils.isNotEmpty(intervalExecuteTime) ? intervalExecuteTime.substring(11) : intervalExecuteTime;
+                    taskInfo.setIntervalExecuteTime(intervalExecuteTime);
+
+                    boolean isInterval = StringUtils.isEmpty(tCruiseTaskAdd.getIntervalType());
+                    taskInfo.setCycleStartTime(isInterval ? format.format(new Date()) : "");
+                    taskInfo.setCycleEndTime(isInterval ? tCruiseTaskAdd.getEndTime() : "");
+                    taskInfo.setIntervalStartTime(isInterval ? "" : format.format(new Date()));
+                    taskInfo.setIntervalEndTime(isInterval ? "" : tCruiseTaskAdd.getEndTime());
+                    break;
+                default:
+                    break;
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+    }
+
     public Result robotTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);

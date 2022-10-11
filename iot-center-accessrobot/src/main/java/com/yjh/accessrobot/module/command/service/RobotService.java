@@ -894,13 +894,13 @@ public class RobotService {
     private boolean checkRobotStatus(RobotTaskInstanceInfo item) throws InterruptedException {
         String robotOnlineStatus = tRobotInfoDao.selectStatusByRobotCode(item.getRobotCode());
         if (OFF_LINE.equals(robotOnlineStatus)){
-            log.info("==========该机器人处于离线状态,没有成功将任务下发到机器人,巡视结果数据默认==========");
+            log.info("=========="+ item.getRobotCode() +"该机器人处于离线状态,没有成功将任务下发到机器人,巡视结果数据默认==========");
             return false;
         }else{
             Map<String,String> mapForRobotState = redisTemplate.opsForHash().entries("RobotStatus:" + item.getRobotCode() + ":41");
             String robotStatus = mapForRobotState.get("value");
             if ("4".equals(robotStatus)){
-                log.info("==========该机器人处于检修状态,没有成功将任务下发到机器,巡视结果数据默认==========");
+                log.info("=========="+ item.getRobotCode() +"该机器人处于检修状态,没有成功将任务下发到机器,巡视结果数据默认==========");
                 return false;
             }else {
                 // 控制权获得
@@ -1140,10 +1140,6 @@ public class RobotService {
                     String code = flag ? "1".equals(commandValue) ? taskId : tasSkPatrolledId : taskId;
                     log.info("taskId=={},robotTaskId=={},tasSkPatrolledId=={},code=={}", taskId, robotTaskId, tasSkPatrolledId, code);
                     if (Objects.nonNull(code)) {
-    //                    List<Map<String, Object>> itemList = new ArrayList<>();
-    //                    Map<String, Object> itemMap = new HashMap<>(1);
-    //                    itemMap.put("task_patrolled_id", taskPatrolledId);
-    //                    itemList.add(itemMap);
                         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                                 .setType("41")
                                 .setSendCode(sendCode)
@@ -1151,7 +1147,6 @@ public class RobotService {
                                 .setCode(code)
                                 .setCommand(commandValue)
                                 .setTime(DateTimeUtil.format(new Date()));
-    //                            .setItems(itemList);
                         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
                         log.info("生成的任务控制xml是<start>{}<end>", xmlString);
 
@@ -1160,7 +1155,7 @@ public class RobotService {
                         if (Objects.equals("2", commandValue) || Objects.equals("4", commandValue)) {
                             modifyTaskResult(code, Integer.valueOf(commandValue));
                         }
-                        result.setMessage(200, "该机器人处于离线状态,没有成功将任务控制下发到机器人......");
+//                        result.setMessage(200, "该机器人处于离线状态,没有成功将任务控制下发到机器人......");
                     }else {
                         log.info("机器人未上报任务状态信息,无法获取当前巡视任务id");
                     }
@@ -1337,7 +1332,6 @@ public class RobotService {
         // 将已经做过的巡视点Map清空
         if (CollectionUtils.isNotEmpty(Constant.flagMap.get(taskId))){
             log.info("将公共类的instanceIdList清空");
-//            Constant.flagMap = new HashMap<>(16);
             Constant.flagMap.remove(taskId);
         }
 

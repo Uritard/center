@@ -114,4 +114,22 @@ public class TCruiseTaskAdd implements Serializable {
     @ApiModelProperty(value = "是否为联动任务（1-是0否）")
     private String unionTaskStatus;
 
+    @ApiModelProperty(value = "周期（月） ")
+    private String cycleMonth;
+
+    @ApiModelProperty(value = "周期（周） ")
+    private String cycleWeek;
+
+    @ApiModelProperty(value = "周期（执行时间） ")
+    private String cycleExecuteTime;
+
+    @ApiModelProperty(value = "间隔（数量） ")
+    private String intervalNumber;
+
+    @ApiModelProperty(value = "间隔（类型） ")
+    private String intervalType;
+
+    @ApiModelProperty(value = "间隔（执行时间） ")
+    private String intervalExecuteTime;
+
 }

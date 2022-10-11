@@ -15,6 +15,7 @@ import com.yjh.platform.module.task.service.TCruiseTaskAttrService;
 import com.yjh.platform.module.task.service.TCruiseTaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,15 +68,46 @@ public class TCruiseTaskController {
                     cronExpressionDate = tPeriodModel.getCronExpression();
                 } else {
                     // 秒  分  时  天  月  星期  年
-                    Map<String, String> mapTime = new HashMap<>();
-                    if (Objects.isNull(tCruiseTaskAdd.getMin())) {mapTime.put("min", "");} else {mapTime.put("min", tCruiseTaskAdd.getMin());}
-                    if (Objects.isNull(tCruiseTaskAdd.getHour())) {mapTime.put("hour", "");} else {mapTime.put("hour", tCruiseTaskAdd.getHour());}
-                    if (Objects.isNull(tCruiseTaskAdd.getDayOfMonth())) {mapTime.put("dayOfMonth", "");} else {mapTime.put("dayOfMonth", tCruiseTaskAdd.getDayOfMonth());}
-                    if (Objects.isNull(tCruiseTaskAdd.getMonth())) {mapTime.put("month", "");} else {mapTime.put("month", tCruiseTaskAdd.getMonth());}
-                    if (Objects.isNull(tCruiseTaskAdd.getDayOfWeek())) {mapTime.put("dayOfWeek", "");} else {mapTime.put("dayOfWeek", tCruiseTaskAdd.getDayOfWeek());}
-                    if (Objects.isNull(tCruiseTaskAdd.getYear())) {mapTime.put("year", "");} else {mapTime.put("year", tCruiseTaskAdd.getYear());}
-                    cronExpressionDate = DateTimeUtil.createCronExpression(mapTime);
-                    System.out.println("cronExpressionDate: "+cronExpressionDate);
+//                    Map<String, String> mapTime = new HashMap<>();
+//                    if (Objects.isNull(tCruiseTaskAdd.getMin())) {mapTime.put("min", "");} else {mapTime.put("min", tCruiseTaskAdd.getMin());}
+//                    if (Objects.isNull(tCruiseTaskAdd.getHour())) {mapTime.put("hour", "");} else {mapTime.put("hour", tCruiseTaskAdd.getHour());}
+//                    if (Objects.isNull(tCruiseTaskAdd.getDayOfMonth())) {mapTime.put("dayOfMonth", "");} else {mapTime.put("dayOfMonth", tCruiseTaskAdd.getDayOfMonth());}
+//                    if (Objects.isNull(tCruiseTaskAdd.getMonth())) {mapTime.put("month", "");} else {mapTime.put("month", tCruiseTaskAdd.getMonth());}
+//                    if (Objects.isNull(tCruiseTaskAdd.getDayOfWeek())) {mapTime.put("dayOfWeek", "");} else {mapTime.put("dayOfWeek", tCruiseTaskAdd.getDayOfWeek());}
+//                    if (Objects.isNull(tCruiseTaskAdd.getYear())) {mapTime.put("year", "");} else {mapTime.put("year", tCruiseTaskAdd.getYear());}
+//                    cronExpressionDate = DateTimeUtil.createCronExpression(mapTime);
+//                    System.out.println("cronExpressionDate: "+cronExpressionDate);
+
+                    String cycleMonth = tCruiseTaskAdd.getCycleMonth();
+                    String cycleWeek = tCruiseTaskAdd.getCycleWeek();
+                    String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
+
+                    String intervalNumber = tCruiseTaskAdd.getIntervalNumber();
+                    String intervalExecuteTime = tCruiseTaskAdd.getIntervalExecuteTime();
+                    String intervalType = tCruiseTaskAdd.getIntervalType();
+
+                    cycleMonth = StringUtils.equals("1,2,3,4,5,6,7,8,9,10,11,12", cycleMonth) ? "*" : cycleMonth;
+                    cycleWeek = StringUtils.equals("2,3,4,5,6,7,1", cycleWeek) ? "*" : cycleWeek;
+                    // 周期
+                    if (StringUtils.isNotEmpty(cycleMonth) && StringUtils.isNotEmpty(cycleWeek) && StringUtils.isNotEmpty(cycleExecuteTime)){
+                        cronExpressionDate = String.format("0 %s %s ? %s %s", 0, cycleExecuteTime, cycleMonth, cycleWeek);
+                    }
+                    // 间隔
+                    if (StringUtils.isNotEmpty(intervalType) && StringUtils.isNotEmpty(intervalNumber) && StringUtils.isNotEmpty(intervalExecuteTime)){
+                        String hour = intervalExecuteTime.substring(11,13).startsWith("0") ? intervalExecuteTime.substring(12,13) : intervalExecuteTime.substring(11,13);
+                        String min = intervalExecuteTime.substring(14,16).startsWith("0") ? intervalExecuteTime.substring(14,15) : intervalExecuteTime.substring(14,16);
+                        String second = intervalExecuteTime.substring(17,19).startsWith("0") ? intervalExecuteTime.substring(18,19) : intervalExecuteTime.substring(17,19);
+
+                        // 天: 秒 分 时 */日 * ?
+                        if (StringUtils.equals("2", intervalType)){
+                            cronExpressionDate = String.format("%s %s %s */%s * ?", second, min, hour, intervalNumber);
+                        }
+                        // 时: 秒 分 */时 * * ？
+                        else {
+                            cronExpressionDate = String.format("%s %s */%s * * ?", second, min, intervalNumber);
+                        }
+                    }
+                    log.info("cronExpressionDate==================: {}", cronExpressionDate);
                 }
                 if (CronExpression.isValidExpression(cronExpressionDate)) {
                     tCruiseTaskAdd.setDateType(cronExpressionDate);
