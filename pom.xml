@@ -13,10 +13,7 @@
         <module>iot-center-accessvideo</module>
         <module>iot-center-accessudp</module>
         <module>iot-center-accesstcp</module>
-        <module>iot-center-accessatmosphere</module>
-        <module>iot-center-device</module>
         <module>iot-center-platform</module>
-        <module>iot-center-etl</module>
         <module>iot-center-share</module>
         <module>iot-center-manager</module>
         <module>iot-center-gateway</module>
