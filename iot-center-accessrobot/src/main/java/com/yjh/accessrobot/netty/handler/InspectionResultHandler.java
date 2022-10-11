@@ -5,6 +5,8 @@ import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
@@ -62,42 +64,70 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到巡视结果了+++++++++++++++++");
-
         // Deal with robot task result data
         String robotCode = xmlBaseModel.getSendCode();
-//        Map<String, Object> item = xmlBaseModel.getItems().get(0);
+
+        // 给机器人响应
+        String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true,robotCode));
+        byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
+        RobotServerHandler.send(cruiseResultProtocol, robotCode);
+        log.info("巡视主机给机器人{}响应了", robotCode);
+
+        // 巡视结果上报上一级系统
+        resultToUpSystem(xmlBaseModel, robotCode);
+
+        // 处理数据
         for(Map<String, Object> item : xmlBaseModel.getItems()){
             Map<String, String> cruiseResultMap = new HashMap<>(16);
-            // 2022过检 robot_name -> patroldevice_name
-        cruiseResultMap.put("patrolDeviceName", String.valueOf(item.get("patroldevice_name")));
-        cruiseResultMap.put("patrolDeviceCode", String.valueOf(item.get("patroldevice_code")));
-        cruiseResultMap.put("robotCode",robotCode);
-        cruiseResultMap.put("taskName",  String.valueOf(item.get("task_name")));
-        String taskCode = String.valueOf(item.get("task_code"));
-        // 通过机器人上报的任务id查询巡视主机上的任务id
-        String taskId = StaticContextAccessor.getBean(RobotService.class).selectRealTaskId(taskCode);
-        if(StringUtils.isEmpty(taskId)){
-            taskId = taskCode;
-            log.info("taskId is empty, use taskCode as taskId");
+            cruiseResultMap.put("patrolDeviceName", String.valueOf(item.get("patroldevice_name")));
+            cruiseResultMap.put("patrolDeviceCode", String.valueOf(item.get("patroldevice_code")));
+            cruiseResultMap.put("robotCode", robotCode);
+            cruiseResultMap.put("taskName", String.valueOf(item.get("task_name")));
+            String taskCode = String.valueOf(item.get("task_code"));
+            // 通过机器人上报的任务id查询巡视主机上的任务id
+            String taskId = StaticContextAccessor.getBean(RobotService.class).selectRealTaskId(taskCode);
+            if(StringUtils.isEmpty(taskId)){
+                taskId = taskCode;
+                log.info("taskId is empty, use taskCode as taskId");
+            }
+            log.info("taskCode==={},taskId===={}", taskCode, taskId);
+            cruiseResultMap.put("taskCode", taskId);
+            cruiseResultMap.put("deviceName", String.valueOf(item.get("device_name")));
+            cruiseResultMap.put("deviceId", String.valueOf(item.get("device_id")));
+            // 2022过检 新增字段value_type 0:默认值类型 11:局放放电频次 12:局放信号峰值 13:局放信号均值
+            cruiseResultMap.put("valueType", String.valueOf(item.get("value_type")));
+            cruiseResultMap.put("value", String.valueOf(item.get("value")));
+            cruiseResultMap.put("valueUnit", String.valueOf(item.get("value_unit")));
+            cruiseResultMap.put("unit", String.valueOf(item.get("unit")));
+            cruiseResultMap.put("time", String.valueOf(item.get("time")));
+            cruiseResultMap.put("recognitionType", String.valueOf(item.get("recognition_type")));
+            cruiseResultMap.put("fileType", String.valueOf(item.get("file_type")));
+            cruiseResultMap.put("rectangle", String.valueOf(item.get("rectangle")));
+            cruiseResultMap.put("taskPatrolledId", String.valueOf(item.get("task_patrolled_id")));
+            cruiseResultMap.put("filePath", String.valueOf(item.get("file_path")));
+            if (Objects.nonNull(item.get("valid"))) {
+                cruiseResultMap.put("valid", String.valueOf(item.get("valid")));
+            }
+
+            // 是否升级任务流程
+            String isUpgradeTask = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isUpgradeTask", "content"));
+
+            if (StringUtils.equals("true", isUpgradeTask)){
+                // 将任务结果发送至platform处理
+                try {
+                    StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_PROCESS_URL, cruiseResultMap, Result.class);
+                }catch (Exception e){
+                    log.error("调用platform出错：{}", e.getMessage());
+                }
+            }else{
+                // 处理机器人巡视结果
+                processRobotCruiseResult(xmlBaseModel, item, cruiseResultMap);
+            }
         }
-        log.info("taskCode==={},taskId===={}", taskCode, taskId);
-        cruiseResultMap.put("taskCode",  taskId);
-        cruiseResultMap.put("deviceName",  String.valueOf(item.get("device_name")));
-        cruiseResultMap.put("deviceId",  String.valueOf(item.get("device_id")));
-        // 2022过检 新增字段value_type 0:默认值类型 11:局放放电频次 12:局放信号峰值 13:局放信号均值
-        cruiseResultMap.put("valueType",  String.valueOf(item.get("value_type")));
-        cruiseResultMap.put("value",  String.valueOf(item.get("value")));
-        cruiseResultMap.put("valueUnit",  String.valueOf(item.get("value_unit")));
-        cruiseResultMap.put("unit",  String.valueOf(item.get("unit")));
-        cruiseResultMap.put("time",  String.valueOf(item.get("time")));
-        cruiseResultMap.put("recognitionType",  String.valueOf(item.get("recognition_type")));
-        cruiseResultMap.put("fileType",  String.valueOf(item.get("file_type")));
-        cruiseResultMap.put("rectangle",  String.valueOf(item.get("rectangle")));
-        cruiseResultMap.put("taskPatrolledId",  String.valueOf(item.get("task_patrolled_id")));
-        cruiseResultMap.put("filePath",  String.valueOf(item.get("file_path")));
-        if (Objects.nonNull(item.get("valid"))) {
-            cruiseResultMap.put("valid",  String.valueOf(item.get("valid")));
-        }
+//        resultUpToStation(xmlBaseModel,robotCode);
+    }
+
+    private void processRobotCruiseResult(XMLBaseModel xmlBaseModel, Map<String, Object> item, Map<String, String> cruiseResultMap) {
         String ftpFilePath =  String.valueOf(item.get("file_path"));
         robotService.uploadFile(ftpFilePath, ftpFilePath);
 
@@ -121,17 +151,6 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap, redisTemplate, websocketUrl,1);
             TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
         }
-        }
-
-
-        String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true,robotCode));
-        byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
-        RobotServerHandler.send(cruiseResultProtocol, robotCode);
-        log.info("巡视主机给机器人{}响应了", robotCode);
-
-        resultToUpSystem(xmlBaseModel,robotCode);
-
-//        resultUpToStation(xmlBaseModel,robotCode);
     }
 
     /**

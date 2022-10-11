@@ -78,6 +78,8 @@ public class Constant {
 
     public static String SEND_ROBOT_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
+    public static String TASK_PROCESS_URL = "http://iot-center-platform/uPatrolTask/v1/sendXML";
+
     public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
         //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
