@@ -303,7 +303,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
      * @param xmlBaseModel xml格式的内容
      * @param robotCode 机器人唯一标识
      */
-    public void resultUpToStation(XMLBaseModel xmlBaseModel,String robotCode){
+    public void resultUpToStation(XMLBaseModel xmlBaseModel,String robotCode) throws Exception {
         Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("Robot_SPAndIN_Info:" + robotCode + ":" + xmlBaseModel.getCode());
         String instanceId = redisInfoMap.get("instanceId");
         Map<String, String> mapForGet = redisTemplate.opsForHash().entries("t_cruise_task_result:" + xmlBaseModel.getCode() + ":" + instanceId);
@@ -323,6 +323,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         // 国网要求
         robotService.upToCruise(xmlBaseModel);
     }
+
 
     /**
      * 巡视结果上报上级系统
