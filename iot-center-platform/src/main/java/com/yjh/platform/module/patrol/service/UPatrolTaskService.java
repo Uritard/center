@@ -4,7 +4,6 @@
 
 package com.yjh.platform.module.patrol.service;
 
-import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -16,12 +15,9 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.smUtil.Demo;
-import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
-import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
-import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskAttrDao;
@@ -29,14 +25,16 @@ import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
-import com.yjh.platform.module.task.service.RunAtNowTask;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.SysUser;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
+import com.yjh.platform.module.patrol.entity.RobotPatrolTaskStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -48,6 +46,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 /**
  * <功能描述>
  *
@@ -55,16 +57,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2022/10/11
  * @since [产品/模块版本] （可选）
  */
-@Slf4j
 @Service
 public class UPatrolTaskService {
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    private Logger log = LoggerFactory.getLogger(UPatrolTaskService.class);
 
     @Autowired
     private TCruiseTaskDao tCruiseTaskDao;
     @Autowired
     private TCruiseTaskDelDao tCruiseTaskDelDao;
-    @Autowired
-    RedisTemplate redisTemplate;
     @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
     @Autowired
@@ -211,6 +215,61 @@ public class UPatrolTaskService {
             redisTemplate.opsForHash().putAll(str, map);
         }
         return detailList;
+    }
+
+    /**
+     * 处理机器人/无人机巡视结果
+     *
+     * @param resultList 机器人/无人机巡视结果
+     * @return void
+     */
+    public void robotPatrolTaskResult(List<RobotPatrolTaskResult> resultList){
+        for (RobotPatrolTaskResult robotPatrolTaskResult : resultList){
+            // 通过上报的任务id查询巡视主机上的任务id
+            String taskCode = robotPatrolTaskResult.getTaskCode();
+            String taskId = "selectRealTaskByTaskCode(taskCode)";
+            if(StringUtils.isEmpty(taskId)){
+                taskId = taskCode;
+                log.info("taskId is empty, use taskCode as taskId");
+            }
+            log.info("taskCode==={},taskId===={}", taskCode, taskId);
+
+            // 结果文件处理及判断结果是否告警
+            String ftpImageRelative = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content"));
+            String ftpImageAbsolute = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content"));
+            String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
+
+            String filePathTemp = new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + "/" + taskId;
+            String[] nameArray = robotPatrolTaskResult.getFilePath().split("/");
+            String fileName = nameArray[nameArray.length - 1];
+
+            String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
+            String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
+
+            String temporaryFilePath = ftpsFilePath + "/" + robotPatrolTaskResult.getFilePath();
+            log.info("temporaryFilePath==={}",temporaryFilePath);
+
+            String fileType = robotPatrolTaskResult.getFileType();
+            String originFilePath = robotPatrolTaskResult.getOriginFilePath();
+            if (StringUtils.isNotEmpty(originFilePath) && StringUtils.equals("1", fileType)){
+                // 红外原图
+                String[] originNameArray = originFilePath.split("/");
+                String infraredOriginName = originNameArray[originNameArray.length - 1];
+                String temporaryInfraredOriginPath = ftpsFilePath + "/" + originFilePath;
+            }
+
+        }
+        return;
+    }
+
+    /**
+     * 处理机器人/无人机任务状态
+     *
+     * @param statusList 机器人/无人机任务状态
+     * @return void
+     */
+    public void robotPatrolTaskStatus(List<RobotPatrolTaskStatus> statusList){
+        return;
     }
 
     /**

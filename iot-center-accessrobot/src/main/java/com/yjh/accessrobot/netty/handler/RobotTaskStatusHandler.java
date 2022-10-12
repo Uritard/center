@@ -1,9 +1,13 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
@@ -14,6 +18,7 @@ import com.yjh.accessrobot.netty.thread.TaskStatusThread;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,8 +59,10 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         robotService.upToCruise(xmlBaseModel);
 
         // 处理数据
+        List<RobotPatrolTaskStatus> statusList = new ArrayList<>();
         for(Map<String, Object> item : xmlBaseModel.getItems()) {
             Map<String, Object> taskStatusMap = new HashMap<>(16);
+            taskStatusMap.put("robotCode", robotCode);
             taskStatusMap.put("taskPatrolled_id", String.valueOf(item.get("task_patrolled_id")));
             String taskName = String.valueOf(item.get("task_name"));
             taskStatusMap.put("taskName", taskName);
@@ -71,6 +78,10 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
                     String.valueOf(item.get("task_estimated_time")) : "");
             taskStatusMap.put("description", item.containsKey("description") ?
                     String.valueOf(item.get("description")) : "");
+
+            String toJSON = JSONObject.toJSONString(taskStatusMap);
+            RobotPatrolTaskStatus taskStatus = JSONObject.toJavaObject(JSON.parseObject(toJSON), RobotPatrolTaskStatus.class);
+            statusList.add(taskStatus);
 
             // 判断任务是否属于机器人本体任务
             Long robotId = robotService.selectIsRobotTask(taskId);
@@ -124,6 +135,17 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
 
             TaskStatusThread taskStatusThread = new TaskStatusThread(redisTemplate, robotService, taskStatusMap, websocketUrl);
             TaskExecutePool.getInstance().execute(taskStatusThread);
+        }
+
+        // 是否升级任务流程
+        String isUpgradeTask = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isUpgradeTask", "content"));
+        if (StringUtils.equals("true", isUpgradeTask)){
+            // 将任务状态发送至platform处理
+            try {
+                StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_STATUS_PROCESS, statusList, Result.class);
+            }catch (Exception e){
+                log.error("调用platform出错：{}", e.getMessage());
+            }
         }
     }
 

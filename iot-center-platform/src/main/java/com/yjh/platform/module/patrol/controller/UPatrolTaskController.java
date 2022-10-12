@@ -4,7 +4,6 @@
 
 package com.yjh.platform.module.patrol.controller;
 
-import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -14,13 +13,12 @@ import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
-import com.yjh.platform.module.task.entity.TCruisePlanCount;
-import com.yjh.platform.module.task.entity.TCruiseTask;
 import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
 import com.yjh.platform.module.task.entity.TPeriodModel;
+import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
+import com.yjh.platform.module.patrol.entity.RobotPatrolTaskStatus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -29,6 +27,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * <功能描述>
@@ -37,20 +45,54 @@ import java.util.*;
  * @date 2022/10/11
  * @since [产品/模块版本] （可选）
  */
-@Slf4j
 @RestController
 @RequestMapping("/uPatrolTask/v1")
 @Api(value = "/uPatrolTask", tags = {"新的巡检任务接口"})
 public class UPatrolTaskController {
 
+    @Autowired
+    private final UPatrolTaskService uPatrolTaskService;
+
     @Resource
     private RedisTemplate redisTemplate;
     @Autowired
     private TPeriodModelDao tPeriodModelDao;
-    @Autowired
-    private TCruisePlanDao tCruisePlanDao;
-    @Resource
-    private UPatrolTaskService uPatrolTaskService;
+
+    private Logger log = LoggerFactory.getLogger(UPatrolTaskController.class);
+
+    public UPatrolTaskController(UPatrolTaskService uPatrolTaskService) { this.uPatrolTaskService = uPatrolTaskService; }
+
+    @ApiOperation(value = "机器人/无人机巡视结果")
+    @PostMapping(value = "/robotPatrolTaskResult")
+    public Result robotPatrolTaskResult(@RequestBody List<RobotPatrolTaskResult> resultList) {
+        Result result = new Result();
+        try {
+            log.info("The resultList from accessRobot is=={}", resultList);
+            uPatrolTaskService.robotPatrolTaskResult(resultList);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("接收并处理机器人/无人机巡视结果错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "机器人/无人机任务状态")
+    @PostMapping(value = "/robotPatrolTaskStatus")
+    public Result robotPatrolTaskStatus(@RequestBody List<RobotPatrolTaskStatus> statusList) {
+        Result result = new Result();
+        try {
+            log.info("The statusList from accessRobot is=={}", statusList);
+            uPatrolTaskService.robotPatrolTaskStatus(statusList);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("接收并处理机器人/无人机任务状态错误:", e);
+        }
+        return result;
+    }
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
@@ -60,7 +102,6 @@ public class UPatrolTaskController {
         try {
             String userId = request.getHeader("userId");
             tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
-            String userRole = String.valueOf(redisTemplate.opsForHash().entries("userInfo:"+userId).get("roleId"));
             int i = uPatrolTaskService.taskConfirmation(userId,tCruiseTaskAdd.getpCode(),request,tCruiseTaskAdd.getIdentifier());
             if(i == 1){
                 result = this.insert(tCruiseTaskAdd);
@@ -111,7 +152,7 @@ public class UPatrolTaskController {
                 }
             } else {
 
-                if (Objects.nonNull(tCruiseTaskAdd.getTaskId()))uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskId());
+                if (Objects.nonNull(tCruiseTaskAdd.getTaskId())) { uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskId());}
                 if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("",tCruiseTaskAdd.getStartTime())) {
                     uPatrolTask.setStartTime(tCruiseTaskAdd.getStartTime());
                 } else {
@@ -125,7 +166,7 @@ public class UPatrolTaskController {
                     .setAreaId(tCruiseTaskAdd.getAreaId())
                     .setTaskType(tCruiseTaskAdd.getTaskType())
                     .setExecuteType(tCruiseTaskAdd.getIfRun())
-                    .setCreateUserId(tCruiseTaskAdd.getCreateUserId()) //用户
+                    .setCreateUserId(tCruiseTaskAdd.getCreateUserId())
                     .setRobotId(tCruiseTaskAdd.getRobotId());
 
             String res = uPatrolTaskService.insert(uPatrolTask,tCruiseTaskAdd);

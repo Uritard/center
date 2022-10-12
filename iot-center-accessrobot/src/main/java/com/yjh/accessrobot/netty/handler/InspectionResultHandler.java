@@ -1,5 +1,7 @@
 package com.yjh.accessrobot.netty.handler;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
@@ -28,7 +30,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -77,24 +78,16 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         resultToUpSystem(xmlBaseModel, robotCode);
 
         // 处理数据
+        List<RobotPatrolTaskResult> resultList = new ArrayList<>();
         for(Map<String, Object> item : xmlBaseModel.getItems()){
             Map<String, String> cruiseResultMap = new HashMap<>(16);
             cruiseResultMap.put("patrolDeviceName", String.valueOf(item.get("patroldevice_name")));
             cruiseResultMap.put("patrolDeviceCode", String.valueOf(item.get("patroldevice_code")));
             cruiseResultMap.put("robotCode", robotCode);
             cruiseResultMap.put("taskName", String.valueOf(item.get("task_name")));
-            String taskCode = String.valueOf(item.get("task_code"));
-            // 通过机器人上报的任务id查询巡视主机上的任务id
-            String taskId = StaticContextAccessor.getBean(RobotService.class).selectRealTaskId(taskCode);
-            if(StringUtils.isEmpty(taskId)){
-                taskId = taskCode;
-                log.info("taskId is empty, use taskCode as taskId");
-            }
-            log.info("taskCode==={},taskId===={}", taskCode, taskId);
-            cruiseResultMap.put("taskCode", taskId);
+            cruiseResultMap.put("taskCode", String.valueOf(item.get("task_code")));
             cruiseResultMap.put("deviceName", String.valueOf(item.get("device_name")));
             cruiseResultMap.put("deviceId", String.valueOf(item.get("device_id")));
-            // 2022过检 新增字段value_type 0:默认值类型 11:局放放电频次 12:局放信号峰值 13:局放信号均值
             cruiseResultMap.put("valueType", String.valueOf(item.get("value_type")));
             cruiseResultMap.put("value", String.valueOf(item.get("value")));
             cruiseResultMap.put("valueUnit", String.valueOf(item.get("value_unit")));
@@ -105,26 +98,24 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             cruiseResultMap.put("rectangle", String.valueOf(item.get("rectangle")));
             cruiseResultMap.put("taskPatrolledId", String.valueOf(item.get("task_patrolled_id")));
             cruiseResultMap.put("filePath", String.valueOf(item.get("file_path")));
-            if (Objects.nonNull(item.get("valid"))) {
-                cruiseResultMap.put("valid", String.valueOf(item.get("valid")));
-            }
+            cruiseResultMap.put("valid", Objects.nonNull(item.get("valid")) ?
+                    String.valueOf(item.get("valid")) : "");
+            cruiseResultMap.put("originFilePath", Objects.nonNull(item.get("origin_file_path")) ?
+                    String.valueOf(item.get("origin_file_path")) : "");
+            cruiseResultMap.put("originFileResultPath", Objects.nonNull(item.get("origin_file_result_path")) ?
+                    String.valueOf(item.get("origin_file_result_path")) : "");
 
-            // 是否升级任务流程
-            String isUpgradeTask = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isUpgradeTask", "content"));
-
-            if (StringUtils.equals("true", isUpgradeTask)){
-                // 将任务结果发送至platform处理
-                try {
-                    StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_PROCESS_URL, cruiseResultMap, Result.class);
-                }catch (Exception e){
-                    log.error("调用platform出错：{}", e.getMessage());
-                }
-            }else{
-                // 处理机器人巡视结果
-                processRobotCruiseResult(xmlBaseModel, item, cruiseResultMap);
-            }
+            String toJSON = JSONObject.toJSONString(cruiseResultMap);
+            RobotPatrolTaskResult taskResult = JSONObject.toJavaObject(JSON.parseObject(toJSON), RobotPatrolTaskResult.class);
+            resultList.add(taskResult);
         }
-//        resultUpToStation(xmlBaseModel,robotCode);
+        log.info("resultList=={}", resultList);
+
+        try {
+            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_RESULT_PROCESS, resultList, Result.class);
+        }catch (Exception e){
+            log.error("调用platform出错：{}", e.getMessage());
+        }
     }
 
     private void processRobotCruiseResult(XMLBaseModel xmlBaseModel, Map<String, Object> item, Map<String, String> cruiseResultMap) {
