@@ -4,6 +4,13 @@
 
 package com.yjh.platform.module.patrol.dao;
 
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
+
 /**
  * <功能描述>
  *
@@ -11,5 +18,30 @@ package com.yjh.platform.module.patrol.dao;
  * @date 2022/10/11
  * @since [产品/模块版本] （可选）
  */
+@Repository
 public interface UPatrolTaskDao {
+
+    int add(UPatrolTask uPatrolTask);
+    int deleteByPrimaryId(@Param(value = "taskId") String taskId);
+    int update(UPatrolTask uPatrolTask);
+    UPatrolTask selectByPrimaryId(@Param(value = "taskId") String taskId);
+    List<UPatrolTask> select(@Param(value = "taskId") String taskId,
+                             @Param(value = "taskCode") String taskCode,
+                             @Param(value = "taskName") String taskName,
+                             @Param(value = "planId") Long planId,
+                             @Param(value = "areaId") String areaId,
+                             @Param(value = "taskType") Integer taskType,
+                             @Param(value = "executeType") Integer executeType,
+                             @Param(value = "robotId") Long robotId,
+                             @Param(value = "dateType") String dateType,
+                             @Param(value = "taskSource") Integer taskSource,
+                             @Param(value = "taskLevel") Integer taskLevel,
+                             @Param(value = "startTime") Date startTime,
+                             @Param(value = "createTime") Date createTime,
+                             @Param(value = "endTime") Date endTime,
+                             @Param(value = "createUserId") Long createUserId);
+    List<UPatrolTask> selectByPage(UPatrolTask uPatrolTask);
+
+    int batchAdd(List<UPatrolTask> list);
+    int batchDelete(List<String> list);
 }

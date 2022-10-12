@@ -95,4 +95,10 @@ public class TCruisePointInstanceAttr implements Serializable {
 
     @ApiModelProperty(value = "属性值")
     private String attrValue;
+
+    private String deviceName;
+
+    private Long robotId;
+
+    private String deviceMeteName;
 }

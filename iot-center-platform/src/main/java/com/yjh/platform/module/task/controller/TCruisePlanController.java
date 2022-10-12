@@ -1,6 +1,8 @@
 package com.yjh.platform.module.task.controller;
 
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
+import com.yjh.platform.module.patrol.service.UPatrolPlanAttrService;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruisePlanAttrService;
 import com.yjh.platform.module.task.service.TCruisePlanService;
@@ -34,6 +36,8 @@ public class TCruisePlanController {
     private final TCruisePlanService tCruisePlanService;
     @Autowired
     private TCruisePlanAttrService tCruisePlanAttrService;
+    @Autowired
+    private UPatrolPlanAttrService uPatrolPlanAttrService;
 
     private Logger log = LoggerFactory.getLogger(TCruisePlanController.class);
 
@@ -47,7 +51,8 @@ public class TCruisePlanController {
     public Result insert(@RequestBody Map<String, Object> map) {
         Result result = new Result();
         try {
-            result.setData(tCruisePlanService.insert(map));
+//            result.setData(tCruisePlanService.insert(map));
+            result.setData(uPatrolPlanAttrService.insert(map));
             if(result.getData().equals(ResultCodeEnum.CODE10010.getCode())){
                 result.setCode(ResultCodeEnum.CODE10010.getCode(),ResultCodeEnum.CODE10010.getName());
             }
