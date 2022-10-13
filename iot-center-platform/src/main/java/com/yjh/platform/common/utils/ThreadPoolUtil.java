@@ -4,8 +4,8 @@
 
 package com.yjh.platform.common.utils;
 
-import com.sun.istack.internal.NotNull;
 import com.yjh.platform.configuration.ThreadPoolConfig;
+import org.springframework.lang.NonNull;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -124,7 +124,7 @@ public enum ThreadPoolUtil {
         }
 
         @Override
-        public Thread newThread(@NotNull Runnable r) {
+        public Thread newThread(@NonNull Runnable r) {
             int c = count.incrementAndGet();
             Thread t = new Thread(r);
             t.setName(namePrefix + "-" + c);

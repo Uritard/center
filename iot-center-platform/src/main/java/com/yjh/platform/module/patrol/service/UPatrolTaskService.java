@@ -35,8 +35,10 @@ import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.threadpool.TaskExecutePool;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +106,6 @@ public class UPatrolTaskService {
     private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
 
     private static final byte[] LOCK_FLAG = new byte[0];
-
 
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -835,12 +836,26 @@ public class UPatrolTaskService {
         }
 
         List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
-            tasKeys.stream().filter(String::isEmpty).forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+            tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
             return null;
         });
 
         taskInfoList.forEach(m -> {
-            // String cameraId =
+            String cruiseType = MapUtils.getString(m, "cruiseType");
+            switch (cruiseType){
+                case "229": // 视频
+                case "230": // 红外
+
+                    break;
+                case "232": // 声纹
+
+                    break;
+                case "228": // 机器人
+                case "524": // 无人机
+                case "231": // 在线监控
+                default:
+                    break;
+            }
         });
 
     }

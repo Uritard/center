@@ -9,6 +9,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -213,15 +214,10 @@ public class TCameraInfoService {
         return tCameraInfoDao.selectByCameraName(cameraName);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public List<TCameraInfoByDict> select(Long cameraId, String cameraName, Integer cameraModel,String pmsId,String aliasName, String recordId,
-                                          Long upRegionId, Integer channelNum, Integer cameraNum,Integer smsId, Integer rmsId,String monitorId,
-                                          Integer vendorId, Integer streamType, Integer protocolType, String cameraIp,
-                                          String url, Integer port,Integer infreadPort,String cameraManager,String cameraCode, Integer cameraType, Integer isControl, String latitude,
-                                          String longitude, String address,String unit) {
-        return tCameraInfoDao.select(cameraId, cameraName, cameraModel,pmsId,aliasName,
-                recordId, upRegionId, channelNum,cameraNum, smsId, rmsId, monitorId,vendorId, streamType, protocolType, cameraIp, url,
-                port, infreadPort,cameraManager,cameraCode,cameraType,isControl,latitude, longitude, address, unit);
+    public List<TCameraInfo> select(Long cameraId, String cameraName, Integer cameraModel, String pmsId, String aliasName, String recordId,
+        Long upRegionId, Integer streamType, Integer protocolType, String cameraIp, String url, Integer cameraType, Integer isControl) {
+        return tCameraInfoDao.select(cameraId, cameraName, cameraModel, pmsId, aliasName, recordId, upRegionId, streamType, protocolType,
+            cameraIp, url, cameraType, isControl);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -436,22 +432,21 @@ public class TCameraInfoService {
         return tCameraInfoDao.selectCameraByRecord(recordId);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public int intoRedis() {
-        List<Long> list =tCameraInfoDao.selectCameraAll();
-        for (Long item:list) {
-            String str = "camera_info:"+item;
-            Map<String,String> map = redisTemplate.opsForHash().entries(str);
-            if(map != null && map.size()>0){
-                continue;
-            }else {
-                map = new HashMap<>();
+        List<TCameraInfo> list = tCameraInfoDao.select(null, null, null, null, null, null, null, null, null, null, null, null, null);
+        for (TCameraInfo item : list) {
+            Long cameraId = item.getCameraId();
+            String str = "camera_info:" + cameraId;
+            Map<String, String> map = redisTemplate.opsForHash().entries(str);
+            if (MapUtils.isEmpty(map)) {
+                map = new HashMap<>(8);
+                map.put("state", "0");
             }
-            map.put("cameraId",item.toString());
-            map.put("state","0");
+            map.put("cameraId", String.valueOf(cameraId));
+            map.put("cameraIp", item.getCameraIp());
             redisTemplate.opsForHash().putAll(str, map);
         }
-       return 1;
+        return 1;
     }
 
 
