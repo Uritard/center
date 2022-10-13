@@ -4,13 +4,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.audiodevice.impl.AudioDeviceFactory;
-import com.yjh.platform.audiodevice.impl.standard.StandardAudioDevice;
-import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.tradio.NET_TRADIO_DEVICEINFO;
-import com.yjh.platform.common.tradio.RecordVoiceFileTestThread;
-import com.yjh.platform.common.tradio.TradioLibrary;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -25,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ws.schild.jave.MultimediaInfo;
@@ -34,11 +27,9 @@ import ws.schild.jave.MultimediaObject;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.nio.LongBuffer;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 
 /**
@@ -215,97 +206,6 @@ public class TVoiceDeviceService{
         return 1;
     }
 
-    private static TradioLibrary sdk_= TradioLibrary.INSTANCE;
-
-    @Transactional(rollbackFor = Exception.class)
-    public Result startRecord(Long voiceDeviceId) {
-        Result result = new Result();
-        VoiceDeviceAllInfo voiceDeviceAllInfo = tVoiceDeviceDao.selectById(voiceDeviceId);
-
-        long hdForData = 0l;
-        if (Objects.isNull(Constant.voiceMap.get(voiceDeviceId))) {
-            if (sdk_.NET_TRADIO_Init() != 0) {
-                log.info("SDK初始化失败");
-                Constant.isThreadStart = false;
-                Map<String, Object> openStateMap = new HashMap<String, Object>();
-                openStateMap.put("openState", "关闭");
-                openStateMap.put("voiceDeviceId", String.valueOf(voiceDeviceId));
-                String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
-                redisTemplate.opsForHash().putAll(recordKey, openStateMap);
-                result.setMessage("开启失败！");
-                result.setData("fail");
-            }
-
-            LongBuffer hd = LongBuffer.allocate(1);
-            if(sdk_.NET_TRADIO_CreateDevice(hd) != 0) {
-                log.info("创建设备失败");
-                Constant.isThreadStart = false;
-                Map<String, Object> openStateMap = new HashMap<String, Object>();
-                openStateMap.put("openState", "关闭");
-                openStateMap.put("voiceDeviceId", String.valueOf(voiceDeviceId));
-                String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
-                redisTemplate.opsForHash().putAll(recordKey, openStateMap);
-                result.setMessage("开启失败！");
-                result.setData("fail");
-            }
-            hdForData = hd.get();
-
-            NET_TRADIO_DEVICEINFO dev = new NET_TRADIO_DEVICEINFO();
-            int logId = sdk_.NET_TRADIO_Login(hdForData, voiceDeviceAllInfo.getFtpUrl(), voiceDeviceAllInfo.getPort(), voiceDeviceAllInfo.getOwner(),
-                    voiceDeviceAllInfo.getOwnerCode(), dev);
-            if (logId != 0) {
-                log.info("注册失败");
-                VoiceDeviceAllInfoDetail tVoiceDevice = selectByPrimaryId(voiceDeviceId);
-                tVoiceDevice.setState("离线");
-                update(tVoiceDevice);
-                Constant.isThreadStart = false;
-                Map<String, Object> openStateMap = new HashMap<String, Object>();
-                openStateMap.put("openState", "关闭");
-                openStateMap.put("voiceDeviceId", String.valueOf(voiceDeviceId));
-                String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
-                redisTemplate.opsForHash().putAll(recordKey, openStateMap);
-                result.setMessage("开启失败！");
-                result.setData("fail");
-            } else {
-                Constant.voiceMap.put(voiceDeviceId, hdForData);
-                VoiceDeviceAllInfoDetail tVoiceDevice = selectByPrimaryId(voiceDeviceId);
-                tVoiceDevice.setState("在线");
-                update(tVoiceDevice);
-                Constant.isThreadStart = true;
-                Map<String, Object> openStateMap = new HashMap<String, Object>();
-                openStateMap.put("openState", "开启");
-                openStateMap.put("voiceDeviceId", String.valueOf(voiceDeviceId));
-                String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
-                redisTemplate.opsForHash().putAll(recordKey, openStateMap);
-                RecordVoiceFileTestThread recordVoiceFileTestThread = new RecordVoiceFileTestThread(redisTemplate, voiceDeviceId, hdForData);
-                Thread thread = new Thread(recordVoiceFileTestThread);
-                thread.setDaemon(true);
-                thread.start();
-                result.setMessage("开启成功！");
-                result.setData("ok");
-            }
-        } else { result.setMessage("已开启");}
-        return result;
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public Result stopRecord(Long voiceDeviceId) {
-        Result result = new Result();
-        Constant.isThreadStart = false;
-        if (Objects.nonNull(Constant.voiceMap.get(voiceDeviceId))) {
-            long hdForData = (long) Constant.voiceMap.get(voiceDeviceId);
-            if (sdk_.NET_TRADIO_Logout(hdForData) == 0) { log.info("设备注销成功"); } else { log.info("设备注销失败"); }
-            sdk_.NET_TRADIO_Clear();
-            Constant.voiceMap.remove(voiceDeviceId);
-        }
-        Map<String, Object> openStateMap = new HashMap<String, Object>();
-        openStateMap.put("openState", "关闭");
-        openStateMap.put("voiceDeviceId", String.valueOf(voiceDeviceId));
-        String recordKey = "is_record_open_state:"+String.valueOf(voiceDeviceId);
-        redisTemplate.opsForHash().putAll(recordKey, openStateMap);
-        return result;
-    }
-
     @Transactional(rollbackFor = Exception.class)
     public List<VoiceDevice> selectVoiceDeviceTree(String voiceDeviceName, Long userId) {
 //        List<VoiceDevice> re = new ArrayList<>();
@@ -447,6 +347,7 @@ public class TVoiceDeviceService{
         if (list != null && list.size() > 0) {
 
             Collections.sort(list, new Comparator<File>() {
+                @Override
                 public int compare(File file, File newFile) {
                     if (file.lastModified() < newFile.lastModified()) {
                         return 1;
@@ -471,6 +372,7 @@ public class TVoiceDeviceService{
         if (list != null && list.size() > 0) {
 
             Collections.sort(list, new Comparator<File>() {
+                @Override
                 public int compare(File file, File newFile) {
                     if (file.lastModified() < newFile.lastModified()) {
                         return 1;
