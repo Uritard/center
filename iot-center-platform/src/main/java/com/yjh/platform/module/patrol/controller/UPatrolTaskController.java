@@ -19,6 +19,7 @@ import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskStatus;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,7 +62,9 @@ public class UPatrolTaskController {
 
     private Logger log = LoggerFactory.getLogger(UPatrolTaskController.class);
 
-    public UPatrolTaskController(UPatrolTaskService uPatrolTaskService) { this.uPatrolTaskService = uPatrolTaskService; }
+    public UPatrolTaskController(UPatrolTaskService uPatrolTaskService) {
+        this.uPatrolTaskService = uPatrolTaskService;
+    }
 
     @ApiOperation(value = "机器人/无人机巡视结果")
     @PostMapping(value = "/robotPatrolTaskResult")
@@ -96,16 +100,16 @@ public class UPatrolTaskController {
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    @Logs(title = "新增任务",content = "根据用户传递的参数新增数据",logType = 2, authority = "1235")
+    @Logs(title = "新增任务", content = "根据用户传递的参数新增数据", logType = 2, authority = "1235")
     public Result taskConfirmation(HttpServletRequest request, @RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
         Result result = new Result();
         try {
             String userId = request.getHeader("userId");
             tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
-            int i = uPatrolTaskService.taskConfirmation(userId,tCruiseTaskAdd.getpCode(),request,tCruiseTaskAdd.getIdentifier());
-            if(i == 1){
+            int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd.getpCode(), request, tCruiseTaskAdd.getIdentifier());
+            if (i == 1) {
                 result = this.insert(tCruiseTaskAdd);
-            }else {
+            } else {
                 result.setCode(209);
                 result.setMessage("密码错误");
             }
@@ -132,16 +136,36 @@ public class UPatrolTaskController {
                     TPeriodModel tPeriodModel = tPeriodModelDao.selectByPrimaryId(periodId);
                     cronExpressionDate = tPeriodModel.getCronExpression();
                 } else {
-                    // 秒  分  时  天  月  星期  年
-                    Map<String, String> mapTime = new HashMap<>();
-                    if (Objects.isNull(tCruiseTaskAdd.getMin())) {mapTime.put("min", "");} else {mapTime.put("min", tCruiseTaskAdd.getMin());}
-                    if (Objects.isNull(tCruiseTaskAdd.getHour())) {mapTime.put("hour", "");} else {mapTime.put("hour", tCruiseTaskAdd.getHour());}
-                    if (Objects.isNull(tCruiseTaskAdd.getDayOfMonth())) {mapTime.put("dayOfMonth", "");} else {mapTime.put("dayOfMonth", tCruiseTaskAdd.getDayOfMonth());}
-                    if (Objects.isNull(tCruiseTaskAdd.getMonth())) {mapTime.put("month", "");} else {mapTime.put("month", tCruiseTaskAdd.getMonth());}
-                    if (Objects.isNull(tCruiseTaskAdd.getDayOfWeek())) {mapTime.put("dayOfWeek", "");} else {mapTime.put("dayOfWeek", tCruiseTaskAdd.getDayOfWeek());}
-                    if (Objects.isNull(tCruiseTaskAdd.getYear())) {mapTime.put("year", "");} else {mapTime.put("year", tCruiseTaskAdd.getYear());}
-                    cronExpressionDate = DateTimeUtil.createCronExpression(mapTime);
-                    System.out.println("cronExpressionDate: "+cronExpressionDate);
+                    String cycleMonth = tCruiseTaskAdd.getCycleMonth();
+                    String cycleWeek = tCruiseTaskAdd.getCycleWeek();
+                    String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
+
+                    String intervalNumber = tCruiseTaskAdd.getIntervalNumber();
+                    String intervalExecuteTime = tCruiseTaskAdd.getIntervalExecuteTime();
+                    String intervalType = tCruiseTaskAdd.getIntervalType();
+
+                    cycleMonth = StringUtils.equals("1,2,3,4,5,6,7,8,9,10,11,12", cycleMonth) ? "*" : cycleMonth;
+                    cycleWeek = StringUtils.equals("2,3,4,5,6,7,1", cycleWeek) ? "*" : cycleWeek;
+                    // 周期
+                    if (StringUtils.isNotEmpty(cycleMonth) && StringUtils.isNotEmpty(cycleWeek) && StringUtils.isNotEmpty(cycleExecuteTime)) {
+                        cronExpressionDate = String.format("0 %s %s ? %s %s", 0, cycleExecuteTime, cycleMonth, cycleWeek);
+                    }
+                    // 间隔
+                    if (StringUtils.isNotEmpty(intervalType) && StringUtils.isNotEmpty(intervalNumber) && StringUtils.isNotEmpty(intervalExecuteTime)) {
+                        String hour = intervalExecuteTime.substring(11, 13).startsWith("0") ? intervalExecuteTime.substring(12, 13) : intervalExecuteTime.substring(11, 13);
+                        String min = intervalExecuteTime.substring(14, 16).startsWith("0") ? intervalExecuteTime.substring(14, 15) : intervalExecuteTime.substring(14, 16);
+                        String second = intervalExecuteTime.substring(17, 19).startsWith("0") ? intervalExecuteTime.substring(18, 19) : intervalExecuteTime.substring(17, 19);
+
+                        // 天: 秒 分 时 */日 * ?
+                        if (StringUtils.equals("2", intervalType)) {
+                            cronExpressionDate = String.format("%s %s %s */%s * ?", second, min, hour, intervalNumber);
+                        }
+                        // 时: 秒 分 */时 * * ？
+                        else {
+                            cronExpressionDate = String.format("%s %s */%s * * ?", second, min, intervalNumber);
+                        }
+                    }
+                    log.info("cronExpressionDate==================: {}", cronExpressionDate);
                 }
                 if (CronExpression.isValidExpression(cronExpressionDate)) {
                     tCruiseTaskAdd.setDateType(cronExpressionDate);
@@ -152,8 +176,10 @@ public class UPatrolTaskController {
                 }
             } else {
 
-                if (Objects.nonNull(tCruiseTaskAdd.getTaskId())) { uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskId());}
-                if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("",tCruiseTaskAdd.getStartTime())) {
+                if (Objects.nonNull(tCruiseTaskAdd.getTaskId())) {
+                    uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskId());
+                }
+                if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("", tCruiseTaskAdd.getStartTime())) {
                     uPatrolTask.setStartTime(tCruiseTaskAdd.getStartTime());
                 } else {
 
@@ -169,10 +195,10 @@ public class UPatrolTaskController {
                     .setCreateUserId(tCruiseTaskAdd.getCreateUserId())
                     .setRobotId(tCruiseTaskAdd.getRobotId());
 
-            String res = uPatrolTaskService.insert(uPatrolTask,tCruiseTaskAdd);
-            if ("啥也不是".equals(res)){
-                result.setCode(209,"任务间隔过短,机器人暂不支持");
-            }else {
+            String res = uPatrolTaskService.insert(uPatrolTask, tCruiseTaskAdd);
+            if ("啥也不是".equals(res)) {
+                result.setCode(209, "任务间隔过短,机器人暂不支持");
+            } else {
                 result.setData(res);
             }
         } catch (BusinessException b) {
@@ -186,7 +212,7 @@ public class UPatrolTaskController {
 
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    @Logs(title = "删除巡检任务",content = "根据用户传递的参数删除巡检任务数据",logType = 4)
+    @Logs(title = "删除巡检任务", content = "根据用户传递的参数删除巡检任务数据", logType = 4)
     public Result delete(@RequestParam(value = "taskId", required = true) String taskId,
                          @RequestParam(value = "startTime", required = false) String startTime) {
         Result result = new Result();
@@ -198,6 +224,56 @@ public class UPatrolTaskController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("删除错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "任务启动")
+    @RequestMapping(value = "/taskStart", method = RequestMethod.GET)
+    @Logs(title = "任务启动",content = "任务启动",logType = 29,authority = "1235")
+    public Result taskStart(@RequestParam(value = "taskId") String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(uPatrolTaskService.taskStart(taskId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("任务启动异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务启动错误:", e);
+        }
+        return result;
+    }
+    @ApiOperation(value = "任务暂停")
+    @RequestMapping(value = "/taskPause", method = RequestMethod.GET)
+    @Logs(title = "任务暂停",content = "任务暂停",logType = 11,authority = "1235")
+    public Result taskPause(@RequestParam(value = "taskId") String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(uPatrolTaskService.taskPause(taskId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("任务暂停异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务暂停错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "任务继续")
+    @RequestMapping(value = "/taskGoOn", method = RequestMethod.GET)
+    @Logs(title = "任务恢复",content = "任务恢复",logType = 12,authority = "1235")
+    public Result taskGoOn(@RequestParam(value = "taskId") String taskId) {
+        Result result = new Result();
+        try {
+            result.setData(uPatrolTaskService.taskGoOn(taskId));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("任务继续异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("任务继续错误:", e);
         }
         return result;
     }
