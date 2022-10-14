@@ -642,6 +642,7 @@
         t_device_maintenance a
         WHERE
         a.maintenance_start &lt;= #{time,jdbcType=TIMESTAMP} AND a.maintenance_stop &gt;=#{time,jdbcType=TIMESTAMP}
+        order by a.device_id asc
     </select>
 
     <select id="selectCameraByDeviceMeteId" resultType="java.util.HashMap">

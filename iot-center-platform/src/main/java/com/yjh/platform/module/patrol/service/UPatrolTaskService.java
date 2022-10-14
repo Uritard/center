@@ -13,6 +13,7 @@ import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.Object2Map;
@@ -29,16 +30,17 @@ import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.InspectionResultThread;
 import com.yjh.platform.module.patrol.thread.IsWarnAfterCruiseThread;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
-import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.entity.RobotTaskInstanceInfo;
+import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
+import com.yjh.platform.module.task.entity.TCruiseTaskDel;
+import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.threadpool.TaskExecutePool;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.annotations.Param;
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -840,24 +841,118 @@ public class UPatrolTaskService {
             return null;
         });
 
+        // 查询检修区域
+        List<Long> overhaul = tCruisePointInstanceDao.selectTimeIsIn(new Date());
+        // 不需要执行的点
+        List<Map<String, String>> skipPointList = new ArrayList<>();
+        Map<String, List<Map<String, String>>> cruiseGroupMap = new HashMap<>(32);
+        Map<Long, Integer> robotOfflineMap = new HashMap<>();
+
         taskInfoList.forEach(m -> {
-            String cruiseType = MapUtils.getString(m, "cruiseType");
-            switch (cruiseType){
-                case "229": // 视频
-                case "230": // 红外
+            int cruiseStatus = MapUtils.getIntValue(m, "cruiseStatus", 253);
+            String cruiseResult = MapUtils.getString(m, "cruiseResult");
+            // 已经执行点位
+            if (cruiseStatus != 253 && !CommonUtils.isEmptyOrNullstr(cruiseResult)) {
+                return;
+            }
 
-                    break;
-                case "232": // 声纹
+            // 巡检点类型
+            int cruiseType = MapUtils.getIntValue(m, "cruiseType");
 
+            boolean skipFlag = false;
+            // 设备检修判断
+            if (CollectionUtils.isNotEmpty(overhaul) && Collections.binarySearch(overhaul, MapUtils.getLong(m, "deviceId")) >= 0) {
+                m.put("resultNum", "设备检修中");
+                // 异常原因，设备检修
+                m.put("cruiseAbnormal", "410");
+                skipFlag = true;
+            }
+            // 机器人离线判断
+            if (!skipFlag && 228 == cruiseType) {
+                long robotId = MapUtils.getLongValue(m, "robotId");
+                if (robotOffline(robotOfflineMap, robotId)) {
+                    m.put("resultNum", "机器人离线,未执行");
+                    if (robotOfflineMap.get(robotId) == 4) {
+                        m.put("resultNum", "机器人处于检修状态,未执行");
+                    }
+                    // 异常原因，设备离线
+                    m.put("cruiseAbnormal", "411");
+                }
+            }
+            if (skipFlag) {
+                // 巡视结果，异常
+                m.put("cruiseResult", "247");
+                // 未审核
+                m.put("evaluationState", "257");
+                m.put("isWarn", "0");
+                m.put("picpath", "--");
+                // 巡检数据状态，未执行
+                m.put("cruiseStatus", "253");
+                String dateTime = DateTimeUtil.getDateTimeString();
+                m.put("createtime", dateTime);
+                m.put("endTime", dateTime);
+                m.put("cruiseTime", dateTime);
+                skipPointList.add(m);
+                return;
+            }
+
+            switch (cruiseType) {
+                case 229: // 视频
+                case 230: // 红外
+                    String cameraId = MapUtils.getString(m, "cameraId");
+                    if (StringUtils.isEmpty(cameraId)) {
+                        log.error("task {} cruise data has no cameraId, {}", taskId, JSON.toJSONString(m));
+                    } else {
+                        String cameraIp = (String)redisTemplate.opsForHash().get("camera_info:" + cameraId, "cameraIp");
+                        cruiseGroup(cruiseGroupMap, cameraIp, m);
+                    }
                     break;
-                case "228": // 机器人
-                case "524": // 无人机
-                case "231": // 在线监控
+                case 232: // 声纹
+                    String cruiseId = MapUtils.getString(m, "cruiseId");
+                    if (StringUtils.isEmpty(cruiseId)) {
+                        log.error("task {} cruise data has no cruiseId, {}", taskId, JSON.toJSONString(m));
+                    } else {
+                        cruiseGroup(cruiseGroupMap, cruiseId, m);
+                    }
+                    break;
+                case 228: // 机器人
+                case 524: // 无人机
+                case 231: // 在线监控
                 default:
                     break;
             }
         });
 
+
+    }
+
+    /**
+     * 判断机器人是否离线
+     */
+    public boolean robotOffline(Map<Long, Integer> robotOfflineMap, long robotId) {
+        if (robotId > 0 && !robotOfflineMap.containsKey(robotId)) {
+            TRobotInfo tRobotInfo = tRobotInspectionDao.selectRobot(robotId);
+            if (tRobotInfo != null) {
+                Map<String, String> mapForRobotState =
+                    redisTemplate.opsForHash().entries("RobotStatus:" + tRobotInfo.getRobotCode() + ":41");
+                if ("离线".equals(tRobotInfo.getRobotStatus())) {
+                    // 1 机器人离线
+                    robotOfflineMap.put(robotId, 1);
+                } else if ("4".equals(mapForRobotState.get("value"))) {
+                    // 4 机器人检修
+                    robotOfflineMap.put(robotId, 4);
+                } else {
+                    // 机器人在线
+                    robotOfflineMap.put(robotId, 0);
+                }
+            }
+        }
+        return robotOfflineMap.getOrDefault(robotId, 0) != 0;
+    }
+
+    public void cruiseGroup(Map<String, List<Map<String, String>>> cruiseGroupMap, String key, Map<String, String> m) {
+        List<Map<String, String>> cruiseList = cruiseGroupMap.computeIfAbsent(key, k -> new ArrayList<>());
+        cruiseList.add(m);
     }
 
     /**
