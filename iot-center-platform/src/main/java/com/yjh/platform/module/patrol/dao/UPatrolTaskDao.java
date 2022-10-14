@@ -44,4 +44,11 @@ public interface UPatrolTaskDao {
 
     int batchAdd(List<UPatrolTask> list);
     int batchDelete(List<String> list);
+
+    Integer selectIsAlarmByTask(@Param(value = "taskId") String taskId,
+                                @Param(value = "instanceId") Long instanceId);
+
+    Integer updatePicPath(@Param(value = "taskId") String taskId,
+                          @Param(value = "instanceId") Long instanceId,
+                          @Param(value = "imagePath") String imagePath);
 }

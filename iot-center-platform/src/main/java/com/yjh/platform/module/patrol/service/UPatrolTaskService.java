@@ -23,10 +23,13 @@ import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.thread.InspectionResultThread;
+import com.yjh.platform.module.patrol.thread.IsWarnAfterCruiseThread;
 import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.SysUser;
+import com.yjh.platform.threadpool.TaskExecutePool;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +44,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -89,6 +93,11 @@ public class UPatrolTaskService {
     private UPatrolPlanAttrDao uPatrolPlanAttrDao;
 
 
+    /**
+     * websocket路径
+     */
+    @Value("${other.webSocketUrl}")
+    private String websocketUrl;
     //模板图片路径
     private String picModelPath;
     //等待相机转到预置位时间
@@ -111,6 +120,8 @@ public class UPatrolTaskService {
     private static final String DEFECT_URL = "http://iot-center-accessvideo/analysis/v1/defect";
     private static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
 
+    private static final byte[] LOCK_FLAG = new byte[0];
+
 
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -132,7 +143,7 @@ public class UPatrolTaskService {
         uPatrolTask.setTaskCode(uPatrolTask.getTaskId());
         List<Long> instanceList = insertTaskAttr(uPatrolTask, tCruiseTaskAdd);
 
-        List<TCruisePointInstanceNameDetail> detailList = initializeTaskInfo(instanceList,uPatrolTask);
+        List<TCruisePointInstanceNameDetail> detailList = initializeTaskInfo(instanceList, uPatrolTask);
         // 找出机器人和无人机做任务的巡检点
         String res = taskToRobotOrDrone(uPatrolTask, tCruiseTaskAdd, format, detailList);
         if (StringUtils.isNotEmpty(res)) {
@@ -182,7 +193,6 @@ public class UPatrolTaskService {
         return instanceList;
     }
 
-
     private List<TCruisePointInstanceNameDetail> initializeTaskInfo(List<Long> instanceList, UPatrolTask task) {
         UPatrolResult uPatrolResult = new UPatrolResult();
         uPatrolResult.setTaskId(task.getTaskId())
@@ -210,7 +220,7 @@ public class UPatrolTaskService {
                     .setCruiseName(item.getCruiseName())
                     .setCruiseStatus(253)
                     .setCruiseType(item.getCruiseType());
-            Map map = Object2Map.toStringMap(Object2Map.objectToMap(uPatrolDataResult,true));
+            Map map = Object2Map.toStringMap(Object2Map.objectToMap(uPatrolDataResult, true));
             String str = "t_cruise_task_result:" + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);
         }
@@ -221,45 +231,148 @@ public class UPatrolTaskService {
      * 处理机器人/无人机巡视结果
      *
      * @param resultList 机器人/无人机巡视结果
-     * @return void
      */
-    public void robotPatrolTaskResult(List<RobotPatrolTaskResult> resultList){
-        for (RobotPatrolTaskResult robotPatrolTaskResult : resultList){
+    public void robotPatrolTaskResult(List<RobotPatrolTaskResult> resultList) {
+        for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
+            Map<String, String> infoMap = new HashMap<>(5);
+
             // 通过上报的任务id查询巡视主机上的任务id
             String taskCode = robotPatrolTaskResult.getTaskCode();
-            String taskId = "selectRealTaskByTaskCode(taskCode)";
-            if(StringUtils.isEmpty(taskId)){
+            String taskId = selectRealTaskByTaskCode(taskCode);
+            if (StringUtils.isEmpty(taskId)) {
                 taskId = taskCode;
                 log.info("taskId is empty, use taskCode as taskId");
             }
             log.info("taskCode==={},taskId===={}", taskCode, taskId);
+            infoMap.put("taskId", taskId);
 
-            // 结果文件处理及判断结果是否告警
-            String ftpImageRelative = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content"));
-            String ftpImageAbsolute = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content"));
-            String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
+            // 文件处理
+            Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap);
+            // 告警处理
+            alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
+            // 巡视结果处理
+            InspectionResultThread cruiseResultDealThread = new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, websocketUrl, true);
+            TaskExecutePool.getInstance().execute(cruiseResultDealThread);
+            // 非同源告警处理
+//            NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap, redisTemplate, websocketUrl,1);
+//            TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
+        }
+    }
 
-            String filePathTemp = new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + "/" + taskId;
-            String[] nameArray = robotPatrolTaskResult.getFilePath().split("/");
-            String fileName = nameArray[nameArray.length - 1];
+    /**
+     * 根据巡视结果判断是否生成告警
+     *
+     * @param robotPatrolTaskResult 机器人/无人机巡视结果
+     * @param taskId
+     * @param isAlarmMap
+     * @return void
+     */
+    private void alarmHandlerAfterCruise(RobotPatrolTaskResult robotPatrolTaskResult, String taskId, Map<String, String> isAlarmMap) {
+        try {
+            isAlarmMap.put("robotCode", robotPatrolTaskResult.getRobotCode());
+            isAlarmMap.put("taskCode", taskId);
+            isAlarmMap.put("deviceId", robotPatrolTaskResult.getDeviceId());
+            isAlarmMap.put("value", robotPatrolTaskResult.getValue());
+            isAlarmMap.put("deviceName", robotPatrolTaskResult.getDeviceName());
+            isAlarmMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
+            isAlarmMap.put("fileType", robotPatrolTaskResult.getFileType());
+            isAlarmMap.put("time", robotPatrolTaskResult.getTime());
+            IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate, websocketUrl, stationCode);
+            TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+    }
 
+    /**
+     * 对机器人/无人机结果文件处理
+     *
+     * @param robotPatrolTaskResult 机器人/无人机巡视结果
+     * @param infoMap                任务结果其他信息
+     * @return Map<String, String>
+     */
+    private Map<String, String> resultFileHandler(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap) {
+        Map<String, String> isAlarmMap = new HashMap<>(16);
+        String taskId = infoMap.get("taskId");
+
+        String ftpImageRelative = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content"));
+        String ftpImageAbsolute = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content"));
+        String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
+        String filePathTemp = new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + "/" + taskId + "/";
+
+        try {
+            // 文件路径
+            String filePath = robotPatrolTaskResult.getFilePath();
+            String temporaryFilePath = ftpsFilePath + "/" + filePath;
+            log.info("巡视结果图片全路径==={}", temporaryFilePath);
+            String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
+
+            // 1.红外 2.可见光 3.音频 4.视频
+            String fileType = robotPatrolTaskResult.getFileType();
             String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
             String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
 
-            String temporaryFilePath = ftpsFilePath + "/" + robotPatrolTaskResult.getFilePath();
-            log.info("temporaryFilePath==={}",temporaryFilePath);
+            switch (fileType){
+                case "1":
+                    copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "FIR");
+                    infoMap.put("relativePath", developRelativeUrl + "FIR" + "/" + fileName);
+                    infoMap.put("absolutePath", developAbsoluteUrl + "FIR" + "/" + fileName);
 
-            String fileType = robotPatrolTaskResult.getFileType();
-            String originFilePath = robotPatrolTaskResult.getOriginFilePath();
-            if (StringUtils.isNotEmpty(originFilePath) && StringUtils.equals("1", fileType)){
-                // 红外原图
-                String[] originNameArray = originFilePath.split("/");
-                String infraredOriginName = originNameArray[originNameArray.length - 1];
-                String temporaryInfraredOriginPath = ftpsFilePath + "/" + originFilePath;
+                    isAlarmMap.put("relativePath", developRelativeUrl + "FIR" + "/" + fileName);
+                    isAlarmMap.put("absolutePath", developAbsoluteUrl + "FIR" + "/" + fileName);
+                    break;
+                case "2":
+                    copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Infrared");
+                    infoMap.put("relativePath", developRelativeUrl + "CCD" + "/" + fileName);
+                    infoMap.put("absolutePath", developAbsoluteUrl + "CCD" + "/" + fileName);
+
+                    isAlarmMap.put("relativePath", developRelativeUrl + "CCD" + "/" + fileName);
+                    isAlarmMap.put("absolutePath", developAbsoluteUrl + "CCD" + "/" + fileName);
+                    break;
+                case "3":
+                    copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Audio");
+                    infoMap.put("relativePath", developRelativeUrl + "Audio" + "/" + fileName);
+                    infoMap.put("absolutePath", developAbsoluteUrl + "Audio" + "/" + fileName);
+                    break;
+                case "4":
+                    copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Video");
+                    infoMap.put("relativePath", developRelativeUrl + "Video" + "/" + fileName);
+                    infoMap.put("absolutePath", developAbsoluteUrl + "Video" + "/" + fileName);
+                    break;
+                default:
+                    break;
             }
-
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
-        return;
+        return isAlarmMap;
+    }
+
+    /**
+     * 将ftp服务器上的文件复制到开发环境
+     */
+    public static void copyFileToDevelop(String source,String aim){
+        File ff=new File(aim);
+        if (!ff.exists()){
+            ff.setWritable(true, false);
+            ff.mkdirs();
+        }
+        try {
+            String url = "cp " + source + " "+aim;
+            Runtime.getRuntime().exec(url);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String selectRealTaskByTaskCode(String robotTaskId) {
+        return tRobotInspectionDao.selectRealTaskId(robotTaskId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Integer selectRobotType(String robotCode) {
+        return tRobotInspectionDao.selectRobotType(robotCode);
     }
 
     /**
@@ -268,14 +381,14 @@ public class UPatrolTaskService {
      * @param statusList 机器人/无人机任务状态
      * @return void
      */
-    public void robotPatrolTaskStatus(List<RobotPatrolTaskStatus> statusList){
+    public void robotPatrolTaskStatus(List<RobotPatrolTaskStatus> statusList) {
         return;
     }
 
     /**
      * 找出机器人和无人机的点让其做任务
      *
-     * @param task    任务信息
+     * @param task           任务信息
      * @param tCruiseTaskAdd 任务关联信息
      * @param format         时间格式
      * @param detailList     区域巡视主机上的巡视点信息
@@ -600,4 +713,82 @@ public class UPatrolTaskService {
         tCruiseTaskDelDao.deleteByPrimaryId(taskId);
         return this.tCruiseTaskDao.deleteByPrimaryId(taskId);
     }
+
+    /**
+     * 巡视任务结果处理
+     *
+     * @param taskId 任务id
+     * @param instanceId 巡视点id
+     */
+    public void patrolTaskResultHandler(String taskId, Long instanceId){
+        String redisKeyName = "t_cruise_task_result:" + taskId + ":" + instanceId;
+        Map<String, Object> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+
+        // 判断该点巡视类型
+        String cruiseType = String.valueOf(cruiseResultMap.get("cruiseType"));
+
+        switch (cruiseType){
+            case "228":
+            case "521":
+                // 机器人和无人机
+                break;
+            case "229":
+            case "230":
+                // 可见光和红外
+                //
+                break;
+            case "231":
+                // ToDo:在线监控
+                break;
+            case "232":
+                // 声纹
+                break;
+            default:
+                break;
+        }
+
+        // 获取当前redis正常异常点位个数并更新
+        Integer abnormalCounts;
+        Integer normalCounts;
+        Integer allCounts;
+        synchronized (LOCK_FLAG){
+            String strForCountAbnormal = "countForAbnormal:" + taskId;
+            Map<String, Object> resultCountsMap  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+            abnormalCounts = Integer.valueOf(String.valueOf(resultCountsMap.get("abnormal")));
+            normalCounts = Integer.valueOf(String.valueOf(resultCountsMap.get("normal")));
+            allCounts = Integer.valueOf(String.valueOf(resultCountsMap.get("all")));
+            log.info("从redis获取的taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, allCounts, abnormalCounts, normalCounts);
+
+            if (StringUtils.equals("246", String.valueOf(cruiseResultMap.get("cruiseResult")))){
+                normalCounts++;
+            }else {
+                abnormalCounts++;
+            }
+            log.info("normalCounts:{}, abnormalCounts:{}", normalCounts, abnormalCounts);
+            resultCountsMap.put("abnormal", String.valueOf(abnormalCounts));
+            resultCountsMap.put("normal", String.valueOf(normalCounts));
+            redisTemplate.opsForHash().putAll(strForCountAbnormal, resultCountsMap);
+        }
+
+        // 判断任务是否结束
+        if (normalCounts + abnormalCounts != allCounts){
+            return;
+        }
+
+        // 插库
+
+        // 给上级系统上报任务状态
+
+        return;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Integer selectIsAlarmByTask(String taskId, String instanceId){
+        return uPatrolTaskDao.selectIsAlarmByTask(taskId, Long.valueOf(instanceId));
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public Integer updatePicPath(String taskId, String instanceId, String imagePath){
+        return uPatrolTaskDao.updatePicPath(taskId, Long.valueOf(instanceId), imagePath);
+    }
+
 }
