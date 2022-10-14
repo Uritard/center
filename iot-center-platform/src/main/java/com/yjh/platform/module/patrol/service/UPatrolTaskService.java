@@ -24,11 +24,8 @@ import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.entity.*;
-import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.*;
-import com.yjh.platform.module.task.service.RunAtNowTask;
-import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import org.apache.commons.collections4.CollectionUtils;
@@ -66,28 +63,19 @@ public class UPatrolTaskService {
     public static final String PATROL_SUMMARY_PREFIX = "patrol_point_summary:";
 
     @Autowired
-    private UPatrolTaskDao UPatrolTaskDao;
+    private UPatrolTaskDao uPatrolTaskDao;
     @Autowired
     private RedisTemplate redisTemplate;
-
-    @Autowired
-    private TCruiseTaskDao tCruiseTaskDao;
-    private Logger log = LoggerFactory.getLogger(UPatrolTaskService.class);
-
-
     @Autowired
     private TCruiseTaskDelDao tCruiseTaskDelDao;
     @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
-    @Autowired
-    private UPatrolTaskDao uPatrolTaskDao;
     @Autowired
     private UPatrolTaskAttrDao uPatrolTaskAttrDao;
     @Autowired
     private UPatrolResultDao uPatrolResultDao;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
-
     @Autowired
     private SysUserDao sysUserDao;
     @Autowired
@@ -95,11 +83,6 @@ public class UPatrolTaskService {
     @Autowired
     private UPatrolPlanAttrDao uPatrolPlanAttrDao;
 
-    //模板图片路径
-    private String picModelPath;
-    //等待相机转到预置位时间
-    private Long waitTime;
-    ;
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
@@ -172,7 +155,7 @@ public class UPatrolTaskService {
             instanceList.add(uPatrolPlanAttr.getInstanceId());
             uPatrolTaskAttrs.add(uPatrolTaskAttr);
         }
-        this.uPatrolTaskDao.add(uPatrolTask);
+        uPatrolTaskDao.add(uPatrolTask);
         this.uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
         return instanceList;
     }
