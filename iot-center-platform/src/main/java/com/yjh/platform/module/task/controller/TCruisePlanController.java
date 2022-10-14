@@ -71,7 +71,8 @@ public class TCruisePlanController {
     public Result delete(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
-            result.setData(tCruisePlanService.deleteByPrimaryId(planId));
+//            result.setData(tCruisePlanService.deleteByPrimaryId(planId));
+            result.setData(uPatrolPlanAttrService.deleteByPrimaryId(planId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除预案异常:", e);
@@ -88,7 +89,8 @@ public class TCruisePlanController {
     public Result update(@RequestBody Map<String, Object> planDetailMap) {
         Result result = new Result();
         try {
-            result.setData(tCruisePlanService.update(planDetailMap));
+//            result.setData(tCruisePlanService.update(planDetailMap));
+            result.setData(uPatrolPlanAttrService.update(planDetailMap));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新预案异常:", e);

@@ -35,4 +35,5 @@ public interface UPatrolPlanAttrDao {
 
     int batchAdd(List<UPatrolPlanAttr> list);
     int batchDelete(List<String> list);
+    List<Long> seletcInsByPlan (@Param(value = "planId") Long planId);
 }
