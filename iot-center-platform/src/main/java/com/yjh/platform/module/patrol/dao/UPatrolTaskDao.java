@@ -4,8 +4,10 @@
 
 package com.yjh.platform.module.patrol.dao;
 
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -58,4 +60,27 @@ public interface UPatrolTaskDao {
     Integer updatePicPath(@Param(value = "taskId") String taskId,
                           @Param(value = "instanceId") Long instanceId,
                           @Param(value = "imagePath") String imagePath);
+    /**
+     * 根据巡视点id查询测点信息
+     * @param instanceId 巡视点id
+     * @return TStdDeviceMete
+     */
+    TStdDeviceMete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
+
+    /**
+     * 查询字典id
+     * @param dictNote 字典编码
+     * @param colName 字典列名
+     * @return String
+     */
+    String selectDictCodeByNote(@Param(value = "dictNote")String dictNote,
+                                @Param(value = "colName")String colName);
+
+    /**
+     * 根据机器人实物id查询机器人信息
+     * @param robotCode 机器人实物id
+     * @return TRobotInfo 机器人信息
+     */
+    TRobotInfo selectRobotInfoByCode(@Param(value = "robotCode") String robotCode);
+
 }

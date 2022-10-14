@@ -26,23 +26,21 @@ import java.util.concurrent.TimeUnit;
 public class InspectionResultThread implements Runnable{
 
     private RedisTemplate redisTemplate;
-    private String webSocketUrl;
     private Boolean changeTaskStatus;
     private RobotPatrolTaskResult robotPatrolTaskResult;
     private Map<String, String> infoMap;
+    private UPatrolTaskService uPatrolTaskService;
 
-    public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap, RedisTemplate redisTemplate, String webSocketUrl, boolean changeTaskStatus){
+    public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap, RedisTemplate redisTemplate, boolean changeTaskStatus){
         this.robotPatrolTaskResult = robotPatrolTaskResult;
         this.infoMap = infoMap;
         this.redisTemplate = redisTemplate;
-        this.webSocketUrl = webSocketUrl;
         this.changeTaskStatus = changeTaskStatus;
+        this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
     }
 
     @Override
     public void run(){
-        UPatrolTaskService uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
-
         try {
             log.info("开始处理巡检结果并对其标准化 >>>>>>> robotPatrolTaskResult==={}", robotPatrolTaskResult);
             String taskId = infoMap.get("taskId");
@@ -112,11 +110,8 @@ public class InspectionResultThread implements Runnable{
                     }
                 }
             }
-
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new RuntimeException("巡检结果处理失败");
         }
     }
 

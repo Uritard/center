@@ -14,11 +14,13 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskAttrDao;
@@ -26,14 +28,15 @@ import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.InspectionResultThread;
 import com.yjh.platform.module.patrol.thread.IsWarnAfterCruiseThread;
-import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.threadpool.TaskExecutePool;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,17 +91,10 @@ public class UPatrolTaskService {
     @Autowired
     private UPatrolPlanAttrDao uPatrolPlanAttrDao;
 
-
-    /**
-     * websocket路径
-     */
-    @Value("${other.webSocketUrl}")
-    private String websocketUrl;
     //模板图片路径
     private String picModelPath;
     //等待相机转到预置位时间
     private Long waitTime;
-    ;
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
@@ -240,7 +236,7 @@ public class UPatrolTaskService {
             // 告警处理
             alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
             // 巡视结果处理
-            InspectionResultThread cruiseResultDealThread = new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, websocketUrl, true);
+            InspectionResultThread cruiseResultDealThread = new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, true);
             TaskExecutePool.getInstance().execute(cruiseResultDealThread);
             // 非同源告警处理
 //            NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap, redisTemplate, websocketUrl,1);
@@ -266,7 +262,8 @@ public class UPatrolTaskService {
             isAlarmMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
             isAlarmMap.put("fileType", robotPatrolTaskResult.getFileType());
             isAlarmMap.put("time", robotPatrolTaskResult.getTime());
-            IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate, websocketUrl, stationCode);
+            isAlarmMap.put("taskName", robotPatrolTaskResult.getTaskName());
+            IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate);
             TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
         }catch (Exception e){
             log.error(e.getMessage(), e);
@@ -287,7 +284,7 @@ public class UPatrolTaskService {
         String ftpImageRelative = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content"));
         String ftpImageAbsolute = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content"));
         String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
-        String filePathTemp = new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + "/" + taskId + "/";
+        String filePathTemp = new SimpleDateFormat("yyyy/MM/dd").format(new Date()) + "/" + taskId;
 
         try {
             // 文件路径
@@ -301,34 +298,36 @@ public class UPatrolTaskService {
             String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
             String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
 
-            String temporaryFilePath = ftpsFilePath + "/" + robotPatrolTaskResult.getFilePath();
-            log.info("temporaryFilePath==={}", temporaryFilePath);
             switch (fileType){
                 case "1":
-                    copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "FIR");
-                    infoMap.put("relativePath", developRelativeUrl + "FIR" + "/" + fileName);
-                    infoMap.put("absolutePath", developAbsoluteUrl + "FIR" + "/" + fileName);
+                    String descFirFilePath = developAbsoluteUrl + "/FIR/" + fileName;
+                    FileUtil.copyFileUsingStream(temporaryFilePath, descFirFilePath);
+                    infoMap.put("relativePath", developRelativeUrl + "/FIR/" + fileName);
+                    infoMap.put("absolutePath", descFirFilePath);
 
-                    isAlarmMap.put("relativePath", developRelativeUrl + "FIR" + "/" + fileName);
-                    isAlarmMap.put("absolutePath", developAbsoluteUrl + "FIR" + "/" + fileName);
+                    isAlarmMap.put("relativePath", developRelativeUrl + "/FIR/" + fileName);
+                    isAlarmMap.put("absolutePath", descFirFilePath);
                     break;
                 case "2":
-                    copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Infrared");
-                    infoMap.put("relativePath", developRelativeUrl + "CCD" + "/" + fileName);
-                    infoMap.put("absolutePath", developAbsoluteUrl + "CCD" + "/" + fileName);
+                    String descCcdFilePath = developAbsoluteUrl + "/CCD/" + fileName;
+                    FileUtil.copyFileUsingStream(temporaryFilePath, descCcdFilePath);
+                    infoMap.put("relativePath", developRelativeUrl + "/CCD/" + fileName);
+                    infoMap.put("absolutePath", descCcdFilePath);
 
-                    isAlarmMap.put("relativePath", developRelativeUrl + "CCD" + "/" + fileName);
-                    isAlarmMap.put("absolutePath", developAbsoluteUrl + "CCD" + "/" + fileName);
+                    isAlarmMap.put("relativePath", developRelativeUrl + "/CCD/" + fileName);
+                    isAlarmMap.put("absolutePath", descCcdFilePath);
                     break;
                 case "3":
-                    copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Audio");
-                    infoMap.put("relativePath", developRelativeUrl + "Audio" + "/" + fileName);
-                    infoMap.put("absolutePath", developAbsoluteUrl + "Audio" + "/" + fileName);
+                    String descAudioFilePath = developAbsoluteUrl + "/Audio/" + fileName;
+                    FileUtil.copyFileUsingStream(temporaryFilePath, descAudioFilePath);
+                    infoMap.put("relativePath", developRelativeUrl + "/Audio/" + fileName);
+                    infoMap.put("absolutePath", descAudioFilePath);
                     break;
                 case "4":
-                    copyFileToDevelop(temporaryFilePath, developAbsoluteUrl + "Video");
-                    infoMap.put("relativePath", developRelativeUrl + "Video" + "/" + fileName);
-                    infoMap.put("absolutePath", developAbsoluteUrl + "Video" + "/" + fileName);
+                    String descVideoFilePath = developAbsoluteUrl + "/Video/" + fileName;
+                    FileUtil.copyFileUsingStream(temporaryFilePath, descVideoFilePath);
+                    infoMap.put("relativePath", developRelativeUrl + "/Video/" + fileName);
+                    infoMap.put("absolutePath", descVideoFilePath);
                     break;
                 default:
                     break;
@@ -337,31 +336,6 @@ public class UPatrolTaskService {
             log.error(e.getMessage(), e);
         }
         return isAlarmMap;
-    }
-
-            String fileType = robotPatrolTaskResult.getFileType();
-            String originFilePath = robotPatrolTaskResult.getOriginFilePath();
-            if (StringUtils.isNotEmpty(originFilePath) && StringUtils.equals("1", fileType)) {
-                // 红外原图
-                String[] originNameArray = originFilePath.split("/");
-                String infraredOriginName = originNameArray[originNameArray.length - 1];
-                String temporaryInfraredOriginPath = ftpsFilePath + "/" + originFilePath;
-            }
-    /**
-     * 将ftp服务器上的文件复制到开发环境
-     */
-    public static void copyFileToDevelop(String source,String aim){
-        File ff=new File(aim);
-        if (!ff.exists()){
-            ff.setWritable(true, false);
-            ff.mkdirs();
-        }
-        try {
-            String url = "cp " + source + " "+aim;
-            Runtime.getRuntime().exec(url);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -948,4 +922,31 @@ public class UPatrolTaskService {
         return uPatrolTaskDao.updatePicPath(taskId, Long.valueOf(instanceId), imagePath);
     }
 
+    /**
+     * 根据巡视点id查询该测点信息
+     * @param instanceId
+     * @return TStdDeviceMete
+     */
+    public TStdDeviceMete selectDeviceMeteInfo(Long instanceId){
+        return uPatrolTaskDao.selectDeviceMeteInfo(instanceId);
+    }
+
+    /**
+     * 字典值查询
+     * @param dictNote 说明
+     * @param colName 类型
+     * @return String
+     */
+    public String selectDictCodeByNote(String dictNote, String colName){
+        return uPatrolTaskDao.selectDictCodeByNote(dictNote,colName);
+    }
+
+    /**
+     * 根据机器人实物id查询机器人信息
+     * @param robotCode 机器人实物id
+     * @return TRobotInfo 机器人信息
+     */
+    public TRobotInfo selectRobotInfoByCode(String robotCode){
+        return uPatrolTaskDao.selectRobotInfoByCode(robotCode);
+    }
 }

@@ -1,9 +1,12 @@
 package com.yjh.platform.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.StringUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,5 +37,23 @@ public class FileUtil {
         }
         log.error("上传文件不在规定文件范围内: {} - {}", fileName, name);
         return false;
+    }
+
+    /**
+     * 文件复制
+     *
+     * @param sourcePath 文件源路径
+     * @param descPath 文件目的路径
+     * @return
+     */
+    public static void copyFileUsingStream(String sourcePath, String descPath) {
+        File source = new File(sourcePath);
+        File dest = new File(descPath);
+
+        try {
+            FileUtils.copyFile(source, dest);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
