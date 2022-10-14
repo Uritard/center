@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -50,6 +51,19 @@ public class UPatrolPlanAttrService {
         tCruisePlan.setPlanPointTypes(map.get("simulationSteps") == null ? "" : map.get("simulationSteps").toString());//该字段用于操作票初始状态
         if (Objects.isNull(map.get("instanceList"))) return this.tCruisePlanDao.insert(tCruisePlan);
         List<Long> InstanceMapList = (List<Long>) map.get("instanceList");
+        //处理操作票数据 新增的操作票不绑定设备以及区域 之前绑定的操作票进行更新
+        if (InstanceMapList.size() == 0) {
+            return this.tCruisePlanDao.insert(tCruisePlan);
+        } else {
+            Long planId = dealOperationTicket(tCruisePlan);
+            if (planId != null) {
+                deleteTCruisePointInstance(planId);
+                this.tCruisePlanDao.update(tCruisePlan);
+                this.uPatrolPlanAttrDao.deleteByPrimaryId(planId);
+            } else {
+                this.tCruisePlanDao.insert(tCruisePlan);
+            }
+        }
         this.tCruisePlanDao.insert(tCruisePlan);
 
         Long planId = tCruisePlan.getPlanId();
@@ -70,6 +84,79 @@ public class UPatrolPlanAttrService {
             uPatrolPlanAttrList.add(uPatrolPlanAttr);
         }
         return uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
+    }
+
+    /**
+     * 处理操作票信息
+     *
+     * @param tCruisePlan
+     * @return planId
+     */
+    private Long dealOperationTicket(TCruisePlan tCruisePlan) {
+        Long planId = null;
+        if (!StringUtils.isEmpty(tCruisePlan.getPlanCode())) {
+            TCruisePlan orderTCruisePlan = tCruisePlanDao.selectByPlanCode(tCruisePlan.getPlanCode());
+            if (Objects.nonNull(orderTCruisePlan)
+                    && !StringUtils.isEmpty(orderTCruisePlan.getPlanCode())
+                    && orderTCruisePlan.getType() == 456) {
+                planId = orderTCruisePlan.getPlanId();
+                tCruisePlan.setDeviceId(orderTCruisePlan.getDeviceId());
+                tCruisePlan.setPlanId(planId);
+            }
+        }
+        return planId;
+    }
+
+    private void deleteTCruisePointInstance(Long planId) {
+        List<Long> instanceIdList = uPatrolPlanAttrDao.seletcInsByPlan(planId);
+        tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteByPrimaryId(Long planId) {
+        uPatrolPlanAttrDao.deleteByPrimaryId(planId);
+        return this.tCruisePlanDao.deleteByPrimaryId(planId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int update(Map<String, Object> planDetailMap) {
+        TCruisePlan tCruisePlan = new TCruisePlan();
+        Long planId = Long.valueOf(String.valueOf(planDetailMap.get("planId")));
+        tCruisePlan.setPlanId(planId);
+        tCruisePlan.setPlanName(String.valueOf(planDetailMap.get("planName")));
+
+        List<Long> instanceList = (List<Long>) planDetailMap.get("instanceList");
+        if (instanceList.size() == 0) return ResultCodeEnum.CODE10010.getCode();
+
+        List<TCruisePointInstanceAttr> tCruisePointInstanceAttrList = tCruisePointInstanceDao.batchSelectInstanceAttr(instanceList);
+
+        List<UPatrolPlanAttr> uPatrolPlanAttrList = new ArrayList<>();
+        Date date = new Date();
+        for (TCruisePointInstanceAttr tCruisePointInstanceAttr : tCruisePointInstanceAttrList) {
+            UPatrolPlanAttr uPatrolPlanAttr = new UPatrolPlanAttr();
+            uPatrolPlanAttr.setPlanId(planId)
+                    .setDeviceId(tCruisePointInstanceAttr.getDeviceId())
+                    .setDeviceName(tCruisePointInstanceAttr.getDeviceName())
+                    .setDeviceMeteId(tCruisePointInstanceAttr.getDeviceMeteId())
+                    .setDeviceMeteName(tCruisePointInstanceAttr.getDeviceMeteName())
+                    .setPositionId(tCruisePointInstanceAttr.getCruiseId())
+                    .setPositionName(tCruisePointInstanceAttr.getCruiseName())
+                    .setPointType(tCruisePointInstanceAttr.getCruiseType())
+                    .setRobotId(tCruisePointInstanceAttr.getRobotId());
+            uPatrolPlanAttrList.add(uPatrolPlanAttr);
+        }
+        this.uPatrolPlanAttrDao.deleteByPrimaryId(planId);
+//        this.tCruisePlanDao.update(tCruisePlan);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("planId", planId);
+        map.put("planName", String.valueOf(planDetailMap.get("planName")));
+        this.tCruisePlanDao.updateByMap(map);
+        if (uPatrolPlanAttrList.size() > 0) {
+            return uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
+        } else {
+            return 0;
+        }
     }
 
 

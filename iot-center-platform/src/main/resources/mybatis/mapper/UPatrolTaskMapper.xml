@@ -232,4 +232,57 @@
             )
     </delete>
 
+
+    <select id="selectPlanRunningTask" resultType="java.lang.String">
+        select
+            distinct
+            result.task_id
+        from t_cruise_result result
+                 left join t_cruise_task task on task.task_id = result.task_id
+        where result.c_state = 239  and task.task_level &lt; #{taskLevel}
+    </select>
+
+    <select id="selectInsByTask" resultType="java.lang.Long">
+        select instance_id from u_patrol_task_attr where task_id = #{taskId}
+    </select>
+
+    <select id="countInstance" resultType="java.lang.Integer">
+        select
+            count(1) as count
+        FROM
+            u_patrol_task_attr
+        WHERE
+            task_id = #{taskId,jdbcType = VARCHAR}
+    </select>
+
+    <select id="selectForTaskId" parameterType="java.lang.String" resultType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        select
+            a.task_id,
+            a.task_code,
+            a.task_name,
+            a.area_id,
+            a.task_type,
+            a.execute_type,
+            a.robot_id,
+            a.task_source,
+            a.task_level,
+            a.task_state,
+            a.modify_state,
+            a.task_count,
+            a.task_wait,
+            a.check_user,
+            a.check_date,
+            a.weather,
+            a.create_time,
+            a.end_time,
+            a.execute_time,
+            a.is_review,
+            a.task_abnormal,
+            a.cruise_result,
+            a.remark
+        from u_patrol_result a
+        where 1 = 1
+          and a.task_id = #{taskId, jdbcType=VARCHAR}
+    </select>
+
 </mapper>

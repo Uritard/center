@@ -4,6 +4,7 @@
 
 package com.yjh.platform.module.patrol.dao;
 
+import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -44,6 +45,12 @@ public interface UPatrolTaskDao {
 
     int batchAdd(List<UPatrolTask> list);
     int batchDelete(List<String> list);
+    List<String> selectPlanRunningTask(@Param(value = "taskLevel")Integer taskLevel);
+    List<Long> selectInsByTask(@Param(value = "taskId")String taskId);
+
+    int countInstance(@Param(value = "taskId") String taskId);
+
+    UPatrolResult selectForTaskId(@Param(value = "taskId") String taskId);
 
     Integer selectIsAlarmByTask(@Param(value = "taskId") String taskId,
                                 @Param(value = "instanceId") Long instanceId);

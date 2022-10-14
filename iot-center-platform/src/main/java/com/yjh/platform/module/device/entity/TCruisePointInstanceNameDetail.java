@@ -22,5 +22,6 @@ public class TCruisePointInstanceNameDetail extends TCruisePointInstance{
     private String isAi;
     private Long robotId;
     private String isJudge;
+    private Long cameraId;
 
 }
