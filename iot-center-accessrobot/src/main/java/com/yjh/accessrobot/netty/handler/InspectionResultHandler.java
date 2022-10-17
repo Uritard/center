@@ -5,8 +5,9 @@ import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.configuration.UpFtpsConfig;
-import com.yjh.accessrobot.module.command.entity.*;
+import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
@@ -26,8 +27,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -51,13 +50,6 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
     private UpFtpsConfig upFtpsConfig;
     @Autowired
     private RobotService robotService;
-
-    private static ThreadLocal<String> threadLocal = new ThreadLocal<String>(){
-        @Override
-        protected String initialValue() {
-            return new SimpleDateFormat("yyyy/MM/dd").format(new Date());
-        }
-    };
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -151,9 +143,10 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         Map<String, Object> item = xmlBaseModel.getItems().get(0);
 
         try {
-            log.info("当前时间==={},格式化后的时间==={}", new Date(), threadLocal.get());
-            String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + threadLocal.get() + "/" + cruiseResultMap.get("taskCode") + "/";
-            String developRelativeUrl = relativeImgMap.get("content") + "/" + threadLocal.get() + "/" + cruiseResultMap.get("taskCode") + "/";
+            String todayTime = DateTimeUtil.format(new Date(), "yyyy/MM/dd");
+            log.info("当前时间==={},格式化后的时间==={}", new Date(), todayTime);
+            String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + cruiseResultMap.get("taskCode") + "/";
+            String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + cruiseResultMap.get("taskCode") + "/";
             // 可见光结果、红外fir、音频wav
             String[] sArray = ftpFilePath.split("/");
             String ftpFileName = sArray[sArray.length - 1];

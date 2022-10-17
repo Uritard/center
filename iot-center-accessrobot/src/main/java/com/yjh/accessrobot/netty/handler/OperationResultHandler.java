@@ -3,12 +3,12 @@ package com.yjh.accessrobot.netty.handler;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import com.yjh.accessrobot.netty.thread.InspectionResultThread;
-import com.yjh.accessrobot.netty.thread.IsWarnAfterCruiseThread;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,8 +40,6 @@ public class OperationResultHandler implements MessageHandlerStrategy, Initializ
 
     @Autowired
     private RobotService robotService;
-
-    private String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -87,6 +84,8 @@ public class OperationResultHandler implements MessageHandlerStrategy, Initializ
         Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
         Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+
+        String todayTime = DateTimeUtil.format(new Date(), "yyyy/MM/dd");
 
         String developAbsoluteUrl = absoluteImgMap.get("content") + "/" + todayTime + "/" + xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
         String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + xmlBaseModel.getItems().get(0).get("task_code").toString() + "/";
