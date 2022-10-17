@@ -376,8 +376,6 @@ public interface TRobotInfoDao {
     Integer selectIsAlarmByTask(@Param(value = "taskId") String taskId,
                                 @Param(value = "instanceId") Long instanceId);
 
-    List<Integer> selectDictCodeByColName(String colName);
-
     Integer updatePicPath(@Param(value = "taskId") String taskId,
                           @Param(value = "instanceId") Long instanceId,
                           @Param(value = "imagePath") String imagePath);

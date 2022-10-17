@@ -86,7 +86,6 @@ public interface TCruisePointInstanceDao {
     Long selectForPresetId(@Param(value = "presetId")Long presetId);
 
     List<TCruisePointInstanceAttr> batchSelectInstanceAttr(@Param(value = "list")List<Long> list);
-    List<TCruisePointInstanceAttr> selectInstanceAttrInfo(@Param(value = "list")List<Long> list);
     List<Long> selectTimeIsIn(@Param(value = "time") Date time);
     List<Map<Object,Object>>selectCameraByDeviceMeteId(@Param(value = "deviceMeteId")Long deviceMeteId);
     List<Map<Object,Object>>selectRobotByDeviceMeteId(@Param(value = "deviceMeteId")Long deviceMeteId);

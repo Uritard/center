@@ -1317,15 +1317,6 @@
         WHERE a.task_id = #{taskId} AND a.instance_id = #{instanceId}
     </select>
 
-    <select id="selectDictCodeByColName" resultType="java.lang.Integer">
-        SELECT
-            dict_code
-        FROM
-            t_dict_business
-        WHERE
-            col_name = #{colName,jdbcType=VARCHAR}
-    </select>
-
     <update id="updatePicPath" >
         UPDATE t_warn_info a
         <set>

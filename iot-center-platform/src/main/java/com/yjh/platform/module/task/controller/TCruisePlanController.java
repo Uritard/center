@@ -1,8 +1,6 @@
 package com.yjh.platform.module.task.controller;
 
 import com.yjh.platform.common.logs.Logs;
-import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
-import com.yjh.platform.module.patrol.service.UPatrolPlanAttrService;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.TCruisePlanAttrService;
 import com.yjh.platform.module.task.service.TCruisePlanService;
@@ -36,8 +34,6 @@ public class TCruisePlanController {
     private final TCruisePlanService tCruisePlanService;
     @Autowired
     private TCruisePlanAttrService tCruisePlanAttrService;
-    @Autowired
-    private UPatrolPlanAttrService uPatrolPlanAttrService;
 
     private Logger log = LoggerFactory.getLogger(TCruisePlanController.class);
 
@@ -51,8 +47,7 @@ public class TCruisePlanController {
     public Result insert(@RequestBody Map<String, Object> map) {
         Result result = new Result();
         try {
-//            result.setData(tCruisePlanService.insert(map));
-            result.setData(uPatrolPlanAttrService.insert(map));
+            result.setData(tCruisePlanService.insert(map));
             if(result.getData().equals(ResultCodeEnum.CODE10010.getCode())){
                 result.setCode(ResultCodeEnum.CODE10010.getCode(),ResultCodeEnum.CODE10010.getName());
             }
@@ -71,8 +66,7 @@ public class TCruisePlanController {
     public Result delete(@RequestParam(value = "planId", required = true) Long planId) {
         Result result = new Result();
         try {
-//            result.setData(tCruisePlanService.deleteByPrimaryId(planId));
-            result.setData(uPatrolPlanAttrService.deleteByPrimaryId(planId));
+            result.setData(tCruisePlanService.deleteByPrimaryId(planId));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除预案异常:", e);
@@ -89,8 +83,7 @@ public class TCruisePlanController {
     public Result update(@RequestBody Map<String, Object> planDetailMap) {
         Result result = new Result();
         try {
-//            result.setData(tCruisePlanService.update(planDetailMap));
-            result.setData(uPatrolPlanAttrService.update(planDetailMap));
+            result.setData(tCruisePlanService.update(planDetailMap));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新预案异常:", e);
