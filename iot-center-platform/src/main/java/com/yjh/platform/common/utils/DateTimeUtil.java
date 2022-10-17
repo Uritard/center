@@ -30,6 +30,9 @@ public class DateTimeUtil {
     private static final String DATETIMEMSFORMATTPL = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String TIMESIMPLEFORMATTPL = "HH:mm";
     private static final String TIMEFORMATTPL = "HH:mm:ss";
+    private static final String TIMEFORMAT = "yyyy/MM/dd";
+    private static final String TIMEFORMAT2 = "yyyyMMddHHmmss";
+
     private static ResourceBundle resource = null;
 
     private DateTimeUtil() {
@@ -98,6 +101,14 @@ public class DateTimeUtil {
      */
     public static String getDateTimePattern() {
         return DATETIMEFORMATTPL;
+    }
+
+    public static String getDateTimePattern2() {
+        return TIMEFORMAT;
+    }
+
+    public static String getDateTimePattern3() {
+        return TIMEFORMAT2;
     }
 
     /**
@@ -217,6 +228,34 @@ public class DateTimeUtil {
             return "";
         }
         SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
+        return sdf.format(date);
+    }
+
+    /**
+     * 日期转为字符串.
+     *
+     * @param date 要格式化的日期
+     * @return 日期字符串
+     */
+    public static String format2(Date date) {
+        if (date == null) {
+            return "";
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern2());
+        return sdf.format(date);
+    }
+
+    /**
+     * 日期转为字符串.
+     *
+     * @param date 要格式化的日期
+     * @return 日期字符串
+     */
+    public static String format3(Date date) {
+        if (date == null) {
+            return "";
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern3());
         return sdf.format(date);
     }
 

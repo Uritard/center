@@ -10,6 +10,8 @@ import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceAttr;
 import com.yjh.platform.module.device.entity.TRobotInspection;
+import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
+import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.entity.*;
@@ -47,6 +49,8 @@ public class TCruisePlanService{
 
     @Autowired
     private TStdDevicemeteDao tStdDevicemeteDao;
+    @Autowired
+    private UPatrolPlanAttrDao uPatrolPlanAttrDao;
 
     private Logger log = LoggerFactory.getLogger(TCruisePlanService.class);
 

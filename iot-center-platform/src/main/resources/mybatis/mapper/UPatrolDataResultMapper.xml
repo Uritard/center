@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.patrol.dao.UPatrolDataResultDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        <id column="cruise_data_id" jdbcType="BIGINT" property="cruiseDataId" />
+        <result column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="instance_id" jdbcType="BIGINT" property="instanceId" />
+        <result column="instance_name" jdbcType="VARCHAR" property="instanceName" />
+        <result column="cruise_id" jdbcType="BIGINT" property="cruiseId" />
+        <result column="cruise_name" jdbcType="VARCHAR" property="cruiseName" />
+        <result column="cruise_time" jdbcType="TIMESTAMP" property="cruiseTime" />
+        <result column="cruise_status" jdbcType="INTEGER" property="cruiseStatus" />
+        <result column="cruise_type" jdbcType="INTEGER" property="cruiseType" />
+        <result column="result_desc" jdbcType="VARCHAR" property="resultDesc" />
+        <result column="result_num" jdbcType="VARCHAR" property="resultNum" />
+        <result column="modify_num" jdbcType="VARCHAR" property="modifyNum" />
+        <result column="picpath" jdbcType="VARCHAR" property="picpath" />
+        <result column="confirm_pic_path" jdbcType="VARCHAR" property="confirmPicPath" />
+        <result column="pic_path_anl" jdbcType="VARCHAR" property="picPathAnl" />
+        <result column="person_check" jdbcType="VARCHAR" property="personCheck" />
+        <result column="origpic" jdbcType="VARCHAR" property="origpic" />
+        <result column="orig_confirm_pic_path" jdbcType="VARCHAR" property="origConfirmPicPath" />
+        <result column="orig_pic_anl" jdbcType="VARCHAR" property="origPicAnl" />
+        <result column="cruise_abnormal" jdbcType="INTEGER" property="cruiseAbnormal" />
+        <result column="evaluation_state" jdbcType="INTEGER" property="evaluationState" />
+        <result column="identify_state" jdbcType="INTEGER" property="identifyState" />
+        <result column="identify_result" jdbcType="INTEGER" property="identifyResult" />
+        <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="check_user" jdbcType="VARCHAR" property="checkUser" />
+        <result column="check_date" jdbcType="TIMESTAMP" property="checkDate" />
+        <result column="is_warn" jdbcType="INTEGER" property="isWarn" />
+        <result column="cruise_result" jdbcType="INTEGER" property="cruiseResult" />
+        <result column="fir_name" jdbcType="VARCHAR" property="firName" />
+        <result column="fir_date" jdbcType="TIMESTAMP" property="firDate" />
+        <result column="result_pic" jdbcType="VARCHAR" property="resultPic" />
+        <result column="points" jdbcType="VARCHAR" property="points" />
+        <result column="voice_path" jdbcType="VARCHAR" property="voicePath" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        cruise_data_id, task_id, device_id, device_name, instance_id, instance_name, cruise_id, cruise_name, cruise_time, cruise_status, cruise_type, result_desc, result_num, modify_num, picpath, confirm_pic_path, pic_path_anl, person_check, origpic, orig_confirm_pic_path, orig_pic_anl, cruise_abnormal, evaluation_state, identify_state, identify_result, createtime, remark, check_user, check_date, is_warn, cruise_result, fir_name, fir_date, result_pic, points, voice_path
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="cruiseDataId" parameterType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        insert into u_patrol_data_result(
+            cruise_data_id,
+            task_id,
+            device_id,
+            device_name,
+            instance_id,
+            instance_name,
+            cruise_id,
+            cruise_name,
+            cruise_time,
+            cruise_status,
+            cruise_type,
+            result_desc,
+            result_num,
+            modify_num,
+            picpath,
+            confirm_pic_path,
+            pic_path_anl,
+            person_check,
+            origpic,
+            orig_confirm_pic_path,
+            orig_pic_anl,
+            cruise_abnormal,
+            evaluation_state,
+            identify_state,
+            identify_result,
+            createtime,
+            remark,
+            check_user,
+            check_date,
+            is_warn,
+            cruise_result,
+            fir_name,
+            fir_date,
+            result_pic,
+            points,
+            voice_path
+        )values(
+                #{cruiseDataId, jdbcType=BIGINT},
+                #{taskId, jdbcType=VARCHAR},
+                #{deviceId, jdbcType=BIGINT},
+                #{deviceName, jdbcType=VARCHAR},
+                #{instanceId, jdbcType=BIGINT},
+                #{instanceName, jdbcType=VARCHAR},
+                #{cruiseId, jdbcType=BIGINT},
+                #{cruiseName, jdbcType=VARCHAR},
+                #{cruiseTime, jdbcType=TIMESTAMP},
+                #{cruiseStatus, jdbcType=INTEGER},
+                #{cruiseType, jdbcType=INTEGER},
+                #{resultDesc, jdbcType=VARCHAR},
+                #{resultNum, jdbcType=VARCHAR},
+                #{modifyNum, jdbcType=VARCHAR},
+                #{picpath, jdbcType=VARCHAR},
+                #{confirmPicPath, jdbcType=VARCHAR},
+                #{picPathAnl, jdbcType=VARCHAR},
+                #{personCheck, jdbcType=VARCHAR},
+                #{origpic, jdbcType=VARCHAR},
+                #{origConfirmPicPath, jdbcType=VARCHAR},
+                #{origPicAnl, jdbcType=VARCHAR},
+                #{cruiseAbnormal, jdbcType=INTEGER},
+                #{evaluationState, jdbcType=INTEGER},
+                #{identifyState, jdbcType=INTEGER},
+                #{identifyResult, jdbcType=INTEGER},
+                #{createtime, jdbcType=TIMESTAMP},
+                #{remark, jdbcType=VARCHAR},
+                #{checkUser, jdbcType=VARCHAR},
+                #{checkDate, jdbcType=TIMESTAMP},
+                #{isWarn, jdbcType=INTEGER},
+                #{cruiseResult, jdbcType=INTEGER},
+                #{firName, jdbcType=VARCHAR},
+                #{firDate, jdbcType=TIMESTAMP},
+                #{resultPic, jdbcType=VARCHAR},
+                #{points, jdbcType=VARCHAR},
+                #{voicePath, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+        delete from u_patrol_data_result
+                where cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        update u_patrol_data_result a <set>
+        <if test="cruiseDataId != null and cruiseDataId != ''">a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT},</if>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
+        <if test="deviceName != null and deviceName != ''">a.device_name = #{deviceName, jdbcType=VARCHAR},</if>
+        <if test="instanceId != null and instanceId != ''">a.instance_id = #{instanceId, jdbcType=BIGINT},</if>
+        <if test="instanceName != null and instanceName != ''">a.instance_name = #{instanceName, jdbcType=VARCHAR},</if>
+        <if test="cruiseId != null and cruiseId != ''">a.cruise_id = #{cruiseId, jdbcType=BIGINT},</if>
+        <if test="cruiseName != null and cruiseName != ''">a.cruise_name = #{cruiseName, jdbcType=VARCHAR},</if>
+        <if test="cruiseTime != null and cruiseTime != ''">a.cruise_time = #{cruiseTime, jdbcType=TIMESTAMP},</if>
+        <if test="cruiseStatus != null and cruiseStatus != ''">a.cruise_status = #{cruiseStatus, jdbcType=INTEGER},</if>
+        <if test="cruiseType != null and cruiseType != ''">a.cruise_type = #{cruiseType, jdbcType=INTEGER},</if>
+        <if test="resultDesc != null and resultDesc != ''">a.result_desc = #{resultDesc, jdbcType=VARCHAR},</if>
+        <if test="resultNum != null and resultNum != ''">a.result_num = #{resultNum, jdbcType=VARCHAR},</if>
+        <if test="modifyNum != null and modifyNum != ''">a.modify_num = #{modifyNum, jdbcType=VARCHAR},</if>
+        <if test="picpath != null and picpath != ''">a.picpath = #{picpath, jdbcType=VARCHAR},</if>
+        <if test="confirmPicPath != null and confirmPicPath != ''">a.confirm_pic_path = #{confirmPicPath, jdbcType=VARCHAR},</if>
+        <if test="picPathAnl != null and picPathAnl != ''">a.pic_path_anl = #{picPathAnl, jdbcType=VARCHAR},</if>
+        <if test="personCheck != null and personCheck != ''">a.person_check = #{personCheck, jdbcType=VARCHAR},</if>
+        <if test="origpic != null and origpic != ''">a.origpic = #{origpic, jdbcType=VARCHAR},</if>
+        <if test="origConfirmPicPath != null and origConfirmPicPath != ''">a.orig_confirm_pic_path = #{origConfirmPicPath, jdbcType=VARCHAR},</if>
+        <if test="origPicAnl != null and origPicAnl != ''">a.orig_pic_anl = #{origPicAnl, jdbcType=VARCHAR},</if>
+        <if test="cruiseAbnormal != null and cruiseAbnormal != ''">a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER},</if>
+        <if test="evaluationState != null and evaluationState != ''">a.evaluation_state = #{evaluationState, jdbcType=INTEGER},</if>
+        <if test="identifyState != null and identifyState != ''">a.identify_state = #{identifyState, jdbcType=INTEGER},</if>
+        <if test="identifyResult != null and identifyResult != ''">a.identify_result = #{identifyResult, jdbcType=INTEGER},</if>
+        <if test="createtime != null and createtime != ''">a.createtime = #{createtime, jdbcType=TIMESTAMP},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+        <if test="checkDate != null and checkDate != ''">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
+        <if test="isWarn != null and isWarn != ''">a.is_warn = #{isWarn, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null and cruiseResult != ''">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="firName != null and firName != ''">a.fir_name = #{firName, jdbcType=VARCHAR},</if>
+        <if test="firDate != null and firDate != ''">a.fir_date = #{firDate, jdbcType=TIMESTAMP},</if>
+        <if test="resultPic != null and resultPic != ''">a.result_pic = #{resultPic, jdbcType=VARCHAR},</if>
+        <if test="points != null and points != ''">a.points = #{points, jdbcType=VARCHAR},</if>
+        <if test="voicePath != null and voicePath != ''">a.voice_path = #{voicePath, jdbcType=VARCHAR},</if>
+    </set>
+            where a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        select
+        a.cruise_data_id,
+        a.task_id,
+        a.device_id,
+        a.device_name,
+        a.instance_id,
+        a.instance_name,
+        a.cruise_id,
+        a.cruise_name,
+        a.cruise_time,
+        a.cruise_status,
+        a.cruise_type,
+        a.result_desc,
+        a.result_num,
+        a.modify_num,
+        a.picpath,
+        a.confirm_pic_path,
+        a.pic_path_anl,
+        a.person_check,
+        a.origpic,
+        a.orig_confirm_pic_path,
+        a.orig_pic_anl,
+        a.cruise_abnormal,
+        a.evaluation_state,
+        a.identify_state,
+        a.identify_result,
+        a.createtime,
+        a.remark,
+        a.check_user,
+        a.check_date,
+        a.is_warn,
+        a.cruise_result,
+        a.fir_name,
+        a.fir_date,
+        a.result_pic,
+        a.points,
+        a.voice_path
+        from u_patrol_data_result a
+        where 1 = 1
+            and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.patrol.entity.UPatrolDataResult" resultType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        select
+        a.cruise_data_id,
+        a.task_id,
+        a.device_id,
+        a.device_name,
+        a.instance_id,
+        a.instance_name,
+        a.cruise_id,
+        a.cruise_name,
+        a.cruise_time,
+        a.cruise_status,
+        a.cruise_type,
+        a.result_desc,
+        a.result_num,
+        a.modify_num,
+        a.picpath,
+        a.confirm_pic_path,
+        a.pic_path_anl,
+        a.person_check,
+        a.origpic,
+        a.orig_confirm_pic_path,
+        a.orig_pic_anl,
+        a.cruise_abnormal,
+        a.evaluation_state,
+        a.identify_state,
+        a.identify_result,
+        a.createtime,
+        a.remark,
+        a.check_user,
+        a.check_date,
+        a.is_warn,
+        a.cruise_result,
+        a.fir_name,
+        a.fir_date,
+        a.result_pic,
+        a.points,
+        a.voice_path
+        from u_patrol_data_result a
+        where 1 = 1
+        <if test="cruiseDataId != null and cruiseDataId != ''"> and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}</if>
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_name = #{deviceName, jdbcType=VARCHAR}</if>
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="instanceName != null and instanceName != ''"> and a.instance_name = #{instanceName, jdbcType=VARCHAR}</if>
+        <if test="cruiseId != null and cruiseId != ''"> and a.cruise_id = #{cruiseId, jdbcType=BIGINT}</if>
+        <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name = #{cruiseName, jdbcType=VARCHAR}</if>
+        <if test="cruiseTime != null and cruiseTime != ''"> and a.cruise_time = #{cruiseTime, jdbcType=TIMESTAMP}</if>
+        <if test="cruiseStatus != null and cruiseStatus != ''"> and a.cruise_status = #{cruiseStatus, jdbcType=INTEGER}</if>
+        <if test="cruiseType != null and cruiseType != ''"> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="resultDesc != null and resultDesc != ''"> and a.result_desc = #{resultDesc, jdbcType=VARCHAR}</if>
+        <if test="resultNum != null and resultNum != ''"> and a.result_num = #{resultNum, jdbcType=VARCHAR}</if>
+        <if test="modifyNum != null and modifyNum != ''"> and a.modify_num = #{modifyNum, jdbcType=VARCHAR}</if>
+        <if test="picpath != null and picpath != ''"> and a.picpath = #{picpath, jdbcType=VARCHAR}</if>
+        <if test="confirmPicPath != null and confirmPicPath != ''"> and a.confirm_pic_path = #{confirmPicPath, jdbcType=VARCHAR}</if>
+        <if test="picPathAnl != null and picPathAnl != ''"> and a.pic_path_anl = #{picPathAnl, jdbcType=VARCHAR}</if>
+        <if test="personCheck != null and personCheck != ''"> and a.person_check = #{personCheck, jdbcType=VARCHAR}</if>
+        <if test="origpic != null and origpic != ''"> and a.origpic = #{origpic, jdbcType=VARCHAR}</if>
+        <if test="origConfirmPicPath != null and origConfirmPicPath != ''"> and a.orig_confirm_pic_path = #{origConfirmPicPath, jdbcType=VARCHAR}</if>
+        <if test="origPicAnl != null and origPicAnl != ''"> and a.orig_pic_anl = #{origPicAnl, jdbcType=VARCHAR}</if>
+        <if test="cruiseAbnormal != null and cruiseAbnormal != ''"> and a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER}</if>
+        <if test="evaluationState != null and evaluationState != ''"> and a.evaluation_state = #{evaluationState, jdbcType=INTEGER}</if>
+        <if test="identifyState != null and identifyState != ''"> and a.identify_state = #{identifyState, jdbcType=INTEGER}</if>
+        <if test="identifyResult != null and identifyResult != ''"> and a.identify_result = #{identifyResult, jdbcType=INTEGER}</if>
+        <if test="createtime != null and createtime != ''"> and a.createtime = #{createtime, jdbcType=TIMESTAMP}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="checkUser != null and checkUser != ''"> and a.check_user = #{checkUser, jdbcType=VARCHAR}</if>
+        <if test="checkDate != null and checkDate != ''"> and a.check_date = #{checkDate, jdbcType=TIMESTAMP}</if>
+        <if test="isWarn != null and isWarn != ''"> and a.is_warn = #{isWarn, jdbcType=INTEGER}</if>
+        <if test="cruiseResult != null and cruiseResult != ''"> and a.cruise_result = #{cruiseResult, jdbcType=INTEGER}</if>
+        <if test="firName != null and firName != ''"> and a.fir_name = #{firName, jdbcType=VARCHAR}</if>
+        <if test="firDate != null and firDate != ''"> and a.fir_date = #{firDate, jdbcType=TIMESTAMP}</if>
+        <if test="resultPic != null and resultPic != ''"> and a.result_pic = #{resultPic, jdbcType=VARCHAR}</if>
+        <if test="points != null and points != ''"> and a.points = #{points, jdbcType=VARCHAR}</if>
+        <if test="voicePath != null and voicePath != ''"> and a.voice_path = #{voicePath, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.patrol.entity.UPatrolDataResult" resultType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        select
+        a.cruise_data_id,
+        a.task_id,
+        a.device_id,
+        a.device_name,
+        a.instance_id,
+        a.instance_name,
+        a.cruise_id,
+        a.cruise_name,
+        a.cruise_time,
+        a.cruise_status,
+        a.cruise_type,
+        a.result_desc,
+        a.result_num,
+        a.modify_num,
+        a.picpath,
+        a.confirm_pic_path,
+        a.pic_path_anl,
+        a.person_check,
+        a.origpic,
+        a.orig_confirm_pic_path,
+        a.orig_pic_anl,
+        a.cruise_abnormal,
+        a.evaluation_state,
+        a.identify_state,
+        a.identify_result,
+        a.createtime,
+        a.remark,
+        a.check_user,
+        a.check_date,
+        a.is_warn,
+        a.cruise_result,
+        a.fir_name,
+        a.fir_date,
+        a.result_pic,
+        a.points,
+        a.voice_path
+        from u_patrol_data_result a
+        where 1 = 1
+        <if test="cruiseDataId != null and cruiseDataId != ''"> and a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}</if>
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="deviceName != null and deviceName != ''"> and a.device_name = #{deviceName, jdbcType=VARCHAR}</if>
+        <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
+        <if test="instanceName != null and instanceName != ''"> and a.instance_name = #{instanceName, jdbcType=VARCHAR}</if>
+        <if test="cruiseId != null and cruiseId != ''"> and a.cruise_id = #{cruiseId, jdbcType=BIGINT}</if>
+        <if test="cruiseName != null and cruiseName != ''"> and a.cruise_name = #{cruiseName, jdbcType=VARCHAR}</if>
+        <if test="cruiseTime != null and cruiseTime != ''"> and a.cruise_time = #{cruiseTime, jdbcType=TIMESTAMP}</if>
+        <if test="cruiseStatus != null and cruiseStatus != ''"> and a.cruise_status = #{cruiseStatus, jdbcType=INTEGER}</if>
+        <if test="cruiseType != null and cruiseType != ''"> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="resultDesc != null and resultDesc != ''"> and a.result_desc = #{resultDesc, jdbcType=VARCHAR}</if>
+        <if test="resultNum != null and resultNum != ''"> and a.result_num = #{resultNum, jdbcType=VARCHAR}</if>
+        <if test="modifyNum != null and modifyNum != ''"> and a.modify_num = #{modifyNum, jdbcType=VARCHAR}</if>
+        <if test="picpath != null and picpath != ''"> and a.picpath = #{picpath, jdbcType=VARCHAR}</if>
+        <if test="confirmPicPath != null and confirmPicPath != ''"> and a.confirm_pic_path = #{confirmPicPath, jdbcType=VARCHAR}</if>
+        <if test="picPathAnl != null and picPathAnl != ''"> and a.pic_path_anl = #{picPathAnl, jdbcType=VARCHAR}</if>
+        <if test="personCheck != null and personCheck != ''"> and a.person_check = #{personCheck, jdbcType=VARCHAR}</if>
+        <if test="origpic != null and origpic != ''"> and a.origpic = #{origpic, jdbcType=VARCHAR}</if>
+        <if test="origConfirmPicPath != null and origConfirmPicPath != ''"> and a.orig_confirm_pic_path = #{origConfirmPicPath, jdbcType=VARCHAR}</if>
+        <if test="origPicAnl != null and origPicAnl != ''"> and a.orig_pic_anl = #{origPicAnl, jdbcType=VARCHAR}</if>
+        <if test="cruiseAbnormal != null and cruiseAbnormal != ''"> and a.cruise_abnormal = #{cruiseAbnormal, jdbcType=INTEGER}</if>
+        <if test="evaluationState != null and evaluationState != ''"> and a.evaluation_state = #{evaluationState, jdbcType=INTEGER}</if>
+        <if test="identifyState != null and identifyState != ''"> and a.identify_state = #{identifyState, jdbcType=INTEGER}</if>
+        <if test="identifyResult != null and identifyResult != ''"> and a.identify_result = #{identifyResult, jdbcType=INTEGER}</if>
+        <if test="createtime != null and createtime != ''"> and a.createtime = #{createtime, jdbcType=TIMESTAMP}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+        <if test="checkUser != null and checkUser != ''"> and a.check_user = #{checkUser, jdbcType=VARCHAR}</if>
+        <if test="checkDate != null and checkDate != ''"> and a.check_date = #{checkDate, jdbcType=TIMESTAMP}</if>
+        <if test="isWarn != null and isWarn != ''"> and a.is_warn = #{isWarn, jdbcType=INTEGER}</if>
+        <if test="cruiseResult != null and cruiseResult != ''"> and a.cruise_result = #{cruiseResult, jdbcType=INTEGER}</if>
+        <if test="firName != null and firName != ''"> and a.fir_name = #{firName, jdbcType=VARCHAR}</if>
+        <if test="firDate != null and firDate != ''"> and a.fir_date = #{firDate, jdbcType=TIMESTAMP}</if>
+        <if test="resultPic != null and resultPic != ''"> and a.result_pic = #{resultPic, jdbcType=VARCHAR}</if>
+        <if test="points != null and points != ''"> and a.points = #{points, jdbcType=VARCHAR}</if>
+        <if test="voicePath != null and voicePath != ''"> and a.voice_path = #{voicePath, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into u_patrol_data_result(
+            cruise_data_id,
+            task_id,
+            device_id,
+            device_name,
+            instance_id,
+            instance_name,
+            cruise_id,
+            cruise_name,
+            cruise_time,
+            cruise_status,
+            cruise_type,
+            result_desc,
+            result_num,
+            modify_num,
+            picpath,
+            confirm_pic_path,
+            pic_path_anl,
+            person_check,
+            origpic,
+            orig_confirm_pic_path,
+            orig_pic_anl,
+            cruise_abnormal,
+            evaluation_state,
+            identify_state,
+            identify_result,
+            createtime,
+            remark,
+            check_user,
+            check_date,
+            is_warn,
+            cruise_result,
+            fir_name,
+            fir_date,
+            result_pic,
+            points,
+            voice_path
+        )values
+        <foreach collection="list" item="UPatrolDataResult" separator=",">
+            (
+                #{UPatrolDataResult.cruiseDataId, jdbcType=BIGINT},
+                #{UPatrolDataResult.taskId, jdbcType=VARCHAR},
+                #{UPatrolDataResult.deviceId, jdbcType=BIGINT},
+                #{UPatrolDataResult.deviceName, jdbcType=VARCHAR},
+                #{UPatrolDataResult.instanceId, jdbcType=BIGINT},
+                #{UPatrolDataResult.instanceName, jdbcType=VARCHAR},
+                #{UPatrolDataResult.cruiseId, jdbcType=BIGINT},
+                #{UPatrolDataResult.cruiseName, jdbcType=VARCHAR},
+                #{UPatrolDataResult.cruiseTime, jdbcType=TIMESTAMP},
+                #{UPatrolDataResult.cruiseStatus, jdbcType=INTEGER},
+                #{UPatrolDataResult.cruiseType, jdbcType=INTEGER},
+                #{UPatrolDataResult.resultDesc, jdbcType=VARCHAR},
+                #{UPatrolDataResult.resultNum, jdbcType=VARCHAR},
+                #{UPatrolDataResult.modifyNum, jdbcType=VARCHAR},
+                #{UPatrolDataResult.picpath, jdbcType=VARCHAR},
+                #{UPatrolDataResult.confirmPicPath, jdbcType=VARCHAR},
+                #{UPatrolDataResult.picPathAnl, jdbcType=VARCHAR},
+                #{UPatrolDataResult.personCheck, jdbcType=VARCHAR},
+                #{UPatrolDataResult.origpic, jdbcType=VARCHAR},
+                #{UPatrolDataResult.origConfirmPicPath, jdbcType=VARCHAR},
+                #{UPatrolDataResult.origPicAnl, jdbcType=VARCHAR},
+                #{UPatrolDataResult.cruiseAbnormal, jdbcType=INTEGER},
+                #{UPatrolDataResult.evaluationState, jdbcType=INTEGER},
+                #{UPatrolDataResult.identifyState, jdbcType=INTEGER},
+                #{UPatrolDataResult.identifyResult, jdbcType=INTEGER},
+                #{UPatrolDataResult.createtime, jdbcType=TIMESTAMP},
+                #{UPatrolDataResult.remark, jdbcType=VARCHAR},
+                #{UPatrolDataResult.checkUser, jdbcType=VARCHAR},
+                #{UPatrolDataResult.checkDate, jdbcType=TIMESTAMP},
+                #{UPatrolDataResult.isWarn, jdbcType=INTEGER},
+                #{UPatrolDataResult.cruiseResult, jdbcType=INTEGER},
+                #{UPatrolDataResult.firName, jdbcType=VARCHAR},
+                #{UPatrolDataResult.firDate, jdbcType=TIMESTAMP},
+                #{UPatrolDataResult.resultPic, jdbcType=VARCHAR},
+                #{UPatrolDataResult.points, jdbcType=VARCHAR},
+                #{UPatrolDataResult.voicePath, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from u_patrol_data_result
+        where cruise_data_id in (
+            <foreach collection="list" item="cruiseDataId" separator=",">
+                #{cruiseDataId, jdbcType=BIGINT}
+            </foreach>
+            )
+    </delete>
+
+</mapper>

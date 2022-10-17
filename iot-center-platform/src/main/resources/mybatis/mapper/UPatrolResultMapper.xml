@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.patrol.dao.UPatrolResultDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        <id column="task_id" jdbcType="VARCHAR" property="taskId" />
+        <result column="task_code" jdbcType="VARCHAR" property="taskCode" />
+        <result column="task_name" jdbcType="VARCHAR" property="taskName" />
+        <result column="area_id" jdbcType="VARCHAR" property="areaId" />
+        <result column="task_type" jdbcType="INTEGER" property="taskType" />
+        <result column="execute_type" jdbcType="INTEGER" property="executeType" />
+        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
+        <result column="task_source" jdbcType="INTEGER" property="taskSource" />
+        <result column="task_level" jdbcType="INTEGER" property="taskLevel" />
+        <result column="task_state" jdbcType="INTEGER" property="taskState" />
+        <result column="modify_state" jdbcType="INTEGER" property="modifyState" />
+        <result column="task_count" jdbcType="INTEGER" property="taskCount" />
+        <result column="task_wait" jdbcType="INTEGER" property="taskWait" />
+        <result column="check_user" jdbcType="VARCHAR" property="checkUser" />
+        <result column="check_date" jdbcType="TIMESTAMP" property="checkDate" />
+        <result column="weather" jdbcType="VARCHAR" property="weather" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+        <result column="execute_time" jdbcType="TIMESTAMP" property="executeTime" />
+        <result column="is_review" jdbcType="VARCHAR" property="isReview" />
+        <result column="task_abnormal" jdbcType="INTEGER" property="taskAbnormal" />
+        <result column="cruise_result" jdbcType="INTEGER" property="cruiseResult" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        task_id, task_code, task_name, area_id, task_type, execute_type, robot_id, task_source, task_level, task_state, modify_state, task_count, task_wait, check_user, check_date, weather, create_time, end_time, execute_time, is_review, task_abnormal, cruise_result, remark
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="taskId" parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        insert into u_patrol_result(
+            task_id,
+            task_code,
+            task_name,
+            area_id,
+            task_type,
+            execute_type,
+            robot_id,
+            task_source,
+            task_level,
+            task_state,
+            modify_state,
+            task_count,
+            task_wait,
+            check_user,
+            check_date,
+            weather,
+            create_time,
+            end_time,
+            execute_time,
+            is_review,
+            task_abnormal,
+            cruise_result,
+            remark
+        )values(
+                #{taskId, jdbcType=VARCHAR},
+                #{taskCode, jdbcType=VARCHAR},
+                #{taskName, jdbcType=VARCHAR},
+                #{areaId, jdbcType=VARCHAR},
+                #{taskType, jdbcType=INTEGER},
+                #{executeType, jdbcType=INTEGER},
+                #{robotId, jdbcType=BIGINT},
+                #{taskSource, jdbcType=INTEGER},
+                #{taskLevel, jdbcType=INTEGER},
+                #{taskState, jdbcType=INTEGER},
+                #{modifyState, jdbcType=INTEGER},
+                #{taskCount, jdbcType=INTEGER},
+                #{taskWait, jdbcType=INTEGER},
+                #{checkUser, jdbcType=VARCHAR},
+                #{checkDate, jdbcType=TIMESTAMP},
+                #{weather, jdbcType=VARCHAR},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{endTime, jdbcType=TIMESTAMP},
+                #{executeTime, jdbcType=TIMESTAMP},
+                #{isReview, jdbcType=VARCHAR},
+                #{taskAbnormal, jdbcType=INTEGER},
+                #{cruiseResult, jdbcType=INTEGER},
+                #{remark, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete from u_patrol_result
+                where task_id = #{taskId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        update u_patrol_result a <set>
+        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
+        <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
+        <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
+        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+        <if test="taskType != null and taskType != ''">a.task_type = #{taskType, jdbcType=INTEGER},</if>
+        <if test="executeType != null and executeType != ''">a.execute_type = #{executeType, jdbcType=INTEGER},</if>
+        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        <if test="taskSource != null and taskSource != ''">a.task_source = #{taskSource, jdbcType=INTEGER},</if>
+        <if test="taskLevel != null and taskLevel != ''">a.task_level = #{taskLevel, jdbcType=INTEGER},</if>
+        <if test="taskState != null and taskState != ''">a.task_state = #{taskState, jdbcType=INTEGER},</if>
+        <if test="modifyState != null and modifyState != ''">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
+        <if test="taskCount != null and taskCount != ''">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
+        <if test="taskWait != null and taskWait != ''">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
+        <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+        <if test="checkDate != null and checkDate != ''">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
+        <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
+        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
+        <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP},</if>
+        <if test="executeTime != null and executeTime != ''">a.execute_time = #{executeTime, jdbcType=TIMESTAMP},</if>
+        <if test="isReview != null and isReview != ''">a.is_review = #{isReview, jdbcType=VARCHAR},</if>
+        <if test="taskAbnormal != null and taskAbnormal != ''">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
+        <if test="cruiseResult != null and cruiseResult != ''">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+    </set>
+            where a.task_id = #{taskId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        select
+        a.task_id,
+        a.task_code,
+        a.task_name,
+        a.area_id,
+        a.task_type,
+        a.execute_type,
+        a.robot_id,
+        a.task_source,
+        a.task_level,
+        a.task_state,
+        a.modify_state,
+        a.task_count,
+        a.task_wait,
+        a.check_user,
+        a.check_date,
+        a.weather,
+        a.create_time,
+        a.end_time,
+        a.execute_time,
+        a.is_review,
+        a.task_abnormal,
+        a.cruise_result,
+        a.remark
+        from u_patrol_result a
+        where 1 = 1
+            and a.task_id = #{taskId, jdbcType=VARCHAR}
+        limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult" resultType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        select
+        a.task_id,
+        a.task_code,
+        a.task_name,
+        a.area_id,
+        a.task_type,
+        a.execute_type,
+        a.robot_id,
+        a.task_source,
+        a.task_level,
+        a.task_state,
+        a.modify_state,
+        a.task_count,
+        a.task_wait,
+        a.check_user,
+        a.check_date,
+        a.weather,
+        a.create_time,
+        a.end_time,
+        a.execute_time,
+        a.is_review,
+        a.task_abnormal,
+        a.cruise_result,
+        a.remark
+        from u_patrol_result a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="taskCode != null and taskCode != ''"> and a.task_code = #{taskCode, jdbcType=VARCHAR}</if>
+        <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
+        <if test="taskType != null and taskType != ''"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="executeType != null and executeType != ''"> and a.execute_type = #{executeType, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="taskSource != null and taskSource != ''"> and a.task_source = #{taskSource, jdbcType=INTEGER}</if>
+        <if test="taskLevel != null and taskLevel != ''"> and a.task_level = #{taskLevel, jdbcType=INTEGER}</if>
+        <if test="taskState != null and taskState != ''"> and a.task_state = #{taskState, jdbcType=INTEGER}</if>
+        <if test="modifyState != null and modifyState != ''"> and a.modify_state = #{modifyState, jdbcType=INTEGER}</if>
+        <if test="taskCount != null and taskCount != ''"> and a.task_count = #{taskCount, jdbcType=INTEGER}</if>
+        <if test="taskWait != null and taskWait != ''"> and a.task_wait = #{taskWait, jdbcType=INTEGER}</if>
+        <if test="checkUser != null and checkUser != ''"> and a.check_user = #{checkUser, jdbcType=VARCHAR}</if>
+        <if test="checkDate != null and checkDate != ''"> and a.check_date = #{checkDate, jdbcType=TIMESTAMP}</if>
+        <if test="weather != null and weather != ''"> and a.weather = #{weather, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="endTime != null and endTime != ''"> and a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="executeTime != null and executeTime != ''"> and a.execute_time = #{executeTime, jdbcType=TIMESTAMP}</if>
+        <if test="isReview != null and isReview != ''"> and a.is_review = #{isReview, jdbcType=VARCHAR}</if>
+        <if test="taskAbnormal != null and taskAbnormal != ''"> and a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER}</if>
+        <if test="cruiseResult != null and cruiseResult != ''"> and a.cruise_result = #{cruiseResult, jdbcType=INTEGER}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult" resultType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        select
+        a.task_id,
+        a.task_code,
+        a.task_name,
+        a.area_id,
+        a.task_type,
+        a.execute_type,
+        a.robot_id,
+        a.task_source,
+        a.task_level,
+        a.task_state,
+        a.modify_state,
+        a.task_count,
+        a.task_wait,
+        a.check_user,
+        a.check_date,
+        a.weather,
+        a.create_time,
+        a.end_time,
+        a.execute_time,
+        a.is_review,
+        a.task_abnormal,
+        a.cruise_result,
+        a.remark
+        from u_patrol_result a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="taskCode != null and taskCode != ''"> and a.task_code = #{taskCode, jdbcType=VARCHAR}</if>
+        <if test="taskName != null and taskName != ''"> and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="areaId != null and areaId != ''"> and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
+        <if test="taskType != null and taskType != ''"> and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="executeType != null and executeType != ''"> and a.execute_type = #{executeType, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="taskSource != null and taskSource != ''"> and a.task_source = #{taskSource, jdbcType=INTEGER}</if>
+        <if test="taskLevel != null and taskLevel != ''"> and a.task_level = #{taskLevel, jdbcType=INTEGER}</if>
+        <if test="taskState != null and taskState != ''"> and a.task_state = #{taskState, jdbcType=INTEGER}</if>
+        <if test="modifyState != null and modifyState != ''"> and a.modify_state = #{modifyState, jdbcType=INTEGER}</if>
+        <if test="taskCount != null and taskCount != ''"> and a.task_count = #{taskCount, jdbcType=INTEGER}</if>
+        <if test="taskWait != null and taskWait != ''"> and a.task_wait = #{taskWait, jdbcType=INTEGER}</if>
+        <if test="checkUser != null and checkUser != ''"> and a.check_user = #{checkUser, jdbcType=VARCHAR}</if>
+        <if test="checkDate != null and checkDate != ''"> and a.check_date = #{checkDate, jdbcType=TIMESTAMP}</if>
+        <if test="weather != null and weather != ''"> and a.weather = #{weather, jdbcType=VARCHAR}</if>
+        <if test="createTime != null and createTime != ''"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="endTime != null and endTime != ''"> and a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="executeTime != null and executeTime != ''"> and a.execute_time = #{executeTime, jdbcType=TIMESTAMP}</if>
+        <if test="isReview != null and isReview != ''"> and a.is_review = #{isReview, jdbcType=VARCHAR}</if>
+        <if test="taskAbnormal != null and taskAbnormal != ''"> and a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER}</if>
+        <if test="cruiseResult != null and cruiseResult != ''"> and a.cruise_result = #{cruiseResult, jdbcType=INTEGER}</if>
+        <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into u_patrol_result(
+            task_id,
+            task_code,
+            task_name,
+            area_id,
+            task_type,
+            execute_type,
+            robot_id,
+            task_source,
+            task_level,
+            task_state,
+            modify_state,
+            task_count,
+            task_wait,
+            check_user,
+            check_date,
+            weather,
+            create_time,
+            end_time,
+            execute_time,
+            is_review,
+            task_abnormal,
+            cruise_result,
+            remark
+        )values
+        <foreach collection="list" item="UPatrolResult" separator=",">
+            (
+                #{UPatrolResult.taskId, jdbcType=VARCHAR},
+                #{UPatrolResult.taskCode, jdbcType=VARCHAR},
+                #{UPatrolResult.taskName, jdbcType=VARCHAR},
+                #{UPatrolResult.areaId, jdbcType=VARCHAR},
+                #{UPatrolResult.taskType, jdbcType=INTEGER},
+                #{UPatrolResult.executeType, jdbcType=INTEGER},
+                #{UPatrolResult.robotId, jdbcType=BIGINT},
+                #{UPatrolResult.taskSource, jdbcType=INTEGER},
+                #{UPatrolResult.taskLevel, jdbcType=INTEGER},
+                #{UPatrolResult.taskState, jdbcType=INTEGER},
+                #{UPatrolResult.modifyState, jdbcType=INTEGER},
+                #{UPatrolResult.taskCount, jdbcType=INTEGER},
+                #{UPatrolResult.taskWait, jdbcType=INTEGER},
+                #{UPatrolResult.checkUser, jdbcType=VARCHAR},
+                #{UPatrolResult.checkDate, jdbcType=TIMESTAMP},
+                #{UPatrolResult.weather, jdbcType=VARCHAR},
+                #{UPatrolResult.createTime, jdbcType=TIMESTAMP},
+                #{UPatrolResult.endTime, jdbcType=TIMESTAMP},
+                #{UPatrolResult.executeTime, jdbcType=TIMESTAMP},
+                #{UPatrolResult.isReview, jdbcType=VARCHAR},
+                #{UPatrolResult.taskAbnormal, jdbcType=INTEGER},
+                #{UPatrolResult.cruiseResult, jdbcType=INTEGER},
+                #{UPatrolResult.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from u_patrol_result
+        where task_id in (
+            <foreach collection="list" item="taskId" separator=",">
+                #{taskId, jdbcType=VARCHAR}
+            </foreach>
+            )
+    </delete>
+
+</mapper>
