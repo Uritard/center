@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +26,6 @@ public class NonhomologousWarnService {
 
     private final Logger log = LoggerFactory.getLogger(NonhomologousWarnService.class);
 
-    String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
     private static final String OFF_LINE = "离线";
 
     @Autowired

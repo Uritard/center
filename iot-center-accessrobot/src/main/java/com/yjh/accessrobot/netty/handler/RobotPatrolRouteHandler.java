@@ -4,6 +4,7 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
@@ -11,7 +12,6 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.bcel.generic.IF_ACMPEQ;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -38,7 +37,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
     @Autowired
     private RobotService robotService;
 
-    private String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+    // private String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -66,6 +65,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
                 String temporaryPath = filePathMap.get("content") + "/" + filePath;
                 log.info("temporaryPath是===" + temporaryPath);
 
+                String todayTime = DateTimeUtil.format(new Date(), "yyyy/MM/dd");
                 // 开发环境图片相对路径文件目录
                 String developRelativeUrl = relativeImgMap.get("content") + "/" + todayTime + "/" + taskId + "/Road";
                 // 开发环境图片绝对路径文件目录

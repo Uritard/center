@@ -62,7 +62,7 @@ public class RobotService {
 
     private Logger log = LoggerFactory.getLogger(RobotService.class);
 
-    String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+    // String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
     private static final String OFF_LINE = "离线";
 
     @Autowired
@@ -125,6 +125,7 @@ public class RobotService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> feignRobotControl(String robotCode, String type, String command, String value, String direction, String key, Long userId, String password, HttpServletRequest request,String content) throws Exception{
+        String todayTime = DateTimeUtil.format(new Date(), "yyyy/MM/dd");
         Map scmap = new HashMap();
         String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
         if (command.equals("1") && type.equals("1")) {
@@ -741,6 +742,8 @@ public class RobotService {
     public Map<String,Object> receivingResponse(XMLBaseModel xmlBaseModel, long receiveSessionId) {
         RobotServerHandler.getRobotResultMap().put("Code", xmlBaseModel.getCode());
         RobotServerHandler.getRobotResultMap().put("receiveSessionId", receiveSessionId);
+
+        String todayTime = DateTimeUtil.format(new Date(), "yyyy/MM/dd");
 
         if (Constant.sendSessionId == receiveSessionId){
             log.info("-------------这是刚发命令的响应{}-------------", receiveSessionId);

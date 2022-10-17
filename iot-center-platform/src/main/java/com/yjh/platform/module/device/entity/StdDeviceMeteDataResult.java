@@ -39,6 +39,10 @@ public class StdDeviceMeteDataResult {
         this.pageNum  = pageNum;
         this.pageSize = pageSize;
         this.count = list.size();
+        if(pageSize == 0){
+            this.list = list;
+            return;
+        }
 
         // 总记录数和每页显示的记录之间是否可以凑成整数（pages）
         boolean full = count % pageSize == 0;
