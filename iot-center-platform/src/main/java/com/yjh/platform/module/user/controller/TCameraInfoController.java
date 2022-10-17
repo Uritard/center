@@ -233,16 +233,31 @@ public class TCameraInfoController {
                          @RequestParam(value = "aliasName", required = false) String aliasName,
                          @RequestParam(value = "recordId", required = false) String recordId,
                          @RequestParam(value = "upRegionId", required = false) Long upRegionId,
+                         @RequestParam(value = "channelNum", required = false) Integer channelNum,
+                         @RequestParam(value = "cameraNum", required = false) Integer cameraNum,
+                         @RequestParam(value = "smsId", required = false) Integer smsId,
+                         @RequestParam(value = "rmsId", required = false) Integer rmsId,
+                         @RequestParam(value = "monitorId", required = false) String monitorId,
+                         @RequestParam(value = "vendorId", required = false) Integer vendorId,
                          @RequestParam(value = "streamType", required = false) Integer streamType,
                          @RequestParam(value = "protocolType", required = false) Integer protocolType,
                          @RequestParam(value = "cameraIp", required = false) String cameraIp,
                          @RequestParam(value = "url", required = false) String url,
+                         @RequestParam(value = "port", required = false) Integer port,
+                         @RequestParam(value = "infreadPort", required = false) Integer infreadPort,
+                         @RequestParam(value = "cameraManager", required = false) String cameraManager,
+                         @RequestParam(value = "cameraCode", required = false) String cameraCode,
                          @RequestParam(value = "cameraType", required = false) Integer cameraType,
-                         @RequestParam(value = "isControl", required = false) Integer isControl) {
+                         @RequestParam(value = "latitude", required = false) String latitude,
+                         @RequestParam(value = "longitude", required = false) String longitude,
+                         @RequestParam(value = "address", required = false) String address,
+                         @RequestParam(value = "isControl", required = false) Integer isControl,
+                         @RequestParam(value = "unit", required = false) String unit) {
         Result result = new Result();
         try {
-            List<TCameraInfo> list = tCameraInfoService.select(cameraId, cameraName, cameraModel, pmsId, aliasName, recordId, upRegionId, streamType, protocolType,
-                cameraIp, url, cameraType, isControl);
+            List<TCameraInfoByDict> list = tCameraInfoService.select(cameraId, cameraName, cameraModel,pmsId,aliasName,
+                    recordId, upRegionId, channelNum, cameraNum,smsId, rmsId, monitorId,vendorId, streamType, protocolType,
+                    cameraIp,url, port, infreadPort,cameraManager,cameraCode,cameraType, isControl,latitude,longitude,address,unit);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

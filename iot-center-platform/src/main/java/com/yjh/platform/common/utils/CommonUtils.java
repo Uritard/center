@@ -1,9 +1,9 @@
 package com.yjh.platform.common.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -91,10 +91,6 @@ public class CommonUtils {
         return (array == null || array.length == 0);
     }
 
-    public static boolean isEmptyOrNullstr(String str) {
-        return StringUtils.isEmpty(str) || "null".equalsIgnoreCase(str);
-    }
-
     /**
      * @param json String
      * @return true/false
@@ -129,6 +125,17 @@ public class CommonUtils {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * 判断比较值是否为空，为空则赋值
+     *
+     * @param object       比较对象值
+     * @param defaultValue 设置默认对象值
+     * @return 新值
+     */
+    public static Object defaultJudge(Object object, Object defaultValue) {
+        return StringUtils.isEmpty(object) ? defaultValue : object;
     }
 
     /**
@@ -415,11 +422,9 @@ public class CommonUtils {
      * @return
      */
     public static String percentFormat(float v, String format) {
-        try {
+        if (!StringUtils.isEmpty(v)) {
             DecimalFormat decimalFormat = new DecimalFormat(format);
             return decimalFormat.format(v);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
         }
         return "";
     }

@@ -536,8 +536,7 @@
         f.device_name,
         g.real_code,
         c.robot_id,
-        IFNULL(c.inspection_name,d.preset_name) as cruiseName,
-        d.camera_id
+        IFNULL(c.inspection_name,d.preset_name) as cruiseName
         FROM
         t_cruise_point_instance a
         LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
@@ -642,7 +641,6 @@
         t_device_maintenance a
         WHERE
         a.maintenance_start &lt;= #{time,jdbcType=TIMESTAMP} AND a.maintenance_stop &gt;=#{time,jdbcType=TIMESTAMP}
-        order by a.device_id asc
     </select>
 
     <select id="selectCameraByDeviceMeteId" resultType="java.util.HashMap">
@@ -654,55 +652,6 @@
         t_std_devicemete a,t_cruise_point_instance b,t_camera_preset c,t_camera_info d
         where a.device_mete_id = b.device_mete_id and b.cruise_id = c.preset_id and c.camera_id = d.camera_id
         and a.device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
-    </select>
-    <select id="selectInstanceAttrInfo"  resultType="com.yjh.platform.module.device.entity.TCruisePointInstanceAttr">
-        select distinct
-        a.instance_id,
-        (
-        CASE
-        WHEN ISNULL(b.mete_name)
-        AND ISNULL(c.inspection_id)
-        AND ISNULL(d.preset_name) THEN
-        ''
-        WHEN ISNULL(b.mete_name)
-        AND ISNULL(c.inspection_name) THEN
-        d.preset_name
-        WHEN ISNULL(b.mete_name)
-        AND ISNULL(d.preset_img) THEN
-        c.inspection_name
-        WHEN ISNULL(c.inspection_name)
-        AND ISNULL(d.preset_name) THEN
-        b.mete_name
-        WHEN ISNULL(c.inspection_name) THEN
-        CONCAT(
-        b.mete_name,
-        ' /',
-        d.preset_name
-        )
-        WHEN ISNULL(d.preset_name) THEN
-        CONCAT(
-        b.mete_name,
-        ' /',
-        c.inspection_name
-        )
-        END
-        ) AS instanceName,
-        a.device_id,
-        e.device_name,
-        a.cruise_id,
-        a.cruise_name,
-        a.cruise_type,
-        a.robot_id,
-        b.device_mete_name
-        from t_cruise_point_instance a
-        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
-        LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
-        LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
-        left join t_std_device e on a.device_id = e.device_id
-        where a.instance_id in
-        <foreach collection="list" open="(" close=")" separator="," item="instanceId">
-            #{instanceId, jdbcType=BIGINT}
-        </foreach>
     </select>
     <select id="selectRobotByDeviceMeteId" resultType="java.util.HashMap">
         SELECT

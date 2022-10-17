@@ -20,7 +20,6 @@ import com.yjh.platform.common.utils.ResultHandleUtils;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdMetemodelDetailDao;
 import com.yjh.platform.module.device.entity.Analysis;
-import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
@@ -596,32 +595,18 @@ public class HelloController {
 //        }
 //        return result;
 //    }
-public static void main(String[] args) {
-    Map<String, String> cruiseResultMap = new HashMap<>(16);
-    cruiseResultMap.put("patrolDeviceName", "111");
-    cruiseResultMap.put("patrolDeviceCode", "22");
-    cruiseResultMap.put("robotCode", "333");
-    cruiseResultMap.put("taskName", "444");
-    cruiseResultMap.put("taskCode", "555");
-    cruiseResultMap.put("deviceName", "666");
-    cruiseResultMap.put("deviceId", "777");
-    cruiseResultMap.put("valueType", "888");
-    cruiseResultMap.put("value","999" );
-    cruiseResultMap.put("valueUnit","000");
-    cruiseResultMap.put("unit","qqq");
-    cruiseResultMap.put("time", "www");
-    cruiseResultMap.put("recognitionType", "eee");
-    cruiseResultMap.put("fileType", "rrr");
-    cruiseResultMap.put("rectangle", "ttt");
-    cruiseResultMap.put("taskPatrolledId", "yyy");
-    cruiseResultMap.put("filePath", "");
-//    cruiseResultMap.put("valid", "iii");
+    @ApiOperation(value = "main")
+    @GetMapping(value = "/main")
+    public Result main() {
+        Result result = new Result();
+        try {
+//            result.setData(tCameraPresetService.main());
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询预置位树失败：" + e);
+        }
+        return result;
+    }
 
-    String toJSON = JSONObject.toJSONString(cruiseResultMap);
-    RobotPatrolTaskResult taskResult = JSONObject.toJavaObject(JSON.parseObject(toJSON), RobotPatrolTaskResult.class);
-    System.out.println("转换后的实体类taskResult是===" + taskResult);
-
-    System.out.println(cruiseResultMap.get("lll") + "===" + Objects.isNull(cruiseResultMap.get("lll")));
-}
 
 }

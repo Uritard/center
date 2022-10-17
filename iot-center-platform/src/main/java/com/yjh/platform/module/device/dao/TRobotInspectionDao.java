@@ -64,17 +64,4 @@ public interface TRobotInspectionDao {
 
     Map<String,Object> selectInspection(@Param(value = "inspectionCode") String inspectionCode);
 
-    /**
-     * 通过机器人上报的任务id查询巡视主机上的任务id
-     * @param robotTaskId 任务id
-     * @return String
-     */
-    String selectRealTaskId(@Param(value = "robotTaskId")String robotTaskId);
-    /**
-     * 通过机器人编码查询巡视机器人类型
-     * @param robotCode 机器人编码
-     * @return Integer
-     */
-    Integer selectRobotType(@Param(value = "robotCode") String robotCode);
-
 }

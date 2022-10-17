@@ -130,11 +130,6 @@ public class Constant {
 
     public static String WEBSOCKET_URL="";
 
-    /**
-     * 机器人做过的巡视点与任务对应关系
-     */
-    public static Map<String, List<Long>> flagMap = new ConcurrentHashMap<>();
-
     public static RedisTemplate redisTemplate;
 
     public static Boolean packetLog;

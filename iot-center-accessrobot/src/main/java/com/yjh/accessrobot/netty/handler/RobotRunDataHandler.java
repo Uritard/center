@@ -52,11 +52,11 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
                 robotOperationMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
                 robotOperationMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
                 robotOperationMap.put("robotCode", robotCode);
-                robotOperationMap.put("time", String.valueOf(res.get("time")));
-                robotOperationMap.put("type", String.valueOf(res.get("type")));
-                robotOperationMap.put("value", String.valueOf(res.get("value")));
-                robotOperationMap.put("valueUnit", String.valueOf(res.get("value_unit")));
-                robotOperationMap.put("unit", String.valueOf(res.get("unit")));
+                robotOperationMap.put("time", res.get("time").toString());
+                robotOperationMap.put("type", res.get("type").toString());
+                robotOperationMap.put("value", res.get("value").toString());
+                robotOperationMap.put("valueUnit", res.get("value_unit").toString());
+                robotOperationMap.put("unit", res.get("unit").toString());
                 robotOperationList.add(robotOperationMap);
             });
 

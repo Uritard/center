@@ -2,7 +2,6 @@ package com.yjh.platform.common.quartz;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.StaticContextAccessor;
-import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import org.quartz.*;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
@@ -274,59 +273,6 @@ public class JobManager {
                 .build();
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, simpleTrigger);
         logger.info("定时任务创建成功");
-        return "success";
-    }
-
-    /**
-     *新建一个周期巡视任务
-     */
-    public String createTask(QuartzTask quartzTask, UPatrolTask task) throws Exception {
-        ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
-        TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-        JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
-
-        if (StaticContextAccessor.getBean(Scheduler.class).checkExists(jobKey) && StaticContextAccessor.getBean(Scheduler.class).checkExists(triggerKey)) {
-            logger.error(" Job already exist");
-            return "false";
-        }
-//        logger.info("dataUploadInterval :" + dataUploadInterval);
-        JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
-                usingJobData("taskId", task.getTaskId()).build();
-        taskMap.put("taskId",task.getTaskId());
-        taskMap.put("jobName",quartzTask.getJobName()+System.currentTimeMillis());
-        taskMap.put("jobGroupName",quartzTask.getJobGroup());
-        String str = quartzTask.getJobName()+System.currentTimeMillis();
-        taskMap.put("triggerName",str);
-        taskMap.put("triggerGroupName",quartzTask.getJobGroup());
-        Constant.taskMap.add(taskMap);
-        Trigger trigger = null;
-        if (task.getExecuteType() ==172) {//周期
-            trigger = TriggerBuilder.newTrigger()
-                    .withIdentity(str, quartzTask.getJobGroup())
-                    .withSchedule(cronSchedule(quartzTask.getCronExpression()))
-                    .build();
-        } else if (task.getExecuteType() ==173) {//立即
-            trigger = TriggerBuilder.newTrigger()
-                    .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
-                    .startNow()
-                    .withSchedule(
-                            SimpleScheduleBuilder.simpleSchedule()
-                                    .withIntervalInSeconds(3)
-                                    .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
-                    .build();
-        } else if (task.getExecuteType() ==174) {//定期
-            trigger = TriggerBuilder.newTrigger()
-                    .withIdentity(str, quartzTask.getJobGroup())
-                    .startAt(quartzTask.getStartTime())
-                    .withSchedule(
-                            SimpleScheduleBuilder.simpleSchedule()
-                                    .withIntervalInSeconds(3)
-                                    .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
-                    .build();
-        }
-
-        StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, trigger);
-        logger.info("周期任务创建成功");
         return "success";
     }
 }
