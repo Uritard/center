@@ -538,8 +538,8 @@ public class TCruiseTaskService {
                 // 周期和间隔任务
                 case "172":
                     taskInfo.setFixedStartTime("");
-                    taskInfo.setCycleMonth(Optional.of(tCruiseTaskAdd.getCycleMonth()).orElse(""));
-                    taskInfo.setCycleWeek(Optional.of(tCruiseTaskAdd.getCycleWeek()).orElse(""));
+                    taskInfo.setCycleMonth(Optional.ofNullable(tCruiseTaskAdd.getCycleMonth()).orElse(""));
+                    taskInfo.setCycleWeek(Optional.ofNullable(tCruiseTaskAdd.getCycleWeek()).orElse(""));
                     String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
 
                     if (StringUtils.isNotEmpty(cycleExecuteTime)){
@@ -550,19 +550,21 @@ public class TCruiseTaskService {
                         }
                     }
                     taskInfo.setCycleExecuteTime(cycleExecuteTime);
+                    taskInfo.setCycleStartTime(Optional.ofNullable(tCruiseTaskAdd.getCycleStartTime()).orElse(""));
+                    taskInfo.setCycleEndTime(Optional.ofNullable(tCruiseTaskAdd.getCycleEndTime()).orElse(""));
 
-                    taskInfo.setIntervalType(Optional.of(tCruiseTaskAdd.getIntervalType()).orElse(""));
-                    taskInfo.setIntervalNumber(Optional.of(tCruiseTaskAdd.getIntervalNumber()).orElse(""));
+                    taskInfo.setIntervalType(Optional.ofNullable(tCruiseTaskAdd.getIntervalType()).orElse(""));
+                    taskInfo.setIntervalNumber(Optional.ofNullable(tCruiseTaskAdd.getIntervalNumber()).orElse(""));
 
                     String intervalExecuteTime = tCruiseTaskAdd.getIntervalExecuteTime();
                     intervalExecuteTime = StringUtils.isNotEmpty(intervalExecuteTime) ? intervalExecuteTime.substring(11) : intervalExecuteTime;
                     taskInfo.setIntervalExecuteTime(intervalExecuteTime);
 
                     boolean isInterval = StringUtils.isEmpty(tCruiseTaskAdd.getIntervalType());
-                    taskInfo.setCycleStartTime(isInterval ? format.format(new Date()) : "");
-                    taskInfo.setCycleEndTime(isInterval ? tCruiseTaskAdd.getEndTime() : "");
-                    taskInfo.setIntervalStartTime(isInterval ? "" : format.format(new Date()));
-                    taskInfo.setIntervalEndTime(isInterval ? "" : tCruiseTaskAdd.getEndTime());
+                    taskInfo.setCycleStartTime(isInterval ? tCruiseTaskAdd.getCycleStartTime() : "");
+                    taskInfo.setCycleEndTime(isInterval ? tCruiseTaskAdd.getCycleEndTime() : "");
+                    taskInfo.setIntervalStartTime(isInterval ? "" : tCruiseTaskAdd.getIntervalStartTime());
+                    taskInfo.setIntervalEndTime(isInterval ? "" : tCruiseTaskAdd.getIntervalEndTime());
                     break;
                 default:
                     break;
