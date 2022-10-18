@@ -40,7 +40,7 @@ public class RunningThread implements Runnable{
 
                 }
 
-                String s = Constant.paramMap.get("env_interval");
+                String s = Constant.paramMap.get("weather_interval");
                 if(s == null){
                     s= "30";
                 }

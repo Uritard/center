@@ -84,8 +84,8 @@ public class MessageThread {
                             Constant.paramMap.put("patroldevice_run_interval",
                                 item.get("patroldevice_run_interval").toString());//巡视设备运行数据间隔间隔
                         }
-                        if (item.get("env_interval") != null) {
-                            Constant.paramMap.put("env_interval", item.get("env_interval").toString());//微气象数据间隔
+                        if (item.get("weather_interval") != null) {
+                            Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
                         }
                         if (item.get("nest_run_interval") != null) {
                             Constant.paramMap.put("nest_run_interval", item.get("nest_run_interval").toString());//无人机巢运行数据间隔
@@ -126,8 +126,8 @@ public class MessageThread {
                     if (item.get("patroldevice_run_interval") != null) {
                         Constant.paramMap.put("patroldevice_run_interval", item.get("patroldevice_run_interval").toString());//巡视设备运行数据间隔间隔
                     }
-                    if (item.get("env_interval") != null) {
-                        Constant.paramMap.put("env_interval", item.get("env_interval").toString());//微气象数据间隔
+                    if (item.get("weather_interval") != null) {
+                        Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
                     }
                     if (item.get("nest_run_interval") != null) {
                         Constant.paramMap.put("nest_run_interval", item.get("nest_run_interval").toString());//无人机巢运行数据间隔
