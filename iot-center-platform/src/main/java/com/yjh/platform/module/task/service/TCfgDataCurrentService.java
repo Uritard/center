@@ -6,6 +6,8 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.service.TCfgDeviceService;
 import com.yjh.platform.module.device.service.TStdDeviceService;
+import com.yjh.platform.module.patrol.controller.UPatrolTaskController;
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.task.controller.TCruiseTaskController;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
@@ -59,6 +61,9 @@ public class TCfgDataCurrentService {
 
     @Autowired
     private TCruiseTaskController tCruiseTaskController;
+
+    @Autowired
+    private UPatrolTaskController uPatrolTaskController;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -306,7 +311,8 @@ public class TCfgDataCurrentService {
             tCruiseTaskAdd.setUnionTaskStatus("1");
             // 联动任务优先级
             tCruiseTaskAdd.setTaskLevel(4);
-            Result result=tCruiseTaskController.insert(tCruiseTaskAdd);
+//            Result result=tCruiseTaskController.insert(tCruiseTaskAdd);
+            Result result=uPatrolTaskController.insert(tCruiseTaskAdd);
             String taskId=result.getData().toString();//联动任务ID
             cLogger.info("联动开始执行");
             //联动记录插库

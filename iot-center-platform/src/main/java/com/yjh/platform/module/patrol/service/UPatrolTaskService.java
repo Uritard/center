@@ -20,6 +20,7 @@ import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
@@ -30,10 +31,7 @@ import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.InspectionResultThread;
 import com.yjh.platform.module.patrol.thread.IsWarnAfterCruiseThread;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
-import com.yjh.platform.module.task.entity.RobotTaskInstanceInfo;
-import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
-import com.yjh.platform.module.task.entity.TCruiseTaskDel;
-import com.yjh.platform.module.task.entity.XMLBaseModel;
+import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
@@ -41,6 +39,7 @@ import com.yjh.platform.threadpool.TaskExecutePool;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,10 +93,6 @@ public class UPatrolTaskService {
     @Autowired
     private UPatrolPlanAttrDao uPatrolPlanAttrDao;
 
-    //模板图片路径
-    private String picModelPath;
-    //等待相机转到预置位时间
-    private Long waitTime;
     //jobName
     @Value("${spring.QingHua.jobName}")
     private String jobName;
@@ -108,7 +103,8 @@ public class UPatrolTaskService {
 
     private static final byte[] LOCK_FLAG = new byte[0];
 
-    DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final SimpleDateFormat daySdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Transactional(rollbackFor = Exception.class)
     public String insert(UPatrolTask uPatrolTask, TCruiseTaskAdd tCruiseTaskAdd) {
@@ -124,7 +120,10 @@ public class UPatrolTaskService {
         if (Objects.isNull(uPatrolTask.getTaskId())) {
             uPatrolTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
         }
-        uPatrolTask.setTaskCode(uPatrolTask.getTaskId());
+        if (Objects.isNull(uPatrolTask.getTaskCode())){
+            uPatrolTask.setTaskCode(uPatrolTask.getTaskId());
+        }
+
         List<Long> instanceList = insertTaskAttr(uPatrolTask, tCruiseTaskAdd);
 
         List<TCruisePointInstanceNameDetail> detailList = initializeTaskInfo(instanceList, uPatrolTask);
@@ -584,8 +583,6 @@ public class UPatrolTaskService {
 
     @Transactional(rollbackFor = Exception.class)
     public int taskConfirmation(String userId, String password, HttpServletRequest request, String identifier) throws Exception {
-        //return 1;
-        //todo 密码的解密
         String iP = request.getHeader("HTTP_X_FORWARDED_FOR");
         SysUser sysUser = sysUserDao.selectByPrimaryId(Long.valueOf(userId));
         //判断开关
@@ -746,7 +743,7 @@ public class UPatrolTaskService {
                 serviceRestTemplate.postForObject(Constant.ROBOT_TASK_STATUS_URL, robotTaskStatesMap, String.class);
             }
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("机器人任务控制出错：", e);
         }
     }
 
@@ -768,6 +765,7 @@ public class UPatrolTaskService {
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 robotTaskStates(robotTaskStatesMap);
             }
+            updateTaskStateForRedis(taskId,"241");
             Map<String,String> jasonMapOnFinished=new HashMap<>();
             jasonMapOnFinished.put("type","taskChange");
             jasonMapOnFinished.put("taskId",taskId);
@@ -784,6 +782,12 @@ public class UPatrolTaskService {
         sendTaskStateToUp(uPatrolTask, 3);
 
         return uPatrolResultDao.update(uPatrolResult);
+    }
+
+    private void updateTaskStateForRedis(String taskId,String state){
+        String strForCountAbnormal = "countForAbnormal:"+taskId;
+        Map<String,String> map = redisTemplate.opsForHash().entries(strForCountAbnormal);
+        map.put("taskState",state);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -808,7 +812,8 @@ public class UPatrolTaskService {
 //            return uPatrolResultDao.update(uPatrolResult);
 //        }
 
-        //todo  任务怎么继续？
+        updateTaskStateForRedis(taskId,"239");
+        videoTaskStart(taskId);
 
         uPatrolResult.setTaskState(239);
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
@@ -823,6 +828,35 @@ public class UPatrolTaskService {
 
         //任务状态上报站端
         sendTaskStateToUp(task, 2);
+        return uPatrolResultDao.update(uPatrolResult);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int taskShutDown(String taskId) {
+        UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
+        if (uPatrolResult.getExecuteType() == 240) {
+            return 1;
+        }
+        uPatrolResult.setExecuteType(242);
+        UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
+
+        List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+        Map<String, Object> robotTaskStatesMap = new HashMap<>();
+        robotTaskStatesMap.put("taskId", taskId);
+        robotTaskStatesMap.put("commandValue", 1);
+        robotTaskStatesMap.put("robotCodeList", robotCodeList);
+        robotTaskStates(robotTaskStatesMap);
+
+        updateTaskStateForRedis(taskId,"242");
+        try {
+           // todo 任务终止  结果处理
+            log.info("任务终止创建成功=="+taskId);
+        } catch (Exception e) {
+            log.info("任务终止创建失败" + e);
+        }
+
+        //任务状态上报站端
+        sendTaskStateToUp(task, 4);
         return uPatrolResultDao.update(uPatrolResult);
     }
 
@@ -1059,4 +1093,556 @@ public class UPatrolTaskService {
     public TRobotInfo selectRobotInfoByCode(String robotCode){
         return uPatrolTaskDao.selectRobotInfoByCode(robotCode);
     }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String, Object>> taskCount(Date taskStartDate, int flag) {
+        // 时间格式化处理
+        Map<String, String> map = new HashMap<>();
+        if (flag == 1){
+            map = monthHandle(taskStartDate);
+        }else {
+            map = yearHandle(taskStartDate);
+        }
+
+        SimpleDateFormat secondSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat secondFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Date dayBefore = new Date();
+        Date dayAfter = new Date();
+        Date originTime = new Date();
+        try {
+            originTime = secondFormat.parse("2000-01-01 00:00:00");
+            dayBefore = secondFormat.parse(map.get("firstDay"));
+            dayAfter = secondFormat.parse(map.get("lastDay"));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        log.info("dayBefore：{}", dayBefore);
+        log.info("dayAfter：{}", dayAfter);
+
+        List<TCruiseTaskCount> list = uPatrolTaskDao.taskCount(dayBefore, dayAfter);
+        List<TCruiseTaskDel> listDel = tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
+        List<Map<String, Object>> listTask = new ArrayList<>();
+        Date now = new Date();
+        for (TCruiseTaskCount tCruiseTaskCount : list) {
+            if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
+                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
+                for (Date aTimeList : timeList) {
+                    Map<String, Object> taskCountMap = new HashMap<>();
+                    Map<String, Object> taskCountMapDel = new HashMap<>();
+                    long taskTime = aTimeList.getTime();
+                    if (listDel.size() > 0) {
+                        for (TCruiseTaskDel tCruiseTaskDel : listDel) {
+                            long taskDelTime = tCruiseTaskDel.getDelTime().getTime();
+                            if (Objects.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) && taskDelTime == taskTime) {
+                                log.info("已删除的任务信息： " + tCruiseTaskCount.getTaskId() + " " + taskDelTime);
+                                taskCountMapDel.put("taskId", tCruiseTaskCount.getTaskId());
+                                taskCountMapDel.put("taskDelTime", taskDelTime);
+                            }
+                        }
+                        if (taskCountMapDel.size() == 0) {
+                            taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                            taskCountMap.put("total", tCruiseTaskCount.getTotal());
+                            taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                            taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+                            taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                            taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+                            if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                                taskCountMap.put("taskState", 238);
+                                taskCountMap.put("taskStateName", "任务未开始");
+                            } else {
+                                taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
+                                taskCountMap.put("taskStateName", tCruiseTaskCount.getTaskStateName());
+
+                            }
+                            if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                                taskCountMap.put("taskStatus", "-1");
+                            } else {
+                                taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
+                            }
+                            taskCountMap.put("startTime", secondSdf.format(aTimeList));
+                            listTask.add(taskCountMap);
+                        }
+                    } else {
+                        taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                        taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                        taskCountMap.put("total", tCruiseTaskCount.getTotal());
+                        taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                        taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+                        taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+                        if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                            taskCountMap.put("taskState", 238);
+                            taskCountMap.put("taskStateName", "任务未开始");
+                        } else {
+                            taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
+                            taskCountMap.put("taskStateName", tCruiseTaskCount.getTaskStateName());
+
+                        }
+                        if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                            taskCountMap.put("taskStatus", "-1");
+                        } else {
+                            taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
+                        }
+                        taskCountMap.put("startTime", secondSdf.format(aTimeList));
+                        listTask.add(taskCountMap);
+                    }
+                }
+            } else {
+                Map<String, Object> taskCountMap = new HashMap<>();
+                taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+                taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+                taskCountMap.put("total", tCruiseTaskCount.getTotal());
+                taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                    taskCountMap.put("taskState", 238);
+                    taskCountMap.put("taskStateName", "任务未开始");
+                } else {
+                    taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
+                    taskCountMap.put("taskStateName", tCruiseTaskCount.getTaskStateName());
+
+                }
+                if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                    taskCountMap.put("taskStatus", "-1");
+                } else {
+                    taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
+                }
+
+                taskCountMap.put("startTime", secondSdf.format(tCruiseTaskCount.getStartTime()));
+                listTask.add(taskCountMap);
+            }
+        }
+        return listTask;
+    }
+
+    private Map<String, String> monthHandle(Date taskStartDate) {
+        Map<String, String> map = new HashMap<>();
+        String firstDay = "";
+        String lastDay = "";
+        if (Objects.equals(null, taskStartDate)) {
+            Date date = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.MONTH, date.getMonth() - 1);
+            if ((date.getMonth()) == 1) {
+                int fDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            } else {
+                int fDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }
+            firstDay = daySdf.format(calendar.getTime()) + " 23:59:59";
+            log.info("firstDay: " + firstDay);
+            map.put("firstDay", firstDay);
+
+            int lDay = 0;
+            calendar.set(Calendar.MONTH, date.getMonth());
+            //2月的平年瑞年天数
+            if (date.getMonth() == 1) {
+                lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+            } else {
+                lDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+            }
+            calendar.set(Calendar.MONTH, date.getMonth());
+            calendar.set(Calendar.DAY_OF_MONTH, lDay);
+            lastDay = daySdf.format(calendar.getTime()) + " 23:59:59";
+            log.info("lastDay: " + lastDay);
+            map.put("lastDay", lastDay);
+
+        } else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth() - 1);
+            if ((taskStartDate.getMonth()) == 1) {
+                int fDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            } else {
+                int fDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }
+            firstDay = daySdf.format(calendar.getTime()) + " 23:59:59";
+            log.info("firstDay: " + firstDay);
+            map.put("firstDay", firstDay);
+
+            int lDay = 0;
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+            //2月的平年瑞年天数
+            if (taskStartDate.getMonth() == 1) {
+                lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+            } else {
+                lDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+            }
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+            calendar.set(Calendar.YEAR, taskStartDate.getYear() + 1900);
+            calendar.set(Calendar.DAY_OF_MONTH, lDay);
+            lastDay = daySdf.format(calendar.getTime()) + " 23:59:59";
+            log.info("lastDay: " + lastDay);
+            map.put("lastDay", lastDay);
+        }
+        return map;
+    }
+
+    private  Map<String, String> yearHandle(Date taskStartDate) {
+        Map<String, String> map = new HashMap<>();
+        String firstDay = "";
+        String lastDay= " ";
+        if (Objects.equals(null, taskStartDate)) {
+            Date date = new Date();
+            int year = date.getYear() + 1900;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+
+            calendar.clear();
+            calendar.set(Calendar.YEAR, year);
+            Date currYearFirst = calendar.getTime();
+            firstDay = daySdf.format(currYearFirst) + " 00:00:00";
+            log.info("firstDay: " + firstDay);
+            map.put("firstDay", firstDay);
+
+            calendar.clear();
+            calendar.set(Calendar.YEAR, year);
+            calendar.roll(Calendar.DAY_OF_YEAR, -1);
+            Date currYearLast = calendar.getTime();
+            lastDay = daySdf.format(currYearLast) + " 23:59:59";
+            log.info("lastDay: " + lastDay);
+            map.put("lastDay", lastDay);
+
+        } else {
+            int year = taskStartDate.getYear() + 1900;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(taskStartDate);
+
+            calendar.clear();
+            calendar.set(Calendar.YEAR, year);
+            Date currYearFirst = calendar.getTime();
+            firstDay = daySdf.format(currYearFirst) + " 00:00:00";
+            log.info("firstDay: " + firstDay);
+            map.put("firstDay", firstDay);
+
+            calendar.clear();
+            calendar.set(Calendar.YEAR, year);
+            calendar.roll(Calendar.DAY_OF_YEAR, -1);
+            Date currYearLast = calendar.getTime();
+            lastDay = daySdf.format(currYearLast) + " 23:59:59";
+            log.info("lastDay: " + lastDay);
+            map.put("lastDay", lastDay);
+        }
+        return map;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<TCruiseTaskList> selectPointStatus(String taskId) {
+        List<TCruiseTaskList> tCruiseTaskList = uPatrolTaskDao.selectPointStatus(taskId);
+        return tCruiseTaskList;
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String, Object>> taskCountByCondition(Date startTime, Date endTime, String taskState, String taskName) {
+        HashMap<String, Object> map = new HashMap<>();
+        if ("-1".equals(taskState)) {
+            taskState = null;
+        }
+        map.put("taskState", taskState);
+        map.put("taskName", taskName);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        List<Map<String, Object>> resultListAfter = null;
+        List<Map<String, Object>> resultListBefore = new ArrayList<>();
+        List<Map<String, Object>> resultListForAdd = new ArrayList<>();
+        Date now = new Date();
+        try {
+            if (endTime == null) {
+                Calendar calendar = new GregorianCalendar();
+                calendar.add(Calendar.DAY_OF_MONTH, 0);
+
+                //一天的开始时间 yyyy:MM:dd 00:00:00
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+                Date dayStart = calendar.getTime();
+                String startStr = format.format(dayStart);
+                now = format.parse(startStr);
+                startTime = now;
+                //System.out.println("一天的开始时间: "+now);
+                //一天的结束时间 yyyy:MM:dd 23:59:59
+                calendar.set(Calendar.HOUR_OF_DAY, 23);
+                calendar.set(Calendar.MINUTE, 59);
+                calendar.set(Calendar.SECOND, 59);
+                calendar.set(Calendar.MILLISECOND, 999);
+                Date dayEnd = calendar.getTime();
+                String endStr = format.format(dayEnd);
+                endTime = format.parse(endStr);
+                //System.out.println("一天的开始时间: "+endTime);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        resultListBefore = this.afterTaskCount(startTime, taskState, taskName);
+        resultListAfter = this.afterTaskCount(endTime, taskState, taskName);
+
+        resultListForAdd.addAll(resultListBefore);
+
+        for (Map<String, Object> itemBefore : resultListBefore) {
+            for (Map<String, Object> itemAfter : resultListAfter) {
+                if (itemAfter.get("taskId").toString().equals(itemBefore.get("taskId").toString())) {
+                    resultListForAdd.remove(itemBefore);
+                    break;
+                }
+            }
+        }
+        resultListForAdd.addAll(resultListAfter);
+        if (resultListForAdd == null || resultListForAdd.size() == 0) {
+            return resultList;
+        } else {
+            try {
+                for (Map<String, Object> item : resultListForAdd) {
+
+                    if (startTime.compareTo(format.parse(item.get("startTime").toString())) <= 0 && endTime.compareTo(format.parse(item.get("startTime").toString())) >= 0) {
+                        if (taskState != null && !taskState.equals("")) {
+//                        System.out.println("------------:"+item.get("taskState"));
+//                        System.out.println("-------------"+taskState.equals(item.get("taskState").toString()));
+                            if (taskState.equals(item.get("taskState").toString())) {
+                                resultList.add(item);
+                                continue;
+                            } else {
+                                continue;
+                            }
+                        }
+                        resultList.add(item);
+                    }
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
+        return resultList;
+    }
+
+    public List<Map<String, Object>> afterTaskCount(Date taskStartDate, String taskState, String taskName) {
+
+        SimpleDateFormat sdfF = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdfF2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date dayBefore = new Date();
+        Date dayAfter = new Date();
+        Date originTime = new Date();
+        String firstDay = "", lastDay = "";
+        if (Objects.equals(null, taskStartDate)) {
+//            Date date = new Date();
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.set(Calendar.MONTH, date.getMonth());
+//            int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+//            calendar.set(Calendar.DAY_OF_MONTH, fDay);
+//            firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
+
+            Date date = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.MONTH, date.getMonth() - 1);
+            if ((date.getMonth()) == 1) {
+                int fDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            } else {
+                int fDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }
+            firstDay = sdfF.format(calendar.getTime()) + " 23:59:59";
+            log.info("firstDay: " + firstDay);
+
+            int lDay = 0;
+            calendar.set(Calendar.MONTH, date.getMonth());
+            //2月的平年瑞年天数
+            if (date.getMonth() == 1) {
+                lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+            } else {
+                lDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+            }
+            calendar.set(Calendar.MONTH, date.getMonth());
+            calendar.set(Calendar.DAY_OF_MONTH, lDay);
+            lastDay = sdfF.format(calendar.getTime()) + " 23:59:59";
+            log.info("lastDay: " + lastDay);
+        } else {
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+//            calendar.set(Calendar.YEAR, taskStartDate.getYear()+1900);
+//            int fDay = calendar.getActualMinimum(Calendar.DAY_OF_MONTH);
+//            calendar.set(Calendar.DAY_OF_MONTH, fDay);
+//            firstDay = sdfF.format(calendar.getTime())+" 00:00:00";
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth() - 1);
+            if ((taskStartDate.getMonth()) == 1) {
+                int fDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            } else {
+                int fDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+                calendar.set(Calendar.DAY_OF_MONTH, fDay);
+            }
+            firstDay = sdfF.format(calendar.getTime()) + " 23:59:59";
+            log.info("firstDay: " + firstDay);
+
+            int lDay = 0;
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+            //2月的平年瑞年天数
+            if (taskStartDate.getMonth() == 1) {
+                lDay = calendar.getLeastMaximum(Calendar.DAY_OF_MONTH);
+            } else {
+                lDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+            }
+            calendar.set(Calendar.MONTH, taskStartDate.getMonth());
+            calendar.set(Calendar.YEAR, taskStartDate.getYear() + 1900);
+            calendar.set(Calendar.DAY_OF_MONTH, lDay);
+            lastDay = sdfF.format(calendar.getTime()) + " 23:59:59";
+            log.info("lastDay: " + lastDay);
+        }
+
+        try {
+            originTime = format.parse("2000-01-01 00:00:00");
+            dayBefore = format.parse(firstDay);
+            dayAfter = format.parse(lastDay);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        List<TCruiseTaskCount> list = new ArrayList<>();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("startTime", dayBefore);
+        map.put("endTime", dayAfter);
+        map.put("taskState", taskState);
+        map.put("taskName", taskName);
+        list = this.uPatrolTaskDao.afterTaskCount(map);
+        log.info("list: " + list);
+        List<TCruiseTaskDel> listDel = this.tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
+        List<Map<String, Object>> listTask = new ArrayList<>();
+        for (TCruiseTaskCount tCruiseTaskCount : list) {
+            if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
+                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
+                for (Date aTimeList : timeList) {
+                    Map<String, Object> taskCountMap = new HashMap<>();
+                    Map<String, Object> taskCountMapDel = new HashMap<>();
+                    long taskTime = aTimeList.getTime();
+                    if (listDel.size() > 0) {
+                        for (TCruiseTaskDel tCruiseTaskDel : listDel) {
+                            long taskDelTime = tCruiseTaskDel.getDelTime().getTime();
+                            if (Objects.equals(tCruiseTaskDel.getTaskId(), tCruiseTaskCount.getTaskId()) && taskDelTime == taskTime) {
+                                log.info("已删除的任务信息： " + tCruiseTaskCount.getTaskId() + " " + taskDelTime);
+                                taskCountMapDel.put("taskId", tCruiseTaskCount.getTaskId());
+                                taskCountMapDel.put("taskDelTime", taskDelTime);
+                            }
+                        }
+                        if (taskCountMapDel.size() == 0) {
+                            taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                            taskCountMap.put("total", tCruiseTaskCount.getTotal());
+                            taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                            taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+                            taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                            taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+                            //TODO 增加redis获取任务状态，1是真
+                            if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                                taskCountMap.put("taskState", 238);
+                                taskCountMap.put("taskStateName", "任务未开始");
+                            } else {
+                                taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
+                                taskCountMap.put("taskStateName", tCruiseTaskCount.getTaskStateName());
+
+                            }
+                            if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                                taskCountMap.put("taskStatus", "-1");
+                            } else {
+                                taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
+                            }
+                            taskCountMap.put("startTime", sdfF2.format(aTimeList));
+                            listTask.add(taskCountMap);
+                        }
+                    } else {
+                        taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                        taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                        taskCountMap.put("total", tCruiseTaskCount.getTotal());
+                        taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                        taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+                        taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+                        //TODO 增加redis获取任务状态，1是真
+                        if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                            taskCountMap.put("taskState", 238);
+                            taskCountMap.put("taskStateName", "任务未开始");
+                        } else {
+                            taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
+                            taskCountMap.put("taskStateName", tCruiseTaskCount.getTaskStateName());
+
+                        }
+                        if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                            taskCountMap.put("taskStatus", "-1");
+                        } else {
+                            taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
+                        }
+                        taskCountMap.put("startTime", sdfF2.format(aTimeList));
+                        listTask.add(taskCountMap);
+                    }
+                }
+            } else {
+                Map<String, Object> taskCountMap = new HashMap<>();
+                taskCountMap.put("type", tCruiseTaskCount.getIfRun());
+                taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
+                taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
+                taskCountMap.put("total", tCruiseTaskCount.getTotal());
+                taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
+                taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
+                //TODO 增加redis获取任务状态，1是真
+                if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
+                    taskCountMap.put("taskState", 238);
+                    taskCountMap.put("taskStateName", "任务未开始");
+                } else {
+                    taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
+                    taskCountMap.put("taskStateName", tCruiseTaskCount.getTaskStateName());
+                }
+                if (Objects.equals(null, tCruiseTaskCount.getTaskStatus())) {
+                    taskCountMap.put("taskStatus", "-1");
+                } else {
+                    taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
+                }
+
+                taskCountMap.put("startTime", sdfF2.format(tCruiseTaskCount.getStartTime()));
+                listTask.add(taskCountMap);
+            }
+        }
+        log.info("listTask: " + listTask);
+        return listTask;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int executeDifferentiateTasks(List<String> images) {
+        //任务封装
+        List<Analysis> analysisList=new ArrayList<>();
+        String taskId= RandomStringUtils.randomAlphanumeric(12);
+        for (String imageUrl : images) {
+            Analysis analysis = new Analysis();
+            analysis.setTaskId(taskId);
+            analysis.setAnalyseType("11");
+            analysis.setPicPath(imageUrl);
+            if (imageUrl.equals(images.get(0))) {//Normal
+                analysis.setInstanceId(Long.valueOf(0));
+            } else {                             //different
+                analysis.setInstanceId(Long.valueOf(RandomStringUtils.randomNumeric(10)));
+            }
+            analysisList.add(analysis);
+        }
+
+        log.info("List:"+analysisList);
+        //任务插库
+
+        UPatrolTask tCruiseTask=new UPatrolTask();
+        tCruiseTask.setTaskId(taskId);
+        tCruiseTask.setTaskName("图像判别-"+taskId);
+        tCruiseTask.setStartTime(new Date());
+        int status=uPatrolTaskDao.add(tCruiseTask);
+
+        // TODO: 2021/2/6 联调时放开 任务下发请求
+//        //任务下发请求
+//        Map<String,List<Analysis>> listMap=new HashMap<>();
+//        listMap.put("list",analysisList);
+//        defect(listMap);
+        //返回自定义结果
+        return status;
+    }
+
 }

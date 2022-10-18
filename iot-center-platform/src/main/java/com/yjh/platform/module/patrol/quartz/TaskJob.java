@@ -80,12 +80,13 @@ public class TaskJob extends QuartzJobBean {
             log.info("将低优先任务暂停失败:",e);
         }
         List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
+        initializeThisTaskInfo(task, allInstanceList);
         //初始化下一次任务信息
         initializeNextTaskInfo(task, allInstanceList);
         //给机器人发任务启动
         robotTaskStart(task);
         //调用摄像机任务
-
+        uPatrolTaskService.videoTaskStart(taskId);
     }
 
     /**
@@ -109,6 +110,30 @@ public class TaskJob extends QuartzJobBean {
                 });
             }
         }
+    }
+
+    private void initializeThisTaskInfo(UPatrolTask task, List<Long> instanceList){
+
+        Map<String,String> mapForAbnormal = new HashMap<>();
+        mapForAbnormal.put("all",String.valueOf(instanceList.size()));
+        mapForAbnormal.put("abnormal","0");
+        mapForAbnormal.put("normal","0");
+        Date taskStart = new Date();
+        //任务超期时间
+        Map<String,String> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+        Integer tasksAreTime = Integer.valueOf(mapForTaskAreTime.get("content"));
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(taskStart);
+        cal.add(Calendar.MINUTE,tasksAreTime);
+        Date taskAre = cal.getTime();
+
+        mapForAbnormal.put("taskStart",simpleDateFormat.format(taskStart));
+        mapForAbnormal.put("overDay",simpleDateFormat.format(taskAre));
+        mapForAbnormal.put("taskState","239");
+
+        String strForCountAbnormal = "countForAbnormal:"+task.getTaskId();
+        redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
     }
 
     /**

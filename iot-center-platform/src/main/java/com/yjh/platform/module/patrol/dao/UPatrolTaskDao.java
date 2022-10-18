@@ -8,10 +8,13 @@ import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.user.entity.TRobotInfo;
+import com.yjh.platform.module.task.entity.TCruiseTaskCount;
+import com.yjh.platform.module.task.entity.TCruiseTaskList;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -83,4 +86,10 @@ public interface UPatrolTaskDao {
      */
     TRobotInfo selectRobotInfoByCode(@Param(value = "robotCode") String robotCode);
 
+
+    List<TCruiseTaskCount> taskCount(@Param(value = "startTime") Date startTime,
+                                     @Param(value = "endTime") Date endTime);
+    List<TCruiseTaskList> selectPointStatus(String taskId);
+
+    List<TCruiseTaskCount> afterTaskCount(HashMap<String,Object> map);
 }
