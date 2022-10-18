@@ -14,6 +14,7 @@ import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,6 +65,9 @@ public class SendToUpSystemServices {
             log.error("服务未连接，请重试，port: {}", port);
             Constant.sendSessionId.set(0L);
             return -1;
+        }
+        if(code == null || StringUtils.isEmpty(code)){
+            code = stationCode;
         }
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(sendCode)

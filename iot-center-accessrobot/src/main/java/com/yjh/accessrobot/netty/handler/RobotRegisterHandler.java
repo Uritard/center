@@ -79,8 +79,8 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
         // robot run interval
         //巡视设备运行时间间隔 2022过检 robot_run_interval修改为patroldevice_run_interval
         items.put("patroldevice_run_interval", patroldeviceRunInterval);
-        //环境数据间隔 2022过检  weather interval 修改为 env_interval
-        items.put("env_interval", envInterval);
+        //环境数据间隔 2022过检  weather interval 修改为 weather_interval
+        items.put("weather_interval", envInterval);
         if (robotService.selectIsDrone(robotCode)) {
             //2022过检新增 无人机机巢运行数据间隔
             items.put("nest_run_interval", nestRunInterval);

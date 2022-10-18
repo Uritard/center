@@ -38,7 +38,7 @@ public class WeatherThread implements Runnable{
                     log.info("Thread stop success!");
                 }
                 {
-                    String s = Constant.paramMap.get("env_interval");
+                    String s = Constant.paramMap.get("weather_interval");
 
                     Thread.sleep(NumberUtils.toLong(s,30) *1000L);
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
