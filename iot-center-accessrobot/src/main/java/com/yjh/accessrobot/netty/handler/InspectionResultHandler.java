@@ -126,6 +126,14 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 //        resultUpToStation(xmlBaseModel,robotCode);
     }
 
+
+    public static void main(String[] args) {
+        String path = "task/1/2022/09/08/0388adc82ed9436c9fa5e46c30968a4a/CCD/100000203__20220908213641.jpg";
+        String fileName1 = path.trim().substring(path.trim().lastIndexOf("/") + 1);
+        String pp = "123/456q/wert";
+        System.out.println(pp.substring(pp.lastIndexOf("/")));
+        System.out.println(fileName1);
+    }
     /**
      * 对机器人结果文件处理及判断结果是否告警
      * @param xmlBaseModel xml内容
@@ -158,9 +166,8 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             if (item.containsKey("origin_file_path") && Objects.equals("1",fileType)) {
                 // 红外原图
                 String ftpInfraredOriginPath = String.valueOf(item.get("origin_file_path"));
-                String[] sArray2 = ftpInfraredOriginPath.split("/");
                 // 红外原图名称
-                String ftpInfraredOriginName = sArray2[sArray2.length - 1];
+                String ftpInfraredOriginName = ftpInfraredOriginPath.trim().substring(ftpInfraredOriginPath.trim().lastIndexOf("/") + 1);
                 String temporaryInfraredOriginPath = filePathMap.get("content") + "/" + ftpInfraredOriginPath;
                 // 拷贝原图
                 copyFileToDevelop(temporaryInfraredOriginPath, developAbsoluteUrl + "InfraredOrigin");
@@ -176,9 +183,8 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
                 ftpOriginPath = String.valueOf(item.get("file_path"));
             }
 
-            String[] sArray2 = ftpOriginPath.split("/");
             // 原图文件名称
-            String ftpOriginName = sArray2[sArray2.length - 1];
+            String ftpOriginName = ftpOriginPath.trim().substring(ftpOriginPath.trim().lastIndexOf("/") + 1);
             String temporaryOriginPath = filePathMap.get("content") + "/" + ftpOriginPath;
             log.info("temporaryOriginPath==={}",temporaryOriginPath);
 

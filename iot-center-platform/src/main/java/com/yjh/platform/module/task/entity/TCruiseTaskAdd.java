@@ -123,6 +123,12 @@ public class TCruiseTaskAdd implements Serializable {
     @ApiModelProperty(value = "周期（执行时间） ")
     private String cycleExecuteTime;
 
+    @ApiModelProperty(value = "周期（开始时间） ")
+    private String cycleStartTime;
+
+    @ApiModelProperty(value = "周期（结束时间） ")
+    private String cycleEndTime;
+
     @ApiModelProperty(value = "间隔（数量） ")
     private String intervalNumber;
 
@@ -131,5 +137,11 @@ public class TCruiseTaskAdd implements Serializable {
 
     @ApiModelProperty(value = "间隔（执行时间） ")
     private String intervalExecuteTime;
+
+    @ApiModelProperty(value = "间隔（开始时间） ")
+    private String intervalStartTime;
+
+    @ApiModelProperty(value = "间隔（结束时间） ")
+    private String intervalEndTime;
 
 }

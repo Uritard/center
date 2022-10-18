@@ -600,7 +600,11 @@ public class HelloController {
     public Result main() {
         Result result = new Result();
         try {
-//            result.setData(tCameraPresetService.main());
+            TCameraPreset tCameraPreset = new TCameraPreset()
+                    .setCameraId(123L);
+            tCameraPresetService.insert(tCameraPreset);
+            log.info("id==={}", tCameraPreset.getPresetId());
+
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询预置位树失败：" + e);
@@ -608,5 +612,9 @@ public class HelloController {
         return result;
     }
 
-
+    public static void main(String[] args) {
+       String filePathTemp = "变电/dd站编码/年/月/日/巡视任务编码/CCD";
+        filePathTemp = filePathTemp.substring(0, filePathTemp.indexOf("/"));
+        System.out.println(filePathTemp);
+    }
 }
