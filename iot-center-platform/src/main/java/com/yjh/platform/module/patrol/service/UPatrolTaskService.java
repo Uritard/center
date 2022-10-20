@@ -59,6 +59,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.yjh.platform.module.patrol.service.CruiseInspectionExecute.*;
+
 /**
  * <功能描述>
  *
@@ -884,10 +886,10 @@ public class UPatrolTaskService {
         Map<Long, Integer> robotOfflineMap = new HashMap<>();
 
         taskInfoList.forEach(m -> {
-            int cruiseStatus = MapUtils.getIntValue(m, "cruiseStatus", 253);
+            int cruiseStatus = MapUtils.getIntValue(m, "cruiseStatus", CRUISE_STATE_UN);
             String cruiseResult = MapUtils.getString(m, "cruiseResult");
             // 已经执行点位
-            if (cruiseStatus != 253 && !CommonUtils.isEmptyOrNullstr(cruiseResult)) {
+            if (cruiseStatus != CRUISE_STATE_UN && !CommonUtils.isEmptyOrNullstr(cruiseResult)) {
                 return;
             }
 
@@ -899,7 +901,7 @@ public class UPatrolTaskService {
             if (CollectionUtils.isNotEmpty(overhaul) && Collections.binarySearch(overhaul, MapUtils.getLong(m, "deviceId")) >= 0) {
                 m.put("resultNum", "设备检修中");
                 // 异常原因，设备检修
-                m.put("cruiseAbnormal", "410");
+                m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
                 skipFlag = true;
             }
             // 机器人离线判断
@@ -911,18 +913,18 @@ public class UPatrolTaskService {
                         m.put("resultNum", "机器人处于检修状态,未执行");
                     }
                     // 异常原因，设备离线
-                    m.put("cruiseAbnormal", "411");
+                    m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
                 }
             }
             if (skipFlag) {
                 // 巡视结果，异常
-                m.put("cruiseResult", "247");
+                m.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 // 未审核
-                m.put("evaluationState", "257");
+                m.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
                 m.put("isWarn", "0");
                 m.put("picpath", "--");
                 // 巡检数据状态，未执行
-                m.put("cruiseStatus", "253");
+                m.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
                 String dateTime = DateTimeUtil.getDateTimeString();
                 m.put("createtime", dateTime);
                 m.put("endTime", dateTime);
@@ -932,8 +934,8 @@ public class UPatrolTaskService {
             }
 
             switch (cruiseType) {
-                case 229: // 视频
-                case 230: // 红外
+                case CRUISE_TYPE_VIDEO: // 视频
+                case CRUISE_TYPE_INFRARED: // 红外
                     String cameraId = MapUtils.getString(m, "cameraId");
                     if (StringUtils.isEmpty(cameraId)) {
                         log.error("task {} cruise data has no cameraId, {}", taskId, JSON.toJSONString(m));
@@ -942,7 +944,7 @@ public class UPatrolTaskService {
                         cruiseGroup(cruiseGroupMap, cameraIp, m);
                     }
                     break;
-                case 232: // 声纹
+                case CRUISE_TYPE_VOICE: // 声纹
                     String cruiseId = MapUtils.getString(m, "cruiseId");
                     if (StringUtils.isEmpty(cruiseId)) {
                         log.error("task {} cruise data has no cruiseId, {}", taskId, JSON.toJSONString(m));
@@ -950,14 +952,16 @@ public class UPatrolTaskService {
                         cruiseGroup(cruiseGroupMap, cruiseId, m);
                     }
                     break;
-                case 228: // 机器人
-                case 524: // 无人机
-                case 231: // 在线监控
+                case CRUISE_TYPE_ROBOT: // 机器人
+                case CRUISE_TYPE_UAV: // 无人机
+                case CRUISE_TYPE_ONLINE: // 在线监控
                 default:
                     break;
             }
         });
 
+        // skipPointList
+        //     cruiseGroupMap
 
     }
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
+import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -37,4 +38,6 @@ public interface TAlgorithmInfoDao {
     List<TAlgorithmInfo> selectByDeviceMeteId(@Param(value = "deviceMeteId") Long deviceMeteId);
     List<Long> selectHaveDevice(@Param(value = "algorithmId") Long algorithmId);
     TStdDeviceMete selectDeviceMete(@Param(value = "deviceMeteId") Long deviceMeteId);
+
+    List<TAlgorithmMeteInfo> selectAlgorithmMete(@Param(value = "deviceMeteId") String deviceMeteId);
 }
