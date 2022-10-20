@@ -15,6 +15,9 @@ import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.patrol.controller.AnalysisController;
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
@@ -60,12 +63,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
             String robotCode = threadMap.get("robotCode");
 
             String robotTaskId = taskId;
-            /*if ("true".equals(redisTemplate.opsForValue().get("RobotTask.taskToRobot"))) {
-                robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
-            }*/
-
-//            UPatrolTask uPatrolTask = uPatrolTaskService.selectUPatrolTask(taskId);
-//            log.info("taskId是: {}的任务数据uPatrolTask是: {}", taskId, uPatrolTask);
+            UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
+            log.info("taskId是: {}的任务数据uPatrolTask是: {}", taskId, uPatrolTask);
 
             Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId);
 //            if (Objects.isNull(tCruiseTask.getTaskType())) {
@@ -140,8 +139,6 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setTaskId(taskId);
             String robotId = String.valueOf(uPatrolTaskService.selectRobotInfoByCode(threadMap.get("robotCode")).getRobotId());
             warnInfo.setDeviceCode(robotId);
-            map.put("absolutePath",threadMap.get("absolutePath"));
-            map.put("deviceName",threadMap.get("deviceName"));
             warnInfo.setWarnName(String.valueOf(map.get("warnName")));
             warnInfo.setWarnLevel(Integer.valueOf(String.valueOf(map.get("warnLevel"))));
             warnInfo.setWarnContent(String.valueOf(map.get("warnContent")));
@@ -172,7 +169,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             alarmToUpSystem(warnInfo, tStdDevicemete);
 
             // 将产生的告警上送到算法管理平台
-            alarmToAmPlatform(map, warnMap);
+            alarmToAmPlatform(warnMap);
 
         }catch (Exception e){
             log.error(e.getMessage(), e);
@@ -215,11 +212,11 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
     /**
      * 将产生的告警上送到算法管理平台
+     * 这不是我写的 我从上个人那边copy的
      *
-     * @param map 告警信息
      * @param warnMap 告警信息
      */
-    private void alarmToAmPlatform (Map<String, Object> map, Map<String, String> warnMap) {
+    private void alarmToAmPlatform (Map<String, String> warnMap) {
         try{
             log.info("开始与算法管理平台交互");
             ftpsservice ftpsservice = GetSpringUtil.getBean("ftpsservice");
@@ -235,14 +232,14 @@ public class IsWarnAfterCruiseThread implements Runnable {
                 String taskidbak = warnMap.get("taskId");
                 String instanceIdbak = warnMap.get("instanceId");
                 Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak + ":" + instanceIdbak);
-                String devicename= map.get("deviceName").toString();
+                String devicename= threadMap.get("deviceName");
                 alarm.setDevice_name(devicename);
                 String origpicpath = cruiseResult2.get("origpic").toString();
                 String[] str2 = origpicpath.split("/");
                 String origpcimagename = str2[str2.length - 1];
                 String remoteorigfilepath = ftpsservice.getFtpsRemotePath() + "/" + "different" + "/" + year + "/" + month + "/" + origpcimagename;
                 //结果文件
-                String resultImagebak = map.get("absolutePath").toString();
+                String resultImagebak = threadMap.get("absolutePath");
                 String[] str3 = resultImagebak.split("/");
                 //获取结果图名称，然后拼接远程文件全路径
                 String resultimagename = str3[str3.length - 1];

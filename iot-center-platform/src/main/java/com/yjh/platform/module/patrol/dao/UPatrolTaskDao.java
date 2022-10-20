@@ -4,7 +4,9 @@
 
 package com.yjh.platform.module.patrol.dao;
 
+import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.user.entity.TRobotInfo;
@@ -86,10 +88,37 @@ public interface UPatrolTaskDao {
      */
     TRobotInfo selectRobotInfoByCode(@Param(value = "robotCode") String robotCode);
 
-
     List<TCruiseTaskCount> taskCount(@Param(value = "startTime") Date startTime,
                                      @Param(value = "endTime") Date endTime);
     List<TCruiseTaskList> selectPointStatus(String taskId);
 
     List<TCruiseTaskCount> afterTaskCount(HashMap<String,Object> map);
+
+    /**
+     * 根据巡视点查询相关信息
+     * @param instanceId 巡视点id
+     * @return TCruisePointInstanceDetail
+     */
+    TCruisePointInstanceDetail selectForTask(@Param(value = "instanceId")Long instanceId);
+
+    /**
+     * 根据测点id查询测点信息
+     * @param deviceMeteId 测点id
+     * @return TStdDeviceMete
+     */
+    TStdDeviceMete selectDeviceMete(@Param(value = "deviceMeteId") Long deviceMeteId);
+
+    /**
+     * 根据任务id查询已经有结果且已入库的巡视点
+     * @param taskId 任务id
+     * @return List<Long>
+     */
+    List<Long> selectInstanceForTaskGoOn(@Param(value = "taskId") String taskId);
+
+    /**
+     * 插入巡视任务结果数据
+     * @param uPatrolDataResultList 巡视点结果集
+     * @return int
+     */
+    int batchInsertUPatrolDataResult(List<UPatrolDataResult> uPatrolDataResultList);
 }
