@@ -1,0 +1,35 @@
+package com.yjh.platform.netty.client;
+
+import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import org.springframework.data.redis.core.RedisTemplate;
+
+/**
+ *
+ * @author tt
+ * @date 2019/7/31
+ */
+public class AnalysisClientChannelInitializer extends ChannelInitializer<SocketChannel> {
+
+    private RedisTemplate redisTemplate;
+    private AnalyseDataOperateService analyseDataOperateService;
+    private String syncWebsocketUrl;
+    private String stationCode;
+    public AnalysisClientChannelInitializer(RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService,
+                                            String syncWebsocketUrl, String stationCode) {
+        this.redisTemplate = redisTemplate;
+        this.analyseDataOperateService=analyseDataOperateService;
+        this.syncWebsocketUrl=syncWebsocketUrl;
+        this.stationCode = stationCode;
+    }
+
+    @Override
+    protected void initChannel(SocketChannel socketChannel) throws Exception {
+        ChannelPipeline p = socketChannel.pipeline();
+        //p.addLast("decoder", new StringDecoder(CharsetUtil.UTF_8));
+        //p.addLast("encoder", new StringEncoder(CharsetUtil.UTF_8));
+        p.addLast(new AnalysisClientHandler(redisTemplate,analyseDataOperateService,syncWebsocketUrl, stationCode));
+    }
+}

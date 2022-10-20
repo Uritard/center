@@ -45,4 +45,12 @@ public interface UPatrolResultDao {
 
     int batchAdd(List<UPatrolResult> list);
     int batchDelete(List<String> list);
+
+    /**
+     * 更新任务结果表数据
+     * @param uPatrolResult 任务结果数据
+     * @return int
+     */
+    int updateUPatrolResult(UPatrolResult uPatrolResult);
+
 }

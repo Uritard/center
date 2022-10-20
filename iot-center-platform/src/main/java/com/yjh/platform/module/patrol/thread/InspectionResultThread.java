@@ -3,8 +3,12 @@ package com.yjh.platform.module.patrol.thread;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
+import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
+import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisCallback;
@@ -14,6 +18,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -98,7 +103,7 @@ public class InspectionResultThread implements Runnable{
                     log.info("taskId为{}巡视点instanceId为{}的点位已更新redis", taskId, instanceId);
 
                     // 区分是模拟工具上报巡视结果还是真实的
-                    taskResultTypeHandler(uPatrolTaskService, taskId, instanceId);
+                    taskResultTypeHandler(infoMap.get("absolutePath"), taskId, instanceId);
 
                     boolean isSelfTask = true;
                     if (Boolean.TRUE.equals(isSelfTask)){
@@ -148,11 +153,11 @@ public class InspectionResultThread implements Runnable{
     /**
      * 区分是模拟工具上报巡视结果还是真实的
      *
-     * @param uPatrolTaskService
+     * @param originPath 巡视结果文件全路径
      * @param taskId 任务id
      * @param instanceId 巡视点id
      */
-    private void taskResultTypeHandler(UPatrolTaskService uPatrolTaskService, String taskId, String instanceId) {
+    private void taskResultTypeHandler(String originPath, String taskId, String instanceId) {
         try {
             Integer robotType = uPatrolTaskService.selectRobotType(robotPatrolTaskResult.getRobotCode());
             boolean isSimulationTool = StringUtils.isNotEmpty(robotPatrolTaskResult.getFilePath())
@@ -161,6 +166,7 @@ public class InspectionResultThread implements Runnable{
                     // 且是E机器人
                     && Objects.equals(159, robotType);
             if (Boolean.FALSE.equals(isSimulationTool)) {
+                // 真实设备上报的巡视结果
                 Map<String, String> jasonMap = new HashMap<>(2);
                 jasonMap.put("type", "finishedOneInstance");
                 jasonMap.put("taskId", taskId);
@@ -175,20 +181,56 @@ public class InspectionResultThread implements Runnable{
                 }
                 return;
             }
-            // ToDo:模拟工具上报的巡视结果处理
+            //模拟工具上报的巡视结果
+
+            // 复制图片到算法分析指定的路径
+            String ftpFileName = originPath.trim().substring(originPath.trim().lastIndexOf("/") + 1);
+            String resultImagePath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content") + ftpFileName;
+            FileUtil.copyFileUsingStream(resultImagePath, resultImagePath);
+            // 标定文件
+            String picModelPath = redisTemplate.opsForHash().get("t_sys_param:picModelPath", "content") + "/" + "inspectionCode";
+            // 测点信息
+            TCruisePointInstanceDetail details = uPatrolTaskService.selectForTask(Long.valueOf(instanceId));
+            TStdDeviceMete tStdDevicemete =uPatrolTaskService.selectDeviceMete(details.getDeviceMeteId());
+
+            String redisKeyName = "t_cruise_task_result:" + taskId + ":";
+            Map<String, Object> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName + instanceId);
+            try {
+                tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
+                tCruiseTaskResultMap.put("cruiseStatus", "253");
+                tCruiseTaskResultMap.put("evaluationState", "257");
+                tCruiseTaskResultMap.put("isWarn", "0");
+                tCruiseTaskResultMap.put("origpic", resultImagePath);
+                String picPath = resultImagePath.replace(
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")),
+                        String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")));
+                tCruiseTaskResultMap.put("picpath", picPath);
+            }catch (Exception e){
+                log.error("往redis插入值错误：{}", e);
+            }
+
+            /*if ( "on".equals(details.getIsAi()) || "on".equals(details.getIsJudge())) {
+                // 配置了缺陷算法
+
+                // 测点配置的算法类型
+                List<TAlgorithmInfo> tAlgorithmInfoList = StaticContextAccessor.getBean(RobotService.class).selectByDeviceMeteId(details.getDeviceMeteId());
+
+                addRequiredInfo(tAlgorithmInfoList, taskId, instanceId, tStdDevicemete, tCruiseTaskResultMap);
+                packageAndInvoke(tAlgorithmInfoList, taskId, instanceId, resultImagePath, picModelPath, tStdDevicemete);
+            } else {
+                // 即拍照的点位和声音
+                Map<String, Integer> map = updatePointStatusNum(taskId, tCruiseTaskResultMap, details);
+
+                // 判断该点是否为最后一个
+                processResult(map, taskId, tCruiseResult, tCruiseTaskResultMap, instanceId);
+            }*/
+
+
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
     }
 
-
-//    if(cruiseResultMap.containsKey("confirmRelativePath")){
-//        tCruiseTaskResultMap.put("confirmPicPath", cruiseResultMap.get("confirmRelativePath"));
-//    }
-//    if (cruiseResultMap.containsKey("confirmAbsolutePath")){
-//        tCruiseTaskResultMap.put("origConfirmPicPath", cruiseResultMap.get("confirmAbsolutePath"));
-//    }
-//
 //    taskIsFinished(taskId, totalNum, abnormal, normal, tCruiseTaskResultMap, tCruiseResult);
 
     /**

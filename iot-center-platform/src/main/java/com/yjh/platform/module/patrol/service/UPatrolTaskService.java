@@ -19,6 +19,7 @@ import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
@@ -26,6 +27,7 @@ import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.thread.InspectionResultThread;
 import com.yjh.platform.module.patrol.thread.IsWarnAfterCruiseThread;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
@@ -35,8 +37,7 @@ import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.threadpool.TaskExecutePool;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.annotations.Param;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -903,20 +904,115 @@ public class UPatrolTaskService {
 
         // 判断任务是否结束
         if (normalCounts + abnormalCounts != allCounts){
+            log.info("{}该点不是任务{}最后一个点", instanceId, taskId);
             return;
         }
 
-        // 插库
-
-        // 给上级系统上报任务状态
-
+        log.info("{}该点是任务{}最后一个点", instanceId, taskId);
+        completionOfTask(taskId, abnormalCounts, normalCounts, allCounts);
         return;
+    }
+
+    /**
+     * 任务所有点做完,完成,并且进度为100%的处理
+     *
+     * @param taskId 任务id
+     * @param abnormalCounts 异常点位数
+     * @param normalCounts 正常点位数
+     * @param allCounts 全部点位数
+     */
+    private void completionOfTask(String taskId, Integer abnormalCounts, Integer normalCounts, Integer allCounts) {
+        try {
+            Thread.sleep(15000);
+            // webSocket通知前端调用巡视监控的接口（任务完成）
+            Map<String, String> jasonMap = new HashMap<>(2);
+            jasonMap.put("type", "lastOneInstance");
+            jasonMap.put("taskId", taskId);
+            String json = JSON.toJSONString(jasonMap);
+            log.info("最后一个点-前端推送：" + json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+
+            // 更新upr
+            UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
+            uPatrolResult.setTaskState(240);
+            uPatrolResult.setTaskWait(allCounts - abnormalCounts - normalCounts);
+            uPatrolResult.setEndTime(new Date());
+            uPatrolResult.setTaskAbnormal(allCounts - normalCounts);
+            uPatrolResultDao.updateUPatrolResult(uPatrolResult);
+
+            // 插入updr
+            List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);
+            log.info("任务为{}已经做过的巡视点===={}", taskId, instanceIdDoneList);
+            List<Long> inDataBaseInstanceList = selectInstanceForTaskGoOn(taskId);
+            log.info("任务为{}已经入库的巡视点==={}", taskId, inDataBaseInstanceList);
+            if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
+                for (Long instanceIdInTable : inDataBaseInstanceList) {
+                    instanceIdDoneList.remove(instanceIdInTable.toString());
+                }
+            }
+            log.info("删除已经入库的巡视点后==={}", instanceIdDoneList);
+
+            List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
+            List<String> cruiseResultIdList = new ArrayList<>();
+            for (Long instanceIdDone : instanceIdDoneList) {
+                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceIdDone);
+                boolean conditionRes = true;
+                if (Boolean.TRUE.equals(conditionRes)) {
+                    UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
+                    uPatrolDataResult.setTaskId(taskId);
+                    uPatrolDataResult.setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")));
+                    uPatrolDataResult.setDeviceName(redisInfoMap.get("deviceName"));
+                    uPatrolDataResult.setInstanceId(instanceIdDone);
+                    uPatrolDataResult.setInstanceName(redisInfoMap.get("instanceName"));
+                    uPatrolDataResult.setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")));
+                    uPatrolDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
+                    uPatrolDataResult.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
+                    uPatrolDataResult.setCruiseStatus(Integer.valueOf(redisInfoMap.get("cruiseStatus")));
+                    uPatrolDataResult.setResultNum(redisInfoMap.get("resultNum"));
+                    uPatrolDataResult.setPicpath(redisInfoMap.get("picPath"));
+                    uPatrolDataResult.setOrigpic(redisInfoMap.get("origPic"));
+                    uPatrolDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
+                    uPatrolDataResult.setEvaluationState(Integer.valueOf(redisInfoMap.get("evaluationState")));
+                    uPatrolDataResult.setCreatetime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
+                    uPatrolDataResult.setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")));
+                    uPatrolDataResult.setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
+
+                    uPatrolDataResultList.add(uPatrolDataResult);
+                    cruiseResultIdList.add("");
+                }
+            }
+            log.info("任务{}的uPatrolDataResultList大小是:{}", taskId, uPatrolDataResultList.size());
+
+            if (CollectionUtils.isNotEmpty(uPatrolDataResultList)){
+                batchInsertUPatrolDataResult(uPatrolDataResultList);
+                log.info("准备传其他服务的cruiseResultIdList==={}", cruiseResultIdList);
+//            postForObject(Constant.TASK_FINISH, cruiseResultIdList, Result.class);
+            }
+
+//        for (UPatrolDataResult up : uPatrolDataResultList){
+//            updateIsWarn(taskId, up.getInstanceId(), up.getInstanceId());
+//        }
+
+            // 将已经做过的巡视点Map清空
+            if (CollectionUtils.isNotEmpty(Constant.flagMap.get(taskId))){
+                log.info("将公共类的instanceIdList清空");
+                Constant.flagMap.remove(taskId);
+            }
+
+            //低优先任务继续
+//        StaticContextAccessor.getBean(RobotService.class).lowTaskGoOn(taskId);
+
+            // 给上级系统上报任务状态
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Integer selectIsAlarmByTask(String taskId, String instanceId){
         return uPatrolTaskDao.selectIsAlarmByTask(taskId, Long.valueOf(instanceId));
     }
+
     @Transactional(rollbackFor = Exception.class)
     public Integer updatePicPath(String taskId, String instanceId, String imagePath){
         return uPatrolTaskDao.updatePicPath(taskId, Long.valueOf(instanceId), imagePath);
@@ -927,6 +1023,7 @@ public class UPatrolTaskService {
      * @param instanceId
      * @return TStdDeviceMete
      */
+    @Transactional(rollbackFor = Exception.class)
     public TStdDeviceMete selectDeviceMeteInfo(Long instanceId){
         return uPatrolTaskDao.selectDeviceMeteInfo(instanceId);
     }
@@ -937,6 +1034,7 @@ public class UPatrolTaskService {
      * @param colName 类型
      * @return String
      */
+    @Transactional(rollbackFor = Exception.class)
     public String selectDictCodeByNote(String dictNote, String colName){
         return uPatrolTaskDao.selectDictCodeByNote(dictNote,colName);
     }
@@ -946,7 +1044,39 @@ public class UPatrolTaskService {
      * @param robotCode 机器人实物id
      * @return TRobotInfo 机器人信息
      */
+    @Transactional(rollbackFor = Exception.class)
     public TRobotInfo selectRobotInfoByCode(String robotCode){
         return uPatrolTaskDao.selectRobotInfoByCode(robotCode);
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public UPatrolTask selectByPrimaryId(String taskId) {
+        return uPatrolTaskDao.selectByPrimaryId(taskId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public TCruisePointInstanceDetail selectForTask (Long instanceId){
+        return this.uPatrolTaskDao.selectForTask(instanceId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public TStdDeviceMete selectDeviceMete(Long deviceMeteId){
+        return this.uPatrolTaskDao.selectDeviceMete(deviceMeteId);
+    }
+
+    /**
+     * 根据任务id查询已经有结果且已入库的巡视点
+     * @param taskId 任务id
+     * @return Long
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public List<Long> selectInstanceForTaskGoOn(String taskId){
+        return uPatrolTaskDao.selectInstanceForTaskGoOn(taskId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int batchInsertUPatrolDataResult(List<UPatrolDataResult> uPatrolDataResultList) {
+        return this.uPatrolTaskDao.batchInsertUPatrolDataResult(uPatrolDataResultList);
+    }
+
 }

@@ -46,15 +46,15 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         // Deal with robot task result data
         String robotCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(robotCode)) {
-            log.error("机器人编码为空");
-            throw new RuntimeException("机器人编码为空");
+            log.error("机器人/无人机编码为空");
+            throw new RuntimeException("机器人/无人机编码为空");
         }
 
         // 给机器人响应
         String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true,robotCode));
         byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
         RobotServerHandler.send(cruiseResultProtocol, robotCode);
-        log.info("巡视主机给机器人{}响应了", robotCode);
+        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
 
         // 巡视结果上报上一级系统
         resultToUpSystem(xmlBaseModel, robotCode);
@@ -91,7 +91,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             RobotPatrolTaskResult taskResult = JSONObject.toJavaObject(JSON.parseObject(toJson), RobotPatrolTaskResult.class);
             resultList.add(taskResult);
         }
-        log.info("resultList=={}", resultList);
+        log.info("The resultList to platform is=={}", resultList);
 
         try {
             StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_RESULT_PROCESS, resultList, Result.class);
@@ -109,7 +109,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         try {
             for(Map<String, Object> item : xmlBaseModel.getItems()){
                 String value = String.valueOf(item.get("file_path"));
-                String tagPath = "robotTask/" + value;
+                String tagPath = value.substring(0, value.indexOf("/"));
                 log.info("tagPath==={}", tagPath);
                 String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/" + value;
                 uploadFileToUpFtps(imgPath, "/" + tagPath, upFtpsConfig);
@@ -118,12 +118,12 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
                 String dataType = robotService.selectIsDrone(robotCode) ? "0x03" : "0x02";
                 item.put("data_type", dataType);
                 item.put("file_path", tagPath);
+                log.info("准备上报上级系统的机器人/无人机巡视结果是==={}", xmlBaseModel);
+                robotService.upToCruise(xmlBaseModel);
             }
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
-        log.info("准备上报上级系统的机器人巡视结果是==={}", xmlBaseModel);
-        robotService.upToCruise(xmlBaseModel);
     }
 
     /**
