@@ -209,4 +209,11 @@
         where device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
 
+    <select id="selectAlgorithmMete" resultType="com.yjh.platform.module.user.entity.TAlgorithmMeteInfo">
+        select d.device_mete_id, d.analyse_type as mete_analyse, d.is_ai as mete_ai, d.is_judge as mete_judge, b.*
+        from t_std_devicemete d LEFT JOIN
+            t_algorithm_mete a on d.device_mete_id=a.device_mete_id
+            left join t_algorithm_info b on a.algorithm_id = b.algorithm_id
+        WHERE d.device_mete_id=#{deviceMeteId}
+    </select>
 </mapper>

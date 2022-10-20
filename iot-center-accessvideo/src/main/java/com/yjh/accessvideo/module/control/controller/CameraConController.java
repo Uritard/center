@@ -327,7 +327,7 @@ public class CameraConController {
     public Result capturePictureForTask(@RequestParam(value = "cameraId") Long cameraId,
                                         @RequestParam(value = "meteName", required = false) String meteName) {
         Result result = new Result();
-        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, String> resultMap = new HashMap<>();
         try {
             int max=9999,min=1;
             int ran = (int) (Math.random()*(max-min)+min);
@@ -339,6 +339,7 @@ public class CameraConController {
             String urlPath = capturePath+filePathTem;
             resultMap.put("urlPath", urlPath);
             resultMap.put("absPath", filePath);
+            resultMap.put("resultNum", "已拍照");
             String url = "chmod 777 "+ filePath;
             Runtime.getRuntime().exec(url);
             result.setData(resultMap);
