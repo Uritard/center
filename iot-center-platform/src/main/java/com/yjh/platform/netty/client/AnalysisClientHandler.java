@@ -1,6 +1,7 @@
 package com.yjh.platform.netty.client;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.module.patrol.entity.Analysis;
@@ -139,10 +140,9 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     public void SendHeartBeat(Analysis analysis) throws InterruptedException {
-        log.info("analysis-INFO-----:"+analysis);
+        log.info("analysis-INFO-----:{}", JSON.toJSONString(analysis));
         String instanceId = analysis.getInstanceId().toString();
         String taskId = analysis.getTaskId();
-        Thread.sleep(3000);
         String registerMsg = "{\n\"msgType\": \"5\", \n\"msgData\": {\n\"instanceId\": " + "\"" + instanceId + "\", \n\"taskId\": \"" + taskId + "\"\n}\n}\n";
         sendString(ctx, registerMsg);
     }
@@ -150,7 +150,6 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     // 发送请求数据
     public void sendDataReguest(JSONObject analysisObject) throws InterruptedException {
         String msg = analysisObject.toString();
-        Thread.sleep(3000);//延迟发送数据
         sendString(ctx, msg);
     }
 

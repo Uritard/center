@@ -20,6 +20,9 @@ public class TAlgorithmMeteInfo extends TAlgorithmInfo {
     @TableField(value = "device_mete_id", updateStrategy = FieldStrategy.IGNORED)
     private Long deviceMeteId;
 
+    @TableField(value = "device_point_id", updateStrategy = FieldStrategy.IGNORED)
+    private String devicePointId;
+
     @TableField(value = "mete_analyse", updateStrategy = FieldStrategy.IGNORED)
     private String meteAnalyse;
 

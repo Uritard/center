@@ -10,9 +10,15 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
+import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
 import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
+import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
+
+import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.VIDEO;
 
 /**
  * 普通可见光相机处理
@@ -21,12 +27,17 @@ import java.util.Map;
  * @date 2022/10/18
  * @since [产品/模块版本] （可选）
  */
+@Component
 public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements CruiseInspectionExecute {
 
     ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
 
+    public NormalVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate) {
+        super(tAlgorithmInfoDao, redisTemplate);
+    }
+
     @Override
-    public void execute(Map<String, String> inspectionMap, long waitTime) {
+    public void execute(Map<String, String> inspectionMap) {
         videoExecute(inspectionMap);
     }
 
@@ -77,5 +88,10 @@ public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements
     @Override
     protected void analysisExt(Analysis analysis, JSONObject captureResult) {
         // noting to do.
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        CruiseExecuteFactory.CREATE.registerExecute(VIDEO, this);
     }
 }

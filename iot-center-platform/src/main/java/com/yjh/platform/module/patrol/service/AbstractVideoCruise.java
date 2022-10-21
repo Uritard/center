@@ -9,21 +9,25 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
-import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 
 import java.util.*;
 
-import static com.yjh.platform.module.patrol.service.CruiseInspectionExecute.*;
+import static com.yjh.platform.module.patrol.CruiseConstant.*;
+import static com.yjh.platform.module.patrol.CruiseConstant.AnalyticsEnum.HTTP;
+import static com.yjh.platform.module.patrol.CruiseConstant.AnalyticsEnum.TCP;
 
 /**
  * <功能描述>
@@ -63,12 +67,28 @@ public abstract class AbstractVideoCruise {
     public static final String RED_MOVE_URL =
         "http://iot-center-accessvideo/camera/v1/givePicFir?presetId={presetId}&cameraId={cameraId}&meteName={meteName}";
 
-    private TCameraPresetDao tCameraPresetDao;
-    private TAlgorithmInfoDao tAlgorithmInfoDao;
-    private RedisTemplate redisTemplate;
+    private final TAlgorithmInfoDao tAlgorithmInfoDao;
+    private final RedisTemplate<String, ?> redisTemplate;
+    private final HashOperations<String, String, String> hashOperations;
 
     private String picModelPath;
-    protected long waitTime;
+    private String intelDefectAnalysis;
+    protected static long waitTime = 10000;
+
+    protected AbstractVideoCruise(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, ?> redisTemplate) {
+        this.tAlgorithmInfoDao = tAlgorithmInfoDao;
+        this.redisTemplate = redisTemplate;
+        this.hashOperations = redisTemplate.opsForHash();
+
+        resetParams();
+    }
+
+    public void resetParams() {
+        //模板图片路径
+        picModelPath = hashOperations.get("t_sys_param:picModelPath", "content");
+        intelDefectAnalysis = hashOperations.get("t_sys_param:isIntelDefectAnalysis", "content");
+        waitTime = NumberUtils.toLong(hashOperations.get("t_sys_param:waitTime", "content"), waitTime);
+    }
 
     protected void videoExecute(Map<String, String> inspectionMap) {
         long presetId = MapUtils.getLongValue(inspectionMap, "cruiseId");
@@ -190,24 +210,22 @@ public abstract class AbstractVideoCruise {
             analysis.setIsAi(isAi);
             List<Analysis> analysisList = new ArrayList<>();
             analysisList.add(analysis);
-            Map<String, List<Analysis>> analysisMap = new HashMap<>();
-            analysisMap.put("list", analysisList);
-            log.info("算法信息：    " + analysisMap);
+            log.info("算法信息：   {}", JSON.toJSONString(analysisList));
             // 0-缺陷 1-表记
             if (algorithm.getIsAi() == 1) {
                 // 算法额外参数设置，红外
                 analysisExt(analysis, jsonForRe);
-                analysis(analysisMap);
+                analysis(analysisList);
             } else {
-                defect(analysisMap);
+                defect(analysisList);
             }
         }
     }
 
     protected boolean waitCamera(String taskName, String cameraId, String presetName) {
 
-        Map<String, String> mapForCameraState = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
-        Integer cameraState = Integer.valueOf(mapForCameraState.get("state"));
+        Map<String, String> mapForCameraState = hashOperations.entries("camera_info:" + cameraId);
+        int cameraState = Integer.parseInt(mapForCameraState.get("state"));
         boolean waitFlag = true;
         if (cameraState == 1) {//摄像头在任务中
             int waitCount = 0;
@@ -220,8 +238,8 @@ public abstract class AbstractVideoCruise {
                 }
                 log.info("任务：{} 在 {} 时已经等待了 {} 预置位,摄像机Id {} {}s", taskName, DateTimeUtil.getDateTimeString(), cameraId, presetName,
                     ((waitCount + 1) * waitTime + 1000) / 1000);
-                Map<String, String> mapForCameraStateForGet = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
-                cameraState = Integer.valueOf(mapForCameraStateForGet.get("state"));
+                Map<String, String> mapForCameraStateForGet = hashOperations.entries("camera_info:" + cameraId);
+                cameraState = Integer.parseInt(mapForCameraStateForGet.get("state"));
                 waitCount = waitCount + 1;
                 if (waitCount == 30) {
                     log.info("任务：{} 已经等待了 {} 秒,仍未等待到 {} 预置位,摄像机Id {} 退出等待", taskName, ((waitCount + 1) * waitTime + 1000) / 1000,
@@ -240,7 +258,7 @@ public abstract class AbstractVideoCruise {
             "if redis.call('hget', KEYS[1], KEYS[2]) == ARGV[1] then return redis.call('hset', KEYS[1], KEYS[2], ARGV[2]) else return -1 end";
 
         RedisScript<Long> redisScript = new DefaultRedisScript<>(script, Long.class);
-        Long cameraState = (Long)redisTemplate.execute(redisScript, Arrays.asList("camera_info:" + cameraId, "state"), 0, 1);
+        Long cameraState = redisTemplate.execute(redisScript, Arrays.asList("camera_info:" + cameraId, "state"), 0, 1);
         cameraState = cameraState == null ? -1 : cameraState;
         boolean waitFlag = true;
         if (cameraState == -1) {
@@ -255,7 +273,7 @@ public abstract class AbstractVideoCruise {
                 }
                 log.info("任务：{} 在 {} 时已经等待了 {} 预置位,摄像机Id {} {}s", taskName, DateTimeUtil.getDateTimeString(), cameraId, presetName,
                     ((waitCount + 1) * waitTime + 1000) / 1000);
-                cameraState = (Long)redisTemplate.execute(redisScript, Arrays.asList("camera_info:" + cameraId, "state"), 0, 1);
+                cameraState = redisTemplate.execute(redisScript, Arrays.asList("camera_info:" + cameraId, "state"), 0, 1);
                 cameraState = cameraState == null ? -1 : cameraState;
 
                 waitCount = waitCount + 1;
@@ -274,37 +292,47 @@ public abstract class AbstractVideoCruise {
     /**
      * 表计 算法识别
      */
-    protected void analysis(Map<String, List<Analysis>> analysisMap) {
-
+    protected Result analysis(List<Analysis> analysisList) {
+        AnalyticsEnum analytics = getAnalytics();
+        return AnalyticsFactory.getAnalytics(analytics).analytics(analysisList);
     }
 
     /**
      * 缺陷/判别 算法识别
      */
-    protected void defect(Map<String, List<Analysis>> analysisMap) {
+    protected Result defect(List<Analysis> analysisList) {
+        AnalyticsEnum analytics = getAnalytics();
+        return AnalyticsFactory.getAnalytics(analytics).analytics(analysisList);
+    }
 
+    private AnalyticsEnum getAnalytics() {
+        return Boolean.parseBoolean(intelDefectAnalysis) ? HTTP : TCP;
     }
 
     /**
      * 向页面发送websocket
+     *
      * @param taskId 正在执行任务ID
      */
     public abstract void sendWebsocket(String taskId);
 
     /**
      * 向上级系统发送识别结果
+     *
      * @param inspectionMap 任务测点信息
      */
     public abstract void sendTaskUpSyatem(Map<String, String> inspectionMap);
 
     /**
      * 相机转到预置位
+     *
      * @param map 相机参数
      */
     protected abstract void moveWait(Map<String, Object> map);
 
     /**
      * 相机抓图
+     *
      * @param map 抓图参数
      * @return 抓图结果
      */
@@ -312,8 +340,22 @@ public abstract class AbstractVideoCruise {
 
     /**
      * 算法分析额外信息处理
-     * @param analysis 调用算法信息
+     *
+     * @param analysis      调用算法信息
      * @param captureResult 抓图返回结果
      */
     protected abstract void analysisExt(Analysis analysis, JSONObject captureResult);
+
+    public static class AnalyticsFactory {
+        private static final Map<CruiseConstant.AnalyticsEnum, AnalyticsService> ANALYTICS_SERVICE_MAP = new HashMap<>(8);
+
+        public static AnalyticsService getAnalytics(CruiseConstant.AnalyticsEnum anayEnum) {
+
+            return ANALYTICS_SERVICE_MAP.get(anayEnum);
+        }
+
+        public static void registerAnalytics(CruiseConstant.AnalyticsEnum analyticsEnum, AnalyticsService service) {
+            ANALYTICS_SERVICE_MAP.put(analyticsEnum, service);
+        }
+    }
 }

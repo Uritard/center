@@ -6,19 +6,15 @@ package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
-import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.InitializingBean;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <功能描述>
@@ -27,78 +23,25 @@ import java.util.Map;
  * @date 2022/10/18
  * @since [产品/模块版本] （可选）
  */
-@Service
-public interface CruiseInspectionExecute {
+public interface CruiseInspectionExecute extends InitializingBean {
     Logger log = LoggerFactory.getLogger(CruiseInspectionExecute.class);
 
     /**
-     * 巡视结果正常
+     * 空的执行方式，不执行任何操作
      */
-    int CRUISE_RESULT_NORMAL = 246;
-    /**
-     * 巡视结果异常
-     */
-    int CRUISE_RESULT_ABNORMAL = 247;
+    NullableCruiseExecuteImpl NULLABLE_EXECUTE = new NullableCruiseExecuteImpl();
 
     /**
-     * 审核状态，未审核
+     * 测点执行
+     * @param inspectionMap 测点数据
      */
-    int EVALUATION_STATE_UN = 257;
+    void execute(Map<String, String> inspectionMap);
 
     /**
-     * 巡检数据状态，已执行
+     * 向页面 Websocket 发送消息
+     * @param taskId 任务ID
      */
-    int CRUISE_STATE_DONE = 252;
-    /**
-     * 巡检数据状态，未执行
-     */
-    int CRUISE_STATE_UN = 253;
-    /**
-     * 巡检数据状态，执行失败
-     */
-    int CRUISE_STATE_FAILED = 254;
-
-    /**
-     * 异常原因，检修
-     */
-    int CRUISE_ABNORMAL_OVERHAUL = 410;
-    /**
-     * 异常原因，离线
-     */
-    int CRUISE_ABNORMAL_OFFLINE = 411;
-    /**
-     * 异常原因，抓图失败
-     */
-    int CRUISE_ABNORMAL_NOPIC = 248;
-
-    /**
-     * 巡视类型，视频（可见光）
-     */
-    int CRUISE_TYPE_VIDEO = 229;
-    /**
-     * 巡视类型，红外
-     */
-    int CRUISE_TYPE_INFRARED = 230;
-    /**
-     * 巡视类型，声纹
-     */
-    int CRUISE_TYPE_VOICE = 232;
-    /**
-     * 巡视类型，机器人
-     */
-    int CRUISE_TYPE_ROBOT = 228;
-    /**
-     * 巡视类型，无人机
-     */
-    int CRUISE_TYPE_UAV = 524;
-    /**
-     * 巡视类型，在线监控
-     */
-    int CRUISE_TYPE_ONLINE = 231;
-
-    void execute(Map<String, String> inspectionMap, long waitTime);
-
-    default void sendWebsocket(String taskId){
+    default void sendWebsocket(String taskId) {
         try {
             Map<String, String> jasonMapOnFinished = new HashMap<>();
             jasonMapOnFinished.put("type", "finishedOneInstance");
@@ -111,29 +54,48 @@ public interface CruiseInspectionExecute {
         }
     }
 
-    default void sendTaskUpSyatem(Map<String, String> inspectionMap){
+    /**
+     * 向上级系统同步消息
+     * @param inspectionMap 测点数据
+     */
+    default void sendTaskUpSyatem(Map<String, String> inspectionMap) {
         //巡视点结果上报站端
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
         Map<String, Object> xmlItem = new HashMap<>();
         xmlBaseModel.setType("61");
-        xmlItem.put("patroldevice_code", "");
-        xmlItem.put("task_name", taskName);
-        xmlItem.put("task_code", "");
-        xmlItem.put("device_name", item.getCruiseName());
-        xmlItem.put("device_id", item.getInstanceId());
-        xmlItem.put("material_id", item.getRealCode());
-        xmlItem.put("value", "");
-        xmlItem.put("value_unit", "");
+        xmlItem.put("patroldevice_code", inspectionMap.getOrDefault("instanceId", ""));
+        xmlItem.put("patroldevice_name", inspectionMap.getOrDefault("instanceName", ""));
+        xmlItem.put("task_name", inspectionMap.getOrDefault("taskName", ""));
+        xmlItem.put("task_code", inspectionMap.getOrDefault("taskCode", ""));
+        xmlItem.put("device_name", inspectionMap.getOrDefault("cruiseName", ""));
+        String deviceMeteId = inspectionMap.getOrDefault("deviceMeteId", "");
+        xmlItem.put("device_id", deviceMeteId);
+        xmlItem.put("material_id", inspectionMap.getOrDefault("realCode", ""));
+        xmlItem.put("value", inspectionMap.getOrDefault("resultNum", ""));
+        xmlItem.put("value_unit", inspectionMap.getOrDefault("resultNum", ""));
         xmlItem.put("unit", "");
-        xmlItem.put("time", cruiseTime);
-        //todo
+        xmlItem.put("time", inspectionMap.getOrDefault("cruiseTime", ""));
+        // todo
         xmlItem.put("recognition_type", "");
         xmlItem.put("file_type", "2");
-        xmlItem.put("file_path", urlPath);
+
+        // 根据相机id获取相机pms编码 （仿照机器人编码）
+        // redist
+        // String cameraPmS = tCameraPresetDao.selectPMSByCameraId(tCameraPreset.getCameraId());
+        // // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
+        // String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        // String tagPath =  "task/" + stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)
+        //     + "/" + taskId + "/CCD/" + deviceMeteId + "_" + cameraPmS + "_" + timeFormat + ".jpg";
+        // log.info("imgPath==={},tagPath==={}", absPath, tagPath);
+        // uploadFileToUpFtps(absPath, "/" + tagPath);
+
+        // xmlItem.put("file_path", tagPath);
         xmlItem.put("rectangle", "");
-        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-        xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat2.format(tCruiseTask.getStartTime()));
+        String startTime =
+            StringUtils.replaceAll(inspectionMap.getOrDefault("startTime", DateFormatUtils.format(new Date(), "yyyyMMddhhmmss")), "- :",
+                "");
+        xmlItem.put("task_patrolled_id", inspectionMap.get("taskId") + "_" + startTime);
         xmlItem.put("data_type", "0x01");
         xmlItem.put("valid", "0");
 
@@ -144,6 +106,24 @@ public interface CruiseInspectionExecute {
         Map<String, List<XMLBaseModel>> cruiseResult = new HashMap<>();
         cruiseResult.put("list", list);
         log.info("信息上报：-" + cruiseResult);
-        Constant.otherServer(cruiseResult,Constant.TCP_URL);//江苏要求
+        try {
+            Constant.otherServer(cruiseResult, Constant.TCP_URL);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    class NullableCruiseExecuteImpl implements CruiseInspectionExecute {
+
+        @Override
+        public void execute(Map<String, String> inspectionMap) {
+            log.warn("default execute，nothing done，please confirm the data: {}", JSON.toJSONString(inspectionMap));
+        }
+
+        @Override
+        public void afterPropertiesSet() {
+            // nothing to do
+        }
+
     }
 }

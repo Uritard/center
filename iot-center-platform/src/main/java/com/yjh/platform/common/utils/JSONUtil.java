@@ -1,5 +1,8 @@
 package com.yjh.platform.common.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -33,7 +36,7 @@ public class JSONUtil {
         objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
     }
 
-    public JSONUtil() {
+    private JSONUtil() {
     }
 
     public static String toJSONString(Object data) {
@@ -73,5 +76,13 @@ public class JSONUtil {
             log.error("Jsons.toBean error: ", e);
         }
         return null;
+    }
+
+    /**
+     * 格式化 json 字符串
+     */
+    public static String prettyJSONString(Object object) {
+        return JSON.toJSONString(object, SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue,
+            SerializerFeature.WriteDateUseDateFormat);
     }
 }

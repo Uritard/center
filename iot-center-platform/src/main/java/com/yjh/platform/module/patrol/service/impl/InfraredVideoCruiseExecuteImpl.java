@@ -11,9 +11,16 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
+import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
 import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
+import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
+
+import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.INFRARED;
 
 /**
  * 红外相机处理
@@ -22,12 +29,17 @@ import java.util.Map;
  * @date 2022/10/18
  * @since [产品/模块版本] （可选）
  */
+@Component
 public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implements CruiseInspectionExecute {
 
     ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
 
+    public InfraredVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate) {
+        super(tAlgorithmInfoDao, redisTemplate);
+    }
+
     @Override
-    public void execute(Map<String, String> inspectionMap, long waitTime) {
+    public void execute(Map<String, String> inspectionMap) {
         videoExecute(inspectionMap);
     }
 
@@ -76,5 +88,10 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
         analysis.setCsvPath(csvPath);
         analysis.setDataPath(dataPath);
         log.info("算法信息(红外)： {}", JSON.toJSONString(analysis));
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        CruiseExecuteFactory.CREATE.registerExecute(INFRARED, this);
     }
 }

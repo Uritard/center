@@ -5,9 +5,9 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
-import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.yjh.platform.module.patrol.CruiseConstant;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,21 +23,14 @@ public enum CruiseExecuteFactory {
      */
     CREATE;
 
-    CruiseInspectionExecute createExecute(int cruiseType) {
-        CruiseInspectionExecute execute;
-        switch (cruiseType) {
-            case 229: // 视频
-            case 230: // 红外
+    private static Map<CruiseConstant.TypeEnum, CruiseInspectionExecute> cruiseInspectionExecuteMap = new HashMap<>(16);
 
-                break;
-            case 232: // 声纹
+    public CruiseInspectionExecute createExecute(CruiseConstant.TypeEnum cruiseTypeEnum) {
 
-                break;
-            case 231: // 在线监控
-            default:
-                execute = (Map<String, String> inspectionMap) -> CruiseInspectionExecute.log.warn("default execute，nothing done，please confirm the data: {}",
-                    JSON.toJSONString(inspectionMap));
-        }
-        return execute;
+        return cruiseInspectionExecuteMap.getOrDefault(cruiseTypeEnum, CruiseInspectionExecute.NULLABLE_EXECUTE);
+    }
+
+    public void registerExecute(CruiseConstant.TypeEnum type, CruiseInspectionExecute execute) {
+        cruiseInspectionExecuteMap.put(type, execute);
     }
 }

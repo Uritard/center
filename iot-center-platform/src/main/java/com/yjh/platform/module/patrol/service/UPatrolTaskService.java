@@ -20,6 +20,7 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskAttrDao;
@@ -28,6 +29,7 @@ import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.InspectionResultThread;
 import com.yjh.platform.module.patrol.thread.IsWarnAfterCruiseThread;
+import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.SysUserDao;
@@ -56,7 +58,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.yjh.platform.module.patrol.service.CruiseInspectionExecute.*;
+import static com.yjh.platform.module.patrol.CruiseConstant.*;
 
 /**
  * <功能描述>
@@ -964,7 +966,7 @@ public class UPatrolTaskService {
                 skipFlag = true;
             }
             // 机器人离线判断
-            if (!skipFlag && 228 == cruiseType) {
+            if (!skipFlag && TypeEnum.ROBOT.getCode() == cruiseType) {
                 long robotId = MapUtils.getLongValue(m, "robotId");
                 if (robotOffline(robotOfflineMap, robotId)) {
                     m.put("resultNum", "机器人离线,未执行");
@@ -992,9 +994,10 @@ public class UPatrolTaskService {
                 return;
             }
 
-            switch (cruiseType) {
-                case CRUISE_TYPE_VIDEO: // 视频
-                case CRUISE_TYPE_INFRARED: // 红外
+            CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+            switch (cruiseTypeEnum) {
+                case VIDEO: // 视频
+                case INFRARED: // 红外
                     String cameraId = MapUtils.getString(m, "cameraId");
                     if (StringUtils.isEmpty(cameraId)) {
                         log.error("task {} cruise data has no cameraId, {}", taskId, JSON.toJSONString(m));
@@ -1003,7 +1006,7 @@ public class UPatrolTaskService {
                         cruiseGroup(cruiseGroupMap, cameraIp, m);
                     }
                     break;
-                case CRUISE_TYPE_VOICE: // 声纹
+                case VOICE: // 声纹
                     String cruiseId = MapUtils.getString(m, "cruiseId");
                     if (StringUtils.isEmpty(cruiseId)) {
                         log.error("task {} cruise data has no cruiseId, {}", taskId, JSON.toJSONString(m));
@@ -1011,16 +1014,18 @@ public class UPatrolTaskService {
                         cruiseGroup(cruiseGroupMap, cruiseId, m);
                     }
                     break;
-                case CRUISE_TYPE_ROBOT: // 机器人
-                case CRUISE_TYPE_UAV: // 无人机
-                case CRUISE_TYPE_ONLINE: // 在线监控
+                case ROBOT: // 机器人
+                case UAV: // 无人机
+                case ONLINE: // 在线监控
                 default:
                     break;
             }
         });
 
-        // skipPointList
-        //     cruiseGroupMap
+        ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList));
+        for (List<Map<String, String>> pointList : cruiseGroupMap.values()){
+            ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, pointList));
+        }
 
     }
 

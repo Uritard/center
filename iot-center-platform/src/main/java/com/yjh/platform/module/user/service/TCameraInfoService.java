@@ -444,6 +444,7 @@ public class TCameraInfoService {
             }
             map.put("cameraId", String.valueOf(cameraId));
             map.put("cameraIp", item.getCameraIp());
+            map.put("pmsId", item.getPmsId());
             redisTemplate.opsForHash().putAll(str, map);
         }
         return 1;
