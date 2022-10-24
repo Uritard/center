@@ -68,6 +68,7 @@ public class TaskJob extends QuartzJobBean {
             log.error("转换任务执行时间出错：", e);
         }
         List<TCruiseTaskDel> tCruiseTaskDelList = tCruiseTaskDelDao.select(taskId, date, null);
+        //判断周期的任务结束时间 todo
         if (tCruiseTaskDelList != null && tCruiseTaskDelList.size() > 0) {
             //不需要执行任务
             log.info(task.getTaskName() + "在 " + taskDate + " 时间不需要执行");
@@ -83,10 +84,26 @@ public class TaskJob extends QuartzJobBean {
         initializeThisTaskInfo(task, allInstanceList);
         //初始化下一次任务信息
         initializeNextTaskInfo(task, allInstanceList);
+        //更改任务状态
+        setTaskResult(taskId);
         //给机器人发任务启动
         robotTaskStart(task);
         //调用摄像机任务
         uPatrolTaskService.videoTaskStart(taskId);
+    }
+
+    private void setTaskResult(String taskId){
+        String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
+        UPatrolResult result = uPatrolTaskDao.selectForTaskId(realTaskId);
+        result.setTaskState(239);
+        //任务开始时间
+        Date date = result.getCreateTime();
+        if (date == null){
+            date = new Date();
+            result.setCreateTime(date);
+        }
+
+        uPatrolResultDao.update(result);
     }
 
     /**

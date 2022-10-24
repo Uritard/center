@@ -94,6 +94,8 @@ public interface UPatrolTaskDao {
 
     List<TCruiseTaskCount> afterTaskCount(HashMap<String,Object> map);
 
+    String selectTaskByRobotTaskCode(@Param(value = "taskCode") String taskCode);
+
     /**
      * 根据巡视点查询相关信息
      * @param instanceId 巡视点id

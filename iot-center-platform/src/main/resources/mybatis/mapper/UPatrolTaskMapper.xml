@@ -527,4 +527,13 @@
         ) ) h order by h.start_time desc;
     </select>
 
+    <select id="selectTaskByRobotTaskCode" resultType="java.lang.String">
+        select
+            task_id
+        from u_patrol_task
+        where task_code = #{taskCode}
+        order by create_time desc
+        limit 1
+    </select>
+
 </mapper>

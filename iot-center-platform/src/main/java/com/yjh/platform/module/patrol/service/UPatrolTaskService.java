@@ -13,10 +13,7 @@ import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
-import com.yjh.platform.common.utils.CommonUtils;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.FileUtil;
-import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -123,7 +120,7 @@ public class UPatrolTaskService {
         if (Objects.isNull(uPatrolTask.getTaskId())) {
             uPatrolTask.setTaskId(String.valueOf(UUID.randomUUID()).replace("-", ""));
         }
-        if (Objects.isNull(uPatrolTask.getTaskCode())){
+        if (Objects.isNull(uPatrolTask.getTaskCode())) {
             uPatrolTask.setTaskCode(uPatrolTask.getTaskId());
         }
 
@@ -207,8 +204,8 @@ public class UPatrolTaskService {
                     .setCruiseName(item.getCruiseName())
                     .setCruiseStatus(253)
                     .setCruiseType(item.getCruiseType());
-            Map map = Object2Map.toStringMap(Object2Map.objectToMap(uPatrolDataResult,true));
-            map.put("cameraId",String.valueOf(item.getCameraId()));
+            Map map = Object2Map.toStringMap(Object2Map.objectToMap(uPatrolDataResult, true));
+            map.put("cameraId", String.valueOf(item.getCameraId()));
             String str = "t_cruise_task_result:" + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);
         }
@@ -269,7 +266,7 @@ public class UPatrolTaskService {
             isAlarmMap.put("taskName", robotPatrolTaskResult.getTaskName());
             IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate);
             TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }
@@ -278,7 +275,7 @@ public class UPatrolTaskService {
      * 对机器人/无人机结果文件处理
      *
      * @param robotPatrolTaskResult 机器人/无人机巡视结果
-     * @param infoMap                任务结果其他信息
+     * @param infoMap               任务结果其他信息
      * @return Map<String, String>
      */
     private Map<String, String> resultFileHandler(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap) {
@@ -302,7 +299,7 @@ public class UPatrolTaskService {
             String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
             String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
 
-            switch (fileType){
+            switch (fileType) {
                 case "1":
                     String descFirFilePath = developAbsoluteUrl + "/FIR/" + fileName;
                     FileUtil.copyFileUsingStream(temporaryFilePath, descFirFilePath);
@@ -336,7 +333,7 @@ public class UPatrolTaskService {
                 default:
                     break;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return isAlarmMap;
@@ -356,23 +353,84 @@ public class UPatrolTaskService {
      * 处理机器人/无人机任务状态
      *
      * @param statusList 机器人/无人机任务状态
+     *                   任务状态(1:已执行 2:正在执行 3:暂停 4:终止 5:未执行 6:超期)
      * @return void
      */
-    public void robotPatrolTaskStatus(List<RobotPatrolTaskStatus> statusList){
-        return;
+    public void robotPatrolTaskStatus(List<RobotPatrolTaskStatus> statusList) {
+        statusList.forEach(robotPatrolTaskStatus -> {
+            switch (robotPatrolTaskStatus.getTaskState()) {
+                case "3":
+                    break;
+                case "2":
+                    break;
+                case "1":
+                case "4":
+                case "6":
+                    //机器人任务终止
+                    TaskExecutePool.getInstance().execute(
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    dealRobotTaskShutDown(robotPatrolTaskStatus);
+                                }
+                            }
+                    );
+                    break;
+                case "5":
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    private void dealRobotTaskShutDown(RobotPatrolTaskStatus robotPatrolTaskStatus) {
+        try {
+            //等待30秒
+            Thread.sleep(30 * 1000);
+        } catch (Exception e) {
+            log.error("等待出错：", e);
+        }
+        String taskId = uPatrolTaskDao.selectTaskByRobotTaskCode(robotPatrolTaskStatus.getTaskCode());
+        String cruiseResultKey = "t_cruise_task_result" + taskId +":";
+        //处理结果 获取机器人的点
+        List<Map<String,String>> resultMap = redisTemplate.opsForHash().values("cruiseResultKey");
+        resultMap.forEach(result ->{
+            //判断是不是机器人的点以及还是否完成
+            String cruiseType = result.get("cruiseType");
+            String cruiseState = result.get("cruiseStatus");
+            String instanceId = result.get("instanceId");
+            if ("228".equals(cruiseType) && "253".equals(cruiseState)){
+                //这个点 没有做
+                result.put("cruiseStatus","254");//执行失败
+                result.put("resultNum","机器人任务异常");
+                result.put("cruiseAbnormal","249");//数据异常
+                result.put("evaluationState","257");//未审核
+                result.put("identifyResult","247");//异常
+
+                String instanceKey = cruiseResultKey+instanceId;
+                redisTemplate.opsForHash().putAll(instanceKey,result);
+
+                patrolTaskResultHandler(taskId,Long.valueOf(instanceId));
+            }
+        });
+
+
+
+
     }
 
     /**
      * 找出机器人和无人机的点让其做任务
      *
-     * @param task    任务信息
+     * @param task           任务信息
      * @param tCruiseTaskAdd 任务关联信息
      * @param format         时间格式
      * @param detailList     区域巡视主机上的巡视点信息
      * @return String
      */
     private String taskToRobotOrDrone(UPatrolTask task, TCruiseTaskAdd tCruiseTaskAdd, DateFormat format,
-        List<TCruisePointInstanceNameDetail> detailList) {
+                                      List<TCruisePointInstanceNameDetail> detailList) {
         try {
             // 找出机器人和无人机做任务的巡检点
             List<Long> robotCruiseList = new ArrayList<>();
@@ -475,7 +533,7 @@ public class UPatrolTaskService {
 
                     String intervalExecuteTime = tCruiseTaskAdd.getIntervalExecuteTime();
                     intervalExecuteTime =
-                        StringUtils.isNotEmpty(intervalExecuteTime) ? intervalExecuteTime.substring(11) : intervalExecuteTime;
+                            StringUtils.isNotEmpty(intervalExecuteTime) ? intervalExecuteTime.substring(11) : intervalExecuteTime;
                     taskInfo.setIntervalExecuteTime(intervalExecuteTime);
 
                     boolean isInterval = StringUtils.isEmpty(tCruiseTaskAdd.getIntervalType());
@@ -696,12 +754,12 @@ public class UPatrolTaskService {
         try {
             //Thread.sleep(10000);
             //机器人任务暂停
-            Map<String,String> jasonMapOnFinished=new HashMap<>();
-            jasonMapOnFinished.put("type","taskChange");
-            jasonMapOnFinished.put("taskId",taskId);
-            String jsonMessage= JSON.toJSONString(jasonMapOnFinished);
-            log.info("发送给前端的消息："+jsonMessage);
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
+            Map<String, String> jasonMapOnFinished = new HashMap<>();
+            jasonMapOnFinished.put("type", "taskChange");
+            jasonMapOnFinished.put("taskId", taskId);
+            String jsonMessage = JSON.toJSONString(jasonMapOnFinished);
+            log.info("发送给前端的消息：" + jsonMessage);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapOnFinished);
         } catch (Exception e) {
             log.error("任务暂停异常: " + e);
             e.printStackTrace();
@@ -719,7 +777,7 @@ public class UPatrolTaskService {
 
         try {
             List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
-            log.info("机器人任务启动,robotCodeList:{}",robotCodeList);
+            log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
             if (robotCodeList != null && robotCodeList.size() > 0) {
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
                 robotTaskStatesMap.put("taskId", taskId);
@@ -739,6 +797,7 @@ public class UPatrolTaskService {
 
         return 1;
     }
+
     private void robotTaskStates(Map<String, Object> robotTaskStatesMap) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
@@ -760,7 +819,7 @@ public class UPatrolTaskService {
             //Thread.sleep(10000);
             //机器人任务暂停
             List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
-            log.info("机器人任务暂停,robotCodeList:{}",robotCodeList);
+            log.info("机器人任务暂停,robotCodeList:{}", robotCodeList);
             if (robotCodeList != null && robotCodeList.size() > 0) {
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
                 robotTaskStatesMap.put("taskId", taskId);
@@ -768,13 +827,13 @@ public class UPatrolTaskService {
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 robotTaskStates(robotTaskStatesMap);
             }
-            updateTaskStateForRedis(taskId,"241");
-            Map<String,String> jasonMapOnFinished=new HashMap<>();
-            jasonMapOnFinished.put("type","taskChange");
-            jasonMapOnFinished.put("taskId",taskId);
-            String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
-            log.info("发送给前端的消息："+jsonMessage);
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
+            updateTaskStateForRedis(taskId, "241");
+            Map<String, String> jasonMapOnFinished = new HashMap<>();
+            jasonMapOnFinished.put("type", "taskChange");
+            jasonMapOnFinished.put("taskId", taskId);
+            String jsonMessage = JSON.toJSONString(jasonMapOnFinished);
+            log.info("发送给前端的消息：" + jsonMessage);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapOnFinished);
         } catch (Exception e) {
             log.error("任务暂停异常: " + e);
             e.printStackTrace();
@@ -787,10 +846,10 @@ public class UPatrolTaskService {
         return uPatrolResultDao.update(uPatrolResult);
     }
 
-    private void updateTaskStateForRedis(String taskId,String state){
-        String strForCountAbnormal = "countForAbnormal:"+taskId;
-        Map<String,String> map = redisTemplate.opsForHash().entries(strForCountAbnormal);
-        map.put("taskState",state);
+    private void updateTaskStateForRedis(String taskId, String state) {
+        String strForCountAbnormal = "countForAbnormal:" + taskId;
+        Map<String, String> map = redisTemplate.opsForHash().entries(strForCountAbnormal);
+        map.put("taskState", state);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -799,7 +858,7 @@ public class UPatrolTaskService {
 
         //机器人任务继续
         List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
-        log.info("机器人任务继续,robotCodeList:{}",robotCodeList);
+        log.info("机器人任务继续,robotCodeList:{}", robotCodeList);
         if (robotCodeList != null && robotCodeList.size() > 0) {
             Map<String, Object> robotTaskStatesMap = new HashMap<>();
             robotTaskStatesMap.put("taskId", taskId);
@@ -815,19 +874,19 @@ public class UPatrolTaskService {
 //            return uPatrolResultDao.update(uPatrolResult);
 //        }
 
-        updateTaskStateForRedis(taskId,"239");
+        updateTaskStateForRedis(taskId, "239");
         videoTaskStart(taskId);
 
         uPatrolResult.setTaskState(239);
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
 
 
-        Map<String,String> jasonMapOnFinished=new HashMap<>();
-        jasonMapOnFinished.put("type","taskChange");
-        jasonMapOnFinished.put("taskId",taskId);
-        String jsonMessage=JSON.toJSONString(jasonMapOnFinished);
-        log.info("发送给前端的消息："+jsonMessage);
-        Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMapOnFinished);
+        Map<String, String> jasonMapOnFinished = new HashMap<>();
+        jasonMapOnFinished.put("type", "taskChange");
+        jasonMapOnFinished.put("taskId", taskId);
+        String jsonMessage = JSON.toJSONString(jasonMapOnFinished);
+        log.info("发送给前端的消息：" + jsonMessage);
+        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapOnFinished);
 
         //任务状态上报站端
         sendTaskStateToUp(task, 2);
@@ -850,10 +909,10 @@ public class UPatrolTaskService {
         robotTaskStatesMap.put("robotCodeList", robotCodeList);
         robotTaskStates(robotTaskStatesMap);
 
-        updateTaskStateForRedis(taskId,"242");
+        updateTaskStateForRedis(taskId, "242");
         try {
-           // todo 任务终止  结果处理
-            log.info("任务终止创建成功=="+taskId);
+            // todo 任务终止  结果处理
+            log.info("任务终止创建成功==" + taskId);
         } catch (Exception e) {
             log.info("任务终止创建失败" + e);
         }
@@ -873,7 +932,7 @@ public class UPatrolTaskService {
             throw new BusinessException("任务未正确初始化");
         }
 
-        List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>)connection -> {
+        List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
             tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
             return null;
         });
@@ -940,7 +999,7 @@ public class UPatrolTaskService {
                     if (StringUtils.isEmpty(cameraId)) {
                         log.error("task {} cruise data has no cameraId, {}", taskId, JSON.toJSONString(m));
                     } else {
-                        String cameraIp = (String)redisTemplate.opsForHash().get("camera_info:" + cameraId, "cameraIp");
+                        String cameraIp = (String) redisTemplate.opsForHash().get("camera_info:" + cameraId, "cameraIp");
                         cruiseGroup(cruiseGroupMap, cameraIp, m);
                     }
                     break;
@@ -973,7 +1032,7 @@ public class UPatrolTaskService {
             TRobotInfo tRobotInfo = tRobotInspectionDao.selectRobot(robotId);
             if (tRobotInfo != null) {
                 Map<String, String> mapForRobotState =
-                    redisTemplate.opsForHash().entries("RobotStatus:" + tRobotInfo.getRobotCode() + ":41");
+                        redisTemplate.opsForHash().entries("RobotStatus:" + tRobotInfo.getRobotCode() + ":41");
                 if ("离线".equals(tRobotInfo.getRobotStatus())) {
                     // 1 机器人离线
                     robotOfflineMap.put(robotId, 1);
@@ -997,17 +1056,17 @@ public class UPatrolTaskService {
     /**
      * 巡视任务结果处理
      *
-     * @param taskId 任务id
+     * @param taskId     任务id
      * @param instanceId 巡视点id
      */
-    public void patrolTaskResultHandler(String taskId, Long instanceId){
+    public void patrolTaskResultHandler(String taskId, Long instanceId) {
         String redisKeyName = "t_cruise_task_result:" + taskId + ":" + instanceId;
         Map<String, Object> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
 
         // 判断该点巡视类型
         String cruiseType = String.valueOf(cruiseResultMap.get("cruiseType"));
 
-        switch (cruiseType){
+        switch (cruiseType) {
             case "228":
             case "521":
                 // 机器人和无人机
@@ -1031,17 +1090,17 @@ public class UPatrolTaskService {
         Integer abnormalCounts;
         Integer normalCounts;
         Integer allCounts;
-        synchronized (LOCK_FLAG){
+        synchronized (LOCK_FLAG) {
             String strForCountAbnormal = "countForAbnormal:" + taskId;
-            Map<String, Object> resultCountsMap  = redisTemplate.opsForHash().entries(strForCountAbnormal);
+            Map<String, Object> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
             abnormalCounts = Integer.valueOf(String.valueOf(resultCountsMap.get("abnormal")));
             normalCounts = Integer.valueOf(String.valueOf(resultCountsMap.get("normal")));
             allCounts = Integer.valueOf(String.valueOf(resultCountsMap.get("all")));
             log.info("从redis获取的taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, allCounts, abnormalCounts, normalCounts);
 
-            if (StringUtils.equals("246", String.valueOf(cruiseResultMap.get("cruiseResult")))){
+            if (StringUtils.equals("246", String.valueOf(cruiseResultMap.get("cruiseResult")))) {
                 normalCounts++;
-            }else {
+            } else {
                 abnormalCounts++;
             }
             log.info("normalCounts:{}, abnormalCounts:{}", normalCounts, abnormalCounts);
@@ -1157,17 +1216,18 @@ public class UPatrolTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Integer selectIsAlarmByTask(String taskId, String instanceId){
+    public Integer selectIsAlarmByTask(String taskId, String instanceId) {
         return uPatrolTaskDao.selectIsAlarmByTask(taskId, Long.valueOf(instanceId));
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Integer updatePicPath(String taskId, String instanceId, String imagePath){
+    public Integer updatePicPath(String taskId, String instanceId, String imagePath) {
         return uPatrolTaskDao.updatePicPath(taskId, Long.valueOf(instanceId), imagePath);
     }
 
     /**
      * 根据巡视点id查询该测点信息
+     *
      * @param instanceId
      * @return TStdDeviceMete
      */
@@ -1178,8 +1238,9 @@ public class UPatrolTaskService {
 
     /**
      * 字典值查询
+     *
      * @param dictNote 说明
-     * @param colName 类型
+     * @param colName  类型
      * @return String
      */
     @Transactional(rollbackFor = Exception.class)
@@ -1189,6 +1250,7 @@ public class UPatrolTaskService {
 
     /**
      * 根据机器人实物id查询机器人信息
+     *
      * @param robotCode 机器人实物id
      * @return TRobotInfo 机器人信息
      */
@@ -1201,9 +1263,9 @@ public class UPatrolTaskService {
     public List<Map<String, Object>> taskCount(Date taskStartDate, int flag) {
         // 时间格式化处理
         Map<String, String> map = new HashMap<>();
-        if (flag == 1){
+        if (flag == 1) {
             map = monthHandle(taskStartDate);
-        }else {
+        } else {
             map = yearHandle(taskStartDate);
         }
 
@@ -1325,6 +1387,8 @@ public class UPatrolTaskService {
         String lastDay = "";
         if (Objects.equals(null, taskStartDate)) {
             Date date = new Date();
+            Calendar nowDate = Calendar.getInstance();
+            nowDate.setTime(date);
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.MONTH, date.getMonth() - 1);
             if ((date.getMonth()) == 1) {
@@ -1384,10 +1448,10 @@ public class UPatrolTaskService {
         return map;
     }
 
-    private  Map<String, String> yearHandle(Date taskStartDate) {
+    private Map<String, String> yearHandle(Date taskStartDate) {
         Map<String, String> map = new HashMap<>();
         String firstDay = "";
-        String lastDay= " ";
+        String lastDay = " ";
         if (Objects.equals(null, taskStartDate)) {
             Date date = new Date();
             int year = date.getYear() + 1900;
@@ -1437,6 +1501,7 @@ public class UPatrolTaskService {
         List<TCruiseTaskList> tCruiseTaskList = uPatrolTaskDao.selectPointStatus(taskId);
         return tCruiseTaskList;
     }
+
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> taskCountByCondition(Date startTime, Date endTime, String taskState, String taskName) {
         HashMap<String, Object> map = new HashMap<>();
