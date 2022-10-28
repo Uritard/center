@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accesstcp.module.device.dao.PatrolTaskDao">
+
+    <select id="selectTaskInfo" resultType="java.util.LinkedHashMap">
+        SELECT b.up_dict                            as type,
+               a.task_id                            as task_code,
+               a.task_name,
+               a.task_level                         as priority,
+               "3"                                  as device_level,
+--                IFNULL(a.date_type, "") as time,
+               "" as cycle_month,
+               "" as  cycle_week,
+               "" as cycle_execute_time,
+               "" as cycle_start_time,
+               "" as cycle_end_time,
+               "" as interval_number,
+               "" as interval_type,
+               "" as interval_execute_time,
+               "" as interval_start_time,
+               "" as interval_end_time,
+               "" as invalid_start_time,
+               "" as invalid_end_time,
+               '0' isenable,
+               u.user_name as creator,
+               DATE_FORMAT(a.start_time, '%Y-%m-%d %H:%i:%s')  as fixed_start_time,
+               DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') as create_time
+        from u_patrol_task a
+        left join sys_user u on a.create_user_id = u.user_id
+        left join t_dict_business b on a.task_type = b.dict_code and b.col_name="plan_type"
+    </select>
+
+    <select id="selectInstanceId" resultType="java.lang.Long">
+        SELECT a.instance_id
+        from u_patrol_task_attr a
+        where a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="countInstanceLoss" resultType="java.util.LinkedHashMap">
+        SELECT count(1)                                AS totalNum,
+               sum(IF(result.cruise_status = 252, 0, 1)) AS validNum
+        FROM u_patrol_data_result result
+        WHERE result.cruise_time BETWEEN #{startTime} and #{endTime}
+    </select>
+
+    <select id="countResultCheck" resultType="java.util.LinkedHashMap">
+        SELECT count(1)                      AS totalNum,
+               count(result.identify_result) AS validNum
+        FROM u_patrol_data_result result
+        WHERE result.cruise_time BETWEEN #{startTime} and #{endTime}
+    </select>
+
+</mapper>
