@@ -3,6 +3,7 @@ package com.yjh.platform.module.patrol.quartz;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
@@ -57,6 +58,7 @@ public class TaskJob extends QuartzJobBean {
      *
      * @param context
      */
+    @Override
     public void executeInternal(JobExecutionContext context) {
         String taskId = context.getMergedJobDataMap().getString("taskId");
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
@@ -73,32 +75,39 @@ public class TaskJob extends QuartzJobBean {
             //不需要执行任务
             log.info(task.getTaskName() + "在 " + taskDate + " 时间不需要执行");
             return;
+        } else if (Objects.nonNull(task.getEndTime()) && date.after(task.getEndTime())) {
+            log.info("此时间大于结束时间,以后都不会再做了,删除当前任务");
+            uPatrolTaskService.deleteByPrimaryId(taskId, DateTimeUtil.format(date));
+        } else if (Objects.nonNull(task.getStartTime()) && date.before(task.getStartTime())) {
+            log.info(taskDate + "此时间小于开始时间,任务不需要执行");
+        } else {
+            try {
+                log.info("当前任务优先级：{}", task.getTaskLevel());
+                pauseFormerLowerTask(taskId, task);
+            } catch (Exception e) {
+                log.info("将低优先任务暂停失败:", e);
+            }
+            List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
+            initializeThisTaskInfo(task, allInstanceList);
+            //初始化下一次任务信息
+            initializeNextTaskInfo(task, allInstanceList);
+            //更改任务状态
+            setTaskResult(taskId);
+            //给机器人发任务启动
+            robotTaskStart(task);
+            //调用摄像机任务
+            uPatrolTaskService.videoTaskStart(taskId);
+            //声纹的
         }
-        try{
-            log.info("当前任务优先级：{}",task.getTaskLevel());
-            pauseFormerLowerTask(taskId, task);
-        }catch (Exception e){
-            log.info("将低优先任务暂停失败:",e);
-        }
-        List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
-        initializeThisTaskInfo(task, allInstanceList);
-        //初始化下一次任务信息
-        initializeNextTaskInfo(task, allInstanceList);
-        //更改任务状态
-        setTaskResult(taskId);
-        //给机器人发任务启动
-        robotTaskStart(task);
-        //调用摄像机任务
-        uPatrolTaskService.videoTaskStart(taskId);
     }
 
-    private void setTaskResult(String taskId){
+    private void setTaskResult(String taskId) {
         String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
         UPatrolResult result = uPatrolTaskDao.selectForTaskId(realTaskId);
         result.setTaskState(239);
         //任务开始时间
         Date date = result.getCreateTime();
-        if (date == null){
+        if (date == null) {
             date = new Date();
             result.setCreateTime(date);
         }
@@ -117,7 +126,7 @@ public class TaskJob extends QuartzJobBean {
             //任务开始前 判断任务优先级 找到优先级比当前任务小的任务
             List<String> lowTaskList = uPatrolTaskDao.selectPlanRunningTask(task.getTaskLevel());
             //将此任务暂停的任务放入 redis
-            log.info("低优先级任务id：",lowTaskList);
+            log.info("低优先级任务id：{}", lowTaskList);
             if (lowTaskList != null && lowTaskList.size() > 0) {
                 String lowTaskKey = "lowTask:" + taskId;
                 redisTemplate.opsForList().leftPushAll(lowTaskKey, lowTaskList);
@@ -129,28 +138,28 @@ public class TaskJob extends QuartzJobBean {
         }
     }
 
-    private void initializeThisTaskInfo(UPatrolTask task, List<Long> instanceList){
+    private void initializeThisTaskInfo(UPatrolTask task, List<Long> instanceList) {
 
-        Map<String,String> mapForAbnormal = new HashMap<>();
-        mapForAbnormal.put("all",String.valueOf(instanceList.size()));
-        mapForAbnormal.put("abnormal","0");
-        mapForAbnormal.put("normal","0");
+        Map<String, String> mapForAbnormal = new HashMap<>();
+        mapForAbnormal.put("all", String.valueOf(instanceList.size()));
+        mapForAbnormal.put("abnormal", "0");
+        mapForAbnormal.put("normal", "0");
         Date taskStart = new Date();
         //任务超期时间
-        Map<String,String> mapForTaskAreTime  = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+        Map<String, String> mapForTaskAreTime = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
         Integer tasksAreTime = Integer.valueOf(mapForTaskAreTime.get("content"));
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(taskStart);
-        cal.add(Calendar.MINUTE,tasksAreTime);
+        cal.add(Calendar.MINUTE, tasksAreTime);
         Date taskAre = cal.getTime();
 
-        mapForAbnormal.put("taskStart",simpleDateFormat.format(taskStart));
-        mapForAbnormal.put("overDay",simpleDateFormat.format(taskAre));
-        mapForAbnormal.put("taskState","239");
+        mapForAbnormal.put("taskStart", simpleDateFormat.format(taskStart));
+        mapForAbnormal.put("overDay", simpleDateFormat.format(taskAre));
+        mapForAbnormal.put("taskState", "239");
 
-        String strForCountAbnormal = "countForAbnormal:"+task.getTaskId();
-        redisTemplate.opsForHash().putAll(strForCountAbnormal,mapForAbnormal);
+        String strForCountAbnormal = "countForAbnormal:" + task.getTaskId();
+        redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
     }
 
     /**
@@ -159,7 +168,7 @@ public class TaskJob extends QuartzJobBean {
     private void initializeNextTaskInfo(UPatrolTask task, List<Long> instanceList) {
         if (task.getExecuteType() == 172) {
             UPatrolTask nextTask = new UPatrolTask();
-            String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");//任务结果uuid
+            String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
             nextTask.setTaskId(newTaskId)
                     .setTaskCode(task.getTaskCode())
                     .setTaskName(task.getTaskName())
@@ -171,6 +180,8 @@ public class TaskJob extends QuartzJobBean {
                     .setDateType(task.getDateType())
                     .setTaskSource(task.getTaskSource())
                     .setTaskLevel(task.getTaskLevel())
+                    .setStartTime(task.getStartTime())
+                    .setEndTime(task.getEndTime())
                     .setCreateUserId(task.getCreateUserId());
             uPatrolTaskService.initializeTaskInfo(instanceList, nextTask);
         }
@@ -196,6 +207,7 @@ public class TaskJob extends QuartzJobBean {
         }
 
     }
+
     private void robotTaskStates(Map<String, Object> robotTaskStatesMap) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);

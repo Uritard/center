@@ -114,6 +114,20 @@ public class UPatrolTaskService {
         try {
             if (uPatrolTask.getExecuteType() == 172) {
                 Date startTime = format.parse("2000-01-01 00:00:00");
+                Date endTime = null;
+                if (org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleMonth())
+                        && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleWeek())
+                        && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleExecuteTime())){
+                    startTime = DateTimeUtil.parse(tCruiseTaskAdd.getCycleStartTime());
+                    endTime = DateTimeUtil.parse(tCruiseTaskAdd.getCycleEndTime());
+                }
+                // 间隔
+                if (org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalType())
+                        && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalNumber())
+                        && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalExecuteTime())){
+                    startTime = DateTimeUtil.parse(tCruiseTaskAdd.getIntervalStartTime());
+                    endTime = DateTimeUtil.parse(tCruiseTaskAdd.getIntervalEndTime());
+                }
                 uPatrolTask.setStartTime(startTime);
             }
         } catch (Exception e) {
@@ -208,7 +222,7 @@ public class UPatrolTaskService {
                     .setCruiseType(item.getCruiseType());
             Map map = Object2Map.toStringMap(Object2Map.objectToMap(uPatrolDataResult, true));
             map.put("cameraId", String.valueOf(item.getCameraId()));
-            String str = "t_cruise_task_result:" + task.getTaskId() + ":" + item.getInstanceId();
+            String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);
         }
         return detailList;
@@ -1295,7 +1309,18 @@ public class UPatrolTaskService {
         List<Map<String, Object>> listTask = new ArrayList<>();
         Date now = new Date();
         for (TCruiseTaskCount tCruiseTaskCount : list) {
-            if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
+            Date dayBeforeTime = dayBefore;
+            Date dayAfterTime = dayAfter;
+            if (tCruiseTaskCount.getIfRun() == 172 && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskCount.getDateType())) {
+
+                if (tCruiseTaskCount.getStartTime().after(dayBeforeTime)){
+                    dayBeforeTime = tCruiseTaskCount.getStartTime();
+                }
+                if (Objects.nonNull(tCruiseTaskCount.getEndTime()) && tCruiseTaskCount.getEndTime().before(dayAfterTime)){
+                    dayAfterTime = tCruiseTaskCount.getEndTime();
+                }
+
+                log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
                 List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
                 for (Date aTimeList : timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();

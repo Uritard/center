@@ -376,7 +376,7 @@ public class UPatrolTaskController {
     }
 
     @ApiOperation(value = "图片判别任务下发")
-    @RequestMapping(value = "executeDifferentiateTask",method = RequestMethod.POST)
+    @RequestMapping(value = "/executeDifferentiateTask",method = RequestMethod.POST)
     public Result executeDifferentiateTask(@RequestBody List<String> images){
         Result result=new Result();
         try {
