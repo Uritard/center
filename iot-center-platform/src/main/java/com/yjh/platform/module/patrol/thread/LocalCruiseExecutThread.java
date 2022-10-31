@@ -31,10 +31,12 @@ public class LocalCruiseExecutThread<T> implements Runnable {
 
     private final UPatrolTaskService uPatrolTaskService;
     private final List<Map<String, String>> cruisePointList;
+    private final boolean skip;
 
-    public LocalCruiseExecutThread(UPatrolTaskService uPatrolTaskService, List<Map<String, String>> cruisePoints) {
+    public LocalCruiseExecutThread(UPatrolTaskService uPatrolTaskService, List<Map<String, String>> cruisePoints, boolean skip) {
         this.uPatrolTaskService = uPatrolTaskService;
         this.cruisePointList = cruisePoints;
+        this.skip = skip;
     }
 
     @Override
@@ -44,18 +46,27 @@ public class LocalCruiseExecutThread<T> implements Runnable {
             return;
         }
 
-        cruisePointList.forEach(m -> {
-            int cruiseResult = MapUtils.getIntValue(m, "cruiseResult");
-            if (CRUISE_RESULT_ABNORMAL == cruiseResult) {
-                skipPoint(m);
-            } else {
-                pointExecut(m);
-            }
-        });
+        if (skip) {
+            skipPointList(cruisePointList);
+        } else {
+            cruisePointList.forEach(m -> {
+                int cruiseResult = MapUtils.getIntValue(m, "cruiseResult");
+                if (CRUISE_RESULT_ABNORMAL == cruiseResult) {
+                    skipPoint(m);
+                } else {
+                    pointExecut(m);
+                }
+            });
+        }
+
+    }
+
+    private void skipPointList(List<Map<String, String>> inspectionMapList) {
+        CruiseRedisStorage.piplinePutPatrolDetail(inspectionMapList);
     }
 
     private void skipPoint(Map<String, String> inspectionMap) {
-
+        CruiseRedisStorage.offer(inspectionMap);
     }
 
     private void pointExecut(Map<String, String> inspectionMap) {
@@ -63,7 +74,18 @@ public class LocalCruiseExecutThread<T> implements Runnable {
         int cruiseType = MapUtils.getIntValue(inspectionMap, "cruiseType");
         CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
         CruiseInspectionExecute execute = CruiseExecuteFactory.CREATE.createExecute(cruiseTypeEnum);
-        execute.execute(inspectionMap);
+        boolean isEnded = execute.execute(inspectionMap);
+
+        String taskId = inspectionMap.get("taskId");
+        long insId = MapUtils.getIntValue(inspectionMap, "instanceId");
+        // 上传上级系统
+        execute.sendTaskUpSystem(inspectionMap);
+        // 发送页面
+        execute.sendWebsocket(taskId);
+        // 任务结束，调用结束方法
+        if (isEnded) {
+            uPatrolTaskService.patrolTaskResultHandler(taskId, insId);
+        }
     }
 }
 

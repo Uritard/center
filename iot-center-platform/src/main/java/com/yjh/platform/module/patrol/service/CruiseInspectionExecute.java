@@ -33,12 +33,15 @@ public interface CruiseInspectionExecute extends InitializingBean {
 
     /**
      * 测点执行
+     *
      * @param inspectionMap 测点数据
+     * @return 测点是否已经执行结束，true 表示不需要算法返回，false 表示需要算法返回
      */
-    void execute(Map<String, String> inspectionMap);
+    boolean execute(Map<String, String> inspectionMap);
 
     /**
      * 向页面 Websocket 发送消息
+     *
      * @param taskId 任务ID
      */
     default void sendWebsocket(String taskId) {
@@ -56,9 +59,10 @@ public interface CruiseInspectionExecute extends InitializingBean {
 
     /**
      * 向上级系统同步消息
+     *
      * @param inspectionMap 测点数据
      */
-    default void sendTaskUpSyatem(Map<String, String> inspectionMap) {
+    default void sendTaskUpSystem(Map<String, String> inspectionMap) {
         //巡视点结果上报站端
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
@@ -116,8 +120,9 @@ public interface CruiseInspectionExecute extends InitializingBean {
     class NullableCruiseExecuteImpl implements CruiseInspectionExecute {
 
         @Override
-        public void execute(Map<String, String> inspectionMap) {
+        public boolean execute(Map<String, String> inspectionMap) {
             log.warn("default execute，nothing done，please confirm the data: {}", JSON.toJSONString(inspectionMap));
+            return true;
         }
 
         @Override

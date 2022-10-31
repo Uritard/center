@@ -37,8 +37,8 @@ public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements
     }
 
     @Override
-    public void execute(Map<String, String> inspectionMap) {
-        videoExecute(inspectionMap);
+    public boolean execute(Map<String, String> inspectionMap) {
+        return videoExecute(inspectionMap);
     }
 
     @Override
@@ -47,8 +47,8 @@ public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements
     }
 
     @Override
-    public void sendTaskUpSyatem(Map<String, String> inspectionMap) {
-        CruiseInspectionExecute.super.sendTaskUpSyatem(inspectionMap);
+    public void sendTaskUpSystem(Map<String, String> inspectionMap) {
+        CruiseInspectionExecute.super.sendTaskUpSystem(inspectionMap);
     }
 
     /**

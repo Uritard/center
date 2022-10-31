@@ -39,8 +39,8 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
     }
 
     @Override
-    public void execute(Map<String, String> inspectionMap) {
-        videoExecute(inspectionMap);
+    public boolean execute(Map<String, String> inspectionMap) {
+        return videoExecute(inspectionMap);
     }
 
     @Override
@@ -49,13 +49,14 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
     }
 
     @Override
-    public void sendTaskUpSyatem(Map<String, String> inspectionMap) {
-        CruiseInspectionExecute.super.sendTaskUpSyatem(inspectionMap);
+    public void sendTaskUpSystem(Map<String, String> inspectionMap) {
+        CruiseInspectionExecute.super.sendTaskUpSystem(inspectionMap);
     }
 
     /**
      * 红外相机转到预置位，红外相机抓图时进行了处理，不需要转动预置位
-     * @param map
+     *
+     * @param map 预置位信息
      */
     @Override
     protected void moveWait(Map<String, Object> map) {
@@ -70,7 +71,7 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
         Result re = null;
         try {
             if (null != serviceRestTemplate) {
-                re =  serviceRestTemplate.getForObject(RED_MOVE_URL, Result.class,map);
+                re = serviceRestTemplate.getForObject(RED_MOVE_URL, Result.class, map);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

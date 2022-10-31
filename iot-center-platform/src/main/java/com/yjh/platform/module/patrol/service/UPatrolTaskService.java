@@ -1036,9 +1036,9 @@ public class UPatrolTaskService {
             }
         });
 
-        ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList));
+        ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true));
         for (List<Map<String, String>> pointList : cruiseGroupMap.values()){
-            ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, pointList));
+            ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, pointList, false));
         }
 
     }

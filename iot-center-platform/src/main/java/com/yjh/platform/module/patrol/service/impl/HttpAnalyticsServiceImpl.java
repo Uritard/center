@@ -6,8 +6,8 @@ package com.yjh.platform.module.patrol.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.JSONUtil;
@@ -21,19 +21,11 @@ import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyticsService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -91,12 +83,17 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
     public Result analytics(List<Analysis> analysisList) {
         List<Response> responseList = new ArrayList<>();
         List<PicAnalyseRequest> list = formatTransition(analysisList);
+        int code = ResultCodeEnum.NORMAL.getCode();
         for (PicAnalyseRequest request : list) {
             Response response = picAnalyse(request);
             responseList.add(response);
+            if (200 != response.getCode()) {
+                code = response.getCode();
+            }
         }
-
-        return null;
+        Result result = new Result(responseList);
+        result.setCode(code, 200 == code ? "SUCCESS" : "ERROR");
+        return result;
     }
 
     private List<PicAnalyseRequest> formatTransition(List<Analysis> analysisList) {
@@ -244,11 +241,18 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
     public Result defect(List<Analysis> analysisList) {
         List<Response> responseList = new ArrayList<>();
         List<PicAnalyseRequest> list = formatTransition(analysisList);
+        int code = ResultCodeEnum.NORMAL.getCode();
         for (PicAnalyseRequest request : list) {
             Response response = picAnalyse(request);
             responseList.add(response);
+            if (200 != response.getCode()) {
+                code = response.getCode();
+            }
         }
-        return null;
+
+        Result result = new Result(responseList);
+        result.setCode(code, 200 == code ? "SUCCESS" : "ERROR");
+        return result;
     }
 
     /**

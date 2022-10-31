@@ -40,11 +40,11 @@ public class ThreadPoolConfig {
     /**
      * 核心线程数
      */
-    private static int patrolCorePoolSize = 20;
+    private static int patrolCorePoolSize = 100;
     /**
      * 最大线程数
      */
-    private static int patrolMaxPoolSize = 400;
+    private static int patrolMaxPoolSize = 800;
     /**
      * 线程队列大小
      */

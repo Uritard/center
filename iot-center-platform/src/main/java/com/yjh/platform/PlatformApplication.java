@@ -5,6 +5,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
+import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
 import com.yjh.platform.module.user.service.SysKeyService;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.service.TCameraInfoService;
@@ -91,25 +92,7 @@ public class PlatformApplication  implements CommandLineRunner {
         Constant.redisTemplate = redisTemplate;
         Constant.apiPermissions= Boolean.valueOf(interfaceApi);
         tDeviceTypeImgService.findPic();//本地启动把此行注掉
-        //开机自动将所有拾音器开启状态转为关闭
-        Set voiceKeys = redisScan("is_record_open_state:*");
-        List voiceList = redisTemplate.executePipelined(
-                new SessionCallback<Object>() {
-                    @Override
-                    public <K, V> Object execute(RedisOperations<K, V> redisOperations) throws DataAccessException {
-                        for (Object key : voiceKeys) {
-                            redisTemplate.opsForHash().entries(key);
-                        }
-                        return null;
-                    }});
-        if (voiceList.size()>0) {
-            int voiceListLen = voiceList.size();
-            for (int i=0; i<voiceListLen; i++) {
-                Map deviceMap = (Map) voiceList.get(i);
-                deviceMap.replace("openState", "关闭");
-                redisTemplate.opsForHash().putAll("is_record_open_state:"+deviceMap.get("voiceDeviceId"), deviceMap);
-            }
-        }
+        CruiseRedisStorage.start(redisTemplate);
     }
 
     @Bean
@@ -135,28 +118,4 @@ public class PlatformApplication  implements CommandLineRunner {
         return new ServiceRestTemplate();
     }
 
-    public Set<String> redisScan(String key) {
-        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = Sets.newHashSet();
-
-            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
-            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
-
-            ScanParams scanParams = new ScanParams();
-            scanParams.match("*" + key + "*");
-            scanParams.count(1000);
-            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
-            while (null != scan.getStringCursor()) {
-                keys.addAll(scan.getResult());
-                if (!StringUtils.equals("0", scan.getStringCursor())) {
-                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
-                    continue;
-                } else {
-                    break;
-                }
-            }
-
-            return keys;
-        });
-    }
 }
