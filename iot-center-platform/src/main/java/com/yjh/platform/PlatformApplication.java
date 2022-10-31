@@ -5,11 +5,13 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
+import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
 import com.yjh.platform.module.user.service.SysKeyService;
 import com.yjh.platform.module.user.service.SysUserService;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import com.yjh.platform.module.user.service.TSysParamService;
+import com.yjh.platform.netty.client.NettyClient;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,10 +69,28 @@ public class PlatformApplication  implements CommandLineRunner {
     private RedisTemplate redisTemplate;
     @Autowired
     private TDeviceTypeImgService tDeviceTypeImgService;
+    @Autowired
+    private AnalyseDataOperateService analyseDataOperateService;
+    private NettyClient nettyClient = new NettyClient();
     @Value("${spring.websocket.send.url}")
     private String url;
     @Value("${spring.interface.api}")
     private String interfaceApi;
+    /**
+     * 表计识别分析端口
+     */
+    @Value("${netty.recognize.port}")
+    private int recognizePort;
+    /**
+     * 缺陷分析端口
+     */
+    @Value("${netty.ai.port}")
+    private int aiPort;
+    /**
+     * 算法服务端IP
+     */
+    @Value("${netty.server.url}")
+    private String serverUrl;
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
@@ -93,6 +114,30 @@ public class PlatformApplication  implements CommandLineRunner {
         Constant.apiPermissions= Boolean.valueOf(interfaceApi);
         tDeviceTypeImgService.findPic();//本地启动把此行注掉
         CruiseRedisStorage.start(redisTemplate);
+
+        InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
+        InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
+        nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate, analyseDataOperateService, url);
+
+        //开机自动将所有拾音器开启状态转为关闭
+        Set voiceKeys = redisScan("is_record_open_state:*");
+        List voiceList = redisTemplate.executePipelined(
+                new SessionCallback<Object>() {
+                    @Override
+                    public <K, V> Object execute(RedisOperations<K, V> redisOperations) throws DataAccessException {
+                        for (Object key : voiceKeys) {
+                            redisTemplate.opsForHash().entries(key);
+                        }
+                        return null;
+                    }});
+        if (voiceList.size()>0) {
+            int voiceListLen = voiceList.size();
+            for (int i=0; i<voiceListLen; i++) {
+                Map deviceMap = (Map) voiceList.get(i);
+                deviceMap.replace("openState", "关闭");
+                redisTemplate.opsForHash().putAll("is_record_open_state:"+deviceMap.get("voiceDeviceId"), deviceMap);
+            }
+        }
     }
 
     @Bean
@@ -118,4 +163,28 @@ public class PlatformApplication  implements CommandLineRunner {
         return new ServiceRestTemplate();
     }
 
+    public Set<String> redisScan(String key) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
+
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+
+            ScanParams scanParams = new ScanParams();
+            scanParams.match("*" + key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            return keys;
+        });
+    }
 }

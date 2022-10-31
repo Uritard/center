@@ -5,7 +5,7 @@
 package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
-import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
@@ -66,6 +66,22 @@ public interface UPatrolTaskDao {
                           @Param(value = "instanceId") Long instanceId,
                           @Param(value = "imagePath") String imagePath);
     /**
+     * 根据任务id和巡检点id查询告警id查询该点是否为告警
+     * @param instanceId 巡视点id
+     * @param taskId 任务id
+     * @return int
+     */
+    int selectIsWarnByTaskId(@Param(value = "instanceId")Long instanceId,
+                             @Param(value = "taskId")String taskId);
+
+    /**
+     * 更新任务结果表
+     * @param cruiseDataId 巡视点结果id
+     * @return int
+     */
+    int updateIsWarnByCruiseDataId(@Param(value = "cruiseDataId")Long cruiseDataId);
+
+    /**
      * 根据巡视点id查询测点信息
      * @param instanceId 巡视点id
      * @return TStdDeviceMete
@@ -119,8 +135,8 @@ public interface UPatrolTaskDao {
 
     /**
      * 插入巡视任务结果数据
-     * @param uPatrolDataResultList 巡视点结果集
+     * @param list 巡视点结果集
      * @return int
      */
-    int batchInsertUPatrolDataResult(List<UPatrolDataResult> uPatrolDataResultList);
+    int batchInsertUPatrolDataResult(List<UPatrolDataResult> list);
 }

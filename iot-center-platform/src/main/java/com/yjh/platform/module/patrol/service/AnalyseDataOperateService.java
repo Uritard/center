@@ -6,6 +6,7 @@ import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.task.entity.TStdDevicemete;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ public class AnalyseDataOperateService {
     @Autowired
     private UpFtpsConfig upFtpsConfig;
 
-    private Logger log = LoggerFactory.getLogger(AnalyseDataOperateService.class);
+    private final Logger log = LoggerFactory.getLogger(AnalyseDataOperateService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public int insertWarnInfo(TWarnInfo tWarnInfo) {
@@ -106,12 +107,12 @@ public class AnalyseDataOperateService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TStdDevicemete selectByPrimaryIdDeviceMete(Long deviceMeteId) {
+    public TStdDeviceMete selectByPrimaryIdDeviceMete(Long deviceMeteId) {
         return this.analyseDataOperateDao.selectByPrimaryIdDeviceMete(deviceMeteId);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TStdDevicemete selectDeviceMeteByInstanceId(Long instanceId) {
+    public TStdDeviceMete selectDeviceMeteByInstanceId(Long instanceId) {
         return this.analyseDataOperateDao.selectDeviceMeteByInstanceId(instanceId);
     }
 
@@ -336,12 +337,16 @@ public class AnalyseDataOperateService {
     }
 
 
-
     /**
      * ------巡视点告警配置判断（综合告警预判断）-------
+     *
+     * @param value 值
+     * @param stdDeviceMeteName 测点名称
      * @param meteKind 测点类型
-     * @param stateZero 遥信状态0
      * @param alarmState 遥信预告警状态
+     * @param stateZero 遥信状态0
+     * @param stateOne 遥信状态1
+     * @param alarmLevel 告警级别
      * @param highLimit1 遥测 上1 阈值
      * @param lowLimit1 遥测 下1 阈值
      * @param highLimit2 遥测 上2 阈值
@@ -352,20 +357,139 @@ public class AnalyseDataOperateService {
      * @param lowLimit4 遥测 下4 阈值
      * @return  是否产生告警  0/1
      */
-    //@Logs(title = "告警配置判断")
+   public Map<String,Object> alarmJudge(String value, String stdDeviceMeteName,
+                                        String meteKind,
+                                        Integer alarmState, String stateZero,
+                                        String stateOne, Integer alarmLevel,
+                                        Float highLimit1, Float lowLimit1,
+                                        Float highLimit2, Float lowLimit2,
+                                        Float highLimit3, Float lowLimit3,
+                                        Float highLimit4, Float lowLimit4){
+       Map<String,Object> resultMap = new HashMap<>(7);
+       try {
+           int flag = warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1, highLimit2, lowLimit2,
+                   highLimit3, lowLimit3, highLimit4, lowLimit4);
+           if (flag !=1 ){
+               // 未配置告警规则
+               resultMap.put("isWarn", false);
+               resultMap.put("warnLevel", 0);
+               resultMap.put("warnName", null);
+               resultMap.put("warnContent", null);
+               resultMap.put("outRange", null);
+               resultMap.put("warnTime", null);
+               return resultMap;
+           }
+           // 告警信息拼装并返回
+           warnInfoSetting(value, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, resultMap);
+       }catch (Exception e){
+           log.error(e.getMessage(), e);
+       }
+
+       return resultMap;
+   }
+
+    private Map<String,Object> warnInfoSetting(String value, String stdDeviceMeteName, String meteKind, Integer alarmState, String stateZero, String stateOne, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Float highLimit3, Float lowLimit3, Float highLimit4, Float lowLimit4, Map<String, Object> resultMap) {
+        Boolean isWarn = false;
+        Integer warnLevel = 0;
+        String warnName = null;
+        String warnContent = null;
+        //超越浮动值
+        String outRange = null;
+        Date warnTime = null;
+        switch (meteKind) {
+            case "1":
+                warnLevel = alarmLevel;
+                if (warnJudgementTelesignaling(value, stateZero, stateOne, alarmState) == 1) {
+                    isWarn = true;
+                    warnName = stdDeviceMeteName;
+                    switch (alarmState) {
+                        case 0:
+                            warnContent = stdDeviceMeteName + ":" + stateZero + "--" + "状态" + selectDictNote(warnLevel.toString(), "alarm_level");
+                            break;
+                        case 1:
+                            warnContent = stdDeviceMeteName + ":" + stateOne + "--" + "状态" + selectDictNote(warnLevel.toString(), "alarm_level");
+                        default:
+                            break;
+                    }
+                    warnTime = new Date();
+                }
+                break;
+            case "2":
+                if (value.matches("^[a-zA-Z_\\u4e00-\\u9fa5_\\--]+$")) {
+                    break;
+                } else {
+                    int level = warnJudgement(Float.valueOf(value), highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
+                    log.info("level-------------:" + level);
+                    if (level > 0) {
+                        isWarn = true;
+                        warnName = stdDeviceMeteName + "数据异常";
+                        warnTime = new Date();
+                        Float resultValueMeter = Float.valueOf(value);
+                        switch (level) {
+                            case 1:
+                                warnLevel = Integer.valueOf(selectDictCode("alarm_level", "预警"));
+                                warnContent = stdDeviceMeteName + ":" + value + "--" + "预警";
+                                if (resultValueMeter >= highLimit1) {
+                                    outRange = String.valueOf(resultValueMeter - highLimit1);
+                                } else {
+                                    outRange = String.valueOf(lowLimit1 - resultValueMeter);
+                                }
+                                break;
+                            case 2:
+                                warnLevel = Integer.valueOf(selectDictCode("alarm_level", "一般告警"));
+                                warnContent = stdDeviceMeteName + ":" + value + "--" + "一般告警";
+                                if (resultValueMeter >= highLimit2) {
+                                    outRange = String.valueOf(resultValueMeter - highLimit2);
+                                } else {
+                                    outRange = String.valueOf(lowLimit2 - resultValueMeter);
+                                }
+                                break;
+                            case 3:
+                                warnLevel = Integer.valueOf(selectDictCode("alarm_level", "严重告警"));
+                                warnContent = stdDeviceMeteName + ":" + value + "-" + "严重告警";
+                                if (resultValueMeter >= highLimit3) {
+                                    outRange = String.valueOf(resultValueMeter - highLimit3);
+                                } else {
+                                    outRange = String.valueOf(lowLimit3 - resultValueMeter);
+                                }
+                                break;
+                            case 4:
+                                warnLevel = Integer.valueOf(selectDictCode("alarm_level", "危急告警"));
+                                warnContent = stdDeviceMeteName + ":" + value + "-" + "危急告警";
+                                if (resultValueMeter >= highLimit4) {
+                                    outRange = String.valueOf(resultValueMeter - highLimit4);
+                                } else {
+                                    outRange = String.valueOf(lowLimit4 - resultValueMeter);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        resultMap.put("isWarn", isWarn);
+        resultMap.put("warnLevel", warnLevel);
+        resultMap.put("warnName", warnName);
+        resultMap.put("warnContent", warnContent);
+        resultMap.put("outRange", outRange);
+        resultMap.put("warnTime", warnTime);
+        return resultMap;
+    }
+
+
+    /**
+     * 判断是否配置了告警规则
+     */
     @Transactional(rollbackFor = Exception.class)
-    public int warnSettings(String meteKind,
-                            String stateZero,
-                            Integer alarmState,
-                            Float highLimit1,
-                            Float lowLimit1,
-                            Float highLimit2,
-                            Float lowLimit2,
-                            Float highLimit3,
-                            Float lowLimit3,
-                            Float highLimit4,
-                            Float lowLimit4) {
-        int warnFlag=0;
+    public int warnSettings(String meteKind, String stateZero, Integer alarmState,
+                            Float highLimit1, Float lowLimit1,
+                            Float highLimit2, Float lowLimit2,
+                            Float highLimit3, Float lowLimit3,
+                            Float highLimit4, Float lowLimit4) {
         Set<Float> alarmMeter = new HashSet<>();
         alarmMeter.add(highLimit1);
         alarmMeter.add(lowLimit1);
@@ -376,61 +500,43 @@ public class AnalyseDataOperateService {
         alarmMeter.add(highLimit4);
         alarmMeter.add(lowLimit4);
         alarmMeter.remove(null);
-        log.info("alarmMeter:"+alarmMeter);
-        if(Objects.nonNull(meteKind)){
-            switch (meteKind){
-                case "1":
-                    if(Objects.nonNull(stateZero) && Objects.nonNull(alarmState)){
-                        warnFlag=1;
-                    }
-                    break;
-                case "2":
-                    if(alarmMeter.size() > 0){
-                        warnFlag=1;
-                    }
-                    break;
-            }
+        log.info("alarmMeter:{}", alarmMeter);
+
+        int warnFlag = 0;
+        if (Objects.isNull(meteKind)){
+            return warnFlag;
         }
 
+        switch (meteKind){
+            case "1":
+                if(Objects.nonNull(stateZero) && Objects.nonNull(alarmState)){
+                    warnFlag=1;
+                }
+                break;
+            case "2":
+                if(alarmMeter.size() > 0){
+                    warnFlag=1;
+                }
+                break;
+            default:
+                break;
+        }
         return warnFlag;
-
     }
 
 
     /**
      * -------表计识别 数据告警判断 --------
-     * @param value 算法识别结果
-     * @param highLimit1
-     * @param lowLimit1
-     * @param highLimit2
-     * @param lowLimit2
-     * @param highLimit3
-     * @param lowLimit3
-     * @param highLimit4
-     * @param lowLimit4
      * @return 返回遥测告警等级或未告警  4:危急  3:严重  2:一般  1:预警  0:正常
      */
     @Transactional(rollbackFor = Exception.class)
     public int warnJudgement(Float value,
-                             Float highLimit1,
-                             Float lowLimit1,
-                             Float highLimit2,
-                             Float lowLimit2,
-                             Float highLimit3,
-                             Float lowLimit3,
-                             Float highLimit4,
-                             Float lowLimit4) {
-
-        log.info("input----------------------------------:"+value+"--"+
-                highLimit1+"*"+
-                lowLimit1+"*"+
-                highLimit2+"*"+
-                lowLimit2+"*"+
-                highLimit3+"*"+
-                lowLimit3+"*"+
-                highLimit4+"*"+
-                lowLimit4);
-
+                             Float highLimit1, Float lowLimit1,
+                             Float highLimit2, Float lowLimit2,
+                             Float highLimit3, Float lowLimit3,
+                             Float highLimit4, Float lowLimit4) {
+        log.info("value:{},highLimit1:{},lowLimit1:{},highLimit2:{},lowLimit2:{},highLimit3:{},lowLimit3:{},highLimit4:{},lowLimit4:{}",
+                value, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
         Boolean emergency1 = false;
         Boolean emergency2 = false;
         Boolean worse1 = false;
@@ -475,15 +581,11 @@ public class AnalyseDataOperateService {
         } else {
             return 0;
         }
-
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int warnJudgementTelesignaling(String value, String stateOne, String stateTwo, Integer alarmState) {
-        log.info("value" + value);
-        log.info("stateOne" + stateOne);
-        log.info("stateTwo" + stateTwo);
-        log.info("alarmState" + alarmState);
+        log.info("value:{},stateOne:{},stateTwo:{},alarmState:{}", value, stateOne, stateTwo, alarmState);
         int finalResult = 0;
         // 0-非告警 1-告警
         switch (alarmState) {
@@ -501,10 +603,12 @@ public class AnalyseDataOperateService {
                     finalResult = 0;
                 }
                 break;
+            default:
+                break;
         }
+        log.info("finalResult=={}", finalResult);
         return finalResult;
     }
-
 
     /**
      * -----缺陷识别结果解析（标签数据转化文字描述）------

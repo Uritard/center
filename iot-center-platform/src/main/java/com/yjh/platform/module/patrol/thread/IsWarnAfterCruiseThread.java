@@ -14,10 +14,8 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.UpFtpsConfig;
-import com.yjh.platform.module.device.entity.TStdDeviceMete;
-import com.yjh.platform.module.patrol.controller.AnalysisController;
+import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
-import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
@@ -33,7 +31,6 @@ import redis.clients.jedis.ScanResult;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author YC
@@ -79,7 +76,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
                         if (Objects.isNull(tStdDevicemete)){
                             return;
                         }
-                        //该巡视点还在,能找到对应
+                        // 该巡视点还在,能找到对应
                         Map<String, Object> params = new HashMap<>(16);
                         params.put("value", threadMap.get("value"));
                         params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
@@ -122,8 +119,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
      * @param instanceId     巡视点id
      */
     private void alarmStoreAndHandler(Map<String, Object> map, String taskId, TStdDeviceMete tStdDevicemete, Long instanceId) {
+        log.info("产生了告警！！！");
         TWarnInfo warnInfo = new TWarnInfo();
-
         try {
             warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
             warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
@@ -144,7 +141,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setWarnContent(String.valueOf(map.get("warnContent")));
             String outRange = Objects.nonNull(map.get("outRange"))? String.valueOf(map.get("outRange")) : null;
             warnInfo.setOutRange(outRange);
-            log.info("要插库的告警数据是===" + warnInfo);
+            log.info("要插库的告警数据是==={}", JSON.toJSONString(warnInfo));
 
             // webSocket通知前端刷新告警统计数量
             Map<String, String> jasonMaps = new HashMap<>(16);
@@ -152,18 +149,21 @@ public class IsWarnAfterCruiseThread implements Runnable {
             jasonMaps.put("alarmName", warnInfo.getWarnName());
             jasonMaps.put("alarmTime", String.valueOf(warnInfo.getWarnTime()));
             jasonMaps.put("alarmContent", warnInfo.getWarnContent());
-            String jsons = JSON.toJSONString(jasonMaps);
-            log.info("告警生成-前端推送：" + jsons);
+            log.info("告警生成-前端推送：{}", JSON.toJSONString(jasonMaps));
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
 
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
-            log.info("warnId===" + warnInfo.getWarnId());
+            log.info("warnId==={}", warnInfo.getWarnId());
 
             // 将告警信息放入redis
             Map<String, String> warnMap = putWarnToRedis(taskId, warnInfo);
 
             // 告警推送
-            alarmPopUp(tStdDevicemete, warnInfo);
+            Map<String, String> infoMap = new HashMap<>(5);
+            infoMap.put("alarmLevel", String.valueOf(warnInfo.getWarnLevel()));
+            infoMap.put("flag", "warn");
+            infoMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
+            StaticContextAccessor.getBean(UPatrolTaskService.class).alarmPopUp(tStdDevicemete, infoMap);
 
             // 将产生的告警上送至上级系统
             alarmToUpSystem(warnInfo, tStdDevicemete);
@@ -171,40 +171,6 @@ public class IsWarnAfterCruiseThread implements Runnable {
             // 将产生的告警上送到算法管理平台
             alarmToAmPlatform(warnMap);
 
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * 判断该测点是否设置了告警推送
-     * 若是,则将配置的告警信息组成告警弹框所需内容推给前端
-     *
-     * @param tStdDevicemete  测点信息
-     * @param warnInfo        告警信息
-     */
-    private void alarmPopUp(TStdDeviceMete tStdDevicemete, TWarnInfo warnInfo){
-        Map<String, String> currentWarnInfo = new HashMap<>(16);
-        try {
-            currentWarnInfo.put("warnId", String.valueOf(warnInfo.getWarnId()));
-            currentWarnInfo.put("defectModel", "450");
-            currentWarnInfo.put("isPop", "false");
-
-            boolean isSet = StringUtils.isNotEmpty(tStdDevicemete.getAlarmNote()) && StringUtils.equals("1", tStdDevicemete.getAlarmNote());
-            boolean reachAlarmLevel = Objects.nonNull(tStdDevicemete.getAlarmLevel()) &&
-                    (warnInfo.getWarnLevel().compareTo(tStdDevicemete.getAlarmLevel()) == 0 || warnInfo.getWarnLevel() > tStdDevicemete.getAlarmLevel());
-            if (Boolean.TRUE.equals(isSet) && Boolean.TRUE.equals(reachAlarmLevel)) {
-                // webSocket通知前端调用查询告警弹框的接口
-                Map<String, String> jasonMaps2 = new HashMap<>(16);
-                jasonMaps2.put("type", "alarmPopUp");
-                jasonMaps2.put("warnId", String.valueOf(warnInfo.getWarnId()));
-                jasonMaps2.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
-                String json = JSON.toJSONString(jasonMaps2);
-                log.info("告警弹窗-前端推送：" + json);
-                currentWarnInfo.put("isPop", "true");
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps2);
-            }
-            redisTemplate.opsForValue().set("currentWarn", currentWarnInfo, 3, TimeUnit.MINUTES);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
@@ -221,7 +187,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             log.info("开始与算法管理平台交互");
             ftpsservice ftpsservice = GetSpringUtil.getBean("ftpsservice");
             String flag = ftpsservice.getFlag();
-            if ("1".equals(flag)) {
+            if (StringUtils.equals("1", flag)) {
                 Alarm alarm = new Alarm();
                 alarm.setBay_name(warnMap.get(""));
                 alarm.setTime(warnMap.get("warnTime"));
@@ -294,12 +260,11 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnMap.put("warnTime", new SimpleDateFormat().format(warnInfo.getWarnTime()));
             warnMap.put("warnContent", warnInfo.getWarnContent());
             warnMap.put("outRange", Objects.nonNull(warnInfo.getOutRange()) ? warnInfo.getOutRange() : "");
-
+            log.info("warnMap==={}", warnMap);
+            redisTemplate.opsForHash().putAll(warnName, warnMap);
         }catch (Exception e){
-            log.error(e.getMessage(), e);
+            log.error("将告警信息放入redis异常：", e);
         }
-        log.info("warnMap===" + warnMap);
-        redisTemplate.opsForHash().putAll(warnName, warnMap);
         return warnMap;
     }
 

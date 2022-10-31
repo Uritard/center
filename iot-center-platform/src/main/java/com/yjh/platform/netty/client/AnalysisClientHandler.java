@@ -39,13 +39,11 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
     private RedisTemplate redisTemplate;
     private AnalyseDataOperateService analyseDataOperateService;
     private String syncWebsocketUrl;
-    private String stationCode;
 
-    public AnalysisClientHandler(RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService,String syncWebsocketUrl, String stationCode) {
+    public AnalysisClientHandler(RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService,String syncWebsocketUrl) {
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateService = analyseDataOperateService;
         this.syncWebsocketUrl=syncWebsocketUrl;
-        this. stationCode = stationCode;
     }
 
     private static Map<Integer, AnalysisClientHandler> analysisClientHandlerHashMap = new HashMap<>();
@@ -106,7 +104,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
             int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));
             if(usefulBody !="") {
                 DataDealThread dataDealThread = new DataDealThread(usefulBody, remotePort, redisTemplate, analyseDataOperateService,
-                        syncWebsocketUrl, stationCode);
+                        syncWebsocketUrl);
                 TaskExecutePool.getInstance().execute(dataDealThread);
             }
         } catch (Exception e) {
@@ -139,7 +137,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         sendString(ctx, registerMsg);
     }
 
-    public void SendHeartBeat(Analysis analysis) throws InterruptedException {
+    public void sendHeartBeat(Analysis analysis) throws InterruptedException {
         log.info("analysis-INFO-----:{}", JSON.toJSONString(analysis));
         String instanceId = analysis.getInstanceId().toString();
         String taskId = analysis.getTaskId();
@@ -147,7 +145,6 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         sendString(ctx, registerMsg);
     }
 
-    // 发送请求数据
     public void sendDataReguest(JSONObject analysisObject) throws InterruptedException {
         String msg = analysisObject.toString();
         sendString(ctx, msg);

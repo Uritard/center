@@ -114,7 +114,7 @@
         <result column="result_pic" jdbcType="VARCHAR" property="resultPic"/>
     </resultMap>
 
-    <resultMap id="stdDeviceMete" type="com.yjh.platform.module.patrol.entity.TStdDevicemete">
+    <resultMap id="stdDeviceMete" type="com.yjh.platform.module.patrol.entity.TStdDeviceMete">
         <id column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
         <result column="device_id" jdbcType="BIGINT" property="deviceId" />
         <result column="custom_id" jdbcType="VARCHAR" property="customId" />
@@ -634,7 +634,7 @@
     </insert>
 
 
-    <select id="selectByPrimaryIdDeviceMete" parameterType="java.lang.Long" resultType="com.yjh.platform.module.patrol.entity.TStdDevicemete">
+    <select id="selectByPrimaryIdDeviceMete" parameterType="java.lang.Long" resultType="com.yjh.platform.module.patrol.entity.TStdDeviceMete">
         select
         a.device_mete_id,
         a.device_id,
@@ -674,7 +674,7 @@
         limit 1
     </select>
 
-    <select id="selectDeviceMeteByInstanceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.patrol.entity.TStdDevicemete">
+    <select id="selectDeviceMeteByInstanceId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.patrol.entity.TStdDeviceMete">
         select
         a.device_mete_id,
         a.device_id,

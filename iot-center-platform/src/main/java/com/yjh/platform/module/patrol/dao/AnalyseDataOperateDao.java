@@ -38,9 +38,9 @@ public interface AnalyseDataOperateDao {
 
     int batchInsertCruiseDataResult(List<TCruiseDataResult> list);
 
-    TStdDevicemete selectByPrimaryIdDeviceMete(@Param(value = "deviceMeteId") Long deviceMeteId);
+    TStdDeviceMete selectByPrimaryIdDeviceMete(@Param(value = "deviceMeteId") Long deviceMeteId);
 
-    TStdDevicemete selectDeviceMeteByInstanceId(@Param(value = "instanceId") Long instanceId);
+    TStdDeviceMete selectDeviceMeteByInstanceId(@Param(value = "instanceId") Long instanceId);
 
     TCruisePointInstance selectPointInstance(@Param(value = "instanceId") Long instanceId);
 

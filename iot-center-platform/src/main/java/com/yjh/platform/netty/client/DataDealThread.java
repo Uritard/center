@@ -2,7 +2,18 @@ package com.yjh.platform.netty.client;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Sets;
+import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.mqtt.AlarmService;
+import com.yjh.platform.common.mqtt.GetSpringUtil;
+import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
+import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
+import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
+import com.yjh.platform.common.mqtt.ftpsservice;
+import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
+import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -55,21 +66,15 @@ public class DataDealThread implements Runnable {
     private static ReentrantLock lock = new ReentrantLock();
 
     public DataDealThread(String body, int remotePort, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService,
-                          String syncWebsocketUrl, String stationCode) {
+                          String syncWebsocketUrl) {
         this.analyseDataOperateService = analyseDataOperateService;
         this.redisTemplate = redisTemplate;
         this.body = body;
         this.syncWebsocketUrl=syncWebsocketUrl;
         this.remotePort = remotePort;
-        this.stationCode = stationCode;
     }
 
-    @Override
-    public void run() {
-        // 反拆包解析
-    }
-
-    /*private void yjskHandle(JSONObject jsonObjectResult){
+    private void yjskHandle(JSONObject jsonObjectResult){
         try{
             Map<String,String> recBack = new HashMap<>();
             recBack.put("meteId", jsonObjectResult.getString("instanceId"));
@@ -239,7 +244,7 @@ public class DataDealThread implements Runnable {
                                         }
 
                                         log.info("开始告警预处理");
-                                        TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
+                                        TStdDeviceMete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
                                         //单个数值表计识别结果的告警判断与处理
                                         TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
                                         log.info("数据查询初始化");
@@ -599,7 +604,7 @@ public class DataDealThread implements Runnable {
                                 // TODO: 2021/1/11 算法服务端需要区分数据异常和未识别出缺陷的情形
                                 if (!"null".equals(resultValue ) && !(resultValue.contains("device"))) {
                                     //巡视点被识别出缺陷就会被判定为异常点，异常类型为--缺陷异常
-                                    TStdDevicemete tStdDevicemeteM = new TStdDevicemete();
+                                    TStdDeviceMete tStdDevicemeteM = new TStdDeviceMete();
                                     try {
                                         Map<String, String> doubleResultMap = analyseDataOperateService.doubleResultHandle(recognitionMode, cruiseRedisName, "异常", "缺陷异常", resultValue);
                                         cruiseResultMap.put("resultNum", doubleResultMap.get("resultNum"));
@@ -625,7 +630,7 @@ public class DataDealThread implements Runnable {
 //                                    tNormal = tNormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(0);
 //                                    tAbnormal = tAbnormal + analyseDataOperateService.mutiAlgoCount(recognitionMode, 0, cruiseRedisName).get(1);
 //
-//                                    TStdDevicemete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
+//                                    TStdDeviceMete tStdDevicemeteM = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(jsonObjectResult.getString("instanceId")));
 //
 //                                    //生成缺陷缓存信息（单一缺陷和多元缺陷）
 //                                    log.info("--------____--------生成缺陷缓存");
@@ -644,7 +649,7 @@ public class DataDealThread implements Runnable {
                                         defectMap.put("defectContent", resultValue);
                                         defectMap.put("deviceId", cruiseResult.get("deviceId"));
                                         defectMap.put("instanceId", cruiseResult.get("instanceId"));
-                                        TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResult.get("instanceId")));
+                                        TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResult.get("instanceId")));
                                         defectMap.put("customId", tStdDevicemete.getCustomId());
                                         defectMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
                                         defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未核查"));
@@ -728,7 +733,7 @@ public class DataDealThread implements Runnable {
                                             defectMap.put("defectContent", resultArr[i]);
                                             defectMap.put("deviceId", cruiseResult.get("deviceId"));
                                             defectMap.put("instanceId", cruiseResult.get("instanceId"));
-                                            TStdDevicemete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResult.get("instanceId")));
+                                            TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResult.get("instanceId")));
                                             defectMap.put("customId", tStdDevicemete.getCustomId());
                                             defectMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
                                             defectMap.put("confMode", "276");//确认状态--未核查
@@ -1351,13 +1356,13 @@ public class DataDealThread implements Runnable {
 
         }
     }
-    *//**
+    /**
      * 请求webSocket发送方法
      *
      * @param url 请求地址
      * @param json 发送内容
      * @return String
-     *//*
+     */
     public String postUrl(String url, String json) throws IOException, URISyntaxException {
         log.info("webSocketUrl"+url);
         CloseableHttpClient client = HttpClients.createDefault();
@@ -1371,11 +1376,11 @@ public class DataDealThread implements Runnable {
         return EntityUtils.toString(entity, "UTF-8");
     }
 
-    *//**
+    /**
      * Redis数据库批量查询Key值游标
      * @param key redis的key
      * @return Set<String>
-     *//*
+     */
     public Set<String> redisScan(String key) {
         return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
             Set<String> keys = Sets.newHashSet();
@@ -1399,7 +1404,7 @@ public class DataDealThread implements Runnable {
 
             return keys;
         });
-    }*/
+    }
 
 }
 

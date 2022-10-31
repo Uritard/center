@@ -536,4 +536,245 @@
         limit 1
     </select>
 
+    <select id="selectIsAlarmByTask" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_warn_info a
+        WHERE a.task_id = #{taskId} AND a.instance_id = #{instanceId}
+    </select>
+
+    <update id="updatePicPath" >
+        UPDATE t_warn_info a
+        <set>
+            a.image_path = #{imagePath, jdbcType=TIMESTAMP}
+        </set>
+        WHERE
+        a.task_id = #{taskId, jdbcType=VARCHAR}
+        AND a.instance_id = #{instanceId}
+    </update>
+
+    <select id="selectIsWarnByTaskId" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM t_warn_info a where 1 = 1
+        <if test="instanceId != null ">and a.instance_id = #{instanceId,jdbcType=BIGINT}</if>
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=VARCHAR}</if>
+        limit 1
+    </select>
+
+    <update id="updateIsWarnByCruiseDataId" parameterType="java.lang.String">
+        UPDATE u_patrol_data_result a <set>
+        a.is_warn = 1,
+        a.cruise_result  = 247,
+        a.cruise_abnormal = 250
+    </set>
+        WHERE
+        a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectDeviceMeteInfo"  parameterType="java.lang.Long" resultType="com.yjh.platform.module.patrol.entity.TStdDeviceMete">
+        select
+            a.device_mete_id,
+            a.device_id,
+            a.custom_id,
+            a.mete_id,
+            a.mete_kind,
+            a.mete_type,
+            a.mete_name,
+            a.device_type,
+            a.position_type,
+            a.unit,
+            a.alarm_note,
+            a.alarm_type,
+            a.up_effect,
+            a.down_effect,
+            a.state_zero,
+            a.state_one,
+            a.alarm_state,
+            a.alarm_level,
+            a.high_limit1,
+            a.low_limit1,
+            a.high_limit2,
+            a.low_limit2,
+            a.high_limit3,
+            a.low_limit3,
+            a.high_limit4,
+            a.low_limit4,
+            a.alarm_delay,
+            a.alarm_cnt,
+            a.threshold_abs,
+            a.threshold_per,
+            a.modulus,
+            a.remark
+        from t_cruise_point_instance b left join t_std_devicemete a
+                                                 on b.device_mete_id=a.device_mete_id
+        where b.instance_id=#{instanceId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectDictCodeByNote" resultType="java.lang.String">
+        SELECT
+        a.dict_code
+        FROM
+        t_dict_business a
+        WHERE 1 = 1
+        <if test="dictNote != null "> and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
+        <if test="colName != null "> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectRobotInfoByCode" resultType="com.yjh.platform.module.patrol.entity.TRobotInfo">
+        select
+            a.robot_id,
+            a.robot_code,
+            a.robot_num,
+            a.robot_name,
+            a.nest_code,
+            a.nest_name,
+            a.robot_status,
+            a.robot_type,
+            a.drone_type,
+            a.robot_ip,
+            a.robot_port,
+            a.light_ip,
+            a.light_port,
+            a.identity_manager,
+            a.identity_code,
+            a.lnferad_IP,
+            a.Inferad_Port,
+            a.Inferad_username,
+            a.Inferad_password,
+            a.phote_path,
+            a.create_by,
+            a.create_date,
+            a.update_by,
+            a.update_date,
+            a.robot_factory,
+            a.made_in,
+            a.made_date,
+            a.is_use,
+            a.commission_date,
+            a.up_region_id,
+            a.robot_position,
+            a.drone_position,
+            a.robot_source,
+            a.address,
+            a.building_user,
+            a.appearance_number,
+            a.defect_record,
+            a.repair_record,
+            a.exit_putInto_record,
+            a.remarks,
+            a.record_id,
+            a.channel_num_light,
+            a.channel_num_inferad
+        from t_robot_info a
+        where 1 = 1
+          and a.robot_code = #{robotCode, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectForTask" parameterType="java.lang.Long" resultType="com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail">
+        SELECT
+        a.instance_id,
+        a.device_mete_id,
+        b.analyse_type,
+        b.is_ai,
+        b.is_judge
+        FROM
+        t_cruise_point_instance a
+        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        left join (select distinct device_id,device_name from t_std_device) f on a.device_id = f.device_id
+        where 1 = 1
+        <if test="instanceId != null ">and a.instance_id = #{instanceId,jdbcType=BIGINT}</if>
+    </select>
+
+    <select id="selectDeviceMete" resultType="com.yjh.platform.module.patrol.entity.TStdDeviceMete">
+        select *
+        from t_std_devicemete
+        where device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectInstanceForTaskGoOn" parameterType="java.lang.String" resultType="java.lang.Long">
+        select b.instance_id
+        from u_patrol_result a,u_patrol_data_result b
+        where a.task_result_id = b.task_result_id
+          AND a.task_id = #{taskId,jdbcType=VARCHAR}
+          and b.cruise_status = 252
+    </select>
+
+    <insert id="batchInsertUPatrolDataResult">
+        insert into u_patrol_data_result(
+        cruise_data_id,
+        task_id,
+        device_id,
+        device_name,
+        instance_id,
+        instance_name,
+        cruise_id,
+        cruise_name,
+        cruise_time,
+        cruise_status,
+        cruise_type,
+        result_desc,
+        result_num,
+        modify_num,
+        picpath,
+        confirm_pic_path,
+        pic_path_anl,
+        person_check,
+        origpic,
+        orig_confirm_pic_path,
+        orig_pic_anl,
+        cruise_abnormal,
+        evaluation_state,
+        identify_state,
+        identify_result,
+        createtime,
+        remark,
+        check_user,
+        check_date,
+        is_warn,
+        cruise_result,
+        fir_name,
+        fir_date,
+        result_pic,
+        points,
+        voice_path
+        )values
+        <foreach collection="list" item="TCruiseDataResult" separator=",">
+            (
+            #{TCruiseDataResult.cruiseDataId, jdbcType=BIGINT},
+            #{TCruiseDataResult.taskId, jdbcType=VARCHAR},
+            #{TCruiseDataResult.deviceId, jdbcType=BIGINT},
+            #{TCruiseDataResult.deviceName, jdbcType=VARCHAR},
+            #{TCruiseDataResult.instanceId, jdbcType=BIGINT},
+            #{TCruiseDataResult.instanceName, jdbcType=VARCHAR},
+            #{TCruiseDataResult.cruiseId, jdbcType=BIGINT},
+            #{TCruiseDataResult.cruiseName, jdbcType=VARCHAR},
+            #{TCruiseDataResult.cruiseTime, jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.cruiseStatus, jdbcType=INTEGER},
+            #{TCruiseDataResult.cruiseType, jdbcType=INTEGER},
+            #{TCruiseDataResult.resultDesc, jdbcType=VARCHAR},
+            #{TCruiseDataResult.resultNum, jdbcType=VARCHAR},
+            #{TCruiseDataResult.modifyNum, jdbcType=VARCHAR},
+            #{TCruiseDataResult.picpath, jdbcType=VARCHAR},
+            #{TCruiseDataResult.confirmPicPath, jdbcType=VARCHAR},
+            #{TCruiseDataResult.picPathAnl, jdbcType=VARCHAR},
+            #{TCruiseDataResult.personCheck, jdbcType=VARCHAR},
+            #{TCruiseDataResult.origpic, jdbcType=VARCHAR},
+            #{TCruiseDataResult.origConfirmPicPath, jdbcType=VARCHAR},
+            #{TCruiseDataResult.origPicAnl, jdbcType=VARCHAR},
+            #{TCruiseDataResult.cruiseAbnormal, jdbcType=INTEGER},
+            #{TCruiseDataResult.evaluationState, jdbcType=INTEGER},
+            #{TCruiseDataResult.identifyState, jdbcType=INTEGER},
+            #{TCruiseDataResult.identifyResult, jdbcType=INTEGER},
+            #{TCruiseDataResult.createtime, jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.remark, jdbcType=VARCHAR},
+            #{TCruiseDataResult.checkUser, jdbcType=VARCHAR},
+            #{TCruiseDataResult.checkDate, jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.isWarn, jdbcType=INTEGER},
+            #{TCruiseDataResult.cruiseResult, jdbcType=INTEGER},
+            #{TCruiseDataResult.firName, jdbcType=VARCHAR},
+            #{TCruiseDataResult.firDate, jdbcType=TIMESTAMP},
+            #{TCruiseDataResult.resultPic, jdbcType=VARCHAR},
+            #{TCruiseDataResult.points, jdbcType=VARCHAR},
+            #{TCruiseDataResult.voicePath, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
 </mapper>

@@ -16,14 +16,16 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by tt on 2019/7/31.
+ *
+ * @author tt
+ * @date 2019/7/31
  */
 public class NettyClient {
 
     private static final Logger log = LoggerFactory.getLogger(NettyClient.class);
 
     public void start(InetSocketAddress remoteAddress1, InetSocketAddress remoteAddress2, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService,
-                      String syncWebsocketUrl,String stationCode) throws InterruptedException{
+                      String syncWebsocketUrl) throws InterruptedException{
 
         EventLoopGroup group = new NioEventLoopGroup();
         try {
@@ -34,11 +36,11 @@ public class NettyClient {
                     .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .handler(new AnalysisClientChannelInitializer(redisTemplate,analyseDataOperateService,syncWebsocketUrl, stationCode) {
+                    .handler(new AnalysisClientChannelInitializer(redisTemplate,analyseDataOperateService,syncWebsocketUrl) {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
-                            p.addLast(new AnalysisClientHandler(redisTemplate,analyseDataOperateService,syncWebsocketUrl, stationCode));
+                            p.addLast(new AnalysisClientHandler(redisTemplate,analyseDataOperateService,syncWebsocketUrl));
                         }
                     });
 

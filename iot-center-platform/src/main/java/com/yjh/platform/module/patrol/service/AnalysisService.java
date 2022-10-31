@@ -30,7 +30,7 @@ public class AnalysisService {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    private Logger log = LoggerFactory.getLogger(AnalysisService.class);
+    private final Logger log = LoggerFactory.getLogger(AnalysisService.class);
 
     private static long algorithmMsgId = 100000001;
     private static long defectMsgId = 200000001;
@@ -45,7 +45,7 @@ public class AnalysisService {
             log.info("任务结束心跳发送");
             log.info("----------任务结束报文-----------");
             log.info("----------------"+analysisList.get(0));
-            AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).SendHeartBeat(analysisList.get(0));
+            AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendHeartBeat(analysisList.get(0));
         } else {
             log.info("进入识别算法方法----------");
             algorithmMsgId = algorithmMsgId+1;
@@ -60,8 +60,8 @@ public class AnalysisService {
                 for (Analysis analysis: analysisList) {
                     log.info("表计IsAI："+analysis.getIsAi());
                     if (analysis.getIsAi()==1) {
-                        Map<String,String> firHandelMap=new HashMap<>();
-                        if(analysis.getAnalyseType().equals("9")) {
+                        Map<String,String> firHandelMap=new HashMap<>(5);
+                        if(StringUtils.equals("9", analysis.getAnalyseType())) {
                             firHandelMap.put("picPath",analysis.getPicPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content").toString()));
                             firHandelMap.put("csvPath", analysis.getCsvPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredStorePath","content").toString()));
                             firHandelMap.put("dataPath", analysis.getDataPath().replaceAll(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath","content").toString(),redisTemplate.opsForHash().get("t_sys_param:infraredStorePath","content").toString()));
@@ -92,8 +92,7 @@ public class AnalysisService {
 
                 log.info("算法数据初始化-----完成");
             }catch (Exception e){
-                log.error("表计识别算法异常："+e);
-                log.error("exceptionDetails:"+e.getStackTrace()[0]);
+                log.error("表计识别算法异常：", e);
                 // 异常
                 redisTemplate.opsForHash().put("t_cruise_task_result:"+analysisList.get(0).getTaskId()+":"+analysisList.get(0).getInstanceId().toString(),"cruiseResult","247");
                 // 算法超时
@@ -122,7 +121,7 @@ public class AnalysisService {
             JSONObject pictureInfoObject = new JSONObject();
             for (Analysis analysis: analysisList) {
 
-                if(analysis.getAnalyseType().equals("11")){
+                if(StringUtils.equals("11", analysis.getAnalyseType())){
                     JSONObject normalPictureDataObject=new JSONObject();
                     normalPictureDataObject.put("analyseType", analysis.getAnalyseType());
                     normalPictureDataObject.put("modelPath", analysis.getPicModelPath());
@@ -153,7 +152,7 @@ public class AnalysisService {
                 }
 
                 log.info("缺陷IsAI："+analysis.getIsAi());
-                if (analysis.getIsAi()==0 || analysis.getAnalyseType().equals("11")) {
+                if (analysis.getIsAi()==0 || StringUtils.equals("11", analysis.getAnalyseType())) {
                     JSONObject pictureDataObject = new JSONObject();
                     pictureDataObject.put("analyseType", analysis.getAnalyseType());
                     pictureDataObject.put("imagePath", analysis.getPicPath());
@@ -174,10 +173,8 @@ public class AnalysisService {
             AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
             log.info("算法数据初始化-----完成");
         }catch (Exception e){
-            log.error("缺陷算法识别异常："+e);
-            log.error("exceptionDetails:"+e.getStackTrace()[0]);
+            log.error("缺陷算法识别异常：", e);
         }
-
         log.info("缺陷算法结束------------"+msgDataObject);
         return "success";
     }

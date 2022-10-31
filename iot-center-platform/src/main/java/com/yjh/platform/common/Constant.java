@@ -293,5 +293,20 @@ public class Constant {
     }
 
     public static final String GET_LOW_TASK_GO_ON = "http://iot-center-platform/tCruiseTask/v1/lowTaskGoOn";
+
+    public static void  otherServerMap( Map<String,String> map, String url) {
+        try{
+            Result re = new Result();
+            //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
+            //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url,map, Result.class);
+        }catch (Exception e){
+            log.info("一键顺控："+e);
+        }
+    }
+
+    public static final String picRecBack = "http://iot-center-platform/tSequentialConf/v1/sequentialRecBack";
+
+    public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze?cruiseResultIdList";
 }
 
