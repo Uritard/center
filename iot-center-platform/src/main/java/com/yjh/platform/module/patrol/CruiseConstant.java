@@ -44,6 +44,10 @@ public interface CruiseConstant {
     int CRUISE_STATE_FAILED = 254;
 
     /**
+     * 异常原因，超时
+     */
+    int CRUISE_ABNORMAL_TIMEOUT = 251;
+    /**
      * 异常原因，检修
      */
     int CRUISE_ABNORMAL_OVERHAUL = 410;

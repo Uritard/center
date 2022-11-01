@@ -837,7 +837,7 @@ public class UPatrolTaskService {
         return 1;
     }
 
-    private void robotTaskStates(Map<String, Object> robotTaskStatesMap) {
+    public void robotTaskStates(Map<String, Object> robotTaskStatesMap) {
         try {
             ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
@@ -1030,7 +1030,7 @@ public class UPatrolTaskService {
                 // 巡检数据状态，未执行
                 m.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
                 String dateTime = DateTimeUtil.getDateTimeString();
-                m.put("createtime", dateTime);
+                // m.put("createtime", dateTime);
                 m.put("endTime", dateTime);
                 m.put("cruiseTime", dateTime);
                 skipPointList.add(m);
@@ -1167,7 +1167,7 @@ public class UPatrolTaskService {
         }
 
         // 判断任务是否结束
-        if (normalCounts + abnormalCounts != allCounts) {
+        if (normalCounts + abnormalCounts < allCounts) {
             return -1;
         }
         return abnormalCounts;
