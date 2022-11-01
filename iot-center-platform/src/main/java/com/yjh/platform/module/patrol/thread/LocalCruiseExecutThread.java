@@ -10,6 +10,7 @@ import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORM
 import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum;
 
 /**
- * <功能描述>
+ * 任务执行线程
  *
  * @author Chenfei
  * @date 2022/10/18
@@ -49,35 +50,48 @@ public class LocalCruiseExecutThread<T> implements Runnable {
         if (skip) {
             skipPointList(cruisePointList);
         } else {
-            cruisePointList.forEach(m -> {
+            for (Map<String, String> m : cruisePointList) {
                 int cruiseResult = MapUtils.getIntValue(m, "cruiseResult");
                 if (CRUISE_RESULT_ABNORMAL == cruiseResult) {
                     skipPoint(m);
                 } else {
-                    pointExecut(m);
+                    // 执行点位，并判断是否暂停
+                    if (!pointExecut(m)) {
+                        break;
+                    }
                 }
-            });
+            }
         }
 
     }
 
     private void skipPointList(List<Map<String, String>> inspectionMapList) {
         CruiseRedisStorage.piplinePutPatrolDetail(inspectionMapList);
+        uPatrolTaskService.patrolTaskResultHandler(inspectionMapList);
     }
 
     private void skipPoint(Map<String, String> inspectionMap) {
         CruiseRedisStorage.offer(inspectionMap);
+        uPatrolTaskService.patrolTaskResultHandler(inspectionMap);
     }
 
-    private void pointExecut(Map<String, String> inspectionMap) {
+    private boolean pointExecut(Map<String, String> inspectionMap) {
+        String taskId = inspectionMap.get("taskId");
+        long insId = MapUtils.getLongValue(inspectionMap, "instanceId");
+
+        String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId;
+        String taskStatus = uPatrolTaskService.taskStatus(key);
+        if (NumberUtils.toInt(taskStatus) == CruiseConstant.TASK_STATE_PAUSE) {
+            // 任务暂停
+            return false;
+        }
+
         // 巡检点类型
         int cruiseType = MapUtils.getIntValue(inspectionMap, "cruiseType");
         CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
         CruiseInspectionExecute execute = CruiseExecuteFactory.CREATE.createExecute(cruiseTypeEnum);
         boolean isEnded = execute.execute(inspectionMap);
 
-        String taskId = inspectionMap.get("taskId");
-        long insId = MapUtils.getIntValue(inspectionMap, "instanceId");
         // 上传上级系统
         execute.sendTaskUpSystem(inspectionMap);
         // 发送页面
@@ -86,6 +100,7 @@ public class LocalCruiseExecutThread<T> implements Runnable {
         if (isEnded) {
             uPatrolTaskService.patrolTaskResultHandler(taskId, insId);
         }
+        return true;
     }
 }
 

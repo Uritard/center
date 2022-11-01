@@ -56,6 +56,31 @@ public interface CruiseConstant {
      */
     int CRUISE_ABNORMAL_NOPIC = 248;
 
+    /**
+     * 任务状态，未开始
+     */
+    int TASK_STATE_UNSTART = 238;
+    /**
+     * 任务状态，正在执行
+     */
+    int TASK_STATE_RUNNING = 239;
+    /**
+     * 任务状态，执行完成
+     */
+    int TASK_STATE_DONE = 240;
+    /**
+     * 任务状态，暂停
+     */
+    int TASK_STATE_PAUSE = 241;
+    /**
+     * 任务状态，终止
+     */
+    int TASK_STATE_INTERRUPT = 242;
+    /**
+     * 任务状态，异常终止
+     */
+    int TASK_STATE_ABNORMAL = 243;
+
     enum TypeEnum {
 
         /**
@@ -89,11 +114,11 @@ public interface CruiseConstant {
 
         final int code;
 
-        private static Map<Integer, TypeEnum> cruiseEnumMap = new HashMap<>();
+        private static final Map<Integer, TypeEnum> CRUISE_ENUM_MAP = new HashMap<>();
 
         static {
             for (TypeEnum value : TypeEnum.values()) {
-                cruiseEnumMap.put(value.getCode(), value);
+                CRUISE_ENUM_MAP.put(value.getCode(), value);
             }
         }
 
@@ -106,7 +131,7 @@ public interface CruiseConstant {
         }
 
         public static TypeEnum getEnum(int code) {
-            return cruiseEnumMap.getOrDefault(code, TypeEnum.OTHERS);
+            return CRUISE_ENUM_MAP.getOrDefault(code, TypeEnum.OTHERS);
         }
     }
 

@@ -53,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -88,7 +89,7 @@ public class UPatrolTaskService {
     private Logger log = LoggerFactory.getLogger(UPatrolTaskService.class);
 
     public static final String PATROL_TASK_PREFIX = "patrol_task_result:";
-    public static final String PATROL_SUMMARY_PREFIX = "patrol_point_summary:";
+    public static final String PATROL_SUMMARY_PREFIX = "countForAbnormal:";
 
     @Autowired
     private UPatrolTaskDao uPatrolTaskDao;
@@ -258,7 +259,7 @@ public class UPatrolTaskService {
         }
 
         for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
-            Map<String, String> infoMap = new HashMap<>(5);
+            Map<String, String> infoMap = new HashMap<>(8);
 
             // 通过上报的任务id查询巡视主机上的任务id
             String taskCode = robotPatrolTaskResult.getTaskCode();
@@ -656,7 +657,7 @@ public class UPatrolTaskService {
             if (state == 5) {
                 i = uPatrolTaskDao.countInstance(task.getTaskId());
             } else {
-                Map<String, String> mapForGet = redisTemplate.opsForHash().entries("countForAbnormal:" + task.getTaskId());
+                Map<String, String> mapForGet = redisTemplate.opsForHash().entries(PATROL_SUMMARY_PREFIX + task.getTaskId());
                 Integer all = Integer.valueOf(mapForGet.get("all"));
                 Integer normal = Integer.valueOf(mapForGet.get("normal"));
                 Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
@@ -885,9 +886,15 @@ public class UPatrolTaskService {
     }
 
     private void updateTaskStateForRedis(String taskId, String state) {
-        String strForCountAbnormal = "countForAbnormal:" + taskId;
+        String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
         Map<String, String> map = redisTemplate.opsForHash().entries(strForCountAbnormal);
         map.put("taskState", state);
+    }
+
+    public String taskStatus(String taskId) {
+        String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
+        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+        return hashOperations.get(strForCountAbnormal, "taskState");
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -1102,42 +1109,68 @@ public class UPatrolTaskService {
      */
     public void patrolTaskResultHandler(String taskId, Long instanceId) {
         String redisKeyName = "t_cruise_task_result:" + taskId + ":" + instanceId;
-        Map<String, Object> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+        Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
 
-        // 判断该点巡视类型
-        String cruiseType = String.valueOf(cruiseResultMap.get("cruiseType"));
+        patrolTaskResultHandler(cruiseResultMap);
+    }
 
+    public void patrolTaskResultHandler(Map<String, String> cruiseResultMap) {
+        String taskId = MapUtils.getString(cruiseResultMap, "taskId");
+
+        int abnormalCounts = patrolTaskResult(taskId, MapUtils.getIntValue(cruiseResultMap, "cruiseResult"), 1);
+
+        if (abnormalCounts >= 0) {
+            log.info("{}该点是任务{}最后一个点", MapUtils.getString(cruiseResultMap, "instanceId"), taskId);
+            completionOfTask(taskId, abnormalCounts);
+        }
+    }
+
+    public void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList) {
+        int size = cruiseResultList.size();
+        if(CollectionUtils.isEmpty(cruiseResultList)){
+            log.error("cruiseResultList is empty.");
+            return;
+        }
+        String taskId = cruiseResultList.get(0).get("taskId");
+        int abnormalCounts = patrolTaskResult(taskId, CRUISE_RESULT_ABNORMAL, size);
+
+        if (abnormalCounts >= 0) {
+            log.info("该点任务执行完成{}", taskId);
+            completionOfTask(taskId, abnormalCounts);
+        }
+    }
+
+    private int patrolTaskResult(String taskId, int cruiseResult, int size) {
         // 获取当前redis正常异常点位个数并更新
-        Integer abnormalCounts;
-        Integer normalCounts;
-        Integer allCounts;
-        synchronized (LOCK_FLAG){
-            String strForCountAbnormal = "countForAbnormal:" + taskId;
-            Map<String, Object> resultCountsMap  = redisTemplate.opsForHash().entries(strForCountAbnormal);
-            abnormalCounts = Integer.valueOf(String.valueOf(resultCountsMap.get("abnormal")));
-            normalCounts = Integer.valueOf(String.valueOf(resultCountsMap.get("normal")));
-            allCounts = Integer.valueOf(String.valueOf(resultCountsMap.get("all")));
+        int abnormalCounts;
+        int normalCounts;
+        int allCounts;
+        synchronized (LOCK_FLAG) {
+            String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
+            Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
+            abnormalCounts = NumberUtils.toInt(resultCountsMap.get("abnormal"));
+            normalCounts = NumberUtils.toInt(resultCountsMap.get("normal"));
+            allCounts = NumberUtils.toInt(resultCountsMap.get("all"));
             log.info("从redis获取的taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, allCounts, abnormalCounts, normalCounts);
 
-            if (StringUtils.equals("246", String.valueOf(cruiseResultMap.get("cruiseResult")))) {
-                normalCounts++;
+            if (CRUISE_RESULT_NORMAL == cruiseResult) {
+                normalCounts += size;
             } else {
-                abnormalCounts++;
+                abnormalCounts += size;
             }
-            log.info("normalCounts:{}, abnormalCounts:{}", normalCounts, abnormalCounts);
+            log.info("task:{}, normalCounts:{}, abnormalCounts:{}", taskId, normalCounts, abnormalCounts);
             resultCountsMap.put("abnormal", String.valueOf(abnormalCounts));
             resultCountsMap.put("normal", String.valueOf(normalCounts));
+            resultCountsMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
             redisTemplate.opsForHash().putAll(strForCountAbnormal, resultCountsMap);
+            redisTemplate.expire(strForCountAbnormal, 7, TimeUnit.DAYS);
         }
 
         // 判断任务是否结束
-        if (normalCounts + abnormalCounts != allCounts){
-            log.info("{}该点不是任务{}最后一个点", instanceId, taskId);
-            return;
+        if (normalCounts + abnormalCounts != allCounts) {
+            return -1;
         }
-
-        log.info("{}该点是任务{}最后一个点", instanceId, taskId);
-        completionOfTask(taskId, abnormalCounts, normalCounts, allCounts);
+        return abnormalCounts;
     }
 
     /**
@@ -1145,10 +1178,8 @@ public class UPatrolTaskService {
      *
      * @param taskId 任务id
      * @param abnormalCounts 异常点位数
-     * @param normalCounts 正常点位数
-     * @param allCounts 全部点位数
      */
-    private void completionOfTask(String taskId, Integer abnormalCounts, Integer normalCounts, Integer allCounts) {
+    private void completionOfTask(String taskId, Integer abnormalCounts) {
         try {
             Thread.sleep(15000);
             Map<String, String> jasonMap = new HashMap<>(2);
@@ -1160,9 +1191,9 @@ public class UPatrolTaskService {
             // 更新upr
             UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
             uPatrolResult.setTaskState(240);
-            uPatrolResult.setTaskWait(allCounts - abnormalCounts - normalCounts);
+            uPatrolResult.setTaskWait(0);
             uPatrolResult.setEndTime(new Date());
-            uPatrolResult.setTaskAbnormal(allCounts - normalCounts);
+            uPatrolResult.setTaskAbnormal(abnormalCounts);
             uPatrolResultDao.updateUPatrolResult(uPatrolResult);
 
             // 插入updr

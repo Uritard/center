@@ -4,7 +4,6 @@
 
 package com.yjh.platform.module.patrol.service;
 
-import com.alibaba.fastjson.JSON;
 import com.yjh.platform.module.patrol.CruiseConstant;
 
 import java.util.HashMap;
@@ -23,14 +22,14 @@ public enum CruiseExecuteFactory {
      */
     CREATE;
 
-    private static Map<CruiseConstant.TypeEnum, CruiseInspectionExecute> cruiseInspectionExecuteMap = new HashMap<>(16);
+    private static final Map<CruiseConstant.TypeEnum, CruiseInspectionExecute> CRUISE_INSPECTION_EXECUTE_MAP = new HashMap<>(16);
 
     public CruiseInspectionExecute createExecute(CruiseConstant.TypeEnum cruiseTypeEnum) {
 
-        return cruiseInspectionExecuteMap.getOrDefault(cruiseTypeEnum, CruiseInspectionExecute.NULLABLE_EXECUTE);
+        return CRUISE_INSPECTION_EXECUTE_MAP.getOrDefault(cruiseTypeEnum, CruiseInspectionExecute.NULLABLE_EXECUTE);
     }
 
     public void registerExecute(CruiseConstant.TypeEnum type, CruiseInspectionExecute execute) {
-        cruiseInspectionExecuteMap.put(type, execute);
+        CRUISE_INSPECTION_EXECUTE_MAP.put(type, execute);
     }
 }
