@@ -118,26 +118,6 @@ public class PlatformApplication  implements CommandLineRunner {
         InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
         nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate, analyseDataOperateService, url);
-
-        //开机自动将所有拾音器开启状态转为关闭
-        Set voiceKeys = redisScan("is_record_open_state:*");
-        List voiceList = redisTemplate.executePipelined(
-                new SessionCallback<Object>() {
-                    @Override
-                    public <K, V> Object execute(RedisOperations<K, V> redisOperations) throws DataAccessException {
-                        for (Object key : voiceKeys) {
-                            redisTemplate.opsForHash().entries(key);
-                        }
-                        return null;
-                    }});
-        if (voiceList.size()>0) {
-            int voiceListLen = voiceList.size();
-            for (int i=0; i<voiceListLen; i++) {
-                Map deviceMap = (Map) voiceList.get(i);
-                deviceMap.replace("openState", "关闭");
-                redisTemplate.opsForHash().putAll("is_record_open_state:"+deviceMap.get("voiceDeviceId"), deviceMap);
-            }
-        }
     }
 
     @Bean
@@ -159,7 +139,7 @@ public class PlatformApplication  implements CommandLineRunner {
 
     @LoadBalanced
     @Bean(name = "serviceRestTemplate")
-    RestTemplate serviceRestTemplate() {
+    ServiceRestTemplate serviceRestTemplate() {
         return new ServiceRestTemplate();
     }
 

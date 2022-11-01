@@ -6,6 +6,7 @@ package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -23,6 +24,7 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -70,15 +72,18 @@ public abstract class AbstractVideoCruise {
 
     private final TAlgorithmInfoDao tAlgorithmInfoDao;
     private final RedisTemplate<String, ?> redisTemplate;
+    protected final RestTemplate serviceRestTemplate;
     private final HashOperations<String, String, String> hashOperations;
 
     private static String picModelPath;
     private static String intelDefectAnalysis;
     protected static long waitTime = 10000;
 
-    protected AbstractVideoCruise(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, ?> redisTemplate) {
+    protected AbstractVideoCruise(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, ?> redisTemplate,
+        RestTemplate serviceRestTemplate) {
         this.tAlgorithmInfoDao = tAlgorithmInfoDao;
         this.redisTemplate = redisTemplate;
+        this.serviceRestTemplate = serviceRestTemplate;
         this.hashOperations = redisTemplate.opsForHash();
 
         resetParams();

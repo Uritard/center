@@ -266,6 +266,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <!-- The configuration of the plugin -->
                 <configuration>
+                    <finalName>${artifactId}</finalName>
                     <!-- Specifies the configuration file of the assembly plugin -->
                     <descriptors>
                         <descriptor>${project.basedir}/package.xml</descriptor>

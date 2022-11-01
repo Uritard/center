@@ -941,10 +941,10 @@ public class UPatrolTaskService {
     @Transactional(rollbackFor = Exception.class)
     public int taskShutDown(String taskId) {
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
-        if (uPatrolResult.getExecuteType() == 240) {
+        if (uPatrolResult.getTaskState() == 240) {
             return 1;
         }
-        uPatrolResult.setExecuteType(242);
+        uPatrolResult.setTaskState(242);
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
 
         List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);

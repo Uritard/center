@@ -16,7 +16,6 @@ import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
@@ -32,10 +31,8 @@ import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.INFRARED;
 @Component
 public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implements CruiseInspectionExecute {
 
-    ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-
-    public InfraredVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate) {
-        super(tAlgorithmInfoDao, redisTemplate);
+    public InfraredVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate, ServiceRestTemplate serviceRestTemplate) {
+        super(tAlgorithmInfoDao, redisTemplate, serviceRestTemplate);
     }
 
     @Override

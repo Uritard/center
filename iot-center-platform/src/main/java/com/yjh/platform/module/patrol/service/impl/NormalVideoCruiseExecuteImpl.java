@@ -30,10 +30,8 @@ import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.VIDEO;
 @Component
 public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements CruiseInspectionExecute {
 
-    ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-
-    public NormalVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate) {
-        super(tAlgorithmInfoDao, redisTemplate);
+    public NormalVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate, ServiceRestTemplate serviceRestTemplate) {
+        super(tAlgorithmInfoDao, redisTemplate, serviceRestTemplate);
     }
 
     @Override
