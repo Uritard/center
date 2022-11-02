@@ -35,6 +35,9 @@ public class TCameraInfoByDict implements Serializable {
     @ApiModelProperty(value = "录像机ID")
     private Long recordId;
 
+    @ApiModelProperty(value = "录像机名称")
+    private String recordName;
+
     @ApiModelProperty(value = "录像机ID")
     private Long upRegionId;
     @ApiModelProperty(value = "区域名称")

@@ -262,6 +262,7 @@
         from t_cruise_plan_attr a
         where 1 = 1
         and a.plan_id = #{planId, jdbcType=BIGINT}
+        ORDER BY a.point_type
     </select>
 
     <select id="selectPlanRunningTask" resultType="java.lang.String">

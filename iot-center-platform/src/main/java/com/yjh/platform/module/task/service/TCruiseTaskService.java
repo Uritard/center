@@ -157,7 +157,24 @@ public class TCruiseTaskService {
         try {
             if (tCruiseTask.getIfRun() == 172) {
                 Date startTime = format.parse("2000-01-01 00:00:00");
+                Date endTime = null;
+                if (StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleMonth())
+                        && StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleWeek())
+                        && StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleExecuteTime())){
+                    startTime = DateTimeUtil.parse(tCruiseTaskAdd.getCycleStartTime());
+                    endTime = DateTimeUtil.parse(tCruiseTaskAdd.getCycleEndTime());
+                }
+                // 间隔
+                if (StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalType())
+                        && StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalNumber())
+                        && StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalExecuteTime())){
+                    startTime = DateTimeUtil.parse(tCruiseTaskAdd.getIntervalStartTime());
+                    endTime = DateTimeUtil.parse(tCruiseTaskAdd.getIntervalEndTime());
+                }
+
                 tCruiseTask.setStartTime(startTime);
+                tCruiseTask.setEndTime(endTime);
+                tCruiseTask.setCreateTime(new Date());
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -176,6 +193,11 @@ public class TCruiseTaskService {
         }else {
             instanceList.add(tCruiseTaskAdd.getInstanceId());
             tCruiseTask.setInstanceId(tCruiseTaskAdd.getInstanceId());
+        }
+
+        if (instanceList.isEmpty()){
+            log.info("该预案下没有巡视点,这是个无效的预案");
+            return "啥也不是";
         }
 
         List<TCruisePointInstance> tCruisePointInstanceList = this.tCruiseTaskAttrDao.batchSelect(instanceList);
@@ -228,6 +250,7 @@ public class TCruiseTaskService {
         // 所有点
 //        List<Long> instanceIdList = tCruisePlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());
         // 巡检点
+
         List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(instanceList);
 
         // 找出机器人和无人机做任务的巡检点
@@ -472,44 +495,48 @@ public class TCruiseTaskService {
 
             List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
             log.info("robotCode : {}", robotCode);
-            List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+            String[] cycleExecuteTimeArray = tCruiseTaskAdd.getCycleExecuteTime().split(",");
 
-            for (String item : robotCode) {
-                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
-                Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
-                String robotTaskStatus = robotTaskStatusMap.get("value");
-                String robotPattern = robotStatusMap.get("value");
-                if ("1".equals(robotTaskStatus) && "5".equals(robotPattern)) {
-                    return "机器人" + robotCode + "正在执行操作任务,无法下发巡检任务！";
+            for (int i = 0; i < cycleExecuteTimeArray.length; i++) {
+                tCruiseTaskAdd.setCycleExecuteTime(cycleExecuteTimeArray[i]);
+
+                List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+                for (String item : robotCode) {
+                    Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
+                    Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
+                    String robotTaskStatus = robotTaskStatusMap.get("value");
+                    String robotPattern = robotStatusMap.get("value");
+                    if ("1".equals(robotTaskStatus) && "5".equals(robotPattern)) {
+                        return "机器人" + robotCode + "正在执行操作任务,无法下发巡检任务！";
+                    }
+                    RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
+                    robotTaskInfo.setCruiseType(tCruiseTask.getType());
+                    robotTaskInfo.setTaskId(tCruiseTask.getTaskId());
+                    robotTaskInfo.setPlanCode(tCruiseTask.getPlanCode());
+                    // 从巡视主机下发至机器人的任务等级都暂定3级
+                    robotTaskInfo.setPriority(3);
+                    robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
+                    List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
+                    robotTaskInfo.setInstanceList(robotTaskInstanceList);
+                    String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
+                    robotTaskInfo.setIfRun(ifFun);
+                    robotTaskInfo.setRobotCode(item);
+                    robotTaskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
+                    robotTaskInfo.setIsOcr(tCruiseTaskAdd.getIsOcr());
+
+                    // 根据任务信息及协议组装任务信息
+                    packageTaskProtocolInfo(tCruiseTaskAdd, format, robotTaskInfo, ifFun);
+
+                    robotTaskInfoList.add(robotTaskInfo);
                 }
-                RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
-                robotTaskInfo.setCruiseType(tCruiseTask.getType());
-                robotTaskInfo.setTaskId(tCruiseTask.getTaskId());
-                robotTaskInfo.setPlanCode(tCruiseTask.getPlanCode());
-                // 从巡视主机下发至机器人的任务等级都暂定3级
-                robotTaskInfo.setPriority(3);
-                robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
-                List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
-                robotTaskInfo.setInstanceList(robotTaskInstanceList);
-                String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
-                robotTaskInfo.setIfRun(ifFun);
-                robotTaskInfo.setRobotCode(item);
-                robotTaskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
-                robotTaskInfo.setIsOcr(tCruiseTaskAdd.getIsOcr());
 
-                // 根据任务信息及协议组装任务信息
-                packageTaskProtocolInfo(tCruiseTaskAdd, format, robotTaskInfo, ifFun);
+                Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+                robotTaskInfoMap.put("robotTaskInfoList", robotTaskInfoList);
+                log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
 
-                robotTaskInfoList.add(robotTaskInfo);
+                // 调用robot服务下发任务
+                Result result = robotTask(robotTaskInfoMap);
             }
-
-            Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
-            robotTaskInfoMap.put("robotTaskInfoList", robotTaskInfoList);
-            log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
-
-            // 调用robot服务下发任务
-            Result result = robotTask(robotTaskInfoMap);
-
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
@@ -539,7 +566,20 @@ public class TCruiseTaskService {
                 case "172":
                     taskInfo.setFixedStartTime("");
                     taskInfo.setCycleMonth(Optional.ofNullable(tCruiseTaskAdd.getCycleMonth()).orElse(""));
-                    taskInfo.setCycleWeek(Optional.ofNullable(tCruiseTaskAdd.getCycleWeek()).orElse(""));
+                    String cycleWeek = tCruiseTaskAdd.getCycleWeek();
+                    if (StringUtils.isNotEmpty(cycleWeek)){
+                        String[] array = cycleWeek.split(",");
+                        StringJoiner cycleWeeks = new StringJoiner(",");
+                        for (int i = 0; i < array.length; i++) {
+                            int cycleWeekTemp = Integer.parseInt(array[i]);
+                            cycleWeek = String.valueOf(cycleWeekTemp == 1 ? 7 : cycleWeekTemp - 1);
+                            cycleWeeks.add(cycleWeek);
+                        }
+                        taskInfo.setCycleWeek(String.valueOf(cycleWeeks));
+                    }else {
+                        taskInfo.setCycleWeek("");
+                    }
+
                     String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
 
                     if (StringUtils.isNotEmpty(cycleExecuteTime)){
@@ -894,8 +934,20 @@ public class TCruiseTaskService {
 //                // 任务未到开始时间，忽略
 //                continue;
 //            }
-            if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
-                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
+            Date dayBeforeTime = dayBefore;
+            Date dayAfterTime = dayAfter;
+            if (tCruiseTaskCount.getIfRun() == 172 && StringUtils.isNotEmpty(tCruiseTaskCount.getDateType())){
+//                    && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
+
+                if (tCruiseTaskCount.getStartTime().after(dayBeforeTime)){
+                    dayBeforeTime = tCruiseTaskCount.getStartTime();
+                }
+                if (Objects.nonNull(tCruiseTaskCount.getEndTime()) && tCruiseTaskCount.getEndTime().before(dayAfterTime)){
+                    dayAfterTime = tCruiseTaskCount.getEndTime();
+                }
+
+                log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
+                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
                 for (Date aTimeList : timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
                     Map<String, Object> taskCountMapDel = new HashMap<>();
@@ -1359,6 +1411,7 @@ public class TCruiseTaskService {
 
         map.put("startTime", startTime);
         map.put("endTime", endTime);
+        log.info("startTime=={}，endTime=={}", startTime,endTime);
         resultListBefore = this.afterTaskCount(startTime, taskState, taskName);
         resultListAfter = this.afterTaskCount(endTime, taskState, taskName);
 
@@ -1495,8 +1548,19 @@ public class TCruiseTaskService {
         List<TCruiseTaskDel> listDel = this.tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
         List<Map<String, Object>> listTask = new ArrayList<>();
         for (TCruiseTaskCount tCruiseTaskCount : list) {
-            if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
-                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
+            if (tCruiseTaskCount.getIfRun() == 172 && StringUtils.isNotEmpty(tCruiseTaskCount.getDateType())) {
+                // tCruiseTaskCount.getStartTime().compareTo(originTime) == 0
+                Date dayBeforeTime = dayBefore;
+                Date dayAfterTime = dayAfter;
+
+                if (tCruiseTaskCount.getStartTime().after(dayBeforeTime)){
+                    dayBeforeTime = tCruiseTaskCount.getStartTime();
+                }
+                if (Objects.nonNull(tCruiseTaskCount.getEndTime()) && tCruiseTaskCount.getEndTime().before(dayAfterTime)){
+                    dayAfterTime = tCruiseTaskCount.getEndTime();
+                }
+
+                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
                 for (Date aTimeList : timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
                     Map<String, Object> taskCountMapDel = new HashMap<>();

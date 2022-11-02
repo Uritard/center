@@ -548,6 +548,7 @@
         <foreach collection="list" open="(" close=")" separator="," item="instanceId">
             #{instanceId, jdbcType=BIGINT}
         </foreach>
+        ORDER BY a.cruise_type
      </select>
 
     <select id="selectCruiseId" parameterType="com.yjh.platform.module.device.entity.TCruisePointInstanceDetail" resultType="java.lang.Long">

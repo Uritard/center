@@ -124,7 +124,7 @@ public class TCruiseTaskController {
                     tCruiseTask.setCreateUserId(tCruiseTaskAdd.getCreateUserId());
                     String res = tCruiseTaskService.insert(tCruiseTask,tCruiseTaskAdd);
                     if ("啥也不是".equals(res)){
-                        result.setCode(209,"任务间隔过短,机器人暂不支持");
+                        result.setCode(209,"该预案下没有巡视点,下发任务失败");
                     }else {
                         result.setData(res);
                     }
@@ -152,6 +152,9 @@ public class TCruiseTaskController {
                 if (Objects.nonNull(tCruiseTaskAdd.getTaskId()))tCruiseTask.setTaskId(tCruiseTaskAdd.getTaskId());
                 if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("",tCruiseTaskAdd.getStartTime())) {
                     tCruiseTask.setStartTime(tCruiseTaskAdd.getStartTime());
+                    tCruiseTask.setCreateTime(new Date());
+                    tCruiseTask.setEndTime(tCruiseTaskAdd.getStartTime());
+                    tCruiseTask.setCreateUserId(tCruiseTaskAdd.getCreateUserId());
                 } else {
                       //延迟20s后
 //                    Calendar nowTimeCal = Calendar.getInstance();
@@ -160,11 +163,12 @@ public class TCruiseTaskController {
 
                     tCruiseTask.setStartTime(new Date());
                     tCruiseTask.setEndTime(new Date());
+                    tCruiseTask.setCreateTime(new Date());
                     tCruiseTask.setCreateUserId(tCruiseTaskAdd.getCreateUserId()); //用户
                 }
                 String res = tCruiseTaskService.insert(tCruiseTask,tCruiseTaskAdd);
                 if ("啥也不是".equals(res)){
-                    result.setCode(209,"任务间隔过短,机器人暂不支持");
+                    result.setCode(209,"该预案下没有巡视点,下发任务失败");
                 }else {
                     result.setData(res);
                     //有变动 同步模型
@@ -293,7 +297,7 @@ public class TCruiseTaskController {
     //任务统计
     @ApiOperation(value = "任务统计")
     @RequestMapping(value = "/taskCount", method = RequestMethod.GET)
-    @Logs(title = "查询巡检任务",content = "根据用户传递的参数统计任务",logType = 1,authority = "1235")
+    @Logs(title = "查询巡检任务",content = "根据用户传递的参数统计任务",logType = 1,authority = "1234,1235")
     public Result taskCount(@RequestParam(value = "taskDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date taskStartDate,
                             @RequestParam(value = "flag") int flag){
         Result result = new Result();

@@ -328,13 +328,11 @@ public class TSequentialConfService{
 //                    }
 
                     String filePath = Constant.filePath;
-                    HttpClientUtils.getInstance().getUrl(endRecordVideo+ "?fileName=" +  filePath, null);
+                    String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
+                    HttpClientUtils.getInstance().getUrl(endRecordVideo+ "?fileName=" +  fileName, null);
 
+                    filePath = filePath.replace(".h264", ".mp4");
                     if(StringUtils.isNotEmpty(filePath)){
-                        boolean flag2 = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:sequentialByMp4","content"));
-                        if (flag2) {
-                            filePath = filePath.replace(".h264", ".mp4");
-                        }
                         param.put("picPath", filePath);
                     }else{
                         throw new BusinessException("一键顺控-变位信号-录像地址为空");

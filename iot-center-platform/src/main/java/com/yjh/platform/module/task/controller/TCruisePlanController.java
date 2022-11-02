@@ -184,7 +184,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPlanPage", method = RequestMethod.POST)
-    @Logs(title = "查询预案",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1,authority = "1235")
+    @Logs(title = "查询预案",content = "根据用户传递的参数分页查询巡检预案属性信息",logType = 1,authority = "1234,1235")
     public Result selectByPlanPage(@RequestBody TCruisePlan tCruisePlan
     ) {
         Result result = new Result();
@@ -256,7 +256,7 @@ public class TCruisePlanController {
 
     @ApiOperation(value = "查询标准设备下挂巡检点")
     @RequestMapping(value = "/findInstances", method = RequestMethod.GET)
-    @Logs(title = "查询预案",content = "查询标准设备下的巡检点 ",logType = 1 ,authority = "1235")
+    @Logs(title = "查询预案",content = "查询标准设备下的巡检点 ",logType = 1 ,authority = "1234,1235")
     public Result findInstances(@RequestParam(value = "deviceIds", required = false) String deviceIds,
                                 @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize) {

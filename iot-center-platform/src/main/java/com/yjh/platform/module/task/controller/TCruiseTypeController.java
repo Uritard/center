@@ -107,7 +107,7 @@ public class TCruiseTypeController {
 
     @ApiOperation(value = "查询")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
-    @Logs(title = "查询巡视类型关联实例点数据",content = "根据用户传递的参数查询巡视类型关联实例点信息",logType = 1, authority = "1234")
+    @Logs(title = "查询巡视类型关联实例点数据",content = "根据用户传递的参数查询巡视类型关联实例点信息",logType = 1, authority = "1234,1235")
     public Result select(@RequestParam(value = "subType", required = true) Integer subType,
                          @RequestParam(value = "pageNum", required = false) Integer pageNum,
                          @RequestParam(value = "pageSize", required = false,defaultValue = "0") Integer pageSize) {

@@ -166,7 +166,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "巡检点关联分页查询")
     @RequestMapping(value = "/selectCruisePointByPage", method = RequestMethod.POST)
-    @Logs(title = "查询巡检点数据",content = "根据用户传递的参数查询巡检点数据",logType = 1,authority = "1234")
+    @Logs(title = "查询巡检点数据",content = "根据用户传递的参数查询巡检点数据",logType = 1,authority = "1234,1235")
     public Result selectCruisePointByPage(@RequestBody TStdDeviceMete tStdDeviceMete
 
     ) {
@@ -267,7 +267,7 @@ public class TCruisePointInstanceController {
 
     @ApiOperation(value = "C-查询各种巡检类型下的巡检点数量")
     @RequestMapping(value = "/selectCruiseCountByType",method = RequestMethod.GET)
-    @Logs(title = "查询巡检类型下的巡检点数量",content = "查询巡检类型下的巡检点数量",logType = 1,authority = "1235")
+    @Logs(title = "查询巡检类型下的巡检点数量",content = "查询巡检类型下的巡检点数量",logType = 1,authority = "1234,1235")
     public Result selectCruiseCountByType(@RequestParam String taskId){
         Result result=new Result();
         try {

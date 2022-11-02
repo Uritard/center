@@ -9,6 +9,7 @@ import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
 import com.yjh.accessvideo.commons.utils.DateTimeUtil;
+import com.yjh.accessvideo.commons.utils.VideoUtil;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
@@ -18,7 +19,6 @@ import com.yjh.accessvideo.thread.TaskExecutePool;
 import com.yjh.accessvideo.threads.RecordFileThread;
 import com.yjh.accessvideo.threads.TranscodeThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
-import javafx.scene.input.DataFormat;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -1813,6 +1813,19 @@ public class CameraConService {
         if (Objects.nonNull(camreaStatusMap.get("state"))) {
             Integer state = Integer.parseInt(String.valueOf(camreaStatusMap.get("state")));
             if (Objects.equals(state, 1)) {
+                try {
+                    //判断时间问题
+                    String lastTime = String.valueOf(camreaStatusMap.get("lastTime"));
+                    Date endDate = format.parse(lastTime);
+                    if (System.currentTimeMillis() - endDate.getTime() > 10*60*1000){
+                        //最后一次操控时间距离现在大于10分钟
+                        camreaStatusMap.put("state",0);
+                        redisTemplate.opsForHash().putAll("camera_info",camreaStatusMap);
+                        return;
+                    }
+                }catch (Exception e){
+                    log.info("时间转换出错：", e);
+                }
                 log.info("unable to control...");
                 throw new BusinessException("相机不可控！");
             }
@@ -1860,9 +1873,11 @@ public class CameraConService {
     public void endRecordVideo(String fileName) {
         try {
             log.info("停止录制视频");
+            String path = videoPath + fileName;
             fileName = fileName.replace(videoPath, "");
             NativeLong lRealPlayHandle = Constant.recordLongMap.get(fileName);
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
+            VideoUtil.h264ToMp4(path);
             String url = "chmod 777 " + videoPath + fileName;
             Runtime.getRuntime().exec(url);
         }catch (Exception ignored){
