@@ -1020,14 +1020,14 @@ public class DateTimeUtil {
                 if (date.getMonth() > dayAfter.getMonth()) { return validTimeList;}
                 if (date.getMonth() == dayAfter.getMonth()) { dd = exp.getNextValidTimeAfter(date); }
                 if (date.getMonth() < dayAfter.getMonth()) { dd = exp.getNextValidTimeAfter(dayBefore); }
-                while (dd.getTime() < dayAfter.getTime()) {
-                    if (dd.getTime() > date.getTime()) { validTimeList.add(dd); }
+                while (dd.getTime() <= dayAfter.getTime()) {
+                    if (dd.getTime() >= date.getTime()) { validTimeList.add(dd); }
                     dd = exp.getNextValidTimeAfter(dd);
                 }
             } else {
                 dd = exp.getNextValidTimeAfter(dayBefore);
-                while (dd.getTime() < dayAfter.getTime()) {
-                    if (dd.getTime() > date.getTime()) { validTimeList.add(dd); }
+                while (dd.getTime() <= dayAfter.getTime()) {
+                    if (dd.getTime() >= date.getTime()) { validTimeList.add(dd); }
                     dd = exp.getNextValidTimeAfter(dd);
                 }
             }

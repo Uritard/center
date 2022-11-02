@@ -131,7 +131,7 @@ public class UPatrolTaskService {
     public String insert(UPatrolTask uPatrolTask, TCruiseTaskAdd tCruiseTaskAdd) {
         setLevel(uPatrolTask, tCruiseTaskAdd);
         try {
-            if (uPatrolTask.getExecuteType() == 172) {
+            if (uPatrolTask.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
                 Date startTime = format.parse("2000-01-01 00:00:00");
                 Date endTime = null;
                 if (org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleMonth())
@@ -148,6 +148,8 @@ public class UPatrolTaskService {
                     endTime = DateTimeUtil.parse(tCruiseTaskAdd.getIntervalEndTime());
                 }
                 uPatrolTask.setStartTime(startTime);
+                uPatrolTask.setEndTime(endTime);
+                uPatrolTask.setCreateTime(new Date());
             }
         } catch (Exception e) {
             log.error("设置周期任务起始时间出错：", e);
@@ -179,7 +181,7 @@ public class UPatrolTaskService {
         Integer ifRun = uPatrolTask.getExecuteType();
         if (tCruiseTaskAdd.getTaskLevel() == null) {
             if (Objects.equals("0", tCruiseTaskAdd.getUnionTaskStatus()) || tCruiseTaskAdd.getUnionTaskStatus() == null) {
-                if (Objects.equals(173, ifRun)) {
+                if (Objects.equals(TaskTypeEnum.NOW.getType(), ifRun)) {
                     uPatrolTask.setTaskLevel(3);
                 } else {
                     uPatrolTask.setTaskLevel(1);
@@ -205,9 +207,12 @@ public class UPatrolTaskService {
             uPatrolTaskAttr.setPointTaskId(uPatrolTaskAttr.getPointTaskId());
             instanceList.add(uPatrolPlanAttr.getInstanceId());
             uPatrolTaskAttrs.add(uPatrolTaskAttr);
+            if (uPatrolTaskAttrs.size()%2000 == 0){
+                this.uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
+                uPatrolTaskAttrs = new ArrayList<>();
+            }
         }
         uPatrolTaskDao.add(uPatrolTask);
-        this.uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
         return instanceList;
     }
 
@@ -239,7 +244,7 @@ public class UPatrolTaskService {
                     .setCruiseName(item.getCruiseName())
                     .setCruiseStatus(253)
                     .setCruiseType(item.getCruiseType());
-            Map map = Object2Map.toStringMap(Object2Map.objectToMap(uPatrolDataResult, true));
+            Map map = Object2Map.objectToMap(uPatrolDataResult, true);
             map.put("cameraId", String.valueOf(item.getCameraId()));
             String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);
@@ -431,9 +436,9 @@ public class UPatrolTaskService {
             log.error("等待出错：", e);
         }
         String taskId = uPatrolTaskDao.selectTaskByRobotTaskCode(robotPatrolTaskStatus.getTaskCode());
-        String cruiseResultKey = "t_cruise_task_result" + taskId +":";
+        String cruiseResultKey = PATROL_TASK_PREFIX + taskId +":";
         //处理结果 获取机器人的点
-        List<Map<String,String>> resultMap = redisTemplate.opsForHash().values("cruiseResultKey");
+        List<Map<String,String>> resultMap = redisTemplate.opsForHash().values(cruiseResultKey);
         resultMap.forEach(result ->{
             //判断是不是机器人的点以及还是否完成
             String cruiseType = result.get("cruiseType");
@@ -441,11 +446,11 @@ public class UPatrolTaskService {
             String instanceId = result.get("instanceId");
             if ("228".equals(cruiseType) && "253".equals(cruiseState)){
                 //这个点 没有做
-                result.put("cruiseStatus","254");//执行失败
+                result.put("cruiseStatus",String.valueOf(CRUISE_STATE_FAILED));//执行失败
                 result.put("resultNum","机器人任务异常");
-                result.put("cruiseAbnormal","249");//数据异常
-                result.put("evaluationState","257");//未审核
-                result.put("identifyResult","247");//异常
+                result.put("cruiseAbnormal",String.valueOf(CRUISE_ABNORMAL_DATA_ABNORMAL));//数据异常
+                result.put("evaluationState",String.valueOf(EVALUATION_STATE_REVIEWED));//未审核
+                result.put("identifyResult",String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
 
                 String instanceKey = cruiseResultKey+instanceId;
                 redisTemplate.opsForHash().putAll(instanceKey,result);
@@ -475,7 +480,7 @@ public class UPatrolTaskService {
             List<Long> robotCruiseList = new ArrayList<>();
             List<Long> robotInstanceList = new ArrayList<>();
             for (TCruisePointInstanceNameDetail item : detailList) {
-                if ((228 == item.getCruiseType() || 524 == item.getCruiseType())) {
+                if ((TypeEnum.ROBOT.getCode() == item.getCruiseType() || TypeEnum.UAV.getCode() == item.getCruiseType())) {
                     robotCruiseList.add(item.getCruiseId());
                     robotInstanceList.add(item.getInstanceId());
                 }
@@ -542,17 +547,19 @@ public class UPatrolTaskService {
      */
     private void packageTaskProtocolInfo(TCruiseTaskAdd tCruiseTaskAdd, DateFormat format, RobotTaskInstanceInfo taskInfo, String ifFun) {
         try {
-            switch (ifFun) {
+            CruiseConstant.TaskTypeEnum taskType = CruiseConstant.TaskTypeEnum.getEnm(Integer.valueOf(ifFun));
+
+            switch (taskType) {
                 //立即任务
-                case "173":
+                case NOW:
                     taskInfo.setFixedStartTime(format.format(new Date()));
                     break;
                 //定时任务
-                case "174":
+                case TIME:
                     taskInfo.setFixedStartTime(format.format(tCruiseTaskAdd.getStartTime()));
                     break;
                 // 周期和间隔任务
-                case "172":
+                case CYCLE:
                     taskInfo.setFixedStartTime("");
                     taskInfo.setCycleMonth(Optional.of(tCruiseTaskAdd.getCycleMonth()).orElse(""));
                     taskInfo.setCycleWeek(Optional.of(tCruiseTaskAdd.getCycleWeek()).orElse(""));
@@ -608,7 +615,7 @@ public class UPatrolTaskService {
         quartzTask.setJobGroup(jobName);
         JobManager jobManager = new JobManager();
         if (task.getDateType() == null) {
-            if (task.getExecuteType() == 173) {
+            if (task.getExecuteType() == TaskTypeEnum.NOW.getType()) {
                 //立即执行
                 quartzTask.setStartTime(new Date());
             } else {
@@ -642,7 +649,7 @@ public class UPatrolTaskService {
             item.put("task_code", task.getTaskCode());
             item.put("task_state", String.valueOf(state));
             item.put("plan_start_time", DateTimeUtil.format(task.getStartTime()));
-            if (task.getExecuteType() == 172) {
+            if (task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
                 try {
                     //CronExpression expression = new CronExpression(tCruiseTask.getDateType());
                     item.put("start_time", DateTimeUtil.format(task.getStartTime()));
@@ -737,7 +744,7 @@ public class UPatrolTaskService {
     @Transactional(rollbackFor = Exception.class)
     public int deleteByPrimaryId(String taskId, String startTime) {
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
-        if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == 172) {
+        if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
             if (!startTime.equals("-1")) {
                 TCruiseTaskDel tCruiseTaskDel = new TCruiseTaskDel();
                 tCruiseTaskDel.setTaskId(taskId);
@@ -771,7 +778,7 @@ public class UPatrolTaskService {
                 tCruiseTaskDelDao.deleteByPrimaryId(taskId);
                 return uPatrolTaskDao.deleteByPrimaryId(taskId);
             }
-        } else if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == 174) {
+        } else if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.TIME.getType()) {
             //删除定时任务
             for (ConcurrentHashMap<String, Object> mapItem : Constant.taskMap) {
                 //找到任务Id
@@ -789,7 +796,7 @@ public class UPatrolTaskService {
     public int taskPauseWithoutRobot(String taskId) {
         //任务暂停 不用给机器人发
         UPatrolResult taskResult = uPatrolResultDao.selectByPrimaryId(taskId);
-        taskResult.setTaskState(241);
+        taskResult.setTaskState(TASK_STATE_PAUSE);
         try {
             //Thread.sleep(10000);
             //机器人任务暂停
@@ -851,7 +858,7 @@ public class UPatrolTaskService {
     @Transactional(rollbackFor = Exception.class)
     public int taskPause(String taskId) {
         UPatrolResult uPatrolResult = uPatrolTaskDao.selectForTaskId(taskId);
-        uPatrolResult.setTaskState(241);
+        uPatrolResult.setTaskState(TASK_STATE_PAUSE);
         try {
             //TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
 
@@ -911,7 +918,7 @@ public class UPatrolTaskService {
             robotTaskStatesMap.put("robotCodeList", robotCodeList);
             robotTaskStates(robotTaskStatesMap);
         }
-        if (uPatrolResult.getTaskState() == 240 || uPatrolResult.getTaskState() == 239) {
+        if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED || uPatrolResult.getTaskState() == TASK_STATE_EXECUTING) {
             return 1;
         }
 //        if(Constant.taskStateMap.get(taskId) != null && Constant.taskStateMap.get(taskId) == 1){
@@ -922,7 +929,7 @@ public class UPatrolTaskService {
         updateTaskStateForRedis(taskId, "239");
         videoTaskStart(taskId);
 
-        uPatrolResult.setTaskState(239);
+        uPatrolResult.setTaskState(TASK_STATE_EXECUTING);
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
 
 
@@ -1212,7 +1219,7 @@ public class UPatrolTaskService {
             List<String> cruiseResultIdList = new ArrayList<>();
             for (Long instanceIdDone : instanceIdDoneList) {
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceIdDone);
-                boolean conditionRes = ArrayUtils.contains(new String[]{"246", "247"}, redisInfoMap.get("cruiseResult"));
+                boolean conditionRes = ArrayUtils.contains(new String[]{String.valueOf(CRUISE_RESULT_NORMAL), String.valueOf(CRUISE_RESULT_ABNORMAL)}, redisInfoMap.get("cruiseResult"));
                 if (Boolean.TRUE.equals(conditionRes)) {
                     UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
                     uPatrolDataResult.setTaskId(taskId);
@@ -1356,7 +1363,7 @@ public class UPatrolTaskService {
         for (TCruiseTaskCount tCruiseTaskCount : list) {
             Date dayBeforeTime = dayBefore;
             Date dayAfterTime = dayAfter;
-            if (tCruiseTaskCount.getIfRun() == 172 && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskCount.getDateType())) {
+            if (tCruiseTaskCount.getIfRun() == TaskTypeEnum.CYCLE.getType() && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskCount.getDateType())) {
 
                 if (tCruiseTaskCount.getStartTime().after(dayBeforeTime)){
                     dayBeforeTime = tCruiseTaskCount.getStartTime();
@@ -1388,7 +1395,7 @@ public class UPatrolTaskService {
                             taskCountMap.put("type", tCruiseTaskCount.getIfRun());
                             taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
                             if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
-                                taskCountMap.put("taskState", 238);
+                                taskCountMap.put("taskState", TASK_STATE_NOT_START);
                                 taskCountMap.put("taskStateName", "任务未开始");
                             } else {
                                 taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
@@ -1411,7 +1418,7 @@ public class UPatrolTaskService {
                         taskCountMap.put("planTypeName", tCruiseTaskCount.getPlanTypeName());
                         taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
                         if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
-                            taskCountMap.put("taskState", 238);
+                            taskCountMap.put("taskState", TASK_STATE_NOT_START);
                             taskCountMap.put("taskStateName", "任务未开始");
                         } else {
                             taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());
@@ -1436,7 +1443,7 @@ public class UPatrolTaskService {
                 taskCountMap.put("taskId", tCruiseTaskCount.getTaskId());
                 taskCountMap.put("taskName", tCruiseTaskCount.getTaskName());
                 if (Objects.equals(null, tCruiseTaskCount.getTaskState())) {
-                    taskCountMap.put("taskState", 238);
+                    taskCountMap.put("taskState", TASK_STATE_NOT_START);
                     taskCountMap.put("taskStateName", "任务未开始");
                 } else {
                     taskCountMap.put("taskState", tCruiseTaskCount.getTaskState());

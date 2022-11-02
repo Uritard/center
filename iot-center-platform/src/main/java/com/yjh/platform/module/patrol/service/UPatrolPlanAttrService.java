@@ -64,7 +64,7 @@ public class UPatrolPlanAttrService {
                 this.tCruisePlanDao.insert(tCruisePlan);
             }
         }
-        this.tCruisePlanDao.insert(tCruisePlan);
+//        this.tCruisePlanDao.insert(tCruisePlan);
 
         Long planId = tCruisePlan.getPlanId();
 
@@ -82,8 +82,12 @@ public class UPatrolPlanAttrService {
                     .setPointType(tCruisePointInstanceAttr.getCruiseType())
                     .setRobotId(tCruisePointInstanceAttr.getRobotId());
             uPatrolPlanAttrList.add(uPatrolPlanAttr);
+            if (uPatrolPlanAttrList.size()%2000 == 0) {
+                uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
+                uPatrolPlanAttrList = new ArrayList<>();
+            }
         }
-        return uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
+        return 1;
     }
 
     /**

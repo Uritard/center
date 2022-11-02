@@ -5,6 +5,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
@@ -62,7 +63,8 @@ public class TaskJob extends QuartzJobBean {
     public void executeInternal(JobExecutionContext context) {
         String taskId = context.getMergedJobDataMap().getString("taskId");
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
-        String taskDate = simpleDateFormat.format(context.getFireTime());//任务的执行时间
+        //任务的执行时间
+        String taskDate = simpleDateFormat.format(context.getFireTime());
         Date date = null;
         try {
             date = simpleDateFormat.parse(taskDate);
@@ -97,14 +99,13 @@ public class TaskJob extends QuartzJobBean {
             robotTaskStart(task);
             //调用摄像机任务
             uPatrolTaskService.videoTaskStart(taskId);
-            //声纹的
         }
     }
 
     private void setTaskResult(String taskId) {
         String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
         UPatrolResult result = uPatrolTaskDao.selectForTaskId(realTaskId);
-        result.setTaskState(239);
+        result.setTaskState(CruiseConstant.TASK_STATE_EXECUTING);
         //任务开始时间
         Date date = result.getCreateTime();
         if (date == null) {
@@ -156,7 +157,7 @@ public class TaskJob extends QuartzJobBean {
 
         mapForAbnormal.put("taskStart", simpleDateFormat.format(taskStart));
         mapForAbnormal.put("overDay", simpleDateFormat.format(taskAre));
-        mapForAbnormal.put("taskState", "239");
+        mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_EXECUTING));
 
         String strForCountAbnormal = "countForAbnormal:" + task.getTaskId();
         redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
@@ -166,7 +167,7 @@ public class TaskJob extends QuartzJobBean {
      * 周期任务初始化下一次的任务信息
      */
     private void initializeNextTaskInfo(UPatrolTask task, List<Long> instanceList) {
-        if (task.getExecuteType() == 172) {
+        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
             UPatrolTask nextTask = new UPatrolTask();
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
             nextTask.setTaskId(newTaskId)

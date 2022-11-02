@@ -61,6 +61,23 @@ public interface CruiseConstant {
     int CRUISE_ABNORMAL_NOPIC = 248;
 
     /**
+     * 异常原因，数据异常
+     */
+    int CRUISE_ABNORMAL_DATA_ABNORMAL = 249;
+    /**
+     * 异常原因，异常告警
+     */
+    int CRUISE_ABNORMAL_ABNORMAL_WARING = 250;
+    /**
+     * 异常原因，算法超时
+     */
+    int CRUISE_ABNORMAL_ALGORITHM_TIMEOUT = 251;
+    /**
+     * 异常原因，缺陷异常
+     */
+    int CRUISE_ABNORMAL_DEFECT_WARING = 409;
+
+    /**
      * 任务状态，未开始
      */
     int TASK_STATE_UNSTART = 238;
@@ -150,4 +167,76 @@ public interface CruiseConstant {
          */
         HTTP
     }
+
+    enum TaskTypeEnum{
+        /**
+         * 周期
+         */
+        CYCLE(172),
+        /**
+         * 定期
+         */
+        TIME(174),
+        /**
+         * 立即
+         */
+        NOW(173);
+
+        final int type;
+
+        TaskTypeEnum(int type){
+            this.type = type;
+        }
+
+        private static Map<Integer, TaskTypeEnum> taskTypeEnumHashMap = new HashMap<>();
+
+        static {
+            for (TaskTypeEnum value : TaskTypeEnum.values()) {
+                taskTypeEnumHashMap.put(value.getType(), value);
+            }
+        }
+
+        public int getType(){
+            return type;
+        }
+
+        public static TaskTypeEnum getEnm(int type){
+            return taskTypeEnumHashMap.get(type);
+        }
+    }
+
+    /**
+     * 任务状态-任务未开始
+     */
+    int TASK_STATE_NOT_START = 238;
+    /**
+     * 任务状态-正在执行
+     */
+    int TASK_STATE_EXECUTING = 239;
+    /**
+     * 任务状态-执行完成
+     */
+    int TASK_STATE_FINISHED = 240;
+    /**
+     * 任务状态-任务终止
+     */
+    int TASK_STATE_SHUT_DOWN = 242;
+    /**
+     * 任务状态-任务异常终止
+     */
+    int TASK_STATE_ABNORMAL_SHUT_DOWN = 243;
+    /**
+     * 任务状态-任务超期
+     */
+    int TASK_STATE_OVERTIME = 244;
+
+    /**
+     * 审核状态-未审核
+     */
+    int EVALUATION_STATE_UNREVIEWED = 256;
+    /**
+     * 审核状态-审核
+     */
+    int EVALUATION_STATE_REVIEWED = 257;
+
 }

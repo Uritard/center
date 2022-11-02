@@ -444,9 +444,9 @@ public class RunAtNowTask implements Runnable{
                         TCTRDList.add(tCruiseTaskResultDetail);
                         cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
-                        Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                        Map tCruiseTaskResultDetailMap = Object2Map.objectToMap(tCruiseTaskResultDetail,true);
                         String str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
-                        Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                        Map tCruiseDataResultMap = Object2Map.objectToMap(tCruiseDataResult,true);
                         tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                         tCruiseTaskResultDetailMap.put("taskId",taskId);
                         tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
@@ -472,9 +472,9 @@ public class RunAtNowTask implements Runnable{
 
                 }
 
-                Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                Map tCruiseTaskResultDetailMap = Object2Map.objectToMap(tCruiseTaskResultDetail,true);
                 String str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
-                Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                Map tCruiseDataResultMap = Object2Map.objectToMap(tCruiseDataResult,true);
                 tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                 tCruiseTaskResultDetailMap.put("taskId",taskId);
                 tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
@@ -709,9 +709,9 @@ public class RunAtNowTask implements Runnable{
                         TCTRDList.add(tCruiseTaskResultDetail);
                         cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
-                        tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                        tCruiseTaskResultDetailMap = Object2Map.objectToMap(tCruiseTaskResultDetail,true);
                         str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
-                        tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                        tCruiseDataResultMap = Object2Map.objectToMap(tCruiseDataResult,true);
                         tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                         tCruiseTaskResultDetailMap.put("taskId",taskId);
                         tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
@@ -772,10 +772,10 @@ public class RunAtNowTask implements Runnable{
                             tCruiseDataResult.setPicpath(urlPath);
                             tCruiseDataResult.setOrigpic(absPath);
                             tCruiseTaskResultDetail.setCruiseStatus(253);
-                            tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                            tCruiseTaskResultDetailMap = Object2Map.objectToMap(tCruiseTaskResultDetail,true);
                             str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
 
-                            tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                            tCruiseDataResultMap = Object2Map.objectToMap(tCruiseDataResult,true);
                             tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                             tCruiseTaskResultDetailMap.put("taskId",taskId);
                             tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));
@@ -890,9 +890,9 @@ public class RunAtNowTask implements Runnable{
                             TCTRDList.add(tCruiseTaskResultDetail);
                             cruiseResultIdList.add(tCruiseTaskResultDetail.getCruiseResultId());
 
-                            tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail,true));
+                            tCruiseTaskResultDetailMap = Object2Map.objectToMap(tCruiseTaskResultDetail,true);
                             str = "t_cruise_task_result:"+taskId +":"+ item.getInstanceId();
-                            tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult,true));
+                            tCruiseDataResultMap = Object2Map.objectToMap(tCruiseDataResult,true);
                             tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                             tCruiseTaskResultDetailMap.put("taskId",taskId);
                             tCruiseTaskResultDetailMap.put("startTime",simpleDateFormat.format(date));

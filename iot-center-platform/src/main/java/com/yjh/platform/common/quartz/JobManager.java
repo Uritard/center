@@ -2,6 +2,7 @@ package com.yjh.platform.common.quartz;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import org.quartz.*;
 import org.quartz.impl.triggers.CronTriggerImpl;
@@ -289,7 +290,6 @@ public class JobManager {
             logger.error(" Job already exist");
             return "false";
         }
-//        logger.info("dataUploadInterval :" + dataUploadInterval);
         JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
                 usingJobData("taskId", task.getTaskId()).build();
         taskMap.put("taskId",task.getTaskId());
@@ -300,28 +300,28 @@ public class JobManager {
         taskMap.put("triggerGroupName",quartzTask.getJobGroup());
         Constant.taskMap.add(taskMap);
         Trigger trigger = null;
-        if (task.getExecuteType() ==172) {//周期
+        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
             trigger = TriggerBuilder.newTrigger()
                     .withIdentity(str, quartzTask.getJobGroup())
                     .withSchedule(cronSchedule(quartzTask.getCronExpression()))
                     .build();
-        } else if (task.getExecuteType() ==173) {//立即
+        } else if (task.getExecuteType() ==CruiseConstant.TaskTypeEnum.NOW.getType()) {
             trigger = TriggerBuilder.newTrigger()
                     .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
                     .startNow()
                     .withSchedule(
                             SimpleScheduleBuilder.simpleSchedule()
                                     .withIntervalInSeconds(3)
-                                    .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
+                                    .withRepeatCount(0))
                     .build();
-        } else if (task.getExecuteType() ==174) {//定期
+        } else if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.TIME.getType()) {
             trigger = TriggerBuilder.newTrigger()
                     .withIdentity(str, quartzTask.getJobGroup())
                     .startAt(quartzTask.getStartTime())
                     .withSchedule(
                             SimpleScheduleBuilder.simpleSchedule()
                                     .withIntervalInSeconds(3)
-                                    .withRepeatCount(0))//重复执行的次数，因为加入任务的时候马上执行了，所以不需要重复，否则会多一次。
+                                    .withRepeatCount(0))
                     .build();
         }
 
