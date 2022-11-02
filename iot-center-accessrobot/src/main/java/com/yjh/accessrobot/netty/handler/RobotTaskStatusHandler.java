@@ -1,6 +1,5 @@
 package com.yjh.accessrobot.netty.handler;
 
-import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
@@ -19,6 +18,7 @@ import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,8 +57,16 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         taskStatusMap.put("taskPatrolled_id", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
         String taskName = xmlBaseModel.getItems().get(0).get("task_name").toString();
         taskStatusMap.put("taskName",taskName );
-        String taskId = xmlBaseModel.getItems().get(0).get("task_code").toString();
-        taskStatusMap.put("taskCode", taskId);
+        String taskCode = String.valueOf(xmlBaseModel.getItems().get(0).get("task_code"));
+        String taskId = taskCode;
+        // 通过机器人上报的任务id查询巡视主机上的任务id
+//        String taskId = robotService.selectRealTaskId(taskCode);
+//        if(StringUtils.isEmpty(taskId)){
+//            taskId = taskCode;
+//            log.info("taskId is empty, use taskCode as taskId");
+//        }
+//        log.info("taskCode==={},taskId===={}", taskCode, taskId);
+        taskStatusMap.put("taskCode",  taskId);
         String taskState = xmlBaseModel.getItems().get(0).get("task_state").toString();
         taskStatusMap.put("taskState", taskState);
         taskStatusMap.put("planStartTime", xmlBaseModel.getItems().get(0).get("plan_start_time"));
@@ -102,6 +110,12 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         RobotServerHandler.send(taskStatusProtocol, robotCode);
         log.info("巡视主机给机器人{}响应了", robotCode);
 
+        taskId = robotService.selectRealTaskId(taskCode);
+        if(StringUtils.isEmpty(taskId)){
+            taskId = taskCode;
+            log.info("taskId is empty, use taskCode as taskId");
+        }
+        log.info("taskCode==={},taskId===={}", taskCode, taskId);
         Map<String, String> robotTaskStatus = new HashMap<>();
         if (Objects.nonNull(Constant.taskRobotMap.get(taskId))){
             robotTaskStatus = Constant.taskRobotMap.get(taskId);

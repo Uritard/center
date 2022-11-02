@@ -2,11 +2,13 @@ package com.yjh.platform.common.quartz;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.commons.CollectionUtil;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.StaticContextAccessor;
@@ -25,6 +27,7 @@ import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.*;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronExpression;
 import org.quartz.DisallowConcurrentExecution;
@@ -129,12 +132,18 @@ public class CruiseTaskJob extends QuartzJobBean {
                 log.error(e.getMessage(), e);
             }
             List<TCruiseTaskDel> tCruiseTaskDelList =tCruiseTaskDelDao.select(taskId, date,null);
+            TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);
+            log.info("date=={},taskId=={},TCruiseTask=={}", date, taskId, tCruiseTask);
 
-            if(tCruiseTaskDelList != null && tCruiseTaskDelList.size()>0){
+            if(CollectionUtil.isNotEmpty(tCruiseTaskDelList)) {
                 //不需要执行任务
-                log.info(taskDate+"此时间任务不需要执行");
+                log.info("{}此时间任务不需要执行", taskDate);
+            }else if (Objects.nonNull(tCruiseTask.getEndTime()) && date.after(tCruiseTask.getEndTime())){
+                log.info("{}此时间大于结束时间,以后都不会再做了,删除当前任务", taskDate);
+                tCruiseTaskService.deleteByPrimaryId(taskId, "-1");
+            }else if (Objects.nonNull(tCruiseTask.getStartTime()) && date.before(tCruiseTask.getStartTime())){
+                log.info("{}此时间小于开始时间,任务不需要执行", taskDate);
             }else {
-
                 //Thread.sleep(10000);
                 //模板图片路径
                 Map<String,Object> mapForPicModelPath  = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
@@ -152,7 +161,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                 log.info("开始进行任务" +taskStart+taskId);
                 //Long taskIsStart = taskStart.getTime();
 
-                TCruiseTask tCruiseTask = tCruiseTaskDao.selectByPrimaryId(taskId);//获取任务
                 //在任务表里新建一条
                 if(tCruiseTask.getIfRun() == 172){
                     List<TCruiseTaskAttr> attrList = tCruiseTaskAttrDao.selectByTaskId(tCruiseTask.getTaskId());
@@ -163,6 +171,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     tCruiseTask.setDateType(null);
                     tCruiseTask.setStartTime(new Date());
                     tCruiseTask.setCreateTime(new Date());
+                    tCruiseTask.setEndTime(new Date());
                     tCruiseTaskDao.insert(tCruiseTask);
                     for (TCruiseTaskAttr item:attrList) {
                         item.setTaskId(newTaskId);
@@ -950,7 +959,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                     TCruiseResult tCruiseResultIsPause = tCruiseResultDao.selectForTaskId(tCruiseTask.getTaskId());
                     Long taskEndTime = new Date().getTime();
 
-                    if(tCruiseResultIsPause.getCState() != 239 && tCruiseResultIsPause.getCState() != 240){
+                    if(!ArrayUtils.contains(new int[]{239,240,243}, tCruiseResultIsPause.getCState())){
                         if(tCruiseResultIsPause.getCState() == 242){
                             Map<String,String> jsonMap=new HashMap<>();
                             jsonMap.put("type","newTask");
@@ -1010,7 +1019,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                         analysis(analysisMap);
                         log.info("任务停止执行"+tCruiseTask.getTaskId());
                         Constant.taskStateMap.put(taskId,0);
-                        return;
                     }
                 }
                 //做完了 入库
@@ -1083,7 +1091,7 @@ public class CruiseTaskJob extends QuartzJobBean {
                 log.info("完成任务执行"+new Date());
             }
         } catch (Exception e) {
-            log.error("定时任务或周期任务异常: "+e);
+            log.error(e.getMessage(), e);
             e.printStackTrace();
         }
 
@@ -1138,14 +1146,14 @@ public class CruiseTaskJob extends QuartzJobBean {
 
     //让机器人做任务
     private void robotTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
+//        try {
+//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+//            if (null != serviceRestTemplate) {
+//                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
+//            }
+//        } catch (Exception e) {
+//            log.error(e.getMessage(), e);
+//        }
     }
 
     //红外相机抓图

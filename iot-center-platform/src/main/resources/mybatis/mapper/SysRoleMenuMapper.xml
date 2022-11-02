@@ -134,6 +134,8 @@
         left join sys_role_menu b on a.role_id = b.role_id
         left join sys_menu c on b.menu_code = c.menu_code
         WHERE a.role_id != #{roleId, jdbcType=BIGINT}
+        <if test="roleId == 1235">and a.role_id != 1237</if>
+        <if test="roleId == 1237">and a.role_id != 1235</if>
         and menu_level != 1
     </select>
 </mapper>

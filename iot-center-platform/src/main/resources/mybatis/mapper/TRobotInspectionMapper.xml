@@ -251,15 +251,7 @@
             and a.robot_type = #{robotType, jdbcType=VARCHAR}
         </if>
         AND a.drone_type IS NULL
-        AND a.robot_id NOT IN (
-        SELECT
-        monitor_device_id
-        FROM
-        sys_role_monitor_device srmd
-        LEFT JOIN sys_user su ON srmd.role_id = su.role_id
-        WHERE
-        su.user_id = #{userId, jdbcType = BIGINT}
-        )
+
     </select>
 
     <select id="selectDroneInfo" resultType="com.yjh.platform.module.device.entity.Robot">
@@ -288,15 +280,7 @@
             and a.drone_type = #{droneType, jdbcType=VARCHAR}
         </if>
         AND a.robot_type IS NULL
-        AND a.robot_id NOT IN (
-        SELECT
-        monitor_device_id
-        FROM
-        sys_role_monitor_device srmd
-        LEFT JOIN sys_user su ON srmd.role_id = su.role_id
-        WHERE
-        su.user_id = #{userId, jdbcType = BIGINT}
-        )
+
     </select>
 
 

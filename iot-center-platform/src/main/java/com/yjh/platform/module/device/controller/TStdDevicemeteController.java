@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.swagger.annotations.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -80,7 +81,13 @@ public class TStdDevicemeteController {
     public Result delete(@RequestParam(value = "deviceMeteId") Long deviceMeteId) {
         Result result = new Result();
         try {
-            result.setData(tStdDevicemeteService.deleteByPrimaryId(deviceMeteId));
+            // 当前测点配置巡视点 ？ 不允许删除 ： 删除逻辑
+            List<Long> haveList = tStdDevicemeteDao.selectHave(deviceMeteId);
+            if (CollectionUtils.isNotEmpty(haveList)){
+                result.setMessage(209,"测点已配置为巡视点,操作无法生效");
+            }else {
+                result.setData(tStdDevicemeteService.deleteByPrimaryId(deviceMeteId));
+            }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("标准设备测点删除异常:", e);
@@ -176,7 +183,7 @@ public class TStdDevicemeteController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
-    @Logs(title = "查询标准设备测点",content = "根据用户传递的参数查询标准设备测点",logType = 1,authority = "1234")
+    @Logs(title = "查询标准设备测点",content = "根据用户传递的参数查询标准设备测点",logType = 1,authority = "1234,1235")
     public Result selectByPage(@RequestBody TStdDeviceMeteDetail tStdDeviceMeteDetail
                               ) {
         Result result = new Result();

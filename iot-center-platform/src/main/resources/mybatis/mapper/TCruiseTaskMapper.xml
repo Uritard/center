@@ -98,7 +98,8 @@
         a.task_type,
         a.task_level,
         a.start_time,
-        a.create_time
+        a.create_time,
+        a.end_time
         from t_cruise_task a
         where 1 = 1
             and a.task_id = #{taskId, jdbcType=VARCHAR}
@@ -119,7 +120,8 @@
         a.task_type,
         a.task_level,
         a.start_time,
-        a.create_time
+        a.create_time,
+        a.end_time
         from t_cruise_task a
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
@@ -150,7 +152,8 @@
         a.task_type,
         a.task_level,
         a.start_time,
-        a.create_time
+        a.create_time,
+        a.end_time
         from t_cruise_task a
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
@@ -230,6 +233,7 @@
             a.date_type,
             a.task_type,
             DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+            DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
             DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from t_cruise_task a
         JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
@@ -265,6 +269,7 @@
                 a.date_type,
                 a.task_type,
                 DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+                DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
                 DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
             from t_cruise_task a
             JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
@@ -301,6 +306,7 @@
                 a.date_type,
                 a.task_type,
                 DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+                DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
                 DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
             from t_cruise_task a
             JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
@@ -349,7 +355,8 @@ select *from (
         a.date_type,
         a.task_type,
         DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
-        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time,
+        DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time
         from t_cruise_task a
         JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
         LEFT JOIN t_dict_business c ON a.if_run = c.dict_code AND c.col_name = "if_run"
@@ -386,7 +393,8 @@ select *from (
         a.date_type,
         a.task_type,
         DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
-        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time,
+        DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time
         from t_cruise_task a
         JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
         LEFT JOIN t_dict_business c ON a.if_run = c.dict_code AND c.col_name = "if_run"
@@ -424,7 +432,8 @@ select *from (
         a.date_type,
         a.task_type,
         DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
-        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time,
+        DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time
         from t_cruise_task a
         JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
         LEFT JOIN t_dict_business c ON a.if_run = c.dict_code AND c.col_name = "if_run"

@@ -231,6 +231,15 @@ public class ReportManageService {
         recordData.setCpTypeItems(cpTypeItems);
         // 3.明细-所选设备的所有测点巡检结果详情
         List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  reportManageDao.selectTaskResult(taskId);
+        Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:prefixAbsolutePath");
+        String absPath = map.get("content");
+        Map<String,String> entries = redisTemplate.opsForHash().entries("t_sys_param:prefixRelativePath");
+        String relPath = entries.get("content");
+        // 相对路径替换绝对路径
+        tCruiseDataResultDetailList.forEach(detail->{
+            String resultPath = detail.getPicPath().replace(relPath, absPath);
+            detail.setPicPath(resultPath);
+        });
         recordData.setTCDRDList(tCruiseDataResultDetailList);
 
         /*String taskName = recordData.getTaskVO().getTaskName();

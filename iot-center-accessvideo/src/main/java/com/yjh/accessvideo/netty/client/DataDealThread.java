@@ -879,11 +879,6 @@ public class DataDealThread implements Runnable {
                             lock.unlock();
                         }
 
-                        // 巡视点结果上报站端
-                        StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
-                                jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult,null, null);
-
-
 //                NORMAL = NORMAL + 1;
 
                         // webSocket通知前端调用巡视监控的接口

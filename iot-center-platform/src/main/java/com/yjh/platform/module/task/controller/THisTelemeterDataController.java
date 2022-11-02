@@ -1,6 +1,5 @@
 package com.yjh.platform.module.task.controller;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.task.entity.TUnionInfo;
 import com.yjh.platform.module.task.entity.UnionTaskInfo;
@@ -131,7 +130,7 @@ public class THisTelemeterDataController {
 
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
-    @Logs(title = "查询遥测历史数据",content = "根据用户传递的参数分页查询信息",logType = 1,authority = "1235")
+    @Logs(title = "查询遥测历史数据",content = "根据用户传递的参数分页查询信息",logType = 1,authority = "1234,1235")
     public Result selectByPage(@RequestParam(value = "startDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startDate,
                                @RequestParam(value = "endDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endDate,
                                @RequestParam(value = "meteKind", required = false) Integer meteKind,
@@ -170,7 +169,7 @@ public class THisTelemeterDataController {
 
     @ApiOperation(value = "查询联动任务信息")
     @RequestMapping(value = "/selectUnionTask", method = RequestMethod.GET)
-    @Logs(title = "查询联动任务信息",content = "根据用户传递的参数查询联动任务信息",logType = 1,authority = "1235")
+    @Logs(title = "查询联动任务信息",content = "根据用户传递的参数查询联动任务信息",logType = 1,authority = "1234,1235")
     public Result selectUnionTask(@RequestParam(value = "startDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startDate,
                                   @RequestParam(value = "endDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endDate,
                                   @RequestParam(value = "deviceName", required = false) String deviceName,

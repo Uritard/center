@@ -185,7 +185,7 @@ public class TAlgorithmConfBakController {
 
     @ApiOperation(value = "获取已有的算法分析类型")
     @RequestMapping(value = "/selectAnalyseType", method = RequestMethod.GET)
-    @Logs(title = "查询已有的算法分析类型",content = "根据用户传递的参数查询已有的算法分析类型",logType = 1,authority = "1234")
+    @Logs(title = "查询已有的算法分析类型",content = "根据用户传递的参数查询已有的算法分析类型",logType = 1,authority = "1234,1235")
     public Result selectAnalyseType() {
         Result result = new Result();
         try {
