@@ -18,6 +18,7 @@ import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.configuration.IntelAnalysisFtpsConfig;
 import com.yjh.platform.configuration.IntelligentAlgorithmConfig;
 import com.yjh.platform.configuration.UpFtpsConfig;
+import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;

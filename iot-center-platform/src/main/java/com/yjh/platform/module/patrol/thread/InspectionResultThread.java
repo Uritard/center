@@ -1,13 +1,19 @@
 package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
-import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
+import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
+import com.yjh.platform.module.patrol.entity.UPatrolResult;
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
+import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,6 +25,8 @@ import redis.clients.jedis.ScanResult;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.yjh.platform.module.patrol.CruiseConstant.*;
+
 /**
  * @author YC
  * @date 2020/12/8 9:58
@@ -29,23 +37,26 @@ public class InspectionResultThread implements Runnable{
 
     private RedisTemplate redisTemplate;
     private Boolean changeTaskStatus;
-    private RobotPatrolTaskResult robotPatrolTaskResult;
-    private Map<String, String> infoMap;
-    private UPatrolTaskService uPatrolTaskService;
+    private final RobotPatrolTaskResult robotPatrolTaskResult;
+    private final Map<String, String> infoMap;
+    private final UPatrolTaskService uPatrolTaskService;
+    private final AbstractVideoCruise abstractVideoCruise;
     public static final String PATROL_TASK_PREFIX = "patrol_task_result:";
 
-    public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap, RedisTemplate redisTemplate, boolean changeTaskStatus){
+    public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
+                                  RedisTemplate redisTemplate, boolean changeTaskStatus){
         this.robotPatrolTaskResult = robotPatrolTaskResult;
         this.infoMap = infoMap;
         this.redisTemplate = redisTemplate;
         this.changeTaskStatus = changeTaskStatus;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
+        this.abstractVideoCruise = StaticContextAccessor.getBean(AbstractVideoCruise.class);
     }
 
     @Override
     public void run(){
         try {
-            log.info("开始处理巡检结果并对其标准化 >>>>>>> robotPatrolTaskResult==={}", robotPatrolTaskResult);
+            log.info("开始处理巡检结果并对其标准化 >>>>>>> robotPatrolTaskResult==={}", JSON.toJSONString(robotPatrolTaskResult));
             String taskId = infoMap.get("taskId");
             String instanceId;
             String robotCode = robotPatrolTaskResult.getRobotCode();
@@ -65,32 +76,31 @@ public class InspectionResultThread implements Runnable{
                     instanceIdList.add(Long.valueOf(instanceId));
                     Constant.flagMap.put(taskId, instanceIdList);
 
-                    Map<String, Object> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName + instanceId);
+                    Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName + instanceId);
                     tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
-                    tCruiseTaskResultMap.put("cruiseStatus", "252");
+                    tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
 
                     if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
                         tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
-                        tCruiseTaskResultMap.put("cruiseResult", "246");
-                        tCruiseTaskResultMap.put("cruiseAbnormal", "null");
+                        tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                        tCruiseTaskResultMap.put("cruiseAbnormal", "--");
                         log.info("taskId为{},instanceId为{}的该点结果正常", taskId, instanceId);
                     }else {
                         // value无值且resultNum为--，若结果非音频文件，则为异常情况
                         tCruiseTaskResultMap.put("resultNum", "--");
                         if ("3".equals(robotPatrolTaskResult.getFileType())){
-                            tCruiseTaskResultMap.put("cruiseResult", "246");
-                            tCruiseTaskResultMap.put("cruiseAbnormal","null");
+                            tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                            tCruiseTaskResultMap.put("cruiseAbnormal", "--");
                             log.info("taskId为{},instanceId为{}的该点结果正常", taskId, instanceId);
                         }else {
-                            tCruiseTaskResultMap.put("cruiseResult","247");
-                            tCruiseTaskResultMap.put("cruiseAbnormal","249");
-
+                            tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                            tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
                             log.info("taskId为{},instanceId为{}的该点结果异常", taskId, instanceId);
                         }
                     }
                     tCruiseTaskResultMap.put("picpath", infoMap.get("relativePath"));
                     tCruiseTaskResultMap.put("origpic", infoMap.containsKey("absolutePath") ? infoMap.get("absolutePath") : "");
-                    tCruiseTaskResultMap.put("evaluationState", "257");
+                    tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
                     tCruiseTaskResultMap.put("isWarn", "0");
                     tCruiseTaskResultMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
                     tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
@@ -164,8 +174,8 @@ public class InspectionResultThread implements Runnable{
      */
     private void standTaskDealHandler(String taskId, String robotCode, Set<String> robotInfoKeys){
         try {
-            Map<String, Object> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
-            log.info("redisInfoMap=={}", JSON.toJSONString(redisInfoMap));
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
+            log.info("redisInfoMap=={}", redisInfoMap);
             Integer taskState = Integer.valueOf(String.valueOf(redisInfoMap.get("taskState")));
             if (Objects.isNull(taskState)){
                 return;
@@ -196,7 +206,6 @@ public class InspectionResultThread implements Runnable{
             Set<String> cruiseKey = redisScan(PATROL_TASK_PREFIX + taskId);
             if (robotInfoKeys.size() == cruiseKey.size()){
                 taskState = 240;
-                TimeUnit.SECONDS.sleep(2);
             }
             UPatrolResult uPatrolResult = StaticContextAccessor.getBean(UPatrolResultDao.class).selectByPrimaryId(taskId);
             uPatrolResult.setTaskState(taskState);
@@ -208,7 +217,7 @@ public class InspectionResultThread implements Runnable{
     }
 
     /**
-     * 区分是模拟工具上报巡视结果还是真实的
+     * 工具上报的巡视结果结果
      *
      * @param originPath 巡视结果文件全路径
      * @param taskId 任务id
@@ -220,15 +229,13 @@ public class InspectionResultThread implements Runnable{
             String ftpFileName = originPath.trim().substring(originPath.trim().lastIndexOf("/") + 1);
             String resultImagePath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content") + ftpFileName;
             FileUtil.copyFileUsingStream(resultImagePath, resultImagePath);
-            // 标定文件
-            String picModelPath = redisTemplate.opsForHash().get("t_sys_param:picModelPath", "content") + "/" + "inspectionCode";
-            TCruisePointInstanceDetail details = uPatrolTaskService.selectForTask(Long.valueOf(instanceId));
-            TStdDeviceMete tStdDevicemete = uPatrolTaskService.selectDeviceMete(details.getDeviceMeteId());
 
-            Map<String, Object> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+            TCruisePointInstanceDetail details = uPatrolTaskService.selectForTask(Long.valueOf(instanceId));
+
+            Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
-            tCruiseTaskResultMap.put("cruiseStatus", "253");
-            tCruiseTaskResultMap.put("evaluationState", "257");
+            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
+            tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
             tCruiseTaskResultMap.put("isWarn", "0");
             tCruiseTaskResultMap.put("origpic", resultImagePath);
             String picPath = resultImagePath.replace(
@@ -236,14 +243,13 @@ public class InspectionResultThread implements Runnable{
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")));
             tCruiseTaskResultMap.put("picpath", picPath);
 
-
-            if (StringUtils.equals("on", details.getIsAi()) || StringUtils.equals("on", details.getIsJudge())) {
-                // 配置了缺陷或判别算法的点位
-//                List<TAlgorithmInfo> tAlgorithmInfoList = uPatrolTaskService.selectByDeviceMeteId(details.getDeviceMeteId());
-//
-//                packageAndInvoke(tAlgorithmInfoList, taskId, instanceId, resultImagePath, picModelPath, tStdDevicemete);
-            } else {
-                // 即拍照的点位和声音
+            // 判断是否有配置算法
+            TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()));
+            if (algorithm != null){
+                JSONObject jsonForRe = new JSONObject();
+                jsonForRe.put("absPath", resultImagePath);
+                abstractVideoCruise.algorithmAnalysis(tCruiseTaskResultMap, 0, taskId, jsonForRe, algorithm);
+            }else {
                 updatePointStatusNum(taskId, tCruiseTaskResultMap, details);
             }
         }catch (Exception e){
@@ -258,11 +264,11 @@ public class InspectionResultThread implements Runnable{
      * @param tCruiseTaskResultMap 巡视结果map
      * @param details 测点信息
      */
-    private void updatePointStatusNum(String taskId,  Map<String, Object> tCruiseTaskResultMap, TCruisePointInstanceDetail details) {
+    private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details) {
         try {
             tCruiseTaskResultMap.put("cruiseAbnormal", "null");
-            tCruiseTaskResultMap.put("cruiseStatus", "252");
-            tCruiseTaskResultMap.put("cruiseResult", "246");
+            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
+            tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
             tCruiseTaskResultMap.put("resultDesc", "--");
             tCruiseTaskResultMap.put("cruiseTime", tCruiseTaskResultMap.get("time"));
             tCruiseTaskResultMap.put("resultNum", Objects.nonNull(details.getAnalyseType()) ? "已录音" : "已拍照");

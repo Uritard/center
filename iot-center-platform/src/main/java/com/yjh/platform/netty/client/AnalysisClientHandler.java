@@ -4,7 +4,7 @@ package com.yjh.platform.netty.client;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
-import com.yjh.platform.module.patrol.entity.Analysis;
+import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.threadpool.TaskExecutePool;
 import io.netty.bootstrap.Bootstrap;

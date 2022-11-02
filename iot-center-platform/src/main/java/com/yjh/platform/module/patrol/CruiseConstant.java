@@ -59,6 +59,14 @@ public interface CruiseConstant {
      * 异常原因，抓图失败
      */
     int CRUISE_ABNORMAL_NOPIC = 248;
+    /**
+     * 异常原因，数据异常
+     */
+    int CRUISE_ABNORMAL_DATAABNORMAL = 249;
+    /**
+     * 异常原因，缺陷异常
+     */
+    int CRUISE_ABNORMAL_DEFECT = 409;
 
     /**
      * 异常原因，数据异常

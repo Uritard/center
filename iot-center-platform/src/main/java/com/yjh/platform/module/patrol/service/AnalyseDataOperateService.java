@@ -365,7 +365,7 @@ public class AnalyseDataOperateService {
                                         Float highLimit2, Float lowLimit2,
                                         Float highLimit3, Float lowLimit3,
                                         Float highLimit4, Float lowLimit4){
-       Map<String,Object> resultMap = new HashMap<>(7);
+       Map<String,Object> resultMap = new HashMap<>(8);
        try {
            int flag = warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1, highLimit2, lowLimit2,
                    highLimit3, lowLimit3, highLimit4, lowLimit4);
@@ -380,7 +380,8 @@ public class AnalyseDataOperateService {
                return resultMap;
            }
            // 告警信息拼装并返回
-           warnInfoSetting(value, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel, highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, resultMap);
+           warnInfoSetting(value, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel,
+                   highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4, resultMap);
        }catch (Exception e){
            log.error(e.getMessage(), e);
        }
@@ -388,7 +389,12 @@ public class AnalyseDataOperateService {
        return resultMap;
    }
 
-    private Map<String,Object> warnInfoSetting(String value, String stdDeviceMeteName, String meteKind, Integer alarmState, String stateZero, String stateOne, Integer alarmLevel, Float highLimit1, Float lowLimit1, Float highLimit2, Float lowLimit2, Float highLimit3, Float lowLimit3, Float highLimit4, Float lowLimit4, Map<String, Object> resultMap) {
+    private Map<String,Object> warnInfoSetting(String value, String stdDeviceMeteName, String meteKind,
+                                               Integer alarmState, String stateZero, String stateOne,
+                                               Integer alarmLevel, Float highLimit1, Float lowLimit1,
+                                               Float highLimit2, Float lowLimit2, Float highLimit3,
+                                               Float lowLimit3, Float highLimit4, Float lowLimit4,
+                                               Map<String, Object> resultMap) {
         Boolean isWarn = false;
         Integer warnLevel = 0;
         String warnName = null;
@@ -617,12 +623,12 @@ public class AnalyseDataOperateService {
      */
     @Transactional(rollbackFor = Exception.class)
     public  String resolveDefectResult(String resultValueOrigin) {
-        String resultValue=resultValueOrigin.replaceAll(","," ");
-        log.info("----缺陷识别结果解析---resultValue:" + resultValue);
+        String resultValue = resultValueOrigin.replaceAll(","," ");
+        log.info("----缺陷识别结果解析---resultValue:{}", resultValue);
         String defectValue = "";
         //算法设备识别专用
-        String defectRealValue="1";
-        List<String> flags=new ArrayList<>();
+        String defectRealValue = "1";
+        List<String> flags = new ArrayList<>();
         String value = resultValue;
         String finalValue = value.replaceAll("[0-9]", "")
                 .replaceAll("\\.", "")
@@ -793,23 +799,23 @@ public class AnalyseDataOperateService {
                     flags.add("1");
                     break;
                 case "sly_jhbyw":
-                    defectValue="套管胶合部油污";
+                    defectValue = "套管胶合部油污";
                     flags.add("1");
                     break;
                 case "hkgnl":
-                    defectValue="汇控柜凝露";
+                    defectValue = "汇控柜凝露";
                     flags.add("1");
                     break;
                 case "pzqcd":
-                    defectValue="膨胀器冲顶";
+                    defectValue = "膨胀器冲顶";
                     flags.add("1");
                     break;
                 case "drqgd":
-                    defectValue="电容器鼓肚";
+                    defectValue = "电容器鼓肚";
                     flags.add("1");
                     break;
                 case "":
-                    defectValue=defectValue+"";
+                    defectValue = defectValue+"";
                     break;
                 default:
                     defectRealValue=resultValue;

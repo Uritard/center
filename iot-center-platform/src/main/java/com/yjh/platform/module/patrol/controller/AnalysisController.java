@@ -4,7 +4,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.patrol.entity.Analysis;
+import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.UpdateRequest;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.AnalysisService;
@@ -164,7 +164,7 @@ public class AnalysisController {
         analysisList.add(analysis);
         Map<String, List<Analysis>> analysisMap  = new HashMap<>(2);
         analysisMap.put("list",analysisList);
-        log.info("算法信息：    "+analysisMap);
+        log.info("算法信息:{}", analysisMap);
         Constant.algorithmTestPicPath = picPath;
         if (Objects.equals("-1", type)){
             feignAlgorithm(analysisMap);

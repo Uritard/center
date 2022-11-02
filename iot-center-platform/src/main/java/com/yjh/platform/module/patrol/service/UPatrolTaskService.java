@@ -1973,10 +1973,10 @@ public class UPatrolTaskService {
                     recognitionHandler(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
                 }
 
-                cruiseResultMap.put("cruiseStatus", analyseDataOperateService.selectDictCode("cruise_data_state", "已执行"));
+                cruiseResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
                 cruiseResultMap.put("isWarn", StringUtils.isNotEmpty(cruiseResultMap.get("isWarn")) ? "0" : "1");
-                cruiseResultMap.put("evaluationState", analyseDataOperateService.selectDictCode("evaluation_state", "未审核"));
-                log.info("cruiseResultMap==={}", JSON.toJSONString(cruiseResultMap));
+                cruiseResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
+                log.info("cruiseResultMap==={}", cruiseResultMap);
                 redisTemplate.opsForHash().putAll(redisKeyName, cruiseResultMap);
 
                 // webSocket通知前端调用巡视监控的接口
@@ -2019,7 +2019,7 @@ public class UPatrolTaskService {
         SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String yearMonth = ym.format(new Date());
         String nowTime = timeFormat.format(new Date());
-        if(differentList.size() > 0 && ("1".equals(flag))){
+        if(!differentList.isEmpty() && ("1".equals(flag))){
             log.info("different类型:开始向算法管理平台发送图片和mqtt消息");
 
             HashMap<String,String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
@@ -2464,8 +2464,8 @@ public class UPatrolTaskService {
             cruiseResultMap.put("resultNum", resultValue);
             cruiseResultMap.put("picpath", resultImage);
             if (!"null".equals(resultValue) && !(resultValue.contains("device"))) {
-                cruiseResultMap.put("cruiseResult", "247");
-                cruiseResultMap.put("cruiseAbnormal", "409");
+                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DEFECT));
 
                 List<TDefectInfo> defectInfoList = new ArrayList<>();
                 String[] resultArr = resultValue.split("\\s+");
@@ -2494,7 +2494,7 @@ public class UPatrolTaskService {
                 } else if (resultArr.length > 1) {
                     log.info("产生了多条缺陷！！！");
                     String defectNames = "";
-                    for (int i = 0; i < resultArr.length; i++) {
+                    for (String s : resultArr) {
                         // 缺陷信息存redis
                         String redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
                         Map<String, String> defectMap = getDefectMap(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
@@ -2512,7 +2512,7 @@ public class UPatrolTaskService {
                         infoMap.put("flag", "defect");
                         infoMap.put("defectModel", defectMap.get("defectType"));
                         alarmPopUp(tStdDevicemete, infoMap);
-                        defectNames = defectNames + resultArr[i] + " ";
+                        defectNames = defectNames + s + " ";
                     }
 
                     pushAlarmInfo(defectNames, tStdDevicemete.getMeteName() + "--" + resultValue);
@@ -2525,7 +2525,7 @@ public class UPatrolTaskService {
                 log.info("--------缺陷入库完成-----");
             }else {
                 cruiseResultMap.put("resultNum", resultValue.contains("device") ? resultValue.replaceAll("device","") : "--");
-                cruiseResultMap.put("cruiseResult", "246");
+                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                 cruiseResultMap.put("cruiseAbnormal", "--");
             }
         }catch (Exception e){
@@ -2682,7 +2682,8 @@ public class UPatrolTaskService {
 
             cruiseResultMap.put("resultNum", resultValue);
             cruiseResultMap.put("picpath", resultImage);
-            cruiseResultMap.put("cruiseResultMap", StringUtils.equals("abnormal", resultValue) ? "247" : "246");
+            cruiseResultMap.put("cruiseResultMap", StringUtils.equals("abnormal", resultValue) ?
+                    String.valueOf(CRUISE_RESULT_ABNORMAL) : String.valueOf(CRUISE_RESULT_NORMAL));
             cruiseResultMap.put("cruiseAbnormal", "--");
 
             //判别异常

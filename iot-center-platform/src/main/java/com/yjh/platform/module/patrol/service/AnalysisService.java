@@ -2,8 +2,8 @@ package com.yjh.platform.module.patrol.service;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
-import com.yjh.platform.module.patrol.entity.Analysis;
 import com.yjh.platform.netty.client.AnalysisClientHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

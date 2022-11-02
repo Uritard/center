@@ -1,7 +1,7 @@
 package com.yjh.platform.module.patrol.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.yjh.platform.module.patrol.entity.Analysis;
+import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import io.swagger.annotations.Api;

@@ -199,7 +199,7 @@ public abstract class AbstractVideoCruise {
         return true;
     }
 
-    private TAlgorithmMeteInfo needAnalysis(String deviceMeteId) {
+    public TAlgorithmMeteInfo needAnalysis(String deviceMeteId) {
         List<TAlgorithmMeteInfo> algorithmList = tAlgorithmInfoDao.selectAlgorithmMete(deviceMeteId);
         // 配置了算法
         boolean isAnalyse = CollectionUtils.isNotEmpty(algorithmList) && (algorithmList.get(0).getMeteAnalyse() != null || "on".equals(
@@ -216,7 +216,7 @@ public abstract class AbstractVideoCruise {
     /**
      * 算法分析
      */
-    private boolean algorithmAnalysis(Map<String, String> inspectionMap, long presetId, String taskId, JSONObject jsonForRe,
+    public boolean algorithmAnalysis(Map<String, String> inspectionMap, long presetId, String taskId, JSONObject jsonForRe,
         TAlgorithmMeteInfo algorithm) {
 
         Analysis analysis = new Analysis();
@@ -242,7 +242,7 @@ public abstract class AbstractVideoCruise {
         log.info("算法信息：   {}", JSON.toJSONString(analysisList));
         // 0-缺陷 1-表记
         Result result;
-        if (algorithm.getIsAi() == 1) {
+        if (Objects.equals(1, algorithm.getIsAi())) {
             // 算法额外参数设置，红外
             analysisExt(analysis, jsonForRe);
             result = analysis(analysisList);
@@ -333,7 +333,7 @@ public abstract class AbstractVideoCruise {
     /**
      * 表计 算法识别
      */
-    protected Result analysis(List<Analysis> analysisList) {
+    public Result analysis(List<Analysis> analysisList) {
         AnalyticsEnum analytics = getAnalytics();
         return AnalyticsFactory.getAnalytics(analytics).analytics(analysisList);
     }
@@ -341,7 +341,7 @@ public abstract class AbstractVideoCruise {
     /**
      * 缺陷/判别 算法识别
      */
-    protected Result defect(List<Analysis> analysisList) {
+    public Result defect(List<Analysis> analysisList) {
         AnalyticsEnum analytics = getAnalytics();
         return AnalyticsFactory.getAnalytics(analytics).analytics(analysisList);
     }
