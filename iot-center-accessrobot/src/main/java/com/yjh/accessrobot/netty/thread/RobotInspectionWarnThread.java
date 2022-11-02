@@ -64,10 +64,9 @@ public class RobotInspectionWarnThread implements Runnable{
                 throw new RuntimeException("机器人编码为空");
             }
 
-            String robotTaskId = taskId;
-            if ("true".equals(redisTemplate.opsForValue().get("RobotTask.taskToRobot"))) {
-                robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
-            }
+            // taskId是巡视主机的id,robotTaskId是机器人上报的id
+            String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+
             Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId);
             for (String key : robotInfoKeys) {
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);

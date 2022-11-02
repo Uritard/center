@@ -71,10 +71,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
                 throw new RuntimeException("机器人编码为空");
             }
 
-            String robotTaskId = taskId;
-            if ("true".equals(redisTemplate.opsForValue().get("RobotTask.taskToRobot"))) {
-                robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
-            }
+            // taskId是巡视主机的id,robotTaskId是机器人上报的id
+            String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
             Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId);
             //根据taskId查询相关内容
             TCruiseTask tCruiseTask = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(taskId);

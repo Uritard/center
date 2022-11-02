@@ -59,13 +59,6 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         taskStatusMap.put("taskName",taskName );
         String taskCode = String.valueOf(xmlBaseModel.getItems().get(0).get("task_code"));
         String taskId = taskCode;
-        // 通过机器人上报的任务id查询巡视主机上的任务id
-//        String taskId = robotService.selectRealTaskId(taskCode);
-//        if(StringUtils.isEmpty(taskId)){
-//            taskId = taskCode;
-//            log.info("taskId is empty, use taskCode as taskId");
-//        }
-//        log.info("taskCode==={},taskId===={}", taskCode, taskId);
         taskStatusMap.put("taskCode",  taskId);
         String taskState = xmlBaseModel.getItems().get(0).get("task_state").toString();
         taskStatusMap.put("taskState", taskState);
