@@ -194,7 +194,7 @@ public class UPatrolTaskController {
                     .setPlanId(tCruiseTaskAdd.getPlanId())
                     .setTaskCode(tCruiseTaskAdd.getTaskCode())
                     .setAreaId(tCruiseTaskAdd.getAreaId())
-                    .setTaskType(tCruiseTaskAdd.getTaskType())
+                    .setTaskType(tCruiseTaskAdd.getType())
                     .setExecuteType(tCruiseTaskAdd.getIfRun())
                     .setCreateUserId(tCruiseTaskAdd.getCreateUserId())
                     .setRobotId(tCruiseTaskAdd.getRobotId());

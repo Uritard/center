@@ -183,7 +183,6 @@
             LEFT JOIN t_dict_business e ON d.type=e.dict_code AND e.col_name='plan_type'
             JOIN t_cruise_result a ON a.task_id=d.task_id
             LEFT JOIN t_dict_business b ON a.c_state=b.dict_code AND b.col_name='task_state'
-
             WHERE d.task_id=#{taskId,jdbcType=VARCHAR}
 
     </select>

@@ -39,6 +39,7 @@ import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.InspectionResultThread;
 import com.yjh.platform.module.patrol.thread.IsWarnAfterCruiseThread;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
+import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.SysUserDao;
@@ -115,6 +116,8 @@ public class UPatrolTaskService {
     private UPatrolPlanAttrDao uPatrolPlanAttrDao;
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
+    @Autowired
+    private TCruisePlanDao tCruisePlanDao;
 
     //jobName
     @Value("${spring.QingHua.jobName}")
@@ -205,6 +208,7 @@ public class UPatrolTaskService {
             uPatrolTaskAttr.setInstanceId(uPatrolPlanAttr.getInstanceId());
             uPatrolTaskAttr.setDeviceMeteId(uPatrolPlanAttr.getDeviceMeteId());
             uPatrolTaskAttr.setDeviceId(uPatrolPlanAttr.getDeviceId());
+            uPatrolTaskAttr.setDeviceMeteId(uPatrolPlanAttr.getDeviceMeteId());
             uPatrolTaskAttr.setCustomId(uPatrolPlanAttr.getCustomId());
             uPatrolTaskAttr.setPointTaskId(uPatrolTaskAttr.getPointTaskId());
             instanceList.add(uPatrolPlanAttr.getInstanceId());
@@ -217,6 +221,8 @@ public class UPatrolTaskService {
         if (uPatrolTaskAttrs.size() > 0) {
             uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
         }
+        TCruisePlanCount plan = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
+        uPatrolTask.setTaskType(plan.getType());
         uPatrolTaskDao.add(uPatrolTask);
         return instanceList;
     }

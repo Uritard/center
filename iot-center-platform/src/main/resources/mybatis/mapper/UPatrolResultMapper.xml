@@ -371,7 +371,7 @@
         a.task_wait,a.create_time,
         a.remark
         FROM u_patrol_result a
-        JOIN t_dict_business d ON a.task_type = d.dict_code and d.col_name = 'plan_type'
+        LEFT JOIN t_dict_business d ON a.task_type = d.dict_code and d.col_name = 'plan_type'
         LEFT JOIN t_dict_business e ON a.task_state = e.dict_code and e.col_name='task_state'
         LEFT JOIN u_patrol_data_result f ON a.task_id = f.task_id
         <if test="deviceType != -1">
@@ -621,5 +621,122 @@
         ORDER BY d.create_time DESC
     </select>
 
+    <select id="selectTaskStateByTaskId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TaskSimpleInfo">
+        SELECT
+            d.task_id,
+            d.task_name,
+            d.task_type as Type,
+            a.task_state as 'taskState',
+                b.dict_note AS 'taskStateName',
+                e.dict_note AS 'typeName'
+        FROM
+            u_patrol_task d
+                LEFT JOIN t_dict_business e ON d.task_type=e.dict_code AND e.col_name='plan_type'
+                LEFT JOIN u_patrol_result a ON a.task_id=d.task_id
+                LEFT JOIN t_dict_business b ON a.task_state=b.dict_code AND b.col_name='task_state'
+        WHERE d.task_id=#{taskId,jdbcType=VARCHAR}
+
+    </select>
+
+    <select id="selectCruiseCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            t_cruise_point_instance a
+                LEFT JOIN (
+                (
+                    t_cruise_plan b
+                        JOIN u_patrol_plan_attr c ON b.plan_id = c.plan_id
+                    )
+                    LEFT JOIN u_patrol_task d ON b.plan_id = d.plan_id
+                ) ON a.instance_id = c.instance_id
+        WHERE d.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectCruiseCountByType" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.CruiseCountOfType">
+        SELECT
+            dict_code as"cruiseType",
+            dict_note as "cruiseTypeName",
+            (
+                SELECT
+                    COUNT(*)
+                FROM
+                    t_cruise_point_instance a
+                        LEFT JOIN (
+                        (
+                            t_cruise_plan b
+                                JOIN u_patrol_plan_attr c ON b.plan_id = c.plan_id
+                            )
+                            LEFT JOIN u_patrol_task d ON b.plan_id = d.plan_id
+                        ) ON a.instance_id = c.instance_id
+                WHERE
+                    a.cruise_type=dict_code
+                  AND d.task_id=#{taskId,jdbcType=VARCHAR}
+            ) AS "Count"
+        FROM
+            t_dict_business
+        WHERE
+                dict_code IN(SELECT dict_code FROM t_dict_business WHERE col_name="cruise_type" ORDER BY dict_code)
+    </select>
+
+    <select id="selectInstanceIdByTask" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT
+            a.instance_id
+        FROM
+            u_patrol_task_attr a
+        WHERE
+            a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectCruiseInspectByTaskIdYC" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.CruiseInspectResult">
+        SELECT
+            n.device_id as'deviceId',
+                m.device_name,
+            n.instance_id as 'instanceId',
+                c.save_type_list,
+            n.cruise_type as 'cruiseType',
+                e.dict_note as 'cruiseTypeName',
+                n.unit,
+            (
+                CASE
+                    WHEN ISNULL(b.mete_name)
+                        AND ISNULL(c.inspection_id)
+                        AND ISNULL(d.preset_name) THEN
+                        ''
+                    WHEN ISNULL(b.mete_name)
+                        AND ISNULL(c.inspection_name) THEN
+                        d.preset_name
+                    WHEN ISNULL(b.mete_name)
+                        AND ISNULL(d.preset_img) THEN
+                        c.inspection_name
+                    WHEN ISNULL(c.inspection_name)
+                        AND ISNULL(d.preset_name) THEN
+                        b.mete_name
+                    WHEN ISNULL(c.inspection_name) THEN
+                        CONCAT(
+                                b.mete_name,
+                                ' /',
+                                d.preset_name
+                            )
+                    WHEN ISNULL(d.preset_name) THEN
+                        CONCAT(
+                                b.mete_name,
+                                ' /',
+                                c.inspection_name
+                            )
+                    END
+                ) AS instanceName
+        FROM
+            u_patrol_task_attr k
+                LEFT JOIN t_cruise_point_instance n ON k.instance_id = n.instance_id
+                LEFT JOIN t_dict_business e ON n.cruise_type=e.dict_code AND e.col_name='cruise_type'
+                LEFT JOIN t_std_device m on m.device_id = n.device_id
+                LEFT JOIN t_std_devicemete b ON n.device_mete_id = b.device_mete_id
+                LEFT JOIN t_robot_inspection c ON n.cruise_id = c.inspection_id
+                LEFT JOIN t_camera_preset d ON n.cruise_id = d.preset_id
+        WHERE
+            k.task_id = #{taskId,jdbcType=VARCHAR}
+        GROUP BY instanceId
+    </select>
 
 </mapper>

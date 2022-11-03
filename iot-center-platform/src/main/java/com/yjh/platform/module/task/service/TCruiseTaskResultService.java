@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.druid.util.StringUtils;
 import com.google.common.collect.Sets;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -11,6 +12,8 @@ import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
+import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.task.controller.HelloController;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
@@ -79,6 +82,9 @@ public class TCruiseTaskResultService {
 
     @Autowired
     private TCruiseResultDao tCruiseResultDao;
+
+    @Autowired
+    private UPatrolResultDao uPatrolResultDao;
 
     private Logger log = LoggerFactory.getLogger(HelloController.class);
 
@@ -154,7 +160,8 @@ public class TCruiseTaskResultService {
         Map<String, Object> resultsMap = new HashMap<>();
         CruiseInspectResult inspectResult = new CruiseInspectResult();
 
-        List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskIdYC(taskId);
+//        List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskIdYC(taskId);
+        List<CruiseInspectResult> cruiseInspectResults = uPatrolResultDao.selectCruiseInspectByTaskIdYC(taskId);
         List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null, "", "cruise_data_state", "", null, null, null);
         HashMap<String, String> tDictMap = new HashMap<>();
         for (TDictBusiness tDictBusiness:tDictBusinessList) tDictMap.put(tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
@@ -385,8 +392,11 @@ public class TCruiseTaskResultService {
         } else {
             rateAndTaskInfo.put("rate", cruiseComCount / cruiseCount);
         }
-        rateAndTaskInfo.put("taskState", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskState());
-        rateAndTaskInfo.put("taskStateName", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskStateName());
+        TaskSimpleInfo taskSimpleInfo = uPatrolResultDao.selectTaskStateByTaskId(taskId);
+//        rateAndTaskInfo.put("taskState", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskState());
+        rateAndTaskInfo.put("taskState", taskSimpleInfo.getTaskState());
+//        rateAndTaskInfo.put("taskStateName", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskStateName());
+        rateAndTaskInfo.put("taskStateName", taskSimpleInfo.getTaskStateName());
         return rateAndTaskInfo;
     }
 
@@ -407,7 +417,8 @@ public class TCruiseTaskResultService {
         Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
 
 
-        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
+//        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
+        Set<Long> instanceIds = uPatrolResultDao.selectInstanceIdByTask(taskId);
         for (Long instanceId : instanceIds) {
             deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
             deviceMeteIds.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
@@ -478,6 +489,38 @@ public class TCruiseTaskResultService {
 
         log.info("总点数：" + deviceMete.size()+", 已执行点数：" + deviceMeteComp.size());
 
+        return cruiseResultCounter;
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public CruiseResultCounter selectCruiseStatusCountNew(String taskId) throws ParseException {
+        CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
+        //计算运行时间
+
+        UPatrolResult result = uPatrolResultDao.selectByPrimaryId(taskId);
+        Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
+
+        if (Objects.nonNull(countResult)) {
+            //获取任务开始时间
+            String startTime = countResult.get("taskStart").toString();
+            Integer all = ValueUtil.toInteger(countResult.get("all"),0);
+            Integer normal = ValueUtil.toInteger(countResult.get("normal"),0);
+            Integer abnormal = ValueUtil.toInteger(countResult.get("abnormal"),0);
+            cruiseResultCounter.setAlarmCount(abnormal);
+            cruiseResultCounter.setCruisedCount(normal+abnormal);
+            cruiseResultCounter.setCruiseNotCount(all - abnormal -normal);
+            //将两个时间字符串转为日期类型
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date d1 = simpleDateFormat.parse(startTime);
+            String d2String = simpleDateFormat.format(new Date());
+            Date d2 = simpleDateFormat.parse(d2String);
+            cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
+        } else {
+            cruiseResultCounter.setCruisedCount(result.getTaskCount());
+            cruiseResultCounter.setAlarmCount(0);
+            cruiseResultCounter.setCruiseNotCount(0);
+            cruiseResultCounter.setRunningTime(Long.valueOf("0"));
+        }
         return cruiseResultCounter;
     }
 

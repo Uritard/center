@@ -245,7 +245,8 @@ public class TCruiseTaskResultController {
     public Result selectCruiseStatusCount(@RequestParam String taskId){
         Result result=new Result();
         try{
-            CruiseResultCounter cruiseResultCounter = tCruiseTaskResultService.selectCruiseStatusCount(taskId);
+//            CruiseResultCounter cruiseResultCounter = tCruiseTaskResultService.selectCruiseStatusCount(taskId);
+            CruiseResultCounter cruiseResultCounter = tCruiseTaskResultService.selectCruiseStatusCountNew(taskId);
             if (Objects.nonNull(cruiseResultCounter)) {
                 result.setData(cruiseResultCounter);
             } else {result.setMessage("巡检结果还未返回结果");}

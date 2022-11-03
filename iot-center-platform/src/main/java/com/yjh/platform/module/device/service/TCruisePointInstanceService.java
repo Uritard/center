@@ -7,6 +7,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
 import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
+import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
@@ -57,6 +58,8 @@ public class TCruisePointInstanceService{
 
     @Autowired
     private TVoiceDeviceDao tVoiceDeviceDao;
+    @Autowired
+    private UPatrolResultDao uPatrolResultDao;
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
@@ -490,12 +493,14 @@ public class TCruisePointInstanceService{
     public Map<String, Integer> selectCruiseCount(String taskId){
         Map<String,Integer>map=new HashMap<>();
         map.put("Count",this.tCruisePointInstanceDao.selectCruiseCount(taskId));
+        map.put("Count",uPatrolResultDao.selectCruiseCount(taskId));
         return map;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseCountOfType> selectCruiseCountByType(String taskId){
-        return this.tCruisePointInstanceDao.selectCruiseCountByType(taskId);
+//        return this.tCruisePointInstanceDao.selectCruiseCountByType(taskId);
+        return this.uPatrolResultDao.selectCruiseCountByType(taskId);
     }
     @Transactional(rollbackFor = Exception.class)
     public Map<Object,Object> selectCameraByDeviceMeteId(Long deviceMeteId){

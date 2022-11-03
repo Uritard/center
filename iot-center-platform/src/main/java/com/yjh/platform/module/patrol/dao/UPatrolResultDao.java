@@ -1,15 +1,14 @@
 package com.yjh.platform.module.patrol.dao;
 
+import com.yjh.platform.module.device.entity.CruiseCountOfType;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
-import com.yjh.platform.module.task.entity.AfterManualReviewInfo;
-import com.yjh.platform.module.task.entity.CruiseResultDetail;
-import com.yjh.platform.module.task.entity.TCruiseResultExpand;
-import com.yjh.platform.module.task.entity.TaskSimpleInfo;
+import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author lqh
@@ -102,5 +101,17 @@ public interface UPatrolResultDao {
      * @return int
      */
     int updateUPatrolResult(UPatrolResult uPatrolResult);
+
+    TaskSimpleInfo selectTaskStateByTaskId(@Param(value = "taskId")String taskId);
+
+    //统计当前任务下的巡检点数量
+    int selectCruiseCount(@Param(value = "taskId")String taskId);
+
+    //根据巡检点类型查询巡检点数量
+    List<CruiseCountOfType> selectCruiseCountByType(@Param(value = "taskId")String taskId);
+
+    Set<Long> selectInstanceIdByTask(@Param(value = "taskId")String taskId);
+
+    List<CruiseInspectResult> selectCruiseInspectByTaskIdYC(@Param(value = "taskId")String taskId);
 
 }
