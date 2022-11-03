@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
+import org.quartz.SchedulerException;
+import org.quartz.impl.StdScheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -61,16 +63,23 @@ public class TaskJob extends QuartzJobBean {
      */
     @Override
     public void executeInternal(JobExecutionContext context) {
+
         String taskId = context.getMergedJobDataMap().getString("taskId");
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
         //任务的执行时间
+        Date date = context.getFireTime();
         String taskDate = simpleDateFormat.format(context.getFireTime());
-        Date date = null;
+
         try {
-            date = simpleDateFormat.parse(taskDate);
-        } catch (Exception e) {
-            log.error("转换任务执行时间出错：", e);
+            Date startTime = context.getTrigger().getStartTime();
+            Date fireTime = context.getScheduledFireTime();
+            List<JobExecutionContext> jobs = context.getScheduler().getCurrentlyExecutingJobs();
+            log.info("任务开始执行, taskId: {}, startTime: {}, scheduledFireTime: {}, fireTime: {}, jobs: {}", taskId,
+                simpleDateFormat.format(startTime), simpleDateFormat.format(fireTime), taskDate, jobs.toArray());
+        } catch (SchedulerException e) {
+            log.error(e.getMessage(), e);
         }
+
         List<TCruiseTaskDel> tCruiseTaskDelList = tCruiseTaskDelDao.select(taskId, date, null);
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
             if (tCruiseTaskDelList != null && tCruiseTaskDelList.size() > 0) {
@@ -94,7 +103,7 @@ public class TaskJob extends QuartzJobBean {
         }
         log.info("任务 {} 开始执行", task.getTaskName());
         log.info("任务Id {} ", task.getTaskId());
-        log.info("任务执行时间 {} ", new Date());
+        log.info("任务执行时间 {}, fireTime: {} ", new Date(), taskDate);
         log.info("task.getStartTime {} ", task.getStartTime());
         List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
         initializeThisTaskInfo(task, allInstanceList);

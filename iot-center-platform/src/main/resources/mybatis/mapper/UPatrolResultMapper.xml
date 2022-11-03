@@ -739,4 +739,94 @@
         GROUP BY instanceId
     </select>
 
+    <!--巡视任务结果统计-->
+    <select id="taskStatistical"  resultType="com.yjh.platform.module.task.entity.StatisticalTools">
+        select
+        dict_code ,
+        dict_note ,
+        (select COUNT(*)
+        from u_patrol_result a,u_patrol_data_result b
+        where a.task_id = b.task_id
+        and task_type = dict_code
+        and a.execute_time BETWEEN #{start} and #{end}
+        ) AS "count"
+        from t_dict_business
+        where dict_code IN
+        (
+        select dict_code
+        from t_dict_business
+        where col_name = #{colName1}
+        )
+        ORDER BY dict_code
+    </select>
+
+    <select id="cruiseStatisticalByAbnormal" resultType="com.yjh.platform.module.task.entity.CruiseStatistical">
+        select
+        dict_code as cruise_abnormal,
+        dict_note as abnormal_type,
+        (
+        (select COUNT(*)
+        from u_patrol_data_result
+        WHERE  cruise_abnormal = dict_code)
+        +
+        (select COUNT(*)
+        from u_patrol_data_result
+        WHERE  remark = dict_code)
+        ) AS "count"
+        from t_dict_business
+        where dict_code IN
+        (
+        select dict_code
+        from t_dict_business
+        where col_name = 'abnormal_type'
+        )
+        ORDER BY dict_code;
+    </select>
+
+    <select id="cruiseInspectCount" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT
+        count(*)
+        FROM
+        t_std_devicemete
+        WHERE
+        device_mete_id IN (
+        SELECT DISTINCT
+        a.device_mete_id
+        FROM
+        u_patrol_task_attr a
+        WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+        )
+        UNION ALL
+        SELECT
+        count(*)
+        FROM
+        t_camera_info
+        WHERE
+        camera_id IN (
+        SELECT DISTINCT
+        c.camera_id
+        FROM
+        u_patrol_task_attr a
+        LEFT JOIN t_camera_preset c ON a.point_task_id = c.preset_id
+        WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+        )
+        UNION ALL
+        SELECT
+        count(*)
+        FROM
+        u_patrol_task_attr a
+        LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
+        WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+        AND c.cruise_type = 228
+        UNION ALL
+        SELECT
+        count(*)
+        FROM
+        u_patrol_task_attr a
+        WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
 </mapper>

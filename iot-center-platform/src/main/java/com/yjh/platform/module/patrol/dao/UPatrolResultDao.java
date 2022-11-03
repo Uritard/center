@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.device.entity.CruiseCountOfType;
+import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
@@ -114,4 +115,56 @@ public interface UPatrolResultDao {
 
     List<CruiseInspectResult> selectCruiseInspectByTaskIdYC(@Param(value = "taskId")String taskId);
 
+    /**
+     * 巡视任务结果统计
+     */
+    List<StatisticalTools> taskStatistical(@Param(value = "colName1")String colName1,
+        @Param(value = "start")String start,
+        @Param(value = "end")String end);
+
+    List<CruiseStatistical> cruiseStatisticalByAbnormal();
+
+    /**
+     * 查询巡视监控统计点(listIndex:0-任务下测点 1-任务下摄像头个数 2-任务下机器人点位 3-任务下巡视点个数)
+     *
+     */
+    List<Long> cruiseInspectCount(@Param(value = "taskId")String taskId);
+
+    List<UPatrolDataResult> selectCruiseDataResult(@Param(value = "taskId")String taskId);
+
+    List<CruiseManualReview> selectManualDetail(@Param(value = "taskResultId")String taskResultId);
+
+    int manualReview(CruiseManualReview cruiseManualReview);
+
+    int updateDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
+
+    TStdDevicemete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
+
+    int updateIsWarn(@Param(value = "cruiseDataId")Long cruiseDataId);
+
+    int updateWarnInfo(@Param(value = "warnId")Long warnId,
+        @Param(value = "warnName")String warnName,
+        @Param(value = "warnLevel")Integer warnLevel,
+        @Param(value = "warnContent")String warnContent,
+        @Param(value = "outRange")String outRange,
+        @Param(value = "dealPersonId")String dealPersonId,
+        @Param(value = "dealTime")Date dealTime);
+
+    int updateWarnInfo2(@Param(value = "warnId")Long warnId,
+        @Param(value = "dealPersonId")String dealPersonId,
+        @Param(value = "dealTime")Date dealTime);
+
+    int updateWarnInfo3(@Param(value = "warnId")Long warnId,
+        @Param(value = "dealPersonId")String dealPersonId,
+        @Param(value = "dealTime")Date dealTime);
+
+    List<Long> selectWarnId(@Param(value = "taskId")String taskId,
+        @Param(value = "instanceId")Long instanceId);
+
+    int updateCheck(@Param(value = "taskId")String taskId,
+        @Param(value = "checkUserName")String checkUserName,
+        @Param(value = "checkDate")Date checkDate,
+        @Param(value = "remark")String remark);
+
+    String selectAlgorithmType(@Param(value = "deviceMeteId") Long deviceMeteId);
 }

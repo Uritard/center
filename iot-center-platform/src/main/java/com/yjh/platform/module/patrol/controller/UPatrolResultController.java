@@ -30,7 +30,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/uPatrolResult/v1")
-@Api(value = "/tCruiseResult")
+@Api(value = "/uPatrolResult")
 public class UPatrolResultController {
 
     @Autowired
@@ -103,7 +103,7 @@ public class UPatrolResultController {
         }
         return result;
     }
-/*
+
     @ApiOperation(value = "巡视任务结果统计")
     @GetMapping(value = "/taskStatistical")
     @Logs(title = "巡视任务结果统计",content = "根据用户传递的参数统计巡视任务结果",logType = 1,authority = "1235")
@@ -133,7 +133,7 @@ public class UPatrolResultController {
         }
         return result;
     }
-    */
+
     @ApiOperation(value = "分页查询--巡视结果任务详情查询")
     @GetMapping(value = "/selectCruiseByPage")
    // @Logs(title = "巡视结果任务详情查询",content = "根据用户传递的参数查询巡视结果任务详情",logType = 1)
@@ -188,7 +188,6 @@ public class UPatrolResultController {
         }
         return result;
     }
-/*
 
     @ApiOperation(value = "分页查询--识别异常点位")
     @GetMapping(value = "/selectAbnormalResult")
@@ -294,6 +293,5 @@ public class UPatrolResultController {
         }
         return result;
     }
-*/
 
 }
