@@ -344,9 +344,8 @@
                a.identify_result,
                a.person_check,
                a.picpath
-        FROM u_patrol_data_result a u_patrol_result b
+        FROM u_patrol_data_result a
         WHERE 1 = 1
-          AND a.task_id = b.task_id
           and a.instance_id = #{instanceId}
           and a.task_id = #{taskId}
     </select>
@@ -828,5 +827,142 @@
         u_patrol_task_attr a
         WHERE
         a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
+
+    <update id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
+        update u_patrol_data_result set
+        <if test="personCheck != null ">person_check = #{personCheck},</if>
+        <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
+        evaluation_state = 256,
+        <if test="checkUser != null ">check_user = #{checkUser},</if>
+        <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
+        <if test="identifyState != null ">identify_state = #{identifyState,jdbcType=INTEGER}</if>
+        where cruise_data_id = #{cruiseDataId,jdbcType =BIGINT }
+    </update>
+
+    <update id="updateDeviceMeteUpdate">
+        update t_std_devicemete_update a <set>
+        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
+        <if test="updateTime != null">a.update_time = #{updateTime},</if>
+        <if test="cruiseResult != null ">a.cruise_result = #{cruiseResult},</if>
+        <if test="identifyResult != null ">a.identify_result = #{identifyResult},</if>
+        <if test="picPath != null">a.pic_path = #{picPath},</if>
+    </set>
+        where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectDeviceMeteInfo"  parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TStdDevicemete">
+        select
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.mete_id,
+        a.mete_kind,
+        a.mete_type,
+        a.mete_name,
+        a.device_type,
+        a.position_type,
+        a.unit,
+        a.alarm_note,
+        a.alarm_type,
+        a.up_effect,
+        a.down_effect,
+        a.state_zero,
+        a.state_one,
+        a.alarm_state,
+        a.alarm_level,
+        a.high_limit1,
+        a.low_limit1,
+        a.high_limit2,
+        a.low_limit2,
+        a.high_limit3,
+        a.low_limit3,
+        a.high_limit4,
+        a.low_limit4,
+        a.alarm_delay,
+        a.alarm_cnt,
+        a.threshold_abs,
+        a.threshold_per,
+        a.modulus,
+        a.remark
+        from t_cruise_point_instance b left join t_std_devicemete a
+        on b.device_mete_id=a.device_mete_id
+        where b.instance_id=#{instanceId,jdbcType=BIGINT}
+    </select>
+
+
+    <update id="updateCheck">
+        update t_cruise_result a <set>
+        <if test="checkUserName != null">a.check_user = #{checkUserName},</if>
+        a.check_date = #{checkDate, jdbcType=TIMESTAMP},
+        <if test="remark != null">a.remark = #{remark},</if>
+    </set>
+        where a.task_id = #{taskId, jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateWarnInfo">
+        UPDATE t_warn_info a <set>
+        <if test="warnName != null">a.warn_name = #{warnName},</if>
+        <if test="warnLevel != null">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
+        <if test="warnContent != null ">a.warn_content = #{warnContent},</if>
+        a.conf_mode = 275,
+        a.deal_type = #{dealType},
+        a.deal_info = "程序正常，告警属实",
+        <if test="outRange != null ">a.out_range = #{outRange},</if>
+        <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
+        a.deal_time = #{dealTime, jdbcType=TIMESTAMP}
+    </set>
+        WHERE
+        a.warn_id = #{warnId, jdbcType=BIGINT}
+    </update>
+
+    <update id="updateIsWarn" parameterType="java.lang.Long">
+        UPDATE u_patrol_data_result a <set>
+        a.is_warn = 1
+    </set>
+        WHERE
+        a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectWarnId" resultType="java.lang.Long">
+        SELECT a.warn_id
+        FROM
+        t_warn_info a
+        WHERE
+        a.task_id = #{taskId, jdbcType=VARCHAR}
+        and a.instance_id = #{instanceId,jdbcType = BIGINT}
+    </select>
+
+    <select id="selectAlgorithmType" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT a.analyse_type FROM t_std_devicemete a
+        WHERE a.device_mete_id = #{deviceMeteId, jdbcType = BIGINT}
+    </select>
+
+
+    <select id="selectCruiseDataResult" parameterType="java.lang.String" resultType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        SELECT
+        b.cruise_data_id,
+        b.cruise_result,
+        b.result_num
+        FROM
+        u_patrol_data_result b
+        WHERE 1 = 1
+        <if test="taskId != null ">and b.task_id = #{taskId,jdbcType=VARCHAR}</if>
+        and ISNULL(b.check_user)
+    </select>
+
+    <select id="selectManualDetail" resultType="com.yjh.platform.module.task.entity.CruiseManualReview">
+        SELECT
+        b.task_id,
+        b.cruise_data_id,
+        b.evaluation_state,
+        e.dict_note as evaluation_state_name,
+        b.check_user,
+        b.check_date
+        FROM u_patrol_data_result b
+        LEFT JOIN t_dict_business e on e.dict_code = b.evaluation_state
+        WHERE 1 = 1
+        <if test="taskResultId != null ">and b.task_id = #{taskResultId,jdbcType=VARCHAR}</if>
+
     </select>
 </mapper>

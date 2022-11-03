@@ -146,15 +146,8 @@ public interface UPatrolResultDao {
         @Param(value = "warnName")String warnName,
         @Param(value = "warnLevel")Integer warnLevel,
         @Param(value = "warnContent")String warnContent,
+        @Param(value = "dealType")int dealType,
         @Param(value = "outRange")String outRange,
-        @Param(value = "dealPersonId")String dealPersonId,
-        @Param(value = "dealTime")Date dealTime);
-
-    int updateWarnInfo2(@Param(value = "warnId")Long warnId,
-        @Param(value = "dealPersonId")String dealPersonId,
-        @Param(value = "dealTime")Date dealTime);
-
-    int updateWarnInfo3(@Param(value = "warnId")Long warnId,
         @Param(value = "dealPersonId")String dealPersonId,
         @Param(value = "dealTime")Date dealTime);
 
