@@ -1,6 +1,10 @@
 package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
+import com.yjh.platform.module.task.entity.BrokenLineInfo;
+import com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo;
+import com.yjh.platform.module.task.entity.TCruiseDataResult;
+import com.yjh.platform.module.task.entity.TStdDeviceMeteUpdate;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -58,4 +62,33 @@ public interface UPatrolDataResultDao {
 
     int batchAdd(List<UPatrolDataResult> list);
     int batchDelete(List<String> list);
+
+    List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList2(@Param(value = "cruiseType") Integer cruiseType,
+        @Param(value = "cType") Integer cType,
+        @Param(value = "deviceMeteId") Long deviceMeteId,
+        @Param(value = "meteType") String meteType,
+        @Param(value = "meterType") Integer meterType,
+        @Param(value = "endTime") String endTime,
+        @Param(value = "startTime") String startTime);
+
+    List<CruiseResultAnalyzeInfo> selectCruiseDataReport(@Param(value = "cType") Integer cType,
+        @Param(value = "meteType") String meteType,
+        @Param(value = "meterType") Integer meterType,
+        @Param(value = "endTime") String endTime,
+        @Param(value = "startTime") String startTime,
+        @Param(value = "list") List<Long> list,
+        @Param(value = "instanceName") String instanceName);
+
+    List<BrokenLineInfo> selectBrokenLine(@Param(value = "cruiseType") Integer cruiseType,
+        @Param(value = "cType") Integer cType,
+        @Param(value = "deviceMeteId") Long deviceMeteId,
+        @Param(value = "startTime") String startTime,
+        @Param(value = "endTime") String endTime,
+        @Param(value = "meteType") String meteType,
+        @Param(value = "meterType") Integer meterType);
+
+    List<TCruiseDataResult> selectByCameraId(@Param(value = "cameraId")Long cameraId,
+        @Param(value = "startDate")String startDate,
+        @Param(value = "endDate")String endDate,
+        @Param(value = "firName")String firName);
 }

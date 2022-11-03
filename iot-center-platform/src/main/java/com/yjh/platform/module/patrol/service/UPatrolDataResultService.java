@@ -1,0 +1,136 @@
+package com.yjh.platform.module.patrol.service;
+
+import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.patrol.dao.UPatrolDataResultDao;
+import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
+import com.yjh.platform.module.task.entity.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * @author czh
+ * @since 2020-08-25
+ */
+@Service
+public class UPatrolDataResultService {
+
+    private final UPatrolDataResultDao uPatrolDataResultDao;
+    private final TStdDevicemeteDao tStdDevicemeteDao;
+
+    @Autowired
+    public UPatrolDataResultService(UPatrolDataResultDao uPatrolDataResultDao, TStdDevicemeteDao tStdDevicemeteDao) {
+        this.uPatrolDataResultDao = uPatrolDataResultDao;
+        this.tStdDevicemeteDao = tStdDevicemeteDao;
+    }
+
+    private Logger log = LoggerFactory.getLogger(UPatrolDataResultService.class);
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<CruiseResultAnalyzeMeteInfo> selectCruiseResultAnalyze(List<Long> deviceIdList, Integer deviceType, String meteType, Integer meterType, Integer cruiseRes,Long customId) {
+        List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
+        if (deviceIdList != null && !deviceIdList.isEmpty()) {
+            //cruiseRes:-1全部,1正常,0异常
+            if (cruiseRes == 1) {
+                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList, deviceType, meteType, meterType, cruiseRes,customId);
+            } else {
+                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze2(deviceIdList, deviceType, meteType, meterType, cruiseRes,customId);
+            }
+            for (CruiseResultAnalyzeMeteInfo item : cruiseResultAnalMeteInfoList) {
+                if (item.getFinalState() == 246 || item.getFinalState() == 261) {
+                    item.setFinalState(1);
+                } else {
+                    item.setFinalState(0);
+                }
+            }
+        }
+        return cruiseResultAnalMeteInfoList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName) {
+        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
+        if (deviceIdList != null && !deviceIdList.isEmpty()) {
+            cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName);
+            for (CruiseResultAnalyzeInfo cRAI : cruiseResultAnalyzeInfoList) {
+                if (Objects.isNull(cRAI.getIdentifyResult())) {
+                    cRAI.setIdentifyResultName(cRAI.getCruiseResultName());
+                }
+                if (Objects.isNull(cRAI.getPersonCheck())) {
+                    cRAI.setPersonCheck(cRAI.getResultNum());
+                }
+            }
+        }
+        return cruiseResultAnalyzeInfoList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<CruiseResultAnalyzeInfo> selectCruiseDataResultByList2(Integer cruiseType, Integer cType, Long deviceMeteId, String meteType, Integer meterType, String endTime, String startTime, int pageNum, int pageSize) {
+
+        List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType, meterType, endTime, startTime);
+        for (CruiseResultAnalyzeInfo cruiseResultAnalInfo : cruiseResultAnalyzeInfoList) {
+            if (Objects.isNull(cruiseResultAnalInfo.getIdentifyResult())) {
+                cruiseResultAnalInfo.setIdentifyResultName(cruiseResultAnalInfo.getCruiseResultName());
+            }
+            if (Objects.isNull(cruiseResultAnalInfo.getPersonCheck())) {
+                cruiseResultAnalInfo.setPersonCheck(cruiseResultAnalInfo.getResultNum());
+            }
+        }
+
+        return cruiseResultAnalyzeInfoList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<BrokenLineInfo> selectBrokenLine(Integer cruiseType,
+                                                 Integer cType,
+                                                 Long deviceMeteId,
+                                                 String startTime,
+                                                 String endTime,
+                                                 String meteType,
+                                                 Integer meterType) {
+
+        List<BrokenLineInfo> brokenLineInfos = uPatrolDataResultDao.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime, meteType, meterType);
+        for (BrokenLineInfo point : brokenLineInfos) {
+            if (point.getResultNum().matches("^[a-zA-Z_\\u4e00-\\u9fa5_\\--]+$")) {
+                point.setResultNum("0");
+            }
+        }
+        return brokenLineInfos;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<FirAndPicInfo> selectByCameraId(Long cameraId, String startDate, String endDate, String firName) {
+        List<FirAndPicInfo> listFir = new ArrayList<>();
+        List<TCruiseDataResult> list = uPatrolDataResultDao.selectByCameraId(cameraId,startDate,endDate,firName);
+        for (TCruiseDataResult t : list) {
+            if (t.getResultPic() != null && t.getResultPic() != "" &&!t.getResultPic().isEmpty()) {
+                File file = new File(t.getResultPic());
+                FirAndPicInfo f = new FirAndPicInfo();
+                f.setCruiseDataId(t.getCruiseDataId());
+                String[] arr = file.getParent().split("/");
+                f.setPicPath(arr[0] + "//" + arr[1] + "/" + arr[2] + "/resultImg" + "/" + t.getFirName() + ".jpg");
+                f.setFirPath(t.getResultPic());
+                f.setFirName(t.getFirName());
+                if (t.getFirDate()!=null){
+                    f.setDateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(t.getFirDate()));
+                }
+                else {
+                    f.setDateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                }
+                listFir.add(f);
+            }
+        }
+        return listFir;
+    }
+
+}
+
