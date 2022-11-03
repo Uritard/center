@@ -47,37 +47,41 @@
         tr.robot_id robotId,
         tr.robot_code robotCode,
         tr.robot_name robotName,
-        DATE_FORMAT(
-        tr.commission_date,
-        '%Y-%m-%d %H:%i:%s'
-        ) commissionDate,
-        TO_DAYS(NOW()) - TO_DAYS(tr.`commission_date`) + 1 commissionDay,
-        (SELECT
+        tr.commission_date commissionDate,
+        TO_DAYS(CURDATE()) currentDays,
+        TO_DAYS(tr.`commission_date`) commissionDays,
         COUNT(
-        DISTINCT DATE_FORMAT(tcdr.`createtime`, '%Y-%m-%d')
-        )) cruiseDay,
-        TO_DAYS(NOW()) - TO_DAYS(tr.`commission_date`) - COUNT(
-        DISTINCT DATE_FORMAT(ta.alarm_time, '%Y-%m-%d')
-        ) + 1 normalDay
+        DISTINCT DAY(tcdr.`createtime`)
+        ) cruiseDay
         FROM
         t_robot_info tr
-        LEFT JOIN t_robot_alarm ta
-        ON ta.`robot_id` = tr.`robot_id`
-        AND (
-        ta.alarm_time IS NULL
-        OR ta.alarm_time >= tr.commission_date
-        )
-        LEFT JOIN t_robot_inspection tri
-        ON tri.robot_id = tr.robot_id
-        LEFT JOIN `t_cruise_point_instance` tcpi
-        ON tcpi.cruise_id = tri.inspection_id
-        LEFT JOIN `t_cruise_data_result` tcdr
-        ON tcdr.`cruise_id` = tcpi.`instance_id` AND tr.commission_date <![CDATA[<=]]> tcdr.`createtime`
-        WHERE tr.commission_date IS TRUE
+        JOIN t_robot_info ON tr.robot_id = t_robot_info.robot_id
         AND tr.commission_date <![CDATA[<=]]> NOW()
         AND tr.robot_type IS TRUE
+        AND tr.commission_date IS TRUE
+        LEFT JOIN t_robot_inspection tri ON tri.robot_id = tr.robot_id
+        LEFT JOIN `t_cruise_point_instance` tcpi ON tcpi.cruise_id = tri.inspection_id
+        LEFT JOIN `t_cruise_data_result` tcdr ON tcdr.`cruise_id` = tcpi.`instance_id`
+        AND tr.commission_date <![CDATA[<=]]> tcdr.`createtime`
+        WHERE 1=1
         <if test="robotId != null and robotId != ''">and tr.robot_id = #{robotId, jdbcType=BIGINT}</if>
-        GROUP BY robotId
+        GROUP BY
+        robotId
+    </select>
+
+    <select id="selectNormalDayRobot" resultType="java.util.Map">
+        SELECT
+        tr.robot_id robotId,
+        COUNT(DISTINCT DAY(ta.alarm_time)) normalDay
+        FROM
+        t_robot_alarm ta
+        JOIN t_robot_info tr ON tr.robot_id = ta.robot_id
+        WHERE
+        ta.alarm_time >= tr.commission_date
+        OR ta.alarm_time IS NULL
+        <if test="robotId != null and robotId != ''">and tr.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        GROUP BY
+        robotId
     </select>
 
     <select id="selectStatisticsDrone" resultType="java.util.Map">

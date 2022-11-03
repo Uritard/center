@@ -273,10 +273,13 @@ public class CruiseTaskJob extends QuartzJobBean {
                         RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
                         robotTaskInfo.setCruiseType(tCruiseTask.getType());
                         robotTaskInfo.setTaskId(taskId);
+                        robotTaskInfo.setPlanCode(tCruiseTask.getPlanCode());
                         robotTaskInfo.setPriority(tCruiseTask.getTaskLevel());//优先级
                         robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
                         List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
                         robotTaskInfo.setInstanceList(robotTaskInstanceList);
+                        // 上层控制任务调度  方式就是立即
+                        robotTaskInfo.setIfRun("173");
                         robotTaskInfo.setRobotCode(item);
                         robotTaskInfo.setFixedStartTime(simpleDateFormat.format(new Date()));
                         robotTaskInfoList.add(robotTaskInfo);
@@ -286,8 +289,12 @@ public class CruiseTaskJob extends QuartzJobBean {
 
                     log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
                     //让机器人做任务
-                    if (!taskToRobot && tCruiseTask.getIfRun() == 172){
+                    TCruiseTask tCruiseTaskTemp = tCruiseTaskDao.selectCruiseTask(tCruiseTask.getTaskCode(), tCruiseTask.getTaskCode());
+                    log.info("tCruiseTaskTemp=={}", tCruiseTaskTemp);
+                    boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
+                    if (moreTime && tCruiseTaskTemp.getIfRun() == 172){
                         robotTask(robotTaskInfoMap);
+                        log.info("下发成功！！！");
                     }
                 }
 
@@ -1146,14 +1153,14 @@ public class CruiseTaskJob extends QuartzJobBean {
 
     //让机器人做任务
     private void robotTask(Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap) {
-//        try {
-//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-//            if (null != serviceRestTemplate) {
-//                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
-//            }
-//        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
-//        }
+        try {
+            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            if (null != serviceRestTemplate) {
+                serviceRestTemplate.postForObject(ROBOT_TASK_URL, robotTaskInfoMap, String.class);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     //红外相机抓图

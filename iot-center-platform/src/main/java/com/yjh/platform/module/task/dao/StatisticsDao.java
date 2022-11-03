@@ -27,6 +27,13 @@ public interface StatisticsDao {
   List<Map<String, Object>> selectStatisticsRobot(@Param(value = "robotId") Long robotId);
 
   /**
+   * 查询机器人正常天数
+   *
+   * @return
+   */
+  List<Map<String, Object>> selectNormalDayRobot(@Param(value = "robotId") Long robotId);
+
+  /**
    * 查询无人机总天数，告警异常天数，正常天数，drone_type 非空
    *
    * @return

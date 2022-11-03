@@ -1134,10 +1134,9 @@ public class RobotService {
                     return result;
                 }else {
                     String taskId = robotTaskControlMap.get("taskId").toString();
-                    String robotTaskId = taskId;
-                    if ("true".equals(redisTemplate.opsForValue().get("RobotTask.taskToRobot"))) {
-                        robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
-                    }
+                    // taskId是巡视主机的id,robotTaskId是机器人上报的id
+                    String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + robotTaskId);
                     String tasSkPatrolledId = redisInfoMap.get("taskPatrolled_id");
                     String code = flag ? "1".equals(commandValue) ? taskId : tasSkPatrolledId : taskId;

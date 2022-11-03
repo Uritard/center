@@ -496,10 +496,9 @@ public class TCruiseTaskService {
             List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
             log.info("robotCode : {}", robotCode);
             String[] cycleExecuteTimeArray = tCruiseTaskAdd.getCycleExecuteTime().split(",");
-
-            for (int i = 0; i < cycleExecuteTimeArray.length; i++) {
-                tCruiseTaskAdd.setCycleExecuteTime(cycleExecuteTimeArray[i]);
-
+            if (cycleExecuteTimeArray.length > 1){
+                log.info("这种格式的周期任务走上层任务调度");
+            }else {
                 List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
                 for (String item : robotCode) {
                     Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
