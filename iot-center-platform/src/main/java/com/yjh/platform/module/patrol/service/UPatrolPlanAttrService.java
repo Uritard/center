@@ -77,6 +77,8 @@ public class UPatrolPlanAttrService {
                     .setDeviceName(tCruisePointInstanceAttr.getDeviceName())
                     .setDeviceMeteId(tCruisePointInstanceAttr.getDeviceMeteId())
                     .setDeviceMeteName(tCruisePointInstanceAttr.getDeviceMeteName())
+                    .setInstanceId(tCruisePointInstanceAttr.getInstanceId())
+                    .setInstanceName(tCruisePointInstanceAttr.getInstanceName())
                     .setPositionId(tCruisePointInstanceAttr.getCruiseId())
                     .setPositionName(tCruisePointInstanceAttr.getCruiseName())
                     .setPointType(tCruisePointInstanceAttr.getCruiseType())
@@ -86,6 +88,9 @@ public class UPatrolPlanAttrService {
                 uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
                 uPatrolPlanAttrList = new ArrayList<>();
             }
+        }
+        if (uPatrolPlanAttrList.size() > 0){
+            uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
         }
         return 1;
     }
@@ -132,10 +137,9 @@ public class UPatrolPlanAttrService {
         List<Long> instanceList = (List<Long>) planDetailMap.get("instanceList");
         if (instanceList.size() == 0) return ResultCodeEnum.CODE10010.getCode();
 
-        List<TCruisePointInstanceAttr> tCruisePointInstanceAttrList = tCruisePointInstanceDao.batchSelectInstanceAttr(instanceList);
-
+        List<TCruisePointInstanceAttr> tCruisePointInstanceAttrList = tCruisePointInstanceDao.selectInstanceAttrInfo(instanceList);
+        this.uPatrolPlanAttrDao.deleteByPrimaryId(planId);
         List<UPatrolPlanAttr> uPatrolPlanAttrList = new ArrayList<>();
-        Date date = new Date();
         for (TCruisePointInstanceAttr tCruisePointInstanceAttr : tCruisePointInstanceAttrList) {
             UPatrolPlanAttr uPatrolPlanAttr = new UPatrolPlanAttr();
             uPatrolPlanAttr.setPlanId(planId)
@@ -144,14 +148,17 @@ public class UPatrolPlanAttrService {
                     .setDeviceMeteId(tCruisePointInstanceAttr.getDeviceMeteId())
                     .setDeviceMeteName(tCruisePointInstanceAttr.getDeviceMeteName())
                     .setPositionId(tCruisePointInstanceAttr.getCruiseId())
+                    .setInstanceId(tCruisePointInstanceAttr.getInstanceId())
+                    .setInstanceName(tCruisePointInstanceAttr.getInstanceName())
                     .setPositionName(tCruisePointInstanceAttr.getCruiseName())
                     .setPointType(tCruisePointInstanceAttr.getCruiseType())
                     .setRobotId(tCruisePointInstanceAttr.getRobotId());
             uPatrolPlanAttrList.add(uPatrolPlanAttr);
+            if (uPatrolPlanAttrList.size()%2000 == 0) {
+                uPatrolPlanAttrDao.batchAdd(uPatrolPlanAttrList);
+                uPatrolPlanAttrList = new ArrayList<>();
+            }
         }
-        this.uPatrolPlanAttrDao.deleteByPrimaryId(planId);
-//        this.tCruisePlanDao.update(tCruisePlan);
-
         Map<String, Object> map = new HashMap<>();
         map.put("planId", planId);
         map.put("planName", String.valueOf(planDetailMap.get("planName")));

@@ -4,6 +4,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.quartz.TaskJob;
 import org.quartz.*;
 import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
@@ -290,7 +291,7 @@ public class JobManager {
             logger.error(" Job already exist");
             return "false";
         }
-        JobDetail jobDetail = JobBuilder.newJob(CruiseTaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
+        JobDetail jobDetail = JobBuilder.newJob(TaskJob.class).withIdentity(quartzTask.getJobName(), quartzTask.getJobGroup()).
                 usingJobData("taskId", task.getTaskId()).build();
         taskMap.put("taskId",task.getTaskId());
         taskMap.put("jobName",quartzTask.getJobName()+System.currentTimeMillis());
@@ -306,13 +307,13 @@ public class JobManager {
                     .withSchedule(cronSchedule(quartzTask.getCronExpression()))
                     .build();
         } else if (task.getExecuteType() ==CruiseConstant.TaskTypeEnum.NOW.getType()) {
+//            trigger = TriggerBuilder.newTrigger().
             trigger = TriggerBuilder.newTrigger()
-                    .withIdentity(quartzTask.getJobName()+System.currentTimeMillis(), quartzTask.getJobGroup())
+                    .withIdentity(str, quartzTask.getJobGroup())
                     .startNow()
                     .withSchedule(
                             SimpleScheduleBuilder.simpleSchedule()
-                                    .withIntervalInSeconds(3)
-                                    .withRepeatCount(0))
+                                    .withMisfireHandlingInstructionFireNow())
                     .build();
         } else if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.TIME.getType()) {
             trigger = TriggerBuilder.newTrigger()
@@ -320,8 +321,7 @@ public class JobManager {
                     .startAt(quartzTask.getStartTime())
                     .withSchedule(
                             SimpleScheduleBuilder.simpleSchedule()
-                                    .withIntervalInSeconds(3)
-                                    .withRepeatCount(0))
+                                    .withMisfireHandlingInstructionFireNow())
                     .build();
         }
 

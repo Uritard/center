@@ -192,7 +192,7 @@ public class UPatrolTaskController {
             }
             uPatrolTask.setTaskName(tCruiseTaskAdd.getTaskName())
                     .setPlanId(tCruiseTaskAdd.getPlanId())
-                    .setTaskCode(tCruiseTaskAdd.getpCode())
+                    .setTaskCode(tCruiseTaskAdd.getTaskCode())
                     .setAreaId(tCruiseTaskAdd.getAreaId())
                     .setTaskType(tCruiseTaskAdd.getTaskType())
                     .setExecuteType(tCruiseTaskAdd.getIfRun())

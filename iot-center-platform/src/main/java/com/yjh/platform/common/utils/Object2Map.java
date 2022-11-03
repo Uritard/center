@@ -4,6 +4,9 @@ package com.yjh.platform.common.utils;
  * @author lqh
  * @since 2020/9/27
  */
+
+import com.yjh.commons.ValueUtil;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +37,8 @@ public class Object2Map {
             for (Field field : declaredFields) {
                 field.setAccessible(true);
                 if (keepNullVal == true) {
-                    map.put(field.getName(), field.get(obj).toString());
+                    map.put(field.getName(),
+                            field.get(obj) == null || "".equals(field.get(obj).toString())?"null":field.get(obj).toString());
                 } else {
                     if (field.get(obj) != null && !"".equals(field.get(obj).toString())) {
                         map.put(field.getName(), field.get(obj).toString());

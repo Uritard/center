@@ -109,19 +109,14 @@
             <if test="taskCount != null and taskCount != ''">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
             <if test="taskWait != null and taskWait != ''">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
             <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
-            <if test="checkDate != null and checkDate != ''">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
+            <if test="checkDate != null">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
             <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
-            <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-            <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP},</if>
-            <if test="executeTime != null and executeTime != ''">a.execute_time = #{executeTime, jdbcType=TIMESTAMP},
-            </if>
+            <if test="createTime != null">a.create_time = #{createTime},</if>
+            <if test="endTime != null">a.end_time = #{endTime},</if>
+            <if test="executeTime != null">a.execute_time = #{executeTime},</if>
             <if test="isReview != null and isReview != ''">a.is_review = #{isReview, jdbcType=VARCHAR},</if>
-            <if test="taskAbnormal != null and taskAbnormal != ''">a.task_abnormal =
-                #{taskAbnormal, jdbcType=INTEGER},
-            </if>
-            <if test="cruiseResult != null and cruiseResult != ''">a.cruise_result =
-                #{cruiseResult, jdbcType=INTEGER},
-            </if>
+            <if test="taskAbnormal != null and taskAbnormal != ''">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
+            <if test="cruiseResult != null and cruiseResult != ''">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
             <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
         </set>
         where a.task_id = #{taskId, jdbcType=VARCHAR}
@@ -199,11 +194,11 @@
         <if test="taskCount != null and taskCount != ''">and a.task_count = #{taskCount, jdbcType=INTEGER}</if>
         <if test="taskWait != null and taskWait != ''">and a.task_wait = #{taskWait, jdbcType=INTEGER}</if>
         <if test="checkUser != null and checkUser != ''">and a.check_user = #{checkUser, jdbcType=VARCHAR}</if>
-        <if test="checkDate != null and checkDate != ''">and a.check_date = #{checkDate, jdbcType=TIMESTAMP}</if>
+        <if test="checkDate != null">and a.check_date = #{checkDate, jdbcType=TIMESTAMP}</if>
         <if test="weather != null and weather != ''">and a.weather = #{weather, jdbcType=VARCHAR}</if>
-        <if test="createTime != null and createTime != ''">and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
-        <if test="endTime != null and endTime != ''">and a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime, jdbcType=TIMESTAMP}
+        <if test="createTime != null">and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="endTime != null">and a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="executeTime != null">and a.execute_time = #{executeTime, jdbcType=TIMESTAMP}
         </if>
         <if test="isReview != null and isReview != ''">and a.is_review = #{isReview, jdbcType=VARCHAR}</if>
         <if test="taskAbnormal != null and taskAbnormal != ''">and a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER}
@@ -255,11 +250,11 @@
         <if test="taskCount != null and taskCount != ''">and a.task_count = #{taskCount, jdbcType=INTEGER}</if>
         <if test="taskWait != null and taskWait != ''">and a.task_wait = #{taskWait, jdbcType=INTEGER}</if>
         <if test="checkUser != null and checkUser != ''">and a.check_user = #{checkUser, jdbcType=VARCHAR}</if>
-        <if test="checkDate != null and checkDate != ''">and a.check_date = #{checkDate, jdbcType=TIMESTAMP}</if>
+        <if test="checkDate != null and">and a.check_date = #{checkDate, jdbcType=TIMESTAMP}</if>
         <if test="weather != null and weather != ''">and a.weather = #{weather, jdbcType=VARCHAR}</if>
-        <if test="createTime != null and createTime != ''">and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
-        <if test="endTime != null and endTime != ''">and a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
-        <if test="executeTime != null and executeTime != ''">and a.execute_time = #{executeTime, jdbcType=TIMESTAMP}
+        <if test="createTime != null">and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="endTime != null">and a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="executeTime != null">and a.execute_time = #{executeTime, jdbcType=TIMESTAMP}
         </if>
         <if test="isReview != null and isReview != ''">and a.is_review = #{isReview, jdbcType=VARCHAR}</if>
         <if test="taskAbnormal != null and taskAbnormal != ''">and a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER}
@@ -378,11 +373,11 @@
         FROM u_patrol_result a
         JOIN t_dict_business d ON a.task_type = d.dict_code and d.col_name = 'plan_type'
         LEFT JOIN t_dict_business e ON a.task_state = e.dict_code and e.col_name='task_state'
-        -- LEFT JOIN u_patrol_data_result f ON a.task_id = f.task_id
+        LEFT JOIN u_patrol_data_result f ON a.task_id = f.task_id
         <if test="deviceType != -1">
-            LEFT JOIN t_std_device j on g.device_id = j.device_id
+            LEFT JOIN t_std_device j on f.device_id = j.device_id
         </if>
-        LEFT JOIN t_cruise_point_instance m on m.instance_id = g.instance_id
+        LEFT JOIN t_cruise_point_instance m on m.instance_id = f.instance_id
         LEFT JOIN t_std_devicemete k on k.device_mete_id = m.device_mete_id
         where 1 = 1
         <if test="taskName != null and taskName != ''">and a.task_name like
@@ -397,7 +392,7 @@
             #{endDate, jdbcType=TIMESTAMP}
         </if>
 
-        <if test="list != null and list.size() > 0">and g.device_id IN
+        <if test="list != null and list.size() > 0">and f.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
@@ -411,7 +406,7 @@
         <if test="isCheck != null and isCheck == 1">and a.check_user is null</if>
         <if test="isCheck != null and isCheck == 2">and a.check_user is not null</if>
 
-        and a.c_state != 239 and a.c_state != 241
+        and a.task_state != 239 and a.task_state != 241
         GROUP BY task_id
         order by a.execute_time desc
     </select>
@@ -620,10 +615,9 @@
         d.task_type as Type,
         d.task_state as 'taskState', b.dict_note AS 'taskStateName', e.dict_note AS 'typeName'
         FROM u_patrol_result d
-        JOIN t_dict_business e ON d.task_type = e.dict_code AND e.col_name = 'plan_type'
+        left JOIN t_dict_business e ON d.task_type = e.dict_code AND e.col_name = 'plan_type'
         LEFT JOIN t_dict_business b ON d.task_state = b.dict_code AND b.col_name = 'task_state'
         WHERE d.task_state in (239, 241)
-          AND d.robot_id IS NULL
         ORDER BY d.create_time DESC
     </select>
 

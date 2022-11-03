@@ -183,8 +183,8 @@
             plan_id,
             device_id,
             device_name,
-        a.device_mete_id,
-        a.device_mete_name,
+        device_mete_id,
+        device_mete_name,
             instance_id,
             instance_name,
             position_id,
@@ -232,6 +232,41 @@
         from u_patrol_plan_attr a
         where 1 = 1
           and a.plan_id = #{planId, jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TCruisePlanAttrDetail">
+        SELECT
+            a.plan_id,
+            a.instance_id,
+            (CASE
+                 WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN ''
+                 WHEN ISNULL(h.mete_name) AND ISNULL(f.inspection_name) THEN g.preset_name
+                 WHEN ISNULL(h.mete_name) AND ISNULL(g.preset_name) THEN f.inspection_name
+                 WHEN ISNULL(f.inspection_name) AND ISNULL(g.preset_name) THEN h.mete_name
+                 WHEN ISNULL(f.inspection_name) THEN CONCAT(h.mete_name,'/',g.preset_name)
+                 WHEN ISNULL(g.preset_name) THEN CONCAT(h.mete_name,'/',f.inspection_name)
+                END) AS instance_name,
+            a.device_id,
+            a.device_name,
+            b.custom_id,
+            b.text_desc AS behavior,
+            i.dict_note AS custom_name,
+            b.cruise_type,
+            e.dict_note AS cruise_type_name,
+            a.point_type,
+            a.area_id,
+            a.create_time,
+            a.update_time
+        FROM u_patrol_plan_attr a
+        LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
+        LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
+        LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
+        LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
+        LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id
+        LEFT JOIN t_std_devicemete h ON h.device_mete_id = b.device_mete_id
+        LEFT JOIN t_dict_business i ON i.dict_code = b.custom_id AND i.col_name = "custom_type"
+        where 1 = 1
+          and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY b.device_id, b.custom_id,a.instance_id
     </select>
 
 </mapper>

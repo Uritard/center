@@ -239,7 +239,7 @@
             result.task_id
         from u_patrol_result result
                  left join u_patrol_task task on task.task_id = result.task_id
-        where result.c_state = 239  and task.task_level &lt; #{taskLevel}
+        where result.task_state = 239  and task.task_level &lt; #{taskLevel}
     </select>
 
     <select id="selectInsByTask" resultType="java.lang.Long">

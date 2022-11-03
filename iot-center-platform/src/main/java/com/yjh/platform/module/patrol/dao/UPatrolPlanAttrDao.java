@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
+import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -36,4 +37,5 @@ public interface UPatrolPlanAttrDao {
     int batchAdd(List<UPatrolPlanAttr> list);
     int batchDelete(List<String> list);
     List<Long> seletcInsByPlan (@Param(value = "planId") Long planId);
+    List<TCruisePlanAttrDetail> selectByPrimaryId(@Param(value = "planId") Long planId);
 }
