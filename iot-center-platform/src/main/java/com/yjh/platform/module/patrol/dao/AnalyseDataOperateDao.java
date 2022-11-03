@@ -89,4 +89,6 @@ public interface AnalyseDataOperateDao {
     String selectPMSByCameraId(@Param(value = "cameraId") Long cameraId);
 
     String selectAnalyseType(@Param(value = "instanceId") Long instanceId);
+
+    String selectMaterialId(@Param(value = "deviceId") Long deviceId);
 }

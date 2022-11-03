@@ -841,6 +841,15 @@ public class AnalyseDataOperateService {
         return analyseDataOperateDao.selectWarnInfo(deviceMeteId);
     }
 
+    /**
+     * 查询实物ID
+     * @return List<String>
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public String selectMaterialId(Long deviceId) {
+        return analyseDataOperateDao.selectMaterialId(deviceId);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public Long selectCurrentWarn(){
         return analyseDataOperateDao.selectCurrentWarn();

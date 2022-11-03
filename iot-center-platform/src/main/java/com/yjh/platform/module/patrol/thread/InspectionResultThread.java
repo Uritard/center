@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
  * @author YC
@@ -41,7 +42,6 @@ public class InspectionResultThread implements Runnable{
     private final Map<String, String> infoMap;
     private final UPatrolTaskService uPatrolTaskService;
     private final AbstractVideoCruise abstractVideoCruise;
-    public static final String PATROL_TASK_PREFIX = "patrol_task_result:";
 
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
                                   RedisTemplate redisTemplate, boolean changeTaskStatus){
@@ -275,14 +275,11 @@ public class InspectionResultThread implements Runnable{
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
-            // webSocket通知前端调用巡视监控的接口
             Map<String, String> jasonMap = new HashMap<>(2);
             jasonMap.put("type", "finishedOneInstance");
             jasonMap.put("taskId", taskId);
             log.info("做完一个点-前端推送：{}", JSON.toJSONString(jasonMap));
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
-
-            // todo：巡视结果上报上一级系统
 
             uPatrolTaskService.patrolTaskResultHandler(taskId, details.getInstanceId());
         }catch (Exception e){

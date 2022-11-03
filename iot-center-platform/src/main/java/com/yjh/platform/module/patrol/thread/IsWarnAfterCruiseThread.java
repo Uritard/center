@@ -32,6 +32,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
+
 /**
  * @author YC
  * @date 2020/12/18 15:38
@@ -197,7 +199,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
                 String month = Integer.toString(LocalDate.now().getMonthValue());
                 String taskidbak = warnMap.get("taskId");
                 String instanceIdbak = warnMap.get("instanceId");
-                Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskidbak + ":" + instanceIdbak);
+                Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskidbak + ":" + instanceIdbak);
                 String devicename= threadMap.get("deviceName");
                 alarm.setDevice_name(devicename);
                 String origpicpath = cruiseResult2.get("origpic").toString();

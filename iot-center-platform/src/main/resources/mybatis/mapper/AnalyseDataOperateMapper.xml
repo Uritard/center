@@ -1054,4 +1054,13 @@
         WHERE
             a.instance_id = #{instanceId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectMaterialId" resultType="java.lang.String">
+        SELECT
+            a.real_code
+        FROM
+            t_std_device_attr a
+        WHERE
+            a.device_id = #{deviceId, jdbcType=BIGINT}
+    </select>
 </mapper>

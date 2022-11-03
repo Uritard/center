@@ -450,7 +450,7 @@ public class DataDealThread implements Runnable {
 
                                                     // 告警上报站端
                                                     StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
-                                                            jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult, alarm_level, tWarnInfo);
+                                                            jsonObjectResult.getString("analyseType"), cruiseResultMap, alarm_level, tWarnInfo);
 
                                                     // webSocket通知前端刷新告警统计数量
                                                     Map<String, Object> jasonMaps = new HashMap<>();
@@ -857,7 +857,7 @@ public class DataDealThread implements Runnable {
 
                         // 巡视点结果上报站端
                         StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
-                                jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult,null, null);
+                                jsonObjectResult.getString("analyseType"), cruiseResultMap, null, null);
                         log.info("Border_______---------______________________________________________________________________________________________");
                         lock.lock();
                         try {
@@ -878,7 +878,7 @@ public class DataDealThread implements Runnable {
 
                         // 巡视点结果上报站端
                         StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
-                                jsonObjectResult.getString("analyseType"), cruiseResultMap, cruiseResult,null, null);
+                                jsonObjectResult.getString("analyseType"), cruiseResultMap, null, null);
 
 
 //                NORMAL = NORMAL + 1;
@@ -913,6 +913,7 @@ public class DataDealThread implements Runnable {
                         SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
                         String yearMonth = ym.format(new Date());
                         String nowTime = timeFormat.format(new Date());
+
                         if(differentList.size()>0&&("1".equals(flag))){
                             log.info("different类型:开始向算法管理平台发送图片和mqtt消息");
 
@@ -995,7 +996,10 @@ public class DataDealThread implements Runnable {
                             alarmService.PushMsg(alarmDetail);
 
                             // 判别上报站端
-                            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).defectAndDistinguishToUpSystem(jsonObjectResultbak, differentList);
+                            String taskId = jsonObjectResultbak.getString("taskId");
+
+                            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
+                            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
                         }
 
                         if(defectList.size()>0&&("1".equals(flag))){
@@ -1082,7 +1086,10 @@ public class DataDealThread implements Runnable {
                             log.info("发送算法管理平台结束");
 
                             // 缺陷上报站端
-                            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).defectAndDistinguishToUpSystem(jsonObjectResultbak, defectList);
+                            String taskId = jsonObjectResultbak.getString("taskId");
+
+                            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
+                            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).defectAndDistinguishToUpSystem(cruiseResultMap, defectList);
                         }
                     } catch (Exception e) {
                         log.info("与算法管理平台交互失败" + e);
