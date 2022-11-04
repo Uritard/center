@@ -43,9 +43,11 @@ public class LocalCruiseExecutThread<T> implements Runnable {
     @Override
     public void run() {
         if (CollectionUtils.isEmpty(cruisePointList)) {
-            log.warn("cruisePoints is empty !!!");
+            log.warn("cruisePoints is empty !!! skip: {}", skip);
             return;
         }
+
+        log.info("cruiseExecutThread start, size: {}", cruisePointList.size());
 
         if (skip) {
             skipPointList(cruisePointList);
@@ -82,6 +84,7 @@ public class LocalCruiseExecutThread<T> implements Runnable {
         String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId;
         String taskStatus = uPatrolTaskService.taskStatus(key);
         if (NumberUtils.toInt(taskStatus) != CruiseConstant.TASK_STATE_RUNNING) {
+            log.warn("任务非进行时，taskId: {}, instanceId: {}， taskStatus: {}", taskId, insId, taskStatus);
             // 任务非进行时，停止执行
             return false;
         }

@@ -12,14 +12,12 @@ import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
-import com.yjh.platform.module.task.entity.TCruiseTask;
 import com.yjh.platform.module.task.entity.TCruiseTaskDel;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
 import org.quartz.SchedulerException;
-import org.quartz.impl.StdScheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -114,7 +112,7 @@ public class TaskJob extends QuartzJobBean {
         //给机器人发任务启动
         robotTaskStart(task);
         //调用摄像机任务
-        uPatrolTaskService.videoTaskStart(taskId);
+        uPatrolTaskService.localTaskStart(taskId);
 
 
     }

@@ -28,12 +28,13 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
-import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
+import com.yjh.platform.module.patrol.entity.TDefectInfo;
+import com.yjh.platform.module.patrol.entity.TWarnInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.InspectionResultThread;
@@ -63,8 +64,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import com.yjh.platform.module.patrol.entity.TWarnInfo;
-import com.yjh.platform.module.patrol.entity.TDefectInfo;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
@@ -941,7 +940,7 @@ public class UPatrolTaskService {
 //        }
 
         updateTaskStateForRedis(taskId, "239");
-        videoTaskStart(taskId);
+        localTaskStart(taskId);
 
         uPatrolResult.setTaskState(TASK_STATE_EXECUTING);
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
@@ -991,17 +990,21 @@ public class UPatrolTaskService {
     /**
      * 本地任务执行
      */
-    public void videoTaskStart(String taskId) {
+    public void localTaskStart(String taskId) {
         Set<String> tasKeys = redisTemplate.keys(PATROL_TASK_PREFIX + taskId + ":*");
         if (CollectionUtils.isEmpty(tasKeys)) {
             log.error("patrol_task_result:{}:* 未查到任务，任务未正确初始化", taskId);
             throw new BusinessException("任务未正确初始化");
         }
 
+        log.info("tasKeys size: {}", tasKeys.size());
+
         List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
             tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
             return null;
         });
+
+        log.info("taskInfoList size: {}", taskInfoList.size());
 
         // 查询检修区域
         List<Long> overhaul = tCruisePointInstanceDao.selectTimeIsIn(new Date());
@@ -1011,10 +1014,15 @@ public class UPatrolTaskService {
         Map<Long, Integer> robotOfflineMap = new HashMap<>();
 
         taskInfoList.forEach(m -> {
+            if(MapUtils.isEmpty(m)){
+                log.error("taskInfo is empty.");
+            }
+            String instanceId = m.get("instanceId");
             int cruiseStatus = MapUtils.getIntValue(m, "cruiseStatus", CRUISE_STATE_UN);
             String cruiseResult = MapUtils.getString(m, "cruiseResult");
             // 已经执行点位
             if (cruiseStatus != CRUISE_STATE_UN && !CommonUtils.isEmptyOrNullstr(cruiseResult)) {
+                log.warn("instance already done. task: {}, cruiseStatus: {}, cruiseResult: {}", taskId + ":" + instanceId, cruiseStatus, cruiseResult);
                 return;
             }
 
@@ -1086,6 +1094,7 @@ public class UPatrolTaskService {
             }
         });
 
+        log.info("task [{}] ready, skipPointList: {}, cruiseGroupMapSize: {}", taskId, skipPointList.size(), cruiseGroupMap.size());
         ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true));
         for (List<Map<String, String>> pointList : cruiseGroupMap.values()){
             ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, pointList, false));

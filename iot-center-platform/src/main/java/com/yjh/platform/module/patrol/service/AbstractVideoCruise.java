@@ -129,7 +129,7 @@ public abstract class AbstractVideoCruise {
                     captureMap.put("meteName", instanceName);
                     //2.抓图
                     re = capture(captureMap);
-
+                    log.info("capture result: {}", JSON.toJSONString(re));
                     redisTemplate.opsForHash().put("camera_info:" + cameraId, "state", "0");
                 } catch (Exception e) {
                     log.error("设置摄像机状态出错", e);
@@ -180,6 +180,7 @@ public abstract class AbstractVideoCruise {
                     // 判断是否有配置算法
                     TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("device_mete_id", "-1"));
                     if (algorithm != null) {
+                        log.info("request algorithm: {}", JSON.toJSONString(algorithm));
                         // 算法分析
                         isEnded = algorithmAnalysis(inspectionMap, presetId, taskId, jsonForRe, algorithm);
                         if (isEnded) {
@@ -249,6 +250,7 @@ public abstract class AbstractVideoCruise {
         } else {
             result = defect(analysisList);
         }
+        log.info("调用算法：   {}\n=========={}", JSON.toJSONString(analysisList), JSON.toJSONString(result));
 
         if (200 != result.getCode()) {
             // 拍照结果处理
