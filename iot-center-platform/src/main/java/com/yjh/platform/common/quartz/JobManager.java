@@ -326,6 +326,7 @@ public class JobManager {
         }
 
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, trigger);
+        StaticContextAccessor.getBean(Scheduler.class).start();
         logger.info("周期任务创建成功");
         return "success";
     }
