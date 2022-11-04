@@ -137,7 +137,7 @@ public class UPatrolResultController {
     @ApiOperation(value = "分页查询--巡视结果任务详情查询")
     @GetMapping(value = "/selectCruiseByPage")
    // @Logs(title = "巡视结果任务详情查询",content = "根据用户传递的参数查询巡视结果任务详情",logType = 1)
-    public Result selectCruiseByPage(@RequestParam(value = "taskResultId", required = false) String taskResultId,
+    public Result selectCruiseByPage(@RequestParam(value = "taskId", required = false) String taskId,
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
                                      @RequestParam(value = "deviceType", required = false) Integer deviceType,
@@ -175,7 +175,7 @@ public class UPatrolResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultService.selectCruiseByPage(taskResultId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList,customId);
+            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultService.selectCruiseByPage(taskId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList,customId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);

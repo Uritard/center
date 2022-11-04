@@ -14,6 +14,7 @@ import com.yjh.platform.module.device.entity.CruiseTypeInfo;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.controller.HelloController;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
@@ -299,7 +300,7 @@ public class TCruiseTaskResultService {
         for (String warnKey : warnKeys) {
             Map<String, Object> warnMap = redisTemplate.opsForHash().entries(warnKey);
             String instanceId = warnMap.get("instanceId").toString();
-            Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
+            Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId);
             log.info("cruiseMap==={}", cruiseMap);
             RealTimeWarn realTimeWarn = new RealTimeWarn();
             realTimeWarn.setDeviceName(cruiseMap.get("deviceName").toString());

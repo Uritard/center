@@ -57,12 +57,12 @@ public class UPatrolResultService {
         return list;
     }
 
-    public List<CruiseResultDetail> selectCruiseByPage(String taskResultId, Integer cruiseType, Integer cruiseResult, Integer deviceType,
+    public List<CruiseResultDetail> selectCruiseByPage(String taskId, Integer cruiseType, Integer cruiseResult, Integer deviceType,
         String startTime, String endTime, List<Long> deviceIdList, String customId) {
         List<CruiseResultDetail> cruiseResultDetailList = new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()) {
             cruiseResultDetailList =
-                uPatrolResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,
+                uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,
                     customId);
         }
         return cruiseResultDetailList;

@@ -72,7 +72,7 @@ public interface UPatrolResultDao {
                                                @Param(value = "customId") String customId,
                                                @Param(value = "isCheck") Integer isCheck);
 
-    List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskResultId") String taskResultId,
+    List<CruiseResultDetail> selectCruiseByPage(@Param(value = "taskId") String taskId,
                                                 @Param(value = "cruiseType") Integer cruiseType,
                                                 @Param(value = "cruiseResult") Integer cruiseResult,
                                                 @Param(value = "deviceType") Integer deviceType,

@@ -484,13 +484,13 @@
         left join t_voice_device voice on e.cruise_id = voice.voice_device_id
         left join t_voice_config conf on voice.config_id = conf.config_id
         WHERE 1 = 1
-        <if test="taskId != null and tasktId != ''">and b.task_id = #{taskId,jdbcType=VARCHAR}</if>
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=VARCHAR}</if>
 
         <if test="deviceType != null and deviceType != -1">and n.device_type = #{deviceType, jdbcType=INTEGER}</if>
 
         <if test="cruiseType != null and cruiseType != -1">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
 
-        <if test="startTime != null and endTime != null">and cruise_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND
+        <if test="startTime != null and endTime != null">and a.cruise_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND
             #{endTime, jdbcType=TIMESTAMP}
         </if>
 
@@ -583,13 +583,13 @@
 
         <if test="deviceType != null and deviceType != -1">and n.device_type = #{deviceType, jdbcType=INTEGER}</if>
 
-        <if test="cruiseType != null and cruiseType != -1">and g.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+        <if test="cruiseType != null and cruiseType != -1">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
 
-        <if test="startTime != null and endTime != null">and cruise_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND
+        <if test="startTime != null and endTime != null">and a.cruise_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND
             #{endTime, jdbcType=TIMESTAMP}
         </if>
 
-        <if test="cruiseResult != null and cruiseResult != -1 ">and g.cruise_result =
+        <if test="cruiseResult != null and cruiseResult != -1 ">and b.cruise_result =
             #{cruiseResult, jdbcType=INTEGER}
         </if>
 
