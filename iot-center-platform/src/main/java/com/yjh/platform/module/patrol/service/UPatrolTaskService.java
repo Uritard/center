@@ -1391,7 +1391,7 @@ public class UPatrolTaskService {
                 }
 
                 log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
-                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
+                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
                 for (Date aTimeList : timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
                     Map<String, Object> taskCountMapDel = new HashMap<>();
@@ -1627,8 +1627,18 @@ public class UPatrolTaskService {
         List<TCruiseTaskDel> listDel = this.tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
         List<Map<String, Object>> listTask = new ArrayList<>();
         for (TCruiseTaskCount tCruiseTaskCount : list) {
+            Date dayBeforeTime = dayBefore;
+            Date dayAfterTime = dayAfter;
             if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
-                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBefore, dayAfter);
+                if (tCruiseTaskCount.getStartTime().after(dayBeforeTime)){
+                    dayBeforeTime = tCruiseTaskCount.getStartTime();
+                }
+                if (Objects.nonNull(tCruiseTaskCount.getEndTime()) && tCruiseTaskCount.getEndTime().before(dayAfterTime)){
+                    dayAfterTime = tCruiseTaskCount.getEndTime();
+                }
+
+                log.info("dayBefore={}，dayAfter={}", dayBeforeTime, dayAfterTime);
+                List<Date> timeList = DateTimeUtil.cornTransTime(tCruiseTaskCount.getDateType(), dayBeforeTime, dayAfterTime);
                 for (Date aTimeList : timeList) {
                     Map<String, Object> taskCountMap = new HashMap<>();
                     Map<String, Object> taskCountMapDel = new HashMap<>();

@@ -1011,39 +1011,26 @@ public class DateTimeUtil {
             try {
                 exp = new CronExpression(cronExpression);
             } catch (Exception e) {
-                e.getMessage();
+                logger.error(e.getMessage(), e);
                 return validTimeList;
             }
             Date date = new Date();
-            Date dd = new Date();
-            if (dayAfter.getYear() <= date.getYear()) {
-                if (date.getMonth() > dayAfter.getMonth()) { return validTimeList;}
-                if (date.getMonth() == dayAfter.getMonth()) { dd = exp.getNextValidTimeAfter(date); }
-                if (date.getMonth() < dayAfter.getMonth()) { dd = exp.getNextValidTimeAfter(dayBefore); }
-                while (dd.getTime() <= dayAfter.getTime()) {
-                    if (dd.getTime() >= date.getTime()) { validTimeList.add(dd); }
-                    dd = exp.getNextValidTimeAfter(dd);
-                }
-            } else {
+            Date dd;
+
+            if(date.compareTo(dayAfter) < 0 && date.compareTo(dayBefore) >= 0){
+                dd = exp.getNextValidTimeAfter(date);
+            } else if(date.compareTo(dayAfter) < 0 && date.compareTo(dayBefore) < 0) {
                 dd = exp.getNextValidTimeAfter(dayBefore);
-                while (dd.getTime() <= dayAfter.getTime()) {
-                    if (dd.getTime() >= date.getTime()) { validTimeList.add(dd); }
-                    dd = exp.getNextValidTimeAfter(dd);
-                }
+            } else {
+                return validTimeList;
             }
-            exp = null;
-//            Calendar calendar = Calendar.getInstance();
-//            String cronDate = calendar.get(Calendar.YEAR) + "-" + (calendar.get(Calendar.MONTH) + 1) + "-" + calendar.get(Calendar.DATE);
-//            String sStart = cronDate + " 00:00:00";
-//            Date dStart = null;
-//            Date dEnd = null;
-//            try {
-//                dStart = sdf.parse(sStart);
-//                calendar.setTime(dStart);
-//                calendar.add(Calendar.DATE, 1);
-//                dEnd = calendar.getTime();
-//            } catch (Exception e) { e.getMessage(); }
-//            validTimeList.add(sdf.format(dd));
+
+            while (dd.getTime() <= dayAfter.getTime()) {
+                if (dd.getTime() >= dayBefore.getTime()) {
+                    validTimeList.add(dd);
+                }
+                dd = exp.getNextValidTimeAfter(dd);
+            }
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

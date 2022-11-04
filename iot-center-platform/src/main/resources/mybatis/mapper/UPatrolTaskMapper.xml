@@ -313,6 +313,7 @@
             a.date_type,
             a.task_type,
             DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+            DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
             DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
                  LEFT JOIN t_dict_business b ON a.task_type = b.dict_code AND b.col_name = "plan_type"
@@ -348,6 +349,7 @@
                 a.date_type,
                 a.task_type,
                 DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+                DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
                 DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
             from u_patrol_task a
                      LEFT JOIN t_dict_business b ON a.task_type = b.dict_code AND b.col_name = "plan_type"
@@ -384,6 +386,7 @@
                 a.date_type,
                 a.task_type,
                 DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+                DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
                 DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
             from u_patrol_task a
                      LEFT JOIN t_dict_business b ON a.execute_type = b.dict_code AND b.col_name = "plan_type"
@@ -441,6 +444,7 @@
         a.date_type,
         a.task_type,
         DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+        DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
         DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
         LEFT JOIN t_dict_business b ON a.task_type = b.dict_code AND b.col_name = "plan_type"
@@ -478,6 +482,7 @@
         a.date_type,
         a.task_type,
         DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+        DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
         DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
         LEFT JOIN t_dict_business b ON a.task_type = b.dict_code AND b.col_name = "plan_type"
@@ -516,6 +521,7 @@
         a.date_type,
         a.task_type,
         DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+        DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
         DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
         LEFT JOIN t_dict_business b ON a.task_type = b.dict_code AND b.col_name = "plan_type"
