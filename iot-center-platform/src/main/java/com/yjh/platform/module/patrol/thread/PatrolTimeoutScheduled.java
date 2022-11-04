@@ -55,7 +55,7 @@ public class PatrolTimeoutScheduled {
         this.hashOperations = redisTemplate.opsForHash();
     }
 
-    @Scheduled(cron = "0 */10 * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     public void patrolTimeoutScheduled() {
         log.info("超时判断定时任务");
 
@@ -70,7 +70,8 @@ public class PatrolTimeoutScheduled {
             String taskId = task.getTaskId();
             String key = PATROL_SUMMARY_PREFIX + taskId;
             String lastDate = hashOperations.get(key, "lastCruiseTime");
-            Date lastTime = DateTimeUtil.parse(lastDate);
+            String taskStart = hashOperations.get(key, "taskStart");
+            Date lastTime = DateTimeUtil.parse(lastDate, taskStart);
             if (currentDate.getTime() - lastTime.getTime() >= timeOut * 60 * 1000L) {
                 // 判断超时
                 hashOperations.put(key, "taskState", String.valueOf(TASK_STATE_ABNORMAL));

@@ -1138,9 +1138,9 @@ public class UPatrolTaskService {
      * @param instanceId 巡视点id
      */
     public void patrolTaskResultHandler(String taskId, Long instanceId) {
-        String redisKeyName = "t_cruise_task_result:" + taskId + ":" + instanceId;
+        String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
         Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
-
+        log.info("taskResultHandler redisKeyName: {},", redisKeyName);
         patrolTaskResultHandler(cruiseResultMap);
     }
 

@@ -42,7 +42,8 @@ import redis.clients.jedis.ScanResult;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
  * @author czh
@@ -170,7 +171,8 @@ public class TCruiseTaskResultService {
         for (CruiseInspectResult cruiseInspectResult:cruiseInspectResults) {
             cruiseInspectResult.setCruiseResultName("--");
             cruiseInspectResult.setEndTime(null);
-            String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + cruiseInspectResult.getInstanceId().toString();
+
+            String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + cruiseInspectResult.getInstanceId();
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);
             if (resultMap.size()>0) {
                 //从redis拿数据
@@ -300,7 +302,7 @@ public class TCruiseTaskResultService {
         for (String warnKey : warnKeys) {
             Map<String, Object> warnMap = redisTemplate.opsForHash().entries(warnKey);
             String instanceId = warnMap.get("instanceId").toString();
-            Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+            Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
             log.info("cruiseMap==={}", cruiseMap);
             RealTimeWarn realTimeWarn = new RealTimeWarn();
             realTimeWarn.setDeviceName(cruiseMap.get("deviceName").toString());

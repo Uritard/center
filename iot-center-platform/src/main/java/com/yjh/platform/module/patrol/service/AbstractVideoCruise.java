@@ -110,8 +110,8 @@ public abstract class AbstractVideoCruise {
 
         if (presetId > 0 && StringUtils.isNotEmpty(cameraId)) {
 
-            boolean waitFlag = waitCamera2(taskName, taskId, presetName);
             Result re = null;
+            boolean waitFlag = waitCamera2(taskId, cameraId, presetName);
             if (waitFlag) {
                 try {
                     //1.转到预置位
@@ -123,19 +123,20 @@ public abstract class AbstractVideoCruise {
                     moveWait(moveMap);
 
                     String instanceName = inspectionMap.get("instanceName");
-                    redisTemplate.opsForHash().put("camera_info:" + cameraId, "state", "1");
+
                     HashMap<String, Object> captureMap = new HashMap<>();
                     captureMap.put("cameraId", cameraId);
                     captureMap.put("meteName", instanceName);
                     //2.抓图
                     re = capture(captureMap);
-                    log.info("capture result: {}", JSON.toJSONString(re));
-                    redisTemplate.opsForHash().put("camera_info:" + cameraId, "state", "0");
                 } catch (Exception e) {
                     log.error("设置摄像机状态出错", e);
+                } finally {
                     redisTemplate.opsForHash().put("camera_info:" + cameraId, "state", "0");
                 }
             }
+
+            log.info("capture result: {}", JSON.toJSONString(re));
 
             try {
                 // 抓图失败处理
@@ -292,10 +293,13 @@ public abstract class AbstractVideoCruise {
                 }
             }
         }
+        if (waitFlag) {
+            redisTemplate.opsForHash().put("camera_info:" + cameraId, "state", "1");
+        }
         return waitFlag;
     }
 
-    protected boolean waitCamera2(String taskName, String cameraId, String presetName) {
+    protected boolean waitCamera2(String taskId, String cameraId, String presetName) {
 
         String script =
             "if redis.call('hget', KEYS[1], KEYS[2]) == ARGV[1] then return redis.call('hset', KEYS[1], KEYS[2], ARGV[2]) else return -1 end";
@@ -314,14 +318,14 @@ public abstract class AbstractVideoCruise {
                     log.error(e.getMessage(), e);
                     break;
                 }
-                log.info("任务：{} 在 {} 时已经等待了 {} 预置位,摄像机Id {} {}s", taskName, DateTimeUtil.getDateTimeString(), cameraId, presetName,
-                    ((waitCount + 1) * waitTime + 1000) / 1000);
+                log.info("任务：【{}】 在 【{}】 时已经等待了 【{}】 预置位,摄像机Id 【{}】 【{}】s", taskId, DateTimeUtil.getDateTimeString(), presetName,
+                    cameraId, ((waitCount + 1) * waitTime + 1000) / 1000);
                 cameraState = redisTemplate.execute(redisScript, Arrays.asList("camera_info:" + cameraId, "state"), 0, 1);
                 cameraState = cameraState == null ? -1 : cameraState;
 
                 waitCount = waitCount + 1;
                 if (waitCount == 30) {
-                    log.info("任务：{} 已经等待了 {} 秒,仍未等待到 {} 预置位,摄像机Id {} 退出等待", taskName, ((waitCount + 1) * waitTime + 1000) / 1000,
+                    log.info("任务：【{}】 已经等待了 【{}】 秒,仍未等待到 【{}】 预置位,摄像机Id 【{}】 退出等待", taskId, ((waitCount + 1) * waitTime + 1000) / 1000,
                         presetName, cameraId);
                     waitFlag = false;
                     break;

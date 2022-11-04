@@ -266,12 +266,22 @@ public class DateTimeUtil {
      * @return 日期
      */
     public static Date parse(String source) {
+        return parse(source, null);
+    }
+
+    public static Date parse(String source, String defaultDateStr) {
         Date rtn = null;
         try {
+            if(StringUtils.isNullOrEmpty(source) && !StringUtils.isNullOrEmpty(defaultDateStr)){
+                source = defaultDateStr;
+            }
             SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
             rtn = sdf.parse(source);
         } catch (Exception e) {
             logger.error(e.getMessage());
+            if(!StringUtils.isNullOrEmpty(defaultDateStr)) {
+                parse(defaultDateStr, null);
+            }
         }
         return rtn;
     }
