@@ -165,6 +165,9 @@ public interface TRobotInfoDao {
      * @return String
      */
     String selectTaskId(@Param(value = "robotTaskId") String robotTaskId);
+
+    TCruiseTask selectCruiseTask(@Param(value = "taskId") String taskId,
+                                 @Param(value = "taskCode") String taskCode);
     /**
      * 根据任务id查询任务数据
      * @param taskId 任务id

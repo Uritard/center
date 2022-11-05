@@ -1134,8 +1134,17 @@ public class RobotService {
                     return result;
                 }else {
                     String taskId = robotTaskControlMap.get("taskId").toString();
-                    // taskId是巡视主机的id,robotTaskId是机器人上报的id
-                    String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+
+                    String robotTaskId = taskId;
+                    TCruiseTask tCruiseTaskTemp = StaticContextAccessor.getBean(RobotService.class).selectCruiseTask(robotTaskId, robotTaskId);
+                    log.info("tCruiseTaskTemp=={}", tCruiseTaskTemp);
+                    boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
+                    if (!moreTime){
+                        // taskId是巡视主机的id,robotTaskId是机器人上报的id
+                        robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+                        log.info("robotTaskId==={}", robotTaskId);
+                    }
+                    log.info("最终的taskId==={}", robotTaskId);
 
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + robotTaskId);
                     String tasSkPatrolledId = redisInfoMap.get("taskPatrolled_id");
@@ -1390,6 +1399,10 @@ public class RobotService {
     public String selectTaskId(String robotTaskId){
         return tRobotInfoDao.selectTaskId(robotTaskId);
     }
+    public TCruiseTask selectCruiseTask(String taskId, String taskCode){
+        return tRobotInfoDao.selectCruiseTask(taskId, taskCode);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public TCruiseTask selectTCruiseTask(String taskId) {
         return tRobotInfoDao.selectTCruiseTask(taskId);
