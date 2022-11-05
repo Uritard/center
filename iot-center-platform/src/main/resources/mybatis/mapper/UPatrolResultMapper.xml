@@ -92,36 +92,6 @@
         where task_id = #{taskId, jdbcType=VARCHAR}
     </delete>
 
-    <update id="updateUPatrolResult" parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult">
-    update u_patrol_result a
-    <set>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
-        <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
-        <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
-        <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
-        <if test="taskType != null and taskType != ''">a.task_type = #{taskType, jdbcType=INTEGER},</if>
-        <if test="executeType != null and executeType != ''">a.execute_type = #{executeType, jdbcType=INTEGER},</if>
-        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
-        <if test="taskSource != null and taskSource != ''">a.task_source = #{taskSource, jdbcType=INTEGER},</if>
-        <if test="taskLevel != null and taskLevel != ''">a.task_level = #{taskLevel, jdbcType=INTEGER},</if>
-        <if test="taskState != null and taskState != ''">a.task_state = #{taskState, jdbcType=INTEGER},</if>
-        <if test="modifyState != null and modifyState != ''">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
-        <if test="taskCount != null and taskCount != ''">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
-        <if test="taskWait != null and taskWait != ''">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
-        <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
-        <if test="checkDate != null">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
-        <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
-        <if test="createTime != null">a.create_time = #{createTime},</if>
-        <if test="endTime != null">a.end_time = #{endTime},</if>
-        <if test="executeTime != null">a.execute_time = #{executeTime},</if>
-        <if test="isReview != null and isReview != ''">a.is_review = #{isReview, jdbcType=VARCHAR},</if>
-        <if test="taskAbnormal != null and taskAbnormal != ''">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
-        <if test="cruiseResult != null and cruiseResult != ''">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
-        <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
-    </set>
-        where a.task_id = #{taskId, jdbcType=VARCHAR}
-        </update>
-
     <update id="update" parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult">
         update u_patrol_result a
         <set>

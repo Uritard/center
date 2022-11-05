@@ -1247,6 +1247,22 @@ public class UPatrolTaskService {
     }
 
     /**
+     * 判断是否生成告警，若是则更新任务结果表
+     * @param taskId 任务id
+     * @param instanceId 巡检点id
+     * @param cruiseDataId 点位结果id
+     * @return int
+     */
+    public int updateIsWarn(String taskId, Long instanceId, Long cruiseDataId){
+        int isWarnFlag = uPatrolTaskDao.selectIsWarnByTaskId(instanceId, taskId);
+        if (isWarnFlag > 0){
+            uPatrolTaskDao.updateIsWarnByCruiseDataId(cruiseDataId);
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
      * 任务所有点做完,完成,并且进度为100%的处理
      *
      * @param taskId 任务id
@@ -1270,16 +1286,16 @@ public class UPatrolTaskService {
             uPatrolResultDao.update(uPatrolResult);
 
             // 插入updr
-//            List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);
-//            log.info("任务为{}已经做过的巡视点===={}", taskId, instanceIdDoneList);
-//            List<Long> inDataBaseInstanceList = selectInstanceForTaskGoOn(taskId);
-//            log.info("任务为{}已经入库的巡视点==={}", taskId, inDataBaseInstanceList);
-//            if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
-//                for (Long instanceIdInTable : inDataBaseInstanceList) {
-//                    instanceIdDoneList.remove(instanceIdInTable.toString());
-//                }
-//            }
-//            log.info("删除已经入库的巡视点后==={}", instanceIdDoneList);
+            //            List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);
+            //            log.info("任务为{}已经做过的巡视点===={}", taskId, instanceIdDoneList);
+            //            List<Long> inDataBaseInstanceList = selectInstanceForTaskGoOn(taskId);
+            //            log.info("任务为{}已经入库的巡视点==={}", taskId, inDataBaseInstanceList);
+            //            if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
+            //                for (Long instanceIdInTable : inDataBaseInstanceList) {
+            //                    instanceIdDoneList.remove(instanceIdInTable.toString());
+            //                }
+            //            }
+            //            log.info("删除已经入库的巡视点后==={}", instanceIdDoneList);
 
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
             List<String> cruiseResultIdList = new ArrayList<>();
@@ -1314,7 +1330,7 @@ public class UPatrolTaskService {
                     cruiseResultIdList.add("");
 
                     // 巡视结果上报上一级系统
-//                    processResultToUpSystem.alarmAndResultToUpSystem("", redisInfoMap, null, null);
+                    //                    processResultToUpSystem.alarmAndResultToUpSystem("", redisInfoMap, null, null);
 
                 }
             }
@@ -1337,28 +1353,12 @@ public class UPatrolTaskService {
             }
 
             //低优先任务继续
-//        StaticContextAccessor.getBean(RobotService.class).lowTaskGoOn(taskId);
+            //        StaticContextAccessor.getBean(RobotService.class).lowTaskGoOn(taskId);
 
             // todo:给上一级系统上报任务状态
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
-    }
-
-    /**
-     * 判断是否生成告警，若是则更新任务结果表
-     * @param taskId 任务id
-     * @param instanceId 巡检点id
-     * @param cruiseDataId 点位结果id
-     * @return int
-     */
-    public int updateIsWarn(String taskId, Long instanceId, Long cruiseDataId){
-        int isWarnFlag = uPatrolTaskDao.selectIsWarnByTaskId(instanceId, taskId);
-        if (isWarnFlag > 0){
-            uPatrolTaskDao.updateIsWarnByCruiseDataId(cruiseDataId);
-            return 1;
-        }
-        return 0;
     }
 
     @Transactional(rollbackFor = Exception.class)
