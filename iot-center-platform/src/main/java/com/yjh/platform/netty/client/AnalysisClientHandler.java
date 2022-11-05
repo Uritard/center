@@ -14,6 +14,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.EventLoop;
 import io.netty.util.ReferenceCountUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -95,7 +96,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
         byteBuf.readBytes(bytes);
         try {
             String body = new String(bytes, "UTF-8");
-            log.info("接收服务端数据:" + body);
+            log.info("接收服务端数据:{}", body);
             // 反拆包解析
             String usefulBody = analyseDataOperateService.nonUnpacking(body);
 

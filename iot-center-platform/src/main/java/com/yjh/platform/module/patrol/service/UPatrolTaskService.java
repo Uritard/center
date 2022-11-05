@@ -1227,37 +1227,41 @@ public class UPatrolTaskService {
             uPatrolResultDao.updateUPatrolResult(uPatrolResult);
 
             // 插入updr
-            List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);
-            log.info("任务为{}已经做过的巡视点===={}", taskId, instanceIdDoneList);
-            List<Long> inDataBaseInstanceList = selectInstanceForTaskGoOn(taskId);
-            log.info("任务为{}已经入库的巡视点==={}", taskId, inDataBaseInstanceList);
-            if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
-                for (Long instanceIdInTable : inDataBaseInstanceList) {
-                    instanceIdDoneList.remove(instanceIdInTable.toString());
-                }
-            }
-            log.info("删除已经入库的巡视点后==={}", instanceIdDoneList);
+//            List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);
+//            log.info("任务为{}已经做过的巡视点===={}", taskId, instanceIdDoneList);
+//            List<Long> inDataBaseInstanceList = selectInstanceForTaskGoOn(taskId);
+//            log.info("任务为{}已经入库的巡视点==={}", taskId, inDataBaseInstanceList);
+//            if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
+//                for (Long instanceIdInTable : inDataBaseInstanceList) {
+//                    instanceIdDoneList.remove(instanceIdInTable.toString());
+//                }
+//            }
+//            log.info("删除已经入库的巡视点后==={}", instanceIdDoneList);
 
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
             List<String> cruiseResultIdList = new ArrayList<>();
-            for (Long instanceIdDone : instanceIdDoneList) {
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceIdDone);
+            Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
+
+            for (String key : robotInfoKeys) {
+                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+
                 boolean conditionRes = ArrayUtils.contains(new String[]{String.valueOf(CRUISE_RESULT_NORMAL), String.valueOf(CRUISE_RESULT_ABNORMAL)}, redisInfoMap.get("cruiseResult"));
                 if (Boolean.TRUE.equals(conditionRes)) {
                     UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
                     uPatrolDataResult.setTaskId(taskId);
                     uPatrolDataResult.setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")));
                     uPatrolDataResult.setDeviceName(redisInfoMap.get("deviceName"));
-                    uPatrolDataResult.setInstanceId(instanceIdDone);
+                    uPatrolDataResult.setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")));
                     uPatrolDataResult.setInstanceName(redisInfoMap.get("instanceName"));
                     uPatrolDataResult.setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")));
                     uPatrolDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
                     uPatrolDataResult.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
                     uPatrolDataResult.setCruiseStatus(Integer.valueOf(redisInfoMap.get("cruiseStatus")));
                     uPatrolDataResult.setResultNum(redisInfoMap.get("resultNum"));
-                    uPatrolDataResult.setPicpath(redisInfoMap.get("picPath"));
-                    uPatrolDataResult.setOrigpic(redisInfoMap.get("origPic"));
-                    uPatrolDataResult.setCruiseAbnormal(Integer.valueOf(redisInfoMap.get("cruiseAbnormal")));
+                    uPatrolDataResult.setPicpath(redisInfoMap.get("picpath"));
+                    uPatrolDataResult.setCruiseType(Integer.valueOf(redisInfoMap.get("cruiseType")));
+                    uPatrolDataResult.setOrigpic(redisInfoMap.get("origpic"));
+                    uPatrolDataResult.setCruiseAbnormal(NumberUtils.toInt(redisInfoMap.get("cruiseAbnormal")));
                     uPatrolDataResult.setEvaluationState(Integer.valueOf(redisInfoMap.get("evaluationState")));
                     uPatrolDataResult.setCreatetime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
                     uPatrolDataResult.setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")));
@@ -1267,7 +1271,7 @@ public class UPatrolTaskService {
                     cruiseResultIdList.add("");
 
                     // 巡视结果上报上一级系统
-                    processResultToUpSystem.alarmAndResultToUpSystem("", redisInfoMap, null, null);
+//                    processResultToUpSystem.alarmAndResultToUpSystem("", redisInfoMap, null, null);
 
                 }
             }

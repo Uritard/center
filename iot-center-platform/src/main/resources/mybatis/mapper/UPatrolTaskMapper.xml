@@ -698,7 +698,7 @@
     <select id="selectInstanceForTaskGoOn" parameterType="java.lang.String" resultType="java.lang.Long">
         select b.instance_id
         from u_patrol_result a,u_patrol_data_result b
-        where a.task_result_id = b.task_result_id
+        where a.task_id = b.task_id
           AND a.task_id = #{taskId,jdbcType=VARCHAR}
           and b.cruise_status = 252
     </select>

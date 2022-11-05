@@ -52,6 +52,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
+
 /**
  * @author 丫C
  * @date 2022/4/11
@@ -392,7 +394,7 @@ public class IntelAnalysisService {
                 StringJoiner resultImg = new StringJoiner(" ");
 
                 String instanceId = analyseResult.getObjectId();
-                String redisKeyName = "patrol_task_result:" + taskId + ":" + instanceId;
+                String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
                 String originPicPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "origpic"));
                 log.info("originPicPath===={}", originPicPath);
 
@@ -420,8 +422,8 @@ public class IntelAnalysisService {
                 taskResult.setTaskId(taskId);
                 taskResult.setInstanceId(instanceId);
                 taskResult.setAnalyseType(algorithmType);
-                taskResult.setConf("0.0");
                 for (AnalyseResultItem result : results) {
+                    taskResult.setConf(String.valueOf(result.getConf()));
                     if (StringUtils.equals("2001", result.getCode())){
                         log.error("巡视点为{}图像数据错误", instanceId);
                         taskResult.setResultValue("图像数据错误");
