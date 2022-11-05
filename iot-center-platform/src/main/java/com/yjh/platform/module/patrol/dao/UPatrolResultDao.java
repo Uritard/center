@@ -94,15 +94,6 @@ public interface UPatrolResultDao {
     //查询正在执行的任务
     List<TaskSimpleInfo> selectTaskIsRunning();
 
-
-    /**
-     * 更新任务结果表数据
-     *
-     * @param uPatrolResult 任务结果数据
-     * @return int
-     */
-    int updateUPatrolResult(UPatrolResult uPatrolResult);
-
     TaskSimpleInfo selectTaskStateByTaskId(@Param(value = "taskId")String taskId);
 
     //统计当前任务下的巡检点数量

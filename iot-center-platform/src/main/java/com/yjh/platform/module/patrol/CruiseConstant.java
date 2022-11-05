@@ -67,23 +67,14 @@ public interface CruiseConstant {
      * 异常原因，缺陷异常
      */
     int CRUISE_ABNORMAL_DEFECT = 409;
-
-    /**
-     * 异常原因，数据异常
-     */
-    int CRUISE_ABNORMAL_DATA_ABNORMAL = 249;
     /**
      * 异常原因，异常告警
      */
-    int CRUISE_ABNORMAL_ABNORMAL_WARING = 250;
+    int CRUISE_ABNORMAL_WARING = 250;
     /**
-     * 异常原因，算法超时
+     * 异常原因，任务终止
      */
-    int CRUISE_ABNORMAL_ALGORITHM_TIMEOUT = 251;
-    /**
-     * 异常原因，缺陷异常
-     */
-    int CRUISE_ABNORMAL_DEFECT_WARING = 409;
+    int CRUISE_ABNORMAL_INTERRUPT = 412;
 
     /**
      * 任务状态，未开始

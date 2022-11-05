@@ -207,10 +207,10 @@ public class InspectionResultThread implements Runnable{
             if (robotInfoKeys.size() == cruiseKey.size()){
                 taskState = 240;
             }
-            UPatrolResult uPatrolResult = StaticContextAccessor.getBean(UPatrolResultDao.class).selectByPrimaryId(taskId);
+            UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
             uPatrolResult.setTaskState(taskState);
             uPatrolResult.setExecuteTime(new Date());
-            StaticContextAccessor.getBean(UPatrolResultDao.class).updateUPatrolResult(uPatrolResult);
+            StaticContextAccessor.getBean(UPatrolResultDao.class).update(uPatrolResult);
         }catch (Exception e){
             log.error("更新站端本体任务状态异常：", e);
         }

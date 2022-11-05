@@ -43,6 +43,8 @@ import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.entity.TCruiseDataResult;
+import com.yjh.platform.module.task.entity.TCruiseTaskResultDetail;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
@@ -60,6 +62,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -461,7 +464,7 @@ public class UPatrolTaskService {
                 //这个点 没有做
                 result.put("cruiseStatus",String.valueOf(CRUISE_STATE_FAILED));//执行失败
                 result.put("resultNum","机器人任务异常");
-                result.put("cruiseAbnormal",String.valueOf(CRUISE_ABNORMAL_DATA_ABNORMAL));//数据异常
+                result.put("cruiseAbnormal",String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));//数据异常
                 result.put("evaluationState",String.valueOf(EVALUATION_STATE_REVIEWED));//未审核
                 result.put("identifyResult",String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
 
@@ -667,7 +670,7 @@ public class UPatrolTaskService {
                     //CronExpression expression = new CronExpression(tCruiseTask.getDateType());
                     item.put("start_time", DateTimeUtil.format(task.getStartTime()));
                 } catch (Exception e) {
-                    log.info("上报出错{}", e);
+                    log.info("上报出错", e);
                 }
             } else {
                 item.put("start_time", DateTimeUtil.format(task.getStartTime()));
@@ -958,13 +961,16 @@ public class UPatrolTaskService {
         return uPatrolResultDao.update(uPatrolResult);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    /**
+     * 任务终止，异步执行
+     */
+    @Async
     public int taskShutDown(String taskId) {
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
-        if (uPatrolResult.getTaskState() == 240) {
+        if (uPatrolResult.getTaskState() == TASK_STATE_DONE) {
             return 1;
         }
-        uPatrolResult.setTaskState(242);
+        uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
 
         List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
@@ -976,10 +982,47 @@ public class UPatrolTaskService {
 
         updateTaskStateForRedis(taskId, "242");
         try {
-            // todo 任务终止  结果处理
-            log.info("任务终止创建成功==" + taskId);
+
+            Set<String> tasKeys = redisTemplate.keys(PATROL_TASK_PREFIX + taskId + ":*");
+            if (CollectionUtils.isEmpty(tasKeys)) {
+                log.error("patrol_task_result:{}:* 未查到任务，任务未正确初始化", taskId);
+                throw new BusinessException("任务未正确初始化");
+            }
+
+            log.info("tasKeys size: {}", tasKeys.size());
+
+            List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
+                tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
+                return null;
+            });
+
+            log.info("taskInfoList size: {}", taskInfoList.size());
+
+            // 暂停15秒等待未接收数据完成接收
+            Thread.sleep(15000);
+            if(taskInfoList.size() != 0) {
+                List<Map<String, String>> skipPointList = new ArrayList<>();
+                for (Map<String, String> taskInfo : taskInfoList) {
+                    if (MapUtils.isNotEmpty(taskInfo)) {
+                        //count = count+1;
+                        if (CommonUtils.isEmptyOrNullstr(taskInfo.get("cruiseResult"))) {
+                            //任务终止
+                            taskInfo.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                            taskInfo.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
+                            taskInfo.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
+                            taskInfo.put("resultNum", "任务终止");
+                            skipPointList.add(taskInfo);
+                        }
+                        // todo 任务终止 上报站端
+                    }
+                }
+                log.info("task [{}] shut down, skipPointList: {}", taskId, skipPointList.size());
+                ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true));
+            }
+
+            log.info("任务终止成功=={}", taskId);
         } catch (Exception e) {
-            log.info("任务终止创建失败" + e);
+            log.info("任务终止失败", e);
         }
 
         //任务状态上报站端
@@ -1219,12 +1262,12 @@ public class UPatrolTaskService {
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
 
             // 更新upr
-            UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
+            UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
             uPatrolResult.setTaskState(240);
             uPatrolResult.setTaskWait(0);
             uPatrolResult.setEndTime(new Date());
             uPatrolResult.setTaskAbnormal(abnormalCounts);
-            uPatrolResultDao.updateUPatrolResult(uPatrolResult);
+            uPatrolResultDao.update(uPatrolResult);
 
             // 插入updr
 //            List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);

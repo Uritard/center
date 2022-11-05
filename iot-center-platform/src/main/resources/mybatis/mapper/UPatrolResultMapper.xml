@@ -125,7 +125,6 @@
     <update id="update" parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult">
         update u_patrol_result a
         <set>
-            <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
             <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
             <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
             <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
@@ -141,7 +140,6 @@
             <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
             <if test="checkDate != null">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
             <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
-            <if test="createTime != null">a.create_time = #{createTime},</if>
             <if test="endTime != null">a.end_time = #{endTime},</if>
             <if test="executeTime != null">a.execute_time = #{executeTime},</if>
             <if test="isReview != null and isReview != ''">a.is_review = #{isReview, jdbcType=VARCHAR},</if>
