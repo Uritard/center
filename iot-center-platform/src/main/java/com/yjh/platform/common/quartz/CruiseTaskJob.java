@@ -278,7 +278,6 @@ public class CruiseTaskJob extends QuartzJobBean {
                         robotTaskInfo.setTaskName(tCruiseTask.getTaskName());
                         List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(instanceList,item);
                         robotTaskInfo.setInstanceList(robotTaskInstanceList);
-                        // 上层控制任务调度  方式就是立即
                         robotTaskInfo.setIfRun("173");
                         robotTaskInfo.setRobotCode(item);
                         robotTaskInfo.setFixedStartTime(simpleDateFormat.format(new Date()));
@@ -292,7 +291,8 @@ public class CruiseTaskJob extends QuartzJobBean {
                     TCruiseTask tCruiseTaskTemp = tCruiseTaskDao.selectCruiseTask(tCruiseTask.getTaskCode(), tCruiseTask.getTaskCode());
                     log.info("tCruiseTaskTemp=={}", tCruiseTaskTemp);
                     boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
-                    if (moreTime && tCruiseTaskTemp.getIfRun() == 172){
+                    String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:taskToRobot","content"));
+                    if ( moreTime && tCruiseTaskTemp.getIfRun() == 172){
                         robotTask(robotTaskInfoMap);
                         log.info("下发成功！！！");
                     }

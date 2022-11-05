@@ -476,6 +476,27 @@
         ORDER BY b.execute_time desc
             LIMIT 1
     </select>
+
+    <select id="selectCruiseTask" resultType="com.yjh.accessrobot.module.command.entity.TCruiseTask">
+        select
+            a.task_id,
+            a.task_code,
+            a.task_name,
+            a.plan_id,
+            a.area_id,
+            a.type,
+            a.if_run,
+            a.robot_id,
+            a.date_type,
+            a.task_type,
+            a.task_level,
+            a.start_time,
+            a.create_time
+        from t_cruise_task a
+        where 1 = 1
+          and a.task_id = #{taskId, jdbcType=VARCHAR}
+          and a.task_code = #{taskCode, jdbcType=VARCHAR}
+    </select>
     <!--查询机器人相关信息2-->
     <select id="selectTCruiseTask" parameterType="java.lang.String" resultType="com.yjh.accessrobot.module.command.entity.TCruiseTask">
         select
