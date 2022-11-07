@@ -151,4 +151,8 @@ public interface UPatrolResultDao {
         @Param(value = "remark")String remark);
 
     String selectAlgorithmType(@Param(value = "deviceMeteId") Long deviceMeteId);
+
+    TaskVO selectTaskNameAndTime(@Param(value = "taskId")String taskId);
+
+    String selectReviewTaskFlag(@Param(value = "taskId")String taskId);
 }

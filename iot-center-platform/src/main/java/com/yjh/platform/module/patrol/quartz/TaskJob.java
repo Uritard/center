@@ -123,11 +123,7 @@ public class TaskJob extends QuartzJobBean {
         result.setTaskState(CruiseConstant.TASK_STATE_EXECUTING);
         //任务开始时间
         Date date = result.getCreateTime();
-        if (date == null) {
-            date = new Date();
-            result.setCreateTime(date);
-        }
-
+        result.setExecuteTime(date);
         uPatrolResultDao.update(result);
     }
 

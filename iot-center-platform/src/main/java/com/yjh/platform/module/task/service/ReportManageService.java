@@ -6,6 +6,7 @@ import com.yjh.platform.common.utils.smUtil.report.ReportDataModel;
 import com.yjh.platform.common.utils.smUtil.report.ReportDataRepo;
 import com.yjh.platform.common.utils.smUtil.report.ReportHelper;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
+import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dao.ReportManageDao;
 import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
 import com.yjh.platform.module.task.entity.*;
@@ -38,6 +39,8 @@ public class ReportManageService {
     private TStdDeviceDao tStdDeviceDao;
     @Autowired
     private TCruiseDataResultDao tCruiseDataResultDao;
+    @Autowired
+    private UPatrolResultDao uPatrolResultDao;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 
     private DateTimeUtil dateTimeUtil;
@@ -288,7 +291,8 @@ public class ReportManageService {
     }
 
     public TaskVO getTaskVO(String taskId) {
-        TaskVO taskVO = reportManageDao.selectTaskNameAndTime(taskId);
+//        TaskVO taskVO = reportManageDao.selectTaskNameAndTime(taskId);
+        TaskVO taskVO = uPatrolResultDao.selectTaskNameAndTime(taskId);
         String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
         taskVO.setStationName(stationName);
         // 测点数
@@ -315,7 +319,8 @@ public class ReportManageService {
 
     @Transactional(rollbackFor = Exception.class)
     public String downLoadCruiseReport(String taskId){
-        String flag = reportManageDao.selectReviewTaskFlag(taskId);
+//        String flag = reportManageDao.selectReviewTaskFlag(taskId);
+        String flag = uPatrolResultDao.selectReviewTaskFlag(taskId);
         if ("0".equals(flag)) {
             return "0";
         }

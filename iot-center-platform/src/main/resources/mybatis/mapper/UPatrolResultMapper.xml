@@ -334,7 +334,7 @@
 
     </select>
 
-    <select id="selectJudgeCondition" parameterType="java.lang.Long"
+    <select id="selectJudgeCondition"
             resultType="com.yjh.platform.module.task.entity.AfterManualReviewInfo">
         select a.is_warn,
                a.instance_id,
@@ -414,6 +414,7 @@
         f.real_code,
         b.device_name,
         b.instance_name,
+        b.cruise_data_id,
         b.cruise_type,
         h.dict_note as cruise_type_name,
         b.result_num,
@@ -560,7 +561,7 @@
         s.dict_note as alarm_level_name,
         n.device_type,
         b.voice_path
-        FROM t_cruise_result a
+        FROM u_patrol_result a
         LEFT JOIN u_patrol_data_result b on a.task_id = b.task_id
         LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
         LEFT JOIN t_std_device n on n.device_id = b.device_id
@@ -890,7 +891,7 @@
 
 
     <update id="updateCheck">
-        update t_cruise_result a <set>
+        update u_patrol_result a <set>
         <if test="checkUserName != null">a.check_user = #{checkUserName},</if>
         a.check_date = #{checkDate, jdbcType=TIMESTAMP},
         <if test="remark != null">a.remark = #{remark},</if>
@@ -941,11 +942,13 @@
         SELECT
         b.cruise_data_id,
         b.cruise_result,
-        b.result_num
+        b.result_num,
+        b.task_id,
+        b.instance_id
         FROM
         u_patrol_data_result b
         WHERE 1 = 1
-        <if test="taskId != null ">and b.task_id = #{taskId,jdbcType=VARCHAR}</if>
+        <if test="taskId != null ">and b.task_id = #{taskId}</if>
         and ISNULL(b.check_user)
     </select>
 
@@ -962,5 +965,36 @@
         WHERE 1 = 1
         <if test="taskResultId != null ">and b.task_id = #{taskResultId,jdbcType=VARCHAR}</if>
 
+    </select>
+
+    <select id="selectTaskNameAndTime" resultType="com.yjh.platform.module.task.entity.TaskVO">
+        SELECT
+        a.task_name,
+        a.start_time as cruise_date,
+        d.task_count as total,
+        d.task_wait as wait,
+        d.task_count - task_wait as already,
+        d.task_abnormal as abnormal,
+        d.task_count -  d.task_abnormal as normal,
+        (SELECT count(1) from u_patrol_data_result WHERE c.check_user IS NULL)as unReview,
+        MIN(d.execute_time) as cruiseStartTime,
+        MAX(d.end_time) as cruiseEndTime,
+        d.check_user as reviewer,
+        d.check_date as reviewTime
+        from
+        u_patrol_task a,u_patrol_result d, u_patrol_data_result c
+        where 1 = 1
+        and a.task_id = d.task_id
+        and c.task_id = a.task_id
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectReviewTaskFlag" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+        a.remark
+        FROM
+        u_patrol_result a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 </mapper>

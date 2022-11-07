@@ -43,8 +43,6 @@ import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.*;
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
-import com.yjh.platform.module.task.entity.TCruiseTaskResultDetail;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
@@ -242,6 +240,7 @@ public class UPatrolTaskService {
                 .setExecuteType(task.getExecuteType())
                 .setTaskLevel(task.getTaskLevel())
                 .setTaskState(238)
+                .setCreateTime(new Date())
                 .setTaskCount(instanceList.size())
                 .setTaskWait(instanceList.size())
                 .setRemark("0");
@@ -1031,6 +1030,7 @@ public class UPatrolTaskService {
             log.info("任务终止失败", e);
         }
 
+        lowTaskGoOn(taskId);
         //任务状态上报站端
         sendTaskStateToUp(task, 4);
         return uPatrolResultDao.update(uPatrolResult);
@@ -1359,7 +1359,7 @@ public class UPatrolTaskService {
             }
 
             //低优先任务继续
-            //        StaticContextAccessor.getBean(RobotService.class).lowTaskGoOn(taskId);
+            lowTaskGoOn(taskId);
 
             // todo:给上一级系统上报任务状态
         }catch (Exception e){
@@ -2658,5 +2658,19 @@ public class UPatrolTaskService {
 
             return keys;
         });
+    }
+
+    private void lowTaskGoOn(String taskId){
+        String lowTaskKey = "lowTask:" + taskId;
+        List<String> lowTaskList = redisTemplate.opsForList().range(lowTaskKey, 0, -1);
+        if (lowTaskList != null && lowTaskList.size() > 0) {
+            lowTaskList.forEach(lowTask -> {
+                try {
+                    taskGoOn(lowTask);
+                }catch (Exception e){
+                    log.info("低优先级任务继续出错：{}",e);
+                }
+            });
+        }
     }
 }

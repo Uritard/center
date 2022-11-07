@@ -490,7 +490,7 @@
         LEFT JOIN t_std_devicemete a on a.device_mete_id = b.device_mete_id
         LEFT JOIN u_patrol_task g ON f.task_id = g.task_id
         LEFT JOIN t_dict_business h ON f.cruise_type = h.dict_code AND h.col_name = "cruise_type"
-        JOIN t_dict_business i ON g.task_type = i.dict_code AND i.col_name = "plan_type"
+        LEFT JOIN t_dict_business i ON g.task_type = i.dict_code AND i.col_name = "plan_type"
         LEFT JOIN t_dict_business j ON f.identify_result = j.dict_code AND j.col_name = "identify_result"
         LEFT JOIN t_dict_business z ON f.cruise_result=z.dict_code AND z.col_name="cruise_result"
         LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
@@ -530,7 +530,7 @@
         LEFT JOIN t_std_devicemete a on a.device_mete_id = w.device_mete_id
         LEFT JOIN u_patrol_task g ON f.task_id = g.task_id
         LEFT JOIN t_dict_business h ON f.cruise_type = h.dict_code AND h.col_name = "cruise_type"
-        JOIN t_dict_business i ON g.task_type = i.dict_code AND i.col_name = "plan_type"
+        LEFT JOIN t_dict_business i ON g.task_type = i.dict_code AND i.col_name = "plan_type"
         LEFT JOIN t_dict_business j ON f.identify_result = j.dict_code AND j.col_name = "identify_result"
         LEFT JOIN t_dict_business z ON f.cruise_result=z.dict_code AND z.col_name="cruise_result"
         LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
@@ -568,7 +568,7 @@
         LEFT JOIN t_std_devicemete a on a.device_mete_id = b.device_mete_id
         LEFT JOIN u_patrol_task g ON f.task_id = g.task_id
         LEFT JOIN t_dict_business h ON f.cruise_type = h.dict_code AND h.col_name = "cruise_type"
-        JOIN t_dict_business i ON g.task_type = i.dict_code AND i.col_name = "plan_type"
+        LEFT JOIN t_dict_business i ON g.task_type = i.dict_code AND i.col_name = "plan_type"
         LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name="mete_type"
         LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name="meter_type"
         WHERE
