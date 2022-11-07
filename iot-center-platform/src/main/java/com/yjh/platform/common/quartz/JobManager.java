@@ -307,7 +307,6 @@ public class JobManager {
                     .withSchedule(cronSchedule(quartzTask.getCronExpression()))
                     .build();
         } else if (task.getExecuteType() ==CruiseConstant.TaskTypeEnum.NOW.getType()) {
-//            trigger = TriggerBuilder.newTrigger().
             trigger = TriggerBuilder.newTrigger()
                     .withIdentity(str, quartzTask.getJobGroup())
                     .startNow()

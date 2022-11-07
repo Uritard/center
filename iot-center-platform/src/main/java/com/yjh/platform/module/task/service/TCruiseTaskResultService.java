@@ -372,22 +372,14 @@ public class TCruiseTaskResultService {
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Map<String, Object> selectCruiseAdvance(String taskId) {
-        Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId);
-
-        String cruiseExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "已执行");
-        String cruiseNotExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未执行");
-        String cruiseExecuteFailed = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "执行失败");
-        String cruiseUnknown = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未知");
-
         Long cruiseCount = tCruiseTaskResultDao.selectCruiseCountsByTaskId(taskId);//总巡检点数量
         float cruiseComCount = 0;//执行完成的巡检点数量
 
-        for (String cruiseKey : keyResult) {
-            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(cruiseKey);
-            if (!(resultMap.get("cruiseStatus").equals(cruiseNotExecuted))) {
-                cruiseComCount = cruiseComCount + 1;
-            }
-        }
+        Map<String, Object> countResult = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId);
+        Integer normal = ValueUtil.toInteger(countResult.get("normal"),0);
+        Integer abnormal = ValueUtil.toInteger(countResult.get("abnormal"),0);
+
+        cruiseComCount = normal+abnormal;
         log.info("执行完成点：" + cruiseComCount + "个");
         Map<String, Object> rateAndTaskInfo = new HashMap<>();
         if (cruiseCount == 0 || cruiseComCount == 0) {

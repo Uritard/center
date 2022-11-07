@@ -261,7 +261,13 @@ public class UPatrolTaskService {
                     .setCruiseStatus(253)
                     .setCruiseType(item.getCruiseType());
             Map map = Object2Map.objectToMap(uPatrolDataResult, true);
-            map.put("cameraId", String.valueOf(item.getCameraId()));
+            if(item.getCruiseType() != 228){
+                map.put("cameraId",item.getCruiseId().toString());
+                map.put("robotId","");
+            }else {
+                map.put("cameraId","");
+                map.put("robotId",item.getRobotId().toString());
+            }
             String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);
         }

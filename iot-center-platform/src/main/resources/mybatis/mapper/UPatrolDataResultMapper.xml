@@ -546,7 +546,7 @@
         <if test="meteType != -1 ">and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="meterType != -1 ">and a.meter_type = #{meterType, jdbcType=INTEGER}</if>
         <if test="instanceName != null and instanceName != '' ">and f.instance_name LIKE CONCAT('%',#{instanceName, jdbcType=VARCHAR},'%')</if>
-        ORDER BY e.cruise_time DESC
+        ORDER BY f.cruise_time DESC
     </select>
 
     <select id="selectBrokenLine"  resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
@@ -599,7 +599,7 @@
             AND a.fir_name != 'f'
         <if test="cameraId!=null  and cameraId!=''"> and  d.camera_id =  #{cameraId,jdbcType=BIGINT} </if>
         <if test="firName != null and firName != '' ">and a.fir_name LIKE CONCAT('%',#{firName, jdbcType=VARCHAR},'%')</if>
-        <if test="startDate != null and startDate != '' endDate != null and endDate != ''" >and a.fir_date between STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s') and STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')</if>
+        <if test="startDate != null and endDate != null" >and a.fir_date between STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s') and STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')</if>
         ORDER BY a.fir_date DESC
     </select>
 
