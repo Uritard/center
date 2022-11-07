@@ -233,6 +233,7 @@ public class UPatrolTaskService {
 
     public List<TCruisePointInstanceNameDetail> initializeTaskInfo(List<Long> instanceList, UPatrolTask task)  {
         UPatrolResult uPatrolResult = new UPatrolResult();
+        Date now = new Date();
         uPatrolResult.setTaskId(task.getTaskId())
                 .setTaskName(task.getTaskName())
                 .setTaskCode(task.getTaskCode())
@@ -244,7 +245,8 @@ public class UPatrolTaskService {
                 .setCreateTime(new Date())
                 .setTaskCount(instanceList.size())
                 .setTaskWait(instanceList.size())
-                .setRemark("0");
+                .setRemark("0")
+                .setCreateTime(now);
         uPatrolResultDao.add(uPatrolResult);
 
         List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(instanceList);
@@ -259,14 +261,15 @@ public class UPatrolTaskService {
                     .setCruiseId(item.getCruiseId())
                     .setCruiseName(item.getCruiseName())
                     .setCruiseStatus(253)
-                    .setCruiseType(item.getCruiseType());
+                    .setCruiseType(item.getCruiseType()).setCreatetime(now);
             Map map = Object2Map.objectToMap(uPatrolDataResult, true);
+            map.put("deviceMeteId", String.valueOf(item.getDeviceMeteId()));
             if(item.getCruiseType() != 228){
-                map.put("cameraId",item.getCruiseId().toString());
+                map.put("cameraId", String.valueOf(item.getCameraId()));
                 map.put("robotId","");
             }else {
                 map.put("cameraId","");
-                map.put("robotId",item.getRobotId().toString());
+                map.put("robotId", String.valueOf(item.getRobotId()));
             }
             String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);

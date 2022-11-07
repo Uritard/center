@@ -179,7 +179,7 @@ public abstract class AbstractVideoCruise {
                 CruiseRedisStorage.offer(inspectionMap);
                 if (!picError) {
                     // 判断是否有配置算法
-                    TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("device_mete_id", "-1"));
+                    TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("deviceMeteId", "-1"));
                     if (algorithm != null) {
                         log.info("request algorithm: {}", JSON.toJSONString(algorithm));
                         // 算法分析
