@@ -16,6 +16,7 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
@@ -167,8 +168,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
             infoMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
             StaticContextAccessor.getBean(UPatrolTaskService.class).alarmPopUp(tStdDevicemete, infoMap);
 
-            // 将产生的告警上送至上级系统
-            alarmToUpSystem(warnInfo, tStdDevicemete);
+            // 将产生的告警上送至上一级系统
+            alarmToUpSystem(warnInfo, tStdDevicemete, taskId, instanceId);
 
             // 将产生的告警上送到算法管理平台
             alarmToAmPlatform(warnMap);
@@ -277,87 +278,42 @@ public class IsWarnAfterCruiseThread implements Runnable {
      * @param tStdDevicemete 测点信息
      * @return void
      */
-    private void alarmToUpSystem(TWarnInfo warnInfo, TStdDeviceMete tStdDevicemete){
-        XMLBaseModel xmlBaseModel = new XMLBaseModel();
-        List<Map<String, Object>> xmlItems = new ArrayList<>();
-        Map<String, Object> xmlItem = new HashMap<>(16);
-        try {
-            xmlBaseModel.setType("62");
-            xmlItem.put("patroldevice_code", threadMap.getOrDefault("robotCode", ""));
-            xmlItem.put("patroldevice_name", threadMap.getOrDefault("robotCode", ""));
-            xmlItem.put("task_name", Optional.ofNullable(threadMap.get("taskName")).orElse(""));
-            xmlItem.put("task_code", Optional.ofNullable(warnInfo.getTaskId()).orElse(""));
-            xmlItem.put("device_name", Optional.ofNullable(threadMap.get("deviceName")).orElse(""));
-            xmlItem.put("device_id", Optional.ofNullable(threadMap.get("deviceId")).orElse(""));
-            switch (warnInfo.getWarnLevel()){
-                case 130:
-                    xmlItem.put("alarm_level", "1");
-                    break;
-                case 131:
-                    xmlItem.put("alarm_level", "2");
-                    break;
-                case 132:
-                    xmlItem.put("alarm_level", "3");
-                    break;
-                case 133:
-                    xmlItem.put("alarm_level", "4");
-                    break;
-                default:
-                    break;
-            }
+    private void alarmToUpSystem(TWarnInfo warnInfo, TStdDeviceMete tStdDevicemete, String taskId, Long instanceId){
+        String alarmLevel = "";
+        switch (warnInfo.getWarnLevel()){
+            case 130:
+                alarmLevel = "1";
+                break;
+            case 131:
+                alarmLevel = "2";
+                break;
+            case 132:
+                alarmLevel = "3";
+                break;
+            case 133:
+                alarmLevel = "4";
+                break;
+            default:
+                break;
+        }
+        String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
+        Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+//        StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, warnInfo);
+
+        try{
             // 存在可见光的表计和红外测温和刀闸
             String recognitionType = threadMap.get("recognitionType");
             switch (recognitionType){
                 case "1":
-                    xmlItem.put("alarm_type", "7"); break;
-                case "2":
-                    xmlItem.put("alarm_type", "10"); break;
-                case "3":
-                    xmlItem.put("alarm_type", "6"); break;
-                case "4":
-                    xmlItem.put("alarm_type", "1"); break;
+//                    xmlItem.put("alarm_type", "7"); break;
+//                case "2":
+//                    xmlItem.put("alarm_type", "10"); break;
+//                case "3":
+//                    xmlItem.put("alarm_type", "6"); break;
+//                case "4":
+//                    xmlItem.put("alarm_type", "1"); break;
                 default: break;
             }
-            xmlItem.put("recognition_type", threadMap.get("recognitionType"));
-            String fileType = threadMap.get("fileType");
-            String fileNamePath = "";
-            switch (fileType){
-                case "1": fileNamePath = "/FIR/"; break;
-                case "2": fileNamePath = "/CCD/"; break;
-                case "3": fileNamePath = "/Audio/"; break;
-                default: break;
-            }
-            xmlItem.put("file_type", fileType);
-
-            String imgPath = warnInfo.getImagePath().replaceAll(
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative", "content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute", "content")));
-            String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationCode", "content"));
-
-            // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR或Audio/设备点位ID_编码_时间.jpg
-            String timeFormat = DateTimeUtil.format3(DateTimeUtil.parse(threadMap.get("time")));
-            String tagPath = stationCode + "/" + DateTimeUtil.format2(DateTimeUtil.parse(threadMap.get("time"))) + "/" + warnInfo.getTaskId() + fileNamePath +
-                    threadMap.get("deviceId") + "_" + threadMap.get("robotCode") + "_" + timeFormat + ".jpg";
-            log.info("tagPath==={}", tagPath);
-            log.info("imgPath:{},tagPath:{}", imgPath,tagPath);
-            uploadFileToUpFtps(imgPath, "/" + tagPath, upFtpsConfig);
-            xmlItem.put("file_path", tagPath);
-
-            xmlItem.put("value", warnInfo.getValue());
-            xmlItem.put("unit", Optional.ofNullable(tStdDevicemete.getUnit()).orElse(""));
-            xmlItem.put("value_unit", warnInfo.getValue() + xmlItem.get("unit"));
-            xmlItem.put("time", DateTimeUtil.format(new Date()));
-            xmlItem.put("task_patrolled_id", warnInfo.getTaskId()+"_"+DateTimeUtil.format3(warnInfo.getWarnTime()));
-            xmlItem.put("content", warnInfo.getWarnContent());
-
-            xmlItems.add(xmlItem);
-            xmlBaseModel.setItems(xmlItems);
-            List<XMLBaseModel> list = new ArrayList<>();
-            list.add(xmlBaseModel);
-            Map<String, List<XMLBaseModel>> map = new HashMap<>(2);
-            map.put("list", list);
-            log.info("告警上报：-" + map);
-//            Constant.otherServer(map, Constant.TCP_URL);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }

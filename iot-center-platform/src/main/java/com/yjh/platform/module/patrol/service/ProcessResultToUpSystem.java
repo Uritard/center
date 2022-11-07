@@ -1,8 +1,10 @@
 package com.yjh.platform.module.patrol.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.patrol.CruiseConstant;
+import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TWarnInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import org.apache.commons.lang3.ArrayUtils;
@@ -30,7 +32,7 @@ public class ProcessResultToUpSystem {
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
-    private IntelAnalysisService intelAnalysisService;
+    private AnalyseDataOperateDao analyseDataOperateDao;
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
 
@@ -56,7 +58,7 @@ public class ProcessResultToUpSystem {
             String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
             String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
             String simpleDateFormat = DateTimeUtil.format3(new Date());
-            String analyseType = intelAnalysisService.getAlgorithmTypeMap(instanceId);
+            String analyseType = getAlgorithmTypeMap(instanceId);
             HashMap<String, String> typeAndPathName = getTypeAndPathName(analyseType);
 
             xmlItem.put("patroldevice_code", "巡视设备名称");
@@ -98,6 +100,32 @@ public class ProcessResultToUpSystem {
             log.error(e.getMessage(), e);
         }
         return xmlBaseModel;
+    }
+
+    /**
+     * 查询巡视点关联的算法类型
+     * @param instanceId 巡视点id
+     * @return String
+     */
+    public String getAlgorithmTypeMap(String instanceId) {
+        String analyseType = "";
+        try {
+            // is_ai为on缺陷,is_judge为on判别,algorithm_id非空为表计
+            Map<String, Object> algorithmTypeMap = analyseDataOperateDao.selectAlgorithmByInstanceId(Long.valueOf(instanceId));
+            log.info("algorithmTypeMap==={}", JSON.toJSONString(algorithmTypeMap));
+
+            // 判断巡视点配置的算法类型 398-缺陷 11判别 1-12表计
+            if (Objects.equals("on",  algorithmTypeMap.get("is_ai"))){
+                analyseType = "398";
+            }else if (Objects.nonNull(algorithmTypeMap.get("algorithm_id"))){
+                analyseType = String.valueOf(algorithmTypeMap.get("algorithm_type"));
+            }else {
+                analyseType = "11";
+            }
+        }catch (Exception e){
+            log.error("判断巡视点配置的算法类型异常：", e);
+        }
+        return analyseType;
     }
 
     /**
@@ -178,9 +206,17 @@ public class ProcessResultToUpSystem {
      */
     private Map<String, String> packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, Map<String, Object> xmlItem, String tagPath) {
         Map<String, String> resultPathMap = new HashMap<>(4);
-        String imgPath = tWarnInfo.getImagePath().replaceAll(
-                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
-                String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content")));
+        String imagePath = tWarnInfo.getImagePath();
+        if (imagePath.contains("meter")){
+            imagePath = imagePath.replaceAll(
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content")));
+        }else if (imagePath.contains("ftpImg")){
+            imagePath = imagePath.replaceAll(
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative","content")),
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute","content")));
+        }
+
         try {
             tagPath = "alarm/" + tagPath;
             xmlItem.put("file_path", tagPath);
@@ -194,7 +230,7 @@ public class ProcessResultToUpSystem {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
-        resultPathMap.put("imgPath", imgPath);
+        resultPathMap.put("imgPath", imagePath);
         resultPathMap.put("tagPath", tagPath);
         return resultPathMap;
     }
