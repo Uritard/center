@@ -7,6 +7,7 @@ import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.task.entity.TStdDevicemete;
+import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

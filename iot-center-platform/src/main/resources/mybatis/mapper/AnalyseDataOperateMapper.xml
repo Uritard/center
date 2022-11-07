@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao">
 
-    <resultMap id="warnInfo" type="com.yjh.platform.module.patrol.entity.TWarnInfo">
+    <resultMap id="warnInfo" type="com.yjh.platform.module.task.entity.TWarnInfo">
         <id column="warn_id" jdbcType="BIGINT" property="warnId" />
         <result column="warn_level" jdbcType="INTEGER" property="warnLevel" />
         <result column="warn_time" jdbcType="TIMESTAMP" property="warnTime" />
@@ -190,7 +190,7 @@
 
 
 
-    <insert id="insertWarnInfo" useGeneratedKeys="true" keyProperty="warnId" parameterType="com.yjh.platform.module.patrol.entity.TWarnInfo">
+    <insert id="insertWarnInfo" useGeneratedKeys="true" keyProperty="warnId" parameterType="com.yjh.platform.module.task.entity.TWarnInfo">
         insert into t_warn_info(
             warn_id,
             warn_level,

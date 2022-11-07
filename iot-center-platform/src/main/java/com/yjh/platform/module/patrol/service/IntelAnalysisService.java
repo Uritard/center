@@ -6,11 +6,11 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
+import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.GetSpringUtil;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.mqtt.ftpsService;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
@@ -22,6 +22,7 @@ import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
+import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -89,7 +90,7 @@ public class IntelAnalysisService {
     @Autowired
     private IntelligentAlgorithmConfig algorithmConfig;
     @Autowired
-    private ftpsService ftpsservice;
+    private FtpsService ftpsservice;
     @Autowired
     private UPatrolTaskService uPatrolTaskService;
 
@@ -910,7 +911,7 @@ public class IntelAnalysisService {
 
     private void alarmToSFZJ(Boolean isHave, String instanceId, List<AnalyseResultItem> results){
         try{
-            ftpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
+            FtpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
             String flag= ftpsservice.getFlag();
             if("1".equals(flag) && isHave) {
                 log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");

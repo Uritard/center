@@ -12,11 +12,11 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.mqtt.AlarmService;
+import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.GetSpringUtil;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.mqtt.ftpsService;
 import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -34,7 +34,6 @@ import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
 import com.yjh.platform.module.patrol.entity.TDefectInfo;
-import com.yjh.platform.module.patrol.entity.TWarnInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.InspectionResultThread;
@@ -43,6 +42,7 @@ import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
@@ -1949,7 +1949,7 @@ public class UPatrolTaskService {
         // msg：判别告警 defect：缺陷告警
         Set<String> differentList= redisScan( "msg:" + msgID);
         Set<String> defectList = redisScan("defect:" + msgID);
-        ftpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
+        FtpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
         String flag= ftpsservice.getFlag();
         String ftpsRemotePath = ftpsservice.getFtpsRemotePath();
 

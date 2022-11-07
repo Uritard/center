@@ -5,8 +5,8 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
-import com.yjh.platform.module.patrol.entity.TWarnInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
+import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -218,11 +218,29 @@ public class ProcessResultToUpSystem {
         }
 
         try {
+            String recognitionType = String.valueOf(xmlItem.get("recognition_type"));
+            String alarmType = "";
+            switch (recognitionType){
+                case "1":
+                    alarmType = "7";
+                    break;
+                case "2":
+                    alarmType = "10";
+                    break;
+                case "3":
+                    alarmType = "6";
+                    break;
+                case "4":
+                    alarmType = "1";
+                    break;
+                default:
+                    break;
+            }
             tagPath = "alarm/" + tagPath;
             xmlItem.put("file_path", tagPath);
             // 1-预警 2-一般 3-严重 4-危急
             xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));
-            xmlItem.put("alarm_type", "6");
+            xmlItem.put("alarm_type", alarmType);
             xmlItem.put("value", Optional.ofNullable(tWarnInfo.getValue()).orElse(""));
             xmlItem.put("unit", "");
             xmlItem.put("value_unit", Optional.ofNullable(tWarnInfo.getValue()).orElse(""));

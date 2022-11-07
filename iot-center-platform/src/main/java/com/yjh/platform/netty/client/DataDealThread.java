@@ -5,15 +5,16 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
+import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.GetSpringUtil;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.mqtt.ftpsService;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
+import com.yjh.platform.module.task.entity.TWarnInfo;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -903,7 +904,7 @@ public class DataDealThread implements Runnable {
                         Set<String> differentList= redisScan( "msg:" + reponseMessage);  //标记告警，也就是判别告警
                         Set<String> defectList=  redisScan("defect:" + reponseMessage);   //缺陷告警
                         Alarm alarmDetail=new Alarm();
-                        ftpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
+                        FtpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
                         String flag= ftpsservice.getFlag();
 
                         SimpleDateFormat ym = new SimpleDateFormat("yyyyMM");
