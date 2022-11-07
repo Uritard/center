@@ -56,9 +56,6 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         RobotServerHandler.send(cruiseResultProtocol, robotCode);
         log.info("巡视主机给机器人/无人机{}响应了", robotCode);
 
-        // 巡视结果上报上一级系统
-        resultToUpSystem(xmlBaseModel, robotCode);
-
         // 处理数据
         List<RobotPatrolTaskResult> resultList = new ArrayList<>();
         for(Map<String, Object> item : xmlBaseModel.getItems()){

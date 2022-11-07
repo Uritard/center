@@ -17,6 +17,30 @@ import java.util.Map;
 public interface CruiseConstant {
 
     /**
+     * 任务状态，未开始
+     */
+    int TASK_STATE_NOT_START = 238;
+    /**
+     * 任务状态，正在执行
+     */
+    int TASK_STATE_EXECUTING = 239;
+    /**
+     * 任务状态，执行完成
+     */
+    int TASK_STATE_FINISHED = 240;
+    /**
+     * 任务状态，暂停
+     */
+    int TASK_STATE_PAUSE = 241;
+    /**
+     * 任务状态，终止
+     */
+    int TASK_STATE_INTERRUPT = 242;
+    /**
+     * 任务状态，异常终止
+     */
+    int TASK_STATE_ABNORMAL = 243;
+    /**
      * 巡视结果正常
      */
     int CRUISE_RESULT_NORMAL = 246;
@@ -24,11 +48,22 @@ public interface CruiseConstant {
      * 巡视结果异常
      */
     int CRUISE_RESULT_ABNORMAL = 247;
-
     /**
-     * 审核状态，未审核
+     * 异常原因，抓图失败
      */
-    int EVALUATION_STATE_UN = 257;
+    int CRUISE_ABNORMAL_NOPIC = 248;
+    /**
+     * 异常原因，数据异常
+     */
+    int CRUISE_ABNORMAL_DATAABNORMAL = 249;
+    /**
+     * 异常原因，异常告警
+     */
+    int CRUISE_ABNORMAL_ABNORMALALARM = 250;
+    /**
+     * 异常原因，超时
+     */
+    int CRUISE_ABNORMAL_TIMEOUT = 251;
 
     /**
      * 巡检数据状态，已执行
@@ -44,9 +79,18 @@ public interface CruiseConstant {
     int CRUISE_STATE_FAILED = 254;
 
     /**
-     * 异常原因，超时
+     * 审核状态，已审核
      */
-    int CRUISE_ABNORMAL_TIMEOUT = 251;
+    int EVALUATION_STATE_DONE = 256;
+    /**
+     * 审核状态，未审核
+     */
+    int EVALUATION_STATE_UN = 257;
+
+    /**
+     * 异常原因，缺陷异常
+     */
+    int CRUISE_ABNORMAL_DEFECT = 409;
     /**
      * 异常原因，检修
      */
@@ -56,50 +100,9 @@ public interface CruiseConstant {
      */
     int CRUISE_ABNORMAL_OFFLINE = 411;
     /**
-     * 异常原因，抓图失败
-     */
-    int CRUISE_ABNORMAL_NOPIC = 248;
-    /**
-     * 异常原因，数据异常
-     */
-    int CRUISE_ABNORMAL_DATAABNORMAL = 249;
-    /**
-     * 异常原因，缺陷异常
-     */
-    int CRUISE_ABNORMAL_DEFECT = 409;
-    /**
-     * 异常原因，异常告警
-     */
-    int CRUISE_ABNORMAL_WARING = 250;
-    /**
      * 异常原因，任务终止
      */
     int CRUISE_ABNORMAL_INTERRUPT = 412;
-
-    /**
-     * 任务状态，未开始
-     */
-    int TASK_STATE_UNSTART = 238;
-    /**
-     * 任务状态，正在执行
-     */
-    int TASK_STATE_RUNNING = 239;
-    /**
-     * 任务状态，执行完成
-     */
-    int TASK_STATE_DONE = 240;
-    /**
-     * 任务状态，暂停
-     */
-    int TASK_STATE_PAUSE = 241;
-    /**
-     * 任务状态，终止
-     */
-    int TASK_STATE_INTERRUPT = 242;
-    /**
-     * 任务状态，异常终止
-     */
-    int TASK_STATE_ABNORMAL = 243;
 
     enum TypeEnum {
 
@@ -203,39 +206,5 @@ public interface CruiseConstant {
             return taskTypeEnumHashMap.get(type);
         }
     }
-
-    /**
-     * 任务状态-任务未开始
-     */
-    int TASK_STATE_NOT_START = 238;
-    /**
-     * 任务状态-正在执行
-     */
-    int TASK_STATE_EXECUTING = 239;
-    /**
-     * 任务状态-执行完成
-     */
-    int TASK_STATE_FINISHED = 240;
-    /**
-     * 任务状态-任务终止
-     */
-    int TASK_STATE_SHUT_DOWN = 242;
-    /**
-     * 任务状态-任务异常终止
-     */
-    int TASK_STATE_ABNORMAL_SHUT_DOWN = 243;
-    /**
-     * 任务状态-任务超期
-     */
-    int TASK_STATE_OVERTIME = 244;
-
-    /**
-     * 审核状态-未审核
-     */
-    int EVALUATION_STATE_UNREVIEWED = 256;
-    /**
-     * 审核状态-审核
-     */
-    int EVALUATION_STATE_REVIEWED = 257;
 
 }

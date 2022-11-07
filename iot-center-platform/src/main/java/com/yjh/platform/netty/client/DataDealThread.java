@@ -9,7 +9,7 @@ import com.yjh.platform.common.mqtt.GetSpringUtil;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.mqtt.ftpsservice;
+import com.yjh.platform.common.mqtt.ftpsService;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
@@ -449,8 +449,7 @@ public class DataDealThread implements Runnable {
                                                     currentWarnInfo.put("isPop","false");
 
                                                     // 告警上报站端
-                                                    StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
-                                                            jsonObjectResult.getString("analyseType"), cruiseResultMap, alarm_level, tWarnInfo);
+                                                    StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(cruiseResultMap, alarm_level, tWarnInfo);
 
                                                     // webSocket通知前端刷新告警统计数量
                                                     Map<String, Object> jasonMaps = new HashMap<>();
@@ -856,8 +855,7 @@ public class DataDealThread implements Runnable {
                         redisTemplate.opsForHash().putAll(cruiseRedisName, cruiseResultMap);//修改redis
 
                         // 巡视点结果上报站端
-                        StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
-                                jsonObjectResult.getString("analyseType"), cruiseResultMap, null, null);
+                        StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem( cruiseResultMap, null, null);
                         log.info("Border_______---------______________________________________________________________________________________________");
                         lock.lock();
                         try {
@@ -877,8 +875,7 @@ public class DataDealThread implements Runnable {
                         }
 
                         // 巡视点结果上报站端
-                        StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(
-                                jsonObjectResult.getString("analyseType"), cruiseResultMap, null, null);
+                        StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(cruiseResultMap, null, null);
 
 
 //                NORMAL = NORMAL + 1;
@@ -906,7 +903,7 @@ public class DataDealThread implements Runnable {
                         Set<String> differentList= redisScan( "msg:" + reponseMessage);  //标记告警，也就是判别告警
                         Set<String> defectList=  redisScan("defect:" + reponseMessage);   //缺陷告警
                         Alarm alarmDetail=new Alarm();
-                        ftpsservice ftpsservice= GetSpringUtil.getBean("ftpsservice");
+                        ftpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
                         String flag= ftpsservice.getFlag();
 
                         SimpleDateFormat ym = new SimpleDateFormat("yyyyMM");

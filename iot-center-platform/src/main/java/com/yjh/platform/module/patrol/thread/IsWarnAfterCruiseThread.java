@@ -7,7 +7,7 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
 import com.yjh.platform.common.mqtt.GetSpringUtil;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
-import com.yjh.platform.common.mqtt.ftpsservice;
+import com.yjh.platform.common.mqtt.ftpsService;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -187,7 +187,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private void alarmToAmPlatform (Map<String, String> warnMap) {
         try{
             log.info("开始与算法管理平台交互");
-            ftpsservice ftpsservice = GetSpringUtil.getBean("ftpsservice");
+            ftpsService ftpsservice = GetSpringUtil.getBean("ftpsservice");
             String flag = ftpsservice.getFlag();
             if (StringUtils.equals("1", flag)) {
                 Alarm alarm = new Alarm();

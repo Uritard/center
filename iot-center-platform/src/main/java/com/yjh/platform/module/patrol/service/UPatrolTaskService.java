@@ -16,7 +16,7 @@ import com.yjh.platform.common.mqtt.GetSpringUtil;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.mqtt.ftpsservice;
+import com.yjh.platform.common.mqtt.ftpsService;
 import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -73,6 +73,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -143,16 +144,16 @@ public class UPatrolTaskService {
             if (uPatrolTask.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
                 Date startTime = format.parse("2000-01-01 00:00:00");
                 Date endTime = null;
-                if (org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleMonth())
-                        && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleWeek())
-                        && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleExecuteTime())){
+                if (StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleMonth())
+                        && StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleWeek())
+                        && StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleExecuteTime())){
                     startTime = DateTimeUtil.parse(tCruiseTaskAdd.getCycleStartTime());
                     endTime = DateTimeUtil.parse(tCruiseTaskAdd.getCycleEndTime());
                 }
                 // 间隔
-                if (org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalType())
-                        && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalNumber())
-                        && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalExecuteTime())){
+                if (StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalType())
+                        && StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalNumber())
+                        && StringUtils.isNotEmpty(tCruiseTaskAdd.getIntervalExecuteTime())){
                     startTime = DateTimeUtil.parse(tCruiseTaskAdd.getIntervalStartTime());
                     endTime = DateTimeUtil.parse(tCruiseTaskAdd.getIntervalEndTime());
                 }
@@ -470,8 +471,8 @@ public class UPatrolTaskService {
                 //这个点 没有做
                 result.put("cruiseStatus",String.valueOf(CRUISE_STATE_FAILED));//执行失败
                 result.put("resultNum","机器人任务异常");
-                result.put("cruiseAbnormal",String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));//数据异常
-                result.put("evaluationState",String.valueOf(EVALUATION_STATE_REVIEWED));//未审核
+                result.put("cruiseAbnormal",String.valueOf(CruiseConstant.CRUISE_ABNORMAL_DATAABNORMAL));//数据异常
+                result.put("evaluationState",String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
                 result.put("identifyResult",String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
 
                 String instanceKey = cruiseResultKey+instanceId;
@@ -973,7 +974,7 @@ public class UPatrolTaskService {
     @Async
     public int taskShutDown(String taskId) {
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
-        if (uPatrolResult.getTaskState() == TASK_STATE_DONE) {
+        if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED) {
             return 1;
         }
         uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
@@ -1198,6 +1199,9 @@ public class UPatrolTaskService {
 
         int abnormalCounts = patrolTaskResult(taskId, MapUtils.getIntValue(cruiseResultMap, "cruiseResult"), 1);
 
+        // 巡视结果上报上一级系统
+        processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultMap, null, null);
+
         if (abnormalCounts >= 0) {
             log.info("{}该点是任务{}最后一个点", MapUtils.getString(cruiseResultMap, "instanceId"), taskId);
             completionOfTask(taskId, abnormalCounts);
@@ -1335,8 +1339,6 @@ public class UPatrolTaskService {
                     uPatrolDataResultList.add(uPatrolDataResult);
                     cruiseResultIdList.add("");
 
-                    // 巡视结果上报上一级系统
-                    //                    processResultToUpSystem.alarmAndResultToUpSystem("", redisInfoMap, null, null);
 
                 }
             }
@@ -1359,7 +1361,7 @@ public class UPatrolTaskService {
             }
 
             //低优先任务继续
-            //        StaticContextAccessor.getBean(RobotService.class).lowTaskGoOn(taskId);
+//        StaticContextAccessor.getBean(RobotService.class).lowTaskGoOn(taskId);
 
             // todo:给上一级系统上报任务状态
         }catch (Exception e){
@@ -1443,7 +1445,7 @@ public class UPatrolTaskService {
         for (TCruiseTaskCount tCruiseTaskCount : list) {
             Date dayBeforeTime = dayBefore;
             Date dayAfterTime = dayAfter;
-            if (tCruiseTaskCount.getIfRun() == TaskTypeEnum.CYCLE.getType() && org.apache.commons.lang.StringUtils.isNotEmpty(tCruiseTaskCount.getDateType())) {
+            if (tCruiseTaskCount.getIfRun() == TaskTypeEnum.CYCLE.getType() && StringUtils.isNotEmpty(tCruiseTaskCount.getDateType())) {
 
                 if (tCruiseTaskCount.getStartTime().after(dayBeforeTime)){
                     dayBeforeTime = tCruiseTaskCount.getStartTime();
@@ -1880,6 +1882,7 @@ public class UPatrolTaskService {
                 String resultValue = patrolTaskResult.getResultValue();
                 String resultDesc = patrolTaskResult.getResultDesc();
                 String conf = patrolTaskResult.getConf();
+                String firDocPath = patrolTaskResult.getFirDocPath();
 
                 String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
                 Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
@@ -1905,7 +1908,7 @@ public class UPatrolTaskService {
                     defectHandler(msgID, analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
                 }else {
                     log.info("taskId为{}instanceId为{}的点为识别的点位", taskId, instanceId);
-                    recognitionHandler(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
+                    recognitionHandler(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
                 }
 
                 cruiseResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
@@ -1934,7 +1937,6 @@ public class UPatrolTaskService {
 
     /**
      * 缺陷和判别上报算法管理平台
-     * 这不是我写的 我从上个人那边copy的
      *
      * @param taskId 任务id
      * @param instanceId 巡视点id
@@ -1943,125 +1945,127 @@ public class UPatrolTaskService {
     private void defectToAlgorithmM(String taskId, String instanceId, String msgID) {
         // msg：判别告警 defect：缺陷告警
         Set<String> differentList= redisScan( "msg:" + msgID);
-        Set<String> defectList=  redisScan("defect:" + msgID);
-        Alarm alarmDetail = new Alarm();
-        ftpsservice ftpsservice= GetSpringUtil.getBean("ftpsservice");
+        Set<String> defectList = redisScan("defect:" + msgID);
+        ftpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
         String flag= ftpsservice.getFlag();
+        String ftpsRemotePath = ftpsservice.getFtpsRemotePath();
 
-        SimpleDateFormat ym = new SimpleDateFormat("yyyyMM");
-        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String yearMonth = ym.format(new Date());
-        String nowTime = timeFormat.format(new Date());
-        if(!differentList.isEmpty() && ("1".equals(flag))){
-            log.info("different类型:开始向算法管理平台发送图片和mqtt消息");
+        String nowTime = DateTimeUtil.getDateofFormatString();
+        String yearMonth = DateTimeUtil.getMonthDateString();
+        if(CollectionUtils.isNotEmpty(differentList) && ("1".equals(flag))){
+            log.info("判别告警类型:开始向算法管理平台发送图片和mqtt消息");
 
-            HashMap<String,String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
-            String picF = nowTime+"_"+nameMap.get("upRegionName")+"_"+nameMap.get("deviceName")+"_"+nameMap.get("meteName")+"_";
+            HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
+            String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
 
-            //,先取出算法平台返回的resultinfo中的结果图片路径
+            // 先取出算法平台返回的resultinfo中的结果图片路径
             String resultImagebak = "analyseResultImg";
-            String taskidbak = taskId;
-            Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskidbak+":"+ instanceId);//读redis
-            String devicename= String.valueOf(cruiseResult2.get("deviceName"));
-            //,获取原始路径.并拼接算法管理平台对应远程文件路径
-            String origpicpath=String.valueOf(cruiseResult2.get("origpic").toString());
-            String[] str2=origpicpath.split("/");
-            String origpcimagename=str2[str2.length-1];
-            String remoteorigfilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"原图.jpg";
+            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId+":"+ instanceId);
+            String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
+            String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
+
+            String remoteorigfilepath = ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"原图.jpg";
             //,获取结果路径.并拼接算法管理平台对应远程文件路径
-            String[] str=resultImagebak.split("/");
-            String imagename=str[str.length-1];
-            String remotefilepath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别告警.jpg";
+            String remotefilepath=ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别告警.jpg";
             //,获取基准路径.并拼接算法管理平台所需要的基准文件路径
             TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
             String Cruiseid=String.valueOf(tCruisePointInstance.getCruiseid());   //获取巡视点位id
             String judgeBaseImagepath= redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString();
             judgeBaseImagepath=judgeBaseImagepath+"/"+Cruiseid+"/"+Cruiseid+".jpg"; //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
             //拼接算法管理平台分析告警结果图片地址
-            String remotebaseimagicpath=ftpsservice.getFtpsRemotePath() + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别基准.jpg";
-            Iterator it=differentList.iterator();
-            List<Different> defectList1=new ArrayList<>();
+            String remotebaseimagicpath=ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别基准.jpg";
+
+            Iterator it = differentList.iterator();
+            List<Different> defectTempList = new ArrayList<>();
+            Alarm alarmDetail = new Alarm();
             while (it.hasNext()){
-                String key=it.next().toString();//所有的key
-                Map<String, String>  differentlistmap= redisTemplate.opsForHash().entries(key);
-                String resultinfo=differentlistmap.get("value");      //获取返回的resultvalue值,判别类是一个数值，缺陷类是坐标
-                log.info("判别结果：{}",resultinfo);
-                Different different= new Different();
-                String[] re = resultinfo.split(",");
+                String key = it.next().toString();
+                Map<String, String> differentListMap= redisTemplate.opsForHash().entries(key);
+                String resultValue = differentListMap.get("value");
+                log.info("判别结果：{}",resultValue);
+                Different different = new Different();
+                String[] re = resultValue.split(",");
                 if(re != null && re.length > 4){
                     different.setX1((int) NumberUtils.toDouble(re[1]));
                     different.setY1((int) NumberUtils.toDouble(re[2]));
                     different.setX2((int) NumberUtils.toDouble(re[3]));
                     different.setY2((int) NumberUtils.toDouble(re[4]));
                 }else {
-                    different.setX1((int) NumberUtils.toDouble(resultinfo));
+                    different.setX1((int) NumberUtils.toDouble(resultValue));
                     different.setY1(0);
                     different.setX2(0);
                     different.setY2(0);
                 }
-                defectList1.add(different);
+                defectTempList.add(different);
                 alarmDetail.setBay_name(nameMap.get("upRegionName"));
-                alarmDetail.setDevice_name(devicename);
+                alarmDetail.setDevice_name(deviceName);
                 alarmDetail.setPoint_name(nameMap.get("meteName"));
-                alarmDetail.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-                alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
-                alarmDetail.setPic_diff_base(remotebaseimagicpath);               //判别基准图路径
-                alarmDetail.setPic_different(remotefilepath);               //判别告警图路径,判别结果图
-                alarmDetail.setPic_defect("");      //缺陷告警图路径//
+                alarmDetail.setTime(DateTimeUtil.format(new Date()));
+                // 原图
+                alarmDetail.setPic_raw(remoteorigfilepath);
+                // 判别基准图
+                alarmDetail.setPic_diff_base(remotebaseimagicpath);
+                // 判别结果图
+                alarmDetail.setPic_different(remotefilepath);
+                // 缺陷告警图
+                alarmDetail.setPic_defect("");
             }
-            alarmDetail.setDifferent(defectList1);
-            ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
-            ftpsservice.uploadFile("判别告警",judgeBaseImagepath,remotebaseimagicpath);  //判别基准图片上传
-            ftpsservice.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
-            log.info("判别预算法主机origpicpath:{}， remoteorigfilepath:{}",origpicpath,remoteorigfilepath);
-            log.info("判别预算法主机judgeBaseImagepath:{}， remotebaseimagicpath:{}",judgeBaseImagepath,remotebaseimagicpath);
-            log.info("判别预算法主机resultImagebak:{}， remotefilepath:{}",resultImagebak,remotefilepath);
+            alarmDetail.setDifferent(defectTempList);
+            // 原始图片上传
+            ftpsservice.uploadFile("判别告警", origPicPath, remoteorigfilepath);
+            // 判别基准图片上传
+            ftpsservice.uploadFile("判别告警", judgeBaseImagepath, remotebaseimagicpath);
+            // 判别结果图片上传
+            ftpsservice.uploadFile("判别告警", resultImagebak, remotefilepath);
+            log.info("判别预算法主机origpicpath:{}， remoteorigfilepath:{}", origPicPath, remoteorigfilepath);
+            log.info("判别预算法主机judgeBaseImagepath:{}， remotebaseimagicpath:{}", judgeBaseImagepath, remotebaseimagicpath);
+            log.info("判别预算法主机resultImagebak:{}， remotefilepath:{}", resultImagebak, remotefilepath);
             //可靠性 文件是否传输成功
             if( !ftpsservice.fileExits(remoteorigfilepath)){
-                ftpsservice.uploadFile("判别告警",origpicpath,remoteorigfilepath);  //原始图片上传
+                ftpsservice.uploadFile("判别告警", origPicPath, remoteorigfilepath);
             }
             if( !ftpsservice.fileExits(remotebaseimagicpath)){
-                ftpsservice.uploadFile("判别告警",judgeBaseImagepath,remotebaseimagicpath);  //判别基准图片上传
+                ftpsservice.uploadFile("判别告警", judgeBaseImagepath, remotebaseimagicpath);
             }
             if( !ftpsservice.fileExits(remotefilepath)){
-                ftpsservice.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
+                ftpsservice.uploadFile("判别告警", resultImagebak, remotefilepath);
             }
             AlarmService alarmService= GetSpringUtil.getBean("alarmService");
             alarmService.PushMsg(alarmDetail);
+            log.info("判别告警发送算法管理平台结束");
 
-            // todo:判别上报上一级系统
+            // 判别上报上一级系统
+            processResultToUpSystem.defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
         }
 
-        if(defectList.size()> 0 && ("1".equals(flag))) {
-            log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
+        if(CollectionUtils.isNotEmpty(defectList) && ("1".equals(flag))) {
+            log.info("缺陷告警类型:开始向算法管理平台发送图片和mqtt消息");
+
             HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(Long.valueOf(instanceId));
             String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
 
-            //,先取出算法平台返回的resultinfo中的结果图片路径
+            // 先取出算法平台返回的resultinfo中的结果图片路径
             String resultImagebak = "analyseResultImg";
-            String taskidbak = taskId;
-            Map<String, Object> cruiseResult2 = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskidbak + ":" + instanceId);//读redis
-            String devicename = String.valueOf(cruiseResult2.get("deviceName"));
-            // 获取原始图路径
-            String origpicpath = String.valueOf(cruiseResult2.get("origpic"));
-            String[] str2 = origpicpath.split("/");
-            String origpcimagename = str2[str2.length - 1];
-            //拼接算法管理平台原始图片推送地址
-            String remoteorigfilepath = ftpsservice.getFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
-            log.info("开始向算法管理平台发送图片和mqtt消息");
-            String[] str = resultImagebak.split("/");
-            String imagename = str[str.length - 1];
-            //拼接算法管理平台分析告警结果图片地址
-            String remotefilepath = ftpsservice.getFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
-            Iterator it = defectList.iterator();
+            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+            String deviceName = Optional.ofNullable(cruiseResultMap.get("deviceName")).orElse("");
+            String origPicPath = Optional.ofNullable(cruiseResultMap.get("origpic")).orElse("");
 
+            //拼接算法管理平台原始图片推送地址
+            String remoteorigfilepath = ftpsRemotePath + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
+            //拼接算法管理平台分析告警结果图片地址
+            String remotefilepath = ftpsRemotePath + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
+
+            Iterator it = defectList.iterator();
+            Alarm alarmDetail = new Alarm();
             while (it.hasNext()) {
-                String key = it.next().toString();//所有的key
-                Map<String, String> differenmap = redisTemplate.opsForHash().entries(key);
-                String resultinfo = differenmap.get("value");      //获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
+                String key = it.next().toString();
+                Map<String, String> differentListMap = redisTemplate.opsForHash().entries(key);
+                // 获取返回的resultvalue值，这个值就是缺陷和判别的x,y位置信息
+                String resultinfo = differentListMap.get("value");
                 log.info("缺陷结果：{}", resultinfo);
-                String[] arr1 = resultinfo.split(",");   //目前格式："sly_dmyw,0,171,502,667,bj_bpps,745,143,724,923"
-                List<Defect> defectList1 = new ArrayList<>();
+                // 目前格式："wcaqm,1049.0,216.0,1211.0,389.0,0.8829"
+                String[] arr1 = resultinfo.split(",");
+                List<Defect> defectTempList = new ArrayList<>();
                 for (int i = 0; i < arr1.length; ) {
                     Defect defect = new Defect();
                     defect.setX1((int) NumberUtils.toDouble(arr1[i + 1]));
@@ -2069,47 +2073,50 @@ public class UPatrolTaskService {
                     defect.setX2((int) NumberUtils.toDouble(arr1[i + 3]));
                     defect.setY2((int) NumberUtils.toDouble(arr1[i + 4]));
                     defect.setType(arr1[i]);
-                    // DecimalFormat df =  new DecimalFormat("0%");
-                    // String confidence = df.format(Double.valueOf(arr1[i+5]));
                     int confidence = (int) (NumberUtils.toDouble(arr1[i + 5]) * 100);
                     defect.setConfidence(confidence);
-                    defect.setDesc(differenmap.get("defectContent") + "(坐标位置 " + defect.getX1() + "," +
-                            defect.getY1() + "," +
-                            defect.getX2() + "," +
-                            defect.getY2() + ";" +
-                            "置信度 " + confidence
-                            + "%)");
-                    defectList1.add(defect);
+                    defect.setDesc(differentListMap.get("defectContent") +
+                            "(坐标位置 " + defect.getX1() + "," + defect.getY1() + "," + defect.getX2() + "," + defect.getY2() + ";" +
+                            "置信度 " + confidence + "%)"
+                    );
+                    defectTempList.add(defect);
                     i = i + 6;
                 }
-                alarmDetail.setDefect(defectList1);
+                alarmDetail.setDefect(defectTempList);
                 alarmDetail.setBay_name(nameMap.get("upRegionName"));
-                alarmDetail.setDevice_name(devicename);  //需要修改位devicename
+                alarmDetail.setDevice_name(deviceName);
                 alarmDetail.setPoint_name(nameMap.get("meteName"));
-                alarmDetail.setTime(differenmap.get("defectTime"));
-                alarmDetail.setPic_raw(remoteorigfilepath);         //图片原图
-                alarmDetail.setPic_diff_base("");               //判别基准图路径
-                alarmDetail.setPic_different("");               //判别告警图路径,即分析结果图
-                alarmDetail.setPic_defect(remotefilepath);      //缺陷告警图路径//
+                alarmDetail.setTime(DateTimeUtil.format(new Date()));
+                // 原图
+                alarmDetail.setPic_raw(remoteorigfilepath);
+                // 判别基准图
+                alarmDetail.setPic_diff_base("");
+                // 判别结果图
+                alarmDetail.setPic_different("");
+                // 缺陷告警图
+                alarmDetail.setPic_defect(remotefilepath);
             }
-            ftpsservice.uploadFile("遥信告警", origpicpath, remoteorigfilepath);
+            // 原始图片上传
+            ftpsservice.uploadFile("遥信告警", origPicPath, remoteorigfilepath);
+            // 缺陷结果图片上传
             ftpsservice.uploadFile("遥信告警", resultImagebak, remotefilepath);
             if (!ftpsservice.fileExits(remoteorigfilepath)) {
-                ftpsservice.uploadFile("遥信告警", origpicpath, remoteorigfilepath);  //原始图片上传
+                ftpsservice.uploadFile("遥信告警", origPicPath, remoteorigfilepath);
             }
             if (!ftpsservice.fileExits(remotefilepath)) {
                 ftpsservice.uploadFile("遥信告警", resultImagebak, remotefilepath);
             }
 
-            log.info("巡视主机与智能分析主机：origpicpath:{}", origpicpath);
+            log.info("巡视主机与智能分析主机：origpicpath:{}", origPicPath);
             log.info("巡视主机与智能分析主机：remoteorigfilepath:{}", remoteorigfilepath);
             log.info("巡视主机与智能分析主机：resultImagebak:{}", resultImagebak);
             log.info("巡视主机与智能分析主机：remotefilepath:{}", remotefilepath);
             AlarmService alarmService = GetSpringUtil.getBean("alarmService");
             alarmService.PushMsg(alarmDetail);
-            log.info("发送算法管理平台结束");
+            log.info("缺陷告警发送算法管理平台结束");
 
-            // todo:缺陷上报上一级系统
+            // 缺陷上报上一级系统
+            processResultToUpSystem.defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
         }
     }
 
@@ -2122,7 +2129,7 @@ public class UPatrolTaskService {
      * @param tStdDevicemete 测点信息
      * @return String
      */
-    private String recognitionHandler(String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete) {
+    private String recognitionHandler(String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String firDocPath) {
         String resultImage;
         try {
             boolean dltFlag = NumberUtils.toInt(cruiseResultMap.get("cruiseType")) == 230
@@ -2157,7 +2164,7 @@ public class UPatrolTaskService {
                 resultStringValue = resultStringValue.split(",")[0];
                 log.info("resultStringValue=={}", resultStringValue);
 
-                normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, resultStringValue);
+                normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, resultStringValue, firDocPath);
             }
         }catch (Exception e){
             log.error("识别结果处理异常：", e);
@@ -2174,22 +2181,20 @@ public class UPatrolTaskService {
      * @param resultStringValue 处理后的结果值
      * @return void
      */
-    private void normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String resultStringValue) {
+    private void normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String resultStringValue, String firDocPath) {
         try {
             if (resultStringValue.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+")) {
-                //判断是否为红外识别且获取FIR文件 JsonObject中存在 firDocPath 则放入缓存中
-            /*if(Objects.nonNull(jsonObjectResult.get("firDocPath"))) {
-                if (!("".equals(jsonObjectResult.get("firDocPath")))) {
-                    String firDocPath = jsonObjectResult.getString("firDocPath").replaceAll(
+                //判断是否为红外识别且获取FIR文件 放入缓存中
+                if(StringUtils.isNotEmpty(firDocPath)) {
+                    firDocPath = firDocPath.replaceAll(
                             String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content")),
                             String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content")));
                     cruiseResultMap.put("firDocPath", firDocPath);
                     File file = new File(firDocPath);
                     //放入文件名
                     cruiseResultMap.put("firName", file.getName().substring(0, file.getName().lastIndexOf(".")));
-                    log.info("FIR-Doc-----:" + jsonObjectResult.get("firDocPath"));
+                    log.info("FIR-Doc-----:" + firDocPath);
                 }
-            }*/
 
                 log.info("开始告警预处理");
                 String meteKind = String.valueOf(tStdDevicemete.getMeteKind());
@@ -2328,7 +2333,7 @@ public class UPatrolTaskService {
                         pushAlarmInfo(warningMsg.get("warnName"), warningMsg.get("warnContent"));
 
                         // 告警上报上一级系统
-                        processResultToUpSystem.alarmAndResultToUpSystem("", cruiseResultMap, alarmLevel, tWarnInfo);
+                        processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, tWarnInfo);
                     }
                 }else {
                     cruiseResultMap.put("resultNum", resultValue);

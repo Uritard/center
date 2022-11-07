@@ -35,6 +35,9 @@ public class AnalysePatrolTaskResult implements Serializable {
     @ApiModelProperty(value = "巡视结果图片")
     private String analyseResultImg;
 
+    @ApiModelProperty(value = "红外fir文件")
+    private String firDocPath;
+
     @ApiModelProperty(value = "巡视结果值描述")
     private String resultDesc;
 

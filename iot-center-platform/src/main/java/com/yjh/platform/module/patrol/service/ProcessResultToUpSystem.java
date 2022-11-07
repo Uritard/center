@@ -2,9 +2,11 @@ package com.yjh.platform.module.patrol.service;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.entity.TWarnInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ import java.util.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
- * 将各类结果上报上级系统
+ * 将各类结果上报上一级系统
  *
  * @author 丫C
  * @date 2022/5/31
@@ -28,6 +30,8 @@ public class ProcessResultToUpSystem {
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
+    private IntelAnalysisService intelAnalysisService;
+    @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
 
     private static final String CCD_PATH = "/CCD/";
@@ -37,32 +41,33 @@ public class ProcessResultToUpSystem {
     private final Logger log = LoggerFactory.getLogger(ProcessResultToUpSystem.class);
 
     /**
-     * 告警或结果上报站端
+     * 告警或结果上报上一级系统
      *
-     * @param analyseType 分析类型
      * @param cruiseResultMap 巡视结果map
      * @param alarmLevel 告警等级
      * @param tWarnInfo 告警信息
      */
     @Async
-    public XMLBaseModel alarmAndResultToUpSystem(String analyseType, Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
+    public XMLBaseModel alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
         Map<String, Object> xmlItem = new HashMap<>(16);
         try {
             String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
+            String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
+            String simpleDateFormat = DateTimeUtil.format3(new Date());
+            String analyseType = intelAnalysisService.getAlgorithmTypeMap(instanceId);
+            HashMap<String, String> typeAndPathName = getTypeAndPathName(analyseType);
+
             xmlItem.put("patroldevice_code", "巡视设备名称");
             xmlItem.put("patroldevice_name", "巡视设备编码");
             xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
             xmlItem.put("task_code", taskId);
             xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
-            String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
             xmlItem.put("device_id", instanceId);
             xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
-            HashMap<String, String> typeAndPathName = getTypeAndPathName(analyseType);
             xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
             xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
-            String simpleDateFormat = DateTimeUtil.format3(new Date());
             xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
 
             // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
@@ -73,7 +78,7 @@ public class ProcessResultToUpSystem {
             Map<String, String> resMap;
             if (Objects.isNull(tWarnInfo)){
                 xmlBaseModel.setType("61");
-                resMap = packageCruiseResultInfo(cruiseResultMap, xmlItem, tagPath);
+                resMap = packageCruiseResultInfo(taskId, instanceId, cruiseResultMap, xmlItem, tagPath);
             }else {
                 xmlBaseModel.setType("62");
                 resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath);
@@ -87,7 +92,7 @@ public class ProcessResultToUpSystem {
             list.add(xmlBaseModel);
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             map.put("list", list);
-            log.info("信息上报==={}", map);
+            log.info("往上一级准备上报的信息是==={}", map);
             Constant.otherServer(map, Constant.TCP_URL);
         }catch (Exception e){
             log.error(e.getMessage(), e);
@@ -179,12 +184,13 @@ public class ProcessResultToUpSystem {
         try {
             tagPath = "alarm/" + tagPath;
             xmlItem.put("file_path", tagPath);
+            // 1-预警 2-一般 3-严重 4-危急
             xmlItem.put("alarm_level", Optional.ofNullable(alarmLevel).orElse(""));
             xmlItem.put("alarm_type", "6");
             xmlItem.put("value", Optional.ofNullable(tWarnInfo.getValue()).orElse(""));
             xmlItem.put("unit", "");
-            xmlItem.put("value_unit", tWarnInfo.getValue() + xmlItem.get("unit"));
-            xmlItem.put("content", tWarnInfo.getWarnContent());
+            xmlItem.put("value_unit", Optional.ofNullable(tWarnInfo.getValue()).orElse(""));
+            xmlItem.put("content", Optional.ofNullable(tWarnInfo.getWarnContent()).orElse(""));
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
@@ -201,11 +207,9 @@ public class ProcessResultToUpSystem {
      * @param tagPath
      * @return Map<String, String>
      */
-    private Map<String, String> packageCruiseResultInfo(Map<String, String> cruiseResultMap, Map<String, Object> xmlItem, String tagPath) {
+    private Map<String, String> packageCruiseResultInfo(String taskId, String instanceId, Map<String, String> cruiseResultMap, Map<String, Object> xmlItem, String tagPath) {
         Map<String, String> resultPathMap = new HashMap<>(5);
         String imgPath = "";
-        String instanceId = cruiseResultMap.get("instanceId");
-        String taskId = cruiseResultMap.get("taskId");
         String picPath = String.valueOf(redisTemplate.opsForHash().get(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "picpath"));
         log.info("picPath====={}", picPath);
         // meter-表计 defect-缺陷 panbie-判别
@@ -223,21 +227,45 @@ public class ProcessResultToUpSystem {
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")));
         }else{
             // 原图
-            imgPath = picPath.replaceAll
-                    (String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content")),
+            imgPath = picPath.replaceAll(
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content")));
         }
         try {
-            xmlItem.put("file_path", tagPath);
             String materialId = analyseDataOperateService.selectMaterialId(Long.valueOf(cruiseResultMap.get("deviceId")));
-            xmlItem.put("material_id", Optional.ofNullable(materialId).orElse(""));
             String resultNum = Optional.ofNullable(cruiseResultMap.get("resultNum")).orElse("");
+
+            String cruiseType = Optional.ofNullable(cruiseResultMap.get("cruiseType")).orElse("");
+            CruiseConstant.TypeEnum cruiseTypeEnum = CruiseConstant.TypeEnum.getEnum(NumberUtils.toInt(cruiseType));
+            switch (cruiseTypeEnum){
+                case VIDEO:
+                case INFRARED:
+                    cruiseType = "0x01";
+                    break;
+                case ROBOT:
+                    cruiseType = "0x02";
+                    break;
+                case UAV:
+                    cruiseType = "0x03";
+                    break;
+                case VOICE:
+                    cruiseType = "0x04";
+                    break;
+                case ONLINE:
+                    cruiseType = "0x05";
+                    break;
+                default:
+                    break;
+            }
+
+            xmlItem.put("file_path", tagPath);
+            xmlItem.put("material_id", Optional.ofNullable(materialId).orElse(""));
             xmlItem.put("value", resultNum);
             xmlItem.put("unit", "");
             xmlItem.put("value_unit", resultNum);
             xmlItem.put("value_type", "0");
             xmlItem.put("rectangle", Optional.ofNullable(cruiseResultMap.get("rectangle")).orElse(""));
-            xmlItem.put("data_type", "0x01");
+            xmlItem.put("data_type", cruiseType);
             xmlItem.put("valid", ArrayUtils.contains(new String[]{"--", "null"}, resultNum) ? "0" : "1");
         }catch (Exception e){
             log.error(e.getMessage(), e);
@@ -248,7 +276,7 @@ public class ProcessResultToUpSystem {
     }
 
     /**
-     * 缺陷及判别结果上报站端
+     * 缺陷及判别结果上报上一级系统
      *
      * @param cruiseResultMap redis的结果
      * @param resultList 缺陷或判别结果
@@ -258,12 +286,11 @@ public class ProcessResultToUpSystem {
     public void defectAndDistinguishToUpSystem(Map<String, String> cruiseResultMap, Set<String> resultList){
         try {
             for (String key : resultList){
-                String instanceId = cruiseResultMap.get("instanceId");
-                String analyseType = "";
                 // 判别告警等级暂定为一般
                 String alarmLevel = "2";
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
                 TWarnInfo tWarnInfo = new TWarnInfo();
+
                 String value = redisInfoMap.get("value");
                 if (value.contains("abnormal")){
                     // 判别
@@ -291,10 +318,10 @@ public class ProcessResultToUpSystem {
                             break;
                     }
                 }
-                alarmAndResultToUpSystem(analyseType, cruiseResultMap, alarmLevel, tWarnInfo);
+                alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, tWarnInfo);
             }
         }catch (Exception e){
-            log.error(e.getMessage(), e);
+            log.error("缺陷及判别结果上报站端异常：" , e);
         }
     }
 }

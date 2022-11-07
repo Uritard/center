@@ -99,13 +99,8 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
             log.info("接收服务端数据:{}", body);
             // 反拆包解析
             String usefulBody = analyseDataOperateService.nonUnpacking(body);
-
-            // Port:13668-表计识别,Port:13669-缺陷识别
-            String remoteAdds = ctx.channel().remoteAddress().toString();
-            int remotePort = Integer.parseInt(remoteAdds.substring(remoteAdds.indexOf(":") + 1));
-            if(usefulBody !="") {
-                DataDealThread dataDealThread = new DataDealThread(usefulBody, remotePort, redisTemplate, analyseDataOperateService,
-                        syncWebsocketUrl);
+            if(StringUtils.isNotBlank(usefulBody)) {
+                NewDataDealThread dataDealThread = new NewDataDealThread(usefulBody);
                 TaskExecutePool.getInstance().execute(dataDealThread);
             }
         } catch (Exception e) {
