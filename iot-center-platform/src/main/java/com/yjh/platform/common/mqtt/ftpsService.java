@@ -10,11 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-
 @Service
 @Data
-public class ftpsservice {
+public class ftpsService {
     @Value("${manager.server.ftps.flag}")
     private String flag;
     @Value("${manager.server.ftps.ip}")
@@ -30,25 +28,20 @@ public class ftpsservice {
     @Value("${manager.server.ftps.remote.path}")
     private String ftpsRemotePath;
 
-    private Logger log = LoggerFactory.getLogger(ftpsservice.class);
+    private Logger log = LoggerFactory.getLogger(ftpsService.class);
 
     @Transactional(rollbackFor = Exception.class)
-    public void uploadFile(String arlmtype, String filepath,String remotefilename) {
+    public void uploadFile(String alarmType, String filePath,String remoteFileName) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
-                    Calendar cal = Calendar.getInstance();
-                    String year =String.valueOf( cal.get(Calendar.YEAR));
-                    String month = String.valueOf(cal.get(Calendar.MONTH) + 1);
-                    if ("".equals(arlmtype)) {
+                    if ("".equals(alarmType)) {
                         return;
                     }
-
-                    FtpsUtil.putFile(filepath, remotefilename,
-                            serverip, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
+                    FtpsUtil.putFile(filePath, remoteFileName, serverip, Integer.valueOf(ftpsPort), key, ftpsUserName, ftpsPassWord);
                 } catch (Exception e) {
-                    log.error("上传至ftps错误 " + e);
+                    log.error("上传至ftps错误: " + e);
                 }
             }
         };
@@ -58,4 +51,5 @@ public class ftpsservice {
     public boolean fileExits(String filepath){
         return FtpsUtil.isFTPFileExist(filepath,serverip,Integer.valueOf(ftpsPort),key,ftpsUserName, ftpsPassWord);
     }
+
 }

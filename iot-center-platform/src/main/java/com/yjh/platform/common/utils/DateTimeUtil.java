@@ -32,6 +32,8 @@ public class DateTimeUtil {
     private static final String TIMEFORMATTPL = "HH:mm:ss";
     private static final String TIMEFORMAT = "yyyy/MM/dd";
     private static final String TIMEFORMAT2 = "yyyyMMddHHmmss";
+    private static final String DATEOFFORMAT = "yyyyMMdd_HHmmss";
+
 
     private static ResourceBundle resource = null;
 
@@ -630,6 +632,12 @@ public class DateTimeUtil {
         SimpleDateFormat sdf = new SimpleDateFormat(MONTHFORMATTPLCABLE);
         return sdf.format(new Date());
     }
+
+    public static String getDateofFormatString() {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATEOFFORMAT);
+        return sdf.format(new Date());
+    }
+
 
     /**
      * 获取当前的月份时间

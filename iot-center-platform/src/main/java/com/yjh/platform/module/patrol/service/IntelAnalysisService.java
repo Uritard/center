@@ -10,7 +10,7 @@ import com.yjh.platform.common.mqtt.GetSpringUtil;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.mqtt.ftpsservice;
+import com.yjh.platform.common.mqtt.ftpsService;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
@@ -89,7 +89,7 @@ public class IntelAnalysisService {
     @Autowired
     private IntelligentAlgorithmConfig algorithmConfig;
     @Autowired
-    private com.yjh.platform.common.mqtt.ftpsservice ftpsservice;
+    private ftpsService ftpsservice;
     @Autowired
     private UPatrolTaskService uPatrolTaskService;
 
@@ -467,7 +467,7 @@ public class IntelAnalysisService {
      * @param instanceId 巡视点id
      * @return String
      */
-    private String getAlgorithmTypeMap(String instanceId) {
+    public String getAlgorithmTypeMap(String instanceId) {
         String analyseType = "";
         try {
             // is_ai为on缺陷,is_judge为on判别,algorithm_id非空为表计
@@ -910,7 +910,7 @@ public class IntelAnalysisService {
 
     private void alarmToSFZJ(Boolean isHave, String instanceId, List<AnalyseResultItem> results){
         try{
-            ftpsservice ftpsservice= GetSpringUtil.getBean("ftpsservice");
+            ftpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
             String flag= ftpsservice.getFlag();
             if("1".equals(flag) && isHave) {
                 log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");

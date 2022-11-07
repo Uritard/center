@@ -887,12 +887,8 @@ public class AnalyseDataOperateService {
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
                     upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
         } catch (Exception e) {
-            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+            log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }
-    }
-
-    public String selectPMSByCameraId(Long cameraId){
-        return analyseDataOperateDao.selectPMSByCameraId(cameraId);
     }
 }
 
