@@ -10,7 +10,6 @@ import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
@@ -305,22 +304,6 @@ public class IsWarnAfterCruiseThread implements Runnable {
             StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, warnInfo);
         }catch (Exception e){
             log.error(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * 将文件上传至上级系统ftp服务器
-     *
-     * @param sourcePath 源文件地址
-     * @param targetPathName 目标文件地址名称
-     */
-    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
-        try {
-            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
-            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
-        } catch (Exception e) {
-            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
         }
     }
 

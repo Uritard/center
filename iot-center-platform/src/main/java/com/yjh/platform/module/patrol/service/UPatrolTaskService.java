@@ -1190,7 +1190,7 @@ public class UPatrolTaskService {
                     uPatrolDataResult.setOrigpic(redisInfoMap.get("origpic"));
                     uPatrolDataResult.setCruiseAbnormal(NumberUtils.toInt(redisInfoMap.get("cruiseAbnormal")));
                     uPatrolDataResult.setEvaluationState(Integer.valueOf(redisInfoMap.get("evaluationState")));
-                    uPatrolDataResult.setCreatetime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
+                    uPatrolDataResult.setCreatetime(new Date());
                     uPatrolDataResult.setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")));
                     uPatrolDataResult.setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
 

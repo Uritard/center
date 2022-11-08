@@ -60,6 +60,12 @@ public class ProcessResultToUpSystem {
 
     private final Logger log = LoggerFactory.getLogger(ProcessResultToUpSystem.class);
 
+    public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao, AnalyseDataOperateService analyseDataOperateService) {
+        this.redisTemplate = redisTemplate;
+        this.analyseDataOperateDao = analyseDataOperateDao;
+        this.analyseDataOperateService = analyseDataOperateService;
+    }
+
     /**
      * 告警或结果上报上一级系统
      *
@@ -402,12 +408,12 @@ public class ProcessResultToUpSystem {
      *
      * @param taskId 任务id
      * @param instanceId 巡视点id
-     * @param msgID
+     * @param msgId
      */
-    public void defectToAlgorithmM(String taskId, String instanceId, String msgID) {
+    public void defectToAlgorithmM(String taskId, String instanceId, String msgId) {
         // msg：判别告警 defect：缺陷告警
-        Set<String> differentList= redisScan( "msg:" + msgID);
-        Set<String> defectList = redisScan("defect:" + msgID);
+        Set<String> differentList= redisScan( "msg:" + msgId);
+        Set<String> defectList = redisScan("defect:" + msgId);
         String flag= ftpsservice.getFlag();
         String ftpsRemotePath = ftpsservice.getFtpsRemotePath();
 
@@ -430,9 +436,11 @@ public class ProcessResultToUpSystem {
             String remotefilepath=ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别告警.jpg";
             //,获取基准路径.并拼接算法管理平台所需要的基准文件路径
             TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
-            String Cruiseid=String.valueOf(tCruisePointInstance.getCruiseid());   //获取巡视点位id
+            // 获取巡视点位id
+            String cruiseId=String.valueOf(tCruisePointInstance.getCruiseid());
             String judgeBaseImagepath= redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString();
-            judgeBaseImagepath=judgeBaseImagepath+"/"+Cruiseid+"/"+Cruiseid+".jpg"; //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
+            //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
+            judgeBaseImagepath=judgeBaseImagepath+"/"+cruiseId+"/"+cruiseId+".jpg";
             //拼接算法管理平台分析告警结果图片地址
             String remotebaseimagicpath=ftpsRemotePath + "/" +"判别"+"/"+yearMonth+"/"+picF+"判别基准.jpg";
 

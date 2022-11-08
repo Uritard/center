@@ -58,7 +58,6 @@ public class PatrolResultHandler {
      * 处理机器人/无人机巡视结果
      *
      * @param resultList 机器人/无人机巡视结果
-     * @return void
      */
     public void robotPatrolTaskResult(List<RobotPatrolTaskResult> resultList) {
         if (resultList.isEmpty()){
@@ -97,7 +96,6 @@ public class PatrolResultHandler {
      * @param robotPatrolTaskResult 机器人/无人机巡视结果
      * @param taskId
      * @param isAlarmMap
-     * @return void
      */
     private void alarmHandlerAfterCruise(RobotPatrolTaskResult robotPatrolTaskResult, String taskId, Map<String, String> isAlarmMap) {
         try {
@@ -189,7 +187,6 @@ public class PatrolResultHandler {
      * 处理算法分析后的巡视结果
      *
      * @param  resultList 算法分析返回的巡视结果
-     * @return void
      */
     public void analysePatrolTaskResult(List<AnalysePatrolTaskResult> resultList){
         if (resultList.isEmpty()){
@@ -223,13 +220,13 @@ public class PatrolResultHandler {
                 TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResultMap.get("instanceId")));
 
                 log.info("tStdDeviceMete==={}", JSON.toJSONString(tStdDevicemete));
-                String msgID = String.valueOf(UUID.randomUUID());
+                String msgId = String.valueOf(UUID.randomUUID());
                 if (StringUtils.equals("11", analyseType)){
                     log.info("taskId为{}instanceId为{}的点为判别的点位", taskId, instanceId);
-                    distinguishHandler(msgID, analyseResultImg, resultValue, cruiseResultMap);
+                    distinguishHandler(msgId, analyseResultImg, resultValue, cruiseResultMap);
                 }else if (StringUtils.equals("398", analyseType)){
                     log.info("taskId为{}instanceId为{}的点为缺陷的点位", taskId, instanceId);
-                    defectHandler(msgID, analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
+                    defectHandler(msgId, analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
                 }else {
                     log.info("taskId为{}instanceId为{}的点为识别的点位", taskId, instanceId);
                     recognitionHandler(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
@@ -251,7 +248,7 @@ public class PatrolResultHandler {
                 uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
 
                 // 缺陷和判别上报算法管理平台
-                processResultToUpSystem.defectToAlgorithmM(taskId, instanceId, msgID);
+                processResultToUpSystem.defectToAlgorithmM(taskId, instanceId, msgId);
             }
         }catch (Exception e){
             log.error("处理算法分析后的巡视结果异常：", e);

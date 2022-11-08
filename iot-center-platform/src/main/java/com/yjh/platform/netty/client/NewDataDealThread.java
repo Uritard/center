@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.entity.AnalysePatrolTaskResult;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
-import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,11 +13,17 @@ import java.util.LinkedList;
 import java.util.Map;
 
 
+/**
+ * 巡视主机算法分析结果处理
+ *
+ * @author 丫C
+ * @date 2022/5/31
+ */
 @lombok.extern.slf4j.Slf4j
 public class NewDataDealThread implements Runnable {
 
-    private String body;
-    private PatrolResultHandler patrolResultHandler;
+    private final String body;
+    private final PatrolResultHandler patrolResultHandler;
 
     public NewDataDealThread(String body) {
         this.body = body;
@@ -29,8 +34,7 @@ public class NewDataDealThread implements Runnable {
     @Override
     public void run() {
         // 反拆包解析
-        String usefulBody = body;
-        JSONObject jsonObject = JSON.parseObject(usefulBody);
+        JSONObject jsonObject = JSON.parseObject(body);
         log.info("JSON对象1：" + jsonObject);
         if (!StringUtils.equals("2", jsonObject.getString("msgType"))){
             return;
