@@ -571,10 +571,10 @@ public class PatrolResultHandler {
                 } else if (resultArr.length > 1) {
                     log.info("产生了多条缺陷！！！");
                     String defectNames = "";
-                    for (String s : resultArr) {
+                    for (String res : resultArr) {
                         // 缺陷信息存redis
                         String redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
-                        Map<String, String> defectMap = getDefectMap(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
+                        Map<String, String> defectMap = getDefectMap(analyseResultImg, res, cruiseResultMap, tStdDevicemete);
                         log.info("defectMap=={}", JSON.toJSONString(defectMap));
                         redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
                         redisTemplate.opsForHash().putAll("defect:" + msgID + ":" + redisKeyTemp, defectMap);
@@ -589,10 +589,10 @@ public class PatrolResultHandler {
                         infoMap.put("flag", "defect");
                         infoMap.put("defectModel", defectMap.get("defectType"));
                         alarmPopUp(tStdDevicemete, infoMap);
-                        defectNames = defectNames + s + " ";
+                        defectNames = defectNames + res + " ";
                     }
 
-                    pushAlarmInfo(defectNames, tStdDevicemete.getMeteName() + "--" + resultValue);
+                    pushAlarmInfo(defectNames, tStdDevicemete.getMeteName() + "--" + defectNames);
                 }
 
                 // 缺陷批量实时入库
