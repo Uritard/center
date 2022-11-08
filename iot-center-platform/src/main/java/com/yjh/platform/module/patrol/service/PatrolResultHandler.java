@@ -712,6 +712,7 @@ public class PatrolResultHandler {
      * @return Map<String,String>
      */
     private Map<String, String> getDefectMap(String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete) {
+        log.info("analyseResultImg:{},resultValue:{}", analyseResultImg, resultValue);
         Map<String, String> defectMap = new HashMap<>(16);
         try {
             defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
