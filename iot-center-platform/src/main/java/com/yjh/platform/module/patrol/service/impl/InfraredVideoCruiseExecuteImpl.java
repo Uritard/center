@@ -70,6 +70,7 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
     protected Result capture(Map<String, Object> map) {
         Result re = null;
         try {
+            log.info("红外抓图： {}", RED_MOVE_URL);
             if (null != serviceRestTemplate) {
                 re = serviceRestTemplate.getForObject(RED_MOVE_URL, Result.class, map);
             }

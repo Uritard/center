@@ -64,12 +64,12 @@ public abstract class AbstractVideoCruise {
      * 机器人任务路径
      */
     public static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
+
     /**
      * 红外相机拍图
      */
     public static final String RED_MOVE_URL =
         "http://iot-center-accessvideo/camera/v1/givePicFir?presetId={presetId}&cameraId={cameraId}&meteName={meteName}";
-
     private final TAlgorithmInfoDao tAlgorithmInfoDao;
     private final RedisTemplate<String, ?> redisTemplate;
     protected final RestTemplate serviceRestTemplate;
@@ -125,6 +125,7 @@ public abstract class AbstractVideoCruise {
                     String instanceName = inspectionMap.get("instanceName");
 
                     HashMap<String, Object> captureMap = new HashMap<>();
+                    captureMap.put("presetId", presetId);
                     captureMap.put("cameraId", cameraId);
                     captureMap.put("meteName", instanceName);
                     //2.抓图
@@ -263,14 +264,14 @@ public abstract class AbstractVideoCruise {
             log.info("调用算法：   {}\n=========={}", JSON.toJSONString(analysisList), JSON.toJSONString(result));
 
             if (200 == result.getCode()) {
-                // 拍照结果处理
-                inspectionMap.put("resultNum", "算法分析失败");
-                // 巡视结果，正常
-                inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                // 巡检数据状态，已经执行
-                inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
                 return false;
             }
+            // 拍照结果处理
+            inspectionMap.put("resultNum", "算法分析失败");
+            // 巡视结果，正常
+            inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            // 巡检数据状态，已经执行
+            inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -360,7 +361,7 @@ public abstract class AbstractVideoCruise {
      */
     public Result defect(List<Analysis> analysisList) {
         AnalyticsEnum analytics = getAnalytics();
-        return AnalyticsFactory.getAnalytics(analytics).analytics(analysisList);
+        return AnalyticsFactory.getAnalytics(analytics).defect(analysisList);
     }
 
     private AnalyticsEnum getAnalytics() {
