@@ -2,6 +2,7 @@ package com.yjh.platform.common.mqtt;
 
 
 import com.yjh.platform.common.utils.FtpsUtil;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.threadpool.TaskExecutePool;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ public class FtpsService {
                 }
             }
         };
-        TaskExecutePool.getInstance().execute(runnable);
+        ThreadPoolUtil.COMMON_POOL.addThread(runnable);
     }
 
     public boolean fileExits(String filepath){

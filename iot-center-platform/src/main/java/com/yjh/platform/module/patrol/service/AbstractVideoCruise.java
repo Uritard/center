@@ -139,10 +139,11 @@ public abstract class AbstractVideoCruise {
             log.info("capture result: {}", JSON.toJSONString(re));
 
             try {
-                // 抓图失败处理
                 boolean isEnded = true;
+                // 抓图失败处理
                 boolean picError = re == null || !"success".equals(re.getMessage());
                 JSONObject jsonForRe = null;
+                String resultNum = "已拍照";
                 if (picError) {
                     inspectionMap.put("resultNum", "抓图失败");
                     inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
@@ -159,10 +160,12 @@ public abstract class AbstractVideoCruise {
                     jsonForRe = (JSONObject)JSONObject.toJSON(re.getData());
                     String urlPath = jsonForRe.getString("urlPath");
                     String absPath = jsonForRe.getString("absPath");
-                    String resultNum = jsonForRe.getString("resultNum");
+                    if (StringUtils.isNotEmpty(jsonForRe.getString("resultNum"))) {
+                        resultNum = jsonForRe.getString("resultNum");
+                    }
 
                     // 拍照结果处理
-                    inspectionMap.put("resultNum", StringUtils.isEmpty(resultNum) ? "已拍照" : resultNum);
+                    inspectionMap.put("resultNum", resultNum);
                     // 巡视结果，正常
                     inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                     // 未审核
@@ -179,7 +182,7 @@ public abstract class AbstractVideoCruise {
                 CruiseRedisStorage.offer(inspectionMap);
                 if (!picError) {
                     // 判断是否有配置算法
-                    TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("deviceMeteId", "-1"));
+                    TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("deviceMeteId", "-1"), resultNum);
                     if (algorithm != null) {
                         log.info("request algorithm: {}", JSON.toJSONString(algorithm));
                         // 算法分析
@@ -202,6 +205,11 @@ public abstract class AbstractVideoCruise {
     }
 
     public TAlgorithmMeteInfo needAnalysis(String deviceMeteId) {
+        return needAnalysis(deviceMeteId, "已拍照");
+
+    }
+
+    public TAlgorithmMeteInfo needAnalysis(String deviceMeteId, String resultNum) {
         List<TAlgorithmMeteInfo> algorithmList = tAlgorithmInfoDao.selectAlgorithmMete(deviceMeteId);
         // 配置了算法
         boolean isAnalyse = CollectionUtils.isNotEmpty(algorithmList) && (algorithmList.get(0).getMeteAnalyse() != null || "on".equals(

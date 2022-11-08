@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.entity.AnalysePatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
@@ -83,10 +84,10 @@ public class PatrolResultHandler {
             alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
             // 巡视结果处理
             InspectionResultThread cruiseResultDealThread = new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, true);
-            TaskExecutePool.getInstance().execute(cruiseResultDealThread);
+            ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
             // 非同源告警处理
             NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskResult, redisTemplate, 1);
-            TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
+            ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
         }
     }
 
@@ -110,7 +111,7 @@ public class PatrolResultHandler {
             isAlarmMap.put("time", robotPatrolTaskResult.getTime());
             isAlarmMap.put("taskName", robotPatrolTaskResult.getTaskName());
             IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate);
-            TaskExecutePool.getInstance().execute(isWarnAfterCruiseThread);
+            ThreadPoolUtil.PATROL_POOL.addThread(isWarnAfterCruiseThread);
         }catch (Exception e){
             log.error("机器人/无人机告警处理异常：", e);
         }

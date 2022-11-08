@@ -13,7 +13,9 @@ import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
+import com.yjh.platform.module.patrol.service.impl.NormalVideoCruiseExecuteImpl;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,7 +35,7 @@ import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_T
  * @date 2020/12/8 9:58
  * 机器人巡视结果处理线程
  */
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class InspectionResultThread implements Runnable{
 
     private RedisTemplate redisTemplate;
@@ -50,7 +52,7 @@ public class InspectionResultThread implements Runnable{
         this.redisTemplate = redisTemplate;
         this.changeTaskStatus = changeTaskStatus;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
-        this.abstractVideoCruise = StaticContextAccessor.getBean(AbstractVideoCruise.class);
+        this.abstractVideoCruise = StaticContextAccessor.getBean(NormalVideoCruiseExecuteImpl.class);
     }
 
     @Override

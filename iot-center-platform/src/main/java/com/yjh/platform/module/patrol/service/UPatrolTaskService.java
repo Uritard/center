@@ -11,12 +11,6 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.FtpsService;
-import com.yjh.platform.common.mqtt.GetSpringUtil;
-import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
-import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
-import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
 import com.yjh.platform.common.quartz.JobManager;
 import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -45,7 +39,6 @@ import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
-import com.yjh.platform.threadpool.TaskExecutePool;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -275,7 +268,6 @@ public class UPatrolTaskService {
         return detailList;
     }
 
-
     @Transactional(rollbackFor = Exception.class)
     public Integer selectRobotType(String robotCode) {
         return tRobotInspectionDao.selectRobotType(robotCode);
@@ -299,7 +291,7 @@ public class UPatrolTaskService {
                 case "4":
                 case "6":
                     //机器人任务终止
-                    TaskExecutePool.getInstance().execute(
+                    ThreadPoolUtil.PATROL_POOL.addThread(
                             new Runnable() {
                                 @Override
                                 public void run() {
