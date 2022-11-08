@@ -92,7 +92,7 @@ public class IntelAnalysisService {
     @Autowired
     private FtpsService ftpsservice;
     @Autowired
-    private UPatrolTaskService uPatrolTaskService;
+    private PatrolResultHandler patrolResultHandler;
 
     private final Logger log = LoggerFactory.getLogger(IntelAnalysisService.class);
 
@@ -376,7 +376,7 @@ public class IntelAnalysisService {
         }
         // 普通图像分析
         List<AnalysePatrolTaskResult> resultList = sendAnalysePatrolTaskResult(response, flagId);
-        uPatrolTaskService.analysePatrolTaskResult(resultList);
+        patrolResultHandler.analysePatrolTaskResult(resultList);
     }
 
     /**

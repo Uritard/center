@@ -217,7 +217,7 @@ public class InspectionResultThread implements Runnable{
     }
 
     /**
-     * 工具上报的巡视结果结果
+     * 工具上报的巡视结果处理
      *
      * @param originPath 巡视结果文件全路径
      * @param taskId 任务id

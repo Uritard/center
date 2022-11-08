@@ -16,6 +16,7 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
@@ -165,7 +166,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             infoMap.put("alarmLevel", String.valueOf(warnInfo.getWarnLevel()));
             infoMap.put("flag", "warn");
             infoMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
-            StaticContextAccessor.getBean(UPatrolTaskService.class).alarmPopUp(tStdDevicemete, infoMap);
+            StaticContextAccessor.getBean(PatrolResultHandler.class).alarmPopUp(tStdDevicemete, infoMap);
 
             // 将产生的告警上送至上一级系统
             alarmToUpSystem(warnInfo, taskId, instanceId);
