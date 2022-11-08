@@ -6,7 +6,6 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
 import com.yjh.platform.common.mqtt.FtpsService;
-import com.yjh.platform.common.mqtt.GetSpringUtil;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
@@ -21,6 +20,7 @@ import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.TWarnInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -40,19 +40,23 @@ import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_T
  * @date 2020/12/18 15:38
  * 机器人的巡视结果再做告警判断线程
  */
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class IsWarnAfterCruiseThread implements Runnable {
 
     private Map<String, String> threadMap;
     private RedisTemplate redisTemplate;
     private UpFtpsConfig upFtpsConfig;
     private UPatrolTaskService uPatrolTaskService;
+    private FtpsService ftpsservice;
+    private AlarmService alarmService;
 
     public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate) {
         this.threadMap = threadMap;
         this.redisTemplate = redisTemplate;
         this.upFtpsConfig = StaticContextAccessor.getBean(UpFtpsConfig.class);
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
+        ftpsservice = StaticContextAccessor.getBean(FtpsService.class);
+        alarmService = StaticContextAccessor.getBean(AlarmService.class);
     }
 
     @Override
@@ -188,13 +192,11 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private void alarmToAmPlatform (Map<String, String> warnMap) {
         try{
             log.info("开始与算法管理平台交互");
-            FtpsService ftpsservice = GetSpringUtil.getBean("ftpsservice");
             String flag = ftpsservice.getFlag();
             if (StringUtils.equals("1", flag)) {
                 Alarm alarm = new Alarm();
                 alarm.setBay_name(warnMap.get(""));
                 alarm.setTime(warnMap.get("warnTime"));
-                AlarmService alarmService = GetSpringUtil.getBean("alarmService");
                 //获取原始路径
                 String year = Integer.toString(LocalDate.now().getYear());
                 String month = Integer.toString(LocalDate.now().getMonthValue());

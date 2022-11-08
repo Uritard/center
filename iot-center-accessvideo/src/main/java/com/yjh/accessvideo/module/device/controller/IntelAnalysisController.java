@@ -23,7 +23,8 @@ import java.util.*;
  * @date 2022/4/11
  */
 @RestController
-@Api(value = "/intel-analysis", tags = "调用智能分析主机接口")
+@Deprecated
+@Api(value = "/intel-analysis/Deprecated", tags = "调用智能分析主机接口")
 public class IntelAnalysisController {
 
     @Autowired

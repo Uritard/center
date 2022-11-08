@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
 import com.yjh.platform.common.mqtt.FtpsService;
-import com.yjh.platform.common.mqtt.GetSpringUtil;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -50,6 +49,10 @@ public class ProcessResultToUpSystem {
     private AnalyseDataOperateDao analyseDataOperateDao;
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
+    @Autowired
+    private FtpsService ftpsservice;
+    @Autowired
+    private AlarmService alarmService;
 
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
@@ -405,7 +408,6 @@ public class ProcessResultToUpSystem {
         // msg：判别告警 defect：缺陷告警
         Set<String> differentList= redisScan( "msg:" + msgID);
         Set<String> defectList = redisScan("defect:" + msgID);
-        FtpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
         String flag= ftpsservice.getFlag();
         String ftpsRemotePath = ftpsservice.getFtpsRemotePath();
 
@@ -489,7 +491,6 @@ public class ProcessResultToUpSystem {
             if( !ftpsservice.fileExits(remotefilepath)){
                 ftpsservice.uploadFile("判别告警", resultImagebak, remotefilepath);
             }
-            AlarmService alarmService= GetSpringUtil.getBean("alarmService");
             alarmService.PushMsg(alarmDetail);
             log.info("判别告警发送算法管理平台结束");
 
@@ -570,7 +571,6 @@ public class ProcessResultToUpSystem {
             log.info("巡视主机与智能分析主机：remoteorigfilepath:{}", remoteorigfilepath);
             log.info("巡视主机与智能分析主机：resultImagebak:{}", resultImagebak);
             log.info("巡视主机与智能分析主机：remotefilepath:{}", remotefilepath);
-            AlarmService alarmService = GetSpringUtil.getBean("alarmService");
             alarmService.PushMsg(alarmDetail);
             log.info("缺陷告警发送算法管理平台结束");
 

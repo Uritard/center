@@ -229,49 +229,52 @@ public abstract class AbstractVideoCruise {
     public boolean algorithmAnalysis(Map<String, String> inspectionMap, long presetId, String taskId, JSONObject jsonForRe,
         TAlgorithmMeteInfo algorithm) {
 
-        Analysis analysis = new Analysis();
-        analysis.setTaskId(taskId);
-        analysis.setInstanceId(MapUtils.getLong(inspectionMap, "instanceId"));
-        analysis.setPicPath(jsonForRe.getString("absPath"));
+        try {
+            Analysis analysis = new Analysis();
+            analysis.setTaskId(taskId);
+            analysis.setInstanceId(MapUtils.getLong(inspectionMap, "instanceId"));
+            analysis.setPicPath(jsonForRe.getString("absPath"));
 
-        analysis.setPicModelPath(picModelPath + "/" + presetId);
+            analysis.setPicModelPath(picModelPath + "/" + presetId);
 
-        // 表计
-        if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {
-            analysis.setAnalyseType(algorithm.getMeteAnalyse());
-        } else if ("on".equals(algorithm.getMeteJudge())) {
-            // 判别
-            analysis.setAnalyseType("11");
-        } else {
-            analysis.setAnalyseType("398");
-        }
-        int isAi = algorithm.getIsAi() == null ? 0 : algorithm.getIsAi();
-        analysis.setIsAi(isAi);
-        List<Analysis> analysisList = new ArrayList<>();
-        analysisList.add(analysis);
-        log.info("算法信息：   {}", JSON.toJSONString(analysisList));
-        // 0-缺陷 1-表记
-        Result result;
-        if (Objects.equals(1, algorithm.getIsAi())) {
-            // 算法额外参数设置，红外
-            analysisExt(analysis, jsonForRe);
-            result = analysis(analysisList);
-        } else {
-            result = defect(analysisList);
-        }
-        log.info("调用算法：   {}\n=========={}", JSON.toJSONString(analysisList), JSON.toJSONString(result));
+            // 表计
+            if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {
+                analysis.setAnalyseType(algorithm.getMeteAnalyse());
+            } else if ("on".equals(algorithm.getMeteJudge())) {
+                // 判别
+                analysis.setAnalyseType("11");
+            } else {
+                analysis.setAnalyseType("398");
+            }
+            int isAi = algorithm.getIsAi() == null ? 0 : algorithm.getIsAi();
+            analysis.setIsAi(isAi);
+            List<Analysis> analysisList = new ArrayList<>();
+            analysisList.add(analysis);
+            log.info("算法信息：   {}", JSON.toJSONString(analysisList));
+            // 0-缺陷 1-表记
+            Result result;
+            if (Objects.equals(1, algorithm.getIsAi())) {
+                // 算法额外参数设置，红外
+                analysisExt(analysis, jsonForRe);
+                result = analysis(analysisList);
+            } else {
+                result = defect(analysisList);
+            }
+            log.info("调用算法：   {}\n=========={}", JSON.toJSONString(analysisList), JSON.toJSONString(result));
 
-        if (200 != result.getCode()) {
-            // 拍照结果处理
-            inspectionMap.put("resultNum", "算法分析失败");
-            // 巡视结果，正常
-            inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-            // 巡检数据状态，已经执行
-            inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
-            return true;
-        } else {
-            return false;
+            if (200 == result.getCode()) {
+                // 拍照结果处理
+                inspectionMap.put("resultNum", "算法分析失败");
+                // 巡视结果，正常
+                inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                // 巡检数据状态，已经执行
+                inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
+                return false;
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
+        return true;
     }
 
     protected boolean waitCamera(String taskName, String cameraId, String presetName) {

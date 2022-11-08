@@ -1108,10 +1108,10 @@ public class UPatrolTaskService {
         }
 
         // 判断任务是否结束
-        if (normalCounts + abnormalCounts < allCounts) {
-            return -1;
+        if (normalCounts + abnormalCounts == allCounts) {
+            return abnormalCounts;
         }
-        return abnormalCounts;
+        return -1;
     }
 
     /**

@@ -13,6 +13,7 @@ import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyticsService;
 import com.yjh.platform.netty.client.AnalysisClientHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -36,11 +37,13 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
     /**
      * 表计算法端口
      */
+    @Value("${netty.recognize.port}")
     int recognizePort;
 
     /**
      * 缺陷算法端口
      */
+    @Value("${netty.ai.port}")
     int aiPort;
 
     AtomicLong algorithmMsgId = new AtomicLong(100000000L);
@@ -61,7 +64,7 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
      */
     @Override
     public Result analytics(List<Analysis> analysisList) {
-
+        Result result = new Result();
         log.info("analysisList____-----____: {}", JSON.toJSONString(analysisList));
         log.info("recognizePort-----: {}", recognizePort);
         JSONObject analysisObject = new JSONObject();
@@ -107,13 +110,13 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
             analysisObject.put("msgData", msgDataObject);
             log.info("analysisObject----: {}", analysisObject);
             AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendDataReguest(analysisObject);
-
+            result.setCode(200, "SUCCESS");
             log.info("算法数据初始化-----完成");
         } catch (Exception e) {
+            result.setCode(400, "ERROR");
             log.error("表计识别算法异常：", e);
         }
-
-        return null;
+        return result;
     }
 
     /**
@@ -124,6 +127,7 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
      */
     @Override
     public Result defect(List<Analysis> analysisList) {
+        Result result = new Result();
         JSONObject analysisObject = new JSONObject();
         JSONObject msgDataObject = new JSONObject();
         long msgId = defectMsgId.incrementAndGet();
@@ -189,14 +193,16 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
             log.info("aiPort---------: {}", aiPort);
 
             AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
+            result.setCode(200, "SUCCESS");
             log.info("算法数据初始化-----完成");
         } catch (Exception e) {
+            result.setCode(400, "ERROR");
             log.error("缺陷算法识别异常：", e);
         }
 
         log.info("缺陷算法结束------------{}", analysisObject);
 
-        return null;
+        return result;
     }
 
     @Override

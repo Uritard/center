@@ -7,7 +7,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
 import com.yjh.platform.common.mqtt.FtpsService;
-import com.yjh.platform.common.mqtt.GetSpringUtil;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
@@ -93,6 +92,9 @@ public class IntelAnalysisService {
     private FtpsService ftpsservice;
     @Autowired
     private PatrolResultHandler patrolResultHandler;
+    @Autowired
+    private AlarmService alarmService;
+
 
     private final Logger log = LoggerFactory.getLogger(IntelAnalysisService.class);
 
@@ -688,7 +690,6 @@ public class IntelAnalysisService {
             ftpsservice.uploadFile("基准",basePath,remoteBaseFilePath);
             ftpsservice.uploadFile("结果",resImageUrl,remotefilepath);
 
-            AlarmService alarmService= GetSpringUtil.getBean("alarmService");
             alarmService.PushMsg(alarmDetail);
             log.info("发送算法管理平台结束");
         }
@@ -755,7 +756,6 @@ public class IntelAnalysisService {
             ftpsservice.uploadFile("原图", Constant.algorithmTestPicPath,remoteorigfilepath);
             ftpsservice.uploadFile("结果图",resImageUrl,remotefilepath);
 
-            AlarmService alarmService= GetSpringUtil.getBean("alarmService");
             alarmService.PushMsg(alarmDetail);
             log.info("发送算法管理平台结束");
         }else {
@@ -911,7 +911,6 @@ public class IntelAnalysisService {
 
     private void alarmToSFZJ(Boolean isHave, String instanceId, List<AnalyseResultItem> results){
         try{
-            FtpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
             String flag= ftpsservice.getFlag();
             if("1".equals(flag) && isHave) {
                 log.info("defect类型:开始向算法管理平台发送图片和mqtt消息");
@@ -983,7 +982,6 @@ public class IntelAnalysisService {
                 log.info("巡视主机与智能分析主机：remoteorigfilepath:{}", remoteorigfilepath);
                 log.info("巡视主机与智能分析主机：resultImagebak:{}", resultImagebak);
                 log.info("巡视主机与智能分析主机：remotefilepath:{}", remotefilepath);
-                AlarmService alarmService = GetSpringUtil.getBean("alarmService");
                 alarmService.PushMsg(alarmDetail);
                 log.info("发送算法管理平台结束");
             }

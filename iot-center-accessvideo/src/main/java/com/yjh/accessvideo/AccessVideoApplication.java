@@ -85,9 +85,9 @@ public class AccessVideoApplication implements CommandLineRunner {
         log.info("init success..");
         hCNetSDK.NET_DVR_SetLogToFile(logLevel, sdkLogPath,false);
         register();
-        InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
-        InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
-        nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate,analyseDataOperateService,syncWebsocketUrl, stationCode);
+        // InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
+        // InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
+        // nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate,analyseDataOperateService,syncWebsocketUrl, stationCode);
     }
 
     private void setSDKCom() {
