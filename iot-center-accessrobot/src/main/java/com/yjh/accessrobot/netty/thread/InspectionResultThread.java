@@ -194,16 +194,19 @@ public class InspectionResultThread implements Runnable{
                 Integer abnormal = abnormalNum;
                 Integer normal = normalNum;
 
+                // taskId是巡视主机的id,robotTaskId是机器人上报的id
+                String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+                log.info("robotTaskId==={}", robotTaskId);
 
-                String robotTaskId = taskId;
                 TCruiseTask tCruiseTaskTemp = StaticContextAccessor.getBean(RobotService.class).selectCruiseTask(robotTaskId, robotTaskId);
                 log.info("tCruiseTaskTemp=={}", tCruiseTaskTemp);
-                boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
-                if (!moreTime){
-                    // taskId是巡视主机的id,robotTaskId是机器人上报的id
-                    robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
-                    log.info("robotTaskId==={}", robotTaskId);
+                if (Objects.nonNull(tCruiseTaskTemp) && StringUtils.isNotEmpty(tCruiseTaskTemp.getDateType())) {
+                    boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
+                    if (moreTime) {
+                        robotTaskId = taskId;
+                    }
                 }
+
                 log.info("最终的taskId==={}", robotTaskId);
                 Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId);
                 Map<String,String> tCruiseTaskResultMap = new HashMap<>(16);
@@ -323,14 +326,13 @@ public class InspectionResultThread implements Runnable{
             }
             log.info("机器人任务为{}返回结果个数===={}", taskId, resultList.size());
 
-            String robotTaskId = taskId;
-            TCruiseTask tCruiseTaskTemp = StaticContextAccessor.getBean(RobotService.class).selectCruiseTask(robotTaskId, robotTaskId);
-            log.info("tCruiseTaskTemp=={}", tCruiseTaskTemp);
-            boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
-            if (!moreTime){
-                // taskId是巡视主机的id,robotTaskId是机器人上报的id
-                robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
-                log.info("robotTaskId==={}", robotTaskId);
+            String robotTaskId  = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+            TCruiseTask tCruiseTask = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(robotTaskId);
+            if (Objects.nonNull(tCruiseTask) && StringUtils.isNotEmpty(tCruiseTask.getDateType())){
+                boolean moreTime = tCruiseTask.getDateType().split(" ")[2].contains(",");
+                if (moreTime) {
+                    robotTaskId = taskId;
+                }
             }
             log.info("最终的taskId==={}", robotTaskId);
 

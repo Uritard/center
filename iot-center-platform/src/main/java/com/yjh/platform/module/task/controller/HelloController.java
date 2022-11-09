@@ -616,5 +616,9 @@ public class HelloController {
        String filePathTemp = "变电/dd站编码/年/月/日/巡视任务编码/CCD";
         filePathTemp = filePathTemp.substring(0, filePathTemp.indexOf("/"));
         System.out.println(filePathTemp);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("shabi", "123");
+        System.out.println(JSON.toJSONString(jsonObject.getString("123")));
     }
 }
