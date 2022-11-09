@@ -64,7 +64,6 @@ public class PatrolResultHandler {
         }
 
         for (RobotPatrolTaskAlarm taskAlarm : alarmList){
-
             // 通过上报的任务id查询巡视主机上的任务id
             String taskCode = taskAlarm.getTaskCode();
             String taskId = tRobotInspectionDao.selectRealTaskId(taskCode);

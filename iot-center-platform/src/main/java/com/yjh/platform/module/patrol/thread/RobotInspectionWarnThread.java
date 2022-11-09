@@ -55,7 +55,34 @@ public class RobotInspectionWarnThread implements Runnable{
 
             TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(instanceId);
 
-            TWarnInfo warnInfo = new TWarnInfo();
+            TWarnInfo warnInfo = getWarnInfo(tStdDevicemete, taskId, instanceId, robotCode);
+            StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
+
+            getWarnMap(taskId, warnInfo);
+
+            // 将产生的告警上送至上一级系统
+            alarmToUpSystem(taskAlarm.getAlarmLevel(), warnInfo, taskId, instanceId);
+
+            // 若是缺陷，上报至算法管理平台    识别类型是3即设备外观查看
+            /*if (Objects.equals("3", taskAlarm.getRecognitionType())){
+                alarmToAlgorithmManagement(warnInfo, tStdDevicemete);
+            }*/
+
+            // 告警推送
+            Map<String, String> infoMap = new HashMap<>(5);
+            infoMap.put("alarmLevel", String.valueOf(warnInfo.getWarnLevel()));
+            infoMap.put("flag", "robot");
+            infoMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
+            StaticContextAccessor.getBean(PatrolResultHandler.class).alarmPopUp(tStdDevicemete, infoMap);
+
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    private TWarnInfo getWarnInfo(TStdDeviceMete tStdDevicemete, String taskId, Long instanceId, String robotCode){
+        TWarnInfo warnInfo = new TWarnInfo();
+        try {
             warnInfo.setWarnTime(DateTimeUtil.parse(taskAlarm.getTime()));
             warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
             warnInfo.setCunstomId(tStdDevicemete.getCustomId());
@@ -101,10 +128,16 @@ public class RobotInspectionWarnThread implements Runnable{
                 }
             }
             warnInfo.setWarnContent(taskAlarm.getContent());
-            log.info("warnInfo==={}", warnInfo);
-
-            String warnName = "warnInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
-            Map<String, String> warnMap = new HashMap<>(16);
+        }catch (Exception e){
+            log.error("组装告警信息异常：", e);
+        }
+        log.info("warnInfo==={}", warnInfo);
+        return warnInfo;
+    }
+    private void getWarnMap(String taskId, TWarnInfo warnInfo) {
+        String warnName = "warnInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
+        Map<String, String> warnMap = new HashMap<>(16);
+        try {
             warnMap.put("deviceId", warnInfo.getDeviceId().toString());
             warnMap.put("customId", warnInfo.getCunstomId());
             warnMap.put("instanceId", warnInfo.getInstanceId().toString());
@@ -118,30 +151,11 @@ public class RobotInspectionWarnThread implements Runnable{
             warnMap.put("warnName", warnInfo.getWarnName());
             warnMap.put("warnTime", new SimpleDateFormat().format(warnInfo.getWarnTime()));
             warnMap.put("warnContent", warnInfo.getWarnContent());
-            log.info("warnMap===" + warnMap);
-            redisTemplate.opsForHash().putAll(warnName, warnMap);
-
-            StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
-
-            // 将产生的告警上送至上一级系统
-            alarmToUpSystem(alarmLevel, warnInfo, taskId, instanceId);
-
-            // 若是缺陷，上报至算法管理平台    识别类型是3即设备外观查看
-            /*if (Objects.equals("3", taskAlarm.getRecognitionType())){
-                alarmToAlgorithmManagement(warnInfo, tStdDevicemete);
-            }*/
-
-            // 告警推送
-            Map<String, String> infoMap = new HashMap<>(5);
-            infoMap.put("alarmLevel", String.valueOf(warnInfo.getWarnLevel()));
-            infoMap.put("flag", "robot");
-            infoMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
-            StaticContextAccessor.getBean(PatrolResultHandler.class).alarmPopUp(tStdDevicemete, infoMap);
-
         }catch (Exception e){
-            e.printStackTrace();
-            log.error(e.getMessage(), e);
+            log.error("组装告警map异常：", e);
         }
+        log.info("warnMap===" + warnMap);
+        redisTemplate.opsForHash().putAll(warnName, warnMap);
     }
 
     /**

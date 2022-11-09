@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
-import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -19,7 +19,7 @@ import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_T
  * @since 2022-04-08
  * 机器人侧非同源告警处理线程
  */
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class NonhomologousWarnThread implements Runnable{
 
     private final RedisTemplate redisTemplate;
@@ -48,7 +48,7 @@ public class NonhomologousWarnThread implements Runnable{
                 warnInfo.put("warnId", warnId);
                 warnInfo.put("warnType", 5);
                 warnInfo.put("instanceId", null);
-//                warnInfo.put("warnContent", "机器人相别告警：" + cruiseResultMap.get("content"));
+                warnInfo.put("warnContent", "机器人相别告警：" + robotPatrolTaskAlarm.getContent());
                 List<Map<String, Object>> insResults = new ArrayList<>();
                 String[] deviceIdArray = robotPatrolTaskAlarm.getDeviceId().split(",");
                 for(String deviceId : deviceIdArray){

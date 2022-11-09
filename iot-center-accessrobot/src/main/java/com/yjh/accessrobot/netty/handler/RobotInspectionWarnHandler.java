@@ -79,7 +79,7 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
         }
 
         // 国网要求
-        robotService.upToCruise(xmlBaseModel);
+//        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override
