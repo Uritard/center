@@ -5,22 +5,21 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.GetSpringUtil;
+import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
-import com.yjh.platform.common.mqtt.ftpsService;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
-import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.task.service.TWarnInfoService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -40,19 +39,23 @@ import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_T
  * @date 2020/12/18 15:38
  * 机器人的巡视结果再做告警判断线程
  */
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class IsWarnAfterCruiseThread implements Runnable {
 
     private Map<String, String> threadMap;
     private RedisTemplate redisTemplate;
     private UpFtpsConfig upFtpsConfig;
     private UPatrolTaskService uPatrolTaskService;
+    private FtpsService ftpsservice;
+    private AlarmService alarmService;
 
     public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate) {
         this.threadMap = threadMap;
         this.redisTemplate = redisTemplate;
         this.upFtpsConfig = StaticContextAccessor.getBean(UpFtpsConfig.class);
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
+        ftpsservice = StaticContextAccessor.getBean(FtpsService.class);
+        alarmService = StaticContextAccessor.getBean(AlarmService.class);
     }
 
     @Override
@@ -166,10 +169,10 @@ public class IsWarnAfterCruiseThread implements Runnable {
             infoMap.put("alarmLevel", String.valueOf(warnInfo.getWarnLevel()));
             infoMap.put("flag", "warn");
             infoMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
-            StaticContextAccessor.getBean(UPatrolTaskService.class).alarmPopUp(tStdDevicemete, infoMap);
+            StaticContextAccessor.getBean(PatrolResultHandler.class).alarmPopUp(tStdDevicemete, infoMap);
 
             // 将产生的告警上送至上一级系统
-            alarmToUpSystem(warnInfo, tStdDevicemete, taskId, instanceId);
+            alarmToUpSystem(warnInfo, taskId, instanceId);
 
             // 将产生的告警上送到算法管理平台
             alarmToAmPlatform(warnMap);
@@ -188,13 +191,11 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private void alarmToAmPlatform (Map<String, String> warnMap) {
         try{
             log.info("开始与算法管理平台交互");
-            ftpsService ftpsservice = GetSpringUtil.getBean("ftpsservice");
             String flag = ftpsservice.getFlag();
             if (StringUtils.equals("1", flag)) {
                 Alarm alarm = new Alarm();
                 alarm.setBay_name(warnMap.get(""));
                 alarm.setTime(warnMap.get("warnTime"));
-                AlarmService alarmService = GetSpringUtil.getBean("alarmService");
                 //获取原始路径
                 String year = Integer.toString(LocalDate.now().getYear());
                 String month = Integer.toString(LocalDate.now().getMonthValue());
@@ -275,63 +276,34 @@ public class IsWarnAfterCruiseThread implements Runnable {
      * 将产生的告警上送至上级系统
      *
      * @param warnInfo 告警信息
-     * @param tStdDevicemete 测点信息
-     * @return void
+     * @param taskId 任务id
+     * @param instanceId 巡视点id
      */
-    private void alarmToUpSystem(TWarnInfo warnInfo, TStdDeviceMete tStdDevicemete, String taskId, Long instanceId){
-        String alarmLevel = "";
-        switch (warnInfo.getWarnLevel()){
-            case 130:
-                alarmLevel = "1";
-                break;
-            case 131:
-                alarmLevel = "2";
-                break;
-            case 132:
-                alarmLevel = "3";
-                break;
-            case 133:
-                alarmLevel = "4";
-                break;
-            default:
-                break;
-        }
-        String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
-        Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
-//        StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, warnInfo);
-
+    private void alarmToUpSystem(TWarnInfo warnInfo, String taskId, Long instanceId){
         try{
-            // 存在可见光的表计和红外测温和刀闸
-            String recognitionType = threadMap.get("recognitionType");
-            switch (recognitionType){
-                case "1":
-//                    xmlItem.put("alarm_type", "7"); break;
-//                case "2":
-//                    xmlItem.put("alarm_type", "10"); break;
-//                case "3":
-//                    xmlItem.put("alarm_type", "6"); break;
-//                case "4":
-//                    xmlItem.put("alarm_type", "1"); break;
-                default: break;
+            String alarmLevel = "";
+            switch (warnInfo.getWarnLevel()){
+                case 130:
+                    alarmLevel = "1";
+                    break;
+                case 131:
+                    alarmLevel = "2";
+                    break;
+                case 132:
+                    alarmLevel = "3";
+                    break;
+                case 133:
+                    alarmLevel = "4";
+                    break;
+                default:
+                    break;
             }
+
+            String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
+            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, warnInfo);
         }catch (Exception e){
             log.error(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * 将文件上传至上级系统ftp服务器
-     *
-     * @param sourcePath 源文件地址
-     * @param targetPathName 目标文件地址名称
-     */
-    private void uploadFileToUpFtps(String sourcePath, String targetPathName, UpFtpsConfig upFtpsConfig) {
-        try {
-            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
-            FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
-                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
-        } catch (Exception e) {
-            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
         }
     }
 

@@ -23,11 +23,11 @@ public class ThreadPoolConfig {
     /**
      * 核心线程数
      */
-    private static int corePoolSizeDefault = 20;
+    private static int corePoolSizeDefault = 32;
     /**
      * 最大线程数
      */
-    private static int maxPoolSizeDefault = 20;
+    private static int maxPoolSizeDefault = 32;
     /**
      * 线程队列大小
      */

@@ -22,6 +22,7 @@ import java.util.*;
 * @since 2020-08-20
 */
 @Service
+@Deprecated
 public class AnalysisService {
     @Autowired
     private AnalyseDataOperateDao analyseDataOperateDao;

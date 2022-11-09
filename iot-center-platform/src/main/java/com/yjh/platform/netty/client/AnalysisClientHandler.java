@@ -4,6 +4,7 @@ package com.yjh.platform.netty.client;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.threadpool.TaskExecutePool;
@@ -101,7 +102,7 @@ public class AnalysisClientHandler extends ChannelInboundHandlerAdapter {
             String usefulBody = analyseDataOperateService.nonUnpacking(body);
             if(StringUtils.isNotBlank(usefulBody)) {
                 NewDataDealThread dataDealThread = new NewDataDealThread(usefulBody);
-                TaskExecutePool.getInstance().execute(dataDealThread);
+                ThreadPoolUtil.COMMON_POOL.addThread(dataDealThread);
             }
         } catch (Exception e) {
             log.error("任务失败: ", e);

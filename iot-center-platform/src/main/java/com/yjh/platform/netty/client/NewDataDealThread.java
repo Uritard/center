@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.entity.AnalysePatrolTaskResult;
-import com.yjh.platform.module.patrol.service.UPatrolTaskService;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,30 +13,35 @@ import java.util.LinkedList;
 import java.util.Map;
 
 
+/**
+ * 巡视主机算法分析结果处理
+ *
+ * @author 丫C
+ * @date 2022/5/31
+ */
 @lombok.extern.slf4j.Slf4j
 public class NewDataDealThread implements Runnable {
 
-    private String body;
-    private UPatrolTaskService uPatrolTaskService;
+    private final String body;
+    private final PatrolResultHandler patrolResultHandler;
 
     public NewDataDealThread(String body) {
         this.body = body;
-        this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
+        this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
     }
 
     @SneakyThrows
     @Override
     public void run() {
         // 反拆包解析
-        String usefulBody = body;
-        JSONObject jsonObject = JSON.parseObject(usefulBody);
+        JSONObject jsonObject = JSON.parseObject(body);
         log.info("JSON对象1：" + jsonObject);
         if (!StringUtils.equals("2", jsonObject.getString("msgType"))){
             return;
         }
 
         JSONObject jsonObjectData = JSON.parseObject(JSON.parseObject(jsonObject.getString("msgData")).getString("data"));
-        log.info("原生数据****：" + jsonObjectData);
+        log.info("原生数据****：{}", jsonObjectData);
         Iterator iterator = jsonObjectData.entrySet().iterator();
 
         LinkedList<AnalysePatrolTaskResult> resultList = new LinkedList<AnalysePatrolTaskResult>();
@@ -46,7 +51,7 @@ public class NewDataDealThread implements Runnable {
                 Map.Entry entry = (Map.Entry) iterator.next();
                 // 遍历每一个结果子集
                 JSONObject jsonObjectResult = JSON.parseObject(String.valueOf(entry.getValue()));
-                log.info("数据****：" + jsonObjectResult);
+                log.info("数据****：{}", jsonObjectResult);
                 String taskId = jsonObjectResult.getString("taskId");
                 String instanceId = jsonObjectResult.getString("instanceId");
                 String resultValue = jsonObjectResult.getString("resultValue");
@@ -72,7 +77,8 @@ public class NewDataDealThread implements Runnable {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
-        uPatrolTaskService.analysePatrolTaskResult(resultList);
+        log.info("resultList=={}", resultList);
+        patrolResultHandler.analysePatrolTaskResult(resultList);
     }
 }
 

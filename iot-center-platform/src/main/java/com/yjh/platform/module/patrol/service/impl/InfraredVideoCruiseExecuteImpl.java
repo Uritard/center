@@ -14,9 +14,12 @@ import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
 import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
+import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.INFRARED;
@@ -67,6 +70,7 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
     protected Result capture(Map<String, Object> map) {
         Result re = null;
         try {
+            log.info("红外抓图： {}", RED_MOVE_URL);
             if (null != serviceRestTemplate) {
                 re = serviceRestTemplate.getForObject(RED_MOVE_URL, Result.class, map);
             }
@@ -86,6 +90,15 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
         analysis.setCsvPath(csvPath);
         analysis.setDataPath(dataPath);
         log.info("算法信息(红外)： {}", JSON.toJSONString(analysis));
+    }
+
+    @Override
+    public TAlgorithmMeteInfo needAnalysis(String deviceMeteId, String resultNum) {
+        if("已拍照".equals(resultNum)){
+            return super.needAnalysis(deviceMeteId, resultNum);
+        }
+        // dlt 红外 抓图能直接获取到数值，不需要进行算法处理，直接返回 null
+        return null;
     }
 
     @Override

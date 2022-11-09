@@ -101,7 +101,7 @@ public class LocalCruiseExecutThread<T> implements Runnable {
         execute.sendWebsocket(taskId);
         // 任务结束，调用结束方法
         if (isEnded) {
-            uPatrolTaskService.patrolTaskResultHandler(taskId, insId);
+            uPatrolTaskService.patrolTaskResultHandler(inspectionMap);
         }
         return true;
     }

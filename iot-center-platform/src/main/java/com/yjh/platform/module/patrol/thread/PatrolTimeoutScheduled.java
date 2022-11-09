@@ -137,7 +137,7 @@ public class PatrolTimeoutScheduled {
 
             outPointList.add(m);
         });
-
+        log.info("任务超时处理, task:{}", taskId);
         // 存入 redis
         CruiseRedisStorage.piplinePutPatrolDetail(outPointList);
         // 更新 PATROL_SUMMARY_PREFIX 并存储

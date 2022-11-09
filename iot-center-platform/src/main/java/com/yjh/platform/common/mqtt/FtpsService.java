@@ -2,6 +2,7 @@ package com.yjh.platform.common.mqtt;
 
 
 import com.yjh.platform.common.utils.FtpsUtil;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.threadpool.TaskExecutePool;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Data
-public class ftpsService {
+public class FtpsService {
     @Value("${manager.server.ftps.flag}")
     private String flag;
     @Value("${manager.server.ftps.ip}")
@@ -28,7 +29,7 @@ public class ftpsService {
     @Value("${manager.server.ftps.remote.path}")
     private String ftpsRemotePath;
 
-    private Logger log = LoggerFactory.getLogger(ftpsService.class);
+    private Logger log = LoggerFactory.getLogger(FtpsService.class);
 
     @Transactional(rollbackFor = Exception.class)
     public void uploadFile(String alarmType, String filePath,String remoteFileName) {
@@ -45,7 +46,7 @@ public class ftpsService {
                 }
             }
         };
-        TaskExecutePool.getInstance().execute(runnable);
+        ThreadPoolUtil.COMMON_POOL.addThread(runnable);
     }
 
     public boolean fileExits(String filepath){

@@ -5,16 +5,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
-import com.yjh.platform.common.mqtt.GetSpringUtil;
+import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.mqtt.ftpsService;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
+import com.yjh.platform.module.task.entity.TWarnInfo;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -46,7 +48,7 @@ import java.util.concurrent.locks.ReentrantLock;
 //import static com.yjh.accessvideo.common.Constant.INSTANCEID;
 //import static com.yjh.accessvideo.common.Constant.TASKID;
 
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class DataDealThread implements Runnable {
 
     private String body;
@@ -56,6 +58,8 @@ public class DataDealThread implements Runnable {
     private String INSTANCEID;
     private String syncWebsocketUrl;
     private String stationCode;
+    private FtpsService ftpsservice;
+    private AlarmService alarmService;
 
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     /**
@@ -72,6 +76,8 @@ public class DataDealThread implements Runnable {
         this.body = body;
         this.syncWebsocketUrl=syncWebsocketUrl;
         this.remotePort = remotePort;
+        ftpsservice = StaticContextAccessor.getBean(FtpsService.class);
+        alarmService = StaticContextAccessor.getBean(AlarmService.class);
     }
 
     private void yjskHandle(JSONObject jsonObjectResult){
@@ -903,7 +909,6 @@ public class DataDealThread implements Runnable {
                         Set<String> differentList= redisScan( "msg:" + reponseMessage);  //标记告警，也就是判别告警
                         Set<String> defectList=  redisScan("defect:" + reponseMessage);   //缺陷告警
                         Alarm alarmDetail=new Alarm();
-                        ftpsService ftpsservice= GetSpringUtil.getBean("ftpsservice");
                         String flag= ftpsservice.getFlag();
 
                         SimpleDateFormat ym = new SimpleDateFormat("yyyyMM");
@@ -989,7 +994,6 @@ public class DataDealThread implements Runnable {
                             if( !ftpsservice.fileExits(remotefilepath)){
                                 ftpsservice.uploadFile("判别告警",resultImagebak,remotefilepath);            //判别结果图片
                             }
-                            AlarmService alarmService= GetSpringUtil.getBean("alarmService");
                             alarmService.PushMsg(alarmDetail);
 
                             // 判别上报站端
@@ -1078,7 +1082,6 @@ public class DataDealThread implements Runnable {
 //                       ftp文件上传测试数据
 //                      String localpath="D://信息化工作.jpg";
 //                      ftpsservice.uploadFile("遥信告警",localpath,remotefilepath);
-                            AlarmService alarmService= GetSpringUtil.getBean("alarmService");
                             alarmService.PushMsg(alarmDetail);
                             log.info("发送算法管理平台结束");
 

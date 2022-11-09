@@ -2595,13 +2595,12 @@ public class CameraConService {
                     map.put("csvPath", hotFirShow + newName + ".csv");
                     log.info("hotFirShowcsv地址：" + hotFirShow + newName + ".csv");
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             }
         } catch (Exception e) {
             int iErr = hCNetSDK.NET_DVR_GetLastError();
-            log.info("系统异常" + iErr);
-            log.error("红外图片抓取异常", e);
+            log.error("红外图片抓取异常 [{}]", iErr, e);
         } finally {
             hCNetSDK.NET_DVR_Logout(lUserID);
         }

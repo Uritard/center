@@ -64,12 +64,12 @@ public abstract class AbstractVideoCruise {
      * 机器人任务路径
      */
     public static final String ROBOT_TASK_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
+
     /**
      * 红外相机拍图
      */
     public static final String RED_MOVE_URL =
         "http://iot-center-accessvideo/camera/v1/givePicFir?presetId={presetId}&cameraId={cameraId}&meteName={meteName}";
-
     private final TAlgorithmInfoDao tAlgorithmInfoDao;
     private final RedisTemplate<String, ?> redisTemplate;
     protected final RestTemplate serviceRestTemplate;
@@ -125,6 +125,7 @@ public abstract class AbstractVideoCruise {
                     String instanceName = inspectionMap.get("instanceName");
 
                     HashMap<String, Object> captureMap = new HashMap<>();
+                    captureMap.put("presetId", presetId);
                     captureMap.put("cameraId", cameraId);
                     captureMap.put("meteName", instanceName);
                     //2.抓图
@@ -139,10 +140,11 @@ public abstract class AbstractVideoCruise {
             log.info("capture result: {}", JSON.toJSONString(re));
 
             try {
-                // 抓图失败处理
                 boolean isEnded = true;
+                // 抓图失败处理
                 boolean picError = re == null || !"success".equals(re.getMessage());
                 JSONObject jsonForRe = null;
+                String resultNum = "已拍照";
                 if (picError) {
                     inspectionMap.put("resultNum", "抓图失败");
                     inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
@@ -159,10 +161,12 @@ public abstract class AbstractVideoCruise {
                     jsonForRe = (JSONObject)JSONObject.toJSON(re.getData());
                     String urlPath = jsonForRe.getString("urlPath");
                     String absPath = jsonForRe.getString("absPath");
-                    String resultNum = jsonForRe.getString("resultNum");
+                    if (StringUtils.isNotEmpty(jsonForRe.getString("resultNum"))) {
+                        resultNum = jsonForRe.getString("resultNum");
+                    }
 
                     // 拍照结果处理
-                    inspectionMap.put("resultNum", StringUtils.isEmpty(resultNum) ? "已拍照" : resultNum);
+                    inspectionMap.put("resultNum", resultNum);
                     // 巡视结果，正常
                     inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                     // 未审核
@@ -179,7 +183,7 @@ public abstract class AbstractVideoCruise {
                 CruiseRedisStorage.offer(inspectionMap);
                 if (!picError) {
                     // 判断是否有配置算法
-                    TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("deviceMeteId", "-1"));
+                    TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("deviceMeteId", "-1"), resultNum);
                     if (algorithm != null) {
                         log.info("request algorithm: {}", JSON.toJSONString(algorithm));
                         // 算法分析
@@ -202,6 +206,11 @@ public abstract class AbstractVideoCruise {
     }
 
     public TAlgorithmMeteInfo needAnalysis(String deviceMeteId) {
+        return needAnalysis(deviceMeteId, "已拍照");
+
+    }
+
+    public TAlgorithmMeteInfo needAnalysis(String deviceMeteId, String resultNum) {
         List<TAlgorithmMeteInfo> algorithmList = tAlgorithmInfoDao.selectAlgorithmMete(deviceMeteId);
         // 配置了算法
         boolean isAnalyse = CollectionUtils.isNotEmpty(algorithmList) && (algorithmList.get(0).getMeteAnalyse() != null || "on".equals(
@@ -221,49 +230,52 @@ public abstract class AbstractVideoCruise {
     public boolean algorithmAnalysis(Map<String, String> inspectionMap, long presetId, String taskId, JSONObject jsonForRe,
         TAlgorithmMeteInfo algorithm) {
 
-        Analysis analysis = new Analysis();
-        analysis.setTaskId(taskId);
-        analysis.setInstanceId(MapUtils.getLong(inspectionMap, "instanceId"));
-        analysis.setPicPath(jsonForRe.getString("absPath"));
+        try {
+            Analysis analysis = new Analysis();
+            analysis.setTaskId(taskId);
+            analysis.setInstanceId(MapUtils.getLong(inspectionMap, "instanceId"));
+            analysis.setPicPath(jsonForRe.getString("absPath"));
 
-        analysis.setPicModelPath(picModelPath + "/" + presetId);
+            analysis.setPicModelPath(picModelPath + "/" + presetId);
 
-        // 表计
-        if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {
-            analysis.setAnalyseType(algorithm.getMeteAnalyse());
-        } else if ("on".equals(algorithm.getMeteJudge())) {
-            // 判别
-            analysis.setAnalyseType("11");
-        } else {
-            analysis.setAnalyseType("398");
-        }
-        int isAi = algorithm.getIsAi() == null ? 0 : algorithm.getIsAi();
-        analysis.setIsAi(isAi);
-        List<Analysis> analysisList = new ArrayList<>();
-        analysisList.add(analysis);
-        log.info("算法信息：   {}", JSON.toJSONString(analysisList));
-        // 0-缺陷 1-表记
-        Result result;
-        if (Objects.equals(1, algorithm.getIsAi())) {
-            // 算法额外参数设置，红外
-            analysisExt(analysis, jsonForRe);
-            result = analysis(analysisList);
-        } else {
-            result = defect(analysisList);
-        }
-        log.info("调用算法：   {}\n=========={}", JSON.toJSONString(analysisList), JSON.toJSONString(result));
+            // 表计
+            if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {
+                analysis.setAnalyseType(algorithm.getMeteAnalyse());
+            } else if ("on".equals(algorithm.getMeteJudge())) {
+                // 判别
+                analysis.setAnalyseType("11");
+            } else {
+                analysis.setAnalyseType("398");
+            }
+            int isAi = algorithm.getIsAi() == null ? 0 : algorithm.getIsAi();
+            analysis.setIsAi(isAi);
+            List<Analysis> analysisList = new ArrayList<>();
+            analysisList.add(analysis);
+            log.info("算法信息：   {}", JSON.toJSONString(analysisList));
+            // 0-缺陷 1-表记
+            Result result;
+            if (Objects.equals(1, algorithm.getIsAi())) {
+                // 算法额外参数设置，红外
+                analysisExt(analysis, jsonForRe);
+                result = analysis(analysisList);
+            } else {
+                result = defect(analysisList);
+            }
+            log.info("调用算法：   {}\n=========={}", JSON.toJSONString(analysisList), JSON.toJSONString(result));
 
-        if (200 != result.getCode()) {
+            if (200 == result.getCode()) {
+                return false;
+            }
             // 拍照结果处理
             inspectionMap.put("resultNum", "算法分析失败");
             // 巡视结果，正常
             inspectionMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
             // 巡检数据状态，已经执行
             inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
-            return true;
-        } else {
-            return false;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
+        return true;
     }
 
     protected boolean waitCamera(String taskName, String cameraId, String presetName) {
@@ -349,7 +361,7 @@ public abstract class AbstractVideoCruise {
      */
     public Result defect(List<Analysis> analysisList) {
         AnalyticsEnum analytics = getAnalytics();
-        return AnalyticsFactory.getAnalytics(analytics).analytics(analysisList);
+        return AnalyticsFactory.getAnalytics(analytics).defect(analysisList);
     }
 
     private AnalyticsEnum getAnalytics() {

@@ -10,10 +10,9 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
-import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
 import com.yjh.platform.module.task.entity.TCruiseTaskList;
@@ -57,6 +56,7 @@ import java.util.Map;
 public class UPatrolTaskController {
 
     private final UPatrolTaskService uPatrolTaskService;
+    private final PatrolResultHandler patrolResultHandler;
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -65,8 +65,9 @@ public class UPatrolTaskController {
 
     private Logger log = LoggerFactory.getLogger(UPatrolTaskController.class);
 
-    public UPatrolTaskController(UPatrolTaskService uPatrolTaskService) {
+    public UPatrolTaskController(UPatrolTaskService uPatrolTaskService, PatrolResultHandler patrolResultHandler) {
         this.uPatrolTaskService = uPatrolTaskService;
+        this.patrolResultHandler = patrolResultHandler;
     }
 
     @ApiOperation(value = "机器人/无人机巡视结果")
@@ -75,7 +76,7 @@ public class UPatrolTaskController {
         Result result = new Result();
         try {
             log.info("The resultList from accessRobot is=={}", resultList);
-            uPatrolTaskService.robotPatrolTaskResult(resultList);
+            patrolResultHandler.robotPatrolTaskResult(resultList);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

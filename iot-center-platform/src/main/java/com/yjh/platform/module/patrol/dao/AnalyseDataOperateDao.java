@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
