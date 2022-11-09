@@ -1133,18 +1133,20 @@ public class UPatrolTaskService {
     }
 
     public void patrolTaskResultHandler(Map<String, String> cruiseResultMap) {
-        /*String taskId = MapUtils.getString(cruiseResultMap, "taskId");
+        try {
+            String taskId = MapUtils.getString(cruiseResultMap, "taskId");
 
-        int abnormalCounts = patrolTaskResult(taskId, MapUtils.getIntValue(cruiseResultMap, "cruiseResult"), 1);
+            // webSocket通知前端调用巡视监控的接口
+            Map<String, String> jasonMap = new HashMap<>(3);
+            jasonMap.put("type", "finishedOneInstance");
+            jasonMap.put("taskId", taskId);
+            log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
 
-        // 巡视结果上报上一级系统
-        processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultMap, null, null);
-
-        if (abnormalCounts >= 0) {
-            log.info("{}该点是任务{}最后一个点", MapUtils.getString(cruiseResultMap, "instanceId"), taskId);
-            completionOfTask(taskId, abnormalCounts);
-        }*/
-        patrolTaskResultHandler(Collections.singletonList(cruiseResultMap));
+            patrolTaskResultHandler(Collections.singletonList(cruiseResultMap));
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 
     public void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList) {
@@ -1155,7 +1157,10 @@ public class UPatrolTaskService {
         }
         String taskId = cruiseResultList.get(0).get("taskId");
         int abnormalCounts = patrolTaskResult(taskId, CRUISE_RESULT_ABNORMAL, size);
+
+        // 巡视结果上报上一级系统
         processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
+
         if (abnormalCounts >= 0) {
             log.info("该点任务执行完成{}", taskId);
             completionOfTask(taskId, abnormalCounts);

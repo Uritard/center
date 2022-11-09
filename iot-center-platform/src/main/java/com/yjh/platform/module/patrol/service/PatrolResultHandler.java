@@ -274,12 +274,12 @@ public class PatrolResultHandler {
                 log.info("cruiseResultMap==={}", cruiseResultMap);
                 redisTemplate.opsForHash().putAll(redisKeyName, cruiseResultMap);
 
-                // webSocket通知前端调用巡视监控的接口
-                Map<String, String> jasonMap = new HashMap<>(3);
-                jasonMap.put("type", "finishedOneInstance");
-                jasonMap.put("taskId", taskId);
-                log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+//                // webSocket通知前端调用巡视监控的接口
+//                Map<String, String> jasonMap = new HashMap<>(3);
+//                jasonMap.put("type", "finishedOneInstance");
+//                jasonMap.put("taskId", taskId);
+//                log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
+//                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
 
                 uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
 
@@ -545,11 +545,11 @@ public class PatrolResultHandler {
      *
      * @param msgID 随机数
      * @param analyseResultImg 巡视结果图
-     * @param resultValue 巡视结果值
+     * @param resultValueItem 巡视结果值
      * @param cruiseResultMap redis中巡视点结果信息
      * @param tStdDevicemete 测点信息
      */
-    private void defectHandler(String msgID, String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete)  {
+    private void defectHandler(String msgID, String analyseResultImg, String resultValueItem, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete)  {
         String resultImage;
         try {
             if (StringUtils.isNotEmpty(analyseResultImg)){
@@ -563,7 +563,7 @@ public class PatrolResultHandler {
             }
             log.info("defect image=={}", resultImage);
 
-            resultValue = analyseDataOperateService.resolveDefectResult(resultValue);
+            String resultValue = analyseDataOperateService.resolveDefectResult(resultValueItem);
             log.info("Parse defect data is ==={}", resultValue);
 
             cruiseResultMap.put("resultNum", resultValue);
@@ -578,7 +578,7 @@ public class PatrolResultHandler {
                     log.info("Only one defect is generated！！！");
                     // 缺陷信息存redis
                     String redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
-                    Map<String, String> defectMap = getDefectMap(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
+                    Map<String, String> defectMap = getDefectMap(analyseResultImg, resultValueItem, cruiseResultMap, tStdDevicemete, resultValue);
                     log.info("defectMap=={}", JSON.toJSONString(defectMap));
                     redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
                     redisTemplate.opsForHash().putAll("defect:" + msgID + ":" + redisKeyTemp, defectMap);
@@ -602,7 +602,7 @@ public class PatrolResultHandler {
                     for (String res : resultArr) {
                         // 缺陷信息存redis
                         String redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
-                        Map<String, String> defectMap = getDefectMap(analyseResultImg, res, cruiseResultMap, tStdDevicemete);
+                        Map<String, String> defectMap = getDefectMap(analyseResultImg, resultValueItem, cruiseResultMap, tStdDevicemete, res);
                         log.info("defectMap=={}", JSON.toJSONString(defectMap));
                         redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
                         redisTemplate.opsForHash().putAll("defect:" + msgID + ":" + redisKeyTemp, defectMap);
@@ -741,7 +741,8 @@ public class PatrolResultHandler {
      * @param tStdDevicemete 测点信息
      * @return Map<String,String>
      */
-    private Map<String, String> getDefectMap(String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete) {
+    private Map<String, String> getDefectMap(String analyseResultImg, String resultValueItem, Map<String, String> cruiseResultMap,
+                                             TStdDeviceMete tStdDevicemete, String resultValue) {
         log.info("analyseResultImg:{},resultValue:{}", analyseResultImg, resultValue);
         Map<String, String> defectMap = new HashMap<>(16);
         try {
@@ -756,7 +757,7 @@ public class PatrolResultHandler {
             defectMap.put("imagePath", analyseResultImg);
             defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
             defectMap.put("defectTime", DateTimeUtil.format(new Date()));
-            defectMap.put("value", resultValue);
+            defectMap.put("value", resultValueItem);
         }catch (Exception e){
             log.error("组装缺陷map信息异常：" , e);
         }

@@ -130,11 +130,11 @@ public class InspectionResultThread implements Runnable{
             boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
             if (Boolean.TRUE.equals(isSimulationTool)) {
                 // 真实设备上报的巡视结果
-                Map<String, String> jasonMap = new HashMap<>(2);
-                jasonMap.put("type", "finishedOneInstance");
-                jasonMap.put("taskId", taskId);
-                log.info("做完一个点-前端推送：{}", JSON.toJSONString(jasonMap));
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+//                Map<String, String> jasonMap = new HashMap<>(2);
+//                jasonMap.put("type", "finishedOneInstance");
+//                jasonMap.put("taskId", taskId);
+//                log.info("做完一个点-前端推送：{}", JSON.toJSONString(jasonMap));
+//                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
 
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0){
@@ -258,11 +258,11 @@ public class InspectionResultThread implements Runnable{
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
-            Map<String, String> jasonMap = new HashMap<>(2);
-            jasonMap.put("type", "finishedOneInstance");
-            jasonMap.put("taskId", taskId);
-            log.info("做完一个点-前端推送：{}", JSON.toJSONString(jasonMap));
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+//            Map<String, String> jasonMap = new HashMap<>(2);
+//            jasonMap.put("type", "finishedOneInstance");
+//            jasonMap.put("taskId", taskId);
+//            log.info("做完一个点-前端推送：{}", JSON.toJSONString(jasonMap));
+//            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
 
             uPatrolTaskService.patrolTaskResultHandler(taskId, details.getInstanceId());
         }catch (Exception e){
