@@ -742,6 +742,17 @@
       AND dict_note = #{dictNote,jdbcType=VARCHAR}
     </select>
 
+    <select id="selectDictCodeByUpDict" resultType="java.lang.String">
+        SELECT
+            dict_code
+        FROM
+            t_dict_business
+        WHERE
+            col_name = #{colName, jdbcType = VARCHAR}
+          AND
+            up_dict = #{upDict, jdbcType = VARCHAR}
+    </select>
+
     <select id="selectDictNote"  resultType="java.lang.String">
         SELECT
             dict_note

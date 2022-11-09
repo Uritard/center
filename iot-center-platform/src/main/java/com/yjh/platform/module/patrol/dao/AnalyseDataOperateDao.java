@@ -47,6 +47,9 @@ public interface AnalyseDataOperateDao {
 
     String selectDictCode(@Param(value = "colName") String colName, @Param(value = "dictNote") String dictNote);
 
+    String selectDictCodeByUpDict(@Param(value = "colName") String colName,
+                                  @Param(value = "upDict") String upDict);
+
     String selectDictNote(@Param(value = "dictCode") String dictCode, @Param(value = "colName") String colName);
 
     String selectAlarmLevel( @Param(value = "colName")String colName,

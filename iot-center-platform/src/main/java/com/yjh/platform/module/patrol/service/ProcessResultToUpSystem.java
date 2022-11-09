@@ -118,7 +118,7 @@ public class ProcessResultToUpSystem {
             list.add(xmlBaseModel);
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             map.put("list", list);
-            log.info("往上一级准备上报的信息是==={}", map);
+            log.info("The information to be reported one level up is==={}", map);
             Constant.otherServer(map, Constant.TCP_URL);
         }catch (Exception e){
             log.error(e.getMessage(), e);

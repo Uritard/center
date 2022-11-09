@@ -3,6 +3,7 @@ package com.yjh.platform.module.patrol.thread;
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.dao.NonhomologousWarnDao;
+import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,12 +23,12 @@ import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_T
 public class NonhomologousWarnThread implements Runnable{
 
     private final RedisTemplate redisTemplate;
-    private final RobotPatrolTaskResult robotPatrolTaskResult;
+    private final RobotPatrolTaskAlarm robotPatrolTaskAlarm;
     private final int isResult;
     private final NonhomologousWarnDao nonhomologousWarnDao;
 
-    public NonhomologousWarnThread(RobotPatrolTaskResult robotPatrolTaskResult, RedisTemplate redisTemplate, int isResult){
-        this.robotPatrolTaskResult = robotPatrolTaskResult;
+    public NonhomologousWarnThread(RobotPatrolTaskAlarm robotPatrolTaskAlarm, RedisTemplate redisTemplate, int isResult){
+        this.robotPatrolTaskAlarm = robotPatrolTaskAlarm;
         this.redisTemplate = redisTemplate;
         this.isResult = isResult;
         this.nonhomologousWarnDao = StaticContextAccessor.getBean(NonhomologousWarnDao.class);
@@ -36,9 +37,9 @@ public class NonhomologousWarnThread implements Runnable{
     @Override
     public void run(){
         try {
-            log.info("开始处理巡检结果并生成相应的非同源告警 >>>>>>> robotPatrolTaskResult==={}, isResult ==={}", JSON.toJSONString(robotPatrolTaskResult), isResult);
-            String taskCode = robotPatrolTaskResult.getTaskCode();
-            String robotInsResult = robotPatrolTaskResult.getValue();
+            log.info("开始处理巡检结果并生成相应的非同源告警 >>>>>>> robotPatrolTaskAlarm==={}, isResult ==={}", JSON.toJSONString(robotPatrolTaskAlarm), isResult);
+            String taskCode = robotPatrolTaskAlarm.getTaskCode();
+            String robotInsResult = robotPatrolTaskAlarm.getValue();
 
             String warnId = String.valueOf(UUID.randomUUID()).replace("-", "");
             if (0 == isResult){
@@ -49,7 +50,7 @@ public class NonhomologousWarnThread implements Runnable{
                 warnInfo.put("instanceId", null);
 //                warnInfo.put("warnContent", "机器人相别告警：" + cruiseResultMap.get("content"));
                 List<Map<String, Object>> insResults = new ArrayList<>();
-                String[] deviceIdArray = robotPatrolTaskResult.getDeviceId().split(",");
+                String[] deviceIdArray = robotPatrolTaskAlarm.getDeviceId().split(",");
                 for(String deviceId : deviceIdArray){
                     Map<String, Object> robotWarn = new HashMap<>(4);
                     robotWarn.put("taskId", taskCode);

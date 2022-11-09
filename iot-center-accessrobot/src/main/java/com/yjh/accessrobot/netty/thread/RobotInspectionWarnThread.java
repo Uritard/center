@@ -68,48 +68,44 @@ public class RobotInspectionWarnThread implements Runnable{
             if ("true".equals(redisTemplate.opsForValue().get("RobotTask.taskToRobot"))) {
                 robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
             }
-            Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId);
-            for (String key : robotInfoKeys) {
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-                if (Objects.equals(robotCode,redisInfoMap.get("robotCode"))
-                        && Objects.equals(robotTaskId,redisInfoMap.get("taskId"))
-                        && Objects.equals(warnResultMap.get("deviceId"),redisInfoMap.get("inspectionCode"))) {
-                    Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
-                    TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);
 
-                    Long warnId = storeWarnInfo(tStdDevicemete, instanceId, taskId, robotCode);
-                    log.info("warnId===" + warnId);
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + warnResultMap.get("deviceId");
+            Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
+            Long instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
 
-                    Map<String, String> currentWarnInfo = new HashMap<>(16);
-                    currentWarnInfo.put("warnId", warnId.toString());
-                    currentWarnInfo.put("defectModel", "450");
-                    currentWarnInfo.put("isPop", "false");
+            TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);
 
-                    // webSocket通知前端刷新告警统计数量
-                    Map<String, Object> jasonMaps = new HashMap<>(16);
-                    jasonMaps.put("type", "newAlarm");
-                    jasonMaps.put("alarmName", warnResultMap.get("content"));
-                    jasonMaps.put("alarmTime", warnResultMap.get("time"));
-                    jasonMaps.put("alarmContent", warnResultMap.get("content"));
-                    String jsons = JSON.toJSONString(jasonMaps);
-                    log.info("告警生成-前端推送：" + jsons);
-                    Constant.postUrl(webSocketUrl, jsons);
+            Long warnId = storeWarnInfo(tStdDevicemete, instanceId, taskId, robotCode);
+            log.info("warnId===" + warnId);
 
-                    //webSocket通知前端调用查询告警弹框的接口
-                    currentWarnInfo.put("isPop", "true");
-                    Map<String, Object> jasonMaps2 = new HashMap<>(16);
-                    jasonMaps2.put("type", "alarmPopUp");
-                    jasonMaps2.put("warnId", warnId);
-                    jasonMaps2.put("defectModel", 450);
-                    String json = JSON.toJSONString(jasonMaps2);
-                    log.info("发送给前端的消息：" + json);
-                    Constant.postUrl(webSocketUrl, json);
+            Map<String, String> currentWarnInfo = new HashMap<>(16);
+            currentWarnInfo.put("warnId", warnId.toString());
+            currentWarnInfo.put("defectModel", "450");
+            currentWarnInfo.put("isPop", "false");
 
-                    //最近一条告警信息 入缓存
-                    redisTemplate.opsForValue().set("currentWarn", currentWarnInfo, 3, TimeUnit.MINUTES);
-                    log.info("currentWarnInfo666" + currentWarnInfo);
-                }
-            }
+            // webSocket通知前端刷新告警统计数量
+            Map<String, Object> jasonMaps = new HashMap<>(16);
+            jasonMaps.put("type", "newAlarm");
+            jasonMaps.put("alarmName", warnResultMap.get("content"));
+            jasonMaps.put("alarmTime", warnResultMap.get("time"));
+            jasonMaps.put("alarmContent", warnResultMap.get("content"));
+            String jsons = JSON.toJSONString(jasonMaps);
+            log.info("告警生成-前端推送：" + jsons);
+            Constant.postUrl(webSocketUrl, jsons);
+
+            //webSocket通知前端调用查询告警弹框的接口
+            currentWarnInfo.put("isPop", "true");
+            Map<String, Object> jasonMaps2 = new HashMap<>(16);
+            jasonMaps2.put("type", "alarmPopUp");
+            jasonMaps2.put("warnId", warnId);
+            jasonMaps2.put("defectModel", 450);
+            String json = JSON.toJSONString(jasonMaps2);
+            log.info("发送给前端的消息：" + json);
+            Constant.postUrl(webSocketUrl, json);
+
+            //最近一条告警信息 入缓存
+            redisTemplate.opsForValue().set("currentWarn", currentWarnInfo, 3, TimeUnit.MINUTES);
+            log.info("currentWarnInfo666" + currentWarnInfo);
         }catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage(), e);

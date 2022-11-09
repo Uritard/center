@@ -971,7 +971,7 @@ public class RobotService {
             }
             for (int i = 0; i < redisInfoList.size(); i++) {
                 redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
-                        + ":" + redisInfoList.get(i).get("taskId") + ":" + redisInfoList.get(i).get("instanceId"), redisInfoList.get(i));
+                        + ":" + redisInfoList.get(i).get("taskId") + ":" + redisInfoList.get(i).get("inspectionCode"), redisInfoList.get(i));
             }
         }catch (Exception e){
             log.error(e.getMessage(), e);
@@ -1927,7 +1927,7 @@ public class RobotService {
                     // 放数据到缓存
                     for (Map<String, String> stringStringMap : redisInfoList) {
                         redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + stringStringMap.get("robotCode")
-                                + ":" + stringStringMap.get("taskId") + ":" + stringStringMap.get("instanceId"), stringStringMap);
+                                + ":" + stringStringMap.get("taskId") + ":" + stringStringMap.get("inspectionCode"), stringStringMap);
                     }
 
                     log.info("tCruiseTaskAttrList==={}", tCruiseTaskAttrList);

@@ -10,6 +10,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -98,6 +99,22 @@ public class UPatrolTaskController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("接收并处理机器人/无人机任务状态错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "机器人/无人机测点告警")
+    @PostMapping(value = "/robotPatrolTaskAlarm")
+    public Result robotPatrolTaskAlarm(@RequestBody List<RobotPatrolTaskAlarm> alarmList) {
+        Result result = new Result();
+        try {
+            log.info("The alarmList from accessRobot is=={}", alarmList);
+            patrolResultHandler.robotPatrolTaskAlarm(alarmList);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("接收并处理机器人/无人机测点告警错误:", e);
         }
         return result;
     }

@@ -69,48 +69,42 @@ public class IsWarnAfterCruiseThread implements Runnable {
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
             log.info("taskId是: {}的任务数据uPatrolTask是: {}", taskId, uPatrolTask);
 
-            Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId);
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + threadMap.get("deviceId");
+            Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
 //            if (Objects.isNull(tCruiseTask.getTaskType())) {
-                for (String key : robotInfoKeys) {
-                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-                    if (Objects.equals(robotCode, redisInfoMap.get("robotCode"))
-                            && Objects.equals(robotTaskId, redisInfoMap.get("taskId"))
-                            && Objects.equals(threadMap.get("deviceId"), redisInfoMap.get("inspectionCode"))) {
-                        Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
-                        TStdDeviceMete tStdDevicemete = uPatrolTaskService.selectDeviceMeteInfo(instanceId);
+            Long instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
+            TStdDeviceMete tStdDevicemete = uPatrolTaskService.selectDeviceMeteInfo(instanceId);
 
-                        if (Objects.isNull(tStdDevicemete)){
-                            return;
-                        }
-                        // 该巡视点还在,能找到对应
-                        Map<String, Object> params = new HashMap<>(16);
-                        params.put("value", threadMap.get("value"));
-                        params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
-                        params.put("meteKind", tStdDevicemete.getMeteKind());
-                        params.put("alarmState", tStdDevicemete.getAlarmState());
-                        params.put("stateZero", tStdDevicemete.getStateZero());
-                        params.put("stateOne", tStdDevicemete.getStateOne());
-                        params.put("alarmLevel", tStdDevicemete.getAlarmLevel());
-                        params.put("highLimit1", tStdDevicemete.getHighLimit1());
-                        params.put("lowLimit1", tStdDevicemete.getLowLimit1());
-                        params.put("highLimit2", tStdDevicemete.getHighLimit2());
-                        params.put("lowLimit2", tStdDevicemete.getLowLimit2());
-                        params.put("highLimit3", tStdDevicemete.getHighLimit3());
-                        params.put("lowLimit3", tStdDevicemete.getLowLimit3());
-                        params.put("highLimit4", tStdDevicemete.getHighLimit4());
-                        params.put("lowLimit4", tStdDevicemete.getLowLimit4());
-
-                        Result result = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(Constant.WARN_JUDGE, Result.class, params);
-                        Map<String, Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
-                        log.info("object转map的东西==={}", map);
-                        Boolean isWarN = (Boolean) map.get("isWarn");
-
-                        if (Boolean.FALSE.equals(isWarN)) {
-                            return;
-                        }
-                        alarmStoreAndHandler(map, taskId, tStdDevicemete, instanceId);
-                }
+            if (Objects.isNull(tStdDevicemete)){
+                return;
             }
+            // 该巡视点还在,能找到对应
+            Map<String, Object> params = new HashMap<>(16);
+            params.put("value", threadMap.get("value"));
+            params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
+            params.put("meteKind", tStdDevicemete.getMeteKind());
+            params.put("alarmState", tStdDevicemete.getAlarmState());
+            params.put("stateZero", tStdDevicemete.getStateZero());
+            params.put("stateOne", tStdDevicemete.getStateOne());
+            params.put("alarmLevel", tStdDevicemete.getAlarmLevel());
+            params.put("highLimit1", tStdDevicemete.getHighLimit1());
+            params.put("lowLimit1", tStdDevicemete.getLowLimit1());
+            params.put("highLimit2", tStdDevicemete.getHighLimit2());
+            params.put("lowLimit2", tStdDevicemete.getLowLimit2());
+            params.put("highLimit3", tStdDevicemete.getHighLimit3());
+            params.put("lowLimit3", tStdDevicemete.getLowLimit3());
+            params.put("highLimit4", tStdDevicemete.getHighLimit4());
+            params.put("lowLimit4", tStdDevicemete.getLowLimit4());
+
+            Result result = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(Constant.WARN_JUDGE, Result.class, params);
+            Map<String, Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
+            log.info("object转map的东西==={}", map);
+            Boolean isWarN = (Boolean) map.get("isWarn");
+
+            if (Boolean.FALSE.equals(isWarN)) {
+                return;
+            }
+            alarmStoreAndHandler(map, taskId, tStdDevicemete, instanceId);
         } catch (Exception e) {
             log.error(e.getMessage());
         }

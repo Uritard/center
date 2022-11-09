@@ -60,64 +60,51 @@ public class InspectionResultThread implements Runnable{
         try {
             log.info("开始处理巡检结果并对其标准化 >>>>>>> robotPatrolTaskResult==={}", JSON.toJSONString(robotPatrolTaskResult));
             String taskId = infoMap.get("taskId");
-            String instanceId;
             String robotCode = robotPatrolTaskResult.getRobotCode();
 
-            Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + taskId);
-            // 上报结果的巡视点,即已经做过的点
-            List<Long> instanceIdList = Optional.ofNullable(Constant.flagMap.get(taskId)).orElse(new ArrayList<>());
-            // 遍历在下任务时提前组装好的巡检点信息
-            for (String key : robotInfoKeys){
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + taskId + ":" + robotPatrolTaskResult.getDeviceId();
+            Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
+            String instanceId = robotInfoKeyMap.get("instanceId");
 
-                String redisKeyName = PATROL_TASK_PREFIX + taskId + ":";
-                if (Objects.equals(robotCode, redisInfoMap.get("robotCode"))
-                        && Objects.equals(taskId, redisInfoMap.get("taskId"))
-                        && Objects.equals(robotPatrolTaskResult.getDeviceId(), redisInfoMap.get("inspectionCode"))) {
-                    instanceId = redisInfoMap.get("instanceId");
-                    instanceIdList.add(Long.valueOf(instanceId));
-                    Constant.flagMap.put(taskId, instanceIdList);
+            String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
+            Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+            tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
+            tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
 
-                    Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName + instanceId);
-                    tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
-                    tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-
-                    if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
-                        tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
-                        tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                        tCruiseTaskResultMap.put("cruiseAbnormal", "--");
-                        log.info("taskId为{},instanceId为{}的该点结果正常", taskId, instanceId);
-                    }else {
-                        // value无值且resultNum为--，若结果非音频文件，则为异常情况
-                        tCruiseTaskResultMap.put("resultNum", "--");
-                        if ("3".equals(robotPatrolTaskResult.getFileType())){
-                            tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                            tCruiseTaskResultMap.put("cruiseAbnormal", "--");
-                            log.info("taskId为{},instanceId为{}的该点结果正常", taskId, instanceId);
-                        }else {
-                            tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                            tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-                            log.info("taskId为{},instanceId为{}的该点结果异常", taskId, instanceId);
-                        }
-                    }
-                    tCruiseTaskResultMap.put("picpath", infoMap.get("relativePath"));
-                    tCruiseTaskResultMap.put("origpic", infoMap.containsKey("absolutePath") ? infoMap.get("absolutePath") : "");
-                    tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-                    tCruiseTaskResultMap.put("isWarn", "0");
-                    tCruiseTaskResultMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
-                    tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
-                    tCruiseTaskResultMap.put("rectangle", robotPatrolTaskResult.getRectangle());
-                    tCruiseTaskResultMap.put("confidence", "");
-
-                    redisTemplate.opsForHash().putAll(PATROL_TASK_PREFIX + taskId + ":" + instanceId, tCruiseTaskResultMap);
-                    log.info("taskId为{}巡视点instanceId为{}的点位已更新redis", taskId, instanceId);
-
-                    // 巡视主机下发的任务或者站端本体任务
-                    boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode, robotInfoKeys);
-                    if (Boolean.FALSE.equals(flag)){
-                        simulationToolTaskHandler(infoMap.get("absolutePath"), taskId, instanceId);
-                    }
+            if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
+                tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
+                tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                tCruiseTaskResultMap.put("cruiseAbnormal", "--");
+                log.info("taskId为{},instanceId为{}的该点结果正常", taskId, instanceId);
+            }else {
+                // value无值且resultNum为--，若结果非音频文件，则为异常情况
+                tCruiseTaskResultMap.put("resultNum", "--");
+                if ("3".equals(robotPatrolTaskResult.getFileType())){
+                    tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                    tCruiseTaskResultMap.put("cruiseAbnormal", "--");
+                    log.info("taskId为{},instanceId为{}的该点结果正常", taskId, instanceId);
+                }else {
+                    tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                    tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
+                    log.info("taskId为{},instanceId为{}的该点结果异常", taskId, instanceId);
                 }
+            }
+            tCruiseTaskResultMap.put("picpath", infoMap.get("relativePath"));
+            tCruiseTaskResultMap.put("origpic", infoMap.containsKey("absolutePath") ? infoMap.get("absolutePath") : "");
+            tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
+            tCruiseTaskResultMap.put("isWarn", "0");
+            tCruiseTaskResultMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
+            tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
+            tCruiseTaskResultMap.put("rectangle", robotPatrolTaskResult.getRectangle());
+            tCruiseTaskResultMap.put("confidence", "");
+
+            redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
+            log.info("taskId为{}巡视点instanceId为{}的点位已更新redis", taskId, instanceId);
+
+            // 巡视主机下发的任务或者站端本体任务
+            boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);
+            if (Boolean.FALSE.equals(flag)){
+                simulationToolTaskHandler(infoMap.get("absolutePath"), taskId, instanceId);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -129,10 +116,9 @@ public class InspectionResultThread implements Runnable{
      * @param taskId 任务id
      * @param instanceId 巡视点id
      * @param robotCode 机器人/无人机编码
-     * @param robotInfoKeys redis有用的值
      * @return boolean
      */
-    private boolean judgeTaskSourceHandler(String taskId, String instanceId, String robotCode, Set<String> robotInfoKeys) {
+    private boolean judgeTaskSourceHandler(String taskId, String instanceId, String robotCode) {
         try {
             Integer robotType = uPatrolTaskService.selectRobotType(robotPatrolTaskResult.getRobotCode());
             boolean isSimulationTool = StringUtils.isNotEmpty(robotPatrolTaskResult.getFilePath())
@@ -158,7 +144,7 @@ public class InspectionResultThread implements Runnable{
                 uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
                 // 区分是否为站端本体任务如果是站端本体任务,需更新任务状态
                 if (Boolean.TRUE.equals(isSelfTask)){
-                    standTaskDealHandler(taskId, robotCode, robotInfoKeys);
+                    standTaskDealHandler(taskId, robotCode);
                 }
                 return true;
             }
@@ -172,9 +158,8 @@ public class InspectionResultThread implements Runnable{
      * 更新站端本体任务状态
      * @param taskId 任务id
      * @param robotCode 机器人/无人机编码
-     * @param robotInfoKeys redis有用的值
      */
-    private void standTaskDealHandler(String taskId, String robotCode, Set<String> robotInfoKeys){
+    private void standTaskDealHandler(String taskId, String robotCode){
         try {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
             log.info("redisInfoMap=={}", redisInfoMap);
@@ -204,10 +189,6 @@ public class InspectionResultThread implements Runnable{
                     break;
                 default:
                     break;
-            }
-            Set<String> cruiseKey = redisScan(PATROL_TASK_PREFIX + taskId);
-            if (robotInfoKeys.size() == cruiseKey.size()){
-                taskState = 240;
             }
             UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
             uPatrolResult.setTaskState(taskState);

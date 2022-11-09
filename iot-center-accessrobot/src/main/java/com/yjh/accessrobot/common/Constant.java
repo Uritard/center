@@ -86,6 +86,10 @@ public class Constant {
      * platform接收机器人/无人机任务状态接口
      */
     public static final String TASK_STATUS_PROCESS = "http://iot-center-platform/uPatrolTask/v1/robotPatrolTaskStatus";
+    /**
+     * platform接收机器人/无人机测点告警接口
+     */
+    public static final String POINT_ALARM_PROCESS = "http://iot-center-platform/uPatrolTask/v1/robotPatrolTaskAlarm";
 
     public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();

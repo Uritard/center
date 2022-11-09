@@ -10,6 +10,7 @@ import com.yjh.platform.module.task.entity.TStdDevicemete;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,6 +126,11 @@ public class AnalyseDataOperateService {
     @Transactional(rollbackFor = Exception.class)
     public String selectDictCode(String colName, String dictNote) {
         return this.analyseDataOperateDao.selectDictCode(colName, dictNote);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Integer selectDictCodeByUpDict(String colName, String value) {
+        return NumberUtils.toInt(analyseDataOperateDao.selectDictCodeByUpDict(colName, value));
     }
 
     @Transactional(rollbackFor = Exception.class)

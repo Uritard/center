@@ -107,7 +107,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
             }
             robotTaskStatus.put(robotCode, taskState);
             Constant.taskRobotMap.put(taskId, robotTaskStatus);
-            log.info("taskRobotMap Put {}", Constant.taskRobotMap.get(taskId));
+            log.info("taskId is {} ,taskRobotMap is {}", taskId, Constant.taskRobotMap.get(taskId));
 
             // 任务已执行和任务终止 更新任务结束时间
             if (/*"1".equals(taskState) ||*/ "4".equals(taskState)) {

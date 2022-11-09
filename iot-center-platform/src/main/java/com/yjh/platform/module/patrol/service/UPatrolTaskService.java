@@ -1172,7 +1172,7 @@ public class UPatrolTaskService {
             abnormalCounts = NumberUtils.toInt(resultCountsMap.get("abnormal"));
             normalCounts = NumberUtils.toInt(resultCountsMap.get("normal"));
             allCounts = NumberUtils.toInt(resultCountsMap.get("all"));
-            log.info("从redis获取的taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, allCounts, abnormalCounts, normalCounts);
+            log.info("From redis---task:{}, all:{}, abnormalCounts:{}, normalCounts:{}", taskId, allCounts, abnormalCounts, normalCounts);
 
             if (CRUISE_RESULT_NORMAL == cruiseResult) {
                 normalCounts += size;
