@@ -1,6 +1,5 @@
 package com.yjh.accessrobot.netty.thread;
 
-import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.accessrobot.common.Constant;
@@ -18,6 +17,7 @@ import com.yjh.accessrobot.module.command.entity.TWarnInfo;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.module.device.service.AlarmService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -65,14 +65,17 @@ public class RobotInspectionWarnThread implements Runnable{
                 throw new RuntimeException("机器人编码为空");
             }
 
-            String robotTaskId = taskId;
+            // taskId是巡视主机的id,robotTaskId是机器人上报的id
+            String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
+            log.info("robotTaskId==={}", robotTaskId);
+
             TCruiseTask tCruiseTaskTemp = StaticContextAccessor.getBean(RobotService.class).selectCruiseTask(robotTaskId, robotTaskId);
             log.info("tCruiseTaskTemp=={}", tCruiseTaskTemp);
-            boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
-            if (!moreTime){
-                // taskId是巡视主机的id,robotTaskId是机器人上报的id
-                robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
-                log.info("robotTaskId==={}", robotTaskId);
+            if (Objects.nonNull(tCruiseTaskTemp) && StringUtils.isNotEmpty(tCruiseTaskTemp.getDateType())) {
+                boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
+                if (moreTime) {
+                    robotTaskId = taskId;
+                }
             }
             log.info("最终的taskId==={}", robotTaskId);
 

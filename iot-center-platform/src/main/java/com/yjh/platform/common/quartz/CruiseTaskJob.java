@@ -290,11 +290,12 @@ public class CruiseTaskJob extends QuartzJobBean {
                     //让机器人做任务
                     TCruiseTask tCruiseTaskTemp = tCruiseTaskDao.selectCruiseTask(tCruiseTask.getTaskCode(), tCruiseTask.getTaskCode());
                     log.info("tCruiseTaskTemp=={}", tCruiseTaskTemp);
-                    boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
-                    String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:taskToRobot","content"));
-                    if ( moreTime && tCruiseTaskTemp.getIfRun() == 172){
-                        robotTask(robotTaskInfoMap);
-                        log.info("下发成功！！！");
+                    if (Objects.nonNull(tCruiseTaskTemp) && StringUtils.isNotEmpty(tCruiseTaskTemp.getDateType())) {
+                        boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
+                        if (moreTime && tCruiseTaskTemp.getIfRun() == 172) {
+                            robotTask(robotTaskInfoMap);
+                            log.info("下发成功！！！");
+                        }
                     }
                 }
 
