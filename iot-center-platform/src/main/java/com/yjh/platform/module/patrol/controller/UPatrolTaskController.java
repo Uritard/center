@@ -111,7 +111,7 @@ public class UPatrolTaskController {
             tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
             int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd.getpCode(), request, tCruiseTaskAdd.getIdentifier());
             if (i == 1) {
-                result = this.insert(tCruiseTaskAdd);
+                result.setData(uPatrolTaskService.insert(tCruiseTaskAdd));
             } else {
                 result.setCode(209);
                 result.setMessage("密码错误");
@@ -123,93 +123,6 @@ public class UPatrolTaskController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("更新错误:", e);
-        }
-        return result;
-    }
-
-
-    public Result insert(@RequestBody TCruiseTaskAdd tCruiseTaskAdd) {
-        Result result = new Result();
-        try {
-            UPatrolTask uPatrolTask = new UPatrolTask();
-            if (tCruiseTaskAdd.getIfRun() == 172) {
-                String cronExpressionDate = "";
-                Long periodId = tCruiseTaskAdd.getPeriodId();
-                if (Objects.nonNull(periodId)) {
-                    TPeriodModel tPeriodModel = tPeriodModelDao.selectByPrimaryId(periodId);
-                    cronExpressionDate = tPeriodModel.getCronExpression();
-                } else {
-                    String cycleMonth = tCruiseTaskAdd.getCycleMonth();
-                    String cycleWeek = tCruiseTaskAdd.getCycleWeek();
-                    String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
-
-                    String intervalNumber = tCruiseTaskAdd.getIntervalNumber();
-                    String intervalExecuteTime = tCruiseTaskAdd.getIntervalExecuteTime();
-                    String intervalType = tCruiseTaskAdd.getIntervalType();
-
-                    cycleMonth = StringUtils.equals("1,2,3,4,5,6,7,8,9,10,11,12", cycleMonth) ? "*" : cycleMonth;
-                    cycleWeek = StringUtils.equals("2,3,4,5,6,7,1", cycleWeek) ? "*" : cycleWeek;
-                    // 周期
-                    if (StringUtils.isNotEmpty(cycleMonth) && StringUtils.isNotEmpty(cycleWeek) && StringUtils.isNotEmpty(cycleExecuteTime)) {
-                        cronExpressionDate = String.format("0 %s %s ? %s %s", 0, cycleExecuteTime, cycleMonth, cycleWeek);
-                    }
-                    // 间隔
-                    if (StringUtils.isNotEmpty(intervalType) && StringUtils.isNotEmpty(intervalNumber) && StringUtils.isNotEmpty(intervalExecuteTime)) {
-                        String hour = intervalExecuteTime.substring(11, 13).startsWith("0") ? intervalExecuteTime.substring(12, 13) : intervalExecuteTime.substring(11, 13);
-                        String min = intervalExecuteTime.substring(14, 16).startsWith("0") ? intervalExecuteTime.substring(14, 15) : intervalExecuteTime.substring(14, 16);
-                        String second = intervalExecuteTime.substring(17, 19).startsWith("0") ? intervalExecuteTime.substring(18, 19) : intervalExecuteTime.substring(17, 19);
-
-                        // 天: 秒 分 时 */日 * ?
-                        if (StringUtils.equals("2", intervalType)) {
-                            cronExpressionDate = String.format("%s %s %s */%s * ?", second, min, hour, intervalNumber);
-                        }
-                        // 时: 秒 分 */时 * * ？
-                        else {
-                            cronExpressionDate = String.format("%s %s */%s * * ?", second, min, intervalNumber);
-                        }
-                    }
-                    log.info("cronExpressionDate==================: {}", cronExpressionDate);
-                }
-                if (CronExpression.isValidExpression(cronExpressionDate)) {
-                    tCruiseTaskAdd.setDateType(cronExpressionDate);
-                    uPatrolTask.setDateType(cronExpressionDate);
-                } else {
-                    result.setData(ResultCodeEnum.CODE10005.getName());
-                    return result;
-                }
-            } else {
-
-                if (Objects.nonNull(tCruiseTaskAdd.getTaskId())) {
-                    uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskId());
-                }
-                if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("", tCruiseTaskAdd.getStartTime())) {
-                    uPatrolTask.setStartTime(tCruiseTaskAdd.getStartTime());
-                } else {
-
-                    uPatrolTask.setStartTime(new Date());
-                    uPatrolTask.setEndTime(new Date());
-                }
-            }
-            uPatrolTask.setTaskName(tCruiseTaskAdd.getTaskName())
-                    .setPlanId(tCruiseTaskAdd.getPlanId())
-                    .setTaskCode(tCruiseTaskAdd.getTaskCode())
-                    .setAreaId(tCruiseTaskAdd.getAreaId())
-                    .setTaskType(tCruiseTaskAdd.getType())
-                    .setExecuteType(tCruiseTaskAdd.getIfRun())
-                    .setCreateUserId(tCruiseTaskAdd.getCreateUserId())
-                    .setRobotId(tCruiseTaskAdd.getRobotId());
-
-            String res = uPatrolTaskService.insert(uPatrolTask, tCruiseTaskAdd);
-            if ("啥也不是".equals(res)) {
-                result.setCode(209, "任务间隔过短,机器人暂不支持");
-            } else {
-                result.setData(res);
-            }
-        } catch (BusinessException b) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
-        } catch (Exception e) {
-            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("添加任务错误:", e);
         }
         return result;
     }
@@ -364,7 +277,7 @@ public class UPatrolTaskController {
             log.info("--站端任务下发--"+tCruiseTaskAdd);
             tCruiseTaskAdd.setTaskCode(tCruiseTaskAdd.getTaskId());
             tCruiseTaskAdd.setTaskId(null);
-            result.setData(insert(tCruiseTaskAdd));
+            result.setData(uPatrolTaskService.insert(tCruiseTaskAdd));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("站端任务控制异常:", e);

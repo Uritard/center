@@ -22,6 +22,7 @@ import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
@@ -42,6 +43,7 @@ import com.yjh.platform.module.patrol.thread.IsWarnAfterCruiseThread;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
+import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
@@ -53,6 +55,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,6 +124,8 @@ public class UPatrolTaskService {
     private TCruisePlanDao tCruisePlanDao;
     @Autowired
     private ProcessResultToUpSystem processResultToUpSystem;
+    @Autowired
+    private TPeriodModelDao tPeriodModelDao;
 
     //jobName
     @Value("${spring.QingHua.jobName}")
@@ -136,7 +141,9 @@ public class UPatrolTaskService {
     private final SimpleDateFormat daySdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Transactional(rollbackFor = Exception.class)
-    public String insert(UPatrolTask uPatrolTask, TCruiseTaskAdd tCruiseTaskAdd) {
+    public String insert(TCruiseTaskAdd tCruiseTaskAdd) {
+        UPatrolTask uPatrolTask = dealTaskInfo(tCruiseTaskAdd);
+
         setLevel(uPatrolTask, tCruiseTaskAdd);
         try {
             if (uPatrolTask.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
@@ -183,6 +190,77 @@ public class UPatrolTaskService {
         sendTaskStateToUp(uPatrolTask, 5);
 
         return uPatrolTask.getTaskId();
+    }
+
+    private UPatrolTask dealTaskInfo(TCruiseTaskAdd tCruiseTaskAdd){
+        UPatrolTask uPatrolTask = new UPatrolTask();
+        if (tCruiseTaskAdd.getIfRun() == 172) {
+            String cronExpressionDate = "";
+            Long periodId = tCruiseTaskAdd.getPeriodId();
+            if (Objects.nonNull(periodId)) {
+                TPeriodModel tPeriodModel = tPeriodModelDao.selectByPrimaryId(periodId);
+                cronExpressionDate = tPeriodModel.getCronExpression();
+            } else {
+                String cycleMonth = tCruiseTaskAdd.getCycleMonth();
+                String cycleWeek = tCruiseTaskAdd.getCycleWeek();
+                String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
+
+                String intervalNumber = tCruiseTaskAdd.getIntervalNumber();
+                String intervalExecuteTime = tCruiseTaskAdd.getIntervalExecuteTime();
+                String intervalType = tCruiseTaskAdd.getIntervalType();
+
+                cycleMonth = StringUtils.equals("1,2,3,4,5,6,7,8,9,10,11,12", cycleMonth) ? "*" : cycleMonth;
+                cycleWeek = StringUtils.equals("2,3,4,5,6,7,1", cycleWeek) ? "*" : cycleWeek;
+                // 周期
+                if (StringUtils.isNotEmpty(cycleMonth) && StringUtils.isNotEmpty(cycleWeek) && StringUtils.isNotEmpty(cycleExecuteTime)) {
+                    cronExpressionDate = String.format("0 %s %s ? %s %s", 0, cycleExecuteTime, cycleMonth, cycleWeek);
+                }
+                // 间隔
+                if (StringUtils.isNotEmpty(intervalType) && StringUtils.isNotEmpty(intervalNumber) && StringUtils.isNotEmpty(intervalExecuteTime)) {
+                    String hour = intervalExecuteTime.substring(11, 13).startsWith("0") ? intervalExecuteTime.substring(12, 13) : intervalExecuteTime.substring(11, 13);
+                    String min = intervalExecuteTime.substring(14, 16).startsWith("0") ? intervalExecuteTime.substring(14, 15) : intervalExecuteTime.substring(14, 16);
+                    String second = intervalExecuteTime.substring(17, 19).startsWith("0") ? intervalExecuteTime.substring(18, 19) : intervalExecuteTime.substring(17, 19);
+
+                    // 天: 秒 分 时 */日 * ?
+                    if (StringUtils.equals("2", intervalType)) {
+                        cronExpressionDate = String.format("%s %s %s */%s * ?", second, min, hour, intervalNumber);
+                    }
+                    // 时: 秒 分 */时 * * ？
+                    else {
+                        cronExpressionDate = String.format("%s %s */%s * * ?", second, min, intervalNumber);
+                    }
+                }
+                log.info("cronExpressionDate==================: {}", cronExpressionDate);
+            }
+            if (CronExpression.isValidExpression(cronExpressionDate)) {
+                tCruiseTaskAdd.setDateType(cronExpressionDate);
+                uPatrolTask.setDateType(cronExpressionDate);
+            } else {
+                throw new BusinessException(ResultCodeEnum.CODE10005.getName());
+            }
+        } else {
+
+            if (Objects.nonNull(tCruiseTaskAdd.getTaskId())) {
+                uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskId());
+            }
+            if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("", tCruiseTaskAdd.getStartTime())) {
+                uPatrolTask.setStartTime(tCruiseTaskAdd.getStartTime());
+            } else {
+
+                uPatrolTask.setStartTime(new Date());
+                uPatrolTask.setEndTime(new Date());
+            }
+        }
+        uPatrolTask.setTaskName(tCruiseTaskAdd.getTaskName())
+                .setPlanId(tCruiseTaskAdd.getPlanId())
+                .setTaskCode(tCruiseTaskAdd.getTaskCode())
+                .setAreaId(tCruiseTaskAdd.getAreaId())
+                .setTaskType(tCruiseTaskAdd.getType())
+                .setExecuteType(tCruiseTaskAdd.getIfRun())
+                .setCreateUserId(tCruiseTaskAdd.getCreateUserId())
+                .setRobotId(tCruiseTaskAdd.getRobotId());
+
+        return uPatrolTask;
     }
 
     private void setLevel(UPatrolTask uPatrolTask, TCruiseTaskAdd tCruiseTaskAdd) {
@@ -264,6 +342,7 @@ public class UPatrolTaskService {
                     .setCruiseType(item.getCruiseType()).setCreatetime(now);
             Map map = Object2Map.objectToMap(uPatrolDataResult, true);
             map.put("deviceMeteId", String.valueOf(item.getDeviceMeteId()));
+            map.put("taskName", task.getTaskName());
             if(item.getCruiseType() != 228){
                 map.put("cameraId", String.valueOf(item.getCameraId()));
                 map.put("robotId","");
