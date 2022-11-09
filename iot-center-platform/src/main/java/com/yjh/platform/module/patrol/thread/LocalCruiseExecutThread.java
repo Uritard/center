@@ -95,10 +95,6 @@ public class LocalCruiseExecutThread<T> implements Runnable {
         CruiseInspectionExecute execute = CruiseExecuteFactory.CREATE.createExecute(cruiseTypeEnum);
         boolean isEnded = execute.execute(inspectionMap);
 
-        // 上传上级系统
-        execute.sendTaskUpSystem(inspectionMap);
-        // 发送页面
-        execute.sendWebsocket(taskId);
         // 任务结束，调用结束方法
         if (isEnded) {
             uPatrolTaskService.patrolTaskResultHandler(inspectionMap);

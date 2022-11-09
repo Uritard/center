@@ -1133,7 +1133,7 @@ public class UPatrolTaskService {
     }
 
     public void patrolTaskResultHandler(Map<String, String> cruiseResultMap) {
-        String taskId = MapUtils.getString(cruiseResultMap, "taskId");
+        /*String taskId = MapUtils.getString(cruiseResultMap, "taskId");
 
         int abnormalCounts = patrolTaskResult(taskId, MapUtils.getIntValue(cruiseResultMap, "cruiseResult"), 1);
 
@@ -1143,7 +1143,8 @@ public class UPatrolTaskService {
         if (abnormalCounts >= 0) {
             log.info("{}该点是任务{}最后一个点", MapUtils.getString(cruiseResultMap, "instanceId"), taskId);
             completionOfTask(taskId, abnormalCounts);
-        }
+        }*/
+        patrolTaskResultHandler(Collections.singletonList(cruiseResultMap));
     }
 
     public void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList) {
@@ -1154,7 +1155,7 @@ public class UPatrolTaskService {
         }
         String taskId = cruiseResultList.get(0).get("taskId");
         int abnormalCounts = patrolTaskResult(taskId, CRUISE_RESULT_ABNORMAL, size);
-
+        processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
         if (abnormalCounts >= 0) {
             log.info("该点任务执行完成{}", taskId);
             completionOfTask(taskId, abnormalCounts);

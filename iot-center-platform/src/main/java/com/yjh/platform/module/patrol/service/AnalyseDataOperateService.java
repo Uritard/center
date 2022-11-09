@@ -2,6 +2,7 @@ package com.yjh.platform.module.patrol.service;
 
 
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
@@ -890,7 +891,7 @@ public class AnalyseDataOperateService {
      */
     public void uploadFileToUpFtps(String sourcePath, String targetPathName) {
         try {
-            if(StringUtils.isEmpty(sourcePath) || StringUtils.isEmpty(targetPathName)) {return;}
+            if(CommonUtils.isEmptyOrNullstr(sourcePath) || CommonUtils.isEmptyOrNullstr(targetPathName)) {return;}
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
                     upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
         } catch (Exception e) {

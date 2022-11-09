@@ -44,16 +44,6 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
         return videoExecute(inspectionMap);
     }
 
-    @Override
-    public void sendWebsocket(String taskId) {
-        CruiseInspectionExecute.super.sendWebsocket(taskId);
-    }
-
-    @Override
-    public void sendTaskUpSystem(Map<String, String> inspectionMap) {
-        CruiseInspectionExecute.super.sendTaskUpSystem(inspectionMap);
-    }
-
     /**
      * 红外相机转到预置位，红外相机抓图时进行了处理，不需要转动预置位
      *

@@ -40,16 +40,6 @@ public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements
         return videoExecute(inspectionMap);
     }
 
-    @Override
-    public void sendWebsocket(String taskId) {
-        CruiseInspectionExecute.super.sendWebsocket(taskId);
-    }
-
-    @Override
-    public void sendTaskUpSystem(Map<String, String> inspectionMap) {
-        CruiseInspectionExecute.super.sendTaskUpSystem(inspectionMap);
-    }
-
     /**
      * 相机转到预置位，普通相机需要等待几秒，让相机到达预置位
      */

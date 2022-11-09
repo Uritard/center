@@ -66,53 +66,60 @@ public class ProcessResultToUpSystem {
         this.analyseDataOperateService = analyseDataOperateService;
     }
 
+    public XMLBaseModel alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
+        return alarmAndResultToUpSystem(Collections.singletonList(cruiseResultMap), alarmLevel, tWarnInfo);
+    }
+
     /**
      * 告警或结果上报上一级系统
      *
-     * @param cruiseResultMap 巡视结果map
+     * @param cruiseResultList 巡视结果map
      * @param alarmLevel 告警等级
      * @param tWarnInfo 告警信息
      */
     @Async
-    public XMLBaseModel alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
+    public XMLBaseModel alarmAndResultToUpSystem(List<Map<String, String>> cruiseResultList, String alarmLevel, TWarnInfo tWarnInfo){
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
-        Map<String, Object> xmlItem = new HashMap<>(16);
+
         try {
-            String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
-            String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
-            String simpleDateFormat = DateTimeUtil.format3(new Date());
-            String analyseType = getAlgorithmTypeMap(instanceId);
-            HashMap<String, String> typeAndPathName = getTypeAndPathName(analyseType);
+            for(Map<String, String> cruiseResultMap:cruiseResultList) {
+                Map<String, Object> xmlItem = new HashMap<>(16);
+                String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
+                String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
+                String simpleDateFormat = DateTimeUtil.format3(new Date());
+                String analyseType = getAlgorithmTypeMap(instanceId);
+                HashMap<String, String> typeAndPathName = getTypeAndPathName(analyseType);
 
-            xmlItem.put("patroldevice_code", "巡视设备名称");
-            xmlItem.put("patroldevice_name", "巡视设备编码");
-            xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
-            xmlItem.put("task_code", taskId);
-            xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
-            xmlItem.put("device_id", instanceId);
-            xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
-            xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
-            xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
-            xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
+                xmlItem.put("patroldevice_code", "巡视设备名称");
+                xmlItem.put("patroldevice_name", "巡视设备编码");
+                xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
+                xmlItem.put("task_code", taskId);
+                xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
+                xmlItem.put("device_id", instanceId);
+                xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
+                xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
+                xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
+                xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
 
-            // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-            String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationCode", "content"));
-            String tagPath = stationCode + "/" + simpleDateFormat.substring(0,4) + "/" + simpleDateFormat.substring(4,6) + "/" + simpleDateFormat.substring(6,8)
-                    + "/" + taskId + typeAndPathName.get("fileNamePath") + instanceId + "_巡视主机编码_" + simpleDateFormat + ".jpg";
+                // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
+                String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationCode", "content"));
+                String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
+                    8) + "/" + taskId + typeAndPathName.get("fileNamePath") + instanceId + "_巡视主机编码_" + simpleDateFormat + ".jpg";
 
-            Map<String, String> resMap;
-            if (Objects.isNull(tWarnInfo)){
-                xmlBaseModel.setType("61");
-                resMap = packageCruiseResultInfo(taskId, instanceId, cruiseResultMap, xmlItem, tagPath);
-            }else {
-                xmlBaseModel.setType("62");
-                resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath);
+                Map<String, String> resMap;
+                if (Objects.isNull(tWarnInfo)) {
+                    xmlBaseModel.setType("61");
+                    resMap = packageCruiseResultInfo(taskId, instanceId, cruiseResultMap, xmlItem, tagPath);
+                } else {
+                    xmlBaseModel.setType("62");
+                    resMap = packageAlarmInfo(alarmLevel, tWarnInfo, xmlItem, tagPath);
+                }
+                log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
+                analyseDataOperateService.uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
+
+                xmlItems.add(xmlItem);
             }
-            log.info("imgPath==={},tagPath==={}", resMap.get("imgPath"), resMap.get("tagPath"));
-            analyseDataOperateService.uploadFileToUpFtps(resMap.get("imgPath"), "/" + resMap.get("tagPath"));
-
-            xmlItems.add(xmlItem);
             xmlBaseModel.setItems(xmlItems);
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
