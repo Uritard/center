@@ -5,13 +5,13 @@
 package com.yjh.platform.module.patrol.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
 import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -30,8 +30,9 @@ import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.VIDEO;
 @Component
 public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements CruiseInspectionExecute {
 
-    public NormalVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate, ServiceRestTemplate serviceRestTemplate) {
-        super(tAlgorithmInfoDao, redisTemplate, serviceRestTemplate);
+    public NormalVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate,
+        ServiceRestTemplate serviceRestTemplate, PatrolResultHandler patrolResultHandler) {
+        super(tAlgorithmInfoDao, redisTemplate, serviceRestTemplate, patrolResultHandler);
     }
 
     @Override
@@ -85,6 +86,11 @@ public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements
      */
     @Override
     protected void analysisExt(Analysis analysis, JSONObject captureResult) {
+        // noting to do.
+    }
+
+    @Override
+    protected void resultRecognition(Map<String, String> inspectionMap) {
         // noting to do.
     }
 

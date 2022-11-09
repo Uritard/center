@@ -6,7 +6,6 @@ package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -73,6 +72,7 @@ public abstract class AbstractVideoCruise {
     private final TAlgorithmInfoDao tAlgorithmInfoDao;
     private final RedisTemplate<String, ?> redisTemplate;
     protected final RestTemplate serviceRestTemplate;
+    protected final PatrolResultHandler patrolResultHandler;
     private final HashOperations<String, String, String> hashOperations;
 
     private static String picModelPath;
@@ -80,10 +80,11 @@ public abstract class AbstractVideoCruise {
     protected static long waitTime = 10000;
 
     protected AbstractVideoCruise(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, ?> redisTemplate,
-        RestTemplate serviceRestTemplate) {
+        RestTemplate serviceRestTemplate, PatrolResultHandler patrolResultHandler) {
         this.tAlgorithmInfoDao = tAlgorithmInfoDao;
         this.redisTemplate = redisTemplate;
         this.serviceRestTemplate = serviceRestTemplate;
+        this.patrolResultHandler = patrolResultHandler;
         this.hashOperations = redisTemplate.opsForHash();
 
         resetParams();
@@ -192,6 +193,9 @@ public abstract class AbstractVideoCruise {
                             // 数据存入 redis
                             CruiseRedisStorage.offer(inspectionMap);
                         }
+                    } else {
+                        // 如果不进行算法处理，则本级处理结果信息
+                        resultRecognition(inspectionMap);
                     }
                 }
 
@@ -368,19 +372,6 @@ public abstract class AbstractVideoCruise {
         return Boolean.parseBoolean(intelDefectAnalysis) ? HTTP : TCP;
     }
 
-    /**
-     * 向页面发送websocket
-     *
-     * @param taskId 正在执行任务ID
-     */
-    public abstract void sendWebsocket(String taskId);
-
-    /**
-     * 向上级系统发送识别结果
-     *
-     * @param inspectionMap 任务测点信息
-     */
-    public abstract void sendTaskUpSystem(Map<String, String> inspectionMap);
 
     /**
      * 相机转到预置位
@@ -404,6 +395,8 @@ public abstract class AbstractVideoCruise {
      * @param captureResult 抓图返回结果
      */
     protected abstract void analysisExt(Analysis analysis, JSONObject captureResult);
+
+    protected abstract void resultRecognition(Map<String, String> inspectionMap);
 
     public static class AnalyticsFactory {
         private static final Map<CruiseConstant.AnalyticsEnum, AnalyticsService> ANALYTICS_SERVICE_MAP = new HashMap<>(8);

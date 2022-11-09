@@ -304,21 +304,13 @@ public class PatrolResultHandler {
     private String recognitionHandler(String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String firDocPath) {
         String resultImage;
         try {
-            boolean dltFlag = NumberUtils.toInt(cruiseResultMap.get("cruiseType")) == 230
-                    && Objects.nonNull(cruiseResultMap.get("resultNum"))
-                    && !Objects.equals("null", cruiseResultMap.get("resultNum"));
-
             if(StringUtils.isNotEmpty(analyseResultImg)){
                 resultImage = analyseResultImg.replaceAll(
                         (String)redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content"),
                         (String)redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content"));
                 log.info("recognition image=={}", resultImage);
 
-                if (Boolean.TRUE.equals(dltFlag)) {
-                    log.info("dltFlag {}, dlt664抓图", dltFlag);
-                }else{
-                    cruiseResultMap.put("picpath", resultImage);
-                }
+                cruiseResultMap.put("picpath", resultImage);
             }
 
             if (StringUtils.equals("数据错误", resultValue)){
@@ -330,13 +322,7 @@ public class PatrolResultHandler {
                 cruiseResultMap.put("cruiseResult", "247");
                 cruiseResultMap.put("cruiseAbnormal", "249");
             }else {
-                // 正常的识别
-                String resultStringValue = dltFlag ? cruiseResultMap.get("resultNum") : resultValue;
-                // 红外会返回两个温度(如：12.3,2.3),所以需要这样取值
-                resultStringValue = resultStringValue.split(",")[0];
-                log.info("resultStringValue=={}", resultStringValue);
-
-                normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, resultStringValue, firDocPath);
+                normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
             }
         }catch (Exception e){
             log.error("识别结果处理异常：", e);
@@ -344,17 +330,24 @@ public class PatrolResultHandler {
         return resultValue;
     }
 
+    public void normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, String firDocPath) {
+        TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResultMap.get("instanceId")));
+        normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
+    }
     /**
      * 正常识别结果处理
      *
      * @param resultValue 算法分析返回的巡视结果
      * @param cruiseResultMap redis中巡视点结果信息
      * @param tStdDevicemete 测点信息
-     * @param resultStringValue 处理后的结果值
      * @return void
      */
-    private void normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String resultStringValue, String firDocPath) {
+    private void normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String firDocPath) {
         try {
+            // 红外会返回两个温度(如：12.3,2.3),所以需要这样取值
+            String resultStringValue = resultValue.split(",")[0];
+            log.info("resultStringValue=={}", resultStringValue);
+
             if (resultStringValue.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+")) {
                 //判断是否为红外识别且获取FIR文件 放入缓存中
                 if(StringUtils.isNotEmpty(firDocPath)) {

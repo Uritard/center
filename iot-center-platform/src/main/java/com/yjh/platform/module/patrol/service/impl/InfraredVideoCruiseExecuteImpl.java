@@ -6,20 +6,20 @@ package com.yjh.platform.module.patrol.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
 import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.INFRARED;
@@ -34,8 +34,9 @@ import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.INFRARED;
 @Component
 public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implements CruiseInspectionExecute {
 
-    public InfraredVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate, ServiceRestTemplate serviceRestTemplate) {
-        super(tAlgorithmInfoDao, redisTemplate, serviceRestTemplate);
+    public InfraredVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate,
+        ServiceRestTemplate serviceRestTemplate, PatrolResultHandler patrolResultHandler) {
+        super(tAlgorithmInfoDao, redisTemplate, serviceRestTemplate, patrolResultHandler);
     }
 
     @Override
@@ -93,8 +94,14 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
     }
 
     @Override
+    protected void resultRecognition(Map<String, String> inspectionMap) {
+        String resultValue = inspectionMap.get("resultNum");
+        patrolResultHandler.normalRecognitionHandler(resultValue, inspectionMap, null);
+    }
+
+    @Override
     public TAlgorithmMeteInfo needAnalysis(String deviceMeteId, String resultNum) {
-        if("已拍照".equals(resultNum)){
+        if ("已拍照".equals(resultNum)) {
             return super.needAnalysis(deviceMeteId, resultNum);
         }
         // dlt 红外 抓图能直接获取到数值，不需要进行算法处理，直接返回 null
