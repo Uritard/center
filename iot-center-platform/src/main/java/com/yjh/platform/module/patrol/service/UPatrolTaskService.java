@@ -67,6 +67,7 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -1133,20 +1134,7 @@ public class UPatrolTaskService {
     }
 
     public void patrolTaskResultHandler(Map<String, String> cruiseResultMap) {
-        try {
-            String taskId = MapUtils.getString(cruiseResultMap, "taskId");
-
-            // webSocket通知前端调用巡视监控的接口,离线 检修 终止各种异常点不用通知
-            Map<String, String> jasonMap = new HashMap<>(3);
-            jasonMap.put("type", "finishedOneInstance");
-            jasonMap.put("taskId", taskId);
-            log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
-
-            patrolTaskResultHandler(Collections.singletonList(cruiseResultMap));
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }
+        patrolTaskResultHandler(Collections.singletonList(cruiseResultMap));
     }
 
     public void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList) {
@@ -1158,8 +1146,19 @@ public class UPatrolTaskService {
         String taskId = cruiseResultList.get(0).get("taskId");
         int abnormalCounts = patrolTaskResult(taskId, CRUISE_RESULT_ABNORMAL, size);
 
-        // 巡视结果上报上一级系统
-        processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
+        try {
+            // webSocket通知前端调用巡视监控的接口
+            Map<String, String> jasonMap = new HashMap<>(3);
+            jasonMap.put("type", "finishedOneInstance");
+            jasonMap.put("taskId", taskId);
+            log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+
+            // 巡视结果上报上一级系统
+            processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
 
         if (abnormalCounts >= 0) {
             log.info("该点任务执行完成{}", taskId);
