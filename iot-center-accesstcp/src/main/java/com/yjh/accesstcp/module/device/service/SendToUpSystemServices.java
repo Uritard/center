@@ -11,12 +11,10 @@ import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.dao.SendToUpSystemDao;
+import com.yjh.accesstcp.module.device.dao.TCameraInfoMapper;
 import com.yjh.accesstcp.module.device.dao.TCameraRecorderDao;
 import com.yjh.accesstcp.module.device.dao.TStdRegionDao;
-import com.yjh.accesstcp.module.device.entity.MaintenanceModel;
-import com.yjh.accesstcp.module.device.entity.TCameraRecorder;
-import com.yjh.accesstcp.module.device.entity.TStdRegion;
-import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.entity.*;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +59,8 @@ public class SendToUpSystemServices {
     private TStdRegionDao tStdRegionDao;
     @Autowired
     private TCameraRecorderDao tCameraRecorderDao;
+    @Autowired
+    private TCameraInfoMapper tCameraInfoMapper;
 
     @Autowired
     private FtpsUtil ftpsUtil;
@@ -358,13 +358,19 @@ public class SendToUpSystemServices {
 
     public String createCameraModel(String path) throws Exception {
         //摄像机模型
-        List<Map<String, Object>> list = sendToUpSystemDao.selectCameraInfo();
-        list.forEach(item -> {
-            item.put("station_code", stationCode);
-            item.put("station_name", getStationName());
-        });
+        List<CameraModel> cameraModelList = tCameraInfoMapper.selectAll();
+        String stationCode = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeId", "content");
+        String stationName = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "stationName", "content");
+        SerializeConfig serializeConfig = new SerializeConfig();
+        serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
+        List<Map<String, Object>> list = cameraModelList.stream().peek(cameraModel -> {
+            cameraModel.setStationCode(stationCode);
+            cameraModel.setStationName(stationName);
+        }).map((Function<CameraModel, Map<String, Object>>) cameraModel -> {
+            JSONObject jsonObject = (JSONObject) JSON.toJSON(cameraModel, serializeConfig);
+            return jsonObject.toJavaObject(Map.class);
+        }).collect(Collectors.toList());
         return CreateModeXMLUtil.createXmlFile(list, path, "video_model.xml", "PatrolDevice_Model");
-
     }
 
     public String createRegionModel(String path) throws Exception {

@@ -1,6 +1,11 @@
 package com.yjh.accessrobot.module.command.dao;
 
 import com.yjh.accessrobot.module.command.entity.TCameraInfo;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
 * @author yanhao
@@ -8,6 +13,7 @@ import com.yjh.accessrobot.module.command.entity.TCameraInfo;
 * @createDate 2022-11-09 16:08:05
 * @Entity com.yjh.accessrobot.module.command.entity.TCameraInfo
 */
+@Repository
 public interface TCameraInfoMapper {
 
     int deleteByPrimaryKey(Long id);
@@ -21,5 +27,11 @@ public interface TCameraInfoMapper {
     int updateByPrimaryKeySelective(TCameraInfo record);
 
     int updateByPrimaryKey(TCameraInfo record);
+
+    List<TCameraInfo> selectByEdgeCode(@Param("edgeCode") String edgeCode);
+
+    int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
+
+    int insertBatch(Collection<TCameraInfo> tCameraInfoList);
 
 }

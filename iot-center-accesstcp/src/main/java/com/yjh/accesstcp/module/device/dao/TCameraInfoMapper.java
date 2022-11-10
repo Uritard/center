@@ -2,6 +2,7 @@ package com.yjh.accesstcp.module.device.dao;
 
 import com.yjh.accesstcp.module.device.entity.CameraModel;
 import com.yjh.accesstcp.module.device.entity.TCameraInfo;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
 * @createDate 2022-11-09
 * @Entity com.yjh.accesstcp.module.device.entity.TCameraInfo
 */
+@Repository
 public interface TCameraInfoMapper {
 
     int deleteByPrimaryKey(Long id);
