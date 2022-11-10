@@ -105,6 +105,14 @@ public class DateTimeUtil {
         return DATETIMEFORMATTPL;
     }
 
+    public static String getDateTimePattern2() {
+        return TIMEFORMAT;
+    }
+
+    public static String getDateTimePattern3() {
+        return TIMEFORMAT2;
+    }
+
     /**
      * 获取当前时间字符串
      *
@@ -222,6 +230,34 @@ public class DateTimeUtil {
             return "";
         }
         SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
+        return sdf.format(date);
+    }
+
+    /**
+     * 日期转为字符串.
+     *
+     * @param date 要格式化的日期
+     * @return 日期字符串
+     */
+    public static String format2(Date date) {
+        if (date == null) {
+            return "";
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern2());
+        return sdf.format(date);
+    }
+
+    /**
+     * 日期转为字符串.
+     *
+     * @param date 要格式化的日期
+     * @return 日期字符串
+     */
+    public static String format3(Date date) {
+        if (date == null) {
+            return "";
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern3());
         return sdf.format(date);
     }
 

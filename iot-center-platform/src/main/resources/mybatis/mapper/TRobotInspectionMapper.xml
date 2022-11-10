@@ -380,4 +380,19 @@
         WHERE 1 = 1
         <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
     </select>
+
+    <select id="selectRealTaskId" resultType="java.lang.String">
+        SELECT
+            a.task_id
+        FROM
+            u_patrol_task a,u_patrol_result b
+        WHERE a.task_id = b.task_id
+          and a.task_code = #{robotTaskId, jdbcType=VARCHAR}
+        ORDER BY b.execute_time desc
+            LIMIT 1
+    </select>
+
+    <select id="selectRobotType" resultType="java.lang.Integer">
+        SELECT robot_type from t_robot_info where robot_code = #{robotCode}
+    </select>
 </mapper>
