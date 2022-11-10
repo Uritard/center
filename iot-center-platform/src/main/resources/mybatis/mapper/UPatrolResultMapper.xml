@@ -1,0 +1,1000 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.patrol.dao.UPatrolResultDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        <id column="task_id" jdbcType="VARCHAR" property="taskId"/>
+        <result column="task_code" jdbcType="VARCHAR" property="taskCode"/>
+        <result column="task_name" jdbcType="VARCHAR" property="taskName"/>
+        <result column="area_id" jdbcType="VARCHAR" property="areaId"/>
+        <result column="task_type" jdbcType="INTEGER" property="taskType"/>
+        <result column="execute_type" jdbcType="INTEGER" property="executeType"/>
+        <result column="robot_id" jdbcType="BIGINT" property="robotId"/>
+        <result column="task_source" jdbcType="INTEGER" property="taskSource"/>
+        <result column="task_level" jdbcType="INTEGER" property="taskLevel"/>
+        <result column="task_state" jdbcType="INTEGER" property="taskState"/>
+        <result column="modify_state" jdbcType="INTEGER" property="modifyState"/>
+        <result column="task_count" jdbcType="INTEGER" property="taskCount"/>
+        <result column="task_wait" jdbcType="INTEGER" property="taskWait"/>
+        <result column="check_user" jdbcType="VARCHAR" property="checkUser"/>
+        <result column="check_date" jdbcType="TIMESTAMP" property="checkDate"/>
+        <result column="weather" jdbcType="VARCHAR" property="weather"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="execute_time" jdbcType="TIMESTAMP" property="executeTime"/>
+        <result column="is_review" jdbcType="VARCHAR" property="isReview"/>
+        <result column="task_abnormal" jdbcType="INTEGER" property="taskAbnormal"/>
+        <result column="cruise_result" jdbcType="INTEGER" property="cruiseResult"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        task_id
+        , task_code, task_name, area_id, task_type, execute_type, robot_id, task_source, task_level, task_state, modify_state, task_count, task_wait, check_user, check_date, weather, create_time, end_time, execute_time, is_review, task_abnormal, cruise_result, remark
+    </sql>
+
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="taskId"
+            parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        insert into u_patrol_result(task_id,
+                                    task_code,
+                                    task_name,
+                                    area_id,
+                                    task_type,
+                                    execute_type,
+                                    robot_id,
+                                    task_source,
+                                    task_level,
+                                    task_state,
+                                    modify_state,
+                                    task_count,
+                                    task_wait,
+                                    check_user,
+                                    check_date,
+                                    weather,
+                                    create_time,
+                                    end_time,
+                                    execute_time,
+                                    is_review,
+                                    task_abnormal,
+                                    cruise_result,
+                                    remark)
+        values (#{taskId, jdbcType=VARCHAR},
+                #{taskCode, jdbcType=VARCHAR},
+                #{taskName, jdbcType=VARCHAR},
+                #{areaId, jdbcType=VARCHAR},
+                #{taskType, jdbcType=INTEGER},
+                #{executeType, jdbcType=INTEGER},
+                #{robotId, jdbcType=BIGINT},
+                #{taskSource, jdbcType=INTEGER},
+                #{taskLevel, jdbcType=INTEGER},
+                #{taskState, jdbcType=INTEGER},
+                #{modifyState, jdbcType=INTEGER},
+                #{taskCount, jdbcType=INTEGER},
+                #{taskWait, jdbcType=INTEGER},
+                #{checkUser, jdbcType=VARCHAR},
+                #{checkDate, jdbcType=TIMESTAMP},
+                #{weather, jdbcType=VARCHAR},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{endTime, jdbcType=TIMESTAMP},
+                #{executeTime, jdbcType=TIMESTAMP},
+                #{isReview, jdbcType=VARCHAR},
+                #{taskAbnormal, jdbcType=INTEGER},
+                #{cruiseResult, jdbcType=INTEGER},
+                #{remark, jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="deleteByPrimaryId" parameterType="java.lang.String">
+        delete
+        from u_patrol_result
+        where task_id = #{taskId, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="update" parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        update u_patrol_result a
+        <set>
+            <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
+            <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
+            <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
+            <if test="taskType != null and taskType != ''">a.task_type = #{taskType, jdbcType=INTEGER},</if>
+            <if test="executeType != null and executeType != ''">a.execute_type = #{executeType, jdbcType=INTEGER},</if>
+            <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+            <if test="taskSource != null and taskSource != ''">a.task_source = #{taskSource, jdbcType=INTEGER},</if>
+            <if test="taskLevel != null and taskLevel != ''">a.task_level = #{taskLevel, jdbcType=INTEGER},</if>
+            <if test="taskState != null and taskState != ''">a.task_state = #{taskState, jdbcType=INTEGER},</if>
+            <if test="modifyState != null and modifyState != ''">a.modify_state = #{modifyState, jdbcType=INTEGER},</if>
+            <if test="taskCount != null and taskCount != ''">a.task_count = #{taskCount, jdbcType=INTEGER},</if>
+            <if test="taskWait != null and taskWait != ''">a.task_wait = #{taskWait, jdbcType=INTEGER},</if>
+            <if test="checkUser != null and checkUser != ''">a.check_user = #{checkUser, jdbcType=VARCHAR},</if>
+            <if test="checkDate != null">a.check_date = #{checkDate, jdbcType=TIMESTAMP},</if>
+            <if test="weather != null and weather != ''">a.weather = #{weather, jdbcType=VARCHAR},</if>
+            <if test="endTime != null">a.end_time = #{endTime},</if>
+            <if test="executeTime != null">a.execute_time = #{executeTime},</if>
+            <if test="isReview != null and isReview != ''">a.is_review = #{isReview, jdbcType=VARCHAR},</if>
+            <if test="taskAbnormal != null and taskAbnormal != ''">a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER},</if>
+            <if test="cruiseResult != null and cruiseResult != ''">a.cruise_result = #{cruiseResult, jdbcType=INTEGER},</if>
+            <if test="remark != null and remark != ''">a.remark = #{remark, jdbcType=VARCHAR},</if>
+        </set>
+        where a.task_id = #{taskId, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByPrimaryId" parameterType="java.lang.String"
+            resultType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        select a.task_id,
+               a.task_code,
+               a.task_name,
+               a.area_id,
+               a.task_type,
+               a.execute_type,
+               a.robot_id,
+               a.task_source,
+               a.task_level,
+               a.task_state,
+               a.modify_state,
+               a.task_count,
+               a.task_wait,
+               a.check_user,
+               a.check_date,
+               a.weather,
+               a.create_time,
+               a.end_time,
+               a.execute_time,
+               a.is_review,
+               a.task_abnormal,
+               a.cruise_result,
+               a.remark
+        from u_patrol_result a
+        where 1 = 1
+          and a.task_id = #{taskId, jdbcType=VARCHAR} limit 1
+    </select>
+
+    <select id="select" parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult"
+            resultType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        select
+        a.task_id,
+        a.task_code,
+        a.task_name,
+        a.area_id,
+        a.task_type,
+        a.execute_type,
+        a.robot_id,
+        a.task_source,
+        a.task_level,
+        a.task_state,
+        a.modify_state,
+        a.task_count,
+        a.task_wait,
+        a.check_user,
+        a.check_date,
+        a.weather,
+        a.create_time,
+        a.end_time,
+        a.execute_time,
+        a.is_review,
+        a.task_abnormal,
+        a.cruise_result,
+        a.remark
+        from u_patrol_result a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="taskCode != null and taskCode != ''">and a.task_code = #{taskCode, jdbcType=VARCHAR}</if>
+        <if test="taskName != null and taskName != ''">and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="areaId != null and areaId != ''">and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
+        <if test="taskType != null and taskType != ''">and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="executeType != null and executeType != ''">and a.execute_type = #{executeType, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''">and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="taskSource != null and taskSource != ''">and a.task_source = #{taskSource, jdbcType=INTEGER}</if>
+        <if test="taskLevel != null and taskLevel != ''">and a.task_level = #{taskLevel, jdbcType=INTEGER}</if>
+        <if test="taskState != null and taskState != ''">and a.task_state = #{taskState, jdbcType=INTEGER}</if>
+        <if test="modifyState != null and modifyState != ''">and a.modify_state = #{modifyState, jdbcType=INTEGER}</if>
+        <if test="taskCount != null and taskCount != ''">and a.task_count = #{taskCount, jdbcType=INTEGER}</if>
+        <if test="taskWait != null and taskWait != ''">and a.task_wait = #{taskWait, jdbcType=INTEGER}</if>
+        <if test="checkUser != null and checkUser != ''">and a.check_user = #{checkUser, jdbcType=VARCHAR}</if>
+        <if test="checkDate != null">and a.check_date = #{checkDate, jdbcType=TIMESTAMP}</if>
+        <if test="weather != null and weather != ''">and a.weather = #{weather, jdbcType=VARCHAR}</if>
+        <if test="createTime != null">and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="endTime != null">and a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="executeTime != null">and a.execute_time = #{executeTime, jdbcType=TIMESTAMP}
+        </if>
+        <if test="isReview != null and isReview != ''">and a.is_review = #{isReview, jdbcType=VARCHAR}</if>
+        <if test="taskAbnormal != null and taskAbnormal != ''">and a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER}
+        </if>
+        <if test="cruiseResult != null and cruiseResult != ''">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER}
+        </if>
+        <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectByPage" parameterType="com.yjh.platform.module.patrol.entity.UPatrolResult"
+            resultType="com.yjh.platform.module.patrol.entity.UPatrolResult">
+        select
+        a.task_id,
+        a.task_code,
+        a.task_name,
+        a.area_id,
+        a.task_type,
+        a.execute_type,
+        a.robot_id,
+        a.task_source,
+        a.task_level,
+        a.task_state,
+        a.modify_state,
+        a.task_count,
+        a.task_wait,
+        a.check_user,
+        a.check_date,
+        a.weather,
+        a.create_time,
+        a.end_time,
+        a.execute_time,
+        a.is_review,
+        a.task_abnormal,
+        a.cruise_result,
+        a.remark
+        from u_patrol_result a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        <if test="taskCode != null and taskCode != ''">and a.task_code = #{taskCode, jdbcType=VARCHAR}</if>
+        <if test="taskName != null and taskName != ''">and a.task_name = #{taskName, jdbcType=VARCHAR}</if>
+        <if test="areaId != null and areaId != ''">and a.area_id = #{areaId, jdbcType=VARCHAR}</if>
+        <if test="taskType != null and taskType != ''">and a.task_type = #{taskType, jdbcType=INTEGER}</if>
+        <if test="executeType != null and executeType != ''">and a.execute_type = #{executeType, jdbcType=INTEGER}</if>
+        <if test="robotId != null and robotId != ''">and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
+        <if test="taskSource != null and taskSource != ''">and a.task_source = #{taskSource, jdbcType=INTEGER}</if>
+        <if test="taskLevel != null and taskLevel != ''">and a.task_level = #{taskLevel, jdbcType=INTEGER}</if>
+        <if test="taskState != null and taskState != ''">and a.task_state = #{taskState, jdbcType=INTEGER}</if>
+        <if test="modifyState != null and modifyState != ''">and a.modify_state = #{modifyState, jdbcType=INTEGER}</if>
+        <if test="taskCount != null and taskCount != ''">and a.task_count = #{taskCount, jdbcType=INTEGER}</if>
+        <if test="taskWait != null and taskWait != ''">and a.task_wait = #{taskWait, jdbcType=INTEGER}</if>
+        <if test="checkUser != null and checkUser != ''">and a.check_user = #{checkUser, jdbcType=VARCHAR}</if>
+        <if test="checkDate != null and">and a.check_date = #{checkDate, jdbcType=TIMESTAMP}</if>
+        <if test="weather != null and weather != ''">and a.weather = #{weather, jdbcType=VARCHAR}</if>
+        <if test="createTime != null">and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
+        <if test="endTime != null">and a.end_time = #{endTime, jdbcType=TIMESTAMP}</if>
+        <if test="executeTime != null">and a.execute_time = #{executeTime, jdbcType=TIMESTAMP}
+        </if>
+        <if test="isReview != null and isReview != ''">and a.is_review = #{isReview, jdbcType=VARCHAR}</if>
+        <if test="taskAbnormal != null and taskAbnormal != ''">and a.task_abnormal = #{taskAbnormal, jdbcType=INTEGER}
+        </if>
+        <if test="cruiseResult != null and cruiseResult != ''">and a.cruise_result = #{cruiseResult, jdbcType=INTEGER}
+        </if>
+        <if test="remark != null and remark != ''">and a.remark = #{remark, jdbcType=VARCHAR}</if>
+    </select>
+
+    <insert id="batchAdd">
+        insert into u_patrol_result(
+        task_id,
+        task_code,
+        task_name,
+        area_id,
+        task_type,
+        execute_type,
+        robot_id,
+        task_source,
+        task_level,
+        task_state,
+        modify_state,
+        task_count,
+        task_wait,
+        check_user,
+        check_date,
+        weather,
+        create_time,
+        end_time,
+        execute_time,
+        is_review,
+        task_abnormal,
+        cruise_result,
+        remark
+        )values
+        <foreach collection="list" item="UPatrolResult" separator=",">
+            (
+            #{UPatrolResult.taskId, jdbcType=VARCHAR},
+            #{UPatrolResult.taskCode, jdbcType=VARCHAR},
+            #{UPatrolResult.taskName, jdbcType=VARCHAR},
+            #{UPatrolResult.areaId, jdbcType=VARCHAR},
+            #{UPatrolResult.taskType, jdbcType=INTEGER},
+            #{UPatrolResult.executeType, jdbcType=INTEGER},
+            #{UPatrolResult.robotId, jdbcType=BIGINT},
+            #{UPatrolResult.taskSource, jdbcType=INTEGER},
+            #{UPatrolResult.taskLevel, jdbcType=INTEGER},
+            #{UPatrolResult.taskState, jdbcType=INTEGER},
+            #{UPatrolResult.modifyState, jdbcType=INTEGER},
+            #{UPatrolResult.taskCount, jdbcType=INTEGER},
+            #{UPatrolResult.taskWait, jdbcType=INTEGER},
+            #{UPatrolResult.checkUser, jdbcType=VARCHAR},
+            #{UPatrolResult.checkDate, jdbcType=TIMESTAMP},
+            #{UPatrolResult.weather, jdbcType=VARCHAR},
+            #{UPatrolResult.createTime, jdbcType=TIMESTAMP},
+            #{UPatrolResult.endTime, jdbcType=TIMESTAMP},
+            #{UPatrolResult.executeTime, jdbcType=TIMESTAMP},
+            #{UPatrolResult.isReview, jdbcType=VARCHAR},
+            #{UPatrolResult.taskAbnormal, jdbcType=INTEGER},
+            #{UPatrolResult.cruiseResult, jdbcType=INTEGER},
+            #{UPatrolResult.remark, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete">
+        delete from u_patrol_result
+        where task_id in (
+        <foreach collection="list" item="taskId" separator=",">
+            #{taskId, jdbcType=VARCHAR}
+        </foreach>
+        )
+    </delete>
+
+    <select id="selectDeviceMeteId" resultType="java.lang.Long">
+        SELECT d.device_mete_id
+        FROM t_cruise_point_instance d
+        WHERE 1 = 1
+          and instance_id = #{instanceId}
+
+    </select>
+
+    <select id="selectJudgeCondition"
+            resultType="com.yjh.platform.module.task.entity.AfterManualReviewInfo">
+        select a.is_warn,
+               a.instance_id,
+               a.task_id,
+               a.identify_result,
+               a.person_check,
+               a.picpath
+        FROM u_patrol_data_result a
+        WHERE 1 = 1
+          and a.instance_id = #{instanceId}
+          and a.task_id = #{taskId}
+    </select>
+
+    <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand"
+            resultType="com.yjh.platform.module.task.entity.TCruiseResultExpand">
+        select distinct
+        a.task_id,
+        a.task_name,
+        a.task_type as cType,
+        d.dict_note as plan_type,
+        a.task_state as cState,
+        e.dict_note as task_state,
+        a.task_count,
+        a.task_count-a.task_wait as cruise_data_state1,
+        a.task_wait as cruise_data_state2,
+        a.task_abnormal,
+        a.execute_time,
+        a.check_user,
+        a.check_date,
+        a.modify_state,
+        a.task_wait,a.create_time,
+        a.remark
+        FROM u_patrol_result a
+        LEFT JOIN t_dict_business d ON a.task_type = d.dict_code and d.col_name = 'plan_type'
+        LEFT JOIN t_dict_business e ON a.task_state = e.dict_code and e.col_name='task_state'
+        LEFT JOIN u_patrol_data_result f ON a.task_id = f.task_id
+        <if test="deviceType != -1">
+            LEFT JOIN t_std_device j on f.device_id = j.device_id
+        </if>
+        LEFT JOIN t_cruise_point_instance m on m.instance_id = f.instance_id
+        LEFT JOIN t_std_devicemete k on k.device_mete_id = m.device_mete_id
+        where 1 = 1
+        <if test="taskName != null and taskName != ''">and a.task_name like
+            concat('%',#{taskName, jdbcType=VARCHAR},'%')
+        </if>
+
+        <if test="cType != null and cType != -1">and a.task_type = #{cType, jdbcType=INTEGER}</if>
+
+        <if test="cState != null and cState != -1">and a.task_state = #{cState, jdbcType=INTEGER}</if>
+
+        <if test="startDate != null and endDate != null">and a.execute_time BETWEEN #{startDate, jdbcType=TIMESTAMP} AND
+            #{endDate, jdbcType=TIMESTAMP}
+        </if>
+
+        <if test="list != null and list.size() > 0">and f.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+
+        <if test="deviceType != -1">and j.device_type = #{deviceType, jdbcType=INTEGER}</if>
+
+        <if test="meteType != -1 ">and k.mete_type = #{meteType, jdbcType=VARCHAR}</if>
+
+        <if test="customId != -1 and customId != null">and m.custom_id = #{customId, jdbcType=VARCHAR}</if>
+        <if test="isCheck != null and isCheck == 1">and a.check_user is null</if>
+        <if test="isCheck != null and isCheck == 2">and a.check_user is not null</if>
+
+        and a.task_state != 239 and a.task_state != 241
+        GROUP BY task_id
+        order by a.execute_time desc
+    </select>
+
+    <select id="selectCruiseByPage" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail"
+            resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
+        SELECT DISTINCT
+        f.real_code,
+        b.device_name,
+        b.instance_name,
+        b.cruise_data_id,
+        b.cruise_type,
+        h.dict_note as cruise_type_name,
+        b.result_num,
+        b.cruise_result,
+        j.dict_note as cruise_result_name,
+        b.cruise_time,
+        b.cruise_abnormal,
+        p.dict_note as abnormal_type1,
+        IF(ISNULL(b.remark),p.dict_note,CONCAT(p.dict_note,',',x.dict_note)) as abnormal_type,
+        b.remark,
+        x.dict_note as abnormal_type2,
+        b.evaluation_state,
+        i.dict_note as evaluation_state_name,
+        b.check_user,
+        b.check_date,
+        b.picpath as pic_path,
+        b.identify_result,
+        w.dict_note as identify_result_name,
+        b.identify_state,
+        b.person_check,
+        b.device_id,
+        q.device_point_id,
+        b.instance_id,
+        e.device_mete_id,
+        q.state_zero,
+        q.state_one,
+        q.high_limit1,
+        q.high_limit2,
+        q.high_limit3,
+        q.high_limit4,
+        q.low_limit1,
+        q.low_limit2,
+        q.low_limit3,
+        q.low_limit4,
+        q.unit,
+        q.mete_kind,
+        q.meter_type,
+        q.mete_type,
+        m.dict_note as mete_kind_name,
+        e.cruise_id as preset_id,
+        k.camera_id,
+        -- b.end_time,
+        b.is_warn,
+        q.alarm_state,
+        q.alarm_level,
+        s.dict_note as alarm_level_name,
+        n.device_type,
+        b.voice_path,
+        conf.db_value as dbValue,
+        conf.f_value as fValue
+        FROM u_patrol_result a
+        LEFT JOIN u_patrol_data_result b on a.task_id = b.task_id
+        LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
+        LEFT JOIN t_std_device n on n.device_id = b.device_id
+        LEFT JOIN t_std_device_attr f on f.device_id = b.device_id
+        LEFT JOIN t_dict_business h on h.dict_code = b.cruise_type and h.col_name = 'cruise_type'
+        LEFT JOIN t_dict_business i on i.dict_code = b.evaluation_state and i.col_name = 'evaluation_state'
+        LEFT JOIN t_dict_business j on j.dict_code = b.cruise_result and j.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business p ON p.dict_code = b.cruise_abnormal and p.col_name = 'abnormal_type'
+        LEFT JOIN t_std_devicemete q on q.device_mete_id = e.device_mete_id
+        LEFT JOIN t_dict_business m on q.mete_kind = m.dict_code and m.col_name ='mete_kind'
+        LEFT JOIN t_camera_preset k on k.preset_id = e.cruise_id
+        LEFT JOIN t_dict_business w on w.dict_code = b.identify_result and w.col_name ='identify_result'
+        LEFT JOIN t_dict_business s on s.dict_code = q.alarm_level and s.col_name ='alarm_level'
+        LEFT JOIN t_dict_business x ON x.dict_code = b.remark and x.col_name = 'abnormal_type'
+        left join t_voice_device voice on e.cruise_id = voice.voice_device_id
+        left join t_voice_config conf on voice.config_id = conf.config_id
+        WHERE 1 = 1
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=VARCHAR}</if>
+
+        <if test="deviceType != null and deviceType != -1">and n.device_type = #{deviceType, jdbcType=INTEGER}</if>
+
+        <if test="cruiseType != null and cruiseType != -1">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+
+        <if test="startTime != null and endTime != null">and a.cruise_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND
+            #{endTime, jdbcType=TIMESTAMP}
+        </if>
+
+        <if test="cruiseResult != null and cruiseResult != -1 ">and b.cruise_result =
+            #{cruiseResult, jdbcType=INTEGER}
+        </if>
+
+        <if test="customId != null and customId != -1 ">and e.custom_id = #{customId, jdbcType=VARCHAR}</if>
+
+        <if test="list != null and list.size() > 0">and b.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        ORDER BY b.cruise_time desc, b.instance_id asc, b.device_id asc, n.custom_id asc
+    </select>
+
+    <select id="selectAbnormalResult" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail"
+            resultType="com.yjh.platform.module.task.entity.CruiseResultDetail">
+        SELECT DISTINCT
+        f.real_code,
+        b.device_name,
+        b.instance_name,
+        b.cruise_type,
+        h.dict_note as cruise_type_name,
+        b.result_num,
+        b.cruise_result,
+        j.dict_note as cruise_result_name,
+        b.cruise_time,
+        b.cruise_abnormal,
+        p.dict_note as abnormal_type1,
+        IF(ISNULL(b.remark),p.dict_note,CONCAT(p.dict_note,',',x.dict_note)) as abnormal_type,
+        b.remark,
+        x.dict_note as abnormal_type2,
+        b.evaluation_state,
+        i.dict_note as evaluation_state_name,
+        b.check_user,
+        b.check_date,
+        b.picpath as pic_path,
+        b.identify_result,
+        w.dict_note as identify_result_name,
+        b.identify_state,
+        b.person_check,
+        b.device_id,
+        q.device_point_id,
+        b.instance_id,
+        e.device_mete_id,
+        q.state_zero,
+        q.state_one,
+        q.high_limit1,
+        q.high_limit2,
+        q.high_limit3,
+        q.high_limit4,
+        q.low_limit1,
+        q.low_limit2,
+        q.low_limit3,
+        q.low_limit4,
+        q.unit,
+        q.mete_kind,
+        q.meter_type,
+        q.mete_type,
+        m.dict_note as mete_kind_name,
+        e.cruise_id as preset_id,
+        k.camera_id,
+        -- b.end_time,
+        b.is_warn,
+        q.alarm_state,
+        q.alarm_level,
+        s.dict_note as alarm_level_name,
+        n.device_type,
+        b.voice_path
+        FROM u_patrol_result a
+        LEFT JOIN u_patrol_data_result b on a.task_id = b.task_id
+        LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
+        LEFT JOIN t_std_device n on n.device_id = b.device_id
+        LEFT JOIN t_std_device_attr f on f.device_id = b.device_id
+        LEFT JOIN t_dict_business h on h.dict_code = b.cruise_type and h.col_name = 'cruise_type'
+        LEFT JOIN t_dict_business i on i.dict_code = b.evaluation_state and i.col_name = 'evaluation_state'
+        LEFT JOIN t_dict_business j on j.dict_code = b.cruise_result and j.col_name = 'cruise_result'
+        LEFT JOIN t_dict_business p ON p.dict_code = b.cruise_abnormal and p.col_name = 'abnormal_type'
+        LEFT JOIN t_std_devicemete q on q.device_mete_id = e.device_mete_id
+        LEFT JOIN t_dict_business m on q.mete_kind = m.dict_code and m.col_name ='mete_kind'
+        LEFT JOIN t_camera_preset k on k.preset_id = e.cruise_id
+        LEFT JOIN t_dict_business w on w.dict_code = b.identify_result and w.col_name ='identify_result'
+        LEFT JOIN t_dict_business s on s.dict_code = q.alarm_level and s.col_name ='alarm_level'
+        LEFT JOIN t_dict_business x ON x.dict_code = b.remark and x.col_name = 'abnormal_type'
+        WHERE 1 = 1
+        <if test="taskResultId != null and taskResultId != ''">and b.task_result_id = #{taskResultId,jdbcType=VARCHAR}
+        </if>
+
+        <if test="deviceType != null and deviceType != -1">and n.device_type = #{deviceType, jdbcType=INTEGER}</if>
+
+        <if test="cruiseType != null and cruiseType != -1">and b.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
+
+        <if test="startTime != null and endTime != null">and a.cruise_time BETWEEN #{startTime, jdbcType=TIMESTAMP} AND
+            #{endTime, jdbcType=TIMESTAMP}
+        </if>
+
+        <if test="cruiseResult != null and cruiseResult != -1 ">and b.cruise_result =
+            #{cruiseResult, jdbcType=INTEGER}
+        </if>
+
+        <if test="customId != null and customId != -1 ">and e.custom_id = #{customId, jdbcType=VARCHAR}</if>
+
+        <if test="instanceName != null and instanceName != ''">and b.instance_name like
+            concat('%',#{instanceName, jdbcType=VARCHAR},'%')
+        </if>
+
+        <if test="list != null and list.size() > 0">and b.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        ORDER BY b.cruise_time DESC
+    </select>
+
+    <select id="selectTaskIsRunning" resultType="com.yjh.platform.module.task.entity.TaskSimpleInfo">
+        SELECT
+        d.task_id,
+        d.task_name,
+        d.task_type as Type,
+        d.task_state as 'taskState', b.dict_note AS 'taskStateName', e.dict_note AS 'typeName'
+        FROM u_patrol_result d
+        left JOIN t_dict_business e ON d.task_type = e.dict_code AND e.col_name = 'plan_type'
+        LEFT JOIN t_dict_business b ON d.task_state = b.dict_code AND b.col_name = 'task_state'
+        WHERE d.task_state in (239, 241)
+        ORDER BY d.create_time DESC
+    </select>
+
+    <select id="selectTaskStateByTaskId" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TaskSimpleInfo">
+        SELECT
+            d.task_id,
+            d.task_name,
+            d.task_type as Type,
+            a.task_state as 'taskState',
+                b.dict_note AS 'taskStateName',
+                e.dict_note AS 'typeName'
+        FROM
+            u_patrol_task d
+                LEFT JOIN t_dict_business e ON d.task_type=e.dict_code AND e.col_name='plan_type'
+                LEFT JOIN u_patrol_result a ON a.task_id=d.task_id
+                LEFT JOIN t_dict_business b ON a.task_state=b.dict_code AND b.col_name='task_state'
+        WHERE d.task_id=#{taskId,jdbcType=VARCHAR}
+
+    </select>
+
+    <select id="selectCruiseCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            t_cruise_point_instance a
+                LEFT JOIN (
+                (
+                    t_cruise_plan b
+                        JOIN u_patrol_plan_attr c ON b.plan_id = c.plan_id
+                    )
+                    LEFT JOIN u_patrol_task d ON b.plan_id = d.plan_id
+                ) ON a.instance_id = c.instance_id
+        WHERE d.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectCruiseCountByType" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.CruiseCountOfType">
+        SELECT
+            dict_code as"cruiseType",
+            dict_note as "cruiseTypeName",
+            (
+                SELECT
+                    COUNT(*)
+                FROM
+                    t_cruise_point_instance a
+                        LEFT JOIN (
+                        (
+                            t_cruise_plan b
+                                JOIN u_patrol_plan_attr c ON b.plan_id = c.plan_id
+                            )
+                            LEFT JOIN u_patrol_task d ON b.plan_id = d.plan_id
+                        ) ON a.instance_id = c.instance_id
+                WHERE
+                    a.cruise_type=dict_code
+                  AND d.task_id=#{taskId,jdbcType=VARCHAR}
+            ) AS "Count"
+        FROM
+            t_dict_business
+        WHERE
+                dict_code IN(SELECT dict_code FROM t_dict_business WHERE col_name="cruise_type" ORDER BY dict_code)
+    </select>
+
+    <select id="selectInstanceIdByTask" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT
+            a.instance_id
+        FROM
+            u_patrol_task_attr a
+        WHERE
+            a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectCruiseInspectByTaskIdYC" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.CruiseInspectResult">
+        SELECT
+            n.device_id as'deviceId',
+                m.device_name,
+            n.instance_id as 'instanceId',
+                c.save_type_list,
+            n.cruise_type as 'cruiseType',
+                e.dict_note as 'cruiseTypeName',
+                n.unit,
+            (
+                CASE
+                    WHEN ISNULL(b.mete_name)
+                        AND ISNULL(c.inspection_id)
+                        AND ISNULL(d.preset_name) THEN
+                        ''
+                    WHEN ISNULL(b.mete_name)
+                        AND ISNULL(c.inspection_name) THEN
+                        d.preset_name
+                    WHEN ISNULL(b.mete_name)
+                        AND ISNULL(d.preset_img) THEN
+                        c.inspection_name
+                    WHEN ISNULL(c.inspection_name)
+                        AND ISNULL(d.preset_name) THEN
+                        b.mete_name
+                    WHEN ISNULL(c.inspection_name) THEN
+                        CONCAT(
+                                b.mete_name,
+                                ' /',
+                                d.preset_name
+                            )
+                    WHEN ISNULL(d.preset_name) THEN
+                        CONCAT(
+                                b.mete_name,
+                                ' /',
+                                c.inspection_name
+                            )
+                    END
+                ) AS instanceName
+        FROM
+            u_patrol_task_attr k
+                LEFT JOIN t_cruise_point_instance n ON k.instance_id = n.instance_id
+                LEFT JOIN t_dict_business e ON n.cruise_type=e.dict_code AND e.col_name='cruise_type'
+                LEFT JOIN t_std_device m on m.device_id = n.device_id
+                LEFT JOIN t_std_devicemete b ON n.device_mete_id = b.device_mete_id
+                LEFT JOIN t_robot_inspection c ON n.cruise_id = c.inspection_id
+                LEFT JOIN t_camera_preset d ON n.cruise_id = d.preset_id
+        WHERE
+            k.task_id = #{taskId,jdbcType=VARCHAR}
+        GROUP BY instanceId
+    </select>
+
+    <!--巡视任务结果统计-->
+    <select id="taskStatistical"  resultType="com.yjh.platform.module.task.entity.StatisticalTools">
+        select
+        dict_code ,
+        dict_note ,
+        (select COUNT(*)
+        from u_patrol_result a,u_patrol_data_result b
+        where a.task_id = b.task_id
+        and task_type = dict_code
+        and a.execute_time BETWEEN #{start} and #{end}
+        ) AS "count"
+        from t_dict_business
+        where dict_code IN
+        (
+        select dict_code
+        from t_dict_business
+        where col_name = #{colName1}
+        )
+        ORDER BY dict_code
+    </select>
+
+    <select id="cruiseStatisticalByAbnormal" resultType="com.yjh.platform.module.task.entity.CruiseStatistical">
+        select
+        dict_code as cruise_abnormal,
+        dict_note as abnormal_type,
+        (
+        (select COUNT(*)
+        from u_patrol_data_result
+        WHERE  cruise_abnormal = dict_code)
+        +
+        (select COUNT(*)
+        from u_patrol_data_result
+        WHERE  remark = dict_code)
+        ) AS "count"
+        from t_dict_business
+        where dict_code IN
+        (
+        select dict_code
+        from t_dict_business
+        where col_name = 'abnormal_type'
+        )
+        ORDER BY dict_code;
+    </select>
+
+    <select id="cruiseInspectCount" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT
+        count(*)
+        FROM
+        t_std_devicemete
+        WHERE
+        device_mete_id IN (
+        SELECT DISTINCT
+        a.device_mete_id
+        FROM
+        u_patrol_task_attr a
+        WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+        )
+        UNION ALL
+        SELECT
+        count(*)
+        FROM
+        t_camera_info
+        WHERE
+        camera_id IN (
+        SELECT DISTINCT
+        c.camera_id
+        FROM
+        u_patrol_task_attr a
+        LEFT JOIN t_camera_preset c ON a.point_task_id = c.preset_id
+        WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+        )
+        UNION ALL
+        SELECT
+        count(*)
+        FROM
+        u_patrol_task_attr a
+        LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
+        WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+        AND c.cruise_type = 228
+        UNION ALL
+        SELECT
+        count(*)
+        FROM
+        u_patrol_task_attr a
+        WHERE
+        a.task_id = #{taskId,jdbcType=VARCHAR}
+    </select>
+
+    <update id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
+        update u_patrol_data_result set
+        <if test="personCheck != null ">person_check = #{personCheck},</if>
+        <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
+        evaluation_state = 256,
+        <if test="checkUser != null ">check_user = #{checkUser},</if>
+        <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
+        <if test="identifyState != null ">identify_state = #{identifyState,jdbcType=INTEGER}</if>
+        where cruise_data_id = #{cruiseDataId,jdbcType =BIGINT }
+    </update>
+
+    <update id="updateDeviceMeteUpdate">
+        update t_std_devicemete_update a <set>
+        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
+        <if test="updateTime != null">a.update_time = #{updateTime},</if>
+        <if test="cruiseResult != null ">a.cruise_result = #{cruiseResult},</if>
+        <if test="identifyResult != null ">a.identify_result = #{identifyResult},</if>
+        <if test="picPath != null">a.pic_path = #{picPath},</if>
+    </set>
+        where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectDeviceMeteInfo"  parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TStdDevicemete">
+        select
+        a.device_mete_id,
+        a.device_id,
+        a.custom_id,
+        a.mete_id,
+        a.mete_kind,
+        a.mete_type,
+        a.mete_name,
+        a.device_type,
+        a.position_type,
+        a.unit,
+        a.alarm_note,
+        a.alarm_type,
+        a.up_effect,
+        a.down_effect,
+        a.state_zero,
+        a.state_one,
+        a.alarm_state,
+        a.alarm_level,
+        a.high_limit1,
+        a.low_limit1,
+        a.high_limit2,
+        a.low_limit2,
+        a.high_limit3,
+        a.low_limit3,
+        a.high_limit4,
+        a.low_limit4,
+        a.alarm_delay,
+        a.alarm_cnt,
+        a.threshold_abs,
+        a.threshold_per,
+        a.modulus,
+        a.remark
+        from t_cruise_point_instance b left join t_std_devicemete a
+        on b.device_mete_id=a.device_mete_id
+        where b.instance_id=#{instanceId,jdbcType=BIGINT}
+    </select>
+
+
+    <update id="updateCheck">
+        update u_patrol_result a <set>
+        <if test="checkUserName != null">a.check_user = #{checkUserName},</if>
+        a.check_date = #{checkDate, jdbcType=TIMESTAMP},
+        <if test="remark != null">a.remark = #{remark},</if>
+    </set>
+        where a.task_id = #{taskId, jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateWarnInfo">
+        UPDATE t_warn_info a <set>
+        <if test="warnName != null">a.warn_name = #{warnName},</if>
+        <if test="warnLevel != null">a.warn_level = #{warnLevel, jdbcType=INTEGER},</if>
+        <if test="warnContent != null ">a.warn_content = #{warnContent},</if>
+        a.conf_mode = 275,
+        a.deal_type = #{dealType},
+        a.deal_info = "程序正常，告警属实",
+        <if test="outRange != null ">a.out_range = #{outRange},</if>
+        <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
+        a.deal_time = #{dealTime, jdbcType=TIMESTAMP}
+    </set>
+        WHERE
+        a.warn_id = #{warnId, jdbcType=BIGINT}
+    </update>
+
+    <update id="updateIsWarn" parameterType="java.lang.Long">
+        UPDATE u_patrol_data_result a <set>
+        a.is_warn = 1
+    </set>
+        WHERE
+        a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectWarnId" resultType="java.lang.Long">
+        SELECT a.warn_id
+        FROM
+        t_warn_info a
+        WHERE
+        a.task_id = #{taskId, jdbcType=VARCHAR}
+        and a.instance_id = #{instanceId,jdbcType = BIGINT}
+    </select>
+
+    <select id="selectAlgorithmType" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT a.analyse_type FROM t_std_devicemete a
+        WHERE a.device_mete_id = #{deviceMeteId, jdbcType = BIGINT}
+    </select>
+
+
+    <select id="selectCruiseDataResult" parameterType="java.lang.String" resultType="com.yjh.platform.module.patrol.entity.UPatrolDataResult">
+        SELECT
+        b.cruise_data_id,
+        b.cruise_result,
+        b.result_num,
+        b.task_id,
+        b.instance_id
+        FROM
+        u_patrol_data_result b
+        WHERE 1 = 1
+        <if test="taskId != null ">and b.task_id = #{taskId}</if>
+        and ISNULL(b.check_user)
+    </select>
+
+    <select id="selectManualDetail" resultType="com.yjh.platform.module.task.entity.CruiseManualReview">
+        SELECT
+        b.task_id,
+        b.cruise_data_id,
+        b.evaluation_state,
+        e.dict_note as evaluation_state_name,
+        b.check_user,
+        b.check_date
+        FROM u_patrol_data_result b
+        LEFT JOIN t_dict_business e on e.dict_code = b.evaluation_state
+        WHERE 1 = 1
+        <if test="taskResultId != null ">and b.task_id = #{taskResultId,jdbcType=VARCHAR}</if>
+
+    </select>
+
+    <select id="selectTaskNameAndTime" resultType="com.yjh.platform.module.task.entity.TaskVO">
+        SELECT
+        a.task_name,
+        a.start_time as cruise_date,
+        d.task_count as total,
+        d.task_wait as wait,
+        d.task_count - task_wait as already,
+        d.task_abnormal as abnormal,
+        d.task_count -  d.task_abnormal as normal,
+        (SELECT count(1) from u_patrol_data_result WHERE c.check_user IS NULL)as unReview,
+        MIN(d.execute_time) as cruiseStartTime,
+        MAX(d.end_time) as cruiseEndTime,
+        d.check_user as reviewer,
+        d.check_date as reviewTime
+        from
+        u_patrol_task a,u_patrol_result d, u_patrol_data_result c
+        where 1 = 1
+        and a.task_id = d.task_id
+        and c.task_id = a.task_id
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
+
+    <select id="selectReviewTaskFlag" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+        a.remark
+        FROM
+        u_patrol_result a
+        where 1 = 1
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
+</mapper>

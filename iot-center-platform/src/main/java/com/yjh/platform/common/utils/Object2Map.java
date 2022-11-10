@@ -4,6 +4,9 @@ package com.yjh.platform.common.utils;
  * @author lqh
  * @since 2020/9/27
  */
+
+import com.yjh.commons.ValueUtil;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,24 +23,25 @@ public class Object2Map {
     //默认null值字段不显示
     public static Map objectToMap(Object obj) {
 
-        Map<String, Object> map  = objectToMap(obj, false);
+        Map<String, String> map  = objectToMap(obj, false);
         return map;
     }
-    public static Map objectToMap(Object obj, boolean keepNullVal) {
+    public static Map<String, String> objectToMap(Object obj, boolean keepNullVal) {
         if (obj == null) {
             return null;
         }
 
-        Map<String, Object> map = new HashMap();
+        Map<String, String> map = new HashMap();
         try {
             Field[] declaredFields = obj.getClass().getDeclaredFields();
             for (Field field : declaredFields) {
                 field.setAccessible(true);
                 if (keepNullVal == true) {
-                    map.put(field.getName(), field.get(obj));
+                    map.put(field.getName(),
+                            field.get(obj) == null || "".equals(field.get(obj).toString())?"null":field.get(obj).toString());
                 } else {
                     if (field.get(obj) != null && !"".equals(field.get(obj).toString())) {
-                        map.put(field.getName(), field.get(obj));
+                        map.put(field.getName(), field.get(obj).toString());
                     }
                 }
             }

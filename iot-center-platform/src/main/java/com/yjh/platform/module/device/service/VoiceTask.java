@@ -144,9 +144,9 @@ public class VoiceTask implements Runnable{
                 tCruiseDataResult.setCruiseName(item.getCruiseName());
                 tCruiseDataResult.setIsWarn(0);
 
-                Map tCruiseTaskResultDetailMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseTaskResultDetail, true));
+                Map tCruiseTaskResultDetailMap = Object2Map.objectToMap(tCruiseTaskResultDetail, true);
                 String str = "t_cruise_task_result:" + taskId + ":" + item.getInstanceId();
-                Map tCruiseDataResultMap = Object2Map.toStringMap(Object2Map.objectToMap(tCruiseDataResult, true));
+                Map tCruiseDataResultMap = Object2Map.objectToMap(tCruiseDataResult, true);
                 tCruiseTaskResultDetailMap.putAll(tCruiseDataResultMap);
                 tCruiseTaskResultDetailMap.put("taskId", taskId);
                 tCruiseTaskResultDetailMap.put("device_mete_id", item.getDeviceMeteId() == null ? "" : item.getDeviceMeteId().toString());

@@ -4,25 +4,23 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.module.command.entity.RobotPatrolTaskAlarm;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
-import com.yjh.accessrobot.netty.thread.NonhomologousWarnThread;
-import com.yjh.accessrobot.netty.thread.RobotInspectionWarnThread;
-import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author YChen
@@ -32,14 +30,6 @@ import java.util.Objects;
 @Service
 public class RobotInspectionWarnHandler implements MessageHandlerStrategy, InitializingBean {
 
-    @Value("${other.webSocketUrl}")
-    private String websocketUrl;
-    @Value("${stationCode}")
-    private String stationCode;
-
-    @Autowired
-    private RedisTemplate redisTemplate;
-
     @Autowired
     private RobotService robotService;
 
@@ -47,48 +37,49 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到机器人设备测点告警了+++++++++++++++++");
         // Deal with robot warn data
-        Map<String, String> warnResultMap = new HashMap<>(16);
         String robotCode = xmlBaseModel.getSendCode();
-        warnResultMap.put("robotCode", robotCode);
-        warnResultMap.put("taskName", xmlBaseModel.getItems().get(0).get("task_name").toString());
-        String taskCode = xmlBaseModel.getItems().get(0).get("task_code").toString();
-        // 通过机器人上报的任务id查询巡视主机上的任务id
-        String taskId = StaticContextAccessor.getBean(RobotService.class).selectRealTaskId(taskCode);
-        if(StringUtils.isEmpty(taskId)){
-            taskId = taskCode;
-            log.info("taskId is empty, use taskCode as taskId");
-        }
-        log.info("taskCode==={},taskId===={}", taskCode, taskId);
-        warnResultMap.put("taskCode", taskId);
-        warnResultMap.put("deviceName", xmlBaseModel.getItems().get(0).get("device_name").toString());
-        warnResultMap.put("deviceId", xmlBaseModel.getItems().get(0).get("device_id").toString());
-        warnResultMap.put("alarmLevel", xmlBaseModel.getItems().get(0).get("alarm_level").toString());
-        warnResultMap.put("alarmType", xmlBaseModel.getItems().get(0).get("alarm_type").toString());
-        warnResultMap.put("recognitionType", xmlBaseModel.getItems().get(0).get("recognition_type").toString());
-        warnResultMap.put("value", xmlBaseModel.getItems().get(0).get("value").toString());
-        warnResultMap.put("valueUnit", xmlBaseModel.getItems().get(0).get("value_unit").toString());
-        warnResultMap.put("unit", xmlBaseModel.getItems().get(0).get("unit").toString());
-        warnResultMap.put("time", xmlBaseModel.getItems().get(0).get("time").toString());
-        warnResultMap.put("taskPatrolledId", xmlBaseModel.getItems().get(0).get("task_patrolled_id").toString());
-        warnResultMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
-
-        log.info("机器人设备测点告警数据是：{}", warnResultMap);
-        RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(warnResultMap, redisTemplate, websocketUrl, stationCode);
-        TaskExecutePool.getInstance().execute(robotWarnThread);
-
-        if(!Objects.isNull(warnResultMap.get("alarmType")) && (warnResultMap.get("alarmType").equals("3")||warnResultMap.get("alarmType").equals("4")||warnResultMap.get("alarmType").equals("9"))){
-            //非同源告警处理
-            NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(warnResultMap, redisTemplate, websocketUrl,0);
-            TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
+        if (StringUtils.isEmpty(robotCode)) {
+            log.error("机器人/无人机编码为空");
+            throw new RuntimeException("机器人/无人机编码为空");
         }
 
+        // 给机器人响应
         String alarmXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
         RobotServerHandler.send( alarmProtocol, robotCode);
-        log.info("巡视主机给机器人{}响应了", robotCode);
+        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
+
+        // 处理数据
+        List<RobotPatrolTaskAlarm> alarmList = new ArrayList<>();
+        for(Map<String, Object> item : xmlBaseModel.getItems()){
+            RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
+            robotPatrolTaskAlarm.setRobotCode(robotCode);
+            robotPatrolTaskAlarm.setTaskName(String.valueOf(item.get("task_name")));
+            robotPatrolTaskAlarm.setTaskCode(String.valueOf(item.get("task_code")));
+            robotPatrolTaskAlarm.setDeviceName(String.valueOf(item.get("device_name")));
+            robotPatrolTaskAlarm.setDeviceId(String.valueOf(item.get("device_id")));
+            robotPatrolTaskAlarm.setAlarmLevel(String.valueOf(item.get("alarm_level")));
+            robotPatrolTaskAlarm.setAlarmType(String.valueOf(item.get("alarm_type")));
+            robotPatrolTaskAlarm.setRecognitionType(String.valueOf(item.get("recognition_type")));
+            robotPatrolTaskAlarm.setValue(String.valueOf(item.get("value")));
+            robotPatrolTaskAlarm.setValueUnit(String.valueOf(item.get("value_unit")));
+            robotPatrolTaskAlarm.setUnit(String.valueOf(item.get("unit")));
+            robotPatrolTaskAlarm.setTime(String.valueOf(item.get("time")));
+            robotPatrolTaskAlarm.setTaskPatrolledId(String.valueOf(item.get("task_patrolled_id")));
+            robotPatrolTaskAlarm.setContent(String.valueOf(item.get("content")));
+            alarmList.add(robotPatrolTaskAlarm);
+        }
+
+        log.info("The alarmList to platform is=={}", alarmList);
+
+        try {
+            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.POINT_ALARM_PROCESS, alarmList, Result.class);
+        }catch (Exception e){
+            log.error("调用platform出错：{}", e.getMessage());
+        }
 
         // 国网要求
-        robotService.upToCruise(xmlBaseModel);
+//        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override

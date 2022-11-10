@@ -30,6 +30,11 @@ public class DateTimeUtil {
     private static final String DATETIMEMSFORMATTPL = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String TIMESIMPLEFORMATTPL = "HH:mm";
     private static final String TIMEFORMATTPL = "HH:mm:ss";
+    private static final String TIMEFORMAT = "yyyy/MM/dd";
+    private static final String TIMEFORMAT2 = "yyyyMMddHHmmss";
+    private static final String DATEOFFORMAT = "yyyyMMdd_HHmmss";
+
+
     private static ResourceBundle resource = null;
 
     private DateTimeUtil() {
@@ -227,12 +232,22 @@ public class DateTimeUtil {
      * @return 日期
      */
     public static Date parse(String source) {
+        return parse(source, null);
+    }
+
+    public static Date parse(String source, String defaultDateStr) {
         Date rtn = null;
         try {
+            if(StringUtils.isNullOrEmpty(source) && !StringUtils.isNullOrEmpty(defaultDateStr)){
+                source = defaultDateStr;
+            }
             SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
             rtn = sdf.parse(source);
         } catch (Exception e) {
             logger.error(e.getMessage());
+            if(!StringUtils.isNullOrEmpty(defaultDateStr)) {
+                parse(defaultDateStr, null);
+            }
         }
         return rtn;
     }
@@ -581,6 +596,12 @@ public class DateTimeUtil {
         SimpleDateFormat sdf = new SimpleDateFormat(MONTHFORMATTPLCABLE);
         return sdf.format(new Date());
     }
+
+    public static String getDateofFormatString() {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATEOFFORMAT);
+        return sdf.format(new Date());
+    }
+
 
     /**
      * 获取当前的月份时间

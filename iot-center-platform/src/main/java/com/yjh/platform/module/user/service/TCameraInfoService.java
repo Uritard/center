@@ -9,6 +9,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -438,20 +439,21 @@ public class TCameraInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public int intoRedis() {
-        List<Long> list =tCameraInfoDao.selectCameraAll();
-        for (Long item:list) {
-            String str = "camera_info:"+item;
-            Map<String,String> map = redisTemplate.opsForHash().entries(str);
-            if(map != null && map.size()>0){
-                continue;
-            }else {
-                map = new HashMap<>();
+        List<TCameraInfo> list = tCameraInfoDao.select(null, null, null, null, null, null, null, null, null, null, null, null, null);
+        for (TCameraInfo item : list) {
+            Long cameraId = item.getCameraId();
+            String str = "camera_info:" + cameraId;
+            Map<String, String> map = redisTemplate.opsForHash().entries(str);
+            if (MapUtils.isEmpty(map)) {
+                map = new HashMap<>(8);
+                map.put("state", "0");
             }
-            map.put("cameraId",item.toString());
-            map.put("state","0");
+            map.put("cameraId", String.valueOf(cameraId));
+            map.put("cameraIp", item.getCameraIp());
+            map.put("pmsId", item.getPmsId());
             redisTemplate.opsForHash().putAll(str, map);
         }
-       return 1;
+        return 1;
     }
 
 

@@ -184,7 +184,7 @@ public class TSysParamService{
     public int insertIntoRedis(boolean putSysProp){
         List<TSysParam> list = this.tSysParamDao.selectAll();
         for (TSysParam item:list) {
-            Map map = Object2Map.toStringMap(Object2Map.objectToMap(item,true));
+            Map map = Object2Map.objectToMap(item,true);
             String str = "t_sys_param:"+item.getParamCode();
             redisTemplate.opsForHash().putAll(str, map);
         }

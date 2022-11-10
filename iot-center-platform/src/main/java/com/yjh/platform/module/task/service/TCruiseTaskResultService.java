@@ -2,6 +2,7 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.druid.util.StringUtils;
 import com.google.common.collect.Sets;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -11,6 +12,9 @@ import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.device.entity.CruiseTypeInfo;
 import com.yjh.platform.module.device.entity.TStdDeviceMete;
+import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
+import com.yjh.platform.module.patrol.entity.UPatrolResult;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.controller.HelloController;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
@@ -38,7 +42,8 @@ import redis.clients.jedis.ScanResult;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
  * @author czh
@@ -79,6 +84,9 @@ public class TCruiseTaskResultService {
 
     @Autowired
     private TCruiseResultDao tCruiseResultDao;
+
+    @Autowired
+    private UPatrolResultDao uPatrolResultDao;
 
     private Logger log = LoggerFactory.getLogger(HelloController.class);
 
@@ -154,7 +162,8 @@ public class TCruiseTaskResultService {
         Map<String, Object> resultsMap = new HashMap<>();
         CruiseInspectResult inspectResult = new CruiseInspectResult();
 
-        List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskIdYC(taskId);
+//        List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskIdYC(taskId);
+        List<CruiseInspectResult> cruiseInspectResults = uPatrolResultDao.selectCruiseInspectByTaskIdYC(taskId);
         List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null, "", "cruise_data_state", "", null, null, null);
         HashMap<String, String> tDictMap = new HashMap<>();
         for (TDictBusiness tDictBusiness:tDictBusinessList) tDictMap.put(tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
@@ -162,7 +171,8 @@ public class TCruiseTaskResultService {
         for (CruiseInspectResult cruiseInspectResult:cruiseInspectResults) {
             cruiseInspectResult.setCruiseResultName("--");
             cruiseInspectResult.setEndTime(null);
-            String key = "t_cruise_task_result:" + taskId + ":" + cruiseInspectResult.getInstanceId().toString();
+
+            String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + cruiseInspectResult.getInstanceId();
             Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);
             if (resultMap.size()>0) {
                 //从redis拿数据
@@ -292,7 +302,7 @@ public class TCruiseTaskResultService {
         for (String warnKey : warnKeys) {
             Map<String, Object> warnMap = redisTemplate.opsForHash().entries(warnKey);
             String instanceId = warnMap.get("instanceId").toString();
-            Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
+            Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
             log.info("cruiseMap==={}", cruiseMap);
             RealTimeWarn realTimeWarn = new RealTimeWarn();
             realTimeWarn.setDeviceName(cruiseMap.get("deviceName").toString());
@@ -314,7 +324,7 @@ public class TCruiseTaskResultService {
         for (String defectKey : defectKeys) {
             Map<String, Object> defectMap = redisTemplate.opsForHash().entries(defectKey);
             String instanceId = defectMap.get("instanceId").toString();
-            Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId);
+            Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId);
             log.info("cruiseMap==={}", cruiseMap);
             RealTimeWarn realTimeWarn = new RealTimeWarn();
             realTimeWarn.setDeviceName(cruiseMap.get("deviceName").toString());
@@ -362,22 +372,14 @@ public class TCruiseTaskResultService {
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Map<String, Object> selectCruiseAdvance(String taskId) {
-        Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
-
-        String cruiseExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "已执行");
-        String cruiseNotExecuted = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未执行");
-        String cruiseExecuteFailed = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "执行失败");
-        String cruiseUnknown = tDictBusinessDao.selectCameraTypeAndRobotPosition("cruise_data_state", "未知");
-
         Long cruiseCount = tCruiseTaskResultDao.selectCruiseCountsByTaskId(taskId);//总巡检点数量
         float cruiseComCount = 0;//执行完成的巡检点数量
 
-        for (String cruiseKey : keyResult) {
-            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(cruiseKey);
-            if (!(resultMap.get("cruiseStatus").equals(cruiseNotExecuted))) {
-                cruiseComCount = cruiseComCount + 1;
-            }
-        }
+        Map<String, Object> countResult = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId);
+        Integer normal = ValueUtil.toInteger(countResult.get("normal"),0);
+        Integer abnormal = ValueUtil.toInteger(countResult.get("abnormal"),0);
+
+        cruiseComCount = normal+abnormal;
         log.info("执行完成点：" + cruiseComCount + "个");
         Map<String, Object> rateAndTaskInfo = new HashMap<>();
         if (cruiseCount == 0 || cruiseComCount == 0) {
@@ -385,8 +387,11 @@ public class TCruiseTaskResultService {
         } else {
             rateAndTaskInfo.put("rate", cruiseComCount / cruiseCount);
         }
-        rateAndTaskInfo.put("taskState", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskState());
-        rateAndTaskInfo.put("taskStateName", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskStateName());
+        TaskSimpleInfo taskSimpleInfo = uPatrolResultDao.selectTaskStateByTaskId(taskId);
+//        rateAndTaskInfo.put("taskState", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskState());
+        rateAndTaskInfo.put("taskState", taskSimpleInfo.getTaskState());
+//        rateAndTaskInfo.put("taskStateName", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskStateName());
+        rateAndTaskInfo.put("taskStateName", taskSimpleInfo.getTaskStateName());
         return rateAndTaskInfo;
     }
 
@@ -404,10 +409,11 @@ public class TCruiseTaskResultService {
         Set<Long> deviceMeteComp = new HashSet<>();//已执行的标准测点
         List<Long> deviceMeteIds = new ArrayList<>();//测点对比器
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
-        Set<String> keyResult = redisScan("t_cruise_task_result:" + taskId);
+        Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId);
 
 
-        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
+//        Set<Long> instanceIds = tCruiseTaskAttrDao.selectInstanceIdByTask(taskId);
+        Set<Long> instanceIds = uPatrolResultDao.selectInstanceIdByTask(taskId);
         for (Long instanceId : instanceIds) {
             deviceMete.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
             deviceMeteIds.add(tStdDevicemeteDao.getdeviceMeteByPointinstance(instanceId));
@@ -481,6 +487,38 @@ public class TCruiseTaskResultService {
         return cruiseResultCounter;
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public CruiseResultCounter selectCruiseStatusCountNew(String taskId) throws ParseException {
+        CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
+        //计算运行时间
+
+        UPatrolResult result = uPatrolResultDao.selectByPrimaryId(taskId);
+        Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
+
+        if (Objects.nonNull(countResult)) {
+            //获取任务开始时间
+            String startTime = countResult.get("taskStart").toString();
+            Integer all = ValueUtil.toInteger(countResult.get("all"),0);
+            Integer normal = ValueUtil.toInteger(countResult.get("normal"),0);
+            Integer abnormal = ValueUtil.toInteger(countResult.get("abnormal"),0);
+            cruiseResultCounter.setAlarmCount(abnormal);
+            cruiseResultCounter.setCruisedCount(normal+abnormal);
+            cruiseResultCounter.setCruiseNotCount(all - abnormal -normal);
+            //将两个时间字符串转为日期类型
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date d1 = simpleDateFormat.parse(startTime);
+            String d2String = simpleDateFormat.format(new Date());
+            Date d2 = simpleDateFormat.parse(d2String);
+            cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
+        } else {
+            cruiseResultCounter.setCruisedCount(result.getTaskCount());
+            cruiseResultCounter.setAlarmCount(0);
+            cruiseResultCounter.setCruiseNotCount(0);
+            cruiseResultCounter.setRunningTime(Long.valueOf("0"));
+        }
+        return cruiseResultCounter;
+    }
+
 
     @Transactional(rollbackFor = Exception.class)
     public List<Object> selectCruiseDeviceAndCruiseAdvance(String taskId) {
@@ -496,7 +534,7 @@ public class TCruiseTaskResultService {
         List<Object> finalResult = new ArrayList<>();//最终结果集(封装机器人、可见光、红外相机的信息)
 
 
-        Set<String> cruiseKeys = redisScan("t_cruise_task_result*");
+        Set<String> cruiseKeys = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX+"*");
         Set<String> robotKeys = redisScan("robot_info*");
         for (String robotKey : robotKeys) {
             Map<String, Object> robotInfo = redisTemplate.opsForHash().entries(robotKey);
@@ -700,7 +738,7 @@ public class TCruiseTaskResultService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, String> PictureCompare(String taskId, Long instanceId) {
         String preImg = tCameraPresetDao.selectPreImgByCruiseId(instanceId);
-        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());
+        Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId.toString());
         String meteType = "";
         if (Objects.nonNull(redisInfoMap.get("device_mete_id"))) {
             TStdDeviceMete tStdDeviceMete = tStdDevicemeteDao.selectByPrimaryId(Long.parseLong(redisInfoMap.get("device_mete_id")));
@@ -716,7 +754,7 @@ public class TCruiseTaskResultService {
 
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> cameraInfoByRedis() {
-        Set<String> cruiseKeys = redisScan("t_cruise_task_result*");
+        Set<String> cruiseKeys = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX+"*");
         for (String cruiseKey : cruiseKeys) {
             Map<String, Object> cruiseInfo = redisTemplate.opsForHash().entries(cruiseKey);
             CruiseTypeInfo cruiseTypeInfo = tCruisePointInstanceDao.selectCruiseCommonInfoByInstanceId(Long.valueOf(cruiseInfo.get("cruiseId").toString()));

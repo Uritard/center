@@ -40,7 +40,8 @@ import java.util.*;
  * @since 2020-08-20
  */
 @RestController
-@RequestMapping("/analysis/v1")
+@Deprecated
+@RequestMapping("/analysis/v1/Deprecated")
 @Api(value = "/analysis", tags = "算法调用操作接口")
 public class AnalysisController {
 

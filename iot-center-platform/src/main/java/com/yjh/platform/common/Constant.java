@@ -5,6 +5,7 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.user.entity.Channel;
+import io.netty.bootstrap.Bootstrap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpEntity;
@@ -61,7 +62,7 @@ public class Constant {
 
     public static final String account_lock_time = "account_lock_time:userAccountID";
 
-    public static final String WARN_JUDGE = "http://iot-center-accessvideo/AnalysisDataOperate/v1/warnInfo?value={value}&stdDeviceMeteName={stdDeviceMeteName}&meteKind={meteKind}&alarmState={alarmState}&stateZero={stateZero}&stateOne={stateOne}&alarmLevel={alarmLevel}&highLimit1={highLimit1}&lowLimit1={lowLimit1}&highLimit2={highLimit2}&lowLimit2={lowLimit2}&highLimit3={highLimit3}&lowLimit3={lowLimit3}&highLimit4={highLimit4}&lowLimit4={lowLimit4}";
+    public static final String WARN_JUDGE = "http://iot-center-platform/analysis/v1/warnInfo?value={value}&stdDeviceMeteName={stdDeviceMeteName}&meteKind={meteKind}&alarmState={alarmState}&stateZero={stateZero}&stateOne={stateOne}&alarmLevel={alarmLevel}&highLimit1={highLimit1}&lowLimit1={lowLimit1}&highLimit2={highLimit2}&lowLimit2={lowLimit2}&highLimit3={highLimit3}&lowLimit3={lowLimit3}&highLimit4={highLimit4}&lowLimit4={lowLimit4}";
 
     public static final String DIAGNOSE_CHANNEL_OPERATE="http://iot-center-accessvqd/channelOperate/v1/updateChannel";
 
@@ -270,4 +271,37 @@ public class Constant {
         re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
         return re;
     }
+
+    public static String algorithmTestPicPath= "";
+
+    public static Map<Integer, Bootstrap> bootstrapHashMap = new HashMap<>();
+
+    //心跳报文
+    public static final byte TYPET3 = 0x03;
+
+    public static<T> Result otherServerList( List<T> list, String url) {
+        Result re = new Result();
+        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
+        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
+        return re;
+    }
+
+    public static final String GET_LOW_TASK_GO_ON = "http://iot-center-platform/tCruiseTask/v1/lowTaskGoOn";
+
+    public static void  otherServerMap( Map<String,String> map, String url) {
+        try{
+            Result re = new Result();
+            //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
+            //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+            re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url,map, Result.class);
+        }catch (Exception e){
+            log.info("一键顺控："+e);
+        }
+    }
+
+    public static final String picRecBack = "http://iot-center-platform/tSequentialConf/v1/sequentialRecBack";
+
+    public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze?cruiseResultIdList";
 }
+

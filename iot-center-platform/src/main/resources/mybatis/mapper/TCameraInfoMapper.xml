@@ -202,7 +202,7 @@
         <if test="regionId != null ">and  a.up_region_id = #{regionId, jdbcType=BIGINT}</if>
     </select>
 
-    <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">
+    <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfo">
         select
         a.camera_id,
         a.camera_name,
@@ -229,7 +229,7 @@
         a.latitude,
         a.longitude,
         a.address,
-        a.unit
+        a.unit,
         a.commission_date
         from t_camera_info a
         where 1 = 1
@@ -240,28 +240,12 @@
         <if test="aliasName != null and aliasName != ''"> and a.alias_name like concat('%',#{aliasName, jdbcType=VARCHAR},'%')</if>
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
-        <if test="channelNum != null "> and a.channel_num = #{channelNum, jdbcType=INTEGER}</if>
-        <if test="cameraNum != null "> and a.camera_num = #{cameraNum, jdbcType=INTEGER}</if>
-        <if test="smsId != null "> and a.sms_id = #{smsId, jdbcType=INTEGER}</if>
-        <if test="rmsId != null "> and a.rms_id = #{rmsId, jdbcType=INTEGER}</if>
-        <if test="monitorId != null and monitorId != ''"> and a.monitor_id = #{monitorId, jdbcType=VARCHAR}</if>
-        <if test="vendorId != null and vendorId != ''"> and a.vendor_id = #{vendorId, jdbcType=VARCHAR}</if>
-        <if test="streamType != null "> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
         <if test="protocolType != null "> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
         <if test="streamType != null "> and a.stream_type = #{streamType, jdbcType=INTEGER}</if>
-        <if test="protocolType != null "> and a.protocol_type = #{protocolType, jdbcType=INTEGER}</if>
         <if test="cameraIp != null and cameraIp != ''"> and a.camera_ip like concat('%',#{cameraIp, jdbcType=VARCHAR},'%')</if>
         <if test="url != null and url != ''"> and a.url = #{url, jdbcType=VARCHAR}</if>
-        <if test="port != null "> and a.port = #{port, jdbcType=INTEGER}</if>
-        <if test="infreadPort != null "> and a.infread_port = #{infreadPort, jdbcType=INTEGER}</if>
-        <if test="cameraManager != null">and a.camera_manager = #{cameraManager, jdbcType=VARCHAR},</if>
-        <if test="cameraCode != null">and a.camera_code = #{cameraCode, jdbcType=VARCHAR},</if>
         <if test="cameraType != null "> and a.camera_type = #{cameraType, jdbcType=INTEGER}</if>
         <if test="isControl != null "> and a.is_control = #{isControl, jdbcType=INTEGER}</if>
-        <if test="address != null">and a.address = #{address, jdbcType=VARCHAR},</if>
-        <if test="latitude != null">and a.latitude = #{latitude, jdbcType=VARCHAR},</if>
-        <if test="longitude != null">and a.longitude = #{longitude, jdbcType=VARCHAR},</if>
-        <if test="unit != null and unit != ''">and a.unit = #{unit, jdbcType=VARCHAR},</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.user.entity.TCameraInfo" resultType="com.yjh.platform.module.user.entity.TCameraInfoByDict">

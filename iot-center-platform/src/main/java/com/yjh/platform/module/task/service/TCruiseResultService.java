@@ -15,6 +15,8 @@ import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDeviceAttr;
+import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
+import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
@@ -52,6 +54,8 @@ public class TCruiseResultService{
     private TWarnInfoDao tWarnInfoDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private UPatrolResultDao uPatrolResultDao;
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruiseResult tCruiseResult) {
@@ -82,7 +86,8 @@ public class TCruiseResultService{
     public List<TCruiseResultExpand> selectTaskByPage(String taskName,Integer cState, Integer cType,Integer deviceType,String startTime,String endTime,List<Long> deviceIdList,Integer meteType,String customId,Integer isCheck) {
         List<TCruiseResultExpand> list =new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()){
-            list = tCruiseResultDao.selectTaskByPage(taskName,cState,cType,deviceType,startTime,endTime,deviceIdList,meteType,customId,isCheck);
+//            list = tCruiseResultDao.selectTaskByPage(taskName,cState,cType,deviceType,startTime,endTime,deviceIdList,meteType,customId,isCheck);
+            list = uPatrolResultDao.selectTaskByPage(taskName,cState,cType,deviceType,startTime,endTime,deviceIdList,meteType,customId,isCheck);
         }
         return list;
     }
@@ -90,7 +95,8 @@ public class TCruiseResultService{
     public List<CruiseResultDetail>  selectCruiseByPage( String taskResultId,Integer cruiseType,Integer cruiseResult,Integer deviceType,String startTime,String endTime,List<Long> deviceIdList,String customId) {
         List<CruiseResultDetail> cruiseResultDetailList = new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()){
-            cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,customId);
+//            cruiseResultDetailList = tCruiseResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,customId);
+            cruiseResultDetailList = uPatrolResultDao.selectCruiseByPage(taskResultId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,customId);
         }
         return cruiseResultDetailList;
     }
@@ -113,14 +119,16 @@ public class TCruiseResultService{
         int result1 = tCruiseResultDao.manualReview(cruiseManualReview);
 
         //更新测点信息
-        Long deviceMeteId = tCruiseResultDao.selectDeviceMeteId(cruiseManualReview.getCruiseDataId());
+//        Long deviceMeteId = tCruiseResultDao.selectDeviceMeteId(cruiseManualReview.getCruiseDataId());
+        Long deviceMeteId = uPatrolResultDao.selectDeviceMeteId(cruiseManualReview.getInstanceId());
         TStdDeviceMeteUpdate stdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
                 .setDeviceMeteId(deviceMeteId)
                 .setIdentifyResult(cruiseManualReview.getIdentifyResult());
         tCruiseResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
 
         //查询该巡检点审核后的相关信息
-        AfterManualReviewInfo afterManualReviewInfo = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
+//        AfterManualReviewInfo afterManualReviewInfo = tCruiseResultDao.selectJudgeCondition(cruiseManualReview.getCruiseDataId());
+        AfterManualReviewInfo afterManualReviewInfo = uPatrolResultDao.selectJudgeCondition(cruiseManualReview.getInstanceId(),cruiseManualReview.getTaskId());
         //查询该巡检点对应测点配置的告警阈值相关信息
         TStdDevicemete tStdDevicemete = tCruiseResultDao.selectDeviceMeteInfo(afterManualReviewInfo.getInstanceId());
         log.info("tStdDeviceMete==="+tStdDevicemete);
@@ -358,7 +366,8 @@ public class TCruiseResultService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TaskSimpleInfo> selectTaskIsRunning(){
-        List<TaskSimpleInfo> novelTaskList=tCruiseResultDao.selectTaskIsRunning();
+//        List<TaskSimpleInfo> novelTaskList=tCruiseResultDao.selectTaskIsRunning();
+        List<TaskSimpleInfo> novelTaskList=uPatrolResultDao.selectTaskIsRunning();
         for(TaskSimpleInfo temTask:novelTaskList){
             List<Long> counts=tCruiseResultDao.cruiseInspectCount(temTask.getTaskId());
             temTask.setDeviceMeteCount(counts.get(0));

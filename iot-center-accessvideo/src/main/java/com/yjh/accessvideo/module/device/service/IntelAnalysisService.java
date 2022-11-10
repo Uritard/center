@@ -64,6 +64,7 @@ import java.util.stream.Collectors;
  * @date 2022/4/11
  */
 @Service
+@Deprecated
 public class IntelAnalysisService {
     /**
      * webSocket请求地址

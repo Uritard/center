@@ -66,17 +66,9 @@ public class AnalysisResultThread implements Runnable{
         String taskId = cruiseResultMap.get("taskCode");
         String robotCode = cruiseResultMap.get("robotCode");
         String inspectionCode = cruiseResultMap.get("deviceId");
-        Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + taskId);
-        Long instanceId = null;
-
-        for (String key : robotInfoKeys) {
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-            if (Objects.equals(robotCode, redisInfoMap.get("robotCode"))
-                    && Objects.equals(taskId, redisInfoMap.get("taskId"))
-                    && Objects.equals(inspectionCode, redisInfoMap.get("inspectionCode"))) {
-                instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
-            }
-        }
+        String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + taskId + ":" + cruiseResultMap.get("deviceId");
+        Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
+        Long instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
 
         // 复制原图到算法分析指定的路径
         String resultImagePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content")) + ftpFileName;

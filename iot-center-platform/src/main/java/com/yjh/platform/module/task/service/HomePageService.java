@@ -96,7 +96,8 @@ public class HomePageService {
         log.info("任务list: "+listTask);
         for (TaskOnExecuteInfo item: listTask) {
             try {
-                CruiseResultCounter cruiseResultCounter = tCruiseTaskResultService.selectCruiseStatusCount(item.getTaskId());
+//                CruiseResultCounter cruiseResultCounter = tCruiseTaskResultService.selectCruiseStatusCount(item.getTaskId());
+                CruiseResultCounter cruiseResultCounter = tCruiseTaskResultService.selectCruiseStatusCountNew(item.getTaskId());
                 item.setAlarmCount(cruiseResultCounter.getAlarmCount());
                 item.setCruisedCount(cruiseResultCounter.getCruisedCount());
                 item.setCruiseNotCount(cruiseResultCounter.getCruiseNotCount());

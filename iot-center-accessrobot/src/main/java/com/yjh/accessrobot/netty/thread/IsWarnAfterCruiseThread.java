@@ -83,75 +83,68 @@ public class IsWarnAfterCruiseThread implements Runnable {
                     robotTaskId = taskId;
                 }
             }
-            log.info("最终的taskId==={}", robotTaskId);
-            Set<String> robotInfoKeys = redisScan("Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId);
+
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + threadMap.get("deviceId");
+            Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
+            Long instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
+
             //根据taskId查询相关内容
             TCruiseTask tCruiseTask = StaticContextAccessor.getBean(RobotService.class).selectTCruiseTask(taskId);
             log.info("taskId是: {}的任务数据tCruiseTask是: {}", taskId, tCruiseTask);
 
             if (Objects.isNull(tCruiseTask.getTaskType())) {
-                for (String key : robotInfoKeys) {
-                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-                    if (Objects.equals(robotCode, redisInfoMap.get("robotCode"))
-                            && Objects.equals(robotTaskId, redisInfoMap.get("taskId"))
-                            && Objects.equals(threadMap.get("deviceId"), redisInfoMap.get("inspectionCode"))) {
-                        Long instanceId = Long.valueOf(redisInfoMap.get("instanceId"));
-                        TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);
+                TStdDeviceMete tStdDevicemete = StaticContextAccessor.getBean(RobotService.class).selectDeviceMeteInfo(instanceId);
 
-                        //该巡视点还在,能找到对应测点信息
-                        if (Objects.nonNull(tStdDevicemete)) {
-                            Map<String, Object> params = new HashMap<>(16);
-                            params.put("value", threadMap.get("value"));
-                            params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
-                            params.put("meteKind", tStdDevicemete.getMeteKind());
-                            params.put("alarmState", tStdDevicemete.getAlarmState());
-                            params.put("stateZero", tStdDevicemete.getStateZero());
-                            params.put("stateOne", tStdDevicemete.getStateOne());
-                            params.put("alarmLevel", tStdDevicemete.getAlarmLevel());
-                            params.put("highLimit1", tStdDevicemete.getHighLimit1());
-                            params.put("lowLimit1", tStdDevicemete.getLowLimit1());
-                            params.put("highLimit2", tStdDevicemete.getHighLimit2());
-                            params.put("lowLimit2", tStdDevicemete.getLowLimit2());
-                            params.put("highLimit3", tStdDevicemete.getHighLimit3());
-                            params.put("lowLimit3", tStdDevicemete.getLowLimit3());
-                            params.put("highLimit4", tStdDevicemete.getHighLimit4());
-                            params.put("lowLimit4", tStdDevicemete.getLowLimit4());
+                //该巡视点还在,能找到对应测点信息
+                if (Objects.nonNull(tStdDevicemete)) {
+                    Map<String, Object> params = new HashMap<>(16);
+                    params.put("value", threadMap.get("value"));
+                    params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
+                    params.put("meteKind", tStdDevicemete.getMeteKind());
+                    params.put("alarmState", tStdDevicemete.getAlarmState());
+                    params.put("stateZero", tStdDevicemete.getStateZero());
+                    params.put("stateOne", tStdDevicemete.getStateOne());
+                    params.put("alarmLevel", tStdDevicemete.getAlarmLevel());
+                    params.put("highLimit1", tStdDevicemete.getHighLimit1());
+                    params.put("lowLimit1", tStdDevicemete.getLowLimit1());
+                    params.put("highLimit2", tStdDevicemete.getHighLimit2());
+                    params.put("lowLimit2", tStdDevicemete.getLowLimit2());
+                    params.put("highLimit3", tStdDevicemete.getHighLimit3());
+                    params.put("lowLimit3", tStdDevicemete.getLowLimit3());
+                    params.put("highLimit4", tStdDevicemete.getHighLimit4());
+                    params.put("lowLimit4", tStdDevicemete.getLowLimit4());
 
-                            Result result = sendPostRequest(Constant.WARN_JUDGE, params);
-                            Map<String, Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
-                            log.info("object转map的东西==={}", map);
-                            Boolean isWarN = (Boolean) map.get("isWarn");
-                            String outRange = null;
-                            if (Objects.nonNull(map.get("outRange"))) {
-                                outRange = map.get("outRange").toString();
-                            }
-
-                            //组装告警基本信息
-                            TWarnInfo warnInfo = new TWarnInfo();
-                            warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
-                            warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
-                            warnInfo.setCunstomId(tStdDevicemete.getCustomId());
-                            warnInfo.setInstanceId(instanceId);
-                            warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
-                            //未核查
-                            warnInfo.setConfMode(276);
-                            Integer warnFlag = Integer.valueOf(StaticContextAccessor.getBean(RobotService.class).selectDictCodeByNote("其他", "defect_model"));
-                            warnInfo.setDefectModel(warnFlag);
-                            //主辅设备
-                            warnInfo.setAlarmSource(282);
-                            warnInfo.setImagePath(threadMap.get("relativePath"));
-                            warnInfo.setValue(threadMap.get("value"));
-                            warnInfo.setTaskId(taskId);
-                            Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(robotCode);
-                            warnInfo.setDeviceCode(robotId.toString());
-                            map.put("absolutePath",threadMap.get("absolutePath"));
-                            map.put("deviceName",threadMap.get("deviceName"));
-
-                            ifGeneratedAlarm(isWarN, map, taskId, warnInfo, outRange, tStdDevicemete);
-
-
-                        }
+                    Result result = sendPostRequest(Constant.WARN_JUDGE, params);
+                    Map<String, Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
+                    log.info("object转map的东西==={}", map);
+                    Boolean isWarN = (Boolean) map.get("isWarn");
+                    String outRange = null;
+                    if (Objects.nonNull(map.get("outRange"))) {
+                        outRange = map.get("outRange").toString();
                     }
+
+                    //组装告警基本信息
+                    TWarnInfo warnInfo = new TWarnInfo();
+                    warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
+                    warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
+                    warnInfo.setCunstomId(tStdDevicemete.getCustomId());
+                    warnInfo.setInstanceId(instanceId);
+                    warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
+                    //未核查
+                    warnInfo.setConfMode(276);
+                    Integer warnFlag = Integer.valueOf(StaticContextAccessor.getBean(RobotService.class).selectDictCodeByNote("其他", "defect_model"));
+                    warnInfo.setDefectModel(warnFlag);
+                    //主辅设备
+                    warnInfo.setAlarmSource(282);
+                    warnInfo.setImagePath(threadMap.get("relativePath"));
+                    warnInfo.setValue(threadMap.get("value"));
+                    warnInfo.setTaskId(taskId);
+                    Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(robotCode);
+                    warnInfo.setDeviceCode(robotId.toString());
+                    map.put("absolutePath",threadMap.get("absolutePath"));
+                    map.put("deviceName",threadMap.get("deviceName"));
+
+                    ifGeneratedAlarm(isWarN, map, taskId, warnInfo, outRange, tStdDevicemete);
                 }
             }
         } catch (Exception e) {

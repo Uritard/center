@@ -1,5 +1,7 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
+import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
 import com.yjh.platform.module.task.entity.TCruisePlanAttr;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 
@@ -21,6 +23,8 @@ public class TCruisePlanAttrService{
 
     @Autowired
     private TCruisePlanAttrDao tCruisePlanAttrDao;
+    @Autowired
+    private UPatrolPlanAttrDao uPatrolPlanAttrDao;
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruisePlanAttr tCruisePlanAttr) {
@@ -39,7 +43,8 @@ public class TCruisePlanAttrService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TCruisePlanAttrDetail> selectByPrimaryId(Long planId) {
-        return this.tCruisePlanAttrDao.selectByPrimaryId(planId);
+//        return this.tCruisePlanAttrDao.selectByPrimaryId(planId);
+        return this.uPatrolPlanAttrDao.selectByPrimaryId(planId);
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -43,4 +43,8 @@ public class Analysis implements Serializable {
 
     private String dataPath;
 
+    private String devicePointId;
+
+    private String referenceImage;
+
 }

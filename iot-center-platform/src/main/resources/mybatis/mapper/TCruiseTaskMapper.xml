@@ -236,7 +236,7 @@
             DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
             DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from t_cruise_task a
-        JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
+        LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
         LEFT JOIN t_dict_business c ON a.if_run = c.dict_code AND c.col_name = "if_run"
         LEFT JOIN t_cruise_result d ON a.task_id = d.task_id
         LEFT JOIN t_dict_business e ON e.dict_code = d.c_state AND e.col_name = "task_state"
@@ -272,7 +272,7 @@
                 DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
                 DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
             from t_cruise_task a
-            JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
+            LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
             LEFT JOIN t_dict_business c ON a.if_run = c.dict_code AND c.col_name = "if_run"
             LEFT JOIN t_cruise_result d ON a.task_id = d.task_id
             LEFT JOIN t_dict_business e ON e.dict_code = d.c_state AND e.col_name = "task_state"
@@ -309,7 +309,7 @@
                 DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
                 DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
             from t_cruise_task a
-            JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
+            LEFT JOIN t_dict_business b ON a.type = b.dict_code AND b.col_name = "plan_type"
             LEFT JOIN t_dict_business c ON a.if_run = c.dict_code AND c.col_name = "if_run"
             LEFT JOIN t_cruise_result d ON a.task_id = d.task_id
             LEFT JOIN t_dict_business e ON e.dict_code = d.c_state AND e.col_name = "task_state"
