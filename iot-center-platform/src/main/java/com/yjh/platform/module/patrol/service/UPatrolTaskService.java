@@ -1136,7 +1136,7 @@ public class UPatrolTaskService {
         try {
             String taskId = MapUtils.getString(cruiseResultMap, "taskId");
 
-            // webSocket通知前端调用巡视监控的接口
+            // webSocket通知前端调用巡视监控的接口,离线 检修 终止各种异常点不用通知
             Map<String, String> jasonMap = new HashMap<>(3);
             jasonMap.put("type", "finishedOneInstance");
             jasonMap.put("taskId", taskId);
@@ -1286,7 +1286,7 @@ public class UPatrolTaskService {
 
                 }
             }
-            log.info("任务{}的uPatrolDataResultList大小是:{}", taskId, uPatrolDataResultList.size());
+            log.info("taskId is:{} , uPatrolDataResultList size is:{}", taskId, uPatrolDataResultList.size());
 
             if (CollectionUtils.isNotEmpty(uPatrolDataResultList)){
                 batchInsertUPatrolDataResult(uPatrolDataResultList);
@@ -1296,12 +1296,6 @@ public class UPatrolTaskService {
 
             for (UPatrolDataResult up : uPatrolDataResultList){
                 updateIsWarn(taskId, up.getInstanceId(), up.getCruiseDataId());
-            }
-
-            // 将已经做过的巡视点Map清空
-            if (CollectionUtils.isNotEmpty(Constant.flagMap.get(taskId))){
-                log.info("将公共类的instanceIdList清空");
-                Constant.flagMap.remove(taskId);
             }
 
             //低优先任务继续

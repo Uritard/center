@@ -5,6 +5,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
 import com.yjh.platform.module.task.entity.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -212,7 +213,7 @@ public class TCruiseDataResultService {
     @Transactional(rollbackFor = Exception.class)
     public int updateCruiseAnalyze(List<String> cruiseResultIdList) {
         log.info("cruiseResultIdList===" + cruiseResultIdList);
-        if (cruiseResultIdList != null && !cruiseResultIdList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(cruiseResultIdList)) {
             List<TStdDeviceMeteUpdate> list = tCruiseDataResultDao.selectDeviceMeteList(cruiseResultIdList);
             log.info("list===" + list);
 

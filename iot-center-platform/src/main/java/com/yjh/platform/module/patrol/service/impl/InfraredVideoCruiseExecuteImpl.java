@@ -84,9 +84,9 @@ public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implemen
     }
 
     @Override
-    protected void resultRecognition(Map<String, String> inspectionMap) {
+    protected Map<String, String> resultRecognition(Map<String, String> inspectionMap) {
         String resultValue = inspectionMap.get("resultNum");
-        patrolResultHandler.normalRecognitionHandler(resultValue, inspectionMap, null);
+        return patrolResultHandler.normalRecognitionHandler(resultValue, inspectionMap, null);
     }
 
     @Override

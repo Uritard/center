@@ -195,7 +195,9 @@ public abstract class AbstractVideoCruise {
                         }
                     } else {
                         // 如果不进行算法处理，则本级处理结果信息
-                        resultRecognition(inspectionMap);
+                        inspectionMap = resultRecognition(inspectionMap);
+                        // 数据存入 redis
+                        CruiseRedisStorage.offer(inspectionMap);
                     }
                 }
 
@@ -396,7 +398,7 @@ public abstract class AbstractVideoCruise {
      */
     protected abstract void analysisExt(Analysis analysis, JSONObject captureResult);
 
-    protected abstract void resultRecognition(Map<String, String> inspectionMap);
+    protected abstract Map<String, String> resultRecognition(Map<String, String> inspectionMap);
 
     public static class AnalyticsFactory {
         private static final Map<CruiseConstant.AnalyticsEnum, AnalyticsService> ANALYTICS_SERVICE_MAP = new HashMap<>(8);
