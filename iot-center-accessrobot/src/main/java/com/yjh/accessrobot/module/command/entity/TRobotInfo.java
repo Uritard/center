@@ -141,4 +141,64 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "机器人/无人机编号编码")
     @TableField(value = "robot_num", updateStrategy = FieldStrategy.IGNORED)
     private Integer robotNum;
+
+    /**
+     * 无人机型号
+     */
+    private Integer droneType;
+
+    /**
+     * 生成国家
+     */
+    private String madeIn;
+
+    /**
+     * 无人机类型
+     */
+    private String dronePosition;
+
+    /**
+     * 安装位置
+     */
+    private String address;
+
+    /**
+     * 缺陷记录
+     */
+    private String defectRecord;
+
+    /**
+     * 大修记录
+     */
+    private String repairRecord;
+
+    /**
+     * 退出再重放记录
+     */
+    private String exitPutintoRecord;
+
+    /**
+     * 录像机id
+     */
+    private Long recordId;
+
+    /**
+     * 通道号可见光
+     */
+    private Integer channelNumLight;
+
+    /**
+     * 通道号红外
+     */
+    private Integer channelNumInferad;
+
+    /**
+     * 节点编码
+     */
+    private String edgeCode;
+
+    /**
+     * 原始id(下级同步的id)
+     */
+    private String originId;
 }

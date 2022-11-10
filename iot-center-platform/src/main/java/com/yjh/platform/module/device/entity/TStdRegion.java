@@ -1,8 +1,5 @@
 package com.yjh.platform.module.device.entity;
 
-import java.util.Date;
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
@@ -13,7 +10,8 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Past;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author tt
@@ -52,9 +50,12 @@ public class TStdRegion implements Serializable {
     private String upRegionIds;
 
     @Length(max = 10,message = "regionCode长度必须小于等于10")
-    @ApiModelProperty(value = "类型区域，标准测点区域类型：100；E机器人区域类型：101；相机区域类型：102")
+    @ApiModelProperty(value = "下级系统ID")
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String regionCode;
+
+    @ApiModelProperty(value = "下级节点区域ID(state为0时有值)")
+    private Long originRegionId;
 
     @Length(max = 32,message = "stationId长度必须小于等于32")
     @ApiModelProperty(value = "变电站ID")
@@ -71,7 +72,17 @@ public class TStdRegion implements Serializable {
     @Length(max = 32,message = "stationName长度必须小于等于32")
     private  String stationName;
 
-    private Integer pageNum = 1;
+    @TableField(value = "edge_status",updateStrategy = FieldStrategy.IGNORED)
+    /**
+     * 边缘节点在线状态
+     */
+    private String edgeStatus;
 
-    private Integer pageSize = 0;
+    @Length(max = 512)
+    private  String remark;
+    /**
+     * 站所地图路径
+     */
+    private String regionPath;
+
 }

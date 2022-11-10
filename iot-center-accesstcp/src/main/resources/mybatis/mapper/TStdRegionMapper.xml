@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accesstcp.module.device.dao.TStdRegionDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.accesstcp.module.device.entity.TStdRegion">
+        <id property="regionId" column="region_id" jdbcType="BIGINT"/>
+        <result property="regionName" column="region_name" jdbcType="VARCHAR"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+        <result property="upRegionIds" column="up_region_ids" jdbcType="VARCHAR"/>
+        <result property="regionCode" column="region_code" jdbcType="VARCHAR"/>
+        <result property="originRegionId" column="origin_region_id" jdbcType="BIGINT"/>
+        <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
+        <result property="stationName" column="station_name" jdbcType="VARCHAR"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <result property="edgeStatus" column="edge_status" jdbcType="VARCHAR"/>
+        <result property="regionPath" column="region_path" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        region_id,region_name,sort,
+        up_region_id,up_region_ids,region_code,
+        origin_region_id,station_id,station_name,
+        state,edge_status,region_path,
+        remark,create_time
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_std_region a
+    </select>
+
+
+</mapper>

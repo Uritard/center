@@ -4,101 +4,113 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TRobotInfo">
-        <id column="robot_id" jdbcType="BIGINT" property="robotId" />
-        <result column="robot_code" jdbcType="VARCHAR" property="robotCode" />
-        <result column="robot_num" jdbcType="INTEGER" property="robotNum" />
-        <result column="robot_name" jdbcType="VARCHAR" property="robotName" />
-        <result column="robot_status" jdbcType="VARCHAR" property="robotStatus" />
-        <result column="robot_type" jdbcType="INTEGER" property="robotType" />
-        <result column="robot_ip" jdbcType="VARCHAR" property="robotIp" />
-        <result column="robot_port" jdbcType="INTEGER" property="robotPort" />
-        <result column="light_ip" jdbcType="VARCHAR" property="lightIp" />
-        <result column="light_port" jdbcType="VARCHAR" property="lightPort" />
-        <result column="identity_manager" jdbcType="VARCHAR" property="identityManager" />
-        <result column="identity_code" jdbcType="VARCHAR" property="identityCode" />
-        <result column="lnferad_IP" jdbcType="VARCHAR" property="lnferadIp" />
-        <result column="Inferad_Port" jdbcType="INTEGER" property="inferadPort" />
-        <result column="Inferad_username" jdbcType="VARCHAR" property="inferadUsername" />
-        <result column="Inferad_password" jdbcType="VARCHAR" property="inferadPassword" />
-        <result column="phote_path" jdbcType="VARCHAR" property="photePath" />
-        <result column="create_by" jdbcType="VARCHAR" property="createBy" />
-        <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
-        <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
-        <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
-        <result column="robot_factory" jdbcType="VARCHAR" property="robotFactory" />
-        <result column="is_use" jdbcType="VARCHAR" property="isUse" />
-        <result column="commission_date" jdbcType="TIMESTAMP" property="commissionDate" />
-        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
-        <result column="robot_position" jdbcType="VARCHAR" property="robotPosition" />
-        <result column="remarks" jdbcType="VARCHAR" property="remarks" />
-        <result column="last_online_time" jdbcType="BIGINT" property="lastOnlineTime" />
-        <result column="off_line_count" jdbcType="BIGINT" property="offLineCount" />
+        <id property="robotId" column="robot_id" jdbcType="BIGINT"/>
+        <result property="robotCode" column="robot_code" jdbcType="VARCHAR"/>
+        <result property="robotNum" column="robot_num" jdbcType="INTEGER"/>
+        <result property="robotName" column="robot_name" jdbcType="VARCHAR"/>
+        <result property="nestName" column="nest_name" jdbcType="VARCHAR"/>
+        <result property="nestCode" column="nest_code" jdbcType="VARCHAR"/>
+        <result property="robotStatus" column="robot_status" jdbcType="VARCHAR"/>
+        <result property="robotType" column="robot_type" jdbcType="INTEGER"/>
+        <result property="droneType" column="drone_type" jdbcType="INTEGER"/>
+        <result property="robotIp" column="robot_ip" jdbcType="VARCHAR"/>
+        <result property="robotPort" column="robot_port" jdbcType="INTEGER"/>
+        <result property="lightIp" column="light_ip" jdbcType="VARCHAR"/>
+        <result property="lightPort" column="light_port" jdbcType="VARCHAR"/>
+        <result property="identityManager" column="identity_manager" jdbcType="VARCHAR"/>
+        <result property="identityCode" column="identity_code" jdbcType="VARCHAR"/>
+        <result property="lnferadIp" column="lnferad_IP" jdbcType="VARCHAR"/>
+        <result property="inferadPort" column="Inferad_Port" jdbcType="INTEGER"/>
+        <result property="inferadUsername" column="Inferad_username" jdbcType="VARCHAR"/>
+        <result property="inferadPassword" column="Inferad_password" jdbcType="VARCHAR"/>
+        <result property="photePath" column="phote_path" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateDate" column="update_date" jdbcType="TIMESTAMP"/>
+        <result property="robotFactory" column="robot_factory" jdbcType="VARCHAR"/>
+        <result property="madeIn" column="made_in" jdbcType="VARCHAR"/>
+        <result property="madeDate" column="made_date" jdbcType="TIMESTAMP"/>
+        <result property="isUse" column="is_use" jdbcType="VARCHAR"/>
+        <result property="commissionDate" column="commission_date" jdbcType="TIMESTAMP"/>
+        <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+        <result property="robotPosition" column="robot_position" jdbcType="VARCHAR"/>
+        <result property="dronePosition" column="drone_position" jdbcType="VARCHAR"/>
+        <result property="robotSource" column="robot_source" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="buildingUser" column="building_user" jdbcType="VARCHAR"/>
+        <result property="appearanceNumber" column="appearance_number" jdbcType="VARCHAR"/>
+        <result property="defectRecord" column="defect_record" jdbcType="VARCHAR"/>
+        <result property="repairRecord" column="repair_record" jdbcType="VARCHAR"/>
+        <result property="exitPutintoRecord" column="exit_putInto_record" jdbcType="VARCHAR"/>
+        <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+        <result property="recordId" column="record_id" jdbcType="BIGINT"/>
+        <result property="channelNumLight" column="channel_num_light" jdbcType="INTEGER"/>
+        <result property="channelNumInferad" column="channel_num_inferad" jdbcType="INTEGER"/>
+        <result property="lastOnlineTime" column="last_online_time" jdbcType="BIGINT"/>
+        <result property="duration" column="duration" jdbcType="BIGINT"/>
+        <result property="offLineCount" column="off_line_count" jdbcType="BIGINT"/>
+        <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+        <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        robot_id, robot_code, robot_num, robot_name, robot_status, robot_type, robot_ip, robot_port, light_ip, light_port, light_username, light_password, lnferad_IP, Inferad_Port, Inferad_username, Inferad_password, phote_path, create_by, create_date, update_by, update_date, robot_factory, is_use, commission_date, up_region_id, robot_position, remarks,last_online_time,off_line_count,duration
+        robot_id,robot_code,robot_num,
+        robot_name,nest_name,nest_code,
+        robot_status,robot_type,drone_type,
+        robot_ip,robot_port,light_ip,
+        light_port,identity_manager,identity_code,
+        lnferad_IP,Inferad_Port,Inferad_username,
+        Inferad_password,phote_path,create_by,
+        create_date,update_by,update_date,
+        robot_factory,made_in,made_date,
+        is_use,commission_date,up_region_id,
+        robot_position,drone_position,robot_source,
+        address,building_user,appearance_number,
+        defect_record,repair_record,exit_putInto_record,
+        remarks,record_id,channel_num_light,
+        channel_num_inferad,last_online_time,duration,
+        off_line_count,edge_code,origin_id
     </sql>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="robotId" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
-        insert into t_robot_info(
-            robot_id,
-            robot_code,
-            robot_num,
-            robot_name,
-            robot_status,
-            robot_type,
-            robot_ip,
-            robot_port,
-            light_ip,
-            light_port,
-            identity_manager,
-            identity_code,
-            lnferad_IP,
-            Inferad_Port,
-            Inferad_username,
-            Inferad_password,
-            phote_path,
-            create_by,
-            create_date,
-            update_by,
-            update_date,
-            robot_factory,
-            is_use,
-            commission_date,
-            up_region_id,
-            robot_position,
-            remarks
-        )values(
-                #{robotId, jdbcType=BIGINT},
-                #{robotCode, jdbcType=VARCHAR},
-                #{robotNum, jdbcType=INTEGER},
-                #{robotName, jdbcType=VARCHAR},
-                #{robotStatus, jdbcType=VARCHAR},
-                #{robotType, jdbcType=INTEGER},
-                #{robotIp, jdbcType=VARCHAR},
-                #{robotPort, jdbcType=INTEGER},
-                #{lightIp, jdbcType=VARCHAR},
-                #{lightPort, jdbcType=VARCHAR},
-                #{identityManager, jdbcType=VARCHAR},
-                #{identityCode, jdbcType=VARCHAR},
-                #{lnferadIp, jdbcType=VARCHAR},
-                #{inferadPort, jdbcType=INTEGER},
-                #{inferadUsername, jdbcType=VARCHAR},
-                #{inferadPassword, jdbcType=VARCHAR},
-                #{photePath, jdbcType=VARCHAR},
-                #{createBy, jdbcType=VARCHAR},
-                #{createDate, jdbcType=TIMESTAMP},
-                #{updateBy, jdbcType=VARCHAR},
-                #{updateDate, jdbcType=TIMESTAMP},
-                #{robotFactory, jdbcType=VARCHAR},
-                #{isUse, jdbcType=VARCHAR},
-                #{commissionDate, jdbcType=TIMESTAMP},
-                #{upRegionId, jdbcType=BIGINT},
-                #{robotPosition, jdbcType=VARCHAR},
-                #{remarks, jdbcType=VARCHAR}
+        insert into t_robot_info
+        ( robot_code,robot_num
+        ,robot_name,nest_name,nest_code
+        ,robot_status,robot_type,drone_type
+        ,robot_ip,robot_port,light_ip
+        ,light_port,identity_manager,identity_code
+        ,lnferad_IP,Inferad_Port,Inferad_username
+        ,Inferad_password,phote_path,create_by
+        ,create_date,update_by,update_date
+        ,robot_factory,made_in,made_date
+        ,is_use,commission_date,up_region_id
+        ,robot_position,drone_position,robot_source
+        ,address,building_user,appearance_number
+        ,defect_record,repair_record,exit_putInto_record
+        ,remarks,record_id,channel_num_light
+        ,channel_num_inferad,last_online_time,duration
+        ,off_line_count,edge_code,origin_id
         )
+        values (#{robotCode,jdbcType=VARCHAR},#{robotNum,jdbcType=INTEGER}
+               ,#{robotName,jdbcType=VARCHAR},#{nestName,jdbcType=VARCHAR},#{nestCode,jdbcType=VARCHAR}
+               ,#{robotStatus,jdbcType=VARCHAR},#{robotType,jdbcType=INTEGER},#{droneType,jdbcType=INTEGER}
+               ,#{robotIp,jdbcType=VARCHAR},#{robotPort,jdbcType=INTEGER},#{lightIp,jdbcType=VARCHAR}
+               ,#{lightPort,jdbcType=VARCHAR},#{identityManager,jdbcType=VARCHAR},#{identityCode,jdbcType=VARCHAR}
+               ,#{lnferadIp,jdbcType=VARCHAR},#{inferadPort,jdbcType=INTEGER},#{inferadUsername,jdbcType=VARCHAR}
+               ,#{inferadPassword,jdbcType=VARCHAR},#{photePath,jdbcType=VARCHAR},#{createBy,jdbcType=VARCHAR}
+               ,#{createDate,jdbcType=TIMESTAMP},#{updateBy,jdbcType=VARCHAR},#{updateDate,jdbcType=TIMESTAMP}
+               ,#{robotFactory,jdbcType=VARCHAR},#{madeIn,jdbcType=VARCHAR},#{madeDate,jdbcType=TIMESTAMP}
+               ,#{isUse,jdbcType=VARCHAR},#{commissionDate,jdbcType=TIMESTAMP},#{upRegionId,jdbcType=BIGINT}
+               ,#{robotPosition,jdbcType=VARCHAR},#{dronePosition,jdbcType=VARCHAR},#{robotSource,jdbcType=VARCHAR}
+               ,#{address,jdbcType=VARCHAR},#{buildingUser,jdbcType=VARCHAR},#{appearanceNumber,jdbcType=VARCHAR}
+               ,#{defectRecord,jdbcType=VARCHAR},#{repairRecord,jdbcType=VARCHAR},#{exitPutintoRecord,jdbcType=VARCHAR}
+               ,#{remarks,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT},#{channelNumLight,jdbcType=INTEGER}
+               ,#{channelNumInferad,jdbcType=INTEGER},#{lastOnlineTime,jdbcType=BIGINT},#{duration,jdbcType=BIGINT}
+               ,#{offLineCount,jdbcType=BIGINT},#{edgeCode,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR}
+               )
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -147,33 +159,7 @@
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
         select
-        a.robot_id,
-        a.robot_code,
-        a.robot_num,
-        a.robot_name,
-        a.robot_status,
-        a.robot_type,
-        a.robot_ip,
-        a.robot_port,
-        a.light_ip,
-        a.light_port,
-        a.identity_manager,
-        a.identity_code,
-        a.lnferad_IP,
-        a.Inferad_Port,
-        a.Inferad_username,
-        a.Inferad_password,
-        a.phote_path,
-        a.create_by,
-        a.create_date,
-        a.update_by,
-        a.update_date,
-        a.robot_factory,
-        a.is_use,
-        a.commission_date,
-        a.up_region_id,
-        a.robot_position,
-        a.remarks
+        <include refid="Base_Column_List" />
         from t_robot_info a
         where 1 = 1
             and a.robot_id = #{robotId, jdbcType=BIGINT}
@@ -182,36 +168,7 @@
 
     <select id="select" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
         select
-        a.robot_id,
-        a.robot_code,
-        a.robot_num,
-        a.robot_name,
-        a.robot_status,
-        a.robot_type,
-        a.robot_ip,
-        a.robot_port,
-        a.light_ip,
-        a.light_port,
-        a.identity_manager,
-        a.identity_code,
-        a.lnferad_IP,
-        a.Inferad_Port,
-        a.Inferad_username,
-        a.Inferad_password,
-        a.phote_path,
-        a.create_by,
-        a.create_date,
-        a.update_by,
-        a.update_date,
-        a.robot_factory,
-        a.is_use,
-        a.commission_date,
-        a.up_region_id,
-        a.robot_position,
-        a.remarks,
-        a.last_online_time,
-        a.off_line_count,
-        a.duration
+        <include refid="Base_Column_List" />
         from t_robot_info a
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
@@ -244,37 +201,7 @@
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
-        select
-        a.robot_id,
-        a.robot_code,
-        a.robot_num,
-        a.robot_name,
-        a.robot_status,
-        a.robot_type,
-        a.robot_ip,
-        a.robot_port,
-        a.light_ip,
-        a.light_port,
-        a.identity_manager,
-        a.identity_code,
-        a.lnferad_IP,
-        a.Inferad_Port,
-        a.Inferad_username,
-        a.Inferad_password,
-        a.phote_path,
-        a.create_by,
-        a.create_date,
-        a.update_by,
-        a.update_date,
-        a.robot_factory,
-        a.is_use,
-        a.commission_date,
-        a.up_region_id,
-        a.robot_position,
-        a.remarks,
-        a.last_online_time,
-        a.off_line_count,
-        a.duration
+        <include refid="Base_Column_List" />
         from t_robot_info a
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
@@ -308,63 +235,40 @@
 
     <insert id="batchInsert">
         insert into t_robot_info(
-            robot_id,
-            robot_code,
-            robot_num,
-            robot_name,
-            robot_status,
-            robot_type,
-            robot_ip,
-            robot_port,
-            light_ip,
-            light_port,
-            identity_manager,
-            identity_code,
-            lnferad_IP,
-            Inferad_Port,
-            Inferad_username,
-            Inferad_password,
-            phote_path,
-            create_by,
-            create_date,
-            update_by,
-            update_date,
-            robot_factory,
-            is_use,
-            commission_date,
-            up_region_id,
-            robot_position,
-            remarks
+        robot_id,robot_code,robot_num
+        ,robot_name,nest_name,nest_code
+        ,robot_status,robot_type,drone_type
+        ,robot_ip,robot_port,light_ip
+        ,light_port,identity_manager,identity_code
+        ,lnferad_IP,Inferad_Port,Inferad_username
+        ,Inferad_password,phote_path,create_by
+        ,create_date,update_by,update_date
+        ,robot_factory,made_in,made_date
+        ,is_use,commission_date,up_region_id
+        ,robot_position,drone_position,robot_source
+        ,address,building_user,appearance_number
+        ,defect_record,repair_record,exit_putInto_record
+        ,remarks,record_id,channel_num_light
+        ,channel_num_inferad,last_online_time,duration
+        ,off_line_count,edge_code,origin_id
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
-            (
-                #{TRobotInfo.robotId, jdbcType=BIGINT},
-                #{TRobotInfo.robotCode, jdbcType=VARCHAR},
-                #{TRobotInfo.robotNum, jdbcType=INTEGER},
-                #{TRobotInfo.robotName, jdbcType=VARCHAR},
-                #{TRobotInfo.robotStatus, jdbcType=VARCHAR},
-                #{TRobotInfo.robotType, jdbcType=INTEGER},
-                #{TRobotInfo.robotIp, jdbcType=VARCHAR},
-                #{TRobotInfo.robotPort, jdbcType=INTEGER},
-                #{TRobotInfo.lightIp, jdbcType=VARCHAR},
-                #{TRobotInfo.lightPort, jdbcType=VARCHAR},
-                #{TRobotInfo.identityManager, jdbcType=VARCHAR},
-                #{TRobotInfo.identityCode, jdbcType=VARCHAR},
-                #{TRobotInfo.lnferadIp, jdbcType=VARCHAR},
-                #{TRobotInfo.inferadPort, jdbcType=INTEGER},
-                #{TRobotInfo.inferadUsername, jdbcType=VARCHAR},
-                #{TRobotInfo.inferadPassword, jdbcType=VARCHAR},
-                #{TRobotInfo.photePath, jdbcType=VARCHAR},
-                #{TRobotInfo.createBy, jdbcType=VARCHAR},
-                #{TRobotInfo.createDate, jdbcType=TIMESTAMP},
-                #{TRobotInfo.updateBy, jdbcType=VARCHAR},
-                #{TRobotInfo.updateDate, jdbcType=TIMESTAMP},
-                #{TRobotInfo.robotFactory, jdbcType=VARCHAR},
-                #{TRobotInfo.isUse, jdbcType=VARCHAR},
-                #{TRobotInfo.commissionDate, jdbcType=TIMESTAMP},
-                #{TRobotInfo.upRegionId, jdbcType=BIGINT},
-                #{TRobotInfo.robotPosition, jdbcType=VARCHAR},
-                #{TRobotInfo.remarks, jdbcType=VARCHAR}
+            values (#{TRobotInfo.robotId,jdbcType=BIGINT},#{TRobotInfo.robotCode,jdbcType=VARCHAR},#{TRobotInfo.robotNum,jdbcType=INTEGER}
+            ,#{TRobotInfo.robotName,jdbcType=VARCHAR},#{TRobotInfo.nestName,jdbcType=VARCHAR},#{TRobotInfo.nestCode,jdbcType=VARCHAR}
+            ,#{TRobotInfo.robotStatus,jdbcType=VARCHAR},#{TRobotInfo.robotType,jdbcType=INTEGER},#{TRobotInfo.droneType,jdbcType=INTEGER}
+            ,#{TRobotInfo.robotIp,jdbcType=VARCHAR},#{TRobotInfo.robotPort,jdbcType=INTEGER},#{TRobotInfo.lightIp,jdbcType=VARCHAR}
+            ,#{TRobotInfo.lightPort,jdbcType=VARCHAR},#{TRobotInfo.identityManager,jdbcType=VARCHAR},#{TRobotInfo.identityCode,jdbcType=VARCHAR}
+            ,#{TRobotInfo.lnferadIp,jdbcType=VARCHAR},#{TRobotInfo.inferadPort,jdbcType=INTEGER},#{TRobotInfo.inferadUsername,jdbcType=VARCHAR}
+            ,#{TRobotInfo.inferadPassword,jdbcType=VARCHAR},#{TRobotInfo.photePath,jdbcType=VARCHAR},#{TRobotInfo.createBy,jdbcType=VARCHAR}
+            ,#{TRobotInfo.createDate,jdbcType=TIMESTAMP},#{TRobotInfo.updateBy,jdbcType=VARCHAR},#{TRobotInfo.updateDate,jdbcType=TIMESTAMP}
+            ,#{TRobotInfo.robotFactory,jdbcType=VARCHAR},#{TRobotInfo.madeIn,jdbcType=VARCHAR},#{TRobotInfo.madeDate,jdbcType=TIMESTAMP}
+            ,#{TRobotInfo.isUse,jdbcType=VARCHAR},#{TRobotInfo.commissionDate,jdbcType=TIMESTAMP},#{TRobotInfo.upRegionId,jdbcType=BIGINT}
+            ,#{TRobotInfo.robotPosition,jdbcType=VARCHAR},#{TRobotInfo.dronePosition,jdbcType=VARCHAR},#{TRobotInfo.robotSource,jdbcType=VARCHAR}
+            ,#{TRobotInfo.address,jdbcType=VARCHAR},#{TRobotInfo.buildingUser,jdbcType=VARCHAR},#{TRobotInfo.appearanceNumber,jdbcType=VARCHAR}
+            ,#{TRobotInfo.defectRecord,jdbcType=VARCHAR},#{TRobotInfo.repairRecord,jdbcType=VARCHAR},#{TRobotInfo.exitPutintoRecord,jdbcType=VARCHAR}
+            ,#{TRobotInfo.remarks,jdbcType=VARCHAR},#{TRobotInfo.recordId,jdbcType=BIGINT},#{TRobotInfo.channelNumLight,jdbcType=INTEGER}
+            ,#{TRobotInfo.channelNumInferad,jdbcType=INTEGER},#{TRobotInfo.lastOnlineTime,jdbcType=BIGINT},#{TRobotInfo.duration,jdbcType=BIGINT}
+            ,#{TRobotInfo.offLineCount,jdbcType=BIGINT},#{TRobotInfo.edgeCode,jdbcType=VARCHAR},#{TRobotInfo.originId,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

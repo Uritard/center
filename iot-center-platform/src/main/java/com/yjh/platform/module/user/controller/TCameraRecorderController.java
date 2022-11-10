@@ -11,13 +11,13 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.user.entity.TCameraRecorder;
 import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
-import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.service.TCameraRecorderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -44,14 +44,18 @@ public class TCameraRecorderController {
     public TCameraRecorderController(TCameraRecorderService tCameraRecorderService) {
         this.tCameraRecorderService = tCameraRecorderService;
     }
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @ApiOperation(value = "插入")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     @Logs(title = "新增录像服务器信息",content = "根据用户传递的参数新增录像服务器信息",logType = 2,authority = "1234")
+
     public Result insert( @Validated @RequestBody TCameraRecorder tCameraRecorder) {
 
         Result result = new Result();
         try {
+            tCameraRecorder.setEdgeCode((String)redisTemplate.opsForHash().get(Constant.T_SYS_PARAM+"edgeCode","content"));
             List<String> selectAllPMSIdList = tCameraRecorderService.selectAllPMSId();
             if (StringUtils.hasLength(tCameraRecorder.getPmsId()) &&  selectAllPMSIdList.contains(tCameraRecorder.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");

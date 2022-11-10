@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +30,14 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author YJH
  */
 public class Constant {
+    /**
+     * 本系统数据
+     */
+    public static final int STATE_LOCAL = 1;
+    /**
+     * 下级系统数据
+     */
+    public static final int STATE_SUB = 0;
     public static Map<String, ChannelHandlerContext> maps = new ConcurrentHashMap<>();
     /**
      * 巡视主机发送会话序列号
@@ -162,4 +169,7 @@ public class Constant {
     public static String sendCode="";
 
     public static boolean handlerNew = true;
+
+
+
 }

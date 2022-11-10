@@ -1,4 +1,4 @@
-package com.yjh.accessrobot.module.command.entity;
+package com.yjh.accesstcp.module.device.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
