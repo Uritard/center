@@ -1457,6 +1457,10 @@ public class RobotService {
     public TCruiseTask selectTCruiseTask(String taskId) {
         return tRobotInfoDao.selectTCruiseTask(taskId);
     }
+    @Transactional(rollbackFor = Exception.class)
+    public List<Integer> selectDictCodeByColName(String colName) {
+        return tRobotInfoDao.selectDictCodeByColName(colName);
+    }
 
     public Long selectRobotIdByCode(String robotCode) {
         return tRobotInfoDao.selectRobotIdByCode(robotCode);
