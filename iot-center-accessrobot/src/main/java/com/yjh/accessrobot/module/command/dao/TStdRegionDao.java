@@ -49,6 +49,6 @@ public interface TStdRegionDao {
 
     void updateUpRegionId(TStdRegion stdRegion);
 
-    List<TStdRegion> selectByRegionCodeAndState(@Param(value = "regionCode") String regionCode, @Param(value = "state") int state);
+    List<TStdRegion> selectByRegionCodeAndState(@Param(value = "regionCode") String regionCode, @Param(value = "state") Integer state);
 
 }

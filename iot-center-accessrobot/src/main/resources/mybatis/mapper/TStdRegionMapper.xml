@@ -192,7 +192,8 @@
         select
         <include refid="Base_Column_List" />
         from t_std_region a
-        where   a.region_code=#{regionCode} and state=#{state}
+        where   a.region_code=#{regionCode}
+          <if test="state!=null"> and state=#{state}</if>
     </select>
 
     <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TStdRegion" >

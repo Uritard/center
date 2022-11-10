@@ -98,4 +98,6 @@ public class Constant {
 
     public static String stationCode="";
     public static boolean handlerNew = true;
+
+    public static final String T_SYS_PARAM = "t_sys_param:";
 }

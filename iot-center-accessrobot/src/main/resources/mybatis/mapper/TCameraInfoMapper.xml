@@ -288,4 +288,44 @@
             origin_id =  #{originId,jdbcType=VARCHAR}
         where   camera_id = #{cameraId,jdbcType=BIGINT} 
     </update>
+
+    <select id="selectByEdgeCode"  resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_camera_info
+        where  edge_code = #{edgeCode}
+    </select>
+
+    <delete id="deleteByEdgeCodeAndOriginId">
+        delete from t_camera_info  where edge_code=#{edgeCode}  and origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+    </delete>
+    <insert id="insertBatch" parameterType="java.util.Collection"  useGeneratedKeys="true" keyColumn="camera_id" keyProperty="cameraId">
+            insert into t_camera_info ( camera_name,camera_model
+                                              ,pms_id,alias_name,record_id
+                                              ,up_region_id,channel_num,camera_num
+                                              ,sms_id,rms_id,monitor_id
+                                              ,vendor_id,stream_type,protocol_type
+                                              ,url,camera_ip,port
+                                              ,infread_port,camera_manager,camera_code
+                                              ,camera_type,is_control,latitude
+                                              ,longitude,address,unit
+                                              ,create_time,commission_date,edge_code
+                                              ,origin_id)  values
+            <foreach collection="tCameraInfoList"  item="tCameraInfo" separator=",">                              
+                   (#{tCameraInfo.cameraName,jdbcType=VARCHAR},#{tCameraInfo.cameraModel,jdbcType=INTEGER}
+                   ,#{tCameraInfo.pmsId,jdbcType=VARCHAR},#{tCameraInfo.aliasName,jdbcType=VARCHAR},#{tCameraInfo.recordId,jdbcType=BIGINT}
+                   ,#{tCameraInfo.upRegionId,jdbcType=VARCHAR},#{tCameraInfo.channelNum,jdbcType=INTEGER},#{tCameraInfo.cameraNum,jdbcType=INTEGER}
+                   ,#{tCameraInfo.smsId,jdbcType=INTEGER},#{tCameraInfo.rmsId,jdbcType=INTEGER},#{tCameraInfo.monitorId,jdbcType=VARCHAR}
+                   ,#{tCameraInfo.vendorId,jdbcType=VARCHAR},#{tCameraInfo.streamType,jdbcType=INTEGER},#{tCameraInfo.protocolType,jdbcType=INTEGER}
+                   ,#{tCameraInfo.url,jdbcType=VARCHAR},#{tCameraInfo.cameraIp,jdbcType=VARCHAR},#{tCameraInfo.port,jdbcType=INTEGER}
+                   ,#{tCameraInfo.infreadPort,jdbcType=INTEGER},#{tCameraInfo.cameraManager,jdbcType=VARCHAR},#{tCameraInfo.cameraCode,jdbcType=VARCHAR}
+                   ,#{tCameraInfo.cameraType,jdbcType=INTEGER},#{tCameraInfo.isControl,jdbcType=INTEGER},#{tCameraInfo.latitude,jdbcType=VARCHAR}
+                   ,#{tCameraInfo.longitude,jdbcType=VARCHAR},#{tCameraInfo.address,jdbcType=VARCHAR},#{tCameraInfo.unit,jdbcType=VARCHAR}
+                   ,#{tCameraInfo.createTime,jdbcType=TIMESTAMP},#{tCameraInfo.commissionDate,jdbcType=TIMESTAMP},#{tCameraInfo.edgeCode,jdbcType=VARCHAR}
+                   ,#{tCameraInfo.originId,jdbcType=VARCHAR})
+            </foreach>
+    </insert>
+
+
 </mapper>
