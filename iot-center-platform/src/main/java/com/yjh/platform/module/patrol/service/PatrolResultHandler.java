@@ -252,9 +252,9 @@ public class PatrolResultHandler {
                 if ("11".equals(analyseType) && "".equals(resultImage)) {
                     continue;
                 }
-                TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResultMap.get("instanceId")));
-
+                TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(instanceId));
                 log.info("tStdDeviceMete==={}", JSON.toJSONString(tStdDevicemete));
+
                 String msgId = String.valueOf(UUID.randomUUID());
                 if (StringUtils.equals("11", analyseType)){
                     log.info("taskId is {} instanceId is {}:distinguish", taskId, instanceId);
@@ -314,12 +314,12 @@ public class PatrolResultHandler {
 
             if (StringUtils.equals("数据错误", resultValue)){
                 cruiseResultMap.put("resultNum", resultValue + ",缺少标定文件");
-                cruiseResultMap.put("cruiseResult", "247");
-                cruiseResultMap.put("cruiseAbnormal", "249");
+                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
             }else if (StringUtils.equals("未获得读数", resultValue)){
                 cruiseResultMap.put("resultNum", resultValue + ",识别失败");
-                cruiseResultMap.put("cruiseResult", "247");
-                cruiseResultMap.put("cruiseAbnormal", "249");
+                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
             }else {
                 normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
             }
@@ -329,9 +329,9 @@ public class PatrolResultHandler {
         return resultValue;
     }
 
-    public void normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, String firDocPath) {
+    public Map<String, String> normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, String firDocPath) {
         TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResultMap.get("instanceId")));
-        normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
+        return normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
     }
     /**
      * 正常识别结果处理
@@ -339,23 +339,23 @@ public class PatrolResultHandler {
      * @param resultValue 算法分析返回的巡视结果
      * @param cruiseResultMap redis中巡视点结果信息
      * @param tStdDevicemete 测点信息
-     * @return void
+     * @return Map<String, String>
      */
-    private void normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String firDocPath) {
+    private Map<String, String> normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String firDocPath) {
         try {
             // 红外会返回两个温度(如：12.3,2.3),所以需要这样取值
             String resultStringValue = resultValue.split(",")[0];
-            log.info("resultStringValue=={}", resultStringValue);
+            log.info("resultStringValue=={}, resultValue=={}", resultStringValue, resultValue);
 
             if (resultStringValue.matches("^([0-9]{1,})$|^([0-9]{1,}[.][0-9]*)$|^(-[0-9]{1,})$|^(-[0-9]{1,}[.][0-9]*)$|[\\u4E00-\\u9FA5]+")) {
-                //判断是否为红外识别且获取FIR文件 放入缓存中
+                // 判断是否为红外识别且获取FIR文件 放入缓存中
                 if(StringUtils.isNotEmpty(firDocPath)) {
                     firDocPath = firDocPath.replaceAll(
                             String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredStorePath", "content")),
                             String.valueOf(redisTemplate.opsForHash().get("t_sys_param:infraredRealPath", "content")));
                     cruiseResultMap.put("firDocPath", firDocPath);
                     File file = new File(firDocPath);
-                    //放入文件名
+                    // 放入文件名
                     cruiseResultMap.put("firName", file.getName().substring(0, file.getName().lastIndexOf(".")));
                     log.info("FIR-Doc-----:{}", firDocPath);
                 }
@@ -411,12 +411,12 @@ public class PatrolResultHandler {
 
                                 cruiseResultMap.put("isWarn", "1");
                                 cruiseResultMap.put("resultNum", resultStringValue);
-                                cruiseResultMap.put("cruiseResult", "247");
-                                cruiseResultMap.put("cruiseAbnormal", "250");
+                                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
                             }else {
                                 log.info("Alarm value is not reached(遥信)");
                                 cruiseResultMap.put("resultNum", resultValue);
-                                cruiseResultMap.put("cruiseResult", "246");
+                                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                                 cruiseResultMap.put("cruiseAbnormal", "--");
                             }
                             break;
@@ -468,12 +468,12 @@ public class PatrolResultHandler {
 
                                 cruiseResultMap.put("isWarn", "1");
                                 cruiseResultMap.put("resultNum", resultValue);
-                                cruiseResultMap.put("cruiseResult", "247");
-                                cruiseResultMap.put("cruiseAbnormal", "250");
+                                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
                             }else {
                                 log.info("Alarm value is not reached(遥测)");
                                 cruiseResultMap.put("resultNum", resultValue);
-                                cruiseResultMap.put("cruiseResult", "246");
+                                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                                 cruiseResultMap.put("cruiseAbnormal", "--");
                             }
                             break;
@@ -500,17 +500,19 @@ public class PatrolResultHandler {
                     }
                 }else {
                     cruiseResultMap.put("resultNum", resultValue);
-                    cruiseResultMap.put("cruiseResult", "246");
+                    cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                     cruiseResultMap.put("cruiseAbnormal", "--");
                 }
             }else {
                 cruiseResultMap.put("resultNum", resultValue);
-                cruiseResultMap.put("cruiseResult", "247");
-                cruiseResultMap.put("cruiseAbnormal", "249");
+                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
             }
         }catch (Exception e){
             log.error("正常识别结果处理异常：", e);
         }
+        log.info("cruiseResultMap=={}", cruiseResultMap);
+        return cruiseResultMap;
     }
 
     /**
@@ -562,6 +564,7 @@ public class PatrolResultHandler {
             }
             log.info("defect image=={}", resultImage);
 
+            log.info("Defect data is ==={}", resultValueItem);
             String resultValue = analyseDataOperateService.resolveDefectResult(resultValueItem);
             log.info("Parse defect data is ==={}", resultValue);
 

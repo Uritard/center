@@ -80,8 +80,9 @@ public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements
     }
 
     @Override
-    protected void resultRecognition(Map<String, String> inspectionMap) {
+    protected Map<String, String> resultRecognition(Map<String, String> inspectionMap) {
         // noting to do.
+        return null;
     }
 
     @Override
