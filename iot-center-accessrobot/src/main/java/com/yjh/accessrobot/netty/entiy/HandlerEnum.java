@@ -45,6 +45,8 @@ public enum HandlerEnum {
     NEST_STATUS("20001","nestStatus"),
     // 无人机机巢运行数据
     NEST_RUN_DATA("10004","nestRunData"),
+    // 模型更新指令
+    MODEL_UPDATE("11", "modelUpdate"),
     // 巡视报告数据
     ROBOT_CRUISE_REPORT("63", "robotCruiseReport");
 

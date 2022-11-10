@@ -2,30 +2,42 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yjh.platform.module.user.dao.TCameraRecorderDao">
 
-    <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.TCameraRecorder">
-        <id column="record_id" jdbcType="BIGINT" property="recordId" />
-        <result column="record_name" jdbcType="VARCHAR" property="recordName" />
-        <result column="recorder_type" jdbcType="VARCHAR" property="recorderType" />
-        <result column="alias_name" jdbcType="VARCHAR" property="aliasName" />
-        <result column="record_ip" jdbcType="VARCHAR" property="recordIp" />
-        <result column="protocol" jdbcType="VARCHAR" property="protocol" />
-        <result column="http_port" jdbcType="INTEGER" property="httpPort" />
-        <result column="trans_port" jdbcType="INTEGER" property="transPort" />
-        <result column="rtsp_port" jdbcType="INTEGER" property="rtspPort" />
-        <result column="identity_manager" jdbcType="VARCHAR" property="identityManager" />
-        <result column="identity_code" jdbcType="VARCHAR" property="identityCode" />
-        <result column="protocolUrl" jdbcType="VARCHAR" property="protocolUrl" />
-        <result column="max_channel" jdbcType="INTEGER" property="maxChannel" />
-        <result column="hdd_size" jdbcType="INTEGER" property="hddSize" />
-        <result column="buffer_day" jdbcType="INTEGER" property="bufferDay" />
-        <result column="time_long" jdbcType="INTEGER" property="timeLong" />
+            <id property="recordId" column="record_id" jdbcType="BIGINT"/>
+            <result property="recordName" column="record_name" jdbcType="VARCHAR"/>
+            <result property="recorderModel" column="recorder_model" jdbcType="INTEGER"/>
+            <result property="recorderType" column="recorder_type" jdbcType="VARCHAR"/>
+            <result property="vendorId" column="vendor_id" jdbcType="INTEGER"/>
+            <result property="pmsId" column="pms_id" jdbcType="VARCHAR"/>
+            <result property="aliasName" column="alias_name" jdbcType="VARCHAR"/>
+            <result property="recordIp" column="record_ip" jdbcType="VARCHAR"/>
+            <result property="protocol" column="protocol" jdbcType="VARCHAR"/>
+            <result property="httpPort" column="http_port" jdbcType="INTEGER"/>
+            <result property="transPort" column="trans_port" jdbcType="INTEGER"/>
+            <result property="rtspPort" column="rtsp_port" jdbcType="INTEGER"/>
+            <result property="identityManager" column="identity_manager" jdbcType="VARCHAR"/>
+            <result property="identityCode" column="identity_code" jdbcType="VARCHAR"/>
+            <result property="protocolUrl" column="protocol_url" jdbcType="VARCHAR"/>
+            <result property="maxChannel" column="max_channel" jdbcType="INTEGER"/>
+            <result property="hddSize" column="hdd_size" jdbcType="INTEGER"/>
+            <result property="bufferDay" column="buffer_day" jdbcType="INTEGER"/>
+            <result property="timeLong" column="time_long" jdbcType="INTEGER"/>
+            <result property="unit" column="unit" jdbcType="VARCHAR"/>
+            <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+            <result property="originId" column="origin_id" jdbcType="BIGINT"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        record_id, record_name, recorder_model,recorder_type, alias_name, record_ip, protocol, http_port, trans_port, rtsp_port, user_name, pwd, protocol_url, max_channel, hdd_size, buffer_day, time_long
-    </sql>
+        record_id,record_name,recorder_model,
+        recorder_type,vendor_id,pms_id,
+        alias_name,record_ip,protocol,
+        http_port,trans_port,rtsp_port,
+        identity_manager,identity_code,protocol_url,
+        max_channel,hdd_size,buffer_day,
+        time_long,unit,edge_code,
+        origin_id
+            </sql>
     <sql id="TongYong">
         a.record_id,
         a.record_name,
@@ -50,53 +62,28 @@
         a.hdd_size,
         a.buffer_day,
         a.time_long,
-        unit
+        unit,
+        edge_code,
+        origin_id
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="recordId" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder">
-        insert into t_camera_recorder(
-            record_id,
-            record_name,
-            recorder_model,
-            recorder_type,
-            vendor_id,
-            pms_id,
-            alias_name,
-            record_ip,
-            protocol,
-            http_port,
-            trans_port,
-            rtsp_port,
-            identity_manager,
-            identity_code,
-            protocol_url,
-            max_channel,
-            hdd_size,
-            buffer_day,
-            time_long,
-            unit
-        )values(
-                #{recordId, jdbcType=BIGINT},
-                #{recordName, jdbcType=VARCHAR},
-                #{recorderModel, jdbcType=INTEGER},
-                #{recorderType, jdbcType=VARCHAR},
-                #{vendorId, jdbcType=INTEGER},
-                #{pmsId, jdbcType=VARCHAR},
-                #{aliasName, jdbcType=VARCHAR},
-                #{recordIp, jdbcType=VARCHAR},
-                #{protocol, jdbcType=VARCHAR},
-                #{httpPort, jdbcType=INTEGER},
-                #{transPort, jdbcType=INTEGER},
-                #{rtspPort, jdbcType=INTEGER},
-                #{identityManager, jdbcType=VARCHAR},
-                #{identityCode, jdbcType=VARCHAR},
-                #{protocolUrl, jdbcType=VARCHAR},
-                #{maxChannel, jdbcType=INTEGER},
-                #{hddSize, jdbcType=INTEGER},
-                #{bufferDay, jdbcType=INTEGER},
-                #{timeLong, jdbcType=INTEGER},
-                #{unit, jdbcType=VARCHAR}
-        )
+        insert into t_camera_recorder
+        ( record_name,recorder_model
+        ,recorder_type,vendor_id,pms_id
+        ,alias_name,record_ip,protocol
+        ,http_port,trans_port,rtsp_port
+        ,identity_manager,identity_code,protocol_url
+        ,max_channel,hdd_size,buffer_day
+        ,time_long,unit,edge_code,origin_id)
+        values (#{recordName,jdbcType=VARCHAR},#{recorderModel,jdbcType=INTEGER}
+        ,#{recorderType,jdbcType=VARCHAR},#{vendorId,jdbcType=INTEGER},#{pmsId,jdbcType=VARCHAR}
+        ,#{aliasName,jdbcType=VARCHAR},#{recordIp,jdbcType=VARCHAR},#{protocol,jdbcType=VARCHAR}
+        ,#{httpPort,jdbcType=INTEGER},#{transPort,jdbcType=INTEGER},#{rtspPort,jdbcType=INTEGER}
+        ,#{identityManager,jdbcType=VARCHAR},#{identityCode,jdbcType=VARCHAR},#{protocolUrl,jdbcType=VARCHAR}
+        ,#{maxChannel,jdbcType=INTEGER},#{hddSize,jdbcType=INTEGER},#{bufferDay,jdbcType=INTEGER}
+        ,#{timeLong,jdbcType=INTEGER},#{unit,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
+        ,#{originId,jdbcType=BIGINT})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -158,54 +145,14 @@
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.TCameraRecorderByDict">
         select
-            record_id,
-            record_name,
-            recorder_model,
-            recorder_type,
-            vendor_id,
-            pms_id,
-            alias_name,
-            record_ip,
-            protocol,
-            http_port,
-            trans_port,
-            rtsp_port,
-            identity_manager,
-            identity_code,
-            protocol_url,
-            max_channel,
-            hdd_size,
-            buffer_day,
-            time_long,
-            unit
+        <include refid="Base_Column_List" />
         from t_camera_recorder a
-        where 1 = 1
-            and a.record_id = #{recordId, jdbcType=BIGINT}
-        limit 1
+        where  a.record_id = #{recordId, jdbcType=BIGINT}
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.user.entity.TCameraRecorder" resultType="com.yjh.platform.module.user.entity.TCameraRecorderByDict">
         select
-            a.record_id,
-            a.record_name,
-            a.recorder_model,
-            a.recorder_type,
-            a.vendor_id,
-            a.pms_id,
-            a.alias_name,
-            a.record_ip,
-            a.protocol,
-            a.http_port,
-            a.trans_port,
-            a.rtsp_port,
-            a.identity_manager,
-            a.identity_code,
-            a.protocol_url,
-            a.max_channel,
-            a.hdd_size,
-            a.buffer_day,
-            a.time_long,
-            a.unit
+        <include refid="Base_Column_List" />
         from t_camera_recorder a
         where 1 = 1
         <if test="recordId != null and recordId != ''"> and a.record_id = #{recordId, jdbcType=BIGINT}</if>
@@ -247,51 +194,26 @@
         ORDER BY record_id
     </select>
 
-    <insert id="batchInsert">
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="recordId" parameterType="java.util.List">
         insert into t_camera_recorder(
-            record_id,
-            record_name,
-            recorder_model,
-            recorder_type,
-            vendor_id,
-            pms_id,
-            alias_name,
-            record_ip,
-            protocol,
-            http_port,
-            trans_port,
-            rtsp_port,
-        identity_manager,
-        identity_code,
-            protocol_url,
-            max_channel,
-            hdd_size,
-            buffer_day,
-            time_long,
-            unit
+         record_name,recorder_model
+        ,recorder_type,vendor_id,pms_id
+        ,alias_name,record_ip,protocol
+        ,http_port,trans_port,rtsp_port
+        ,identity_manager,identity_code,protocol_url
+        ,max_channel,hdd_size,buffer_day
+        ,time_long,unit,edge_code,origin_id
         )values
-        <foreach collection="list" item="TCameraRecorder" separator=",">
+        <foreach collection="list" item="tCameraRecorder" separator=",">
             (
-                #{TCameraRecorder.recordId, jdbcType=BIGINT},
-                #{TCameraRecorder.recordName, jdbcType=VARCHAR},
-            #{TCameraRecorder.recorderModel, jdbcType=INTEGER},
-                #{TCameraRecorder.recorderType, jdbcType=VARCHAR},
-            #{TCameraRecorder.vendorId, jdbcType=INTEGER},
-            #{TCameraRecorder.pmsId, jdbcType=VARCHAR},
-            #{TCameraRecorder.aliasName, jdbcType=VARCHAR},
-                #{TCameraRecorder.recordIp, jdbcType=VARCHAR},
-                #{TCameraRecorder.protocol, jdbcType=VARCHAR},
-                #{TCameraRecorder.httpPort, jdbcType=INTEGER},
-                #{TCameraRecorder.transPort, jdbcType=INTEGER},
-                #{TCameraRecorder.rtspPort, jdbcType=INTEGER},
-                #{TCameraRecorder.identityManager, jdbcType=VARCHAR},
-                #{TCameraRecorder.identityCode, jdbcType=VARCHAR},
-                #{TCameraRecorder.protocolUrl, jdbcType=VARCHAR},
-                #{TCameraRecorder.maxChannel, jdbcType=INTEGER},
-                #{TCameraRecorder.hddSize, jdbcType=INTEGER},
-                #{TCameraRecorder.bufferDay, jdbcType=INTEGER},
-                #{TCameraRecorder.timeLong, jdbcType=INTEGER},
-                #{TCameraRecorder.unit, jdbcType=VARCHAR}
+            #{tCameraRecorder.recordName,jdbcType=VARCHAR},#{tCameraRecorder.recorderModel,jdbcType=INTEGER}
+            ,#{tCameraRecorder.recorderType,jdbcType=VARCHAR},#{tCameraRecorder.vendorId,jdbcType=INTEGER},#{tCameraRecorder.pmsId,jdbcType=VARCHAR}
+            ,#{tCameraRecorder.aliasName,jdbcType=VARCHAR},#{tCameraRecorder.recordIp,jdbcType=VARCHAR},#{tCameraRecorder.protocol,jdbcType=VARCHAR}
+            ,#{tCameraRecorder.httpPort,jdbcType=INTEGER},#{tCameraRecorder.transPort,jdbcType=INTEGER},#{tCameraRecorder.rtspPort,jdbcType=INTEGER}
+            ,#{tCameraRecorder.identityManager,jdbcType=VARCHAR},#{tCameraRecorder.identityCode,jdbcType=VARCHAR},#{tCameraRecorder.protocolUrl,jdbcType=VARCHAR}
+            ,#{tCameraRecorder.maxChannel,jdbcType=INTEGER},#{tCameraRecorder.hddSize,jdbcType=INTEGER},#{tCameraRecorder.bufferDay,jdbcType=INTEGER}
+            ,#{tCameraRecorder.timeLong,jdbcType=INTEGER},#{tCameraRecorder.unit,jdbcType=VARCHAR},#{tCameraRecorder.edgeCode,jdbcType=VARCHAR}
+            ,#{tCameraRecorder.originId,jdbcType=BIGINT}
             )
         </foreach>
     </insert>

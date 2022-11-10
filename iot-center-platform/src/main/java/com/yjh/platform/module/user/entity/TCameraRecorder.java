@@ -117,7 +117,15 @@ public class TCameraRecorder implements Serializable {
     @Length(max = 32,message = "PMS ID长度必须小于等于32")
      @TableField(value = "pms_id",updateStrategy = FieldStrategy.IGNORED)
     private String pmsId;
+    /**
+     * 站点ID
+     */
+    @ApiModelProperty(value = "站点ID")
+    private String edgeCode;
 
-    @ApiModelProperty(value = "秘钥标识符", hidden=true)
-    private String identifier;
+    /**
+     * 原始录像机ID
+     */
+    @ApiModelProperty(value = "原始录像机ID")
+    private Long originId;
 }

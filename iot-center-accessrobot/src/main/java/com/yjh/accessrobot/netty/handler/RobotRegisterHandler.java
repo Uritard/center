@@ -4,12 +4,15 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
+import com.yjh.accessrobot.module.command.dao.TStdRegionDao;
+import com.yjh.accessrobot.module.command.entity.TStdRegion;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +38,7 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
     private String sendCode;
 
     @Value("${heart.beat.interval}")
-    private String heartBeatInterval;
+    private Integer heartBeatInterval;
 
     @Value("${patroldevice.run.interval}")
     private String patroldeviceRunInterval;
@@ -46,21 +49,28 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
     @Value("${nest.run.interval}")
     private String nestRunInterval;
 
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
+
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         String robotCode = xmlBaseModel.getSendCode();
         Integer registerCount = Constant.robotRegisterCounts.getOrDefault(robotCode, 1);
         log.info("巡视主机收到注册指令了,robotCode：{},这是第{}次", robotCode, registerCount);
         registerCount++;
-        Constant.robotRegisterCounts.put(robotCode,registerCount);
+        Constant.robotRegisterCounts.put(robotCode, registerCount);
+
+        List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
+        // 如果边缘节点 code 不为空，则表示底端上传数据的是边缘节点，不是机器人或无人机
+        boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
 
         Map<String, String> allRobotCodeMap = redisTemplate.opsForHash().entries("AllRobotCode");
         String code = null;
-        if (allRobotCodeMap.containsValue(robotCode)){
+        if (isEdge || allRobotCodeMap.containsValue(robotCode)) {
             code = "200";
             log.info("robotCode：{},缓存有,可以注册", robotCode);
             Constant.robotRegisterFlag.put(robotCode, true);
-        }else {
+        } else {
             List<String> robotCodeList = robotService.selectAllRobotCode();
             if (robotCodeList.contains(robotCode)) {
                 code = "200";
@@ -79,12 +89,14 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
         // robot run interval
         //巡视设备运行时间间隔 2022过检 robot_run_interval修改为patroldevice_run_interval
         items.put("patroldevice_run_interval", patroldeviceRunInterval);
-        //环境数据间隔 2022过检  weather interval 修改为 weather_interval
+        //环境数据间隔 2022过检  weather interval 修改为 env_interval
+        // 220kv改为weather_interval  
         items.put("weather_interval", envInterval);
-        if (robotService.selectIsDrone(robotCode)) {
-            //2022过检新增 无人机机巢运行数据间隔
-            items.put("nest_run_interval", nestRunInterval);
-        }
+        // 220kv过检
+//        if (isEdge || robotService.selectIsDrone(robotCode)) {
+        //2022过检新增 无人机机巢运行数据间隔
+        items.put("nest_run_interval", nestRunInterval);
+//        }
 
         itemsList.add(items);
         XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
@@ -118,9 +130,9 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
 //        thread.start();
 
         // Check whether there are unfinished tasks on the inspection host
-        try{
+        try {
             robotService.hasStandTaskIsFinish(xmlBaseModel.getSendCode());
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }

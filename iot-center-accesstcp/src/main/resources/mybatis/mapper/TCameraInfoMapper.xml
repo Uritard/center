@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accesstcp.module.device.dao.TCameraInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accesstcp.module.device.entity.TCameraInfo">
+            <id property="cameraId" column="camera_id" jdbcType="BIGINT"/>
+            <result property="cameraName" column="camera_name" jdbcType="VARCHAR"/>
+            <result property="cameraModel" column="camera_model" jdbcType="INTEGER"/>
+            <result property="pmsId" column="pms_id" jdbcType="VARCHAR"/>
+            <result property="aliasName" column="alias_name" jdbcType="VARCHAR"/>
+            <result property="recordId" column="record_id" jdbcType="BIGINT"/>
+            <result property="upRegionId" column="up_region_id" jdbcType="VARCHAR"/>
+            <result property="channelNum" column="channel_num" jdbcType="INTEGER"/>
+            <result property="cameraNum" column="camera_num" jdbcType="INTEGER"/>
+            <result property="smsId" column="sms_id" jdbcType="INTEGER"/>
+            <result property="rmsId" column="rms_id" jdbcType="INTEGER"/>
+            <result property="monitorId" column="monitor_id" jdbcType="VARCHAR"/>
+            <result property="vendorId" column="vendor_id" jdbcType="VARCHAR"/>
+            <result property="streamType" column="stream_type" jdbcType="INTEGER"/>
+            <result property="protocolType" column="protocol_type" jdbcType="INTEGER"/>
+            <result property="url" column="url" jdbcType="VARCHAR"/>
+            <result property="cameraIp" column="camera_ip" jdbcType="VARCHAR"/>
+            <result property="port" column="port" jdbcType="INTEGER"/>
+            <result property="infreadPort" column="infread_port" jdbcType="INTEGER"/>
+            <result property="cameraManager" column="camera_manager" jdbcType="VARCHAR"/>
+            <result property="cameraCode" column="camera_code" jdbcType="VARCHAR"/>
+            <result property="cameraType" column="camera_type" jdbcType="INTEGER"/>
+            <result property="isControl" column="is_control" jdbcType="INTEGER"/>
+            <result property="latitude" column="latitude" jdbcType="VARCHAR"/>
+            <result property="longitude" column="longitude" jdbcType="VARCHAR"/>
+            <result property="address" column="address" jdbcType="VARCHAR"/>
+            <result property="unit" column="unit" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="commissionDate" column="commission_date" jdbcType="TIMESTAMP"/>
+            <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+            <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        camera_id,camera_name,camera_model,
+        pms_id,alias_name,record_id,
+        up_region_id,channel_num,camera_num,
+        sms_id,rms_id,monitor_id,
+        vendor_id,stream_type,protocol_type,
+        url,camera_ip,port,
+        infread_port,camera_manager,camera_code,
+        camera_type,is_control,latitude,
+        longitude,address,unit,
+        create_time,commission_date,edge_code,
+        origin_id
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_camera_info
+        where  camera_id = #{cameraId,jdbcType=BIGINT} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_camera_info
+        where  camera_id = #{cameraId,jdbcType=BIGINT} 
+    </delete>
+    <insert id="insert" keyColumn="camera_id" keyProperty="cameraId" parameterType="com.yjh.accesstcp.module.device.entity.TCameraInfo" useGeneratedKeys="true">
+        insert into t_camera_info
+        ( camera_id,camera_name,camera_model
+        ,pms_id,alias_name,record_id
+        ,up_region_id,channel_num,camera_num
+        ,sms_id,rms_id,monitor_id
+        ,vendor_id,stream_type,protocol_type
+        ,url,camera_ip,port
+        ,infread_port,camera_manager,camera_code
+        ,camera_type,is_control,latitude
+        ,longitude,address,unit
+        ,create_time,commission_date,edge_code
+        ,origin_id)
+        values (#{cameraId,jdbcType=BIGINT},#{cameraName,jdbcType=VARCHAR},#{cameraModel,jdbcType=INTEGER}
+        ,#{pmsId,jdbcType=VARCHAR},#{aliasName,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT}
+        ,#{upRegionId,jdbcType=VARCHAR},#{channelNum,jdbcType=INTEGER},#{cameraNum,jdbcType=INTEGER}
+        ,#{smsId,jdbcType=INTEGER},#{rmsId,jdbcType=INTEGER},#{monitorId,jdbcType=VARCHAR}
+        ,#{vendorId,jdbcType=VARCHAR},#{streamType,jdbcType=INTEGER},#{protocolType,jdbcType=INTEGER}
+        ,#{url,jdbcType=VARCHAR},#{cameraIp,jdbcType=VARCHAR},#{port,jdbcType=INTEGER}
+        ,#{infreadPort,jdbcType=INTEGER},#{cameraManager,jdbcType=VARCHAR},#{cameraCode,jdbcType=VARCHAR}
+        ,#{cameraType,jdbcType=INTEGER},#{isControl,jdbcType=INTEGER},#{latitude,jdbcType=VARCHAR}
+        ,#{longitude,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},#{unit,jdbcType=VARCHAR}
+        ,#{createTime,jdbcType=TIMESTAMP},#{commissionDate,jdbcType=TIMESTAMP},#{edgeCode,jdbcType=VARCHAR}
+        ,#{originId,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="camera_id" keyProperty="cameraId" parameterType="com.yjh.accesstcp.module.device.entity.TCameraInfo" useGeneratedKeys="true">
+        insert into t_camera_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="cameraId != null">camera_id,</if>
+                <if test="cameraName != null">camera_name,</if>
+                <if test="cameraModel != null">camera_model,</if>
+                <if test="pmsId != null">pms_id,</if>
+                <if test="aliasName != null">alias_name,</if>
+                <if test="recordId != null">record_id,</if>
+                <if test="upRegionId != null">up_region_id,</if>
+                <if test="channelNum != null">channel_num,</if>
+                <if test="cameraNum != null">camera_num,</if>
+                <if test="smsId != null">sms_id,</if>
+                <if test="rmsId != null">rms_id,</if>
+                <if test="monitorId != null">monitor_id,</if>
+                <if test="vendorId != null">vendor_id,</if>
+                <if test="streamType != null">stream_type,</if>
+                <if test="protocolType != null">protocol_type,</if>
+                <if test="url != null">url,</if>
+                <if test="cameraIp != null">camera_ip,</if>
+                <if test="port != null">port,</if>
+                <if test="infreadPort != null">infread_port,</if>
+                <if test="cameraManager != null">camera_manager,</if>
+                <if test="cameraCode != null">camera_code,</if>
+                <if test="cameraType != null">camera_type,</if>
+                <if test="isControl != null">is_control,</if>
+                <if test="latitude != null">latitude,</if>
+                <if test="longitude != null">longitude,</if>
+                <if test="address != null">address,</if>
+                <if test="unit != null">unit,</if>
+                <if test="createTime != null">create_time,</if>
+                <if test="commissionDate != null">commission_date,</if>
+                <if test="edgeCode != null">edge_code,</if>
+                <if test="originId != null">origin_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="cameraId != null">#{cameraId,jdbcType=BIGINT},</if>
+                <if test="cameraName != null">#{cameraName,jdbcType=VARCHAR},</if>
+                <if test="cameraModel != null">#{cameraModel,jdbcType=INTEGER},</if>
+                <if test="pmsId != null">#{pmsId,jdbcType=VARCHAR},</if>
+                <if test="aliasName != null">#{aliasName,jdbcType=VARCHAR},</if>
+                <if test="recordId != null">#{recordId,jdbcType=BIGINT},</if>
+                <if test="upRegionId != null">#{upRegionId,jdbcType=VARCHAR},</if>
+                <if test="channelNum != null">#{channelNum,jdbcType=INTEGER},</if>
+                <if test="cameraNum != null">#{cameraNum,jdbcType=INTEGER},</if>
+                <if test="smsId != null">#{smsId,jdbcType=INTEGER},</if>
+                <if test="rmsId != null">#{rmsId,jdbcType=INTEGER},</if>
+                <if test="monitorId != null">#{monitorId,jdbcType=VARCHAR},</if>
+                <if test="vendorId != null">#{vendorId,jdbcType=VARCHAR},</if>
+                <if test="streamType != null">#{streamType,jdbcType=INTEGER},</if>
+                <if test="protocolType != null">#{protocolType,jdbcType=INTEGER},</if>
+                <if test="url != null">#{url,jdbcType=VARCHAR},</if>
+                <if test="cameraIp != null">#{cameraIp,jdbcType=VARCHAR},</if>
+                <if test="port != null">#{port,jdbcType=INTEGER},</if>
+                <if test="infreadPort != null">#{infreadPort,jdbcType=INTEGER},</if>
+                <if test="cameraManager != null">#{cameraManager,jdbcType=VARCHAR},</if>
+                <if test="cameraCode != null">#{cameraCode,jdbcType=VARCHAR},</if>
+                <if test="cameraType != null">#{cameraType,jdbcType=INTEGER},</if>
+                <if test="isControl != null">#{isControl,jdbcType=INTEGER},</if>
+                <if test="latitude != null">#{latitude,jdbcType=VARCHAR},</if>
+                <if test="longitude != null">#{longitude,jdbcType=VARCHAR},</if>
+                <if test="address != null">#{address,jdbcType=VARCHAR},</if>
+                <if test="unit != null">#{unit,jdbcType=VARCHAR},</if>
+                <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
+                <if test="commissionDate != null">#{commissionDate,jdbcType=TIMESTAMP},</if>
+                <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+                <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accesstcp.module.device.entity.TCameraInfo">
+        update t_camera_info
+        <set>
+                <if test="cameraName != null">
+                    camera_name = #{cameraName,jdbcType=VARCHAR},
+                </if>
+                <if test="cameraModel != null">
+                    camera_model = #{cameraModel,jdbcType=INTEGER},
+                </if>
+                <if test="pmsId != null">
+                    pms_id = #{pmsId,jdbcType=VARCHAR},
+                </if>
+                <if test="aliasName != null">
+                    alias_name = #{aliasName,jdbcType=VARCHAR},
+                </if>
+                <if test="recordId != null">
+                    record_id = #{recordId,jdbcType=BIGINT},
+                </if>
+                <if test="upRegionId != null">
+                    up_region_id = #{upRegionId,jdbcType=VARCHAR},
+                </if>
+                <if test="channelNum != null">
+                    channel_num = #{channelNum,jdbcType=INTEGER},
+                </if>
+                <if test="cameraNum != null">
+                    camera_num = #{cameraNum,jdbcType=INTEGER},
+                </if>
+                <if test="smsId != null">
+                    sms_id = #{smsId,jdbcType=INTEGER},
+                </if>
+                <if test="rmsId != null">
+                    rms_id = #{rmsId,jdbcType=INTEGER},
+                </if>
+                <if test="monitorId != null">
+                    monitor_id = #{monitorId,jdbcType=VARCHAR},
+                </if>
+                <if test="vendorId != null">
+                    vendor_id = #{vendorId,jdbcType=VARCHAR},
+                </if>
+                <if test="streamType != null">
+                    stream_type = #{streamType,jdbcType=INTEGER},
+                </if>
+                <if test="protocolType != null">
+                    protocol_type = #{protocolType,jdbcType=INTEGER},
+                </if>
+                <if test="url != null">
+                    url = #{url,jdbcType=VARCHAR},
+                </if>
+                <if test="cameraIp != null">
+                    camera_ip = #{cameraIp,jdbcType=VARCHAR},
+                </if>
+                <if test="port != null">
+                    port = #{port,jdbcType=INTEGER},
+                </if>
+                <if test="infreadPort != null">
+                    infread_port = #{infreadPort,jdbcType=INTEGER},
+                </if>
+                <if test="cameraManager != null">
+                    camera_manager = #{cameraManager,jdbcType=VARCHAR},
+                </if>
+                <if test="cameraCode != null">
+                    camera_code = #{cameraCode,jdbcType=VARCHAR},
+                </if>
+                <if test="cameraType != null">
+                    camera_type = #{cameraType,jdbcType=INTEGER},
+                </if>
+                <if test="isControl != null">
+                    is_control = #{isControl,jdbcType=INTEGER},
+                </if>
+                <if test="latitude != null">
+                    latitude = #{latitude,jdbcType=VARCHAR},
+                </if>
+                <if test="longitude != null">
+                    longitude = #{longitude,jdbcType=VARCHAR},
+                </if>
+                <if test="address != null">
+                    address = #{address,jdbcType=VARCHAR},
+                </if>
+                <if test="unit != null">
+                    unit = #{unit,jdbcType=VARCHAR},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="commissionDate != null">
+                    commission_date = #{commissionDate,jdbcType=TIMESTAMP},
+                </if>
+                <if test="edgeCode != null">
+                    edge_code = #{edgeCode,jdbcType=VARCHAR},
+                </if>
+                <if test="originId != null">
+                    origin_id = #{originId,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   camera_id = #{cameraId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accesstcp.module.device.entity.TCameraInfo">
+        update t_camera_info
+        set 
+            camera_name =  #{cameraName,jdbcType=VARCHAR},
+            camera_model =  #{cameraModel,jdbcType=INTEGER},
+            pms_id =  #{pmsId,jdbcType=VARCHAR},
+            alias_name =  #{aliasName,jdbcType=VARCHAR},
+            record_id =  #{recordId,jdbcType=BIGINT},
+            up_region_id =  #{upRegionId,jdbcType=VARCHAR},
+            channel_num =  #{channelNum,jdbcType=INTEGER},
+            camera_num =  #{cameraNum,jdbcType=INTEGER},
+            sms_id =  #{smsId,jdbcType=INTEGER},
+            rms_id =  #{rmsId,jdbcType=INTEGER},
+            monitor_id =  #{monitorId,jdbcType=VARCHAR},
+            vendor_id =  #{vendorId,jdbcType=VARCHAR},
+            stream_type =  #{streamType,jdbcType=INTEGER},
+            protocol_type =  #{protocolType,jdbcType=INTEGER},
+            url =  #{url,jdbcType=VARCHAR},
+            camera_ip =  #{cameraIp,jdbcType=VARCHAR},
+            port =  #{port,jdbcType=INTEGER},
+            infread_port =  #{infreadPort,jdbcType=INTEGER},
+            camera_manager =  #{cameraManager,jdbcType=VARCHAR},
+            camera_code =  #{cameraCode,jdbcType=VARCHAR},
+            camera_type =  #{cameraType,jdbcType=INTEGER},
+            is_control =  #{isControl,jdbcType=INTEGER},
+            latitude =  #{latitude,jdbcType=VARCHAR},
+            longitude =  #{longitude,jdbcType=VARCHAR},
+            address =  #{address,jdbcType=VARCHAR},
+            unit =  #{unit,jdbcType=VARCHAR},
+            create_time =  #{createTime,jdbcType=TIMESTAMP},
+            commission_date =  #{commissionDate,jdbcType=TIMESTAMP},
+            edge_code =  #{edgeCode,jdbcType=VARCHAR},
+            origin_id =  #{originId,jdbcType=VARCHAR}
+        where   camera_id = #{cameraId,jdbcType=BIGINT} 
+    </update>
+    <select id="selectAll" resultType="com.yjh.accesstcp.module.device.entity.CameraModel">
+        select
+        <include refid="Base_Column_List" />
+        from t_camera_info a
+
+
+    </select>
+
+
+
+</mapper>

@@ -1,28 +1,28 @@
 package com.yjh.platform.module.device.controller;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
-import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
+import com.yjh.platform.module.device.entity.TStdRegion;
+import com.yjh.platform.module.device.entity.TStdRegionQueryParam;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
-import com.yjh.platform.module.device.entity.TStdRegion;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Date;
-import io.swagger.annotations.*;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.result.Result;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.Page;
-import java.util.Map;
-
-import com.yjh.platform.common.result.ResultCodeEnum;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.mysql.jdbc.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -142,7 +142,7 @@ public class TStdRegionController {
     @ApiOperation(value = "分页查询")
     @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
     @Logs(title = "查询区域",content = "根据用户传递的参数查询标准区域",logType = 1)
-    public Result selectByPage(@RequestBody TStdRegion tStdRegion
+    public Result selectByPage(@RequestBody TStdRegionQueryParam tStdRegion
                                ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();

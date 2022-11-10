@@ -1,14 +1,12 @@
 package com.yjh.platform.module.device.dao;
 
-import java.util.List;
-import java.util.Date;
-import java.util.Map;
-
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.TStdRegion;
-import com.yjh.platform.module.user.entity.SysOrg;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author tt
@@ -31,16 +29,13 @@ public interface TStdRegionDao {
                                 @Param(value = "state") Integer state,
                                 @Param(value = "createTime") Date createTime);
     List<AreaInfoRegionCode> selectAreaTree();
-
-    int updateByMap(@Param("map") Map<String, Object> map);
-    List<TStdRegion> selectByPage(TStdRegion tStdRegion);
+   List<TStdRegion> selectByPage(TStdRegion tStdRegion);
     List<AreaInfoRegionCode> selectRegTreeByRegName(@Param(value = "regionName") String regionName);
-    List<Long> selectRegionIds(Long upRegionId);
     List<Long> selectDownId(@Param(value = "regionId") Long regionId);
-    int batchDelete(@Param(value = "list") List<Long> list);
-
-    //根据上层ID查询子层区域ID
-    List<Long> selectRegionByUpId(List<Long> upRegionIds);
     List<Long>selectDevice(@Param(value = "list") List<Long> list);
     List<TStdRegion> selectIsIn(TStdRegion tStdRegion);
+
+    int updateByPrimaryKey(TStdRegion record);
+    List<TStdRegion> selectAll();
+
 }

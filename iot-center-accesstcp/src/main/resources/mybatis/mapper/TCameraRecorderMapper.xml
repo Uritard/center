@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accesstcp.module.device.dao.TCameraRecorderDao">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accesstcp.module.device.entity.TCameraRecorder">
+            <id property="recordId" column="record_id" jdbcType="BIGINT"/>
+            <result property="recordName" column="record_name" jdbcType="VARCHAR"/>
+            <result property="recorderModel" column="recorder_model" jdbcType="INTEGER"/>
+            <result property="recorderType" column="recorder_type" jdbcType="VARCHAR"/>
+            <result property="vendorId" column="vendor_id" jdbcType="INTEGER"/>
+            <result property="pmsId" column="pms_id" jdbcType="VARCHAR"/>
+            <result property="aliasName" column="alias_name" jdbcType="VARCHAR"/>
+            <result property="recordIp" column="record_ip" jdbcType="VARCHAR"/>
+            <result property="protocol" column="protocol" jdbcType="VARCHAR"/>
+            <result property="httpPort" column="http_port" jdbcType="INTEGER"/>
+            <result property="transPort" column="trans_port" jdbcType="INTEGER"/>
+            <result property="rtspPort" column="rtsp_port" jdbcType="INTEGER"/>
+            <result property="identityManager" column="identity_manager" jdbcType="VARCHAR"/>
+            <result property="identityCode" column="identity_code" jdbcType="VARCHAR"/>
+            <result property="protocolUrl" column="protocol_url" jdbcType="VARCHAR"/>
+            <result property="maxChannel" column="max_channel" jdbcType="INTEGER"/>
+            <result property="hddSize" column="hdd_size" jdbcType="INTEGER"/>
+            <result property="bufferDay" column="buffer_day" jdbcType="INTEGER"/>
+            <result property="timeLong" column="time_long" jdbcType="INTEGER"/>
+            <result property="unit" column="unit" jdbcType="VARCHAR"/>
+            <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+            <result property="originId" column="origin_id" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        record_id,record_name,recorder_model,
+        recorder_type,vendor_id,pms_id,
+        alias_name,record_ip,protocol,
+        http_port,trans_port,rtsp_port,
+        identity_manager,identity_code,protocol_url,
+        max_channel,hdd_size,buffer_day,
+        time_long,unit,edge_code,
+        origin_id
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_camera_recorder
+        where  record_id = #{recordId,jdbcType=BIGINT} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_camera_recorder
+        where  record_id = #{recordId,jdbcType=BIGINT} 
+    </delete>
+    <insert id="insert" keyColumn="record_id" keyProperty="recordId" parameterType="com.yjh.accesstcp.module.device.entity.TCameraRecorder" useGeneratedKeys="true">
+        insert into t_camera_recorder
+        ( record_id,record_name,recorder_model
+        ,recorder_type,vendor_id,pms_id
+        ,alias_name,record_ip,protocol
+        ,http_port,trans_port,rtsp_port
+        ,identity_manager,identity_code,protocol_url
+        ,max_channel,hdd_size,buffer_day
+        ,time_long,unit,edge_code
+        ,origin_id)
+        values (#{recordId,jdbcType=BIGINT},#{recordName,jdbcType=VARCHAR},#{recorderModel,jdbcType=INTEGER}
+        ,#{recorderType,jdbcType=VARCHAR},#{vendorId,jdbcType=INTEGER},#{pmsId,jdbcType=VARCHAR}
+        ,#{aliasName,jdbcType=VARCHAR},#{recordIp,jdbcType=VARCHAR},#{protocol,jdbcType=VARCHAR}
+        ,#{httpPort,jdbcType=INTEGER},#{transPort,jdbcType=INTEGER},#{rtspPort,jdbcType=INTEGER}
+        ,#{identityManager,jdbcType=VARCHAR},#{identityCode,jdbcType=VARCHAR},#{protocolUrl,jdbcType=VARCHAR}
+        ,#{maxChannel,jdbcType=INTEGER},#{hddSize,jdbcType=INTEGER},#{bufferDay,jdbcType=INTEGER}
+        ,#{timeLong,jdbcType=INTEGER},#{unit,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
+        ,#{originId,jdbcType=BIGINT})
+    </insert>
+    <insert id="insertSelective" keyColumn="record_id" keyProperty="recordId" parameterType="com.yjh.accesstcp.module.device.entity.TCameraRecorder" useGeneratedKeys="true">
+        insert into t_camera_recorder
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="recordId != null">record_id,</if>
+                <if test="recordName != null">record_name,</if>
+                <if test="recorderModel != null">recorder_model,</if>
+                <if test="recorderType != null">recorder_type,</if>
+                <if test="vendorId != null">vendor_id,</if>
+                <if test="pmsId != null">pms_id,</if>
+                <if test="aliasName != null">alias_name,</if>
+                <if test="recordIp != null">record_ip,</if>
+                <if test="protocol != null">protocol,</if>
+                <if test="httpPort != null">http_port,</if>
+                <if test="transPort != null">trans_port,</if>
+                <if test="rtspPort != null">rtsp_port,</if>
+                <if test="identityManager != null">identity_manager,</if>
+                <if test="identityCode != null">identity_code,</if>
+                <if test="protocolUrl != null">protocol_url,</if>
+                <if test="maxChannel != null">max_channel,</if>
+                <if test="hddSize != null">hdd_size,</if>
+                <if test="bufferDay != null">buffer_day,</if>
+                <if test="timeLong != null">time_long,</if>
+                <if test="unit != null">unit,</if>
+                <if test="edgeCode != null">edge_code,</if>
+                <if test="originId != null">origin_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="recordId != null">#{recordId,jdbcType=BIGINT},</if>
+                <if test="recordName != null">#{recordName,jdbcType=VARCHAR},</if>
+                <if test="recorderModel != null">#{recorderModel,jdbcType=INTEGER},</if>
+                <if test="recorderType != null">#{recorderType,jdbcType=VARCHAR},</if>
+                <if test="vendorId != null">#{vendorId,jdbcType=INTEGER},</if>
+                <if test="pmsId != null">#{pmsId,jdbcType=VARCHAR},</if>
+                <if test="aliasName != null">#{aliasName,jdbcType=VARCHAR},</if>
+                <if test="recordIp != null">#{recordIp,jdbcType=VARCHAR},</if>
+                <if test="protocol != null">#{protocol,jdbcType=VARCHAR},</if>
+                <if test="httpPort != null">#{httpPort,jdbcType=INTEGER},</if>
+                <if test="transPort != null">#{transPort,jdbcType=INTEGER},</if>
+                <if test="rtspPort != null">#{rtspPort,jdbcType=INTEGER},</if>
+                <if test="identityManager != null">#{identityManager,jdbcType=VARCHAR},</if>
+                <if test="identityCode != null">#{identityCode,jdbcType=VARCHAR},</if>
+                <if test="protocolUrl != null">#{protocolUrl,jdbcType=VARCHAR},</if>
+                <if test="maxChannel != null">#{maxChannel,jdbcType=INTEGER},</if>
+                <if test="hddSize != null">#{hddSize,jdbcType=INTEGER},</if>
+                <if test="bufferDay != null">#{bufferDay,jdbcType=INTEGER},</if>
+                <if test="timeLong != null">#{timeLong,jdbcType=INTEGER},</if>
+                <if test="unit != null">#{unit,jdbcType=VARCHAR},</if>
+                <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+                <if test="originId != null">#{originId,jdbcType=BIGINT},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accesstcp.module.device.entity.TCameraRecorder">
+        update t_camera_recorder
+        <set>
+                <if test="recordName != null">
+                    record_name = #{recordName,jdbcType=VARCHAR},
+                </if>
+                <if test="recorderModel != null">
+                    recorder_model = #{recorderModel,jdbcType=INTEGER},
+                </if>
+                <if test="recorderType != null">
+                    recorder_type = #{recorderType,jdbcType=VARCHAR},
+                </if>
+                <if test="vendorId != null">
+                    vendor_id = #{vendorId,jdbcType=INTEGER},
+                </if>
+                <if test="pmsId != null">
+                    pms_id = #{pmsId,jdbcType=VARCHAR},
+                </if>
+                <if test="aliasName != null">
+                    alias_name = #{aliasName,jdbcType=VARCHAR},
+                </if>
+                <if test="recordIp != null">
+                    record_ip = #{recordIp,jdbcType=VARCHAR},
+                </if>
+                <if test="protocol != null">
+                    protocol = #{protocol,jdbcType=VARCHAR},
+                </if>
+                <if test="httpPort != null">
+                    http_port = #{httpPort,jdbcType=INTEGER},
+                </if>
+                <if test="transPort != null">
+                    trans_port = #{transPort,jdbcType=INTEGER},
+                </if>
+                <if test="rtspPort != null">
+                    rtsp_port = #{rtspPort,jdbcType=INTEGER},
+                </if>
+                <if test="identityManager != null">
+                    identity_manager = #{identityManager,jdbcType=VARCHAR},
+                </if>
+                <if test="identityCode != null">
+                    identity_code = #{identityCode,jdbcType=VARCHAR},
+                </if>
+                <if test="protocolUrl != null">
+                    protocol_url = #{protocolUrl,jdbcType=VARCHAR},
+                </if>
+                <if test="maxChannel != null">
+                    max_channel = #{maxChannel,jdbcType=INTEGER},
+                </if>
+                <if test="hddSize != null">
+                    hdd_size = #{hddSize,jdbcType=INTEGER},
+                </if>
+                <if test="bufferDay != null">
+                    buffer_day = #{bufferDay,jdbcType=INTEGER},
+                </if>
+                <if test="timeLong != null">
+                    time_long = #{timeLong,jdbcType=INTEGER},
+                </if>
+                <if test="unit != null">
+                    unit = #{unit,jdbcType=VARCHAR},
+                </if>
+                <if test="edgeCode != null">
+                    edge_code = #{edgeCode,jdbcType=VARCHAR},
+                </if>
+                <if test="originId != null">
+                    origin_id = #{originId,jdbcType=BIGINT},
+                </if>
+        </set>
+        where   record_id = #{recordId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accesstcp.module.device.entity.TCameraRecorder">
+        update t_camera_recorder
+        set 
+            record_name =  #{recordName,jdbcType=VARCHAR},
+            recorder_model =  #{recorderModel,jdbcType=INTEGER},
+            recorder_type =  #{recorderType,jdbcType=VARCHAR},
+            vendor_id =  #{vendorId,jdbcType=INTEGER},
+            pms_id =  #{pmsId,jdbcType=VARCHAR},
+            alias_name =  #{aliasName,jdbcType=VARCHAR},
+            record_ip =  #{recordIp,jdbcType=VARCHAR},
+            protocol =  #{protocol,jdbcType=VARCHAR},
+            http_port =  #{httpPort,jdbcType=INTEGER},
+            trans_port =  #{transPort,jdbcType=INTEGER},
+            rtsp_port =  #{rtspPort,jdbcType=INTEGER},
+            identity_manager =  #{identityManager,jdbcType=VARCHAR},
+            identity_code =  #{identityCode,jdbcType=VARCHAR},
+            protocol_url =  #{protocolUrl,jdbcType=VARCHAR},
+            max_channel =  #{maxChannel,jdbcType=INTEGER},
+            hdd_size =  #{hddSize,jdbcType=INTEGER},
+            buffer_day =  #{bufferDay,jdbcType=INTEGER},
+            time_long =  #{timeLong,jdbcType=INTEGER},
+            unit =  #{unit,jdbcType=VARCHAR},
+            edge_code =  #{edgeCode,jdbcType=VARCHAR},
+            origin_id =  #{originId,jdbcType=BIGINT}
+        where   record_id = #{recordId,jdbcType=BIGINT} 
+    </update>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_camera_recorder
+    </select>
+</mapper>

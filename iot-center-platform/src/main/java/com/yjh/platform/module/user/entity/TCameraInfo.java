@@ -1,9 +1,5 @@
 package com.yjh.platform.module.user.entity;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -16,6 +12,7 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -154,4 +151,20 @@ public class TCameraInfo implements Serializable {
 
     @ApiModelProperty(value = "秘钥标识符", hidden=true)
     private String identifier;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 节点编码
+     */
+    private String edgeCode;
+
+    /**
+     * 原始id(下级同步的id)
+     */
+    private String originId;
+
 }
