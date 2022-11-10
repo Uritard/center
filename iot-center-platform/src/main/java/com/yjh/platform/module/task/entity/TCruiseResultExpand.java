@@ -40,10 +40,10 @@ public class TCruiseResultExpand  {
     private Integer modifyState;
 
     @ApiModelProperty(value = "检测点数")
-    private Integer taskCount;
+    private int taskCount;
 
     @ApiModelProperty(value = "待检测点数")
-    private Integer taskWait;
+    private int taskWait;
 
     @ApiModelProperty(value = "审核人")
     private String checkUser;
@@ -75,13 +75,13 @@ public class TCruiseResultExpand  {
     private String taskName;
 
     @ApiModelProperty(value = "异常数")
-    private Integer taskAbnormal;
+    private int taskAbnormal;
 
     @ApiModelProperty(value = "任务状态")
     private String taskState;
 
     @ApiModelProperty(value = "巡检数据状态--已测点数")
-    private Integer cruiseDataState1;
+    private int cruiseDataState1;
 
     @ApiModelProperty(value = "巡检数据状态--未处理")
     private Integer cruiseDataState2;

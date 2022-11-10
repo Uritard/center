@@ -180,8 +180,6 @@ public abstract class AbstractVideoCruise {
                     inspectionMap.put("endTime", DateTimeUtil.getDateTimeString());
                 }
 
-                // 数据存入 redis
-                CruiseRedisStorage.offer(inspectionMap);
                 if (!picError) {
                     // 判断是否有配置算法
                     TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("deviceMeteId", "-1"), resultNum);
@@ -189,18 +187,13 @@ public abstract class AbstractVideoCruise {
                         log.info("request algorithm: {}", JSON.toJSONString(algorithm));
                         // 算法分析
                         isEnded = algorithmAnalysis(inspectionMap, presetId, taskId, jsonForRe, algorithm);
-                        if (isEnded) {
-                            // 数据存入 redis
-                            CruiseRedisStorage.offer(inspectionMap);
-                        }
                     } else {
                         // 如果不进行算法处理，则本级处理结果信息
-                        inspectionMap = resultRecognition(inspectionMap);
-                        // 数据存入 redis
-                        CruiseRedisStorage.offer(inspectionMap);
+                        resultRecognition(inspectionMap);
                     }
                 }
-
+                // 数据存入 redis
+                CruiseRedisStorage.offer(inspectionMap);
                 return isEnded;
             } catch (Exception e) {
                 log.error("摄像机处理出错", e);
