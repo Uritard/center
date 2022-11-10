@@ -1133,18 +1133,27 @@ public class UPatrolTaskService {
         patrolTaskResultHandler(cruiseResultMap);
     }
 
+    /**
+     * 通过  cruiseResult 判断正常还是异常
+     */
     public void patrolTaskResultHandler(Map<String, String> cruiseResultMap) {
-        patrolTaskResultHandler(Collections.singletonList(cruiseResultMap));
+        patrolTaskResultHandler(Collections.singletonList(cruiseResultMap), MapUtils.getIntValue(cruiseResultMap, "cruiseResult", CRUISE_RESULT_NORMAL));
     }
 
+    /**
+     * 批量传入，则表示一定异常
+     */
     public void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList) {
+        patrolTaskResultHandler(cruiseResultList, CRUISE_RESULT_ABNORMAL);
+    }
+    public void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList, int cruiseResult) {
         int size = cruiseResultList.size();
         if(CollectionUtils.isEmpty(cruiseResultList)){
             log.error("cruiseResultList is empty.");
             return;
         }
         String taskId = cruiseResultList.get(0).get("taskId");
-        int abnormalCounts = patrolTaskResult(taskId, CRUISE_RESULT_ABNORMAL, size);
+        int abnormalCounts = patrolTaskResult(taskId, cruiseResult, size);
 
         try {
             // webSocket通知前端调用巡视监控的接口
@@ -1232,7 +1241,7 @@ public class UPatrolTaskService {
 
             // 更新upr
             UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
-            uPatrolResult.setTaskState(240);
+            uPatrolResult.setTaskState(TASK_STATE_FINISHED);
             uPatrolResult.setTaskWait(0);
             uPatrolResult.setEndTime(new Date());
             uPatrolResult.setTaskAbnormal(abnormalCounts);
