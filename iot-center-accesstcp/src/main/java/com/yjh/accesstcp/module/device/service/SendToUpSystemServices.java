@@ -25,11 +25,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -100,11 +98,11 @@ public class SendToUpSystemServices {
 
     public Map<String, Object> creatModel(String type) {
         try {
-            Map<String, Object> map = new HashMap<>();
-            Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
-//            String path = mapForPath.get("content")+"/"+stationCode+"/Model";
-            String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "D:\\testform\\robotTemplate" : mapForPath.get("content") + "/" + stationCode + "/Model";
-            log.info("模型文件路径：" + path);
+            String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+            Map<String,Object> map = new HashMap<>();
+            Map<String,String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
+            String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model"+"/"+stationCode+"/Model":mapForPath.get("content")+"/"+stationCode+"/Model";
+            log.info("模型文件路径："+path);
 
             switch (type) {
                 case "1":
@@ -296,37 +294,38 @@ public class SendToUpSystemServices {
     }
 
     public String createDeviceModel(String path) throws Exception {
-        List<Map<String, Object>> list = sendToUpSystemDao.selectDeviceModel();
-        Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:stationName");
-        list.forEach(item -> {
-            item.put("station_code", stationCode);
+        List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel();
+        list.forEach(item->{
+            item.put("station_code",stationCode);
             item.put("station_name", getStationName());
             JSONArray jsonArray = new JSONArray();
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("device_code", "");
-            jsonObject.put("device_pos", "");
-            jsonObject.put("robot_code", "");
-            jsonObject.put("robot_pos", "");
-            jsonObject.put("uav_code", "");
-            jsonObject.put("uav_pos", "");
-            if (item.get("cruise_type").equals(228)) {// 机器人
-                item.put("save_type_list", "jpg");
-                item.put("data_type", "01");
+            jsonObject.put("device_code","");
+            jsonObject.put("device_pos","");
+            jsonObject.put("robot_code","");
+            jsonObject.put("robot_pos","");
+            jsonObject.put("uav_code","");
+            jsonObject.put("uav_pos","");
+            if (item.get("cruise_type").equals(228)){// 机器人
+                item.put("save_type_list","jpg");
+                item.put("data_type","01");
                 jsonObject.put("robot_code", item.get("robot_num"));
-                jsonObject.put("robot_pos", item.get("inspection_id"));
-            } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)) {//视屏 红外
-                item.put("save_type_list", "jpg");
-                item.put("data_type", "1");
-                jsonObject.put("device_code", item.get("camera_id"));
-                jsonObject.put("device_pos", item.get("preset_id"));
-            } else if (item.get("cruise_type").equals(232)) {//声纹
-                item.put("save_type_list", "wav");
-                item.put("data_type", "0001");
-            } else if (item.get("cruise_type").equals(524)) {// 无人机
-                item.put("save_type_list", "jpg");
-                item.put("data_type", "001");
+                jsonObject.put("robot_pos",item.get("inspection_id"));
+            } else if (item.get("cruise_type").equals(229) || item.get("cruise_type").equals(230)){//视屏 红外
+                item.put("save_type_list","jpg");
+                item.put("data_type","1");
+                jsonObject.put("device_code",item.get("camera_id"));
+                jsonObject.put("device_pos",item.get("preset_id"));
+            }else if (item.get("cruise_type").equals(232)){//声纹
+                item.put("save_type_list","wav");
+                item.put("data_type","0001");
+                jsonObject.put("voice_code",item.get("voice_id"));
+                jsonObject.put("voice_pos",item.get("voice_id"));
+            }else if (item.get("cruise_type").equals(524)){// 无人机
+                item.put("save_type_list","jpg");
+                item.put("data_type","001");
                 jsonObject.put("uav_code", item.get("robot_num"));
-                jsonObject.put("uav_pos", item.get("inspection_id"));
+                jsonObject.put("uav_pos",item.get("inspection_id"));
             }
             item.remove("cruise_type");
             item.remove("camera_id");
@@ -334,7 +333,18 @@ public class SendToUpSystemServices {
             item.remove("robot_code");
             item.remove("inspection_id");
             jsonArray.add(jsonObject);
-            item.put("video_pos", jsonArray.toJSONString());
+            item.put("video_pos",jsonArray.toJSONString());
+            String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+            if ("1".equals(edgeLevel) && Objects.nonNull(item.get("preset_img")) && Objects.nonNull(item.get("local_path"))){
+                String localPath = String.valueOf(item.get("local_path"));
+                String targetPath = String.valueOf(item.get("preset_img"));
+                try {
+                    ftpsUtil.putFile(localPath, targetPath);
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
+            }
+            item.remove("local_path");
         });
         return CreateModeXMLUtil.createXmlFile(list, path, "device_model.xml", "Device_Model");
     }
