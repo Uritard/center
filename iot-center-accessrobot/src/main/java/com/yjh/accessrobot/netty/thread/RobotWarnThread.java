@@ -30,14 +30,9 @@ public class RobotWarnThread implements Runnable{
         try {
             log.info("开始处理告警数据 >>>>>>> robotAlarmMap==={}", robotAlarmMap);
 
-            String robotCode = robotAlarmMap.getOrDefault("robotCode", "");
-            if (StringUtils.isEmpty(robotCode)) {
-                log.error("机器人编码为空");
-                throw new RuntimeException("机器人编码为空");
-            }
-
-            Long robotId = StaticContextAccessor.getBean(RobotService.class).selectRobotIdByCode(robotCode);
-            String robotName = StaticContextAccessor.getBean(RobotService.class).selectRobotNameByCode(robotCode);
+            String robotCode = robotAlarmMap.get("robotCode");
+            Long robotId = robotService.selectRobotIdByCode(robotCode);
+            String robotName = robotService.selectRobotNameByCode(robotCode);
 
             log.info("该robotCode的robotId是==={}", robotId);
             if (Objects.nonNull(robotId)){

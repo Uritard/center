@@ -38,6 +38,10 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             log.error("机器人/无人机编码为空");
             throw new RuntimeException("机器人/无人机编码为空");
         }
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+            log.error("机器人/无人机未注册或未连接");
+            throw new RuntimeException("机器人/无人机未注册或未连接");
+        }
 
         // 给机器人响应
         String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true,robotCode));

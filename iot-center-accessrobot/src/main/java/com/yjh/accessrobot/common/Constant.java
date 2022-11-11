@@ -100,14 +100,6 @@ public class Constant {
      */
     public static final String POINT_ALARM_PROCESS = "http://iot-center-platform/uPatrolTask/v1/robotPatrolTaskAlarm";
 
-    public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
-        Result re = new Result();
-        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
-        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
-        return re;
-    }
-
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
     public static<T> Result otherServerList( List<String> list, String url){
@@ -117,10 +109,7 @@ public class Constant {
 
     public static final String WEATHER_URL="http://iot-center-platform/homePage/v1/getWeatherInfoForService";
     public static Result weatherServer(Map<String,String> map, String url){
-        Result re = new Result();
-        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
-        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+        Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
         return re;
     }
 

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author YChen
@@ -44,33 +45,44 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             xmlBaseModel.setCode(stationCode);
         }
         String robotCode = xmlBaseModel.getSendCode();
-        if (Constant.robotRegisterFlag.getOrDefault(robotCode, false)) {
-            List<Map<String, String>> robotOperationList = new ArrayList<>();
-            xmlBaseModel.getItems().forEach(res -> {
-                Map<String, String> robotOperationMap = new HashMap<>(16);
-                // 2022过检 修改robot_name为patroldevice_name
-                robotOperationMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
-                robotOperationMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
-                robotOperationMap.put("robotCode", robotCode);
-                robotOperationMap.put("time", res.get("time").toString());
-                robotOperationMap.put("type", res.get("type").toString());
-                robotOperationMap.put("value", res.get("value").toString());
-                robotOperationMap.put("valueUnit", res.get("value_unit").toString());
-                robotOperationMap.put("unit", res.get("unit").toString());
-                robotOperationList.add(robotOperationMap);
-            });
-
-            for (int i = 0; i < robotOperationList.size(); i++) {
-                redisTemplate.opsForHash().putAll("RobotOperation:" + robotCode + ":" + robotOperationList.get(i).get("type"), robotOperationList.get(i));
-            }
-
-            String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
-            byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
-            RobotServerHandler.send( operationProtocol, robotCode);
-            log.info("巡视主机给机器人{}响应了", robotCode);
-            // 国网要求
-            robotService.upToCruise(xmlBaseModel);
+        if (StringUtils.isEmpty(robotCode)) {
+            log.error("机器人/无人机编码为空");
+            throw new RuntimeException("机器人/无人机编码为空");
         }
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+            log.error("机器人/无人机未注册或未连接");
+            throw new RuntimeException("机器人/无人机未注册或未连接");
+        }
+
+        // 给机器人响应
+        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+        RobotServerHandler.send( operationProtocol, robotCode);
+        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
+
+        List<Map<String, String>> robotOperationList = new ArrayList<>();
+        xmlBaseModel.getItems().forEach(res -> {
+            Map<String, String> robotOperationMap = new HashMap<>(16);
+            // 2022过检 修改robot_name为patroldevice_name
+            robotOperationMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
+            robotOperationMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
+            robotOperationMap.put("robotCode", robotCode);
+            robotOperationMap.put("time", res.get("time").toString());
+            robotOperationMap.put("type", res.get("type").toString());
+            robotOperationMap.put("value", res.get("value").toString());
+            robotOperationMap.put("valueUnit", res.get("value_unit").toString());
+            robotOperationMap.put("unit", res.get("unit").toString());
+            robotOperationList.add(robotOperationMap);
+        });
+
+        for (int i = 0; i < robotOperationList.size(); i++) {
+            String robotOperation = "RobotOperation:" + robotCode + ":" + robotOperationList.get(i).get("type");
+            redisTemplate.opsForHash().putAll(robotOperation, robotOperationList.get(i));
+            redisTemplate.expire(robotOperation, 7, TimeUnit.DAYS);
+        }
+
+        // 国网要求
+        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override

@@ -85,8 +85,8 @@ public class StateGridADecoder extends ByteToMessageDecoder {
             out.add(message);
             byte[] stag = new byte[2];
             in.readBytes(stag);
-            log.info("读取完成， 原始报文 head:{},\n\tcontent:{},\n\tend tag: {}", ByteUtil.toHexString(tmpBuff),
-                    ByteUtil.toHexString(content), ByteUtil.toHexString(TAG));
+//            log.info("读取完成， 原始报文 head:{},\n\tcontent:{},\n\tend tag: {}", ByteUtil.toHexString(tmpBuff),
+//                    ByteUtil.toHexString(content), ByteUtil.toHexString(TAG));
             message = null;
             tmpBuff = null;
         }

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author YChen
@@ -63,7 +64,9 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
             log.info("机器人状态数据是：" + robotStatusList);
 
             for (int i = 0; i < robotStatusList.size(); i++) {
-                redisTemplate.opsForHash().putAll("RobotStatus:" + robotCode + ":" + robotStatusList.get(i).get("type"), robotStatusList.get(i));
+                String robotStatus = "RobotStatus:" + robotCode + ":" + robotStatusList.get(i).get("type");
+                redisTemplate.opsForHash().putAll(robotStatus, robotStatusList.get(i));
+                redisTemplate.expire(robotStatus, 7, TimeUnit.DAYS);
             }
 
             String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));

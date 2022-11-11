@@ -8,6 +8,7 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +23,22 @@ public class RobotCruiseReportHandler implements MessageHandlerStrategy, Initial
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到机器人巡视报告数据了+++++++++++++++++");
-        // todo 暂时不用
         String robotCode = xmlBaseModel.getSendCode();
-        String taskStatusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
-        byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, taskStatusXmlString);
-        RobotServerHandler.send(taskStatusProtocol, robotCode);
-        log.info("巡视主机给机器人{}响应了", robotCode);
+        if (StringUtils.isEmpty(robotCode)) {
+            log.error("机器人/无人机编码为空");
+            throw new RuntimeException("机器人/无人机编码为空");
+        }
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+            log.error("机器人/无人机未注册或未连接");
+            throw new RuntimeException("机器人/无人机未注册或未连接");
+        }
+        // todo 暂时不用
+
+        // 给机器人响应
+        String cruiseReportString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        byte[] cruiseReportProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseReportString);
+        RobotServerHandler.send( cruiseReportProtocol, robotCode);
+        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
     }
 
     @Override
