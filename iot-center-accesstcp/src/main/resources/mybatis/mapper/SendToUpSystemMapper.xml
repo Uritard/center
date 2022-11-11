@@ -4,62 +4,103 @@
 
 
     <select id="selectDeviceModel" resultType="java.util.LinkedHashMap">
-        SELECT
-            region.region_id   as area_id,
-            region.region_name as area_name,
-            f.up_region_id   as bay_id,
-            f.up_region_name as bay_name,
-            a.instance_id    as device_id,
-            (CASE
-                 WHEN ISNULL(b.mete_name) AND ISNULL(c.inspection_id) AND ISNULL(d.preset_name) THEN ''
-                 WHEN ISNULL(b.mete_name) AND ISNULL(c.inspection_name) THEN d.preset_name
-                 WHEN ISNULL(b.mete_name) AND ISNULL(d.preset_img) THEN c.inspection_name
-                 WHEN ISNULL(c.inspection_name) AND ISNULL(d.preset_name) THEN b.mete_name
-                 WHEN ISNULL(c.inspection_name) THEN CONCAT(b.mete_name, ' /', d.preset_name)
-                 WHEN ISNULL(d.preset_name) THEN CONCAT(b.mete_name, ' /', c.inspection_name)
-                END)         AS device_name,
-            f.custom_id      as component_id,
-            f.custom_name    as component_name,
-            f.device_id      as main_device_id,
-            f.device_name    as main_device_name,
-            j.up_dict        as device_type,
-            case b.meter_type
-                when 411 then '1'
-                when 412 then '2'
-                when 413 then '3'
-                when 414 then '4'
-                when 415 then '5'
-                when 416 then '6'
-                when 417 then '7'
-                when 418 then '8'
-                when 419 then '9'
-                end as meter_type,
---                b.meter_type,
-            (b.appearance_type - 419)  as appearance_type,
-            ""               as save_type_list,
-            k.dict_note      as recognition_type_list,
-            ""               as phase,
-            ""               as device_info,
-            ""               as data_type,
-            ""               as lower_value,
-            ""               as upper_value,
-            ""               as video_pos,
-            a.cruise_type,
-            c.inspection_id,
-            d.preset_id,
-            robot.robot_code,
-            robot.robot_num,
-            d.camera_id
+        SELECT  DISTINCT
+        region.region_id as area_id,
+        region.region_name as area_name,
+        f.up_region_id as bay_id,
+        f.up_region_name as bay_name,
+        a.instance_id AS device_id,
+        (CASE
+        WHEN ISNULL(b.mete_name) AND ISNULL(c.inspection_id) AND ISNULL(d.preset_name) THEN ''
+        WHEN ISNULL(b.mete_name) AND ISNULL(c.inspection_name) THEN d.preset_name
+        WHEN ISNULL(b.mete_name) AND ISNULL(d.preset_img) THEN c.inspection_name
+        WHEN ISNULL(c.inspection_name) AND ISNULL(d.preset_name) THEN b.mete_name
+        WHEN ISNULL(c.inspection_name) THEN CONCAT(b.mete_name, ' /', d.preset_name)
+        WHEN ISNULL(d.preset_name) THEN CONCAT(b.mete_name, ' /', c.inspection_name)
+        END)         AS device_name,
+        b.custom_id      as component_id,
+        m.dict_note    as component_name,
+        f.device_id AS main_device_id,
+        f.device_name    as main_device_name,
+        f.preset_id AS device_preset_id,
+        f.camera_id AS device_camera_id,
+        j.up_dict        as device_type,
+        f.real_code,
+        case b.meter_type
+        when 411 then '1'
+        when 412 then '2'
+        when 413 then '3'
+        when 414 then '4'
+        when 415 then '5'
+        when 416 then '6'
+        when 417 then '7'
+        when 418 then '8'
+        when 419 then '9'
+        end as meter_type,
+        b.mete_type,
+        (b.appearance_type - 419)  as appearance_type,
+        b.device_mete_id AS device_mete_id,
+        b.device_point_id,
+        b.mete_kind,
+        b.position_type,
+        b.analyse_type,
+        b.is_ai,
+        b.is_judge,
+        b.unit,
+        b.alarm_note,
+        b.alarm_type,
+        b.up_effect,
+        b.down_effect,
+        b.state_zero,
+        b.state_one,
+        b.alarm_state,
+        b.alarm_level,
+        b.high_limit1,
+        b.high_limit2,
+        b.high_limit3,
+        b.high_limit4,
+        b.low_limit1,
+        b.low_limit2,
+        b.low_limit3,
+        b.low_limit4,
+        b.alarm_delay,
+        b.alarm_cnt,
+        b.threshold_abs,
+        b.threshold_per,
+        b.redundant_type,
+        ""               as save_type_list,
+        k.dict_note      as recognition_type_list,
+        ""               as phase,
+        ""               as device_info,
+        ""               as data_type,
+        ""               as lower_value,
+        ""               as upper_value,
+        ""               as video_pos,
+        a.cruise_type,
+        c.inspection_id AS inspection_id,
+        d.preset_id AS preset_id,
+        d.preset_num,
+        d.is_keep_watch,
+        d.is_keep_watch_task,
+        d.is_second_keep_watch_task,
+        CONCAT('/', d.preset_id,'/' ,d.preset_id,'.jpg') AS preset_img,
+        REPLACE(d.preset_img, (SELECT content FROM t_sys_param WHERE param_code = 'presetRealImgPath') ,(SELECT content FROM t_sys_param WHERE param_code = 'presetImgPath')) AS local_path,
+        robot.robot_code,
+        robot.robot_num,
+        d.camera_id AS camera_id,
+        i.voice_device_id AS voice_id
         FROM t_cruise_point_instance a
-                 LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
-                 LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
-                 left join t_robot_info robot on c.robot_id = robot.robot_id
-                 LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
-                 left join t_std_device f on a.device_id = f.device_id and a.custom_id = f.custom_id
-                 left join t_std_region re on f.up_region_id = re.region_id
-                 left join t_std_region region on re.up_region_id = region.region_id
-                 left join t_dict_business j on f.device_type = j.dict_code
-                 left join t_dict_business k on a.cruise_type = k.dict_code
+        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
+        left join t_robot_info robot on c.robot_id = robot.robot_id
+        LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
+        left join t_std_device f on a.device_id = f.device_id
+        left join t_std_region re on f.up_region_id = re.region_id
+        left join t_std_region region on re.up_region_id = region.region_id
+        left join t_dict_business j on f.device_type = j.dict_code
+        left join t_dict_business k on a.cruise_type = k.dict_code
+        LEFT JOIN t_dict_business m ON b.custom_id = m.dict_code
+        LEFT JOIN t_voice_device i ON i.voice_device_id = a.cruise_id
     </select>
 
     <select id="selectRobotInfo" resultType="java.util.LinkedHashMap">

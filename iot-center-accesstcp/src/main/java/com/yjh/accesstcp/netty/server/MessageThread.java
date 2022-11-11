@@ -360,7 +360,12 @@ public class MessageThread {
                 Map<String, Object> map = sendToUpSystemServices.creatModel(xmlBaseModel.getCommand());
                 List<Map<String, Object>> list = new ArrayList<>();
                 list.add(map);
-                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", list, false);
+                String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+                String command = "4";
+                if ("1".equals(edgeLevel)){
+                    command = "3";
+                }
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", command, "200", list, false);
             } catch (Exception e) {
                 log.info("模型同步错误" + e);
                 //                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", list);
