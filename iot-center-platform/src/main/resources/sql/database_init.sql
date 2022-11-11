@@ -1586,6 +1586,8 @@ CREATE TABLE `t_robot_camera_rule` (
 DROP TABLE IF EXISTS `t_robot_info`;
 CREATE TABLE `t_robot_info` (
   `robot_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '机器人id',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   `robot_code` varchar(32) DEFAULT '',
   `robot_num` int(6) DEFAULT NULL COMMENT '机器人/无人机编号编码',
   `robot_name` varchar(64) DEFAULT '' COMMENT '机器人名称',
@@ -1710,6 +1712,8 @@ CREATE TABLE `t_sequential_conf` (
 DROP TABLE IF EXISTS `t_std_device`;
 CREATE TABLE `t_std_device` (
   `device_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '设备ID',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   `custom_id` varchar(32) NOT NULL COMMENT '部位ID',
   `device_code` varchar(40) DEFAULT '' COMMENT '设备编码',
   `device_name` varchar(128) DEFAULT '' COMMENT '设备名称',
@@ -1727,6 +1731,7 @@ CREATE TABLE `t_std_device` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
   `preset_id` bigint(32) DEFAULT NULL COMMENT '预置位id',
   `camera_id` bigint(32) DEFAULT NULL COMMENT '摄像机id',
+  `real_code` varchar(32) DEFAULT '' COMMENT '实物编码',
   PRIMARY KEY (`device_id`,`custom_id`) USING BTREE,
   KEY `index_create_date` (`create_time`) USING BTREE,
   KEY `index_device_type` (`device_type`) USING BTREE
@@ -1738,9 +1743,12 @@ CREATE TABLE `t_std_device` (
 DROP TABLE IF EXISTS `t_std_devicemete`;
 CREATE TABLE `t_std_devicemete` (
   `device_mete_id` bigint(50) NOT NULL AUTO_INCREMENT COMMENT '设备测点实例ID',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   `device_id` bigint(32) DEFAULT '1' COMMENT '设备ID',
   `device_point_id` varchar(64) DEFAULT NULL COMMENT '设备点位ID',
   `custom_id` varchar(50) DEFAULT '' COMMENT '部位ID',
+  `custom_name` varchar(50) DEFAULT '' COMMENT '部件名称',
   `mete_id` bigint(50) DEFAULT '1' COMMENT '标准测点ID',
   `mete_kind` varchar(20) DEFAULT '' COMMENT '测点类型:0-遥信，1-遥测',
   `mete_type` varchar(50) DEFAULT '' COMMENT '巡检类型',
@@ -2144,6 +2152,8 @@ CREATE TABLE `t_voice_config` (
 DROP TABLE IF EXISTS `t_voice_device`;
 CREATE TABLE `t_voice_device` (
   `voice_device_id` bigint(64) NOT NULL AUTO_INCREMENT COMMENT '声纹监控设备Id',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   `voice_device_name` varchar(255) DEFAULT '' COMMENT '声纹监控设备名称（）',
   `std_device_id` bigint(32) DEFAULT '1' COMMENT '变压器下面换流变的设备Id',
   `device_type` varchar(64) DEFAULT '' COMMENT '被监测的设备类型',
