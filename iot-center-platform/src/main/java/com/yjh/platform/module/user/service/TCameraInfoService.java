@@ -214,15 +214,10 @@ public class TCameraInfoService {
         return tCameraInfoDao.selectByCameraName(cameraName);
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public List<TCameraInfoByDict> select(Long cameraId, String cameraName, Integer cameraModel,String pmsId,String aliasName, String recordId,
-                                          Long upRegionId, Integer channelNum, Integer cameraNum,Integer smsId, Integer rmsId,String monitorId,
-                                          Integer vendorId, Integer streamType, Integer protocolType, String cameraIp,
-                                          String url, Integer port,Integer infreadPort,String cameraManager,String cameraCode, Integer cameraType, Integer isControl, String latitude,
-                                          String longitude, String address,String unit) {
-        return tCameraInfoDao.select(cameraId, cameraName, cameraModel,pmsId,aliasName,
-                recordId, upRegionId, channelNum,cameraNum, smsId, rmsId, monitorId,vendorId, streamType, protocolType, cameraIp, url,
-                port, infreadPort,cameraManager,cameraCode,cameraType,isControl,latitude, longitude, address, unit);
+    public List<TCameraInfo> select(Long cameraId, String cameraName, Integer cameraModel, String pmsId, String aliasName, String recordId,
+                                    Long upRegionId, Integer streamType, Integer protocolType, String cameraIp, String url, Integer cameraType, Integer isControl) {
+        return tCameraInfoDao.select(cameraId, cameraName, cameraModel, pmsId, aliasName, recordId, upRegionId, streamType, protocolType,
+                cameraIp, url, cameraType, isControl);
     }
 
     @Transactional(rollbackFor = Exception.class)
