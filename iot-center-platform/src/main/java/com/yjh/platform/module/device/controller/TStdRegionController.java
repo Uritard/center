@@ -175,4 +175,17 @@ public class TStdRegionController {
         return result;
     }
 
+    @ApiOperation(value = "刷新区域缓存")
+    @RequestMapping(value = "/refreshRegion", method = RequestMethod.GET)
+    public Result refreshRegion() {
+        Result result = new Result();
+        try {
+            result.setData(tStdRegionService.loadRegionIntoRedis());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("刷新区域缓存失败：", e);
+        }
+        return result;
+    }
+
 }

@@ -39,6 +39,7 @@ public class TCameraInfoService {
 
     @Transactional
     public void saveReportData(List<CameraModel> cameraModelList, String edgeNode) {
+        log.info("开始同步摄像机信息  edgeNode:{}  ",edgeNode);
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectByEdgeCode(edgeNode);
         Map<Long, Long> tCameraRecorderMap = tCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, TCameraRecorder::getRecordId));
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeNode, null);
@@ -80,7 +81,7 @@ public class TCameraInfoService {
        }).collect(Collectors.toList());
 
         List<TCameraInfo> oldTCameraInfoList = tCameraInfoMapper.selectByEdgeCode(edgeNode);
-        if (CollectionUtils.isNotEmpty(oldTCameraInfoList)) {
+        if (CollectionUtils.isEmpty(oldTCameraInfoList)) {
             tCameraInfoMapper.insertBatch(tCameraInfoList);
         } else {
             Map<String, TCameraInfo> oldCameraInfoMap = oldTCameraInfoList.stream().collect(Collectors.toMap(TCameraInfo::getOriginId, Function.identity()));

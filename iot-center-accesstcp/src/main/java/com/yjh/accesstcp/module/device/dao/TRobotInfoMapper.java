@@ -1,6 +1,10 @@
 package com.yjh.accesstcp.module.device.dao;
 
+import com.yjh.accesstcp.module.device.entity.RobotModel;
 import com.yjh.accesstcp.module.device.entity.TRobotInfo;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
 * @author yanhao
@@ -8,6 +12,7 @@ import com.yjh.accesstcp.module.device.entity.TRobotInfo;
 * @createDate 2022-11-09 16:41:59
 * @Entity com.yjh.accesstcp.module.device.entity.TRobotInfo
 */
+@Repository
 public interface TRobotInfoMapper {
 
     int deleteByPrimaryKey(Long id);
@@ -22,4 +27,8 @@ public interface TRobotInfoMapper {
 
     int updateByPrimaryKey(TRobotInfo record);
 
+
+    List<RobotModel> selectAllRobot();
+
+    List<RobotModel> selectAllDrone();
 }

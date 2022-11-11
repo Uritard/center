@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -149,11 +150,13 @@ public class TCameraInfo implements Serializable {
     /**
      * 创建时间
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     /**
      * 投运日期
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date commissionDate;
 
     /**

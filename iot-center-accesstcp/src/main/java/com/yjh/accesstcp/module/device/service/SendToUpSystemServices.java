@@ -10,10 +10,7 @@ import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
-import com.yjh.accesstcp.module.device.dao.SendToUpSystemDao;
-import com.yjh.accesstcp.module.device.dao.TCameraInfoMapper;
-import com.yjh.accesstcp.module.device.dao.TCameraRecorderDao;
-import com.yjh.accesstcp.module.device.dao.TStdRegionDao;
+import com.yjh.accesstcp.module.device.dao.*;
 import com.yjh.accesstcp.module.device.entity.*;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
@@ -61,6 +58,8 @@ public class SendToUpSystemServices {
     private TCameraRecorderDao tCameraRecorderDao;
     @Autowired
     private TCameraInfoMapper tCameraInfoMapper;
+    @Autowired
+    private TRobotInfoMapper tRobotInfoMapper;
 
     @Autowired
     private FtpsUtil ftpsUtil;
@@ -347,13 +346,19 @@ public class SendToUpSystemServices {
 
     public String createRobotModel(String path) throws Exception {
         //机器人模型
-        List<Map<String, Object>> list = sendToUpSystemDao.selectRobotInfo();
-        list.forEach(item -> {
-            item.put("station_code", stationCode);
-            item.put("station_name", getStationName());
-        });
+        List<RobotModel> robotModelList = tRobotInfoMapper.selectAllRobot();
+        String stationCode = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeId", "content");
+        String stationName = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "stationName", "content");
+        SerializeConfig serializeConfig = new SerializeConfig();
+        serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
+        List<Map<String, Object>> list = robotModelList.stream().peek(robotModel -> {
+            robotModel.setStationCode(stationCode);
+            robotModel.setStationName(stationName);
+        }).map((Function<RobotModel, Map<String, Object>>) robotModel -> {
+            JSONObject jsonObject = (JSONObject) JSON.toJSON(robotModel, serializeConfig);
+            return jsonObject.toJavaObject(Map.class);
+        }).collect(Collectors.toList());
         return CreateModeXMLUtil.createXmlFile(list, path, "robot_model.xml", "PatrolDevice_Model");
-
     }
 
     public String createCameraModel(String path) throws Exception {
@@ -387,13 +392,19 @@ public class SendToUpSystemServices {
 
     public String createDroneModel(String path) throws Exception {
         //无人机模型
-        List<Map<String, Object>> list = sendToUpSystemDao.selectDroneInfo();
-        list.forEach(item -> {
-            item.put("station_code", stationCode);
-            item.put("station_name", getStationName());
-        });
+        List<RobotModel> robotModelList = tRobotInfoMapper.selectAllDrone();
+        String stationCode = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeId", "content");
+        String stationName = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "stationName", "content");
+        SerializeConfig serializeConfig = new SerializeConfig();
+        serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
+        List<Map<String, Object>> list = robotModelList.stream().peek(robotModel -> {
+            robotModel.setStationCode(stationCode);
+            robotModel.setStationName(stationName);
+        }).map((Function<RobotModel, Map<String, Object>>) robotModel -> {
+            JSONObject jsonObject = (JSONObject) JSON.toJSON(robotModel, serializeConfig);
+            return jsonObject.toJavaObject(Map.class);
+        }).collect(Collectors.toList());
         return CreateModeXMLUtil.createXmlFile(list, path, "drone_model.xml", "PatrolDevice_Model");
-
     }
 
     public String createVoiceModel(String path) throws Exception {

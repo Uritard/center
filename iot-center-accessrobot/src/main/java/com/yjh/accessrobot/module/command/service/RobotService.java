@@ -112,6 +112,8 @@ public class RobotService {
 
     @Autowired
     private TCameraRecorderService tCameraRecorderService;
+    @Autowired
+    private TCameraInfoService tCameraInfoService;
 
     @Transactional(rollbackFor = Exception.class)
     public int updateAllRobotStatus() {
@@ -2780,10 +2782,10 @@ public class RobotService {
 //                log.info("机器人模型 {}", filePath);
 //                dealRobotFile(filePathMap,filePath,edgeCode);
 //                break;
-//            case "4":
-//                log.info("摄像机模型 {}", filePath);
-//                dealCameraFile(filePathMap,filePath,edgeCode);
-//                break;
+            case "4":
+                log.info("摄像机模型 {}", filePath);
+                dealCameraFile(filePathMap.get("content") + File.separator + filePath,edgeCode);
+                break;
 //            case "5":
 //                log.info("无人机模型 {}", filePath);
 //                dealDroneFile(filePathMap,filePath,edgeCode);
@@ -2817,6 +2819,21 @@ public class RobotService {
         }
     }
 
+    public void dealCameraFile(String filePath, String edgeCode) {
+        if (StringUtils.isBlank(filePath)) {
+            log.info("file path is null");
+            return;
+        }
+        try {
+            XMLBaseModel model = getXmlMessage(filePath);
+            List<Map<String, Object>> mapList = model.getItems();
+            List<CameraModel> cameraModelList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, CameraModel.class)).collect(Collectors.toList());
+            tCameraInfoService.saveReportData(cameraModelList,edgeCode);
+        } catch (DocumentException e) {
+            log.error("录像机文件处理失败", e);
+        }
+    }
+
     public void dealRecordFile(String filePath, String edgeCode) {
         if (StringUtils.isBlank(filePath)) {
             log.info("file path is null");
@@ -2842,6 +2859,8 @@ public class RobotService {
             List<Map<String, Object>> mapList = model.getItems();
             List<TStdRegion> tStdRegionList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, TStdRegion.class)).collect(Collectors.toList());
             tStdRegionService.saveReportData(tStdRegionList, edgeCode);
+            // 刷新缓存
+            StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(Constant.REGION_REFRESH_URL, Result.class);
         } catch (DocumentException e) {
             log.error("区域文件处理失败", e);
         }

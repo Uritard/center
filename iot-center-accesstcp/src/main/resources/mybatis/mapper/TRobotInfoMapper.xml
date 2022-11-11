@@ -5,54 +5,54 @@
 <mapper namespace="com.yjh.accesstcp.module.device.dao.TRobotInfoMapper">
 
     <resultMap id="BaseResultMap" type="com.yjh.accesstcp.module.device.entity.TRobotInfo">
-            <id property="robotId" column="robot_id" jdbcType="BIGINT"/>
-            <result property="robotCode" column="robot_code" jdbcType="VARCHAR"/>
-            <result property="robotNum" column="robot_num" jdbcType="INTEGER"/>
-            <result property="robotName" column="robot_name" jdbcType="VARCHAR"/>
-            <result property="nestName" column="nest_name" jdbcType="VARCHAR"/>
-            <result property="nestCode" column="nest_code" jdbcType="VARCHAR"/>
-            <result property="robotStatus" column="robot_status" jdbcType="VARCHAR"/>
-            <result property="robotType" column="robot_type" jdbcType="INTEGER"/>
-            <result property="droneType" column="drone_type" jdbcType="INTEGER"/>
-            <result property="robotIp" column="robot_ip" jdbcType="VARCHAR"/>
-            <result property="robotPort" column="robot_port" jdbcType="INTEGER"/>
-            <result property="lightIp" column="light_ip" jdbcType="VARCHAR"/>
-            <result property="lightPort" column="light_port" jdbcType="VARCHAR"/>
-            <result property="identityManager" column="identity_manager" jdbcType="VARCHAR"/>
-            <result property="identityCode" column="identity_code" jdbcType="VARCHAR"/>
-            <result property="lnferadIp" column="lnferad_IP" jdbcType="VARCHAR"/>
-            <result property="inferadPort" column="Inferad_Port" jdbcType="INTEGER"/>
-            <result property="inferadUsername" column="Inferad_username" jdbcType="VARCHAR"/>
-            <result property="inferadPassword" column="Inferad_password" jdbcType="VARCHAR"/>
-            <result property="photePath" column="phote_path" jdbcType="VARCHAR"/>
-            <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
-            <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
-            <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
-            <result property="updateDate" column="update_date" jdbcType="TIMESTAMP"/>
-            <result property="robotFactory" column="robot_factory" jdbcType="VARCHAR"/>
-            <result property="madeIn" column="made_in" jdbcType="VARCHAR"/>
-            <result property="madeDate" column="made_date" jdbcType="TIMESTAMP"/>
-            <result property="isUse" column="is_use" jdbcType="VARCHAR"/>
-            <result property="commissionDate" column="commission_date" jdbcType="TIMESTAMP"/>
-            <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
-            <result property="robotPosition" column="robot_position" jdbcType="VARCHAR"/>
-            <result property="dronePosition" column="drone_position" jdbcType="VARCHAR"/>
-            <result property="robotSource" column="robot_source" jdbcType="VARCHAR"/>
-            <result property="address" column="address" jdbcType="VARCHAR"/>
-            <result property="buildingUser" column="building_user" jdbcType="VARCHAR"/>
-            <result property="appearanceNumber" column="appearance_number" jdbcType="VARCHAR"/>
-            <result property="defectRecord" column="defect_record" jdbcType="VARCHAR"/>
-            <result property="repairRecord" column="repair_record" jdbcType="VARCHAR"/>
-            <result property="exitPutintoRecord" column="exit_putInto_record" jdbcType="VARCHAR"/>
-            <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
-            <result property="recordId" column="record_id" jdbcType="BIGINT"/>
-            <result property="channelNumLight" column="channel_num_light" jdbcType="INTEGER"/>
-            <result property="channelNumInferad" column="channel_num_inferad" jdbcType="INTEGER"/>
-            <result property="lastOnlineTime" column="last_online_time" jdbcType="BIGINT"/>
-            <result property="duration" column="duration" jdbcType="BIGINT"/>
-            <result property="offLineCount" column="off_line_count" jdbcType="BIGINT"/>
-            <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
-            <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+        <id property="robotId" column="robot_id" jdbcType="BIGINT"/>
+        <result property="robotCode" column="robot_code" jdbcType="VARCHAR"/>
+        <result property="robotNum" column="robot_num" jdbcType="INTEGER"/>
+        <result property="robotName" column="robot_name" jdbcType="VARCHAR"/>
+        <result property="nestName" column="nest_name" jdbcType="VARCHAR"/>
+        <result property="nestCode" column="nest_code" jdbcType="VARCHAR"/>
+        <result property="robotStatus" column="robot_status" jdbcType="VARCHAR"/>
+        <result property="robotType" column="robot_type" jdbcType="INTEGER"/>
+        <result property="droneType" column="drone_type" jdbcType="INTEGER"/>
+        <result property="robotIp" column="robot_ip" jdbcType="VARCHAR"/>
+        <result property="robotPort" column="robot_port" jdbcType="INTEGER"/>
+        <result property="lightIp" column="light_ip" jdbcType="VARCHAR"/>
+        <result property="lightPort" column="light_port" jdbcType="VARCHAR"/>
+        <result property="identityManager" column="identity_manager" jdbcType="VARCHAR"/>
+        <result property="identityCode" column="identity_code" jdbcType="VARCHAR"/>
+        <result property="lnferadIp" column="lnferad_IP" jdbcType="VARCHAR"/>
+        <result property="inferadPort" column="Inferad_Port" jdbcType="INTEGER"/>
+        <result property="inferadUsername" column="Inferad_username" jdbcType="VARCHAR"/>
+        <result property="inferadPassword" column="Inferad_password" jdbcType="VARCHAR"/>
+        <result property="photePath" column="phote_path" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="VARCHAR"/>
+        <result property="createDate" column="create_date" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
+        <result property="updateDate" column="update_date" jdbcType="TIMESTAMP"/>
+        <result property="robotFactory" column="robot_factory" jdbcType="VARCHAR"/>
+        <result property="madeIn" column="made_in" jdbcType="VARCHAR"/>
+        <result property="madeDate" column="made_date" jdbcType="TIMESTAMP"/>
+        <result property="isUse" column="is_use" jdbcType="VARCHAR"/>
+        <result property="commissionDate" column="commission_date" jdbcType="TIMESTAMP"/>
+        <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+        <result property="robotPosition" column="robot_position" jdbcType="VARCHAR"/>
+        <result property="dronePosition" column="drone_position" jdbcType="VARCHAR"/>
+        <result property="robotSource" column="robot_source" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="buildingUser" column="building_user" jdbcType="VARCHAR"/>
+        <result property="appearanceNumber" column="appearance_number" jdbcType="VARCHAR"/>
+        <result property="defectRecord" column="defect_record" jdbcType="VARCHAR"/>
+        <result property="repairRecord" column="repair_record" jdbcType="VARCHAR"/>
+        <result property="exitPutintoRecord" column="exit_putInto_record" jdbcType="VARCHAR"/>
+        <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+        <result property="recordId" column="record_id" jdbcType="BIGINT"/>
+        <result property="channelNumLight" column="channel_num_light" jdbcType="INTEGER"/>
+        <result property="channelNumInferad" column="channel_num_inferad" jdbcType="INTEGER"/>
+        <result property="lastOnlineTime" column="last_online_time" jdbcType="BIGINT"/>
+        <result property="duration" column="duration" jdbcType="BIGINT"/>
+        <result property="offLineCount" column="off_line_count" jdbcType="BIGINT"/>
+        <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+        <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -76,352 +76,416 @@
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from t_robot_info
-        where  robot_id = #{robotId,jdbcType=BIGINT} 
+        where robot_id = #{robotId,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from t_robot_info
-        where  robot_id = #{robotId,jdbcType=BIGINT} 
+        delete
+        from t_robot_info
+        where robot_id = #{robotId,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" keyColumn="robot_id" keyProperty="robotId" parameterType="com.yjh.accesstcp.module.device.entity.TRobotInfo" useGeneratedKeys="true">
+    <insert id="insert" keyColumn="robot_id" keyProperty="robotId" parameterType="com.yjh.accesstcp.module.device.entity.TRobotInfo"
+            useGeneratedKeys="true">
         insert into t_robot_info
-        ( robot_id,robot_code,robot_num
-        ,robot_name,nest_name,nest_code
-        ,robot_status,robot_type,drone_type
-        ,robot_ip,robot_port,light_ip
-        ,light_port,identity_manager,identity_code
-        ,lnferad_IP,Inferad_Port,Inferad_username
-        ,Inferad_password,phote_path,create_by
-        ,create_date,update_by,update_date
-        ,robot_factory,made_in,made_date
-        ,is_use,commission_date,up_region_id
-        ,robot_position,drone_position,robot_source
-        ,address,building_user,appearance_number
-        ,defect_record,repair_record,exit_putInto_record
-        ,remarks,record_id,channel_num_light
-        ,channel_num_inferad,last_online_time,duration
-        ,off_line_count,edge_code,origin_id
-        )
-        values (#{robotId,jdbcType=BIGINT},#{robotCode,jdbcType=VARCHAR},#{robotNum,jdbcType=INTEGER}
-        ,#{robotName,jdbcType=VARCHAR},#{nestName,jdbcType=VARCHAR},#{nestCode,jdbcType=VARCHAR}
-        ,#{robotStatus,jdbcType=VARCHAR},#{robotType,jdbcType=INTEGER},#{droneType,jdbcType=INTEGER}
-        ,#{robotIp,jdbcType=VARCHAR},#{robotPort,jdbcType=INTEGER},#{lightIp,jdbcType=VARCHAR}
-        ,#{lightPort,jdbcType=VARCHAR},#{identityManager,jdbcType=VARCHAR},#{identityCode,jdbcType=VARCHAR}
-        ,#{lnferadIp,jdbcType=VARCHAR},#{inferadPort,jdbcType=INTEGER},#{inferadUsername,jdbcType=VARCHAR}
-        ,#{inferadPassword,jdbcType=VARCHAR},#{photePath,jdbcType=VARCHAR},#{createBy,jdbcType=VARCHAR}
-        ,#{createDate,jdbcType=TIMESTAMP},#{updateBy,jdbcType=VARCHAR},#{updateDate,jdbcType=TIMESTAMP}
-        ,#{robotFactory,jdbcType=VARCHAR},#{madeIn,jdbcType=VARCHAR},#{madeDate,jdbcType=TIMESTAMP}
-        ,#{isUse,jdbcType=VARCHAR},#{commissionDate,jdbcType=TIMESTAMP},#{upRegionId,jdbcType=BIGINT}
-        ,#{robotPosition,jdbcType=VARCHAR},#{dronePosition,jdbcType=VARCHAR},#{robotSource,jdbcType=VARCHAR}
-        ,#{address,jdbcType=VARCHAR},#{buildingUser,jdbcType=VARCHAR},#{appearanceNumber,jdbcType=VARCHAR}
-        ,#{defectRecord,jdbcType=VARCHAR},#{repairRecord,jdbcType=VARCHAR},#{exitPutintoRecord,jdbcType=VARCHAR}
-        ,#{remarks,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT},#{channelNumLight,jdbcType=INTEGER}
-        ,#{channelNumInferad,jdbcType=INTEGER},#{lastOnlineTime,jdbcType=BIGINT},#{duration,jdbcType=BIGINT}
-        ,#{offLineCount,jdbcType=BIGINT},#{edgeCode,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR}
-        )
+        ( robot_id, robot_code, robot_num
+        , robot_name, nest_name, nest_code
+        , robot_status, robot_type, drone_type
+        , robot_ip, robot_port, light_ip
+        , light_port, identity_manager, identity_code
+        , lnferad_IP, Inferad_Port, Inferad_username
+        , Inferad_password, phote_path, create_by
+        , create_date, update_by, update_date
+        , robot_factory, made_in, made_date
+        , is_use, commission_date, up_region_id
+        , robot_position, drone_position, robot_source
+        , address, building_user, appearance_number
+        , defect_record, repair_record, exit_putInto_record
+        , remarks, record_id, channel_num_light
+        , channel_num_inferad, last_online_time, duration
+        , off_line_count, edge_code, origin_id)
+        values ( #{robotId,jdbcType=BIGINT}, #{robotCode,jdbcType=VARCHAR}, #{robotNum,jdbcType=INTEGER}
+               , #{robotName,jdbcType=VARCHAR}, #{nestName,jdbcType=VARCHAR}, #{nestCode,jdbcType=VARCHAR}
+               , #{robotStatus,jdbcType=VARCHAR}, #{robotType,jdbcType=INTEGER}, #{droneType,jdbcType=INTEGER}
+               , #{robotIp,jdbcType=VARCHAR}, #{robotPort,jdbcType=INTEGER}, #{lightIp,jdbcType=VARCHAR}
+               , #{lightPort,jdbcType=VARCHAR}, #{identityManager,jdbcType=VARCHAR}, #{identityCode,jdbcType=VARCHAR}
+               , #{lnferadIp,jdbcType=VARCHAR}, #{inferadPort,jdbcType=INTEGER}, #{inferadUsername,jdbcType=VARCHAR}
+               , #{inferadPassword,jdbcType=VARCHAR}, #{photePath,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}
+               , #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}
+               , #{robotFactory,jdbcType=VARCHAR}, #{madeIn,jdbcType=VARCHAR}, #{madeDate,jdbcType=TIMESTAMP}
+               , #{isUse,jdbcType=VARCHAR}, #{commissionDate,jdbcType=TIMESTAMP}, #{upRegionId,jdbcType=BIGINT}
+               , #{robotPosition,jdbcType=VARCHAR}, #{dronePosition,jdbcType=VARCHAR}, #{robotSource,jdbcType=VARCHAR}
+               , #{address,jdbcType=VARCHAR}, #{buildingUser,jdbcType=VARCHAR}, #{appearanceNumber,jdbcType=VARCHAR}
+               , #{defectRecord,jdbcType=VARCHAR}, #{repairRecord,jdbcType=VARCHAR}, #{exitPutintoRecord,jdbcType=VARCHAR}
+               , #{remarks,jdbcType=VARCHAR}, #{recordId,jdbcType=BIGINT}, #{channelNumLight,jdbcType=INTEGER}
+               , #{channelNumInferad,jdbcType=INTEGER}, #{lastOnlineTime,jdbcType=BIGINT}, #{duration,jdbcType=BIGINT}
+               , #{offLineCount,jdbcType=BIGINT}, #{edgeCode,jdbcType=VARCHAR}, #{originId,jdbcType=VARCHAR})
     </insert>
-    <insert id="insertSelective" keyColumn="robot_id" keyProperty="robotId" parameterType="com.yjh.accesstcp.module.device.entity.TRobotInfo" useGeneratedKeys="true">
+    <insert id="insertSelective" keyColumn="robot_id" keyProperty="robotId"
+            parameterType="com.yjh.accesstcp.module.device.entity.TRobotInfo" useGeneratedKeys="true">
         insert into t_robot_info
         <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="robotId != null">robot_id,</if>
-                <if test="robotCode != null">robot_code,</if>
-                <if test="robotNum != null">robot_num,</if>
-                <if test="robotName != null">robot_name,</if>
-                <if test="nestName != null">nest_name,</if>
-                <if test="nestCode != null">nest_code,</if>
-                <if test="robotStatus != null">robot_status,</if>
-                <if test="robotType != null">robot_type,</if>
-                <if test="droneType != null">drone_type,</if>
-                <if test="robotIp != null">robot_ip,</if>
-                <if test="robotPort != null">robot_port,</if>
-                <if test="lightIp != null">light_ip,</if>
-                <if test="lightPort != null">light_port,</if>
-                <if test="identityManager != null">identity_manager,</if>
-                <if test="identityCode != null">identity_code,</if>
-                <if test="lnferadIp != null">lnferad_IP,</if>
-                <if test="inferadPort != null">Inferad_Port,</if>
-                <if test="inferadUsername != null">Inferad_username,</if>
-                <if test="inferadPassword != null">Inferad_password,</if>
-                <if test="photePath != null">phote_path,</if>
-                <if test="createBy != null">create_by,</if>
-                <if test="createDate != null">create_date,</if>
-                <if test="updateBy != null">update_by,</if>
-                <if test="updateDate != null">update_date,</if>
-                <if test="robotFactory != null">robot_factory,</if>
-                <if test="madeIn != null">made_in,</if>
-                <if test="madeDate != null">made_date,</if>
-                <if test="isUse != null">is_use,</if>
-                <if test="commissionDate != null">commission_date,</if>
-                <if test="upRegionId != null">up_region_id,</if>
-                <if test="robotPosition != null">robot_position,</if>
-                <if test="dronePosition != null">drone_position,</if>
-                <if test="robotSource != null">robot_source,</if>
-                <if test="address != null">address,</if>
-                <if test="buildingUser != null">building_user,</if>
-                <if test="appearanceNumber != null">appearance_number,</if>
-                <if test="defectRecord != null">defect_record,</if>
-                <if test="repairRecord != null">repair_record,</if>
-                <if test="exitPutintoRecord != null">exit_putInto_record,</if>
-                <if test="remarks != null">remarks,</if>
-                <if test="recordId != null">record_id,</if>
-                <if test="channelNumLight != null">channel_num_light,</if>
-                <if test="channelNumInferad != null">channel_num_inferad,</if>
-                <if test="lastOnlineTime != null">last_online_time,</if>
-                <if test="duration != null">duration,</if>
-                <if test="offLineCount != null">off_line_count,</if>
-                <if test="edgeCode != null">edge_code,</if>
-                <if test="originId != null">origin_id,</if>
+            <if test="robotId != null">robot_id,</if>
+            <if test="robotCode != null">robot_code,</if>
+            <if test="robotNum != null">robot_num,</if>
+            <if test="robotName != null">robot_name,</if>
+            <if test="nestName != null">nest_name,</if>
+            <if test="nestCode != null">nest_code,</if>
+            <if test="robotStatus != null">robot_status,</if>
+            <if test="robotType != null">robot_type,</if>
+            <if test="droneType != null">drone_type,</if>
+            <if test="robotIp != null">robot_ip,</if>
+            <if test="robotPort != null">robot_port,</if>
+            <if test="lightIp != null">light_ip,</if>
+            <if test="lightPort != null">light_port,</if>
+            <if test="identityManager != null">identity_manager,</if>
+            <if test="identityCode != null">identity_code,</if>
+            <if test="lnferadIp != null">lnferad_IP,</if>
+            <if test="inferadPort != null">Inferad_Port,</if>
+            <if test="inferadUsername != null">Inferad_username,</if>
+            <if test="inferadPassword != null">Inferad_password,</if>
+            <if test="photePath != null">phote_path,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateDate != null">update_date,</if>
+            <if test="robotFactory != null">robot_factory,</if>
+            <if test="madeIn != null">made_in,</if>
+            <if test="madeDate != null">made_date,</if>
+            <if test="isUse != null">is_use,</if>
+            <if test="commissionDate != null">commission_date,</if>
+            <if test="upRegionId != null">up_region_id,</if>
+            <if test="robotPosition != null">robot_position,</if>
+            <if test="dronePosition != null">drone_position,</if>
+            <if test="robotSource != null">robot_source,</if>
+            <if test="address != null">address,</if>
+            <if test="buildingUser != null">building_user,</if>
+            <if test="appearanceNumber != null">appearance_number,</if>
+            <if test="defectRecord != null">defect_record,</if>
+            <if test="repairRecord != null">repair_record,</if>
+            <if test="exitPutintoRecord != null">exit_putInto_record,</if>
+            <if test="remarks != null">remarks,</if>
+            <if test="recordId != null">record_id,</if>
+            <if test="channelNumLight != null">channel_num_light,</if>
+            <if test="channelNumInferad != null">channel_num_inferad,</if>
+            <if test="lastOnlineTime != null">last_online_time,</if>
+            <if test="duration != null">duration,</if>
+            <if test="offLineCount != null">off_line_count,</if>
+            <if test="edgeCode != null">edge_code,</if>
+            <if test="originId != null">origin_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-                <if test="robotId != null">#{robotId,jdbcType=BIGINT},</if>
-                <if test="robotCode != null">#{robotCode,jdbcType=VARCHAR},</if>
-                <if test="robotNum != null">#{robotNum,jdbcType=INTEGER},</if>
-                <if test="robotName != null">#{robotName,jdbcType=VARCHAR},</if>
-                <if test="nestName != null">#{nestName,jdbcType=VARCHAR},</if>
-                <if test="nestCode != null">#{nestCode,jdbcType=VARCHAR},</if>
-                <if test="robotStatus != null">#{robotStatus,jdbcType=VARCHAR},</if>
-                <if test="robotType != null">#{robotType,jdbcType=INTEGER},</if>
-                <if test="droneType != null">#{droneType,jdbcType=INTEGER},</if>
-                <if test="robotIp != null">#{robotIp,jdbcType=VARCHAR},</if>
-                <if test="robotPort != null">#{robotPort,jdbcType=INTEGER},</if>
-                <if test="lightIp != null">#{lightIp,jdbcType=VARCHAR},</if>
-                <if test="lightPort != null">#{lightPort,jdbcType=VARCHAR},</if>
-                <if test="identityManager != null">#{identityManager,jdbcType=VARCHAR},</if>
-                <if test="identityCode != null">#{identityCode,jdbcType=VARCHAR},</if>
-                <if test="lnferadIp != null">#{lnferadIp,jdbcType=VARCHAR},</if>
-                <if test="inferadPort != null">#{inferadPort,jdbcType=INTEGER},</if>
-                <if test="inferadUsername != null">#{inferadUsername,jdbcType=VARCHAR},</if>
-                <if test="inferadPassword != null">#{inferadPassword,jdbcType=VARCHAR},</if>
-                <if test="photePath != null">#{photePath,jdbcType=VARCHAR},</if>
-                <if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
-                <if test="createDate != null">#{createDate,jdbcType=TIMESTAMP},</if>
-                <if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
-                <if test="updateDate != null">#{updateDate,jdbcType=TIMESTAMP},</if>
-                <if test="robotFactory != null">#{robotFactory,jdbcType=VARCHAR},</if>
-                <if test="madeIn != null">#{madeIn,jdbcType=VARCHAR},</if>
-                <if test="madeDate != null">#{madeDate,jdbcType=TIMESTAMP},</if>
-                <if test="isUse != null">#{isUse,jdbcType=VARCHAR},</if>
-                <if test="commissionDate != null">#{commissionDate,jdbcType=TIMESTAMP},</if>
-                <if test="upRegionId != null">#{upRegionId,jdbcType=BIGINT},</if>
-                <if test="robotPosition != null">#{robotPosition,jdbcType=VARCHAR},</if>
-                <if test="dronePosition != null">#{dronePosition,jdbcType=VARCHAR},</if>
-                <if test="robotSource != null">#{robotSource,jdbcType=VARCHAR},</if>
-                <if test="address != null">#{address,jdbcType=VARCHAR},</if>
-                <if test="buildingUser != null">#{buildingUser,jdbcType=VARCHAR},</if>
-                <if test="appearanceNumber != null">#{appearanceNumber,jdbcType=VARCHAR},</if>
-                <if test="defectRecord != null">#{defectRecord,jdbcType=VARCHAR},</if>
-                <if test="repairRecord != null">#{repairRecord,jdbcType=VARCHAR},</if>
-                <if test="exitPutintoRecord != null">#{exitPutintoRecord,jdbcType=VARCHAR},</if>
-                <if test="remarks != null">#{remarks,jdbcType=VARCHAR},</if>
-                <if test="recordId != null">#{recordId,jdbcType=BIGINT},</if>
-                <if test="channelNumLight != null">#{channelNumLight,jdbcType=INTEGER},</if>
-                <if test="channelNumInferad != null">#{channelNumInferad,jdbcType=INTEGER},</if>
-                <if test="lastOnlineTime != null">#{lastOnlineTime,jdbcType=BIGINT},</if>
-                <if test="duration != null">#{duration,jdbcType=BIGINT},</if>
-                <if test="offLineCount != null">#{offLineCount,jdbcType=BIGINT},</if>
-                <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
-                <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+            <if test="robotId != null">#{robotId,jdbcType=BIGINT},</if>
+            <if test="robotCode != null">#{robotCode,jdbcType=VARCHAR},</if>
+            <if test="robotNum != null">#{robotNum,jdbcType=INTEGER},</if>
+            <if test="robotName != null">#{robotName,jdbcType=VARCHAR},</if>
+            <if test="nestName != null">#{nestName,jdbcType=VARCHAR},</if>
+            <if test="nestCode != null">#{nestCode,jdbcType=VARCHAR},</if>
+            <if test="robotStatus != null">#{robotStatus,jdbcType=VARCHAR},</if>
+            <if test="robotType != null">#{robotType,jdbcType=INTEGER},</if>
+            <if test="droneType != null">#{droneType,jdbcType=INTEGER},</if>
+            <if test="robotIp != null">#{robotIp,jdbcType=VARCHAR},</if>
+            <if test="robotPort != null">#{robotPort,jdbcType=INTEGER},</if>
+            <if test="lightIp != null">#{lightIp,jdbcType=VARCHAR},</if>
+            <if test="lightPort != null">#{lightPort,jdbcType=VARCHAR},</if>
+            <if test="identityManager != null">#{identityManager,jdbcType=VARCHAR},</if>
+            <if test="identityCode != null">#{identityCode,jdbcType=VARCHAR},</if>
+            <if test="lnferadIp != null">#{lnferadIp,jdbcType=VARCHAR},</if>
+            <if test="inferadPort != null">#{inferadPort,jdbcType=INTEGER},</if>
+            <if test="inferadUsername != null">#{inferadUsername,jdbcType=VARCHAR},</if>
+            <if test="inferadPassword != null">#{inferadPassword,jdbcType=VARCHAR},</if>
+            <if test="photePath != null">#{photePath,jdbcType=VARCHAR},</if>
+            <if test="createBy != null">#{createBy,jdbcType=VARCHAR},</if>
+            <if test="createDate != null">#{createDate,jdbcType=TIMESTAMP},</if>
+            <if test="updateBy != null">#{updateBy,jdbcType=VARCHAR},</if>
+            <if test="updateDate != null">#{updateDate,jdbcType=TIMESTAMP},</if>
+            <if test="robotFactory != null">#{robotFactory,jdbcType=VARCHAR},</if>
+            <if test="madeIn != null">#{madeIn,jdbcType=VARCHAR},</if>
+            <if test="madeDate != null">#{madeDate,jdbcType=TIMESTAMP},</if>
+            <if test="isUse != null">#{isUse,jdbcType=VARCHAR},</if>
+            <if test="commissionDate != null">#{commissionDate,jdbcType=TIMESTAMP},</if>
+            <if test="upRegionId != null">#{upRegionId,jdbcType=BIGINT},</if>
+            <if test="robotPosition != null">#{robotPosition,jdbcType=VARCHAR},</if>
+            <if test="dronePosition != null">#{dronePosition,jdbcType=VARCHAR},</if>
+            <if test="robotSource != null">#{robotSource,jdbcType=VARCHAR},</if>
+            <if test="address != null">#{address,jdbcType=VARCHAR},</if>
+            <if test="buildingUser != null">#{buildingUser,jdbcType=VARCHAR},</if>
+            <if test="appearanceNumber != null">#{appearanceNumber,jdbcType=VARCHAR},</if>
+            <if test="defectRecord != null">#{defectRecord,jdbcType=VARCHAR},</if>
+            <if test="repairRecord != null">#{repairRecord,jdbcType=VARCHAR},</if>
+            <if test="exitPutintoRecord != null">#{exitPutintoRecord,jdbcType=VARCHAR},</if>
+            <if test="remarks != null">#{remarks,jdbcType=VARCHAR},</if>
+            <if test="recordId != null">#{recordId,jdbcType=BIGINT},</if>
+            <if test="channelNumLight != null">#{channelNumLight,jdbcType=INTEGER},</if>
+            <if test="channelNumInferad != null">#{channelNumInferad,jdbcType=INTEGER},</if>
+            <if test="lastOnlineTime != null">#{lastOnlineTime,jdbcType=BIGINT},</if>
+            <if test="duration != null">#{duration,jdbcType=BIGINT},</if>
+            <if test="offLineCount != null">#{offLineCount,jdbcType=BIGINT},</if>
+            <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+            <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accesstcp.module.device.entity.TRobotInfo">
         update t_robot_info
         <set>
-                <if test="robotCode != null">
-                    robot_code = #{robotCode,jdbcType=VARCHAR},
-                </if>
-                <if test="robotNum != null">
-                    robot_num = #{robotNum,jdbcType=INTEGER},
-                </if>
-                <if test="robotName != null">
-                    robot_name = #{robotName,jdbcType=VARCHAR},
-                </if>
-                <if test="nestName != null">
-                    nest_name = #{nestName,jdbcType=VARCHAR},
-                </if>
-                <if test="nestCode != null">
-                    nest_code = #{nestCode,jdbcType=VARCHAR},
-                </if>
-                <if test="robotStatus != null">
-                    robot_status = #{robotStatus,jdbcType=VARCHAR},
-                </if>
-                <if test="robotType != null">
-                    robot_type = #{robotType,jdbcType=INTEGER},
-                </if>
-                <if test="droneType != null">
-                    drone_type = #{droneType,jdbcType=INTEGER},
-                </if>
-                <if test="robotIp != null">
-                    robot_ip = #{robotIp,jdbcType=VARCHAR},
-                </if>
-                <if test="robotPort != null">
-                    robot_port = #{robotPort,jdbcType=INTEGER},
-                </if>
-                <if test="lightIp != null">
-                    light_ip = #{lightIp,jdbcType=VARCHAR},
-                </if>
-                <if test="lightPort != null">
-                    light_port = #{lightPort,jdbcType=VARCHAR},
-                </if>
-                <if test="identityManager != null">
-                    identity_manager = #{identityManager,jdbcType=VARCHAR},
-                </if>
-                <if test="identityCode != null">
-                    identity_code = #{identityCode,jdbcType=VARCHAR},
-                </if>
-                <if test="lnferadIp != null">
-                    lnferad_IP = #{lnferadIp,jdbcType=VARCHAR},
-                </if>
-                <if test="inferadPort != null">
-                    Inferad_Port = #{inferadPort,jdbcType=INTEGER},
-                </if>
-                <if test="inferadUsername != null">
-                    Inferad_username = #{inferadUsername,jdbcType=VARCHAR},
-                </if>
-                <if test="inferadPassword != null">
-                    Inferad_password = #{inferadPassword,jdbcType=VARCHAR},
-                </if>
-                <if test="photePath != null">
-                    phote_path = #{photePath,jdbcType=VARCHAR},
-                </if>
-                <if test="createBy != null">
-                    create_by = #{createBy,jdbcType=VARCHAR},
-                </if>
-                <if test="createDate != null">
-                    create_date = #{createDate,jdbcType=TIMESTAMP},
-                </if>
-                <if test="updateBy != null">
-                    update_by = #{updateBy,jdbcType=VARCHAR},
-                </if>
-                <if test="updateDate != null">
-                    update_date = #{updateDate,jdbcType=TIMESTAMP},
-                </if>
-                <if test="robotFactory != null">
-                    robot_factory = #{robotFactory,jdbcType=VARCHAR},
-                </if>
-                <if test="madeIn != null">
-                    made_in = #{madeIn,jdbcType=VARCHAR},
-                </if>
-                <if test="madeDate != null">
-                    made_date = #{madeDate,jdbcType=TIMESTAMP},
-                </if>
-                <if test="isUse != null">
-                    is_use = #{isUse,jdbcType=VARCHAR},
-                </if>
-                <if test="commissionDate != null">
-                    commission_date = #{commissionDate,jdbcType=TIMESTAMP},
-                </if>
-                <if test="upRegionId != null">
-                    up_region_id = #{upRegionId,jdbcType=BIGINT},
-                </if>
-                <if test="robotPosition != null">
-                    robot_position = #{robotPosition,jdbcType=VARCHAR},
-                </if>
-                <if test="dronePosition != null">
-                    drone_position = #{dronePosition,jdbcType=VARCHAR},
-                </if>
-                <if test="robotSource != null">
-                    robot_source = #{robotSource,jdbcType=VARCHAR},
-                </if>
-                <if test="address != null">
-                    address = #{address,jdbcType=VARCHAR},
-                </if>
-                <if test="buildingUser != null">
-                    building_user = #{buildingUser,jdbcType=VARCHAR},
-                </if>
-                <if test="appearanceNumber != null">
-                    appearance_number = #{appearanceNumber,jdbcType=VARCHAR},
-                </if>
-                <if test="defectRecord != null">
-                    defect_record = #{defectRecord,jdbcType=VARCHAR},
-                </if>
-                <if test="repairRecord != null">
-                    repair_record = #{repairRecord,jdbcType=VARCHAR},
-                </if>
-                <if test="exitPutintoRecord != null">
-                    exit_putInto_record = #{exitPutintoRecord,jdbcType=VARCHAR},
-                </if>
-                <if test="remarks != null">
-                    remarks = #{remarks,jdbcType=VARCHAR},
-                </if>
-                <if test="recordId != null">
-                    record_id = #{recordId,jdbcType=BIGINT},
-                </if>
-                <if test="channelNumLight != null">
-                    channel_num_light = #{channelNumLight,jdbcType=INTEGER},
-                </if>
-                <if test="channelNumInferad != null">
-                    channel_num_inferad = #{channelNumInferad,jdbcType=INTEGER},
-                </if>
-                <if test="lastOnlineTime != null">
-                    last_online_time = #{lastOnlineTime,jdbcType=BIGINT},
-                </if>
-                <if test="duration != null">
-                    duration = #{duration,jdbcType=BIGINT},
-                </if>
-                <if test="offLineCount != null">
-                    off_line_count = #{offLineCount,jdbcType=BIGINT},
-                </if>
-                <if test="edgeCode != null">
-                    edge_code = #{edgeCode,jdbcType=VARCHAR},
-                </if>
-                <if test="originId != null">
-                    origin_id = #{originId,jdbcType=VARCHAR},
-                </if>
+            <if test="robotCode != null">
+                robot_code = #{robotCode,jdbcType=VARCHAR},
+            </if>
+            <if test="robotNum != null">
+                robot_num = #{robotNum,jdbcType=INTEGER},
+            </if>
+            <if test="robotName != null">
+                robot_name = #{robotName,jdbcType=VARCHAR},
+            </if>
+            <if test="nestName != null">
+                nest_name = #{nestName,jdbcType=VARCHAR},
+            </if>
+            <if test="nestCode != null">
+                nest_code = #{nestCode,jdbcType=VARCHAR},
+            </if>
+            <if test="robotStatus != null">
+                robot_status = #{robotStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="robotType != null">
+                robot_type = #{robotType,jdbcType=INTEGER},
+            </if>
+            <if test="droneType != null">
+                drone_type = #{droneType,jdbcType=INTEGER},
+            </if>
+            <if test="robotIp != null">
+                robot_ip = #{robotIp,jdbcType=VARCHAR},
+            </if>
+            <if test="robotPort != null">
+                robot_port = #{robotPort,jdbcType=INTEGER},
+            </if>
+            <if test="lightIp != null">
+                light_ip = #{lightIp,jdbcType=VARCHAR},
+            </if>
+            <if test="lightPort != null">
+                light_port = #{lightPort,jdbcType=VARCHAR},
+            </if>
+            <if test="identityManager != null">
+                identity_manager = #{identityManager,jdbcType=VARCHAR},
+            </if>
+            <if test="identityCode != null">
+                identity_code = #{identityCode,jdbcType=VARCHAR},
+            </if>
+            <if test="lnferadIp != null">
+                lnferad_IP = #{lnferadIp,jdbcType=VARCHAR},
+            </if>
+            <if test="inferadPort != null">
+                Inferad_Port = #{inferadPort,jdbcType=INTEGER},
+            </if>
+            <if test="inferadUsername != null">
+                Inferad_username = #{inferadUsername,jdbcType=VARCHAR},
+            </if>
+            <if test="inferadPassword != null">
+                Inferad_password = #{inferadPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="photePath != null">
+                phote_path = #{photePath,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="robotFactory != null">
+                robot_factory = #{robotFactory,jdbcType=VARCHAR},
+            </if>
+            <if test="madeIn != null">
+                made_in = #{madeIn,jdbcType=VARCHAR},
+            </if>
+            <if test="madeDate != null">
+                made_date = #{madeDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isUse != null">
+                is_use = #{isUse,jdbcType=VARCHAR},
+            </if>
+            <if test="commissionDate != null">
+                commission_date = #{commissionDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="upRegionId != null">
+                up_region_id = #{upRegionId,jdbcType=BIGINT},
+            </if>
+            <if test="robotPosition != null">
+                robot_position = #{robotPosition,jdbcType=VARCHAR},
+            </if>
+            <if test="dronePosition != null">
+                drone_position = #{dronePosition,jdbcType=VARCHAR},
+            </if>
+            <if test="robotSource != null">
+                robot_source = #{robotSource,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="buildingUser != null">
+                building_user = #{buildingUser,jdbcType=VARCHAR},
+            </if>
+            <if test="appearanceNumber != null">
+                appearance_number = #{appearanceNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="defectRecord != null">
+                defect_record = #{defectRecord,jdbcType=VARCHAR},
+            </if>
+            <if test="repairRecord != null">
+                repair_record = #{repairRecord,jdbcType=VARCHAR},
+            </if>
+            <if test="exitPutintoRecord != null">
+                exit_putInto_record = #{exitPutintoRecord,jdbcType=VARCHAR},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="recordId != null">
+                record_id = #{recordId,jdbcType=BIGINT},
+            </if>
+            <if test="channelNumLight != null">
+                channel_num_light = #{channelNumLight,jdbcType=INTEGER},
+            </if>
+            <if test="channelNumInferad != null">
+                channel_num_inferad = #{channelNumInferad,jdbcType=INTEGER},
+            </if>
+            <if test="lastOnlineTime != null">
+                last_online_time = #{lastOnlineTime,jdbcType=BIGINT},
+            </if>
+            <if test="duration != null">
+                duration = #{duration,jdbcType=BIGINT},
+            </if>
+            <if test="offLineCount != null">
+                off_line_count = #{offLineCount,jdbcType=BIGINT},
+            </if>
+            <if test="edgeCode != null">
+                edge_code = #{edgeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="originId != null">
+                origin_id = #{originId,jdbcType=VARCHAR},
+            </if>
         </set>
-        where   robot_id = #{robotId,jdbcType=BIGINT} 
+        where robot_id = #{robotId,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.yjh.accesstcp.module.device.entity.TRobotInfo">
         update t_robot_info
-        set 
-            robot_code =  #{robotCode,jdbcType=VARCHAR},
-            robot_num =  #{robotNum,jdbcType=INTEGER},
-            robot_name =  #{robotName,jdbcType=VARCHAR},
-            nest_name =  #{nestName,jdbcType=VARCHAR},
-            nest_code =  #{nestCode,jdbcType=VARCHAR},
-            robot_status =  #{robotStatus,jdbcType=VARCHAR},
-            robot_type =  #{robotType,jdbcType=INTEGER},
-            drone_type =  #{droneType,jdbcType=INTEGER},
-            robot_ip =  #{robotIp,jdbcType=VARCHAR},
-            robot_port =  #{robotPort,jdbcType=INTEGER},
-            light_ip =  #{lightIp,jdbcType=VARCHAR},
-            light_port =  #{lightPort,jdbcType=VARCHAR},
-            identity_manager =  #{identityManager,jdbcType=VARCHAR},
-            identity_code =  #{identityCode,jdbcType=VARCHAR},
-            lnferad_IP =  #{lnferadIp,jdbcType=VARCHAR},
-            Inferad_Port =  #{inferadPort,jdbcType=INTEGER},
-            Inferad_username =  #{inferadUsername,jdbcType=VARCHAR},
-            Inferad_password =  #{inferadPassword,jdbcType=VARCHAR},
-            phote_path =  #{photePath,jdbcType=VARCHAR},
-            create_by =  #{createBy,jdbcType=VARCHAR},
-            create_date =  #{createDate,jdbcType=TIMESTAMP},
-            update_by =  #{updateBy,jdbcType=VARCHAR},
-            update_date =  #{updateDate,jdbcType=TIMESTAMP},
-            robot_factory =  #{robotFactory,jdbcType=VARCHAR},
-            made_in =  #{madeIn,jdbcType=VARCHAR},
-            made_date =  #{madeDate,jdbcType=TIMESTAMP},
-            is_use =  #{isUse,jdbcType=VARCHAR},
-            commission_date =  #{commissionDate,jdbcType=TIMESTAMP},
-            up_region_id =  #{upRegionId,jdbcType=BIGINT},
-            robot_position =  #{robotPosition,jdbcType=VARCHAR},
-            drone_position =  #{dronePosition,jdbcType=VARCHAR},
-            robot_source =  #{robotSource,jdbcType=VARCHAR},
-            address =  #{address,jdbcType=VARCHAR},
-            building_user =  #{buildingUser,jdbcType=VARCHAR},
-            appearance_number =  #{appearanceNumber,jdbcType=VARCHAR},
-            defect_record =  #{defectRecord,jdbcType=VARCHAR},
-            repair_record =  #{repairRecord,jdbcType=VARCHAR},
-            exit_putInto_record =  #{exitPutintoRecord,jdbcType=VARCHAR},
-            remarks =  #{remarks,jdbcType=VARCHAR},
-            record_id =  #{recordId,jdbcType=BIGINT},
-            channel_num_light =  #{channelNumLight,jdbcType=INTEGER},
-            channel_num_inferad =  #{channelNumInferad,jdbcType=INTEGER},
-            last_online_time =  #{lastOnlineTime,jdbcType=BIGINT},
-            duration =  #{duration,jdbcType=BIGINT},
-            off_line_count =  #{offLineCount,jdbcType=BIGINT},
-            edge_code =  #{edgeCode,jdbcType=VARCHAR},
-            origin_id =  #{originId,jdbcType=VARCHAR}
-        where   robot_id = #{robotId,jdbcType=BIGINT} 
+        set robot_code          = #{robotCode,jdbcType=VARCHAR},
+            robot_num           = #{robotNum,jdbcType=INTEGER},
+            robot_name          = #{robotName,jdbcType=VARCHAR},
+            nest_name           = #{nestName,jdbcType=VARCHAR},
+            nest_code           = #{nestCode,jdbcType=VARCHAR},
+            robot_status        = #{robotStatus,jdbcType=VARCHAR},
+            robot_type          = #{robotType,jdbcType=INTEGER},
+            drone_type          = #{droneType,jdbcType=INTEGER},
+            robot_ip            = #{robotIp,jdbcType=VARCHAR},
+            robot_port          = #{robotPort,jdbcType=INTEGER},
+            light_ip            = #{lightIp,jdbcType=VARCHAR},
+            light_port          = #{lightPort,jdbcType=VARCHAR},
+            identity_manager    = #{identityManager,jdbcType=VARCHAR},
+            identity_code       = #{identityCode,jdbcType=VARCHAR},
+            lnferad_IP          = #{lnferadIp,jdbcType=VARCHAR},
+            Inferad_Port        = #{inferadPort,jdbcType=INTEGER},
+            Inferad_username    = #{inferadUsername,jdbcType=VARCHAR},
+            Inferad_password    = #{inferadPassword,jdbcType=VARCHAR},
+            phote_path          = #{photePath,jdbcType=VARCHAR},
+            create_by           = #{createBy,jdbcType=VARCHAR},
+            create_date         = #{createDate,jdbcType=TIMESTAMP},
+            update_by           = #{updateBy,jdbcType=VARCHAR},
+            update_date         = #{updateDate,jdbcType=TIMESTAMP},
+            robot_factory       = #{robotFactory,jdbcType=VARCHAR},
+            made_in             = #{madeIn,jdbcType=VARCHAR},
+            made_date           = #{madeDate,jdbcType=TIMESTAMP},
+            is_use              = #{isUse,jdbcType=VARCHAR},
+            commission_date     = #{commissionDate,jdbcType=TIMESTAMP},
+            up_region_id        = #{upRegionId,jdbcType=BIGINT},
+            robot_position      = #{robotPosition,jdbcType=VARCHAR},
+            drone_position      = #{dronePosition,jdbcType=VARCHAR},
+            robot_source        = #{robotSource,jdbcType=VARCHAR},
+            address             = #{address,jdbcType=VARCHAR},
+            building_user       = #{buildingUser,jdbcType=VARCHAR},
+            appearance_number   = #{appearanceNumber,jdbcType=VARCHAR},
+            defect_record       = #{defectRecord,jdbcType=VARCHAR},
+            repair_record       = #{repairRecord,jdbcType=VARCHAR},
+            exit_putInto_record = #{exitPutintoRecord,jdbcType=VARCHAR},
+            remarks             = #{remarks,jdbcType=VARCHAR},
+            record_id           = #{recordId,jdbcType=BIGINT},
+            channel_num_light   = #{channelNumLight,jdbcType=INTEGER},
+            channel_num_inferad = #{channelNumInferad,jdbcType=INTEGER},
+            last_online_time    = #{lastOnlineTime,jdbcType=BIGINT},
+            duration            = #{duration,jdbcType=BIGINT},
+            off_line_count      = #{offLineCount,jdbcType=BIGINT},
+            edge_code           = #{edgeCode,jdbcType=VARCHAR},
+            origin_id           = #{originId,jdbcType=VARCHAR}
+        where robot_id = #{robotId,jdbcType=BIGINT}
     </update>
+
+    <select id="selectAllRobot" resultType="com.yjh.accesstcp.module.device.entity.RobotModel">
+        select a.robot_name as patroldevice_name,
+        a.robot_num as patroldevice_code,
+        b.dict_note as device_model,
+        c.dict_note as manufacturer,
+        a.building_user as use_unit,
+        a.robot_source as device_source,
+        DATE_FORMAT(a.commission_date, '%Y-%m-%d %H:%i:%s') as production_date,
+        a.appearance_number as production_code,
+        if(b.dict_code = 399, 0, 1) as istransport,
+        '' as use_mode,
+        (CASE
+        WHEN a.light_ip is null AND a.lnferad_IP is null THEN ''
+        WHEN locate('.', a.light_ip) > 0 and locate('.', a.lnferad_IP) = 0 THEN '2'
+        WHEN locate('.', a.light_ip) = 0 and locate('.', a.lnferad_IP) > 0 THEN '1'
+        WHEN locate('.', a.light_ip) AND locate('.', a.lnferad_IP) THEN '3'
+        else ''
+        end) as video_mode,
+        a.address as place,
+        (CASE WHEN a.robot_position = 155 THEN '2' WHEN a.robot_position = 156 THEN '1' WHEN a.robot_position = 399 THEN '3' end) as type,
+        a.remarks as patroldevice_info,
+        '' as robots_code,
+        '1' as edge,
+        <include refid="Base_Column_List"/>
+        from t_robot_info a
+        left join t_dict_business b on a.robot_type = b.dict_code
+        left join t_dict_business c on a.robot_factory = c.dict_code
+        where a.robot_type is not null
+    </select>
+    <select id="selectAllDrone" resultType="com.yjh.accesstcp.module.device.entity.RobotModel">
+        select a.robot_name as patroldevice_name,
+        a.robot_code as patroldevice_code,
+        a.robot_code as robot_num,
+        b.dict_note as device_model,
+        c.dict_note as manufacturer,
+        a.building_user as use_unit,
+        a.robot_source as device_source,
+        DATE_FORMAT(a.commission_date, '%Y-%m-%d %H:%i:%s') as production_date,
+        a.appearance_number as production_code,
+        if(b.dict_code = 399, 0, 1) as istransport,
+        '' as use_mode,
+        (CASE
+        WHEN a.light_ip is null AND a.lnferad_IP is null THEN ''
+        WHEN locate('.', a.light_ip) > 0 and locate('.', a.lnferad_IP) = 0 THEN '2'
+        WHEN locate('.', a.light_ip) = 0 and locate('.', a.lnferad_IP) > 0 THEN '1'
+        WHEN locate('.', a.light_ip) AND locate('.', a.lnferad_IP) THEN '3'
+        else ''
+        end) as video_mode,
+        a.address as place,
+        (CASE
+        WHEN a.drone_position = 674 THEN '13'
+        end) as type,
+        '' as patroldevice_info,
+        '' as robots_code,
+        '1' as edge,
+        <include refid="Base_Column_List"/>
+        from t_robot_info a
+        left join t_dict_business b on a.drone_type = b.dict_code
+        left join t_dict_business c on a.robot_factory = c.dict_code
+        where a.drone_type is not null
+    </select>
+
+
 </mapper>

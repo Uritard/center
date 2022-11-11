@@ -32,6 +32,6 @@ public interface TCameraInfoMapper {
 
     int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
 
-    int insertBatch(Collection<TCameraInfo> tCameraInfoList);
+    int insertBatch(@Param("tCameraInfoList")Collection<TCameraInfo> tCameraInfoList);
 
 }
