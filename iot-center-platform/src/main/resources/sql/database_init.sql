@@ -1,25 +1,24 @@
 /*
-SQLyog  v12.2.6 (64 bit)
-MySQL - 5.7.15 : Database - intelligenceelec
-*********************************************************************
+Navicat MySQL Data Transfer
+
+Source Server         : 192.168.1.66
+Source Server Version : 50728
+Source Host           : 192.168.1.66:3306
+Source Database       : intelligenceelec
+
+Target Server Type    : MYSQL
+Target Server Version : 50728
+File Encoding         : 65001
+
+Date: 2022-10-19 17:29:46
 */
 
-/*!40101 SET NAMES utf8 */;
+SET FOREIGN_KEY_CHECKS=0;
 
-/*!40101 SET SQL_MODE=''*/;
-
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`intelligenceelec` /*!40100 DEFAULT CHARACTER SET utf8 */;
-
-USE `intelligenceelec`;
-
-/*Table structure for table `qrtz_blob_triggers` */
-
+-- ----------------------------
+-- Table structure for qrtz_blob_triggers
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_blob_triggers`;
-
 CREATE TABLE `qrtz_blob_triggers` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `TRIGGER_NAME` varchar(200) NOT NULL,
@@ -29,10 +28,14 @@ CREATE TABLE `qrtz_blob_triggers` (
   CONSTRAINT `qrtz_blob_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `qrtz_calendars` */
+-- ----------------------------
+-- Records of qrtz_blob_triggers
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for qrtz_calendars
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_calendars`;
-
 CREATE TABLE `qrtz_calendars` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `CALENDAR_NAME` varchar(200) NOT NULL,
@@ -40,10 +43,14 @@ CREATE TABLE `qrtz_calendars` (
   PRIMARY KEY (`SCHED_NAME`,`CALENDAR_NAME`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `qrtz_cron_triggers` */
+-- ----------------------------
+-- Records of qrtz_calendars
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for qrtz_cron_triggers
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_cron_triggers`;
-
 CREATE TABLE `qrtz_cron_triggers` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `TRIGGER_NAME` varchar(200) NOT NULL,
@@ -54,10 +61,14 @@ CREATE TABLE `qrtz_cron_triggers` (
   CONSTRAINT `qrtz_cron_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `qrtz_fired_triggers` */
+-- ----------------------------
+-- Records of qrtz_cron_triggers
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for qrtz_fired_triggers
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_fired_triggers`;
-
 CREATE TABLE `qrtz_fired_triggers` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `ENTRY_ID` varchar(95) NOT NULL,
@@ -75,10 +86,14 @@ CREATE TABLE `qrtz_fired_triggers` (
   PRIMARY KEY (`SCHED_NAME`,`ENTRY_ID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `qrtz_job_details` */
+-- ----------------------------
+-- Records of qrtz_fired_triggers
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for qrtz_job_details
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_job_details`;
-
 CREATE TABLE `qrtz_job_details` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `JOB_NAME` varchar(200) NOT NULL,
@@ -93,30 +108,38 @@ CREATE TABLE `qrtz_job_details` (
   PRIMARY KEY (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `qrtz_locks` */
+-- ----------------------------
+-- Records of qrtz_job_details
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for qrtz_locks
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_locks`;
-
 CREATE TABLE `qrtz_locks` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `LOCK_NAME` varchar(40) NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`LOCK_NAME`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `qrtz_paused_trigger_grps` */
-
+-- ----------------------------
+-- Table structure for qrtz_paused_trigger_grps
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_paused_trigger_grps`;
-
 CREATE TABLE `qrtz_paused_trigger_grps` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `TRIGGER_GROUP` varchar(200) NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_GROUP`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `qrtz_scheduler_state` */
+-- ----------------------------
+-- Records of qrtz_paused_trigger_grps
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for qrtz_scheduler_state
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_scheduler_state`;
-
 CREATE TABLE `qrtz_scheduler_state` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `INSTANCE_NAME` varchar(200) NOT NULL,
@@ -125,10 +148,10 @@ CREATE TABLE `qrtz_scheduler_state` (
   PRIMARY KEY (`SCHED_NAME`,`INSTANCE_NAME`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `qrtz_simple_triggers` */
-
+-- ----------------------------
+-- Table structure for qrtz_simple_triggers
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_simple_triggers`;
-
 CREATE TABLE `qrtz_simple_triggers` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `TRIGGER_NAME` varchar(200) NOT NULL,
@@ -140,10 +163,14 @@ CREATE TABLE `qrtz_simple_triggers` (
   CONSTRAINT `qrtz_simple_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `qrtz_simprop_triggers` */
+-- ----------------------------
+-- Records of qrtz_simple_triggers
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for qrtz_simprop_triggers
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_simprop_triggers`;
-
 CREATE TABLE `qrtz_simprop_triggers` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `TRIGGER_NAME` varchar(200) NOT NULL,
@@ -163,10 +190,14 @@ CREATE TABLE `qrtz_simprop_triggers` (
   CONSTRAINT `qrtz_simprop_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `qrtz_triggers` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `qrtz_triggers` */
+-- ----------------------------
+-- Records of qrtz_simprop_triggers
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for qrtz_triggers
+-- ----------------------------
 DROP TABLE IF EXISTS `qrtz_triggers`;
-
 CREATE TABLE `qrtz_triggers` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `TRIGGER_NAME` varchar(200) NOT NULL,
@@ -189,10 +220,14 @@ CREATE TABLE `qrtz_triggers` (
   CONSTRAINT `qrtz_triggers_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`) REFERENCES `qrtz_job_details` (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `sys_info_backup` */
+-- ----------------------------
+-- Records of qrtz_triggers
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for sys_info_backup
+-- ----------------------------
 DROP TABLE IF EXISTS `sys_info_backup`;
-
 CREATE TABLE `sys_info_backup` (
   `user_id` bigint(20) NOT NULL COMMENT '用户id',
   `user_name` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '用户名',
@@ -225,22 +260,21 @@ CREATE TABLE `sys_info_backup` (
 -- ----------------------------
 -- Table structure for sys_key
 -- ----------------------------
-drop table if exists `sys_key`;
+DROP TABLE IF EXISTS `sys_key`;
 CREATE TABLE `sys_key` (
   `key_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id',
   `user_id` bigint(20) NOT NULL COMMENT '用户id',
   `bind_type` int(11) NOT NULL COMMENT '绑定类型，1-Ukey 2-ip',
-  `pub_key` varchar(1024) DEFAULT '' COMMENT '公钥',
-  `serial_num` varchar(128) DEFAULT '' COMMENT '序列号',
+  `pub_key` varchar(512) DEFAULT '' COMMENT '公钥',
+  `serial_num` varchar(32) DEFAULT '' COMMENT '序列号',
   `remark` varchar(32) DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`key_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='用户绑定关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='用户绑定关联表';
 
 -- ----------------------------
 -- Table structure for sys_logs
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_logs`;
-
 CREATE TABLE `sys_logs` (
   `log_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `log_type` varchar(50) DEFAULT '' COMMENT '操作类型(0-保存、1-查询、2-新增、3-修改、4-删除、5-确认、6-登录、7-登出、8-导入、9-导出、10-任务下发、11-任务暂停、12-任务恢复、13-任务终止、14-全部)',
@@ -255,12 +289,16 @@ CREATE TABLE `sys_logs` (
   `request_method` varchar(10) DEFAULT '' COMMENT '请求方式(1-GET;2-HEAD;3-POST;4-PUT;5-DELETE;6-CONNECT;7-OPTIONS;8-TRACE;9-PATCH)',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`log_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='审计日志表';
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='审计日志表';
 
-/*Table structure for table `sys_menu` */
+-- ----------------------------
+-- Records of sys_logs
+-- ----------------------------
 
+-- ----------------------------
+-- Table structure for sys_menu
+-- ----------------------------
 DROP TABLE IF EXISTS `sys_menu`;
-
 CREATE TABLE `sys_menu` (
   `menu_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `menu_name` varchar(20) DEFAULT '' COMMENT '菜单名称',
@@ -277,14 +315,15 @@ CREATE TABLE `sys_menu` (
   `url` varchar(225) DEFAULT '' COMMENT '连接地址',
   `creator_id` bigint(20) DEFAULT '1' COMMENT '创建人',
   `sys_state` int(1) DEFAULT '1' COMMENT '系统状态（0系统，1 非系统）',
+  `role_id`  bigint(20) NULL COMMENT '默认所属权限组',
   PRIMARY KEY (`menu_id`) USING BTREE,
   UNIQUE KEY `idx_sys_menu_code` (`menu_code`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='菜单表';
+) ENGINE=InnoDB AUTO_INCREMENT=4003 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='菜单表';
 
-/*Table structure for table `sys_org` */
-
+-- ----------------------------
+-- Table structure for sys_org
+-- ----------------------------
 DROP TABLE IF EXISTS `sys_org`;
-
 CREATE TABLE `sys_org` (
   `org_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '组织ID',
   `org_name` varchar(50) DEFAULT '' COMMENT '组织名称',
@@ -298,12 +337,12 @@ CREATE TABLE `sys_org` (
   `dept_name` varchar(64) DEFAULT '' COMMENT '部门名称',
   PRIMARY KEY (`org_id`) USING BTREE,
   UNIQUE KEY `idx_org_code` (`org_code`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=500001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='组织机构表';
+) ENGINE=InnoDB AUTO_INCREMENT=500002 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='组织机构表';
 
-/*Table structure for table `sys_role` */
-
+-- ----------------------------
+-- Table structure for sys_role
+-- ----------------------------
 DROP TABLE IF EXISTS `sys_role`;
-
 CREATE TABLE `sys_role` (
   `role_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `role_name` varchar(20) DEFAULT '' COMMENT '角色名称',
@@ -312,12 +351,12 @@ CREATE TABLE `sys_role` (
   `sys_state` int(1) DEFAULT '0' COMMENT '1系统权限，0非系统权限',
   PRIMARY KEY (`role_id`) USING BTREE,
   UNIQUE KEY `idx_sys_role_name` (`role_name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='角色表';
+) ENGINE=InnoDB AUTO_INCREMENT=1237 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='角色表';
 
-/*Table structure for table `sys_role_camera` */
-
+-- ----------------------------
+-- Table structure for sys_role_camera
+-- ----------------------------
 DROP TABLE IF EXISTS `sys_role_camera`;
-
 CREATE TABLE `sys_role_camera` (
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
   `camera_id` bigint(20) NOT NULL COMMENT '摄像机ID',
@@ -325,10 +364,10 @@ CREATE TABLE `sys_role_camera` (
   PRIMARY KEY (`role_id`,`camera_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='角色和摄像机关联表';
 
-/*Table structure for table `sys_role_device` */
-
+-- ----------------------------
+-- Table structure for sys_role_device
+-- ----------------------------
 DROP TABLE IF EXISTS `sys_role_device`;
-
 CREATE TABLE `sys_role_device` (
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
   `device_id` bigint(32) NOT NULL COMMENT '设备ID',
@@ -336,10 +375,10 @@ CREATE TABLE `sys_role_device` (
   PRIMARY KEY (`role_id`,`device_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='角色和设备关联表';
 
-/*Table structure for table `sys_role_menu` */
-
+-- ----------------------------
+-- Table structure for sys_role_menu
+-- ----------------------------
 DROP TABLE IF EXISTS `sys_role_menu`;
-
 CREATE TABLE `sys_role_menu` (
   `rp_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
   `menu_code` varchar(20) NOT NULL COMMENT '菜单编码',
@@ -347,12 +386,23 @@ CREATE TABLE `sys_role_menu` (
   `element_code` varchar(255) DEFAULT '' COMMENT '元素编码列表',
   `role_id` bigint(20) DEFAULT '1' COMMENT '角色id',
   PRIMARY KEY (`rp_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=210001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='角色菜单表';
+) ENGINE=InnoDB AUTO_INCREMENT=210153 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='角色菜单表';
 
-/*Table structure for table `sys_role_region` */
+-- ----------------------------
+-- Table structure for sys_role_monitor_device
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_role_monitor_device`;
+CREATE TABLE `sys_role_monitor_device` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `role_id` bigint(20) NOT NULL COMMENT '角色Id',
+  `monitor_device_id` bigint(20) NOT NULL COMMENT '监视设备ID',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='角色-监视设备关系表';
 
+-- ----------------------------
+-- Table structure for sys_role_region
+-- ----------------------------
 DROP TABLE IF EXISTS `sys_role_region`;
-
 CREATE TABLE `sys_role_region` (
   `role_id` bigint(20) NOT NULL COMMENT '角色ID',
   `region_id` bigint(32) NOT NULL COMMENT '机器人ID',
@@ -360,10 +410,10 @@ CREATE TABLE `sys_role_region` (
   PRIMARY KEY (`role_id`,`region_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='权限区域表';
 
-/*Table structure for table `sys_route` */
-
+-- ----------------------------
+-- Table structure for sys_route
+-- ----------------------------
 DROP TABLE IF EXISTS `sys_route`;
-
 CREATE TABLE `sys_route` (
   `route_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `service_id` varchar(50) DEFAULT '' COMMENT '服务id',
@@ -376,12 +426,22 @@ CREATE TABLE `sys_route` (
   `remark` varchar(500) DEFAULT '',
   PRIMARY KEY (`route_id`),
   UNIQUE KEY `idx_sys_route` (`path`)
-) ENGINE=InnoDB AUTO_INCREMENT=19001 DEFAULT CHARSET=utf8 COMMENT='路由表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='路由表';
 
-/*Table structure for table `sys_user` */
+-- ----------------------------
+-- Table structure for sys_unique_user
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_unique_user`;
+CREATE TABLE `sys_unique_user` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id',
+  `unique_user` varchar(128) DEFAULT '' COMMENT '用户名SM3码',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='唯一用户名表';
 
+-- ----------------------------
+-- Table structure for sys_user
+-- ----------------------------
 DROP TABLE IF EXISTS `sys_user`;
-
 CREATE TABLE `sys_user` (
   `user_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户id',
   `user_name` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '用户名',
@@ -409,12 +469,27 @@ CREATE TABLE `sys_user` (
   `last_login` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '最后登录时间',
   PRIMARY KEY (`user_id`) USING BTREE,
   UNIQUE KEY `idx_username` (`user_name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统用户表';
+) ENGINE=InnoDB AUTO_INCREMENT=10004 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统用户表';
 
-/*Table structure for table `t_algorithm_conf` */
+-- ----------------------------
+-- Table structure for three_dimensional_relevancy
+-- ----------------------------
+DROP TABLE IF EXISTS `three_dimensional_relevancy`;
+CREATE TABLE `three_dimensional_relevancy` (
+  `id` bigint(32) NOT NULL COMMENT '台账Id',
+  `name` varchar(64) DEFAULT '' COMMENT '台账名称',
+  `model_name` varchar(64) DEFAULT '' COMMENT '模型名称',
+  `category` int(11) DEFAULT '0' COMMENT '0-辅助设备，1-一次设备，2-二次设备',
+  `is_camera` int(11) DEFAULT '0' COMMENT '0-不是，1-是',
+  `type` varchar(64) DEFAULT NULL,
+  `device_type` int(11) DEFAULT '0' COMMENT '设备类型',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- ----------------------------
+-- Table structure for t_algorithm_conf
+-- ----------------------------
 DROP TABLE IF EXISTS `t_algorithm_conf`;
-
 CREATE TABLE `t_algorithm_conf` (
   `preset_id` bigint(68) NOT NULL COMMENT '摄像头预置位ID或者机器人巡检点ID',
   `algorithm_id` bigint(32) NOT NULL,
@@ -429,10 +504,10 @@ CREATE TABLE `t_algorithm_conf` (
   PRIMARY KEY (`preset_id`,`algorithm_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='算法配置表';
 
-/*Table structure for table `t_algorithm_info` */
-
+-- ----------------------------
+-- Table structure for t_algorithm_info
+-- ----------------------------
 DROP TABLE IF EXISTS `t_algorithm_info`;
-
 CREATE TABLE `t_algorithm_info` (
   `algorithm_id` bigint(32) NOT NULL AUTO_INCREMENT,
   `algorithm_name` varchar(64) DEFAULT '',
@@ -445,12 +520,12 @@ CREATE TABLE `t_algorithm_info` (
   `defect_level` int(11) DEFAULT '1' COMMENT '缺陷等级',
   PRIMARY KEY (`algorithm_id`) USING BTREE,
   UNIQUE KEY `idx_algorithm_name` (`algorithm_name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='算法表';
+) ENGINE=InnoDB AUTO_INCREMENT=1000058 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='算法表';
 
-/*Table structure for table `t_algorithm_mete` */
-
+-- ----------------------------
+-- Table structure for t_algorithm_mete
+-- ----------------------------
 DROP TABLE IF EXISTS `t_algorithm_mete`;
-
 CREATE TABLE `t_algorithm_mete` (
   `device_mete_id` bigint(68) NOT NULL COMMENT '设备标准测点ID',
   `algorithm_id` bigint(32) NOT NULL,
@@ -465,10 +540,10 @@ CREATE TABLE `t_algorithm_mete` (
   PRIMARY KEY (`device_mete_id`,`algorithm_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='算法测点配置表';
 
-/*Table structure for table `t_camera_alarm` */
-
+-- ----------------------------
+-- Table structure for t_camera_alarm
+-- ----------------------------
 DROP TABLE IF EXISTS `t_camera_alarm`;
-
 CREATE TABLE `t_camera_alarm` (
   `camera_alarm_id` bigint(48) NOT NULL AUTO_INCREMENT COMMENT '可视设备本体告警告警ID',
   `alarm_name` varchar(125) DEFAULT '' COMMENT '可视设备本体告警名称',
@@ -487,26 +562,28 @@ CREATE TABLE `t_camera_alarm` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `end_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`camera_alarm_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=10001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='可视设备本体告警表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='可视设备本体告警表';
 
-/*Table structure for table `t_camera_group` */
-
+-- ----------------------------
+-- Table structure for t_camera_group
+-- ----------------------------
 DROP TABLE IF EXISTS `t_camera_group`;
-
 CREATE TABLE `t_camera_group` (
   `group_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '分组ID',
   `group_name` varchar(128) DEFAULT '' COMMENT '分组名称',
   `camera_ids` text COMMENT '相机ID',
   `remarks` varchar(200) DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`group_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=50001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='相机分组表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='相机分组表';
 
-/*Table structure for table `t_camera_info` */
-
+-- ----------------------------
+-- Table structure for t_camera_info
+-- ----------------------------
 DROP TABLE IF EXISTS `t_camera_info`;
-
 CREATE TABLE `t_camera_info` (
   `camera_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   `camera_name` varchar(128) DEFAULT '' COMMENT '摄像机名称',
   `camera_model` int(11) DEFAULT '1' COMMENT '摄像机型号',
   `pms_id` varchar(32) DEFAULT '' COMMENT 'PMS ID',
@@ -534,20 +611,22 @@ CREATE TABLE `t_camera_info` (
   `address` varchar(32) DEFAULT '',
   `unit` varchar(255) DEFAULT '' COMMENT '单位',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`camera_id`) USING BTREE
+  `commission_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '投运日期',
+  PRIMARY KEY (`camera_id`) USING BTREE,
+  KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=40001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='摄像头信息表';
 
-/*Table structure for table `t_camera_preset` */
-
+-- ----------------------------
+-- Table structure for t_camera_preset
+-- ----------------------------
 DROP TABLE IF EXISTS `t_camera_preset`;
-
 CREATE TABLE `t_camera_preset` (
   `preset_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '预置位id',
   `camera_id` bigint(20) DEFAULT '1' COMMENT '摄像头id',
   `preset_num` int(11) DEFAULT '1' COMMENT '预置位号',
   `preset_name` varchar(128) DEFAULT '' COMMENT '预置位名称',
-  `is_keep_watch`  int(1) DEFAULT '0' COMMENT '是否守望位置。0-不是，1-是',
-  `is_keep_watch_task`  int(1) DEFAULT '0' COMMENT '是否静默任务。0-不是，1-是',
+  `is_keep_watch` int(1) DEFAULT '0' COMMENT '是否守望位置。0-不是，1-是',
+  `is_keep_watch_task` int(1) DEFAULT '0' COMMENT '是否静默任务。0-不是，1-是',
   `creator_user` varchar(64) DEFAULT '',
   `creator_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `is_use` int(11) DEFAULT '1' COMMENT '是否使用',
@@ -558,14 +637,16 @@ CREATE TABLE `t_camera_preset` (
   `remark` varchar(255) DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`preset_id`) USING BTREE,
   UNIQUE KEY `idx_camera_num` (`camera_id`,`preset_num`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=21000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='摄像机预位置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='摄像机预位置表';
 
-/*Table structure for table `t_camera_recorder` */
-
+-- ----------------------------
+-- Table structure for t_camera_recorder
+-- ----------------------------
 DROP TABLE IF EXISTS `t_camera_recorder`;
-
 CREATE TABLE `t_camera_recorder` (
   `record_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '录像机ID',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始录像机ID',
   `record_name` varchar(128) DEFAULT '' COMMENT '服务器名称',
   `recorder_model` int(11) DEFAULT '1' COMMENT '录像机型号',
   `recorder_type` varchar(32) DEFAULT '' COMMENT '录像机类型',
@@ -585,13 +666,14 @@ CREATE TABLE `t_camera_recorder` (
   `buffer_day` int(11) DEFAULT '1' COMMENT '缓存天数',
   `time_long` int(32) DEFAULT '1' COMMENT '录制文件时长 单位秒',
   `unit` varchar(255) DEFAULT '' COMMENT '单位',
-  PRIMARY KEY (`record_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='录像服务器表';
+  PRIMARY KEY (`record_id`) USING BTREE,
+  KEY `edge_code` (`edge_code`,`origin_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='录像服务器表';
 
-/*Table structure for table `t_camera_screen` */
-
+-- ----------------------------
+-- Table structure for t_camera_screen
+-- ----------------------------
 DROP TABLE IF EXISTS `t_camera_screen`;
-
 CREATE TABLE `t_camera_screen` (
   `user_id` bigint(20) NOT NULL,
   `screen_num` varchar(50) DEFAULT '',
@@ -600,10 +682,10 @@ CREATE TABLE `t_camera_screen` (
   PRIMARY KEY (`user_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='分屏配置表';
 
-/*Table structure for table `t_cfg_alarm_current` */
-
+-- ----------------------------
+-- Table structure for t_cfg_alarm_current
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cfg_alarm_current`;
-
 CREATE TABLE `t_cfg_alarm_current` (
   `alarm_no` bigint(62) NOT NULL AUTO_INCREMENT COMMENT '告警流水号',
   `device_id` bigint(32) DEFAULT '1' COMMENT '设备编号',
@@ -624,12 +706,12 @@ CREATE TABLE `t_cfg_alarm_current` (
   `show_type` varchar(20) DEFAULT '' COMMENT '显示类型',
   `update_time` datetime NOT NULL COMMENT '告警插入时间',
   PRIMARY KEY (`alarm_no`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=91000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='活动告警表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='活动告警表';
 
-/*Table structure for table `t_cfg_alarm_history` */
-
+-- ----------------------------
+-- Table structure for t_cfg_alarm_history
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cfg_alarm_history`;
-
 CREATE TABLE `t_cfg_alarm_history` (
   `alarm_no` bigint(62) NOT NULL COMMENT '告警流水号current表获取',
   `device_id` bigint(32) DEFAULT '1' COMMENT '设备编号',
@@ -655,10 +737,10 @@ CREATE TABLE `t_cfg_alarm_history` (
   PRIMARY KEY (`alarm_no`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='历史告警表';
 
-/*Table structure for table `t_cfg_data_current` */
-
+-- ----------------------------
+-- Table structure for t_cfg_data_current
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cfg_data_current`;
-
 CREATE TABLE `t_cfg_data_current` (
   `mete_id` bigint(48) NOT NULL COMMENT '监控量编号',
   `device_id` bigint(32) NOT NULL COMMENT '设备编号',
@@ -672,10 +754,10 @@ CREATE TABLE `t_cfg_data_current` (
   PRIMARY KEY (`mete_id`,`device_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='实时数据表';
 
-/*Table structure for table `t_cfg_device` */
-
+-- ----------------------------
+-- Table structure for t_cfg_device
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cfg_device`;
-
 CREATE TABLE `t_cfg_device` (
   `device_id` varchar(20) NOT NULL COMMENT '设备编号',
   `device_name` varchar(128) NOT NULL COMMENT '设备名称',
@@ -690,10 +772,10 @@ CREATE TABLE `t_cfg_device` (
   KEY `index_device_type` (`device_type`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='设备表';
 
-/*Table structure for table `t_cfg_mete` */
-
+-- ----------------------------
+-- Table structure for t_cfg_mete
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cfg_mete`;
-
 CREATE TABLE `t_cfg_mete` (
   `mete_id` varchar(20) NOT NULL COMMENT '监控量编码',
   `mete_type` varchar(20) DEFAULT '' COMMENT '测点标准化编码',
@@ -713,48 +795,48 @@ CREATE TABLE `t_cfg_mete` (
   `alarmthresbhold` int(11) DEFAULT '1',
   `describer` varchar(64) DEFAULT '',
   `mete_precision` int(11) DEFAULT '1',
-  `change_limit` float DEFAULT '1',
-  `hilimit1` float DEFAULT '1',
-  `lolimit1` float DEFAULT '1',
-  `hilimit2` float DEFAULT '1',
-  `lolimit2` float DEFAULT '1',
-  `hilimit3` float DEFAULT '1',
-  `lolimit3` float DEFAULT '1',
-  `hilimit4` float DEFAULT '1',
-  `stander` float DEFAULT '1',
+  `change_limit` float(7,3) DEFAULT '1',
+  `hilimit1` float(7,3) DEFAULT '1',
+  `lolimit1` float(7,3) DEFAULT '1',
+  `hilimit2` float(7,3) DEFAULT '1',
+  `lolimit2` float(7,3) DEFAULT '1',
+  `hilimit3` float(7,3) DEFAULT '1',
+  `lolimit3` float(7,3) DEFAULT '1',
+  `hilimit4` float(7,3) DEFAULT '1',
+  `stander` float(7,3) DEFAULT '1',
   `controlenable` int(11) DEFAULT '1',
   PRIMARY KEY (`mete_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统测点信息表';
 
-/*Table structure for table `t_cfg_teleadjust` */
-
+-- ----------------------------
+-- Table structure for t_cfg_teleadjust
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cfg_teleadjust`;
-
 CREATE TABLE `t_cfg_teleadjust` (
   `device_id` varchar(20) NOT NULL COMMENT '设备编号',
   `mete_id` varchar(20) NOT NULL COMMENT '监控量编号',
   `mete_name` varchar(256) DEFAULT '' COMMENT '监控量名称',
-  `up_effect` float DEFAULT '1' COMMENT '有效上限',
-  `down_effect` float DEFAULT '1' COMMENT '有效下限',
+  `up_effect` float(7,3) DEFAULT '1' COMMENT '有效上限',
+  `down_effect` float(7,3) DEFAULT '1' COMMENT '有效下限',
   `mete_precision` int(11) DEFAULT '1' COMMENT '小数点后的有效位数',
   `unit` varchar(16) DEFAULT '' COMMENT '单位',
   `mete_index` int(11) DEFAULT '1' COMMENT '同一设备下的监控量序号',
   `mete_cid` int(11) DEFAULT '1' COMMENT 'CID',
   `adjust_kind` int(11) DEFAULT '1' COMMENT '遥调量类型',
-  `last_value` float DEFAULT '1' COMMENT '当前值',
+  `last_value` float(7,3) DEFAULT '1' COMMENT '当前值',
   `last_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
   `mete_code` varchar(20) DEFAULT '' COMMENT '信号标准化编码',
   `device_type` varchar(20) DEFAULT '' COMMENT '设备类型',
   `description` varchar(512) DEFAULT '' COMMENT '监控量描述',
-  `stander` float DEFAULT '1' COMMENT '标称值',
+  `stander` float(7,3) DEFAULT '1' COMMENT '标称值',
   `controlenable` int(11) DEFAULT '1' COMMENT '是否可控',
   PRIMARY KEY (`device_id`,`mete_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='遥调量表';
 
-/*Table structure for table `t_cfg_telecontrol` */
-
+-- ----------------------------
+-- Table structure for t_cfg_telecontrol
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cfg_telecontrol`;
-
 CREATE TABLE `t_cfg_telecontrol` (
   `device_id` varchar(20) NOT NULL COMMENT '设备编号',
   `mete_id` varchar(20) NOT NULL COMMENT '监控量编号',
@@ -773,49 +855,49 @@ CREATE TABLE `t_cfg_telecontrol` (
   PRIMARY KEY (`device_id`,`mete_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='遥控量表';
 
-/*Table structure for table `t_cfg_telemeter` */
-
+-- ----------------------------
+-- Table structure for t_cfg_telemeter
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cfg_telemeter`;
-
 CREATE TABLE `t_cfg_telemeter` (
   `device_id` varchar(20) NOT NULL COMMENT '设备编号',
   `mete_id` varchar(20) NOT NULL COMMENT '监控量编号',
   `mete_name` varchar(256) DEFAULT '' COMMENT '监控量名称',
-  `up_effect` float DEFAULT '1' COMMENT '有效上限',
-  `down_effect` float DEFAULT '1' COMMENT '有效下限',
+  `up_effect` float(7,3) DEFAULT '1' COMMENT '有效上限',
+  `down_effect` float(7,3) DEFAULT '1' COMMENT '有效下限',
   `mete_precision` int(11) DEFAULT '1' COMMENT '小数点后的有效位数',
   `unit` varchar(16) DEFAULT '' COMMENT '单位',
   `mete_index` int(11) DEFAULT '1' COMMENT '同一设备下的监控量序号',
   `mete_cid` int(11) DEFAULT '1' COMMENT 'CID',
-  `limit_band` float DEFAULT '1' COMMENT '上下限带宽',
-  `change_limit` float DEFAULT '1' COMMENT '变化幅度门限',
+  `limit_band` float(7,3) DEFAULT '1' COMMENT '上下限带宽',
+  `change_limit` float(7,3) DEFAULT '1' COMMENT '变化幅度门限',
   `valid_mid` varchar(256) DEFAULT '' COMMENT '有效性表达式变量串',
   `valid_string` varchar(256) DEFAULT '' COMMENT '有效性判断表达式',
-  `invalid_value` float DEFAULT '1' COMMENT '无效时的值',
-  `last_value` float DEFAULT '1' COMMENT '当前值',
+  `invalid_value` float(7,3) DEFAULT '1' COMMENT '无效时的值',
+  `last_value` float(7,3) DEFAULT '1' COMMENT '当前值',
   `last_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '当前值更新时间',
   `mete_code` varchar(20) DEFAULT '' COMMENT '信号标准化编码',
   `device_type` varchar(20) DEFAULT '' COMMENT '设备类型',
   `description` varchar(512) DEFAULT '' COMMENT '监控量描述',
-  `hilimit1` float DEFAULT '1' COMMENT '一级告警上限',
-  `lolimit1` float DEFAULT '1' COMMENT '一级告警下限',
-  `hilimit2` float DEFAULT '1' COMMENT '二级告警上限',
-  `lolimit2` float DEFAULT '1' COMMENT '二级告警下限',
-  `hilimit3` float DEFAULT '1' COMMENT '三级告警上限',
-  `lolimit3` float DEFAULT '1' COMMENT '三级告警下限',
-  `hilimit4` float DEFAULT '1' COMMENT '四级告警上限',
-  `lolimit4` float DEFAULT '1' COMMENT '四级告警下限',
-  `stander` float DEFAULT '1' COMMENT '标称值',
+  `hilimit1` float(7,3) DEFAULT '1' COMMENT '一级告警上限',
+  `lolimit1` float(7,3) DEFAULT '1' COMMENT '一级告警下限',
+  `hilimit2` float(7,3) DEFAULT '1' COMMENT '二级告警上限',
+  `lolimit2` float(7,3) DEFAULT '1' COMMENT '二级告警下限',
+  `hilimit3` float(7,3) DEFAULT '1' COMMENT '三级告警上限',
+  `lolimit3` float(7,3) DEFAULT '1' COMMENT '三级告警下限',
+  `hilimit4` float(7,3) DEFAULT '1' COMMENT '四级告警上限',
+  `lolimit4` float(7,3) DEFAULT '1' COMMENT '四级告警下限',
+  `stander` float(7,3) DEFAULT '1' COMMENT '标称值',
   `isshield` int(11) DEFAULT '1' COMMENT '是否屏蔽',
   `storageperiod` bigint(20) DEFAULT '1' COMMENT '存储周期',
   `link_mete_id` varchar(512) DEFAULT '' COMMENT '关联的遥信量',
   PRIMARY KEY (`device_id`,`mete_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='遥测量表';
 
-/*Table structure for table `t_cfg_telesignal` */
-
+-- ----------------------------
+-- Table structure for t_cfg_telesignal
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cfg_telesignal`;
-
 CREATE TABLE `t_cfg_telesignal` (
   `device_id` varchar(20) NOT NULL COMMENT '设备编号',
   `mete_id` varchar(20) NOT NULL COMMENT '监控量编号',
@@ -847,10 +929,10 @@ CREATE TABLE `t_cfg_telesignal` (
   PRIMARY KEY (`device_id`,`mete_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='遥信量表';
 
-/*Table structure for table `t_cfg_union_rule` */
-
+-- ----------------------------
+-- Table structure for t_cfg_union_rule
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cfg_union_rule`;
-
 CREATE TABLE `t_cfg_union_rule` (
   `rule_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '规则编号',
   `plan_id` bigint(32) NOT NULL COMMENT '预案id',
@@ -866,12 +948,12 @@ CREATE TABLE `t_cfg_union_rule` (
   `preset_id` bigint(32) DEFAULT '1' COMMENT '联动监控全景摄像机对应预置位Id',
   PRIMARY KEY (`rule_id`) USING BTREE,
   UNIQUE KEY `rule_name` (`rule_name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='联动规则表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='联动规则表';
 
-/*Table structure for table `t_cruise_data_result` */
-
+-- ----------------------------
+-- Table structure for t_cruise_data_result
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_data_result`;
-
 CREATE TABLE `t_cruise_data_result` (
   `cruise_data_id` bigint(68) NOT NULL AUTO_INCREMENT COMMENT '巡视点数据id',
   `cruise_result_id` varchar(82) DEFAULT '' COMMENT '巡视任务结果id',
@@ -882,9 +964,11 @@ CREATE TABLE `t_cruise_data_result` (
   `result_num` varchar(512) DEFAULT '' COMMENT '巡检结果数值',
   `modify_num` varchar(100) DEFAULT '' COMMENT '机器人巡检图片分析值',
   `picpath` varchar(256) DEFAULT '' COMMENT '巡检分析图片',
+  `confirm_pic_path` varchar(255) DEFAULT '' COMMENT '操作前结果图片,相对',
   `pic_path_anl` varchar(255) DEFAULT '' COMMENT '机器人巡检图片,相对',
   `person_check` varchar(512) DEFAULT '' COMMENT '人工校核结果',
   `origpic` varchar(256) DEFAULT '' COMMENT '算法原始图片/红外可见光',
+  `orig_confirm_pic_path` varchar(255) DEFAULT '' COMMENT '操作前结果图片,绝对',
   `orig_pic_anl` varchar(255) DEFAULT '' COMMENT '机器人巡检图片,绝对',
   `cruise_abnormal` int(11) DEFAULT '1' COMMENT '巡视异常原因 -抓图失败、数据异常、异常告警、算法超时',
   `evaluation_state` int(11) DEFAULT '1' COMMENT '审核状态1-审核0-未审核',
@@ -900,30 +984,79 @@ CREATE TABLE `t_cruise_data_result` (
   `fir_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '红外FIR文件生成时间',
   `result_pic` varchar(255) DEFAULT '' COMMENT 'FIR文件存储路径',
   `points` varchar(125) DEFAULT '' COMMENT '图片坐标点',
-  `voice_path` varchar(512) DEFAULT null COMMENT '声纹文件地址',
+  `voice_path` varchar(512) DEFAULT NULL COMMENT '声纹文件地址',
   PRIMARY KEY (`cruise_data_id`) USING BTREE,
   KEY `cruiseid` (`cruise_data_id`) USING BTREE,
   KEY `cid` (`cruise_result_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1001000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点数据表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点数据表';
 
-/*Table structure for table `t_cruise_plan` */
+-- ----------------------------
+-- Table structure for t_cruise_nonhomologous_point_instance
+-- ----------------------------
+DROP TABLE IF EXISTS `t_cruise_nonhomologous_point_instance`;
+CREATE TABLE `t_cruise_nonhomologous_point_instance` (
+  `instance_id` bigint(64) NOT NULL AUTO_INCREMENT COMMENT '非同源告警规则ID',
+  `device_mete_id` bigint(48) DEFAULT '1' COMMENT '测点实例ID',
+  `device_id` bigint(32) DEFAULT '1' COMMENT '关联设备id',
+  `custom_id` varchar(32) DEFAULT '' COMMENT '关联部位表id',
+  `robot_instance_id` bigint(32) DEFAULT '1' COMMENT '机器人巡视点id',
+  `video_preset_id` bigint(32) DEFAULT '1' COMMENT '相机巡视点id',
+  `identify_type` int(11) DEFAULT '1' COMMENT '点位识别类型 1. 表计读数，2位置状态识别，3外观缺陷识别，4红外测温，5声音检测',
+  `identify_son_type` int(11) DEFAULT '1' COMMENT '点位识别子类型(若选取表计读数再细分)： 1.油位表、2.避雷器动作次数表、3.泄漏电流表、4.档位表、5.SF6压力表、6.油温表、7.开关动作次数表、8.气压表、9液压表',
+  `cruise_type` int(11) DEFAULT '1' COMMENT '非同源类型 1：红外 2：位置 3：数显表计 4：指针表计 5：三相 6：区间 7：5次',
+  `cruise_name` varchar(64) DEFAULT '' COMMENT '巡检点名称',
+  `warn_threshold` varchar(256) DEFAULT NULL COMMENT '告警阈值',
+  `warn_level` int(11) DEFAULT '1' COMMENT '告警等级：1-预警，2-一般告警，3-严重告警，4-危急告警，',
+  `sy_type` int(11) DEFAULT '1' COMMENT '四遥类型 1：遥测 2：摇信 3：遥控 4：遥调',
+  `interval_type` int(11) DEFAULT '0' COMMENT '时间趋势类型 1天2周3月',
+  PRIMARY KEY (`instance_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='非同源告警配置实例表';
 
+-- ----------------------------
+-- Table structure for t_cruise_nonhomologous_warn
+-- ----------------------------
+DROP TABLE IF EXISTS `t_cruise_nonhomologous_warn`;
+CREATE TABLE `t_cruise_nonhomologous_warn` (
+  `warn_id` varchar(64) NOT NULL COMMENT '告警ID',
+  `instance_id` bigint(64) DEFAULT NULL COMMENT '非同源告警规则ID',
+  `warn_type` int(11) DEFAULT '1' COMMENT '非同源类型 1：红外 2：位置 3：数显表计 4：指针表计 5：三相 6：区间 7：5次',
+  `warn_content` varchar(256) DEFAULT NULL COMMENT '告警内容',
+  `warn_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '告警时间',
+  PRIMARY KEY (`warn_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='非同源告警表';
+
+-- ----------------------------
+-- Table structure for t_cruise_nonhomologous_warn_inspection
+-- ----------------------------
+DROP TABLE IF EXISTS `t_cruise_nonhomologous_warn_inspection`;
+CREATE TABLE `t_cruise_nonhomologous_warn_inspection` (
+  `warn_id` varchar(64) NOT NULL COMMENT '告警ID',
+  `inspection_id` bigint(58) NOT NULL COMMENT '巡检点实例ID',
+  `task_id` varchar(64) NOT NULL COMMENT '任务ID'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='非同源告警-巡视点关联表';
+
+-- ----------------------------
+-- Table structure for t_cruise_plan
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_plan`;
-
 CREATE TABLE `t_cruise_plan` (
   `plan_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '预案ID',
+  `plan_code` varchar(50) DEFAULT NULL COMMENT '预案编码',
+  `device_id` varchar(50) DEFAULT NULL COMMENT '主设备编码',
+  `up_region_id` bigint(32) DEFAULT '1' COMMENT '上层区域id',
+  `robot_id` bigint(11) DEFAULT NULL COMMENT '机器人id',
   `plan_name` varchar(32) DEFAULT '' COMMENT '预案名称',
   `type` int(11) DEFAULT '1' COMMENT '任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义',
   `plan_point_types` varchar(32) DEFAULT '' COMMENT '表计读数，位置状态识别，外观缺陷识别，红外测温，声音检测',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`plan_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4100001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检预案属性表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检预案属性表';
 
-/*Table structure for table `t_cruise_plan_attr` */
-
+-- ----------------------------
+-- Table structure for t_cruise_plan_attr
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_plan_attr`;
-
 CREATE TABLE `t_cruise_plan_attr` (
   `plan_id` bigint(32) NOT NULL COMMENT '预案ID',
   `instance_id` bigint(58) NOT NULL COMMENT '关联巡检点定义实例表id',
@@ -942,10 +1075,10 @@ CREATE TABLE `t_cruise_plan_attr` (
   PRIMARY KEY (`plan_id`,`instance_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检预案属性表';
 
-/*Table structure for table `t_cruise_point_attr` */
-
+-- ----------------------------
+-- Table structure for t_cruise_point_attr
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_point_attr`;
-
 CREATE TABLE `t_cruise_point_attr` (
   `instance_id` bigint(48) NOT NULL COMMENT '关联巡检点定义实例表id',
   `instance_name` varchar(32) DEFAULT '' COMMENT '巡检点实例名称',
@@ -955,10 +1088,21 @@ CREATE TABLE `t_cruise_point_attr` (
   PRIMARY KEY (`instance_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点属性表';
 
-/*Table structure for table `t_cruise_point_instance` */
+-- ----------------------------
+-- Table structure for t_cruise_point_info
+-- ----------------------------
+DROP TABLE IF EXISTS `t_cruise_point_info`;
+CREATE TABLE `t_cruise_point_info` (
+  `instance_id` bigint(58) NOT NULL COMMENT '巡检点实例ID',
+  `device_mete_id` bigint(48) DEFAULT '1' COMMENT '测点实例ID',
+  `remark` varchar(32) DEFAULT '' COMMENT '备注',
+  PRIMARY KEY (`instance_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点实例信息表';
 
+-- ----------------------------
+-- Table structure for t_cruise_point_instance
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_point_instance`;
-
 CREATE TABLE `t_cruise_point_instance` (
   `instance_id` bigint(58) NOT NULL AUTO_INCREMENT COMMENT '巡检点实例ID',
   `device_mete_id` bigint(48) DEFAULT '1' COMMENT '测点实例ID',
@@ -982,23 +1126,12 @@ CREATE TABLE `t_cruise_point_instance` (
   `text_desc` varchar(128) DEFAULT '' COMMENT '文本描述',
   `sort` varchar(32) DEFAULT '' COMMENT '排序序号',
   PRIMARY KEY (`instance_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=11000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点实例表';
+) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点实例表';
 
-/*Table structure for table `t_cruise_point_info` */
-
-DROP TABLE IF EXISTS `t_cruise_point_info`;
-
-CREATE TABLE `t_cruise_point_info` (
-  `instance_id` BIGINT(58) NOT NULL COMMENT '巡检点实例ID',
-  `device_mete_id` BIGINT(48) DEFAULT '1' COMMENT '测点实例ID',
-  `remark` VARCHAR(32) DEFAULT '' COMMENT '备注',
-  PRIMARY KEY (`instance_id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点实例信息表';
-
-/*Table structure for table `t_cruise_result` */
-
+-- ----------------------------
+-- Table structure for t_cruise_result
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_result`;
-
 CREATE TABLE `t_cruise_result` (
   `task_result_id` varchar(50) NOT NULL COMMENT '任务结果UUID',
   `task_id` varchar(50) DEFAULT '' COMMENT '巡检任务ID',
@@ -1021,10 +1154,10 @@ CREATE TABLE `t_cruise_result` (
   KEY `index_create_time` (`create_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检任务结果表';
 
-/*Table structure for table `t_cruise_task` */
-
+-- ----------------------------
+-- Table structure for t_cruise_task
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_task`;
-
 CREATE TABLE `t_cruise_task` (
   `task_id` varchar(50) NOT NULL COMMENT '巡检任务UUID',
   `task_code` varchar(50) DEFAULT '' COMMENT '任务编码',
@@ -1039,14 +1172,16 @@ CREATE TABLE `t_cruise_task` (
   `task_level` int(2) DEFAULT '1' COMMENT '任务等级(从高到低):4级,3级,2级,1级',
   `start_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '巡视时间',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `end_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '结束时间',
+  `create_user_id` bigint(20) DEFAULT NULL COMMENT '创建用户id',
   PRIMARY KEY (`task_id`) USING BTREE,
   KEY `areaid` (`area_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检任务表';
 
-/*Table structure for table `t_cruise_task_attr` */
-
+-- ----------------------------
+-- Table structure for t_cruise_task_attr
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_task_attr`;
-
 CREATE TABLE `t_cruise_task_attr` (
   `task_id` varchar(50) NOT NULL COMMENT '关联任务表id',
   `instance_id` bigint(48) NOT NULL COMMENT '巡检点实例ID',
@@ -1061,10 +1196,10 @@ CREATE TABLE `t_cruise_task_attr` (
   PRIMARY KEY (`task_id`,`instance_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='任务关联表';
 
-/*Table structure for table `t_cruise_task_del` */
-
+-- ----------------------------
+-- Table structure for t_cruise_task_del
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_task_del`;
-
 CREATE TABLE `t_cruise_task_del` (
   `task_id` varchar(50) NOT NULL COMMENT '巡检任务UUID',
   `del_time` datetime NOT NULL COMMENT '巡视时间',
@@ -1072,10 +1207,10 @@ CREATE TABLE `t_cruise_task_del` (
   PRIMARY KEY (`task_id`,`del_time`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='周期任务删除记录表';
 
-/*Table structure for table `t_cruise_task_result` */
-
+-- ----------------------------
+-- Table structure for t_cruise_task_result
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_task_result`;
-
 CREATE TABLE `t_cruise_task_result` (
   `task_result_id` varchar(50) NOT NULL COMMENT '任务结果UUID',
   `task_id` varchar(50) DEFAULT '' COMMENT '巡检任务ID',
@@ -1090,10 +1225,10 @@ CREATE TABLE `t_cruise_task_result` (
   PRIMARY KEY (`task_result_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='任务点状态表';
 
-/*Table structure for table `t_cruise_task_result_detail` */
-
+-- ----------------------------
+-- Table structure for t_cruise_task_result_detail
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_task_result_detail`;
-
 CREATE TABLE `t_cruise_task_result_detail` (
   `cruise_result_id` varchar(82) NOT NULL COMMENT '巡检点结果task_result_id+cruise_id',
   `task_result_id` varchar(50) DEFAULT '' COMMENT '巡检任务结果ID',
@@ -1109,10 +1244,10 @@ CREATE TABLE `t_cruise_task_result_detail` (
   KEY `task_result_id` (`task_result_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='任务点状态详细表';
 
-/*Table structure for table `t_cruise_type` */
-
+-- ----------------------------
+-- Table structure for t_cruise_type
+-- ----------------------------
 DROP TABLE IF EXISTS `t_cruise_type`;
-
 CREATE TABLE `t_cruise_type` (
   `sub_type` int(11) NOT NULL COMMENT '巡视类型',
   `instance_id` bigint(20) NOT NULL COMMENT '巡检点id',
@@ -1120,10 +1255,10 @@ CREATE TABLE `t_cruise_type` (
   PRIMARY KEY (`sub_type`,`instance_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡视类型关联实例点表';
 
-/*Table structure for table `t_defect_info` */
-
+-- ----------------------------
+-- Table structure for t_defect_info
+-- ----------------------------
 DROP TABLE IF EXISTS `t_defect_info`;
-
 CREATE TABLE `t_defect_info` (
   `defect_id` bigint(58) NOT NULL AUTO_INCREMENT COMMENT '缺陷ID',
   `defect_level` int(11) DEFAULT '0' COMMENT '缺陷等级',
@@ -1151,12 +1286,12 @@ CREATE TABLE `t_defect_info` (
   `out_range` varchar(100) DEFAULT '',
   `link_message` varchar(512) DEFAULT '' COMMENT '联动信息',
   PRIMARY KEY (`defect_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=100001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='缺陷信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='缺陷信息表';
 
-/*Table structure for table `t_device_maintenance` */
-
+-- ----------------------------
+-- Table structure for t_device_maintenance
+-- ----------------------------
 DROP TABLE IF EXISTS `t_device_maintenance`;
-
 CREATE TABLE `t_device_maintenance` (
   `maintenance_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '检修ID',
   `maintenance_name` varchar(256) NOT NULL COMMENT '检修名称',
@@ -1164,13 +1299,15 @@ CREATE TABLE `t_device_maintenance` (
   `is_valid` int(2) DEFAULT '1' COMMENT '是否使用，0-不使用，1-使用',
   `maintenance_start` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '开始检修时间',
   `maintenance_stop` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '结束检修时间',
+  `coordinate_pixel` varchar(500) NOT NULL COMMENT '坐标框（格式：x1,y1,z1; x2,y2,z2;x3,y3,z3; x4,y4,z4）',
+  `device_level` varchar(50) NOT NULL COMMENT '设备层级（1 = 间隔 2 = 主设备 3 = 设备点位 4 = 部件）',
   PRIMARY KEY (`maintenance_id`,`device_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=96000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='设备区域检修表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='设备区域检修表';
 
-/*Table structure for table `t_device_type_img` */
-
+-- ----------------------------
+-- Table structure for t_device_type_img
+-- ----------------------------
 DROP TABLE IF EXISTS `t_device_type_img`;
-
 CREATE TABLE `t_device_type_img` (
   `type_id` varchar(30) NOT NULL COMMENT '类型',
   `pic_abs_path` varchar(255) DEFAULT NULL COMMENT '图片绝对路径',
@@ -1179,10 +1316,10 @@ CREATE TABLE `t_device_type_img` (
   PRIMARY KEY (`type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `t_diagnose_plan` */
-
+-- ----------------------------
+-- Table structure for t_diagnose_plan
+-- ----------------------------
 DROP TABLE IF EXISTS `t_diagnose_plan`;
-
 CREATE TABLE `t_diagnose_plan` (
   `diagnose_plan_id` varchar(100) NOT NULL COMMENT '诊断任务ID',
   `plan_name` varchar(255) DEFAULT '' COMMENT '诊断任务名称',
@@ -1193,19 +1330,19 @@ CREATE TABLE `t_diagnose_plan` (
   PRIMARY KEY (`diagnose_plan_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `t_diagnose_plan_attr` */
-
+-- ----------------------------
+-- Table structure for t_diagnose_plan_attr
+-- ----------------------------
 DROP TABLE IF EXISTS `t_diagnose_plan_attr`;
-
 CREATE TABLE `t_diagnose_plan_attr` (
   `diagnose_plan_id` varchar(100) NOT NULL COMMENT '诊断任务ID',
   `channel_id` varchar(50) DEFAULT '' COMMENT '检测点ID'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `t_diagnose_plan_detail` */
-
+-- ----------------------------
+-- Table structure for t_diagnose_plan_detail
+-- ----------------------------
 DROP TABLE IF EXISTS `t_diagnose_plan_detail`;
-
 CREATE TABLE `t_diagnose_plan_detail` (
   `diagnose_plan_id` varchar(100) NOT NULL,
   `signal_opt` varchar(10) DEFAULT '',
@@ -1226,10 +1363,10 @@ CREATE TABLE `t_diagnose_plan_detail` (
   PRIMARY KEY (`diagnose_plan_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `t_diagnose_result` */
-
+-- ----------------------------
+-- Table structure for t_diagnose_result
+-- ----------------------------
 DROP TABLE IF EXISTS `t_diagnose_result`;
-
 CREATE TABLE `t_diagnose_result` (
   `diagnose_result_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '诊断结果ID',
   `channel_id` varchar(30) NOT NULL COMMENT '监测点ID',
@@ -1259,12 +1396,12 @@ CREATE TABLE `t_diagnose_result` (
   `diagnose_plan_id` varchar(40) DEFAULT '' COMMENT '诊断任务ID',
   `status` varchar(30) DEFAULT '' COMMENT '结果点状态(正常、故障、未检测、信任)',
   PRIMARY KEY (`diagnose_result_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=96000001 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-/*Table structure for table `t_dict_business` */
-
+-- ----------------------------
+-- Table structure for t_dict_business
+-- ----------------------------
 DROP TABLE IF EXISTS `t_dict_business`;
-
 CREATE TABLE `t_dict_business` (
   `dict_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '字典ID',
   `dict_code` varchar(20) DEFAULT '' COMMENT '字典编码',
@@ -1276,12 +1413,32 @@ CREATE TABLE `t_dict_business` (
   PRIMARY KEY (`dict_id`) USING BTREE,
   UNIQUE KEY `idx_dictcode` (`dict_code`,`col_name`) USING BTREE,
   KEY `colName` (`col_name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=300398 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='业务字典表';
+) ENGINE=InnoDB AUTO_INCREMENT=300696 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='业务字典表';
 
-/*Table structure for table `t_his_signal_data` */
+-- ----------------------------
+-- Table structure for t_env_warning
+-- ----------------------------
+DROP TABLE IF EXISTS `t_env_warning`;
+CREATE TABLE `t_env_warning` (
+  `env_warn_id` varchar(32) NOT NULL COMMENT '环控告警ID',
+  `robot_name` varchar(32) DEFAULT NULL COMMENT '机器人名称',
+  `robot_code` varchar(32) DEFAULT NULL COMMENT '机器人id',
+  `time` datetime DEFAULT NULL COMMENT '时间',
+  `type` varchar(255) DEFAULT NULL COMMENT '类型 1.温度 2.湿度 3.风速，4.水泵 5.防盗 6.灯7.空调8.门禁 9.SF6 10.O3 11.烟雾 12.液位传感器 13.风机 ',
+  `value` varchar(255) DEFAULT NULL COMMENT '值',
+  `unit` varchar(255) DEFAULT NULL COMMENT '单位',
+  `value_unit` varchar(255) DEFAULT NULL COMMENT '值+单位',
+  `sn` varchar(255) DEFAULT NULL COMMENT '环境设备SN编码',
+  `value_type` varchar(255) DEFAULT NULL COMMENT '取值类型 1.状态型（正常或异常）2.数值型 3. 控制型 （开关）',
+  `alarm_time` datetime DEFAULT NULL COMMENT '告警时间',
+  `device_name` varchar(255) DEFAULT NULL COMMENT '环境设备名称',
+  PRIMARY KEY (`env_warn_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
+-- ----------------------------
+-- Table structure for t_his_signal_data
+-- ----------------------------
 DROP TABLE IF EXISTS `t_his_signal_data`;
-
 CREATE TABLE `t_his_signal_data` (
   `id` bigint(52) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `mete_id` bigint(48) DEFAULT '1' COMMENT '监控量编号',
@@ -1295,12 +1452,12 @@ CREATE TABLE `t_his_signal_data` (
   KEY `index_device_id` (`device_id`) USING BTREE,
   KEY `index_mete_kind` (`mete_kind`) USING BTREE,
   KEY `index_record_time` (`record_time`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=101000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='遥信历史数据表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='遥信历史数据表';
 
-/*Table structure for table `t_his_telemeter_data` */
-
+-- ----------------------------
+-- Table structure for t_his_telemeter_data
+-- ----------------------------
 DROP TABLE IF EXISTS `t_his_telemeter_data`;
-
 CREATE TABLE `t_his_telemeter_data` (
   `id` bigint(52) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `mete_id` bigint(48) DEFAULT '1' COMMENT '监控量编号',
@@ -1314,12 +1471,12 @@ CREATE TABLE `t_his_telemeter_data` (
   KEY `index_device_id` (`device_id`) USING BTREE,
   KEY `index_mete_kind` (`mete_kind`) USING BTREE,
   KEY `index_record_time` (`record_time`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=301000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='遥测历史数据表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='遥测历史数据表';
 
-/*Table structure for table `t_period_model` */
-
+-- ----------------------------
+-- Table structure for t_period_model
+-- ----------------------------
 DROP TABLE IF EXISTS `t_period_model`;
-
 CREATE TABLE `t_period_model` (
   `period_id` bigint(30) NOT NULL AUTO_INCREMENT COMMENT '周期ID',
   `cron_expression` varchar(255) DEFAULT '' COMMENT '分',
@@ -1327,12 +1484,39 @@ CREATE TABLE `t_period_model` (
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`period_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=7001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='周期任务模版表';
+) ENGINE=InnoDB AUTO_INCREMENT=1067 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='周期任务模版表';
 
-/*Table structure for table `t_report_info` */
+-- ----------------------------
+-- Table structure for t_point_type_attr
+-- ----------------------------
+DROP TABLE IF EXISTS `t_point_type_attr`;
+CREATE TABLE `t_point_type_attr` (
+  `id` bigint(20) NOT NULL COMMENT '点位类型id',
+  `rule_id` bigint(20) NOT NULL COMMENT '规则id',
+  `remark` varchar(255) DEFAULT '' COMMENT '规则描述',
+  PRIMARY KEY (`id`,`rule_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='点位类型关联相机规则表';
 
+-- ----------------------------
+-- Table structure for t_record_file
+-- ----------------------------
+DROP TABLE IF EXISTS `t_record_file`;
+CREATE TABLE `t_record_file` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `camera_id` bigint(20) NOT NULL COMMENT '相机id',
+  `up_region_id` varchar(32) DEFAULT '' COMMENT '上级区域ID',
+  `file_name` varchar(128) DEFAULT NULL COMMENT '文件名称',
+  `file_path` varchar(255) DEFAULT NULL COMMENT '录制文件路径',
+  `absolute_file_path` varchar(255) DEFAULT NULL COMMENT '录制文件绝对路径',
+  `start_time` datetime DEFAULT NULL COMMENT '开始录制时间',
+  `end_time` datetime DEFAULT NULL COMMENT '结束录制时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='录制文件表';
+
+-- ----------------------------
+-- Table structure for t_report_info
+-- ----------------------------
 DROP TABLE IF EXISTS `t_report_info`;
-
 CREATE TABLE `t_report_info` (
   `report_id` varchar(50) NOT NULL COMMENT '报表id',
   `report_name` varchar(64) NOT NULL COMMENT '报表名称',
@@ -1343,10 +1527,10 @@ CREATE TABLE `t_report_info` (
   PRIMARY KEY (`report_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='报表信息表';
 
-/*Table structure for table `t_robot_alarm` */
-
+-- ----------------------------
+-- Table structure for t_robot_alarm
+-- ----------------------------
 DROP TABLE IF EXISTS `t_robot_alarm`;
-
 CREATE TABLE `t_robot_alarm` (
   `robot_alarm_id` bigint(48) NOT NULL AUTO_INCREMENT COMMENT '机器人告警ID',
   `alarm_name` varchar(125) DEFAULT '' COMMENT '机器人本体告警名称',
@@ -1367,12 +1551,12 @@ CREATE TABLE `t_robot_alarm` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `end_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`robot_alarm_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=71000000477 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='机器人本体告警表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='机器人本体告警表';
 
-/*Table structure for table `t_robot_camera_preset` */
-
+-- ----------------------------
+-- Table structure for t_robot_camera_preset
+-- ----------------------------
 DROP TABLE IF EXISTS `t_robot_camera_preset`;
-
 CREATE TABLE `t_robot_camera_preset` (
   `preset_id` bigint(48) NOT NULL AUTO_INCREMENT COMMENT '预置位id',
   `preset_num` int(20) DEFAULT NULL COMMENT '预置位点号',
@@ -1382,84 +1566,116 @@ CREATE TABLE `t_robot_camera_preset` (
   `creator_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `camera_type` int(10) DEFAULT '1' COMMENT '1=机器人可见光，2=机器人红外',
   PRIMARY KEY (`preset_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=21000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='机器人预位置表';
+) ENGINE=InnoDB AUTO_INCREMENT=2100000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='机器人预位置表';
 
-/*Table structure for table `t_robot_info` */
+-- ----------------------------
+-- Table structure for t_robot_camera_rule
+-- ----------------------------
+DROP TABLE IF EXISTS `t_robot_camera_rule`;
+CREATE TABLE `t_robot_camera_rule` (
+  `rule_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '规则id',
+  `rule_code` varchar(20) DEFAULT '' COMMENT '规则编码',
+  `rule_name` varchar(128) DEFAULT '' COMMENT '规则名称',
+  `remark` varchar(255) DEFAULT '' COMMENT '规则描述',
+  PRIMARY KEY (`rule_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='机器人相机规则表';
 
+-- ----------------------------
+-- Table structure for t_robot_info
+-- ----------------------------
 DROP TABLE IF EXISTS `t_robot_info`;
-
-CREATE TABLE `t_robot_info`  (
+CREATE TABLE `t_robot_info` (
   `robot_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '机器人id',
-  `robot_code` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '',
-  `robot_name` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '机器人名称',
-  `nest_code` varchar(32) DEFAULT NULL COMMENT '机巢编码',
+  `robot_code` varchar(32) DEFAULT '',
+  `robot_num` int(6) DEFAULT NULL COMMENT '机器人/无人机编号编码',
+  `robot_name` varchar(64) DEFAULT '' COMMENT '机器人名称',
   `nest_name` varchar(64) DEFAULT NULL COMMENT '机巢名称',
-  `robot_status` varchar(6) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '机器人在线状态，1-在线0-离线',
-  `robot_type` int(6) NULL DEFAULT 1 COMMENT '机器人型号',
+  `nest_code` varchar(32) DEFAULT NULL COMMENT '机巢编码',
+  `robot_status` varchar(6) DEFAULT '' COMMENT '机器人在线状态，1-在线0-离线',
+  `robot_type` int(6) DEFAULT '1' COMMENT '机器人型号',
   `drone_type` int(6) DEFAULT NULL COMMENT '无人机型号',
-  `robot_ip` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '机器人ip',
-  `robot_port` int(8) NULL DEFAULT 1 COMMENT '机器人端口',
-  `light_ip` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '可见光IP',
-  `light_port` varchar(8) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '可见光端口号',
-  `identity_manager` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '可见光-用户名',
-  `identity_code` varchar(15) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '可见光-密码',
-  `lnferad_IP` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '红外IP',
-  `Inferad_Port` int(8) NULL DEFAULT 1 COMMENT '红外端口号',
-  `Inferad_username` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '红外-用户名',
-  `Inferad_password` varchar(8) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '红外-密码',
-  `phote_path` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '照片路径',
-  `create_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '',
-  `create_date` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '',
-  `update_date` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP,
-  `robot_factory` varchar(28) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '机器人厂家',
-  `made_in`  varchar(32) NULL DEFAULT '' COMMENT '生产国家',
-  `made_date`  datetime NULL COMMENT '出厂日期',
-  `is_use` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '使用状态，1-已报废2-使用中3-未使用',
-  `commission_date` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '投运日期',
-  `up_region_id` bigint(32) NULL DEFAULT 1 COMMENT '上层区域id',
-  `robot_position` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '机器人类型.1-室内0-室外-2-轨道',
-  `drone_position` int(6) DEFAULT NULL COMMENT '无人机类型',
-  `robot_source` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '设备来源',
-  `address` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '安装位置',
-  `building_user` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '使用单位',
-  `appearance_number` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '出场编号',
-  `defect_record` varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '缺陷记录',
-  `repair_record` varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '大修记录',
-  `exit_putInto_record` varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '退出再重放记录',
-  `remarks` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '',
-  `record_id` bigint(20) NULL DEFAULT NULL COMMENT '录像机id',
-  `channel_num_light` int(10) NULL DEFAULT NULL COMMENT '通道号可见光',
-  `channel_num_inferad` int(10) NULL DEFAULT NULL COMMENT '通道号红外',
-  `last_online_time`  BIGINT(20)  COMMENT '上次登录时间(毫秒数)',
-  `duration` BIGINT(20)  COMMENT '在线时长累积(毫秒)',
-  `off_line_count` BIGINT(20)  COMMENT '离线次数',
+  `robot_ip` varchar(32) DEFAULT '' COMMENT '机器人ip',
+  `robot_port` int(8) DEFAULT '1' COMMENT '机器人端口',
+  `light_ip` varchar(32) DEFAULT '' COMMENT '可见光IP',
+  `light_port` varchar(8) DEFAULT '' COMMENT '可见光端口号',
+  `identity_manager` varchar(32) DEFAULT '' COMMENT '可见光-用户名',
+  `identity_code` varchar(32) DEFAULT '' COMMENT '可见光-密码',
+  `lnferad_IP` varchar(32) DEFAULT '' COMMENT '红外IP',
+  `Inferad_Port` int(8) DEFAULT '1' COMMENT '红外端口号',
+  `Inferad_username` varchar(32) DEFAULT '' COMMENT '红外-用户名',
+  `Inferad_password` varchar(32) DEFAULT '' COMMENT '红外-密码',
+  `phote_path` varchar(255) DEFAULT '' COMMENT '照片路径',
+  `create_by` varchar(64) DEFAULT '',
+  `create_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `update_by` varchar(64) DEFAULT '',
+  `update_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `robot_factory` varchar(28) DEFAULT '' COMMENT '机器人厂家',
+  `made_in` varchar(32) DEFAULT '中国' COMMENT '生成国家',
+  `made_date` datetime DEFAULT NULL COMMENT '出厂日期',
+  `is_use` varchar(10) DEFAULT '' COMMENT '使用状态，1-已报废2-使用中3-未使用',
+  `commission_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '投运日期',
+  `up_region_id` bigint(32) DEFAULT '1' COMMENT '上层区域id',
+  `robot_position` varchar(32) DEFAULT '' COMMENT '机器人类型.1-室内0-室外-2-轨道',
+  `drone_position` varchar(32) DEFAULT '' COMMENT '无人机类型',
+  `robot_source` varchar(255) DEFAULT '' COMMENT '设备来源',
+  `address` varchar(255) DEFAULT '' COMMENT '安装位置',
+  `building_user` varchar(255) DEFAULT '' COMMENT '使用单位',
+  `appearance_number` varchar(255) DEFAULT '' COMMENT '出场编号',
+  `defect_record` varchar(512) DEFAULT '' COMMENT '缺陷记录',
+  `repair_record` varchar(512) DEFAULT '' COMMENT '大修记录',
+  `exit_putInto_record` varchar(512) DEFAULT '' COMMENT '退出再重放记录',
+  `remarks` varchar(255) DEFAULT '',
+  `record_id` bigint(20) DEFAULT NULL COMMENT '录像机id',
+  `channel_num_light` int(10) DEFAULT NULL COMMENT '通道号可见光',
+  `channel_num_inferad` int(10) DEFAULT NULL COMMENT '通道号红外',
+  `last_online_time` bigint(20) DEFAULT NULL COMMENT '上次登录时间(毫秒数)',
+  `duration` bigint(20) DEFAULT NULL COMMENT '在线时长累积(毫秒)',
+  `off_line_count` int(10) DEFAULT NULL COMMENT '离线次数',
   PRIMARY KEY (`robot_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8000 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '机器人表' ROW_FORMAT = Dynamic;
+) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='机器人表';
 
-/*Table structure for table `t_robot_inspection` */
-
+-- ----------------------------
+-- Table structure for t_robot_inspection
+-- ----------------------------
 DROP TABLE IF EXISTS `t_robot_inspection`;
-
 CREATE TABLE `t_robot_inspection` (
   `inspection_id` bigint(48) NOT NULL AUTO_INCREMENT COMMENT '机器人设备测点实例ID',
   `robot_id` bigint(20) DEFAULT '1' COMMENT '机器人ID',
   `inspection_code` varchar(255) DEFAULT '' COMMENT '机器人检测点编码',
   `inspection_name` varchar(255) DEFAULT '' COMMENT '测点名称',
+  `inspection_type` int(11) DEFAULT '1' COMMENT '点位类型',
   `component_id` varchar(255) DEFAULT '' COMMENT '部件ID',
   `meter_type` int(11) DEFAULT '1' COMMENT '表计类型',
   `appearance_type` int(11) DEFAULT '1' COMMENT '外观类型',
+  `main_operation_type` int(11) DEFAULT NULL COMMENT '主操作类型',
+  `operation_type` int(11) DEFAULT NULL COMMENT '操作类型',
   `save_type_list` varchar(255) DEFAULT '' COMMENT '采集/保存文件类型列表',
   `recognition_type_list` varchar(255) DEFAULT '' COMMENT '识别类型列表',
   `phase` varchar(255) DEFAULT '' COMMENT '相位，A相B相C相',
   `device_info` varchar(255) DEFAULT '' COMMENT '备注信息',
+  `property_pic_path` varchar(255) DEFAULT '' COMMENT '测点属性图',
   PRIMARY KEY (`inspection_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=100000001 DEFAULT CHARSET=utf8 COMMENT='机器人测点信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='机器人测点信息表';
 
-/*Table structure for table `t_robot_region` */
+-- ----------------------------
+-- Table structure for t_robot_inspection_attr
+-- ----------------------------
+DROP TABLE IF EXISTS `t_robot_inspection_attr`;
+CREATE TABLE `t_robot_inspection_attr` (
+  `id` bigint(48) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `robot_id` bigint(20) DEFAULT '1' COMMENT '机器人ID',
+  `inspection_code` varchar(255) DEFAULT '' COMMENT '机器人检测点编码',
+  `x` int(20) DEFAULT '0' COMMENT '左上角X坐标',
+  `y` int(20) DEFAULT '0' COMMENT '左上角Y坐标',
+  `width` int(20) DEFAULT '0' COMMENT '宽',
+  `height` int(20) DEFAULT '0' COMMENT '高',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='机器人测点属性表';
 
+-- ----------------------------
+-- Table structure for t_robot_region
+-- ----------------------------
 DROP TABLE IF EXISTS `t_robot_region`;
-
 CREATE TABLE `t_robot_region` (
   `region_id` varchar(255) NOT NULL COMMENT '区域ID',
   `region_name` varchar(128) DEFAULT '' COMMENT '区域名称',
@@ -1470,14 +1686,15 @@ CREATE TABLE `t_robot_region` (
   `region_type` int(9) DEFAULT '1' COMMENT '类型区域，标准测点区域类型：100；E机器人区域类型：101；相机区域类型：102',
   `station_id` varchar(32) DEFAULT '' COMMENT '变电站ID',
   `state` int(1) DEFAULT '0' COMMENT '0:非当前变电站 1：当前变电站',
+  `robot_id` bigint(11) DEFAULT NULL COMMENT '机器人id',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`region_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='机器人区域层级表';
 
-/*Table structure for table `t_sequential_conf` */
-
+-- ----------------------------
+-- Table structure for t_sequential_conf
+-- ----------------------------
 DROP TABLE IF EXISTS `t_sequential_conf`;
-
 CREATE TABLE `t_sequential_conf` (
   `cfg_device_id` varchar(20) NOT NULL COMMENT '设备编号',
   `cfg_mete_id` varchar(20) DEFAULT '' COMMENT '监控量编号',
@@ -1487,10 +1704,10 @@ CREATE TABLE `t_sequential_conf` (
   `record_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='顺控配置表';
 
-/*Table structure for table `t_std_device` */
-
+-- ----------------------------
+-- Table structure for t_std_device
+-- ----------------------------
 DROP TABLE IF EXISTS `t_std_device`;
-
 CREATE TABLE `t_std_device` (
   `device_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '设备ID',
   `custom_id` varchar(32) NOT NULL COMMENT '部位ID',
@@ -1506,19 +1723,80 @@ CREATE TABLE `t_std_device` (
   `custom_type` int(8) DEFAULT '1' COMMENT '部位类型',
   `custom_name` varchar(32) DEFAULT '' COMMENT '部位名称',
   `status` int(1) DEFAULT '1' COMMENT '设备状态(0：新建，1：在线，2：离线)',
-  `preset_id` bigint(32) DEFAULT NULL COMMENT '预置位id',
-  `camera_id` bigint(32) DEFAULT NULL COMMENT '摄像机id',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  `preset_id` bigint(32) DEFAULT NULL COMMENT '预置位id',
+  `camera_id` bigint(32) DEFAULT NULL COMMENT '摄像机id',
   PRIMARY KEY (`device_id`,`custom_id`) USING BTREE,
   KEY `index_create_date` (`create_time`) USING BTREE,
   KEY `index_device_type` (`device_type`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=100000001 DEFAULT CHARSET=utf8 COMMENT='标准化设备表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='标准化设备表';
 
-/*Table structure for table `t_std_device_attr` */
+-- ----------------------------
+-- Table structure for t_std_devicemete
+-- ----------------------------
+DROP TABLE IF EXISTS `t_std_devicemete`;
+CREATE TABLE `t_std_devicemete` (
+  `device_mete_id` bigint(50) NOT NULL AUTO_INCREMENT COMMENT '设备测点实例ID',
+  `device_id` bigint(32) DEFAULT '1' COMMENT '设备ID',
+  `device_point_id` varchar(64) DEFAULT NULL COMMENT '设备点位ID',
+  `custom_id` varchar(50) DEFAULT '' COMMENT '部位ID',
+  `mete_id` bigint(50) DEFAULT '1' COMMENT '标准测点ID',
+  `mete_kind` varchar(20) DEFAULT '' COMMENT '测点类型:0-遥信，1-遥测',
+  `mete_type` varchar(50) DEFAULT '' COMMENT '巡检类型',
+  `meter_type` int(8) DEFAULT '1' COMMENT '表计类型',
+  `device_type` int(8) DEFAULT '1' COMMENT '设备类型',
+  `inspection_type` int(8) DEFAULT '1' COMMENT '点位类型',
+  `mete_name` varchar(50) DEFAULT '' COMMENT '测点名称',
+  `appearance_type` int(2) DEFAULT '1' COMMENT '外观类型',
+  `position_type` varchar(20) DEFAULT '' COMMENT '点号位置，inside-内部设备，outside-外部设备',
+  `analyse_type` int(11) DEFAULT '1' COMMENT '算法类型',
+  `is_ai` varchar(20) DEFAULT 'off' COMMENT '是否缺陷 on-是 off-不是',
+  `is_judge` varchar(20) DEFAULT 'off' COMMENT '是否判别--“on”是--“off”不是',
+  `unit` varchar(50) DEFAULT '' COMMENT '单位',
+  `alarm_note` varchar(50) DEFAULT '' COMMENT '是否生成告警提示 1-生成 0-不生成',
+  `alarm_type` varchar(50) DEFAULT '' COMMENT '告警分类',
+  `up_effect` float(7,3) DEFAULT '0.000' COMMENT '有效上限',
+  `down_effect` float(7,3) DEFAULT '0.000' COMMENT '有效下限',
+  `state_zero` varchar(20) DEFAULT '' COMMENT '状态一描述',
+  `state_one` varchar(20) DEFAULT '' COMMENT '状态二描述',
+  `alarm_state` int(8) DEFAULT '1' COMMENT '告警关联信号',
+  `alarm_level` int(11) DEFAULT '1' COMMENT '告警级别',
+  `high_limit1` float(7,3) DEFAULT '0.000' COMMENT '告警上限1',
+  `low_limit1` float(7,3) DEFAULT '0.000' COMMENT '告警下限1',
+  `high_limit2` float(7,3) DEFAULT '0.000' COMMENT '告警上限2',
+  `low_limit2` float(7,3) DEFAULT '0.000' COMMENT '告警下限2',
+  `high_limit3` float(7,3) DEFAULT '0.000' COMMENT '告警上限3',
+  `low_limit3` float(7,3) DEFAULT '0.000' COMMENT '告警下限3',
+  `high_limit4` float(7,3) DEFAULT '0.000' COMMENT '告警上限4',
+  `low_limit4` float(7,3) DEFAULT '0.000' COMMENT '告警下限4',
+  `alarm_delay` int(11) DEFAULT '1' COMMENT '告警延时',
+  `alarm_cnt` int(11) DEFAULT '1' COMMENT '告警次数',
+  `threshold_abs` decimal(10,4) DEFAULT '0.0000' COMMENT '绝对阀值',
+  `threshold_per` decimal(8,4) DEFAULT '0.0000' COMMENT '百分比阀值',
+  `modulus` int(11) DEFAULT '1' COMMENT '系数',
+  `remark` varchar(128) DEFAULT '' COMMENT '信号说明',
+  `redundant_type` varchar(50) NOT NULL COMMENT '测点级别（1 = Ⅰ类 2 = Ⅱ 类型）',
+  PRIMARY KEY (`device_mete_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=100000001 DEFAULT CHARSET=utf8 COMMENT='标准设备测点表';
 
+-- ----------------------------
+-- Table structure for t_std_devicemete_update
+-- ----------------------------
+DROP TABLE IF EXISTS `t_std_devicemete_update`;
+CREATE TABLE `t_std_devicemete_update` (
+  `device_mete_id` bigint(48) NOT NULL COMMENT '测点id',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '巡检时间',
+  `cruise_result` int(11) DEFAULT '1' COMMENT '巡视执行结果',
+  `identify_result` int(11) DEFAULT '1' COMMENT '实际结果',
+  `pic_path` varchar(255) DEFAULT '' COMMENT '巡检图片',
+  PRIMARY KEY (`device_mete_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=100000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='测点巡检时间记录表';
+
+-- ----------------------------
+-- Table structure for t_std_device_attr
+-- ----------------------------
 DROP TABLE IF EXISTS `t_std_device_attr`;
-
 CREATE TABLE `t_std_device_attr` (
   `device_id` bigint(32) NOT NULL,
   `device_model` int(11) DEFAULT '1' COMMENT '设备型号',
@@ -1545,68 +1823,10 @@ CREATE TABLE `t_std_device_attr` (
   KEY `deviceId` (`device_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='标准化设备参数表';
 
-/*Table structure for table `t_std_devicemete` */
-
-DROP TABLE IF EXISTS `t_std_devicemete`;
-
-CREATE TABLE `t_std_devicemete` (
-  `device_mete_id` bigint(50) NOT NULL AUTO_INCREMENT COMMENT '设备测点实例ID',
-  `device_id` bigint(32) DEFAULT '1' COMMENT '设备ID',
-  `custom_id` varchar(50) DEFAULT '' COMMENT '部位ID',
-  `mete_id` bigint(50) DEFAULT '1' COMMENT '标准测点ID',
-  `mete_kind` varchar(20) DEFAULT '' COMMENT '测点类型:0-遥信，1-遥测',
-  `mete_type` varchar(50) DEFAULT '' COMMENT '巡检类型',
-  `meter_type` int(8) DEFAULT '1' COMMENT '表计类型',
-  `device_type` int(8) DEFAULT '1' COMMENT '设备类型',
-  `mete_name` varchar(50) DEFAULT '' COMMENT '测点名称',
-  `appearance_type` int(2) DEFAULT '1' COMMENT '外观类型',
-  `position_type` varchar(20) DEFAULT '' COMMENT '点号位置，inside-内部设备，outside-外部设备',
-  `analyse_type` int(11) DEFAULT '1' COMMENT '算法类型',
-  `is_ai` varchar(20) DEFAULT 'off' COMMENT '是否缺陷 on-是 off-不是',
-  `is_judge` varchar(20) DEFAULT 'off' COMMENT '是否判别--“on”是--“off”不是',
-  `unit` varchar(50) DEFAULT '' COMMENT '单位',
-  `alarm_note` varchar(50) DEFAULT '' COMMENT '是否生成告警提示 1-生成 0-不生成',
-  `alarm_type` varchar(50) DEFAULT '' COMMENT '告警分类',
-  `up_effect` float DEFAULT '1' COMMENT '有效上限',
-  `down_effect` float DEFAULT '1' COMMENT '有效下限',
-  `state_zero` varchar(20) DEFAULT '' COMMENT '状态一描述',
-  `state_one` varchar(20) DEFAULT '' COMMENT '状态二描述',
-  `alarm_state` int(8) DEFAULT '1' COMMENT '告警关联信号',
-  `alarm_level` int(11) DEFAULT '1' COMMENT '告警级别',
-  `high_limit1` float DEFAULT '1' COMMENT '告警上限1',
-  `low_limit1` float DEFAULT '1' COMMENT '告警下限1',
-  `high_limit2` float DEFAULT '1' COMMENT '告警上限2',
-  `low_limit2` float DEFAULT '1' COMMENT '告警下限2',
-  `high_limit3` float DEFAULT '1',
-  `low_limit3` float DEFAULT '1',
-  `high_limit4` float DEFAULT '1',
-  `low_limit4` float DEFAULT '1',
-  `alarm_delay` int(11) DEFAULT '1' COMMENT '告警延时',
-  `alarm_cnt` int(11) DEFAULT '1' COMMENT '告警次数',
-  `threshold_abs` decimal(10,0) DEFAULT '0' COMMENT '绝对阀值',
-  `threshold_per` decimal(5,0) DEFAULT '0' COMMENT '百分比阀值',
-  `modulus` int(11) DEFAULT '1' COMMENT '系数',
-  `remark` varchar(128) DEFAULT '' COMMENT '信号说明',
-  PRIMARY KEY (`device_mete_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 COMMENT='标准设备测点表';
-
-/*Table structure for table `t_std_devicemete_update` */
-
-DROP TABLE IF EXISTS `t_std_devicemete_update`;
-
-CREATE TABLE `t_std_devicemete_update` (
-  `device_mete_id` bigint(48) NOT NULL COMMENT '测点id',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '巡检时间',
-  `cruise_result` int(11) DEFAULT '1' COMMENT '巡视执行结果',
-  `identify_result` int(11) DEFAULT '1' COMMENT '实际结果',
-  `pic_path` varchar(255) DEFAULT '' COMMENT '巡检图片',
-  PRIMARY KEY (`device_mete_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='测点巡检时间记录表';
-
-/*Table structure for table `t_std_mete` */
-
+-- ----------------------------
+-- Table structure for t_std_mete
+-- ----------------------------
 DROP TABLE IF EXISTS `t_std_mete`;
-
 CREATE TABLE `t_std_mete` (
   `std_mete_id` bigint(50) NOT NULL AUTO_INCREMENT COMMENT '测点id',
   `device_type` int(8) DEFAULT '1' COMMENT '设备类型',
@@ -1618,45 +1838,45 @@ CREATE TABLE `t_std_mete` (
   `alarm_type` varchar(50) DEFAULT '' COMMENT '告警分类',
   `analyse_type` int(11) DEFAULT '1' COMMENT '识别算法',
   `unit` varchar(50) DEFAULT '' COMMENT '单位',
-  `up_effect` float DEFAULT '1' COMMENT '有效值上限',
-  `down_effect` float DEFAULT '1' COMMENT '有效值下限',
+  `up_effect` float(7,3) DEFAULT '0.000' COMMENT '有效上限',
+  `down_effect` float(7,3) DEFAULT '0.000' COMMENT '有效下限',
   `alarm_level` int(11) DEFAULT '1' COMMENT '告警级别',
   `alarm_limit` int(11) DEFAULT '1' COMMENT '告警门限',
   `alarm_delay` int(11) DEFAULT '1' COMMENT '告警延时',
   `state_zero` varchar(20) DEFAULT '' COMMENT '状态一',
   `state_one` varchar(20) DEFAULT '' COMMENT '状态二',
-  `high_limit1` float DEFAULT '1' COMMENT '预警上限',
-  `low_limit1` float DEFAULT '1' COMMENT '预警下限',
-  `high_limit2` float DEFAULT '1' COMMENT '一般上限',
-  `low_limit2` float DEFAULT '1' COMMENT '一般下限',
-  `high_limit3` float DEFAULT '1' COMMENT '严重上限',
-  `low_limit3` float DEFAULT '1' COMMENT '严重下限',
-  `high_limit4` float DEFAULT '1' COMMENT '危急上限',
-  `low_limit4` float DEFAULT '1' COMMENT '危急下限',
+  `high_limit1` float(7,3) DEFAULT '0.000' COMMENT '告警上限1',
+  `low_limit1` float(7,3) DEFAULT '0.000' COMMENT '告警下限1',
+  `high_limit2` float(7,3) DEFAULT '0.000' COMMENT '告警上限2',
+  `low_limit2` float(7,3) DEFAULT '0.000' COMMENT '告警下限2',
+  `high_limit3` float(7,3) DEFAULT '0.000' COMMENT '告警上限3',
+  `low_limit3` float(7,3) DEFAULT '0.000' COMMENT '告警下限3',
+  `high_limit4` float(7,3) DEFAULT '0.000' COMMENT '告警上限4',
+  `low_limit4` float(7,3) DEFAULT '0.000' COMMENT '告警下限4',
   `alarm_cnt` int(11) DEFAULT '1' COMMENT '告警次数',
-  `threshold_abs` decimal(10,0) DEFAULT '0' COMMENT '绝对阈值',
-  `threshold_per` decimal(5,0) DEFAULT '0' COMMENT '百分比阈值',
+  `threshold_abs` decimal(10,4) DEFAULT '0.0000' COMMENT '绝对阀值',
+  `threshold_per` decimal(8,4) DEFAULT '0.0000' COMMENT '百分比阀值',
   `modulus` int(11) DEFAULT '1' COMMENT '系数',
   `remark` varchar(125) DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`std_mete_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统测点信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=1000020425 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统测点信息表';
 
-/*Table structure for table `t_std_metemodel` */
-
+-- ----------------------------
+-- Table structure for t_std_metemodel
+-- ----------------------------
 DROP TABLE IF EXISTS `t_std_metemodel`;
-
 CREATE TABLE `t_std_metemodel` (
   `model_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '模板ID',
   `model_name` varchar(128) NOT NULL COMMENT '模板名称',
   `device_type` int(8) NOT NULL COMMENT '所属设备类型',
   `remark` varchar(512) DEFAULT '' COMMENT '模板备注',
   PRIMARY KEY (`model_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=60001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统测点模版表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统测点模版表';
 
-/*Table structure for table `t_std_metemodel_detail` */
-
+-- ----------------------------
+-- Table structure for t_std_metemodel_detail
+-- ----------------------------
 DROP TABLE IF EXISTS `t_std_metemodel_detail`;
-
 CREATE TABLE `t_std_metemodel_detail` (
   `model_id` bigint(20) NOT NULL COMMENT '监控量模板ID',
   `mete_id` bigint(50) NOT NULL COMMENT '监控量ID',
@@ -1669,49 +1889,89 @@ CREATE TABLE `t_std_metemodel_detail` (
   `alarm_note` varchar(256) DEFAULT '' COMMENT '信号说明',
   `alarm_explain` varchar(256) DEFAULT '' COMMENT '信号解释',
   `alarm_type` varchar(50) DEFAULT '' COMMENT '告警分类',
-  `up_effect` float DEFAULT '1' COMMENT '有效上限',
-  `down_effect` float DEFAULT '1' COMMENT '有效下限',
+  `up_effect` float(7,3) DEFAULT '1' COMMENT '有效上限',
+  `down_effect` float(7,3) DEFAULT '1' COMMENT '有效下限',
   `state_zero` varchar(20) DEFAULT '' COMMENT '状态一',
   `state_one` varchar(20) DEFAULT '' COMMENT '状态二',
   `alarm_level` int(11) DEFAULT '1' COMMENT '告警级别',
-  `high_limit1` float DEFAULT '1' COMMENT '告警上限1',
-  `low_limit1` float DEFAULT '1' COMMENT '告警下限1',
-  `high_limit2` float DEFAULT '1' COMMENT '告警上限2',
-  `low_limit2` float DEFAULT '1' COMMENT '告警下限2',
-  `high_limit3` float DEFAULT '1' COMMENT '告警上限3',
-  `low_limit3` float DEFAULT '1' COMMENT '告警下限3',
-  `high_limit4` float DEFAULT '1' COMMENT '告警上限4',
-  `low_limit4` float DEFAULT '1' COMMENT '告警下限4',
+  `high_limit1` float(7,3) DEFAULT '1' COMMENT '告警上限1',
+  `low_limit1` float(7,3) DEFAULT '1' COMMENT '告警下限1',
+  `high_limit2` float(7,3) DEFAULT '1' COMMENT '告警上限2',
+  `low_limit2` float(7,3) DEFAULT '1' COMMENT '告警下限2',
+  `high_limit3` float(7,3) DEFAULT '1' COMMENT '告警上限3',
+  `low_limit3` float(7,3) DEFAULT '1' COMMENT '告警下限3',
+  `high_limit4` float(7,3) DEFAULT '1' COMMENT '告警上限4',
+  `low_limit4` float(7,3) DEFAULT '1' COMMENT '告警下限4',
   `alarm_delay` int(11) DEFAULT '1' COMMENT '告警延时',
   `alarm_cnt` int(11) DEFAULT '1' COMMENT '告警次数',
-  `threshold_abs` decimal(10,0) DEFAULT '0' COMMENT '绝对阀值',
-  `threshold_per` decimal(5,0) DEFAULT '0' COMMENT '百分比阀值',
+  `threshold_abs` decimal(10,4) DEFAULT '0.0000' COMMENT '绝对阀值',
+  `threshold_per` decimal(8,4) DEFAULT '0.0000' COMMENT '百分比阀值',
   `modulus` int(11) DEFAULT '1' COMMENT '系数',
   PRIMARY KEY (`mete_id`,`model_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统测点模版详细表';
 
-/*Table structure for table `t_std_region` */
+-- ----------------------------
+-- Table structure for t_std_meter_type_model
+-- ----------------------------
+DROP TABLE IF EXISTS `t_std_meter_type_model`;
+CREATE TABLE `t_std_meter_type_model` (
+  `id` int(8) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `meter_type` int(8) DEFAULT '1' COMMENT '表计类型',
+  `device_type` int(8) DEFAULT '1' COMMENT '设备类型',
+  `mete_kind` varchar(20) DEFAULT '' COMMENT '测点类型:0-遥信，1-遥测',
+  `unit` varchar(50) DEFAULT '' COMMENT '单位',
+  `alarm_note` varchar(50) DEFAULT '' COMMENT '是否生成告警提示 1-生成 0-不生成',
+  `alarm_type` varchar(50) DEFAULT '' COMMENT '告警分类',
+  `up_effect` float(7,3) DEFAULT '0.000' COMMENT '有效上限',
+  `down_effect` float(7,3) DEFAULT '0.000' COMMENT '有效下限',
+  `state_zero` varchar(20) DEFAULT '' COMMENT '状态一描述',
+  `state_one` varchar(20) DEFAULT '' COMMENT '状态二描述',
+  `alarm_state` int(8) DEFAULT '1' COMMENT '告警关联信号',
+  `alarm_level` int(11) DEFAULT '1' COMMENT '告警级别',
+  `high_limit1` float(7,3) DEFAULT '0.000' COMMENT '告警上限1',
+  `low_limit1` float(7,3) DEFAULT '0.000' COMMENT '告警下限1',
+  `high_limit2` float(7,3) DEFAULT '0.000' COMMENT '告警上限2',
+  `low_limit2` float(7,3) DEFAULT '0.000' COMMENT '告警下限2',
+  `high_limit3` float(7,3) DEFAULT '0.000' COMMENT '告警上限3',
+  `low_limit3` float(7,3) DEFAULT '0.000' COMMENT '告警下限3',
+  `high_limit4` float(7,3) DEFAULT '0.000' COMMENT '告警上限4',
+  `low_limit4` float(7,3) DEFAULT '0.000' COMMENT '告警下限4',
+  `alarm_delay` int(11) DEFAULT '1' COMMENT '告警延时',
+  `alarm_cnt` int(11) DEFAULT '1' COMMENT '告警次数',
+  `threshold_abs` decimal(10,4) DEFAULT '0.0000' COMMENT '绝对阀值',
+  `threshold_per` decimal(8,4) DEFAULT '0.0000' COMMENT '百分比阀值',
+  `modulus` int(11) DEFAULT '1' COMMENT '系数',
+  `remark` varchar(128) DEFAULT '' COMMENT '信号说明',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='告警设置模板表';
 
+-- ----------------------------
+-- Table structure for t_std_region
+-- ----------------------------
 DROP TABLE IF EXISTS `t_std_region`;
-
 CREATE TABLE `t_std_region` (
   `region_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '区域ID',
   `region_name` varchar(128) DEFAULT '' COMMENT '区域名称',
   `sort` int(1) DEFAULT '1' COMMENT '区域类型（1:国家,2:省份、直辖市,3:运维站,4:变电站,5:间隔,6:设备,7:部位）',
   `up_region_id` varchar(32) DEFAULT '' COMMENT '上级区域ID',
   `up_region_ids` varchar(255) DEFAULT '' COMMENT '区域ID层级',
-  `region_code` varchar(10) DEFAULT '1' COMMENT '类型区域，标准测点区域类型：100；E机器人区域类型：101；相机区域类型：102',
+  `region_code` varchar(10) NULL COMMENT '下级区域编码',
+  `origin_region_id` varchar(64) DEFAULT NULL COMMENT '下级节点区域ID(state为0时有值)',
   `station_id` varchar(32) DEFAULT '' COMMENT '变电站ID',
   `station_name` varchar(32) DEFAULT '' COMMENT '场站名称',
   `state` int(1) DEFAULT '0' COMMENT '0:非当前变电站 1：当前变电站',
+  `edge_status` varchar(8) DEFAULT NULL COMMENT '边缘节点在线状态',
+  `region_path` varchar(255) DEFAULT NULL COMMENT '站所地图路径',
+  `remark` varchar(512) DEFAULT NULL COMMENT '备注',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`region_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=700001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='标准区域表';
+  PRIMARY KEY (`region_id`) USING BTREE,
+  UNIQUE KEY `region_code` (`region_code`,`origin_region_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=700002 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='标准区域表';
 
-/*Table structure for table `t_sys_param` */
-
+-- ----------------------------
+-- Table structure for t_sys_param
+-- ----------------------------
 DROP TABLE IF EXISTS `t_sys_param`;
-
 CREATE TABLE `t_sys_param` (
   `param_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '参数ID',
   `param_type` int(11) DEFAULT '1' COMMENT '参数编码',
@@ -1719,13 +1979,14 @@ CREATE TABLE `t_sys_param` (
   `param_name` varchar(50) DEFAULT '' COMMENT '参数名称',
   `content` text COMMENT '参数内容',
   `remark` varchar(255) DEFAULT '' COMMENT '描述',
+  `rules` varchar(1024) DEFAULT NULL COMMENT '校验规则',
   PRIMARY KEY (`param_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=100001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统参数表';
+) ENGINE=InnoDB AUTO_INCREMENT=100115 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统参数表';
 
-/*Table structure for table `t_task_statistics` */
-
+-- ----------------------------
+-- Table structure for t_task_statistics
+-- ----------------------------
 DROP TABLE IF EXISTS `t_task_statistics`;
-
 CREATE TABLE `t_task_statistics` (
   `task_result_id` varchar(50) NOT NULL COMMENT '巡检任务编号',
   `cruise_point_id` bigint(48) NOT NULL COMMENT '巡检点编号',
@@ -1735,10 +1996,10 @@ CREATE TABLE `t_task_statistics` (
   PRIMARY KEY (`task_result_id`,`cruise_point_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='任务统计表';
 
-/*Table structure for table `t_union_task` */
-
+-- ----------------------------
+-- Table structure for t_union_task
+-- ----------------------------
 DROP TABLE IF EXISTS `t_union_task`;
-
 CREATE TABLE `t_union_task` (
   `union_id` varchar(50) NOT NULL COMMENT '巡检任务',
   `rule_id` bigint(32) DEFAULT '1' COMMENT '规则ID',
@@ -1757,10 +2018,10 @@ CREATE TABLE `t_union_task` (
   PRIMARY KEY (`union_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='联合巡视记录表';
 
-/*Table structure for table `t_union_task_attr` */
-
+-- ----------------------------
+-- Table structure for t_union_task_attr
+-- ----------------------------
 DROP TABLE IF EXISTS `t_union_task_attr`;
-
 CREATE TABLE `t_union_task_attr` (
   `union_id` varchar(50) NOT NULL COMMENT '关联任务表UUID',
   `instance_id` bigint(48) NOT NULL,
@@ -1772,10 +2033,24 @@ CREATE TABLE `t_union_task_attr` (
   PRIMARY KEY (`union_id`,`instance_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='联合巡视记录属性表';
 
-/*Table structure for table `t_video_algo_result` */
+-- ----------------------------
+-- Table structure for t_version
+-- ----------------------------
+DROP TABLE IF EXISTS `t_version`;
+CREATE TABLE `t_version` (
+  `version_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `system_type` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1: 系统版本 2: 算法版本',
+  `version_name` varchar(256) NOT NULL COMMENT '版本号',
+  `remark` varchar(512) NOT NULL COMMENT '版本描述',
+  `text` varchar(2000) NOT NULL COMMENT '版本详细说明',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`version_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统版本表';
 
+-- ----------------------------
+-- Table structure for t_video_algo_result
+-- ----------------------------
 DROP TABLE IF EXISTS `t_video_algo_result`;
-
 CREATE TABLE `t_video_algo_result` (
   `id` bigint(58) NOT NULL AUTO_INCREMENT COMMENT '视频轮训任务结果ID',
   `point_id` bigint(48) DEFAULT '1' COMMENT '巡检点ID',
@@ -1797,12 +2072,12 @@ CREATE TABLE `t_video_algo_result` (
   `execute_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '执行时间',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=98100001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='视频轮训任务结果表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='视频轮训任务结果表';
 
-/*Table structure for table `t_video_analyse_result` */
-
+-- ----------------------------
+-- Table structure for t_video_analyse_result
+-- ----------------------------
 DROP TABLE IF EXISTS `t_video_analyse_result`;
-
 CREATE TABLE `t_video_analyse_result` (
   `algorithm_result_id` bigint(58) NOT NULL AUTO_INCREMENT COMMENT '算法分析结果ID',
   `analyse_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '算法分析时间',
@@ -1814,12 +2089,12 @@ CREATE TABLE `t_video_analyse_result` (
   `result_describe` varchar(256) DEFAULT '' COMMENT '算法分析结果描述',
   `reserver` int(11) DEFAULT '1' COMMENT '备用字段1',
   PRIMARY KEY (`algorithm_result_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=98000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='算法结果表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='算法结果表';
 
-/*Table structure for table `t_video_intercom` */
-
+-- ----------------------------
+-- Table structure for t_video_intercom
+-- ----------------------------
 DROP TABLE IF EXISTS `t_video_intercom`;
-
 CREATE TABLE `t_video_intercom` (
   `video_intercom_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '可视对讲id',
   `camera_name` varchar(255) CHARACTER SET utf8 NOT NULL COMMENT '可视对讲名称',
@@ -1839,12 +2114,12 @@ CREATE TABLE `t_video_intercom` (
   `vendor` varchar(255) CHARACTER SET utf8 DEFAULT '' COMMENT '厂家名称',
   `rtsp_port` int(10) NOT NULL COMMENT 'rtsp端口',
   PRIMARY KEY (`video_intercom_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=95000001 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC COMMENT='可视对讲表';
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC COMMENT='可视对讲表';
 
-/*Table structure for table `t_voice_config` */
-
+-- ----------------------------
+-- Table structure for t_voice_config
+-- ----------------------------
 DROP TABLE IF EXISTS `t_voice_config`;
-
 CREATE TABLE `t_voice_config` (
   `config_id` bigint(32) NOT NULL AUTO_INCREMENT,
   `ftp_url` varchar(255) DEFAULT '' COMMENT 'ftp地址',
@@ -1861,12 +2136,12 @@ CREATE TABLE `t_voice_config` (
   `file_path` varchar(255) DEFAULT '' COMMENT '算法配置文件路径',
   `pms_id` varchar(30) DEFAULT '' COMMENT 'pmsId',
   PRIMARY KEY (`config_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=92000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='声纹ftp配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='声纹ftp配置表';
 
-/*Table structure for table `t_voice_device` */
-
+-- ----------------------------
+-- Table structure for t_voice_device
+-- ----------------------------
 DROP TABLE IF EXISTS `t_voice_device`;
-
 CREATE TABLE `t_voice_device` (
   `voice_device_id` bigint(64) NOT NULL AUTO_INCREMENT COMMENT '声纹监控设备Id',
   `voice_device_name` varchar(255) DEFAULT '' COMMENT '声纹监控设备名称（）',
@@ -1875,17 +2150,17 @@ CREATE TABLE `t_voice_device` (
   `config_id` bigint(32) NOT NULL DEFAULT '1',
   `up_region_id` bigint(32) DEFAULT '1' COMMENT '上级区域id',
   `state` varchar(30) DEFAULT '' COMMENT '在线状态',
-  `voice_code`  varchar(256) NULL COMMENT '声纹编码',
-  `voice_type`  varchar(32) NULL COMMENT '设备类型',
-  `voice_model`  varchar(32) NULL COMMENT '设备型号',
-  `voice_factory`  varchar(64) NULL COMMENT '生产厂家',
+  `voice_code` varchar(256) DEFAULT NULL COMMENT '声纹设备编码',
+  `voice_type` varchar(32) DEFAULT NULL COMMENT '设备类型',
+  `voice_model` varchar(32) DEFAULT NULL COMMENT '设备型号',
+  `voice_factory` varchar(32) DEFAULT NULL COMMENT '生产厂家',
   PRIMARY KEY (`voice_device_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=91000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='声纹设备表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='声纹设备表';
 
-/*Table structure for table `t_voice_print` */
-
+-- ----------------------------
+-- Table structure for t_voice_print
+-- ----------------------------
 DROP TABLE IF EXISTS `t_voice_print`;
-
 CREATE TABLE `t_voice_print` (
   `voice_id` varchar(64) NOT NULL COMMENT '声纹Id',
   `voice_print_name` varchar(255) CHARACTER SET utf8 DEFAULT '' COMMENT '声纹名称',
@@ -1905,10 +2180,10 @@ CREATE TABLE `t_voice_print` (
   PRIMARY KEY (`voice_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC COMMENT='声纹文件表';
 
-/*Table structure for table `t_warn_info` */
-
+-- ----------------------------
+-- Table structure for t_warn_info
+-- ----------------------------
 DROP TABLE IF EXISTS `t_warn_info`;
-
 CREATE TABLE `t_warn_info` (
   `warn_id` bigint(58) NOT NULL AUTO_INCREMENT COMMENT '告警ID',
   `warn_level` int(11) DEFAULT '1' COMMENT '告警等级',
@@ -1936,71 +2211,150 @@ CREATE TABLE `t_warn_info` (
   `out_range` varchar(100) DEFAULT '',
   `task_id` varchar(512) DEFAULT '' COMMENT '任务ID',
   PRIMARY KEY (`warn_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=51000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='告警信息表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='告警信息表';
 
-/*Table structure for table `t_record_file` */
+-- 任务重构 --
+-- ----------------------------
+-- Table structure for u_patrol_task_attr
+-- ----------------------------
+DROP TABLE IF EXISTS `u_patrol_task_attr`;
+CREATE TABLE `u_patrol_task_attr` (
+  `task_id` varchar(50) NOT NULL COMMENT '关联任务表id',
+  `instance_id` bigint(48) NOT NULL COMMENT '巡检点实例ID',
+  `device_mete_id` bigint(48) DEFAULT '1' COMMENT '测点实例ID',
+  `device_id` bigint(32) DEFAULT '1' COMMENT '关联设备id',
+  `custom_id` varchar(32) DEFAULT '' COMMENT '关联部位表id',
+  `point_task_id` varchar(32) DEFAULT '' COMMENT '关联巡视点表id',
+  `if_robot` int(11) DEFAULT '1' COMMENT '是否支持机器人巡视（暂时没用）',
+  `if_video` int(11) DEFAULT '1' COMMENT '是否支持视频巡视（暂时没用）',
+  `if_inferad` int(11) DEFAULT '1' COMMENT '是否支持红外巡视（暂时没用）',
+  `if_artificial` int(11) DEFAULT '1' COMMENT '是否支持人工巡视（暂时没用）',
+  PRIMARY KEY (`task_id`,`instance_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='任务关联表';
 
-DROP TABLE IF EXISTS `t_record_file`;
 
-CREATE TABLE `t_record_file` (
-	`id` BIGINT (20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-	`camera_id` BIGINT (20) NOT NULL COMMENT '相机id',
-	`up_region_id` varchar(32) DEFAULT '' COMMENT '上级区域ID',
-	`file_name` varchar(128) DEFAULT NULL COMMENT '文件名称',
-	`file_path` VARCHAR (255) NULL COMMENT '录制文件路径',
-	`absolute_file_path` VARCHAR (255) NULL COMMENT '录制文件绝对路径',
-	`start_time` datetime NULL  COMMENT '开始录制时间',
-	`end_time` datetime NULL COMMENT '结束录制时间',
-	PRIMARY KEY (`id`)
-)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='录制文件表';
+-- ----------------------------
+-- Table structure for u_patrol_data_result
+-- ----------------------------
+DROP TABLE IF EXISTS `u_patrol_data_result`;
+CREATE TABLE `u_patrol_data_result` (
+  `cruise_data_id` bigint(68) NOT NULL AUTO_INCREMENT COMMENT '巡视点数据id',
+  `task_id` varchar(82) DEFAULT '' COMMENT '巡视任务id',
+  `device_id` bigint(32) DEFAULT '0' COMMENT '设备ID',
+  `device_name` varchar(50) DEFAULT '' COMMENT '设备名称',
+  `instance_id` bigint(48) DEFAULT '0' COMMENT '巡检点实例ID',
+  `instance_name` varchar(50) DEFAULT '' COMMENT '巡检点实例名称',
+  `cruise_id` bigint(48) DEFAULT '0' COMMENT '巡检点ID',
+  `cruise_name` varchar(50) DEFAULT '' COMMENT '巡检点名称',
+  `cruise_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '巡检时间',
+  `cruise_status` int(11) DEFAULT '0' COMMENT '状态:0-已执行 1-未执行 2-执行失败 3-未知',
+  `cruise_type` int(11) DEFAULT '1' COMMENT '巡检点类型 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹',
+  `result_desc` varchar(512) DEFAULT '' COMMENT '巡检结果文字描述（暂时没用）',
+  `result_num` varchar(512) DEFAULT '' COMMENT '巡检结果数值',
+  `modify_num` varchar(100) DEFAULT '' COMMENT '机器人巡检图片分析值（暂时没用）',
+  `picpath` varchar(256) DEFAULT '' COMMENT '巡检分析图片，相对路径',
+  `confirm_pic_path` varchar(255) DEFAULT '' COMMENT '操作前结果图片,相对',
+  `pic_path_anl` varchar(255) DEFAULT '' COMMENT '机器人巡检图片,相对（暂时没用）',
+  `person_check` varchar(512) DEFAULT '' COMMENT '人工校核结果',
+  `origpic` varchar(256) DEFAULT '' COMMENT '算法原始图片/红外可见光，绝对路径',
+  `orig_confirm_pic_path` varchar(255) DEFAULT '' COMMENT '操作前结果图片,绝对',
+  `orig_pic_anl` varchar(255) DEFAULT '' COMMENT '机器人巡检图片,绝对（暂时没用）',
+  `cruise_abnormal` int(11) DEFAULT '1' COMMENT '巡视异常原因 -抓图失败、数据异常、异常告警、算法超时',
+  `evaluation_state` int(11) DEFAULT '1' COMMENT '审核状态1-审核0-未审核',
+  `identify_state` int(11) DEFAULT '1' COMMENT '识别状态 1识别正常 2识别异常',
+  `identify_result` int(11) DEFAULT '1' COMMENT '实际结果 1正常 2异常',
+  `createtime` datetime DEFAULT CURRENT_TIMESTAMP,
+  `remark` varchar(256) DEFAULT '' COMMENT '备用字段3',
+  `check_user` varchar(32) DEFAULT '' COMMENT '审核人',
+  `check_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '审核时间',
+  `is_warn` int(11) DEFAULT '1' COMMENT '是否产生告警1.是0.否',
+  `cruise_result` int(11) DEFAULT '1' COMMENT '巡视执行结果-正常、异常',
+  `fir_name` varchar(60) DEFAULT '' COMMENT '红外FIR文件名称',
+  `fir_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '红外FIR文件生成时间',
+  `result_pic` varchar(255) DEFAULT '' COMMENT 'FIR文件存储路径',
+  `points` varchar(125) DEFAULT '' COMMENT '图片坐标点',
+  `voice_path` varchar(512) DEFAULT NULL COMMENT '声纹文件地址',
+  PRIMARY KEY (`cruise_data_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点数据表';
 
 
-/*Table structure for table `t_std_meter_type_model` */
-
-DROP TABLE IF EXISTS `t_std_meter_type_model`;
-CREATE TABLE `t_std_meter_type_model`(
-    `id`            int(8) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    `meter_type`    int(8) DEFAULT '1' COMMENT '表计类型',
-    `device_type`   int(8) DEFAULT '1' COMMENT '设备类型',
-    `mete_kind`     varchar(20)    DEFAULT '' COMMENT '测点类型:0-遥信，1-遥测',
-    `unit`          varchar(50)    DEFAULT '' COMMENT '单位',
-    `alarm_note`    varchar(50)    DEFAULT '' COMMENT '是否生成告警提示 1-生成 0-不生成',
-    `alarm_type`    varchar(50)    DEFAULT '' COMMENT '告警分类',
-    `up_effect`     float          DEFAULT '1' COMMENT '有效上限',
-    `down_effect`   float          DEFAULT '1' COMMENT '有效下限',
-    `state_zero`    varchar(20)    DEFAULT '' COMMENT '状态一描述',
-    `state_one`     varchar(20)    DEFAULT '' COMMENT '状态二描述',
-    `alarm_state`   int(8) DEFAULT '1' COMMENT '告警关联信号',
-    `alarm_level`   int(11) DEFAULT '1' COMMENT '告警级别',
-    `high_limit1`   float          DEFAULT '1' COMMENT '告警上限1',
-    `low_limit1`    float          DEFAULT '1' COMMENT '告警下限1',
-    `high_limit2`   float          DEFAULT '1' COMMENT '告警上限2',
-    `low_limit2`    float          DEFAULT '1' COMMENT '告警下限2',
-    `high_limit3`   float          DEFAULT '1',
-    `low_limit3`    float          DEFAULT '1',
-    `high_limit4`   float          DEFAULT '1',
-    `low_limit4`    float          DEFAULT '1',
-    `alarm_delay`   int(11) DEFAULT '1' COMMENT '告警延时',
-    `alarm_cnt`     int(11) DEFAULT '1' COMMENT '告警次数',
-    `threshold_abs` decimal(10, 0) DEFAULT '0' COMMENT '绝对阀值',
-    `threshold_per` decimal(5, 0)  DEFAULT '0' COMMENT '百分比阀值',
-    `modulus`       int(11) DEFAULT '1' COMMENT '系数',
-    `remark`        varchar(128)   DEFAULT '' COMMENT '信号说明',
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=182412 DEFAULT CHARSET=utf8 COMMENT='告警设置模板表';
-
-DROP TABLE IF EXISTS `t_version`;
-CREATE TABLE `t_version` (
-  `version_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `system_type` tinyint NOT NULL DEFAULT 1 COMMENT '1: 系统版本 2: 算法版本',
-  `version_name` varchar(256) NOT NULL COMMENT '版本号',
-  `remark` varchar(512) NOT NULL COMMENT '版本描述',
-  `text` varchar(2000) NOT NULL COMMENT '版本详细说明',
+-- ----------------------------
+-- Table structure for u_patrol_plan_attr
+-- ----------------------------
+DROP TABLE IF EXISTS `u_patrol_plan_attr`;
+CREATE TABLE `u_patrol_plan_attr` (
+  `plan_id` bigint(32) NOT NULL COMMENT '预案ID',
+  `device_id` bigint(32) DEFAULT '0' COMMENT '设备ID',
+  `device_name` varchar(50) DEFAULT '' COMMENT '设备名称',
+  `device_mete_id` bigint(32) DEFAULT NULL COMMENT '测点id',
+  `device_mete_name` varchar(255) DEFAULT NULL COMMENT '测点名称',
+  `instance_id` bigint(48) NOT NULL DEFAULT '0' COMMENT '巡检点实例ID',
+  `instance_name` varchar(50) DEFAULT '' COMMENT '巡检点实例名称',
+  `position_id` bigint(48) DEFAULT '0' COMMENT '巡检点ID(机器人上报的点位id)',
+  `position_name` varchar(50) DEFAULT '' COMMENT '巡检点名称',
+  `robot_id` bigint(20) DEFAULT '1' COMMENT '机器人id',
+  `area_id` varchar(32) DEFAULT '' COMMENT '区域ID',
+  `point_type` int(11) DEFAULT '1' COMMENT '巡检方式 1视频 2机器人 3红外 4在线监测 5SCADA 6声纹',
+  `cruise_region_ids` varchar(256) DEFAULT '' COMMENT '巡检区域id',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`version_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统版本表';
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`plan_id`,`instance_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检预案属性表';
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- ----------------------------
+-- Table structure for u_patrol_result
+-- ----------------------------
+DROP TABLE IF EXISTS `u_patrol_result`;
+CREATE TABLE `u_patrol_result` (
+  `task_id` varchar(50) NOT NULL DEFAULT '' COMMENT '巡检任务ID',
+  `task_code` varchar(50) DEFAULT '' COMMENT '任务编码',
+  `task_name` varchar(50) DEFAULT '' COMMENT '巡检任务名称',
+  `area_id` varchar(32) DEFAULT '' COMMENT '区域id',
+  `task_type` int(11) DEFAULT '1' COMMENT '任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义',
+  `execute_type` int(11) DEFAULT '1' COMMENT '执行类型（172.周期，173.立即，174.定期）',
+  `robot_id` bigint(20) DEFAULT '1' COMMENT '机器人id',
+  `task_source` int(11) DEFAULT '1' COMMENT '任务来源（暂时没用）',
+  `task_level` int(2) DEFAULT '1' COMMENT '任务等级(从高到低):4级,3级,2级,1级',
+  `task_state` int(11) DEFAULT '1' COMMENT '任务状态  -1.数据异常 0.正在执行 1.执行完成 2.任务暂停 3.任务终止 4任务异常终止5. 任务超期',
+  `modify_state` int(11) DEFAULT '1' COMMENT '状态修正值（暂时没用）',
+  `task_count` int(11) DEFAULT '1' COMMENT '总巡检点数',
+  `task_wait` int(11) DEFAULT '1' COMMENT '待巡检点数',
+  `check_user` varchar(128) DEFAULT '' COMMENT '审核人',
+  `check_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '审核时间',
+  `weather` varchar(255) DEFAULT '' COMMENT '微气象',
+  `create_time` datetime DEFAULT NULL COMMENT '巡检开始时间',
+  `end_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '巡检结束时间',
+  `execute_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '执行时间',
+  `is_review` varchar(10) DEFAULT '0' COMMENT '巡视点是否全部审核完成，1-是0-否',
+  `task_abnormal` int(11) DEFAULT '0' COMMENT '巡检点异常数量',
+  `cruise_result` int(11) DEFAULT '0' COMMENT '巡视结果：0-正常 1-异常',
+  `remark` varchar(255) DEFAULT '' COMMENT '备注',
+  PRIMARY KEY (`task_id`),
+  KEY `index_create_time` (`create_time`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检任务结果表';
+
+
+-- ----------------------------
+-- Table structure for u_patrol_task
+-- ----------------------------
+DROP TABLE IF EXISTS `u_patrol_task`;
+CREATE TABLE `u_patrol_task` (
+  `task_id` varchar(50) NOT NULL COMMENT '巡检任务UUID',
+  `task_code` varchar(50) DEFAULT '' COMMENT '任务编码',
+  `task_name` varchar(50) DEFAULT '' COMMENT '任务名称',
+  `plan_id` bigint(32) DEFAULT '1' COMMENT '所属预案id',
+  `area_id` varchar(32) DEFAULT '' COMMENT '所属厂站',
+  `task_type` int(11) DEFAULT '1' COMMENT '任务类型1. 全面2. 例行3. 熄灯4. 特殊5. 专项 6.自定义',
+  `execute_type` int(11) DEFAULT '1' COMMENT '执行类型（172.周期，173.立即，174.定期）',
+  `robot_id` bigint(20) DEFAULT '1' COMMENT '机器人id',
+  `date_type` varchar(255) DEFAULT '' COMMENT '定时时间类型（1.周，2.日）',
+  `task_source` int(11) DEFAULT '1' COMMENT '任务来源（暂时没用）',
+  `task_level` int(2) DEFAULT '1' COMMENT '任务等级(从高到低):4级,3级,2级,1级',
+  `start_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '巡视时间',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `end_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '结束时间',
+  `create_user_id` bigint(20) DEFAULT NULL COMMENT '创建用户id',
+  PRIMARY KEY (`task_id`) USING BTREE,
+  KEY `areaid` (`area_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检任务表';
