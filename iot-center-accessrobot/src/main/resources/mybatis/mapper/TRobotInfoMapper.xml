@@ -1250,6 +1250,12 @@
         WHERE
             col_name = #{colName,jdbcType=VARCHAR}
     </select>
+    <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        select
+        <include refid="Base_Column_List" />
+        from t_robot_info
+        where  edge_code = #{edgeCode}
+    </select>
 
     <update id="updatePicPath" >
         UPDATE t_warn_info a

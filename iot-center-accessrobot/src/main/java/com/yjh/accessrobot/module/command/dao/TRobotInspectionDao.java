@@ -1,9 +1,11 @@
 package com.yjh.accessrobot.module.command.dao;
 
 import com.yjh.accessrobot.module.command.entity.TRobotInspection;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -43,4 +45,14 @@ public interface TRobotInspectionDao {
     int batchDeleteTCruisePointInstance(List<Long> list);
     int batchDeleteTCruisePlanAttr(List<Long> list);
     Map<String,Object> selectInspection(@Param(value = "inspectionCode") String inspectionCode);
+
+    List<TRobotInspection> selectByEdgeCode(@Param("edgeCode") String edgeCode);
+
+    int insertSelective(TRobotInspection record);
+
+    int updateByPrimaryKeySelective(TRobotInspection record);
+
+    int updateByPrimaryKey(TRobotInspection record);
+
+    int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
 }

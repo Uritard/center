@@ -2,60 +2,56 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yjh.accessrobot.module.command.dao.TRobotInspectionDao">
 
-    <!-- 通用查询映射结果 -->
+
     <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TRobotInspection">
-        <id column="inspection_id" jdbcType="BIGINT" property="inspectionId" />
-        <result column="inspection_code" jdbcType="VARCHAR" property="inspectionCode" />
-        <result column="robot_id" jdbcType="BIGINT" property="robotId" />
-        <result column="inspection_name" jdbcType="VARCHAR" property="inspectionName" />
+        <id property="inspectionId" column="inspection_id" jdbcType="BIGINT"/>
+        <result property="robotId" column="robot_id" jdbcType="BIGINT"/>
+        <result property="inspectionCode" column="inspection_code" jdbcType="VARCHAR"/>
+        <result property="inspectionName" column="inspection_name" jdbcType="VARCHAR"/>
+        <result property="inspectionType" column="inspection_type" jdbcType="INTEGER"/>
+        <result property="componentId" column="component_id" jdbcType="VARCHAR"/>
+        <result property="meterType" column="meter_type" jdbcType="INTEGER"/>
+        <result property="appearanceType" column="appearance_type" jdbcType="INTEGER"/>
+        <result property="mainOperationType" column="main_operation_type" jdbcType="INTEGER"/>
+        <result property="operationType" column="operation_type" jdbcType="INTEGER"/>
+        <result property="saveTypeList" column="save_type_list" jdbcType="VARCHAR"/>
+        <result property="recognitionTypeList" column="recognition_type_list" jdbcType="VARCHAR"/>
+        <result property="phase" column="phase" jdbcType="VARCHAR"/>
+        <result property="deviceInfo" column="device_info" jdbcType="VARCHAR"/>
+        <result property="propertyPicPath" column="property_pic_path" jdbcType="VARCHAR"/>
+        <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+        <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
     </resultMap>
 
-    <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        inspection_id, inspection_code,robot_id, inspection_name, inspection_type, alarm_top, alarm_bottom, default_value, inspection_position, collect_status, calibration_status, unit
+        inspection_id,robot_id,inspection_code,
+        inspection_name,inspection_type,component_id,
+        meter_type,appearance_type,main_operation_type,
+        operation_type,save_type_list,recognition_type_list,
+        phase,device_info,property_pic_path,
+        origin_id,edge_code
     </sql>
 
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="inspectionId" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
-        insert into t_robot_inspection(
-            inspection_id,
-            inspection_code,
-            robot_id,
-            inspection_name,
-            inspection_type,
-            component_id,
-            meter_type,
-            appearance_type,
-            main_operation_type,
-            operation_type,
-            save_type_list,
-            recognition_type_list,
-            phase,
-            device_info,
-            property_pic_path
-        )values(
-                #{inspectionId, jdbcType=BIGINT},
-                #{inspectionCode, jdbcType=VARCHAR},
-                #{robotId, jdbcType=BIGINT},
-                #{inspectionName, jdbcType=VARCHAR},
-                #{inspectionType, jdbcType=INTEGER},
-                #{componentId, jdbcType=VARCHAR},
-                #{meterType, jdbcType=INTEGER},
-                #{appearanceType, jdbcType=INTEGER},
-                #{mainOperationType, jdbcType=INTEGER},
-                #{operationType, jdbcType=INTEGER},
-                #{saveTypeList, jdbcType=VARCHAR},
-                #{recognitionTypeList, jdbcType=VARCHAR},
-                #{phase, jdbcType=VARCHAR},
-                #{deviceInfo, jdbcType=VARCHAR},
-                #{propertyPicPath, jdbcType=VARCHAR}
-        )
-    </insert>
-
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
         delete from t_robot_inspection
-                where inspection_id = #{inspectionId, jdbcType=BIGINT}
+        where  inspection_id = #{inspectionId,jdbcType=BIGINT}
     </delete>
+    <insert id="insert" keyColumn="inspection_id" keyProperty="inspectionId" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection" useGeneratedKeys="true">
+        insert into t_robot_inspection
+        ( inspection_id,robot_id,inspection_code
+        ,inspection_name,inspection_type,component_id
+        ,meter_type,appearance_type,main_operation_type
+        ,operation_type,save_type_list,recognition_type_list
+        ,phase,device_info,property_pic_path
+        ,origin_id,edge_code)
+        values (#{inspectionId,jdbcType=BIGINT},#{robotId,jdbcType=BIGINT},#{inspectionCode,jdbcType=VARCHAR}
+        ,#{inspectionName,jdbcType=VARCHAR},#{inspectionType,jdbcType=INTEGER},#{componentId,jdbcType=VARCHAR}
+        ,#{meterType,jdbcType=INTEGER},#{appearanceType,jdbcType=INTEGER},#{mainOperationType,jdbcType=INTEGER}
+        ,#{operationType,jdbcType=INTEGER},#{saveTypeList,jdbcType=VARCHAR},#{recognitionTypeList,jdbcType=VARCHAR}
+        ,#{phase,jdbcType=VARCHAR},#{deviceInfo,jdbcType=VARCHAR},#{propertyPicPath,jdbcType=VARCHAR}
+        ,#{originId,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR})
+    </insert>
 
     <update id="update" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
         update t_robot_inspection a <set>
@@ -78,27 +74,11 @@
         where a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}
     </update>
 
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
-            a.inspection_id,
-            a.inspection_code,
-            a.robot_id,
-            a.inspection_name,
-            a.inspection_type,
-            a.component_id,
-            a.meter_type,
-            a.appearance_type,
-            a.main_operation_type,
-            a.operation_type,
-            a.save_type_list,
-            a.recognition_type_list,
-            a.phase,
-            a.device_info,
-            property_pic_path
-        from t_robot_inspection a
-        where 1 = 1
-            and a.inspection_id = #{inspectionId, jdbcType=BIGINT}
-        limit 1
+        <include refid="Base_Column_List" />
+        from t_robot_inspection
+        where  inspection_id = #{inspectionId,jdbcType=BIGINT}
     </select>
 
     <select id="select" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
@@ -234,9 +214,8 @@
         </foreach>
     </delete>
     <!--批量插入机器人测点表数据-->
-    <insert id="batchInsertTRobotInspection">
+    <insert id="batchInsertTRobotInspection" keyColumn="inspection_id" keyProperty="inspectionId" parameterType="java.util.List" useGeneratedKeys="true">
         insert into t_robot_inspection(
-        inspection_id,
         inspection_code,
         robot_id,
         inspection_name,
@@ -250,11 +229,10 @@
         recognition_type_list,
         phase,
         device_info,
-        property_pic_path
+        property_pic_path,origin_id,edge_code
         )values
         <foreach collection="list" item="TRobotInspection" separator=",">
             (
-            #{TRobotInspection.inspectionId, jdbcType=BIGINT},
             #{TRobotInspection.inspectionCode, jdbcType=VARCHAR},
             #{TRobotInspection.robotId, jdbcType=BIGINT},
             #{TRobotInspection.inspectionName, jdbcType=VARCHAR},
@@ -268,7 +246,9 @@
             #{TRobotInspection.recognitionTypeList, jdbcType=VARCHAR},
             #{TRobotInspection.phase, jdbcType=VARCHAR},
             #{TRobotInspection.deviceInfo, jdbcType=VARCHAR},
-            #{TRobotInspection.propertyPicPath, jdbcType=VARCHAR}
+            #{TRobotInspection.propertyPicPath, jdbcType=VARCHAR},
+            #{TRobotInspection.originId, jdbcType=VARCHAR},
+            #{TRobotInspection.edgeCode, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -282,6 +262,131 @@
         WHERE 1 = 1
         <if test="inspectionCode != null and inspectionCode != ''"> and a.inspection_code = #{inspectionCode, jdbcType=VARCHAR}</if>
     </select>
+    <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
+        select
+        <include refid="Base_Column_List" />
+        from t_robot_inspection
+        where  edge_code = #{edgeCode}
+    </select>
 
-
+    <insert id="insertSelective" keyColumn="inspection_id" keyProperty="inspectionId" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection" useGeneratedKeys="true">
+        insert into t_robot_inspection
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="inspectionId != null">inspection_id,</if>
+            <if test="robotId != null">robot_id,</if>
+            <if test="inspectionCode != null">inspection_code,</if>
+            <if test="inspectionName != null">inspection_name,</if>
+            <if test="inspectionType != null">inspection_type,</if>
+            <if test="componentId != null">component_id,</if>
+            <if test="meterType != null">meter_type,</if>
+            <if test="appearanceType != null">appearance_type,</if>
+            <if test="mainOperationType != null">main_operation_type,</if>
+            <if test="operationType != null">operation_type,</if>
+            <if test="saveTypeList != null">save_type_list,</if>
+            <if test="recognitionTypeList != null">recognition_type_list,</if>
+            <if test="phase != null">phase,</if>
+            <if test="deviceInfo != null">device_info,</if>
+            <if test="propertyPicPath != null">property_pic_path,</if>
+            <if test="originId != null">origin_id,</if>
+            <if test="edgeCode != null">edge_code,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="inspectionId != null">#{inspectionId,jdbcType=BIGINT},</if>
+            <if test="robotId != null">#{robotId,jdbcType=BIGINT},</if>
+            <if test="inspectionCode != null">#{inspectionCode,jdbcType=VARCHAR},</if>
+            <if test="inspectionName != null">#{inspectionName,jdbcType=VARCHAR},</if>
+            <if test="inspectionType != null">#{inspectionType,jdbcType=INTEGER},</if>
+            <if test="componentId != null">#{componentId,jdbcType=VARCHAR},</if>
+            <if test="meterType != null">#{meterType,jdbcType=INTEGER},</if>
+            <if test="appearanceType != null">#{appearanceType,jdbcType=INTEGER},</if>
+            <if test="mainOperationType != null">#{mainOperationType,jdbcType=INTEGER},</if>
+            <if test="operationType != null">#{operationType,jdbcType=INTEGER},</if>
+            <if test="saveTypeList != null">#{saveTypeList,jdbcType=VARCHAR},</if>
+            <if test="recognitionTypeList != null">#{recognitionTypeList,jdbcType=VARCHAR},</if>
+            <if test="phase != null">#{phase,jdbcType=VARCHAR},</if>
+            <if test="deviceInfo != null">#{deviceInfo,jdbcType=VARCHAR},</if>
+            <if test="propertyPicPath != null">#{propertyPicPath,jdbcType=VARCHAR},</if>
+            <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+            <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
+        update t_robot_inspection
+        <set>
+            <if test="robotId != null">
+                robot_id = #{robotId,jdbcType=BIGINT},
+            </if>
+            <if test="inspectionCode != null">
+                inspection_code = #{inspectionCode,jdbcType=VARCHAR},
+            </if>
+            <if test="inspectionName != null">
+                inspection_name = #{inspectionName,jdbcType=VARCHAR},
+            </if>
+            <if test="inspectionType != null">
+                inspection_type = #{inspectionType,jdbcType=INTEGER},
+            </if>
+            <if test="componentId != null">
+                component_id = #{componentId,jdbcType=VARCHAR},
+            </if>
+            <if test="meterType != null">
+                meter_type = #{meterType,jdbcType=INTEGER},
+            </if>
+            <if test="appearanceType != null">
+                appearance_type = #{appearanceType,jdbcType=INTEGER},
+            </if>
+            <if test="mainOperationType != null">
+                main_operation_type = #{mainOperationType,jdbcType=INTEGER},
+            </if>
+            <if test="operationType != null">
+                operation_type = #{operationType,jdbcType=INTEGER},
+            </if>
+            <if test="saveTypeList != null">
+                save_type_list = #{saveTypeList,jdbcType=VARCHAR},
+            </if>
+            <if test="recognitionTypeList != null">
+                recognition_type_list = #{recognitionTypeList,jdbcType=VARCHAR},
+            </if>
+            <if test="phase != null">
+                phase = #{phase,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceInfo != null">
+                device_info = #{deviceInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="propertyPicPath != null">
+                property_pic_path = #{propertyPicPath,jdbcType=VARCHAR},
+            </if>
+            <if test="originId != null">
+                origin_id = #{originId,jdbcType=VARCHAR},
+            </if>
+            <if test="edgeCode != null">
+                edge_code = #{edgeCode,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where   inspection_id = #{inspectionId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection">
+        update t_robot_inspection
+        set
+        robot_id =  #{robotId,jdbcType=BIGINT},
+        inspection_code =  #{inspectionCode,jdbcType=VARCHAR},
+        inspection_name =  #{inspectionName,jdbcType=VARCHAR},
+        inspection_type =  #{inspectionType,jdbcType=INTEGER},
+        component_id =  #{componentId,jdbcType=VARCHAR},
+        meter_type =  #{meterType,jdbcType=INTEGER},
+        appearance_type =  #{appearanceType,jdbcType=INTEGER},
+        main_operation_type =  #{mainOperationType,jdbcType=INTEGER},
+        operation_type =  #{operationType,jdbcType=INTEGER},
+        save_type_list =  #{saveTypeList,jdbcType=VARCHAR},
+        recognition_type_list =  #{recognitionTypeList,jdbcType=VARCHAR},
+        phase =  #{phase,jdbcType=VARCHAR},
+        device_info =  #{deviceInfo,jdbcType=VARCHAR},
+        property_pic_path =  #{propertyPicPath,jdbcType=VARCHAR},
+        origin_id =  #{originId,jdbcType=VARCHAR},
+        edge_code =  #{edgeCode,jdbcType=VARCHAR}
+        where   inspection_id = #{inspectionId,jdbcType=BIGINT}
+    </update>
+    <delete id="deleteByEdgeCodeAndOriginId">
+        delete from t_robot_inspection  where edge_code=#{edgeCode}  and origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+    </delete>
 </mapper>
