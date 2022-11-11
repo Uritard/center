@@ -125,6 +125,16 @@ public class TCruisePointInstance implements Serializable {
     @TableField(value = "sort",updateStrategy = FieldStrategy.IGNORED)
     private String sort;
 
+    /**
+     * 节点编码
+     */
+    private String edgeCode;
+
+    /**
+     * 原始id(下级同步的id)
+     */
+    private String originId;
+
     private Integer pageNum=1;
 
     private Integer pageSize=0;

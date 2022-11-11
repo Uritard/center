@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.module.command.dao;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.module.command.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -387,4 +388,7 @@ public interface TRobotInfoDao {
     List<TRobotInfo> selectByEdgeCodeAndType(@Param(value = "edgeCode") String edgeCode, @Param("type") String type);
 
     int deleteByEdgeCodeAndOriginId(@Param(value = "edgeCode")String edgeNode, @Param("originIdList") Collection<String> originIdList);
+
+    List<TRobotInfo> selectByEdgeCode(@Param("edgeCode") String edgeCode);
+
 }

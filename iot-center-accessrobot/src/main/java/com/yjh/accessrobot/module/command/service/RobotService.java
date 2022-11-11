@@ -116,6 +116,9 @@ public class RobotService {
     @Autowired
     private  TRobotInfoService tRobotInfoService;
 
+    @Resource
+    private TStdDeviceModelService tStdDeviceModelService;
+
     @Transactional(rollbackFor = Exception.class)
     public int updateAllRobotStatus() {
         return tRobotInfoDao.updateAllRobotStatus("离线");
@@ -449,6 +452,96 @@ public class RobotService {
         }
     }
 
+    /**
+     * 处理机器人返回的模型文件
+     *
+     * @param map 机器人返回的模型文件相关信息
+     * @param nodeCode 节点
+     * @return void
+     */
+    public void addRobotFile(Map<String, Object> map, String nodeCode) {
+        if (StringUtils.isEmpty(nodeCode)){
+            log.error("机器人或边点编码为空, Code：{}", nodeCode);
+            throw new RuntimeException("机器人编码为空");
+        }
+        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+        if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS")){
+            filePathMap.put("content","C:\\robotData\\Model");
+        }
+        String filePathPrefix = filePathMap.get("content");
+
+        // 获取边缘节点 code
+        String edgeCode = (String)redisTemplate.opsForHash().get("region:idRefCode", nodeCode);
+        // 如果边缘节点 code 不为空，则表示底端上传数据的是边缘节点，不是机器人或无人机
+        boolean isEdge = StringUtils.isNotEmpty(edgeCode);
+
+        Long robotId = isEdge ? 1 : tRobotInfoDao.selectRobotIdByCode(nodeCode);
+
+        if (MapUtils.isNotEmpty(map)) {
+            map.forEach((k,v)->{
+                String filePath = filePathPrefix + File.separator + v;
+                try {
+                    List<Map<String, Object>> mapList = new ArrayList<>();
+                    if(!k.equals("map_file_path") && !k.equals("source_file_path")) {
+                        XMLBaseModel model = getXmlMessage(filePath);
+                        mapList = model.getItems();
+                    }
+                    switch (k){
+                        case "device_file_path":
+                            if (isEdge){
+                                syncModelUpdate("1", v.toString(), edgeCode);
+                            }else {
+                                // Device Point Info
+                                addDevicePoint(mapList, robotId);
+                                // Device Point Region Info
+                                addDevicePointRegion(mapList, robotId);
+                            }
+                            break;
+//                        case "robot_file_path":
+//                            // Robot Model Info
+//                            dealRobotFile(filePathMap,v.toString(),edgeCode);
+//                            break;
+                        case "property_file_path":
+                            //Property Info 属性信息 与点位绑定
+                            addPropertyModel(mapList, robotId);
+                            break;
+//                        case "region_file_path":
+//                            addRegionModel(mapList);
+//                            break;
+                        case "map_file_path":
+                            syncModelUpdate("9", v.toString(), edgeCode);
+                            break;
+//                        case "host_file_path":
+//                            dealHostFilePath(filePathMap,v.toString(),edgeCode);
+//                            break;
+//                        case "video_file_path":
+//                            dealCameraFile(filePathMap,v.toString(),edgeCode);
+//                            break;
+//                        case "drone_file_path":
+//                            dealDroneFile(filePathMap,v.toString(),edgeCode);
+//                            break;
+//                        case "voice_file_path":
+//                            dealVoiceFile(filePathMap,v.toString(),edgeCode);
+//                            break;
+                        case "record_file_path":
+                            dealRecordFile(filePathMap.get("content") + File.separator + v.toString(), edgeCode);
+                            break;
+//                        case "overhaularea_file_path":
+//                            dealMaintenanceFilePath(filePathMap,v.toString(),edgeCode);
+//                            break;
+//                        case "source_file_path":
+//                            dealSourceFile(filePath, edgeCode);
+//                            break;
+                        default:
+                            log.warn("模型解析未定义，{}: {}", k, filePath);
+                            break;
+                    }
+                } catch (DocumentException e) {
+                    log.error("解析模型失败，modelPath: {}", filePath, e);
+                }
+            });
+        }
+    }
     /**
      * 机器人模型文件信息处理
      *
@@ -2770,11 +2863,11 @@ public class RobotService {
             filePathMap.put("content", "C:\\robotData\\Model");
         }
         switch (type) {
-//            case "1":
-//                log.info("设备点位模型 {}", filePath);
-//                dealDevicePointModel(filePathMap.get("content") + File.separator + filePath, filePathMap.get("content"),
-//                        mapForPreset.get("content"), mapForPresetReal.get("content"), edgeCode);
-//                break;
+            case "1":
+                log.info("设备点位模型 {}", filePath);
+                dealDevicePointModel(filePathMap.get("content") + File.separator + filePath, filePathMap.get("content"),
+                        mapForPreset.get("content"), mapForPresetReal.get("content"), edgeCode);
+                break;
 //            case "2":
 //                log.info("边缘节点模型 {}", filePath);
 //                dealHostFilePath(filePathMap,filePath,edgeCode);
@@ -2817,6 +2910,28 @@ public class RobotService {
                 break;
             default:
                 break;
+        }
+    }
+
+
+    /**
+     * 处理设备点位模型
+     * @param filePath 设备点位模型路径
+     * @param edgeCode 边缘节点编码
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void dealDevicePointModel(String filePath, String ftpsPath, String presetPath, String presetRealPath, String edgeCode) {
+        if (StringUtils.isBlank(filePath)) {
+            log.info("file path is null");
+            return;
+        }
+        try {
+            XMLBaseModel model = getXmlMessage(filePath);
+            List<Map<String, Object>> deviceModelList = model.getItems();
+            tStdDeviceModelService.saveReportData(deviceModelList,ftpsPath,presetPath,presetRealPath, edgeCode);
+            log.info("节点 {} 的设备点位模型解析完成", edgeCode);
+        } catch (Exception e) {
+            log.error("设备点位模型处理失败", e);
         }
     }
 

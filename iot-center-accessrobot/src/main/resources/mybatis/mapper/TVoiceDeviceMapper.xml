@@ -34,6 +34,12 @@
         from t_voice_device
         where  voice_device_id = #{voiceDeviceId,jdbcType=BIGINT} 
     </select>
+    <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TVoiceDevice">
+        select
+        <include refid="Base_Column_List" />
+        from t_voice_device
+        where  edge_code = #{edgeCode}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from t_voice_device

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TStdDeviceMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TStdDevice">
+        <id property="deviceId" column="device_id" jdbcType="BIGINT"/>
+        <result property="deviceCode" column="device_code" jdbcType="VARCHAR"/>
+        <result property="deviceName" column="device_name" jdbcType="VARCHAR"/>
+        <result property="aliasName" column="alias_name" jdbcType="VARCHAR"/>
+        <result property="deviceType" column="device_type" jdbcType="INTEGER"/>
+        <result property="positionType" column="position_type" jdbcType="VARCHAR"/>
+        <result property="modelId" column="model_id" jdbcType="BIGINT"/>
+        <result property="regionPath" column="region_path" jdbcType="VARCHAR"/>
+        <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+        <result property="upRegionName" column="up_region_name" jdbcType="VARCHAR"/>
+        <result property="customType" column="custom_type" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="presetId" column="preset_id" jdbcType="BIGINT"/>
+        <result property="cameraId" column="camera_id" jdbcType="BIGINT"/>
+        <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+        <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+        <result property="realCode" column="real_code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        device_id,device_code,device_name,
+        alias_name,device_type,position_type,
+        model_id,region_path,up_region_id,
+        up_region_name,custom_type,status,
+        update_time,create_time,preset_id,
+        camera_id,origin_id,edge_code,
+        real_code
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_std_device
+        where  device_id = #{deviceId,jdbcType=BIGINT}
+    </select>
+    <select id="selectDictCodeByUpDict" resultType="java.util.Map">
+        SELECT
+        a.col_name,
+        a.dict_code,
+        a.up_dict
+        FROM
+        `t_dict_business` a
+        WHERE
+        FIND_IN_SET(a.col_name, #{colName, jdbcType=VARCHAR})
+    </select>
+    <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TStdDevice">
+        select
+        <include refid="Base_Column_List" />
+        from t_std_device
+        where  edge_code = #{edgeCode}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_std_device
+        where  device_id = #{deviceId,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteByEdgeCodeAndOriginId">
+        delete from t_std_device  where edge_code=#{edgeCode}  and origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+    </delete>
+    <insert id="insert" keyColumn="device_id" keyProperty="deviceId" parameterType="com.yjh.accessrobot.module.command.entity.TStdDevice" useGeneratedKeys="true">
+        insert into t_std_device
+        ( device_id,device_code,device_name
+        ,alias_name,device_type,position_type
+        ,model_id,region_path,up_region_id
+        ,up_region_name,custom_type,status
+        ,update_time,create_time,preset_id
+        ,camera_id,origin_id,edge_code
+        ,real_code)
+        values (#{deviceId,jdbcType=BIGINT},#{deviceCode,jdbcType=VARCHAR},#{deviceName,jdbcType=VARCHAR}
+        ,#{aliasName,jdbcType=VARCHAR},#{deviceType,jdbcType=INTEGER},#{positionType,jdbcType=VARCHAR}
+        ,#{modelId,jdbcType=BIGINT},#{regionPath,jdbcType=VARCHAR},#{upRegionId,jdbcType=BIGINT}
+        ,#{upRegionName,jdbcType=VARCHAR},#{customType,jdbcType=INTEGER},#{status,jdbcType=INTEGER}
+        ,#{updateTime,jdbcType=TIMESTAMP},#{createTime,jdbcType=TIMESTAMP},#{presetId,jdbcType=BIGINT}
+        ,#{cameraId,jdbcType=BIGINT},#{originId,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
+        ,#{realCode,jdbcType=VARCHAR})
+    </insert>
+    <insert id="batchInsert" keyColumn="device_id" keyProperty="deviceId" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into t_std_device
+        (device_code
+        ,device_name,alias_name,device_type
+        ,position_type,model_id,region_path
+        ,up_region_id,up_region_name,custom_type
+        ,status,update_time
+        ,create_time,preset_id,camera_id
+        ,origin_id,edge_code,real_code
+        )
+        values
+        <foreach collection="list"  item="tStdDevice" separator=",">
+            (#{tStdDevice.deviceCode,jdbcType=VARCHAR}
+            ,#{tStdDevice.deviceName,jdbcType=VARCHAR},#{tStdDevice.aliasName,jdbcType=VARCHAR},#{tStdDevice.deviceType,jdbcType=INTEGER}
+            ,#{tStdDevice.positionType,jdbcType=VARCHAR},#{tStdDevice.modelId,jdbcType=BIGINT},#{tStdDevice.regionPath,jdbcType=VARCHAR}
+            ,#{tStdDevice.upRegionId,jdbcType=BIGINT},#{tStdDevice.upRegionName,jdbcType=VARCHAR},#{tStdDevice.customType,jdbcType=INTEGER}
+            ,#{tStdDevice.status,jdbcType=INTEGER},#{tStdDevice.updateTime,jdbcType=TIMESTAMP}
+            ,#{tStdDevice.createTime,jdbcType=TIMESTAMP},#{tStdDevice.presetId,jdbcType=BIGINT},#{tStdDevice.cameraId,jdbcType=BIGINT}
+            ,#{tStdDevice.originId,jdbcType=VARCHAR},#{tStdDevice.edgeCode,jdbcType=VARCHAR},#{tStdDevice.realCode,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+    <insert id="insertSelective" keyColumn="device_id" keyProperty="deviceId" parameterType="com.yjh.accessrobot.module.command.entity.TStdDevice" useGeneratedKeys="true">
+        insert into t_std_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceId != null">device_id,</if>
+            <if test="deviceCode != null">device_code,</if>
+            <if test="deviceName != null">device_name,</if>
+            <if test="aliasName != null">alias_name,</if>
+            <if test="deviceType != null">device_type,</if>
+            <if test="positionType != null">position_type,</if>
+            <if test="modelId != null">model_id,</if>
+            <if test="regionPath != null">region_path,</if>
+            <if test="upRegionId != null">up_region_id,</if>
+            <if test="upRegionName != null">up_region_name,</if>
+            <if test="customType != null">custom_type,</if>
+            <if test="status != null">status,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="presetId != null">preset_id,</if>
+            <if test="cameraId != null">camera_id,</if>
+            <if test="originId != null">origin_id,</if>
+            <if test="edgeCode != null">edge_code,</if>
+            <if test="realCode != null">real_code,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceId != null">#{deviceId,jdbcType=BIGINT},</if>
+            <if test="deviceCode != null">#{deviceCode,jdbcType=VARCHAR},</if>
+            <if test="deviceName != null">#{deviceName,jdbcType=VARCHAR},</if>
+            <if test="aliasName != null">#{aliasName,jdbcType=VARCHAR},</if>
+            <if test="deviceType != null">#{deviceType,jdbcType=INTEGER},</if>
+            <if test="positionType != null">#{positionType,jdbcType=VARCHAR},</if>
+            <if test="modelId != null">#{modelId,jdbcType=BIGINT},</if>
+            <if test="regionPath != null">#{regionPath,jdbcType=VARCHAR},</if>
+            <if test="upRegionId != null">#{upRegionId,jdbcType=BIGINT},</if>
+            <if test="upRegionName != null">#{upRegionName,jdbcType=VARCHAR},</if>
+            <if test="customType != null">#{customType,jdbcType=INTEGER},</if>
+            <if test="status != null">#{status,jdbcType=INTEGER},</if>
+            <if test="updateTime != null">#{updateTime,jdbcType=TIMESTAMP},</if>
+            <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="presetId != null">#{presetId,jdbcType=BIGINT},</if>
+            <if test="cameraId != null">#{cameraId,jdbcType=BIGINT},</if>
+            <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+            <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+            <if test="realCode != null">#{realCode,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TStdDevice">
+        update t_std_device
+        <set>
+            <if test="deviceCode != null">
+                device_code = #{deviceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceName != null">
+                device_name = #{deviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="aliasName != null">
+                alias_name = #{aliasName,jdbcType=VARCHAR},
+            </if>
+            <if test="deviceType != null">
+                device_type = #{deviceType,jdbcType=INTEGER},
+            </if>
+            <if test="positionType != null">
+                position_type = #{positionType,jdbcType=VARCHAR},
+            </if>
+            <if test="modelId != null">
+                model_id = #{modelId,jdbcType=BIGINT},
+            </if>
+            <if test="regionPath != null">
+                region_path = #{regionPath,jdbcType=VARCHAR},
+            </if>
+            <if test="upRegionId != null">
+                up_region_id = #{upRegionId,jdbcType=BIGINT},
+            </if>
+            <if test="upRegionName != null">
+                up_region_name = #{upRegionName,jdbcType=VARCHAR},
+            </if>
+            <if test="customType != null">
+                custom_type = #{customType,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="presetId != null">
+                preset_id = #{presetId,jdbcType=BIGINT},
+            </if>
+            <if test="cameraId != null">
+                camera_id = #{cameraId,jdbcType=BIGINT},
+            </if>
+            <if test="originId != null">
+                origin_id = #{originId,jdbcType=VARCHAR},
+            </if>
+            <if test="edgeCode != null">
+                edge_code = #{edgeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="realCode != null">
+                real_code = #{realCode,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where   device_id = #{deviceId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TStdDevice">
+        update t_std_device
+        set
+        device_code =  #{deviceCode,jdbcType=VARCHAR},
+        device_name =  #{deviceName,jdbcType=VARCHAR},
+        alias_name =  #{aliasName,jdbcType=VARCHAR},
+        device_type =  #{deviceType,jdbcType=INTEGER},
+        position_type =  #{positionType,jdbcType=VARCHAR},
+        model_id =  #{modelId,jdbcType=BIGINT},
+        region_path =  #{regionPath,jdbcType=VARCHAR},
+        up_region_id =  #{upRegionId,jdbcType=BIGINT},
+        up_region_name =  #{upRegionName,jdbcType=VARCHAR},
+        custom_type =  #{customType,jdbcType=INTEGER},
+        status =  #{status,jdbcType=INTEGER},
+        update_time =  #{updateTime,jdbcType=TIMESTAMP},
+        create_time =  #{createTime,jdbcType=TIMESTAMP},
+        preset_id =  #{presetId,jdbcType=BIGINT},
+        camera_id =  #{cameraId,jdbcType=BIGINT},
+        origin_id =  #{originId,jdbcType=VARCHAR},
+        edge_code =  #{edgeCode,jdbcType=VARCHAR},
+        real_code =  #{realCode,jdbcType=VARCHAR}
+        where   device_id = #{deviceId,jdbcType=BIGINT}
+    </update>
+</mapper>

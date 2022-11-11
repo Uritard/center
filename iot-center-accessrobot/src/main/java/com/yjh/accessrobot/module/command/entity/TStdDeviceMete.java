@@ -36,6 +36,8 @@ public class TStdDeviceMete implements Serializable {
     @ApiModelProperty(value = "设备ID")
     private Long deviceId;
 
+    private String  devicePointId;
+
     @Max(value = 999999999999999999l)
     @ApiModelProperty(value = "标准测点ID")
     @TableField(value = "mete_id",updateStrategy = FieldStrategy.IGNORED)
@@ -43,6 +45,11 @@ public class TStdDeviceMete implements Serializable {
 
     @Length(max = 50, message = "customId长度必须小于等于50")
     private String customId;
+
+    @Length(max = 32, message = "customName长度必须小于等于32")
+    @ApiModelProperty(value = "部位名称")
+    @TableField(value = "custom_name",updateStrategy = FieldStrategy.IGNORED)
+    private String customName;
 
     @Max(value = 999999999)
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
@@ -68,6 +75,8 @@ public class TStdDeviceMete implements Serializable {
     @Max(value = 99999999)
     @ApiModelProperty(value = "设备类型")
     private Integer deviceType;
+
+    private Integer inspectionType;
 
     @Length(max = 20, message = "positionType长度必须小于等于20")
     @ApiModelProperty(value = "点号位置，inside-内部设备，outside-外部设备")
@@ -168,6 +177,8 @@ public class TStdDeviceMete implements Serializable {
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
 
+    private String redundantType;
+
     @Length(max = 20, message = "stateZero长度必须小于等于20")
     @ApiModelProperty(value = "状态一描述")
     @TableField(value = "state_zero",updateStrategy = FieldStrategy.IGNORED)
@@ -180,6 +191,16 @@ public class TStdDeviceMete implements Serializable {
 
     @Max(value = 99999999)
     private Integer alarmState;
+
+    /**
+     * 节点编码
+     */
+    private String edgeCode;
+
+    /**
+     * 原始id(下级同步的id)
+     */
+    private String originId;
 
     private Integer pageNum = 1;
 

@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TStdDevicemeteMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TStdDeviceMete">
+            <id property="deviceMeteId" column="device_mete_id" jdbcType="BIGINT"/>
+            <result property="deviceId" column="device_id" jdbcType="BIGINT"/>
+            <result property="devicePointId" column="device_point_id" jdbcType="VARCHAR"/>
+            <result property="customId" column="custom_id" jdbcType="VARCHAR"/>
+            <result property="customName" column="custom_name" jdbcType="VARCHAR"/>
+            <result property="meteId" column="mete_id" jdbcType="BIGINT"/>
+            <result property="meteKind" column="mete_kind" jdbcType="VARCHAR"/>
+            <result property="meteType" column="mete_type" jdbcType="VARCHAR"/>
+            <result property="meterType" column="meter_type" jdbcType="INTEGER"/>
+            <result property="deviceType" column="device_type" jdbcType="INTEGER"/>
+            <result property="inspectionType" column="inspection_type" jdbcType="INTEGER"/>
+            <result property="meteName" column="mete_name" jdbcType="VARCHAR"/>
+            <result property="appearanceType" column="appearance_type" jdbcType="INTEGER"/>
+            <result property="positionType" column="position_type" jdbcType="VARCHAR"/>
+            <result property="analyseType" column="analyse_type" jdbcType="INTEGER"/>
+            <result property="isAi" column="is_ai" jdbcType="VARCHAR"/>
+            <result property="isJudge" column="is_judge" jdbcType="VARCHAR"/>
+            <result property="unit" column="unit" jdbcType="VARCHAR"/>
+            <result property="alarmNote" column="alarm_note" jdbcType="VARCHAR"/>
+            <result property="alarmType" column="alarm_type" jdbcType="VARCHAR"/>
+            <result property="upEffect" column="up_effect" jdbcType="FLOAT"/>
+            <result property="downEffect" column="down_effect" jdbcType="FLOAT"/>
+            <result property="stateZero" column="state_zero" jdbcType="VARCHAR"/>
+            <result property="stateOne" column="state_one" jdbcType="VARCHAR"/>
+            <result property="alarmState" column="alarm_state" jdbcType="INTEGER"/>
+            <result property="alarmLevel" column="alarm_level" jdbcType="INTEGER"/>
+            <result property="highLimit1" column="high_limit1" jdbcType="FLOAT"/>
+            <result property="lowLimit1" column="low_limit1" jdbcType="FLOAT"/>
+            <result property="highLimit2" column="high_limit2" jdbcType="FLOAT"/>
+            <result property="lowLimit2" column="low_limit2" jdbcType="FLOAT"/>
+            <result property="highLimit3" column="high_limit3" jdbcType="FLOAT"/>
+            <result property="lowLimit3" column="low_limit3" jdbcType="FLOAT"/>
+            <result property="highLimit4" column="high_limit4" jdbcType="FLOAT"/>
+            <result property="lowLimit4" column="low_limit4" jdbcType="FLOAT"/>
+            <result property="alarmDelay" column="alarm_delay" jdbcType="INTEGER"/>
+            <result property="alarmCnt" column="alarm_cnt" jdbcType="INTEGER"/>
+            <result property="thresholdAbs" column="threshold_abs" jdbcType="DECIMAL"/>
+            <result property="thresholdPer" column="threshold_per" jdbcType="DECIMAL"/>
+            <result property="modulus" column="modulus" jdbcType="INTEGER"/>
+            <result property="remark" column="remark" jdbcType="VARCHAR"/>
+            <result property="redundantType" column="redundant_type" jdbcType="VARCHAR"/>
+            <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+            <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        device_mete_id,device_id,device_point_id,
+        custom_id,custom_name,mete_id,mete_kind,
+        mete_type,meter_type,device_type,
+        inspection_type,mete_name,appearance_type,
+        position_type,analyse_type,is_ai,
+        is_judge,unit,alarm_note,
+        alarm_type,up_effect,down_effect,
+        state_zero,state_one,alarm_state,
+        alarm_level,high_limit1,low_limit1,
+        high_limit2,low_limit2,high_limit3,
+        low_limit3,high_limit4,low_limit4,
+        alarm_delay,alarm_cnt,threshold_abs,
+        threshold_per,modulus,remark,
+        redundant_type,origin_id,edge_code
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_std_devicemete
+        where  device_mete_id = #{deviceMeteId,jdbcType=BIGINT} 
+    </select>
+    <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TStdDeviceMete">
+        select
+        <include refid="Base_Column_List" />
+        from t_std_devicemete
+        where  edge_code = #{edgeCode}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_std_devicemete
+        where  device_mete_id = #{deviceMeteId,jdbcType=BIGINT} 
+    </delete>
+    <delete id="deleteByEdgeCodeAndOriginId">
+        delete from t_std_devicemete  where edge_code=#{edgeCode}  and origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+    </delete>
+    <insert id="insert" keyColumn="device_mete_id" keyProperty="deviceMeteId" parameterType="com.yjh.accessrobot.module.command.entity.TStdDeviceMete" useGeneratedKeys="true">
+        insert into t_std_devicemete
+        ( device_mete_id,device_id,device_point_id
+        ,custom_id,custom_name,mete_id,mete_kind
+        ,mete_type,meter_type,device_type
+        ,inspection_type,mete_name,appearance_type
+        ,position_type,analyse_type,is_ai
+        ,is_judge,unit,alarm_note
+        ,alarm_type,up_effect,down_effect
+        ,state_zero,state_one,alarm_state
+        ,alarm_level,high_limit1,low_limit1
+        ,high_limit2,low_limit2,high_limit3
+        ,low_limit3,high_limit4,low_limit4
+        ,alarm_delay,alarm_cnt,threshold_abs
+        ,threshold_per,modulus,remark
+        ,redundant_type,origin_id,edge_code
+        )
+        values (#{deviceMeteId,jdbcType=BIGINT},#{deviceId,jdbcType=BIGINT},#{devicePointId,jdbcType=VARCHAR}
+        ,#{customId,jdbcType=VARCHAR},#{customName,jdbcType=VARCHAR},#{meteId,jdbcType=BIGINT},#{meteKind,jdbcType=VARCHAR}
+        ,#{meteType,jdbcType=VARCHAR},#{meterType,jdbcType=INTEGER},#{deviceType,jdbcType=INTEGER}
+        ,#{inspectionType,jdbcType=INTEGER},#{meteName,jdbcType=VARCHAR},#{appearanceType,jdbcType=INTEGER}
+        ,#{positionType,jdbcType=VARCHAR},#{analyseType,jdbcType=INTEGER},#{isAi,jdbcType=VARCHAR}
+        ,#{isJudge,jdbcType=VARCHAR},#{unit,jdbcType=VARCHAR},#{alarmNote,jdbcType=VARCHAR}
+        ,#{alarmType,jdbcType=VARCHAR},#{upEffect,jdbcType=FLOAT},#{downEffect,jdbcType=FLOAT}
+        ,#{stateZero,jdbcType=VARCHAR},#{stateOne,jdbcType=VARCHAR},#{alarmState,jdbcType=INTEGER}
+        ,#{alarmLevel,jdbcType=INTEGER},#{highLimit1,jdbcType=FLOAT},#{lowLimit1,jdbcType=FLOAT}
+        ,#{highLimit2,jdbcType=FLOAT},#{lowLimit2,jdbcType=FLOAT},#{highLimit3,jdbcType=FLOAT}
+        ,#{lowLimit3,jdbcType=FLOAT},#{highLimit4,jdbcType=FLOAT},#{lowLimit4,jdbcType=FLOAT}
+        ,#{alarmDelay,jdbcType=INTEGER},#{alarmCnt,jdbcType=INTEGER},#{thresholdAbs,jdbcType=DECIMAL}
+        ,#{thresholdPer,jdbcType=DECIMAL},#{modulus,jdbcType=INTEGER},#{remark,jdbcType=VARCHAR}
+        ,#{redundantType,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" keyColumn="device_mete_id" keyProperty="deviceMeteId" parameterType="com.yjh.accessrobot.module.command.entity.TStdDeviceMete" useGeneratedKeys="true">
+        insert into t_std_devicemete
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="deviceMeteId != null">device_mete_id,</if>
+                <if test="deviceId != null">device_id,</if>
+                <if test="devicePointId != null">device_point_id,</if>
+                <if test="customId != null">custom_id,</if>
+                <if test="customName != null">custom_name,</if>
+                <if test="meteId != null">mete_id,</if>
+                <if test="meteKind != null">mete_kind,</if>
+                <if test="meteType != null">mete_type,</if>
+                <if test="meterType != null">meter_type,</if>
+                <if test="deviceType != null">device_type,</if>
+                <if test="inspectionType != null">inspection_type,</if>
+                <if test="meteName != null">mete_name,</if>
+                <if test="appearanceType != null">appearance_type,</if>
+                <if test="positionType != null">position_type,</if>
+                <if test="analyseType != null">analyse_type,</if>
+                <if test="isAi != null">is_ai,</if>
+                <if test="isJudge != null">is_judge,</if>
+                <if test="unit != null">unit,</if>
+                <if test="alarmNote != null">alarm_note,</if>
+                <if test="alarmType != null">alarm_type,</if>
+                <if test="upEffect != null">up_effect,</if>
+                <if test="downEffect != null">down_effect,</if>
+                <if test="stateZero != null">state_zero,</if>
+                <if test="stateOne != null">state_one,</if>
+                <if test="alarmState != null">alarm_state,</if>
+                <if test="alarmLevel != null">alarm_level,</if>
+                <if test="highLimit1 != null">high_limit1,</if>
+                <if test="lowLimit1 != null">low_limit1,</if>
+                <if test="highLimit2 != null">high_limit2,</if>
+                <if test="lowLimit2 != null">low_limit2,</if>
+                <if test="highLimit3 != null">high_limit3,</if>
+                <if test="lowLimit3 != null">low_limit3,</if>
+                <if test="highLimit4 != null">high_limit4,</if>
+                <if test="lowLimit4 != null">low_limit4,</if>
+                <if test="alarmDelay != null">alarm_delay,</if>
+                <if test="alarmCnt != null">alarm_cnt,</if>
+                <if test="thresholdAbs != null">threshold_abs,</if>
+                <if test="thresholdPer != null">threshold_per,</if>
+                <if test="modulus != null">modulus,</if>
+                <if test="remark != null">remark,</if>
+                <if test="redundantType != null">redundant_type,</if>
+                <if test="originId != null">origin_id,</if>
+                <if test="edgeCode != null">edge_code,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="deviceMeteId != null">#{deviceMeteId,jdbcType=BIGINT},</if>
+                <if test="deviceId != null">#{deviceId,jdbcType=BIGINT},</if>
+                <if test="devicePointId != null">#{devicePointId,jdbcType=VARCHAR},</if>
+                <if test="customId != null">#{customId,jdbcType=VARCHAR},</if>
+                <if test="customName != null">#{customName,jdbcType=VARCHAR},</if>
+                <if test="meteId != null">#{meteId,jdbcType=BIGINT},</if>
+                <if test="meteKind != null">#{meteKind,jdbcType=VARCHAR},</if>
+                <if test="meteType != null">#{meteType,jdbcType=VARCHAR},</if>
+                <if test="meterType != null">#{meterType,jdbcType=INTEGER},</if>
+                <if test="deviceType != null">#{deviceType,jdbcType=INTEGER},</if>
+                <if test="inspectionType != null">#{inspectionType,jdbcType=INTEGER},</if>
+                <if test="meteName != null">#{meteName,jdbcType=VARCHAR},</if>
+                <if test="appearanceType != null">#{appearanceType,jdbcType=INTEGER},</if>
+                <if test="positionType != null">#{positionType,jdbcType=VARCHAR},</if>
+                <if test="analyseType != null">#{analyseType,jdbcType=INTEGER},</if>
+                <if test="isAi != null">#{isAi,jdbcType=VARCHAR},</if>
+                <if test="isJudge != null">#{isJudge,jdbcType=VARCHAR},</if>
+                <if test="unit != null">#{unit,jdbcType=VARCHAR},</if>
+                <if test="alarmNote != null">#{alarmNote,jdbcType=VARCHAR},</if>
+                <if test="alarmType != null">#{alarmType,jdbcType=VARCHAR},</if>
+                <if test="upEffect != null">#{upEffect,jdbcType=FLOAT},</if>
+                <if test="downEffect != null">#{downEffect,jdbcType=FLOAT},</if>
+                <if test="stateZero != null">#{stateZero,jdbcType=VARCHAR},</if>
+                <if test="stateOne != null">#{stateOne,jdbcType=VARCHAR},</if>
+                <if test="alarmState != null">#{alarmState,jdbcType=INTEGER},</if>
+                <if test="alarmLevel != null">#{alarmLevel,jdbcType=INTEGER},</if>
+                <if test="highLimit1 != null">#{highLimit1,jdbcType=FLOAT},</if>
+                <if test="lowLimit1 != null">#{lowLimit1,jdbcType=FLOAT},</if>
+                <if test="highLimit2 != null">#{highLimit2,jdbcType=FLOAT},</if>
+                <if test="lowLimit2 != null">#{lowLimit2,jdbcType=FLOAT},</if>
+                <if test="highLimit3 != null">#{highLimit3,jdbcType=FLOAT},</if>
+                <if test="lowLimit3 != null">#{lowLimit3,jdbcType=FLOAT},</if>
+                <if test="highLimit4 != null">#{highLimit4,jdbcType=FLOAT},</if>
+                <if test="lowLimit4 != null">#{lowLimit4,jdbcType=FLOAT},</if>
+                <if test="alarmDelay != null">#{alarmDelay,jdbcType=INTEGER},</if>
+                <if test="alarmCnt != null">#{alarmCnt,jdbcType=INTEGER},</if>
+                <if test="thresholdAbs != null">#{thresholdAbs,jdbcType=DECIMAL},</if>
+                <if test="thresholdPer != null">#{thresholdPer,jdbcType=DECIMAL},</if>
+                <if test="modulus != null">#{modulus,jdbcType=INTEGER},</if>
+                <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>
+                <if test="redundantType != null">#{redundantType,jdbcType=VARCHAR},</if>
+                <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+                <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <insert id="batchInsert" keyColumn="device_mete_id" keyProperty="deviceMeteId" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into t_std_devicemete
+        (device_id,device_point_id
+        ,custom_id,custom_name,mete_id,mete_kind
+        ,mete_type,meter_type,device_type
+        ,inspection_type,mete_name,appearance_type
+        ,position_type,analyse_type,is_ai
+        ,is_judge,unit,alarm_note
+        ,alarm_type,up_effect,down_effect
+        ,state_zero,state_one,alarm_state
+        ,alarm_level,high_limit1,low_limit1
+        ,high_limit2,low_limit2,high_limit3
+        ,low_limit3,high_limit4,low_limit4
+        ,alarm_delay,alarm_cnt,threshold_abs
+        ,threshold_per,modulus,remark
+        ,redundant_type,origin_id,edge_code
+        )
+        values
+        <foreach collection="list"  item="tStdDeviceMete" separator=",">
+            (#{tStdDeviceMete.deviceId,jdbcType=BIGINT},#{tStdDeviceMete.devicePointId,jdbcType=VARCHAR}
+            ,#{tStdDeviceMete.customId,jdbcType=VARCHAR},#{tStdDeviceMete.customName,jdbcType=VARCHAR},#{tStdDeviceMete.meteId,jdbcType=BIGINT},#{tStdDeviceMete.meteKind,jdbcType=VARCHAR}
+            ,#{tStdDeviceMete.meteType,jdbcType=VARCHAR},#{tStdDeviceMete.meterType,jdbcType=INTEGER},#{tStdDeviceMete.deviceType,jdbcType=INTEGER}
+            ,#{tStdDeviceMete.inspectionType,jdbcType=INTEGER},#{tStdDeviceMete.meteName,jdbcType=VARCHAR},#{tStdDeviceMete.appearanceType,jdbcType=INTEGER}
+            ,#{tStdDeviceMete.positionType,jdbcType=VARCHAR},#{tStdDeviceMete.analyseType,jdbcType=INTEGER},#{tStdDeviceMete.isAi,jdbcType=VARCHAR}
+            ,#{tStdDeviceMete.isJudge,jdbcType=VARCHAR},#{tStdDeviceMete.unit,jdbcType=VARCHAR},#{tStdDeviceMete.alarmNote,jdbcType=VARCHAR}
+            ,#{tStdDeviceMete.alarmType,jdbcType=VARCHAR},#{tStdDeviceMete.upEffect,jdbcType=FLOAT},#{tStdDeviceMete.downEffect,jdbcType=FLOAT}
+            ,#{tStdDeviceMete.stateZero,jdbcType=VARCHAR},#{tStdDeviceMete.stateOne,jdbcType=VARCHAR},#{tStdDeviceMete.alarmState,jdbcType=INTEGER}
+            ,#{tStdDeviceMete.alarmLevel,jdbcType=INTEGER},#{tStdDeviceMete.highLimit1,jdbcType=FLOAT},#{tStdDeviceMete.lowLimit1,jdbcType=FLOAT}
+            ,#{tStdDeviceMete.highLimit2,jdbcType=FLOAT},#{tStdDeviceMete.lowLimit2,jdbcType=FLOAT},#{tStdDeviceMete.highLimit3,jdbcType=FLOAT}
+            ,#{tStdDeviceMete.lowLimit3,jdbcType=FLOAT},#{tStdDeviceMete.highLimit4,jdbcType=FLOAT},#{tStdDeviceMete.lowLimit4,jdbcType=FLOAT}
+            ,#{tStdDeviceMete.alarmDelay,jdbcType=INTEGER},#{tStdDeviceMete.alarmCnt,jdbcType=INTEGER},#{tStdDeviceMete.thresholdAbs,jdbcType=DECIMAL}
+            ,#{tStdDeviceMete.thresholdPer,jdbcType=DECIMAL},#{tStdDeviceMete.modulus,jdbcType=INTEGER},#{tStdDeviceMete.remark,jdbcType=VARCHAR}
+            ,#{tStdDeviceMete.redundantType,jdbcType=VARCHAR},#{tStdDeviceMete.originId,jdbcType=VARCHAR},#{tStdDeviceMete.edgeCode,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TStdDeviceMete">
+        update t_std_devicemete
+        <set>
+                <if test="deviceId != null">
+                    device_id = #{deviceId,jdbcType=BIGINT},
+                </if>
+                <if test="devicePointId != null">
+                    device_point_id = #{devicePointId,jdbcType=VARCHAR},
+                </if>
+                <if test="customId != null">
+                    custom_id = #{customId,jdbcType=VARCHAR},
+                </if>
+                <if test="customName != null">
+                    custom_name = #{customName,jdbcType=VARCHAR},
+                </if>
+                <if test="meteId != null">
+                    mete_id = #{meteId,jdbcType=BIGINT},
+                </if>
+                <if test="meteKind != null">
+                    mete_kind = #{meteKind,jdbcType=VARCHAR},
+                </if>
+                <if test="meteType != null">
+                    mete_type = #{meteType,jdbcType=VARCHAR},
+                </if>
+                <if test="meterType != null">
+                    meter_type = #{meterType,jdbcType=INTEGER},
+                </if>
+                <if test="deviceType != null">
+                    device_type = #{deviceType,jdbcType=INTEGER},
+                </if>
+                <if test="inspectionType != null">
+                    inspection_type = #{inspectionType,jdbcType=INTEGER},
+                </if>
+                <if test="meteName != null">
+                    mete_name = #{meteName,jdbcType=VARCHAR},
+                </if>
+                <if test="appearanceType != null">
+                    appearance_type = #{appearanceType,jdbcType=INTEGER},
+                </if>
+                <if test="positionType != null">
+                    position_type = #{positionType,jdbcType=VARCHAR},
+                </if>
+                <if test="analyseType != null">
+                    analyse_type = #{analyseType,jdbcType=INTEGER},
+                </if>
+                <if test="isAi != null">
+                    is_ai = #{isAi,jdbcType=VARCHAR},
+                </if>
+                <if test="isJudge != null">
+                    is_judge = #{isJudge,jdbcType=VARCHAR},
+                </if>
+                <if test="unit != null">
+                    unit = #{unit,jdbcType=VARCHAR},
+                </if>
+                <if test="alarmNote != null">
+                    alarm_note = #{alarmNote,jdbcType=VARCHAR},
+                </if>
+                <if test="alarmType != null">
+                    alarm_type = #{alarmType,jdbcType=VARCHAR},
+                </if>
+                <if test="upEffect != null">
+                    up_effect = #{upEffect,jdbcType=FLOAT},
+                </if>
+                <if test="downEffect != null">
+                    down_effect = #{downEffect,jdbcType=FLOAT},
+                </if>
+                <if test="stateZero != null">
+                    state_zero = #{stateZero,jdbcType=VARCHAR},
+                </if>
+                <if test="stateOne != null">
+                    state_one = #{stateOne,jdbcType=VARCHAR},
+                </if>
+                <if test="alarmState != null">
+                    alarm_state = #{alarmState,jdbcType=INTEGER},
+                </if>
+                <if test="alarmLevel != null">
+                    alarm_level = #{alarmLevel,jdbcType=INTEGER},
+                </if>
+                <if test="highLimit1 != null">
+                    high_limit1 = #{highLimit1,jdbcType=FLOAT},
+                </if>
+                <if test="lowLimit1 != null">
+                    low_limit1 = #{lowLimit1,jdbcType=FLOAT},
+                </if>
+                <if test="highLimit2 != null">
+                    high_limit2 = #{highLimit2,jdbcType=FLOAT},
+                </if>
+                <if test="lowLimit2 != null">
+                    low_limit2 = #{lowLimit2,jdbcType=FLOAT},
+                </if>
+                <if test="highLimit3 != null">
+                    high_limit3 = #{highLimit3,jdbcType=FLOAT},
+                </if>
+                <if test="lowLimit3 != null">
+                    low_limit3 = #{lowLimit3,jdbcType=FLOAT},
+                </if>
+                <if test="highLimit4 != null">
+                    high_limit4 = #{highLimit4,jdbcType=FLOAT},
+                </if>
+                <if test="lowLimit4 != null">
+                    low_limit4 = #{lowLimit4,jdbcType=FLOAT},
+                </if>
+                <if test="alarmDelay != null">
+                    alarm_delay = #{alarmDelay,jdbcType=INTEGER},
+                </if>
+                <if test="alarmCnt != null">
+                    alarm_cnt = #{alarmCnt,jdbcType=INTEGER},
+                </if>
+                <if test="thresholdAbs != null">
+                    threshold_abs = #{thresholdAbs,jdbcType=DECIMAL},
+                </if>
+                <if test="thresholdPer != null">
+                    threshold_per = #{thresholdPer,jdbcType=DECIMAL},
+                </if>
+                <if test="modulus != null">
+                    modulus = #{modulus,jdbcType=INTEGER},
+                </if>
+                <if test="remark != null">
+                    remark = #{remark,jdbcType=VARCHAR},
+                </if>
+                <if test="redundantType != null">
+                    redundant_type = #{redundantType,jdbcType=VARCHAR},
+                </if>
+                <if test="originId != null">
+                    origin_id = #{originId,jdbcType=VARCHAR},
+                </if>
+                <if test="edgeCode != null">
+                    edge_code = #{edgeCode,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   device_mete_id = #{deviceMeteId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TStdDeviceMete">
+        update t_std_devicemete
+        set 
+            device_id =  #{deviceId,jdbcType=BIGINT},
+            device_point_id =  #{devicePointId,jdbcType=VARCHAR},
+            custom_id =  #{customId,jdbcType=VARCHAR},
+            custom_name =  #{customName,jdbcType=VARCHAR},
+            mete_id =  #{meteId,jdbcType=BIGINT},
+            mete_kind =  #{meteKind,jdbcType=VARCHAR},
+            mete_type =  #{meteType,jdbcType=VARCHAR},
+            meter_type =  #{meterType,jdbcType=INTEGER},
+            device_type =  #{deviceType,jdbcType=INTEGER},
+            inspection_type =  #{inspectionType,jdbcType=INTEGER},
+            mete_name =  #{meteName,jdbcType=VARCHAR},
+            appearance_type =  #{appearanceType,jdbcType=INTEGER},
+            position_type =  #{positionType,jdbcType=VARCHAR},
+            analyse_type =  #{analyseType,jdbcType=INTEGER},
+            is_ai =  #{isAi,jdbcType=VARCHAR},
+            is_judge =  #{isJudge,jdbcType=VARCHAR},
+            unit =  #{unit,jdbcType=VARCHAR},
+            alarm_note =  #{alarmNote,jdbcType=VARCHAR},
+            alarm_type =  #{alarmType,jdbcType=VARCHAR},
+            up_effect =  #{upEffect,jdbcType=FLOAT},
+            down_effect =  #{downEffect,jdbcType=FLOAT},
+            state_zero =  #{stateZero,jdbcType=VARCHAR},
+            state_one =  #{stateOne,jdbcType=VARCHAR},
+            alarm_state =  #{alarmState,jdbcType=INTEGER},
+            alarm_level =  #{alarmLevel,jdbcType=INTEGER},
+            high_limit1 =  #{highLimit1,jdbcType=FLOAT},
+            low_limit1 =  #{lowLimit1,jdbcType=FLOAT},
+            high_limit2 =  #{highLimit2,jdbcType=FLOAT},
+            low_limit2 =  #{lowLimit2,jdbcType=FLOAT},
+            high_limit3 =  #{highLimit3,jdbcType=FLOAT},
+            low_limit3 =  #{lowLimit3,jdbcType=FLOAT},
+            high_limit4 =  #{highLimit4,jdbcType=FLOAT},
+            low_limit4 =  #{lowLimit4,jdbcType=FLOAT},
+            alarm_delay =  #{alarmDelay,jdbcType=INTEGER},
+            alarm_cnt =  #{alarmCnt,jdbcType=INTEGER},
+            threshold_abs =  #{thresholdAbs,jdbcType=DECIMAL},
+            threshold_per =  #{thresholdPer,jdbcType=DECIMAL},
+            modulus =  #{modulus,jdbcType=INTEGER},
+            remark =  #{remark,jdbcType=VARCHAR},
+            redundant_type =  #{redundantType,jdbcType=VARCHAR},
+            origin_id =  #{originId,jdbcType=VARCHAR},
+            edge_code =  #{edgeCode,jdbcType=VARCHAR}
+        where   device_mete_id = #{deviceMeteId,jdbcType=BIGINT} 
+    </update>
+</mapper>

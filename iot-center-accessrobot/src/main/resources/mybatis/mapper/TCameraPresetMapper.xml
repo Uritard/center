@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TCameraPresetMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TCameraPreset">
+            <id property="presetId" column="preset_id" jdbcType="BIGINT"/>
+            <result property="cameraId" column="camera_id" jdbcType="BIGINT"/>
+            <result property="presetNum" column="preset_num" jdbcType="INTEGER"/>
+            <result property="presetName" column="preset_name" jdbcType="VARCHAR"/>
+            <result property="isKeepWatch" column="is_keep_watch" jdbcType="INTEGER"/>
+            <result property="isKeepWatchTask" column="is_keep_watch_task" jdbcType="INTEGER"/>
+            <result property="creatorUser" column="creator_user" jdbcType="VARCHAR"/>
+            <result property="creatorTime" column="creator_time" jdbcType="TIMESTAMP"/>
+            <result property="isUse" column="is_use" jdbcType="INTEGER"/>
+            <result property="presetImg" column="preset_img" jdbcType="VARCHAR"/>
+            <result property="inspectionPostion" column="inspection_postion" jdbcType="INTEGER"/>
+            <result property="collectStatus" column="collect_status" jdbcType="INTEGER"/>
+            <result property="calibrationStatus" column="calibration_status" jdbcType="INTEGER"/>
+            <result property="remark" column="remark" jdbcType="VARCHAR"/>
+            <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+            <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+            <result property="isSecondKeepWatchTask" column="is_second_keep_watch_task" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        preset_id,camera_id,preset_num,
+        preset_name,is_keep_watch,is_keep_watch_task,
+        creator_user,creator_time,is_use,
+        preset_img,inspection_postion,collect_status,
+        calibration_status,remark,origin_id,
+        edge_code,is_second_keep_watch_task
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_camera_preset
+        where  preset_id = #{presetId,jdbcType=BIGINT} 
+    </select>
+    <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TCameraPreset">
+        select
+        <include refid="Base_Column_List" />
+        from t_camera_preset
+        where  edge_code = #{edgeCode}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_camera_preset
+        where  preset_id = #{presetId,jdbcType=BIGINT} 
+    </delete>
+    <delete id="deleteByEdgeCodeAndOriginId">
+        delete from t_camera_preset  where edge_code=#{edgeCode}  and origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+    </delete>
+    <insert id="insert" keyColumn="preset_id" keyProperty="presetId" parameterType="com.yjh.accessrobot.module.command.entity.TCameraPreset" useGeneratedKeys="true">
+        insert into t_camera_preset
+        ( preset_id,camera_id,preset_num
+        ,preset_name,is_keep_watch,is_keep_watch_task
+        ,creator_user,creator_time,is_use
+        ,preset_img,inspection_postion,collect_status
+        ,calibration_status,remark,origin_id
+        ,edge_code,is_second_keep_watch_task)
+        values (#{presetId,jdbcType=BIGINT},#{cameraId,jdbcType=BIGINT},#{presetNum,jdbcType=INTEGER}
+        ,#{presetName,jdbcType=VARCHAR},#{isKeepWatch,jdbcType=INTEGER},#{isKeepWatchTask,jdbcType=INTEGER}
+        ,#{creatorUser,jdbcType=VARCHAR},#{creatorTime,jdbcType=TIMESTAMP},#{isUse,jdbcType=INTEGER}
+        ,#{presetImg,jdbcType=VARCHAR},#{inspectionPostion,jdbcType=INTEGER},#{collectStatus,jdbcType=INTEGER}
+        ,#{calibrationStatus,jdbcType=INTEGER},#{remark,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR}
+        ,#{edgeCode,jdbcType=VARCHAR},#{isSecondKeepWatchTask,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" keyColumn="preset_id" keyProperty="presetId" parameterType="com.yjh.accessrobot.module.command.entity.TCameraPreset" useGeneratedKeys="true">
+        insert into t_camera_preset
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="presetId != null">preset_id,</if>
+                <if test="cameraId != null">camera_id,</if>
+                <if test="presetNum != null">preset_num,</if>
+                <if test="presetName != null">preset_name,</if>
+                <if test="isKeepWatch != null">is_keep_watch,</if>
+                <if test="isKeepWatchTask != null">is_keep_watch_task,</if>
+                <if test="creatorUser != null">creator_user,</if>
+                <if test="creatorTime != null">creator_time,</if>
+                <if test="isUse != null">is_use,</if>
+                <if test="presetImg != null">preset_img,</if>
+                <if test="inspectionPostion != null">inspection_postion,</if>
+                <if test="collectStatus != null">collect_status,</if>
+                <if test="calibrationStatus != null">calibration_status,</if>
+                <if test="remark != null">remark,</if>
+                <if test="originId != null">origin_id,</if>
+                <if test="edgeCode != null">edge_code,</if>
+                <if test="isSecondKeepWatchTask != null">is_second_keep_watch_task,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="presetId != null">#{presetId,jdbcType=BIGINT},</if>
+                <if test="cameraId != null">#{cameraId,jdbcType=BIGINT},</if>
+                <if test="presetNum != null">#{presetNum,jdbcType=INTEGER},</if>
+                <if test="presetName != null">#{presetName,jdbcType=VARCHAR},</if>
+                <if test="isKeepWatch != null">#{isKeepWatch,jdbcType=INTEGER},</if>
+                <if test="isKeepWatchTask != null">#{isKeepWatchTask,jdbcType=INTEGER},</if>
+                <if test="creatorUser != null">#{creatorUser,jdbcType=VARCHAR},</if>
+                <if test="creatorTime != null">#{creatorTime,jdbcType=TIMESTAMP},</if>
+                <if test="isUse != null">#{isUse,jdbcType=INTEGER},</if>
+                <if test="presetImg != null">#{presetImg,jdbcType=VARCHAR},</if>
+                <if test="inspectionPostion != null">#{inspectionPostion,jdbcType=INTEGER},</if>
+                <if test="collectStatus != null">#{collectStatus,jdbcType=INTEGER},</if>
+                <if test="calibrationStatus != null">#{calibrationStatus,jdbcType=INTEGER},</if>
+                <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>
+                <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+                <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+                <if test="isSecondKeepWatchTask != null">#{isSecondKeepWatchTask,jdbcType=INTEGER},</if>
+        </trim>
+    </insert>
+    <insert id="batchInsert" keyColumn="preset_id" keyProperty="presetId" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into t_camera_preset
+        (camera_id,preset_num
+        ,preset_name,is_keep_watch,is_keep_watch_task
+        ,creator_user,creator_time,is_use
+        ,preset_img,inspection_postion,collect_status
+        ,calibration_status,remark,origin_id
+        ,edge_code,is_second_keep_watch_task)
+        values
+        <foreach collection="list"  item="tCameraPreset" separator=",">
+            (#{tCameraPreset.cameraId,jdbcType=BIGINT},#{tCameraPreset.presetNum,jdbcType=INTEGER}
+            ,#{tCameraPreset.presetName,jdbcType=VARCHAR},#{tCameraPreset.isKeepWatch,jdbcType=INTEGER},#{tCameraPreset.isKeepWatchTask,jdbcType=INTEGER}
+            ,#{tCameraPreset.creatorUser,jdbcType=VARCHAR},#{tCameraPreset.creatorTime,jdbcType=TIMESTAMP},#{tCameraPreset.isUse,jdbcType=INTEGER}
+            ,#{tCameraPreset.presetImg,jdbcType=VARCHAR},#{tCameraPreset.inspectionPostion,jdbcType=INTEGER},#{tCameraPreset.collectStatus,jdbcType=INTEGER}
+            ,#{tCameraPreset.calibrationStatus,jdbcType=INTEGER},#{tCameraPreset.remark,jdbcType=VARCHAR},#{tCameraPreset.originId,jdbcType=VARCHAR}
+            ,#{tCameraPreset.edgeCode,jdbcType=VARCHAR},#{tCameraPreset.isSecondKeepWatchTask,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TCameraPreset">
+        update t_camera_preset
+        <set>
+                <if test="cameraId != null">
+                    camera_id = #{cameraId,jdbcType=BIGINT},
+                </if>
+                <if test="presetNum != null">
+                    preset_num = #{presetNum,jdbcType=INTEGER},
+                </if>
+                <if test="presetName != null">
+                    preset_name = #{presetName,jdbcType=VARCHAR},
+                </if>
+                <if test="isKeepWatch != null">
+                    is_keep_watch = #{isKeepWatch,jdbcType=INTEGER},
+                </if>
+                <if test="isKeepWatchTask != null">
+                    is_keep_watch_task = #{isKeepWatchTask,jdbcType=INTEGER},
+                </if>
+                <if test="creatorUser != null">
+                    creator_user = #{creatorUser,jdbcType=VARCHAR},
+                </if>
+                <if test="creatorTime != null">
+                    creator_time = #{creatorTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="isUse != null">
+                    is_use = #{isUse,jdbcType=INTEGER},
+                </if>
+                <if test="presetImg != null">
+                    preset_img = #{presetImg,jdbcType=VARCHAR},
+                </if>
+                <if test="inspectionPostion != null">
+                    inspection_postion = #{inspectionPostion,jdbcType=INTEGER},
+                </if>
+                <if test="collectStatus != null">
+                    collect_status = #{collectStatus,jdbcType=INTEGER},
+                </if>
+                <if test="calibrationStatus != null">
+                    calibration_status = #{calibrationStatus,jdbcType=INTEGER},
+                </if>
+                <if test="remark != null">
+                    remark = #{remark,jdbcType=VARCHAR},
+                </if>
+                <if test="originId != null">
+                    origin_id = #{originId,jdbcType=VARCHAR},
+                </if>
+                <if test="edgeCode != null">
+                    edge_code = #{edgeCode,jdbcType=VARCHAR},
+                </if>
+                <if test="isSecondKeepWatchTask != null">
+                    is_second_keep_watch_task = #{isSecondKeepWatchTask,jdbcType=INTEGER},
+                </if>
+        </set>
+        where   preset_id = #{presetId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TCameraPreset">
+        update t_camera_preset
+        set 
+            camera_id =  #{cameraId,jdbcType=BIGINT},
+            preset_num =  #{presetNum,jdbcType=INTEGER},
+            preset_name =  #{presetName,jdbcType=VARCHAR},
+            is_keep_watch =  #{isKeepWatch,jdbcType=INTEGER},
+            is_keep_watch_task =  #{isKeepWatchTask,jdbcType=INTEGER},
+            creator_user =  #{creatorUser,jdbcType=VARCHAR},
+            creator_time =  #{creatorTime,jdbcType=TIMESTAMP},
+            is_use =  #{isUse,jdbcType=INTEGER},
+            preset_img =  #{presetImg,jdbcType=VARCHAR},
+            inspection_postion =  #{inspectionPostion,jdbcType=INTEGER},
+            collect_status =  #{collectStatus,jdbcType=INTEGER},
+            calibration_status =  #{calibrationStatus,jdbcType=INTEGER},
+            remark =  #{remark,jdbcType=VARCHAR},
+            origin_id =  #{originId,jdbcType=VARCHAR},
+            edge_code =  #{edgeCode,jdbcType=VARCHAR},
+            is_second_keep_watch_task =  #{isSecondKeepWatchTask,jdbcType=INTEGER}
+        where   preset_id = #{presetId,jdbcType=BIGINT} 
+    </update>
+</mapper>
