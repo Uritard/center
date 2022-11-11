@@ -75,18 +75,18 @@ public class InspectionResultThread implements Runnable{
                 tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
                 tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                 tCruiseTaskResultMap.put("cruiseAbnormal", "--");
-                log.info("taskId为{},instanceId为{}的该点结果正常", taskId, instanceId);
+                log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
             }else {
                 // value无值且resultNum为--，若结果非音频文件，则为异常情况
                 tCruiseTaskResultMap.put("resultNum", "--");
                 if ("3".equals(robotPatrolTaskResult.getFileType())){
                     tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                     tCruiseTaskResultMap.put("cruiseAbnormal", "--");
-                    log.info("taskId为{},instanceId为{}的该点结果正常", taskId, instanceId);
+                    log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
                 }else {
                     tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                     tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-                    log.info("taskId为{},instanceId为{}的该点结果异常", taskId, instanceId);
+                    log.info("taskId is {},instanceId is {},the result is abnormal", taskId, instanceId);
                 }
             }
             tCruiseTaskResultMap.put("picpath", infoMap.get("relativePath"));
@@ -97,9 +97,7 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
             tCruiseTaskResultMap.put("rectangle", robotPatrolTaskResult.getRectangle());
             tCruiseTaskResultMap.put("confidence", "");
-
             redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
-            log.info("taskId为{}巡视点instanceId为{}的点位已更新redis", taskId, instanceId);
 
             // 巡视主机下发的任务或者站端本体任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);

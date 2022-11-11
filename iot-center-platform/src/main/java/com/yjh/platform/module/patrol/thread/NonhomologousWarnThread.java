@@ -71,7 +71,8 @@ public class NonhomologousWarnThread implements Runnable{
 
     private void judgeNonhomologousWarn(String taskCode, String robotInsResult, String warnId) {
         // 查询非同源告警规则
-        Map cruiseResultMap = Collections.EMPTY_MAP;
+        Map<String, String> cruiseResultMap = new HashMap<>(2);
+        cruiseResultMap.put("deviceId", robotPatrolTaskAlarm.getDeviceId());
         List<Map<String, Object>> list = nonhomologousWarnDao.getNonhomologousInspections(cruiseResultMap);
         for(Map<String, Object> map : list){
             if (!Objects.isNull(map.get("robotInspectionName")) && !Objects.isNull(map.get("warnType"))){
@@ -94,26 +95,8 @@ public class NonhomologousWarnThread implements Runnable{
                             String videoInsResult = StringUtils.substringBefore(redisInfoMap.get("resultNum"), ",");
                             if(isNumeric(warnThreshold) && isNumeric(robotInsResult) && isNumeric(videoInsResult)){
                                 if(Math.abs(Double.parseDouble(robotInsResult) - Double.parseDouble(videoInsResult)) > Double.parseDouble(warnThreshold)){
-                                    Map<String,Object> warn = new HashMap<>(4);
-                                    warn.put("warnId", warnId);
-                                    warn.put("warnType", 1);
-                                    warn.put("instanceId", Double.parseDouble(instanceId));
-                                    warn.put("warnContent", "红外测温非同源结果差值超过阈值：" + warnThreshold);
-                                    List<Map<String,Object>> insResults = new ArrayList<>();
-                                    Map<String,Object> robotWarn = new HashMap<>(4);
-                                    robotWarn.put("taskId", taskCode);
-                                    robotWarn.put("inspectionId", robotInstanceId);
-                                    robotWarn.put("warnId", warnId);
-                                    insResults.add(robotWarn);
-
-                                    Map<String,Object> videoWarn = new HashMap<>(4);
-                                    videoWarn.put("taskId", taskCode);
-                                    videoWarn.put("inspectionId", videoInstanceId);
-                                    videoWarn.put("warnId", warnId);
-                                    insResults.add(videoWarn);
-
-                                    warn.put("resultsInfo", insResults);
-                                    insertNonhomologousWarnInfo(warn);
+                                    String warnContent = "红外测温非同源结果差值超过阈值：" + warnThreshold;
+                                    insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 1);
                                 }
                             }else{
                                 log.info("robotInsResult为==={},videoInsResult为==={},阈值是==={},红外非同源告警--数据非数字", robotInsResult, videoInsResult, warnThreshold);
@@ -131,26 +114,8 @@ public class NonhomologousWarnThread implements Runnable{
 
                             String videoInsResult = redisInfoMap.get("resultNum");
                             if (!Objects.equals(robotInsResult, videoInsResult)) {
-                                Map<String, Object> warn = new HashMap<>(4);
-                                warn.put("warnId", warnId);
-                                warn.put("warnType", 2);
-                                warn.put("instanceId", Long.parseLong(instanceId));
-                                warn.put("warnContent", "位置状态非同源结果不一致");
-                                List<Map<String, Object>> insResults = new ArrayList<>();
-                                Map<String, Object> robotWarn = new HashMap<>(4);
-                                robotWarn.put("taskId", taskCode);
-                                robotWarn.put("inspectionId", robotInstanceId);
-                                robotWarn.put("warnId", warnId);
-                                insResults.add(robotWarn);
-
-                                Map<String, Object> videoWarn = new HashMap<>(4);
-                                videoWarn.put("taskId", taskCode);
-                                videoWarn.put("inspectionId", videoInstanceId);
-                                videoWarn.put("warnId", warnId);
-                                insResults.add(videoWarn);
-
-                                warn.put("resultsInfo", insResults);
-                                insertNonhomologousWarnInfo(warn);
+                                String warnContent = "位置状态非同源结果不一致";
+                                insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 2);
                             } else {
                                 log.info("robotInsResult为==={},videoInsResult为==={},位置状态非同源告警--结果", robotInsResult, videoInsResult);
                             }
@@ -167,26 +132,8 @@ public class NonhomologousWarnThread implements Runnable{
 
                             String videoInsResult = redisInfoMap.get("resultNum");
                             if (!Objects.equals(robotInsResult, videoInsResult)) {
-                                Map<String, Object> warn = new HashMap<>(4);
-                                warn.put("warnId", warnId);
-                                warn.put("warnType", 3);
-                                warn.put("instanceId", Long.parseLong(instanceId));
-                                warn.put("warnContent", "数显类表计识别非同源结果不一致");
-                                List<Map<String, Object>> insResults = new ArrayList<>();
-                                Map<String, Object> robotWarn = new HashMap<>(4);
-                                robotWarn.put("taskId", taskCode);
-                                robotWarn.put("inspectionId", robotInstanceId);
-                                robotWarn.put("warnId", warnId);
-                                insResults.add(robotWarn);
-
-                                Map<String, Object> videoWarn = new HashMap<>(4);
-                                videoWarn.put("taskId", taskCode);
-                                videoWarn.put("inspectionId", videoInstanceId);
-                                videoWarn.put("warnId", warnId);
-                                insResults.add(videoWarn);
-
-                                warn.put("resultsInfo", insResults);
-                                insertNonhomologousWarnInfo(warn);
+                                String warnContent = "数显类表计识别非同源结果不一致";
+                                insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 3);
                             } else {
                                 log.info("robotInsResult为==={},videoInsResult为==={},表计-数显非同源告警--结果不一致", robotInsResult, videoInsResult);
                             }
@@ -204,26 +151,8 @@ public class NonhomologousWarnThread implements Runnable{
                             String videoInsResult = redisInfoMap.get("resultNum");
                             if(isNumeric(warnThreshold) && isNumeric(robotInsResult) && isNumeric(videoInsResult)){
                                 if(Math.abs(Double.parseDouble(robotInsResult) - Double.parseDouble(videoInsResult)) > Double.parseDouble(warnThreshold)){
-                                    Map<String,Object> warn = new HashMap<>(4);
-                                    warn.put("warnId", warnId);
-                                    warn.put("warnType", 4);
-                                    warn.put("instanceId", Long.parseLong(instanceId));
-                                    warn.put("warnContent", "指针类表计识别非同源结果差值超过阈值：" + warnThreshold);
-                                    List<Map<String,Object>> insResults = new ArrayList<>();
-                                    Map<String,Object> robotWarn = new HashMap<>(4);
-                                    robotWarn.put("taskId", taskCode);
-                                    robotWarn.put("inspectionId", robotInstanceId);
-                                    robotWarn.put("warnId", warnId);
-                                    insResults.add(robotWarn);
-
-                                    Map<String,Object> videoWarn = new HashMap<>(4);
-                                    videoWarn.put("taskId", taskCode);
-                                    videoWarn.put("inspectionId", videoInstanceId);
-                                    videoWarn.put("warnId", warnId);
-                                    insResults.add(videoWarn);
-
-                                    warn.put("resultsInfo", insResults);
-                                    insertNonhomologousWarnInfo(warn);
+                                    String warnContent = "指针类表计识别非同源结果差值超过阈值：" + warnThreshold;
+                                    insertWarnInfo(warnId, instanceId, warnContent, taskCode, robotInstanceId, videoInstanceId, 4);
                                 }
                             }else{
                                 log.info("robotInsResult为==={},videoInsResult为==={},阈值是==={},表计-指针非同源告警--数据非数字", robotInsResult, videoInsResult,warnThreshold);
@@ -231,8 +160,6 @@ public class NonhomologousWarnThread implements Runnable{
                         }else{
                             log.info("非同源告警---结果为空或告警已存在,redismap==={}", redisInfoMap);
                         }
-                        break;
-                    case "5":
                         break;
                     case "6":
                         // 1-天 2-周 3-月
@@ -378,6 +305,29 @@ public class NonhomologousWarnThread implements Runnable{
         regx = "^[-\\+]?[.\\d]*$";
         pattern = Pattern.compile(regx);
         return pattern.matcher(str).matches();
+    }
+
+    private void insertWarnInfo(String warnId, String instanceId, String warnContent, String taskCode, String robotInstanceId, String videoInstanceId, int warnType){
+        Map<String,Object> warn = new HashMap<>(4);
+        warn.put("warnId", warnId);
+        warn.put("warnType", warnType);
+        warn.put("instanceId", Long.parseLong(instanceId));
+        warn.put("warnContent", warnContent);
+        List<Map<String,Object>> insResults = new ArrayList<>();
+        Map<String,Object> robotWarn = new HashMap<>(4);
+        robotWarn.put("taskId", taskCode);
+        robotWarn.put("inspectionId", robotInstanceId);
+        robotWarn.put("warnId", warnId);
+        insResults.add(robotWarn);
+
+        Map<String,Object> videoWarn = new HashMap<>(4);
+        videoWarn.put("taskId", taskCode);
+        videoWarn.put("inspectionId", videoInstanceId);
+        videoWarn.put("warnId", warnId);
+        insResults.add(videoWarn);
+
+        warn.put("resultsInfo", insResults);
+        insertNonhomologousWarnInfo(warn);
     }
 
 }
