@@ -155,4 +155,28 @@ public interface UPatrolResultDao {
     TaskVO selectTaskNameAndTime(@Param(value = "taskId")String taskId);
 
     String selectReviewTaskFlag(@Param(value = "taskId")String taskId);
+
+    List<TCruiseDataResultDetail> selectDetail(@Param(value = "list") List<String> list,
+                                               @Param(value = "startTime")Date startTime,
+                                               @Param(value = "endTime")Date endTime);
+
+    int selectMeteNum(@Param(value = "list") List<String> list,
+                      @Param(value = "startTime")Date startTime,
+                      @Param(value = "endTime")Date endTime);
+
+    int selectAbnormalNum(@Param(value = "list") List<String> list);//未处理数
+
+    List<CheckPointType> selectMeteType(@Param(value = "list") List<String> list,
+                                        @Param(value = "startTime")Date startTime,
+                                        @Param(value = "endTime")Date endTime);
+
+    List<CheckPointType> selectMeteType2(@Param(value = "taskId")String taskId);
+
+
+    List<TCruiseDataResultDetail> selectTaskResult(@Param(value = "taskId")String taskId);
+
+    int selectMeteNumByTask(@Param(value = "taskId")String taskId);
+
+    int selectAbnormalNumByTask(@Param(value = "taskId")String taskId);
+
 }
