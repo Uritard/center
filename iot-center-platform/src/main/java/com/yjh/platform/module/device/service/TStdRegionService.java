@@ -1,20 +1,25 @@
 package com.yjh.platform.module.device.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.Object2Map;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.TStdRegion;
-import com.yjh.platform.module.device.dao.TStdRegionDao;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.yjh.platform.common.logs.Logs;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
 * @author tt
@@ -25,6 +30,8 @@ public class TStdRegionService{
 
     @Autowired
     private TStdRegionDao tStdRegionDao;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     private Logger log = LoggerFactory.getLogger(TStdRegionService.class);
 
@@ -161,6 +168,34 @@ public class TStdRegionService{
     @Transactional(rollbackFor = Exception.class)
     public List<Long> selectDownId(Long  regionId) {
         return tStdRegionDao.selectDownId(regionId);
+    }
+
+    public int loadRegionIntoRedis() {
+        List<TStdRegion> list = tStdRegionDao.select(null, null, null, null, null, null, null, null, null);
+        Map<String, String> idRefCodeMap = new HashMap<>();
+        Set<String> keys = redisTemplate.keys("region:*");
+        // 删除所有区域信息重新加载
+        if(CollectionUtils.isNotEmpty(keys)){
+            redisTemplate.delete(keys);
+        }
+        for (TStdRegion item : list) {
+            if(StringUtils.isNotEmpty(item.getRegionCode())) {
+                Map<String, String> map = Object2Map.toStringMap(Object2Map.objectToMap(item, true));
+                String remakStr = map.get("remark");
+                idRefCodeMap.put(item.getStationId(), item.getRegionCode());
+                JSONObject remakJson = JSON.parseObject(remakStr);
+                if(remakJson !=null) {
+                    map.put("voltageGrade", remakJson.getString("voltageGrade"));
+                    map.put("edgeType", remakJson.getString("edgeType"));
+                }
+                String str = "region:" + item.getRegionCode();
+                redisTemplate.opsForHash().putAll(str, map);
+            }
+        }
+        if(MapUtils.isNotEmpty(idRefCodeMap)) {
+            redisTemplate.opsForHash().putAll("region:idRefCode", idRefCodeMap);
+        }
+        return 1;
     }
 
 }

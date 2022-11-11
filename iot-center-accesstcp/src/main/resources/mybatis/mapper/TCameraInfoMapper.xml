@@ -290,10 +290,29 @@
     </update>
     <select id="selectAll" resultType="com.yjh.accesstcp.module.device.entity.CameraModel">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List" />,
+        a.camera_name as patroldevice_name,
+        a.camera_id as patroldevice_code,
+        b.dict_note as device_model,
+        c.dict_note as manufacturer,
+        a.unit as use_unit,
+        c.dict_note as device_source,
+        DATE_FORMAT(a.commission_date, '%Y-%m-%d %H:%i:%s') as production_date,
+        '' as production_code,
+        '' as istransport,
+        if(a.is_control = 1, '11', '10') as use_mode,
+        (CASE
+        WHEN a.camera_type = 205 THEN '1'
+        WHEN a.camera_type = 206 THEN '2'
+        end) as video_mode,
+        a.address as place,
+        '10' as type,
+        '' as patroldevice_info,
+        '' as robots_code,
+        '1' as edge
         from t_camera_info a
-
-
+        left join t_dict_business b on a.camera_model = b.dict_code
+        left join t_dict_business c on a.vendor_id = c.dict_code
     </select>
 
 

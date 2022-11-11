@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -119,6 +120,7 @@ public class TRobotInfo implements Serializable {
     /**
      * 
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date createDate;
 
     /**
@@ -129,6 +131,7 @@ public class TRobotInfo implements Serializable {
     /**
      * 
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date updateDate;
 
     /**
@@ -144,6 +147,7 @@ public class TRobotInfo implements Serializable {
     /**
      * 出厂日期
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date madeDate;
 
     /**
@@ -154,6 +158,7 @@ public class TRobotInfo implements Serializable {
     /**
      * 投运日期
      */
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date commissionDate;
 
     /**
