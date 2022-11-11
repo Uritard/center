@@ -10,7 +10,7 @@
         <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
         <result property="upRegionIds" column="up_region_ids" jdbcType="VARCHAR"/>
         <result property="regionCode" column="region_code" jdbcType="VARCHAR"/>
-        <result property="originRegionId" column="origin_region_id" jdbcType="BIGINT"/>
+        <result property="originRegionId" column="origin_region_id" jdbcType="VARCHAR"/>
         <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
         <result property="stationName" column="station_name" jdbcType="VARCHAR"/>
         <result property="state" column="state" jdbcType="INTEGER"/>

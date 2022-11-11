@@ -30,7 +30,7 @@ public interface TCameraRecorderDao {
 
     List<TCameraRecorder> selectByEdgeCode(@Param("edgeCode") String edgeCode);
 
-    int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<Long> originIdList );
+    int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
 
     int batchInsert(Collection<TCameraRecorder> cameraRecorderCollection);
 

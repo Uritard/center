@@ -10,7 +10,7 @@
         <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
         <result property="upRegionIds" column="up_region_ids" jdbcType="VARCHAR"/>
         <result property="regionCode" column="region_code" jdbcType="VARCHAR"/>
-        <result property="originRegionId" column="origin_region_id" jdbcType="BIGINT"/>
+        <result property="originRegionId" column="origin_region_id" jdbcType="VARCHAR"/>
         <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
         <result property="stationName" column="station_name" jdbcType="VARCHAR"/>
         <result property="state" column="state" jdbcType="INTEGER"/>
@@ -38,7 +38,7 @@
         ,remark)
         values (#{regionName,jdbcType=VARCHAR},#{sort,jdbcType=INTEGER}
                ,#{upRegionId,jdbcType=BIGINT},#{upRegionIds,jdbcType=VARCHAR},#{regionCode,jdbcType=VARCHAR}
-               ,#{originRegionId,jdbcType=BIGINT},#{stationId,jdbcType=VARCHAR},#{stationName,jdbcType=VARCHAR}
+               ,#{originRegionId,jdbcType=VARCHAR},#{stationId,jdbcType=VARCHAR},#{stationName,jdbcType=VARCHAR}
                ,#{state,jdbcType=INTEGER},#{edgeStatus,jdbcType=VARCHAR},#{regionPath,jdbcType=VARCHAR}
                ,#{remark,jdbcType=VARCHAR})
     </insert>
@@ -73,7 +73,7 @@
                   region_code = #{regionCode,jdbcType=VARCHAR},
               </if>
               <if test="originRegionId != null">
-                  origin_region_id = #{originRegionId,jdbcType=BIGINT},
+                  origin_region_id = #{originRegionId,jdbcType=VARCHAR},
               </if>
               <if test="stationId != null">
                   station_id = #{stationId,jdbcType=VARCHAR},
@@ -204,7 +204,7 @@
             up_region_id =  #{upRegionId,jdbcType=BIGINT},
             up_region_ids =  #{upRegionIds,jdbcType=VARCHAR},
             region_code =  #{regionCode,jdbcType=VARCHAR},
-            origin_region_id =  #{originRegionId,jdbcType=BIGINT},
+            origin_region_id =  #{originRegionId,jdbcType=VARCHAR},
             station_id =  #{stationId,jdbcType=VARCHAR},
             station_name =  #{stationName,jdbcType=VARCHAR},
             state =  #{state,jdbcType=INTEGER},

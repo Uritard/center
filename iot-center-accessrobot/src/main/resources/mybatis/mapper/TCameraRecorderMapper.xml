@@ -26,7 +26,7 @@
             <result property="timeLong" column="time_long" jdbcType="INTEGER"/>
             <result property="unit" column="unit" jdbcType="VARCHAR"/>
             <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
-            <result property="originId" column="origin_id" jdbcType="BIGINT"/>
+            <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -68,7 +68,7 @@
         ,#{identityManager,jdbcType=VARCHAR},#{identityCode,jdbcType=VARCHAR},#{protocolUrl,jdbcType=VARCHAR}
         ,#{maxChannel,jdbcType=INTEGER},#{hddSize,jdbcType=INTEGER},#{bufferDay,jdbcType=INTEGER}
         ,#{timeLong,jdbcType=INTEGER},#{unit,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
-        ,#{originId,jdbcType=BIGINT})
+        ,#{originId,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" keyColumn="record_id" keyProperty="recordId" parameterType="com.yjh.accessrobot.module.command.entity.TCameraRecorder" useGeneratedKeys="true">
         insert into t_camera_recorder
@@ -118,7 +118,7 @@
                 <if test="timeLong != null">#{timeLong,jdbcType=INTEGER},</if>
                 <if test="unit != null">#{unit,jdbcType=VARCHAR},</if>
                 <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
-                <if test="originId != null">#{originId,jdbcType=BIGINT},</if>
+                <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
         </trim>
     </insert>
 
@@ -186,7 +186,7 @@
                     edge_code = #{edgeCode,jdbcType=VARCHAR},
                 </if>
                 <if test="originId != null">
-                    origin_id = #{originId,jdbcType=BIGINT},
+                    origin_id = #{originId,jdbcType=VARCHAR},
                 </if>
         </set>
         where   record_id = #{recordId,jdbcType=BIGINT}
@@ -214,7 +214,7 @@
             time_long =  #{timeLong,jdbcType=INTEGER},
             unit =  #{unit,jdbcType=VARCHAR},
             edge_code =  #{edgeCode,jdbcType=VARCHAR},
-            origin_id =  #{originId,jdbcType=BIGINT}
+            origin_id =  #{originId,jdbcType=VARCHAR}
         where   record_id = #{recordId,jdbcType=BIGINT}
     </update>
 
@@ -248,7 +248,7 @@
             ,#{tCameraRecorder.identityManager,jdbcType=VARCHAR},#{tCameraRecorder.identityCode,jdbcType=VARCHAR},#{tCameraRecorder.protocolUrl,jdbcType=VARCHAR}
             ,#{tCameraRecorder.maxChannel,jdbcType=INTEGER},#{tCameraRecorder.hddSize,jdbcType=INTEGER},#{tCameraRecorder.bufferDay,jdbcType=INTEGER}
             ,#{tCameraRecorder.timeLong,jdbcType=INTEGER},#{tCameraRecorder.unit,jdbcType=VARCHAR},#{tCameraRecorder.edgeCode,jdbcType=VARCHAR}
-            ,#{tCameraRecorder.originId,jdbcType=BIGINT}
+            ,#{tCameraRecorder.originId,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

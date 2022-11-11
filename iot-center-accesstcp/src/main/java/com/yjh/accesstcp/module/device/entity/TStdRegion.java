@@ -45,7 +45,7 @@ public class TStdRegion implements Serializable {
     /**
      * 下级节点区域ID(state为0时有值)
      */
-    private Long originRegionId;
+    private String originRegionId;
 
     /**
      * 变电站ID

@@ -24,7 +24,7 @@
             <result property="timeLong" column="time_long" jdbcType="INTEGER"/>
             <result property="unit" column="unit" jdbcType="VARCHAR"/>
             <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
-            <result property="originId" column="origin_id" jdbcType="BIGINT"/>
+            <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -83,7 +83,7 @@
         ,#{identityManager,jdbcType=VARCHAR},#{identityCode,jdbcType=VARCHAR},#{protocolUrl,jdbcType=VARCHAR}
         ,#{maxChannel,jdbcType=INTEGER},#{hddSize,jdbcType=INTEGER},#{bufferDay,jdbcType=INTEGER}
         ,#{timeLong,jdbcType=INTEGER},#{unit,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
-        ,#{originId,jdbcType=BIGINT})
+        ,#{originId,jdbcType=VARCHAR})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -213,7 +213,7 @@
             ,#{tCameraRecorder.identityManager,jdbcType=VARCHAR},#{tCameraRecorder.identityCode,jdbcType=VARCHAR},#{tCameraRecorder.protocolUrl,jdbcType=VARCHAR}
             ,#{tCameraRecorder.maxChannel,jdbcType=INTEGER},#{tCameraRecorder.hddSize,jdbcType=INTEGER},#{tCameraRecorder.bufferDay,jdbcType=INTEGER}
             ,#{tCameraRecorder.timeLong,jdbcType=INTEGER},#{tCameraRecorder.unit,jdbcType=VARCHAR},#{tCameraRecorder.edgeCode,jdbcType=VARCHAR}
-            ,#{tCameraRecorder.originId,jdbcType=BIGINT}
+            ,#{tCameraRecorder.originId,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
