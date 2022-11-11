@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TVoiceDeviceMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TVoiceDevice">
+            <id property="voiceDeviceId" column="voice_device_id" jdbcType="BIGINT"/>
+            <result property="voiceDeviceName" column="voice_device_name" jdbcType="VARCHAR"/>
+            <result property="stdDeviceId" column="std_device_id" jdbcType="BIGINT"/>
+            <result property="deviceType" column="device_type" jdbcType="VARCHAR"/>
+            <result property="configId" column="config_id" jdbcType="BIGINT"/>
+            <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+            <result property="state" column="state" jdbcType="VARCHAR"/>
+            <result property="voiceCode" column="voice_code" jdbcType="VARCHAR"/>
+            <result property="voiceType" column="voice_type" jdbcType="VARCHAR"/>
+            <result property="voiceModel" column="voice_model" jdbcType="VARCHAR"/>
+            <result property="voiceFactory" column="voice_factory" jdbcType="VARCHAR"/>
+            <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+            <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        voice_device_id,voice_device_name,std_device_id,
+        device_type,config_id,up_region_id,
+        state,voice_code,voice_type,
+        voice_model,voice_factory,edge_code,
+        origin_id
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_voice_device
+        where  voice_device_id = #{voiceDeviceId,jdbcType=BIGINT} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_voice_device
+        where  voice_device_id = #{voiceDeviceId,jdbcType=BIGINT} 
+    </delete>
+    <insert id="insert" keyColumn="voice_device_id" keyProperty="voiceDeviceId" parameterType="com.yjh.accessrobot.module.command.entity.TVoiceDevice" useGeneratedKeys="true">
+        insert into t_voice_device
+        ( voice_device_name,std_device_id
+        ,device_type,config_id,up_region_id
+        ,state,voice_code,voice_type
+        ,voice_model,voice_factory,edge_code
+        ,origin_id)
+        values (#{voiceDeviceName,jdbcType=VARCHAR},#{stdDeviceId,jdbcType=BIGINT}
+        ,#{deviceType,jdbcType=VARCHAR},#{configId,jdbcType=BIGINT},#{upRegionId,jdbcType=BIGINT}
+        ,#{state,jdbcType=VARCHAR},#{voiceCode,jdbcType=VARCHAR},#{voiceType,jdbcType=VARCHAR}
+        ,#{voiceModel,jdbcType=VARCHAR},#{voiceFactory,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
+        ,#{originId,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="voice_device_id" keyProperty="voiceDeviceId" parameterType="com.yjh.accessrobot.module.command.entity.TVoiceDevice" useGeneratedKeys="true">
+        insert into t_voice_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="voiceDeviceId != null">voice_device_id,</if>
+                <if test="voiceDeviceName != null">voice_device_name,</if>
+                <if test="stdDeviceId != null">std_device_id,</if>
+                <if test="deviceType != null">device_type,</if>
+                <if test="configId != null">config_id,</if>
+                <if test="upRegionId != null">up_region_id,</if>
+                <if test="state != null">state,</if>
+                <if test="voiceCode != null">voice_code,</if>
+                <if test="voiceType != null">voice_type,</if>
+                <if test="voiceModel != null">voice_model,</if>
+                <if test="voiceFactory != null">voice_factory,</if>
+                <if test="edgeCode != null">edge_code,</if>
+                <if test="originId != null">origin_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="voiceDeviceId != null">#{voiceDeviceId,jdbcType=BIGINT},</if>
+                <if test="voiceDeviceName != null">#{voiceDeviceName,jdbcType=VARCHAR},</if>
+                <if test="stdDeviceId != null">#{stdDeviceId,jdbcType=BIGINT},</if>
+                <if test="deviceType != null">#{deviceType,jdbcType=VARCHAR},</if>
+                <if test="configId != null">#{configId,jdbcType=BIGINT},</if>
+                <if test="upRegionId != null">#{upRegionId,jdbcType=BIGINT},</if>
+                <if test="state != null">#{state,jdbcType=VARCHAR},</if>
+                <if test="voiceCode != null">#{voiceCode,jdbcType=VARCHAR},</if>
+                <if test="voiceType != null">#{voiceType,jdbcType=VARCHAR},</if>
+                <if test="voiceModel != null">#{voiceModel,jdbcType=VARCHAR},</if>
+                <if test="voiceFactory != null">#{voiceFactory,jdbcType=VARCHAR},</if>
+                <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+                <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TVoiceDevice">
+        update t_voice_device
+        <set>
+                <if test="voiceDeviceName != null">
+                    voice_device_name = #{voiceDeviceName,jdbcType=VARCHAR},
+                </if>
+                <if test="stdDeviceId != null">
+                    std_device_id = #{stdDeviceId,jdbcType=BIGINT},
+                </if>
+                <if test="deviceType != null">
+                    device_type = #{deviceType,jdbcType=VARCHAR},
+                </if>
+                <if test="configId != null">
+                    config_id = #{configId,jdbcType=BIGINT},
+                </if>
+                <if test="upRegionId != null">
+                    up_region_id = #{upRegionId,jdbcType=BIGINT},
+                </if>
+                <if test="state != null">
+                    state = #{state,jdbcType=VARCHAR},
+                </if>
+                <if test="voiceCode != null">
+                    voice_code = #{voiceCode,jdbcType=VARCHAR},
+                </if>
+                <if test="voiceType != null">
+                    voice_type = #{voiceType,jdbcType=VARCHAR},
+                </if>
+                <if test="voiceModel != null">
+                    voice_model = #{voiceModel,jdbcType=VARCHAR},
+                </if>
+                <if test="voiceFactory != null">
+                    voice_factory = #{voiceFactory,jdbcType=VARCHAR},
+                </if>
+                <if test="edgeCode != null">
+                    edge_code = #{edgeCode,jdbcType=VARCHAR},
+                </if>
+                <if test="originId != null">
+                    origin_id = #{originId,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   voice_device_id = #{voiceDeviceId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TVoiceDevice">
+        update t_voice_device
+        set 
+            voice_device_name =  #{voiceDeviceName,jdbcType=VARCHAR},
+            std_device_id =  #{stdDeviceId,jdbcType=BIGINT},
+            device_type =  #{deviceType,jdbcType=VARCHAR},
+            config_id =  #{configId,jdbcType=BIGINT},
+            up_region_id =  #{upRegionId,jdbcType=BIGINT},
+            state =  #{state,jdbcType=VARCHAR},
+            voice_code =  #{voiceCode,jdbcType=VARCHAR},
+            voice_type =  #{voiceType,jdbcType=VARCHAR},
+            voice_model =  #{voiceModel,jdbcType=VARCHAR},
+            voice_factory =  #{voiceFactory,jdbcType=VARCHAR},
+            edge_code =  #{edgeCode,jdbcType=VARCHAR},
+            origin_id =  #{originId,jdbcType=VARCHAR}
+        where   voice_device_id = #{voiceDeviceId,jdbcType=BIGINT} 
+    </update>
+</mapper>

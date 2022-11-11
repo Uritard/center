@@ -39,13 +39,13 @@ public class TCameraInfoService {
 
     @Transactional
     public void saveReportData(List<CameraModel> cameraModelList, String edgeNode) {
-        log.info("开始同步摄像机信息  edgeNode:{}  ",edgeNode);
+        log.info("开始同步摄像机信息  edgeNode:{}  ", edgeNode);
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectByEdgeCode(edgeNode);
         Map<Long, Long> tCameraRecorderMap = tCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, TCameraRecorder::getRecordId));
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeNode, null);
         Map<String, String> stdRegionMap = stdRegionList.stream().collect(Collectors.toMap(tStdRegion -> tStdRegion.getOriginRegionId().toString(), tStdRegion -> tStdRegion.getRegionId().toString()));
-        List<TCameraInfo>  tCameraInfoList=cameraModelList.stream().map(cameraModel -> {
-            TCameraInfo tCameraInfo=new CameraModel();
+        List<TCameraInfo> tCameraInfoList = cameraModelList.stream().map(cameraModel -> {
+            TCameraInfo tCameraInfo = new CameraModel();
             tCameraInfo.setCameraId(null);
             tCameraInfo.setCameraName(cameraModel.getPatroldeviceName());
             tCameraInfo.setCameraModel(cameraModel.getCameraModel());
@@ -78,7 +78,7 @@ public class TCameraInfoService {
             tCameraInfo.setEdgeCode(edgeNode);
             tCameraInfo.setOriginId(cameraModel.getPatroldeviceCode());
             return tCameraInfo;
-       }).collect(Collectors.toList());
+        }).collect(Collectors.toList());
 
         List<TCameraInfo> oldTCameraInfoList = tCameraInfoMapper.selectByEdgeCode(edgeNode);
         if (CollectionUtils.isEmpty(oldTCameraInfoList)) {
@@ -88,17 +88,17 @@ public class TCameraInfoService {
             Map<String, TCameraInfo> newCameraInfoMap = tCameraInfoList.stream().collect(Collectors.toMap(TCameraInfo::getOriginId, Function.identity()));
             // 更新的数据
             SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldCameraInfoMap.keySet(), newCameraInfoMap.keySet());
-            if(CollectionUtils.isNotEmpty(updateIdSet)){
+            if (CollectionUtils.isNotEmpty(updateIdSet)) {
                 tCameraInfoList.stream().filter(tCameraInfo -> updateIdSet.contains(tCameraInfo.getOriginId())).forEach(tCameraInfo -> {
-                    TCameraInfo oldCameraInfo= oldCameraInfoMap.get(tCameraInfo.getOriginId());
-                    tCameraInfo.setCameraId( oldCameraInfo.getCameraId());
+                    TCameraInfo oldCameraInfo = oldCameraInfoMap.get(tCameraInfo.getOriginId());
+                    tCameraInfo.setCameraId(oldCameraInfo.getCameraId());
                     tCameraInfoMapper.updateByPrimaryKey(tCameraInfo);
                 });
             }
             //删除的数据
-            SetUtils.SetView<String> deleteIdSet=SetUtils.difference(oldCameraInfoMap.keySet(),newCameraInfoMap.keySet());
-            if(CollectionUtils.isNotEmpty(deleteIdSet)){
-                tCameraInfoMapper.deleteByEdgeCodeAndOriginId(edgeNode,deleteIdSet);
+            SetUtils.SetView<String> deleteIdSet = SetUtils.difference(oldCameraInfoMap.keySet(), newCameraInfoMap.keySet());
+            if (CollectionUtils.isNotEmpty(deleteIdSet)) {
+                tCameraInfoMapper.deleteByEdgeCodeAndOriginId(edgeNode, deleteIdSet);
             }
             //新增的数据
             SetUtils.SetView<String> insertIdSet = SetUtils.difference(newCameraInfoMap.keySet(), oldCameraInfoMap.keySet());

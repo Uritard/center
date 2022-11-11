@@ -4,51 +4,43 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TVoiceDevice">
-        <id column="voice_device_id" jdbcType="BIGINT" property="voiceDeviceId" />
-        <result column="voice_device_name" jdbcType="VARCHAR" property="voiceDeviceName" />
-        <result column="std_device_id" jdbcType="BIGINT" property="stdDeviceId" />
-        <result column="device_type" jdbcType="VARCHAR" property="deviceType" />
-        <result column="state" jdbcType="VARCHAR" property="state" />
-        <result column="voice_code" jdbcType="VARCHAR" property="voiceCode" />
-        <result column="config_id" jdbcType="BIGINT" property="configId" />
-        <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
-        <result column="voice_type" jdbcType="BIGINT" property="voiceType" />
-        <result column="voice_model" jdbcType="BIGINT" property="voiceModel" />
-        <result column="voice_factory" jdbcType="BIGINT" property="voiceFactory" />
+        <id property="voiceDeviceId" column="voice_device_id" jdbcType="BIGINT"/>
+        <result property="voiceDeviceName" column="voice_device_name" jdbcType="VARCHAR"/>
+        <result property="stdDeviceId" column="std_device_id" jdbcType="BIGINT"/>
+        <result property="deviceType" column="device_type" jdbcType="VARCHAR"/>
+        <result property="configId" column="config_id" jdbcType="BIGINT"/>
+        <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+        <result property="state" column="state" jdbcType="VARCHAR"/>
+        <result property="voiceCode" column="voice_code" jdbcType="VARCHAR"/>
+        <result property="voiceType" column="voice_type" jdbcType="VARCHAR"/>
+        <result property="voiceModel" column="voice_model" jdbcType="VARCHAR"/>
+        <result property="voiceFactory" column="voice_factory" jdbcType="VARCHAR"/>
+        <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+        <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        voice_device_id, voice_device_name, std_device_id, device_type, config_id,state,voice_code,voice_type,voice_model,voice_factory
+        voice_device_id,voice_device_name,std_device_id,
+        device_type,config_id,up_region_id,
+        state,voice_code,voice_type,
+        voice_model,voice_factory,edge_code,
+        origin_id
     </sql>
 
 
     <insert id="add" useGeneratedKeys="true" keyProperty="voiceDeviceId" parameterType="com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail">
-        insert into t_voice_device(
-            voice_device_id,
-            voice_device_name,
-            std_device_id,
-            device_type,
-            state,
-            config_id,
-            up_region_id,
-            voice_code,
-            voice_type,
-            voice_model,
-            voice_factory
-        )values(
-                #{voiceDeviceId, jdbcType=BIGINT},
-                #{voiceDeviceName, jdbcType=VARCHAR},
-                #{stdDeviceId, jdbcType=BIGINT},
-                #{deviceType, jdbcType=VARCHAR},
-                #{state, jdbcType=VARCHAR},
-                #{configId, jdbcType=BIGINT},
-                #{upRegionId, jdbcType=BIGINT},
-                #{voiceCode, jdbcType=VARCHAR},
-                #{voiceType, jdbcType=VARCHAR},
-                #{voiceModel, jdbcType=VARCHAR},
-                #{voiceFactory, jdbcType=VARCHAR}
-        )
+        insert into t_voice_device
+        ( voice_device_name,std_device_id
+        ,device_type,config_id,up_region_id
+        ,state,voice_code,voice_type
+        ,voice_model,voice_factory,edge_code
+        ,origin_id)
+        values (#{voiceDeviceName,jdbcType=VARCHAR},#{stdDeviceId,jdbcType=BIGINT}
+               ,#{deviceType,jdbcType=VARCHAR},#{configId,jdbcType=BIGINT},#{upRegionId,jdbcType=BIGINT}
+               ,#{state,jdbcType=VARCHAR},#{voiceCode,jdbcType=VARCHAR},#{voiceType,jdbcType=VARCHAR}
+               ,#{voiceModel,jdbcType=VARCHAR},#{voiceFactory,jdbcType=VARCHAR},#{edgeCode,jdbcType=VARCHAR}
+               ,#{originId,jdbcType=VARCHAR})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -57,20 +49,46 @@
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail">
-        update t_voice_device a <set>
-        <if test="voiceDeviceId != null">a.voice_device_id = #{voiceDeviceId, jdbcType=BIGINT},</if>
-        <if test="voiceDeviceName != null">a.voice_device_name = #{voiceDeviceName, jdbcType=VARCHAR},</if>
-        <if test="stdDeviceId != null">a.std_device_id = #{stdDeviceId, jdbcType=BIGINT},</if>
-        <if test="deviceType != null">a.device_type = #{deviceType, jdbcType=VARCHAR},</if>
-        <if test="state != null">a.state = #{state, jdbcType=VARCHAR},</if>
-        <if test="configId != null">a.config_id = #{configId, jdbcType=BIGINT},</if>
-        <if test="upRegionId != null">a.up_region_id = #{upRegionId, jdbcType=BIGINT},</if>
-        <if test="voiceCode != null">a.voice_code = #{voiceCode, jdbcType=VARCHAR},</if>
-        <if test="voiceType != null">a.voice_type = #{voiceType, jdbcType=VARCHAR},</if>
-        <if test="voiceModel != null">a.voice_model = #{voiceModel, jdbcType=VARCHAR},</if>
-        <if test="voiceFactory != null">a.voice_factory = #{voiceFactory, jdbcType=VARCHAR},</if>
-    </set>
-            where a.voice_device_id = #{voiceDeviceId, jdbcType=BIGINT}
+        update t_voice_device
+        <set>
+            <if test="voiceDeviceName != null">
+                voice_device_name = #{voiceDeviceName,jdbcType=VARCHAR},
+            </if>
+            <if test="stdDeviceId != null">
+                std_device_id = #{stdDeviceId,jdbcType=BIGINT},
+            </if>
+            <if test="deviceType != null">
+                device_type = #{deviceType,jdbcType=VARCHAR},
+            </if>
+            <if test="configId != null">
+                config_id = #{configId,jdbcType=BIGINT},
+            </if>
+            <if test="upRegionId != null">
+                up_region_id = #{upRegionId,jdbcType=BIGINT},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="voiceCode != null">
+                voice_code = #{voiceCode,jdbcType=VARCHAR},
+            </if>
+            <if test="voiceType != null">
+                voice_type = #{voiceType,jdbcType=VARCHAR},
+            </if>
+            <if test="voiceModel != null">
+                voice_model = #{voiceModel,jdbcType=VARCHAR},
+            </if>
+            <if test="voiceFactory != null">
+                voice_factory = #{voiceFactory,jdbcType=VARCHAR},
+            </if>
+            <if test="edgeCode != null">
+                edge_code = #{edgeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="originId != null">
+                origin_id = #{originId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where   voice_device_id = #{voiceDeviceId,jdbcType=BIGINT}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail">
@@ -98,17 +116,7 @@
 
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TVoiceDevice" resultType="com.yjh.platform.module.device.entity.TVoiceDevice">
         select
-        a.voice_device_id,
-        a.voice_device_name,
-        a.std_device_id,
-        a.device_type,
-        a.state,
-        a.config_id,
-        a.up_region_id,
-        a.voice_code,
-        a.voice_type,
-        a.voice_model,
-        a.voice_factory
+        <include refid="Base_Column_List" />
         from t_voice_device a
         where 1 = 1
         <if test="voiceDeviceId != null and voiceDeviceId != ''"> and a.voice_device_id = #{voiceDeviceId, jdbcType=VARCHAR}</if>
@@ -173,27 +181,19 @@
     </select>
 
     <insert id="batchAdd">
-        insert into t_voice_device(
-            voice_device_id,
-            voice_device_name,
-            std_device_id,
-        state,
-            device_type,
-            config_id,
-        up_region_id,
-        voice_code
-        )values
+        insert into t_voice_device
+        ( voice_device_name,std_device_id
+        ,device_type,config_id,up_region_id
+        ,state,voice_code,voice_type
+        ,voice_model,voice_factory,edge_code
+        ,origin_id)
+        values
         <foreach collection="list" item="TVoiceDevice" separator=",">
-            (
-                #{TVoiceDevice.voiceDeviceId, jdbcType=BIGINT},
-                #{TVoiceDevice.voiceDeviceName, jdbcType=VARCHAR},
-                #{TVoiceDevice.stdDeviceId, jdbcType=BIGINT},
-                #{TVoiceDevice.deviceType, jdbcType=VARCHAR},
-                #{TVoiceDevice.state, jdbcType=VARCHAR},
-                #{TVoiceDevice.configId, jdbcType=BIGINT},
-            #{TVoiceDevice.upRegionId, jdbcType=BIGINT},
-            #{TVoiceDevice.voiceCode, jdbcType=VARCHAR},
-            )
+            (#{TVoiceDevice.voiceDeviceName,jdbcType=VARCHAR},#{TVoiceDevice.stdDeviceId,jdbcType=BIGINT}
+            ,#{TVoiceDevice.deviceType,jdbcType=VARCHAR},#{TVoiceDevice.configId,jdbcType=BIGINT},#{TVoiceDevice.upRegionId,jdbcType=BIGINT}
+            ,#{TVoiceDevice.state,jdbcType=VARCHAR},#{TVoiceDevice.voiceCode,jdbcType=VARCHAR},#{TVoiceDevice.voiceType,jdbcType=VARCHAR}
+            ,#{TVoiceDevice.voiceModel,jdbcType=VARCHAR},#{TVoiceDevice.voiceFactory,jdbcType=VARCHAR},#{TVoiceDevice.edgeCode,jdbcType=VARCHAR}
+            ,#{TVoiceDevice.originId,jdbcType=VARCHAR})
         </foreach>
     </insert>
 

@@ -1,7 +1,5 @@
 package com.yjh.platform.module.device.entity;
 
-import java.io.Serializable;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,6 +8,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
+import java.io.Serializable;
 
 /**
  * @author lqh
@@ -49,6 +48,31 @@ public class TVoiceDevice implements Serializable {
     private String state;
 
     private String voiceCode;
+
+
+    /**
+     * 设备类型
+     */
+    private String voiceType;
+
+    /**
+     * 设备型号
+     */
+    private String voiceModel;
+
+    /**
+     * 生产厂家
+     */
+    private String voiceFactory;
+    /**
+     * 节点编码
+     */
+    private String edgeCode;
+
+    /**
+     * 原始id(下级同步的id)
+     */
+    private String originId;
 
     private Integer pageNum = 1;
 

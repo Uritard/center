@@ -235,7 +235,7 @@
 
     <insert id="batchInsert">
         insert into t_robot_info(
-        robot_id,robot_code,robot_num
+         robot_code,robot_num
         ,robot_name,nest_name,nest_code
         ,robot_status,robot_type,drone_type
         ,robot_ip,robot_port,light_ip
@@ -253,7 +253,7 @@
         ,off_line_count,edge_code,origin_id
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
-            values (#{TRobotInfo.robotId,jdbcType=BIGINT},#{TRobotInfo.robotCode,jdbcType=VARCHAR},#{TRobotInfo.robotNum,jdbcType=INTEGER}
+             (#{TRobotInfo.robotCode,jdbcType=VARCHAR},#{TRobotInfo.robotNum,jdbcType=INTEGER}
             ,#{TRobotInfo.robotName,jdbcType=VARCHAR},#{TRobotInfo.nestName,jdbcType=VARCHAR},#{TRobotInfo.nestCode,jdbcType=VARCHAR}
             ,#{TRobotInfo.robotStatus,jdbcType=VARCHAR},#{TRobotInfo.robotType,jdbcType=INTEGER},#{TRobotInfo.droneType,jdbcType=INTEGER}
             ,#{TRobotInfo.robotIp,jdbcType=VARCHAR},#{TRobotInfo.robotPort,jdbcType=INTEGER},#{TRobotInfo.lightIp,jdbcType=VARCHAR}
@@ -1260,4 +1260,17 @@
         a.task_id = #{taskId, jdbcType=VARCHAR}
         AND a.instance_id = #{instanceId}
     </update>
+
+
+    <select id="selectByEdgeCodeAndType" resultMap="BaseResultMap">
+            select  <include refid="Base_Column_List"/>  from t_robot_info  where edge_code=#{edgeCode}
+      <if test="type=='robot'">and robot_type is not null</if>
+        <if test="type=='drone'">and drone_type is not null</if>
+    </select>
+
+    <delete id="deleteByEdgeCodeAndOriginId">
+        delete  from t_robot_info where edge_code=#{edgeCode}  and origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+    </delete>
+
 </mapper>
