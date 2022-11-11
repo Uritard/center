@@ -63,14 +63,17 @@ public class ReportManageService {
         String stationName = reportManageDao.selectStationName();
         taskVO.setStationName(stationName);
         //测点数
-        Integer meteNum = reportManageDao.selectMeteNum(list,startTime,endTime);
+//        Integer meteNum = reportManageDao.selectMeteNum(list,startTime,endTime);
+        Integer meteNum = uPatrolResultDao.selectMeteNum(list,startTime,endTime);
         taskVO.setMeteNum(meteNum);
         recordData.setTaskVO(taskVO);
         //2.分项预览
-        List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType(list,startTime,endTime);
+//        List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType(list,startTime,endTime);
+        List<CheckPointType> cpTypeItems = uPatrolResultDao.selectMeteType(list,startTime,endTime);
         recordData.setCpTypeItems(cpTypeItems);
         //3.明细-所选设备的所有测点巡检结果详情
-        List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(list,startTime,endTime);
+//        List<TCruiseDataResultDetail> tCDRDList =  reportManageDao.selectDetail(list,startTime,endTime);
+        List<TCruiseDataResultDetail> tCDRDList =  uPatrolResultDao.selectDetail(list,startTime,endTime);
         for (TCruiseDataResultDetail tcdr : tCDRDList){
             String relativePath = tcdr.getPicPath();
             if (!"228".equals(tcdr.getCruiseType().toString())){
@@ -230,10 +233,12 @@ public class ReportManageService {
         recordData.setTaskVO(taskVO);
 
         // 2.分项预览
-        List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType2(taskId);
+//        List<CheckPointType> cpTypeItems = reportManageDao.selectMeteType2(taskId);
+        List<CheckPointType> cpTypeItems = uPatrolResultDao.selectMeteType2(taskId);
         recordData.setCpTypeItems(cpTypeItems);
         // 3.明细-所选设备的所有测点巡检结果详情
-        List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  reportManageDao.selectTaskResult(taskId);
+//        List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  reportManageDao.selectTaskResult(taskId);
+        List<TCruiseDataResultDetail> tCruiseDataResultDetailList =  uPatrolResultDao.selectTaskResult(taskId);
         Map<String,String> map = redisTemplate.opsForHash().entries("t_sys_param:prefixAbsolutePath");
         String absPath = map.get("content");
         Map<String,String> entries = redisTemplate.opsForHash().entries("t_sys_param:prefixRelativePath");
@@ -305,7 +310,8 @@ public class ReportManageService {
         String stationName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationName", "content"));
         taskVO.setStationName(stationName);
         // 测点数
-        Integer meteNum = reportManageDao.selectMeteNumByTask(taskId);
+//        Integer meteNum = reportManageDao.selectMeteNumByTask(taskId);
+        Integer meteNum = uPatrolResultDao.selectMeteNumByTask(taskId);
         taskVO.setMeteNum(meteNum);
         String voltageClasses = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content")) + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
@@ -341,7 +347,8 @@ public class ReportManageService {
     }
     @Transactional(rollbackFor = Exception.class)
     public List<TCruiseDataResultDetail> test(String taskId){
-        return reportManageDao.selectTaskResult(taskId);
+//        return reportManageDao.selectTaskResult(taskId);
+        return uPatrolResultDao.selectTaskResult(taskId);
     }
 
     /*
