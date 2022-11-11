@@ -44,7 +44,6 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
     private Map<String, String> threadMap;
     private RedisTemplate redisTemplate;
-    private UpFtpsConfig upFtpsConfig;
     private UPatrolTaskService uPatrolTaskService;
     private FtpsService ftpsservice;
     private AlarmService alarmService;
@@ -52,7 +51,6 @@ public class IsWarnAfterCruiseThread implements Runnable {
     public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate) {
         this.threadMap = threadMap;
         this.redisTemplate = redisTemplate;
-        this.upFtpsConfig = StaticContextAccessor.getBean(UpFtpsConfig.class);
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         ftpsservice = StaticContextAccessor.getBean(FtpsService.class);
         alarmService = StaticContextAccessor.getBean(AlarmService.class);
@@ -67,11 +65,10 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
             String robotTaskId = taskId;
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
-            log.info("taskId是: {}的任务数据uPatrolTask是: {}", taskId, uPatrolTask);
+            log.info("taskId is {} uPatrolTask is: {}", taskId, uPatrolTask);
 
             String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + threadMap.get("deviceId");
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
-//            if (Objects.isNull(tCruiseTask.getTaskType())) {
             Long instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
             TStdDeviceMete tStdDevicemete = uPatrolTaskService.selectDeviceMeteInfo(instanceId);
 
@@ -119,7 +116,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
      * @param instanceId     巡视点id
      */
     private void alarmStoreAndHandler(Map<String, Object> map, String taskId, TStdDeviceMete tStdDevicemete, Long instanceId) {
-        log.info("产生了告警！！！");
+        log.info("An alarm is generated！！！");
         TWarnInfo warnInfo = new TWarnInfo();
         try {
             warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
@@ -128,32 +125,20 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setInstanceId(instanceId);
             warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
             warnInfo.setConfMode(276);
-            Integer warnFlag = Integer.valueOf(uPatrolTaskService.selectDictCodeByNote("其他", "defect_model"));
-            warnInfo.setDefectModel(warnFlag);
+            warnInfo.setDefectModel(Integer.valueOf(uPatrolTaskService.selectDictCodeByNote("其他", "defect_model")));
             warnInfo.setAlarmSource(282);
             warnInfo.setImagePath(threadMap.get("relativePath"));
             warnInfo.setValue(threadMap.get("value"));
             warnInfo.setTaskId(taskId);
-            String robotId = String.valueOf(uPatrolTaskService.selectRobotInfoByCode(threadMap.get("robotCode")).getRobotId());
-            warnInfo.setDeviceCode(robotId);
+            warnInfo.setDeviceCode(String.valueOf(uPatrolTaskService.selectRobotInfoByCode(threadMap.get("robotCode")).getRobotId()));
             warnInfo.setWarnName(String.valueOf(map.get("warnName")));
             warnInfo.setWarnLevel(Integer.valueOf(String.valueOf(map.get("warnLevel"))));
             warnInfo.setWarnContent(String.valueOf(map.get("warnContent")));
-            String outRange = Objects.nonNull(map.get("outRange"))? String.valueOf(map.get("outRange")) : null;
-            warnInfo.setOutRange(outRange);
-            log.info("要插库的告警数据是==={}", JSON.toJSONString(warnInfo));
-
-            // webSocket通知前端刷新告警统计数量
-            Map<String, String> jasonMaps = new HashMap<>(16);
-            jasonMaps.put("type", "newAlarm");
-            jasonMaps.put("alarmName", warnInfo.getWarnName());
-            jasonMaps.put("alarmTime", String.valueOf(warnInfo.getWarnTime()));
-            jasonMaps.put("alarmContent", warnInfo.getWarnContent());
-            log.info("告警生成-前端推送：{}", JSON.toJSONString(jasonMaps));
-            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
-
+            warnInfo.setOutRange(Objects.nonNull(map.get("outRange"))? String.valueOf(map.get("outRange")) : null);
+            log.info("warnInfo==={}", JSON.toJSONString(warnInfo));
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
-            log.info("warnId==={}", warnInfo.getWarnId());
+
+            StaticContextAccessor.getBean(PatrolResultHandler.class).pushAlarmInfo(warnInfo.getWarnName(), warnInfo.getWarnContent());
 
             // 将告警信息放入redis
             Map<String, String> warnMap = putWarnToRedis(taskId, warnInfo);

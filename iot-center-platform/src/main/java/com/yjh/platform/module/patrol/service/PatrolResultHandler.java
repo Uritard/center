@@ -62,26 +62,30 @@ public class PatrolResultHandler {
         if (alarmList.isEmpty()){
             return;
         }
+        log.info("alarmList=={}", alarmList);
+        try {
+            for (RobotPatrolTaskAlarm taskAlarm : alarmList) {
+                // 通过上报的任务id查询巡视主机上的任务id
+                String taskCode = taskAlarm.getTaskCode();
+                String taskId = tRobotInspectionDao.selectRealTaskId(taskCode);
+                if (StringUtils.isEmpty(taskId)) {
+                    taskId = taskCode;
+                    log.info("taskId is empty, use taskCode as taskId");
+                }
+                log.info("taskCode==={},taskId===={}", taskCode, taskId);
 
-        for (RobotPatrolTaskAlarm taskAlarm : alarmList){
-            // 通过上报的任务id查询巡视主机上的任务id
-            String taskCode = taskAlarm.getTaskCode();
-            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode);
-            if (StringUtils.isEmpty(taskId)) {
-                taskId = taskCode;
-                log.info("taskId is empty, use taskCode as taskId");
+                RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(taskAlarm, redisTemplate, analyseDataOperateService);
+                TaskExecutePool.getInstance().execute(robotWarnThread);
+
+                boolean flag = ArrayUtils.contains(new String[]{"3", "4", "9"}, taskAlarm.getAlarmType());
+                if (Boolean.TRUE.equals(flag)) {
+                    //非同源告警处理
+                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 0);
+                    TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
+                }
             }
-            log.info("taskCode==={},taskId===={}", taskCode, taskId);
-
-            RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(taskAlarm, redisTemplate, analyseDataOperateService);
-            TaskExecutePool.getInstance().execute(robotWarnThread);
-
-            boolean flag = ArrayUtils.contains(new String[]{"3", "4", "9"}, taskAlarm.getAlarmType());
-            if (Boolean.TRUE.equals(flag)){
-                //非同源告警处理
-                NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 0);
-                TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
-            }
+        }catch (Exception e){
+            log.error("处理机器人/无人机测点告警异常:", e);
         }
     }
 
@@ -94,34 +98,38 @@ public class PatrolResultHandler {
         if (resultList.isEmpty()){
             return;
         }
+        log.info("resultList=={}", resultList);
+        try {
+            for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
+                Map<String, String> infoMap = new HashMap<>(8);
 
-        for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
-            Map<String, String> infoMap = new HashMap<>(8);
+                // 通过上报的任务id查询巡视主机上的任务id
+                String taskCode = robotPatrolTaskResult.getTaskCode();
+                String taskId = tRobotInspectionDao.selectRealTaskId(taskCode);
+                if (StringUtils.isEmpty(taskId)) {
+                    taskId = taskCode;
+                    log.info("taskId is empty, use taskCode as taskId");
+                }
+                log.info("taskCode==={},taskId===={}", taskCode, taskId);
+                infoMap.put("taskId", taskId);
 
-            // 通过上报的任务id查询巡视主机上的任务id
-            String taskCode = robotPatrolTaskResult.getTaskCode();
-            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode);
-            if (StringUtils.isEmpty(taskId)) {
-                taskId = taskCode;
-                log.info("taskId is empty, use taskCode as taskId");
+                // 文件处理
+                Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap);
+                // 告警处理
+                alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
+                // 巡视结果处理
+                InspectionResultThread cruiseResultDealThread = new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, true);
+                ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
+                // 非同源告警处理
+                RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
+                taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
+                taskAlarm.setValue(robotPatrolTaskResult.getValue());
+                taskAlarm.setDeviceId(robotPatrolTaskResult.getDeviceId());
+                NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
+                ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
             }
-            log.info("taskCode==={},taskId===={}", taskCode, taskId);
-            infoMap.put("taskId", taskId);
-
-            // 文件处理
-            Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap);
-            // 告警处理
-            alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
-            // 巡视结果处理
-            InspectionResultThread cruiseResultDealThread = new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, true);
-            ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
-            // 非同源告警处理
-            RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
-            taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
-            taskAlarm.setValue(robotPatrolTaskResult.getValue());
-            taskAlarm.setDeviceId(robotPatrolTaskResult.getDeviceId());
-            NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
-            ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
+        }catch (Exception e){
+            log.error("处理机器人/无人机巡视结果异常:", e);
         }
     }
 
@@ -129,8 +137,8 @@ public class PatrolResultHandler {
      * 根据巡视结果判断是否生成告警
      *
      * @param robotPatrolTaskResult 机器人/无人机巡视结果
-     * @param taskId
-     * @param isAlarmMap
+     * @param taskId 任务id
+     * @param isAlarmMap 告警信息map
      */
     private void alarmHandlerAfterCruise(RobotPatrolTaskResult robotPatrolTaskResult, String taskId, Map<String, String> isAlarmMap) {
         try {
@@ -170,7 +178,7 @@ public class PatrolResultHandler {
             // 文件路径
             String filePath = robotPatrolTaskResult.getFilePath();
             String temporaryFilePath = ftpsFilePath + "/" + filePath;
-            log.info("巡视结果图片全路径==={}", temporaryFilePath);
+            log.info("temporaryFilePath==={}", temporaryFilePath);
             String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
 
             // 1.红外 2.可见光 3.音频 4.视频
@@ -227,7 +235,7 @@ public class PatrolResultHandler {
         if (resultList.isEmpty()){
             return;
         }
-        log.info("jsonResult=={}", resultList);
+        log.info("resultList=={}", resultList);
 
         try {
             for (AnalysePatrolTaskResult patrolTaskResult: resultList) {
@@ -288,7 +296,6 @@ public class PatrolResultHandler {
         }catch (Exception e){
             log.error("处理算法分析后的巡视结果异常：", e);
         }
-
     }
 
     /**
@@ -298,9 +305,9 @@ public class PatrolResultHandler {
      * @param resultValue 巡视结果值
      * @param cruiseResultMap redis中巡视点结果信息
      * @param tStdDevicemete 测点信息
-     * @return String
+     * @param firDocPath 红外fir文件
      */
-    private String recognitionHandler(String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String firDocPath) {
+    private void recognitionHandler(String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String firDocPath) {
         String resultImage;
         try {
             if(StringUtils.isNotEmpty(analyseResultImg)){
@@ -326,7 +333,6 @@ public class PatrolResultHandler {
         }catch (Exception e){
             log.error("识别结果处理异常：", e);
         }
-        return resultValue;
     }
 
     public Map<String, String> normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, String firDocPath) {
@@ -523,21 +529,25 @@ public class PatrolResultHandler {
      */
     private TWarnInfo getWarnInfo(Map<String, String> warningMsg) {
         TWarnInfo tWarnInfo = new TWarnInfo();
-        tWarnInfo.setWarnLevel(NumberUtils.toInt(warningMsg.get("warnLevel")));
-        tWarnInfo.setDeviceId(NumberUtils.toLong(warningMsg.get("deviceId")));
-        tWarnInfo.setCunstomId(warningMsg.get("customId"));
-        tWarnInfo.setInstanceId(NumberUtils.toLong(warningMsg.get("instanceId")));
-        tWarnInfo.setStdMeteId(NumberUtils.toLong(warningMsg.get("stdMeteId")));
-        tWarnInfo.setTaskId(warningMsg.get("taskId"));
-        tWarnInfo.setValue(warningMsg.get("value"));
-        tWarnInfo.setConfMode(NumberUtils.toInt(warningMsg.get("confMode")));
-        tWarnInfo.setImagePath(warningMsg.get("imagePath"));
-        tWarnInfo.setAlarmSource(NumberUtils.toInt(warningMsg.get("alarmSource")));
-        tWarnInfo.setWarnName(warningMsg.get("warnName"));
-        tWarnInfo.setOutRange(warningMsg.get("outRange"));
-        tWarnInfo.setWarnContent(warningMsg.get("warnContent"));
-        tWarnInfo.setDefectModel(NumberUtils.toInt(warningMsg.get("defectModel")));
-        tWarnInfo.setWarnTime(DateTimeUtil.parse(warningMsg.get("warnTime")));
+        try {
+            tWarnInfo.setWarnLevel(NumberUtils.toInt(warningMsg.get("warnLevel")));
+            tWarnInfo.setDeviceId(NumberUtils.toLong(warningMsg.get("deviceId")));
+            tWarnInfo.setCunstomId(warningMsg.get("customId"));
+            tWarnInfo.setInstanceId(NumberUtils.toLong(warningMsg.get("instanceId")));
+            tWarnInfo.setStdMeteId(NumberUtils.toLong(warningMsg.get("stdMeteId")));
+            tWarnInfo.setTaskId(warningMsg.get("taskId"));
+            tWarnInfo.setValue(warningMsg.get("value"));
+            tWarnInfo.setConfMode(NumberUtils.toInt(warningMsg.get("confMode")));
+            tWarnInfo.setImagePath(warningMsg.get("imagePath"));
+            tWarnInfo.setAlarmSource(NumberUtils.toInt(warningMsg.get("alarmSource")));
+            tWarnInfo.setWarnName(warningMsg.get("warnName"));
+            tWarnInfo.setOutRange(warningMsg.get("outRange"));
+            tWarnInfo.setWarnContent(warningMsg.get("warnContent"));
+            tWarnInfo.setDefectModel(NumberUtils.toInt(warningMsg.get("defectModel")));
+            tWarnInfo.setWarnTime(DateTimeUtil.parse(warningMsg.get("warnTime")));
+        }catch (Exception e){
+            log.error("告警info信息组装异常:",e);
+        }
         return tWarnInfo;
     }
 
@@ -647,7 +657,7 @@ public class PatrolResultHandler {
      * @param warnContent 告警内容
      * @return void
      */
-    private void pushAlarmInfo(String resultValue, String warnContent) {
+    public void pushAlarmInfo(String resultValue, String warnContent) {
         try {
             Map<String, String> jasonMaps = new HashMap<>(5);
             jasonMaps.put("type", "newAlarm");
@@ -729,7 +739,7 @@ public class PatrolResultHandler {
             tDefectInfo.setImagePath(defectMap.get("imagePath"));
             tDefectInfo.setAlarmSource(NumberUtils.toInt(defectMap.get("alarmSource")));
         }catch (Exception e){
-            log.error("组装缺陷info信息异常：", e);
+            log.error("缺陷info信息组装异常：", e);
         }
         return tDefectInfo;
     }
@@ -761,7 +771,7 @@ public class PatrolResultHandler {
             defectMap.put("defectTime", DateTimeUtil.format(new Date()));
             defectMap.put("value", resultValueItem);
         }catch (Exception e){
-            log.error("组装缺陷map信息异常：" , e);
+            log.error("缺陷map信息组装异常：" , e);
         }
         return defectMap;
     }
