@@ -41,7 +41,7 @@ public class TCameraInfoService {
     public void saveReportData(List<CameraModel> cameraModelList, String edgeNode) {
         log.info("开始同步摄像机信息  edgeNode:{}  ", edgeNode);
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectByEdgeCode(edgeNode);
-        Map<Long, Long> tCameraRecorderMap = tCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, TCameraRecorder::getRecordId));
+        Map<String, Long> tCameraRecorderMap = tCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, TCameraRecorder::getRecordId));
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeNode, null);
         Map<String, String> stdRegionMap = stdRegionList.stream().collect(Collectors.toMap(tStdRegion -> tStdRegion.getOriginRegionId().toString(), tStdRegion -> tStdRegion.getRegionId().toString()));
         List<TCameraInfo> tCameraInfoList = cameraModelList.stream().map(cameraModel -> {
@@ -51,7 +51,7 @@ public class TCameraInfoService {
             tCameraInfo.setCameraModel(cameraModel.getCameraModel());
             tCameraInfo.setPmsId(cameraModel.getPmsId());
             tCameraInfo.setAliasName(cameraModel.getAliasName());
-            tCameraInfo.setRecordId(tCameraRecorderMap.get(cameraModel.getRecordId()));
+            tCameraInfo.setRecordId(tCameraRecorderMap.get(cameraModel.getRecordId().toString()));
             tCameraInfo.setUpRegionId(stdRegionMap.get(cameraModel.getUpRegionId()));
             tCameraInfo.setChannelNum(cameraModel.getChannelNum());
             tCameraInfo.setCameraNum(cameraModel.getCameraNum());

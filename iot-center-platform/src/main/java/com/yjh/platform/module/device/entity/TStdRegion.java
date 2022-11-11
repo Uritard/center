@@ -55,7 +55,7 @@ public class TStdRegion implements Serializable {
     private String regionCode;
 
     @ApiModelProperty(value = "下级节点区域ID(state为0时有值)")
-    private Long originRegionId;
+    private String originRegionId;
 
     @Length(max = 32,message = "stationId长度必须小于等于32")
     @ApiModelProperty(value = "变电站ID")

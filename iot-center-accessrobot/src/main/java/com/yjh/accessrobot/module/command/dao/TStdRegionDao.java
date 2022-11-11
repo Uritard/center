@@ -45,7 +45,7 @@ public interface TStdRegionDao {
 
     List<TStdRegion> selectAll();
 
-    int deleteByOriginRegionIdAnRegionCode(@Param(value = "state") int state, @Param(value = "regionCode") String regionCode, @Param(value = "originIdList") Collection<Long> originIdList);
+    int deleteByOriginRegionIdAnRegionCode(@Param(value = "state") int state, @Param(value = "regionCode") String regionCode, @Param(value = "originIdList") Collection<String> originIdList);
 
     void updateUpRegionId(TStdRegion stdRegion);
 

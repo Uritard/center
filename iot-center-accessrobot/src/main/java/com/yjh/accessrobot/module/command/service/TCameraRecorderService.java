@@ -30,7 +30,7 @@ public class TCameraRecorderService {
     @Transactional
     public void saveReportData(List<TCameraRecorder> tCameraRecorderList, String edgeNode) {
         tCameraRecorderList.forEach(tCameraRecorder -> {
-            tCameraRecorder.setOriginId(tCameraRecorder.getRecordId());
+            tCameraRecorder.setOriginId(tCameraRecorder.getRecordId().toString());
             tCameraRecorder.setRecordId(null);
             tCameraRecorder.setEdgeCode(edgeNode);
         });
@@ -41,26 +41,26 @@ public class TCameraRecorderService {
             tCameraRecorderDao.batchInsert(tCameraRecorderList);
             // 否则对比数据
         } else {
-            Map<Long, TCameraRecorder> oldTCameraRecorderMap = oldTCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, Function.identity()));
-            Map<Long, TCameraRecorder> newTCameraRecorderMap = tCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, Function.identity()));
+            Map<String, TCameraRecorder> oldTCameraRecorderMap = oldTCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, Function.identity()));
+            Map<String, TCameraRecorder> newTCameraRecorderMap = tCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, Function.identity()));
             // 更新的数据
-            SetUtils.SetView<Long> updateIdCollection = SetUtils.intersection(oldTCameraRecorderMap.keySet(), newTCameraRecorderMap.keySet());
+            SetUtils.SetView<String> updateIdCollection = SetUtils.intersection(oldTCameraRecorderMap.keySet(), newTCameraRecorderMap.keySet());
             if (CollectionUtils.isNotEmpty(updateIdCollection)) {
-                tCameraRecorderList.stream().filter(tCameraRecorder -> updateIdCollection.contains(tCameraRecorder.getRecordId())).forEach(tCameraRecorder -> {
-                    TCameraRecorder oldTCameraRecorder = oldTCameraRecorderMap.get(tCameraRecorder.getRecordId());
+                tCameraRecorderList.stream().filter(tCameraRecorder -> updateIdCollection.contains(tCameraRecorder.getOriginId())).forEach(tCameraRecorder -> {
+                    TCameraRecorder oldTCameraRecorder = oldTCameraRecorderMap.get(tCameraRecorder.getOriginId());
                     tCameraRecorder.setRecordId(oldTCameraRecorder.getRecordId());
                     tCameraRecorderDao.updateByPrimaryKey(tCameraRecorder);
                 });
             }
             //删除的数据
-            SetUtils.SetView<Long> deleteIdCollection = SetUtils.difference(oldTCameraRecorderMap.keySet(), newTCameraRecorderMap.keySet());
+            SetUtils.SetView<String> deleteIdCollection = SetUtils.difference(oldTCameraRecorderMap.keySet(), newTCameraRecorderMap.keySet());
             if (CollectionUtils.isNotEmpty(deleteIdCollection)) {
                 tCameraRecorderDao.deleteByEdgeCodeAndOriginId(edgeNode, deleteIdCollection);
             }
             //新增的数据
-            SetUtils.SetView<Long> insertIdCollection = SetUtils.difference(newTCameraRecorderMap.keySet(), oldTCameraRecorderMap.keySet());
+            SetUtils.SetView<String> insertIdCollection = SetUtils.difference(newTCameraRecorderMap.keySet(), oldTCameraRecorderMap.keySet());
             if (CollectionUtils.isNotEmpty(insertIdCollection)) {
-                List<TCameraRecorder> insertTCameraRecorderList = tCameraRecorderList.stream().filter(tCameraRecorder -> insertIdCollection.contains(tCameraRecorder.getRecordId())).collect(Collectors.toList());
+                List<TCameraRecorder> insertTCameraRecorderList = tCameraRecorderList.stream().filter(tCameraRecorder -> insertIdCollection.contains(tCameraRecorder.getOriginId())).collect(Collectors.toList());
                 tCameraRecorderDao.batchInsert(insertTCameraRecorderList);
             }
         }

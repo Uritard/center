@@ -74,9 +74,9 @@ public class TRobotInfoService {
     @Transactional
     public void saveReportData(List<RobotModel> robotModelList, String edgeNode, String type) {
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectByEdgeCode(edgeNode);
-        Map<Long, Long> tCameraRecorderMap = tCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, TCameraRecorder::getRecordId));
+        Map<String, Long> tCameraRecorderMap = tCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, TCameraRecorder::getRecordId));
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeNode, null);
-        Map<Long, Long> stdRegionMap = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getOriginRegionId, TStdRegion::getRegionId));
+        Map<String, Long> stdRegionMap = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getOriginRegionId, TStdRegion::getRegionId));
         List<TRobotInfo> tRobotInfoList = robotModelList.stream().map(robotModel -> {
             TRobotInfo tRobotInfo = new TRobotInfo();
             tRobotInfo.setRobotId(null);
@@ -102,7 +102,7 @@ public class TRobotInfoService {
             tRobotInfo.setRobotFactory(robotModel.getRobotFactory());
             tRobotInfo.setIsUse(robotModel.getIsUse());
             tRobotInfo.setCommissionDate(robotModel.getCommissionDate());
-            tRobotInfo.setUpRegionId(stdRegionMap.get(robotModel.getUpRegionId()));
+            tRobotInfo.setUpRegionId(stdRegionMap.get(robotModel.getUpRegionId().toString()));
             tRobotInfo.setRobotPosition(robotModel.getRobotPosition());
             tRobotInfo.setRemarks(robotModel.getRemarks());
             tRobotInfo.setNestCode(robotModel.getNestCode());
@@ -114,7 +114,7 @@ public class TRobotInfoService {
             tRobotInfo.setBuildingUser(robotModel.getBuildingUser());
             tRobotInfo.setRobotSource(robotModel.getRobotSource());
             tRobotInfo.setAppearanceNumber(robotModel.getAppearanceNumber());
-            tRobotInfo.setRobotNum(Integer.valueOf(robotModel.getPatroldeviceCode()));
+            tRobotInfo.setRobotNum(robotModel.getRobotNum());
             tRobotInfo.setDroneType(robotModel.getDroneType());
             tRobotInfo.setMadeIn(robotModel.getMadeIn());
             tRobotInfo.setDronePosition(robotModel.getDronePosition());
@@ -122,7 +122,7 @@ public class TRobotInfoService {
             tRobotInfo.setDefectRecord(robotModel.getDefectRecord());
             tRobotInfo.setRepairRecord(robotModel.getRepairRecord());
             tRobotInfo.setExitPutintoRecord(robotModel.getExitPutintoRecord());
-            tRobotInfo.setRecordId(tCameraRecorderMap.get(robotModel.getRecordId()));
+            tRobotInfo.setRecordId(tCameraRecorderMap.get(robotModel.getRecordId().toString()));
             tRobotInfo.setChannelNumLight(robotModel.getChannelNumLight());
             tRobotInfo.setChannelNumInferad(robotModel.getChannelNumInferad());
             tRobotInfo.setEdgeCode(edgeNode);
@@ -130,7 +130,7 @@ public class TRobotInfoService {
             return tRobotInfo;
         }).collect(Collectors.toList());
         List<TRobotInfo> oldRobotInfoList = tRobotInfoDao.selectByEdgeCodeAndType(edgeNode, type);
-        if (CollectionUtils.isNotEmpty(oldRobotInfoList)) {
+        if (CollectionUtils.isEmpty(oldRobotInfoList)) {
             tRobotInfoDao.batchInsert(tRobotInfoList);
         } else {
             Map<String, TRobotInfo> oldTRobotInfoMap = oldRobotInfoList.stream().collect(Collectors.toMap(TRobotInfo::getOriginId, Function.identity()));
