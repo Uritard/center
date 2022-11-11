@@ -434,28 +434,28 @@ public class PatrolResultHandler {
                                 switch (warnRuleMeter){
                                     case 1:
                                         warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "预警"));
-                                        warnMap.put("warnContent", meteName + ":" + cruiseResultMap.get("resultNum") + "--" + "预警");
+                                        warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "预警");
                                         alarmLevel = "1";
                                         warnMap.put("outRange", resultValueMeter >= highLimit1 ?
                                                 String.valueOf(resultValueMeter - highLimit1) : String.valueOf(lowLimit1 - resultValueMeter));
                                         break;
                                     case 2:
                                         warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
-                                        warnMap.put("warnContent", meteName + ":" + cruiseResultMap.get("resultNum") + "--" + "一般告警");
+                                        warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "一般告警");
                                         alarmLevel = "2";
                                         warnMap.put("outRange", resultValueMeter >= highLimit2 ?
                                                 String.valueOf(resultValueMeter - highLimit2) : String.valueOf(lowLimit2 - resultValueMeter));
                                         break;
                                     case 3:
                                         warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "严重告警"));
-                                        warnMap.put("warnContent", meteName + ":" + cruiseResultMap.get("resultNum") + "--" + "严重告警");
+                                        warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "严重告警");
                                         alarmLevel = "3";
                                         warnMap.put("outRange", resultValueMeter >= highLimit3 ?
                                                 String.valueOf(resultValueMeter - highLimit3) : String.valueOf(lowLimit3 - resultValueMeter));
                                         break;
                                     case 4:
                                         warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "危急告警"));
-                                        warnMap.put("warnContent", meteName + ":" + cruiseResultMap.get("resultNum") + "--" + "危急告警");
+                                        warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "危急告警");
                                         alarmLevel = "4";
                                         warnMap.put("outRange", resultValueMeter >= highLimit4 ?
                                                 String.valueOf(resultValueMeter - highLimit4) : String.valueOf(lowLimit4 - resultValueMeter));
