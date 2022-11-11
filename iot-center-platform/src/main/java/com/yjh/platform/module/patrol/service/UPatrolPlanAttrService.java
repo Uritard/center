@@ -1,16 +1,12 @@
 package com.yjh.platform.module.patrol.service;
 
-import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceAttr;
-import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
 import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.entity.TCruisePlan;
-import com.yjh.platform.module.task.entity.TCruisePlanAttr;
-import com.yjh.platform.module.user.entity.TAlgorithmConf;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
