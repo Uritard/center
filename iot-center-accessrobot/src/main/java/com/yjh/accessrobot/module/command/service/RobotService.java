@@ -22,7 +22,6 @@ import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
 import com.yjh.accessrobot.module.command.dao.TRobotRegionDao;
 import com.yjh.accessrobot.module.command.entity.*;
-import com.yjh.accessrobot.module.device.service.TCameraRecorderService;
 import com.yjh.accessrobot.module.device.utils.StatisticsUtil;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
@@ -114,6 +113,8 @@ public class RobotService {
     private TCameraRecorderService tCameraRecorderService;
     @Autowired
     private TCameraInfoService tCameraInfoService;
+    @Autowired
+    private  TRobotInfoService tRobotInfoService;
 
     @Transactional(rollbackFor = Exception.class)
     public int updateAllRobotStatus() {
@@ -2778,18 +2779,18 @@ public class RobotService {
 //                log.info("边缘节点模型 {}", filePath);
 //                dealHostFilePath(filePathMap,filePath,edgeCode);
 //                break;
-//            case "3":
-//                log.info("机器人模型 {}", filePath);
-//                dealRobotFile(filePathMap,filePath,edgeCode);
-//                break;
+            case "3":
+                log.info("机器人模型 {}", filePath);
+                dealRobotFile(filePathMap.get("content") + File.separator + filePath,edgeCode, Constant.ROBOT);
+                break;
             case "4":
                 log.info("摄像机模型 {}", filePath);
                 dealCameraFile(filePathMap.get("content") + File.separator + filePath,edgeCode);
                 break;
-//            case "5":
-//                log.info("无人机模型 {}", filePath);
-//                dealDroneFile(filePathMap,filePath,edgeCode);
-//                break;
+            case "5":
+                log.info("无人机模型 {}", filePath);
+                dealRobotFile(filePathMap.get("content") + File.separator + filePath,edgeCode, Constant.DRONE);
+                break;
 //            case "6":
 //                log.info("声纹模型 {}", filePath);
 //                dealVoiceFile(filePathMap,filePath,edgeCode);
@@ -2829,6 +2830,20 @@ public class RobotService {
             List<Map<String, Object>> mapList = model.getItems();
             List<CameraModel> cameraModelList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, CameraModel.class)).collect(Collectors.toList());
             tCameraInfoService.saveReportData(cameraModelList,edgeCode);
+        } catch (DocumentException e) {
+            log.error("录像机文件处理失败", e);
+        }
+    }
+    public void dealRobotFile(String filePath, String edgeCode,String type) {
+        if (StringUtils.isBlank(filePath)) {
+            log.info("file path is null");
+            return;
+        }
+        try {
+            XMLBaseModel model = getXmlMessage(filePath);
+            List<Map<String, Object>> mapList = model.getItems();
+            List<RobotModel> robotModelList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, RobotModel.class)).collect(Collectors.toList());
+            tRobotInfoService.saveReportData(robotModelList,edgeCode,type);
         } catch (DocumentException e) {
             log.error("录像机文件处理失败", e);
         }

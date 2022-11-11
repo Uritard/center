@@ -19,8 +19,8 @@ public class CameraModel extends TCameraInfo {
     private String manufacturer;
     private String useUnit;
     private String deviceSource;
-    private String productinDate;
-    private String productinCode;
+    private String productionDate;
+    private String productionCode;
     private String istransport;
     private String useMode;
     private String videoMode;

@@ -1,12 +1,11 @@
 package com.yjh.accessrobot.module.command.dao;
 
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.module.command.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -385,4 +384,7 @@ public interface TRobotInfoDao {
                           @Param(value = "instanceId") Long instanceId,
                           @Param(value = "imagePath") String imagePath);
 
+    List<TRobotInfo> selectByEdgeCodeAndType(@Param(value = "edgeCode") String edgeCode, @Param("type") String type);
+
+    int deleteByEdgeCodeAndOriginId(@Param(value = "edgeCode")String edgeNode, @Param("originIdList") Collection<String> originIdList);
 }

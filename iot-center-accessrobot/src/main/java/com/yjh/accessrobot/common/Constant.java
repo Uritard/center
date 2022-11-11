@@ -38,6 +38,8 @@ public class Constant {
      * 下级系统数据
      */
     public static final int STATE_SUB = 0;
+    public static final String ROBOT = "robot";
+    public static final String DRONE = "drone";
     public static Map<String, ChannelHandlerContext> maps = new ConcurrentHashMap<>();
     /**
      * 巡视主机发送会话序列号

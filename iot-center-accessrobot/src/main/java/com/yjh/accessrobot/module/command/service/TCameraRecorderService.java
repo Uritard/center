@@ -1,4 +1,4 @@
-package com.yjh.accessrobot.module.device.service;
+package com.yjh.accessrobot.module.command.service;
 
 import com.yjh.accessrobot.module.command.dao.TCameraRecorderDao;
 import com.yjh.accessrobot.module.command.entity.TCameraRecorder;
