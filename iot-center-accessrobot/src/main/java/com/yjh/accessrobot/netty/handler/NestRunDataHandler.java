@@ -9,6 +9,7 @@ import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author YChen
@@ -36,32 +38,43 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到无人机机巢运行数据了+++++++++++++++++");
         String robotCode = xmlBaseModel.getSendCode();
-        if (Constant.robotRegisterFlag.getOrDefault(robotCode, false)) {
-            List<Map<String, String>> nestOperationList = new ArrayList<>();
-            xmlBaseModel.getItems().forEach(res -> {
-                Map<String, String> nestOperationMap = new HashMap<>(16);
-                nestOperationMap.put("nestName", res.get("nest_name").toString());
-                nestOperationMap.put("nestCode", res.get("nest_code").toString());
-                nestOperationMap.put("moduleNo", res.get("module_no").toString());
-//                nestOperationMap.put("time", res.get("time").toString());
-                nestOperationMap.put("type", res.get("type").toString());
-                nestOperationMap.put("value", res.get("value").toString());
-                nestOperationMap.put("valueUnit", res.get("value_unit").toString());
-                nestOperationMap.put("unit", res.get("unit").toString());
-                nestOperationList.add(nestOperationMap);
-            });
-
-            for (int i = 0; i < nestOperationList.size(); i++) {
-                redisTemplate.opsForHash().putAll("nestOperation:" + robotCode + ":" + nestOperationList.get(i).get("type"), nestOperationList.get(i));
-            }
-
-            String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
-            byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
-            RobotServerHandler.send(operationProtocol, robotCode);
-            log.info("巡视主机给无人机{}响应了", robotCode);
-            // 国网要求
-            robotService.upToCruise(xmlBaseModel);
+        if (StringUtils.isEmpty(robotCode)) {
+            log.error("机器人/无人机编码为空");
+            throw new RuntimeException("机器人/无人机编码为空");
         }
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+            log.error("机器人/无人机未注册或未连接");
+            throw new RuntimeException("机器人/无人机未注册或未连接");
+        }
+
+        // 给机器人响应
+        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
+        RobotServerHandler.send(operationProtocol, robotCode);
+        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
+
+        List<Map<String, String>> nestOperationList = new ArrayList<>();
+        xmlBaseModel.getItems().forEach(res -> {
+            Map<String, String> nestOperationMap = new HashMap<>(16);
+            nestOperationMap.put("nestName", res.get("nest_name").toString());
+            nestOperationMap.put("nestCode", res.get("nest_code").toString());
+            nestOperationMap.put("moduleNo", res.get("module_no").toString());
+//                nestOperationMap.put("time", res.get("time").toString());
+            nestOperationMap.put("type", res.get("type").toString());
+            nestOperationMap.put("value", res.get("value").toString());
+            nestOperationMap.put("valueUnit", res.get("value_unit").toString());
+            nestOperationMap.put("unit", res.get("unit").toString());
+            nestOperationList.add(nestOperationMap);
+        });
+
+        for (int i = 0; i < nestOperationList.size(); i++) {
+            String nestOperation =  "nestOperation:" + robotCode + ":" + nestOperationList.get(i).get("type");
+            redisTemplate.opsForHash().putAll(nestOperation, nestOperationList.get(i));
+            redisTemplate.expire(nestOperation, 7, TimeUnit.DAYS);
+        }
+
+        // 国网要求
+        robotService.upToCruise(xmlBaseModel);
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.yjh.accessrobot.netty.thread.RobotWarnThread;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,24 +35,32 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
         log.info("+++++++++++++++++巡视主机收到机器人本体异常告警数据了+++++++++++++++++");
         // Deal with robot alarm data
         String robotCode = xmlBaseModel.getSendCode();
-        if (Constant.robotRegisterFlag.getOrDefault(robotCode, false)) {
-            Map<String, String> robotAlarmMap = new HashMap<>(8);
-            // 2022过检 robot_name -> patroldevice_name
-            robotAlarmMap.put("patrolDeviceName", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_name")));
-            robotAlarmMap.put("patrolDeviceCode", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code")));
-            robotAlarmMap.put("robotCode", robotCode);
-            robotAlarmMap.put("time", xmlBaseModel.getItems().get(0).get("time").toString());
-            robotAlarmMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
-
-            // Start alarmResultDealThread
-            RobotWarnThread alarmResultDealThread = new RobotWarnThread(robotAlarmMap, robotService);
-            TaskExecutePool.getInstance().execute(alarmResultDealThread);
-
-            String alarmXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
-            byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
-            RobotServerHandler.send(alarmProtocol, robotCode);
-            log.info("巡视主机给机器人{}响应了", robotCode);
+        if (StringUtils.isEmpty(robotCode)) {
+            log.error("机器人/无人机编码为空");
+            throw new RuntimeException("机器人/无人机编码为空");
         }
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+            log.error("机器人/无人机未注册或未连接");
+            throw new RuntimeException("机器人/无人机未注册或未连接");
+        }
+
+        // 给机器人响应
+        String alarmXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
+        RobotServerHandler.send(alarmProtocol, robotCode);
+        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
+
+        Map<String, String> robotAlarmMap = new HashMap<>(8);
+        // 2022过检 robot_name -> patroldevice_name
+        robotAlarmMap.put("patrolDeviceName", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_name")));
+        robotAlarmMap.put("patrolDeviceCode", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_code")));
+        robotAlarmMap.put("robotCode", robotCode);
+        robotAlarmMap.put("time", xmlBaseModel.getItems().get(0).get("time").toString());
+        robotAlarmMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
+
+        // Start alarmResultDealThread
+        RobotWarnThread alarmResultDealThread = new RobotWarnThread(robotAlarmMap, robotService);
+        TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
         // 国网要求
         robotService.upToCruise(xmlBaseModel);
