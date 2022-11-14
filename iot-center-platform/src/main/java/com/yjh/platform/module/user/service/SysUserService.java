@@ -1,6 +1,7 @@
 package com.yjh.platform.module.user.service;
 
 import com.yjh.commons.DateUtils;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.LogsRecord;
@@ -288,6 +289,10 @@ public class SysUserService {
                             BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
                             mapResult.put("roleMenuList", sysRoleMenuList);
                             mapResult.put("sysUserLogin", sysUserSelect);
+                            Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
+                            Map<String,String> systemLevelMap = redisTemplate.opsForHash().entries("t_sys_param:edgeLevel");
+                            mapResult.put("systemName",systemNameMap.get("content"));
+                            mapResult.put("systemLevel", ValueUtil.getOrDefault(systemLevelMap.get("content"),"2"));
                             String userId = String.valueOf(sysUserLogin.getUserId());
                             Map<String, Object> mapAccount = new HashMap<>();
                             Map<String, Object> mapAppKey = new HashMap<>();
@@ -338,6 +343,10 @@ public class SysUserService {
                         BeanUtils.copyProperties(sysUserLogin, sysUserSelect);
                         mapResult.put("roleMenuList", sysRoleMenuList);
                         mapResult.put("sysUserLogin", sysUserSelect);
+                        Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
+                        Map<String,String> systemLevelMap = redisTemplate.opsForHash().entries("t_sys_param:edgeLevel");
+                        mapResult.put("systemName",systemNameMap.get("content"));
+                        mapResult.put("systemLevel", ValueUtil.getOrDefault(systemLevelMap.get("content"),"2"));
                         String userId = String.valueOf(sysUserLogin.getUserId());
                         Map<String, Object> mapAccount = new HashMap<>();
                         Map<String, Object> mapAppKey = new HashMap<>();
