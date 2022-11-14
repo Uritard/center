@@ -410,7 +410,7 @@
                e.identify_state
         FROM u_patrol_task a
         LEFT JOIN u_patrol_task_attr b ON a.task_id = b.task_id
-        LEFT JOIN t_std_device c ON b.device_id = c.device_id AND b.custom_id = c.custom_id
+        LEFT JOIN t_std_device c ON b.device_id = c.device_id
         LEFT JOIN u_patrol_data_result e ON a.task_id = e.task__id
         WHERE a.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
@@ -783,4 +783,46 @@
             )
         </foreach>
     </insert>
+
+    <select id="selectTaskByTaskCode" parameterType="java.lang.String" resultType="com.yjh.platform.module.patrol.entity.UPatrolTask">
+        select
+        a.task_id,
+        a.task_code,
+        a.task_name,
+        a.area_id,
+        a.task_type,
+        a.execute_type,
+        a.robot_id,
+        a.task_source,
+        a.task_level,
+        a.task_state,
+        a.modify_state,
+        a.task_count,
+        a.task_wait,
+        a.check_user,
+        a.check_date,
+        a.weather,
+        a.create_time,
+        a.end_time,
+        a.execute_time,
+        a.is_review,
+        a.task_abnormal,
+        a.cruise_result,
+        a.remark
+        from u_patrol_task a
+        where 1 = 1
+        and a.task_code = #{taskCode, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectTaskCodeByTaskId" resultType="java.lang.String">
+        SELECT
+            a.task_code
+        FROM
+            u_patrol_task a,u_patrol_result b
+        WHERE a.task_id = b.task_id
+          and a.task_id = #{taskId, jdbcType=VARCHAR}
+        ORDER BY b.execute_time desc
+            LIMIT 1
+    </select>
+
 </mapper>

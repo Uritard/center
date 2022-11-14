@@ -44,7 +44,7 @@ INSERT INTO `sys_org` VALUES ('500001', '电网总公司', '1', '-1', '0', '2020
 -- ----------------------------
 -- Records of t_std_region
 -- ----------------------------
-INSERT INTO `t_std_region` VALUES ('700001', '变电总公司', '0', '-1', '', '0', '123', '普通变电站', '0', '2020-08-05 10:47:58', null);
+INSERT INTO `t_std_region` VALUES ('700001', '变电总公司', '0', '-1', '', '1', NULL, '123', '南昌变电站', '1', NULL, NULL, NULL, '2022-11-03 19:14:32');
 
 -- ----------------------------
 -- Records of sys_role
@@ -689,9 +689,6 @@ INSERT INTO `t_dict_business` VALUES ('300692', '792', 'custom_type', '接地开
 INSERT INTO `t_dict_business` VALUES ('300693', '793', 'custom_type', '消防', '0', '设备部位', '1');
 INSERT INTO `t_dict_business` VALUES ('300694', '794', 'custom_type', '安防', '0', '设备部位', '1');
 INSERT INTO `t_dict_business` VALUES ('300695', '795', 'custom_type', '环境', '0', '设备部位', '1');
-
-INSERT INTO `t_dict_business` VALUES ('300695', '795', 'custom_type', '环境', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300695', '795', 'custom_type', '环境', '0', '设备部位', '1');
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------
@@ -1291,6 +1288,8 @@ INSERT INTO `t_sys_param` VALUES ('100113', '401', 'prefixAbsolutePath', '存储
 INSERT INTO `t_sys_param` VALUES ('100114', '401', 'prefixRelativePath', '存储相对路径前缀', 'https://192.168.1.66/imgs/', '', '{\"rule\":\"^(http|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?$\",\"msg\":\"请输入正确地址\"}');
 INSERT INTO `t_sys_param` VALUES ('100115', '404', 'loginKeepByWs', 'WebSocket登录状态保持', 'true', '使用WebSocket判断用户是否离线，更敏感', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100116', '404', 'voiceNeedEncoding', '声纹是否有格式编码', 'true', '220标准中声纹没有 Encoding 字段', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` VALUES ('100117','404', 'localLongitude', '当前变电站经度', '1', '当前变电站经度',null);
+INSERT INTO `t_sys_param` VALUES ('100118', '404', 'localLatitude', '当前变电站纬度', '1', '当前变电站纬度',null);
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------

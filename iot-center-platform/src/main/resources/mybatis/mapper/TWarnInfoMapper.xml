@@ -652,12 +652,13 @@
         select
             dict_code as device_type,
             dict_note as device_type_name,
-            (select COUNT(*)
-                from t_std_device a,t_warn_info b
-                where a.device_id = b.device_id
-                and a.custom_id = b.cunstom_id
-                and device_type = dict_code
-                and b.warn_time BETWEEN #{startTime} and #{endTime}
+            (SELECT
+                COUNT(*)
+                FROM
+                t_warn_info a
+                LEFT JOIN t_std_device b ON a.device_id = b.device_id
+                WHERE b.device_type = dict_code
+                and a.warn_time BETWEEN #{startTime} and #{endTime}
             ) as c_ount
         from t_dict_business
         where dict_code in
@@ -675,18 +676,14 @@
             dict_note as device_type_name,
             (
                 (select COUNT(*)
-                    from t_std_device a,t_warn_info b
-                    where a.device_id = b.device_id
-                    and a.custom_id = b.cunstom_id
-                    and device_type = dict_code
-                    and b.warn_time BETWEEN #{startTime} and #{endTime}
+                from t_warn_info b
+                LEFT JOIN t_std_device a ON a.device_id = b.device_id
+                where a.device_type = dict_code
                 ) +
                 (select COUNT(*)
-                    from t_std_device a,t_defect_info b
-                    where a.device_id = b.device_id
-                    and a.custom_id = b.cunstom_id
-                    and device_type = dict_code
-                    and b.defect_time BETWEEN #{startTime} and #{endTime}
+                from t_defect_info b
+                LEFT JOIN t_std_device a ON a.device_id = b.device_id
+                where a.device_type = dict_code
                 )
             ) as c_ount
         from t_dict_business
@@ -940,7 +937,7 @@
     WHERE 1 = 1
         <if test="stdMeteId != null "> and a.device_mete_id = #{stdMeteId, jdbcType=BIGINT}</if>
     and a.device_id = b.device_id
-    and a.custom_id = b.custom_id
+
     and a.device_id = d.device_id
     </select>
     <select id="selectPresetId" resultType="java.lang.Long">

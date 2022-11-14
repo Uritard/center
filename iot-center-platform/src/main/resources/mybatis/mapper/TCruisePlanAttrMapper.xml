@@ -132,7 +132,7 @@
         j.dict_note AS sub_type_name
         FROM t_cruise_plan_attr a
         LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
-        LEFT JOIN t_std_device d ON b.device_id = d.device_id AND b.custom_id = d.custom_id
+        LEFT JOIN t_std_device d ON b.device_id = d.device_id
         LEFT JOIN t_dict_business e ON b.cruise_type = e.dict_code AND e.col_name = "cruise_type"
         LEFT JOIN t_robot_inspection f ON f.inspection_id = b.cruise_id
         LEFT JOIN t_camera_preset g ON b.cruise_id = g.preset_id

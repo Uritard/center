@@ -144,7 +144,7 @@
             g.dict_note as cruise_type_name
         FROM
             t_std_device a
-                LEFT JOIN t_std_devicemete b ON a.device_id = b.device_id AND a.custom_id = b.custom_id
+                LEFT JOIN t_std_devicemete b ON a.device_id = b.device_id
                 LEFT JOIN t_cruise_point_instance d on b.device_mete_id = d.device_mete_id
                 LEFT JOIN t_robot_inspection e on d.cruise_id = e.inspection_id
                 LEFT JOIN t_camera_preset f on d.cruise_id = f.preset_id
@@ -171,7 +171,7 @@
         FROM
             t_std_device a
                 LEFT JOIN t_std_devicemete b ON a.device_id = b.device_id
-                AND a.custom_id = b.custom_id
+
                 LEFT JOIN t_warn_info d ON d.std_mete_id = b.device_mete_id
                 LEFT JOIN t_dict_business e ON e.dict_code = d.alarm_source
                 LEFT JOIN t_dict_business f ON f.dict_code = d.warn_level
@@ -278,7 +278,7 @@
             t_camera_info f
         WHERE 1 = 1
         and a.device_id = b.device_id
-        and a.custom_id = b.custom_id
+
         and b.device_id = #{deviceId,jdbcType = BIGINT}
         and b.device_mete_id = d.device_mete_id
         and d.cruise_id = e.preset_id

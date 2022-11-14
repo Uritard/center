@@ -95,7 +95,6 @@
                 #{regionPath, jdbcType=VARCHAR},
                 #{upRegionId, jdbcType=BIGINT},
                 #{upRegionName, jdbcType=VARCHAR},
-                #{customName, jdbcType=VARCHAR},
                 #{customType, jdbcType=INTEGER},
                 #{status, jdbcType=INTEGER},
                 CURRENT_TIMESTAMP(),

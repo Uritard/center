@@ -985,7 +985,7 @@
         FROM
             t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e
         where a.preset_id = b.cruise_id
-          and d.device_id = b.device_id and d.custom_id = b.custom_id
+          and d.device_id = b.device_id
           AND b.device_mete_id = e.device_mete_id
           and a.preset_id = #{presetId,jdbcType=BIGINT}
     </select>
