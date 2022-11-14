@@ -354,7 +354,7 @@
         SELECT
             b.real_code
         FROM
-            t_cruise_point_instance a,t_std_device_attr b
+            t_cruise_point_instance a,t_std_device b
         WHERE a.device_id = b.device_id
         <if test="instanceId != null "> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
     </select>
@@ -1158,7 +1158,7 @@
         FROM
         t_robot_inspection a
         LEFT JOIN t_cruise_point_instance b ON a.inspection_id = b.cruise_id
-        LEFT JOIN t_std_device_attr c ON b.device_id = c.device_id
+        LEFT JOIN t_std_device c ON b.device_id = c.device_id
         WHERE
         a.inspection_code = #{deviceId, jdbcType=VARCHAR}
     </select>

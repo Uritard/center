@@ -18,12 +18,11 @@ public interface TStdDeviceDao {
 
     int add(TStdDevice tStdDevice);
     int deleteByPrimaryId(@Param(value = "deviceId") Long deviceId);
-    int deleteByUnionKeys(@Param(value = "deviceId")Long deviceId,@Param("customId")String customId);
+    int deleteByUnionKeys(@Param(value = "deviceId")Long deviceId);
     int update(TStdDevice tStdDevice);
     List<TStdDevice> selectByPrimaryId(@Param(value = "deviceId") Long deviceId);
     List<TStdDevice> selectListByPrimaryId(@Param(value = "deviceId") Long deviceId);
     List<TStdDevice> select(@Param(value = "deviceId") Long deviceId,
-                                @Param(value = "customId") String customId,
                                 @Param(value = "deviceCode") String deviceCode,
                                 @Param(value = "deviceName") String deviceName,
                                 @Param(value = "aliasName") String aliasName,
@@ -33,15 +32,13 @@ public interface TStdDeviceDao {
                                 @Param(value = "regionPath") String regionPath,
                                 @Param(value = "upRegionId") Long upRegionId,
                                 @Param(value = "upRegionName") String upRegionName,
-                                @Param(value = "customName") String customName,
                                 @Param(value = "customType") Integer customType,
                                 @Param(value = "status") Integer status,
                                 @Param(value = "updateTime") Date updateTime,
                                 @Param(value = "createTime") Date createTime);
     List<TStdDevice> selectByPage(TStdDevice tStdDevice);
-    TStdDevice selectByUnionKeys(@Param(value = "deviceId")Long deviceId,@Param("customId")String customId);
+    TStdDevice selectByUnionKeys(@Param(value = "deviceId")Long deviceId);
     List<TStdDeviceDetail> selectAll(@Param(value = "deviceId") Long deviceId,
-                            @Param(value = "customId") String customId,
                             @Param(value = "deviceCode") String deviceCode,
                             @Param(value = "deviceName") String deviceName,
                             @Param(value = "aliasName") String aliasName,
@@ -51,7 +48,6 @@ public interface TStdDeviceDao {
                             @Param(value = "regionPath") String regionPath,
                             @Param(value = "upRegionId") Long upRegionId,
                             @Param(value = "upRegionName") String upRegionName,
-                            @Param(value = "customName") String customName,
                             @Param(value = "customType") Integer customType,
                             @Param(value = "status") Integer status,
                             @Param(value = "updateTime") Date updateTime,
@@ -105,7 +101,6 @@ public interface TStdDeviceDao {
     List<String> selectByModelId(@Param(value = "modelId") Long modelId);
 
     int updateModelIdByDevCus(@Param(value = "deviceId")Long deviceId,
-                              @Param(value = "customId")Long customId,
                               @Param(value = "modelId")Long modelId);
 
     int batchDelete(@Param(value = "list")List<String> list);

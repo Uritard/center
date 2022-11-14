@@ -187,7 +187,6 @@ public class TStdDeviceController {
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     @Logs(title = "查询标准化设备",content = "根据用户传递的参数查询标准化设备",logType = 1)
     public Result select(@RequestParam(value = "deviceId", required = false) Long deviceId,
-                            @RequestParam(value = "customId", required = false) String customId,
                             @RequestParam(value = "deviceCode", required = false) String deviceCode,
                             @RequestParam(value = "deviceName", required = false) String deviceName,
                             @RequestParam(value = "aliasName", required = false) String aliasName,
@@ -197,14 +196,13 @@ public class TStdDeviceController {
                             @RequestParam(value = "regionPath", required = false) String regionPath,
                             @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                             @RequestParam(value = "upRegionName", required = false) String upRegionName,
-                            @RequestParam(value = "customName", required = false) String customName,
                             @RequestParam(value = "customType", required = false) Integer customType,
                             @RequestParam(value = "status", required = false) Integer status,
                             @RequestParam(value = "updateTime", required = false) Date updateTime,
                             @RequestParam(value = "createTime", required = false) Date createTime) {
         Result result = new Result();
         try {
-            List<TStdDevice> list = tStdDeviceService.select(deviceId, customId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customName, customType, status, updateTime, createTime);
+            List<TStdDevice> list = tStdDeviceService.select(deviceId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customType, status, updateTime, createTime);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -218,7 +216,6 @@ public class TStdDeviceController {
     @RequestMapping(value = "/selectAll", method = RequestMethod.GET)
     @Logs(title = "查询标准化设备",content = "根据用户传递的参数查询标准化设备",logType = 1,authority = "1234")
     public Result selectAll(@RequestParam(value = "deviceId", required = false) Long deviceId,
-                            @RequestParam(value = "customId", required = false) String customId,
                             @RequestParam(value = "deviceCode", required = false) String deviceCode,
                             @RequestParam(value = "deviceName", required = false) String deviceName,
                             @RequestParam(value = "aliasName", required = false) String aliasName,
@@ -228,7 +225,6 @@ public class TStdDeviceController {
                             @RequestParam(value = "regionPath", required = false) String regionPath,
                             @RequestParam(value = "upRegionId", required = false) Long upRegionId,
                             @RequestParam(value = "upRegionName", required = false) String upRegionName,
-                            @RequestParam(value = "customName", required = false) String customName,
                             @RequestParam(value = "customType", required = false) Integer customType,
                             @RequestParam(value = "status", required = false) Integer status,
                             @RequestParam(value = "updateTime", required = false) Date updateTime,
@@ -255,7 +251,7 @@ public class TStdDeviceController {
                             @RequestParam(value = "address", required = false) String address) {
         Result result = new Result();
         try {
-            List<TStdDeviceDetail> list = tStdDeviceService.selectAll(deviceId, customId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customName, customType, status, updateTime, createTime,deviceModel, pmsType, pmsId, deviceVendor, productionDate, usedTime, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, voltageLevel, sequencePoint, realCode,address);
+            List<TStdDeviceDetail> list = tStdDeviceService.selectAll(deviceId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName,  customType, status, updateTime, createTime,deviceModel, pmsType, pmsId, deviceVendor, productionDate, usedTime, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, voltageLevel, sequencePoint, realCode,address);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -415,11 +411,10 @@ public class TStdDeviceController {
     @RequestMapping(value = "/updateModelIdByDevCus",method = RequestMethod.POST)
     @Logs(title = "修改设备的模板",content = "根据用户传递的参数修改设备的模板",logType = 3)
     public Result updateModelIdByDevCus(@RequestParam(value = "deviceId")Long deviceId,
-                                        @RequestParam(value = "customId")Long customId,
                                         @RequestParam(value = "modelId")Long modelId){
         Result result=new Result();
         try{
-            result.setData(tStdDeviceService.updateModelIdByDevCus(deviceId, customId, modelId));
+            result.setData(tStdDeviceService.updateModelIdByDevCus(deviceId, modelId));
         }catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新模板ID异常:", e);

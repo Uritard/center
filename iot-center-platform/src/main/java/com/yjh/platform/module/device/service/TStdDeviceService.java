@@ -50,18 +50,18 @@ public class TStdDeviceService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public TStdDevice selectByUnionKeys(Long deviceId,String customId){
-        return tStdDeviceDao.selectByUnionKeys(deviceId, customId);
+    public TStdDevice selectByUnionKeys(Long deviceId){
+        return tStdDeviceDao.selectByUnionKeys(deviceId);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TStdDevice tStdDevice) {
-        if(tStdDevice.getCustomId() == null){
-            String customId = defaultPart();
-            tStdDevice.setCustomId(customId);
-            List<TDictBusiness> list = tDictBusinessDao.select(null,customId,null,null,null,null,null);
-            tStdDevice.setCustomName(list.get(0).getDictNote());
-        }
+//        if(tStdDevice.getCustomId() == null){
+//            String customId = defaultPart();
+//            tStdDevice.setCustomId(customId);
+//            List<TDictBusiness> list = tDictBusinessDao.select(null,customId,null,null,null,null,null);
+//            tStdDevice.setCustomName(list.get(0).getDictNote());
+//        }
         return this.tStdDeviceDao.add(tStdDevice);
     }
 
@@ -163,19 +163,20 @@ public class TStdDeviceService{
     public int addALL(TStdDeviceDetail tStdDeviceDetail) {
 
         TStdDevice tStdDevice = new TStdDevice();
+        tStdDevice.setRealCode(tStdDeviceDetail.getRealCode());
         tStdDevice.setAliasName(tStdDeviceDetail.getAliasName());
-        tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
-        if(tStdDevice.getCustomId() == null){
-            //不传 设为本体，根据字典表查，暂定为101
-            String customId = defaultPart();
-            tStdDevice.setCustomId(customId);
-            List<TDictBusiness> list = tDictBusinessDao.select(null,customId,null,null,null,null,null);
-            tStdDevice.setCustomName(list.get(0).getDictNote());
-        }else{
-            tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
-            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceDetail.getCustomId(),null,null,null,null,null);
-            tStdDevice.setCustomName(list.get(0).getDictNote());
-        }
+//        tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
+//        if(tStdDevice.getCustomId() == null){
+//            //不传 设为本体，根据字典表查，暂定为101
+//            String customId = defaultPart();
+//            tStdDevice.setCustomId(customId);
+//            List<TDictBusiness> list = tDictBusinessDao.select(null,customId,null,null,null,null,null);
+//            tStdDevice.setCustomName(list.get(0).getDictNote());
+//        }else{
+//            tStdDevice.setCustomId(tStdDeviceDetail.getCustomId());
+//            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceDetail.getCustomId(),null,null,null,null,null);
+//            tStdDevice.setCustomName(list.get(0).getDictNote());
+//        }
         tStdDevice.setCustomType(tStdDeviceDetail.getCustomType());
         tStdDevice.setDeviceCode(tStdDeviceDetail.getDeviceCode());
         tStdDevice.setDeviceId(tStdDeviceDetail.getDeviceId());
@@ -218,7 +219,6 @@ public class TStdDeviceService{
         }
 
         TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
-        tStdDeviceAttr.setRealCode(tStdDeviceDetail.getRealCode());
         tStdDeviceAttr.setDepartment(tStdDeviceDetail.getDepartment());
         tStdDeviceAttr.setDeviceId(tStdDevice.getDeviceId());
         tStdDeviceAttr.setDeviceModel(tStdDeviceDetail.getDeviceModel());
@@ -276,6 +276,7 @@ public class TStdDeviceService{
 
         List<TStdDevice> tStdDevices=tStdDeviceDao.selectListByPrimaryId(tStdDeviceDetail.getDeviceId());
         for(TStdDevice tStdDevice:tStdDevices){
+            tStdDevice.setRealCode(tStdDeviceDetail.getRealCode());
             tStdDevice.setAliasName(tStdDeviceDetail.getAliasName());
             tStdDevice.setCreateTime(tStdDeviceDetail.getCreateTime());
             tStdDevice.setDeviceCode(tStdDeviceDetail.getDeviceCode());
@@ -355,7 +356,6 @@ public class TStdDeviceService{
 
 
         TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
-        tStdDeviceAttr.setRealCode(tStdDeviceDetail.getRealCode());
         tStdDeviceAttr.setDepartment(tStdDeviceDetail.getDepartment());
         tStdDeviceAttr.setDeviceId(Long.valueOf(tStdDeviceDetail.getDeviceId()));
         tStdDeviceAttr.setDeviceModel(tStdDeviceDetail.getDeviceModel());
@@ -394,15 +394,15 @@ public class TStdDeviceService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDevice> select(Long deviceId, String customId, String deviceCode, String deviceName, String aliasName, Integer deviceType, String positionType, Long modelId, String regionPath, Long upRegionId, String upRegionName, String customName, Integer customType, Integer status, Date updateTime, Date createTime) {
-        List<TStdDevice> tStdDeviceList = tStdDeviceDao.select(deviceId, customId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customName, customType, status, updateTime, createTime);
+    public List<TStdDevice> select(Long deviceId, String deviceCode, String deviceName, String aliasName, Integer deviceType, String positionType, Long modelId, String regionPath, Long upRegionId, String upRegionName,  Integer customType, Integer status, Date updateTime, Date createTime) {
+        List<TStdDevice> tStdDeviceList = tStdDeviceDao.select(deviceId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customType, status, updateTime, createTime);
         return tStdDeviceList;
     }
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TStdDeviceDetail> selectAll(Long deviceId, String customId, String deviceCode, String deviceName, String aliasName, Integer deviceType, String positionType, Long modelId, String regionPath, Long upRegionId, String upRegionName, String customName, Integer customType, Integer status, Date updateTime, Date createTime,Integer deviceModel, String pmsType, String pmsId, String deviceVendor, Date productionDate, Date usedTime, Date disableDate, Date lastMaintenance, String maintenanceCount, String organization, String department, String responsiblePerson, String latitude, String longitude, String ip, Integer port, String voltageLevel, String sequencePoint, String realCode,String address) {
-        return this.tStdDeviceDao.selectAll(deviceId, customId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customName, customType, status, updateTime, createTime,
+    public List<TStdDeviceDetail> selectAll(Long deviceId, String deviceCode, String deviceName, String aliasName, Integer deviceType, String positionType, Long modelId, String regionPath, Long upRegionId, String upRegionName, Integer customType, Integer status, Date updateTime, Date createTime,Integer deviceModel, String pmsType, String pmsId, String deviceVendor, Date productionDate, Date usedTime, Date disableDate, Date lastMaintenance, String maintenanceCount, String organization, String department, String responsiblePerson, String latitude, String longitude, String ip, Integer port, String voltageLevel, String sequencePoint, String realCode,String address) {
+        return this.tStdDeviceDao.selectAll(deviceId, deviceCode, deviceName, aliasName, deviceType, positionType, modelId, regionPath, upRegionId, upRegionName, customType, status, updateTime, createTime,
                 deviceModel, pmsType, pmsId, deviceVendor, productionDate, usedTime, disableDate, lastMaintenance, maintenanceCount, organization, department, responsiblePerson, latitude, longitude, ip, port, voltageLevel, sequencePoint, realCode,address);
     }
 
@@ -681,8 +681,8 @@ public class TStdDeviceService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public int updateModelIdByDevCus(Long deviceId,Long customId,Long modelId){
-        return this.tStdDeviceDao.updateModelIdByDevCus(deviceId, customId, modelId);
+    public int updateModelIdByDevCus(Long deviceId,Long modelId){
+        return this.tStdDeviceDao.updateModelIdByDevCus(deviceId, modelId);
     }
 
     @Transactional(rollbackFor = Exception.class)

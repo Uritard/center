@@ -5,7 +5,6 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TStdDevice">
         <id column="device_id" jdbcType="BIGINT" property="deviceId" />
-        <result column="custom_id" jdbcType="VARCHAR" property="customId" />
         <result column="device_code" jdbcType="VARCHAR" property="deviceCode" />
         <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
         <result column="alias_name" jdbcType="VARCHAR" property="aliasName" />
@@ -15,7 +14,6 @@
         <result column="region_path" jdbcType="VARCHAR" property="regionPath" />
         <result column="up_region_id" jdbcType="BIGINT" property="upRegionId" />
         <result column="up_region_name" jdbcType="VARCHAR" property="upRegionName" />
-        <result column="custom_name" jdbcType="VARCHAR" property="customName" />
         <result column="custom_type" jdbcType="INTEGER" property="customType" />
         <result column="status" jdbcType="INTEGER" property="status" />
         <result column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP" property="updateTime" />
@@ -26,12 +24,11 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_id, custom_id, device_code, device_name, alias_name, device_type, position_type, model_id, region_path, up_region_id, up_region_name, custom_name, custom_type, status, update_time, create_time,preset_id,camera_id
+        device_id, device_code, device_name, alias_name, device_type, position_type, model_id, region_path, up_region_id, up_region_name, custom_type, status, update_time, create_time,preset_id,camera_id
     </sql>
 
    <sql id="All">
         a.device_id ,
-        a.custom_id ,
         a.device_code ,
         a.device_name ,
         a.alias_name ,
@@ -40,7 +37,6 @@
         a.model_id ,
         a.region_path ,
         a.up_region_id ,
-        a.custom_name ,
         a.custom_type ,
         a.status ,
         a.update_time ,
@@ -73,7 +69,6 @@
     <insert id="add" useGeneratedKeys="true" keyProperty="deviceId" parameterType="com.yjh.platform.module.device.entity.TStdDevice">
         insert into t_std_device(
             device_id,
-            custom_id,
             device_code,
             device_name,
             alias_name,
@@ -83,7 +78,6 @@
             region_path,
             up_region_id,
             up_region_name,
-            custom_name,
             custom_type,
             status,
             update_time,
@@ -92,7 +86,6 @@
             camera_id
         )values(
                 #{deviceId, jdbcType=BIGINT},
-                #{customId, jdbcType=VARCHAR},
                 #{deviceCode, jdbcType=VARCHAR},
                 #{deviceName, jdbcType=VARCHAR},
                 #{aliasName, jdbcType=VARCHAR},
@@ -120,13 +113,11 @@
     <delete id="deleteByUnionKeys">
         delete from  t_std_device
                 where device_id=#{deviceId,jdbcType=BIGINT}
-                and custom_id=#{customId,jdbcType=VARCHAR}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TStdDevice">
         update t_std_device a <set>
         <if test="deviceId != null ">a.device_id = #{deviceId},</if>
-        <if test="customId != null ">a.custom_id = #{customId},</if>
         <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
         <if test="deviceName != null">a.device_name = #{deviceName},</if>
         <if test="aliasName != null ">a.alias_name = #{aliasName},</if>
@@ -136,21 +127,19 @@
         <if test="regionPath != null">a.region_path = #{regionPath},</if>
         <if test="upRegionId != null">a.up_region_id = #{upRegionId},</if>
         <if test="upRegionName != null ">a.up_region_name = #{upRegionName},</if>
-        <if test="customName != null ">a.custom_name = #{customName},</if>
         <if test="customType != null ">a.custom_type = #{customType, jdbcType=INTEGER},</if>
         <if test="status != null ">a.status = #{status, jdbcType=INTEGER},</if>
         <if test="presetId != null and '' != presetId">a.preset_id = #{presetId},</if>
         <if test="cameraId != null and '' != cameraId">a.camera_id = #{cameraId},</if>
         a.update_time = CURRENT_TIMESTAMP(),
+        a.real_code = #{realCode},
     </set>
             where a.device_id = #{deviceId, jdbcType=VARCHAR}
-            and a.custom_id = #{customId,jdbcType=VARCHAR}
     </update>
 
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDevice">
         select
         a.device_id,
-        a.custom_id,
         a.device_code,
         a.device_name,
         a.alias_name,
@@ -160,7 +149,6 @@
         a.region_path,
         a.up_region_id,
         a.up_region_name,
-        a.custom_name,
         a.custom_type,
         a.status,
         a.update_time,
@@ -177,7 +165,6 @@
     <select id="selectListByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDevice">
          select
         a.device_id,
-        a.custom_id,
         a.device_code,
         a.device_name,
         a.alias_name,
@@ -187,7 +174,6 @@
         a.region_path,
         a.up_region_id,
         a.up_region_name,
-        a.custom_name,
         a.custom_type,
         a.status,
         a.update_time,
@@ -202,7 +188,6 @@
     <select id="selectByPrimaryIdAll" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
         select
         a.device_id ,
-        a.custom_id ,
         a.device_code ,
         a.device_name ,
         a.alias_name ,
@@ -213,7 +198,6 @@
         a.region_path ,
         a.up_region_id ,
         a.up_region_name ,
-        a.custom_name ,
         a.custom_type ,
         a.status ,
         a.update_time ,
@@ -241,7 +225,7 @@
         b.voltage_Level,
         g.dict_note as voltageLevelName,
         b.sequence_point ,
-        b.real_code ,
+        a.real_code ,
         b.address,
         d.model_name as modelName
         from t_std_device a,t_std_device_attr b,t_std_metemodel d,t_dict_business e,t_dict_business f,t_dict_business g,t_dict_business h
@@ -253,7 +237,6 @@
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TStdDevice" resultType="com.yjh.platform.module.device.entity.TStdDevice">
         select
         a.device_id,
-        a.custom_id,
         a.device_code,
         a.device_name,
         a.alias_name,
@@ -263,7 +246,6 @@
         a.region_path,
         a.up_region_id,
         a.up_region_name,
-        a.custom_name,
         a.custom_type,
         a.status,
         a.update_time,
@@ -273,7 +255,6 @@
         from t_std_device a
         where 1 = 1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_name = #{deviceName, jdbcType=VARCHAR}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
@@ -283,7 +264,6 @@
         <if test="regionPath != null and regionPath != ''"> and a.region_path = #{regionPath, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
         <if test="upRegionName != null and upRegionName != ''"> and a.up_region_name = #{upRegionName, jdbcType=VARCHAR}</if>
-        <if test="customName != null and customName != ''"> and a.custom_name = #{customName, jdbcType=VARCHAR}</if>
         <if test="customType != null "> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
         <if test="status != null "> and a.status = #{status, jdbcType=INTEGER}</if>
         <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
@@ -293,7 +273,6 @@
     <select id="selectByUnionKeys" resultType="com.yjh.platform.module.device.entity.TStdDevice">
         select
         a.device_id,
-        a.custom_id,
         a.device_code,
         a.device_name,
         a.alias_name,
@@ -303,7 +282,6 @@
         a.region_path,
         a.up_region_id,
         a.up_region_name,
-        a.custom_name,
         a.custom_type,
         a.status,
         a.update_time,
@@ -311,7 +289,7 @@
         a.preset_id,
         a.camera_id
         from t_std_device a
-        where a.device_id=#{deviceId, jdbcType=BIGINT} and a.custom_id = #{customId, jdbcType=VARCHAR}
+        where a.device_id=#{deviceId, jdbcType=BIGINT}
     </select>
 
     <select id="selectAll" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="com.yjh.platform.module.device.entity.TStdDeviceDetail">
@@ -334,7 +312,6 @@
         left join t_camera_info info on a.camera_id = info.camera_id
         where 1=1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') </if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
@@ -344,7 +321,6 @@
         <if test="regionPath != null and regionPath != ''"> and a.region_path = #{regionPath, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
         <if test="upRegionName != null and upRegionName != ''"> and a.up_region_name = #{upRegionName, jdbcType=VARCHAR}</if>
-        <if test="customName != null and customName != ''"> and a.custom_name = #{customName, jdbcType=VARCHAR}</if>
         <if test="customType != null "> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
         <if test="status != null "> and a.status = #{status, jdbcType=INTEGER}</if>
         <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
@@ -367,7 +343,7 @@
         <if test="port != null "> and b.port = #{port, jdbcType=INTEGER}</if>
         <if test="voltageLevel != null and voltageLevel != ''"> and b.voltage_level = #{voltageLevel, jdbcType=VARCHAR}</if>
         <if test="sequencePoint != null and sequencePoint != ''"> and b.sequence_point = #{sequencePoint, jdbcType=VARCHAR}</if>
-        <if test="realCode != null and realCode != ''"> and b.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
+        <if test="realCode != null and realCode != ''"> and a.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
         <if test="address != null and address != ''"> and b.address = #{address, jdbcType=VARCHAR}</if>
         GROUP BY a.device_id
     </select>
@@ -375,7 +351,6 @@
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdDevice" resultType="com.yjh.platform.module.device.entity.TStdDevice">
         select
         a.device_id,
-        a.custom_id,
         a.device_code,
         a.device_name,
         a.alias_name,
@@ -385,7 +360,6 @@
         a.region_path,
         a.up_region_id,
         a.up_region_name,
-        a.custom_name,
         a.custom_type,
         a.status,
         a.update_time,
@@ -395,7 +369,6 @@
         from t_std_device a
         where 1 = 1
         <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
-        <if test="customId != null and customId != ''"> and a.custom_id = #{customId, jdbcType=VARCHAR}</if>
         <if test="deviceCode != null and deviceCode != ''"> and a.device_code = #{deviceCode, jdbcType=VARCHAR}</if>
         <if test="deviceName != null and deviceName != ''"> and a.device_name = #{deviceName, jdbcType=VARCHAR}</if>
         <if test="aliasName != null and aliasName != ''"> and a.alias_name = #{aliasName, jdbcType=VARCHAR}</if>
@@ -405,7 +378,6 @@
         <if test="regionPath != null and regionPath != ''"> and a.region_path = #{regionPath, jdbcType=VARCHAR}</if>
         <if test="upRegionId != null and upRegionId != ''"> and a.up_region_id = #{upRegionId, jdbcType=BIGINT}</if>
         <if test="upRegionName != null and upRegionName != ''"> and a.up_region_name = #{upRegionName, jdbcType=VARCHAR}</if>
-        <if test="customName != null and customName != ''"> and a.custom_name = #{customName, jdbcType=VARCHAR}</if>
         <if test="customType != null "> and a.custom_type = #{customType, jdbcType=INTEGER}</if>
         <if test="status != null "> and a.status = #{status, jdbcType=INTEGER}</if>
         <if test="updateTime != null"> and a.update_time = #{updateTime, jdbcType=TIMESTAMP}</if>
@@ -415,11 +387,10 @@
     <select id="selectForPage" parameterType="com.yjh.platform.module.device.entity.TStdDeviceDetail" resultType="java.lang.Long">
         select a.device_id
         from t_std_device a
-        left join t_std_device_attr b on a.device_id = b.device_id
         where 1=1
         <if test="deviceName != null and deviceName != ''"> and a.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') </if>
         <if test="deviceType != null and deviceType!=-1"> and a.device_type like concat('%', #{deviceType, jdbcType=INTEGER},'%')</if>
-        <if test="realCode != null and realCode != ''"> and b.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
+        <if test="realCode != null and realCode != ''"> and a.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
         <if test="upRegionId != null and upRegionId != '' and upRegionId != -1">
             and a.up_region_id in
             <foreach collection="upRegionIds" item="upRegionIds"  separator="," open="(" close=")"  >
@@ -460,7 +431,7 @@
         </foreach></if>
         <if test="deviceName != null and deviceName != ''"> and a.device_name like concat('%',#{deviceName, jdbcType=VARCHAR},'%') </if>
         <if test="deviceType != null and deviceType!=-1"> and a.device_type like concat('%', #{deviceType, jdbcType=INTEGER},'%')</if>
-        <if test="realCode != null and realCode != ''"> and b.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
+        <if test="realCode != null and realCode != ''"> and a.real_code like concat('%', #{realCode, jdbcType=VARCHAR},'%')</if>
         <if test="pageSize != 0">  and a.device_id in
             <foreach collection="list" item="deviceId"  separator="," open="(" close=")"  >
                 #{deviceId,jdbcType=BIGINT}
@@ -498,7 +469,7 @@
                 LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
         UNION ALL (
             SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
-                FROM t_std_device c
+                FROM t_std_devicemete c
                 LEFT JOIN t_std_device e ON c.device_id = e.device_id);
     </select>
 
@@ -532,7 +503,7 @@
                 LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
         UNION ALL (
             SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
-                FROM t_std_device c
+                FROM t_std_devicemete c
                 LEFT JOIN t_std_device e ON c.device_id = e.device_id)
         UNION ALL (
             SELECT d.camera_id AS Id, d.camera_name AS label, d.up_region_id AS upId, b.region_name AS upName, "camera" AS infoType
@@ -619,14 +590,13 @@
                 FROM t_std_device b
                 LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
         UNION ALL (
-            SELECT DISTINCT CONCAT(c.device_id,c.custom_id) AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
-                FROM t_std_device c
+            SELECT DISTINCT c.device_mete_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+                FROM t_std_devicemete c
                 LEFT JOIN t_std_device e ON c.device_id = e.device_id)
         UNION ALL (
-		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,CONCAT(dm.device_id,dm.custom_id) AS upId,	d.custom_name AS upName,"devicemete" AS infoType
-		        FROM t_std_devicemete dm
-		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id and dm.device_id = d.device_id
-		        where 1=1
+            SELECT DISTINCT	CONCAT(dm.device_mete_id,dm.custom_id) AS Id, dm.mete_name AS label, dm.device_mete_id AS upId,	dm.custom_name AS upName,"devicemete" AS infoType
+            FROM t_std_devicemete dm
+            where 1=1
         <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
         <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>
         )
@@ -650,14 +620,13 @@
                 FROM t_std_device b
                 LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
         UNION ALL (
-            SELECT DISTINCT CONCAT(c.device_id,c.custom_id) AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
-                FROM t_std_device c
+            SELECT DISTINCT c.device_mete_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+                FROM t_std_devicemete c
                 LEFT JOIN t_std_device e ON c.device_id = e.device_id)
         UNION ALL (
-		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,CONCAT(dm.device_id,dm.custom_id) AS upId,	d.custom_name AS upName,"devicemete" AS infoType
-		        FROM t_std_devicemete dm
-		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id and dm.device_id = d.device_id
-                where 1=1
+            SELECT DISTINCT	CONCAT(dm.device_mete_id,dm.custom_id) AS Id, dm.mete_name AS label, dm.device_mete_id AS upId,	dm.custom_name AS upName,"devicemete" AS infoType
+            FROM t_std_devicemete dm
+            where 1=1
                 <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
                 <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>)
         UNION ALL (
@@ -681,14 +650,13 @@
                 FROM t_std_device b
                 LEFT JOIN t_std_region d ON b.up_region_id = d.region_id)
         UNION ALL (
-            SELECT DISTINCT CONCAT(c.device_id,c.custom_id) AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
-                FROM t_std_device c
+            SELECT DISTINCT c.device_mete_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
+                FROM t_std_devicemete c
                 LEFT JOIN t_std_device e ON c.device_id = e.device_id)
         UNION ALL (
-		SELECT DISTINCT	dm.device_mete_id AS Id,dm.mete_name AS label,CONCAT(dm.device_id,dm.custom_id) AS upId,	d.custom_name AS upName,"devicemete" AS infoType
-		        FROM t_std_devicemete dm
-		        LEFT JOIN t_std_device d ON dm.custom_id = d.custom_id and dm.device_id = d.device_id
-                where 1=1
+            SELECT DISTINCT	CONCAT(dm.device_mete_id,dm.custom_id) AS Id, dm.mete_name AS label, dm.device_mete_id AS upId,	dm.custom_name AS upName,"devicemete" AS infoType
+            FROM t_std_devicemete dm
+            where 1=1
                 <if test="deviceType != null and deviceType != ''">and dm.mete_type = #{deviceType, jdbcType=VARCHAR}</if>
                 <if test="analyseType != null and analyseType != ''">and dm.analyse_type = #{analyseType, jdbcType=VARCHAR}</if>)
         UNION ALL (
@@ -715,9 +683,9 @@
         <if test="taskId != null and taskId != ''"> and e.task_id = #{taskId, jdbcType=VARCHAR}</if>)
         UNION ALL (
         SELECT DISTINCT c.custom_id AS Id, c.custom_name AS label, c.device_id AS upId, e.device_name AS upName, "custom" AS infoType
-        FROM t_std_device c
+        FROM t_std_devicemete c
         LEFT JOIN t_std_device e ON c.device_id = e.device_id
-        LEFT JOIN t_std_region d ON c.up_region_id = d.region_id
+        LEFT JOIN t_std_region d ON e.up_region_id = d.region_id
         LEFT JOIN t_cruise_task_attr f ON f.device_id = c.device_id
         WHERE 1 = 1
         <if test="taskId != null and taskId != ''"> and f.task_id = #{taskId, jdbcType=VARCHAR}</if>)
@@ -736,7 +704,6 @@
        SET model_id = #{modelId,jdbcType=BIGINT}
        WHERE
        device_id = #{deviceId,jdbcType=BIGINT}
-       AND custom_id = #{customId,jdbcType=BIGINT}
        LIMIT 1
     </update>
 
@@ -772,24 +739,24 @@
     </select>
 
     <select id="selectDeviceBase" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.DeviceBaseReport">
-       SELECT
-            b.up_region_name AS 'deviceRegion',
-            b.device_name,
-            b.device_code,
-            c.dict_note AS 'deviceTypeName',
-            b.custom_name,
-            (
-                SELECT
-                    count(*)
-                FROM
-                    t_std_devicemete d
-                LEFT JOIN t_std_device e ON d.device_id = e.device_id
-                WHERE
-                    d.device_mete_id = a.device_mete_id
-            ) AS 'meteCounts'
+        SELECT DISTINCT
+        b.up_region_name AS 'deviceRegion',
+        b.device_name,
+        b.device_code,
+        c.dict_note AS 'deviceTypeName',
+        a.custom_name,
+        (
+        SELECT
+        count(*)
         FROM
-            t_std_devicemete a
-        LEFT JOIN t_std_device b ON a.custom_id = b.custom_id
+        t_std_devicemete d
+
+        WHERE
+        d.device_id = a.device_id
+        ) AS 'meteCounts'
+        FROM
+        t_std_devicemete a
+        LEFT JOIN t_std_device b ON a.device_id = b.device_id
         AND a.device_id = b.device_id
         LEFT JOIN t_dict_business c ON b.device_type = c.dict_code
         WHERE
