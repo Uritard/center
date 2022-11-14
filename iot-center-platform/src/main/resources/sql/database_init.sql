@@ -1633,7 +1633,8 @@ CREATE TABLE `t_robot_info` (
   `last_online_time` bigint(20) DEFAULT NULL COMMENT '上次登录时间(毫秒数)',
   `duration` bigint(20) DEFAULT NULL COMMENT '在线时长累积(毫秒)',
   `off_line_count` int(10) DEFAULT NULL COMMENT '离线次数',
-  PRIMARY KEY (`robot_id`) USING BTREE
+  PRIMARY KEY (`robot_id`) USING BTREE,
+  KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='机器人表';
 
 -- ----------------------------
@@ -1959,7 +1960,7 @@ CREATE TABLE `t_std_region` (
   `region_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '区域ID',
   `region_name` varchar(128) DEFAULT '' COMMENT '区域名称',
   `sort` int(1) DEFAULT '1' COMMENT '区域类型（1:国家,2:省份、直辖市,3:运维站,4:变电站,5:间隔,6:设备,7:部位）',
-  `up_region_id` varchar(32) DEFAULT '' COMMENT '上级区域ID',
+  `up_region_id` bigint(20) DEFAULT NULL COMMENT '上级区域ID',
   `up_region_ids` varchar(255) DEFAULT '' COMMENT '区域ID层级',
   `region_code` varchar(10) NULL COMMENT '下级区域编码',
   `origin_region_id` varchar(64) DEFAULT NULL COMMENT '下级节点区域ID(state为0时有值)',
@@ -1971,7 +1972,7 @@ CREATE TABLE `t_std_region` (
   `remark` varchar(512) DEFAULT NULL COMMENT '备注',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`region_id`) USING BTREE,
-  UNIQUE KEY `region_code` (`region_code`,`origin_region_id`)
+  KEY `region_code` (`region_code`,`origin_region_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=700002 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='标准区域表';
 
 -- ----------------------------
@@ -2162,7 +2163,8 @@ CREATE TABLE `t_voice_device` (
   `voice_type` varchar(32) DEFAULT NULL COMMENT '设备类型',
   `voice_model` varchar(32) DEFAULT NULL COMMENT '设备型号',
   `voice_factory` varchar(32) DEFAULT NULL COMMENT '生产厂家',
-  PRIMARY KEY (`voice_device_id`) USING BTREE
+  PRIMARY KEY (`voice_device_id`) USING BTREE,
+  KEY `edge_code` (`edge_code`,`origin_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='声纹设备表';
 
 -- ----------------------------

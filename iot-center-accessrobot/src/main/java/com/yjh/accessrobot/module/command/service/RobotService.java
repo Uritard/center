@@ -118,6 +118,8 @@ public class RobotService {
 
     @Resource
     private TStdDeviceModelService tStdDeviceModelService;
+    @Autowired
+    private  TVoiceDeviceService tVoiceDeviceService;
 
     @Transactional(rollbackFor = Exception.class)
     public int updateAllRobotStatus() {
@@ -2884,10 +2886,10 @@ public class RobotService {
                 log.info("无人机模型 {}", filePath);
                 dealRobotFile(filePathMap.get("content") + File.separator + filePath,edgeCode, Constant.DRONE);
                 break;
-//            case "6":
-//                log.info("声纹模型 {}", filePath);
-//                dealVoiceFile(filePathMap,filePath,edgeCode);
-//                break;
+            case "6":
+                log.info("声纹模型 {}", filePath);
+                dealVoiceFile(filePathMap.get("content") + File.separator + filePath,edgeCode);
+                break;
 //            case "8":
 //                log.info("检修区域配置模型 {}", filePath);
 //                dealMaintenanceFilePath(filePathMap,filePath,edgeCode);
@@ -2910,6 +2912,22 @@ public class RobotService {
                 break;
             default:
                 break;
+        }
+    }
+
+    public void dealVoiceFile(String filePath, String edgeCode) {
+        if (StringUtils.isBlank(filePath)) {
+            log.info("file path is null");
+            return;
+        }
+        try {
+            XMLBaseModel model = getXmlMessage(filePath);
+            List<Map<String, Object>> list = model.getItems();
+            List<VoiceDeviceModel> cameraModelList = list.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, VoiceDeviceModel.class)).collect(Collectors.toList());
+            tVoiceDeviceService.saveReportData(cameraModelList, edgeCode);
+            log.info("声纹文件处理结束 edgeCode:{}", edgeCode);
+        } catch (Exception e) {
+            log.error("设备点位模型处理失败", e);
         }
     }
 
@@ -2945,6 +2963,7 @@ public class RobotService {
             List<Map<String, Object>> mapList = model.getItems();
             List<CameraModel> cameraModelList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, CameraModel.class)).collect(Collectors.toList());
             tCameraInfoService.saveReportData(cameraModelList,edgeCode);
+            log.info("摄像机文件处理结束 edgeCode:{}", edgeCode);
         } catch (DocumentException e) {
             log.error("录像机文件处理失败", e);
         }
@@ -2959,6 +2978,7 @@ public class RobotService {
             List<Map<String, Object>> mapList = model.getItems();
             List<RobotModel> robotModelList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, RobotModel.class)).collect(Collectors.toList());
             tRobotInfoService.saveReportData(robotModelList,edgeCode,type);
+            log.info("机器人文件处理结束 edgeCode:{} type:{}", edgeCode,type);
         } catch (DocumentException e) {
             log.error("录像机文件处理失败", e);
         }
@@ -2974,6 +2994,7 @@ public class RobotService {
             List<Map<String, Object>> mapList = model.getItems();
             List<TCameraRecorder> tCameraRecorderList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, TCameraRecorder.class)).collect(Collectors.toList());
             tCameraRecorderService.saveReportData(tCameraRecorderList,edgeCode);
+            log.info("录像机文件处理结束 edgeCode:{}", edgeCode);
         } catch (DocumentException e) {
             log.error("录像机文件处理失败", e);
         }
@@ -2989,6 +3010,7 @@ public class RobotService {
             List<Map<String, Object>> mapList = model.getItems();
             List<TStdRegion> tStdRegionList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, TStdRegion.class)).collect(Collectors.toList());
             tStdRegionService.saveReportData(tStdRegionList, edgeCode);
+            log.info("区域处理结束 edgeCode:{}", edgeCode);
             // 刷新缓存
             StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(Constant.REGION_REFRESH_URL, Result.class);
         } catch (DocumentException e) {

@@ -9,9 +9,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.task.entity.RegionPath;
-import com.yjh.platform.module.task.entity.StationCount;
 import com.yjh.platform.module.task.service.HomePageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,9 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lqh
@@ -362,6 +362,20 @@ public class HomePageController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("获取告警内容数据错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "首页查询当前变电站经纬度")
+    @RequestMapping(value = "/queryStationPosition", method = RequestMethod.GET)
+    public Result queryStationPosition(){
+        Result result = new Result();
+        try {
+            result.setData(homePageService.queryStationPosition());
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询当前变电站经纬度异常:", e);
         }
         return result;
     }
