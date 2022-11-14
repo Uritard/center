@@ -167,7 +167,9 @@ public class TStdDeviceModelService {
         List<TStdDeviceMete> newStdDeviceMetes = finalStdDeviceMeteList.stream().distinct().collect(Collectors.toList());
 
         //该节点未同步过  直接入库
-        if (CollectionUtils.isEmpty(oldCruisePointInstanceList)) {
+        if (CollectionUtils.isEmpty(oldCruisePointInstanceList) && CollectionUtils.isEmpty(oldStdDeviceMeteList)
+                && CollectionUtils.isEmpty(oldStdDeviceList) && CollectionUtils.isEmpty(oldCameraPresetList)
+                && CollectionUtils.isEmpty(oldRobotInspectionList)) {
             insertDeviceModel(newCameraPresets, newRobotInspections, newStdDevices, newStdDeviceMetes, newCruisePointInstances, tVoiceDeviceList);
         } else {
             //将旧的数据和新的数据进行对比相同的去掉  不通的更新  新增的直接入库
@@ -268,6 +270,9 @@ public class TStdDeviceModelService {
                     updateIdSet.contains(t.getOriginId())).forEach(t -> {
                 TCruisePointInstance old = oldMap.get(t.getOriginId());
                 t.setInstanceId(old.getInstanceId());
+                t.setDeviceId(old.getDeviceId());
+                t.setDeviceMeteId(old.getDeviceMeteId());
+                t.setCruiseId(old.getCruiseId());
                 tCruisePointInstanceMapper.updateByPrimaryKey(t);
             });
         }
@@ -301,6 +306,7 @@ public class TStdDeviceModelService {
                     updateIdSet.contains(t.getOriginId())).forEach(t -> {
                 TStdDeviceMete old = oldMap.get(t.getOriginId());
                 t.setDeviceMeteId(old.getDeviceMeteId());
+                t.setDeviceId(old.getDeviceId());
                 tStdDevicemeteMapper.updateByPrimaryKey(t);
             });
         }
