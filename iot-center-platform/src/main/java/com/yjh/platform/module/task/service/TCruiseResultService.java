@@ -13,7 +13,9 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.smUtil.report.FileUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdDeviceAttr;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
@@ -49,7 +51,7 @@ public class TCruiseResultService{
     @Autowired
     private TCruisePointInstanceDao tCruisePointInstanceDao;
     @Autowired
-    private TStdDeviceAttrDao tStdDeviceAttrDao;
+    private TStdDeviceDao tStdDeviceDao;
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
     @Autowired
@@ -259,10 +261,10 @@ public class TCruiseResultService{
         if (Objects.nonNull(tCruisePointInstance)){
             String analyseType = tCruiseResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
             if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
-                TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
-                tStdDeviceAttr.setDeviceId(tCruisePointInstance.getDeviceId());
-                tStdDeviceAttr.setRealCode(cruiseManualReview.getPersonCheck());
-                tStdDeviceAttrDao.update(tStdDeviceAttr);
+                TStdDevice tStdDevice = new TStdDevice();
+                tStdDevice.setDeviceId(tCruisePointInstance.getDeviceId());
+                tStdDevice.setRealCode(cruiseManualReview.getPersonCheck());
+                tStdDeviceDao.update(tStdDevice);
             }
         }
         return result1+result2;

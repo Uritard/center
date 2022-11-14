@@ -534,7 +534,7 @@
         b.is_ai,
         b.is_judge,
         f.device_name,
-        g.real_code,
+        f.real_code,
         c.robot_id,
         IFNULL(c.inspection_name,d.preset_name) as cruiseName,
         d.camera_id
@@ -543,8 +543,7 @@
         LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
         LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
         LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
-        left join (select distinct device_id,device_name from t_std_device) f on a.device_id = f.device_id
-        left join t_std_device_attr g on f.device_id = g.device_id
+        left join (select distinct device_id,device_name,real_code from t_std_device) f on a.device_id = f.device_id
         where a.instance_id in
         <foreach collection="list" open="(" close=")" separator="," item="instanceId">
             #{instanceId, jdbcType=BIGINT}

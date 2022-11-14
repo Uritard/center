@@ -55,18 +55,18 @@ public class TStdDevicemeteService{
 
 
         //若插入的测点中的deviceId、customId存在于device表中，则不更新device表；否则进行更新
-        TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查看当前设备ID和部位ID下的设备信息
-        if(Objects.isNull(tStdDevice)){
-            List<TStdDevice> stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
-            stdDevice.get(0).setCustomId(tStdDeviceMeteDetail.getCustomType());
-            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceMeteDetail.getCustomType(),null,null,null,null,null);
-            stdDevice.get(0).setCustomName(list.get(0).getDictNote());
-            tStdDeviceDao.add(stdDevice.get(0));
+//        TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查看当前设备ID和部位ID下的设备信息
+//        if(Objects.isNull(tStdDevice)){
+//            List<TStdDevice> stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
+//            stdDevice.get(0).setCustomId(tStdDeviceMeteDetail.getCustomType());
+//            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceMeteDetail.getCustomType(),null,null,null,null,null);
+//            stdDevice.get(0).setCustomName(list.get(0).getDictNote());
+//            tStdDeviceDao.add(stdDevice.get(0));
             //测点中不存在本体部位 且 新增的测点部位不为本体 则删除之前设备的本体部位
 //            if(tStdDevicemeteDao.selectByDevCus(tStdDeviceMeteDetail.getDeviceId(),"101").size()==0 && !(tStdDeviceMeteDetail.getCustomType().equals("101"))){
 //                tStdDeviceDao.deleteByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),"101");  //删除之前本体部位的设备
 //            }
-        }
+//        }
         this.tStdDevicemeteDao.add(tStdDeviceMeteDetail);
         //配置算法
         if(tStdDeviceMeteDetail.getAnalyseType() != null){
@@ -103,15 +103,15 @@ public class TStdDevicemeteService{
         if((tStdDevicemeteDao.selectDeviceMeteByDeviceCustom(deviceId,customId)).size()==0){//判断是否存在与被删除测点相同设备Id和部位Id的测点
 //
             if(tStdDevicemeteDao.selectByDevId(deviceId).size()==0){ //判断当前设备下是否有测点，若不存在则清空device并新增一个本体部位设备
-                List<TStdDevice> tStdDevices=tStdDeviceDao.selectByPrimaryId(deviceId);
-                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
-                if(tStdDevices.size()==1){
-                tStdDevices.get(0).setCustomId("700");
-                tStdDevices.get(0).setCustomName("本体");
-                tStdDeviceDao.add(tStdDevices.get(0));
-                }
+//                List<TStdDevice> tStdDevices=tStdDeviceDao.selectByPrimaryId(deviceId);
+                tStdDeviceDao.deleteByUnionKeys(deviceId);
+//                if(tStdDevices.size()==1){
+//                tStdDevices.get(0).setCustomId("700");
+//                tStdDevices.get(0).setCustomName("本体");
+//                tStdDeviceDao.add(tStdDevices.get(0));
+//                }
             }else {                                               //若存在则删除与当前测点关联的设备信息
-                tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
+                tStdDeviceDao.deleteByUnionKeys(deviceId);
             }
 //
         }
@@ -157,28 +157,28 @@ public class TStdDevicemeteService{
 //                tAlgorithmConfBakDao.add(tAlgorithmConfBak);
 //            }
 //        }
-        TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId(),tStdDeviceMeteDetail.getCustomType());//查询新增的部位设备是否存在
+        TStdDevice tStdDevice=tStdDeviceDao.selectByUnionKeys(tStdDeviceMeteDetail.getDeviceId());//查询新增的部位设备是否存在
         if(Objects.isNull(tStdDevice)){
             //新增没有的 修改的部位 的设备
-            List<TStdDevice> stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
-            stdDevice.get(0).setCustomId(tStdDeviceMeteDetail.getCustomType());
-            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceMeteDetail.getCustomType(),null,null,null,null,null);
-            stdDevice.get(0).setCustomName(list.get(0).getDictNote());
-            tStdDeviceDao.add(stdDevice.get(0));
+//            List<TStdDevice> stdDevice=tStdDeviceDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceId());
+//            stdDevice.get(0).setCustomId(tStdDeviceMeteDetail.getCustomType());
+//            List<TDictBusiness> list = tDictBusinessDao.select(null,tStdDeviceMeteDetail.getCustomType(),null,null,null,null,null);
+//            stdDevice.get(0).setCustomName(list.get(0).getDictNote());
+//            tStdDeviceDao.add(stdDevice.get(0));
             //对修改之前的测点对应的部位设备进行判断与操作
             TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());//查询修改之前该标准测点的信息
             log.info("查询修改之前该标准测点的信息");
             List<TStdDeviceMete> tStdDeviceMetes=tStdDevicemeteDao.selectByDevCus(tStdDeviceMete.getDeviceId(),tStdDeviceMete.getCustomId());
             log.info("相同deviceID和customId下有多少点");
             if(tStdDeviceMetes.size()<=1){ //如果不存在其他 相同deviceId和customId的测点就删除该设备、否则保留
-                tStdDeviceDao.deleteByUnionKeys(tStdDeviceMete.getDeviceId(),tStdDeviceMete.getCustomId());  //删除之前部位的设备
+                tStdDeviceDao.deleteByUnionKeys(tStdDeviceMete.getDeviceId());  //删除之前部位的设备
             }
         }else {
             TStdDeviceMete tStdDeviceMete=tStdDevicemeteDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());//查询修改之前该标准测点的信息
             if(!(tStdDeviceMeteDetail.getCustomType().equals(tStdDeviceMete.getCustomId()))){
                 List<TStdDeviceMete> tStdDeviceMetes=tStdDevicemeteDao.selectByDevCus(tStdDeviceMete.getDeviceId(),tStdDeviceMete.getCustomId());
                 if(tStdDeviceMetes.size()<=1 || tStdDeviceMetes.size()==1){ //如果不存在其他 相同deviceId和customId的测点就删除该设备、否则保留
-                    tStdDeviceDao.deleteByUnionKeys(tStdDeviceMete.getDeviceId(),tStdDeviceMete.getCustomId());  //删除之前部位的设备
+                    tStdDeviceDao.deleteByUnionKeys(tStdDeviceMete.getDeviceId());  //删除之前部位的设备
                 }
             }
 
@@ -358,14 +358,14 @@ public class TStdDevicemeteService{
 //
                 if(tStdDevicemeteDao.selectByDevId(deviceId).size()==0){ //判断当前设备下是否有测点，若不存在则清空device并新增一个本体部位设备
                     List<TStdDevice> tStdDevices=tStdDeviceDao.selectByPrimaryId(deviceId);
-                    tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
-                    if(tStdDevices.size()==1){
-                        tStdDevices.get(0).setCustomId("700");
-                        tStdDevices.get(0).setCustomName("本体");
-                        tStdDeviceDao.add(tStdDevices.get(0));
-                    }
+                    tStdDeviceDao.deleteByUnionKeys(deviceId);
+//                    if(tStdDevices.size()==1){
+//                        tStdDevices.get(0).setCustomId("700");
+//                        tStdDevices.get(0).setCustomName("本体");
+//                        tStdDeviceDao.add(tStdDevices.get(0));
+//                    }
                 }else {                                               //若存在则删除与当前测点关联的设备信息
-                    tStdDeviceDao.deleteByUnionKeys(deviceId,customId);
+                    tStdDeviceDao.deleteByUnionKeys(deviceId);
                 }
 //
             }

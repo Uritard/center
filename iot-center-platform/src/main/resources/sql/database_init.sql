@@ -1714,7 +1714,6 @@ CREATE TABLE `t_std_device` (
   `device_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '设备ID',
   `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
-  `custom_id` varchar(32) NOT NULL COMMENT '部位ID',
   `device_code` varchar(40) DEFAULT '' COMMENT '设备编码',
   `device_name` varchar(128) DEFAULT '' COMMENT '设备名称',
   `alias_name` varchar(128) DEFAULT '' COMMENT '别名',
@@ -1725,14 +1724,13 @@ CREATE TABLE `t_std_device` (
   `up_region_id` bigint(32) DEFAULT '1' COMMENT '上级区域id',
   `up_region_name` varchar(64) DEFAULT '' COMMENT '上级区域名称',
   `custom_type` int(8) DEFAULT '1' COMMENT '部位类型',
-  `custom_name` varchar(32) DEFAULT '' COMMENT '部位名称',
   `status` int(1) DEFAULT '1' COMMENT '设备状态(0：新建，1：在线，2：离线)',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
   `preset_id` bigint(32) DEFAULT NULL COMMENT '预置位id',
   `camera_id` bigint(32) DEFAULT NULL COMMENT '摄像机id',
   `real_code` varchar(32) DEFAULT '' COMMENT '实物编码',
-  PRIMARY KEY (`device_id`,`custom_id`) USING BTREE,
+  PRIMARY KEY (`device_id`) USING BTREE,
   KEY `index_create_date` (`create_time`) USING BTREE,
   KEY `index_device_type` (`device_type`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='标准化设备表';

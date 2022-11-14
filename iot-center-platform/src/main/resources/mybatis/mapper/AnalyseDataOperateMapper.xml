@@ -1070,7 +1070,7 @@
         SELECT
             a.real_code
         FROM
-            t_std_device_attr a
+            t_std_device a
         WHERE
             a.device_id = #{deviceId, jdbcType=BIGINT}
     </select>

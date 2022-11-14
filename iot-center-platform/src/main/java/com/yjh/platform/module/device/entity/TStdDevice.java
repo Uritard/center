@@ -33,10 +33,10 @@ public class TStdDevice implements Serializable {
     @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
     private Long deviceId;
 
-    @Length(max = 32, message = "customId长度必须小于等于32")
-    @ApiModelProperty(value = "部位ID")
-    @TableField(value = "custom_id",updateStrategy = FieldStrategy.IGNORED)
-    private String customId;
+//    @Length(max = 32, message = "customId长度必须小于等于32")
+//    @ApiModelProperty(value = "部位ID")
+//    @TableField(value = "custom_id",updateStrategy = FieldStrategy.IGNORED)
+//    private String customId;
 
     @Length(max = 40, message = "deviceCode长度必须小于等于40")
     @ApiModelProperty(value = "设备编码")
@@ -82,10 +82,10 @@ public class TStdDevice implements Serializable {
      @TableField(value = "up_region_name",updateStrategy = FieldStrategy.IGNORED)
     private String upRegionName;
 
-    @Length(max = 32, message = "customName长度必须小于等于32")
-    @ApiModelProperty(value = "部位名称")
-     @TableField(value = "custom_name",updateStrategy = FieldStrategy.IGNORED)
-    private String customName;
+//    @Length(max = 32, message = "customName长度必须小于等于32")
+//    @ApiModelProperty(value = "部位名称")
+//     @TableField(value = "custom_name",updateStrategy = FieldStrategy.IGNORED)
+//    private String customName;
 
     @Max(value = 99999999)
     @ApiModelProperty(value = "部位类型")
@@ -104,6 +104,11 @@ public class TStdDevice implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
+
+    @Length(max = 32, message = "realCode长度必须小于等于32")
+    @ApiModelProperty(value = "实物编码")
+    @TableField(value = "real_code", updateStrategy = FieldStrategy.IGNORED)
+    private String realCode;
 
     private Integer pageNum = 1;
 

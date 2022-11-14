@@ -8,6 +8,7 @@
         <result column="device_id" jdbcType="BIGINT" property="deviceId" />
         <result column="device_point_id" jdbcType="VARCHAR" property="devicePointId" />
         <result column="custom_id" jdbcType="VARCHAR" property="customId" />
+        <result column="custom_name" jdbcType="VARCHAR" property="customName" />
         <result column="mete_id" jdbcType="BIGINT" property="meteId" />
         <result column="mete_kind" jdbcType="VARCHAR" property="meteKind" />
         <result column="meter_type" jdbcType="INTEGER" property="meterType" />
@@ -43,7 +44,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        device_mete_id, device_id, device_point_id, custom_id, mete_id, mete_kind, mete_name, device_type, inspection_type, position_type,analyse_type,is_ai,is_judge,unit, alarm_note, alarm
+        device_mete_id, device_id, device_point_id, custom_id, custom_name, mete_id, mete_kind, mete_name, device_type, inspection_type, position_type,analyse_type,is_ai,is_judge,unit, alarm_note, alarm
         up_effect, down_effect, alarm_level, high_limit1, low_limit1, high_limit2, low_limit2, alarm_delay, alarm_cnt, threshold_abs, threshold_per,
         mete_type, modulus, remark,state_zero,state_one,alarm_state
     </sql>
@@ -55,6 +56,7 @@
             device_id,
             device_point_id,
             custom_id,
+            custom_name,
             mete_id,
             mete_kind,
             mete_type,
@@ -96,6 +98,7 @@
                 #{deviceId, jdbcType=BIGINT},
                 #{devicePointId, jdbcType=VARCHAR},
                 #{customType, jdbcType=VARCHAR},
+                #{customTypeName, jdbcType=VARCHAR},
                 #{meteId, jdbcType=BIGINT},
                 #{meteKind, jdbcType=INTEGER},
                 #{meteType, jdbcType=VARCHAR},
@@ -141,6 +144,7 @@
         device_id,
         device_point_id,
         custom_id,
+        custom_name,
         mete_id,
         mete_kind,
         mete_type,
@@ -183,6 +187,7 @@
             #{deviceId, jdbcType=BIGINT},
             #{TStdMeteModelDetail.devicePointId, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.customType, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.customName, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.meteId, jdbcType=BIGINT},
             #{TStdMeteModelDetail.meteKind, jdbcType=INTEGER},
             #{TStdMeteModelDetail.meteType, jdbcType=VARCHAR},
@@ -237,6 +242,7 @@
         <if test="deviceId != null ">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
         <if test="devicePointId != null ">a.device_point_id = #{devicePointId, jdbcType=VARCHAR},</if>
         <if test="customType != null">a.custom_id = #{customType},</if>
+        <if test="customTypeName != null">a.custom_name = #{customTypeName},</if>
         <if test="meteId != null ">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
         a.mete_kind = #{meteKind},
         a.meter_type = #{meterType, jdbcType=INTEGER},
@@ -511,6 +517,7 @@
             device_id,
             device_point_id,
             custom_id,
+            custom_name,
             mete_id,
             mete_kind,
         meter_type,
@@ -549,6 +556,7 @@
                 #{TStdDevicemete.deviceId, jdbcType=BIGINT},
                 #{TStdDevicemete.devicePointId, jdbcType=VARCHAR},
                 #{TStdDevicemete.customId, jdbcType=VARCHAR},
+                #{TStdDevicemete.customName, jdbcType=VARCHAR},
                 #{TStdDevicemete.meteId, jdbcType=BIGINT},
                 #{TStdDevicemete.meteKind, jdbcType=INTEGER},
             #{TStdDevicemete.meterType, jdbcType=INTEGER},
@@ -589,6 +597,7 @@
         a.device_id,
         a.device_point_id,
         a.custom_id,
+        a.custom_name,
         c.mete_id,
         c.mete_kind,
         c.mete_name,
@@ -636,6 +645,7 @@
 	    a.device_id,
 	    a.device_point_id,
         a.custom_id as cruiseType,
+        a.custom_name,
         b.mete_id,
         b.mete_kind,
         b.mete_name,

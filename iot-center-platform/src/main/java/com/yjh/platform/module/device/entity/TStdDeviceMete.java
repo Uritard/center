@@ -50,6 +50,11 @@ public class TStdDeviceMete implements Serializable {
     @Length(max = 50, message = "customId长度必须小于等于50")
     private String customId;
 
+    @Length(max = 32, message = "customName长度必须小于等于32")
+    @ApiModelProperty(value = "部位名称")
+    @TableField(value = "custom_name", updateStrategy = FieldStrategy.IGNORED)
+    private String customName;
+
     @Max(value = 99999999L)
     @ApiModelProperty(value = "测点类型:0-遥信，1-遥测")
     @TableField(value = "mete_kind",updateStrategy = FieldStrategy.IGNORED)
