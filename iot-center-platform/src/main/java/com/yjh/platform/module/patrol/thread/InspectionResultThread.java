@@ -62,7 +62,21 @@ public class InspectionResultThread implements Runnable{
             String taskId = infoMap.get("taskId");
             String robotCode = robotPatrolTaskResult.getRobotCode();
 
-            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + taskId + ":" + robotPatrolTaskResult.getDeviceId();
+            // taskId是巡视主机的id,robotTaskId是机器人上报的id
+            String robotTaskId = uPatrolTaskService.selectTaskCodeByTaskId(taskId);
+            log.info("robotTaskId==={}", robotTaskId);
+
+            UPatrolTask uPatrolTaskTemp = uPatrolTaskService.selectTaskByTaskCode(robotTaskId);
+            log.info("uPatrolTaskTemp=={}", uPatrolTaskTemp);
+            if (Objects.nonNull(uPatrolTaskTemp) && StringUtils.isNotEmpty(uPatrolTaskTemp.getDateType())){
+                boolean moreTime = uPatrolTaskTemp.getDateType().split(" ")[2].contains(",");
+                if (moreTime) {
+                    robotTaskId = taskId;
+                }
+            }
+            log.info("robotTaskId=={}", robotTaskId);
+
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + robotPatrolTaskResult.getDeviceId();
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
             String instanceId = robotInfoKeyMap.get("instanceId");
 

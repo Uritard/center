@@ -63,14 +63,27 @@ public class IsWarnAfterCruiseThread implements Runnable {
             String taskId = threadMap.get("taskCode");
             String robotCode = threadMap.get("robotCode");
 
-            String robotTaskId = taskId;
-            UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
-            log.info("taskId is {} uPatrolTask is: {}", taskId, uPatrolTask);
+            // taskId是巡视主机的id,robotTaskId是机器人上报的id
+            String robotTaskId = uPatrolTaskService.selectTaskCodeByTaskId(taskId);
+            log.info("robotTaskId==={}", robotTaskId);
+
+            UPatrolTask uPatrolTaskTemp = uPatrolTaskService.selectTaskByTaskCode(robotTaskId);
+            log.info("uPatrolTaskTemp=={}", uPatrolTaskTemp);
+            if (Objects.nonNull(uPatrolTaskTemp) && StringUtils.isNotEmpty(uPatrolTaskTemp.getDateType())){
+                boolean moreTime = uPatrolTaskTemp.getDateType().split(" ")[2].contains(",");
+                if (moreTime) {
+                    robotTaskId = taskId;
+                }
+            }
+            log.info("robotTaskId=={}", robotTaskId);
 
             String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + threadMap.get("deviceId");
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
             Long instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
             TStdDeviceMete tStdDevicemete = uPatrolTaskService.selectDeviceMeteInfo(instanceId);
+
+            UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
+            log.info("taskId is {} uPatrolTask is: {}", taskId, uPatrolTask);
 
             if (Objects.isNull(tStdDevicemete)){
                 return;

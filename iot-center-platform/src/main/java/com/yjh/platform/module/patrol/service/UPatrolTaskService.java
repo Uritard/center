@@ -455,43 +455,46 @@ public class UPatrolTaskService {
 
             List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
             log.info("robotCode : {}", robotCode);
-            List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+            String[] cycleExecuteTimeArray = tCruiseTaskAdd.getCycleExecuteTime().split(",");
+            if (cycleExecuteTimeArray.length > 1){
+                log.info("这种格式的周期任务走上层任务调度");
+            }else {
+                List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+                for (String item : robotCode) {
+                    Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
+                    Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
+                    String robotTaskStatus = robotTaskStatusMap.get("value");
+                    String robotPattern = robotStatusMap.get("value");
+                    if ("1".equals(robotTaskStatus) && "5".equals(robotPattern)) {
+                        return "机器人" + robotCode + "正在执行操作任务,无法下发巡检任务！";
+                    }
+                    RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
+                    robotTaskInfo.setCruiseType(task.getTaskType());
+                    robotTaskInfo.setTaskId(task.getTaskId());
+                    // 从巡视主机下发至机器人的任务等级都暂定3级
+                    robotTaskInfo.setPriority(3);
+                    robotTaskInfo.setTaskName(task.getTaskName());
+                    List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
+                    robotTaskInfo.setInstanceList(robotTaskInstanceList);
+                    String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
+                    robotTaskInfo.setIfRun(ifFun);
+                    robotTaskInfo.setRobotCode(item);
+                    robotTaskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
+                    robotTaskInfo.setIsOcr(tCruiseTaskAdd.getIsOcr());
 
-            for (String item : robotCode) {
-                Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":61");
-                Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
-                String robotTaskStatus = robotTaskStatusMap.get("value");
-                String robotPattern = robotStatusMap.get("value");
-                if ("1".equals(robotTaskStatus) && "5".equals(robotPattern)) {
-                    return "机器人" + robotCode + "正在执行操作任务,无法下发巡检任务！";
+                    // 根据任务信息及协议组装任务信息
+                    packageTaskProtocolInfo(tCruiseTaskAdd, format, robotTaskInfo, ifFun);
+
+                    robotTaskInfoList.add(robotTaskInfo);
                 }
-                RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
-                robotTaskInfo.setCruiseType(task.getTaskType());
-                robotTaskInfo.setTaskId(task.getTaskId());
-                // 从巡视主机下发至机器人的任务等级都暂定3级
-                robotTaskInfo.setPriority(3);
-                robotTaskInfo.setTaskName(task.getTaskName());
-                List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
-                robotTaskInfo.setInstanceList(robotTaskInstanceList);
-                String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
-                robotTaskInfo.setIfRun(ifFun);
-                robotTaskInfo.setRobotCode(item);
-                robotTaskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
-                robotTaskInfo.setIsOcr(tCruiseTaskAdd.getIsOcr());
 
-                // 根据任务信息及协议组装任务信息
-                packageTaskProtocolInfo(tCruiseTaskAdd, format, robotTaskInfo, ifFun);
+                Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+                robotTaskInfoMap.put("robotTaskInfoList", robotTaskInfoList);
+                log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
 
-                robotTaskInfoList.add(robotTaskInfo);
+                // 调用robot服务下发任务
+                Result result = robotTask(robotTaskInfoMap);
             }
-
-            Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
-            robotTaskInfoMap.put("robotTaskInfoList", robotTaskInfoList);
-            log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
-
-            // 调用robot服务下发任务
-            Result result = robotTask(robotTaskInfoMap);
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -522,11 +525,24 @@ public class UPatrolTaskService {
                 // 周期和间隔任务
                 case CYCLE:
                     taskInfo.setFixedStartTime("");
-                    taskInfo.setCycleMonth(Optional.of(tCruiseTaskAdd.getCycleMonth()).orElse(""));
-                    taskInfo.setCycleWeek(Optional.of(tCruiseTaskAdd.getCycleWeek()).orElse(""));
+                    taskInfo.setCycleMonth(Optional.ofNullable(tCruiseTaskAdd.getCycleMonth()).orElse(""));
+                    String cycleWeek = tCruiseTaskAdd.getCycleWeek();
+                    if (StringUtils.isNotEmpty(cycleWeek)){
+                        String[] array = cycleWeek.split(",");
+                        StringJoiner cycleWeeks = new StringJoiner(",");
+                        for (int i = 0; i < array.length; i++) {
+                            int cycleWeekTemp = Integer.parseInt(array[i]);
+                            cycleWeek = String.valueOf(cycleWeekTemp == 1 ? 7 : cycleWeekTemp - 1);
+                            cycleWeeks.add(cycleWeek);
+                        }
+                        taskInfo.setCycleWeek(String.valueOf(cycleWeeks));
+                    }else {
+                        taskInfo.setCycleWeek("");
+                    }
+
                     String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
 
-                    if (StringUtils.isNotEmpty(cycleExecuteTime)) {
+                    if (StringUtils.isNotEmpty(cycleExecuteTime)){
                         if (Integer.parseInt(tCruiseTaskAdd.getCycleExecuteTime()) < 10) {
                             cycleExecuteTime = "0" + tCruiseTaskAdd.getCycleExecuteTime() + ":00:00";
                         } else {
@@ -534,20 +550,21 @@ public class UPatrolTaskService {
                         }
                     }
                     taskInfo.setCycleExecuteTime(cycleExecuteTime);
+                    taskInfo.setCycleStartTime(Optional.ofNullable(tCruiseTaskAdd.getCycleStartTime()).orElse(""));
+                    taskInfo.setCycleEndTime(Optional.ofNullable(tCruiseTaskAdd.getCycleEndTime()).orElse(""));
 
-                    taskInfo.setIntervalType(Optional.of(tCruiseTaskAdd.getIntervalType()).orElse(""));
-                    taskInfo.setIntervalNumber(Optional.of(tCruiseTaskAdd.getIntervalNumber()).orElse(""));
+                    taskInfo.setIntervalType(Optional.ofNullable(tCruiseTaskAdd.getIntervalType()).orElse(""));
+                    taskInfo.setIntervalNumber(Optional.ofNullable(tCruiseTaskAdd.getIntervalNumber()).orElse(""));
 
                     String intervalExecuteTime = tCruiseTaskAdd.getIntervalExecuteTime();
-                    intervalExecuteTime =
-                            StringUtils.isNotEmpty(intervalExecuteTime) ? intervalExecuteTime.substring(11) : intervalExecuteTime;
+                    intervalExecuteTime = StringUtils.isNotEmpty(intervalExecuteTime) ? intervalExecuteTime.substring(11) : intervalExecuteTime;
                     taskInfo.setIntervalExecuteTime(intervalExecuteTime);
 
                     boolean isInterval = StringUtils.isEmpty(tCruiseTaskAdd.getIntervalType());
-                    taskInfo.setCycleStartTime(isInterval ? format.format(new Date()) : "");
-                    taskInfo.setCycleEndTime(isInterval ? tCruiseTaskAdd.getEndTime() : "");
-                    taskInfo.setIntervalStartTime(isInterval ? "" : format.format(new Date()));
-                    taskInfo.setIntervalEndTime(isInterval ? "" : tCruiseTaskAdd.getEndTime());
+                    taskInfo.setCycleStartTime(isInterval ? tCruiseTaskAdd.getCycleStartTime() : "");
+                    taskInfo.setCycleEndTime(isInterval ? tCruiseTaskAdd.getCycleEndTime() : "");
+                    taskInfo.setIntervalStartTime(isInterval ? "" : tCruiseTaskAdd.getIntervalStartTime());
+                    taskInfo.setIntervalEndTime(isInterval ? "" : tCruiseTaskAdd.getIntervalEndTime());
                     break;
                 default:
                     break;
@@ -1780,6 +1797,16 @@ public class UPatrolTaskService {
     @Transactional(rollbackFor = Exception.class)
     public UPatrolTask selectByPrimaryId(String taskId) {
         return uPatrolTaskDao.selectByPrimaryId(taskId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public UPatrolTask selectTaskByTaskCode(String taskCode){
+        return uPatrolTaskDao.selectTaskByTaskCode(taskCode);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public String selectTaskCodeByTaskId(String taskId){
+        return uPatrolTaskDao.selectTaskCodeByTaskId(taskId);
     }
 
     @Transactional(rollbackFor = Exception.class)
