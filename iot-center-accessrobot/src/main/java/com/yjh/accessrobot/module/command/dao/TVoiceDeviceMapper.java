@@ -2,15 +2,19 @@ package com.yjh.accessrobot.module.command.dao;
 
 import com.yjh.accessrobot.module.command.entity.TVoiceDevice;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Collection;
 import java.util.List;
 
 /**
 * @author yanhao
 * @description 针对表【t_voice_device(声纹设备表)】的数据库操作Mapper
-* @createDate 2022-11-11 13:54:22
+* @createDate 2022-11-14
 * @Entity com.yjh.accessrobot.module.command.entity.TVoiceDevice
 
 */
+@Repository
 public interface TVoiceDeviceMapper {
 
     int deleteByPrimaryKey(Long id);
@@ -27,4 +31,7 @@ public interface TVoiceDeviceMapper {
 
     List<TVoiceDevice> selectByEdgeCode(@Param("edgeCode") String edgeCode);
 
+    int insertBatch(List<TVoiceDevice> list);
+
+    void deleteByEdgeCodeAndOriginId(String edgeNode, Collection<String> deleteIdCollection);
 }

@@ -1291,6 +1291,8 @@ INSERT INTO `t_sys_param` VALUES ('100113', '401', 'prefixAbsolutePath', '存储
 INSERT INTO `t_sys_param` VALUES ('100114', '401', 'prefixRelativePath', '存储相对路径前缀', 'https://192.168.1.66/imgs/', '', '{\"rule\":\"^(http|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?$\",\"msg\":\"请输入正确地址\"}');
 INSERT INTO `t_sys_param` VALUES ('100115', '404', 'loginKeepByWs', 'WebSocket登录状态保持', 'true', '使用WebSocket判断用户是否离线，更敏感', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100116', '404', 'voiceNeedEncoding', '声纹是否有格式编码', 'true', '220标准中声纹没有 Encoding 字段', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` VALUES ('100117','404', 'localLongitude', '当前变电站经度', '1', '当前变电站经度',null);
+INSERT INTO `t_sys_param` VALUES ('100118', '404', 'localLatitude', '当前变电站纬度', '1', '当前变电站纬度',null);
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------

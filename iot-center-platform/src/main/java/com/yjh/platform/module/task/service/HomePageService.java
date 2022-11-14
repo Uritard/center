@@ -16,7 +16,6 @@ import com.yjh.platform.module.user.dao.TCameraGroupDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -426,5 +425,12 @@ public class HomePageService {
      */
     private <T> T getRedisMapString(String key, String field) {
         return (T) redisTemplate.opsForHash().get(key, field);
+    }
+
+    public Map<String,String> queryStationPosition() {
+        Map<String,String> result=new HashMap<>();
+        result.put("longitude", (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM+"localLongitude","content"));
+        result.put("latitude", (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM+"localLatitude","content"));
+        return result;
     }
 }

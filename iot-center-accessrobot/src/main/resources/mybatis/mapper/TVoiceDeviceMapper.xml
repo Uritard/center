@@ -150,4 +150,27 @@
             origin_id =  #{originId,jdbcType=VARCHAR}
         where   voice_device_id = #{voiceDeviceId,jdbcType=BIGINT} 
     </update>
+
+    <insert id="insertBatch" keyColumn="voice_device_id" keyProperty="voiceDeviceId" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into t_voice_device
+        ( voice_device_name,std_device_id
+        ,device_type,config_id,up_region_id
+        ,state,voice_code,voice_type
+        ,voice_model,voice_factory,edge_code
+        ,origin_id)
+        values
+        <foreach collection="list"  item="voiceDevice" separator=",">
+        (#{voiceDevice.voiceDeviceName,jdbcType=VARCHAR},#{voiceDevice.stdDeviceId,jdbcType=BIGINT}
+               ,#{voiceDevice.deviceType,jdbcType=VARCHAR},#{voiceDevice.configId,jdbcType=BIGINT},#{voiceDevice.upRegionId,jdbcType=BIGINT}
+               ,#{voiceDevice.state,jdbcType=VARCHAR},#{voiceDevice.voiceCode,jdbcType=VARCHAR},#{voiceDevice.voiceType,jdbcType=VARCHAR}
+               ,#{voiceDevice.voiceModel,jdbcType=VARCHAR},#{voiceDevice.voiceFactory,jdbcType=VARCHAR},#{voiceDevice.edgeCode,jdbcType=VARCHAR}
+               ,#{voiceDevice.originId,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByEdgeCodeAndOriginId">
+        delete from t_voice_device  where edge_code=#{edgeCode}  and origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")"> #{originId} </foreach>
+    </delete>
+
 </mapper>
