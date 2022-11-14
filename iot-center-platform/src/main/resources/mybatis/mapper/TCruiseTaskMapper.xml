@@ -320,7 +320,7 @@
     <select id="selectPointStatus" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.TCruiseTaskList">
         SELECT a.task_id,a.task_name,b.*,c.device_name,c.custom_name,a.start_time,a.if_run,f.personcheck,f.identify_state FROM t_cruise_task a
         LEFT JOIN t_cruise_task_attr b ON a.task_id = b.task_id
-        LEFT JOIN t_std_device c ON b.device_id = c.device_id AND b.custom_id = c.custom_id
+        LEFT JOIN t_std_device c ON b.device_id = c.device_id
         LEFT JOIN t_cruise_task_result d ON a.task_id = d.task_id
         LEFT JOIN t_cruise_task_result_detail e ON d.task_result_id = e.task_result_id AND e.instance_id = b.instance_id
         LEFT JOIN t_cruise_data_result f ON e.cruise_result_id = f.cruise_result_id

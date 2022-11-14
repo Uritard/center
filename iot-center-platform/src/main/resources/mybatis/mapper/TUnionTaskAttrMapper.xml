@@ -178,7 +178,7 @@
         END) AS instance_name
         FROM
         t_cruise_task_attr a
-        LEFT JOIN t_std_device b on a.device_id = b.device_id and a.custom_id = b.custom_id
+        LEFT JOIN t_std_device b on a.device_id = b.device_id
         LEFT JOIN	t_cruise_point_instance l on l.instance_id = a.instance_id
         LEFT JOIN t_camera_preset k ON l.cruise_id = k.preset_id
         LEFT JOIN t_robot_inspection m ON m.inspection_id = l.cruise_id

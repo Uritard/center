@@ -44,7 +44,7 @@ INSERT INTO `sys_org` VALUES ('500001', '电网总公司', '1', '-1', '0', '2020
 -- ----------------------------
 -- Records of t_std_region
 -- ----------------------------
-INSERT INTO `t_std_region` VALUES ('700001', '变电总公司', '0', '-1', '', '0', '123', '普通变电站', '0', '2020-08-05 10:47:58', null);
+INSERT INTO `t_std_region` VALUES ('700001', '变电总公司', '0', '-1', '', '1', NULL, '123', '南昌变电站', '1', NULL, NULL, NULL, '2022-11-03 19:14:32');
 
 -- ----------------------------
 -- Records of sys_role
@@ -688,9 +688,6 @@ INSERT INTO `t_dict_business` VALUES ('300691', '791', 'custom_type', '中性点
 INSERT INTO `t_dict_business` VALUES ('300692', '792', 'custom_type', '接地开关', '0', '设备部位', '1');
 INSERT INTO `t_dict_business` VALUES ('300693', '793', 'custom_type', '消防', '0', '设备部位', '1');
 INSERT INTO `t_dict_business` VALUES ('300694', '794', 'custom_type', '安防', '0', '设备部位', '1');
-INSERT INTO `t_dict_business` VALUES ('300695', '795', 'custom_type', '环境', '0', '设备部位', '1');
-
-INSERT INTO `t_dict_business` VALUES ('300695', '795', 'custom_type', '环境', '0', '设备部位', '1');
 INSERT INTO `t_dict_business` VALUES ('300695', '795', 'custom_type', '环境', '0', '设备部位', '1');
 -- ----------------------------
 -- Records of t_period_model

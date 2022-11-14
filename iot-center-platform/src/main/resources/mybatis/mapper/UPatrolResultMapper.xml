@@ -1021,7 +1021,7 @@
         FROM u_patrol_data_result f
         LEFT JOIN t_cruise_point_info h on h.instance_id = f.instance_id
         LEFT JOIN t_std_devicemete b on b.device_mete_id = h.device_mete_id
-        LEFT JOIN t_std_device a on a.device_id = b.device_id and a.custom_id = b.custom_id
+        LEFT JOIN t_std_device a on a.device_id = b.device_id
         LEFT JOIN t_dict_business g on g.dict_code = f.cruise_result AND g.col_name = 'cruise_result'
         LEFT JOIN t_dict_business p on p.dict_code = f.evaluation_state and p.col_name = 'evaluation_state'
         LEFT JOIN t_dict_business q on q.dict_code = b.mete_type and q.col_name = 'mete_type'
@@ -1189,7 +1189,7 @@
         LEFT JOIN t_dict_business w on w.dict_code = b.mete_type and w.col_name = 'mete_type'
         LEFT JOIN t_dict_business x on x.dict_code = f.evaluation_state and x.col_name = 'evaluation_state'
         LEFT JOIN t_dict_business z on z.dict_code = f.identify_result and z.col_name = 'identify_result'
-        LEFT JOIN t_std_device a on a.device_id = b.device_id and a.custom_id = b.custom_id
+        LEFT JOIN t_std_device a on a.device_id = b.device_id
         LEFT JOIN t_std_region d on d.region_id = a.up_region_id
         LEFT JOIN t_std_region m on m.region_id = d.up_region_id
         LEFT JOIN t_dict_business n on n.dict_code = f.cruise_type and n.col_name = 'cruise_type'

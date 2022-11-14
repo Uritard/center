@@ -410,7 +410,7 @@
                e.identify_state
         FROM u_patrol_task a
         LEFT JOIN u_patrol_task_attr b ON a.task_id = b.task_id
-        LEFT JOIN t_std_device c ON b.device_id = c.device_id AND b.custom_id = c.custom_id
+        LEFT JOIN t_std_device c ON b.device_id = c.device_id
         LEFT JOIN u_patrol_data_result e ON a.task_id = e.task__id
         WHERE a.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
