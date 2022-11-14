@@ -5,9 +5,11 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
@@ -18,6 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -34,12 +37,14 @@ public class RobotInspectionWarnThread implements Runnable{
     private final RedisTemplate redisTemplate;
     private final PatrolResultHandler patrolResultHandler;
     private final AnalyseDataOperateService analyseDataOperateService;
+    private final UPatrolTaskService uPatrolTaskService;
 
     public RobotInspectionWarnThread(RobotPatrolTaskAlarm taskAlarm, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService){
         this.taskAlarm = taskAlarm;
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateService = analyseDataOperateService;
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
+        this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
     }
 
     @Override
@@ -49,7 +54,21 @@ public class RobotInspectionWarnThread implements Runnable{
             String taskId = taskAlarm.getTaskCode();
             String robotCode = taskAlarm.getRobotCode();
 
-            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + taskId + ":" + taskAlarm.getDeviceId();
+            // taskId是巡视主机的id,robotTaskId是机器人上报的id
+            String robotTaskId = uPatrolTaskService.selectTaskCodeByTaskId(taskId);
+            log.info("robotTaskId==={}", robotTaskId);
+
+            UPatrolTask uPatrolTaskTemp = uPatrolTaskService.selectTaskByTaskCode(robotTaskId);
+            log.info("uPatrolTaskTemp=={}", uPatrolTaskTemp);
+            if (Objects.nonNull(uPatrolTaskTemp) && StringUtils.isNotEmpty(uPatrolTaskTemp.getDateType())){
+                boolean moreTime = uPatrolTaskTemp.getDateType().split(" ")[2].contains(",");
+                if (moreTime) {
+                    robotTaskId = taskId;
+                }
+            }
+            log.info("robotTaskId=={}", robotTaskId);
+
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + taskAlarm.getDeviceId();
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
             Long instanceId = NumberUtils.toLong(robotInfoKeyMap.get("instanceId"));
 
@@ -73,7 +92,7 @@ public class RobotInspectionWarnThread implements Runnable{
             infoMap.put("alarmLevel", String.valueOf(warnInfo.getWarnLevel()));
             infoMap.put("flag", "robot");
             infoMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
-            StaticContextAccessor.getBean(PatrolResultHandler.class).alarmPopUp(tStdDevicemete, infoMap);
+            patrolResultHandler.alarmPopUp(tStdDevicemete, infoMap);
 
         }catch (Exception e){
             log.error(e.getMessage(), e);

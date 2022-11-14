@@ -139,4 +139,8 @@ public interface UPatrolTaskDao {
      * @return int
      */
     int batchInsertUPatrolDataResult(List<UPatrolDataResult> list);
+
+    UPatrolTask selectTaskByTaskCode(@Param(value = "taskCode") String taskCode);
+
+    String selectTaskCodeByTaskId(@Param(value = "taskId") String taskId);
 }

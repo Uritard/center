@@ -73,6 +73,7 @@ public class PatrolResultHandler {
                     log.info("taskId is empty, use taskCode as taskId");
                 }
                 log.info("taskCode==={},taskId===={}", taskCode, taskId);
+                taskAlarm.setTaskCode(taskId);
 
                 RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(taskAlarm, redisTemplate, analyseDataOperateService);
                 TaskExecutePool.getInstance().execute(robotWarnThread);
@@ -110,7 +111,7 @@ public class PatrolResultHandler {
                     taskId = taskCode;
                     log.info("taskId is empty, use taskCode as taskId");
                 }
-                log.info("taskCode==={},taskId===={}", taskCode, taskId);
+                log.info("report taskCode==={},patrol taskId===={}", taskCode, taskId);
                 infoMap.put("taskId", taskId);
 
                 // 文件处理
