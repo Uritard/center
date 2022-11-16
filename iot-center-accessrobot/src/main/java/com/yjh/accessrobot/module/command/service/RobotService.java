@@ -1275,15 +1275,15 @@ public class RobotService {
                 String robotTaskId = selectTaskId(taskId);
                 log.info("robotTaskId==={}", robotTaskId);
 
-                TCruiseTask tCruiseTaskTemp = selectCruiseTask(robotTaskId, robotTaskId);
-                log.info("tCruiseTaskTemp=={}", tCruiseTaskTemp);
-                if (Objects.nonNull(tCruiseTaskTemp) && StringUtils.isNotEmpty(tCruiseTaskTemp.getDateType())) {
-                    boolean moreTime = tCruiseTaskTemp.getDateType().split(" ")[2].contains(",");
+                UPatrolTask uPatrolTaskTemp = selectTaskByTaskCode(robotTaskId);
+                log.info("uPatrolTaskTemp=={}", uPatrolTaskTemp);
+                if (Objects.nonNull(uPatrolTaskTemp) && StringUtils.isNotEmpty(uPatrolTaskTemp.getDateType())){
+                    boolean moreTime = uPatrolTaskTemp.getDateType().split(" ")[2].contains(",");
                     if (moreTime) {
                         robotTaskId = taskId;
                     }
                 }
-                log.info("最终的taskId==={}", robotTaskId);
+                log.info("robotTaskId=={}", robotTaskId);
 
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + robotTaskId);
                 String tasSkPatrolledId = redisInfoMap.get("taskPatrolled_id");
@@ -1316,6 +1316,11 @@ public class RobotService {
             log.error("给机器人/无人机下发任务控制指令异常:", e);
         }
         return result;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public UPatrolTask selectTaskByTaskCode(String taskCode){
+        return tRobotInfoDao.selectTaskByTaskCode(taskCode);
     }
 
     /**

@@ -391,4 +391,5 @@ public interface TRobotInfoDao {
 
     List<TRobotInfo> selectByEdgeCode(@Param("edgeCode") String edgeCode);
 
+    UPatrolTask selectTaskByTaskCode(@Param(value = "taskCode") String taskCode);
 }
