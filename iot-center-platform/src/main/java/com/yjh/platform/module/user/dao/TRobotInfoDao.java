@@ -31,7 +31,7 @@ public interface TRobotInfoDao {
     TRobotInfo selectByPrimaryId(@Param(value = "robotId") Long robotId);
     List<TRobotInfo> select(@Param(value = "robotId") Long robotId,
                             @Param(value = "robotCode") String robotCode,
-                            @Param(value = "robotNum") Integer robotNum,
+                            @Param(value = "robotNum") String robotNum,
                                 @Param(value = "robotName") String robotName,
                                 @Param(value = "robotStatus") String robotStatus,
                                 @Param(value = "robotType") Integer robotType,

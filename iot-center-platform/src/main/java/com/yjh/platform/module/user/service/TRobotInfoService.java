@@ -149,7 +149,7 @@ public class TRobotInfoService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TRobotInfo> select(Long robotId, String robotCode, Integer robotNum, String robotName, String robotStatus, Integer robotType, String robotIp, Integer robotPort,
+    public List<TRobotInfo> select(Long robotId, String robotCode, String robotNum, String robotName, String robotStatus, Integer robotType, String robotIp, Integer robotPort,
                                     String upRegionName, String lightIp, String lightPort, String identityManager, String identityCode,
                                    String lnferadIp, Integer inferadPort, String inferadUsername, String inferadPassword, String photePath,
                                    String createBy, Date createDate, String updateBy, Date updateDate, String robotFactory,String isUse,
