@@ -2923,8 +2923,8 @@ public class RobotService {
         try {
             XMLBaseModel model = getXmlMessage(filePath);
             List<Map<String, Object>> list = model.getItems();
-            List<VoiceDeviceModel> cameraModelList = list.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, VoiceDeviceModel.class)).collect(Collectors.toList());
-            tVoiceDeviceService.saveReportData(cameraModelList, edgeCode);
+            List<VoiceDeviceModel> voiceDeviceModelList = list.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, VoiceDeviceModel.class)).collect(Collectors.toList());
+            tVoiceDeviceService.saveReportData(voiceDeviceModelList, edgeCode);
             log.info("声纹文件处理结束 edgeCode:{}", edgeCode);
         } catch (Exception e) {
             log.error("设备点位模型处理失败", e);
@@ -3013,7 +3013,7 @@ public class RobotService {
             log.info("区域处理结束 edgeCode:{}", edgeCode);
             // 刷新缓存
             StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(Constant.REGION_REFRESH_URL, Result.class);
-        } catch (DocumentException e) {
+        } catch (Exception e) {
             log.error("区域文件处理失败", e);
         }
     }

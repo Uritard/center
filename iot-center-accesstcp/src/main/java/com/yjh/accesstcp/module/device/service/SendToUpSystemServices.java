@@ -58,6 +58,8 @@ public class SendToUpSystemServices {
     private TCameraInfoMapper tCameraInfoMapper;
     @Autowired
     private TRobotInfoMapper tRobotInfoMapper;
+    @Autowired
+    private TVoiceDeviceMapper tVoiceDeviceMapper;
 
     @Autowired
     private FtpsUtil ftpsUtil;
@@ -419,13 +421,19 @@ public class SendToUpSystemServices {
 
     public String createVoiceModel(String path) throws Exception {
         //声纹模型
-        List<Map<String, Object>> list = sendToUpSystemDao.selectVoiceInfo();
-        list.forEach(item -> {
-            item.put("station_code", stationCode);
-            item.put("station_name", getStationName());
-        });
+        List<VoiceDeviceModel> voiceDeviceModelList =tVoiceDeviceMapper.selectAll();
+        String stationCode = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeId", "content");
+        String stationName = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "stationName", "content");
+        SerializeConfig serializeConfig = new SerializeConfig();
+        serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
+        List<Map<String, Object>> list = voiceDeviceModelList.stream().peek(voiceDeviceModel -> {
+            voiceDeviceModel.setStationCode(stationCode);
+            voiceDeviceModel.setStationName(stationName);
+        }).map((Function<VoiceDeviceModel, Map<String, Object>>) voiceDeviceModel -> {
+            JSONObject jsonObject = (JSONObject) JSON.toJSON(voiceDeviceModel, serializeConfig);
+            return jsonObject.toJavaObject(Map.class);
+        }).collect(Collectors.toList());
         return CreateModeXMLUtil.createXmlFile(list, path, "voice_model.xml", "PatrolDevice_Model");
-
     }
 
     public String createTaskModel(String path) throws Exception {

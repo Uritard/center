@@ -144,4 +144,54 @@
             origin_id =  #{originId,jdbcType=VARCHAR}
         where   voice_device_id = #{voiceDeviceId,jdbcType=BIGINT} 
     </update>
+
+    <select id="selectAll" resultType="com.yjh.accesstcp.module.device.entity.VoiceDeviceModel">
+        select a.voice_device_id,
+               a.voice_device_name,
+               a.std_device_id,
+               a.device_type,
+               a.config_id,
+               a.up_region_id,
+               a.state,
+               a.voice_code,
+               a.voice_type,
+               a.voice_model,
+               a.voice_factory,
+               a.edge_code,
+               a.origin_id,
+               a.voice_device_name as patroldevice_name,
+               a.voice_code        as patroldevice_code,
+               b.dict_note         as device_model,
+               c.dict_note         as manufacturer,
+               '亿嘉和'            as use_unit,
+               '亿嘉和'            as device_source,
+               ''                  as production_date,
+               ''                  as production_code,
+               ''                  as istransport,
+               ''                  as use_mode,
+               ''                  as video_mode,
+               ''                  as place,
+               '14'                as type,
+               ''      as patroldevice_info,
+               ''       as robots_code,
+               '1'        as edge,
+               d.ftp_url,
+               d.station_id,
+               d.owner,
+               d.owner_code,
+               d.port,
+               d.channel_num,
+               d.absolu_path,
+               d.relative_path,
+               d.db_value,
+               d.f_value,
+               d.mp_value,
+               d.file_path,
+               d.pms_id
+        from t_voice_device a
+                 left join t_voice_config d on a.config_id = d.config_id
+                 left join t_dict_business b on a.voice_type = b.dict_code and b.col_name='voice_type'
+                 left join t_dict_business c on a.voice_factory = c.dict_code and c.col_name='voice_factory'
+    </select>
+
 </mapper>
