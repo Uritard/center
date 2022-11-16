@@ -181,7 +181,7 @@ public class TRobotInfoController {
     @Logs(title = "查询巡检设备信息",content = "根据用户传递的参数查询巡检设备信息",logType = 1)
     public Result select(@RequestParam(value = "robotId", required = false) Long robotId,
                          @RequestParam(value = "robotCode", required = false) String robotCode,
-                         @RequestParam(value = "robotNum", required = false) Integer robotNum,
+                         @RequestParam(value = "robotNum", required = false) String robotNum,
                          @RequestParam(value = "robotName", required = false) String robotName,
                          @RequestParam(value = "robotStatus", required = false) String robotStatus,
                          @RequestParam(value = "robotType", required = false) Integer robotType,

@@ -25,7 +25,7 @@ public class TRobotInfo implements Serializable {
     /**
      * 机器人/无人机编号编码
      */
-    private Integer robotNum;
+    private String robotNum;
 
     /**
      * 机器人名称

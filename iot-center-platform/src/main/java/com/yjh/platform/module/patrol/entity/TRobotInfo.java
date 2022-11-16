@@ -140,5 +140,5 @@ public class TRobotInfo implements Serializable {
     @Max(value = 99999999)
     @ApiModelProperty(value = "机器人/无人机编号编码")
     @TableField(value = "robot_num", updateStrategy = FieldStrategy.IGNORED)
-    private Integer robotNum;
+    private String robotNum;
 }
