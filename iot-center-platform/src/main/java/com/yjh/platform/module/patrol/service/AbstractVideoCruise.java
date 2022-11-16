@@ -76,8 +76,10 @@ public abstract class AbstractVideoCruise {
     private final HashOperations<String, String, String> hashOperations;
 
     private static String picModelPath;
-    private static String intelDefectAnalysis;
+    private static boolean intelDefectAnalysis;
+    private static boolean intelAlgorithmAnalysis;
     protected static long waitTime = 10000;
+    private static String presetImgPath;
 
     protected AbstractVideoCruise(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, ?> redisTemplate,
         RestTemplate serviceRestTemplate, PatrolResultHandler patrolResultHandler) {
@@ -93,7 +95,12 @@ public abstract class AbstractVideoCruise {
     public void resetParams() {
         //模板图片路径
         picModelPath = hashOperations.get("t_sys_param:picModelPath", "content");
-        intelDefectAnalysis = hashOperations.get("t_sys_param:isIntelDefectAnalysis", "content");
+        // 预置位图片路径
+        presetImgPath = hashOperations.get("t_sys_param:presetImgPath", "content");
+        // 缺陷是否使用分析主机
+        intelDefectAnalysis = Boolean.parseBoolean(hashOperations.get("t_sys_param:isIntelDefectAnalysis", "content"));
+        // 表计使用分析主机
+        intelAlgorithmAnalysis = Boolean.parseBoolean(hashOperations.get("t_sys_param:isIntelAlgorithmAnalysis", "content"));
         waitTime = NumberUtils.toLong(hashOperations.get("t_sys_param:waitTime", "content"), waitTime);
     }
 
@@ -236,6 +243,7 @@ public abstract class AbstractVideoCruise {
             analysis.setPicPath(jsonForRe.getString("absPath"));
 
             analysis.setPicModelPath(picModelPath + "/" + presetId);
+            analysis.setReferenceImage(presetImgPath + "/" + presetId + "/" + presetId + ".jpg");
 
             // 表计
             if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {
@@ -248,6 +256,7 @@ public abstract class AbstractVideoCruise {
             }
             int isAi = algorithm.getIsAi() == null ? 0 : algorithm.getIsAi();
             analysis.setIsAi(isAi);
+            analysis.setDevicePointId(algorithm.getDevicePointId());
             List<Analysis> analysisList = new ArrayList<>();
             analysisList.add(analysis);
             log.info("算法信息：   {}", JSON.toJSONString(analysisList));
@@ -351,7 +360,7 @@ public abstract class AbstractVideoCruise {
      * 表计 算法识别
      */
     public Result analysis(List<Analysis> analysisList) {
-        AnalyticsEnum analytics = getAnalytics();
+        AnalyticsEnum analytics = getAnalytics(false);
         return AnalyticsFactory.getAnalytics(analytics).analytics(analysisList);
     }
 
@@ -359,12 +368,13 @@ public abstract class AbstractVideoCruise {
      * 缺陷/判别 算法识别
      */
     public Result defect(List<Analysis> analysisList) {
-        AnalyticsEnum analytics = getAnalytics();
+        AnalyticsEnum analytics = getAnalytics(true);
         return AnalyticsFactory.getAnalytics(analytics).defect(analysisList);
     }
 
-    private AnalyticsEnum getAnalytics() {
-        return Boolean.parseBoolean(intelDefectAnalysis) ? HTTP : TCP;
+    private AnalyticsEnum getAnalytics(boolean isDefect) {
+        boolean isHttp = (isDefect && intelDefectAnalysis) || (!isDefect && intelAlgorithmAnalysis);
+        return isHttp ? HTTP : TCP;
     }
 
 

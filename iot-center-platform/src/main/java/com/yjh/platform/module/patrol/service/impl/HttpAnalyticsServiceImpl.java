@@ -161,7 +161,8 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                 // 判别基准图
                 String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isEPRI", "content"));
                 if (StringUtils.equals("false", flag)) {
-                    // TODO 拿提前拍好的预置位作为判别基准图
+                    // 拿提前拍好的预置位作为判别基准图
+                    imageNormalUrlPath = analysis.getReferenceImage();
                     String[] split = imageNormalUrlPath.split("/");
                     targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
                     analyseObject.setImageNormalUrlPath(targetNamePath);
@@ -194,6 +195,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
 
         List<String> typeList = analyseTypeMap.getOrDefault(analyseType, new ArrayList<>());
         analyseObject.setTypeList(typeList);
+        analyseObject.setImageNormalUrlPath(analysis.getPicModelPath());
 
         return analyseObject;
     }

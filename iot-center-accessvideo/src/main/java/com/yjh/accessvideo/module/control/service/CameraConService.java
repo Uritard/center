@@ -84,9 +84,6 @@ public class CameraConService {
     @Value("${robot.A200.infrared.video}")
     private String robotA200InfraredTem;
 
-    @Value("${nvr.capture.Preset}")
-    private String capturePresetPath;//预置位路径
-
     @Value("${spring.redis.host}")
     private String hostIp;
 
@@ -1063,6 +1060,7 @@ public class CameraConService {
 //            return false;
 //        }
         if (presetCmd == 9) {
+            String capturePresetPath = getPresetBasePath();
             String delPresetPic = "rm -rf " + capturePresetPath + "/" + presetId;
             try {
                 Runtime.getRuntime().exec(delPresetPic);
@@ -3444,5 +3442,13 @@ public class CameraConService {
         }catch (Exception e){
             log.info("更新相机最后操作时间出错："+e);
         }
+    }
+
+    public String getPresetBasePath(){
+       return (String)redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
+    }
+
+    public String getPresetUrlPath(){
+        return (String)redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
     }
 }
