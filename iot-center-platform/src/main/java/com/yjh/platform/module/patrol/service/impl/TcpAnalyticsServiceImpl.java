@@ -151,8 +151,8 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
 
                     String flag = hashOperations.get("t_sys_param:isEPRI", "content");
                     if (StringUtils.equals("false", flag)) {
-                        // TODO 拿提前拍好的预置位作为判别基准图
-                        String imagePath = "";
+                        // 拿提前拍好的预置位作为判别基准图
+                        String imagePath = analysis.getReferenceImage();;
                         normalPictureDataObject.put("imagePath", imagePath);
                     } else {
                         // 拿电科院给的图

@@ -54,14 +54,8 @@ public class CameraConController {
     @Value("${nginx.picture.reflact}")
     private String capturePath;//图片路径
 
-    @Value("${nginx.picture.preset}")
-    private String capturePathPreset;//预置位图片路径
-
     @Value("${nvr.capture.result}")
     private String captureResultPath;//结果路径
-
-    @Value("${nvr.capture.Preset}")
-    private String capturePresetPath;//预置位路径
 
     @Value("${srs.stop.url}")
     private String srsStopUrl;//srs停止播流
@@ -362,6 +356,9 @@ public class CameraConController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
+            String capturePresetPath = cameraConService.getPresetBasePath();
+            String capturePathPreset = cameraConService.getPresetUrlPath();
+
             cameraConService.isCameraControlled(cameraId);
             String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
             String filePath = capturePresetPath + filePathTem;
@@ -446,6 +443,7 @@ public class CameraConController {
                                @RequestParam(value = "cameraId") Long cameraId) {
         Result result = new Result();
         try {
+            String capturePresetPath = cameraConService.getPresetBasePath();
             cameraConService.isCameraControlled(cameraId);
 //            String filePathTem = "/"+presetId+"/" + presetId + ".jpg";
 //            String filePath = capturePresetPath + filePathTem;

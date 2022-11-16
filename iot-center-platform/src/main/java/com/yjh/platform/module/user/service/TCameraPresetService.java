@@ -340,10 +340,8 @@ public class TCameraPresetService {
 //                    }
 //                }
 //            }
-        }catch (NullPointerException e) {
-            e.getMessage();
         } catch (Exception e) {
-            e.getMessage();
+            log.error(e.getMessage(), e);
         }
         return 1;
     }
@@ -364,6 +362,14 @@ public class TCameraPresetService {
     public TCameraPreset countKeepWatchTask(Long cameraId,Long preset,Integer isKeepWatch,Integer isKeepWatchTask,Long selfPreset){
         return tCameraPresetDao.selectKeepWatchTask(cameraId,preset,
                 isKeepWatch,isKeepWatchTask,selfPreset);
+    }
+
+    public String getPresetBasePath(){
+        return (String)redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
+    }
+
+    public String getPresetUrlPath(){
+        return (String)redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
     }
 }
 

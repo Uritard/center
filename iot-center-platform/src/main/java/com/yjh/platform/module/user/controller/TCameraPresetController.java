@@ -40,9 +40,6 @@ import java.util.Map;
 @Api(value = "/tCameraPreset")
 public class TCameraPresetController {
 
-    @Value("${nvr.capture.Preset}")
-    private String capturePresetPath;//预置位路径
-
     @Autowired
     private final TCameraPresetService tCameraPresetService;
     @Autowired
@@ -164,7 +161,7 @@ public class TCameraPresetController {
             String presetIdArray[] = presetIds.split(",");
             Long pr1 = Long.valueOf(presetIdArray[0]);
             TCameraPreset tCameraPreset =  tCameraPresetService.selectByPrimaryId(pr1);
-
+            String capturePresetPath = tCameraPresetService.getPresetBasePath();
             for (int i = 0;i<presetIdArray.length;i++){
                 HashMap<String, Object> params = new HashMap<>();
                 params.put("cameraId",tCameraPreset.getCameraId());
