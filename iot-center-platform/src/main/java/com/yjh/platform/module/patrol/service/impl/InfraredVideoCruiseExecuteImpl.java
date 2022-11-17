@@ -9,14 +9,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.entity.Analysis;
-import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
 import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +29,7 @@ import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.INFRARED;
  * @date 2022/10/18
  * @since [产品/模块版本] （可选）
  */
-@Component
+@Component("normalVideoCruiseExecute")
 public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implements CruiseInspectionExecute {
 
     public InfraredVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate,

@@ -13,6 +13,7 @@ import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
 import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +28,8 @@ import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.VIDEO;
  * @date 2022/10/18
  * @since [产品/模块版本] （可选）
  */
-@Component
+@Primary
+@Component("normalVideoCruiseExecute")
 public class NormalVideoCruiseExecuteImpl extends AbstractVideoCruise implements CruiseInspectionExecute {
 
     public NormalVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate,

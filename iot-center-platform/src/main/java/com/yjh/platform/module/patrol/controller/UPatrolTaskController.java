@@ -207,7 +207,8 @@ public class UPatrolTaskController {
     public Result taskShutDown(@RequestParam(value = "taskId") String taskId) {
         Result result = new Result();
         try {
-            result.setData(uPatrolTaskService.taskShutDown(taskId));
+            uPatrolTaskService.taskShutDown(taskId);
+            result.setData(1);
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("任务终止异常:", e);

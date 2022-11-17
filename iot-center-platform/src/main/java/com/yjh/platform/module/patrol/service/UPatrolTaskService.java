@@ -926,10 +926,10 @@ public class UPatrolTaskService {
      * 任务终止，异步执行
      */
     @Async
-    public int taskShutDown(String taskId) {
+    public void taskShutDown(String taskId) {
         UPatrolResult uPatrolResult = uPatrolResultDao.selectByPrimaryId(taskId);
         if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED) {
-            return 1;
+            return;
         }
         uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
@@ -989,7 +989,7 @@ public class UPatrolTaskService {
         lowTaskGoOn(taskId);
         //任务状态上报站端
         sendTaskStateToUp(task, 4);
-        return uPatrolResultDao.update(uPatrolResult);
+        uPatrolResultDao.update(uPatrolResult);
     }
 
     /**
@@ -1211,7 +1211,7 @@ public class UPatrolTaskService {
             }
             String progress = "0";
             if(allCounts != 0){
-                progress = CommonUtils.percentFormat((normalCounts + abnormalCounts) * 100F/allCounts, "#.##");
+                progress = CommonUtils.percentFormat((float)(normalCounts + abnormalCounts)/allCounts, "#.####");
             }
             log.info("task:{}, normalCounts:{}, abnormalCounts:{}", taskId, normalCounts, abnormalCounts);
             resultCountsMap.put("abnormal", String.valueOf(abnormalCounts));

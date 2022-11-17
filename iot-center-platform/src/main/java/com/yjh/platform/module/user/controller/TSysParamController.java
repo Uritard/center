@@ -7,6 +7,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TSysParam;
@@ -16,6 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +45,9 @@ public class TSysParamController {
     private SysUserDao sysUserDao;
     @Resource
     private RedisTemplate redisTemplate;
+    @Autowired
+    @Qualifier("normalVideoCruiseExecute")
+    private AbstractVideoCruise abstractVideoCruise;
 
     private Logger log = LoggerFactory.getLogger(TSysParamController.class);
 
@@ -97,6 +102,8 @@ public class TSysParamController {
             }
             // 更新声纹日志开关
             Constant.refreshPacketLog();
+            // 更新任务配置信息
+            abstractVideoCruise.resetParams();
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
             log.error("更新系统参数异常:", e);
