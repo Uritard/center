@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author tt
@@ -110,4 +109,9 @@ public interface TRobotInfoDao {
     String selectMapPathByCode(@Param(value = "robotCode") String robotCode);
 
     List<Integer> selectAllRobotNum();
+
+    int selectRobotCount();
+
+    int selectDroneCount();
+
 }

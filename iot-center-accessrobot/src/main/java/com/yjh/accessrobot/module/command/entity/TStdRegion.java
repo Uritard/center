@@ -73,6 +73,21 @@ public class TStdRegion implements Serializable {
     private String regionPath;
 
     /**
+     * 经度
+     */
+    private String longitude;
+
+    /**
+     * 纬度
+     */
+    private String latitude;
+
+    /**
+     * 电压层级
+     */
+    private String voltageLevel;
+
+    /**
      * 备注
      */
     private String remark;

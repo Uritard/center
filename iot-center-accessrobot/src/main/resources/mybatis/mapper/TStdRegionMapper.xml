@@ -16,31 +16,37 @@
         <result property="state" column="state" jdbcType="INTEGER"/>
         <result property="edgeStatus" column="edge_status" jdbcType="VARCHAR"/>
         <result property="regionPath" column="region_path" jdbcType="VARCHAR"/>
+         <result property="longitude" column="longitude" jdbcType="VARCHAR"/>
+          <result property="latitude" column="latitude" jdbcType="VARCHAR"/>
+          <result property="voltageLevel" column="voltage_level" jdbcType="VARCHAR"/>
         <result property="remark" column="remark" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        region_id,region_name,sort,
+         region_id,region_name,sort,
         up_region_id,up_region_ids,region_code,
         origin_region_id,station_id,station_name,
         state,edge_status,region_path,
+        longitude,latitude,voltage_level,
         remark,create_time
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="regionId" parameterType="com.yjh.accessrobot.module.command.entity.TStdRegion">
-        insert into t_std_region
+    insert into t_std_region
         ( region_name,sort
         ,up_region_id,up_region_ids,region_code
         ,origin_region_id,station_id,station_name
         ,state,edge_status,region_path
-        ,remark)
+        ,longitude,latitude,voltage_level
+        ,remark,create_time)
         values (#{regionName,jdbcType=VARCHAR},#{sort,jdbcType=INTEGER}
-               ,#{upRegionId,jdbcType=BIGINT},#{upRegionIds,jdbcType=VARCHAR},#{regionCode,jdbcType=VARCHAR}
-               ,#{originRegionId,jdbcType=VARCHAR},#{stationId,jdbcType=VARCHAR},#{stationName,jdbcType=VARCHAR}
-               ,#{state,jdbcType=INTEGER},#{edgeStatus,jdbcType=VARCHAR},#{regionPath,jdbcType=VARCHAR}
-               ,#{remark,jdbcType=VARCHAR})
+        ,#{upRegionId,jdbcType=BIGINT},#{upRegionIds,jdbcType=VARCHAR},#{regionCode,jdbcType=VARCHAR}
+        ,#{originRegionId,jdbcType=VARCHAR},#{stationId,jdbcType=VARCHAR},#{stationName,jdbcType=VARCHAR}
+        ,#{state,jdbcType=INTEGER},#{edgeStatus,jdbcType=VARCHAR},#{regionPath,jdbcType=VARCHAR}
+        ,#{longitude,jdbcType=VARCHAR},#{latitude,jdbcType=VARCHAR},#{voltageLevel,jdbcType=VARCHAR}
+        ,#{remark,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -57,42 +63,54 @@
     <update id="update" parameterType="com.yjh.accessrobot.module.command.entity.TStdRegion">
           update t_std_region
           <set>
-              <if test="regionName != null">
-                  region_name = #{regionName,jdbcType=VARCHAR},
-              </if>
-              <if test="sort != null">
-                  sort = #{sort,jdbcType=INTEGER},
-              </if>
-              <if test="upRegionId != null">
-                  up_region_id = #{upRegionId,jdbcType=BIGINT},
-              </if>
-              <if test="upRegionIds != null">
-                  up_region_ids = #{upRegionIds,jdbcType=VARCHAR},
-              </if>
-              <if test="regionCode != null">
-                  region_code = #{regionCode,jdbcType=VARCHAR},
-              </if>
-              <if test="originRegionId != null">
-                  origin_region_id = #{originRegionId,jdbcType=VARCHAR},
-              </if>
-              <if test="stationId != null">
-                  station_id = #{stationId,jdbcType=VARCHAR},
-              </if>
-              <if test="stationName != null">
-                  station_name = #{stationName,jdbcType=VARCHAR},
-              </if>
-              <if test="state != null">
-                  state = #{state,jdbcType=INTEGER},
-              </if>
-              <if test="edgeStatus != null">
-                  edge_status = #{edgeStatus,jdbcType=VARCHAR},
-              </if>
-              <if test="regionPath != null">
-                  region_path = #{regionPath,jdbcType=VARCHAR},
-              </if>
-              <if test="remark != null">
-                  remark = #{remark,jdbcType=VARCHAR},
-              </if>
+                  <if test="regionName != null">
+                    region_name = #{regionName,jdbcType=VARCHAR},
+                </if>
+                <if test="sort != null">
+                    sort = #{sort,jdbcType=INTEGER},
+                </if>
+                <if test="upRegionId != null">
+                    up_region_id = #{upRegionId,jdbcType=BIGINT},
+                </if>
+                <if test="upRegionIds != null">
+                    up_region_ids = #{upRegionIds,jdbcType=VARCHAR},
+                </if>
+                <if test="regionCode != null">
+                    region_code = #{regionCode,jdbcType=VARCHAR},
+                </if>
+                <if test="originRegionId != null">
+                    origin_region_id = #{originRegionId,jdbcType=VARCHAR},
+                </if>
+                <if test="stationId != null">
+                    station_id = #{stationId,jdbcType=VARCHAR},
+                </if>
+                <if test="stationName != null">
+                    station_name = #{stationName,jdbcType=VARCHAR},
+                </if>
+                <if test="state != null">
+                    state = #{state,jdbcType=INTEGER},
+                </if>
+                <if test="edgeStatus != null">
+                    edge_status = #{edgeStatus,jdbcType=VARCHAR},
+                </if>
+                <if test="regionPath != null">
+                    region_path = #{regionPath,jdbcType=VARCHAR},
+                </if>
+                <if test="longitude != null">
+                    longitude = #{longitude,jdbcType=VARCHAR},
+                </if>
+                <if test="latitude != null">
+                    latitude = #{latitude,jdbcType=VARCHAR},
+                </if>
+                <if test="voltageLevel != null">
+                    voltage_level = #{voltageLevel,jdbcType=VARCHAR},
+                </if>
+                <if test="remark != null">
+                    remark = #{remark,jdbcType=VARCHAR},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime,jdbcType=TIMESTAMP},
+                </if>
           </set>
           where   region_id = #{regionId,jdbcType=BIGINT}
       </update>
@@ -197,7 +215,7 @@
     </select>
 
     <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TStdRegion" >
-        update t_std_region
+       update t_std_region
         set
             region_name =  #{regionName,jdbcType=VARCHAR},
             sort =  #{sort,jdbcType=INTEGER},
@@ -210,7 +228,11 @@
             state =  #{state,jdbcType=INTEGER},
             edge_status =  #{edgeStatus,jdbcType=VARCHAR},
             region_path =  #{regionPath,jdbcType=VARCHAR},
-            remark =  #{remark,jdbcType=VARCHAR}
+            longitude =  #{longitude,jdbcType=VARCHAR},
+            latitude =  #{latitude,jdbcType=VARCHAR},
+            voltage_level =  #{voltageLevel,jdbcType=VARCHAR},
+            remark =  #{remark,jdbcType=VARCHAR},
+            create_time =  #{createTime,jdbcType=TIMESTAMP}
         where   region_id = #{regionId,jdbcType=BIGINT}
     </update>
     <update id="updateUpRegionId" parameterType="com.yjh.accessrobot.module.command.entity.TStdRegion" >

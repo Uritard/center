@@ -419,4 +419,7 @@
         WHERE
             b.record_id = #{recordId ,jdbcType=BIGINT}
     </select>
+    <select id="selectCount" resultType="java.lang.Integer">
+     select count(1)  from t_camera_info
+     </select>
 </mapper>

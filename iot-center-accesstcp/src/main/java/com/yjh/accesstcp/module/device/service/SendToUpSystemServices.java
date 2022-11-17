@@ -51,7 +51,7 @@ public class SendToUpSystemServices {
     @Value("${spring.union.upSystem}")
     private String recvCode;
     @Autowired
-    private TStdRegionDao tStdRegionDao;
+    private TStdRegionMapper tStdRegionMapper;
     @Autowired
     private TCameraRecorderDao tCameraRecorderDao;
     @Autowired
@@ -391,7 +391,7 @@ public class SendToUpSystemServices {
     }
 
     public String createRegionModel(String path) throws Exception {
-        List<TStdRegion> tStdRegionList = tStdRegionDao.selectAll();
+        List<TStdRegion> tStdRegionList = tStdRegionMapper.selectAll();
         SerializeConfig serializeConfig = new SerializeConfig();
         serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
         List<Map<String, Object>> list = tStdRegionList.stream().map((Function<TStdRegion, Map<String, Object>>) tStdRegion -> {

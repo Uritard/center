@@ -1,6 +1,7 @@
 package com.yjh.platform.module.device.dao;
 
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
+import com.yjh.platform.module.device.entity.StationVoltageData;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -37,5 +38,9 @@ public interface TStdRegionDao {
 
     int updateByPrimaryKey(TStdRegion record);
     List<TStdRegion> selectAll();
+
+    List<TStdRegion> selectByState( @Param(value = "state")Integer state);
+
+    List<StationVoltageData> selectStationVoltageData();
 
 }

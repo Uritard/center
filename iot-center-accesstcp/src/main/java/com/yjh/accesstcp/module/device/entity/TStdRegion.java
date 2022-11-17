@@ -38,7 +38,7 @@ public class TStdRegion implements Serializable {
     private String upRegionIds;
 
     /**
-     * 下级节点ID(state为0时有值)
+     * 下级系统ID
      */
     private String regionCode;
 
@@ -73,6 +73,21 @@ public class TStdRegion implements Serializable {
     private String regionPath;
 
     /**
+     * 经度
+     */
+    private String longitude;
+
+    /**
+     * 纬度
+     */
+    private String latitude;
+
+    /**
+     * 电压层级
+     */
+    private String voltageLevel;
+
+    /**
      * 备注
      */
     private String remark;
@@ -83,4 +98,5 @@ public class TStdRegion implements Serializable {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
+    private static final long serialVersionUID = 1L;
 }

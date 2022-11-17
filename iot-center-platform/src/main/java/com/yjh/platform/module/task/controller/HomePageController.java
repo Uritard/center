@@ -379,5 +379,31 @@ public class HomePageController {
         }
         return result;
     }
+    @ApiOperation(value = "首页查询设备数量")
+    @RequestMapping(value = "/queryDeviceCountByType", method = RequestMethod.GET)
+    public Result queryDeviceCountByType(){
+        Result result = new Result();
+        try {
+            result.setData(homePageService.queryDeviceCountByType());
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询当前变电站经纬度异常:", e);
+        }
+        return result;
+    }
 
+    @ApiOperation(value = "首页查询电压等级")
+    @RequestMapping(value = "/queryDeviceCountByType", method = RequestMethod.GET)
+    public Result queryStationVoltage(){
+        Result result = new Result();
+        try {
+            result.setData(homePageService.queryStationVoltage());
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        }catch (Exception e){
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询当前变电站经纬度异常:", e);
+        }
+        return result;
+    }
 }

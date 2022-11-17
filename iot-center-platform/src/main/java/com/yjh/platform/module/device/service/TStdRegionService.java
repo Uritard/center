@@ -2,10 +2,12 @@ package com.yjh.platform.module.device.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
+import com.yjh.platform.module.device.entity.StationVoltageData;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -196,6 +198,15 @@ public class TStdRegionService{
             redisTemplate.opsForHash().putAll("region:idRefCode", idRefCodeMap);
         }
         return 1;
+    }
+
+
+    public List<TStdRegion> queryStationPosition() {
+        return tStdRegionDao.selectByState(Constant.STATE_LOCAL);
+    }
+
+    public List<StationVoltageData> queryStationVoltage() {
+        return tStdRegionDao.selectStationVoltageData();
     }
 
 }

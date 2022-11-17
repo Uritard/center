@@ -689,6 +689,22 @@ INSERT INTO `t_dict_business` VALUES ('300692', '792', 'custom_type', '接地开
 INSERT INTO `t_dict_business` VALUES ('300693', '793', 'custom_type', '消防', '0', '设备部位', '1');
 INSERT INTO `t_dict_business` VALUES ('300694', '794', 'custom_type', '安防', '0', '设备部位', '1');
 INSERT INTO `t_dict_business` VALUES ('300695', '795', 'custom_type', '环境', '0', '设备部位', '1');
+INSERT INTO `t_dict_business` VALUES ('300696', '796', 'voltage_class', '6.6kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300697', '797', 'voltage_class', '10kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300698', '798', 'voltage_class', '20kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300699', '799', 'voltage_class', '35kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300700', '800', 'voltage_class', '110kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300701', '801', 'voltage_class', '220kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300702', '802', 'voltage_class', '330kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300703', '803', 'voltage_class', '500kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300704', '804', 'voltage_class', '750kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300705', '805', 'voltage_class', '800kV', '0', '电压等级', '1');
+INSERT INTO `t_dict_business` VALUES ('300706', '806', 'voltage_class', '1000kV', '0', '电压等级', '1');
+
+
+
+
+
 -- ----------------------------
 -- Records of t_period_model
 -- ----------------------------

@@ -304,5 +304,14 @@ public class Constant {
     public static final String picRecBack = "http://iot-center-platform/tSequentialConf/v1/sequentialRecBack";
 
     public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze?cruiseResultIdList";
+
+    /**
+     * 本系统数据
+     */
+    public static final int STATE_LOCAL = 1;
+    /**
+     * 下级系统数据
+     */
+    public static final int STATE_SUB = 0;
 }
 

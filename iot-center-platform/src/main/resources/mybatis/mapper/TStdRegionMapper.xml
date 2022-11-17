@@ -16,6 +16,9 @@
         <result property="state" column="state" jdbcType="INTEGER"/>
         <result property="edgeStatus" column="edge_status" jdbcType="VARCHAR"/>
         <result property="regionPath" column="region_path" jdbcType="VARCHAR"/>
+        <result property="longitude" column="longitude" jdbcType="VARCHAR"/>
+        <result property="latitude" column="latitude" jdbcType="VARCHAR"/>
+        <result property="voltageLevel" column="voltage_level" jdbcType="VARCHAR"/>
         <result property="remark" column="remark" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
@@ -26,6 +29,7 @@
         up_region_id,up_region_ids,region_code,
         origin_region_id,station_id,station_name,
         state,edge_status,region_path,
+        longitude,latitude,voltage_level,
         remark,create_time
     </sql>
 
@@ -35,12 +39,14 @@
         ,up_region_id,up_region_ids,region_code
         ,origin_region_id,station_id,station_name
         ,state,edge_status,region_path
-        ,remark)
+        ,longitude,latitude,voltage_level
+        ,remark,create_time)
         values (#{regionName,jdbcType=VARCHAR},#{sort,jdbcType=INTEGER}
                ,#{upRegionId,jdbcType=BIGINT},#{upRegionIds,jdbcType=VARCHAR},#{regionCode,jdbcType=VARCHAR}
                ,#{originRegionId,jdbcType=VARCHAR},#{stationId,jdbcType=VARCHAR},#{stationName,jdbcType=VARCHAR}
                ,#{state,jdbcType=INTEGER},#{edgeStatus,jdbcType=VARCHAR},#{regionPath,jdbcType=VARCHAR}
-               ,#{remark,jdbcType=VARCHAR})
+               ,#{longitude,jdbcType=VARCHAR},#{latitude,jdbcType=VARCHAR},#{voltageLevel,jdbcType=VARCHAR}
+               ,#{remark,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
@@ -210,7 +216,30 @@
             state =  #{state,jdbcType=INTEGER},
             edge_status =  #{edgeStatus,jdbcType=VARCHAR},
             region_path =  #{regionPath,jdbcType=VARCHAR},
-            remark =  #{remark,jdbcType=VARCHAR}
+            longitude =  #{longitude,jdbcType=VARCHAR},
+            latitude =  #{latitude,jdbcType=VARCHAR},
+            voltage_level =  #{voltageLevel,jdbcType=VARCHAR},
+            remark =  #{remark,jdbcType=VARCHAR},
+            create_time =  #{createTime,jdbcType=TIMESTAMP}
         where   region_id = #{regionId,jdbcType=BIGINT}
     </update>
+
+    <select id="selectByState" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_std_region a
+        <if test="state!=null">where a.state=#{state}</if>
+    </select>
+    <select id="selectStationVoltageData"   resultType="com.yjh.platform.module.device.entity.StationVoltageData">
+        select a.voltage_level,
+               count(1) as count,
+               (select b.dict_note
+                from t_dict_business b
+                where b.col_name = 'voltage_level' and b.dict_code = a.voltage_level) voltage_level_name
+        from t_std_region a
+        where a.state = '1'
+        group by a.voltage_level
+    </select>
+
+
 </mapper>
