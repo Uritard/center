@@ -388,13 +388,13 @@ public class HomePageController {
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
         }catch (Exception e){
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("查询当前变电站经纬度异常:", e);
+            log.error("查询当前变电站设备数量:", e);
         }
         return result;
     }
 
     @ApiOperation(value = "首页查询电压等级")
-    @RequestMapping(value = "/queryDeviceCountByType", method = RequestMethod.GET)
+    @RequestMapping(value = "/queryStationVoltage", method = RequestMethod.GET)
     public Result queryStationVoltage(){
         Result result = new Result();
         try {
@@ -402,7 +402,7 @@ public class HomePageController {
             result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
         }catch (Exception e){
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("查询当前变电站经纬度异常:", e);
+            log.error("查询当前变电站经电压等级:", e);
         }
         return result;
     }
