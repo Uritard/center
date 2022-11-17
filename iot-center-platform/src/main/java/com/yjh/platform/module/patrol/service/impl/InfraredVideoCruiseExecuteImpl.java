@@ -29,7 +29,7 @@ import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.INFRARED;
  * @date 2022/10/18
  * @since [产品/模块版本] （可选）
  */
-@Component("normalVideoCruiseExecute")
+@Component("infraredVideoCruiseExecute")
 public class InfraredVideoCruiseExecuteImpl extends AbstractVideoCruise implements CruiseInspectionExecute {
 
     public InfraredVideoCruiseExecuteImpl(TAlgorithmInfoDao tAlgorithmInfoDao, RedisTemplate<String, Object> redisTemplate,
