@@ -2,6 +2,7 @@ package com.yjh.accessrobot.module.command.dao;
 
 import com.yjh.accessrobot.module.command.entity.TVoiceConfig;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
@@ -11,6 +12,8 @@ import java.util.Collection;
 * @createDate 2022-11-17 10:25:11
 * @Entity com.yjh.accessrobot.module.command.entity.TVoiceConfig
 */
+
+@Repository
 public interface TVoiceConfigMapper {
 
     int deleteByPrimaryKey(Long id);
