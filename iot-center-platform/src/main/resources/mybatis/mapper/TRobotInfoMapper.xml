@@ -600,4 +600,14 @@
             a.robot_num
         FROM t_robot_info a
     </select>
+    <select id="selectRobotCount" resultType="java.lang.Integer">
+        select count(1)
+        from t_robot_info
+        where robot_type is not null
+    </select>
+    <select id="selectDroneCount" resultType="java.lang.Integer">
+        select count(1)
+           from t_robot_info
+        where drone_type is not null
+    </select>
 </mapper>

@@ -70,4 +70,6 @@ public interface TCameraInfoDao {
     HashMap<String,Object> selectByCameraId(@Param(value = "cameraId")Long cameraId);
     HashMap<String,Object> selectByRobotIdByLight(@Param(value = "robotId")Long robotId);
     HashMap<String,Object> selectByRobotIdByInferad(@Param(value = "robotId")Long robotId);
+
+    int selectCount();
 }

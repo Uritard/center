@@ -333,4 +333,7 @@
         FROM
             t_voice_device a
     </select>
+    <select id="selectCount" resultType="java.lang.Integer">
+        select count(1)  from t_voice_device
+    </select>
 </mapper>

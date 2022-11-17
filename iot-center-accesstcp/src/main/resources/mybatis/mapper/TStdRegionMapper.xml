@@ -1,39 +1,185 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yjh.accesstcp.module.device.dao.TStdRegionDao">
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accesstcp.module.device.dao.TStdRegionMapper">
 
-    <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yjh.accesstcp.module.device.entity.TStdRegion">
-        <id property="regionId" column="region_id" jdbcType="BIGINT"/>
-        <result property="regionName" column="region_name" jdbcType="VARCHAR"/>
-        <result property="sort" column="sort" jdbcType="INTEGER"/>
-        <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
-        <result property="upRegionIds" column="up_region_ids" jdbcType="VARCHAR"/>
-        <result property="regionCode" column="region_code" jdbcType="VARCHAR"/>
-        <result property="originRegionId" column="origin_region_id" jdbcType="VARCHAR"/>
-        <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
-        <result property="stationName" column="station_name" jdbcType="VARCHAR"/>
-        <result property="state" column="state" jdbcType="INTEGER"/>
-        <result property="edgeStatus" column="edge_status" jdbcType="VARCHAR"/>
-        <result property="regionPath" column="region_path" jdbcType="VARCHAR"/>
-        <result property="remark" column="remark" jdbcType="VARCHAR"/>
-        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <id property="regionId" column="region_id" jdbcType="BIGINT"/>
+            <result property="regionName" column="region_name" jdbcType="VARCHAR"/>
+            <result property="sort" column="sort" jdbcType="INTEGER"/>
+            <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+            <result property="upRegionIds" column="up_region_ids" jdbcType="VARCHAR"/>
+            <result property="regionCode" column="region_code" jdbcType="VARCHAR"/>
+            <result property="originRegionId" column="origin_region_id" jdbcType="VARCHAR"/>
+            <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
+            <result property="stationName" column="station_name" jdbcType="VARCHAR"/>
+            <result property="state" column="state" jdbcType="INTEGER"/>
+            <result property="edgeStatus" column="edge_status" jdbcType="VARCHAR"/>
+            <result property="regionPath" column="region_path" jdbcType="VARCHAR"/>
+            <result property="longitude" column="longitude" jdbcType="VARCHAR"/>
+            <result property="latitude" column="latitude" jdbcType="VARCHAR"/>
+            <result property="voltageLevel" column="voltage_level" jdbcType="VARCHAR"/>
+            <result property="remark" column="remark" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
-    <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         region_id,region_name,sort,
         up_region_id,up_region_ids,region_code,
         origin_region_id,station_id,station_name,
         state,edge_status,region_path,
+        longitude,latitude,voltage_level,
         remark,create_time
     </sql>
 
-    <select id="selectAll" resultMap="BaseResultMap">
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from t_std_region a
+        from t_std_region
+        where  region_id = #{regionId,jdbcType=BIGINT} 
     </select>
 
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_std_region
+        where  region_id = #{regionId,jdbcType=BIGINT} 
+    </delete>
+    <insert id="insert" keyColumn="region_id" keyProperty="regionId" parameterType="com.yjh.accesstcp.module.device.entity.TStdRegion" useGeneratedKeys="true">
+        insert into t_std_region
+        ( region_id,region_name,sort
+        ,up_region_id,up_region_ids,region_code
+        ,origin_region_id,station_id,station_name
+        ,state,edge_status,region_path
+        ,longitude,latitude,voltage_level
+        ,remark,create_time)
+        values (#{regionId,jdbcType=BIGINT},#{regionName,jdbcType=VARCHAR},#{sort,jdbcType=INTEGER}
+        ,#{upRegionId,jdbcType=BIGINT},#{upRegionIds,jdbcType=VARCHAR},#{regionCode,jdbcType=VARCHAR}
+        ,#{originRegionId,jdbcType=VARCHAR},#{stationId,jdbcType=VARCHAR},#{stationName,jdbcType=VARCHAR}
+        ,#{state,jdbcType=INTEGER},#{edgeStatus,jdbcType=VARCHAR},#{regionPath,jdbcType=VARCHAR}
+        ,#{longitude,jdbcType=VARCHAR},#{latitude,jdbcType=VARCHAR},#{voltageLevel,jdbcType=VARCHAR}
+        ,#{remark,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" keyColumn="region_id" keyProperty="regionId" parameterType="com.yjh.accesstcp.module.device.entity.TStdRegion" useGeneratedKeys="true">
+        insert into t_std_region
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="regionId != null">region_id,</if>
+                <if test="regionName != null">region_name,</if>
+                <if test="sort != null">sort,</if>
+                <if test="upRegionId != null">up_region_id,</if>
+                <if test="upRegionIds != null">up_region_ids,</if>
+                <if test="regionCode != null">region_code,</if>
+                <if test="originRegionId != null">origin_region_id,</if>
+                <if test="stationId != null">station_id,</if>
+                <if test="stationName != null">station_name,</if>
+                <if test="state != null">state,</if>
+                <if test="edgeStatus != null">edge_status,</if>
+                <if test="regionPath != null">region_path,</if>
+                <if test="longitude != null">longitude,</if>
+                <if test="latitude != null">latitude,</if>
+                <if test="voltageLevel != null">voltage_level,</if>
+                <if test="remark != null">remark,</if>
+                <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="regionId != null">#{regionId,jdbcType=BIGINT},</if>
+                <if test="regionName != null">#{regionName,jdbcType=VARCHAR},</if>
+                <if test="sort != null">#{sort,jdbcType=INTEGER},</if>
+                <if test="upRegionId != null">#{upRegionId,jdbcType=BIGINT},</if>
+                <if test="upRegionIds != null">#{upRegionIds,jdbcType=VARCHAR},</if>
+                <if test="regionCode != null">#{regionCode,jdbcType=VARCHAR},</if>
+                <if test="originRegionId != null">#{originRegionId,jdbcType=VARCHAR},</if>
+                <if test="stationId != null">#{stationId,jdbcType=VARCHAR},</if>
+                <if test="stationName != null">#{stationName,jdbcType=VARCHAR},</if>
+                <if test="state != null">#{state,jdbcType=INTEGER},</if>
+                <if test="edgeStatus != null">#{edgeStatus,jdbcType=VARCHAR},</if>
+                <if test="regionPath != null">#{regionPath,jdbcType=VARCHAR},</if>
+                <if test="longitude != null">#{longitude,jdbcType=VARCHAR},</if>
+                <if test="latitude != null">#{latitude,jdbcType=VARCHAR},</if>
+                <if test="voltageLevel != null">#{voltageLevel,jdbcType=VARCHAR},</if>
+                <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>
+                <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accesstcp.module.device.entity.TStdRegion">
+        update t_std_region
+        <set>
+                <if test="regionName != null">
+                    region_name = #{regionName,jdbcType=VARCHAR},
+                </if>
+                <if test="sort != null">
+                    sort = #{sort,jdbcType=INTEGER},
+                </if>
+                <if test="upRegionId != null">
+                    up_region_id = #{upRegionId,jdbcType=BIGINT},
+                </if>
+                <if test="upRegionIds != null">
+                    up_region_ids = #{upRegionIds,jdbcType=VARCHAR},
+                </if>
+                <if test="regionCode != null">
+                    region_code = #{regionCode,jdbcType=VARCHAR},
+                </if>
+                <if test="originRegionId != null">
+                    origin_region_id = #{originRegionId,jdbcType=VARCHAR},
+                </if>
+                <if test="stationId != null">
+                    station_id = #{stationId,jdbcType=VARCHAR},
+                </if>
+                <if test="stationName != null">
+                    station_name = #{stationName,jdbcType=VARCHAR},
+                </if>
+                <if test="state != null">
+                    state = #{state,jdbcType=INTEGER},
+                </if>
+                <if test="edgeStatus != null">
+                    edge_status = #{edgeStatus,jdbcType=VARCHAR},
+                </if>
+                <if test="regionPath != null">
+                    region_path = #{regionPath,jdbcType=VARCHAR},
+                </if>
+                <if test="longitude != null">
+                    longitude = #{longitude,jdbcType=VARCHAR},
+                </if>
+                <if test="latitude != null">
+                    latitude = #{latitude,jdbcType=VARCHAR},
+                </if>
+                <if test="voltageLevel != null">
+                    voltage_level = #{voltageLevel,jdbcType=VARCHAR},
+                </if>
+                <if test="remark != null">
+                    remark = #{remark,jdbcType=VARCHAR},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime,jdbcType=TIMESTAMP},
+                </if>
+        </set>
+        where   region_id = #{regionId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accesstcp.module.device.entity.TStdRegion">
+        update t_std_region
+        set 
+            region_name =  #{regionName,jdbcType=VARCHAR},
+            sort =  #{sort,jdbcType=INTEGER},
+            up_region_id =  #{upRegionId,jdbcType=BIGINT},
+            up_region_ids =  #{upRegionIds,jdbcType=VARCHAR},
+            region_code =  #{regionCode,jdbcType=VARCHAR},
+            origin_region_id =  #{originRegionId,jdbcType=VARCHAR},
+            station_id =  #{stationId,jdbcType=VARCHAR},
+            station_name =  #{stationName,jdbcType=VARCHAR},
+            state =  #{state,jdbcType=INTEGER},
+            edge_status =  #{edgeStatus,jdbcType=VARCHAR},
+            region_path =  #{regionPath,jdbcType=VARCHAR},
+            longitude =  #{longitude,jdbcType=VARCHAR},
+            latitude =  #{latitude,jdbcType=VARCHAR},
+            voltage_level =  #{voltageLevel,jdbcType=VARCHAR},
+            remark =  #{remark,jdbcType=VARCHAR},
+            create_time =  #{createTime,jdbcType=TIMESTAMP}
+        where   region_id = #{regionId,jdbcType=BIGINT} 
+    </update>
+
+    <select id="selectAll"resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_std_region
+    </select>
 
 </mapper>

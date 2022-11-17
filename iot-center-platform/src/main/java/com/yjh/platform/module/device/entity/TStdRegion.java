@@ -77,6 +77,20 @@ public class TStdRegion implements Serializable {
      * 边缘节点在线状态
      */
     private String edgeStatus;
+    /**
+     * 经度
+     */
+    private String longitude;
+
+    /**
+     * 纬度
+     */
+    private String latitude;
+
+    /**
+     * 电压层级
+     */
+    private String voltageLevel;
 
     @Length(max = 512)
     private  String remark;

@@ -1,10 +1,10 @@
 package com.yjh.platform.module.device.dao;
 
-import java.util.List;
-
 import com.yjh.platform.module.device.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author lqh
@@ -46,4 +46,4 @@ public interface TVoiceDeviceDao {
     int deleteConf(@Param(value = "configId") Long configId);
     VoiceDeviceInfoDetail selectFrequencyInfo(@Param(value = "voiceDeviceId") Long voiceDeviceId);
     List<VoiceDevice> selectVoiceTree();
-}
+    int  selectCount();}
