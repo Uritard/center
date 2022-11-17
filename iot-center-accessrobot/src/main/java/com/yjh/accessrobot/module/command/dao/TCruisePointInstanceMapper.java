@@ -3,6 +3,7 @@ package com.yjh.accessrobot.module.command.dao;
 
 import com.yjh.accessrobot.module.command.entity.TCruisePointInstance;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 * @createDate 2022-11-11 13:07:02
 * @Entity generator.domain.TCruisePointInstance
 */
+@Repository
 public interface TCruisePointInstanceMapper {
 
     int deleteByPrimaryKey(Long id);

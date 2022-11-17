@@ -2,6 +2,7 @@ package com.yjh.accessrobot.module.command.dao;
 
 import com.yjh.accessrobot.module.command.entity.TStdDevice;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Map;
 * @createDate 2022-11-11 11:05:16
 * @Entity generator.domain.TStdDevice
 */
+@Repository
 public interface TStdDeviceMapper {
 
     int deleteByPrimaryKey(Long id);
