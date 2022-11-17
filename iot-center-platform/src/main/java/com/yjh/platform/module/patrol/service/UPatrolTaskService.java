@@ -16,12 +16,11 @@ import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.Object2Map;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
-import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -1210,10 +1209,15 @@ public class UPatrolTaskService {
             } else {
                 abnormalCounts += size;
             }
+            String progress = "0";
+            if(allCounts != 0){
+                progress = CommonUtils.percentFormat((normalCounts + abnormalCounts) * 100F/allCounts, "#.##");
+            }
             log.info("task:{}, normalCounts:{}, abnormalCounts:{}", taskId, normalCounts, abnormalCounts);
             resultCountsMap.put("abnormal", String.valueOf(abnormalCounts));
             resultCountsMap.put("normal", String.valueOf(normalCounts));
             resultCountsMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
+            resultCountsMap.put("progress", progress);
             redisTemplate.opsForHash().putAll(strForCountAbnormal, resultCountsMap);
             redisTemplate.expire(strForCountAbnormal, 7, TimeUnit.DAYS);
         }

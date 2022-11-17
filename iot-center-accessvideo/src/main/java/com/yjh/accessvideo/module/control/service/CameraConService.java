@@ -2537,6 +2537,9 @@ public class CameraConService {
                     //时间位置
                     assert date != null;
                     int b = picString.indexOf(date);
+                    if (b < 8) {
+                        throw new RuntimeException("红外图片时间异常, b=" + b);
+                    }
                     String hs = picString.substring(b - 8, b - 4);
                     byte[] heightByte = ByteUtil.hex2byte(hs.getBytes());
                     String ws = picString.substring(b - 4, b);
@@ -2548,7 +2551,7 @@ public class CameraConService {
                     int width = ByteUtil.unintFrom2Bytes(widthByte, 0, true);
                     log.info("矩阵宽度 {} ", width);
 
-                    int a = picString.indexOf(date) + 28;
+                    int a = b + 28;
                     //拍摄时间之前的字节
                     String realPic = picString.substring(0, a);
                     //拍摄时间之前的字节长度
