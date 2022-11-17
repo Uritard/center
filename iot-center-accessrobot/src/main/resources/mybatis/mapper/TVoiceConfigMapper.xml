@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TVoiceConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TVoiceConfig">
+            <id property="configId" column="config_id" jdbcType="BIGINT"/>
+            <result property="ftpUrl" column="ftp_url" jdbcType="VARCHAR"/>
+            <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
+            <result property="owner" column="owner" jdbcType="VARCHAR"/>
+            <result property="ownerCode" column="owner_code" jdbcType="VARCHAR"/>
+            <result property="port" column="port" jdbcType="INTEGER"/>
+            <result property="channelNum" column="channel_num" jdbcType="VARCHAR"/>
+            <result property="absoluPath" column="absolu_path" jdbcType="VARCHAR"/>
+            <result property="relativePath" column="relative_path" jdbcType="VARCHAR"/>
+            <result property="dbValue" column="db_value" jdbcType="VARCHAR"/>
+            <result property="fValue" column="f_value" jdbcType="VARCHAR"/>
+            <result property="mpValue" column="mp_value" jdbcType="VARCHAR"/>
+            <result property="filePath" column="file_path" jdbcType="VARCHAR"/>
+            <result property="pmsId" column="pms_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        config_id,ftp_url,station_id,
+        owner,owner_code,port,
+        channel_num,absolu_path,relative_path,
+        db_value,f_value,mp_value,
+        file_path,pms_id
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_voice_config
+        where  config_id = #{configId,jdbcType=BIGINT} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_voice_config
+        where  config_id = #{configId,jdbcType=BIGINT} 
+    </delete>
+      <insert id="insert" keyColumn="config_id" keyProperty="configId" parameterType="com.yjh.accessrobot.module.command.entity.TVoiceConfig" useGeneratedKeys="true">
+        insert into t_voice_config
+        ( config_id,ftp_url,station_id
+        ,owner,owner_code,port
+        ,channel_num,absolu_path,relative_path
+        ,db_value,f_value,mp_value
+        ,file_path,pms_id)
+        values (#{configId,jdbcType=BIGINT},#{ftpUrl,jdbcType=VARCHAR},#{stationId,jdbcType=VARCHAR}
+        ,#{owner,jdbcType=VARCHAR},#{ownerCode,jdbcType=VARCHAR},#{port,jdbcType=INTEGER}
+        ,#{channelNum,jdbcType=VARCHAR},#{absoluPath,jdbcType=VARCHAR},#{relativePath,jdbcType=VARCHAR}
+        ,#{dbValue,jdbcType=VARCHAR},#{fValue,jdbcType=VARCHAR},#{mpValue,jdbcType=VARCHAR}
+        ,#{filePath,jdbcType=VARCHAR},#{pmsId,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="config_id" keyProperty="configId" parameterType="com.yjh.accessrobot.module.command.entity.TVoiceConfig" useGeneratedKeys="true">
+        insert into t_voice_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="configId != null">config_id,</if>
+                <if test="ftpUrl != null">ftp_url,</if>
+                <if test="stationId != null">station_id,</if>
+                <if test="owner != null">owner,</if>
+                <if test="ownerCode != null">owner_code,</if>
+                <if test="port != null">port,</if>
+                <if test="channelNum != null">channel_num,</if>
+                <if test="absoluPath != null">absolu_path,</if>
+                <if test="relativePath != null">relative_path,</if>
+                <if test="dbValue != null">db_value,</if>
+                <if test="fValue != null">f_value,</if>
+                <if test="mpValue != null">mp_value,</if>
+                <if test="filePath != null">file_path,</if>
+                <if test="pmsId != null">pms_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="configId != null">#{configId,jdbcType=BIGINT},</if>
+                <if test="ftpUrl != null">#{ftpUrl,jdbcType=VARCHAR},</if>
+                <if test="stationId != null">#{stationId,jdbcType=VARCHAR},</if>
+                <if test="owner != null">#{owner,jdbcType=VARCHAR},</if>
+                <if test="ownerCode != null">#{ownerCode,jdbcType=VARCHAR},</if>
+                <if test="port != null">#{port,jdbcType=INTEGER},</if>
+                <if test="channelNum != null">#{channelNum,jdbcType=VARCHAR},</if>
+                <if test="absoluPath != null">#{absoluPath,jdbcType=VARCHAR},</if>
+                <if test="relativePath != null">#{relativePath,jdbcType=VARCHAR},</if>
+                <if test="dbValue != null">#{dbValue,jdbcType=VARCHAR},</if>
+                <if test="fValue != null">#{fValue,jdbcType=VARCHAR},</if>
+                <if test="mpValue != null">#{mpValue,jdbcType=VARCHAR},</if>
+                <if test="filePath != null">#{filePath,jdbcType=VARCHAR},</if>
+                <if test="pmsId != null">#{pmsId,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TVoiceConfig">
+        update t_voice_config
+        <set>
+                <if test="ftpUrl != null">
+                    ftp_url = #{ftpUrl,jdbcType=VARCHAR},
+                </if>
+                <if test="stationId != null">
+                    station_id = #{stationId,jdbcType=VARCHAR},
+                </if>
+                <if test="owner != null">
+                    owner = #{owner,jdbcType=VARCHAR},
+                </if>
+                <if test="ownerCode != null">
+                    owner_code = #{ownerCode,jdbcType=VARCHAR},
+                </if>
+                <if test="port != null">
+                    port = #{port,jdbcType=INTEGER},
+                </if>
+                <if test="channelNum != null">
+                    channel_num = #{channelNum,jdbcType=VARCHAR},
+                </if>
+                <if test="absoluPath != null">
+                    absolu_path = #{absoluPath,jdbcType=VARCHAR},
+                </if>
+                <if test="relativePath != null">
+                    relative_path = #{relativePath,jdbcType=VARCHAR},
+                </if>
+                <if test="dbValue != null">
+                    db_value = #{dbValue,jdbcType=VARCHAR},
+                </if>
+                <if test="fValue != null">
+                    f_value = #{fValue,jdbcType=VARCHAR},
+                </if>
+                <if test="mpValue != null">
+                    mp_value = #{mpValue,jdbcType=VARCHAR},
+                </if>
+                <if test="filePath != null">
+                    file_path = #{filePath,jdbcType=VARCHAR},
+                </if>
+                <if test="pmsId != null">
+                    pms_id = #{pmsId,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   config_id = #{configId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TVoiceConfig">
+        update t_voice_config
+        set 
+            ftp_url =  #{ftpUrl,jdbcType=VARCHAR},
+            station_id =  #{stationId,jdbcType=VARCHAR},
+            owner =  #{owner,jdbcType=VARCHAR},
+            owner_code =  #{ownerCode,jdbcType=VARCHAR},
+            port =  #{port,jdbcType=INTEGER},
+            channel_num =  #{channelNum,jdbcType=VARCHAR},
+            absolu_path =  #{absoluPath,jdbcType=VARCHAR},
+            relative_path =  #{relativePath,jdbcType=VARCHAR},
+            db_value =  #{dbValue,jdbcType=VARCHAR},
+            f_value =  #{fValue,jdbcType=VARCHAR},
+            mp_value =  #{mpValue,jdbcType=VARCHAR},
+            file_path =  #{filePath,jdbcType=VARCHAR},
+            pms_id =  #{pmsId,jdbcType=VARCHAR}
+        where   config_id = #{configId,jdbcType=BIGINT} 
+    </update>
+
+    <insert id="insertBatch" keyColumn="config_id" keyProperty="configId" parameterType="java.util.Collection" useGeneratedKeys="true">
+        insert into t_voice_config
+        ( ftp_url,station_id
+        ,owner,owner_code,port
+        ,channel_num,absolu_path,relative_path
+        ,db_value,f_value,mp_value
+        ,file_path,pms_id)
+        values
+        <foreach collection="list"  item="voiceConfig" separator=",">
+        (#{voiceConfig.ftpUrl,jdbcType=VARCHAR},#{voiceConfig.stationId,jdbcType=VARCHAR}
+               ,#{voiceConfig.owner,jdbcType=VARCHAR},#{voiceConfig.ownerCode,jdbcType=VARCHAR},#{voiceConfig.port,jdbcType=INTEGER}
+               ,#{voiceConfig.channelNum,jdbcType=VARCHAR},#{voiceConfig.absoluPath,jdbcType=VARCHAR},#{voiceConfig.relativePath,jdbcType=VARCHAR}
+               ,#{voiceConfig.dbValue,jdbcType=VARCHAR},#{voiceConfig.fValue,jdbcType=VARCHAR},#{voiceConfig.mpValue,jdbcType=VARCHAR}
+               ,#{voiceConfig.filePath,jdbcType=VARCHAR},#{voiceConfig.pmsId,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByDeviceEdgeCodeAndOriginId">
+        delete from t_voice_config where config_id in (select b.config_id from t_voice_device b where b.edge_code=#{edgeCode}
+        and b.origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">#{originId}</foreach>
+        )
+    </delete>
+
+
+</mapper>
