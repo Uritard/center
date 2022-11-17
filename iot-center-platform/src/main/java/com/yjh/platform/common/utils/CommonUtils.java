@@ -421,7 +421,7 @@ public class CommonUtils {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        return "";
+        return "0.0";
     }
 
     public static String MD5(String s) {

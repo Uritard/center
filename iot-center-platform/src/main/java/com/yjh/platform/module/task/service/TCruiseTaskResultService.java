@@ -370,27 +370,18 @@ public class TCruiseTaskResultService {
 //        return imageArray;
 //    }
 
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Map<String, Object> selectCruiseAdvance(String taskId) {
-        Long cruiseCount = tCruiseTaskResultDao.selectCruiseCountsByTaskId(taskId);//总巡检点数量
-        float cruiseComCount = 0;//执行完成的巡检点数量
 
         Map<String, Object> countResult = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId);
-        Integer normal = ValueUtil.toInteger(countResult.get("normal"),0);
-        Integer abnormal = ValueUtil.toInteger(countResult.get("abnormal"),0);
-
-        cruiseComCount = normal+abnormal;
-        log.info("执行完成点：" + cruiseComCount + "个");
-        Map<String, Object> rateAndTaskInfo = new HashMap<>();
-        if (cruiseCount == 0 || cruiseComCount == 0) {
-            rateAndTaskInfo.put("rate", Float.valueOf("0"));
-        } else {
-            rateAndTaskInfo.put("rate", cruiseComCount / cruiseCount);
+        String rate = (String)countResult.get("progress");
+        if (StringUtils.isEmpty(rate)){
+            rate = "0";
         }
+        log.info("执行完成点 taskId: {}, 进度: {}", taskId, rate);
+        Map<String, Object> rateAndTaskInfo = new HashMap<>();
+        rateAndTaskInfo.put("rate", rate);
         TaskSimpleInfo taskSimpleInfo = uPatrolResultDao.selectTaskStateByTaskId(taskId);
-//        rateAndTaskInfo.put("taskState", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskState());
         rateAndTaskInfo.put("taskState", taskSimpleInfo.getTaskState());
-//        rateAndTaskInfo.put("taskStateName", tCruiseTaskResultDao.selectTaskStateByTaskId(taskId).getTaskStateName());
         rateAndTaskInfo.put("taskStateName", taskSimpleInfo.getTaskStateName());
         return rateAndTaskInfo;
     }
