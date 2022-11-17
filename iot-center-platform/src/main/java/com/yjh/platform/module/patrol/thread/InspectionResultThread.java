@@ -116,6 +116,7 @@ public class InspectionResultThread implements Runnable{
             // 巡视主机下发的任务或者站端本体任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);
             if (Boolean.FALSE.equals(flag)){
+                log.info("This is simulation tool task！！！");
                 simulationToolTaskHandler(infoMap.get("absolutePath"), taskId, instanceId);
             }
         } catch (Exception e) {
@@ -133,6 +134,7 @@ public class InspectionResultThread implements Runnable{
     private boolean judgeTaskSourceHandler(String taskId, String instanceId, String robotCode) {
         try {
             Integer robotType = uPatrolTaskService.selectRobotType(robotPatrolTaskResult.getRobotCode());
+            // 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path 为模拟工具
             boolean isSimulationTool = StringUtils.isNotEmpty(robotPatrolTaskResult.getFilePath())
                     && StringUtils.isEmpty(robotPatrolTaskResult.getOriginFileResultPath())
                     && StringUtils.isEmpty(robotPatrolTaskResult.getOriginFilePath())
@@ -140,7 +142,7 @@ public class InspectionResultThread implements Runnable{
                     && Objects.equals(159, robotType);
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
             boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
-            if (Boolean.TRUE.equals(isSimulationTool)) {
+            if (Boolean.FALSE.equals(isSimulationTool)) {
                 // 真实设备上报的巡视结果
 //                Map<String, String> jasonMap = new HashMap<>(2);
 //                jasonMap.put("type", "finishedOneInstance");
