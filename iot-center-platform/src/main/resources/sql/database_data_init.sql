@@ -1306,6 +1306,8 @@ INSERT INTO `t_sys_param` VALUES ('100115', '404', 'loginKeepByWs', 'WebSocket�
 INSERT INTO `t_sys_param` VALUES ('100116', '404', 'voiceNeedEncoding', '声纹是否有格式编码', 'true', '220标准中声纹没有 Encoding 字段', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100117','404', 'localLongitude', '当前变电站经度', '1', '当前变电站经度',null);
 INSERT INTO `t_sys_param` VALUES ('100118', '404', 'localLatitude', '当前变电站纬度', '1', '当前变电站纬度',null);
+INSERT INTO `t_sys_param` VALUES ('100119', '404', 'adcode', '地图adcode', '500101', '地图adcode',null);
+
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------
