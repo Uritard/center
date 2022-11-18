@@ -51,29 +51,32 @@ public class TStdRegionService {
         tStdRegionDao.updateByPrimaryKey(rootTStdRegion);
         //保存上报数据非顶层节点数据
         tStdRegionList.removeIf(stdRegion -> stdRegion.getUpRegionId() == -1);
-
+        tStdRegionList.forEach(tStdRegion -> {
+            tStdRegion.setOriginRegionId(tStdRegion.getRegionId().toString() );
+            tStdRegion.setRegionId(null);
+            tStdRegion.setState(Constant.STATE_SUB);
+            tStdRegion.setRegionCode(edgeNode);
+        });
         List<TStdRegion> saveList = new ArrayList<>();
         //查询该下级系统已有数据
         List<TStdRegion> oldStdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeNode, Constant.STATE_SUB);
+        // 没有直接新增
         if (CollectionUtils.isEmpty(oldStdRegionList)) {
             tStdRegionList.forEach(tStdRegion -> {
-                TStdRegion stdRegionNew = convertBean(edgeNode, tStdRegion);
-                saveList.add(stdRegionNew);
-                tStdRegionDao.insert(stdRegionNew);
+                saveList.add(tStdRegion);
+                tStdRegionDao.insert(tStdRegion);
             });
+            // 否则比较
         } else {
             Map<String, TStdRegion> oldStdRegionMap = oldStdRegionList.stream().collect(Collectors.toMap(TStdRegion::getOriginRegionId, Function.identity()));
-            Map<String, TStdRegion> newStdRegionMap = tStdRegionList.stream().collect(Collectors.toMap(tStdRegion -> tStdRegion.getRegionId().toString(), Function.identity()));
+            Map<String, TStdRegion> newStdRegionMap = tStdRegionList.stream().collect(Collectors.toMap(TStdRegion::getOriginRegionId, Function.identity()));
             //更新的数据
             SetUtils.SetView<String> updateIdCollection = SetUtils.intersection(oldStdRegionMap.keySet(), newStdRegionMap.keySet());
             if (CollectionUtils.isNotEmpty(updateIdCollection)) {
                 newStdRegionMap.entrySet().stream().filter(tStdRegionEntry -> updateIdCollection.contains(tStdRegionEntry.getKey())).forEach(stdRegionEntry -> {
                     TStdRegion tStdRegion = stdRegionEntry.getValue();
-                    TStdRegion oldTStdRegion = oldStdRegionMap.get(tStdRegion.getRegionId().toString());
-                    tStdRegion.setOriginRegionId(tStdRegion.getRegionId().toString());
+                    TStdRegion oldTStdRegion = oldStdRegionMap.get(tStdRegion.getOriginRegionId());
                     tStdRegion.setRegionId(oldTStdRegion.getRegionId());
-                    tStdRegion.setRegionCode(edgeNode);
-                    tStdRegion.setState(Constant.STATE_SUB);
                     saveList.add(tStdRegion);
                     tStdRegionDao.updateByPrimaryKey(tStdRegion);
                 });
@@ -86,11 +89,13 @@ public class TStdRegionService {
             //新增的数据
             SetUtils.SetView<String> insertIdCollection = SetUtils.difference(newStdRegionMap.keySet(), oldStdRegionMap.keySet());
             if (CollectionUtils.isNotEmpty(insertIdCollection)) {
-                newStdRegionMap.entrySet().stream().filter(stdRegionEntry -> insertIdCollection.contains(stdRegionEntry.getKey())).forEach(stdRegionEntry -> {
-                    TStdRegion stdRegionNew = convertBean(edgeNode, stdRegionEntry.getValue());
-                    saveList.add(stdRegionNew);
-                    tStdRegionDao.insert(stdRegionNew);
-                });
+                for (Map.Entry<String, TStdRegion> stdRegionEntry : newStdRegionMap.entrySet()) {
+                    if (insertIdCollection.contains(stdRegionEntry.getKey())) {
+                        TStdRegion tStdRegion = stdRegionEntry.getValue();
+                        saveList.add(tStdRegion);
+                        tStdRegionDao.insert(tStdRegion);
+                    }
+                }
             }
         }
         //新增或更新数据upRegionId转换
@@ -100,23 +105,5 @@ public class TStdRegionService {
             stdRegion.setUpRegionId(map.get(stdRegion.getUpRegionId().toString()));
             tStdRegionDao.updateUpRegionId(stdRegion);
         });
-    }
-
-    public TStdRegion convertBean(String edgeNode, TStdRegion tStdRegion) {
-        TStdRegion stdRegionNew = new TStdRegion();
-        stdRegionNew.setRegionName(tStdRegion.getRegionName());
-        stdRegionNew.setSort(tStdRegion.getSort());
-        stdRegionNew.setUpRegionId(tStdRegion.getUpRegionId());
-        stdRegionNew.setUpRegionIds(tStdRegion.getUpRegionIds());
-        stdRegionNew.setRegionCode(edgeNode);
-        stdRegionNew.setOriginRegionId(tStdRegion.getRegionId().toString());
-        stdRegionNew.setStationId(tStdRegion.getStationId());
-        stdRegionNew.setStationName(tStdRegion.getStationName());
-        stdRegionNew.setState(Constant.STATE_SUB);
-        stdRegionNew.setEdgeStatus(tStdRegion.getEdgeStatus());
-        stdRegionNew.setRegionPath(tStdRegion.getRegionPath());
-        stdRegionNew.setRemark(tStdRegion.getRemark());
-        stdRegionNew.setCreateTime(tStdRegion.getCreateTime());
-        return stdRegionNew;
     }
 }
