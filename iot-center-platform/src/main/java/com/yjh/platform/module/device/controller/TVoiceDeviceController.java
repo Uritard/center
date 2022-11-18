@@ -1,7 +1,5 @@
 package com.yjh.platform.module.device.controller;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
@@ -16,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +36,9 @@ public class TVoiceDeviceController {
     @Autowired
     private final TVoiceDeviceService tVoiceDeviceService;
 
+    @Autowired
+    private RedisTemplate  redisTemplate;
+
     private Logger log = LoggerFactory.getLogger(TVoiceDeviceController.class);
 
     public TVoiceDeviceController(TVoiceDeviceService tVoiceDeviceService) {
@@ -51,6 +53,7 @@ public class TVoiceDeviceController {
         try {
             //tVoiceDevice.getfValue();
             //@RequestBody VoiceDeviceAllInfoDetail tVoiceDevice
+            tVoiceDevice.setEdgeCode((String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM+"edgeCode","content"));
             int re = tVoiceDeviceService.add(tVoiceDevice);
             if(re == -1){
                 result.setCode(209,"监视设备不存在");

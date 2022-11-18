@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.controller;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
@@ -52,6 +53,7 @@ public class TStdRegionController {
     public Result insert(@Validated @RequestBody TStdRegion tStdRegion) {
         Result result = new Result();
         try {
+            tStdRegion.setState(Constant.STATE_LOCAL);
             result.setData(tStdRegionService.insert(tStdRegion));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

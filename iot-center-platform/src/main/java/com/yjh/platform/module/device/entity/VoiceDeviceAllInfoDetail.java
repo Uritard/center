@@ -4,9 +4,7 @@ package com.yjh.platform.module.device.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
@@ -140,7 +138,15 @@ public class VoiceDeviceAllInfoDetail{
     }
 
     private String state;
+    /**
+     * 节点编码
+     */
+    private String edgeCode;
 
+    /**
+     * 原始id(下级同步的id)
+     */
+    private String originId;
 
     public String getPmsId() {
         return pmsId;
@@ -379,4 +385,19 @@ public class VoiceDeviceAllInfoDetail{
         this.deviceTypeName = deviceTypeName;
     }
 
+    public String getEdgeCode() {
+        return edgeCode;
+    }
+
+    public void setEdgeCode(String edgeCode) {
+        this.edgeCode = edgeCode;
+    }
+
+    public String getOriginId() {
+        return originId;
+    }
+
+    public void setOriginId(String originId) {
+        this.originId = originId;
+    }
 }
