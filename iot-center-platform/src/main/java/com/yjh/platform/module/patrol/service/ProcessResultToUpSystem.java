@@ -54,8 +54,6 @@ public class ProcessResultToUpSystem {
     @Autowired
     private AlarmService alarmService;
 
-
-
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
     private static final String AUDIO_PATH = "/Audio/";
@@ -91,14 +89,10 @@ public class ProcessResultToUpSystem {
                 String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
                 String simpleDateFormat = DateTimeUtil.format3(new Date());
                 String analyseType = getAlgorithmTypeMap(instanceId);
-                String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
                 HashMap<String, String> typeAndPathName = getTypeAndPathName(analyseType);
 
-                // 通过t_cruise_point_instance.instance_id 获取device_id，到t_std_device获取device_name，device_code
-                Map<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
-
-                xmlItem.put("patroldevice_code", patrolDevice.get("device_code"));
-                xmlItem.put("patroldevice_name", patrolDevice.get("device_name"));
+                xmlItem.put("patroldevice_code", "巡视设备名称");
+                xmlItem.put("patroldevice_name", "巡视设备编码");
                 xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
                 xmlItem.put("task_code", taskId);
                 xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
@@ -109,10 +103,9 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
 
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-                String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId",
-                        "content"));
+                String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationCode", "content"));
                 String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskId + typeAndPathName.get("fileNamePath") + instanceId + edgeCode + simpleDateFormat + ".jpg";
+                    8) + "/" + taskId + typeAndPathName.get("fileNamePath") + instanceId + "_巡视主机编码_" + simpleDateFormat + ".jpg";
 
                 Map<String, String> resMap;
                 if (Objects.isNull(tWarnInfo)) {
