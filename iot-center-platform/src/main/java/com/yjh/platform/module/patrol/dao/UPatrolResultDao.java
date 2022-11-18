@@ -7,7 +7,9 @@ import com.yjh.platform.module.task.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author lqh
@@ -177,12 +179,4 @@ public interface UPatrolResultDao {
 
     int selectAbnormalNumByTask(@Param(value = "taskId")String taskId);
 
-
-    List<Map<String, Object>> selectUpatrolTaskInfo(String taskId,String instanceId);
-
-    int selectUpatrolTaskInfoById(String taskId);
-
-    int selectTaskWait(String taskId);
-
-    int selectReviewTask(String taskId);
 }

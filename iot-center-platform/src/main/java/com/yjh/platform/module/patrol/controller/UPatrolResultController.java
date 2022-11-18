@@ -13,12 +13,14 @@ import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.service.UPatrolResultService;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
+import com.yjh.platform.module.task.service.TCruiseResultService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -32,7 +34,7 @@ import java.util.*;
 public class UPatrolResultController {
 
     @Autowired
-    private UPatrolResultService uPatrolResultService;
+    private UPatrolResultService tCruiseResultService;
     @Autowired
     private LogsRecord logsRecord;
 
@@ -88,7 +90,7 @@ public class UPatrolResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize,true,null,true);
-            List<TCruiseResultExpand> list = uPatrolResultService.selectTaskByPage(taskName,cState,cType,deviceType,startDate,endDate,deviceIdList,meteType,customId,isCheck);
+            List<TCruiseResultExpand> list = tCruiseResultService.selectTaskByPage(taskName,cState,cType,deviceType,startDate,endDate,deviceIdList,meteType,customId,isCheck);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -108,7 +110,7 @@ public class UPatrolResultController {
     public Result taskStatistical() {
         Result result = new Result();
         try {
-            List<StatisticalResult> taskStatisticalList = uPatrolResultService.taskStatistical();
+            List<StatisticalResult> taskStatisticalList = tCruiseResultService.taskStatistical();
             result.setData(taskStatisticalList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -123,7 +125,7 @@ public class UPatrolResultController {
     public Result cruiseStatisticalByAbnormal() {
         Result result = new Result();
         try {
-            List<CruiseStatistical> cruiseStatisticalList = uPatrolResultService.cruiseStatisticalByAbnormal();
+            List<CruiseStatistical> cruiseStatisticalList = tCruiseResultService.cruiseStatisticalByAbnormal();
             result.setData(cruiseStatisticalList);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -173,7 +175,7 @@ public class UPatrolResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultDetail> cruiseResultDetailList = uPatrolResultService.selectCruiseByPage(taskId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList,customId);
+            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultService.selectCruiseByPage(taskId,cruiseType,cruiseResult,deviceType,startTime,endTime,deviceIdList,customId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
@@ -231,7 +233,7 @@ public class UPatrolResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultDetail> cruiseResultDetailList = uPatrolResultService.selectAbnormalResult(taskResultId,cruiseType,cruiseResult,deviceType,instanceName,startTime,endTime,deviceIdList,customId);
+            List<CruiseResultDetail> cruiseResultDetailList = tCruiseResultService.selectAbnormalResult(taskResultId,cruiseType,cruiseResult,deviceType,instanceName,startTime,endTime,deviceIdList,customId);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
@@ -253,7 +255,7 @@ public class UPatrolResultController {
         String userId = request.getHeader("userId");
         Result result = new Result();
         try {
-            result.setData(uPatrolResultService.manualReview(cruiseManualReview,userId));
+            result.setData(tCruiseResultService.manualReview(cruiseManualReview,userId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -269,7 +271,7 @@ public class UPatrolResultController {
     public Result selectTaskIsRunning(){
         Result result=new Result();
         try{
-            result.setData(uPatrolResultService.selectTaskIsRunning());
+            result.setData(tCruiseResultService.selectTaskIsRunning());
         }catch(Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述",e);
@@ -284,7 +286,7 @@ public class UPatrolResultController {
         String userId = request.getHeader("userId");
         Result result=new Result();
         try{
-            result.setData(uPatrolResultService.manualReviewTask(taskResultId,userId,request));
+            result.setData(tCruiseResultService.manualReviewTask(taskResultId,userId,request));
         }catch(Exception e){
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
             log.error("审核任务失败描述",e);

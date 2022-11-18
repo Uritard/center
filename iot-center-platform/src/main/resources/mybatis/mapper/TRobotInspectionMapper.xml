@@ -392,21 +392,7 @@
             LIMIT 1
     </select>
 
-    <select id="selectRealInstanceId" resultType="java.lang.String">
-        SELECT
-        a.instance_id
-        FROM
-        t_cruise_point_instance a
-        WHERE a.origin_id = #{deviceId, jdbcType=VARCHAR}
-        and a.edge_code = #{edgeCode, jdbcType=VARCHAR}
-        and a.origin_id is not null
-    </select>
-
     <select id="selectRobotType" resultType="java.lang.Integer">
         SELECT robot_type from t_robot_info where robot_code = #{robotCode}
-    </select>
-
-    <select id="selectRobot" resultType="java.lang.Integer">
-        SELECT count（robot_id） from t_robot_info where robot_code = #{robotCode}
     </select>
 </mapper>
