@@ -1,7 +1,5 @@
 package com.yjh.platform.module.device.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.Object2Map;
@@ -183,13 +181,7 @@ public class TStdRegionService{
         for (TStdRegion item : list) {
             if(StringUtils.isNotEmpty(item.getRegionCode())) {
                 Map<String, String> map = Object2Map.toStringMap(Object2Map.objectToMap(item, true));
-                String remakStr = map.get("remark");
                 idRefCodeMap.put(item.getStationId(), item.getRegionCode());
-                JSONObject remakJson = JSON.parseObject(remakStr);
-                if(remakJson !=null) {
-                    map.put("voltageGrade", remakJson.getString("voltageGrade"));
-                    map.put("edgeType", remakJson.getString("edgeType"));
-                }
                 String str = "region:" + item.getRegionCode();
                 redisTemplate.opsForHash().putAll(str, map);
             }

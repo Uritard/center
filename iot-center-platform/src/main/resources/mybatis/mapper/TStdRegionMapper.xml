@@ -90,8 +90,20 @@
               <if test="regionPath != null">
                   region_path = #{regionPath,jdbcType=VARCHAR},
               </if>
+              <if test="longitude != null">
+                  longitude = #{longitude,jdbcType=VARCHAR},
+              </if>
+              <if test="latitude != null">
+                  latitude = #{latitude,jdbcType=VARCHAR},
+              </if>
+              <if test="voltageLevel != null">
+                  voltage_level = #{voltageLevel,jdbcType=VARCHAR},
+              </if>
               <if test="remark != null">
                   remark = #{remark,jdbcType=VARCHAR},
+              </if>
+              <if test="createTime != null">
+                  create_time = #{createTime,jdbcType=TIMESTAMP},
               </if>
           </set>
           where   region_id = #{regionId,jdbcType=BIGINT}
