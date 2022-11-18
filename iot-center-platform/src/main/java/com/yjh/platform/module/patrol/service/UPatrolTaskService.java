@@ -1283,10 +1283,10 @@ public class UPatrolTaskService {
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
             List<String> cruiseResultIdList = new ArrayList<>();
             Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
-
+            List<Map<String, String>> cruiseResultMapList = new ArrayList<>();
             for (String key : robotInfoKeys) {
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-
+                cruiseResultMapList.add(redisInfoMap);
                 boolean conditionRes = ArrayUtils.contains(new String[]{String.valueOf(CRUISE_RESULT_NORMAL), String.valueOf(CRUISE_RESULT_ABNORMAL)}, redisInfoMap.get("cruiseResult"));
                 if (Boolean.TRUE.equals(conditionRes)) {
                     UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
@@ -1331,6 +1331,7 @@ public class UPatrolTaskService {
             lowTaskGoOn(taskId);
 
             // todo:给上一级系统上报任务状态
+            processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultMapList,null,null);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
