@@ -11,7 +11,6 @@ import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 import com.yjh.platform.module.device.entity.DeviceCountBean;
 import com.yjh.platform.module.device.entity.StationVoltageData;
-import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.service.SystemInfoService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
@@ -440,8 +439,11 @@ public class HomePageService {
         return (T) redisTemplate.opsForHash().get(key, field);
     }
 
-    public List<TStdRegion> queryStationPosition() {
-        return tStdRegionService.queryStationPosition();
+    public Map queryStationPosition() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", tStdRegionService.queryStationPosition());
+        map.put("adcode", redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "adcode", "content"));
+        return map;
     }
 
     public List<StationVoltageData> queryStationVoltage() {

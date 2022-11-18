@@ -235,7 +235,7 @@
                count(1) as count,
                (select b.dict_note
                 from t_dict_business b
-                where b.col_name = 'voltage_level' and b.dict_code = a.voltage_level) voltage_level_name
+                where b.col_name = 'voltage_class' and b.dict_code = a.voltage_level) voltage_level_name
         from t_std_region a
         where a.state = '1'
         group by a.voltage_level
