@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +40,8 @@ public class TRobotInfoController {
     @Autowired
     private final TStdDeviceService tStdDeviceService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
     private Logger log = LoggerFactory.getLogger(TRobotInfoController.class);
 
     public TRobotInfoController(TRobotInfoService tRobotInfoService, TStdDeviceService tStdDeviceService) {
@@ -53,6 +56,7 @@ public class TRobotInfoController {
 
         Result result = new Result();
         try {
+            tRobotInfo.setEdgeCode((String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeCode", "content"));
             Long userId = Long.valueOf(request.getHeader("userId"));
             if (tRobotInfo.getRobotIp() != null && !"".equals(tRobotInfo.getRobotIp())) {
                 String robotIp = tRobotInfo.getRobotIp();

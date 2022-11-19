@@ -11,14 +11,13 @@ import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraInfoByDict;
-import com.yjh.platform.module.user.entity.TCameraRecorderByDict;
 import com.yjh.platform.module.user.service.TCameraInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +44,8 @@ public class TCameraInfoController {
     @Autowired
     private final TStdDeviceService tStdDeviceService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
     private Logger log = LoggerFactory.getLogger(TCameraInfoController.class);
 
     public TCameraInfoController(TCameraInfoService tCameraInfoService, TStdDeviceService tStdDeviceService) {
@@ -63,6 +64,7 @@ public class TCameraInfoController {
             if (StringUtils.hasLength(tCameraInfo.getPmsId()) && selectAllPMSIdList.contains(tCameraInfo.getPmsId())) {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
+                tCameraInfo.setEdgeCode((String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeCode", "content"));
                 int state = tCameraInfoService.insert(tCameraInfo);
                 if (state == 0) {
                     result.setMessage(ResultCodeEnum.CODE2.getCode(), ResultCodeEnum.CODE2.getName());
