@@ -5,7 +5,6 @@ import com.github.pagehelper.PageHelper;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.logs.LogsAspect;
 import com.yjh.platform.common.logs.LogsRecord;
-import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.service.TStdDeviceService;
@@ -14,8 +13,6 @@ import com.yjh.platform.module.patrol.service.UPatrolDataResultService;
 import com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo;
 import com.yjh.platform.module.task.entity.FirAndPicInfo;
-import com.yjh.platform.module.task.entity.TCruiseDataResult;
-import com.yjh.platform.module.task.service.TCruiseDataResultService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -24,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -44,7 +40,7 @@ public class UPatrolDataResultController {
     private Logger log = LoggerFactory.getLogger(UPatrolDataResultController.class);
 
     @Autowired
-    private UPatrolDataResultService tCruiseDataResultService;
+    private UPatrolDataResultService uPatrolDataResultService;
     @Autowired
     private TStdDeviceService tStdDeviceService;
     @Autowired
@@ -82,7 +78,7 @@ public class UPatrolDataResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = tCruiseDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes,customId);
+            List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = uPatrolDataResultService.selectCruiseResultAnalyze(deviceIdList,deviceType,meteType,meterType,cruiseRes,customId);
             resultMap.put("count",page.getTotal());
             resultMap.put("list", cruiseResultAnalMeteInfoList);
             result.setData(resultMap);
@@ -168,7 +164,7 @@ public class UPatrolDataResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = tCruiseDataResultService.selectCruiseDataReport(cType,meteType,meterType,endTime, startTime,deviceIdList,instanceName);
+            List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectCruiseDataReport(cType,meteType,meterType,endTime, startTime,deviceIdList,instanceName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalyzeInfoList);
             result.setData(resultMap);
@@ -209,7 +205,7 @@ public class UPatrolDataResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
-            List<CruiseResultAnalyzeInfo>  list = tCruiseDataResultService.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType,meterType,endTime, startTime,pageNum,pageSize);
+            List<CruiseResultAnalyzeInfo>  list = uPatrolDataResultService.selectCruiseDataResultByList2(cruiseType, cType, deviceMeteId, meteType,meterType,endTime, startTime,pageNum,pageSize);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -238,7 +234,7 @@ public class UPatrolDataResultController {
             if (Objects.isNull(endTime) || "".equals(endTime)){
                 endTime = null;
             }
-            result.setData(tCruiseDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType));
+            result.setData(uPatrolDataResultService.selectBrokenLine(cruiseType, cType, deviceMeteId, startTime, endTime,meteType,meterType));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("获取折线图元素信息失败描述：", e);
@@ -261,7 +257,7 @@ public class UPatrolDataResultController {
         Map<String, Object> resultMap = new HashMap<>();
         Page page= PageHelper.startPage(pageNum, pageSize,true, null, true); ;
         try {
-            List<FirAndPicInfo> list = tCruiseDataResultService.selectByCameraId(cameraId,startDate,endDate,fileName);
+            List<FirAndPicInfo> list = uPatrolDataResultService.selectByCameraId(cameraId,startDate,endDate,fileName);
             if(list!=null) {
                 resultMap.put("count", page.getTotal());
                 resultMap.put("list", list);

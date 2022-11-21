@@ -187,6 +187,9 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                 }
                 // 上传基准图
                 uploadFileToFtps(imageNormalUrlPath, "/" + targetNamePath, intelAnalysisFtpsConfig);
+            } else {
+                String presetId = StringUtils.substringAfterLast(analysis.getPicModelPath(), "/");
+                analyseObject.setImageNormalUrlPath(presetId);
             }
 
         } catch (Exception e) {
@@ -195,7 +198,6 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
 
         List<String> typeList = analyseTypeMap.getOrDefault(analyseType, new ArrayList<>());
         analyseObject.setTypeList(typeList);
-        analyseObject.setImageNormalUrlPath(analysis.getPicModelPath());
 
         return analyseObject;
     }

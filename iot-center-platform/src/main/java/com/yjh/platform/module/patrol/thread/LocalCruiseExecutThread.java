@@ -92,11 +92,13 @@ public class LocalCruiseExecutThread<T> implements Runnable {
         // 巡检点类型
         int cruiseType = MapUtils.getIntValue(inspectionMap, "cruiseType");
         CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+        log.info("巡检执行，cruiseType: {}, cruiseTypeEnum: {}", cruiseType, cruiseTypeEnum);
         CruiseInspectionExecute execute = CruiseExecuteFactory.CREATE.createExecute(cruiseTypeEnum);
         boolean isEnded = execute.execute(inspectionMap);
 
         // 任务结束，调用结束方法
         if (isEnded) {
+            log.info("当前点位结束，isEnded: {}", isEnded);
             uPatrolTaskService.patrolTaskResultHandler(inspectionMap);
         }
         return true;
