@@ -141,7 +141,7 @@ public class TRobotInfoService {
                 tRobotInfoList.stream().filter(tRobotInfo -> updateIdSet.contains(tRobotInfo.getOriginId())).forEach(tRobotInfo -> {
                     TRobotInfo oldTRobotInfo = oldTRobotInfoMap.get(tRobotInfo.getOriginId());
                     tRobotInfo.setRobotId(oldTRobotInfo.getRobotId());
-                    tRobotInfoDao.update(tRobotInfo);
+                    tRobotInfoDao.updateByPrimaryKey(tRobotInfo);
                 });
             }
             //删除的数据

@@ -1322,5 +1322,55 @@
         WHERE
         a.nest_code = #{nestNum, jdbcType=VARCHAR}
     </select>
-
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        update t_robot_info
+        set robot_code          = #{robotCode,jdbcType=VARCHAR},
+            robot_num           = #{robotNum,jdbcType=VARCHAR},
+            robot_name          = #{robotName,jdbcType=VARCHAR},
+            nest_name           = #{nestName,jdbcType=VARCHAR},
+            nest_code           = #{nestCode,jdbcType=VARCHAR},
+            robot_status        = #{robotStatus,jdbcType=VARCHAR},
+            robot_type          = #{robotType,jdbcType=INTEGER},
+            drone_type          = #{droneType,jdbcType=INTEGER},
+            robot_ip            = #{robotIp,jdbcType=VARCHAR},
+            robot_port          = #{robotPort,jdbcType=INTEGER},
+            light_ip            = #{lightIp,jdbcType=VARCHAR},
+            light_port          = #{lightPort,jdbcType=VARCHAR},
+            identity_manager    = #{identityManager,jdbcType=VARCHAR},
+            identity_code       = #{identityCode,jdbcType=VARCHAR},
+            lnferad_IP          = #{lnferadIp,jdbcType=VARCHAR},
+            Inferad_Port        = #{inferadPort,jdbcType=INTEGER},
+            Inferad_username    = #{inferadUsername,jdbcType=VARCHAR},
+            Inferad_password    = #{inferadPassword,jdbcType=VARCHAR},
+            phote_path          = #{photePath,jdbcType=VARCHAR},
+            create_by           = #{createBy,jdbcType=VARCHAR},
+            create_date         = #{createDate,jdbcType=TIMESTAMP},
+            update_by           = #{updateBy,jdbcType=VARCHAR},
+            update_date         = #{updateDate,jdbcType=TIMESTAMP},
+            robot_factory       = #{robotFactory,jdbcType=VARCHAR},
+            made_in             = #{madeIn,jdbcType=VARCHAR},
+            made_date           = #{madeDate,jdbcType=TIMESTAMP},
+            is_use              = #{isUse,jdbcType=VARCHAR},
+            commission_date     = #{commissionDate,jdbcType=TIMESTAMP},
+            up_region_id        = #{upRegionId,jdbcType=BIGINT},
+            robot_position      = #{robotPosition,jdbcType=VARCHAR},
+            drone_position      = #{dronePosition,jdbcType=VARCHAR},
+            robot_source        = #{robotSource,jdbcType=VARCHAR},
+            address             = #{address,jdbcType=VARCHAR},
+            building_user       = #{buildingUser,jdbcType=VARCHAR},
+            appearance_number   = #{appearanceNumber,jdbcType=VARCHAR},
+            defect_record       = #{defectRecord,jdbcType=VARCHAR},
+            repair_record       = #{repairRecord,jdbcType=VARCHAR},
+            exit_putInto_record = #{exitPutintoRecord,jdbcType=VARCHAR},
+            remarks             = #{remarks,jdbcType=VARCHAR},
+            record_id           = #{recordId,jdbcType=BIGINT},
+            channel_num_light   = #{channelNumLight,jdbcType=INTEGER},
+            channel_num_inferad = #{channelNumInferad,jdbcType=INTEGER},
+            last_online_time    = #{lastOnlineTime,jdbcType=BIGINT},
+            duration            = #{duration,jdbcType=BIGINT},
+            off_line_count      = #{offLineCount,jdbcType=BIGINT},
+            edge_code           = #{edgeCode,jdbcType=VARCHAR},
+            origin_id           = #{originId,jdbcType=VARCHAR}
+        where robot_id = #{robotId,jdbcType=BIGINT}
+    </update>
 </mapper>
