@@ -77,7 +77,7 @@ public class PatrolResultHandler {
             log.info("taskCode==={},taskId===={}", taskCode, taskId);
 
             RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(taskAlarm, redisTemplate,
-                    analyseDataOperateService);
+                    analyseDataOperateService, taskCode);
             ThreadPoolUtil.PATROL_POOL.addThread(robotWarnThread);
 
             boolean flag = ArrayUtils.contains(new String[]{"3", "4", "9"}, taskAlarm.getAlarmType());
@@ -119,6 +119,7 @@ public class PatrolResultHandler {
                 }
                 log.info("taskCode==={},taskId===={}", taskCode, taskId);
                 infoMap.put("taskId", taskId);
+                infoMap.put("taskCode", taskCode);
 
                 // 一键顺控文件
                 if (StringUtils.equals("1001", robotPatrolTaskResult.getRecognitionType())) {

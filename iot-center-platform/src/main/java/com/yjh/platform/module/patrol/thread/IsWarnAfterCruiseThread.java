@@ -65,7 +65,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             String robotCode = threadMap.get("robotCode");
 
             // taskId是巡视主机的id,robotTaskId是机器人上报的id
-            String robotTaskId = uPatrolTaskService.selectTaskCodeByTaskId(taskId);
+            String robotTaskId = threadMap.get("taskCode");;
             log.info("robotTaskId==={}", robotTaskId);
 
             UPatrolTask uPatrolTaskTemp = uPatrolTaskService.selectTaskByTaskCode(robotTaskId);
@@ -152,7 +152,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             log.info("warnInfo==={}", JSON.toJSONString(warnInfo));
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
 
-            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
 
             StaticContextAccessor.getBean(PatrolResultHandler.class).pushAlarmInfo(warnInfo.getWarnName(), warnInfo.getWarnContent());
 

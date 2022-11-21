@@ -13,6 +13,7 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TaskSimpleInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,10 +70,13 @@ public class PatrolTimeoutScheduled {
         for (TaskSimpleInfo task : runningList) {
             String taskId = task.getTaskId();
             String key = PATROL_SUMMARY_PREFIX + taskId;
-            String lastDate = hashOperations.get(key, "lastCruiseTime");
-            String taskStart = hashOperations.get(key, "taskStart");
+            Map<String, String> taskMap = hashOperations.entries(key);
+            String lastDate = taskMap.get("lastCruiseTime");
+            String taskStart = taskMap.get("taskStart");
+            int taskState = NumberUtils.toInt(taskMap.get("taskState"), TASK_STATE_EXECUTING);
             Date lastTime = DateTimeUtil.parse(lastDate, taskStart);
-            if (currentDate.getTime() - lastTime.getTime() >= timeOut * 60 * 1000L) {
+            if (currentDate.getTime() - lastTime.getTime() >= timeOut * 60 * 1000L && !ArrayUtils.contains(
+                new int[] {TASK_STATE_FINISHED, TASK_STATE_PAUSE, TASK_STATE_INTERRUPT, TASK_STATE_ABNORMAL}, taskState)) {
                 // 判断超时
                 hashOperations.put(key, "taskState", String.valueOf(TASK_STATE_ABNORMAL));
 

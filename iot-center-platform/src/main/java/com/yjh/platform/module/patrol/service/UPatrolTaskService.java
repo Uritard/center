@@ -398,7 +398,7 @@ public class UPatrolTaskService {
         mapForAbnormal.put("overDay", DateTimeUtil.format(taskAre));
         mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_EXECUTING));
 
-        String strForCountAbnormal = "countForAbnormal:" + task.getTaskId();
+        String strForCountAbnormal = PATROL_SUMMARY_PREFIX + task.getTaskId();
         redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
     }
     @Transactional(rollbackFor = Exception.class)
@@ -944,7 +944,7 @@ public class UPatrolTaskService {
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 robotTaskStates(robotTaskStatesMap);
             }
-            updateTaskStateForRedis(taskId, "241");
+            updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_PAUSE));
             Map<String, String> jasonMapOnFinished = new HashMap<>();
             jasonMapOnFinished.put("type", "taskChange");
             jasonMapOnFinished.put("taskId", taskId);
@@ -1035,7 +1035,7 @@ public class UPatrolTaskService {
         robotTaskStatesMap.put("robotCodeList", robotCodeList);
         robotTaskStates(robotTaskStatesMap);
 
-        updateTaskStateForRedis(taskId, "242");
+        updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_INTERRUPT));
         try {
 
             Set<String> tasKeys = redisTemplate.keys(PATROL_TASK_PREFIX + taskId + ":*");
@@ -1046,6 +1046,9 @@ public class UPatrolTaskService {
 
             log.info("tasKeys size: {}", tasKeys.size());
 
+            // 暂停15秒等待未接收数据完成接收
+            Thread.sleep(15000);
+
             List<Map<String, String>> taskInfoList = redisTemplate.executePipelined((RedisCallback<Map<String, String>>) connection -> {
                 tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
                 return null;
@@ -1053,8 +1056,6 @@ public class UPatrolTaskService {
 
             log.info("taskInfoList size: {}", taskInfoList.size());
 
-            // 暂停15秒等待未接收数据完成接收
-            Thread.sleep(15000);
             if(taskInfoList.size() != 0) {
                 List<Map<String, String>> skipPointList = new ArrayList<>();
                 for (Map<String, String> taskInfo : taskInfoList) {
@@ -1256,12 +1257,12 @@ public class UPatrolTaskService {
     public void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList) {
         patrolTaskResultHandler(cruiseResultList, CRUISE_RESULT_ABNORMAL);
     }
-    public void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList, int cruiseResult) {
-        int size = cruiseResultList.size();
+    private void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList, int cruiseResult) {
         if(CollectionUtils.isEmpty(cruiseResultList)){
             log.error("cruiseResultList is empty.");
             return;
         }
+        int size = cruiseResultList.size();
         String taskId = cruiseResultList.get(0).get("taskId");
         int abnormalCounts = patrolTaskResult(taskId, cruiseResult, size);
 
@@ -1290,12 +1291,14 @@ public class UPatrolTaskService {
         int abnormalCounts;
         int normalCounts;
         int allCounts;
+        boolean endOnece = false;
         synchronized (LOCK_FLAG) {
             String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
             Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
             abnormalCounts = NumberUtils.toInt(resultCountsMap.get("abnormal"));
             normalCounts = NumberUtils.toInt(resultCountsMap.get("normal"));
             allCounts = NumberUtils.toInt(resultCountsMap.get("all"));
+            boolean ended = Boolean.parseBoolean(resultCountsMap.getOrDefault("ended", "false"));
             log.info("From redis---task:{}, all:{}, abnormalCounts:{}, normalCounts:{}", taskId, allCounts, abnormalCounts, normalCounts);
 
             if (CRUISE_RESULT_NORMAL == cruiseResult) {
@@ -1312,12 +1315,18 @@ public class UPatrolTaskService {
             resultCountsMap.put("normal", String.valueOf(normalCounts));
             resultCountsMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
             resultCountsMap.put("progress", progress);
+
+            if (normalCounts + abnormalCounts >= allCounts && !ended) {
+                resultCountsMap.put("ended", "true");
+                endOnece = true;
+            }
+
             redisTemplate.opsForHash().putAll(strForCountAbnormal, resultCountsMap);
             redisTemplate.expire(strForCountAbnormal, 7, TimeUnit.DAYS);
         }
 
         // 判断任务是否结束
-        if (normalCounts + abnormalCounts == allCounts) {
+        if (endOnece) {
             return abnormalCounts;
         }
         return -1;

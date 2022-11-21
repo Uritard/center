@@ -81,8 +81,7 @@ public class LocalCruiseExecutThread<T> implements Runnable {
         String taskId = inspectionMap.get("taskId");
         long insId = MapUtils.getLongValue(inspectionMap, "instanceId");
 
-        String key = UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId;
-        String taskStatus = uPatrolTaskService.taskStatus(key);
+        String taskStatus = uPatrolTaskService.taskStatus(taskId);
         if (NumberUtils.toInt(taskStatus, CruiseConstant.TASK_STATE_EXECUTING) != CruiseConstant.TASK_STATE_EXECUTING) {
             log.warn("任务非进行时，taskId: {}, instanceId: {}， taskStatus: {}", taskId, insId, taskStatus);
             // 任务非进行时，停止执行

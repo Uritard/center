@@ -385,10 +385,9 @@
         SELECT
             a.task_id
         FROM
-            u_patrol_task a,u_patrol_result b
-        WHERE a.task_id = b.task_id
-          and a.task_code = #{robotTaskId, jdbcType=VARCHAR}
-        ORDER BY b.execute_time desc
+            u_patrol_result a
+        WHERE a.task_code = #{robotTaskId, jdbcType=VARCHAR}
+        ORDER BY a.create_time desc
             LIMIT 1
     </select>
 

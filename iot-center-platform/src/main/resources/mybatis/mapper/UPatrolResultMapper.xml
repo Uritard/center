@@ -403,7 +403,7 @@
         <if test="isCheck != null and isCheck == 1">and a.check_user is null</if>
         <if test="isCheck != null and isCheck == 2">and a.check_user is not null</if>
 
-        and a.task_state != 239 and a.task_state != 241
+        and a.task_state != 239 and a.task_state != 241 and a.task_state != 238
         GROUP BY task_id
         order by a.execute_time desc
     </select>
