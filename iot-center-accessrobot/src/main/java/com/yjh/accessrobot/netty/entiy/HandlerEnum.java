@@ -23,6 +23,8 @@ public enum HandlerEnum {
     ROBOT_PATROL_ROUTE("4","robotPatrolRoute"),
     // 机器人异常告警数据
     ROBOT_WARN("5","robotWarn"),
+    //联动信号消息
+    LINKAGE_SIGNAL("6","linkageSignal"),
     // 微气象数据
     MICRO_WEATHER_DATA("21","microWeatherData"),
     // 任务状态数据
