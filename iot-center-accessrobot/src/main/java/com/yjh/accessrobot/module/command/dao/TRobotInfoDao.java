@@ -1,6 +1,5 @@
 package com.yjh.accessrobot.module.command.dao;
 
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.module.command.entity.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -404,4 +403,7 @@ public interface TRobotInfoDao {
     List<TRobotInfo> selectByEdgeCode(@Param("edgeCode") String edgeCode);
 
     UPatrolTask selectTaskByTaskCode(@Param(value = "taskCode") String taskCode);
+
+    int updateByPrimaryKey(TRobotInfo record);
+
 }
