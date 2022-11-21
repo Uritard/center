@@ -67,4 +67,9 @@ public class AreaInfoRegionCode implements Serializable {
 
     private String voltageLevelName;
 
+    /**
+     * 边缘节点在线状态
+     */
+    private String edgeStatus;
+
 }

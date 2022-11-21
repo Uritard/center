@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TRobotInfo">
         <id property="robotId" column="robot_id" jdbcType="BIGINT"/>
         <result property="robotCode" column="robot_code" jdbcType="VARCHAR"/>
-        <result property="robotNum" column="robot_num" jdbcType="INTEGER"/>
+        <result property="robotNum" column="robot_num" jdbcType="VARCHAR"/>
         <result property="robotName" column="robot_name" jdbcType="VARCHAR"/>
         <result property="nestName" column="nest_name" jdbcType="VARCHAR"/>
         <result property="nestCode" column="nest_code" jdbcType="VARCHAR"/>
