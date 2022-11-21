@@ -549,7 +549,7 @@ public class RobotService {
 //                            dealMaintenanceFilePath(filePathMap,v.toString(),edgeCode);
 //                            break;
                         case "source_file_path":
-                            dealSourceFile(filePath, edgeCode);
+                            dealSourceFile(filePath, nodeCode);
                             break;
                         default:
                             log.warn("模型解析未定义，{}: {}", k, filePath);
