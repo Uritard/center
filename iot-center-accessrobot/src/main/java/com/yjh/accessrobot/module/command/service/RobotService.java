@@ -353,12 +353,11 @@ public class RobotService {
         // 如果边缘节点 code 不为空，则表示底端上传数据的是边缘节点，不是机器人或无人机
         boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
         if (isEdge) {
-            Long regionId = NumberUtils.toLong((String)redisTemplate.opsForHash().get("region:" + robotCode, "regionId"));
             TStdRegion tStdRegion = new TStdRegion();
             tStdRegion.setRegionId(stdRegionList.get(0).getRegionId());
             tStdRegion.setEdgeStatus(robotStatus);
             int res = tStdRegionDao.update(tStdRegion);
-            log.info("edgeCode为==={},regionId为==={}的节点状态是==={},修改结果==={}", robotCode, regionId, tStdRegion.getEdgeStatus(), res);
+            log.info("edgeCode为==={},regionId为==={}的节点状态是==={},修改结果==={}", robotCode, tStdRegion.getRegionId(), tStdRegion.getEdgeStatus(), res);
             //边缘节点下线  机器人所有状态全部下线
             if ("离线".equals(robotStatus)){
                 tStdRegionDao.updateRobotStatus(robotCode);
