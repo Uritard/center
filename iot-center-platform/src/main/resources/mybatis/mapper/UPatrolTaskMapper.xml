@@ -634,7 +634,7 @@
         <if test="colName != null "> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
     </select>
 
-    <select id="selectRobotInfoByCode" resultType="com.yjh.platform.module.patrol.entity.TRobotInfo">
+    <select id="selectRobotInfoByCode" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         select
             a.robot_id,
             a.robot_code,

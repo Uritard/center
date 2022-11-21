@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -150,6 +151,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setOutRange(Objects.nonNull(map.get("outRange"))? String.valueOf(map.get("outRange")) : null);
             log.info("warnInfo==={}", JSON.toJSONString(warnInfo));
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
+
+            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
 
             StaticContextAccessor.getBean(PatrolResultHandler.class).pushAlarmInfo(warnInfo.getWarnName(), warnInfo.getWarnContent());
 

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -76,6 +77,8 @@ public class RobotInspectionWarnThread implements Runnable{
 
             TWarnInfo warnInfo = getWarnInfo(tStdDevicemete, taskId, instanceId, robotCode);
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
+
+            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
 
             getWarnMap(taskId, warnInfo);
 

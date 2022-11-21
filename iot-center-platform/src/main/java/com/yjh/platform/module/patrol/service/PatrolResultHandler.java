@@ -55,8 +55,8 @@ public class PatrolResultHandler {
      *
      * @param alarmList 机器人/无人机/边缘节点测点告警
      */
-    public void robotPatrolTaskAlarm(List<RobotPatrolTaskAlarm> alarmList){
-        if (alarmList.isEmpty()){
+    public void robotPatrolTaskAlarm(List<RobotPatrolTaskAlarm> alarmList) {
+        if (alarmList.isEmpty()) {
             return;
         }
         log.info("alarmList=={}", alarmList);
@@ -83,14 +83,14 @@ public class PatrolResultHandler {
 
             RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(taskAlarm, redisTemplate,
                     analyseDataOperateService);
-            TaskExecutePool.getInstance().execute(robotWarnThread);
+            ThreadPoolUtil.PATROL_POOL.addThread(robotWarnThread);
 
             boolean flag = ArrayUtils.contains(new String[]{"3", "4", "9"}, taskAlarm.getAlarmType());
             if (flag) {
                 //非同源告警处理
                 NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm,
                         redisTemplate, 0);
-                TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
+                ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
             }
         }
         }catch (Exception e){
@@ -104,7 +104,7 @@ public class PatrolResultHandler {
      * @param resultList 机器人/无人机/边缘节点巡视结果
      */
     public void robotPatrolTaskResult(List<RobotPatrolTaskResult> resultList) {
-        if (resultList.isEmpty()){
+        if (resultList.isEmpty()) {
             return;
         }
         log.info("resultList=={}", resultList);
@@ -250,7 +250,7 @@ public class PatrolResultHandler {
                 default:
                     break;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("机器人/无人机文件处理异常：", e);
         }
         return isAlarmMap;
@@ -259,16 +259,16 @@ public class PatrolResultHandler {
     /**
      * 处理算法分析后的巡视结果
      *
-     * @param  resultList 算法分析返回的巡视结果
+     * @param resultList 算法分析返回的巡视结果
      */
-    public void analysePatrolTaskResult(List<AnalysePatrolTaskResult> resultList){
-        if (resultList.isEmpty()){
+    public void analysePatrolTaskResult(List<AnalysePatrolTaskResult> resultList) {
+        if (resultList.isEmpty()) {
             return;
         }
         log.info("resultList=={}", resultList);
 
         try {
-            for (AnalysePatrolTaskResult patrolTaskResult: resultList) {
+            for (AnalysePatrolTaskResult patrolTaskResult : resultList) {
                 String taskId = patrolTaskResult.getTaskId();
                 String instanceId = patrolTaskResult.getInstanceId();
                 String analyseType = patrolTaskResult.getAnalyseType();
@@ -283,7 +283,7 @@ public class PatrolResultHandler {
                 log.info("Read from redis cruiseResultMap is：{}", cruiseResultMap);
 
                 String resultImage = cruiseResultMap.get("picpath");
-                if(StringUtils.isNotEmpty(analyseResultImg)) {
+                if (StringUtils.isNotEmpty(analyseResultImg)) {
                     resultImage = analyseResultImg;
                 }
 
@@ -294,13 +294,13 @@ public class PatrolResultHandler {
                 log.info("tStdDeviceMete==={}", JSON.toJSONString(tStdDevicemete));
 
                 String msgId = String.valueOf(UUID.randomUUID());
-                if (StringUtils.equals("11", analyseType)){
+                if (StringUtils.equals("11", analyseType)) {
                     log.info("taskId is {} instanceId is {}:distinguish", taskId, instanceId);
                     distinguishHandler(msgId, analyseResultImg, resultValue, cruiseResultMap);
-                }else if (StringUtils.equals("398", analyseType)){
+                } else if (StringUtils.equals("398", analyseType)) {
                     log.info("taskId is {} instanceId is {}:defect", taskId, instanceId);
                     defectHandler(msgId, analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
-                }else {
+                } else {
                     log.info("taskId is {} instanceId is {}:recognition", taskId, instanceId);
                     recognitionHandler(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
                 }
@@ -323,7 +323,7 @@ public class PatrolResultHandler {
                 // 缺陷和判别上报算法管理平台
                 processResultToUpSystem.defectToAlgorithmM(taskId, instanceId, msgId);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("处理算法分析后的巡视结果异常：", e);
         }
     }
@@ -332,10 +332,10 @@ public class PatrolResultHandler {
      * 识别结果处理
      *
      * @param analyseResultImg 巡视结果图
-     * @param resultValue 巡视结果值
-     * @param cruiseResultMap redis中巡视点结果信息
-     * @param tStdDevicemete 测点信息
-     * @param firDocPath 红外fir文件
+     * @param resultValue      巡视结果值
+     * @param cruiseResultMap  redis中巡视点结果信息
+     * @param tStdDevicemete   测点信息
+     * @return String
      */
     private void recognitionHandler(String analyseResultImg, String resultValue,
                                       Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete,
@@ -351,18 +351,18 @@ public class PatrolResultHandler {
                 cruiseResultMap.put("picpath", resultImage);
             }
 
-            if (StringUtils.equals("数据错误", resultValue)){
+            if (StringUtils.equals("数据错误", resultValue)) {
                 cruiseResultMap.put("resultNum", resultValue + ",缺少标定文件");
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-            }else if (StringUtils.equals("未获得读数", resultValue)){
+            } else if (StringUtils.equals("未获得读数", resultValue)) {
                 cruiseResultMap.put("resultNum", resultValue + ",识别失败");
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-            }else {
+            } else {
                 normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("识别结果处理异常：", e);
         }
     }
@@ -371,12 +371,13 @@ public class PatrolResultHandler {
         TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResultMap.get("instanceId")));
         return normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
     }
+
     /**
      * 正常识别结果处理
      *
-     * @param resultValue 算法分析返回的巡视结果
+     * @param resultValue     算法分析返回的巡视结果
      * @param cruiseResultMap redis中巡视点结果信息
-     * @param tStdDevicemete 测点信息
+     * @param tStdDevicemete  测点信息
      * @return Map<String, String>
      */
     private Map<String, String> normalRecognitionHandler(String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String firDocPath) {
@@ -586,11 +587,11 @@ public class PatrolResultHandler {
     /**
      * 缺陷结果处理
      *
-     * @param msgID 随机数
+     * @param msgID            随机数
      * @param analyseResultImg 巡视结果图
-     * @param resultValueItem 巡视结果值
-     * @param cruiseResultMap redis中巡视点结果信息
-     * @param tStdDevicemete 测点信息
+     * @param resultValueItem  巡视结果值
+     * @param cruiseResultMap  redis中巡视点结果信息
+     * @param tStdDevicemete   测点信息
      */
     private void defectHandler(String msgID, String analyseResultImg, String resultValueItem, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete)  {
         String resultImage;
@@ -622,7 +623,7 @@ public class PatrolResultHandler {
                     log.info("Only one defect is generated！！！");
                     // 缺陷信息存redis
                     String redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
-                    Map<String, String> defectMap = getDefectMap(analyseResultImg, resultValueItem, cruiseResultMap, tStdDevicemete, resultValue);
+                    Map<String, String> defectMap = getDefectMap(resultImage, resultValueItem, cruiseResultMap, tStdDevicemete, resultValue);
                     log.info("defectMap=={}", JSON.toJSONString(defectMap));
                     redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
                     redisTemplate.opsForHash().putAll("defect:" + msgID + ":" + redisKeyTemp, defectMap);
@@ -646,7 +647,7 @@ public class PatrolResultHandler {
                     for (String res : resultArr) {
                         // 缺陷信息存redis
                         String redisKeyTemp = String.valueOf(UUID.randomUUID()).replace("-", "");
-                        Map<String, String> defectMap = getDefectMap(analyseResultImg, resultValueItem, cruiseResultMap, tStdDevicemete, res);
+                        Map<String, String> defectMap = getDefectMap(resultImage, resultValueItem, cruiseResultMap, tStdDevicemete, res);
                         log.info("defectMap=={}", JSON.toJSONString(defectMap));
                         redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
                         redisTemplate.opsForHash().putAll("defect:" + msgID + ":" + redisKeyTemp, defectMap);
@@ -708,11 +709,11 @@ public class PatrolResultHandler {
      * 若是,则将配置的告警信息组成告警弹框所需内容推给前端
      *
      * @param tStdDevicemete 测点信息
-     * @param infoMap 告警信息
+     * @param infoMap        告警信息
      */
     public void alarmPopUp(TStdDeviceMete tStdDevicemete, Map<String, String> infoMap) {
         // 弹框PlanB-推送
-        Map<String,String> currentWarnInfo = new HashMap<>();
+        Map<String, String> currentWarnInfo = new HashMap<>();
         try {
             String warnId = String.valueOf(analyseDataOperateService.selectCurrentWarn());
             currentWarnInfo.put("warnId", warnId);
@@ -779,15 +780,16 @@ public class PatrolResultHandler {
     /**
      * 缺陷map信息组装
      *
-     * @param analyseResultImg 缺陷结果图片
-     * @param resultValue 缺陷结果
-     * @param cruiseResultMap redis中巡视点结果信息
-     * @param tStdDevicemete 测点信息
-     * @return Map<String,String>
+     * @param resultImage 缺陷结果图片
+     * @param resultValue      缺陷结果
+     * @param cruiseResultMap  redis中巡视点结果信息
+     * @param tStdDevicemete   测点信息
+     * @return Map<String, String>
      */
-    private Map<String, String> getDefectMap(String analyseResultImg, String resultValueItem, Map<String, String> cruiseResultMap,
-                                             TStdDeviceMete tStdDevicemete, String resultValue) {
-        log.info("analyseResultImg:{},resultValue:{}", analyseResultImg, resultValue);
+    private Map<String, String> getDefectMap(String resultImage, String resultValueItem,
+                                             Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete,
+                                             String resultValue) {
+        log.info("resultImage:{},resultValue:{}", resultImage, resultValue);
         Map<String, String> defectMap = new HashMap<>(16);
         try {
             defectMap.put("defectType", analyseDataOperateService.selectDictCode("defect_model", resultValue));
@@ -798,7 +800,7 @@ public class PatrolResultHandler {
             defectMap.put("customId", tStdDevicemete.getCustomId());
             defectMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
             defectMap.put("confMode", analyseDataOperateService.selectDictCode("conf_mode", "未核查"));
-            defectMap.put("imagePath", analyseResultImg);
+            defectMap.put("imagePath", resultImage);
             defectMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
             defectMap.put("defectTime", DateTimeUtil.format(new Date()));
             defectMap.put("value", resultValueItem);
@@ -811,10 +813,10 @@ public class PatrolResultHandler {
     /**
      * 判别结果处理
      *
-     * @param msgID 随机数
+     * @param msgID            随机数
      * @param analyseResultImg 巡视结构图
-     * @param resultValue 巡视结果值
-     * @param cruiseResultMap redis中巡视点结果信息
+     * @param resultValue      巡视结果值
+     * @param cruiseResultMap  redis中巡视点结果信息
      */
     private void distinguishHandler(String msgID, String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap) {
         String resultImage;
