@@ -160,7 +160,7 @@
         ,db_value,f_value,mp_value
         ,file_path,pms_id)
         values
-        <foreach collection="list"  item="voiceConfig" separator=",">
+        <foreach collection="collection"  item="voiceConfig" separator=",">
         (#{voiceConfig.ftpUrl,jdbcType=VARCHAR},#{voiceConfig.stationId,jdbcType=VARCHAR}
                ,#{voiceConfig.owner,jdbcType=VARCHAR},#{voiceConfig.ownerCode,jdbcType=VARCHAR},#{voiceConfig.port,jdbcType=INTEGER}
                ,#{voiceConfig.channelNum,jdbcType=VARCHAR},#{voiceConfig.absoluPath,jdbcType=VARCHAR},#{voiceConfig.relativePath,jdbcType=VARCHAR}
