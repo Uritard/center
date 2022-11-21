@@ -70,21 +70,17 @@
 
     <update id="update" parameterType="com.yjh.platform.module.patrol.entity.UPatrolTask">
         update u_patrol_task a <set>
-        <if test="taskId != null and taskId != ''">a.task_id = #{taskId, jdbcType=VARCHAR},</if>
         <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
         <if test="taskName != null and taskName != ''">a.task_name = #{taskName, jdbcType=VARCHAR},</if>
-        <if test="planId != null and planId != ''">a.plan_id = #{planId, jdbcType=BIGINT},</if>
+        <if test="planId != null">a.plan_id = #{planId, jdbcType=BIGINT},</if>
         <if test="areaId != null and areaId != ''">a.area_id = #{areaId, jdbcType=VARCHAR},</if>
-        <if test="taskType != null and taskType != ''">a.task_type = #{taskType, jdbcType=INTEGER},</if>
-        <if test="executeType != null and executeType != ''">a.execute_type = #{executeType, jdbcType=INTEGER},</if>
-        <if test="robotId != null and robotId != ''">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
+        <if test="taskType != null">a.task_type = #{taskType, jdbcType=INTEGER},</if>
+        <if test="executeType != null">a.execute_type = #{executeType, jdbcType=INTEGER},</if>
+        <if test="robotId != null">a.robot_id = #{robotId, jdbcType=BIGINT},</if>
         <if test="dateType != null and dateType != ''">a.date_type = #{dateType, jdbcType=VARCHAR},</if>
-        <if test="taskSource != null and taskSource != ''">a.task_source = #{taskSource, jdbcType=INTEGER},</if>
-        <if test="taskLevel != null and taskLevel != ''">a.task_level = #{taskLevel, jdbcType=INTEGER},</if>
-        <if test="startTime != null and startTime != ''">a.start_time = #{startTime, jdbcType=TIMESTAMP},</if>
-        <if test="createTime != null and createTime != ''">a.create_time = #{createTime, jdbcType=TIMESTAMP},</if>
-        <if test="endTime != null and endTime != ''">a.end_time = #{endTime, jdbcType=TIMESTAMP},</if>
-        <if test="createUserId != null and createUserId != ''">a.create_user_id = #{createUserId, jdbcType=BIGINT},</if>
+        <if test="taskSource != null">a.task_source = #{taskSource, jdbcType=INTEGER},</if>
+        <if test="taskLevel != null">a.task_level = #{taskLevel, jdbcType=INTEGER},</if>
+        <if test="createUserId != null">a.create_user_id = #{createUserId, jdbcType=BIGINT},</if>
     </set>
             where a.task_id = #{taskId, jdbcType=VARCHAR}
     </update>
