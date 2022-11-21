@@ -457,7 +457,6 @@
     <select id="selectAllDrone" resultType="com.yjh.accesstcp.module.device.entity.RobotModel">
         select a.robot_name as patroldevice_name,
         a.robot_code as patroldevice_code,
-        a.robot_code as robot_num,
         b.dict_note as device_model,
         c.dict_note as manufacturer,
         a.building_user as use_unit,
