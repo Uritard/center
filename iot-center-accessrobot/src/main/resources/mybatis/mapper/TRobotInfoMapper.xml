@@ -94,7 +94,7 @@
         ,channel_num_inferad,last_online_time,duration
         ,off_line_count,edge_code,origin_id
         )
-        values (#{robotCode,jdbcType=VARCHAR},#{robotNum,jdbcType=INTEGER}
+        values (#{robotCode,jdbcType=VARCHAR},#{robotNum,jdbcType=VARCHAR}
                ,#{robotName,jdbcType=VARCHAR},#{nestName,jdbcType=VARCHAR},#{nestCode,jdbcType=VARCHAR}
                ,#{robotStatus,jdbcType=VARCHAR},#{robotType,jdbcType=INTEGER},#{droneType,jdbcType=INTEGER}
                ,#{robotIp,jdbcType=VARCHAR},#{robotPort,jdbcType=INTEGER},#{lightIp,jdbcType=VARCHAR}
@@ -253,7 +253,7 @@
         ,off_line_count,edge_code,origin_id
         )values
         <foreach collection="list" item="TRobotInfo" separator=",">
-             (#{TRobotInfo.robotCode,jdbcType=VARCHAR},#{TRobotInfo.robotNum,jdbcType=INTEGER}
+             (#{TRobotInfo.robotCode,jdbcType=VARCHAR},#{TRobotInfo.robotNum,jdbcType=VARCHAR}
             ,#{TRobotInfo.robotName,jdbcType=VARCHAR},#{TRobotInfo.nestName,jdbcType=VARCHAR},#{TRobotInfo.nestCode,jdbcType=VARCHAR}
             ,#{TRobotInfo.robotStatus,jdbcType=VARCHAR},#{TRobotInfo.robotType,jdbcType=INTEGER},#{TRobotInfo.droneType,jdbcType=INTEGER}
             ,#{TRobotInfo.robotIp,jdbcType=VARCHAR},#{TRobotInfo.robotPort,jdbcType=INTEGER},#{TRobotInfo.lightIp,jdbcType=VARCHAR}
