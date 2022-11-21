@@ -123,10 +123,11 @@ public class SysLogsController {
 
     @ApiOperation(value = "初始化四遥信号量信息")
     @RequestMapping(value = "/SYCreate", method = RequestMethod.GET)
-    public Result sendFile(@Param(value = "filePath") String filePath){
+    public Result sendFile(@RequestParam(value = "filePath") String filePath,
+                           @RequestParam(value = "encode" ,defaultValue = "UTF-8") String encode){
         Result result = new Result();
         try {
-            loadDeviceInfo(filePath);
+            loadDeviceInfo(filePath,encode);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);
@@ -134,13 +135,13 @@ public class SysLogsController {
         return result;
     }
 
-    public void loadDeviceInfo(String filePath)throws Exception {
+    public void loadDeviceInfo(String filePath,String encode)throws Exception {
         //读取联动设备的信息
         log.info("设备文件路径：  "+filePath);
         BufferedReader br = null;
         InputStreamReader in = null;
         try  {
-            in = new InputStreamReader(new FileInputStream(new File(filePath)), "UTF-8");
+            in = new InputStreamReader(new FileInputStream(new File(filePath)), encode);
             br = new BufferedReader(in);
             String line;
             String[] strArray = null;
