@@ -40,13 +40,13 @@
         ,origin_region_id,station_id,station_name
         ,state,edge_status,region_path
         ,longitude,latitude,voltage_level
-        ,remark,create_time)
+        ,remark)
         values (#{regionName,jdbcType=VARCHAR},#{sort,jdbcType=INTEGER}
                ,#{upRegionId,jdbcType=BIGINT},#{upRegionIds,jdbcType=VARCHAR},#{regionCode,jdbcType=VARCHAR}
                ,#{originRegionId,jdbcType=VARCHAR},#{stationId,jdbcType=VARCHAR},#{stationName,jdbcType=VARCHAR}
                ,#{state,jdbcType=INTEGER},#{edgeStatus,jdbcType=VARCHAR},#{regionPath,jdbcType=VARCHAR}
                ,#{longitude,jdbcType=VARCHAR},#{latitude,jdbcType=VARCHAR},#{voltageLevel,jdbcType=VARCHAR}
-               ,#{remark,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP})
+               ,#{remark,jdbcType=VARCHAR})
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
