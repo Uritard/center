@@ -7,10 +7,7 @@ import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.entity.*;
-import com.yjh.platform.module.patrol.thread.InspectionResultThread;
-import com.yjh.platform.module.patrol.thread.IsWarnAfterCruiseThread;
-import com.yjh.platform.module.patrol.thread.NonhomologousWarnThread;
-import com.yjh.platform.module.patrol.thread.RobotInspectionWarnThread;
+import com.yjh.platform.module.patrol.thread.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.threadpool.TaskExecutePool;
 import org.apache.commons.collections4.CollectionUtils;
@@ -54,9 +51,9 @@ public class PatrolResultHandler {
     }
 
     /**
-     * 处理机器人/无人机测点告警
+     * 处理机器人/无人机/边缘节点测点告警
      *
-     * @param alarmList 机器人/无人机测点告警
+     * @param alarmList 机器人/无人机/边缘节点测点告警
      */
     public void robotPatrolTaskAlarm(List<RobotPatrolTaskAlarm> alarmList){
         if (alarmList.isEmpty()){
@@ -64,36 +61,47 @@ public class PatrolResultHandler {
         }
         log.info("alarmList=={}", alarmList);
         try {
-            for (RobotPatrolTaskAlarm taskAlarm : alarmList) {
-                // 通过上报的任务id查询巡视主机上的任务id
-                String taskCode = taskAlarm.getTaskCode();
-                String taskId = tRobotInspectionDao.selectRealTaskId(taskCode);
-                if (StringUtils.isEmpty(taskId)) {
-                    taskId = taskCode;
-                    log.info("taskId is empty, use taskCode as taskId");
-                }
-                log.info("taskCode==={},taskId===={}", taskCode, taskId);
-                taskAlarm.setTaskCode(taskId);
-
-                RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(taskAlarm, redisTemplate, analyseDataOperateService);
-                TaskExecutePool.getInstance().execute(robotWarnThread);
-
-                boolean flag = ArrayUtils.contains(new String[]{"3", "4", "9"}, taskAlarm.getAlarmType());
-                if (Boolean.TRUE.equals(flag)) {
-                    //非同源告警处理
-                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 0);
-                    TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
-                }
+        for (RobotPatrolTaskAlarm taskAlarm : alarmList) {
+            // 通过上报的任务id查询巡视主机上的任务id
+            String taskCode = taskAlarm.getTaskCode();
+            String edgeCode = taskAlarm.getRobotCode();
+            String originId = taskAlarm.getDeviceId();
+            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
+            ));
+            String deviceId = originId;
+            // 1的情况不用考虑，2的情况需要查t_std_region，有就是下级传的；t_robot_info有，就是上级
+            if ("2".equals(sysLevel) && tRobotInspectionDao.selectRobot(edgeCode) > 0 || "3".equals(sysLevel)) {
+                deviceId = tRobotInspectionDao.selectRealInstanceId(originId, edgeCode);
             }
+            taskAlarm.setDeviceId(deviceId);
+            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode);
+            if (StringUtils.isEmpty(taskId)) {
+                taskId = taskCode;
+                log.info("taskId is empty, use taskCode as taskId");
+            }
+            log.info("taskCode==={},taskId===={}", taskCode, taskId);
+
+            RobotInspectionWarnThread robotWarnThread = new RobotInspectionWarnThread(taskAlarm, redisTemplate,
+                    analyseDataOperateService);
+            TaskExecutePool.getInstance().execute(robotWarnThread);
+
+            boolean flag = ArrayUtils.contains(new String[]{"3", "4", "9"}, taskAlarm.getAlarmType());
+            if (flag) {
+                //非同源告警处理
+                NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm,
+                        redisTemplate, 0);
+                TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
+            }
+        }
         }catch (Exception e){
-            log.error("处理机器人/无人机测点告警异常:", e);
+            log.error("处理机器人/无人机/边缘节点测点告警异常:", e);
         }
     }
 
     /**
-     * 处理机器人/无人机巡视结果
+     * 处理机器人/无人机/边缘节点巡视结果
      *
-     * @param resultList 机器人/无人机巡视结果
+     * @param resultList 机器人/无人机/边缘节点巡视结果
      */
     public void robotPatrolTaskResult(List<RobotPatrolTaskResult> resultList) {
         if (resultList.isEmpty()){
@@ -111,39 +119,60 @@ public class PatrolResultHandler {
                     taskId = taskCode;
                     log.info("taskId is empty, use taskCode as taskId");
                 }
-                log.info("report taskCode==={},patrol taskId===={}", taskCode, taskId);
+                log.info("taskCode==={},taskId===={}", taskCode, taskId);
                 infoMap.put("taskId", taskId);
+
+                // 一键顺控文件
+                if (StringUtils.equals("1001", robotPatrolTaskResult.getRecognitionType())) {
+                    SequenceThread sequenceThread = new SequenceThread(redisTemplate, taskCode, robotPatrolTaskResult.getFilePath());
+                    ThreadPoolUtil.PATROL_POOL.addThread(sequenceThread);
+                    continue;
+                }
+
+                String originId = robotPatrolTaskResult.getDeviceId();
+                String edgeCode = robotPatrolTaskResult.getSendCode();
+                String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
+                ));
+                String deviceId = originId;
+                // 1的情况不用考虑，2的情况需要查t_std_region，有就是下级传的；t_robot_info有，就是上级
+                if ("2".equals(sysLevel) && tRobotInspectionDao.selectRobot(edgeCode) > 0 || "3".equals(sysLevel)) {
+                    deviceId = tRobotInspectionDao.selectRealInstanceId(originId, edgeCode);
+                }
+                robotPatrolTaskResult.setDeviceId(deviceId);
 
                 // 文件处理
                 Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap);
-                // 告警处理
-                alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
+                if (!"3".equals(sysLevel)) {
+                    // 告警处理
+                    alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
+                    // 非同源告警处理
+                    RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
+                    taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
+                    taskAlarm.setValue(robotPatrolTaskResult.getValue());
+                    taskAlarm.setDeviceId(deviceId);
+                    NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
+                    ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
+                }
                 // 巡视结果处理
-                InspectionResultThread cruiseResultDealThread = new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, true);
+                InspectionResultThread cruiseResultDealThread = new InspectionResultThread(robotPatrolTaskResult, infoMap
+                        , redisTemplate, true);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
-                // 非同源告警处理
-                RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
-                taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
-                taskAlarm.setValue(robotPatrolTaskResult.getValue());
-                taskAlarm.setDeviceId(robotPatrolTaskResult.getDeviceId());
-                NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
-                ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
             }
         }catch (Exception e){
-            log.error("处理机器人/无人机巡视结果异常:", e);
+            log.error("处理机器人/无人机/边缘节点巡视结果异常:", e);
         }
     }
 
     /**
      * 根据巡视结果判断是否生成告警
      *
-     * @param robotPatrolTaskResult 机器人/无人机巡视结果
+     * @param robotPatrolTaskResult 机器人/无人机/边缘节点巡视结果
      * @param taskId 任务id
      * @param isAlarmMap 告警信息map
      */
     private void alarmHandlerAfterCruise(RobotPatrolTaskResult robotPatrolTaskResult, String taskId, Map<String, String> isAlarmMap) {
         try {
-            isAlarmMap.put("robotCode", robotPatrolTaskResult.getRobotCode());
+            isAlarmMap.put("robotCode", robotPatrolTaskResult.getSendCode());
             isAlarmMap.put("taskCode", taskId);
             isAlarmMap.put("deviceId", robotPatrolTaskResult.getDeviceId());
             isAlarmMap.put("value", robotPatrolTaskResult.getValue());
@@ -155,7 +184,7 @@ public class PatrolResultHandler {
             IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate);
             ThreadPoolUtil.PATROL_POOL.addThread(isWarnAfterCruiseThread);
         }catch (Exception e){
-            log.error("机器人/无人机告警处理异常：", e);
+            log.error("机器人/无人机/边缘节点告警处理异常：", e);
         }
     }
 
@@ -308,7 +337,9 @@ public class PatrolResultHandler {
      * @param tStdDevicemete 测点信息
      * @param firDocPath 红外fir文件
      */
-    private void recognitionHandler(String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete, String firDocPath) {
+    private void recognitionHandler(String analyseResultImg, String resultValue,
+                                      Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete,
+                                      String firDocPath) {
         String resultImage;
         try {
             if(StringUtils.isNotEmpty(analyseResultImg)){

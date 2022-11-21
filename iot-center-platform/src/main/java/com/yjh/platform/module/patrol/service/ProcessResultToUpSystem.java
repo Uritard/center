@@ -103,7 +103,7 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
 
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-                String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationCode", "content"));
+                String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
                 String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
                     8) + "/" + taskId + typeAndPathName.get("fileNamePath") + instanceId + "_巡视主机编码_" + simpleDateFormat + ".jpg";
 
@@ -310,6 +310,10 @@ public class ProcessResultToUpSystem {
             imgPath = picPath.replaceAll(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")));
+        }else if (picPath.contains("ftpImg")){
+            imgPath = picPath.replaceAll(
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative","content")),
+                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute","content")));
         }else{
             // 原图
             imgPath = picPath.replaceAll(

@@ -40,19 +40,19 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
         // Deal with robot coordinates data
         String robotCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(robotCode)) {
-            log.error("机器人/无人机编码为空");
-            throw new RuntimeException("机器人/无人机编码为空");
+            log.error("下级唯一标识为空");
+            throw new RuntimeException("下级唯一标识为空");
         }
         if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
-            log.error("机器人/无人机未注册或未连接");
-            throw new RuntimeException("机器人/无人机未注册或未连接");
+            log.error("下级唯一标识未注册或未连接");
+            throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
-        // 给机器人响应
+        // 给下级响应
         String coordinateXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] coordinateProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, coordinateXmlString);
         RobotServerHandler.send(coordinateProtocol, robotCode);
-        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
+        log.info("巡视主机给下级{}响应了", robotCode);
 
         List<Map<String, String>> robotCoordinateList = new ArrayList<>();
         xmlBaseModel.getItems().forEach(res -> {

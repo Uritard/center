@@ -118,6 +118,12 @@ public interface TRobotInfoDao {
      */
     String selectStatusByRobotCode(@Param(value = "robotCode") String robotCode);
     /**
+     * 根据边缘节点编码查询在线状态
+     * @param edgeCode 边缘节点编码
+     * @return String
+     */
+    String selectStatusByEdgeCode(@Param(value = "edgeCode") String edgeCode);
+    /**
      * 判断任务是否为联动任务
      * @param unionId 联合任务id
      * @return Integer

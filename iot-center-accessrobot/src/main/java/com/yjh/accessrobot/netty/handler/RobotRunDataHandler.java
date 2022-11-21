@@ -34,31 +34,30 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
     private RedisTemplate redisTemplate;
     @Autowired
     private RobotService robotService;
-    @Value("${stationCode}")
-    private String stationCode;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到机器人运行数据了+++++++++++++++++");
         // Deal with robot operation data
         if(StringUtils.isBlank(xmlBaseModel.getCode())){
+            String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
             xmlBaseModel.setCode(stationCode);
         }
         String robotCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(robotCode)) {
-            log.error("机器人/无人机编码为空");
-            throw new RuntimeException("机器人/无人机编码为空");
+            log.error("下级唯一标识为空");
+            throw new RuntimeException("下级唯一标识为空");
         }
         if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
-            log.error("机器人/无人机未注册或未连接");
-            throw new RuntimeException("机器人/无人机未注册或未连接");
+            log.error("下级唯一标识未注册或未连接");
+            throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
-        // 给机器人响应
+        // 给下级响应
         String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
         RobotServerHandler.send( operationProtocol, robotCode);
-        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
+        log.info("巡视主机给下级{}响应了", robotCode);
 
         List<Map<String, String>> robotOperationList = new ArrayList<>();
         xmlBaseModel.getItems().forEach(res -> {

@@ -59,7 +59,7 @@ public class UPatrolTaskController {
         this.patrolResultHandler = patrolResultHandler;
     }
 
-    @ApiOperation(value = "机器人/无人机巡视结果")
+    @ApiOperation(value = "机器人/无人机/边缘节点巡视结果")
     @PostMapping(value = "/robotPatrolTaskResult")
     public Result robotPatrolTaskResult(@RequestBody List<RobotPatrolTaskResult> resultList) {
         Result result = new Result();
@@ -70,12 +70,12 @@ public class UPatrolTaskController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("接收并处理机器人/无人机巡视结果错误:", e);
+            log.error("接收并处理机器人/无人机/边缘节点巡视结果错误:", e);
         }
         return result;
     }
 
-    @ApiOperation(value = "机器人/无人机任务状态")
+    @ApiOperation(value = "机器人/无人机/边缘节点任务状态")
     @PostMapping(value = "/robotPatrolTaskStatus")
     public Result robotPatrolTaskStatus(@RequestBody List<RobotPatrolTaskStatus> statusList) {
         Result result = new Result();
@@ -86,12 +86,12 @@ public class UPatrolTaskController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("接收并处理机器人/无人机任务状态错误:", e);
+            log.error("接收并处理机器人/无人机/边缘节点任务状态错误:", e);
         }
         return result;
     }
 
-    @ApiOperation(value = "机器人/无人机测点告警")
+    @ApiOperation(value = "机器人/无人机/边缘节点测点告警")
     @PostMapping(value = "/robotPatrolTaskAlarm")
     public Result robotPatrolTaskAlarm(@RequestBody List<RobotPatrolTaskAlarm> alarmList) {
         Result result = new Result();
@@ -102,7 +102,7 @@ public class UPatrolTaskController {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
-            log.error("接收并处理机器人/无人机测点告警错误:", e);
+            log.error("接收并处理机器人/无人机/边缘节点测点告警错误:", e);
         }
         return result;
     }

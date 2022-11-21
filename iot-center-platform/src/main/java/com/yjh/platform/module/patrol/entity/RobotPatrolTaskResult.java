@@ -20,8 +20,8 @@ public class RobotPatrolTaskResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "所属机器人/无人机")
-    private String robotCode;
+    @ApiModelProperty(value = "下级唯一标识")
+    private String sendCode;
 
     @ApiModelProperty(value = "巡视设备名称")
     private String patrolDeviceName;

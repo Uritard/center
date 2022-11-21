@@ -1882,4 +1882,9 @@ public class UPatrolTaskService {
             });
         }
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String,Object>> selectForSequenceInfoByMeteId(String meteId) {
+        return uPatrolTaskDao.selectForSequenceInfoByMeteId(meteId);
+    }
 }
