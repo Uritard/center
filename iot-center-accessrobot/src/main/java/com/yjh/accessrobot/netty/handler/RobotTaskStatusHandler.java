@@ -63,7 +63,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         log.info("巡视主机给下级{}响应了", robotCode);
 
         // 任务状态数据上报上一级系统
-        robotService.upToCruise(xmlBaseModel);
+        // robotService.upToCruise(xmlBaseModel);
 
         // 处理数据
         List<RobotPatrolTaskStatus> statusList = new ArrayList<>();

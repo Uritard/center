@@ -139,6 +139,7 @@ public class UPatrolTaskService {
 
         setLevel(uPatrolTask, tCruiseTaskAdd);
         try {
+            uPatrolTask.setCreateTime(new Date());
             if (uPatrolTask.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
                 Date startTime = format.parse("2000-01-01 00:00:00");
                 Date endTime = null;
@@ -157,7 +158,6 @@ public class UPatrolTaskService {
                 }
                 uPatrolTask.setStartTime(startTime);
                 uPatrolTask.setEndTime(endTime);
-                uPatrolTask.setCreateTime(new Date());
             }
         } catch (Exception e) {
             log.error("设置周期任务起始时间出错：", e);
@@ -171,7 +171,7 @@ public class UPatrolTaskService {
 
         List<Long> instanceList = insertTaskAttr(uPatrolTask, tCruiseTaskAdd);
 
-        List<TCruisePointInstanceNameDetail> detailList = initializeTaskInfo(instanceList, uPatrolTask);
+        List<TCruisePointInstanceNameDetail> detailList = initializeNextTaskInfo(uPatrolTask, instanceList);
         // 找出机器人和无人机做任务的巡检点
         String res = taskToRobotOrDrone(uPatrolTask, tCruiseTaskAdd, format, detailList);
         if (StringUtils.isNotEmpty(res)) {
@@ -354,7 +354,7 @@ public class UPatrolTaskService {
     /**
      * 周期任务初始化下一次的任务信息
      */
-    public void initializeNextTaskInfo(UPatrolTask task, List<Long> instanceList) {
+    public List<TCruisePointInstanceNameDetail> initializeNextTaskInfo(UPatrolTask task, List<Long> instanceList) {
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
             UPatrolTask nextTask = new UPatrolTask();
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
@@ -370,12 +370,14 @@ public class UPatrolTaskService {
                     .setTaskSource(task.getTaskSource())
                     .setTaskLevel(task.getTaskLevel())
                     .setStartTime(task.getStartTime())
-                    .setCreateTime(new Date())
+                // 避免下一次的任务创建时间与当前任务创建时间重复，下一次任务创建时间 +1s
+                    .setCreateTime(new Date(System.currentTimeMillis() + 3000))
                     .setEndTime(task.getEndTime())
                     .setCreateUserId(task.getCreateUserId());
-            uPatrolTaskDao.add(task);
-            initializeTaskInfo(instanceList, nextTask);
+            uPatrolTaskDao.add(nextTask);
+            return initializeTaskInfo(instanceList, nextTask);
         }
+        return null;
     }
 
     public void initializeThisTaskInfo(UPatrolTask task, List<Long> instanceList) {
@@ -385,18 +387,9 @@ public class UPatrolTaskService {
         mapForAbnormal.put("abnormal", "0");
         mapForAbnormal.put("normal", "0");
         Date taskStart = new Date();
-        //任务超期时间
-        Map<String, String> mapForTaskAreTime = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
-        Integer tasksAreTime = Integer.valueOf(mapForTaskAreTime.get("content"));
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(taskStart);
-        cal.add(Calendar.MINUTE, tasksAreTime);
-        Date taskAre = cal.getTime();
 
         mapForAbnormal.put("taskStart", DateTimeUtil.format(taskStart));
-        mapForAbnormal.put("overDay", DateTimeUtil.format(taskAre));
-        mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_EXECUTING));
+        mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_NOT_START));
 
         String strForCountAbnormal = PATROL_SUMMARY_PREFIX + task.getTaskId();
         redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
@@ -963,7 +956,7 @@ public class UPatrolTaskService {
         return uPatrolResultDao.update(uPatrolResult);
     }
 
-    private void updateTaskStateForRedis(String taskId, String state) {
+    public void updateTaskStateForRedis(String taskId, String state) {
         String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
         Map<String, String> map = redisTemplate.opsForHash().entries(strForCountAbnormal);
         map.put("taskState", state);
@@ -1255,6 +1248,7 @@ public class UPatrolTaskService {
      * 批量传入，则表示一定异常
      */
     public void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList) {
+        log.info("taskResultHandler task: {}, cruiseResultList: {},", cruiseResultList.get(0).get("taskId"), cruiseResultList.size());
         patrolTaskResultHandler(cruiseResultList, CRUISE_RESULT_ABNORMAL);
     }
     private void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList, int cruiseResult) {

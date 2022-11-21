@@ -106,23 +106,29 @@ public class TaskJob extends QuartzJobBean {
         log.info("task.getStartTime {} ", task.getStartTime());
         List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
         //更改任务状态
-        setTaskResult(task.getTaskId(),date);
+        setTaskResult(task, date);
         //给机器人发任务启动
         robotTaskStart(task);
         //调用摄像机任务
         uPatrolTaskService.localTaskStart(task.getTaskId());
         //初始化下一次任务信息
-        uPatrolTaskService.initializeNextTaskInfo(task, allInstanceList);
+        uPatrolTaskService.initializeNextTaskInfo(ancestralTask, allInstanceList);
 
     }
 
-    private void setTaskResult(String taskId,Date date) {
+    private void setTaskResult(UPatrolTask task,Date date) {
+        String taskId = task.getTaskId();
         String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
         UPatrolResult result = uPatrolTaskDao.selectForTaskId(realTaskId);
         result.setTaskState(CruiseConstant.TASK_STATE_EXECUTING);
         //任务开始时间
         result.setExecuteTime(date);
         uPatrolResultDao.update(result);
+
+        uPatrolTaskService.updateTaskStateForRedis(taskId, String.valueOf(CruiseConstant.TASK_STATE_EXECUTING));
+
+        UPatrolTask utask = new UPatrolTask().setTaskId(taskId).setTaskName(task.getTaskName());
+        uPatrolTaskDao.update(utask);
     }
 
     /**
