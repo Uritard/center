@@ -5,10 +5,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.common.logs.Logs;
+import com.yjh.accessvideo.common.utils.FtpsUtil;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
+import com.yjh.accessvideo.configuration.PlatFromFtpsConfig;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.entity.TemperatureInfo;
 import com.yjh.accessvideo.module.control.service.CameraConService;
@@ -64,6 +66,9 @@ public class CameraConController {
 
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private PlatFromFtpsConfig platFromFtpsConfig;
 
     @ApiOperation(value = "相机播放")
     @RequestMapping(value = "/startRealPlay", method = RequestMethod.GET)
@@ -306,6 +311,7 @@ public class CameraConController {
             Runtime.getRuntime().exec(url);
             result.setData(resultMap);
             result.setMessage(message);
+            copyFile(filePathTem,filePath);
             cameraConService.pushCtrlTime(cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -338,6 +344,7 @@ public class CameraConController {
             Runtime.getRuntime().exec(url);
             result.setData(resultMap);
             result.setMessage(message);
+            copyFile(filePathTem,filePath);
             cameraConService.pushCtrlTime(cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -374,6 +381,7 @@ public class CameraConController {
             Runtime.getRuntime().exec(url);
             result.setData(resultMap);
             result.setMessage(message);
+            copyFile(filePathTem,filePath);
             cameraConService.pushCtrlTime(cameraId);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
@@ -776,6 +784,24 @@ public class CameraConController {
             log.error("视频上传服务器失败",e);
         }
         return result;
+    }
+
+    private void copyFile(String ftpsPath, String localPath){
+        // 如果 ftpsTurbo 为 true，则表示设置了文件盘共享，不使用 ftps 对文件进行传输拷贝
+        if(Constant.ftpsTurbo()){
+            return;
+        }
+        try {
+            if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {return;}
+            FtpsUtil.putFile(localPath, "video"+ftpsPath, platFromFtpsConfig.getIp(), platFromFtpsConfig.getPort(),
+                    platFromFtpsConfig.getKeypw(), platFromFtpsConfig.getUsername(), platFromFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+        }
+        HashMap<String,String> param = new HashMap<>();
+        param.put("ftpsPath","video"+ftpsPath);
+        param.put("localPath",localPath);
+        Constant.otherServerMap(param,Constant.COPY_FILE_URL);
     }
 
 }
