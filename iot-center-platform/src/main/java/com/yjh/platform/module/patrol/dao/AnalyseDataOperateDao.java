@@ -95,4 +95,7 @@ public interface AnalyseDataOperateDao {
     String selectAnalyseType(@Param(value = "instanceId") Long instanceId);
 
     String selectMaterialId(@Param(value = "deviceId") Long deviceId);
+
+
+    HashMap<String, String> selectPatrolDevice(@Param(value = "instanceId") String instanceId);
 }

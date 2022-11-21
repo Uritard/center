@@ -9,13 +9,14 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
-import com.yjh.platform.threadpool.TaskExecutePool;
+import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -39,6 +41,9 @@ public class PatrolResultHandler {
     private final AnalyseDataOperateService analyseDataOperateService;
     private final ProcessResultToUpSystem processResultToUpSystem;
     private final UPatrolTaskService uPatrolTaskService;
+
+    @Autowired
+    private UPatrolResultDao uPatrolResultDao;
 
     Logger log = LoggerFactory.getLogger(PatrolResultHandler.class);
 
@@ -64,16 +69,6 @@ public class PatrolResultHandler {
         for (RobotPatrolTaskAlarm taskAlarm : alarmList) {
             // 通过上报的任务id查询巡视主机上的任务id
             String taskCode = taskAlarm.getTaskCode();
-            String edgeCode = taskAlarm.getRobotCode();
-            String originId = taskAlarm.getDeviceId();
-            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
-            ));
-            String deviceId = originId;
-            // 1的情况不用考虑，2的情况需要查t_std_region，有就是下级传的；t_robot_info有，就是上级
-            if ("2".equals(sysLevel) && tRobotInspectionDao.selectRobot(edgeCode) > 0 || "3".equals(sysLevel)) {
-                deviceId = tRobotInspectionDao.selectRealInstanceId(originId, edgeCode);
-            }
-            taskAlarm.setDeviceId(deviceId);
             String taskId = tRobotInspectionDao.selectRealTaskId(taskCode);
             if (StringUtils.isEmpty(taskId)) {
                 taskId = taskCode;
@@ -107,6 +102,9 @@ public class PatrolResultHandler {
         if (resultList.isEmpty()) {
             return;
         }
+
+        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
+        ));
         log.info("resultList=={}", resultList);
         try {
             for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
@@ -129,17 +127,6 @@ public class PatrolResultHandler {
                     continue;
                 }
 
-                String originId = robotPatrolTaskResult.getDeviceId();
-                String edgeCode = robotPatrolTaskResult.getSendCode();
-                String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
-                ));
-                String deviceId = originId;
-                // 1的情况不用考虑，2的情况需要查t_std_region，有就是下级传的；t_robot_info有，就是上级
-                if ("2".equals(sysLevel) && tRobotInspectionDao.selectRobot(edgeCode) > 0 || "3".equals(sysLevel)) {
-                    deviceId = tRobotInspectionDao.selectRealInstanceId(originId, edgeCode);
-                }
-                robotPatrolTaskResult.setDeviceId(deviceId);
-
                 // 文件处理
                 Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap);
                 if (!"3".equals(sysLevel)) {
@@ -149,7 +136,7 @@ public class PatrolResultHandler {
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
                     taskAlarm.setValue(robotPatrolTaskResult.getValue());
-                    taskAlarm.setDeviceId(deviceId);
+                    taskAlarm.setDeviceId(robotPatrolTaskResult.getDeviceId());
                     NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
                     ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
                 }
@@ -158,7 +145,34 @@ public class PatrolResultHandler {
                         , redisTemplate, true);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
             }
-        }catch (Exception e){
+            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
+            if ("2".equals(sysLevel) && (tRobotInspectionDao.selectRobotCount(edgeCode) > 0 || tRobotInspectionDao.selectRegion(edgeCode) > 0) || "3".equals(sysLevel)) {
+
+                redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX).keySet().forEach(taskId ->
+                {
+                    log.info("该点任务执行完成{}", taskId);
+                    UPatrolResult uPatrolResult = new UPatrolResult()
+                            .setRobotId(tRobotInspectionDao.selectRobotIdByRobotCode(edgeCode));
+                    AtomicInteger abnormalCounts = new AtomicInteger();
+                    AtomicInteger normalCounts = new AtomicInteger();
+                    redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId).keySet().forEach(instanceId -> {
+                        if (redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId).get(
+                                "cruiseAbnormal").equals(String.valueOf(CRUISE_RESULT_NORMAL))) {
+                            normalCounts.getAndIncrement();
+                        } else {
+                            abnormalCounts.getAndIncrement();
+                        }
+                    });
+                    uPatrolResult.setTaskAbnormal(abnormalCounts.get())
+                            .setTaskCount(abnormalCounts.get() + normalCounts.get())
+                            .setTaskState(TASK_STATE_FINISHED)
+                            .setTaskWait(0)
+                            .setEndTime(new Date());
+
+                    uPatrolResultDao.update(uPatrolResult);
+                });
+            }
+            }catch (Exception e){
             log.error("处理机器人/无人机/边缘节点巡视结果异常:", e);
         }
     }

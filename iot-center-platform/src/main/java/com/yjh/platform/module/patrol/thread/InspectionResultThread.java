@@ -9,6 +9,8 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
@@ -20,6 +22,7 @@ import com.yjh.platform.module.patrol.service.impl.NormalVideoCruiseExecuteImpl;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -47,6 +50,14 @@ public class InspectionResultThread implements Runnable{
     private final UPatrolTaskService uPatrolTaskService;
     private final AbstractVideoCruise abstractVideoCruise;
 
+    @Autowired
+    private TRobotInspectionDao tRobotInspectionDao;
+
+    @Autowired
+    private UPatrolResultDao uPatrolResultDao;
+
+    @Autowired
+    private AnalyseDataOperateDao analyseDataOperateDao;
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
                                   RedisTemplate redisTemplate, boolean changeTaskStatus){
         this.robotPatrolTaskResult = robotPatrolTaskResult;
@@ -59,9 +70,17 @@ public class InspectionResultThread implements Runnable{
 
     @Override
     public void run(){
+
         try {
             log.info("开始处理巡检结果并对其标准化 >>>>>>> robotPatrolTaskResult==={}", JSON.toJSONString(robotPatrolTaskResult));
             String taskId = infoMap.get("taskId");
+            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
+            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
+            ));
+            if ("2".equals(sysLevel) && (tRobotInspectionDao.selectRobotCount(edgeCode) > 0 || tRobotInspectionDao.selectRegion(edgeCode) > 0) || "3".equals(sysLevel)) {
+                upSystemDealWith(taskId);
+                return;
+            }
             String robotCode = robotPatrolTaskResult.getSendCode();
 
             // taskId是巡视主机的id,robotTaskId是机器人上报的id
@@ -117,13 +136,76 @@ public class InspectionResultThread implements Runnable{
 
             // 巡视主机下发的任务或者站端本体任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);
-            if (Boolean.FALSE.equals(flag)) {
+            if (!flag) {
                 log.info("This is simulation tool task！！！");
                 simulationToolTaskHandler(infoMap.get("absolutePath"), taskId, instanceId, robotPatrolTaskResult.getValue(), robotPatrolTaskResult.getFilePath());
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    private void upSystemDealWith(String taskId) {
+
+        String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + robotPatrolTaskResult.getDeviceId();
+
+        Map<String, String> map = new HashMap<>(8);
+        if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
+            map.put("resultNum", robotPatrolTaskResult.getValue());
+            map.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+            map.put("cruiseAbnormal", "--");
+        } else {
+            // value无值且resultNum为--，若结果非音频文件，则为异常情况
+            map.put("resultNum", "--");
+            if ("3".equals(robotPatrolTaskResult.getFileType())) {
+                map.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                map.put("cruiseAbnormal", "--");
+            } else {
+                map.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                map.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
+            }
+        }
+        map.put("picPathAnl", "");
+        map.put("cruiseType", "");
+        map.put("instanceName", "");
+        map.put("remark", "");
+        map.put("deviceId", analyseDataOperateDao.selectPatrolDevice(robotPatrolTaskResult.getDeviceId()).get(
+                "device_id"));
+        map.put("deviceName", robotPatrolTaskResult.getPatrolDeviceName());
+        map.put("points", "");
+        map.put("serialVersionUID", "");
+        map.put("origConfirmPicPath", "");
+        map.put("firDate", "");
+        map.put("instanceId", robotPatrolTaskResult.getDeviceId());
+        map.put("confirmPicPath", "");
+        map.put("modifyNum", "");
+        map.put("origPicAnl", "");
+        map.put("identifyResult", "");
+        map.put("personCheck", "");
+        map.put("createtime", "");
+        map.put("identifyState", "");
+        map.put("cruiseDataId", "");
+        map.put("resultPic", "");
+        map.put("cruiseName", "");
+        map.put("firName", "");
+        map.put("resultDesc", "");
+        map.put("checkDate", "");
+        map.put("cruiseTime", robotPatrolTaskResult.getTime());
+        map.put("cruiseId", "");
+        map.put("checkUser", "");
+        map.put("cameraId", "");
+        map.put("voicePath", "");
+        map.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
+        map.put("taskId", taskId);
+        map.put("picpath", infoMap.get("relativePath"));
+        map.put("origpic", infoMap.containsKey("absolutePath") ? infoMap.get("absolutePath") : "");
+        map.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
+        map.put("isWarn", "0");
+        map.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
+        map.put("fileType", robotPatrolTaskResult.getFileType());
+        map.put("rectangle", robotPatrolTaskResult.getRectangle());
+        map.put("confidence", "");
+        redisTemplate.opsForHash().putAll(redisKeyName, map);
     }
 
     /**
@@ -144,8 +226,7 @@ public class InspectionResultThread implements Runnable{
                     && Objects.equals(159, robotType);
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
             boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
-            if (Boolean.FALSE.equals(isSimulationTool)) {
-
+            if (!isSimulationTool) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0) {
                     log.info("taskId为{}巡视点instanceId为{}的点位产生了告警,需要更新图片", taskId, instanceId);
@@ -153,7 +234,7 @@ public class InspectionResultThread implements Runnable{
                 }
                 uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
                 // 区分是否为站端本体任务如果是站端本体任务,需更新任务状态
-                if (Boolean.TRUE.equals(isSelfTask)) {
+                if (isSelfTask) {
                     standTaskDealHandler(taskId, robotCode);
                 }
                 return true;

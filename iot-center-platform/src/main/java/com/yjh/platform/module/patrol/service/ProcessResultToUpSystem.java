@@ -9,6 +9,7 @@ import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
@@ -54,6 +55,10 @@ public class ProcessResultToUpSystem {
     @Autowired
     private AlarmService alarmService;
 
+
+    @Autowired
+    private TRobotInspectionDao tRobotInspectionDao;
+
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
     private static final String AUDIO_PATH = "/Audio/";
@@ -83,16 +88,27 @@ public class ProcessResultToUpSystem {
         List<Map<String, Object>> xmlItems = new ArrayList<>();
 
         try {
+
+            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
+            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
+            ));
             for(Map<String, String> cruiseResultMap:cruiseResultList) {
                 Map<String, Object> xmlItem = new HashMap<>(16);
                 String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
-                String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
+                String originId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
+                String instanceId = originId;
+                // 1的情况不用考虑，2的情况需要查t_std_region，有就是下级传的；t_robot_info有，就是上级
+                if ("2".equals(sysLevel) && (tRobotInspectionDao.selectRobotCount(edgeCode) > 0 || tRobotInspectionDao.selectRegion(edgeCode) > 0) || "3".equals(sysLevel)) {
+                    instanceId = tRobotInspectionDao.selectRealInstanceId(originId, edgeCode);
+                }
                 String simpleDateFormat = DateTimeUtil.format3(new Date());
                 String analyseType = getAlgorithmTypeMap(instanceId);
                 HashMap<String, String> typeAndPathName = getTypeAndPathName(analyseType);
 
-                xmlItem.put("patroldevice_code", "巡视设备名称");
-                xmlItem.put("patroldevice_name", "巡视设备编码");
+                Map<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
+
+                xmlItem.put("patroldevice_code", patrolDevice.get("deviceCode"));
+                xmlItem.put("patroldevice_name", patrolDevice.get("deviceName"));
                 xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
                 xmlItem.put("task_code", taskId);
                 xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
@@ -105,7 +121,7 @@ public class ProcessResultToUpSystem {
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
                 String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
                 String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskId + typeAndPathName.get("fileNamePath") + instanceId + "_巡视主机编码_" + simpleDateFormat + ".jpg";
+                    8) + "/" + taskId + typeAndPathName.get("fileNamePath") + instanceId + "_"+edgeCode +"_" + simpleDateFormat + ".jpg";
 
                 Map<String, String> resMap;
                 if (Objects.isNull(tWarnInfo)) {

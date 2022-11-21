@@ -135,13 +135,6 @@ public interface UPatrolTaskDao {
      */
     List<Long> selectInstanceForTaskGoOn(@Param(value = "taskId") String taskId);
 
-    /**
-     * 插入巡视任务结果数据
-     * @param list 巡视点结果集
-     * @return int
-     */
-    int batchInsertUPatrolDataResult(List<UPatrolDataResult> list);
-
     UPatrolTask selectTaskByTaskCode(@Param(value = "taskCode") String taskCode);
 
     String selectTaskCodeByTaskId(@Param(value = "taskId") String taskId);

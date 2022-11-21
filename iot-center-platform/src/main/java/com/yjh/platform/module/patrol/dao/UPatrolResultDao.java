@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -178,5 +179,15 @@ public interface UPatrolResultDao {
     int selectMeteNumByTask(@Param(value = "taskId")String taskId);
 
     int selectAbnormalNumByTask(@Param(value = "taskId")String taskId);
+
+    List<Map<String, Object>> selectUpatrolTaskInfo(String taskId);
+
+    int selectUpatrolTaskInfoById(String taskId);
+
+    int selectTaskWait(String taskId);
+
+    int selectReviewTask(String taskId);
+
+    int selectCountByTaskId(String taskId);
 
 }
