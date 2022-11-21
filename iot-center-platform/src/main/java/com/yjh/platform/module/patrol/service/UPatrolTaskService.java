@@ -27,10 +27,7 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.patrol.CruiseConstant;
-import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
-import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
-import com.yjh.platform.module.patrol.dao.UPatrolTaskAttrDao;
-import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
+import com.yjh.platform.module.patrol.dao.*;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.LocalCruiseExecutThread;
@@ -69,6 +66,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -118,6 +116,9 @@ public class UPatrolTaskService {
     private ProcessResultToUpSystem processResultToUpSystem;
     @Autowired
     private TPeriodModelDao tPeriodModelDao;
+
+    @Autowired
+    private UPatrolDataResultDao uPatrolDataResultDao;
 
     //jobName
     @Value("${spring.QingHua.jobName}")
@@ -413,11 +414,19 @@ public class UPatrolTaskService {
      * @return void
      */
     public void robotPatrolTaskStatus(List<RobotPatrolTaskStatus> statusList) {
+        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
+        ));
+        String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get(
+                "content"));
         statusList.forEach(robotPatrolTaskStatus -> {
+            String taskId = robotPatrolTaskStatus.getTaskPatrolledId().split("_")[0];
             switch (robotPatrolTaskStatus.getTaskState()) {
                 case "3":
                     break;
                 case "2":
+                    if ("2".equals(sysLevel) && (tRobotInspectionDao.selectRobotCount(edgeCode) > 0 || tRobotInspectionDao.selectRegion(edgeCode) > 0) || "3".equals(sysLevel)) {
+                        updateTaskStateForRedis(taskId, "239");
+                    }
                     break;
                 case "1":
                 case "4":
@@ -433,11 +442,42 @@ public class UPatrolTaskService {
                     );
                     break;
                 case "5":
+                    if ("2".equals(sysLevel) && (tRobotInspectionDao.selectRobotCount(edgeCode) > 0 || tRobotInspectionDao.selectRegion(edgeCode) > 0) || "3".equals(sysLevel)) {
+                        addToUpSystem(robotPatrolTaskStatus, taskId);
+                    }
                     break;
                 default:
                     break;
             }
         });
+    }
+
+
+    private void addToUpSystem(RobotPatrolTaskStatus robotPatrolTaskStatus, String taskId) {
+        try {
+            long robotId = tRobotInspectionDao.selectRobotIdByRobotCode(robotPatrolTaskStatus.getRobotCode());
+            UPatrolTask uPatrolTask = new UPatrolTask()
+                    .setTaskId(taskId)
+                    .setTaskCode(robotPatrolTaskStatus.getTaskCode())
+                    .setTaskName(robotPatrolTaskStatus.getTaskName())
+                    .setRobotId(robotId)
+                    .setStartTime(format.parse(robotPatrolTaskStatus.getStartTime()));
+            UPatrolResult uPatrolResult = new UPatrolResult()
+                    .setTaskId(taskId)
+                    .setTaskState(Integer.valueOf(robotPatrolTaskStatus.getTaskState()))
+                    .setTaskCode(robotPatrolTaskStatus.getTaskCode())
+                    .setTaskName(robotPatrolTaskStatus.getTaskName())
+                    .setRobotId(robotId);
+            uPatrolTaskDao.add(uPatrolTask);
+            uPatrolResultDao.add(uPatrolResult);
+            Map<String, String> map = new HashMap<>(8);
+            map.put("taskStart", robotPatrolTaskStatus.getStartTime());
+            map.put("taskState", "238");
+            map.put("taskProgress", robotPatrolTaskStatus.getTaskProgress());
+            redisTemplate.opsForHash().putAll(PATROL_TASK_PREFIX + taskId, map);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void dealRobotTaskShutDown(RobotPatrolTaskStatus robotPatrolTaskStatus) {
@@ -698,6 +738,8 @@ public class UPatrolTaskService {
                 Integer normal = Integer.valueOf(mapForGet.get("normal"));
                 Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
                 i = all - normal - abnormal;
+                float progress = (1.0f - Float.valueOf(i) / all) * 100;
+                item.put("task_progress", progress + "%");
             }
 
             item.put("task_estimated_time", i * 60 * 5);
@@ -1313,11 +1355,12 @@ public class UPatrolTaskService {
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
 
             // 更新upr
-            UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
-            uPatrolResult.setTaskState(TASK_STATE_FINISHED);
-            uPatrolResult.setTaskWait(0);
-            uPatrolResult.setEndTime(new Date());
-            uPatrolResult.setTaskAbnormal(abnormalCounts);
+            UPatrolResult uPatrolResult = new UPatrolResult()
+                    .setTaskId(taskId)
+                    .setTaskState(TASK_STATE_FINISHED)
+                    .setTaskWait(0)
+                    .setEndTime(new Date())
+                    .setTaskAbnormal(abnormalCounts);
             uPatrolResultDao.update(uPatrolResult);
 
             // 插入updr
@@ -1335,12 +1378,12 @@ public class UPatrolTaskService {
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
             List<String> cruiseResultIdList = new ArrayList<>();
             Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
-
+            List<Map<String, String>> cruiseResultMapList = new ArrayList<>();
             for (String key : robotInfoKeys) {
                 Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
-
+                cruiseResultMapList.add(redisInfoMap);
                 boolean conditionRes = ArrayUtils.contains(new String[]{String.valueOf(CRUISE_RESULT_NORMAL), String.valueOf(CRUISE_RESULT_ABNORMAL)}, redisInfoMap.get("cruiseResult"));
-                if (Boolean.TRUE.equals(conditionRes)) {
+                if (conditionRes) {
                     UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
                     uPatrolDataResult.setTaskId(taskId);
                     uPatrolDataResult.setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")));
@@ -1383,6 +1426,7 @@ public class UPatrolTaskService {
             lowTaskGoOn(taskId);
 
             // todo:给上一级系统上报任务状态
+            processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultMapList, null, null);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
@@ -1887,7 +1931,7 @@ public class UPatrolTaskService {
 
     @Transactional(rollbackFor = Exception.class)
     public int batchInsertUPatrolDataResult(List<UPatrolDataResult> uPatrolDataResultList) {
-        return this.uPatrolTaskDao.batchInsertUPatrolDataResult(uPatrolDataResultList);
+        return this.uPatrolDataResultDao.batchInsertUPatrolDataResult(uPatrolDataResultList);
     }
 
 

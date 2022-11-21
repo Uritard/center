@@ -1047,6 +1047,17 @@
         WHERE tcpi.instance_id = #{instanceId}
     </select>
 
+    <select id="selectPatrolDevice" resultType="java.util.HashMap">
+        SELECT DISTINCT
+        tsd.device_id as deviceId,
+        tsd.device_code as deviceCode,
+        tsd.device_name as deviceName
+        FROM
+        t_std_device tsd
+        LEFT JOIN t_cruise_point_instance tcpi tcpi.device_id = tsd.device_id
+        WHERE tcpi.instance_id = #{instanceId}
+    </select>
+
     <select id="selectPMSByCameraId" resultType="java.lang.String">
         SELECT a.pms_id
         FROM

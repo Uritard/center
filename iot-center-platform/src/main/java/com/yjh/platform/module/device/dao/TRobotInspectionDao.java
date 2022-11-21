@@ -77,4 +77,23 @@ public interface TRobotInspectionDao {
      */
     Integer selectRobotType(@Param(value = "robotCode") String robotCode);
 
+
+    /**
+     * 通过原deviceId，edgeCode查找deviceId
+     * @param deviceId
+     * @param edgeCode
+     * @return
+     */
+    String selectRealInstanceId(@Param(value = "originId") String deviceId,@Param(value = "edgeCode") String edgeCode);
+
+    /**
+     * 判断robotCode是上级系统传来的还是下级系统
+     * @param robotCode
+     * @return
+     */
+    int selectRobotCount(@Param(value = "edgeCode")String robotCode);
+
+    int selectRegion(@Param(value = "edgeCode")String edgeCode);
+
+    long selectRobotIdByRobotCode(String robotCode);
 }
