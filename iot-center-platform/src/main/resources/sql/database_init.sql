@@ -627,6 +627,7 @@ CREATE TABLE `t_camera_preset` (
   `preset_name` varchar(128) DEFAULT '' COMMENT '预置位名称',
   `is_keep_watch` int(1) DEFAULT '0' COMMENT '是否守望位置。0-不是，1-是',
   `is_keep_watch_task` int(1) DEFAULT '0' COMMENT '是否静默任务。0-不是，1-是',
+  `is_second_keep_watch_task` int(1) DEFAULT '0' COMMENT '是否秒级静默任务。0-不是，1-是',
   `creator_user` varchar(64) DEFAULT '',
   `creator_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `is_use` int(11) DEFAULT '1' COMMENT '是否使用',
@@ -635,6 +636,8 @@ CREATE TABLE `t_camera_preset` (
   `collect_status` int(10) DEFAULT '1' COMMENT '采集状态，0-未采集 1-已采集',
   `calibration_status` int(10) DEFAULT '1' COMMENT '标定状态，0-未标定 1-已标定',
   `remark` varchar(255) DEFAULT '' COMMENT '备注',
+  `origin_id` varchar(32) DEFAULT NULL COMMENT '原始id(下级同步的id)',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码'
   PRIMARY KEY (`preset_id`) USING BTREE,
   UNIQUE KEY `idx_camera_num` (`camera_id`,`preset_num`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='摄像机预位置表';
@@ -1125,6 +1128,8 @@ CREATE TABLE `t_cruise_point_instance` (
   `videotape_time` varchar(32) DEFAULT '' COMMENT '录像时长 单位ms',
   `text_desc` varchar(128) DEFAULT '' COMMENT '文本描述',
   `sort` varchar(32) DEFAULT '' COMMENT '排序序号',
+  `origin_id` varchar(32) DEFAULT NULL COMMENT '原始id(下级同步的id)',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   PRIMARY KEY (`instance_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点实例表';
 
@@ -1657,6 +1662,8 @@ CREATE TABLE `t_robot_inspection` (
   `phase` varchar(255) DEFAULT '' COMMENT '相位，A相B相C相',
   `device_info` varchar(255) DEFAULT '' COMMENT '备注信息',
   `property_pic_path` varchar(255) DEFAULT '' COMMENT '测点属性图',
+  `origin_id` varchar(32) DEFAULT NULL COMMENT '原始id(下级同步的id)',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   PRIMARY KEY (`inspection_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='机器人测点信息表';
 

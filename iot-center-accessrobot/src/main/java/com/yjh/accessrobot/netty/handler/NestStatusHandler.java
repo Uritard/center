@@ -37,22 +37,23 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler nestServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到无人机机巢状态数据了+++++++++++++++++");
-        String robotCode = xmlBaseModel.getSendCode();
-        if (StringUtils.isEmpty(robotCode)) {
+        String sendCode = xmlBaseModel.getSendCode();
+        if (StringUtils.isEmpty(sendCode)) {
             log.error("下级唯一标识为空");
             throw new RuntimeException("下级唯一标识为空");
         }
-        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(sendCode, false))) {
             log.error("下级唯一标识未注册或未连接");
             throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
         // 给下级响应
-        String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
-        RobotServerHandler.send(statusProtocol, robotCode);
-        log.info("巡视主机给下级{}响应了", robotCode);
+        RobotServerHandler.send(statusProtocol, sendCode);
+        log.info("巡视主机给下级{}响应了", sendCode);
 
+        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> nestStatusList = new ArrayList<>();
         xmlBaseModel.getItems().forEach(res -> {
             Map<String, String> nestStatusMap = new HashMap<>(16);
@@ -76,9 +77,9 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
             redisTemplate.expire(nestStatus, 7, TimeUnit.DAYS);
         }
         // 无人机机巢状态更新同步到主表形成绑定关系
-        if (nestStatusList.size() > 0) {
-            robotService.updateNestInfo(robotCode, String.valueOf(nestStatusList.get(0).get("nestCode")), String.valueOf(nestStatusList.get(0).get("nestName")));
-        }
+//        if (nestStatusList.size() > 0) {
+//            robotService.updateNestInfo(robotCode, String.valueOf(nestStatusList.get(0).get("nestCode")), String.valueOf(nestStatusList.get(0).get("nestName")));
+//        }
     }
 
     @Override

@@ -192,7 +192,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
         Constant.weatherServer(info, Constant.WEATHER_URL);
 
         // 国网要求
-         robotService.upToCruise(xmlBaseModel);
+//         robotService.upToCruise(xmlBaseModel);
 
     }
 

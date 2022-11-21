@@ -37,22 +37,23 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到无人机机巢运行数据了+++++++++++++++++");
-        String robotCode = xmlBaseModel.getSendCode();
-        if (StringUtils.isEmpty(robotCode)) {
+        String sendCode = xmlBaseModel.getSendCode();
+        if (StringUtils.isEmpty(sendCode)) {
             log.error("下级唯一标识为空");
             throw new RuntimeException("下级唯一标识为空");
         }
-        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(sendCode, false))) {
             log.error("下级唯一标识未注册或未连接");
             throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
         // 给下级响应
-        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
-        RobotServerHandler.send(operationProtocol, robotCode);
-        log.info("巡视主机给下级{}响应了", robotCode);
+        RobotServerHandler.send(operationProtocol, sendCode);
+        log.info("巡视主机给下级{}响应了", sendCode);
 
+        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> nestOperationList = new ArrayList<>();
         xmlBaseModel.getItems().forEach(res -> {
             Map<String, String> nestOperationMap = new HashMap<>(16);

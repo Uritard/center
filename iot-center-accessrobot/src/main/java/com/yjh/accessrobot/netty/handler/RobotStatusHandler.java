@@ -43,37 +43,43 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
             String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
             xmlBaseModel.setCode(stationCode);
         }
-
-        String robotCode = xmlBaseModel.getSendCode();
-        if (StringUtils.isEmpty(robotCode)) {
+        String sendCode = xmlBaseModel.getSendCode();
+        if (StringUtils.isEmpty(sendCode)) {
             log.error("下级唯一标识为空");
             throw new RuntimeException("下级唯一标识为空");
         }
-        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(sendCode, false))) {
             log.error("下级唯一标识未注册或未连接");
             throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
         // 给下级响应
-        String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
-        RobotServerHandler.send(statusProtocol, robotCode);
-        log.info("巡视主机给下级{}响应了", robotCode);
+        RobotServerHandler.send(statusProtocol, sendCode);
+        log.info("巡视主机给下级{}响应了", sendCode);
 
+        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> robotStatusList = new ArrayList<>();
         xmlBaseModel.getItems().forEach(res -> {
             Map<String, String> robotStatusMap = new HashMap<>(16);
             // 2022过检 robot_name修改为patroldevice_name
             robotStatusMap.put("patrolDeviceName", String.valueOf(res.get("patroldevice_name")));
             robotStatusMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
-            robotStatusMap.put("robotCode",robotCode);
+            robotStatusMap.put("robotCode", robotCode);
             robotStatusMap.put("time", res.get("time").toString());
             robotStatusMap.put("type", res.get("type").toString());
             robotStatusMap.put("value", res.get("value").toString());
             robotStatusMap.put("valueUnit", res.containsKey("value_unit") ? String.valueOf(res.get("value_unit")) : "");
             robotStatusMap.put("unit", res.containsKey("unit") ? String.valueOf(res.get("unit")) : "");
             robotStatusList.add(robotStatusMap);
-
+            if ("2".equals(res.get("type").toString())) {
+                if ("0".equals(res.get("value").toString())) {
+                    robotService.updateRobotInfo(robotCode, "在线");
+                } else if ("1".equals(res.get("value").toString())) {
+                    robotService.updateRobotInfo(robotCode, "离线");
+                }
+            }
         });
         log.info("机器人状态数据是：" + robotStatusList);
 

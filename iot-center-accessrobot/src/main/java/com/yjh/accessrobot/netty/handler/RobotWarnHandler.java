@@ -34,22 +34,23 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到机器人本体异常告警数据了+++++++++++++++++");
         // Deal with robot alarm data
-        String robotCode = xmlBaseModel.getSendCode();
-        if (StringUtils.isEmpty(robotCode)) {
+        String sendCode = xmlBaseModel.getSendCode();
+        if (StringUtils.isEmpty(sendCode)) {
             log.error("下级唯一标识为空");
             throw new RuntimeException("下级唯一标识为空");
         }
-        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(sendCode, false))) {
             log.error("下级唯一标识未注册或未连接");
             throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
         // 给下级响应
-        String alarmXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        String alarmXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
-        RobotServerHandler.send(alarmProtocol, robotCode);
-        log.info("巡视主机给下级{}响应了", robotCode);
+        RobotServerHandler.send(alarmProtocol, sendCode);
+        log.info("巡视主机给下级{}响应了", sendCode);
 
+        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         Map<String, String> robotAlarmMap = new HashMap<>(8);
         // 2022过检 robot_name -> patroldevice_name
         robotAlarmMap.put("patrolDeviceName", String.valueOf(xmlBaseModel.getItems().get(0).get("patroldevice_name")));

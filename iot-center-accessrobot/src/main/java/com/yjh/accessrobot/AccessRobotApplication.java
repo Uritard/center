@@ -77,6 +77,7 @@ public class AccessRobotApplication implements CommandLineRunner {
         Constant.robotCode = robotCode;
         Constant.sendCode = sendCode;
         Constant.handlerNew = handlerNew;
+        robotService.dealDevicePointModel("C:\\robotData\\Model\\2000\\Model\\device_model.xml","","","","2000","1");
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);
         nettyServer.start(address,redisTemplate, robotService);

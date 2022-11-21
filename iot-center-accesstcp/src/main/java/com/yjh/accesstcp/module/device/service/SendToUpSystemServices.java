@@ -43,13 +43,6 @@ public class SendToUpSystemServices {
     private int port;
     @Autowired
     private RedisTemplate redisTemplate;
-    @Value("${spring.union.stationCode}")
-    private String stationCode;
-
-    @Value("${spring.union.cruiseHost}")
-    private String sendCode;
-    @Value("${spring.union.upSystem}")
-    private String recvCode;
     @Autowired
     private TStdRegionMapper tStdRegionMapper;
     @Autowired
@@ -70,6 +63,11 @@ public class SendToUpSystemServices {
 
     @Transactional(rollbackFor = Exception.class)
     public int sendResponse(long receiveSessionId, String type, String command, String code, List<Map<String, Object>> items, boolean isSend) {
+
+        String sendCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
+        String recvCode = (String)redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
+        String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+
         byte[] bytes = new byte[]{};
         long sendSessionId;
         TCPClientHandler tcpClientHandler = TCPClientHandler.getTCPClientHandlerHashMap().get(port);
@@ -110,7 +108,7 @@ public class SendToUpSystemServices {
                 case "1":
                     //巡视主机模型
                     String hostModelTargetPath = String.format(stationCode + "/Model/host_model.xml");
-                    ftpsUtil.putFile(createHostModel(path), hostModelTargetPath);
+                    ftpsUtil.putFile(createHostModel(path, stationCode), hostModelTargetPath);
                     map.put("host_file_path", hostModelTargetPath);
                     break;
                 case "2":
@@ -128,7 +126,7 @@ public class SendToUpSystemServices {
                 case "4":
                     //点位模型
                     String deviceModelTargetPath = String.format(stationCode + "/Model/device_model.xml");
-                    ftpsUtil.putFile(createDeviceModel(path), deviceModelTargetPath);
+                    ftpsUtil.putFile(createDeviceModel(path, stationCode), deviceModelTargetPath);
                     map.put("device_file_path", deviceModelTargetPath);
                     break;
                 case "5":
@@ -146,12 +144,12 @@ public class SendToUpSystemServices {
                 case "7":
                     //任务模型
                     String taskModelTargetPath = String.format(stationCode + "/Model/task_model.xml");
-                    ftpsUtil.putFile(createTaskModel(path), taskModelTargetPath);
+                    ftpsUtil.putFile(createTaskModel(path,stationCode), taskModelTargetPath);
                     map.put("task_file_path", taskModelTargetPath);
                     break;
                 case "8":            //检修区域模型
                     String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
-                    ftpsUtil.putFile(createMaintenanceModel(path), overhaulareaModelTargetPath);
+                    ftpsUtil.putFile(createMaintenanceModel(path, stationCode), overhaulareaModelTargetPath);
                     map.put("overhaularea_file_path", overhaulareaModelTargetPath);
                     break;
                 case "9":
@@ -190,6 +188,7 @@ public class SendToUpSystemServices {
     @Async
     public void creatFile(String type) {
         try {
+            String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
             List<Map<String, Object>> list = new ArrayList<>();
             Map<String, Object> map = new HashMap<>();
             Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
@@ -204,13 +203,13 @@ public class SendToUpSystemServices {
                     //点位模型
                     // map.put("device_file_path",createDeviceModel(path));
                     String deviceModelTargetPath = String.format(stationCode + "/Model/device_model.xml");
-                    ftpsUtil.putFile(createDeviceModel(path), deviceModelTargetPath);
+                    ftpsUtil.putFile(createDeviceModel(path, stationCode), deviceModelTargetPath);
                     map.put("file_path", deviceModelTargetPath);
                     break;
                 case "2":
                     //巡视主机模型
                     String hostModelTargetPath = String.format(stationCode + "/Model/host_model.xml");
-                    ftpsUtil.putFile(createHostModel(path), hostModelTargetPath);
+                    ftpsUtil.putFile(createHostModel(path, stationCode), hostModelTargetPath);
                     map.put("file_path", hostModelTargetPath);
                     break;
                 case "3":
@@ -240,13 +239,13 @@ public class SendToUpSystemServices {
                 case "7":
                     //任务模型
                     String taskModelTargetPath = String.format(stationCode + "/Model/task_model.xml");
-                    ftpsUtil.putFile(createTaskModel(path), taskModelTargetPath);
+                    ftpsUtil.putFile(createTaskModel(path, stationCode), taskModelTargetPath);
                     map.put("file_path", taskModelTargetPath);
                     break;
                 case "8":
                     //检修区域模型
                     String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
-                    ftpsUtil.putFile(createMaintenanceModel(path), overhaulareaModelTargetPath);
+                    ftpsUtil.putFile(createMaintenanceModel(path, stationCode), overhaulareaModelTargetPath);
                     map.put("file_path", overhaulareaModelTargetPath);
                     break;
                 case "9":
@@ -295,7 +294,7 @@ public class SendToUpSystemServices {
         return this.sendResponse(0L, xmlBaseModel.getType(), xmlBaseModel.getCommand(), xmlBaseModel.getCode(), xmlBaseModel.getItems(), true);
     }
 
-    public String createDeviceModel(String path) throws Exception {
+    public String createDeviceModel(String path, String stationCode) throws Exception {
         List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel();
         list.forEach(item->{
             item.put("station_code",stationCode);
@@ -436,7 +435,7 @@ public class SendToUpSystemServices {
         return CreateModeXMLUtil.createXmlFile(list, path, "voice_model.xml", "PatrolDevice_Model");
     }
 
-    public String createTaskModel(String path) throws Exception {
+    public String createTaskModel(String path, String stationCode) throws Exception {
         //任务模型
         List<Map<String, Object>> list = sendToUpSystemDao.selectTaskInfo();
         //CronExpression expression;
@@ -473,7 +472,7 @@ public class SendToUpSystemServices {
 
     }
 
-    public String createMaintenanceModel(String path) throws Exception {
+    public String createMaintenanceModel(String path, String stationCode) throws Exception {
         //检修区域模型
         List<MaintenanceModel> infoList = sendToUpSystemDao.selectMaintenanceInfo();
         List<Map<String, Object>> finalList = new ArrayList<>();
@@ -497,7 +496,7 @@ public class SendToUpSystemServices {
 
     }
 
-    public String createHostModel(String path) throws Exception {
+    public String createHostModel(String path, String stationCode) throws Exception {
         //巡视主机模型
         List<Map<String, Object>> finalList = new ArrayList<>();
         Map<String, Object> host = new HashMap<>();
@@ -599,6 +598,7 @@ public class SendToUpSystemServices {
 
     public String downloadFile(String type) {
         try {
+            String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
             List<Map<String, Object>> list = new ArrayList<>();
             Map<String, Object> map = new HashMap<>();
             Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
@@ -613,11 +613,11 @@ public class SendToUpSystemServices {
                     //点位模型
                     // map.put("device_file_path",createDeviceModel(path));
                     String deviceModelTargetPath = String.format(stationCode + "/Model/device_model.xml");
-                    return createDeviceModel(path);
+                    return createDeviceModel(path, stationCode);
                 case "1":
                     //巡视主机模型
                     String hostModelTargetPath = String.format(stationCode + "/Model/host_model.xml");
-                    return createHostModel(path);
+                    return createHostModel(path, stationCode);
                 case "2":
                     //机器人模型
                     String robotModelTargetPath = String.format(stationCode + "/Model/robot_model.xml");
@@ -637,11 +637,11 @@ public class SendToUpSystemServices {
                 case "7":
                     //任务模型
                     String taskModelTargetPath = String.format(stationCode + "/Model/task_model.xml");
-                    return createTaskModel(path);
+                    return createTaskModel(path, stationCode);
                 case "8":
                     //检修区域模型
                     String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
-                    return createMaintenanceModel(path);
+                    return createMaintenanceModel(path, stationCode);
                 case "9":
                     String mapRealPath = sendToUpSystemDao.selectMapPath();
                     String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath").get("content"));
@@ -657,5 +657,12 @@ public class SendToUpSystemServices {
             log.error(e.getMessage(), e);
         }
         return "";
+    }
+    /**
+     * 查询所有在线设备
+     * @return
+     */
+    public List<Map<String, Object>> selectOnlinePatrolDevice(){
+        return sendToUpSystemDao.selectOnlinePatrolDevice();
     }
 }

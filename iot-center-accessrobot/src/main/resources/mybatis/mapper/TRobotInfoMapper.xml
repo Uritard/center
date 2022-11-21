@@ -1235,11 +1235,15 @@
     </select>
 
     <select id="selectRobotCodeByRobotNum" resultType="java.lang.String">
-        select
-            a.robot_code
-        from t_robot_info a
-        where 1 = 1
-          and a.robot_num = #{robotNum}
+        SELECT
+        a.robot_code
+        FROM
+        `t_robot_info` a
+        WHERE
+        a.robot_num = #{robotNum, jdbcType=VARCHAR}
+        <if test="edgeCode != null and edgeCode != ''">
+            and a.edge_code = #{edgeCode, jdbcType=VARCHAR}
+        </if>
     </select>
 
     <select id="selectRobotType" resultType="java.lang.Integer">
@@ -1309,6 +1313,14 @@
         from u_patrol_task a
         where 1 = 1
           and a.task_code = #{taskCode, jdbcType=VARCHAR}
+    </select>
+    <select id="selectRobotCodeByNestNum" resultType="java.lang.String">
+        SELECT
+        a.robot_code
+        FROM
+        `t_robot_info` a
+        WHERE
+        a.nest_code = #{nestNum, jdbcType=VARCHAR}
     </select>
 
 </mapper>

@@ -3,6 +3,7 @@ package com.yjh.accessrobot.module.command.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.*;
 import com.yjh.accessrobot.module.command.entity.*;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,6 +39,8 @@ public class TStdDeviceModelService {
     @Resource
     private TStdDevicemeteMapper tStdDevicemeteMapper;
     @Resource
+    private TAlgorithmMeteMapper tAlgorithmMeteMapper;
+    @Resource
     private TCameraInfoMapper tCameraInfoMapper;
     @Resource
     private TRobotInfoDao tRobotInfoDao;
@@ -47,7 +54,7 @@ public class TStdDeviceModelService {
     private TVoiceDeviceMapper tVoiceDeviceMapper;
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveReportData(List<Map<String, Object>> deviceModelList, String ftpsPath, String presetPath, String presetRealPath, String edgeCode) {
+    public void saveReportData(List<Map<String, Object>> deviceModelList, String ftpsPath, String presetPath, String presetRealPath, String edgeCode, String edgeLevel) {
         //字典表转换
         List<Map<String, String>> dictMapList = tStdDeviceMapper.selectDictCodeByUpDict("device_type");
         //已存在的节点信息
@@ -62,6 +69,8 @@ public class TStdDeviceModelService {
         List<TStdDevice> oldStdDeviceList = tStdDeviceMapper.selectByEdgeCode(edgeCode);
         //old 测点信息
         List<TStdDeviceMete> oldStdDeviceMeteList = tStdDevicemeteMapper.selectByEdgeCode(edgeCode);
+        //old 测点对应算法类型表信息
+        List<TAlgorithmMete> oldAlgorithmMeteList = tAlgorithmMeteMapper.selectByEdgeCode(edgeCode);
         //old 预置位信息
         List<TCameraPreset> oldCameraPresetList = tCameraPresetMapper.selectByEdgeCode(edgeCode);
         //old 机器人测点信息
@@ -73,6 +82,7 @@ public class TStdDeviceModelService {
         List<TCameraPreset> finalCameraPresetList = new ArrayList<>();
         List<TRobotInspection> finalRobotInspectionList = new ArrayList<>();
         List<TStdDeviceMete> finalStdDeviceMeteList = new ArrayList<>();
+        List<TAlgorithmMete> finalAlgorithmMeteList = new ArrayList<>();
         List<TCruisePointInstance> newCruisePointInstances = new ArrayList<>();
         deviceModelList.stream().filter(d -> !JSON.parseObject(JSONArray.parseArray(d.get("video_pos").toString()).get(0).toString()).entrySet().isEmpty())
                 .forEach(device -> {
@@ -103,6 +113,26 @@ public class TStdDeviceModelService {
                             TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t -> cameraOriginId.equals(t.getOriginId()) && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
                             tCameraPreset.setCameraId(tCameraInfo.getCameraId());
                             tCameraPreset.setPresetName(String.valueOf(device.get("device_name")).contains("/") ? StringUtils.substringAfter(device.get("device_name").toString(), "/") : String.valueOf(device.get("device_name")));
+                            //当节点为巡视主机接入边缘节点时再触发
+                            if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
+                                tCameraPreset.setPresetNum((Integer) device.getOrDefault("preset_num", 1));
+                                tCameraPreset.setIsKeepWatch((Integer) device.getOrDefault("is_keep_watch", 0));
+                                tCameraPreset.setIsKeepWatchTask((Integer) device.getOrDefault("is_keep_watch_task", 0));
+                                tCameraPreset.setIsSecondKeepWatchTask((Integer) device.getOrDefault("is_second_keep_watch_task", 0));
+                                if (device.containsKey("preset_img")) {
+                                    String presetFtpsImg = ftpsPath + device.get("preset_img").toString();
+                                    String presetImg = presetPath + device.get("preset_img").toString();
+                                    File ftpsFile = new File(presetFtpsImg);
+                                    if (ftpsFile.exists()) {
+                                        try {
+                                            FileUtil.copyFileUsingStream(presetFtpsImg, presetImg);
+                                            tCameraPreset.setPresetImg(presetRealPath + device.get("preset_img").toString());
+                                        } catch (IOException e) {
+                                            log.error("预置位文件拷贝失败", e);
+                                        }
+                                    }
+                                }
+                            }
                             finalCameraPresetList.add(tCameraPreset);
                             cruiseType = tCameraInfo.getCameraType() == 206 ? 230 : 229;
                             break;
@@ -145,7 +175,17 @@ public class TStdDeviceModelService {
                         tStdDeviceMete.setOriginId(String.valueOf(device.get("device_id")));
                     }
                     tStdDeviceMete.setEdgeCode(edgeCode);
-                    tStdDeviceMete.setRedundantType("1");
+                    tStdDeviceMete.setRedundantType(String.valueOf(device.getOrDefault("redundant_type", "1")));
+                    if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
+                        tStdDeviceMete = convertDeviceMete(device);
+                        if (device.containsKey("algorithm_id") &&  StringUtils.isNotEmpty(device.get("algorithm_id").toString())){
+                            TAlgorithmMete tAlgorithmMete = new TAlgorithmMete();
+                            tAlgorithmMete.setEdgeCode(edgeCode);
+                            tAlgorithmMete.setOriginId(tStdDeviceMete.getOriginId());
+                            tAlgorithmMete.setAlgorithmId((Long) device.get("algorithm_id"));
+                            finalAlgorithmMeteList.add(tAlgorithmMete);
+                        }
+                    }
                     finalStdDeviceMeteList.add(tStdDeviceMete);
                     //构建 t_cruise_point_instance
                     TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
@@ -165,12 +205,13 @@ public class TStdDeviceModelService {
         List<TRobotInspection> newRobotInspections = finalRobotInspectionList.stream().distinct().collect(Collectors.toList());
         List<TStdDevice> newStdDevices = finalDeviceList.stream().distinct().collect(Collectors.toList());
         List<TStdDeviceMete> newStdDeviceMetes = finalStdDeviceMeteList.stream().distinct().collect(Collectors.toList());
+        List<TAlgorithmMete> newAlgorithmMetes = finalAlgorithmMeteList.stream().distinct().collect(Collectors.toList());
 
         //该节点未同步过  直接入库
         if (CollectionUtils.isEmpty(oldCruisePointInstanceList) && CollectionUtils.isEmpty(oldStdDeviceMeteList)
                 && CollectionUtils.isEmpty(oldStdDeviceList) && CollectionUtils.isEmpty(oldCameraPresetList)
-                && CollectionUtils.isEmpty(oldRobotInspectionList)) {
-            insertDeviceModel(newCameraPresets, newRobotInspections, newStdDevices, newStdDeviceMetes, newCruisePointInstances, tVoiceDeviceList);
+                && CollectionUtils.isEmpty(oldRobotInspectionList) && CollectionUtils.isNotEmpty(oldAlgorithmMeteList)) {
+            insertDeviceModel(newCameraPresets, newRobotInspections, newStdDevices, newStdDeviceMetes, newCruisePointInstances, tVoiceDeviceList, newAlgorithmMetes);
         } else {
             //将旧的数据和新的数据进行对比相同的去掉  不通的更新  新增的直接入库
             //预置位
@@ -181,11 +222,50 @@ public class TStdDeviceModelService {
             List<TStdDevice> insertStdDevice = dealStdDevice(oldStdDeviceList, newStdDevices, edgeCode);
             //测点
             List<TStdDeviceMete> insertStdDeviceMete = dealStdDeviceMete(oldStdDeviceMeteList, newStdDeviceMetes, edgeCode);
+            //测点算法关系信息
+            List<TAlgorithmMete> insertAlgorithmMetes = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(newAlgorithmMetes)){
+                insertAlgorithmMetes = dealAlgorithmMete(oldAlgorithmMeteList, newAlgorithmMetes, edgeCode);
+            }
             //巡视点
             List<TCruisePointInstance> insertCruisePointInstanceList = dealCruisePointInstance(oldCruisePointInstanceList, newCruisePointInstances, edgeCode);
             //新增的数据入库
-            insertDeviceModel(insertCameraInfoList, insertRobotInfoList, insertStdDevice, insertStdDeviceMete, insertCruisePointInstanceList, tVoiceDeviceList);
+            insertDeviceModel(insertCameraInfoList, insertRobotInfoList, insertStdDevice, insertStdDeviceMete, insertCruisePointInstanceList, tVoiceDeviceList, insertAlgorithmMetes);
         }
+    }
+
+    private TStdDeviceMete convertDeviceMete(Map<String, Object> device) {
+        TStdDeviceMete tStdDeviceMete = new TStdDeviceMete();
+        tStdDeviceMete.setDevicePointId((String) device.get("device_point_id"));
+        tStdDeviceMete.setMeteKind((Integer) device.get("mete_kind"));
+        tStdDeviceMete.setMeterType((Integer) device.get("meter_type"));
+        tStdDeviceMete.setPositionType((String) device.get("position_type"));
+        tStdDeviceMete.setAnalyseType((Integer) device.get("analyse_type"));
+        tStdDeviceMete.setIsAi((String) device.get("is_ai"));
+        tStdDeviceMete.setIsJudge((String) device.get("is_judge"));
+        tStdDeviceMete.setUnit((String) device.get("unit"));
+        tStdDeviceMete.setAlarmNote((String) device.get("alarm_note"));
+        tStdDeviceMete.setAlarmType((String) device.get("alarm_type"));
+        tStdDeviceMete.setUpEffect((Float) device.get("up_effect"));
+        tStdDeviceMete.setDownEffect((Float) device.get("down_effect"));
+        tStdDeviceMete.setAlarmLevel((Integer) device.get("alarm_level"));
+        tStdDeviceMete.setHighLimit1((Float) device.get("high_limit1"));
+        tStdDeviceMete.setHighLimit2((Float) device.get("high_limit2"));
+        tStdDeviceMete.setHighLimit3((Float) device.get("high_limit3"));
+        tStdDeviceMete.setHighLimit4((Float) device.get("high_limit4"));
+        tStdDeviceMete.setLowLimit1((Float) device.get("low_limit1"));
+        tStdDeviceMete.setLowLimit2((Float) device.get("low_limit2"));
+        tStdDeviceMete.setLowLimit3((Float) device.get("low_limit3"));
+        tStdDeviceMete.setLowLimit4((Float) device.get("low_limit4"));
+        tStdDeviceMete.setAlarmDelay((Integer) device.get("alarm_delay"));
+        tStdDeviceMete.setAlarmCnt((Integer) device.get("alarm_cnt"));
+        tStdDeviceMete.setThresholdAbs((BigDecimal) device.get("threshold_abs"));
+        tStdDeviceMete.setThresholdPer((BigDecimal) device.get("threshold_per"));
+        tStdDeviceMete.setMeteType((String) device.get("mete_type"));
+        tStdDeviceMete.setStateZero((String) device.get("state_zero"));
+        tStdDeviceMete.setStateOne((String) device.get("state_one"));
+        tStdDeviceMete.setAlarmState((Integer) device.get("alarm_state"));
+        return tStdDeviceMete;
     }
 
     /**
@@ -325,6 +405,39 @@ public class TStdDeviceModelService {
     }
 
     /**
+     * 测点
+     * @param oldList 旧数据
+     * @param newList 新数据
+     * @param edgeCode 节点编码
+     * @return 直接入库的数据
+     */
+    private List<TAlgorithmMete> dealAlgorithmMete(List<TAlgorithmMete> oldList, List<TAlgorithmMete> newList, String edgeCode){
+        Map<String, TAlgorithmMete> oldMap = oldList.stream().collect(Collectors.toMap(TAlgorithmMete::getOriginId, Function.identity()));
+        Map<String, TAlgorithmMete> newMap = newList.stream().collect(Collectors.toMap(TAlgorithmMete::getOriginId, Function.identity()));
+        SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
+        if (CollectionUtils.isNotEmpty(updateIdSet)) {
+            newList.stream().filter(t ->
+                    updateIdSet.contains(t.getOriginId())).forEach(t -> {
+                TAlgorithmMete old = oldMap.get(t.getOriginId());
+                t.setDeviceMeteId(old.getDeviceMeteId());
+                tAlgorithmMeteMapper.updateByPrimaryKey(t);
+            });
+        }
+        //删除的数据
+        SetUtils.SetView<String> deleteIdSet=SetUtils.difference(oldMap.keySet(),newMap.keySet());
+        if(CollectionUtils.isNotEmpty(deleteIdSet)){
+            tAlgorithmMeteMapper.deleteByEdgeCodeAndOriginId(edgeCode, deleteIdSet);
+        }
+        //新增的数据
+        SetUtils.SetView<String> insertIdSet = SetUtils.difference(newMap.keySet(), oldMap.keySet());
+        List<TAlgorithmMete> insertList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(insertIdSet)) {
+            insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
+        }
+        return insertList;
+    }
+
+    /**
      * 设备
      * @param oldList 旧数据
      * @param newList 新数据
@@ -368,7 +481,8 @@ public class TStdDeviceModelService {
      */
     private void insertDeviceModel(List<TCameraPreset> newCameraPresets, List<TRobotInspection> newRobotInspections,
                                    List<TStdDevice> newStdDevices, List<TStdDeviceMete> newStdDeviceMetes,
-                                   List<TCruisePointInstance> newCruisePointInstances, List<TVoiceDevice> tVoiceDeviceList){
+                                   List<TCruisePointInstance> newCruisePointInstances, List<TVoiceDevice> tVoiceDeviceList,
+                                   List<TAlgorithmMete> newAlgorithmMetes){
         if (CollectionUtils.isNotEmpty(newCameraPresets)) {
             tCameraPresetMapper.batchInsert(newCameraPresets);
         }
@@ -383,6 +497,14 @@ public class TStdDeviceModelService {
                         .collect(Collectors.toList()).get(0).getDeviceId());
             });
             tStdDevicemeteMapper.batchInsert(newStdDeviceMetes);
+            if (CollectionUtils.isNotEmpty(newAlgorithmMetes)) {
+                newAlgorithmMetes.forEach(tAlgorithmMete ->
+                        tAlgorithmMete.setDeviceMeteId(newStdDeviceMetes.stream().filter(tStdDeviceMete ->
+                                        String.valueOf(tAlgorithmMete.getDeviceMeteId()).equals(tStdDeviceMete.getOriginId()))
+                                .collect(Collectors.toList()).get(0).getDeviceMeteId())
+                );
+                tAlgorithmMeteMapper.batchInsert(newAlgorithmMetes);
+            }
             newCruisePointInstances.forEach(tCruisePointInstance -> {
                 tCruisePointInstance.setDeviceId(newStdDevices.stream().filter(tStdDevice ->
                                 String.valueOf(tCruisePointInstance.getDeviceId()).equals(tStdDevice.getOriginId()))
