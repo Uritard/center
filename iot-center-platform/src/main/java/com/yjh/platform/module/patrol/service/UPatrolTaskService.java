@@ -296,6 +296,7 @@ public class UPatrolTaskService {
         }
         TCruisePlanCount plan = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
         uPatrolTask.setTaskType(plan.getType());
+        uPatrolTask.setCreateTime(new Date());
         uPatrolTaskDao.add(uPatrolTask);
         return instanceList;
     }
@@ -345,9 +346,60 @@ public class UPatrolTaskService {
             String str = PATROL_TASK_PREFIX + task.getTaskId() + ":" + item.getInstanceId();
             redisTemplate.opsForHash().putAll(str, map);
         }
+        initializeThisTaskInfo(task,instanceList);
         return detailList;
     }
 
+    /**
+     * 周期任务初始化下一次的任务信息
+     */
+    public void initializeNextTaskInfo(UPatrolTask task, List<Long> instanceList) {
+        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
+            UPatrolTask nextTask = new UPatrolTask();
+            String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
+            nextTask.setTaskId(newTaskId)
+                    .setTaskCode(task.getTaskCode())
+                    .setTaskName(task.getTaskName())
+                    .setPlanId(task.getPlanId())
+                    .setAreaId(task.getAreaId())
+                    .setTaskType(task.getTaskType())
+                    .setExecuteType(task.getExecuteType())
+                    .setRobotId(task.getRobotId())
+                    .setDateType(task.getDateType())
+                    .setTaskSource(task.getTaskSource())
+                    .setTaskLevel(task.getTaskLevel())
+                    .setStartTime(task.getStartTime())
+                    .setCreateTime(new Date())
+                    .setEndTime(task.getEndTime())
+                    .setCreateUserId(task.getCreateUserId());
+            uPatrolTaskDao.add(task);
+            initializeTaskInfo(instanceList, nextTask);
+        }
+    }
+
+    public void initializeThisTaskInfo(UPatrolTask task, List<Long> instanceList) {
+
+        Map<String, String> mapForAbnormal = new HashMap<>();
+        mapForAbnormal.put("all", String.valueOf(instanceList.size()));
+        mapForAbnormal.put("abnormal", "0");
+        mapForAbnormal.put("normal", "0");
+        Date taskStart = new Date();
+        //任务超期时间
+        Map<String, String> mapForTaskAreTime = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
+        Integer tasksAreTime = Integer.valueOf(mapForTaskAreTime.get("content"));
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(taskStart);
+        cal.add(Calendar.MINUTE, tasksAreTime);
+        Date taskAre = cal.getTime();
+
+        mapForAbnormal.put("taskStart", DateTimeUtil.format(taskStart));
+        mapForAbnormal.put("overDay", DateTimeUtil.format(taskAre));
+        mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_EXECUTING));
+
+        String strForCountAbnormal = "countForAbnormal:" + task.getTaskId();
+        redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
+    }
     @Transactional(rollbackFor = Exception.class)
     public Integer selectRobotType(String robotCode) {
         return tRobotInspectionDao.selectRobotType(robotCode);
@@ -1099,7 +1151,7 @@ public class UPatrolTaskService {
             }
         });
 
-        log.info("task [{}] ready, skipPointList: {}, cruiseGroupMapSize: {}", taskId, skipPointList.size(), cruiseGroupMap.size());
+        log.info("task [{}] ready, skipPointList: {}, cruiseGroupMap: {}", taskId, skipPointList.size(), cruiseGroupMap);
         ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true));
         for (List<Map<String, String>> pointList : cruiseGroupMap.values()){
             ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, pointList, false));

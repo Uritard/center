@@ -6,15 +6,18 @@ import com.yjh.accessudp.commons.result.ResultCodeEnum;
 import com.yjh.accessudp.module.device.dao.TCfgMeteDao;
 import com.yjh.accessudp.module.device.entity.SYAllInfo;
 import com.yjh.accessudp.module.device.entity.SysLogs;
+import com.yjh.accessudp.module.device.entity.TSysParam;
 import com.yjh.accessudp.module.device.service.SysLogsService;
 import com.yjh.accessudp.module.device.service.TCfgMeteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +36,8 @@ public class SysLogsController {
     private final SysLogsService sysLogsService;
     @Autowired
     private TCfgMeteDao tCfgMeteDao;
+    @Autowired
+    private TCfgMeteService tCfgMeteService;
 
     private Logger log = LoggerFactory.getLogger(SysLogsController.class);
 
@@ -114,6 +119,74 @@ public class SysLogsController {
             log.error("失败查询描述：", e);
         }
         return result;
+    }
+
+    @ApiOperation(value = "初始化四遥信号量信息")
+    @RequestMapping(value = "/SYCreate", method = RequestMethod.GET)
+    public Result sendFile(@Param(value = "filePath") String filePath){
+        Result result = new Result();
+        try {
+            loadDeviceInfo(filePath);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败查询描述：", e);
+        }
+        return result;
+    }
+
+    public void loadDeviceInfo(String filePath)throws Exception {
+        //读取联动设备的信息
+        log.info("设备文件路径：  "+filePath);
+        BufferedReader br = null;
+        InputStreamReader in = null;
+        try  {
+            in = new InputStreamReader(new FileInputStream(new File(filePath)), "UTF-8");
+            br = new BufferedReader(in);
+            String line;
+            String[] strArray = null;
+            List<SYAllInfo> list = new ArrayList<>();
+            while ((line = br.readLine()) != null) {
+                // 一次读入一行数据
+                if(line.contains("#")){
+                    strArray = line.split("\\s+");
+                    if("".equals(strArray[0])){
+                        strArray= Arrays.copyOfRange(strArray,1,strArray.length);
+                    }
+                    //取数据
+                    SYAllInfo syAllInfo = new SYAllInfo();
+                    syAllInfo.setStationId(strArray[1]);
+                    String[] mete = strArray[3].split("/");
+                    String meteName = "";
+                    if(mete.length > 1){
+                        meteName = mete[mete.length-2]+"/"+mete[mete.length-1]+"-"+strArray[4];
+                    }else {
+                        meteName = mete[mete.length-1]+"-"+strArray[4];
+                    }
+                    syAllInfo.setMeteId(strArray[2]);
+                    syAllInfo.setMeteName(meteName);
+                    syAllInfo.setDeviceId(strArray[2]);
+                    syAllInfo.setDeviceName(strArray[3]);
+                    Integer meteKind = strArray[4].contains("遥信")?1:(strArray[4].contains("遥测")?2:(strArray[4].contains("遥控")?3:(strArray[4].contains("遥调")?4:5)));
+                    syAllInfo.setMeteKind(meteKind);
+                    syAllInfo.setMeteCode(strArray[5]);
+                    list.add(syAllInfo);
+                }
+            }
+            br.close();
+            in.close();
+            tCfgMeteService.deleteAll(list);
+            tCfgMeteService.insertForAll(list);
+        } catch (IOException e) {
+            log.info("读取联动设备错误: "+e);
+        } finally {
+            if(br != null ){
+                br.close();
+            }
+            if(in != null ){
+                in.close();
+            }
+
+        }
     }
 
 }
