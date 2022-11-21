@@ -42,12 +42,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.catalina.startup.ExpandWar.deleteDir;
@@ -544,9 +548,9 @@ public class RobotService {
 //                        case "overhaularea_file_path":
 //                            dealMaintenanceFilePath(filePathMap,v.toString(),edgeCode);
 //                            break;
-//                        case "source_file_path":
-//                            dealSourceFile(filePath, edgeCode);
-//                            break;
+                        case "source_file_path":
+                            dealSourceFile(filePath, edgeCode);
+                            break;
                         default:
                             log.warn("模型解析未定义，{}: {}", k, filePath);
                             break;
@@ -3019,10 +3023,10 @@ public class RobotService {
 //                log.info("地图文件 {}", filePath);
 //                dealMapFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
 //                break;
-//            case "10":
-//                log.info("设备资源信息配置文件 {}", filePath);
-//                dealSourceFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
-//                break;
+            case "10":
+                log.info("设备资源信息配置文件 {}", filePath);
+                dealSourceFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                break;
             case "1001":
                 log.info("区域文件模型 {}", filePath);
                 dealRegionFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
@@ -3033,6 +3037,63 @@ public class RobotService {
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * 处理设备资源信息配置文件
+     *
+     * @param filePath 设备资源信息配置文件路径
+     */
+    private void dealSourceFile(String filePath, String edgeCode) {
+        log.info("处理设备资源信息配置文件：filePath:{}, edgeCode:{}",filePath,edgeCode);
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            StringBuilder stringBuilder = new StringBuilder();
+            String line = null;
+            String ls = System.getProperty("line.separator");
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+                stringBuilder.append(ls);
+            }
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            reader.close();
+            String data = stringBuilder.toString();
+            String regex = "\\#.*?(是|否)";
+            Matcher matcher = Pattern.compile(regex).matcher(data);
+            List<SYAllInfo> list = new LinkedList<>();
+            while (matcher.find()) {
+                String str = matcher.group();
+                str = str.replaceAll("\\t", " ");
+
+                String[] strArray = str.split("\\s+");
+                if ("".equals(strArray[0])) {
+                    strArray = Arrays.copyOfRange(strArray, 1, strArray.length);
+                }
+                //取数据
+                SYAllInfo syAllInfo = new SYAllInfo();
+                syAllInfo.setStationId(strArray[1]);
+                String[] mete = strArray[3].split("/");
+                String meteName = "";
+                if (mete.length > 1) {
+                    meteName = mete[mete.length - 2] + "/" + mete[mete.length - 1] + "-" + strArray[4];
+                } else {
+                    meteName = mete[mete.length - 1] + "-" + strArray[4];
+                }
+                syAllInfo.setMeteId(edgeCode + strArray[2]);
+                syAllInfo.setMeteName(meteName);
+                syAllInfo.setDeviceId(edgeCode + strArray[2]);
+                syAllInfo.setEdgeCode(edgeCode);
+                syAllInfo.setDeviceName(strArray[3]);
+                Integer meteKind = strArray[4].contains("遥信") ? 1 : (strArray[4].contains("遥测") ? 2 : (strArray[4].contains("遥控") ? 3 : (strArray[4].contains("遥调") ? 4 : 5)));
+                syAllInfo.setMeteKind(meteKind);
+                syAllInfo.setMeteCode(strArray[5]);
+                list.add(syAllInfo);
+                //list.add(str);
+            }
+            Constant.otherServerList(list, Constant.SOURCE_FILE_URL);
+        } catch (Exception e) {
+            log.error("设备资源信息配置文件处理失败", e);
         }
     }
 

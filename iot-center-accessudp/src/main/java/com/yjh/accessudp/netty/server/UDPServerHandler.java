@@ -5,9 +5,11 @@ import com.yjh.accessudp.common.utils.ByteUtil;
 import com.yjh.accessudp.common.utils.MeteValueUtils;
 import com.yjh.accessudp.commons.logs.SpringBeanUtils;
 import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessudp.module.device.entity.EdgeEnum;
 import com.yjh.accessudp.module.device.entity.SYAllInfo;
 import com.yjh.accessudp.module.device.entity.TCfgDataCurrent;
 import com.yjh.accessudp.module.device.service.TCfgMeteService;
+import com.yjh.accessudp.thread.TaskExecutePool;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -143,6 +145,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, DatagramPacket datagramPacket) throws Exception {
+        String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
         // 解析数据包
         ByteBuf sss = datagramPacket.content();
         byte[] req = new byte[sss.readableBytes()];
@@ -232,14 +235,28 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             //将实时表里的数据更新到历史表里
             tCfgMeteService.insertIntoHis(tCfgDataCurrent);
 
-            {//遥控信号
-                if(meteKind == 3){
-                    getUrl(SEQUENCE_URL,meteId.toString());
-                    getUrl(UNION_URL,meteId.toString());
-                }else if(meteKind == 1 && value.equals("变位")){
-                    getUrl(SEQUENCEREC_URL,meteId.toString());
-                }else {
-                    getUrl(UNION_URL,meteId.toString());
+            //边缘节点处理方式
+            if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
+                //联动信息上送 A接口
+                LinkageUploadThread linkageUploadThread = new LinkageUploadThread(meteId.toString(), meteKind == 3 ? "0" : meteKind.toString(), value, commit, time);
+                TaskExecutePool.getInstance().execute(linkageUploadThread);
+                {//遥控信号
+                    if(meteKind == 3){
+                        getUrl(SEQUENCE_URL,meteId.toString());
+                    }else if(meteKind == 1 && "变位".equals(value)){
+                        getUrl(SEQUENCEREC_URL,meteId.toString());
+                    }
+                }
+            }else {
+                {//遥控信号
+                    if(meteKind == 3){
+                        getUrl(SEQUENCE_URL,meteId.toString());
+                        getUrl(UNION_URL,meteId.toString());
+                    }else if(meteKind == 1 && "变位".equals(value)){
+                        getUrl(SEQUENCEREC_URL,meteId.toString());
+                    }else {
+                        getUrl(UNION_URL,meteId.toString());
+                    }
                 }
             }
 
@@ -254,6 +271,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 }else {
                     xuHao = Integer.valueOf(new BigInteger(arrayToStringL(udp,8,2,false),16).toString());
                 }
+                log.info("序号：{}",xuHao);
                 //其实传输位置 9-12
                 Integer valueLength = Integer.valueOf(new BigInteger(udp[14],16).toString());
                 List<String> listByte = new ArrayList<>();
@@ -283,6 +301,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                 }
                 Constant.data.put(xuHao,listByte);
 
+                log.info("数据：{}",Constant.data);
                 List<String> listForSortByte =new ArrayList<>();
                 for(int i=0;i<Constant.data.size();i++ ){
                     Constant.data.get(i);
@@ -291,6 +310,7 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                     }
 
                 }
+                log.info("listForSortByte:{}",listForSortByte);
                 String data="";
                 if(Constant.sort){
                     data = arrayToString(listForSortByte);
@@ -301,7 +321,15 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
                     data = toStringHex(data);
                     log.info("文件内容： "+data);
                 }
-                String regex ="\\#.*?(是|不是)";
+                //设备资源信息配置文件生成与上传
+                SourceFileThread sourceFileThread = new SourceFileThread(data, redisTemplate);
+                TaskExecutePool.getInstance().execute(sourceFileThread);
+                String regex;
+                if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
+                    regex ="\\#.*?(是|否)";
+                }else {
+                    regex = "\\#.*?(是|不是)";
+                }
                 Matcher matcher = Pattern.compile(regex).matcher(data);
                 List<SYAllInfo> list = new LinkedList<>();
                 while (matcher.find()){

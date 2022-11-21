@@ -189,7 +189,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
             redisTemplate.expire(stationWeather, 7, TimeUnit.DAYS);
         }
         System.out.println("微气象数据测试一波++++++++" + info);
-        Constant.weatherServer(info, Constant.WEATHER_URL);
+        Constant.mapToOtherServer(info, Constant.WEATHER_URL);
 
         // 国网要求
 //         robotService.upToCruise(xmlBaseModel);

@@ -1,12 +1,16 @@
 package com.yjh.accessudp.common;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.yjh.accessudp.common.utils.StaticContextAccessor;
+import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
+import com.yjh.accessudp.commons.result.Result;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class Constant {
 
     public static final String USER_COUNT = "statistics:userCount";
@@ -28,6 +32,24 @@ public class Constant {
 
     // 自定义属性
     public static final String DYNAMIC = "dynamic";
+
+    public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
+    public static void modelUpload(String type){
+        try {
+            Map<String, Object> param = new HashMap<>();
+            param.put("type", type);
+            StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);
+        }catch (Exception e){
+            log.error("模型文件上传失败", e);
+        }
+    }
+    public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
+
+    public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
+        Result re = new Result();
+        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
+        return re;
+    }
 
     //自定义遥脉，遥测，遥信，遥调,遥控
     public static final String YX="YX";

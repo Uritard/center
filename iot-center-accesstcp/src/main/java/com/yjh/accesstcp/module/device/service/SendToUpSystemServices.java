@@ -161,6 +161,14 @@ public class SendToUpSystemServices {
                     ftpsUtil.putFile(mapAbsPath, mapModelTargetPath);
                     map.put("map_file_path", mapModelTargetPath);
                     break;
+                case "10":
+                    //设备资源信息配置文件
+                    String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
+                    String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                    String sourceModelPath = sourceModelMap + "source_file_model.cime";
+                    ftpsUtil.putFile(sourceModelPath, sourceFilePath);
+                    map.put("source_file_path",sourceFilePath);
+                    break;
                 case "1001":
                     // 区域模型
                     String regionModelTargetPath = String.format(stationCode + "/Model/region_model.xml");
@@ -256,6 +264,14 @@ public class SendToUpSystemServices {
                     String mapModelTargetPath = stationCode + mapRealPath.replace(filePathMap, "");
                     ftpsUtil.putFile(mapAbsPath, mapModelTargetPath);
                     map.put("file_path", mapModelTargetPath);
+                    break;
+                case "10":
+                    //设备资源信息配置文件
+                    String sourceFilePath = String.format(stationCode + "/Model/source_file_model.cime");
+                    String sourceModelMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                    String sourceModelPath = sourceModelMap + "source_file_model.cime";
+                    ftpsUtil.putFile(sourceModelPath, sourceFilePath);
+                    map.put("file_path",sourceFilePath);
                     break;
                 case "1001":
                     // 区域模型

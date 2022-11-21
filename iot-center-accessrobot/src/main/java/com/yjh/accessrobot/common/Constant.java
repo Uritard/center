@@ -102,15 +102,25 @@ public class Constant {
 
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
-    public static<T> Result otherServerList( List<String> list, String url){
+    public static<T> Result otherServerList(List<T> list, String url){
         return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, list, Result.class);
     }
     public static final String TASK_FINISH="http://iot-center-platform/tCruiseDataResult/v1/updateCruiseAnalyze";
 
     public static final String WEATHER_URL="http://iot-center-platform/homePage/v1/getWeatherInfoForService";
-    public static Result weatherServer(Map<String,String> map, String url){
-        Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);
-        return re;
+
+    public static final String SOURCE_FILE_URL="http://iot-center-accessudp/sendFile/v1/dealSourceFile";
+
+    public static final String DEAL_LINKAGE_SIGNAL_URL="http://iot-center-accessudp/sendFile/v1/dealLinkageSignal";
+
+    public static final String SEQUENCE_URL = "http://iot-center-platform/tSequentialConf/v1/sequential?meteId={meteId}";
+
+    public static final String SEQUENCE_REC_URL = "http://iot-center-platform/tSequentialConf/v1/sequentialRec";
+
+    public static final String UNION_URL = "http://iot-center-platform/tCfgDataCurrent/v1/unionTest?meteId={meteId}";
+
+    public static Result mapToOtherServer(Object o, String url){
+        return StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, o, Result.class);
     }
 
     //添加操作任务模型入口
