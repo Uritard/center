@@ -45,4 +45,26 @@ public class AreaInfoRegionCode implements Serializable {
     @ApiModelProperty(value = "子类")
     private List<AreaInfoRegionCode> children;
 
+    /**
+     * 0:非当前变电站 1：当前变电站
+     */
+    private int state;
+
+    /**
+     * 经度
+     */
+    private String longitude;
+
+    /**
+     * 纬度
+     */
+    private String latitude;
+
+    /**
+     * 电压层级
+     */
+    private String voltageLevel;
+
+    private String voltageLevelName;
+
 }
