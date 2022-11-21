@@ -84,7 +84,7 @@ public class InspectionResultThread implements Runnable{
             String robotCode = robotPatrolTaskResult.getSendCode();
 
             // taskId是巡视主机的id,robotTaskId是机器人上报的id
-            String robotTaskId = uPatrolTaskService.selectTaskCodeByTaskId(taskId);
+            String robotTaskId = infoMap.get("taskCode");
             log.info("robotTaskId==={}", robotTaskId);
 
             UPatrolTask uPatrolTaskTemp = uPatrolTaskService.selectTaskByTaskCode(robotTaskId);

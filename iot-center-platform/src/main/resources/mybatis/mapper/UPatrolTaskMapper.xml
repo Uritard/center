@@ -812,8 +812,9 @@
             a.end_time,
             a.create_user_id
         from u_patrol_task a
-        where 1 = 1
-          and a.task_code = #{taskCode, jdbcType=VARCHAR}
+        where a.task_code = #{taskCode, jdbcType=VARCHAR}
+        order by a.create_time asc
+        limit 1
     </select>
 
     <select id="selectTaskCodeByTaskId" resultType="java.lang.String">

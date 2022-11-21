@@ -39,11 +39,13 @@ public class RobotInspectionWarnThread implements Runnable{
     private final PatrolResultHandler patrolResultHandler;
     private final AnalyseDataOperateService analyseDataOperateService;
     private final UPatrolTaskService uPatrolTaskService;
+    private final String taskCode;
 
-    public RobotInspectionWarnThread(RobotPatrolTaskAlarm taskAlarm, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService){
+    public RobotInspectionWarnThread(RobotPatrolTaskAlarm taskAlarm, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, String taskCode){
         this.taskAlarm = taskAlarm;
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateService = analyseDataOperateService;
+        this.taskCode = taskCode;
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
     }
@@ -56,7 +58,7 @@ public class RobotInspectionWarnThread implements Runnable{
             String robotCode = taskAlarm.getRobotCode();
 
             // taskId是巡视主机的id,robotTaskId是机器人上报的id
-            String robotTaskId = uPatrolTaskService.selectTaskCodeByTaskId(taskId);
+            String robotTaskId = taskCode;
             log.info("robotTaskId==={}", robotTaskId);
 
             UPatrolTask uPatrolTaskTemp = uPatrolTaskService.selectTaskByTaskCode(robotTaskId);
@@ -78,7 +80,7 @@ public class RobotInspectionWarnThread implements Runnable{
             TWarnInfo warnInfo = getWarnInfo(tStdDevicemete, taskId, instanceId, robotCode);
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
 
-            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
 
             getWarnMap(taskId, warnInfo);
 
