@@ -45,19 +45,19 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
         // Deal with robot micro climate data
         String robotCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(robotCode)) {
-            log.error("机器人/无人机编码为空");
-            throw new RuntimeException("机器人/无人机编码为空");
+            log.error("下级唯一标识为空");
+            throw new RuntimeException("下级唯一标识为空");
         }
         if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
-            log.error("机器人/无人机未注册或未连接");
-            throw new RuntimeException("机器人/无人机未注册或未连接");
+            log.error("下级唯一标识未注册或未连接");
+            throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
-        // 给机器人响应
+        // 给下级响应
         String weatherXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);
         RobotServerHandler.send(weatherProtocol, robotCode);
-        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
+        log.info("巡视主机给下级{}响应了", robotCode);
 
         List<Map<String, String>> weatherList = new ArrayList<>();
         Map<String, String> info = new HashMap<>();

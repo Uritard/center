@@ -25,20 +25,20 @@ public class RobotCruiseReportHandler implements MessageHandlerStrategy, Initial
         log.info("+++++++++++++++++巡视主机收到机器人巡视报告数据了+++++++++++++++++");
         String robotCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(robotCode)) {
-            log.error("机器人/无人机编码为空");
-            throw new RuntimeException("机器人/无人机编码为空");
+            log.error("下级唯一标识为空");
+            throw new RuntimeException("下级唯一标识为空");
         }
         if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
-            log.error("机器人/无人机未注册或未连接");
-            throw new RuntimeException("机器人/无人机未注册或未连接");
+            log.error("下级唯一标识未注册或未连接");
+            throw new RuntimeException("下级唯一标识未注册或未连接");
         }
         // todo 暂时不用
 
-        // 给机器人响应
+        // 给下级响应
         String cruiseReportString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] cruiseReportProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseReportString);
         RobotServerHandler.send( cruiseReportProtocol, robotCode);
-        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
+        log.info("巡视主机给下级{}响应了", robotCode);
     }
 
     @Override

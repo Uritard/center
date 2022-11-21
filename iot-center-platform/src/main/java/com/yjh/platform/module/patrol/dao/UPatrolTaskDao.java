@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <功能描述>
@@ -143,4 +144,6 @@ public interface UPatrolTaskDao {
     UPatrolTask selectTaskByTaskCode(@Param(value = "taskCode") String taskCode);
 
     String selectTaskCodeByTaskId(@Param(value = "taskId") String taskId);
+
+    List<Map<String,Object>> selectForSequenceInfoByMeteId(@Param(value = "cfgDeviceId") String cfgDeviceId);
 }

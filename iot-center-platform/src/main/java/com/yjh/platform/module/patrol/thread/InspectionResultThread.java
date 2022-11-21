@@ -2,8 +2,11 @@ package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.logs.SpringBeanUtils;
+import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
@@ -24,8 +27,10 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -60,7 +65,7 @@ public class InspectionResultThread implements Runnable{
         try {
             log.info("开始处理巡检结果并对其标准化 >>>>>>> robotPatrolTaskResult==={}", JSON.toJSONString(robotPatrolTaskResult));
             String taskId = infoMap.get("taskId");
-            String robotCode = robotPatrolTaskResult.getRobotCode();
+            String robotCode = robotPatrolTaskResult.getSendCode();
 
             // taskId是巡视主机的id,robotTaskId是机器人上报的id
             String robotTaskId = uPatrolTaskService.selectTaskCodeByTaskId(taskId);
@@ -115,9 +120,9 @@ public class InspectionResultThread implements Runnable{
 
             // 巡视主机下发的任务或者站端本体任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);
-            if (Boolean.FALSE.equals(flag)){
+            if (!flag) {
                 log.info("This is simulation tool task！！！");
-                simulationToolTaskHandler(infoMap.get("absolutePath"), taskId, instanceId);
+                simulationToolTaskHandler(infoMap.get("absolutePath"), taskId, instanceId, robotPatrolTaskResult.getValue(), robotPatrolTaskResult.getFilePath());
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -219,13 +224,30 @@ public class InspectionResultThread implements Runnable{
      * @param originPath 巡视结果文件全路径
      * @param taskId 任务id
      * @param instanceId 巡视点id
+     * @param value 巡视结果值
+     * @param filePath 上报的巡视结果文件路径
      */
-    private void simulationToolTaskHandler(String originPath, String taskId, String instanceId) {
+    private void simulationToolTaskHandler(String originPath, String taskId, String instanceId, String value, String filePath) {
         try {
             // 复制图片到算法分析指定的路径
             String ftpFileName = originPath.trim().substring(originPath.trim().lastIndexOf("/") + 1);
             String resultImagePath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content") + ftpFileName;
             FileUtil.copyFileUsingStream(resultImagePath, resultImagePath);
+
+            // 复制原图到算法分析指定的路径
+            if (StringUtils.isNotEmpty(ftpFileName) && StringUtils.isNotEmpty(value) && !ftpsTurbo()){
+                log.info("ftpFileName and value is not empty...");
+                log.info("resultImagePath=={}", resultImagePath);
+                try {
+                    // 调用video服务 将要分析的图片从ftps下载到本地
+                    Map<String, String> params = Maps.newLinkedHashMap();
+                    params.put("source", resultImagePath);
+                    params.put("target", filePath);
+                    SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class).postForObject(Constant.VIDEO_DOWNLOAD_FILE, params, String.class);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
 
             TCruisePointInstanceDetail details = uPatrolTaskService.selectForTask(Long.valueOf(instanceId));
 
@@ -272,12 +294,6 @@ public class InspectionResultThread implements Runnable{
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
-//            Map<String, String> jasonMap = new HashMap<>(2);
-//            jasonMap.put("type", "finishedOneInstance");
-//            jasonMap.put("taskId", taskId);
-//            log.info("做完一个点-前端推送：{}", JSON.toJSONString(jasonMap));
-//            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
-
             uPatrolTaskService.patrolTaskResultHandler(taskId, details.getInstanceId());
         }catch (Exception e){
             log.error(e.getMessage(), e);
@@ -310,5 +326,14 @@ public class InspectionResultThread implements Runnable{
 
             return keys;
         });
+    }
+
+    /**
+     * 如果 ftpsTurbo 为 true，则表示设置了文件盘共享，不使用 ftps 对文件进行传输拷贝
+     */
+    public boolean ftpsTurbo() {
+        boolean ftpsTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:ftpsTurbo", "content"));
+        log.warn("ftpsTurbo is {}", ftpsTurbo);
+        return ftpsTurbo;
     }
 }

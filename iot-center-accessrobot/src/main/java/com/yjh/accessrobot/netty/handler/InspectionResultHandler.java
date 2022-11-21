@@ -1,11 +1,13 @@
 package com.yjh.accessrobot.netty.handler;
 
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
+import com.yjh.accessrobot.configuration.UpFtpsConfig;
 import com.yjh.accessrobot.module.command.entity.RobotPatrolTaskResult;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
@@ -33,21 +35,21 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到巡视结果了+++++++++++++++++");
         // Deal with robot task result data
-        String robotCode = xmlBaseModel.getSendCode();
-        if (StringUtils.isEmpty(robotCode)) {
-            log.error("机器人/无人机编码为空");
-            throw new RuntimeException("机器人/无人机编码为空");
+        String sendCode = xmlBaseModel.getSendCode();
+        if (StringUtils.isEmpty(sendCode)) {
+            log.error("下级唯一标识为空");
+            throw new RuntimeException("下级唯一标识为空");
         }
-        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
-            log.error("机器人/无人机未注册或未连接");
-            throw new RuntimeException("机器人/无人机未注册或未连接");
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(sendCode, false))) {
+            log.error("下级唯一标识未注册或未连接");
+            throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
-        // 给机器人响应
-        String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true,robotCode));
+        // 给下级响应
+        String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true,sendCode));
         byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
-        RobotServerHandler.send(cruiseResultProtocol, robotCode);
-        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
+        RobotServerHandler.send(cruiseResultProtocol, sendCode);
+        log.info("巡视主机给下级{}响应了", sendCode);
 
         // 处理数据
         List<RobotPatrolTaskResult> resultList = new ArrayList<>();
@@ -55,7 +57,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             RobotPatrolTaskResult taskResult = new RobotPatrolTaskResult();
             taskResult.setPatrolDeviceName(String.valueOf(item.get("patroldevice_name")));
             taskResult.setPatrolDeviceCode(String.valueOf(item.get("patroldevice_code")));
-            taskResult.setRobotCode(robotCode);
+            taskResult.setSendCode(sendCode);
             taskResult.setTaskName(String.valueOf(item.get("task_name")));
             taskResult.setTaskCode(String.valueOf(item.get("task_code")));
             taskResult.setDeviceName(String.valueOf(item.get("device_name")));
@@ -69,6 +71,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             taskResult.setFileType(String.valueOf(item.get("file_type")));
             taskResult.setRectangle(String.valueOf(item.get("rectangle")));
             taskResult.setFilePath(String.valueOf(item.get("file_path")));
+            taskResult.setTaskPatrolledId(String.valueOf(item.get("task_patrolled_id")));
             taskResult.setValid(Objects.nonNull(item.get("valid")) ? String.valueOf(item.get("valid")) : "");
             taskResult.setOriginFileResultPath(Objects.nonNull(item.get("origin_file_path")) ? String.valueOf(item.get("origin_file_path")) : "");
             taskResult.setOriginFilePath(Objects.nonNull(item.get("origin_file_result_path")) ? String.valueOf(item.get("origin_file_result_path")) : "");

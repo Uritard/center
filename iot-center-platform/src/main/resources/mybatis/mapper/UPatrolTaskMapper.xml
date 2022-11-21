@@ -786,32 +786,24 @@
 
     <select id="selectTaskByTaskCode" parameterType="java.lang.String" resultType="com.yjh.platform.module.patrol.entity.UPatrolTask">
         select
-        a.task_id,
-        a.task_code,
-        a.task_name,
-        a.area_id,
-        a.task_type,
-        a.execute_type,
-        a.robot_id,
-        a.task_source,
-        a.task_level,
-        a.task_state,
-        a.modify_state,
-        a.task_count,
-        a.task_wait,
-        a.check_user,
-        a.check_date,
-        a.weather,
-        a.create_time,
-        a.end_time,
-        a.execute_time,
-        a.is_review,
-        a.task_abnormal,
-        a.cruise_result,
-        a.remark
+            a.task_id,
+            a.task_code,
+            a.task_name,
+            a.plan_id,
+            a.area_id,
+            a.task_type,
+            a.execute_type,
+            a.robot_id,
+            a.date_type,
+            a.task_source,
+            a.task_level,
+            a.start_time,
+            a.create_time,
+            a.end_time,
+            a.create_user_id
         from u_patrol_task a
         where 1 = 1
-        and a.task_code = #{taskCode, jdbcType=VARCHAR}
+          and a.task_code = #{taskCode, jdbcType=VARCHAR}
     </select>
 
     <select id="selectTaskCodeByTaskId" resultType="java.lang.String">
@@ -823,6 +815,38 @@
           and a.task_id = #{taskId, jdbcType=VARCHAR}
         ORDER BY b.execute_time desc
             LIMIT 1
+    </select>
+
+    <select id="selectForSequenceInfoByMeteId" resultType="java.util.Map">
+        SELECT
+            c.sort,
+            a.cfg_device_id as cfgDeviceId,
+            g.device_name as deviceName,
+            IFNULL(b.record_time,"") as recordTime,
+            IFNULL(b.mete_value,"") as state,
+            a.camera_id as cameraId,
+            f.camera_name as cameraName,
+            a.preset_id as presetId,
+            e.preset_name as presetName,
+            h.instance_id as instanceId,
+            i.analyse_type as analyseType
+        FROM t_sequential_conf a
+                 left join t_cfg_data_current b on a.cfg_device_id = b.mete_id
+                 left join (SELECT CAST((@i:=@i+1) AS SIGNED) as sort,x.cfg_device_id FROM t_sequential_conf x,(Select @i:=-1) z) c on a.cfg_device_id = c.cfg_device_id
+                 left join t_camera_preset e on a.preset_id = e.preset_id
+                 left join t_camera_info f on a.camera_id = f.camera_id
+                 left join t_cfg_device g on a.cfg_device_id = g.device_id
+                 left join t_cruise_point_instance h on h.cruise_id = a.preset_id
+                 left join t_std_devicemete i on i.device_mete_id = h.device_mete_id
+        where 1=1
+          and a.cfg_device_id in(
+            SELECT
+                cfgMete.mete_id
+            from
+                t_cfg_mete mete
+                    left join t_cfg_mete cfgMete on mete.mete_code = cfgMete.mete_code
+            where mete.mete_id =#{cfgDeviceId, jdbcType=VARCHAR}
+        )
     </select>
 
 </mapper>

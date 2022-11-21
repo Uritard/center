@@ -316,6 +316,16 @@
         WHERE 1 = 1
         <if test="robotCode != null and robotCode !=''">and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
     </select>
+
+    <select id="selectStatusByEdgeCode" parameterType="java.lang.String" resultType="java.lang.String">
+        select
+            a.edge_status
+        FROM
+            t_std_region a
+        WHERE
+            a.region_code = #{edgeCode, jdbcType=VARCHAR}
+    </select>
+
     <select id="selectIsUnionTask" resultType="java.lang.Integer">
         select COUNT(1) FROM t_union_task a where 1 = 1
         <if test="unionId != null and unionId !=''">and a.union_id = #{unionId, jdbcType=VARCHAR}</if>
@@ -1284,26 +1294,18 @@
             a.task_id,
             a.task_code,
             a.task_name,
+            a.plan_id,
             a.area_id,
             a.task_type,
             a.execute_type,
             a.robot_id,
+            a.date_type,
             a.task_source,
             a.task_level,
-            a.task_state,
-            a.modify_state,
-            a.task_count,
-            a.task_wait,
-            a.check_user,
-            a.check_date,
-            a.weather,
+            a.start_time,
             a.create_time,
             a.end_time,
-            a.execute_time,
-            a.is_review,
-            a.task_abnormal,
-            a.cruise_result,
-            a.remark
+            a.create_user_id
         from u_patrol_task a
         where 1 = 1
           and a.task_code = #{taskCode, jdbcType=VARCHAR}

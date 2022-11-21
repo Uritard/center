@@ -313,5 +313,7 @@ public class Constant {
      * 下级系统数据
      */
     public static final int STATE_SUB = 0;
+
+    public static final String VIDEO_DOWNLOAD_FILE = "http://iot-center-accessvideo/intel-analysis/downloadPicture";
 }
 

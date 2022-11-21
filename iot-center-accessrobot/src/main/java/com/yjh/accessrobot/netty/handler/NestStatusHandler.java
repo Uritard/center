@@ -39,19 +39,19 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
         log.info("+++++++++++++++++巡视主机收到无人机机巢状态数据了+++++++++++++++++");
         String robotCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(robotCode)) {
-            log.error("机器人/无人机编码为空");
-            throw new RuntimeException("机器人/无人机编码为空");
+            log.error("下级唯一标识为空");
+            throw new RuntimeException("下级唯一标识为空");
         }
         if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
-            log.error("机器人/无人机未注册或未连接");
-            throw new RuntimeException("机器人/无人机未注册或未连接");
+            log.error("下级唯一标识未注册或未连接");
+            throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
-        // 给机器人响应
+        // 给下级响应
         String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
         RobotServerHandler.send(statusProtocol, robotCode);
-        log.info("巡视主机给机器人/无人机{}响应了", robotCode);
+        log.info("巡视主机给下级{}响应了", robotCode);
 
         List<Map<String, String>> nestStatusList = new ArrayList<>();
         xmlBaseModel.getItems().forEach(res -> {
