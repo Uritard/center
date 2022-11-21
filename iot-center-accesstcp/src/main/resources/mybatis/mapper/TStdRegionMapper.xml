@@ -176,7 +176,7 @@
         where   region_id = #{regionId,jdbcType=BIGINT} 
     </update>
 
-    <select id="selectAll"resultMap="BaseResultMap">
+    <select id="selectAll" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
         from t_std_region
