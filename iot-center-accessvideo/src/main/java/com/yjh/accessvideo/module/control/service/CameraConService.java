@@ -6,11 +6,13 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.NativeLongByReference;
 import com.yjh.accessvideo.common.Constant;
+import com.yjh.accessvideo.common.utils.FtpsUtil;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.utils.ByteUtil;
 import com.yjh.accessvideo.commons.utils.DateTimeUtil;
 import com.yjh.accessvideo.commons.utils.VideoUtil;
 import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
+import com.yjh.accessvideo.configuration.PlatFromFtpsConfig;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.hik.PlayCtrl;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
@@ -119,6 +121,9 @@ public class CameraConService {
 
     @Value("${system.webSocket.url}")
     private String syncWebsocketUrl;//WS调用接口地址
+
+    @Autowired
+    private PlatFromFtpsConfig platFromFtpsConfig;
 
     private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -1959,7 +1964,7 @@ public class CameraConService {
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
             String url = "chmod 777 " + videoPath + fileName;
             Runtime.getRuntime().exec(url);
-            TranscodeThread transcodeThread = new TranscodeThread(videoPath, savePath, fileName,syncWebsocketUrl,userId,cameraConDao);
+            TranscodeThread transcodeThread = new TranscodeThread(videoPath, savePath, fileName,syncWebsocketUrl,userId,cameraConDao,platFromFtpsConfig);
             TaskExecutePool.getInstance().execute(transcodeThread);
         }catch (Exception ignored){
             log.info("录制失败");
@@ -2065,7 +2070,8 @@ public class CameraConService {
                                             Runtime.getRuntime().exec(url);
                                             log.info("nPos.getValue!:>>>" + nPos.getValue());
                                             judge = savePath + fileName;
-                                           // hCNetSDK.NET_DVR_Logout(m_lLoadHandle);
+                                            copyFile(fileName,videoPath + fileName);
+                                            // hCNetSDK.NET_DVR_Logout(m_lLoadHandle);
                                            // hCNetSDK.NET_DVR_Cleanup();
                                             break;
                                         }
@@ -2318,6 +2324,7 @@ public class CameraConService {
                         pictureWaterMark(path, DateTimeUtil.format(new Date()) + "--" + meteName);
                     }
                     map.put("picPath", hotPicshow + newName + ".jpg");
+                    copyFile(newName + ".jpg",path);
                     log.info("hotPicshow地址：" + hotPicshow + newName + ".jpg");
                 } else {
                     map = null;
@@ -2338,6 +2345,7 @@ public class CameraConService {
                     fout.write(bytes);
                     fout.close();
                     map.put("dataPath", hotFirShow + newName + ".data");
+                    copyFile(newName + ".data",path);
                     log.info("hotFirShowdata地址：" + hotFirShow + newName + ".data");
                 } else {
                     int iErr = hCNetSDK.NET_DVR_GetLastError();
@@ -2362,6 +2370,7 @@ public class CameraConService {
                     fos.flush();
                     fos.close();
                     map.put("csvPath", hotFirShow + newName + ".csv");
+                    copyFile(newName + ".csv",path);
                     log.info("hotFirShowcsv地址：" + hotFirShow + newName + ".csv");
 
                 } else {
@@ -2528,6 +2537,7 @@ public class CameraConService {
                     map.put("picPath", hotPicshow + newName + ".jpg");
                     map.put("urlPath", hotPicshow + newName + ".jpg");
                     map.put("absPath", picPath);
+                    copyFile(newName + ".jpg",picPath);
                     log.info("hotPicshow地址：" + hotPicshow + newName + ".jpg");
 
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -2575,6 +2585,7 @@ public class CameraConService {
                     fout.write(bytes);
                     fout.close();
                     map.put("dataPath", hotFirShow + newName + ".data");
+                    copyFile(newName + ".data",datPath);
                     log.info("hotFirShowdata地址：" + hotFirShow + newName + ".data");
 
                     String csvPath = hotFir + newName + ".csv";
@@ -2609,6 +2620,7 @@ public class CameraConService {
                     DecimalFormat df = new DecimalFormat("##0.00");
                     map.put("resultNum", df.format(max) + "," + df.format(min));
                     map.put("csvPath", hotFirShow + newName + ".csv");
+                    copyFile(newName + ".csv",csvPath);
                     log.info("hotFirShowcsv地址：" + hotFirShow + newName + ".csv");
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
@@ -3453,5 +3465,23 @@ public class CameraConService {
 
     public String getPresetUrlPath(){
         return (String)redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
+    }
+
+    private void copyFile(String ftpsPath, String localPath){
+        // 如果 ftpsTurbo 为 true，则表示设置了文件盘共享，不使用 ftps 对文件进行传输拷贝
+        if(Constant.ftpsTurbo()){
+            return;
+        }
+        try {
+            if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {return;}
+            FtpsUtil.putFile(localPath, "video"+ftpsPath, platFromFtpsConfig.getIp(), platFromFtpsConfig.getPort(),
+                    platFromFtpsConfig.getKeypw(), platFromFtpsConfig.getUsername(), platFromFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+        }
+        HashMap<String,String> param = new HashMap<>();
+        param.put("ftpsPath","video"+ftpsPath);
+        param.put("localPath",localPath);
+        Constant.otherServerMap(param,Constant.COPY_FILE_URL);
     }
 }

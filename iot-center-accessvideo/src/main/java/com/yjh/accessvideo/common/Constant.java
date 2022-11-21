@@ -128,4 +128,14 @@ public class Constant {
     public static String algorithmTestPicPath= "";
     public static String algorithmTestBasePicPath= "";
 
+    public static final String COPY_FILE_URL = "http://iot-center-platform/file/v1/copy-ftps";
+    /**
+     * 如果 ftpsTurbo 为 true，则表示设置了文件盘共享，不使用 ftps 对文件进行传输拷贝
+     */
+    public static boolean ftpsTurbo() {
+        boolean ftpsTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:ftpsTurbo", "content"));
+        log.warn("ftpsTurbo is {}", ftpsTurbo);
+        return ftpsTurbo;
+    }
+
 }

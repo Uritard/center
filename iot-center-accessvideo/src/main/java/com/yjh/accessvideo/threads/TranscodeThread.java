@@ -2,10 +2,13 @@ package com.yjh.accessvideo.threads;
 
 import com.alibaba.fastjson.JSON;
 import com.yjh.accessvideo.common.Constant;
+import com.yjh.accessvideo.common.utils.FtpsUtil;
 import com.yjh.accessvideo.commons.utils.VideoUtil;
+import com.yjh.accessvideo.configuration.PlatFromFtpsConfig;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.RecordFileInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -44,13 +47,16 @@ public class TranscodeThread implements Runnable {
 
     private final CameraConDao cameraConDao;
 
-    public TranscodeThread(String videoPath,String savePath,String fileName,String syncWebsocketUrl, String userId, CameraConDao cameraConDao) {
+    private final PlatFromFtpsConfig platFromFtpsConfig;
+
+    public TranscodeThread(String videoPath,String savePath,String fileName,String syncWebsocketUrl, String userId, CameraConDao cameraConDao, PlatFromFtpsConfig platFromFtpsConfig) {
         this.videoPath = videoPath;
         this.savePath = savePath;
         this.fileName = fileName;
         this.syncWebsocketUrl = syncWebsocketUrl;
         this.userId = userId;
         this.cameraConDao = cameraConDao;
+        this.platFromFtpsConfig = platFromFtpsConfig;
     }
 
     @Override
@@ -72,11 +78,31 @@ public class TranscodeThread implements Runnable {
             jasonMap.put("type", "recordFilePath");
             jasonMap.put("userId", userId);
             jasonMap.put("filePath", judge);
+            copyFile(fileName,path);
             String json = JSON.toJSONString(jasonMap);
             postUrl(syncWebsocketUrl, json);
         }catch (Exception e){
             log.error("录像文件转码失败", e);
         }
+    }
+
+    private void copyFile(String ftpsPath, String localPath){
+        if(Constant.ftpsTurbo()){
+            return;
+        }
+        String remotePath = null;
+        try {
+            if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {return;}
+            remotePath = "video/"+ftpsPath;
+            FtpsUtil.putFile(localPath, remotePath, platFromFtpsConfig.getIp(), platFromFtpsConfig.getPort(),
+                    platFromFtpsConfig.getKeypw(), platFromFtpsConfig.getUsername(), platFromFtpsConfig.getPassword());
+        } catch (Exception e) {
+            log.error("将文件上传至上级系统ftp服务器错误:ftpsPath: {}, remotePath: {} ", ftpsPath, remotePath, e);
+        }
+        HashMap<String,String> param = new HashMap<>();
+        param.put("ftpsPath", remotePath);
+        param.put("localPath",localPath);
+        Constant.otherServerMap(param,Constant.COPY_FILE_URL);
     }
 
     /**
