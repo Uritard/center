@@ -42,6 +42,7 @@ import redis.clients.jedis.ScanResult;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
@@ -342,7 +343,12 @@ public class TCruiseTaskResultService {
             realTimeWarns.add(realTimeWarn);
         }
 
-        return realTimeWarns;
+        return realTimeWarns.stream().sorted((RealTimeWarn o1, RealTimeWarn o2) -> {
+                    Date date1 = o1.getCruiseTime();
+                    Date date2 = o2.getCruiseTime();
+                    return Long.compare(date2.getTime(), date1.getTime());
+                }
+        ).collect(Collectors.toList());
 
     }
 

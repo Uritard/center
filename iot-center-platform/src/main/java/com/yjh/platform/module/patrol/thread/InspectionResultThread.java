@@ -27,10 +27,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -120,7 +117,7 @@ public class InspectionResultThread implements Runnable{
 
             // 巡视主机下发的任务或者站端本体任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);
-            if (!flag) {
+            if (Boolean.FALSE.equals(flag)) {
                 log.info("This is simulation tool task！！！");
                 simulationToolTaskHandler(infoMap.get("absolutePath"), taskId, instanceId, robotPatrolTaskResult.getValue(), robotPatrolTaskResult.getFilePath());
             }
@@ -138,7 +135,7 @@ public class InspectionResultThread implements Runnable{
      */
     private boolean judgeTaskSourceHandler(String taskId, String instanceId, String robotCode) {
         try {
-            Integer robotType = uPatrolTaskService.selectRobotType(robotPatrolTaskResult.getRobotCode());
+            Integer robotType = uPatrolTaskService.selectRobotType(robotPatrolTaskResult.getSendCode());
             // 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path 为模拟工具
             boolean isSimulationTool = StringUtils.isNotEmpty(robotPatrolTaskResult.getFilePath())
                     && StringUtils.isEmpty(robotPatrolTaskResult.getOriginFileResultPath())
@@ -148,26 +145,20 @@ public class InspectionResultThread implements Runnable{
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
             boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
             if (Boolean.FALSE.equals(isSimulationTool)) {
-                // 真实设备上报的巡视结果
-//                Map<String, String> jasonMap = new HashMap<>(2);
-//                jasonMap.put("type", "finishedOneInstance");
-//                jasonMap.put("taskId", taskId);
-//                log.info("做完一个点-前端推送：{}", JSON.toJSONString(jasonMap));
-//                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
 
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
-                if (flag > 0){
+                if (flag > 0) {
                     log.info("taskId为{}巡视点instanceId为{}的点位产生了告警,需要更新图片", taskId, instanceId);
                     uPatrolTaskService.updatePicPath(taskId, instanceId, infoMap.get("relativePath"));
                 }
                 uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
                 // 区分是否为站端本体任务如果是站端本体任务,需更新任务状态
-                if (Boolean.TRUE.equals(isSelfTask)){
+                if (Boolean.TRUE.equals(isSelfTask)) {
                     standTaskDealHandler(taskId, robotCode);
                 }
                 return true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return false;
@@ -222,7 +213,7 @@ public class InspectionResultThread implements Runnable{
      * 工具上报的巡视结果处理
      *
      * @param originPath 巡视结果文件全路径
-     * @param taskId 任务id
+     * @param taskId     任务id
      * @param instanceId 巡视点id
      * @param value 巡视结果值
      * @param filePath 上报的巡视结果文件路径
@@ -264,14 +255,14 @@ public class InspectionResultThread implements Runnable{
 
             // 判断是否有配置算法
             TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()));
-            if (algorithm != null){
+            if (algorithm != null) {
                 JSONObject jsonForRe = new JSONObject();
                 jsonForRe.put("absPath", resultImagePath);
                 abstractVideoCruise.algorithmAnalysis(tCruiseTaskResultMap, 0, taskId, jsonForRe, algorithm);
-            }else {
+            } else {
                 updatePointStatusNum(taskId, tCruiseTaskResultMap, details);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }
@@ -279,9 +270,9 @@ public class InspectionResultThread implements Runnable{
     /**
      * 拍照和声音点位结果redis更新
      *
-     * @param taskId 任务id
+     * @param taskId               任务id
      * @param tCruiseTaskResultMap 巡视结果map
-     * @param details 测点信息
+     * @param details              测点信息
      */
     private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details) {
         try {
@@ -295,7 +286,7 @@ public class InspectionResultThread implements Runnable{
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
             uPatrolTaskService.patrolTaskResultHandler(taskId, details.getInstanceId());
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }
