@@ -167,7 +167,8 @@
         (select c.dict_note
         from t_dict_business c
         where c.col_name = 'voltage_class'
-        and c.dict_code = a.voltage_level) voltageLevelName
+        and c.dict_code = a.voltage_level) voltageLevelName,
+        a.edge_status
         FROM t_std_region a
         LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
         WHERE 1=1
@@ -208,7 +209,8 @@
                (select c.dict_note
                 from t_dict_business c
                 where c.col_name = 'voltage_class'
-                  and c.dict_code = a.voltage_level) voltageLevelName
+                  and c.dict_code = a.voltage_level) voltageLevelName,
+               a.edge_status
         FROM t_std_region a
                  LEFT JOIN t_std_region b ON a.up_region_id = b.region_id
     </select>

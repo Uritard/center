@@ -1589,7 +1589,7 @@ CREATE TABLE `t_robot_info` (
   `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   `robot_code` varchar(32) DEFAULT '',
-  `robot_num` int(6) DEFAULT NULL COMMENT '机器人/无人机编号编码',
+  `robot_num` varchar(32) DEFAULT NULL COMMENT '机器人/无人机编号编码',
   `robot_name` varchar(64) DEFAULT '' COMMENT '机器人名称',
   `nest_name` varchar(64) DEFAULT NULL COMMENT '机巢名称',
   `nest_code` varchar(32) DEFAULT NULL COMMENT '机巢编码',

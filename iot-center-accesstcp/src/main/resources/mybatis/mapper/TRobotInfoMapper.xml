@@ -7,7 +7,7 @@
     <resultMap id="BaseResultMap" type="com.yjh.accesstcp.module.device.entity.TRobotInfo">
         <id property="robotId" column="robot_id" jdbcType="BIGINT"/>
         <result property="robotCode" column="robot_code" jdbcType="VARCHAR"/>
-        <result property="robotNum" column="robot_num" jdbcType="INTEGER"/>
+        <result property="robotNum" column="robot_num" jdbcType="VARCHAR"/>
         <result property="robotName" column="robot_name" jdbcType="VARCHAR"/>
         <result property="nestName" column="nest_name" jdbcType="VARCHAR"/>
         <result property="nestCode" column="nest_code" jdbcType="VARCHAR"/>
@@ -105,7 +105,7 @@
         , remarks, record_id, channel_num_light
         , channel_num_inferad, last_online_time, duration
         , off_line_count, edge_code, origin_id)
-        values ( #{robotId,jdbcType=BIGINT}, #{robotCode,jdbcType=VARCHAR}, #{robotNum,jdbcType=INTEGER}
+        values ( #{robotId,jdbcType=BIGINT}, #{robotCode,jdbcType=VARCHAR}, #{robotNum,jdbcType=VARCHAR}
                , #{robotName,jdbcType=VARCHAR}, #{nestName,jdbcType=VARCHAR}, #{nestCode,jdbcType=VARCHAR}
                , #{robotStatus,jdbcType=VARCHAR}, #{robotType,jdbcType=INTEGER}, #{droneType,jdbcType=INTEGER}
                , #{robotIp,jdbcType=VARCHAR}, #{robotPort,jdbcType=INTEGER}, #{lightIp,jdbcType=VARCHAR}
@@ -178,7 +178,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="robotId != null">#{robotId,jdbcType=BIGINT},</if>
             <if test="robotCode != null">#{robotCode,jdbcType=VARCHAR},</if>
-            <if test="robotNum != null">#{robotNum,jdbcType=INTEGER},</if>
+            <if test="robotNum != null">#{robotNum,jdbcType=VARCHAR},</if>
             <if test="robotName != null">#{robotName,jdbcType=VARCHAR},</if>
             <if test="nestName != null">#{nestName,jdbcType=VARCHAR},</if>
             <if test="nestCode != null">#{nestCode,jdbcType=VARCHAR},</if>
@@ -233,7 +233,7 @@
                 robot_code = #{robotCode,jdbcType=VARCHAR},
             </if>
             <if test="robotNum != null">
-                robot_num = #{robotNum,jdbcType=INTEGER},
+                robot_num = #{robotNum,jdbcType=VARCHAR},
             </if>
             <if test="robotName != null">
                 robot_name = #{robotName,jdbcType=VARCHAR},
@@ -376,7 +376,7 @@
     <update id="updateByPrimaryKey" parameterType="com.yjh.accesstcp.module.device.entity.TRobotInfo">
         update t_robot_info
         set robot_code          = #{robotCode,jdbcType=VARCHAR},
-            robot_num           = #{robotNum,jdbcType=INTEGER},
+            robot_num           = #{robotNum,jdbcType=VARCHAR},
             robot_name          = #{robotName,jdbcType=VARCHAR},
             nest_name           = #{nestName,jdbcType=VARCHAR},
             nest_code           = #{nestCode,jdbcType=VARCHAR},
