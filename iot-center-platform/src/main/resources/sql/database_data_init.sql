@@ -1307,6 +1307,7 @@ INSERT INTO `t_sys_param` VALUES ('100116', '404', 'voiceNeedEncoding', '声纹�
 INSERT INTO `t_sys_param` VALUES ('100117','404', 'localLongitude', '当前变电站经度', '1', '当前变电站经度',null);
 INSERT INTO `t_sys_param` VALUES ('100118', '404', 'localLatitude', '当前变电站纬度', '1', '当前变电站纬度',null);
 INSERT INTO `t_sys_param` VALUES ('100119', '404', 'adcode', '地图adcode', '500101', '地图adcode',null);
+INSERT INTO `t_sys_param` VALUES ('100120', '402', 'isEncryption', '是否开启加解密', 'true', '是否开启加解密',null);
 
 -- ----------------------------
 -- Records of t_version

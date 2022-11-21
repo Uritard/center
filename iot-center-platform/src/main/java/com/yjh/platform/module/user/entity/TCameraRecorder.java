@@ -128,4 +128,7 @@ public class TCameraRecorder implements Serializable {
      */
     @ApiModelProperty(value = "原始录像机ID")
     private String originId;
+
+    @ApiModelProperty(value = "秘钥标识符", hidden=true)
+    private String identifier;
 }
