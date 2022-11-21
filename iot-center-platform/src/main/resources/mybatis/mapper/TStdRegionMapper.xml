@@ -132,7 +132,6 @@
         <if test="stationId != null and stationId != ''"> and a.station_id = #{stationId, jdbcType=VARCHAR}</if>
         <if test="state != null "> and a.state = #{state, jdbcType=INTEGER}</if>
         <if test="createTime != null"> and a.create_time = #{createTime, jdbcType=TIMESTAMP}</if>
-        <if test="stationName != null">and a.station_name = #{stationName, jdbcType=VARCHAR}</if>
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TStdRegion" resultType="com.yjh.platform.module.device.entity.TStdRegion">

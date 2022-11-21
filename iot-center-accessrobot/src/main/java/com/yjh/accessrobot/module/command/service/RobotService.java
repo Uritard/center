@@ -64,7 +64,7 @@ public class RobotService {
     // String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
     private static final String OFF_LINE = "离线";
 
-
+    @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;

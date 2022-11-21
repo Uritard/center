@@ -8,7 +8,6 @@ import com.yjh.platform.module.device.entity.AreaInfoRegionCode;
 import com.yjh.platform.module.device.entity.StationVoltageData;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,22 +171,17 @@ public class TStdRegionService{
 
     public int loadRegionIntoRedis() {
         List<TStdRegion> list = tStdRegionDao.select(null, null, null, null, null, null, null, null, null);
-        Map<String, String> idRefCodeMap = new HashMap<>();
         Set<String> keys = redisTemplate.keys("region:*");
         // 删除所有区域信息重新加载
-        if(CollectionUtils.isNotEmpty(keys)){
+        if (CollectionUtils.isNotEmpty(keys)) {
             redisTemplate.delete(keys);
         }
         for (TStdRegion item : list) {
-            if(StringUtils.isNotEmpty(item.getRegionCode())) {
+            if (StringUtils.isNotEmpty(item.getRegionCode())) {
                 Map<String, String> map = Object2Map.toStringMap(Object2Map.objectToMap(item, true));
-                idRefCodeMap.put(item.getStationId(), item.getRegionCode());
                 String str = "region:" + item.getRegionCode();
                 redisTemplate.opsForHash().putAll(str, map);
             }
-        }
-        if(MapUtils.isNotEmpty(idRefCodeMap)) {
-            redisTemplate.opsForHash().putAll("region:idRefCode", idRefCodeMap);
         }
         return 1;
     }
