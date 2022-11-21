@@ -112,6 +112,16 @@
         limit 1
     </select>
 
+    <select id="selectThisTaskByTaskCode" parameterType="java.lang.String" resultType="com.yjh.platform.module.patrol.entity.UPatrolTask">
+        select
+            *
+        from u_patrol_task a
+        where 1 = 1
+        and a.task_code = #{taskCode}
+        order by create_time desc
+            limit 1
+    </select>
+
     <select id="select" parameterType="com.yjh.platform.module.patrol.entity.UPatrolTask" resultType="com.yjh.platform.module.patrol.entity.UPatrolTask">
         select
         a.task_id,

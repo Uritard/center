@@ -63,17 +63,18 @@ public class TaskJob extends QuartzJobBean {
     public void executeInternal(JobExecutionContext context) {
 
         String taskId = context.getMergedJobDataMap().getString("taskId");
-        UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
+        UPatrolTask ancestralTask = uPatrolTaskDao.selectByPrimaryId(taskId);
+        UPatrolTask task = uPatrolTaskDao.selectThisTaskByTaskCode(taskId);
         //任务的执行时间
-        Date date = context.getFireTime();
-        String taskDate = simpleDateFormat.format(context.getFireTime());
-
+        Date date = context.getScheduledFireTime();
+        String taskDate = simpleDateFormat.format(context.getScheduledFireTime());
+        task.setTaskName(ancestralTask.getTaskName()+"-"+taskDate);
         try {
             Date startTime = context.getTrigger().getStartTime();
-            Date fireTime = context.getScheduledFireTime();
+            Date fireTime = context.getFireTime();
             List<JobExecutionContext> jobs = context.getScheduler().getCurrentlyExecutingJobs();
             log.info("任务开始执行, taskId: {}, startTime: {}, scheduledFireTime: {}, fireTime: {}, jobs: {}", taskId,
-                simpleDateFormat.format(startTime), simpleDateFormat.format(fireTime), taskDate, jobs.toArray());
+                simpleDateFormat.format(startTime), taskDate,simpleDateFormat.format(fireTime), jobs.toArray());
         } catch (SchedulerException e) {
             log.error(e.getMessage(), e);
         }
@@ -104,25 +105,22 @@ public class TaskJob extends QuartzJobBean {
         log.info("任务执行时间 {}, fireTime: {} ", new Date(), taskDate);
         log.info("task.getStartTime {} ", task.getStartTime());
         List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
-        initializeThisTaskInfo(task, allInstanceList);
-        //初始化下一次任务信息
-        initializeNextTaskInfo(task, allInstanceList);
         //更改任务状态
-        setTaskResult(taskId);
+        setTaskResult(task.getTaskId(),date);
         //给机器人发任务启动
         robotTaskStart(task);
         //调用摄像机任务
-        uPatrolTaskService.localTaskStart(taskId);
-
+        uPatrolTaskService.localTaskStart(task.getTaskId());
+        //初始化下一次任务信息
+        uPatrolTaskService.initializeNextTaskInfo(task, allInstanceList);
 
     }
 
-    private void setTaskResult(String taskId) {
+    private void setTaskResult(String taskId,Date date) {
         String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
         UPatrolResult result = uPatrolTaskDao.selectForTaskId(realTaskId);
         result.setTaskState(CruiseConstant.TASK_STATE_EXECUTING);
         //任务开始时间
-        Date date = result.getCreateTime();
         result.setExecuteTime(date);
         uPatrolResultDao.update(result);
     }
@@ -147,55 +145,6 @@ public class TaskJob extends QuartzJobBean {
                     uPatrolTaskService.taskPauseWithoutRobot(lowTask);
                 });
             }
-        }
-    }
-
-    private void initializeThisTaskInfo(UPatrolTask task, List<Long> instanceList) {
-
-        Map<String, String> mapForAbnormal = new HashMap<>();
-        mapForAbnormal.put("all", String.valueOf(instanceList.size()));
-        mapForAbnormal.put("abnormal", "0");
-        mapForAbnormal.put("normal", "0");
-        Date taskStart = new Date();
-        //任务超期时间
-        Map<String, String> mapForTaskAreTime = redisTemplate.opsForHash().entries("t_sys_param:tasksAreTime");
-        Integer tasksAreTime = Integer.valueOf(mapForTaskAreTime.get("content"));
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(taskStart);
-        cal.add(Calendar.MINUTE, tasksAreTime);
-        Date taskAre = cal.getTime();
-
-        mapForAbnormal.put("taskStart", simpleDateFormat.format(taskStart));
-        mapForAbnormal.put("overDay", simpleDateFormat.format(taskAre));
-        mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_EXECUTING));
-
-        String strForCountAbnormal = "countForAbnormal:" + task.getTaskId();
-        redisTemplate.opsForHash().putAll(strForCountAbnormal, mapForAbnormal);
-    }
-
-    /**
-     * 周期任务初始化下一次的任务信息
-     */
-    private void initializeNextTaskInfo(UPatrolTask task, List<Long> instanceList) {
-        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
-            UPatrolTask nextTask = new UPatrolTask();
-            String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
-            nextTask.setTaskId(newTaskId)
-                    .setTaskCode(task.getTaskCode())
-                    .setTaskName(task.getTaskName())
-                    .setPlanId(task.getPlanId())
-                    .setAreaId(task.getAreaId())
-                    .setTaskType(task.getTaskType())
-                    .setExecuteType(task.getExecuteType())
-                    .setRobotId(task.getRobotId())
-                    .setDateType(task.getDateType())
-                    .setTaskSource(task.getTaskSource())
-                    .setTaskLevel(task.getTaskLevel())
-                    .setStartTime(task.getStartTime())
-                    .setEndTime(task.getEndTime())
-                    .setCreateUserId(task.getCreateUserId());
-            uPatrolTaskService.initializeTaskInfo(instanceList, nextTask);
         }
     }
 

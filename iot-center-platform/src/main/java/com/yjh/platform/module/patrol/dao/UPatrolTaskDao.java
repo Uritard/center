@@ -34,6 +34,7 @@ public interface UPatrolTaskDao {
     int deleteByPrimaryId(@Param(value = "taskId") String taskId);
     int update(UPatrolTask uPatrolTask);
     UPatrolTask selectByPrimaryId(@Param(value = "taskId") String taskId);
+    UPatrolTask selectThisTaskByTaskCode(@Param(value = "taskCode") String taskCode);
     List<UPatrolTask> select(@Param(value = "taskId") String taskId,
                              @Param(value = "taskCode") String taskCode,
                              @Param(value = "taskName") String taskName,
