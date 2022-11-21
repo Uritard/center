@@ -2,9 +2,15 @@ package com.yjh.accesstcp.common.utils.PackageProtocolUtils;
 
 
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
 import org.dom4j.*;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+
+import java.io.IOException;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -12,6 +18,7 @@ import java.util.*;
  * @author YC
  * @date 2020/11/13 - 16:02
  */
+@Slf4j
 public class PlatformXMLUtil {
     //解析xml
     public static XMLBaseModel readStringXmlOut(Document doc) {
@@ -113,10 +120,36 @@ public class PlatformXMLUtil {
                 }
             }
         }
-
-        String xmlString = document.asXML();
-
+        String xmlString = "";
+        try {
+            xmlString = formatXML(document);
+        }catch (Exception e){
+            log.error("格式化xml报错", e);
+        }
         return xmlString;
+    }
+
+    public static String formatXML(Document document) throws Exception {
+        String requestXML = null;
+        XMLWriter writer = null;
+        if (document != null) {
+            try {
+                StringWriter stringWriter = new StringWriter();
+                OutputFormat format = new OutputFormat("    ", true);
+                writer = new XMLWriter(stringWriter, format);
+                writer.write(document);
+                writer.flush();
+                requestXML = stringWriter.getBuffer().toString().replace("\n\n", "\n");
+            } finally {
+                if (writer != null) {
+                    try {
+                        writer.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
+        }
+        return requestXML;
     }
 }
 

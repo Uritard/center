@@ -239,5 +239,11 @@
         update t_std_region  set    up_region_id =  #{upRegionId,jdbcType=BIGINT}
         where   region_id = #{regionId,jdbcType=BIGINT}
     </update>
+    <update id="updateRobotStatus">
+        UPDATE t_robot_info
+        SET robot_status = '离线'
+        WHERE
+        edge_code = #{edgeCode,jdbcType=VARCHAR}
+    </update>
 
 </mapper>

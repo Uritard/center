@@ -43,22 +43,23 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
             xmlBaseModel.setCode(stationCode);
         }
-        String robotCode = xmlBaseModel.getSendCode();
-        if (StringUtils.isEmpty(robotCode)) {
+        String sendCode = xmlBaseModel.getSendCode();
+        if (StringUtils.isEmpty(sendCode)) {
             log.error("下级唯一标识为空");
             throw new RuntimeException("下级唯一标识为空");
         }
-        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(robotCode, false))) {
+        if (Boolean.FALSE.equals(Constant.robotRegisterFlag.getOrDefault(sendCode, false))) {
             log.error("下级唯一标识未注册或未连接");
             throw new RuntimeException("下级唯一标识未注册或未连接");
         }
 
         // 给下级响应
-        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
+        String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
-        RobotServerHandler.send( operationProtocol, robotCode);
-        log.info("巡视主机给下级{}响应了", robotCode);
+        RobotServerHandler.send( operationProtocol, sendCode);
+        log.info("巡视主机给下级{}响应了", sendCode);
 
+        String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> robotOperationList = new ArrayList<>();
         xmlBaseModel.getItems().forEach(res -> {
             Map<String, String> robotOperationMap = new HashMap<>(16);

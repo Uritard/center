@@ -10,9 +10,7 @@ import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
-import com.yjh.accesstcp.thread.MyThreadFactory;
-import com.yjh.accesstcp.thread.TaskExecutePool;
-import com.yjh.accesstcp.thread.WeatherThread;
+import com.yjh.accesstcp.thread.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -98,7 +96,11 @@ public class MessageThread {
                     //                    //天气线程发天气
                     WeatherThread weatherThread = new WeatherThread(clientHandler, redisTemplate, true, sendToUpSystemServices);
                     //                    //运行数据
-                    //
+                    RunningThread runningThread = new RunningThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
+                    // 无人机机巢数据线程
+                    NestRunThread nestRunThread = new NestRunThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
+                    TaskExecutePool.getInstance().execute(nestRunThread);
+                    TaskExecutePool.getInstance().execute(runningThread);
                     TaskExecutePool.getInstance().execute(heartBeatThead);
                     TaskExecutePool.getInstance().execute(weatherThread);//江苏要求
 

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TAlgorithmMeteMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TAlgorithmMete">
+            <id property="deviceMeteId" column="device_mete_id" jdbcType="BIGINT"/>
+            <id property="algorithmId" column="algorithm_id" jdbcType="BIGINT"/>
+            <result property="configName" column="config_name" jdbcType="VARCHAR"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="ifDel" column="if_del" jdbcType="INTEGER"/>
+            <result property="ifShow" column="if_show" jdbcType="INTEGER"/>
+            <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>
+            <result property="applyModule" column="apply_module" jdbcType="INTEGER"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+            <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        device_mete_id,algorithm_id,config_name,
+        status,if_del,if_show,
+        pic_url,apply_module,create_time,
+        update_time,edge_code
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_algorithm_mete
+        where  device_mete_id = #{deviceMeteId,jdbcType=BIGINT} AND algorithm_id = #{algorithmId,jdbcType=BIGINT} 
+    </select>
+    <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TAlgorithmMete">
+        SELECT
+        a.device_mete_id,
+        a.algorithm_id,
+        a.edge_code,
+        b.origin_id
+        FROM
+        t_algorithm_mete a
+        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        where  a.edge_code = #{edgeCode}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_algorithm_mete
+        where  device_mete_id = #{deviceMeteId,jdbcType=BIGINT} AND algorithm_id = #{algorithmId,jdbcType=BIGINT} 
+    </delete>
+    <delete id="deleteByEdgeCodeAndOriginId">
+        delete from t_algorithm_mete  where edge_code=#{edgeCode}  and origin_id in (
+        SELECT
+        device_mete_id
+        FROM
+        t_std_devicemete a
+        WHERE
+        origin_id in <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+        )
+    </delete>
+    <insert id="insert">
+        insert into t_algorithm_mete
+        ( device_mete_id,algorithm_id,config_name
+        ,status,if_del,if_show
+        ,pic_url,apply_module,create_time
+        ,update_time,edge_code)
+        values (#{deviceMeteId,jdbcType=BIGINT},#{algorithmId,jdbcType=BIGINT},#{configName,jdbcType=VARCHAR}
+        ,#{status,jdbcType=INTEGER},#{ifDel,jdbcType=INTEGER},#{ifShow,jdbcType=INTEGER}
+        ,#{picUrl,jdbcType=VARCHAR},#{applyModule,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP}
+        ,#{updateTime,jdbcType=TIMESTAMP},#{edgeCode,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective">
+        insert into t_algorithm_mete
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="deviceMeteId != null">device_mete_id,</if>
+                <if test="algorithmId != null">algorithm_id,</if>
+                <if test="configName != null">config_name,</if>
+                <if test="status != null">status,</if>
+                <if test="ifDel != null">if_del,</if>
+                <if test="ifShow != null">if_show,</if>
+                <if test="picUrl != null">pic_url,</if>
+                <if test="applyModule != null">apply_module,</if>
+                <if test="createTime != null">create_time,</if>
+                <if test="updateTime != null">update_time,</if>
+                <if test="edgeCode != null">edge_code,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="deviceMeteId != null">#{deviceMeteId,jdbcType=BIGINT},</if>
+                <if test="algorithmId != null">#{algorithmId,jdbcType=BIGINT},</if>
+                <if test="configName != null">#{configName,jdbcType=VARCHAR},</if>
+                <if test="status != null">#{status,jdbcType=INTEGER},</if>
+                <if test="ifDel != null">#{ifDel,jdbcType=INTEGER},</if>
+                <if test="ifShow != null">#{ifShow,jdbcType=INTEGER},</if>
+                <if test="picUrl != null">#{picUrl,jdbcType=VARCHAR},</if>
+                <if test="applyModule != null">#{applyModule,jdbcType=INTEGER},</if>
+                <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
+                <if test="updateTime != null">#{updateTime,jdbcType=TIMESTAMP},</if>
+                <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <insert id="batchInsert">
+        insert into t_algorithm_mete
+        ( device_mete_id,algorithm_id,config_name
+        ,status,if_del,if_show
+        ,pic_url,apply_module,create_time
+        ,update_time,edge_code)
+        values
+        <foreach collection="list"  item="tAlgorithmMete" separator=",">
+            (#{tAlgorithmMete.deviceMeteId,jdbcType=BIGINT},#{tAlgorithmMete.algorithmId,jdbcType=BIGINT},#{tAlgorithmMete.configName,jdbcType=VARCHAR}
+            ,#{tAlgorithmMete.status,jdbcType=INTEGER},#{tAlgorithmMete.ifDel,jdbcType=INTEGER},#{tAlgorithmMete.ifShow,jdbcType=INTEGER}
+            ,#{tAlgorithmMete.picUrl,jdbcType=VARCHAR},#{tAlgorithmMete.applyModule,jdbcType=INTEGER},#{tAlgorithmMete.createTime,jdbcType=TIMESTAMP}
+            ,#{tAlgorithmMete.updateTime,jdbcType=TIMESTAMP},#{tAlgorithmMete.edgeCode,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TAlgorithmMete">
+        update t_algorithm_mete
+        <set>
+                <if test="configName != null">
+                    config_name = #{configName,jdbcType=VARCHAR},
+                </if>
+                <if test="status != null">
+                    status = #{status,jdbcType=INTEGER},
+                </if>
+                <if test="ifDel != null">
+                    if_del = #{ifDel,jdbcType=INTEGER},
+                </if>
+                <if test="ifShow != null">
+                    if_show = #{ifShow,jdbcType=INTEGER},
+                </if>
+                <if test="picUrl != null">
+                    pic_url = #{picUrl,jdbcType=VARCHAR},
+                </if>
+                <if test="applyModule != null">
+                    apply_module = #{applyModule,jdbcType=INTEGER},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="updateTime != null">
+                    update_time = #{updateTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="edgeCode != null">
+                    edge_code = #{edgeCode,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   device_mete_id = #{deviceMeteId,jdbcType=BIGINT} AND algorithm_id = #{algorithmId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TAlgorithmMete">
+        update t_algorithm_mete
+        set 
+            config_name =  #{configName,jdbcType=VARCHAR},
+            status =  #{status,jdbcType=INTEGER},
+            if_del =  #{ifDel,jdbcType=INTEGER},
+            if_show =  #{ifShow,jdbcType=INTEGER},
+            pic_url =  #{picUrl,jdbcType=VARCHAR},
+            apply_module =  #{applyModule,jdbcType=INTEGER},
+            create_time =  #{createTime,jdbcType=TIMESTAMP},
+            update_time =  #{updateTime,jdbcType=TIMESTAMP},
+            edge_code =  #{edgeCode,jdbcType=VARCHAR}
+        where   device_mete_id = #{deviceMeteId,jdbcType=BIGINT} AND algorithm_id = #{algorithmId,jdbcType=BIGINT} 
+    </update>
+</mapper>

@@ -17,10 +17,7 @@ import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
-import com.yjh.accessrobot.module.command.dao.SysUserDao;
-import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
-import com.yjh.accessrobot.module.command.dao.TRobotInspectionDao;
-import com.yjh.accessrobot.module.command.dao.TRobotRegionDao;
+import com.yjh.accessrobot.module.command.dao.*;
 import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.device.utils.StatisticsUtil;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
@@ -108,6 +105,8 @@ public class RobotService {
 
     @Autowired
     private TStdRegionService tStdRegionService;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
 
     @Autowired
     private TCameraRecorderService tCameraRecorderService;
@@ -268,7 +267,8 @@ public class RobotService {
 
                 // Capture and video file return
                 String filePath = null;
-                if (Objects.nonNull(RobotServerHandler.getRobotResultMap().get("Item"))) {
+                if (Objects.nonNull(RobotServerHandler.getRobotResultMap().get("Item"))
+                        && JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).containsKey("file_path")) {
                     String ftpFilePath = JSONObject.parseObject(JSON.toJSONString(RobotServerHandler.getRobotResultMap().get("Item"))).get("file_path").toString();
                     String[] sArray = ftpFilePath.split("/");
                     String ftpFileName = sArray[sArray.length - 1];
@@ -346,18 +346,32 @@ public class RobotService {
      *
      * @param robotCode   机器人唯一标识
      * @param robotStatus 在线状态
-     * @return int
      */
     @Transactional(rollbackFor = Exception.class)
-    public int updateRobotInfo(String robotCode, String robotStatus) {
-        Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
-        TRobotInfo tRobotInfo = new TRobotInfo()
-                .setRobotId(robotId)
-                .setRobotStatus(robotStatus);
-        StatisticsUtil.onlineDuration(tRobotInfo);
-        int res = tRobotInfoDao.update(tRobotInfo);
-        log.info("robotCode为==={},robotId为==={}的巡视设备状态是==={},修改结果==={}", robotCode, robotId, tRobotInfo.getRobotStatus(), res);
-        return res;
+    public void updateRobotInfo(String robotCode, String robotStatus) {
+        List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
+        // 如果边缘节点 code 不为空，则表示底端上传数据的是边缘节点，不是机器人或无人机
+        boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
+        if (isEdge) {
+            Long regionId = NumberUtils.toLong((String)redisTemplate.opsForHash().get("region:" + robotCode, "regionId"));
+            TStdRegion tStdRegion = new TStdRegion();
+            tStdRegion.setRegionId(stdRegionList.get(0).getRegionId());
+            tStdRegion.setEdgeStatus(robotStatus);
+            int res = tStdRegionDao.update(tStdRegion);
+            log.info("edgeCode为==={},regionId为==={}的节点状态是==={},修改结果==={}", robotCode, regionId, tStdRegion.getEdgeStatus(), res);
+            //边缘节点下线  机器人所有状态全部下线
+            if ("离线".equals(robotStatus)){
+                tStdRegionDao.updateRobotStatus(robotCode);
+            }
+        } else {
+            Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
+            TRobotInfo tRobotInfo = new TRobotInfo()
+                    .setRobotId(robotId)
+                    .setRobotStatus(robotStatus);
+            StatisticsUtil.onlineDuration(tRobotInfo);
+            int res = tRobotInfoDao.update(tRobotInfo);
+            log.info("robotCode为==={},robotId为==={}的巡视设备状态是==={},修改结果==={}", robotCode, robotId, tRobotInfo.getRobotStatus(), res);
+        }
     }
 
     /**
@@ -473,10 +487,9 @@ public class RobotService {
         }
         String filePathPrefix = filePathMap.get("content");
 
-        // 获取边缘节点 code
-        String edgeCode = (String)redisTemplate.opsForHash().get("region:idRefCode", nodeCode);
+        List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(nodeCode, 1);
         // 如果边缘节点 code 不为空，则表示底端上传数据的是边缘节点，不是机器人或无人机
-        boolean isEdge = StringUtils.isNotEmpty(edgeCode);
+        boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
 
         Long robotId = isEdge ? 1 : tRobotInfoDao.selectRobotIdByCode(nodeCode);
 
@@ -492,7 +505,7 @@ public class RobotService {
                     switch (k){
                         case "device_file_path":
                             if (isEdge){
-                                syncModelUpdate("1", v.toString(), edgeCode);
+                                syncModelUpdate("1", v.toString(), nodeCode);
                             }else {
                                 // Device Point Info
                                 addDevicePoint(mapList, robotId);
@@ -512,7 +525,7 @@ public class RobotService {
 //                            addRegionModel(mapList);
 //                            break;
                         case "map_file_path":
-                            syncModelUpdate("9", v.toString(), edgeCode);
+                            syncModelUpdate("9", v.toString(), nodeCode);
                             break;
 //                        case "host_file_path":
 //                            dealHostFilePath(filePathMap,v.toString(),edgeCode);
@@ -527,7 +540,7 @@ public class RobotService {
 //                            dealVoiceFile(filePathMap,v.toString(),edgeCode);
 //                            break;
                         case "record_file_path":
-                            dealRecordFile(filePathMap.get("content") + File.separator + v.toString(), edgeCode);
+                            dealRecordFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
                             break;
 //                        case "overhaularea_file_path":
 //                            dealMaintenanceFilePath(filePathMap,v.toString(),edgeCode);
@@ -1767,7 +1780,7 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public String upSystemCommand(XMLBaseModel xmlBaseModel) {
         //上级下发的 code 是robotNum
-        String robotCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode());
+        String robotCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), "");
         if (StringUtils.isEmpty(robotCode)) {
             xmlBaseModel
                     .setSendCode(sendCode)
@@ -2969,6 +2982,7 @@ public class RobotService {
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
         Map<String, String> mapForPreset = redisTemplate.opsForHash().entries("t_sys_param:presetImgPath");
         Map<String, String> mapForPresetReal = redisTemplate.opsForHash().entries("t_sys_param:presetRealImgPath");
+        String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
         if (System.getProperty("os.name").toUpperCase().startsWith("WINDOWS")) {
             filePathMap.put("content", "C:\\robotData\\Model");
         }
@@ -2976,7 +2990,7 @@ public class RobotService {
             case "1":
                 log.info("设备点位模型 {}", filePath);
                 dealDevicePointModel(filePathMap.get("content") + File.separator + filePath, filePathMap.get("content"),
-                        mapForPreset.get("content"), mapForPresetReal.get("content"), edgeCode);
+                        mapForPreset.get("content"), mapForPresetReal.get("content"), edgeCode, edgeLevel);
                 break;
 //            case "2":
 //                log.info("边缘节点模型 {}", filePath);
@@ -3046,7 +3060,7 @@ public class RobotService {
      * @param edgeCode 边缘节点编码
      */
     @Transactional(rollbackFor = Exception.class)
-    public void dealDevicePointModel(String filePath, String ftpsPath, String presetPath, String presetRealPath, String edgeCode) {
+    public void dealDevicePointModel(String filePath, String ftpsPath, String presetPath, String presetRealPath, String edgeCode, String edgeLevel) {
         if (StringUtils.isBlank(filePath)) {
             log.info("file path is null");
             return;
@@ -3054,7 +3068,7 @@ public class RobotService {
         try {
             XMLBaseModel model = getXmlMessage(filePath);
             List<Map<String, Object>> deviceModelList = model.getItems();
-            tStdDeviceModelService.saveReportData(deviceModelList,ftpsPath,presetPath,presetRealPath, edgeCode);
+            tStdDeviceModelService.saveReportData(deviceModelList,ftpsPath,presetPath,presetRealPath, edgeCode, edgeLevel);
             log.info("节点 {} 的设备点位模型解析完成", edgeCode);
         } catch (Exception e) {
             log.error("设备点位模型处理失败", e);
@@ -3132,5 +3146,27 @@ public class RobotService {
         return PlatformXMLUtil.readStringXmlOut(document);
     }
 
+
+    /**
+     * 判断消息发送是直连机器人 还是 下级节点机器人
+     * @param xmlBaseModel
+     * @param sendCode
+     * @return
+     */
+    public String selectRobotOrEdgeRobot(XMLBaseModel xmlBaseModel, String sendCode){
+        List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(sendCode, 1);
+        // 如果边缘节点 code 不为空，则表示底端上传数据的是边缘节点，不是机器人或无人机
+        boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
+        if (isEdge){
+            if (xmlBaseModel.getItems().get(0).containsKey("nest_code")){
+                String nestNum = xmlBaseModel.getItems().get(0).get("nest_code").toString();
+                sendCode = tRobotInfoDao.selectRobotCodeByNestNum(nestNum);
+            }else {
+                String robotNum = xmlBaseModel.getItems().get(0).get("patroldevice_code").toString();
+                sendCode = tRobotInfoDao.selectRobotCodeByRobotNum(robotNum, sendCode);
+            }
+        }
+        return sendCode;
+    }
 }
 

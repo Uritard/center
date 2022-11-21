@@ -38,6 +38,7 @@
         when 419 then '9'
         end as meter_type,
         b.mete_type,
+        o.algorithm_id,
         (b.appearance_type - 419)  as appearance_type,
         b.device_mete_id AS device_mete_id,
         b.device_point_id,
@@ -91,6 +92,7 @@
         i.voice_device_id AS voice_id
         FROM t_cruise_point_instance a
         LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_algorithm_mete o ON o.device_mete_id = b.device_mete_id
         LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
         left join t_robot_info robot on c.robot_id = robot.robot_id
         LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
@@ -360,5 +362,21 @@
         from t_robot_info
         where phote_path is not null
         limit 1
+    </select>
+    <select id="selectOnlinePatrolDevice" resultType="java.util.Map">
+        SELECT
+        a.robot_code,
+        (
+        CASE
+        WHEN a.robot_type IS NULL THEN
+        'drone'
+        ELSE
+        'robot'
+        END
+        ) AS type
+        FROM
+        t_robot_info a
+        WHERE
+        a.robot_status = '在线'
     </select>
 </mapper>

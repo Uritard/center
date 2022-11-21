@@ -51,4 +51,5 @@ public interface TStdRegionDao {
 
     List<TStdRegion> selectByRegionCodeAndState(@Param(value = "regionCode") String regionCode, @Param(value = "state") Integer state);
 
+    int updateRobotStatus(@Param("edgeCode") String edgeCode);
 }

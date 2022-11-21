@@ -10,6 +10,7 @@ import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.list.AbstractLinkedList;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +28,8 @@ public class DeviceStatistics {
     @Resource
     private SendToUpSystemDao sendToUpSystemDao;
 
-    @Value("${spring.union.stationCode}")
-    private String stationCode;
+    @Resource
+    private RedisTemplate redisTemplate;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -41,6 +42,7 @@ public class DeviceStatistics {
     @Scheduled(cron = "${spring.device.time}")
     public void deviceStatisticsUpload() {
         log.info("设备统计信息上传: "+new Date());
+        String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
         //机器人
         List<DeviceStatisticsInfo> list = sendToUpSystemDao.selectRobot();
         list.forEach(robot->{

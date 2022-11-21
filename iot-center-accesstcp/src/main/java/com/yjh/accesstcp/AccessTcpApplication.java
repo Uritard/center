@@ -38,10 +38,6 @@ public class AccessTcpApplication implements CommandLineRunner {
     private int port;
     @Value("${netty.server.url}")
     private String serverUrl;
-    @Value("${spring.union.upSystem}")
-    private String server;
-    @Value("${spring.union.cruiseHost}")
-    private String cruise;
     @Value("${a.interface.flag}")
     private String flag;
     @Value("${spring.union.stationCode}")
@@ -64,11 +60,13 @@ public class AccessTcpApplication implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         String url = getLocalIp();
-        Constant.stationCode = stationCode;
         Constant.handlerNew = handlerNew;
         if("1".equals(flag)) {
             InetSocketAddress address = new InetSocketAddress(serverUrl, port);
             log.info("accesstcp is running, url is : " + url);
+            String cruise = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
+            String server = (String)redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
+            Constant.stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
             nettyClient.start(address, redisTemplate, sendToUpSystemServices, server, cruise);
         }
     }

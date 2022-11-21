@@ -60,7 +60,7 @@ public class PlatformXMLUtil {
                     }
                 }
                 xmlBaseModel.setItems(itemsList);
-            } else if (rootElt.getName().equals("Robot") || rootElt.getName().equals("PatrolDevice")) {
+            } else if (rootElt.getName().equals("Robot") || rootElt.getName().equals("PatrolDevice") || rootElt.getName().equals("PatrolHost")) {
                 // 遍历节点
                 for (Element element : list) {
                     if (element.getName().equals("SendCode")) {
