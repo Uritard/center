@@ -123,6 +123,8 @@ public class CruiseResultDetail extends TStdDeviceMete {
 
     private String fValue;//频率告警值
 
+    @ApiModelProperty(value = "变电站名称/边缘节点名称")
+    private String edgeName;
 
 }
 

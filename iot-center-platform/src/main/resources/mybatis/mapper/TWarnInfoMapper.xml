@@ -503,7 +503,6 @@
         a.device_id,
         b.device_name,
         k.mete_name,
-        b.custom_name,
         a.warn_content,
         a.warn_level AS alarm_level,
         c.dict_note AS alarm_level_name,
@@ -550,10 +549,11 @@
         ELSE
         ''
         END
-        ) AS video_camera_type
+        ) AS video_camera_type,
+        region.region_name as edge_name
         FROM
         t_warn_info a
-        LEFT JOIN t_std_device b ON a.device_id = b.device_id and a.cunstom_id = b.custom_id
+        LEFT JOIN t_std_device b ON a.device_id = b.device_id
         LEFT JOIN t_dict_business c ON a.warn_level = c.dict_code and c.col_name = 'alarm_level'
         LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code and d.col_name = 'alarm_source'
         LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code and e.col_name = 'conf_mode'
@@ -564,6 +564,7 @@
         LEFT JOIN t_robot_inspection o ON o.inspection_id = n.cruise_id
         LEFT JOIN t_camera_preset j on j.preset_id = n.cruise_id
         LEFT JOIN t_dict_business p ON a.defect_model = p.dict_code and p.col_name = 'defect_model'
+        left join t_std_region region on ifnull(b.edge_code,'0')=region.region_code and region.state=1
         WHERE
         1 = 1
         AND a.warn_type != '507' OR a.warn_type IS NULL
@@ -574,7 +575,6 @@
         a.device_id,
         b.device_name,
         k.mete_name,
-        b.custom_name,
         a.defect_content,
         a.defect_level AS alarm_level,
         c.dict_note AS alarm_level_name,
@@ -605,10 +605,11 @@
         null as high_limit3,
         null as high_limit4,
         j.camera_id,
-        '' AS video_camera_type
+        '' AS video_camera_type,
+        region.region_name as edge_name
         FROM
         t_defect_info a
-        LEFT JOIN t_std_device b ON a.device_id = b.device_id and a.cunstom_id = b.custom_id
+        LEFT JOIN t_std_device b ON a.device_id = b.device_id
         LEFT JOIN t_dict_business c ON a.defect_level = c.dict_code and c.col_name = 'alarm_level'
         LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code and d.col_name = 'alarm_source'
         LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code and e.col_name = 'conf_mode'
@@ -618,6 +619,7 @@
         LEFT JOIN t_cruise_point_instance n on n.instance_id = a.instance_id
         LEFT JOIN t_camera_preset j on j.preset_id = n.cruise_id
         LEFT JOIN t_dict_business p ON a.defect_type = p.dict_code and p.col_name = 'defect_model'
+        left join t_std_region region on ifnull(b.edge_code,'0')=region.region_code and region.state=1
         WHERE
         1 = 1)
         ) big_table

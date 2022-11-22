@@ -43,12 +43,14 @@ INSERT INTO `sys_org` VALUES ('500001', '电网总公司', '1', '-1', '0', '2020
 
 -- ----------------------------
 -- Records of t_std_region
--- ----------------------------
-INSERT INTO `t_std_region` VALUES ('700001', '变电总公司', '0', '-1', '', '1', NULL, '123', '南昌变电站', '1', NULL, NULL, NULL, '2022-11-03 19:14:32');
 
+-- ----------------------------
+insert into `t_std_region` (`region_id`, `region_name`, `sort`, `up_region_id`, `up_region_ids`, `region_code`, `origin_region_id`, `station_id`, `station_name`, `state`, `edge_status`, `region_path`, `longitude`, `latitude`, `voltage_level`, `remark`, `create_time`)
+values('700001','变电总公司','0','-1','','0',NULL,'','','1',NULL,NULL,NULL,NULL,NULL,NULL,'2022-11-03 19:14:32');
 -- ----------------------------
 -- Records of sys_role
 -- ----------------------------
+
 INSERT INTO `sys_role` VALUES ('1234', '管理员', '2020-10-01 12:18:48', '0', '0');
 INSERT INTO `sys_role` VALUES ('1235', '业务员', '2020-08-10 10:50:38', '0', '0');
 INSERT INTO `sys_role` VALUES ('1236', '审计员', '2020-08-10 10:50:50', '0', '0');

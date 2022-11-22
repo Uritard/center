@@ -464,7 +464,8 @@
         n.device_type,
         b.voice_path,
         conf.db_value as dbValue,
-        conf.f_value as fValue
+        conf.f_value as fValue,
+        region.region_name  as  edge_name
         FROM u_patrol_result a
         LEFT JOIN u_patrol_data_result b on a.task_id = b.task_id
         LEFT JOIN t_cruise_point_instance e on b.instance_id = e.instance_id
@@ -481,6 +482,7 @@
         LEFT JOIN t_dict_business x ON x.dict_code = b.remark and x.col_name = 'abnormal_type'
         left join t_voice_device voice on e.cruise_id = voice.voice_device_id
         left join t_voice_config conf on voice.config_id = conf.config_id
+        left join t_std_region region on ifnull(n.edge_code,'0')=region.region_code and region.state=1
         WHERE 1 = 1
         <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=VARCHAR}</if>
 
