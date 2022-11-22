@@ -116,6 +116,8 @@ public class UPatrolTaskService {
     private ProcessResultToUpSystem processResultToUpSystem;
     @Autowired
     private TPeriodModelDao tPeriodModelDao;
+    @Autowired
+    private UPatrolDataResultService uPatrolDataResultService;
 
     @Autowired
     private UPatrolDataResultDao uPatrolDataResultDao;
@@ -355,6 +357,7 @@ public class UPatrolTaskService {
      * 周期任务初始化下一次的任务信息
      */
     public List<TCruisePointInstanceNameDetail> initializeNextTaskInfo(UPatrolTask task, List<Long> instanceList) {
+        UPatrolTask ctask = task;
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
             UPatrolTask nextTask = new UPatrolTask();
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
@@ -366,7 +369,7 @@ public class UPatrolTaskService {
                     .setTaskType(task.getTaskType())
                     .setExecuteType(task.getExecuteType())
                     .setRobotId(task.getRobotId())
-                    .setDateType(task.getDateType())
+                    // .setDateType(task.getDateType())
                     .setTaskSource(task.getTaskSource())
                     .setTaskLevel(task.getTaskLevel())
                     .setStartTime(task.getStartTime())
@@ -374,10 +377,11 @@ public class UPatrolTaskService {
                     .setCreateTime(new Date(System.currentTimeMillis() + 3000))
                     .setEndTime(task.getEndTime())
                     .setCreateUserId(task.getCreateUserId());
+            // 周期任务初始化下一个，非周期初始化当前
+            ctask = nextTask;
             uPatrolTaskDao.add(nextTask);
-            return initializeTaskInfo(instanceList, nextTask);
         }
-        return null;
+        return initializeTaskInfo(instanceList, ctask);
     }
 
     public void initializeThisTaskInfo(UPatrolTask task, List<Long> instanceList) {
@@ -1402,7 +1406,7 @@ public class UPatrolTaskService {
                     uPatrolDataResult.setCruiseType(Integer.valueOf(redisInfoMap.get("cruiseType")));
                     uPatrolDataResult.setOrigpic(redisInfoMap.get("origpic"));
                     uPatrolDataResult.setCruiseAbnormal(NumberUtils.toInt(redisInfoMap.get("cruiseAbnormal")));
-                    uPatrolDataResult.setEvaluationState(Integer.valueOf(redisInfoMap.get("evaluationState")));
+                    uPatrolDataResult.setEvaluationState(MapUtils.getIntValue(redisInfoMap, "evaluationState", EVALUATION_STATE_UN));
                     uPatrolDataResult.setCreatetime(new Date());
                     uPatrolDataResult.setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")));
                     uPatrolDataResult.setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
@@ -1419,6 +1423,7 @@ public class UPatrolTaskService {
                 batchInsertUPatrolDataResult(uPatrolDataResultList);
                 log.info("准备传其他服务的cruiseResultIdList==={}", cruiseResultIdList);
                 // todo:准备传其他服务的cruiseResultIdList
+                uPatrolDataResultService.updateCruiseAnalyze(taskId);
             }
 
             for (UPatrolDataResult up : uPatrolDataResultList){

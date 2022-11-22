@@ -98,4 +98,12 @@ public interface UPatrolDataResultDao {
      * @return int
      */
     int batchInsertUPatrolDataResult(List<UPatrolDataResult> list);
+
+    List<Long> selectAllDeviceMeteId();
+
+    List<TStdDeviceMeteUpdate> selectDeviceMeteList(String taskId);
+
+    int updateDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
+
+    int insertDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
 }
