@@ -13,7 +13,6 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -144,4 +143,7 @@ public class TWarnInfo implements Serializable {
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
+
+    @ApiModelProperty(value = "变电站名称")
+    private String edgeName;
 }
