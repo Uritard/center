@@ -14,6 +14,7 @@ import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.device.entity.TCfgDevice;
 import com.yjh.platform.module.task.dao.TCfgDataCurrentDao;
 import com.yjh.platform.module.task.entity.TCfgDataCurrent;
+import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.controller.TSequentialConfController;
 import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TSequentialConf;
@@ -206,6 +207,7 @@ public class TSequentialConfService{
                 }
             }
 
+            Thread.sleep(1000);
             // 开关
             String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelAlgorithmAnalysis","content"));
             if (StringUtils.equals("true", flag)){
@@ -303,6 +305,9 @@ public class TSequentialConfService{
     public String sequentialRec(String meteId) throws Exception{
         {
 
+            String edgeCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+            String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+            log.info("edgeCode==={}", edgeCode);
             Map<String,Object> map = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId).get(0);
             Map<String , Object> param = new HashMap<>();
             // 开关
@@ -310,32 +315,36 @@ public class TSequentialConfService{
             if (StringUtils.equals("true", flag)){
                 // 收到变位信号停止录视频
                 try {
-//                    String services = HttpClientUtils.getInstance().getUrl(startRecordVideo+ "?cameraId=" +  map.get("cameraId").toString(), null);
-//                    JSONObject jsonObject =JSONObject.parseObject(services);
-//                    String fileName = String.valueOf(jsonObject.get("data"));
-//
-//                    // 等几秒停止录像
-//                    Thread.sleep(30000);
-//                    if(StringUtils.isNotEmpty(fileName)){
-//                        HttpClientUtils.getInstance().getUrl(endRecordVideo+ "?fileName=" +  fileName, null);
-//                        boolean flag2 = Boolean.parseBoolean((String) redisTemplate.opsForHash().get("t_sys_param:sequentialByMp4","content"));
-//                        if (flag2) {
-//                            fileName = fileName.replace(".h264", ".mp4");
-//                        }
-//                        param.put("picPath", fileName);
-//                    }else{
-//                        throw new BusinessException("一键顺控-变位信号-录像地址为空");
-//                    }
-
                     String filePath = Constant.filePath;
-                    String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
-                    HttpClientUtils.getInstance().getUrl(endRecordVideo+ "?fileName=" +  fileName, null);
+                    //等3s再停止录像
+                    Thread.sleep(3000);
+                    //收到变位信号抓图
+                    try{
+                        String services = HttpClientUtils.getInstance().getUrl(cameraCapture+ "?cameraId=" +  map.get("cameraId"), null);
+                        log.info("抓图结果: {}", services);
+                        JSONObject jsonObject =JSONObject.parseObject(services);
+                        Map<String,Object> re = jsonObject.getJSONObject("data");
+                        if(!Objects.isNull(re) && !Objects.isNull(re.get("absPath"))){
+                            param.put("picPath",re.get("absPath").toString());
+                            param.put("fileType", "2");
+                        }else{
+                            throw new BusinessException("一键顺控-变位信号-抓图地址为空");
+                        }
+                    }catch (Exception e){
+                        log.error("一键顺控-变位信号-抓图失败", e);
+                    }
+                    if(StringUtils.isNotEmpty(filePath)) {
+                        String fileName = filePath.trim().substring(filePath.trim().lastIndexOf("/") + 1);
+                        HttpClientUtils.getInstance().getUrl(endRecordVideo + "?fileName=" + fileName, null);
 
-                    filePath = filePath.replace(".h264", ".mp4");
-                    if(StringUtils.isNotEmpty(filePath)){
-                        param.put("picPath", filePath);
-                    }else{
-                        throw new BusinessException("一键顺控-变位信号-录像地址为空");
+                        filePath = filePath.replace(".h264", ".mp4");
+                        if (StringUtils.isNotEmpty(filePath)) {
+                            param.put("picPath", filePath);
+                            param.put("fileName", fileName);
+                            param.put("fileType", "4");
+                        } else {
+                            throw new BusinessException("一键顺控-变位信号-录像地址为空");
+                        }
                     }
                 }catch (Exception e){
                     log.error(e.getMessage(), e);
@@ -343,11 +352,13 @@ public class TSequentialConfService{
             }else{
                 //收到变位信号抓图
                 try{
+                    Thread.sleep(1000);
                     String services = HttpClientUtils.getInstance().getUrl(cameraCapture+ "?cameraId=" +  map.get("cameraId").toString(), null);
                     JSONObject jsonObject =JSONObject.parseObject(services);
                     Map<String,Object> re= (Map<String,Object>) jsonObject.get("data");
                     if(!Objects.isNull(re.get("absPath"))){
                         param.put("picPath",re.get("absPath").toString());
+                        param.put("fileType", "2");
                     }else{
                         throw new BusinessException("一键顺控-变位信号-抓图地址为空");
                     }
@@ -356,26 +367,79 @@ public class TSequentialConfService{
                 }
             }
 
-            //todo 发给算法进行分析
-            try{
-                param.put("analyseType",6);
-                param.put("instanceId",map.get("cfgDeviceId"));
-                param.put("isAi",1);//模板图片路径
-                Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
-                String picModelPath = (String) mapForPicModelPath.get("content");
-
-                param.put("picModelPath",picModelPath+"/"+map.get("presetId"));
-//                param.put("taskId",UUID.randomUUID()+"#yjsk#meteId="+map.get("cfgDeviceId"));
-                param.put("taskId","yjsk#meteId="+map.get("cfgDeviceId"));
-                List<Map<String,Object>> analysis = new ArrayList<>();
-                analysis.add(param);
-                log.info("调用video算法识别接口param={},url={}",JSON.toJSONString(analysis),picRec);
-                Map<String,List<Map<String,Object>>> analysisList = new HashMap<>();
-                analysisList.put("list",analysis);
-                ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-                if (null != serviceRestTemplate) {
-                    serviceRestTemplate.postForObject(picRec, analysisList, String.class);
+            //节点为 边缘节点
+            if ("1".equals(edgeLevel)){
+                //发送结果到区域巡视主机
+                //发文件 picPath /home/yjh_iot_center/iot-picture/resultImg/120920221041304111061.jpg
+                String resultImgPath = (String)redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content");
+                Map<String ,Object> filePathMap = new HashMap<>();
+                String filePath = String.valueOf(param.get("picPath"));
+                String fileName = filePath.replace(resultImgPath, "");
+                filePathMap.put("filePath", filePath);
+                filePathMap.put("targetPath", "VideoFile" + "/" + fileName);
+                Constant.mapToOtherServer(filePathMap, Constant.TCP_UPLOAD_FILE);
+                String videoName = String.valueOf(param.get("fileName"));
+                String videoFilePath = String.valueOf(param.get("voicePath"));
+                log.info("视频文件: {} {}", videoName, videoFilePath);
+                if (StringUtils.isNotEmpty(videoName)) {
+                    filePathMap.put("filePath", videoFilePath);
+                    filePathMap.put("targetPath", "VideoFile" + "/" + videoName);
+                    Constant.mapToOtherServer(filePathMap, Constant.TCP_UPLOAD_FILE);
                 }
+                //上送结果（视频文件）
+                XMLBaseModel xmlBaseModel = new XMLBaseModel();
+                List<Map<String, Object>> xmlItems = new ArrayList<>();
+                Map<String, Object> xmlItem = new HashMap<>(5);
+                xmlBaseModel.setType("61");
+                xmlItem.put("patroldevice_name", "");
+                xmlItem.put("patroldevice_code", "");
+                xmlItem.put("task_name", "一键顺控任务");
+                xmlItem.put("task_code", edgeCode+meteId);
+                xmlItem.put("device_name", map.get("deviceName"));
+                xmlItem.put("device_id", map.get("instanceId"));
+                xmlItem.put("value_type", "0");
+                xmlItem.put("value", "");
+                xmlItem.put("value_unit", "");
+                xmlItem.put("unit", "");
+                xmlItem.put("time", "");
+                //一键顺控检测
+                xmlItem.put("recognition_type", "1001");
+                xmlItem.put("file_type",  param.get("fileType"));
+                xmlItem.put("file_path", edgeCode + "/VideoFile" + "/" + fileName);
+                xmlItem.put("rectangle", "");
+                xmlItem.put("task_patrolled_id", meteId);
+                xmlItem.put("data_type", "01");
+                xmlItem.put("valid", "1");
+                xmlItems.add(xmlItem);
+                xmlBaseModel.setItems(xmlItems);
+                List<XMLBaseModel> xmlBaseModelArrayList = new ArrayList<>();
+                xmlBaseModelArrayList.add(xmlBaseModel);
+                Map<String,List<XMLBaseModel>> taskStatus = new HashMap<>(2);
+                taskStatus.put("list", xmlBaseModelArrayList);
+                Constant.otherServer(taskStatus, Constant.TCP_URL);
+            }else {
+                //节点为 巡视主机
+                //todo 发给算法进行分析
+                try{
+                    param.put("analyseType",6);
+                    param.put("instanceId",map.get("cfgDeviceId"));
+                    //模板图片路径
+                    param.put("isAi",1);
+                    Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
+                    String picModelPath = (String) mapForPicModelPath.get("content");
+
+                    param.put("picModelPath",picModelPath+"/"+map.get("presetId"));
+//                param.put("taskId",UUID.randomUUID()+"#yjsk#meteId="+map.get("cfgDeviceId"));
+                    param.put("taskId","yjsk#meteId="+map.get("cfgDeviceId"));
+                    List<Map<String,Object>> analysis = new ArrayList<>();
+                    analysis.add(param);
+                    log.info("调用video算法识别接口param={},url={}",JSON.toJSONString(analysis),picRec);
+                    Map<String,List<Map<String,Object>>> analysisList = new HashMap<>();
+                    analysisList.put("list",analysis);
+                    ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
+                    if (null != serviceRestTemplate) {
+                        serviceRestTemplate.postForObject(picRec, analysisList, String.class);
+                    }
 //
 //                String services = HttpClientUtils.getInstance().postUrl(picRec, JSON.toJSONString(analysis));
 //                JSONObject jsonObject =JSONObject.parseObject(services);
@@ -384,8 +448,9 @@ public class TSequentialConfService{
 //                }else{
 //                    throw new BusinessException("一键顺控-变位信号-发送至算法识别主机失败"+jsonObject.toJSONString());
 //                }
-            }catch (Exception e){
-                log.error("一键顺控-变位信号-调用算法识别主机失败:",e);
+                }catch (Exception e){
+                    log.error("一键顺控-变位信号-调用算法识别主机失败:",e);
+                }
             }
         }
         return "ok";

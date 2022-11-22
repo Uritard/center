@@ -84,6 +84,8 @@ public class Constant {
     }
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
 
+    public static final String TCP_UPLOAD_FILE = "http://iot-center-accesstcp/sendToUpSystem/v1/uploadFile";
+
     public static final String TCP_MODEL_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/modelUpload?type={type}";
     public static void modelUpload(String type){
         try {
