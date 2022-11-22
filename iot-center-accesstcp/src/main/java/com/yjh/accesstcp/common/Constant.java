@@ -81,6 +81,8 @@ public class Constant {
     //检修区域路径 todo 记得改
     public static final String MAINTENANCE_URL = "http://iot-center-platform/tDeviceMaintenance/v1/systemSend";
 
+    public static final String UDP_SEND ="http://iot-center-accessudp/sendFile/v1/sendFile";
+
     public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
         Result re = new Result();
         //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;

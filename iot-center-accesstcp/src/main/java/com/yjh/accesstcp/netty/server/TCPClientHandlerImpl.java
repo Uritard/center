@@ -7,6 +7,7 @@ import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.thread.TaskExecutePool;
 import com.yjh.accesstcp.thread.WeatherThread;
@@ -36,12 +37,14 @@ public class TCPClientHandlerImpl extends SimpleChannelInboundHandler<DatagramPa
 
     private RedisTemplate redisTemplate;
     private SendToUpSystemServices sendToUpSystemServices;
+    private AnalysisUnionTaskFileService analysisUnionTaskFileService;
     private String server;
     private String cruise;
 
-    public TCPClientHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,String server,String cruise) {
+    public TCPClientHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService,String server,String cruise) {
         this.redisTemplate = redisTemplate;
         this.sendToUpSystemServices = sendToUpSystemServices;
+        this.analysisUnionTaskFileService = analysisUnionTaskFileService;
         this.server = server;
         this.cruise =cruise;
 
@@ -289,7 +292,7 @@ public class TCPClientHandlerImpl extends SimpleChannelInboundHandler<DatagramPa
         if (xmlRes.getSendCode() == null) {
             log.info("连接可能断了，等待重连.....");
         } else {
-            MessageThread.doProcessMessage(xmlRes, sendSessionId, this, sendToUpSystemServices, redisTemplate);
+            MessageThread.doProcessMessage(xmlRes, sendSessionId, this, sendToUpSystemServices, analysisUnionTaskFileService, redisTemplate);
             // doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
         }
 

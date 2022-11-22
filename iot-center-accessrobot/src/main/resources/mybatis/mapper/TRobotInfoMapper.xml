@@ -1322,6 +1322,15 @@
         WHERE
         a.nest_code = #{nestNum, jdbcType=VARCHAR}
     </select>
+    <select id="selectRobotIdByRobotNum" resultType="java.lang.Long">
+        SELECT
+        a.robot_id
+        FROM
+        `t_robot_info` a
+        WHERE
+        a.robot_num = #{robotNum, jdbcType=VARCHAR}
+        and a.edge_code = #{edgeCode, jdbcType=VARCHAR}
+    </select>
     <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
         update t_robot_info
         set robot_code          = #{robotCode,jdbcType=VARCHAR},

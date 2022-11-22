@@ -406,4 +406,11 @@ public interface TRobotInfoDao {
 
     int updateByPrimaryKey(TRobotInfo record);
 
+    /**
+     * 根据机器人编码查询机器人id
+     * @param robotNum 机器人编码
+     * @return Long
+     */
+    Long selectRobotIdByRobotNum(@Param(value = "robotNum") String robotNum, @Param(value = "edgeCode") String edgeCode);
+
 }

@@ -1,6 +1,7 @@
 package com.yjh.accesstcp;
 
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.server.NettyClient;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +51,8 @@ public class AccessTcpApplication implements CommandLineRunner {
     private RedisTemplate redisTemplate;
     @Autowired
     private SendToUpSystemServices sendToUpSystemServices;
+    @Autowired
+    private AnalysisUnionTaskFileService analysisUnionTaskFileService;
 
     private NettyClient nettyClient = new NettyClient();
 
@@ -67,7 +70,7 @@ public class AccessTcpApplication implements CommandLineRunner {
             String cruise = (String)redisTemplate.opsForHash().get("t_sys_param:edgeCode","content");
             String server = (String)redisTemplate.opsForHash().get("t_sys_param:upSystemReceiveCode","content");
             Constant.stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
-            nettyClient.start(address, redisTemplate, sendToUpSystemServices, server, cruise);
+            nettyClient.start(address, redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, server, cruise);
         }
     }
     public void loadDeviceInfo()throws IOException{
