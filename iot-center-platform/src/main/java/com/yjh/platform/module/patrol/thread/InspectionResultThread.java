@@ -170,7 +170,7 @@ public class InspectionResultThread implements Runnable{
         map.put("instanceName", "");
         map.put("remark", "");
         map.put("deviceId", analyseDataOperateDao.selectPatrolDevice(robotPatrolTaskResult.getDeviceId()).get(
-                "device_id"));
+                "deviceId"));
         map.put("deviceName", robotPatrolTaskResult.getPatrolDeviceName());
         map.put("points", "");
         map.put("serialVersionUID", "");

@@ -17,10 +17,14 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * <功能描述>
@@ -39,6 +43,9 @@ public class CameraConV2Controller {
     @Autowired
     private CameraConService cameraConService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
 
     @ApiOperation(value = "获取NVR存储状态和通道信息")
     @RequestMapping(value = "/getNVRStoreInfo", method = RequestMethod.GET)
@@ -46,7 +53,9 @@ public class CameraConV2Controller {
         Result result = new Result();
         try {
             cameraConService.reRegister(recordId);
-            result.setData(cameraConService.getNVRStoreAndChanle(recordId));
+            Map<String, Object> nvrStoreAndChannel = cameraConService.getNVRStoreAndChanle(recordId);
+            redisTemplate.opsForHash().putAll("recorderInfo:" + recordId,nvrStoreAndChannel);
+            result.setData(nvrStoreAndChannel);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

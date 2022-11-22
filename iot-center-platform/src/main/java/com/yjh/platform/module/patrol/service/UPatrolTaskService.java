@@ -731,7 +731,7 @@ public class UPatrolTaskService {
                 Integer normal = Integer.valueOf(mapForGet.get("normal"));
                 Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
                 i = all - normal - abnormal;
-                float progress = (1.0f - Float.valueOf(i) / all) * 100;
+                String progress = String.format("%.2f",(1.0f - Float.valueOf(i) / all) * 100);
                 item.put("task_progress", progress + "%");
             }
 

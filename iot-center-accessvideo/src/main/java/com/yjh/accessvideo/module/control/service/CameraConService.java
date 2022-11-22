@@ -21,15 +21,14 @@ import com.yjh.accessvideo.thread.TaskExecutePool;
 import com.yjh.accessvideo.threads.RecordFileThread;
 import com.yjh.accessvideo.threads.TranscodeThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,13 +41,12 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.yjh.accessvideo.commons.utils.FileUtil.createDirectory;
 
@@ -60,7 +58,7 @@ import static com.yjh.accessvideo.commons.utils.FileUtil.createDirectory;
 @Service
 public class CameraConService {
 
-    private Logger log = LoggerFactory.getLogger(CameraConService.class);
+    private final Logger log = LoggerFactory.getLogger(CameraConService.class);
 
     @Autowired
     private CameraConDao cameraConDao;
@@ -122,15 +120,14 @@ public class CameraConService {
     @Value("${system.webSocket.url}")
     private String syncWebsocketUrl;//WS调用接口地址
 
+    private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     @Autowired
     private PlatFromFtpsConfig platFromFtpsConfig;
-
-    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static HCNetSDK hCNetSDK = HCNetSDK.INSTANCE;
     private static PlayCtrl playCtrl = PlayCtrl.INSTANCE;
     private NativeLong m_lRealPlayHandle = new NativeLong(-1);// playhandle
-//    private NativeLong m_minsOne = new NativeLong(-1);
+    //    private NativeLong m_minsOne = new NativeLong(-1);
 //    private HCNetSDK.NET_DVR_PREVIEWINFO dvr_previewinfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
     private NativeLong lUserIDLong = new NativeLong(-1);
     private HCNetSDK.NET_DVR_CLIENTINFO m_sClientInfo = new HCNetSDK.NET_DVR_CLIENTINFO();    // play structure
@@ -173,7 +170,8 @@ public class CameraConService {
 //
 //            String transUrl = "";
 //            if (cameraType == 205) {
-//                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
+//                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,
+//                videoDefinition, cameraId);
 //            } else if (cameraType == 206) {
 //                transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, cameraId);
 //            }
@@ -184,11 +182,13 @@ public class CameraConService {
 //            isHttps(videoHttps, String.valueOf(cameraId), returnMap);
 //            String webRtc = "webrtc://" + hostIp + "/live/" + cameraId;
 //            returnMap.put("webRtcUrl", webRtc);
-//            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraRealFlow:", Integer.parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
+//            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraRealFlow:", Integer
+//            .parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
 //            Thread thread = new Thread(streamInfoThread);
 //            thread.setDaemon(true);
 //            thread.start();
-//            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{}, cameraId:{}, transUrl:{}"
+//            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{},
+//            cameraId:{}, transUrl:{}"
 //                    , userName, password, cameraIp, cameraPort, iChanNum, cameraType, cameraId, transUrl);
 //        } catch (Exception e) { e.getMessage(); }
 
@@ -200,7 +200,8 @@ public class CameraConService {
             int cameraPort = cameraConInfo.getRtspPort();         //nvr rtsp port
             int iChanNum = cameraConInfo.getChannelNum();         //nvr 通道号
             int cameraType = cameraConInfo.getCameraType();
-            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
+            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,
+                    videoDefinition, cameraId);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId);
             manager.run(videoInfo);
 
@@ -210,9 +211,12 @@ public class CameraConService {
             isHttps(videoHttps, String.valueOf(cameraId), returnMap);
             String webRtc = "webrtc://" + hostIp + "/live/" + cameraId;
             returnMap.put("webRtcUrl", webRtc);
-            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{}, cameraId:{}, transUrl:{}"
+            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{}, cameraId:{}, " +
+                            "transUrl:{}"
                     , userName, password, cameraIp, cameraPort, iChanNum, cameraType, cameraId, transUrl);
-        } catch (Exception e) { e.getMessage(); }
+        } catch (Exception e) {
+            e.getMessage();
+        }
 
         return returnMap;
     }
@@ -223,10 +227,16 @@ public class CameraConService {
     public List<Map<String, Object>> batchStartRealPlay(String cameraIds) {
 
         List<Map<String, Object>> returnMapList = new ArrayList<>();
-        if (Objects.isNull(cameraIds) || cameraIds.length() == 0) return returnMapList;
+        if (Objects.isNull(cameraIds) || cameraIds.length() == 0) {
+            return returnMapList;
+        }
         List<Long> list = new ArrayList<>();
         String[] cameraIdArry = cameraIds.split(",");
-        for (String aCameraIdArry : cameraIdArry) { if (!Objects.equals(aCameraIdArry, "")) list.add(Long.valueOf(aCameraIdArry)); }
+        for (String aCameraIdArry : cameraIdArry) {
+            if (!Objects.equals(aCameraIdArry, "")) {
+                list.add(Long.valueOf(aCameraIdArry));
+            }
+        }
         log.info("list: {}", list);
 //        int returnMapListSize = 0;
 //        try {
@@ -234,7 +244,8 @@ public class CameraConService {
 //                int returnMapListSizeTem = returnMapListSize;
 //                if (Constant.mapsForCamera.size()>0) {
 //                    if (Objects.nonNull(Constant.mapsForCamera.get(String.valueOf(cameraId)))) {
-//                        Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + cameraId);
+//                        Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" +
+//                        cameraId);
 //                        if (cameraFlowMap.size()>0) {
 //                            cameraFlowMap.put("cameraId", String.valueOf(cameraId));
 //                            returnMapList.add(cameraFlowMap);
@@ -254,13 +265,16 @@ public class CameraConService {
 //
 //                    String transUrl = "";
 //                    if (cameraType == 205) {
-//                        transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
+//                        transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,
+//                        videoDefinition, cameraId);
 //                    } else if (cameraType == 206) {
-//                        transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1, cameraId);
+//                        transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, 1,
+//                        cameraId);
 //                    }
 //                    Runtime.getRuntime().exec(transUrl);
 //
-//                    log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{}, cameraId:{}, transUrl:{}"
+//                    log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{},
+//                    cameraId:{}, transUrl:{}"
 //                            , userName, password, cameraIp, cameraPort, iChanNum, cameraType, cameraId, transUrl);
 //                    String[] rtmpUrls = transUrl.split("rtmp");
 //                    String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
@@ -271,7 +285,8 @@ public class CameraConService {
 //                    isHttps(videoHttps, String.valueOf(cameraId), returnMap);
 //                    String webRtc = "webrtc://" + hostIp + "/live/" + cameraId;
 //                    returnMap.put("webRtcUrl", webRtc);
-//                    StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraRealFlow:", Integer.parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
+//                    StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraRealFlow:", Integer
+//                    .parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
 //                    Thread thread = new Thread(streamInfoThread);
 //                    thread.setDaemon(true);
 //                    thread.start();
@@ -289,7 +304,8 @@ public class CameraConService {
             int cameraPort = cameraConInfo.getRtspPort();         //nvr rtsp port
             int iChanNum = cameraConInfo.getChannelNum();         //nvr 通道号
             int cameraType = cameraConInfo.getCameraType();
-            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, cameraId);
+            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,
+                    videoDefinition, cameraId);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(cameraId);
             try {
                 manager.run(videoInfo);
@@ -297,7 +313,8 @@ public class CameraConService {
                 e.printStackTrace();
             }
 
-            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{}, cameraId:{}, transUrl:{}"
+            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, cameraType:{}, cameraId:{}, " +
+                            "transUrl:{}"
                     , userName, password, cameraIp, cameraPort, iChanNum, cameraType, cameraId, transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
             String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
@@ -308,7 +325,8 @@ public class CameraConService {
             isHttps(videoHttps, String.valueOf(cameraId), returnMap);
             String webRtc = "webrtc://" + hostIp + "/live/" + cameraId;
             returnMap.put("webRtcUrl", webRtc);
-            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraRealFlow:", Integer.parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
+            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraRealFlow:",
+                    Integer.parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
             Thread thread = new Thread(streamInfoThread);
             thread.setDaemon(true);
             thread.start();
@@ -328,11 +346,13 @@ public class CameraConService {
 //        String InferadCameraId = String.valueOf(robotId)+"9902";
 //        if (Constant.mapsForCamera.size()>0) {
 //            if (Objects.nonNull(Constant.mapsForCamera.get(lightCameraId))) {
-//                Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + lightCameraId);
+//                Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" +
+//                lightCameraId);
 //                if (robotLightFlowMap.size()>0) returnMapList.add(robotLightFlowMap);
 //            }
 //            if (Objects.nonNull(Constant.mapsForCamera.get(InferadCameraId))) {
-//                Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" + InferadCameraId);
+//                Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraRealFlow:" +
+//                InferadCameraId);
 //                if (robotInferadFlowMap.size()>0) returnMapList.add(robotInferadFlowMap);
 //            }
 //            if (returnMapList.size()>1) { return returnMapList; }
@@ -345,11 +365,15 @@ public class CameraConService {
 //            String lightUsername = robotConInfo.getIdentityManager();
 //            String lightPassword = robotConInfo.getIdentityCode();
 //
-//            String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, String.valueOf(robotId)+"9901");
+//            String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort,
+//            1, String.valueOf(robotId)+"9901");
 //            Runtime.getRuntime().exec(transUrlLight);
 ////            Thread.sleep(3000);
-//            // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/Channels/10%s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
-//            log.info("robotLightInfo: {}, {}, {}, {}, {}, robotTransUrlLight:{}", lightUsername, lightPassword, lightIp, lightPort, String.valueOf(robotId)+"9901", transUrlLight);
+//            // /usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i
+//            rtsp://%s:%s@%s:%s/Streaming/Channels/10%s?transportmode=unicast -vcodec copy -an -f flv rtmp://192.168
+//            .9.40:1935/live/%s
+//            log.info("robotLightInfo: {}, {}, {}, {}, {}, robotTransUrlLight:{}", lightUsername, lightPassword,
+//            lightIp, lightPort, String.valueOf(robotId)+"9901", transUrlLight);
 //            String[] rtmpUrls = transUrlLight.split("rtmp");
 //            String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
 //
@@ -359,7 +383,8 @@ public class CameraConService {
 //            String lightWebRtc = "webrtc://" + hostIp + "/live/" + lightCameraId;
 //            returnLightMap.put("webRtcUrl", lightWebRtc);
 //            isHttps(videoHttps, lightCameraId, returnLightMap);
-//            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraRealFlow:", Integer.parseInt(lightCameraId), Long.parseLong(lightCameraId), returnLightMap, redisTemplate);
+//            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraRealFlow:", Integer
+//            .parseInt(lightCameraId), Long.parseLong(lightCameraId), returnLightMap, redisTemplate);
 //            Thread thread = new Thread(streamInfoThread);
 //            thread.setDaemon(true);
 //            thread.start();
@@ -374,10 +399,12 @@ public class CameraConService {
 ////                String videoFlowId = streamJson.getString("id");
 ////                String publish = streamJson.getString("publish");
 ////                JSONObject publishjson = JSONObject.parseObject(publish);
-////                if (Objects.equals(name, String.valueOf(robotId) + "9901") && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+////                if (Objects.equals(name, String.valueOf(robotId) + "9901") && StringUtils.isNotEmpty(publishjson
+// .getString("cid"))) {
 ////                    returnLightMap.put("videoFlowId", videoFlowId);
 ////                    Constant.mapsForCamera.put(String.valueOf(robotId) + "9901", videoFlowId);
-////                    redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":light", returnLightMap);
+////                    redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":light",
+// returnLightMap);
 ////                }
 ////            });
 //
@@ -387,13 +414,15 @@ public class CameraConService {
 //            if(robotConInfo.getRobotType() == 161){
 //                String inferadUsername = robotConInfo.getInferadUsername();
 //                String inferadPassword = robotConInfo.getInferadPassword();
-//                transUrlinferad = String.format(robotLightTem, inferadUsername, inferadPassword, inferadIp, inferadPort, 1, InferadCameraId);
+//                transUrlinferad = String.format(robotLightTem, inferadUsername, inferadPassword, inferadIp,
+//                inferadPort, 1, InferadCameraId);
 //            }else {
 //                transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, InferadCameraId);
 //            }
 //            Runtime.getRuntime().exec(transUrlinferad);
 ////            Thread.sleep(3000);
-//            log.info("robotInferadInfo: {}, {}, {}, robotTransUrlinferad:{}", inferadIp, inferadPort, InferadCameraId, transUrlinferad);
+//            log.info("robotInferadInfo: {}, {}, {}, robotTransUrlinferad:{}", inferadIp, inferadPort,
+//            InferadCameraId, transUrlinferad);
 //            String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
 //            String rtmpUrlInferad = "rtmp" + rtmpUrlsInferad[rtmpUrlsInferad.length - 1];
 //
@@ -409,24 +438,29 @@ public class CameraConService {
 //            }
 //            String InferadWebRtc = "webrtc://" + hostIp + "/live/" + InferadCameraId;
 //            returnInferadMap.put("webRtcUrl", InferadWebRtc);
-//            StreamInfoThread streamInfoThread2 = new StreamInfoThread(srsStopUrl, "cameraRealFlow:", Integer.parseInt(InferadCameraId), Long.parseLong(InferadCameraId), returnInferadMap, redisTemplate);
+//            StreamInfoThread streamInfoThread2 = new StreamInfoThread(srsStopUrl, "cameraRealFlow:", Integer
+//            .parseInt(InferadCameraId), Long.parseLong(InferadCameraId), returnInferadMap, redisTemplate);
 //            Thread thread2 = new Thread(streamInfoThread2);
 //            thread2.setDaemon(true);
 //            thread2.start();
 ////            JSONObject jsonListInferad = new JSONObject();
-////            try { jsonListInferad = HttpClientUtils.sendGet(getInfoUrl, null); } catch (Exception e) {e.getMessage();}
+////            try { jsonListInferad = HttpClientUtils.sendGet(getInfoUrl, null); } catch (Exception e) {e
+// .getMessage();}
 ////            assert jsonListInferad != null;
-////            List<String> streamsJsonObjectListInferad = JSONArray.parseArray(jsonListInferad.getString("streams"),String.class);
+////            List<String> streamsJsonObjectListInferad = JSONArray.parseArray(jsonListInferad.getString("streams")
+// ,String.class);
 ////            //livePath
 ////            streamsJsonObjectListInferad.stream().map(JSONObject::parseObject).forEach(streamJson -> {
 ////                String name = streamJson.getString("name");
 ////                String videoFlowId = streamJson.getString("id");
 ////                String publish = streamJson.getString("publish");
 ////                JSONObject publishjson = JSONObject.parseObject(publish);
-////                if (Objects.equals(name, String.valueOf(robotId) + "9902") && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+////                if (Objects.equals(name, String.valueOf(robotId) + "9902") && StringUtils.isNotEmpty(publishjson
+// .getString("cid"))) {
 ////                    returnInferadMap.put("videoFlowId", videoFlowId);
 ////                    Constant.mapsForCamera.put(String.valueOf(robotId) + "9902", videoFlowId);
-////                    redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":inferad", returnInferadMap);
+////                    redisTemplate.opsForHash().putAll("cameraRealFlow:" + String.valueOf(robotId) + ":inferad",
+// returnInferadMap);
 ////                }
 ////            });
 //
@@ -436,18 +470,20 @@ public class CameraConService {
 
 //        log.info("mapsForRobot: {}, robotReturnMapList: {}", Constant.mapsForCamera, returnMapList);
         try {
-            String lightCameraId = String.valueOf(robotId) + "9901";
-            String infraredCameraId = String.valueOf(robotId) + "9902";
+            String lightCameraId = robotId + "9901";
+            String infraredCameraId = robotId + "9902";
             RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
             String lightIp = robotConInfo.getLightIp();
             String lightPort = robotConInfo.getLightPort();
             String lightUsername = robotConInfo.getIdentityManager();
             String lightPassword = robotConInfo.getIdentityCode();
 
-            String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1, lightCameraId);
+            String transUrlLight = String.format(robotLightTem, lightUsername, lightPassword, lightIp, lightPort, 1,
+                    lightCameraId);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrlLight).setId(Long.parseLong(lightCameraId));
             manager.run(videoInfo);
-            log.info("robotLightInfo: {}, {}, {}, {}, {}, robotTransUrlLight:{}", lightUsername, lightPassword, lightIp, lightPort, lightCameraId, transUrlLight);
+            log.info("robotLightInfo: {}, {}, {}, {}, {}, robotTransUrlLight:{}", lightUsername, lightPassword,
+                    lightIp, lightPort, lightCameraId, transUrlLight);
             String[] rtmpUrls = transUrlLight.split("rtmp");
             String rtmpUrl = "rtmp" + rtmpUrls[rtmpUrls.length - 1];
 
@@ -464,16 +500,18 @@ public class CameraConService {
             if (robotConInfo.getRobotType() == 161) {
                 String inferadUsername = robotConInfo.getInferadUsername();
                 String inferadPassword = robotConInfo.getInferadPassword();
-                transUrlinferad = String.format(robotLightTem, inferadUsername, inferadPassword, inferadIp, inferadPort, 1, infraredCameraId);
-            } else if (robotConInfo.getRobotType() == 157){
+                transUrlinferad = String.format(robotLightTem, inferadUsername, inferadPassword, inferadIp,
+                        inferadPort, 1, infraredCameraId);
+            } else if (robotConInfo.getRobotType() == 157) {
                 transUrlinferad = String.format(robotA200InfraredTem, inferadIp, inferadPort, infraredCameraId);
-            }else {
+            } else {
                 transUrlinferad = String.format(robotInferadTem, inferadIp, inferadPort, infraredCameraId);
             }
             VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlinferad).setId(Long.parseLong(infraredCameraId));
             manager.run(videoInfo2);
 
-            log.info("robotInferadInfo: {}, {}, {}, robotTransUrlinferad:{}", inferadIp, inferadPort, infraredCameraId, transUrlinferad);
+            log.info("robotInferadInfo: {}, {}, {}, robotTransUrlinferad:{}", inferadIp, inferadPort,
+                    infraredCameraId, transUrlinferad);
             String[] rtmpUrlsInferad = transUrlinferad.split("rtmp");
             String rtmpUrlInferad = "rtmp" + rtmpUrlsInferad[rtmpUrlsInferad.length - 1];
 
@@ -498,7 +536,8 @@ public class CameraConService {
 //        Map<String, Object> returnMap = new HashMap<>();
 //        if (Constant.mapsForHistory.size()>0) {
 //            if (Objects.nonNull(Constant.mapsForHistory.get(String.valueOf(cameraId)))) {
-//                Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + cameraId);
+//                Map<String, Object> cameraFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" +
+//                cameraId);
 //                if (cameraFlowMap.size()>0) {
 //                    cameraFlowMap.put("cameraId", String.valueOf(cameraId));
 //                    return cameraFlowMap;
@@ -518,10 +557,15 @@ public class CameraConService {
 //            String starttime = startTimeTem.replace(" ", "Z");
 //            String endtime = stopTimeTem.replace(" ", "Z");
 //
-//            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1, starttime, endtime, cameraId);
-//            ///usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i rtsp://%s:%s@%s:%s/Streaming/tracks/%s0%s?starttime=%s&endtime=%s -vcodec copy -an -f flv rtmp://192.168.9.40:1935/live/%s
-//            //rtsp://admin:hik12345@192.168.33.2:554/Streaming/tracks/101?starttime=20201111T095500Z&endtime=20201111T100005Z
-//            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}, historyTransUrl: {}"
+//            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1,
+//            starttime, endtime, cameraId);
+//            ///usr/bin/ffmpeg -loglevel error -rtsp_transport tcp -i
+//            rtsp://%s:%s@%s:%s/Streaming/tracks/%s0%s?starttime=%s&endtime=%s -vcodec copy -an -f flv rtmp://192
+//            .168.9.40:1935/live/%s
+//            //rtsp://admin:hik12345@192.168.33
+//            .2:554/Streaming/tracks/101?starttime=20201111T095500Z&endtime=20201111T100005Z
+//            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{},
+//            historyPath:{}, historyTransUrl: {}"
 //                    , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
 //            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
 //            Thread.sleep(3000);
@@ -534,7 +578,8 @@ public class CameraConService {
 //            returnMap.put("webRtcUrl", webRtc);
 //            isHttpsHistory(videoHttps, String.valueOf(cameraId), returnMap);
 //
-//            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraHistoryFlow:", Integer.parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
+//            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraHistoryFlow:", Integer
+//            .parseInt(String.valueOf(cameraId)), cameraId, returnMap, redisTemplate);
 //            Thread thread = new Thread(streamInfoThread);
 //            thread.setDaemon(true);
 //            thread.start();
@@ -551,7 +596,8 @@ public class CameraConService {
 //                String videoFlowId = streamJson.getString("id");
 //                String publish = streamJson.getString("publish");
 //                JSONObject publishjson = JSONObject.parseObject(publish);
-//                if (Objects.equals(name, String.valueOf(cameraId)) && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+//                if (Objects.equals(name, String.valueOf(cameraId)) && StringUtils.isNotEmpty(publishjson.getString
+//                ("cid"))) {
 //                    returnMap.put("videoFlowId", videoFlowId);
 //                    Constant.mapsForHistory.put(name, videoFlowId);
 //                    redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + cameraId, returnMap);
@@ -603,8 +649,10 @@ public class CameraConService {
             String endtime = stopTimeTem.replace(" ", "Z");
 
             Long id = System.currentTimeMillis();
-            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1, starttime, endtime, id);
-            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}, historyTransUrl: {}"
+            String transUrl = String.format(UrlBackTem, userName, password, cameraIp, cameraPort, iChanNum, 1,
+                    starttime, endtime, id);
+            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
+                            "historyPath:{}, historyTransUrl: {}"
                     , userName, password, cameraIp, cameraPort, iChanNum, starttime, endtime, cameraId, transUrl);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(id);
             manager.run(videoInfo);
@@ -617,7 +665,7 @@ public class CameraConService {
             String webRtc = "webrtc://" + hostIp + "/history/" + id;
             returnMap.put("webRtcUrl", webRtc);
             isHttpsHistory(videoHttps, String.valueOf(id), returnMap);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return returnMap;
@@ -626,7 +674,7 @@ public class CameraConService {
     //机器人相机-视频回放
     @Transactional(rollbackFor = Exception.class)
     @SuppressWarnings("unchecked")
-    public List<Map<String,Object>> startRobotPlayBack(Long robotId,String startTime,String stopTime){
+    public List<Map<String, Object>> startRobotPlayBack(Long robotId, String startTime, String stopTime) {
 
 //        //定义返回结果集与可见光、红外历史流地址容器
 //        List<Map<String,Object>> robotHistoryList=new ArrayList<>();
@@ -637,9 +685,12 @@ public class CameraConService {
 //
 //        //判断是否已存在历史视频流
 //        if (Constant.mapsForHistory.size()>0) {
-//            if (Objects.nonNull(Constant.mapsForHistory.get(lightCameraId)) || Objects.nonNull(Constant.mapsForHistory.get(infraredCameraId))) {
-//                Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + lightCameraId);
-//                Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" + infraredCameraId);
+//            if (Objects.nonNull(Constant.mapsForHistory.get(lightCameraId)) || Objects.nonNull(Constant
+//            .mapsForHistory.get(infraredCameraId))) {
+//                Map<String, Object> robotLightFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" +
+//                lightCameraId);
+//                Map<String, Object> robotInferadFlowMap = redisTemplate.opsForHash().entries("cameraHistoryFlow:" +
+//                infraredCameraId);
 //                if (robotLightFlowMap.size()>0) robotHistoryList.add(robotLightFlowMap);
 //                if (robotInferadFlowMap.size()>0) robotHistoryList.add(robotInferadFlowMap);
 //            }
@@ -663,9 +714,12 @@ public class CameraConService {
 //            String portLigh=robotConInfo.getLightPort();
 //            String lightNum=robotConInfo.getNumLight();
 //
-//            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}"
-//                    , userName, password, ipLight, portLigh, lightNum, starttime, endtime, String.valueOf(robotId)+"9901");
-//            String transUrl = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, String.valueOf(robotId)+"9901");
+//            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{},
+//            historyPath:{}"
+//                    , userName, password, ipLight, portLigh, lightNum, starttime, endtime, String.valueOf(robotId)
+//                    +"9901");
+//            String transUrl = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1,
+//            starttime, endtime, String.valueOf(robotId)+"9901");
 //
 //            log.info("historyTransUrl: {}", transUrl);
 //            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrl});
@@ -679,7 +733,8 @@ public class CameraConService {
 //            lightReturnMap.put("webRtcUrl", lightWebRtc);
 //            isHttpsHistory(videoHttps, lightCameraId, lightReturnMap);
 //
-//            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraHistoryFlow:", Integer.parseInt(lightCameraId), Long.parseLong(lightCameraId), lightReturnMap, redisTemplate);
+//            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraHistoryFlow:", Integer
+//            .parseInt(lightCameraId), Long.parseLong(lightCameraId), lightReturnMap, redisTemplate);
 //            Thread thread = new Thread(streamInfoThread);
 //            thread.setDaemon(true);
 //            thread.start();
@@ -695,7 +750,8 @@ public class CameraConService {
 ////                String videoFlowId = streamJson.getString("id");
 ////                String publish = streamJson.getString("publish");
 ////                JSONObject publishjson = JSONObject.parseObject(publish);
-////                if (Objects.equals(name, String.valueOf(robotId) + "9901") && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+////                if (Objects.equals(name, String.valueOf(robotId) + "9901") && StringUtils.isNotEmpty(publishjson
+// .getString("cid"))) {
 ////                    lightReturnMap.put("videoFlowId", videoFlowId);
 ////                    Constant.mapsForHistory.put(String.valueOf(robotId) + "9901", videoFlowId);
 ////                    redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + robotId + ":light", lightReturnMap);
@@ -707,12 +763,15 @@ public class CameraConService {
 //            userName=robotConInfo.getInferadUsername();
 //            password=robotConInfo.getInferadPassword();
 //            String infraredIp=robotConInfo.getLnferadIp();
-//            String infraredPort=Objects.nonNull(robotConInfo.getInferadPort())?robotConInfo.getInferadPort().toString():null;
+//            String infraredPort=Objects.nonNull(robotConInfo.getInferadPort())?robotConInfo.getInferadPort()
+//            .toString():null;
 //            String infraredNum=robotConInfo.getNumInferad();
 //
-//            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}"
+//            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{},
+//            historyPath:{}"
 //                    , userName, password, infraredIp, infraredPort, infraredNum, starttime, endtime, robotId+"9902");
-//            String transUrlIn = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, robotId+"9902");
+//            String transUrlIn = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1,
+//            starttime, endtime, robotId+"9902");
 //
 //            log.info("historyTransUrl: {}", transUrlIn);
 //            Runtime.getRuntime().exec(new String[]{"sh", "-c", transUrlIn});
@@ -731,7 +790,8 @@ public class CameraConService {
 //                String flvUrl = "http://" + hostIp + ":10080/history/" + infraredCameraId + ".flv";
 //                infraredReturnMap.put("flvUrl", flvUrl);
 //            }
-//            StreamInfoThread streamInfoThread2 = new StreamInfoThread(srsStopUrl, "cameraHistoryFlow:", Integer.parseInt(infraredCameraId), Long.parseLong(infraredCameraId), lightReturnMap, redisTemplate);
+//            StreamInfoThread streamInfoThread2 = new StreamInfoThread(srsStopUrl, "cameraHistoryFlow:", Integer
+//            .parseInt(infraredCameraId), Long.parseLong(infraredCameraId), lightReturnMap, redisTemplate);
 //            Thread thread2 = new Thread(streamInfoThread2);
 //            thread2.setDaemon(true);
 //            thread2.start();
@@ -740,17 +800,20 @@ public class CameraConService {
 ////            JSONObject jsonListIn = new JSONObject();
 ////            jsonListIn = HttpClientUtils.sendGet(getInfoUrlIn, null);
 ////            assert jsonListIn != null;
-////            List<String> streamsJsonObjectListIn = JSONArray.parseArray(jsonListIn.getString("streams"),String.class);
+////            List<String> streamsJsonObjectListIn = JSONArray.parseArray(jsonListIn.getString("streams"),String
+// .class);
 ////            //livePath
 ////            streamsJsonObjectListIn.stream().map(JSONObject::parseObject).forEach(streamJson -> {
 ////                String name = streamJson.getString("name");
 ////                String videoFlowId = streamJson.getString("id");
 ////                String publish = streamJson.getString("publish");
 ////                JSONObject publishjson = JSONObject.parseObject(publish);
-////                if (Objects.equals(name, String.valueOf(robotId) + "9902") && StringUtils.isNotEmpty(publishjson.getString("cid"))) {
+////                if (Objects.equals(name, String.valueOf(robotId) + "9902") && StringUtils.isNotEmpty(publishjson
+// .getString("cid"))) {
 ////                    infraredReturnMap.put("videoFlowId", videoFlowId);
 ////                    Constant.mapsForHistory.put(String.valueOf(robotId) + "9902", videoFlowId);
-////                    redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + robotId + ":inferad", infraredReturnMap);
+////                    redisTemplate.opsForHash().putAll("cameraHistoryFlow:" + robotId + ":inferad",
+// infraredReturnMap);
 ////                    robotHistoryList.add(infraredReturnMap);
 ////                }
 ////            });
@@ -760,9 +823,9 @@ public class CameraConService {
 //        return robotHistoryList;
 
         //定义返回结果集与可见光、红外历史流地址容器
-        List<Map<String,Object>> robotHistoryList=new ArrayList<>();
-        Map<String,Object> lightReturnMap=new HashMap<>();
-        Map<String,Object> infraredReturnMap=new HashMap<>();
+        List<Map<String, Object>> robotHistoryList = new ArrayList<>();
+        Map<String, Object> lightReturnMap = new HashMap<>();
+        Map<String, Object> infraredReturnMap = new HashMap<>();
 
         //开始时间 与 结束时间 格式化
         String startTimeTem = startTime.replace("-", "").replace(":", "").replace(" ", "T") + " ";
@@ -772,8 +835,8 @@ public class CameraConService {
         try {
             //获取机器人基本信息
             RobotConInfo robotConInfo = cameraConDao.selectRobotConInfo(robotId);
-            String lightCameraId = String.valueOf(robotId) + "9901";
-            String infraredCameraId = String.valueOf(robotId) + "9902";
+            String lightCameraId = robotId + "9901";
+            String infraredCameraId = robotId + "9902";
             //开启可见光历史流
             String userName = robotConInfo.getIdentityManager();
             String password = robotConInfo.getIdentityCode();
@@ -782,9 +845,11 @@ public class CameraConService {
             String lightNum = robotConInfo.getNumLight();
 
             Long lightId = Long.parseLong(lightCameraId) + System.currentTimeMillis();
-            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}"
+            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
+                            "historyPath:{}"
                     , userName, password, ipLight, portLigh, lightNum, starttime, endtime, lightId);
-            String transUrl = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, lightId);
+            String transUrl = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime
+                    , endtime, lightId);
 
             log.info("historyTransUrl: {}", transUrl);
             VideoInfo videoInfo = new VideoInfo().setCommand(transUrl).setId(lightId);
@@ -802,13 +867,16 @@ public class CameraConService {
             userName = robotConInfo.getInferadUsername();
             password = robotConInfo.getInferadPassword();
             String infraredIp = robotConInfo.getLnferadIp();
-            String infraredPort = Objects.nonNull(robotConInfo.getInferadPort()) ? robotConInfo.getInferadPort().toString() : null;
+            String infraredPort = Objects.nonNull(robotConInfo.getInferadPort()) ?
+                    robotConInfo.getInferadPort().toString() : null;
             String infraredNum = robotConInfo.getNumInferad();
 
             Long infraredId = Long.parseLong(infraredCameraId) + System.currentTimeMillis();
-            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, historyPath:{}"
+            log.info("userName:{}, password:{}, cameraIp:{}, cameraPort:{}, iChanNum:{}, starttime:{}, endtime:{}, " +
+                            "historyPath:{}"
                     , userName, password, infraredIp, infraredPort, infraredNum, starttime, endtime, infraredId);
-            String transUrlIn = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1, starttime, endtime, infraredId);
+            String transUrlIn = String.format(UrlBackTem, userName, password, ipLight, portLigh, lightNum, 1,
+                    starttime, endtime, infraredId);
 
             log.info("historyTransUrl: {}", transUrlIn);
             VideoInfo videoInfo2 = new VideoInfo().setCommand(transUrlIn).setId(infraredId);
@@ -881,13 +949,14 @@ public class CameraConService {
 //        }
         //修改为直接调用控制sdk NET_DVR_PTZControlWithSpeed_Other
         int iChanNum = cameraConInfo.getChannelNum() + 32;
-        if (Objects.isNull(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())))){
+        if (Objects.isNull(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())))) {
             registerNVR(cameraConInfo.getRecordId());
         }
         int userId = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
-        if (hCNetSDK.NET_DVR_PTZControlWithSpeed_Other(new NativeLong(userId), new NativeLong(iChanNum), dwPTZCommand, dStop,speed)){
+        if (hCNetSDK.NET_DVR_PTZControlWithSpeed_Other(new NativeLong(userId), new NativeLong(iChanNum), dwPTZCommand
+                , dStop, speed)) {
             return "susses";
-        }else {
+        } else {
             return "false";
         }
 
@@ -998,10 +1067,11 @@ public class CameraConService {
 
     /**
      * 给图片设置水印
-     * @param filePath 图片地址
+     *
+     * @param filePath         图片地址
      * @param waterMarkContent 水印内容
      */
-    private void pictureWaterMark(String filePath, String waterMarkContent){
+    private void pictureWaterMark(String filePath, String waterMarkContent) {
         try {
             String suffix = filePath.substring(filePath.lastIndexOf(".") + 1);
 
@@ -1020,7 +1090,7 @@ public class CameraConService {
             pen.setFont(new Font("微软雅黑", Font.BOLD, 30));
 
             //设置水印的坐标(为原图片右下角)
-            int x = srcImgWidth - getWatermarkLength(waterMarkContent, pen) -20;
+            int x = srcImgWidth - getWatermarkLength(waterMarkContent, pen) - 20;
             int y = srcImgHeight - 20;
 
             // 写上水印文字和坐标
@@ -1034,6 +1104,7 @@ public class CameraConService {
 
     /**
      * 获取水印文字的长度
+     *
      * @param waterMarkContent
      * @param g
      * @return
@@ -1046,7 +1117,7 @@ public class CameraConService {
     @Transactional(rollbackFor = Exception.class)
     public boolean presetAction(Long presetId, Long cameraId, int presetCmd) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
-        if(cameraConInfo == null){
+        if (cameraConInfo == null) {
             //摄像机id和预置位Id不正确
             throw new BusinessException("无此摄像机或摄像机预置位不正确");
         }
@@ -1086,10 +1157,12 @@ public class CameraConService {
         if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
             lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
             IntByReference intByReference = new IntByReference(0);
-            HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG(); //NET_DVR_IPPARACFG_V40--支持128通道
+            HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG(); //NET_DVR_IPPARACFG_V40
+            // --支持128通道
             m_strIpparaCfg.write();
             Pointer m_strIpparaCfgPointer = m_strIpparaCfg.getPointer();
-            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG, iChanNumTem, m_strIpparaCfgPointer, m_strIpparaCfg.size(), intByReference)) {
+            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG, iChanNumTem,
+                    m_strIpparaCfgPointer, m_strIpparaCfg.size(), intByReference)) {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.error("get camera status fail, error code: " + iErr);
                 channleStatusMap.put("get camera status fail, error code: ", String.valueOf(iErr));
@@ -1101,14 +1174,16 @@ public class CameraConService {
             for (int iChannum = 1; iChannum < HCNetSDK.MAX_IP_CHANNEL; iChannum++) {
                 if (m_strIpparaCfg.struIPChanInfo[iChannum - 1].byEnable == 1) {
                     for (CameraStatusInfo cameraStatusInfo : cameraConInfoMap) {
-                        if (Objects.equals(cameraStatusInfo.getChannelNum(), iChannum))
+                        if (Objects.equals(cameraStatusInfo.getChannelNum(), iChannum)) {
                             channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "1");
+                        }
                     }
                 }
                 if (m_strIpparaCfg.struIPChanInfo[iChannum - 1].byEnable == 0) {
                     for (CameraStatusInfo cameraStatusInfo : cameraConInfoMap) {
-                        if (Objects.equals(cameraStatusInfo.getChannelNum(), iChannum))
+                        if (Objects.equals(cameraStatusInfo.getChannelNum(), iChannum)) {
                             channleStatusMap.put(String.valueOf(cameraStatusInfo.getCameraId()), "0");
+                        }
                     }
                 }
 
@@ -1129,8 +1204,7 @@ public class CameraConService {
         List<CameraAreaInfo> tree = new ArrayList<>();
         Map<String, String> state = new HashMap<>();
         List<CameraAreaInfo> listTree = this.cameraConDao.selectCameraTree(cameraName);
-        for (Iterator<CameraAreaInfo> it = listTree.iterator(); it.hasNext(); ) {
-            CameraAreaInfo areaInfoMap = it.next();
+        for (CameraAreaInfo areaInfoMap : listTree) {
             if (areaInfoMap.getUpId() == -1) {
                 CameraAreaInfo areaInfoCountry = new CameraAreaInfo();
                 areaInfoCountry.setId(areaInfoMap.getId());
@@ -1149,11 +1223,11 @@ public class CameraConService {
 
     }
 
-    private void diGui(List<CameraAreaInfo> areaInfoList, List<CameraAreaInfo> listTree, Map<String, String> state, Integer flag) {
+    private void diGui(List<CameraAreaInfo> areaInfoList, List<CameraAreaInfo> listTree, Map<String, String> state,
+                       Integer flag) {
         for (CameraAreaInfo areaInfo : areaInfoList) {
             List<CameraAreaInfo> childrenList = new ArrayList<>();
-            for (Iterator<CameraAreaInfo> it = listTree.iterator(); it.hasNext(); ) {
-                CameraAreaInfo areaInfoMap = it.next();
+            for (CameraAreaInfo areaInfoMap : listTree) {
                 if (Objects.equals(areaInfo.getId(), areaInfoMap.getUpId())) {
                     CameraAreaInfo areaInfoTem = new CameraAreaInfo();
                     areaInfoTem.setId(areaInfoMap.getId());
@@ -1167,8 +1241,6 @@ public class CameraConService {
                         if ("1".equals(state.get(areaInfoMap.getId().toString()))) {
                             //在线
                             childrenList.add(areaInfoTem);
-                        } else {
-                            continue;
                         }
                     } else {
                         childrenList.add(areaInfoTem);
@@ -1196,7 +1268,8 @@ public class CameraConService {
             HCNetSDK.NET_DVR_HDCFG m_struHDCfg = new HCNetSDK.NET_DVR_HDCFG();
             m_struHDCfg.write();
             Pointer lpPicConfig = m_struHDCfg.getPointer();
-            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_HDCFG, iChanNumTem, lpPicConfig, m_struHDCfg.size(), ibrBytesReturned)) {
+            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_HDCFG, iChanNumTem, lpPicConfig,
+                    m_struHDCfg.size(), ibrBytesReturned)) {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.error("get NVR status fail, error code: {}", iErr);
                 channleStatusMap.put("get NVR status fail, error code: ", String.valueOf(iErr));
@@ -1225,7 +1298,22 @@ public class CameraConService {
     }
 
     /**
+     * 每6小时刷新一次录像机信息
+     */
+    @Scheduled(cron = "0 0 */6 * * ?")
+    public void refreshRecordsOnSchedule() {
+        List<RecorderConInfo> recordersInfo = cameraConDao.SelectRecords();
+        recordersInfo.stream().map(RecorderConInfo::getRecordId).forEach(recordId -> {
+            reRegister(recordId);
+            redisTemplate.opsForHash().putAll("recorderInfo:" + recordId,
+                    getNVRStoreAndChanle(recordId));
+            redisTemplate.expire("recorderInfo:" + recordId, 7, TimeUnit.DAYS);
+        });
+    }
+
+    /**
      * 获取NVR存储状态和通道信息
+     *
      * @param recordId
      * @return
      */
@@ -1241,7 +1329,8 @@ public class CameraConService {
             HCNetSDK.NET_DVR_HDCFG m_struHDCfg = new HCNetSDK.NET_DVR_HDCFG();
             m_struHDCfg.write();
             Pointer lpPicConfig = m_struHDCfg.getPointer();
-            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_HDCFG, iChanNumTem, lpPicConfig, m_struHDCfg.size(), ibrBytesReturned)) {
+            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_HDCFG, iChanNumTem, lpPicConfig,
+                    m_struHDCfg.size(), ibrBytesReturned)) {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.error("get NVR status fail, error code: {}", iErr);
                 channleStatusMap.put("get NVR status fail, error code: ", String.valueOf(iErr));
@@ -1267,7 +1356,8 @@ public class CameraConService {
             channleStatusMap.put("freeTotal", String.valueOf(hardFreeTotal));
             HCNetSDK.NET_DVR_DEVICEINFO_V40 device = Constant.deviceMaps.get(recordId);
             // 查询通道信息
-            List<Map<String, Object>> chanInfo = getNVRIpparaCfg(recordId, lUserIDLong, iChanNumTem, new HCNetSDK.NET_DVR_TIME(), new HCNetSDK.NET_DVR_TIME());
+            List<Map<String, Object>> chanInfo = getNVRIpparaCfg(recordId, lUserIDLong, iChanNumTem,
+                    new HCNetSDK.NET_DVR_TIME(), new HCNetSDK.NET_DVR_TIME());
             channleStatusMap.put("channel", chanInfo);
             channleStatusMap.put("status", "在线");
             return channleStatusMap;
@@ -1281,7 +1371,7 @@ public class CameraConService {
         List<Map<String, Object>> retList = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
         Integer lUserIDLong = Constant.maps.get(String.valueOf(recordId));
-        if (Objects.nonNull(lUserIDLong)){
+        if (Objects.nonNull(lUserIDLong)) {
             HCNetSDK.NET_DVR_TIME stTime = new HCNetSDK.NET_DVR_TIME();
             HCNetSDK.NET_DVR_TIME edTime = new HCNetSDK.NET_DVR_TIME();
 
@@ -1302,18 +1392,22 @@ public class CameraConService {
         }
         return retList;
     }
-        /**
-         * startTime 和 stopTime 不能为 null，至少要 new HCNetSDK.NET_DVR_TIME()
-         */
-    public List<Map<String, Object>> getNVRIpparaCfg(Long recordId, NativeLong lUserIDLong, NativeLong iChanNumTem, HCNetSDK.NET_DVR_TIME startTimeI, HCNetSDK.NET_DVR_TIME stopTimeI) {
+
+    /**
+     * startTime 和 stopTime 不能为 null，至少要 new HCNetSDK.NET_DVR_TIME()
+     */
+    public List<Map<String, Object>> getNVRIpparaCfg(Long recordId, NativeLong lUserIDLong, NativeLong iChanNumTem,
+                                                     HCNetSDK.NET_DVR_TIME startTimeI,
+                                                     HCNetSDK.NET_DVR_TIME stopTimeI) {
 
         IntByReference ibrBytesReturned = new IntByReference(0);
         HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG();
         m_strIpparaCfg.write();
         Pointer lpIpConfig = m_strIpparaCfg.getPointer();
-        boolean cfg = hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG, iChanNumTem, lpIpConfig, m_strIpparaCfg.size(), ibrBytesReturned);
+        boolean cfg = hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG, iChanNumTem,
+                lpIpConfig, m_strIpparaCfg.size(), ibrBytesReturned);
         List<Map<String, Object>> channelInfoList = new ArrayList<>();
-        if(cfg) {
+        if (cfg) {
             m_strIpparaCfg.read();
             // 通道信息
             HCNetSDK.NET_DVR_IPCHANINFO[] ipChans = m_strIpparaCfg.struIPChanInfo;
@@ -1325,7 +1419,8 @@ public class CameraConService {
             int ipChanNum = device.struDeviceV30.byIPChanNum;
             int ipChanStart = device.struDeviceV30.byStartDChan;
 
-            log.info("NVR[{} - {}] ip channel start: {}, num: {}", recordId, lUserIDLong.longValue(), ipChanStart, ipChanNum);
+            log.info("NVR[{} - {}] ip channel start: {}, num: {}", recordId, lUserIDLong.longValue(), ipChanStart,
+                    ipChanNum);
 
             HCNetSDK.NET_DVR_FILECOND_V40 fileCond = new HCNetSDK.NET_DVR_FILECOND_V40();
             fileCond.dwFileType = 0xff;
@@ -1333,7 +1428,7 @@ public class CameraConService {
             boolean nvrFileLog = "true".equals(redisTemplate.opsForHash().get("t_sys_param:nvrFileLog", "content"));
             for (int i = 0; i < ipChans.length; i++) {
                 int ipId = ipChans[i].byIPID;
-                if(ipId == 0){
+                if (ipId == 0) {
                     // 通道未启用，跳出
                     continue;
                 }
@@ -1366,8 +1461,9 @@ public class CameraConService {
                 fileCond.lChannel = ipChan.intValue();
                 fileCond.struStartTime = startTime;
                 fileCond.struStopTime = stopTime;
-                log.info("NVR file find start, channel: {}, beginTime: {}, endTime: {}", ipChan, fileCond.struStartTime.toStringTime(),
-                    fileCond.struStopTime.toStringTime());
+                log.info("NVR file find start, channel: {}, beginTime: {}, endTime: {}", ipChan,
+                        fileCond.struStartTime.toStringTime(),
+                        fileCond.struStopTime.toStringTime());
                 // 查询文件
                 int lFindFile = hCNetSDK.NET_DVR_FindFile_V40(lUserIDLong.intValue(), fileCond);
                 HCNetSDK.NET_DVR_FINDDATA_V40 strFile = new HCNetSDK.NET_DVR_FINDDATA_V40();
@@ -1378,20 +1474,22 @@ public class CameraConService {
                 boolean found = true;
                 if (lFindFile == -1) {
                     found = false;
-                    log.error("文件查找失败 NET_DVR_FindFile_V40, channel: {}, [{} —— {}]", ipChan.intValue(), hCNetSDK.NET_DVR_GetLastError(), lFindFile);
+                    log.error("文件查找失败 NET_DVR_FindFile_V40, channel: {}, [{} —— {}]", ipChan.intValue(),
+                            hCNetSDK.NET_DVR_GetLastError(), lFindFile);
                 }
-                while(found) {
+                while (found) {
                     lNext = hCNetSDK.NET_DVR_FindNextFile_V40(lFindFile, strFile);
-                    if(lNext == HCNetSDK.NET_DVR_FILE_SUCCESS) {
+                    if (lNext == HCNetSDK.NET_DVR_FILE_SUCCESS) {
 
                         long stTime = dvrTime2Timestamp(strFile.struStartTime);
                         long spTime = dvrTime2Timestamp(strFile.struStopTime);
                         long speed = spTime - stTime;
                         // 计算录像时长
                         timeRecord += speed;
-                        if(nvrFileLog) {
-                            log.info("找到文件, channel: {}, fileName: {}, time: [{}  {}]", ipChan.intValue(), new String(strFile.sFileName).trim(),
-                                strFile.struStartTime.toStringTime(), strFile.struStopTime.toStringTime());
+                        if (nvrFileLog) {
+                            log.info("找到文件, channel: {}, fileName: {}, time: [{}  {}]", ipChan.intValue(),
+                                    new String(strFile.sFileName).trim(),
+                                    strFile.struStartTime.toStringTime(), strFile.struStopTime.toStringTime());
                         }
                         // 录像完整性视频段校验
                         recordCheck2(recordschedList, intact, strFile.struStartTime, preEndTime);
@@ -1401,26 +1499,27 @@ public class CameraConService {
                         timeDefect += def;
                         preEndTime = newDvrTime(strFile.struStopTime);
                         preStopTime = spTime;
-                    } else if(lNext == HCNetSDK.NET_DVR_FILE_NOFIND){
+                    } else if (lNext == HCNetSDK.NET_DVR_FILE_NOFIND) {
                         log.info("没有找到文件, channel: {}！", ipChan.intValue());
-                        break;
-                    } else if(lNext != HCNetSDK.NET_DVR_ISFINDING){
-                        log.info("文件查找关闭 NET_DVR_FindClose_V30, channel: {}, [{} —— {}]", ipChan.intValue(), hCNetSDK.NET_DVR_GetLastError(), lNext);
+                        found = false;
+                    } else if (lNext != HCNetSDK.NET_DVR_ISFINDING) {
+                        log.info("文件查找关闭 NET_DVR_FindClose_V30, channel: {}, [{} —— {}]", ipChan.intValue(),
+                                hCNetSDK.NET_DVR_GetLastError(), lNext);
                         hCNetSDK.NET_DVR_FindClose_V30(lFindFile);
-                        break;
+                        found = false;
                     }
                 }
                 String sTemp = timeStr(timeRecord);
                 chanInfoMap.put("recordTime", sTemp);
                 int intactTime = 10000;
-                if(timeRecord > 0L && timeDefect > 0L){
-                    intactTime = (int)((timeRecord * 10000)/(timeDefect + timeRecord));
+                if (timeRecord > 0L && timeDefect > 0L) {
+                    intactTime = (int) ((timeRecord * 10000) / (timeDefect + timeRecord));
                 }
                 chanInfoMap.put("intactTime", intactTime);
                 chanInfoMap.put("defectTime", timeStr(timeDefect));
 
-                if(intact[0] > 0){
-                    intact[2] = (intact[0] * 10000)/(intact[0] + intact[1]);
+                if (intact[0] > 0) {
+                    intact[2] = (intact[0] * 10000) / (intact[0] + intact[1]);
                 }
                 chanInfoMap.put("intact", intact);
 
@@ -1434,17 +1533,19 @@ public class CameraConService {
         return channelInfoList;
     }
 
-    public String[] recordTimeSpan(HCNetSDK.NET_DVR_TIME startTime, HCNetSDK.NET_DVR_TIME stopTime, int ipChan, NativeLong lUserIDLong) {
+    public String[] recordTimeSpan(HCNetSDK.NET_DVR_TIME startTime, HCNetSDK.NET_DVR_TIME stopTime, int ipChan,
+                                   NativeLong lUserIDLong) {
         // 获取录像开始结束时间
         HCNetSDK.NET_DVR_RECORD_TIME_SPAN_INQUIRY timeSpanInquiry = new HCNetSDK.NET_DVR_RECORD_TIME_SPAN_INQUIRY();
         timeSpanInquiry.byType = 0;
         timeSpanInquiry.dwSize = timeSpanInquiry.size();
         HCNetSDK.NET_DVR_RECORD_TIME_SPAN lpResult = new HCNetSDK.NET_DVR_RECORD_TIME_SPAN();
         timeSpanInquiry.write();
-        if(hCNetSDK.NET_DVR_InquiryRecordTimeSpan(lUserIDLong.intValue(), ipChan, timeSpanInquiry, lpResult)) {
+        if (hCNetSDK.NET_DVR_InquiryRecordTimeSpan(lUserIDLong.intValue(), ipChan, timeSpanInquiry, lpResult)) {
             lpResult.read();
-            log.info("通道录像起止时间, beginTime: {}, endTime: {}", lpResult.strBeginTime.toStringTime(), lpResult.strEndTime.toStringTime());
-            if(startTime.dwYear == 0 || stopTime.dwYear == 0){
+            log.info("通道录像起止时间, beginTime: {}, endTime: {}", lpResult.strBeginTime.toStringTime(),
+                    lpResult.strEndTime.toStringTime());
+            if (startTime.dwYear == 0 || stopTime.dwYear == 0) {
                 startTime.dwYear = lpResult.strBeginTime.dwYear;
                 startTime.dwMonth = lpResult.strBeginTime.dwMonth;
                 startTime.dwDay = lpResult.strBeginTime.dwDay;
@@ -1461,10 +1562,10 @@ public class CameraConService {
             }
         } else {
             log.info("通道录像起止时间查询失败, error: {}", hCNetSDK.NET_DVR_GetLastError());
-            if(startTime.dwYear == 0 || stopTime.dwYear == 0){
+            if (startTime.dwYear == 0 || stopTime.dwYear == 0) {
                 Calendar cal = Calendar.getInstance();
                 stopTime.dwYear = cal.get(Calendar.YEAR);
-                stopTime.dwMonth = cal.get(Calendar.MONTH) +  1;
+                stopTime.dwMonth = cal.get(Calendar.MONTH) + 1;
                 stopTime.dwDay = cal.get(Calendar.DAY_OF_MONTH);
                 stopTime.dwHour = 23;
                 stopTime.dwMinute = 59;
@@ -1472,7 +1573,7 @@ public class CameraConService {
                 // 7天前
                 cal.add(Calendar.DAY_OF_MONTH, -7);
                 startTime.dwYear = cal.get(Calendar.YEAR);
-                startTime.dwMonth = cal.get(Calendar.MONTH) +  1;
+                startTime.dwMonth = cal.get(Calendar.MONTH) + 1;
                 startTime.dwDay = cal.get(Calendar.DAY_OF_MONTH);
             }
         }
@@ -1491,8 +1592,9 @@ public class CameraConService {
             HCNetSDK.NET_DVR_RECORD_V30 m_dvrRecord = new HCNetSDK.NET_DVR_RECORD_V30();
             m_dvrRecord.write();
             Pointer lpPicConfig = m_dvrRecord.getPointer();
-            boolean cfg = hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_RECORDCFG_V30, lChannel, lpPicConfig, m_dvrRecord.size(),
-                ibrBytesReturned);
+            boolean cfg = hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_RECORDCFG_V30, lChannel,
+                    lpPicConfig, m_dvrRecord.size(),
+                    ibrBytesReturned);
 
             if (cfg) {
                 m_dvrRecord.read();
@@ -1502,7 +1604,9 @@ public class CameraConService {
                 for (int i = 0; i < recordscheds.length; i++) {
                     HCNetSDK.NET_DVR_RECORDSCHED[] recordsched = recordscheds[i].struRecordSched;
                     List<String> record = new ArrayList<>();
-                    log.info("录像计划, wAllDayRecord:{}, byRecordType:{}, byStartHour[0]:{}, byStopHour[0]:{}", allDay[i].wAllDayRecord, allDay[i].byRecordType, recordsched[0].struRecordTime.byStartHour, recordsched[0].struRecordTime.byStopHour);
+                    log.info("录像计划, wAllDayRecord:{}, byRecordType:{}, byStartHour[0]:{}, byStopHour[0]:{}",
+                            allDay[i].wAllDayRecord, allDay[i].byRecordType, recordsched[0].struRecordTime.byStartHour,
+                            recordsched[0].struRecordTime.byStopHour);
                     if (recordsched[0].struRecordTime.byStartHour == recordsched[0].struRecordTime.byStopHour) {
                         if (allDay[i].wAllDayRecord == 1 && allDay[i].byRecordType == 0) {
                             record.add("00:00 - 24:00");
@@ -1526,9 +1630,10 @@ public class CameraConService {
         HCNetSDK.NET_DVR_PICCFG_V30 m_dvrRecord2 = new HCNetSDK.NET_DVR_PICCFG_V30();
         m_dvrRecord2.write();
         Pointer lpPicConfig2 = m_dvrRecord2.getPointer();
-        boolean cfg2 = hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_PICCFG_V30, lChannel, lpPicConfig2, m_dvrRecord2.size(), ibrBytesReturned2);
+        boolean cfg2 = hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_PICCFG_V30, lChannel,
+                lpPicConfig2, m_dvrRecord2.size(), ibrBytesReturned2);
         String sChanName;
-        if(cfg2) {
+        if (cfg2) {
             m_dvrRecord2.read();
             try {
                 sChanName = new String(m_dvrRecord2.sChanName, "GB2312").trim();
@@ -1545,16 +1650,18 @@ public class CameraConService {
         return MutablePair.of(sChanName, recordschedList);
     }
 
-    public void recordCheck2(List<String[]> recordschedList, int[] intact, HCNetSDK.NET_DVR_TIME struStartTime, HCNetSDK.NET_DVR_TIME preEndTime) {
+    public void recordCheck2(List<String[]> recordschedList, int[] intact, HCNetSDK.NET_DVR_TIME struStartTime,
+                             HCNetSDK.NET_DVR_TIME preEndTime) {
         // 开始或结束时间为空记为视频完整
-        if(preEndTime == null || preEndTime.dwYear == 0 || struStartTime.dwYear == 0){
+        if (preEndTime == null || preEndTime.dwYear == 0 || struStartTime.dwYear == 0) {
             intact[0] = intact[0] + 1;
             return;
         }
 
-        boolean undamaged = struStartTime.dwYear == preEndTime.dwYear && struStartTime.dwMonth == preEndTime.dwMonth && struStartTime.dwDay == preEndTime.dwDay
-            && struStartTime.dwHour == preEndTime.dwHour && struStartTime.dwMinute == preEndTime.dwMinute && struStartTime.dwSecond == preEndTime.dwSecond;
-        if(undamaged){
+        boolean undamaged =
+                struStartTime.dwYear == preEndTime.dwYear && struStartTime.dwMonth == preEndTime.dwMonth && struStartTime.dwDay == preEndTime.dwDay
+                        && struStartTime.dwHour == preEndTime.dwHour && struStartTime.dwMinute == preEndTime.dwMinute && struStartTime.dwSecond == preEndTime.dwSecond;
+        if (undamaged) {
             // 完整
             intact[0] = intact[0] + 1;
         } else {
@@ -1599,7 +1706,8 @@ public class CameraConService {
      * NVR 不支持完整性校验，需自己实现
      */
     @Deprecated
-    public void recordCheck(NativeLong lUserIDLong, int[] intact, HCNetSDK.NET_DVR_TIME struStartTime, HCNetSDK.NET_DVR_TIME struStopTime) {
+    public void recordCheck(NativeLong lUserIDLong, int[] intact, HCNetSDK.NET_DVR_TIME struStartTime,
+                            HCNetSDK.NET_DVR_TIME struStopTime) {
         HCNetSDK.NET_DVR_RECORD_CHECK_COND checkCond = new HCNetSDK.NET_DVR_RECORD_CHECK_COND();
         checkCond.byCheckType = 0;
         checkCond.struBeginTime = new HCNetSDK.NET_DVR_TIME_EX(struStartTime);
@@ -1607,21 +1715,22 @@ public class CameraConService {
         checkCond.write();
         Pointer checkPointer = checkCond.getPointer();
 
-        NativeLong lchek = hCNetSDK.NET_DVR_StartRemoteConfig(lUserIDLong, HCNetSDK.NET_DVR_RECORD_CHECK, checkPointer, checkCond.size(), null, null);
-        if(lchek.longValue() == -1L){
+        NativeLong lchek = hCNetSDK.NET_DVR_StartRemoteConfig(lUserIDLong, HCNetSDK.NET_DVR_RECORD_CHECK,
+                checkPointer, checkCond.size(), null, null);
+        if (lchek.longValue() == -1L) {
             log.info("录像完整性校验失败 [{}]", hCNetSDK.NET_DVR_GetLastError());
             return;
         }
         // checkCond.read();
-        while(true) {
+        while (true) {
             HCNetSDK.NET_DVR_RECORD_CHECK_RET checkRet = new HCNetSDK.NET_DVR_RECORD_CHECK_RET();
             checkRet.write();
             Pointer checkRetPointer = checkRet.getPointer();
 
             lchek = hCNetSDK.NET_DVR_GetNextRemoteConfig(lchek, checkRetPointer, checkRet.size());
-            if(lchek.longValue() == HCNetSDK.NET_SDK_GET_NEXT_STATUS_SUCCESS) {
+            if (lchek.longValue() == HCNetSDK.NET_SDK_GET_NEXT_STATUS_SUCCESS) {
                 checkRet.read();
-                if(checkRet.byRecordNotComplete == 0){
+                if (checkRet.byRecordNotComplete == 0) {
                     // 完整
                     intact[0] = intact[0] + 1;
                 } else {
@@ -1629,7 +1738,7 @@ public class CameraConService {
                     intact[1] = intact[1] + 1;
                 }
                 log.info("录像完整性校验, 完整 : {}", checkRet.byRecordNotComplete);
-            } else if(lchek.longValue() != HCNetSDK.NET_SDK_GET_NETX_STATUS_NEED_WAIT){
+            } else if (lchek.longValue() != HCNetSDK.NET_SDK_GET_NETX_STATUS_NEED_WAIT) {
                 log.info("录像校验关闭 NET_DVR_StopRemoteConfig [{}]", lchek.longValue());
                 hCNetSDK.NET_DVR_StopRemoteConfig(lchek.intValue());
                 break;
@@ -1637,33 +1746,35 @@ public class CameraConService {
         }
     }
 
-    public long dvrTime2Timestamp(HCNetSDK.NET_DVR_TIME struTime){
+    public long dvrTime2Timestamp(HCNetSDK.NET_DVR_TIME struTime) {
         Calendar date = Calendar.getInstance();
         date.set(Calendar.MILLISECOND, 0);
-        date.set(struTime.dwYear, struTime.dwMonth, struTime.dwDay, struTime.dwHour, struTime.dwMinute, struTime.dwSecond);
+        date.set(struTime.dwYear, struTime.dwMonth, struTime.dwDay, struTime.dwHour, struTime.dwMinute,
+                struTime.dwSecond);
         return date.getTimeInMillis();
     }
 
-    public Calendar dvrTime2Date(HCNetSDK.NET_DVR_TIME struTime){
+    public Calendar dvrTime2Date(HCNetSDK.NET_DVR_TIME struTime) {
         Calendar date = Calendar.getInstance();
-        date.set(struTime.dwYear, struTime.dwMonth, struTime.dwDay, struTime.dwHour, struTime.dwMinute, struTime.dwSecond);
+        date.set(struTime.dwYear, struTime.dwMonth, struTime.dwDay, struTime.dwHour, struTime.dwMinute,
+                struTime.dwSecond);
         return date;
     }
 
-    public void date2DvrTime(Date date, HCNetSDK.NET_DVR_TIME struTime){
+    public void date2DvrTime(Date date, HCNetSDK.NET_DVR_TIME struTime) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
 
         struTime.dwYear = cal.get(Calendar.YEAR);
-        struTime.dwMonth = cal.get(Calendar.MONTH) +  1;
+        struTime.dwMonth = cal.get(Calendar.MONTH) + 1;
         struTime.dwDay = cal.get(Calendar.DAY_OF_MONTH);
         struTime.dwHour = cal.get(Calendar.HOUR_OF_DAY);
         struTime.dwMinute = cal.get(Calendar.MINUTE);
         struTime.dwSecond = cal.get(Calendar.SECOND);
     }
 
-    public String timeStr(long time){
-        if (time < 1000L){
+    public String timeStr(long time) {
+        if (time < 1000L) {
             return "0s";
         }
         int iTemp;
@@ -1672,27 +1783,27 @@ public class CameraConService {
         long hm = 60 * 60 * 1000L;
         long dh = 24 * 60 * 60 * 1000L;
         if (time < hm) {
-            iTemp = (int)(time / ms);
+            iTemp = (int) (time / ms);
             sTemp = iTemp + "m ";
-            iTemp = (int)((time % ms) / 1000);
+            iTemp = (int) ((time % ms) / 1000);
             sTemp += iTemp + "s";
         } else if (time < dh) {
-            iTemp = (int)(time / hm);
+            iTemp = (int) (time / hm);
             sTemp = iTemp + "h ";
-            iTemp = (int)((time % hm) / ms);
+            iTemp = (int) ((time % hm) / ms);
             sTemp += iTemp + "m";
         } else {
-            iTemp = (int)(time / dh);
+            iTemp = (int) (time / dh);
             sTemp = iTemp + "d ";
-            iTemp = (int)((time % dh) / hm);
+            iTemp = (int) ((time % dh) / hm);
             sTemp += iTemp + "h ";
-            iTemp = (int)((time % hm) / ms);
+            iTemp = (int) ((time % hm) / ms);
             sTemp += iTemp + "m";
         }
         return sTemp;
     }
 
-    public HCNetSDK.NET_DVR_TIME newDvrTime(HCNetSDK.NET_DVR_TIME struTime){
+    public HCNetSDK.NET_DVR_TIME newDvrTime(HCNetSDK.NET_DVR_TIME struTime) {
         HCNetSDK.NET_DVR_TIME newstru = new HCNetSDK.NET_DVR_TIME();
         newstru.dwYear = struTime.dwYear;
         newstru.dwMonth = struTime.dwMonth;
@@ -1705,6 +1816,7 @@ public class CameraConService {
 
     /**
      * 判断 NVR 是否掉线，如果掉线则重新注册
+     *
      * @param recordId
      */
     public void reRegister(Long recordId) {
@@ -1733,7 +1845,9 @@ public class CameraConService {
     public String registerNVR(Long recordId) {
 
         RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
-        if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) lUserID = Constant.maps.get(String.valueOf(recordId));
+        if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
+            lUserID = Constant.maps.get(String.valueOf(recordId));
+        }
 
         if (lUserID > -1) {
             //NVR log out first...
@@ -1761,9 +1875,11 @@ public class CameraConService {
         HCNetSDK.NET_DVR_DEVICEINFO_V40 strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();
 
         lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, strDeviceInfo);
-        log.info("register nvr {}, ip is {}, port is {}, lUserID:{}" , recorderConInfo.getRecordName(), m_sDeviceIP, m_port, lUserID);
+        log.info("register nvr {}, ip is {}, port is {}, lUserID:{}", recorderConInfo.getRecordName(), m_sDeviceIP,
+                m_port, lUserID);
         if (lUserID == -1) {
-            log.error("recordName:{}, register fail, error code:{}", recorderConInfo.getRecordName(), hCNetSDK.NET_DVR_GetLastError());
+            log.error("recordName:{}, register fail, error code:{}", recorderConInfo.getRecordName(),
+                    hCNetSDK.NET_DVR_GetLastError());
             return recorderConInfo.getRecordName() + " register fail, error code:" + hCNetSDK.NET_DVR_GetLastError();
         } else {
             Constant.maps.put(String.valueOf(recordId), lUserID);
@@ -1788,7 +1904,9 @@ public class CameraConService {
 
     //byte数组到图片
     private void byteToImage(byte[] data, String path, String meteName) {
-        if (data.length < 3 || path.equals("")) return;
+        if (data.length < 3 || "".equals(path)) {
+            return;
+        }
         try {
             FileImageOutputStream imageOutput = new FileImageOutputStream(new File(path));
             imageOutput.write(data, 0, data.length);
@@ -1796,7 +1914,8 @@ public class CameraConService {
             imageOutput.close();
             log.info("Make Picture success,Please find image in {}", path);
             // 红外图片添加水印的开关
-            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared","content"));
+            String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared", "content"
+            ));
             if (StringUtils.isNotEmpty(meteName) && StringUtils.equals("true", flag)) {
                 pictureWaterMark(path, DateTimeUtil.format(new Date()) + "--" + meteName);
             }
@@ -1820,13 +1939,13 @@ public class CameraConService {
                     //判断时间问题
                     String lastTime = String.valueOf(camreaStatusMap.get("lastTime"));
                     Date endDate = format.parse(lastTime);
-                    if (System.currentTimeMillis() - endDate.getTime() > 10*60*1000){
+                    if (System.currentTimeMillis() - endDate.getTime() > 10 * 60 * 1000) {
                         //最后一次操控时间距离现在大于10分钟
-                        camreaStatusMap.put("state",0);
-                        redisTemplate.opsForHash().putAll("camera_info",camreaStatusMap);
+                        camreaStatusMap.put("state", 0);
+                        redisTemplate.opsForHash().putAll("camera_info", camreaStatusMap);
                         return;
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     log.info("时间转换出错：", e);
                 }
                 log.info("unable to control...");
@@ -1865,7 +1984,7 @@ public class CameraConService {
             Constant.recordLongMap.put(fileName, lRealPlayHandle);
 
             judge = path;
-        }catch (Exception e){
+        } catch (Exception e) {
             iErr = hCNetSDK.NET_DVR_GetLastError();
             log.info("获取视频方发异常：" + iErr);
             log.info(e.getMessage());
@@ -1883,13 +2002,13 @@ public class CameraConService {
             VideoUtil.h264ToMp4(path);
             String url = "chmod 777 " + videoPath + fileName;
             Runtime.getRuntime().exec(url);
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
             log.info("录制失败");
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String startDvrToPlace(long cameraId){
+    public String startDvrToPlace(long cameraId) {
         //返回结果
         String judge = "";
         NativeLong lRealPlayHandle;
@@ -1938,7 +2057,8 @@ public class CameraConService {
             hCNetSDK.NET_DVR_SaveRealData(lRealPlayHandle, path);
             Constant.recordLongMap.put(fileName, lRealPlayHandle);
             //防止前端未调用停止接口
-            RecordFileThread recordFileThread = new RecordFileThread(cameraConDao, redisTemplate, hCNetSDK, date.getTime(),fileName, videoPath, savePath);
+            RecordFileThread recordFileThread = new RecordFileThread(cameraConDao, redisTemplate, hCNetSDK,
+                    date.getTime(), fileName, videoPath, savePath);
             TaskExecutePool.getInstance().execute(recordFileThread);
             judge = fileName;
             RecordFileInfo recordFileInfo = new RecordFileInfo();
@@ -1947,7 +2067,7 @@ public class CameraConService {
             recordFileInfo.setCameraId(cameraId);
             recordFileInfo.setUpRegionId(cameraConInfo.getUpRegionId());
             cameraConDao.insertRecordFile(recordFileInfo);
-        }catch (Exception e){
+        } catch (Exception e) {
             iErr = hCNetSDK.NET_DVR_GetLastError();
             log.info("获取视频方发异常：" + iErr);
             log.info(e.getMessage());
@@ -1956,7 +2076,7 @@ public class CameraConService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public String stopDvrToPlace(String fileName, String userId){
+    public String stopDvrToPlace(String fileName, String userId) {
         //返回结果
         String judge = "录制文件正在生成中...";
         try {
@@ -1964,13 +2084,15 @@ public class CameraConService {
             hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
             String url = "chmod 777 " + videoPath + fileName;
             Runtime.getRuntime().exec(url);
-            TranscodeThread transcodeThread = new TranscodeThread(videoPath, savePath, fileName,syncWebsocketUrl,userId,cameraConDao,platFromFtpsConfig);
+            TranscodeThread transcodeThread = new TranscodeThread(videoPath, savePath, fileName, syncWebsocketUrl,
+                    userId, cameraConDao, platFromFtpsConfig);
             TaskExecutePool.getInstance().execute(transcodeThread);
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
             log.info("录制失败");
         }
         return judge;
     }
+
     /**
      * 下载nvr文件
      *
@@ -1990,110 +2112,112 @@ public class CameraConService {
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
            /* if (hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化成功开始注册登录：");*/
-               // String login = registerNVR(cameraConInfo.getRecordId());
-                /*if (!login.isEmpty()) {*/
-                   // log.info("登录成功：" + login);
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    //生成文件名
-                    String fileName = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").format(new Date()) + ".mp4";
-                    log.info("生成文件名" + fileName);
-                    //保存文件地址
-                    String path = videoPath + fileName;
-                    log.info("保存文件地址：" + path);
-                    lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
-                    log.info("lUserIDLong获取到：" + lUserIDLong);
-                    Calendar c = Calendar.getInstance();
-                    //开始时间
-                    HCNetSDK.NET_DVR_TIME struStartTime = new HCNetSDK.NET_DVR_TIME();
-                    HCNetSDK.NET_DVR_TIME struStopTim = new HCNetSDK.NET_DVR_TIME();
-                    Date startTimes = format.parse(startTime);
-                    c.setTime(startTimes);
-                    log.info("startTime获取到：" + startTime);
-                    log.info("stopTime时间转：" + stopTime);
-                    struStartTime.dwYear = c.get(Calendar.YEAR);
-                    struStartTime.dwMonth = c.get(Calendar.MONTH) + 1;
-                    struStartTime.dwDay = c.get(Calendar.DATE);
-                    struStartTime.dwHour = c.get(Calendar.HOUR_OF_DAY);
-                    struStartTime.dwMinute = c.get(Calendar.MINUTE);
-                    struStartTime.dwSecond = c.get(Calendar.SECOND);
-                    // log.info("struStartTime 开始时间结束："+struStartTime.toString());
-                    //结束时间
-                    Date endTimes = format.parse(stopTime);
-                    c.setTime(endTimes);
-                    struStopTim.dwYear = c.get(Calendar.YEAR);
-                    struStopTim.dwMonth = c.get(Calendar.MONTH) + 1;
-                    struStopTim.dwDay = c.get(Calendar.DATE);
-                    struStopTim.dwHour = c.get(Calendar.HOUR_OF_DAY);
-                    struStopTim.dwMinute = c.get(Calendar.MINUTE);
-                    struStopTim.dwSecond = c.get(Calendar.SECOND);
-                    log.info("时间赋值成功");
-                    NativeLong lChannel = new NativeLong(cameraConInfo.getChannelNum());
-                    log.info("lChannel赋值成功:" + lChannel);
-                    //查找文件存在不存在
-                    NativeLong findFile = hCNetSDK.NET_DVR_FindFile(lUserIDLong, lChannel, 0xff, struStartTime, struStopTim);
-                    log.info("findFile查找文件接口:" + "findFile：" + findFile + "lUserIDLong:" + lUserIDLong + "lChannel:" + lChannel);
-                    if (findFile.longValue() > -1) {
-                        //获取时间断的视频接口
-                        NativeLong fileByTime = hCNetSDK.NET_DVR_GetFileByTime(lUserIDLong, lChannel, struStartTime, struStopTim, path);
-                        log.info("调用NET_DVR_GetFileByTime接口获取到：" + fileByTime + "lUserIDLong:" + lUserIDLong + "lChannel" + lChannel + "path" + path);
-                        if (fileByTime.longValue() < 0) {
+            // String login = registerNVR(cameraConInfo.getRecordId());
+            /*if (!login.isEmpty()) {*/
+            // log.info("登录成功：" + login);
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            //生成文件名
+            String fileName = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss").format(new Date()) + ".mp4";
+            log.info("生成文件名" + fileName);
+            //保存文件地址
+            String path = videoPath + fileName;
+            log.info("保存文件地址：" + path);
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            log.info("lUserIDLong获取到：" + lUserIDLong);
+            Calendar c = Calendar.getInstance();
+            //开始时间
+            HCNetSDK.NET_DVR_TIME struStartTime = new HCNetSDK.NET_DVR_TIME();
+            HCNetSDK.NET_DVR_TIME struStopTim = new HCNetSDK.NET_DVR_TIME();
+            Date startTimes = format.parse(startTime);
+            c.setTime(startTimes);
+            log.info("startTime获取到：" + startTime);
+            log.info("stopTime时间转：" + stopTime);
+            struStartTime.dwYear = c.get(Calendar.YEAR);
+            struStartTime.dwMonth = c.get(Calendar.MONTH) + 1;
+            struStartTime.dwDay = c.get(Calendar.DATE);
+            struStartTime.dwHour = c.get(Calendar.HOUR_OF_DAY);
+            struStartTime.dwMinute = c.get(Calendar.MINUTE);
+            struStartTime.dwSecond = c.get(Calendar.SECOND);
+            // log.info("struStartTime 开始时间结束："+struStartTime.toString());
+            //结束时间
+            Date endTimes = format.parse(stopTime);
+            c.setTime(endTimes);
+            struStopTim.dwYear = c.get(Calendar.YEAR);
+            struStopTim.dwMonth = c.get(Calendar.MONTH) + 1;
+            struStopTim.dwDay = c.get(Calendar.DATE);
+            struStopTim.dwHour = c.get(Calendar.HOUR_OF_DAY);
+            struStopTim.dwMinute = c.get(Calendar.MINUTE);
+            struStopTim.dwSecond = c.get(Calendar.SECOND);
+            log.info("时间赋值成功");
+            NativeLong lChannel = new NativeLong(cameraConInfo.getChannelNum());
+            log.info("lChannel赋值成功:" + lChannel);
+            //查找文件存在不存在
+            NativeLong findFile = hCNetSDK.NET_DVR_FindFile(lUserIDLong, lChannel, 0xff, struStartTime, struStopTim);
+            log.info("findFile查找文件接口:" + "findFile：" + findFile + "lUserIDLong:" + lUserIDLong + "lChannel:" + lChannel);
+            if (findFile.longValue() > -1) {
+                //获取时间断的视频接口
+                NativeLong fileByTime = hCNetSDK.NET_DVR_GetFileByTime(lUserIDLong, lChannel, struStartTime,
+                        struStopTim, path);
+                log.info("调用NET_DVR_GetFileByTime接口获取到：" + fileByTime + "lUserIDLong:" + lUserIDLong + "lChannel" + lChannel + "path" + path);
+                if (fileByTime.longValue() < 0) {
+                    iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.error("get camera video NET_DVR_GetFileByTime, error code: " + iErr);
+                    judge = null;
+                } else {
+                    if (fileByTime.longValue() < 100) {
+                        //  hCNetSDK.NET_DVR_SetLogToFile(3,"/home/yjh_iot_center/sdklog",false);
+                        //使用NET_DVR_GetFileByTime_V40接口必须使用一下播放接口才能下载视频到本地
+                        boolean PlayBackControl = hCNetSDK.NET_DVR_PlayBackControl(fileByTime,
+                                HCNetSDK.NET_DVR_PLAYSTART, 0, null);
+                        log.info("PlayBackControl：" + PlayBackControl + "dwControlCode:" + HCNetSDK.NET_DVR_PLAYSTART + "dwInValue:" + 0 + "lpOutValue" + HCNetSDK.NET_DVR_GETTOTALTIME);
+                        if (PlayBackControl) {
+                            log.info("NET_DVR_PlayBackControl成功调用");
                             iErr = hCNetSDK.NET_DVR_GetLastError();
-                            log.error("get camera video NET_DVR_GetFileByTime, error code: " + iErr);
-                            judge = null;
-                        } else {
-                            if (fileByTime.longValue() < 100) {
-                                //  hCNetSDK.NET_DVR_SetLogToFile(3,"/home/yjh_iot_center/sdklog",false);
-                                //使用NET_DVR_GetFileByTime_V40接口必须使用一下播放接口才能下载视频到本地
-                                boolean PlayBackControl = hCNetSDK.NET_DVR_PlayBackControl(fileByTime, HCNetSDK.NET_DVR_PLAYSTART, 0, null);
-                                log.info("PlayBackControl：" + PlayBackControl + "dwControlCode:" + HCNetSDK.NET_DVR_PLAYSTART + "dwInValue:" + 0 + "lpOutValue" + HCNetSDK.NET_DVR_GETTOTALTIME);
-                                if (PlayBackControl) {
-                                    log.info("NET_DVR_PlayBackControl成功调用");
-                                    iErr = hCNetSDK.NET_DVR_GetLastError();
-                                    log.info("NET_DVR_PlayBackControl成功调用后NET_DVR_GetLastError：" + iErr);
-                                    IntByReference nPos = new IntByReference(0);
-                                    while (1 == 1)//获取下载进度，确认下载结束，则停止下载
-                                    {
-                                        NativeLong m_lLoadHandle = fileByTime;
-                                        hCNetSDK.NET_DVR_PlayBackControl(m_lLoadHandle, HCNetSDK.NET_DVR_PLAYGETPOS, 0, nPos);
-                                        //log.info("NET_DVR_PlayBackControl循环内接口参数"+"m_lLoadHandle"+m_lLoadHandle+"nPos"+nPos);
-                                        if (nPos.getValue() > 100) {
-                                            hCNetSDK.NET_DVR_StopGetFile(m_lLoadHandle);
-                                            m_lLoadHandle.setValue(-1);
-                                            log.info("由于网络原因或DVR忙,下载异常终止!");
-                                            judge = null;
-                                            break;
-                                        } else if (nPos.getValue() == 100) {
-                                            hCNetSDK.NET_DVR_StopGetFile(m_lLoadHandle);
-                                            m_lLoadHandle.setValue(-1);
-                                            log.info("按时间下载结束!");
-                                            String url = "chmod 777 " + videoPath + fileName;
-                                            Runtime.getRuntime().exec(url);
-                                            log.info("nPos.getValue!:>>>" + nPos.getValue());
-                                            judge = savePath + fileName;
-                                            copyFile(fileName,videoPath + fileName);
-                                            // hCNetSDK.NET_DVR_Logout(m_lLoadHandle);
-                                           // hCNetSDK.NET_DVR_Cleanup();
-                                            break;
-                                        }
-                                    }
-
-                                } else {
+                            log.info("NET_DVR_PlayBackControl成功调用后NET_DVR_GetLastError：" + iErr);
+                            IntByReference nPos = new IntByReference(0);
+                            while (1 == 1)//获取下载进度，确认下载结束，则停止下载
+                            {
+                                NativeLong m_lLoadHandle = fileByTime;
+                                hCNetSDK.NET_DVR_PlayBackControl(m_lLoadHandle, HCNetSDK.NET_DVR_PLAYGETPOS, 0, nPos);
+                                //log.info("NET_DVR_PlayBackControl循环内接口参数"+"m_lLoadHandle"+m_lLoadHandle+"nPos"+nPos);
+                                if (nPos.getValue() > 100) {
+                                    hCNetSDK.NET_DVR_StopGetFile(m_lLoadHandle);
+                                    m_lLoadHandle.setValue(-1);
+                                    log.info("由于网络原因或DVR忙,下载异常终止!");
                                     judge = null;
-                                    iErr = hCNetSDK.NET_DVR_GetLastError();
-                                    log.error("get camera video NET_DVR_PlayBackControl, error code: " + iErr);
+                                    break;
+                                } else if (nPos.getValue() == 100) {
+                                    hCNetSDK.NET_DVR_StopGetFile(m_lLoadHandle);
+                                    m_lLoadHandle.setValue(-1);
+                                    log.info("按时间下载结束!");
+                                    String url = "chmod 777 " + videoPath + fileName;
+                                    Runtime.getRuntime().exec(url);
+                                    log.info("nPos.getValue!:>>>" + nPos.getValue());
+                                    judge = savePath + fileName;
+                                    copyFile(fileName, videoPath + fileName);
+                                    // hCNetSDK.NET_DVR_Logout(m_lLoadHandle);
+                                    // hCNetSDK.NET_DVR_Cleanup();
+                                    break;
                                 }
-                            } else {
-                                judge = null;
-                                int rr = hCNetSDK.NET_DVR_GetLastError();
-                                log.info("get camera video NET_DVR_GetFileByTime大于100返回, error rr: " + rr);
                             }
 
+                        } else {
+                            judge = null;
+                            iErr = hCNetSDK.NET_DVR_GetLastError();
+                            log.error("get camera video NET_DVR_PlayBackControl, error code: " + iErr);
                         }
                     } else {
                         judge = null;
                         int rr = hCNetSDK.NET_DVR_GetLastError();
-                        log.info("get file by time  NET_DVR_FindFile返回, error rr: " + rr);
+                        log.info("get camera video NET_DVR_GetFileByTime大于100返回, error rr: " + rr);
                     }
+
+                }
+            } else {
+                judge = null;
+                int rr = hCNetSDK.NET_DVR_GetLastError();
+                log.info("get file by time  NET_DVR_FindFile返回, error rr: " + rr);
+            }
 
                /* } else {
                     iErr = hCNetSDK.NET_DVR_GetLastError();
@@ -2133,100 +2257,100 @@ public class CameraConService {
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
          /*  if (hCNetSDK.NET_DVR_Init()) {
                 log.info("初始化成功开始注册登录：");*/
-               // String login = registerNVR(cameraConInfo.getRecordId());
-               // if (!login.isEmpty()) {
-                  //  log.info("登录成功：" + login);
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
-                    log.info("lUserIDLong获取到：" + lUserIDLong);
-                    Calendar c = Calendar.getInstance();
-                    //开始时间
-                    HCNetSDK.NET_DVR_TIME struStartTime = new HCNetSDK.NET_DVR_TIME();
-                    HCNetSDK.NET_DVR_TIME struStopTim = new HCNetSDK.NET_DVR_TIME();
-                    Date startTimes = format.parse(startTime);
-                    c.setTime(startTimes);
-                    log.info("startTime获取到：" + startTime);
-                    log.info("stopTime时间转：" + stopTime);
-                    struStartTime.dwYear = c.get(Calendar.YEAR);
-                    struStartTime.dwMonth = c.get(Calendar.MONTH) + 1;
-                    struStartTime.dwDay = c.get(Calendar.DATE);
-                    struStartTime.dwHour = c.get(Calendar.HOUR_OF_DAY);
-                    struStartTime.dwMinute = c.get(Calendar.MINUTE);
-                    struStartTime.dwSecond = c.get(Calendar.SECOND);
-                    // log.info("struStartTime 开始时间结束："+struStartTime.toString());
-                    //结束时间
-                    Date endTimes = format.parse(stopTime);
-                    Calendar c2 = Calendar.getInstance();
-                    c2.setTime(endTimes);
-                    struStopTim.dwYear = c2.get(Calendar.YEAR);
-                    struStopTim.dwMonth = c2.get(Calendar.MONTH) + 1;
-                    struStopTim.dwDay = c2.get(Calendar.DATE);
-                    struStopTim.dwHour = c2.get(Calendar.HOUR_OF_DAY);
-                    struStopTim.dwMinute = c2.get(Calendar.MINUTE);
-                    struStopTim.dwSecond = c2.get(Calendar.SECOND);
-                    log.info("时间赋值成功");
-                    NativeLong lChannel = new NativeLong(cameraConInfo.getChannelNum());
-                    log.info("lChannel赋值成功:" + lChannel);
-                    //查找文件存在不存在
-                    NativeLong findFile = hCNetSDK.NET_DVR_FindFile(lUserIDLong, lChannel, 0xff, struStartTime, struStopTim);
-                    log.info("findFile查找文件接口:" + "findFile-->>>：" + findFile.longValue());
-                    log.info("findFile查找文件接口:" + "findFile-->>>：" + findFile.longValue() + "<<<<lUserIDLong:" + lUserIDLong + "lChannel:" + lChannel);
-                    HCNetSDK.NET_DVR_FIND_DATA FindData = new HCNetSDK.NET_DVR_FIND_DATA();
-                    if (findFile.longValue() > -1) {
-                        log.info("NET_DVR_FindFile接口请求成功findFile:" + findFile.longValue());
-                        FindData = new HCNetSDK.NET_DVR_FIND_DATA();
-                        // 文件列表接口
-                        NativeLong findNextFile = hCNetSDK.NET_DVR_FindNextFile(findFile, FindData);
-                        log.info("findNextFile>>:" + findNextFile.longValue());
-                        if (findNextFile.longValue() > -1) {
-                            log.info("NET_DVR_FindNextFile接口请求成功findFile:" + findNextFile.longValue());
-                            //当找到录像文件时接口将返回1000，当没有查找到文件或查找结束将返回1003或者1004，返回1002表示当前正在查找
-                            while (findNextFile.longValue() != HCNetSDK.NET_DVR_NOMOREFILE && findNextFile.longValue() != HCNetSDK.NET_DVR_FILE_NOFIND) {
-                                switch ((int) findNextFile.longValue()) {
-                                    case HCNetSDK.NET_DVR_FILE_SUCCESS:
-                                        log.info("NET_DVR_FindNextFile接口请求成功:" + findNextFile.longValue());
-                                        HCNetSDK.NET_DVR_FIND_DATA savedate = new HCNetSDK.NET_DVR_FIND_DATA();
-                                        savedate.sFileName = FindData.sFileName;
-                                        savedate.dwFileSize = FindData.dwFileSize;
-                                        savedate.struStartTime = FindData.struStartTime;
-                                        savedate.struStopTime = FindData.struStopTime;
-                                        list.add(savedate);
-                                        findNextFile = hCNetSDK.NET_DVR_FindNextFile(findFile, FindData);
-                                        break;
-                                    case HCNetSDK.NET_DVR_FILE_NOFIND:
-                                        list = null;
-                                        log.info("没有文件！");
-                                        break;
+            // String login = registerNVR(cameraConInfo.getRecordId());
+            // if (!login.isEmpty()) {
+            //  log.info("登录成功：" + login);
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            log.info("lUserIDLong获取到：" + lUserIDLong);
+            Calendar c = Calendar.getInstance();
+            //开始时间
+            HCNetSDK.NET_DVR_TIME struStartTime = new HCNetSDK.NET_DVR_TIME();
+            HCNetSDK.NET_DVR_TIME struStopTim = new HCNetSDK.NET_DVR_TIME();
+            Date startTimes = format.parse(startTime);
+            c.setTime(startTimes);
+            log.info("startTime获取到：" + startTime);
+            log.info("stopTime时间转：" + stopTime);
+            struStartTime.dwYear = c.get(Calendar.YEAR);
+            struStartTime.dwMonth = c.get(Calendar.MONTH) + 1;
+            struStartTime.dwDay = c.get(Calendar.DATE);
+            struStartTime.dwHour = c.get(Calendar.HOUR_OF_DAY);
+            struStartTime.dwMinute = c.get(Calendar.MINUTE);
+            struStartTime.dwSecond = c.get(Calendar.SECOND);
+            // log.info("struStartTime 开始时间结束："+struStartTime.toString());
+            //结束时间
+            Date endTimes = format.parse(stopTime);
+            Calendar c2 = Calendar.getInstance();
+            c2.setTime(endTimes);
+            struStopTim.dwYear = c2.get(Calendar.YEAR);
+            struStopTim.dwMonth = c2.get(Calendar.MONTH) + 1;
+            struStopTim.dwDay = c2.get(Calendar.DATE);
+            struStopTim.dwHour = c2.get(Calendar.HOUR_OF_DAY);
+            struStopTim.dwMinute = c2.get(Calendar.MINUTE);
+            struStopTim.dwSecond = c2.get(Calendar.SECOND);
+            log.info("时间赋值成功");
+            NativeLong lChannel = new NativeLong(cameraConInfo.getChannelNum());
+            log.info("lChannel赋值成功:" + lChannel);
+            //查找文件存在不存在
+            NativeLong findFile = hCNetSDK.NET_DVR_FindFile(lUserIDLong, lChannel, 0xff, struStartTime, struStopTim);
+            log.info("findFile查找文件接口:" + "findFile-->>>：" + findFile.longValue());
+            log.info("findFile查找文件接口:" + "findFile-->>>：" + findFile.longValue() + "<<<<lUserIDLong:" + lUserIDLong + "lChannel:" + lChannel);
+            HCNetSDK.NET_DVR_FIND_DATA FindData = new HCNetSDK.NET_DVR_FIND_DATA();
+            if (findFile.longValue() > -1) {
+                log.info("NET_DVR_FindFile接口请求成功findFile:" + findFile.longValue());
+                FindData = new HCNetSDK.NET_DVR_FIND_DATA();
+                // 文件列表接口
+                NativeLong findNextFile = hCNetSDK.NET_DVR_FindNextFile(findFile, FindData);
+                log.info("findNextFile>>:" + findNextFile.longValue());
+                if (findNextFile.longValue() > -1) {
+                    log.info("NET_DVR_FindNextFile接口请求成功findFile:" + findNextFile.longValue());
+                    //当找到录像文件时接口将返回1000，当没有查找到文件或查找结束将返回1003或者1004，返回1002表示当前正在查找
+                    while (findNextFile.longValue() != HCNetSDK.NET_DVR_NOMOREFILE && findNextFile.longValue() != HCNetSDK.NET_DVR_FILE_NOFIND) {
+                        switch ((int) findNextFile.longValue()) {
+                            case HCNetSDK.NET_DVR_FILE_SUCCESS:
+                                log.info("NET_DVR_FindNextFile接口请求成功:" + findNextFile.longValue());
+                                HCNetSDK.NET_DVR_FIND_DATA savedate = new HCNetSDK.NET_DVR_FIND_DATA();
+                                savedate.sFileName = FindData.sFileName;
+                                savedate.dwFileSize = FindData.dwFileSize;
+                                savedate.struStartTime = FindData.struStartTime;
+                                savedate.struStopTime = FindData.struStopTime;
+                                list.add(savedate);
+                                findNextFile = hCNetSDK.NET_DVR_FindNextFile(findFile, FindData);
+                                break;
+                            case HCNetSDK.NET_DVR_FILE_NOFIND:
+                                list = null;
+                                log.info("没有文件！");
+                                break;
 
-                                    case HCNetSDK.NET_DVR_ISFINDING:
-                                        findNextFile = hCNetSDK.NET_DVR_FindNextFile(findFile, FindData);
-                                        break;
-                                    case HCNetSDK.NET_DVR_NOMOREFILE:
-                                        log.info("查找完毕！");
-                                        break;
-                                    default:
-                                        list = null;
-                                        log.info("查找文件时异常");
-                                        int iErr = hCNetSDK.NET_DVR_GetLastError();
-                                        log.info("查找文件时候异常iErr:" + iErr);
-                                        break;
-                                }
-                            }
-                            //释放资源
-                            //hCNetSDK.NET_DVR_Logout(lUserIDLong);
-                           // hCNetSDK.NET_DVR_Cleanup();
-                        } else {
-                            list = null;
-                            int iErr = hCNetSDK.NET_DVR_GetLastError();
-                            log.info("查找下一个文件是失败iErr:" + iErr);
+                            case HCNetSDK.NET_DVR_ISFINDING:
+                                findNextFile = hCNetSDK.NET_DVR_FindNextFile(findFile, FindData);
+                                break;
+                            case HCNetSDK.NET_DVR_NOMOREFILE:
+                                log.info("查找完毕！");
+                                break;
+                            default:
+                                list = null;
+                                log.info("查找文件时异常");
+                                int iErr = hCNetSDK.NET_DVR_GetLastError();
+                                log.info("查找文件时候异常iErr:" + iErr);
+                                break;
                         }
-                    } else {
-                        list = null;
-                        int iErr = hCNetSDK.NET_DVR_GetLastError();
-                        log.info("文件不存在:" + iErr);
                     }
-              //  }
-           // }
+                    //释放资源
+                    //hCNetSDK.NET_DVR_Logout(lUserIDLong);
+                    // hCNetSDK.NET_DVR_Cleanup();
+                } else {
+                    list = null;
+                    int iErr = hCNetSDK.NET_DVR_GetLastError();
+                    log.info("查找下一个文件是失败iErr:" + iErr);
+                }
+            } else {
+                list = null;
+                int iErr = hCNetSDK.NET_DVR_GetLastError();
+                log.info("文件不存在:" + iErr);
+            }
+            //  }
+            // }
         } catch (Exception e) {
             list = null;
             log.error(e.getMessage());
@@ -2274,7 +2398,8 @@ public class CameraConService {
             log.info("NET_DVR_Login_V40:返回值" + lUserID);
             lUserIDLong = new NativeLong(lUserID);
             //转到预置点
-            boolean Preset = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, 2, HCNetSDK.GOTO_PRESET, cameraConInfo.getPresetNum());
+            boolean Preset = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, 2, HCNetSDK.GOTO_PRESET,
+                    cameraConInfo.getPresetNum());
             if (Preset) {
                 log.info("转到预置点成功：Preset->" + Preset);
             } else {
@@ -2284,14 +2409,16 @@ public class CameraConService {
             }
 
             try {
-                Long waitTime = Long.valueOf(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content").toString());
+                long waitTime =
+                        Long.parseLong(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content").toString());
                 log.info("waitTime:----------" + waitTime);
                 Thread.sleep(waitTime);
-            }catch (Exception e){
-                log.error("error----"+e);
+            } catch (Exception e) {
+                log.error("error----" + e);
             }
             //       getSetconfig(lUserIDLong);
-            HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
+            HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData =
+                    new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
             m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
             m_strJpegWithAppenData.dwChannel = 1;
             HCNetSDK.BYTE_ARRAY ptrJpegByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 * 1024);
@@ -2311,20 +2438,22 @@ public class CameraConService {
                     fout = new FileOutputStream(path);
                     //将字节写入文件
                     long offset = 0;
-                    ByteBuffer buffers = m_strJpegWithAppenData.pJpegPicBuff.getByteBuffer(offset, m_strJpegWithAppenData.dwJpegPicLen);
+                    ByteBuffer buffers = m_strJpegWithAppenData.pJpegPicBuff.getByteBuffer(offset,
+                            m_strJpegWithAppenData.dwJpegPicLen);
                     byte[] bytes = new byte[m_strJpegWithAppenData.dwJpegPicLen];
                     buffers.rewind();
                     buffers.get(bytes);
                     fout.write(bytes);
                     fout.close();
                     // 红外图片添加水印的开关
-                    String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared","content"));
+                    String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared",
+                            "content"));
                     if (StringUtils.isNotEmpty(meteName) && StringUtils.equals("true", flag)) {
                         log.info("红外图片，添加水印，路径：" + path);
                         pictureWaterMark(path, DateTimeUtil.format(new Date()) + "--" + meteName);
                     }
                     map.put("picPath", hotPicshow + newName + ".jpg");
-                    copyFile(newName + ".jpg",path);
+                    copyFile(newName + ".jpg", path);
                     log.info("hotPicshow地址：" + hotPicshow + newName + ".jpg");
                 } else {
                     map = null;
@@ -2338,14 +2467,15 @@ public class CameraConService {
                     fout = new FileOutputStream(path);
                     //将字节写入文件
                     long offset = 0;
-                    ByteBuffer buffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer(offset, m_strJpegWithAppenData.dwP2PDataLen);
+                    ByteBuffer buffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer(offset,
+                            m_strJpegWithAppenData.dwP2PDataLen);
                     byte[] bytes = new byte[m_strJpegWithAppenData.dwP2PDataLen];
                     buffers.rewind();
                     buffers.get(bytes);
                     fout.write(bytes);
                     fout.close();
                     map.put("dataPath", hotFirShow + newName + ".data");
-                    copyFile(newName + ".data",path);
+                    copyFile(newName + ".data", path);
                     log.info("hotFirShowdata地址：" + hotFirShow + newName + ".data");
                 } else {
                     int iErr = hCNetSDK.NET_DVR_GetLastError();
@@ -2356,12 +2486,14 @@ public class CameraConService {
                     String path = hotFir + newName + ".csv";
                     log.info("hotFircsv地址：" + path);
                     FileWriter fos = new FileWriter(path);
-                    log.info("dwJpegPicHeight: "+m_strJpegWithAppenData.dwJpegPicHeight+", dwJpegPicWidth: "+m_strJpegWithAppenData.dwJpegPicWidth);
+                    log.info("dwJpegPicHeight: " + m_strJpegWithAppenData.dwJpegPicHeight + ", dwJpegPicWidth: " + m_strJpegWithAppenData.dwJpegPicWidth);
                     //height 512 width 640
                     for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicHeight; i++) {
                         for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicWidth; j++) {
-                            byte[] sourceData = m_strJpegWithAppenData.pP2PDataBuff.getByteArray((i - 1)*m_strJpegWithAppenData.dwJpegPicWidth*4 + (j - 1)*4, 4);
-                            int ss = sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
+                            byte[] sourceData =
+                                    m_strJpegWithAppenData.pP2PDataBuff.getByteArray((i - 1) * m_strJpegWithAppenData.dwJpegPicWidth * 4 + (j - 1) * 4, 4);
+                            int ss =
+                                    sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
                             fos.write(String.valueOf(Float.intBitsToFloat(ss)));
                             fos.write(",");
                         }
@@ -2370,7 +2502,7 @@ public class CameraConService {
                     fos.flush();
                     fos.close();
                     map.put("csvPath", hotFirShow + newName + ".csv");
-                    copyFile(newName + ".csv",path);
+                    copyFile(newName + ".csv", path);
                     log.info("hotFirShowcsv地址：" + hotFirShow + newName + ".csv");
 
                 } else {
@@ -2398,6 +2530,7 @@ public class CameraConService {
 
     /**
      * dlt664红外抓图
+     *
      * @param cameraId
      * @param presetId
      * @return
@@ -2436,7 +2569,8 @@ public class CameraConService {
             log.info("NET_DVR_Login_V40:返回值" + lUserID);
             lUserIDLong = new NativeLong(lUserID);
             //转到预置点
-            boolean Preset = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, 2, HCNetSDK.GOTO_PRESET, cameraConInfo.getPresetNum());
+            boolean Preset = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, 2, HCNetSDK.GOTO_PRESET,
+                    cameraConInfo.getPresetNum());
             if (Preset) {
                 log.info("转到预置点成功：Preset->" + Preset);
             } else {
@@ -2446,7 +2580,8 @@ public class CameraConService {
             }
 
             try {
-                Long waitTime = Long.valueOf(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content").toString());
+                Long waitTime =
+                        Long.valueOf(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content").toString());
                 log.info("waitTime:----------" + waitTime);
                 Thread.sleep(waitTime);
             } catch (Exception e) {
@@ -2522,14 +2657,17 @@ public class CameraConService {
                     log.info("hotPic地址：" + picPath);
                     fout = new FileOutputStream(picPath);
                     long offsetPic = 419;
-                    ByteBuffer picBuffers = ptrOutByte.getPointer().getByteBuffer(offsetPic, (struXMLOutput.dwReturnedXMLSize - offsetPic));
-                    byte[] picBytes = new byte[struXMLOutput.dwReturnedXMLSize - Integer.parseInt(String.valueOf(offsetPic + 16))];
+                    ByteBuffer picBuffers = ptrOutByte.getPointer().getByteBuffer(offsetPic,
+                            (struXMLOutput.dwReturnedXMLSize - offsetPic));
+                    byte[] picBytes =
+                            new byte[struXMLOutput.dwReturnedXMLSize - Integer.parseInt(String.valueOf(offsetPic + 16))];
                     picBuffers.rewind();
                     picBuffers.get(picBytes);
                     fout.write(picBytes);
                     fout.close();
                     // 红外图片添加水印的开关
-                    String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared","content"));
+                    String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isWatermarkToInfrared",
+                            "content"));
                     if (StringUtils.isNotEmpty(meteName) && StringUtils.equals("true", flag)) {
                         log.info("红外图片，添加水印，路径：" + picPath);
                         pictureWaterMark(picPath, DateTimeUtil.format(new Date()) + "--" + meteName);
@@ -2537,7 +2675,7 @@ public class CameraConService {
                     map.put("picPath", hotPicshow + newName + ".jpg");
                     map.put("urlPath", hotPicshow + newName + ".jpg");
                     map.put("absPath", picPath);
-                    copyFile(newName + ".jpg",picPath);
+                    copyFile(newName + ".jpg", picPath);
                     log.info("hotPicshow地址：" + hotPicshow + newName + ".jpg");
 
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -2578,14 +2716,16 @@ public class CameraConService {
                     fout = new FileOutputStream(datPath);
                     //将字节写入文件
                     long offset = offsetPic + size1;
-                    ByteBuffer buffers = ptrOutByte.getPointer().getByteBuffer(offset, struXMLOutput.dwReturnedXMLSize - offset);
-                    byte[] bytes = new byte[struXMLOutput.dwReturnedXMLSize - Integer.parseInt(String.valueOf(size3 + offset + 16))];
+                    ByteBuffer buffers = ptrOutByte.getPointer().getByteBuffer(offset,
+                            struXMLOutput.dwReturnedXMLSize - offset);
+                    byte[] bytes =
+                            new byte[struXMLOutput.dwReturnedXMLSize - Integer.parseInt(String.valueOf(size3 + offset + 16))];
                     buffers.rewind();
                     buffers.get(bytes);
                     fout.write(bytes);
                     fout.close();
                     map.put("dataPath", hotFirShow + newName + ".data");
-                    copyFile(newName + ".data",datPath);
+                    copyFile(newName + ".data", datPath);
                     log.info("hotFirShowdata地址：" + hotFirShow + newName + ".data");
 
                     String csvPath = hotFir + newName + ".csv";
@@ -2601,8 +2741,10 @@ public class CameraConService {
                     float min = 0;
                     for (int i = 1; i <= width; i++) {
                         for (int j = 1; j <= height; j++) {
-                            byte[] sourceData = byte_array.getPointer().getByteArray((i - 1) * width * 4 + (j - 1) * 4, 4);
-                            int ss = sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
+                            byte[] sourceData =
+                                    byte_array.getPointer().getByteArray((i - 1) * width * 4 + (j - 1) * 4, 4);
+                            int ss =
+                                    sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
                             float value = Float.intBitsToFloat(ss);
                             max = max == 0 ? value : max;
                             min = min == 0 ? value : min;
@@ -2620,7 +2762,7 @@ public class CameraConService {
                     DecimalFormat df = new DecimalFormat("##0.00");
                     map.put("resultNum", df.format(max) + "," + df.format(min));
                     map.put("csvPath", hotFirShow + newName + ".csv");
-                    copyFile(newName + ".csv",csvPath);
+                    copyFile(newName + ".csv", csvPath);
                     log.info("hotFirShowcsv地址：" + hotFirShow + newName + ".csv");
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
@@ -2634,6 +2776,7 @@ public class CameraConService {
         }
         return map;
     }
+
     /**
      * 语音对讲开始
      *
@@ -2644,7 +2787,7 @@ public class CameraConService {
         int re = 1;
         log.info("开启可视对讲");
         try {
-            String logpath="/home/yjh/iot-center-accessvideo-1.0.0/logs";
+            String logpath = "/home/yjh/iot-center-accessvideo-1.0.0/logs";
 
             log.info("开启可视对讲videoIntercomId：" + videoIntercomId);
             String url = SERVICE_URL + "?videoIntercomId=" + videoIntercomId;
@@ -2664,7 +2807,7 @@ public class CameraConService {
                 log.info("语音对讲初始化失败");
             }*/
             log.info("语音对讲开始登录。。。。。");
-            hCNetSDK.NET_DVR_SetLogToFile(3,logpath,false);
+            hCNetSDK.NET_DVR_SetLogToFile(3, logpath, false);
             m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
             System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
             m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
@@ -2680,13 +2823,15 @@ public class CameraConService {
 
             HCNetSDK.FVoiceDataCallBack_V30 fVoiceDataCallBack = null;
             HCNetSDK.NET_DVR_COMPRESSION_AUDIO lpCompressAudio = new HCNetSDK.NET_DVR_COMPRESSION_AUDIO();
-            boolean net_DVR_GetCurrentAudioCompress = hCNetSDK.NET_DVR_GetCurrentAudioCompress(lUserID, lpCompressAudio);
-            log.info("net_DVR_GetCurrentAudioCompress:"+net_DVR_GetCurrentAudioCompress);
+            boolean net_DVR_GetCurrentAudioCompress = hCNetSDK.NET_DVR_GetCurrentAudioCompress(lUserID,
+                    lpCompressAudio);
+            log.info("net_DVR_GetCurrentAudioCompress:" + net_DVR_GetCurrentAudioCompress);
             byte byAudioEncType = lpCompressAudio.byAudioEncType;
             byte byAudioSamplingRate = lpCompressAudio.byAudioSamplingRate;
             byte byAudioBitRate = lpCompressAudio.byAudioBitRate;
             byte bySupport = lpCompressAudio.bySupport;
-            log.info("音频编码类型=" + byAudioEncType + "  音频采样率=" + byAudioSamplingRate + "    音频码率=" + byAudioBitRate + "   bySupport=" + bySupport);
+            log.info("音频编码类型=" + byAudioEncType + "  音频采样率=" + byAudioSamplingRate + "    音频码率=" + byAudioBitRate +
+                    "   bySupport=" + bySupport);
 
             if (mVoiceTalkHandle.longValue() < 0) {
                 int mVoiceTalkHandle = hCNetSDK.NET_DVR_StartVoiceCom_V30(lUserID, 1, false, fVoiceDataCallBack, null);
@@ -2698,11 +2843,11 @@ public class CameraConService {
                 } else {
                     re = 1;
                     log.info("NET_DVR_StartVoiceCom_V30 SUCC 内部");
-                   // hCNetSDK.NET_DVR_SetVoiceComClientVolume(new NativeLong(mVoiceTalkHandle), (short) 0xffff);
+                    // hCNetSDK.NET_DVR_SetVoiceComClientVolume(new NativeLong(mVoiceTalkHandle), (short) 0xffff);
                 }
             } else {
                 re = 1;
-              //  hCNetSDK.NET_DVR_SetVoiceComClientVolume(mVoiceTalkHandle, (short) 0xffff);
+                //  hCNetSDK.NET_DVR_SetVoiceComClientVolume(mVoiceTalkHandle, (short) 0xffff);
                 log.info("NET_DVR_StartVoiceCom_V30 SUCC:开启对讲");
             }
         } catch (Exception e) {
@@ -2736,7 +2881,7 @@ public class CameraConService {
                 }
 
                 mVoiceTalkHandle = new NativeLong(-1);
-                log.info("关闭后的mVoiceTalkHandle值："+mVoiceTalkHandle);
+                log.info("关闭后的mVoiceTalkHandle值：" + mVoiceTalkHandle);
             }
 
         } catch (Exception e) {
@@ -2770,7 +2915,8 @@ public class CameraConService {
             int iChanNum = 1;
             String livePath = String.valueOf(videoIntercomId) + "9909";
             log.info(userName + " " + password + " " + cameraIp + " " + cameraPort + " " + iChanNum + " " + " " + videoIntercomId);
-            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum, videoDefinition, livePath);
+            String transUrl = String.format(UrlTem, userName, password, cameraIp, cameraPort, iChanNum,
+                    videoDefinition, livePath);
             Runtime.getRuntime().exec(transUrl);
             log.info("transUrl: " + transUrl);
             String[] rtmpUrls = transUrl.split("rtmp");
@@ -2780,7 +2926,8 @@ public class CameraConService {
             returnMap.put("webRtcUrl", webRtc);
             returnMap.put("flvUrl", flvUrl);
             returnMap.put("rtmpUrl", rtmpUrl);
-            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraRealFlow:", Integer.parseInt(livePath), Long.parseLong(livePath), returnMap, redisTemplate);
+            StreamInfoThread streamInfoThread = new StreamInfoThread(srsStopUrl, "cameraRealFlow:",
+                    Integer.parseInt(livePath), Long.parseLong(livePath), returnMap, redisTemplate);
             Thread thread = new Thread(streamInfoThread);
             thread.setDaemon(true);
             thread.start();
@@ -2789,12 +2936,12 @@ public class CameraConService {
             e.getMessage();
         } finally {
             hCNetSDK.NET_DVR_Logout(lUserID);
-           // hCNetSDK.NET_DVR_Cleanup();
+            // hCNetSDK.NET_DVR_Cleanup();
         }
         return returnMap;
     }
 
-//    @Logs(title = "获取可视状态", content = "获取可视状态",logType = 1)
+    //    @Logs(title = "获取可视状态", content = "获取可视状态",logType = 1)
     @Transactional(rollbackFor = Exception.class)
     public int getVidemoIntercomStatus(Long videoIntercomId) {
         int re = 1;
@@ -2843,7 +2990,7 @@ public class CameraConService {
             log.info("获取可视状态  Exception " + iErr);
         } finally {
             hCNetSDK.NET_DVR_Logout(lUserID);
-          //  hCNetSDK.NET_DVR_Cleanup();
+            //  hCNetSDK.NET_DVR_Cleanup();
         }
         return re;
     }
@@ -2851,94 +2998,105 @@ public class CameraConService {
     /**
      * 获取cvs上某行某列的值
      */
-    public  String lineTemperature(String path,String points) {
+    public String lineTemperature(String path, String points) {
 
         int row, column, xPlus, yPlus;
-        String arrs[] = points.split(",");
-        File file= new File(path);
+        String[] arrs = points.split(",");
+        File file = new File(path);
         String fileName = file.getName();
-        fileName=fileName.substring(0,fileName.lastIndexOf("."));
-        path= hotFirShow+fileName+".csv";
-        log.info("cvs path:"+path);
+        fileName = fileName.substring(0, fileName.lastIndexOf("."));
+        path = hotFirShow + fileName + ".csv";
+        log.info("cvs path:" + path);
         String temperature = "0.00";
 
-        if (arrs.length==4) {
+        if (arrs.length == 4) {
             column = Integer.parseInt(arrs[0]);
-            row = Integer.parseInt(arrs[1])+1;
+            row = Integer.parseInt(arrs[1]) + 1;
             xPlus = Integer.parseInt(arrs[2]);
             yPlus = Integer.parseInt(arrs[3]);
             try {
                 URL url = new URL(path);
                 URLConnection connection = url.openConnection();
                 InputStream stream = connection.getInputStream();
-                InputStreamReader reader=new InputStreamReader(stream,"GBK");
-                BufferedReader reade=new BufferedReader(reader);
+                InputStreamReader reader = new InputStreamReader(stream, "GBK");
+                BufferedReader reade = new BufferedReader(reader);
                 String line = null;
-                int rowIndex=1;
-                List<Double> arr =new ArrayList<>();
+                int rowIndex = 1;
+                List<Double> arr = new ArrayList<>();
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
-                    String item[] = line.split(",");
-                    if (row<=rowIndex && rowIndex<=row+yPlus) {
-                        List<Double> arrColumn =new ArrayList<>();
-                        for (int i=0;i<=item.length;i++) { if(column-1<=i && i<=column+xPlus) arrColumn.add(Double.parseDouble(item[i-1])); }
+                    String[] item = line.split(",");
+                    if (row <= rowIndex && rowIndex <= row + yPlus) {
+                        List<Double> arrColumn = new ArrayList<>();
+                        for (int i = 0; i <= item.length; i++) {
+                            if (column - 1 <= i && i <= column + xPlus) {
+                                arrColumn.add(Double.parseDouble(item[i - 1]));
+                            }
+                        }
                         arr.add(Collections.max(arrColumn));
-                    } else if (rowIndex>row+yPlus) { break; }
+                    } else if (rowIndex > row + yPlus) {
+                        break;
+                    }
                     rowIndex++;
                 }
-                log.info("arr: "+arr);
+                log.info("arr: " + arr);
                 //转换保留后两位小数
-                temperature= new DecimalFormat("0.00").format(Collections.max(arr));
-                log.info("框测temperature转换保留后两位小数"+temperature);
-            } catch (Exception e) { e.getMessage(); }
+                temperature = new DecimalFormat("0.00").format(Collections.max(arr));
+                log.info("框测temperature转换保留后两位小数" + temperature);
+            } catch (Exception e) {
+                e.getMessage();
+            }
             return temperature;
         } else {
             column = Integer.parseInt(arrs[0]);
-            row = Integer.parseInt(arrs[1])+1;
+            row = Integer.parseInt(arrs[1]) + 1;
             try {
                 URL url = new URL(path);
                 URLConnection connection = url.openConnection();
                 InputStream stream = connection.getInputStream();
-                InputStreamReader reader=new InputStreamReader(stream,"GBK");
-                BufferedReader reade=new BufferedReader(reader);
+                InputStreamReader reader = new InputStreamReader(stream, "GBK");
+                BufferedReader reade = new BufferedReader(reader);
                 String line = null;
                 int rowIndex = 0;
                 while ((line = reade.readLine()) != null) {
                     //CSV格式文件为逗号分隔符文件，这里根据逗号切分
-                    String item[] = line.split(",");
-                    if (row==rowIndex) {
-                        temperature = item[column-1];
+                    String[] item = line.split(",");
+                    if (row == rowIndex) {
+                        temperature = item[column - 1];
                         break;
                     }
                     rowIndex++;
                 }
                 //转换保留后两位小数
-                temperature= new DecimalFormat("0.00").format(Double.parseDouble(temperature));
-                log.info("点测temperature转换保留后两位小数"+temperature);
-            } catch (Exception e) { e.getMessage(); }
+                temperature = new DecimalFormat("0.00").format(Double.parseDouble(temperature));
+                log.info("点测temperature转换保留后两位小数" + temperature);
+            } catch (Exception e) {
+                e.getMessage();
+            }
             return temperature;
         }
     }
 
     /**
      * 获取行列区域画面最高温度
+     *
      * @param cameraId 摄像头id
      */
-    public String getlineTemperature(long cameraId,String points) {
-        int row=0, column=0, xPlus=0, yPlus=0;
-        String arrs[] = points.split(",");
+    public String getlineTemperature(long cameraId, String points) {
+        int row = 0, column = 0, xPlus = 0, yPlus = 0;
+        String[] arrs = points.split(",");
         String temperature = "0.00";
 
         log.info("arrs.length：" + arrs.length);
-        if (arrs.length==4) {
+        if (arrs.length == 4) {
             column = Integer.parseInt(arrs[0]);
-            row = Integer.parseInt(arrs[1])+1;
+            row = Integer.parseInt(arrs[1]) + 1;
             xPlus = Integer.parseInt(arrs[2]);
             yPlus = Integer.parseInt(arrs[3]);
         }
-        if (arrs.length==2) {
+        if (arrs.length == 2) {
             column = Integer.parseInt(arrs[0]);
-            row = Integer.parseInt(arrs[1])+1;
+            row = Integer.parseInt(arrs[1]) + 1;
         }
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
@@ -2947,7 +3105,8 @@ public class CameraConService {
             String password = cameraConInfo.getCameraCode();
             String cameraIp = cameraConInfo.getCameraIp();
             String port = cameraConInfo.getInfreadPort().toString();
-            log.info("通道号：" + cameraConInfo.getChannelNum() + ", recordId:" + cameraConInfo.getRecordId() + ", userName:" + userName + ", password:" + password
+            log.info("通道号：" + cameraConInfo.getChannelNum() + ", recordId:" + cameraConInfo.getRecordId() + ", " +
+                    "userName:" + userName + ", password:" + password
                     + ", cameraIp:" + cameraIp + ", port:" + port);
             m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
             System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
@@ -2958,9 +3117,11 @@ public class CameraConService {
             m_strLoginInfo.wPort = Short.parseShort(port);
             m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
             m_strLoginInfo.write();
-            lUserIDLong = new NativeLong(hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo));// new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            lUserIDLong = new NativeLong(hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo));// new
+            // NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
             log.info("lUserIDLong" + lUserIDLong);
-            HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
+            HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData =
+                    new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
             m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
             m_strJpegWithAppenData.dwChannel = 1;
             HCNetSDK.BYTE_ARRAY ptrJpegByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 * 1024);
@@ -2970,19 +3131,23 @@ public class CameraConService {
             boolean bRet = hCNetSDK.NET_DVR_CaptureJPEGPicture_WithAppendData(lUserIDLong, 2, m_strJpegWithAppenData);
             log.info("bRet返回值：" + bRet);
             //height 512 width 640
-            if (bRet && m_strJpegWithAppenData.dwP2PDataLen>0) {
+            if (bRet && m_strJpegWithAppenData.dwP2PDataLen > 0) {
                 if (arrs.length == 4) {
-                    float[] arr = new float[yPlus-row+1];
-                    int rowIndex =0;
-                    for (int i=1; i<=m_strJpegWithAppenData.dwJpegPicHeight; i++) {
-                        if (i>=yPlus) break;
-                        if (row<=i && i<yPlus) {
-                            float[] arrTem = new float[xPlus-column+1];
+                    float[] arr = new float[yPlus - row + 1];
+                    int rowIndex = 0;
+                    for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicHeight; i++) {
+                        if (i >= yPlus) {
+                            break;
+                        }
+                        if (row <= i && i < yPlus) {
+                            float[] arrTem = new float[xPlus - column + 1];
                             int columnIndex = 0;
                             for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicWidth; j++) {
-                                if(column<=j && j<xPlus) {
-                                    byte[] sourceData = m_strJpegWithAppenData.pP2PDataBuff.getByteArray((i - 1)*m_strJpegWithAppenData.dwJpegPicWidth*4 + (j - 1)*4, 4);
-                                    int ss = sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
+                                if (column <= j && j < xPlus) {
+                                    byte[] sourceData =
+                                            m_strJpegWithAppenData.pP2PDataBuff.getByteArray((i - 1) * m_strJpegWithAppenData.dwJpegPicWidth * 4 + (j - 1) * 4, 4);
+                                    int ss =
+                                            sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
                                     arrTem[columnIndex] = Float.intBitsToFloat(ss);
                                     columnIndex++;
                                 }
@@ -2998,13 +3163,15 @@ public class CameraConService {
                     temperature = new DecimalFormat("##0.00").format(max);
                     log.info("框测数据: " + temperature);
                 }
-                if (arrs.length==2){
-                    for (int i=1; i<=m_strJpegWithAppenData.dwJpegPicHeight; i++) {
+                if (arrs.length == 2) {
+                    for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicHeight; i++) {
                         if (i == row) {
                             for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicWidth; j++) {
                                 if (j == column) {
-                                    byte[] sourceData = m_strJpegWithAppenData.pP2PDataBuff.getByteArray((i - 1)*m_strJpegWithAppenData.dwJpegPicWidth*4 + (j - 1)*4, 4);
-                                    int ss = sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
+                                    byte[] sourceData =
+                                            m_strJpegWithAppenData.pP2PDataBuff.getByteArray((i - 1) * m_strJpegWithAppenData.dwJpegPicWidth * 4 + (j - 1) * 4, 4);
+                                    int ss =
+                                            sourceData[0] & 0xFF | (sourceData[1] & 0xFF) << 8 | (sourceData[2] & 0xFF) << 16 | (sourceData[3] & 0xFF) << 24;
                                     temperature = new DecimalFormat("##0.00").format(Float.intBitsToFloat(ss));
                                     log.info("点测数据: " + temperature);
                                     break;
@@ -3046,43 +3213,40 @@ public class CameraConService {
         HCNetSDK.BYTE_ARRAY m_szStatusBuf = new HCNetSDK.BYTE_ARRAY(4096 * 4);
         struCfg.lpStatusBuffer = m_szStatusBuf.getPointer();
         struCfg.dwStatusSize = 4096 * 4;
-        struCfg.byDataType=0;
+        struCfg.byDataType = 0;
         boolean bRet = hCNetSDK.NET_DVR_GetSTDConfig(lUserID, 6701, struCfg);
         if (bRet) {
-           int  nErr= hCNetSDK.NET_DVR_GetLastError();
-           log.info("NET_DVR_GetSTDConfig 信息：" + nErr );
+            int nErr = hCNetSDK.NET_DVR_GetLastError();
+            log.info("NET_DVR_GetSTDConfig 信息：" + nErr);
         } else {
-            log.info("NET_DVR_GetSTDConfig  success" );
+            log.info("NET_DVR_GetSTDConfig  success");
         }
         m_struThermometryInfo.dwSize = m_struThermometryInfo.size();
-       // m_struThermometryInfo.wPresetNo = 1;
+        // m_struThermometryInfo.wPresetNo = 1;
         m_struThermometryInfo.struPresetInfo[0] = new HCNetSDK.NET_DVR_THERMOMETRY_PRESETINFO_PARAM();
         m_struThermometryInfo.struPresetInfo[0].byEnabled = 1;
         m_struThermometryInfo.struPresetInfo[0].byRuleID = 1;
-       // 距离，单位：米(m)，取值范围：[0,10000]
+        // 距离，单位：米(m)，取值范围：[0,10000]
         m_struThermometryInfo.struPresetInfo[0].wDistance = 2;
         //发射率(即物体向外辐射能量的本领，精确到小数点后两位)，取值范围：[0.01, 1.00]
         //该值对于不支持规则框以及预置点的设备使用
-        m_struThermometryInfo.struPresetInfo[0].fEmissivity = (float)0.98;
+        m_struThermometryInfo.struPresetInfo[0].fEmissivity = (float) 0.98;
         m_struThermometryInfo.struPresetInfo[0].byReflectiveEnabled = 0;
         //反射温度 精确到小数后一位
         //m_struThermometryInfo.struPresetInfo[0].fReflectiveTemperature = 20;
         //距离单位: 0- 米(m)，1- 英尺(feet)，2-厘米（cm）
         m_struThermometryInfo.struPresetInfo[0].byDistanceUnit = 0;
         m_struThermometryInfo.write();
-        struCfg.lpInBuffer =  m_struThermometryInfo.getPointer();
+        struCfg.lpInBuffer = m_struThermometryInfo.getPointer();
         struCfg.dwInSize = m_struThermometryInfo.size();
 
 
         boolean m = hCNetSDK.NET_DVR_SetSTDConfig(lUserID, 6701, struCfg);
-        if (m == false)
-        {
-           int nErr= hCNetSDK.NET_DVR_GetLastError();
-            log.info("NET_DVR_SET_THERMOMETRY_PRESETINFO 信息：" + nErr );
-        }
-        else
-        {
-            log.info("NET_DVR_SET_THERMOMETRY_PRESETINFO success" );
+        if (m == false) {
+            int nErr = hCNetSDK.NET_DVR_GetLastError();
+            log.info("NET_DVR_SET_THERMOMETRY_PRESETINFO 信息：" + nErr);
+        } else {
+            log.info("NET_DVR_SET_THERMOMETRY_PRESETINFO success");
         }
     }
 
@@ -3159,9 +3323,12 @@ public class CameraConService {
 //                //使用NET_DVR_GetFileByTime_V40接口必须使用一下播放接口才能下载视频到本地
 //                 iErr = hCNetSDK.NET_DVR_GetLastError();
 //                log.error("get camera video fileV40大于0: " + iErr);
-//               // boolean PlayBackControl = hCNetSDK.NET_DVR_PlayBackControl(fileV40, hCNetSDK.NET_DVR_PLAYSTART, 0, null);
-//                boolean PlayBackControl=hCNetSDK.NET_DVR_PlayBackControl_V40(fileV40,hCNetSDK.NET_DVR_PLAYSTART,null,0,null,null);
-//                log.info("PlayBackControl：" + PlayBackControl + "dwControlCode:" + hCNetSDK.NET_DVR_PLAYSTART + "dwInValue:" + 0 + "lpOutValue" + hCNetSDK.NET_DVR_GETTOTALTIME);
+//               // boolean PlayBackControl = hCNetSDK.NET_DVR_PlayBackControl(fileV40, hCNetSDK.NET_DVR_PLAYSTART,
+//               0, null);
+//                boolean PlayBackControl=hCNetSDK.NET_DVR_PlayBackControl_V40(fileV40,hCNetSDK.NET_DVR_PLAYSTART,
+//                null,0,null,null);
+//                log.info("PlayBackControl：" + PlayBackControl + "dwControlCode:" + hCNetSDK.NET_DVR_PLAYSTART +
+//                "dwInValue:" + 0 + "lpOutValue" + hCNetSDK.NET_DVR_GETTOTALTIME);
 //                if (PlayBackControl)
 //                {
 //                    log.info("NET_DVR_PlayBackControl成功调用");
@@ -3218,7 +3385,8 @@ public class CameraConService {
 //        try {
 //            Process processForId = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
 //            processForId.waitFor();
-//            BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
+//            BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(),
+//            "UTF-8"));
 //            String lineForId = null;
 //            StringBuilder dataBackForId = new StringBuilder();
 //            while ((lineForId = readerForId.readLine()) != null) {
@@ -3232,7 +3400,7 @@ public class CameraConService {
 //        } catch (Exception e) { e.getMessage(); }
         //todo 目前先不关闭ffmpeg进程,在多用户同时播放统一个相机视频，一个用户关闭进程后，另外一个用户则无法观看
         //回放视频流可停止
-        if (rtmpUrl.contains("history")){
+        if (rtmpUrl.contains("history")) {
             cameraId = Long.valueOf(StringUtils.substringAfterLast(rtmpUrl, "/"));
             manager.terminate(cameraId);
         }
@@ -3260,7 +3428,8 @@ public class CameraConService {
 //        try {
 //            Process processForId = Runtime.getRuntime().exec(new String[]{"sh", "-c", url});
 //            processForId.waitFor();
-//            BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(), "UTF-8"));
+//            BufferedReader readerForId = new BufferedReader(new InputStreamReader(processForId.getInputStream(),
+//            "UTF-8"));
 //            String lineForId = null;
 //            StringBuilder dataBackForId = new StringBuilder();
 //            while ((lineForId = readerForId.readLine()) != null) {
@@ -3281,7 +3450,8 @@ public class CameraConService {
 //            log.info("stopRobotInfraedUrl: " + urlRobot);
 //            Process processForIdRobot = Runtime.getRuntime().exec(new String[]{"sh", "-c", urlRobot});
 //            processForIdRobot.waitFor();
-//            BufferedReader readerForIdRobot = new BufferedReader(new InputStreamReader(processForIdRobot.getInputStream(), "UTF-8"));
+//            BufferedReader readerForIdRobot = new BufferedReader(new InputStreamReader(processForIdRobot
+//            .getInputStream(), "UTF-8"));
 //            String lineForIdRobot = null;
 //            StringBuilder dataBackForIdRobot = new StringBuilder();
 //            while ((lineForIdRobot = readerForIdRobot.readLine()) != null) {
@@ -3352,10 +3522,12 @@ public class CameraConService {
 //            lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
 //            log.info("NET_DVR_Login_V40:返回值" + lUserID);
 //            //log.info("lUserIDLong:返回值"+lUserIDLong);
-//            lUserIDLong = new NativeLong(lUserID);// new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+//            lUserIDLong = new NativeLong(lUserID);// new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo
+//            .getRecordId())));
 //            log.info("lUserIDLong" + lUserIDLong);
 //            //getSetconfig(lUserIDLong);
-//            HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData = new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
+//            HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData = new HCNetSDK
+//            .NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
 //            m_strJpegWithAppenData.dwSize = m_strJpegWithAppenData.size();
 //            m_strJpegWithAppenData.dwChannel = 2;
 //            HCNetSDK.BYTE_ARRAY ptrJpegByte = new HCNetSDK.BYTE_ARRAY(2 * 1024 * 1024);
@@ -3372,7 +3544,8 @@ public class CameraConService {
 //                    float[] arr = new float[m_strJpegWithAppenData.dwP2PDataLen];
 //                    for (int i = 1; i <= m_strJpegWithAppenData.dwJpegPicWidth; i++) {
 //                        for (int j = 1; j <= m_strJpegWithAppenData.dwJpegPicHeight; j++) {
-//                            ByteBuffer TempDatabuffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i - 1) * (j - 1) * 4, 4);
+//                            ByteBuffer TempDatabuffers = m_strJpegWithAppenData.pP2PDataBuff.getByteBuffer((i - 1)
+//                            * (j - 1) * 4, 4);
 //                            TempDatabuffers.get(byTempData);
 //                            int l;
 //                            l = byTempData[0];
@@ -3426,62 +3599,64 @@ public class CameraConService {
         String s1 = service.timeStr(time1);
         System.out.println(s1);
 
-        time1 = 1000 * 18 * 60 + 1000*60*52 + 198;
+        time1 = 1000 * 18 * 60 + 1000 * 60 * 52 + 198;
         s1 = service.timeStr(time1);
         System.out.println(s1);
 
-        time1 = 1000 * 60 * 60 * 14 + 1000*60*52 + 198;
+        time1 = 1000 * 60 * 60 * 14 + 1000 * 60 * 52 + 198;
         s1 = service.timeStr(time1);
         System.out.println(s1);
 
-        time1 = 1000 * 60 * 60 * 64 + 1000*60*36 + 198;
+        time1 = 1000 * 60 * 60 * 64 + 1000 * 60 * 36 + 198;
         s1 = service.timeStr(time1);
         System.out.println(s1);
 
-        time1 = 1000 * 60 * 60 * 24 * 9 + 1000*60*52 + 198;
+        time1 = 1000 * 60 * 60 * 24 * 9 + 1000 * 60 * 52 + 198;
         s1 = service.timeStr(time1);
         System.out.println(s1);
     }
 
-    public void pushCtrlTime(Long cameraId){
+    public void pushCtrlTime(Long cameraId) {
         try {
             String str = "camera_info:" + cameraId;
             Map<String, String> map = redisTemplate.opsForHash().entries(str);
-            if (map != null && map.size() > 0) {
+            if (map.size() > 0) {
                 map.put("lastTime", format.format(new Date()));
             } else {
                 map = new HashMap<>();
                 map.put("cameraId", String.valueOf(cameraId));
             }
             redisTemplate.opsForHash().putAll(str, map);
-        }catch (Exception e){
-            log.info("更新相机最后操作时间出错："+e);
+        } catch (Exception e) {
+            log.info("更新相机最后操作时间出错：" + e);
         }
     }
 
-    public String getPresetBasePath(){
-       return (String)redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
+    public String getPresetBasePath() {
+        return (String) redisTemplate.opsForHash().get("t_sys_param:presetImgPath", "content");
     }
 
-    public String getPresetUrlPath(){
-        return (String)redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
+    public String getPresetUrlPath() {
+        return (String) redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
     }
 
-    private void copyFile(String ftpsPath, String localPath){
+    private void copyFile(String ftpsPath, String localPath) {
         // 如果 ftpsTurbo 为 true，则表示设置了文件盘共享，不使用 ftps 对文件进行传输拷贝
-        if(Constant.ftpsTurbo()){
+        if (Constant.ftpsTurbo()) {
             return;
         }
         try {
-            if(StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {return;}
-            FtpsUtil.putFile(localPath, "video"+ftpsPath, platFromFtpsConfig.getIp(), platFromFtpsConfig.getPort(),
+            if (StringUtils.isEmpty(ftpsPath) || StringUtils.isEmpty(localPath)) {
+                return;
+            }
+            FtpsUtil.putFile(localPath, "video" + ftpsPath, platFromFtpsConfig.getIp(), platFromFtpsConfig.getPort(),
                     platFromFtpsConfig.getKeypw(), platFromFtpsConfig.getUsername(), platFromFtpsConfig.getPassword());
         } catch (Exception e) {
             log.error("将文件上传至上级系统ftp服务器错误:{}", e);
         }
-        HashMap<String,String> param = new HashMap<>();
-        param.put("ftpsPath","video"+ftpsPath);
-        param.put("localPath",localPath);
-        Constant.otherServerMap(param,Constant.COPY_FILE_URL);
+        HashMap<String, String> param = new HashMap<>();
+        param.put("ftpsPath", "video" + ftpsPath);
+        param.put("localPath", localPath);
+        Constant.otherServerMap(param, Constant.COPY_FILE_URL);
     }
 }
