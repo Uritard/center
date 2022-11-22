@@ -1,5 +1,6 @@
 package com.yjh.platform.module.device.dao;
 
+import com.yjh.platform.module.device.entity.DeviceAndInstance;
 import com.yjh.platform.module.device.entity.IdAndNameDetail;
 import com.yjh.platform.module.device.entity.TDeviceMaintenance;
 import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
@@ -19,7 +20,7 @@ public interface TDeviceMaintenanceDao {
     int add(TDeviceMaintenance tDeviceMaintenance);
     int deleteByPrimaryId(@Param(value = "maintenanceId") Long maintenanceId);
     int update(TDeviceMaintenance tDeviceMaintenance);
-    List<TDeviceMaintenance> selectByPrimaryId(@Param(value = "maintenanceId") Long maintenanceId);
+    TDeviceMaintenance selectByPrimaryId(@Param(value = "maintenanceId") Long maintenanceId);
     List<TDeviceMaintenance> select(@Param(value = "maintenanceId") Long maintenanceId,
                                 @Param(value = "maintenanceName") String maintenanceName,
                                 @Param(value = "deviceId") Long deviceId,
@@ -30,11 +31,11 @@ public interface TDeviceMaintenanceDao {
 
     int batchAdd(List<TDeviceMaintenance> list);
     int batchDelete(List<String> list);
-    List<IdAndNameDetail> selectDevice(@Param(value = "list") List<Long> list);
+    List<DeviceAndInstance> selectDevice(@Param(value = "list") List<Long> list);
     List<IdAndNameDetail> selectInstance(@Param(value = "deviceId") Long deviceId);
-    List<IdAndNameDetail> selectIdAndName(@Param(value = "maintenanceId") Long maintenanceId);
+    List<IdAndNameDetail> selectIdAndName(@Param(value = "list") String[] list);
     int deleteByDeviceId(@Param(value = "deviceId") Long deviceId);
-    List<Long> selectDeviceIds(@Param(value = "maintenanceId") Long maintenanceId);
+    List<DeviceAndInstance> selectDeviceIds(@Param(value = "list") String[] list);
     List<Long> selectDeviceIds2(@Param(value = "list") List<String> list);
 
     List<Long> selectDeviceIdListByIns(@Param(value = "list") List<Long> list);
@@ -44,5 +45,6 @@ public interface TDeviceMaintenanceDao {
     List<String> selectRobotDeviceId(@Param(value = "list") List<Long> list);
     List<String> selectCruiseIdAndDeviceId(@Param(value = "list") List<Long> list);
     List<Long>selectDeviceByRegion(@Param(value = "list") List<Long> list);
+    List<Long> selectInsByDeviceId(@Param(value = "list") List<Long> list);
 
 }

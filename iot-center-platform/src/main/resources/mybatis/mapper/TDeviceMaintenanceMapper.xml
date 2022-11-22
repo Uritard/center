@@ -146,21 +146,37 @@
     </delete>
 
     <select id="selectIdAndName" resultType="com.yjh.platform.module.device.entity.IdAndNameDetail">
-        select DISTINCT
-        a.device_id as id,
-		b.device_name as name
-        from t_device_maintenance a
-		left join t_std_device b on a.device_id = b.device_id
-        where 1 = 1
-            and a.maintenance_id =#{maintenanceId, jdbcType=BIGINT}
+        SELECT DISTINCT
+        a.device_id AS id,
+        a.device_name AS NAME
+        FROM
+        t_std_device a
+        WHERE
+        a.device_id IN
+        <foreach collection="list" item="deviceId" open="(" separator="," close=")">
+            #{deviceId, jdbcType=BIGINT}
+        </foreach>
     </select>
 
-    <select id="selectDevice" resultType="com.yjh.platform.module.device.entity.IdAndNameDetail">
-        select DISTINCT
-        	e.device_id as id,
-	        e.device_name as name
-	    from t_std_device e
-	    where 1 = 1 and e.device_id in <foreach collection="list" item="deviceId" open="(" separator="," close=")">
+    <select id="selectDevice" resultType="com.yjh.platform.module.device.entity.DeviceAndInstance">
+        SELECT DISTINCT
+        (CASE WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_id )AND ISNULL( d.preset_name ) THEN ''
+        WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_name ) THEN d.preset_name
+        WHEN ISNULL( b.mete_name ) AND ISNULL( d.preset_img ) THEN c.inspection_name
+        WHEN ISNULL( c.inspection_name ) AND ISNULL( d.preset_name ) THEN b.mete_name
+        WHEN ISNULL( c.inspection_name ) THEN CONCAT( b.mete_name, ' /', d.preset_name )
+        WHEN ISNULL( d.preset_name ) THEN CONCAT( b.mete_name, ' /', c.inspection_name )
+        END) AS instanceName,
+        a.device_id as deviceId,
+        a.instance_id as instanceId,
+        e.device_name as deviceName
+        FROM t_cruise_point_instance a
+        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
+        LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
+        left join t_std_device e on a.device_id=e.device_id
+        WHERE 1=1 and e.device_id in
+        <foreach collection="list" item="deviceId" open="(" separator="," close=")">
             #{deviceId, jdbcType=BIGINT}
         </foreach>
     </select>
@@ -187,12 +203,28 @@
          delete from t_device_maintenance
                 where device_id = #{deviceId, jdbcType=BIGINT}
     </delete>
-    <select id="selectDeviceIds" resultType="java.lang.Long">
-        select DISTINCT
-        a.device_id
-        from t_device_maintenance a
-        where 1 = 1
-            and a.maintenance_id =#{maintenanceId, jdbcType=BIGINT}
+    <select id="selectDeviceIds" resultType="com.yjh.platform.module.device.entity.DeviceAndInstance">
+        SELECT
+        (CASE WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_id )AND ISNULL( d.preset_name ) THEN ''
+        WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_name ) THEN d.preset_name
+        WHEN ISNULL( b.mete_name ) AND ISNULL( d.preset_img ) THEN c.inspection_name
+        WHEN ISNULL( c.inspection_name ) AND ISNULL( d.preset_name ) THEN b.mete_name
+        WHEN ISNULL( c.inspection_name ) THEN CONCAT( b.mete_name, ' /', d.preset_name )
+        WHEN ISNULL( d.preset_name ) THEN CONCAT( b.mete_name, ' /', c.inspection_name )
+        END) AS instanceName,
+        a.device_id as deviceId,
+        a.instance_id as instanceId,
+        e.device_name as deviceName
+        FROM t_cruise_point_instance a
+        LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
+        LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
+        LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
+        left join t_std_device e on a.device_id=e.device_id
+        WHERE a.instance_id in
+        <foreach collection="list" item="instanceId" open="(" separator="," close=")">
+            #{instanceId, jdbcType=BIGINT}
+        </foreach>
+        GROUP BY a.instance_id
     </select>
     <select id="selectDeviceIds2" resultType="java.lang.Long">
         select DISTINCT
@@ -244,4 +276,14 @@
         #{upRegionId,jdbcType=BIGINT}
     </foreach>
     </select>
+    <select id="selectInsByDeviceId" resultType="java.lang.Long">
+        select DISTINCT
+        a.instance_id
+        from t_cruise_point_instance a
+        where a.device_id in
+        <foreach collection="list" item="deviceId" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </select>
+
 </mapper>

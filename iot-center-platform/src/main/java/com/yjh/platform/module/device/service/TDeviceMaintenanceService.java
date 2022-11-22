@@ -13,20 +13,23 @@ import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
 import com.yjh.platform.module.task.entity.XMLBaseModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import com.yjh.platform.module.device.entity.DeviceAndInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
-* @author lqh
-* @since 2021-01-11
-*/
+ * @author lqh
+ * @since 2021-01-11
+ */
 @Service
 public class TDeviceMaintenanceService{
 
@@ -35,6 +38,8 @@ public class TDeviceMaintenanceService{
     private Logger log = LoggerFactory.getLogger(TDeviceMaintenanceService.class);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    @Autowired
+    private RedisTemplate redisTemplate;
     private static final Pattern PATTERN = Pattern.compile("^((([1-9]\\d{0,4},){0,2}([1-9]\\d{0,4});){0,3}([1-9]\\d{0,4},){0,2}([1-9]\\d{0,4}))$");
 
     @Transactional(rollbackFor = Exception.class)
@@ -49,19 +54,35 @@ public class TDeviceMaintenanceService{
 //                "maintenanceStop": "2021-02-11 06:36:54.759Z"
 //        }
         checkParam(tDeviceMaintenance);
-        tDeviceMaintenance.setDeviceId(tDeviceMaintenance.getDeviceIdList().get(0));
-        this.tDeviceMaintenanceDao.add(tDeviceMaintenance);
-        Long id = tDeviceMaintenance.getMaintenanceId();
         if(tDeviceMaintenance.getMaintenanceStart() == null){
             tDeviceMaintenance.setMaintenanceStart(new Date());
         }
-        this.tDeviceMaintenanceDao.deleteByPrimaryId(tDeviceMaintenance.getMaintenanceId());
 
         List<Long> list = tDeviceMaintenance.getDeviceIdList();
-
+        List<DeviceAndInstance> deviceAndInstanceList = tDeviceMaintenance.getDeviceAndInstanceList();
+        List<String> instanceList = new ArrayList<>();
+        for(DeviceAndInstance item:deviceAndInstanceList){
+            instanceList.add(String.valueOf(item.getInstanceId()));
+        }
+        tDeviceMaintenance.setDeviceIds(tDeviceMaintenance.getDeviceIdList()
+                .toString().replace("[","").replace("]",""));
+        tDeviceMaintenance.setInstanceIds(instanceList
+                .toString().replace("[","").replace("]",""));
+        this.tDeviceMaintenanceDao.add(tDeviceMaintenance);
         //给机器人下发检修区域指令
         {
-            List<String> deviceList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+            List<String> deviceList = new ArrayList<>();
+            //根据页面的deviceLevel 来查list
+            if ("1".equals(tDeviceMaintenance.getDeviceLevel())){
+                //区域
+                deviceList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+            } else if ("2".equals(tDeviceMaintenance.getDeviceLevel())){
+                //设备
+                deviceList = Optional.of(tDeviceMaintenance.getDeviceIdList()).orElseGet(ArrayList::new).stream().map(String::valueOf).collect(Collectors.toList());
+            } else if ("3".equals(tDeviceMaintenance.getDeviceLevel()) || "4".equals(tDeviceMaintenance.getDeviceLevel())){
+                //点位
+                deviceList = instanceList;
+            }
             HashMap<String,Object> params = new HashMap<>();
             params.put("enable",1);
             params.put("deviceList",deviceList);
@@ -75,20 +96,7 @@ public class TDeviceMaintenanceService{
             params.put("coordinatePixel", tDeviceMaintenance.getCoordinatePixel());
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
-        List<TDeviceMaintenance> addList = new ArrayList<>();
-        for(Long item:list){
-            TDeviceMaintenance deviceMaintenanceItem = new TDeviceMaintenance();
-            deviceMaintenanceItem.setDeviceId(item)
-                    .setMaintenanceName(tDeviceMaintenance.getMaintenanceName())
-                    .setIsValid(tDeviceMaintenance.getIsValid())
-                    .setMaintenanceStart(tDeviceMaintenance.getMaintenanceStart())
-                    .setMaintenanceId(id)
-                    .setDeviceLevel(tDeviceMaintenance.getDeviceLevel())
-                    .setCoordinatePixel(tDeviceMaintenance.getCoordinatePixel())
-                    .setMaintenanceStop(tDeviceMaintenance.getMaintenanceStop());
-            addList.add(deviceMaintenanceItem);
-        }
-        return this.tDeviceMaintenanceDao.batchAdd(addList);
+        return 1;
     }
 
     public Result sendPostRequest(String url, HashMap<String,Object> params) {
@@ -108,9 +116,8 @@ public class TDeviceMaintenanceService{
     public int deleteByPrimaryId(Long maintenanceId) {
         //给机器人下发检修区域指令
         {
-            List<Long> list = tDeviceMaintenanceDao.selectDeviceIds(maintenanceId);
-            TDeviceMaintenance tDeviceMaintenance = this.selectByPrimaryId(maintenanceId).get(0);
-            List<String> deviceList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+            TDeviceMaintenance tDeviceMaintenance = this.selectByPrimaryId(maintenanceId);
+            List<String> deviceList = Arrays.asList(tDeviceMaintenance.getDeviceIds().replace(" ","").split(","));
             HashMap<String,Object> params = new HashMap<>();
             params.put("enable",0);
             params.put("deviceList",deviceList);
@@ -130,26 +137,32 @@ public class TDeviceMaintenanceService{
     public int update(TDeviceMaintenance tDeviceMaintenance) {
         checkParam(tDeviceMaintenance);
         List<Long> list = tDeviceMaintenance.getDeviceIdList();
-        List<TDeviceMaintenance> addList = new ArrayList<>();
         this.deleteByPrimaryId(tDeviceMaintenance.getMaintenanceId());
         if(tDeviceMaintenance.getMaintenanceStart() == null){
             tDeviceMaintenance.setMaintenanceStart(new Date());
         }
-        for(Long item:list){
-            TDeviceMaintenance deviceMaintenanceItem = new TDeviceMaintenance();
-            deviceMaintenanceItem.setDeviceId(item)
-                    .setMaintenanceName(tDeviceMaintenance.getMaintenanceName())
-                    .setIsValid(tDeviceMaintenance.getIsValid())
-                    .setMaintenanceStart(tDeviceMaintenance.getMaintenanceStart())
-                    .setMaintenanceId(tDeviceMaintenance.getMaintenanceId())
-                    .setDeviceLevel(tDeviceMaintenance.getDeviceLevel())
-                    .setCoordinatePixel(tDeviceMaintenance.getCoordinatePixel())
-                    .setMaintenanceStop(tDeviceMaintenance.getMaintenanceStop());
-            addList.add(deviceMaintenanceItem);
+        List<String> instanceList = new ArrayList<>();
+        for(DeviceAndInstance item:tDeviceMaintenance.getDeviceAndInstanceList()){
+            instanceList.add(String.valueOf(item.getInstanceId()));
         }
+        tDeviceMaintenance.setDeviceIds(tDeviceMaintenance.getDeviceIdList()
+                .toString().replace("[","").replace("]",""));
+        tDeviceMaintenance.setInstanceIds(instanceList
+                .toString().replace("[","").replace("]",""));
         //给机器人下发检修区域指令
         {
-            List<String> deviceList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+            List<String> deviceList = new ArrayList<>();
+            //根据页面的deviceLevel 来查list
+            if ("1".equals(tDeviceMaintenance.getDeviceLevel())){
+                //区域
+                deviceList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+            } else if ("2".equals(tDeviceMaintenance.getDeviceLevel())){
+                //设备
+                deviceList = Optional.of(tDeviceMaintenance.getDeviceIdList()).orElseGet(ArrayList::new).stream().map(String::valueOf).collect(Collectors.toList());
+            } else if ("3".equals(tDeviceMaintenance.getDeviceLevel()) || "4".equals(tDeviceMaintenance.getDeviceLevel())){
+                //点位
+                deviceList = instanceList;
+            }
             HashMap<String,Object> params = new HashMap<>();
             params.put("enable",1);
             params.put("deviceList",deviceList);
@@ -162,7 +175,7 @@ public class TDeviceMaintenanceService{
             params.put("coordinatePixel", tDeviceMaintenance.getCoordinatePixel());
             sendPostRequest(Constant.Maintenance_Issued,params);
         }
-        return this.tDeviceMaintenanceDao.batchAdd(addList);
+        return this.tDeviceMaintenanceDao.add(tDeviceMaintenance);
     }
 
     /**
@@ -182,27 +195,23 @@ public class TDeviceMaintenanceService{
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TDeviceMaintenance> selectByPrimaryId(Long maintenanceId) {
-        List<TDeviceMaintenance> tDeviceMaintenanceList = tDeviceMaintenanceDao.selectByPrimaryId(maintenanceId);
+    public TDeviceMaintenance selectByPrimaryId(Long maintenanceId) {
+        TDeviceMaintenance tDeviceMaintenance = tDeviceMaintenanceDao.selectByPrimaryId(maintenanceId);
         Date now = new Date();
-        List<TDeviceMaintenance> re =new ArrayList<>();
-        for(TDeviceMaintenance item: tDeviceMaintenanceList){
-            if (item.getMaintenanceStop().compareTo(now) <= 0  ){
-                item.setEffectiveState(407);
-                item.setEffectiveStateName("已失效");
-            }
-            if(item.getMaintenanceStart().compareTo(now) >= 0  ){
-                item.setEffectiveState(408);
-                item.setEffectiveStateName("已生效");
-            }
-            if(item.getMaintenanceStart().compareTo(now) <= 0  && item.getMaintenanceStop().compareTo(now) >= 0){
-                item.setEffectiveState(406);
-                item.setEffectiveStateName("已生效");
-            }
-            re.add(item);
-            //&& endTime.compareTo(format.parse(item.get("startTime").toString())) >= 0)
+        if (tDeviceMaintenance.getMaintenanceStop().compareTo(now) <= 0  ){
+            tDeviceMaintenance.setEffectiveState(407);
+            tDeviceMaintenance.setEffectiveStateName("已失效");
         }
-        return re;
+        if(tDeviceMaintenance.getMaintenanceStart().compareTo(now) >= 0  ){
+            tDeviceMaintenance.setEffectiveState(408);
+            tDeviceMaintenance.setEffectiveStateName("已生效");
+        }
+        if(tDeviceMaintenance.getMaintenanceStart().compareTo(now) <= 0  && tDeviceMaintenance.getMaintenanceStop().compareTo(now) >= 0){
+            tDeviceMaintenance.setEffectiveState(406);
+            tDeviceMaintenance.setEffectiveStateName("已生效");
+        }
+        //&& endTime.compareTo(format.parse(item.get("startTime").toString())) >= 0)
+        return tDeviceMaintenance;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -255,7 +264,7 @@ public class TDeviceMaintenanceService{
                 System.out.println(!(item.getEffectiveState().equals(effectiveState)));
                 continue;
             }
-            List<IdAndNameDetail> list = this.tDeviceMaintenanceDao.selectIdAndName(item.getMaintenanceId());
+            List<IdAndNameDetail> list = this.tDeviceMaintenanceDao.selectIdAndName(item.getDeviceIds().replace(" ","").split(","));
             //item.setUpRegionList(this.tDeviceMaintenanceDao.selectDeviceIds(item.getMaintenanceId()));
             item.setDeviceInfo(list);
             re.add(item);
@@ -267,9 +276,10 @@ public class TDeviceMaintenanceService{
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> selectDeviceDetail(Long maintenanceId){
         Map<String,Object> re = new HashMap<>();
-        List<IdAndNameDetail> list1 = this.tDeviceMaintenanceDao.selectIdAndName(maintenanceId);
+        TDeviceMaintenance t = this.selectByPrimaryId(maintenanceId);
+        List<IdAndNameDetail> list1 = this.tDeviceMaintenanceDao.selectIdAndName(t.getDeviceIds().replace(" ","").split(","));
         re.put("deviceInfo",list1);
-        List<Long> list2 = this.tDeviceMaintenanceDao.selectDeviceIds(maintenanceId);
+        List<DeviceAndInstance> list2 = this.tDeviceMaintenanceDao.selectDeviceIds(t.getInstanceIds().replace(" ","").split(","));
         re.put("deviceIds",list2);
         return re;
     }
@@ -281,30 +291,35 @@ public class TDeviceMaintenanceService{
 
     @Transactional(rollbackFor = Exception.class)
     public int batchDelete(String maintenanceId) {
-    List<String> list1= Arrays.asList(maintenanceId.split(","));
-        //给机器人下发检修区域指令
-        {
-            List<Long> list = tDeviceMaintenanceDao.selectDeviceIds2(list1);
-            List<String> deviceList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+        List<String> list1= Arrays.asList(maintenanceId.split(","));
+        list1.forEach(item->{
+            this.deleteByPrimaryId(Long.valueOf(item));
+        });
+        return 1;
 
-            HashMap<String,Object> params = new HashMap<>();
-            params.put("enable",0);
-            params.put("deviceList",deviceList);
-            params.put("startTime",sdf.format(new Date()));
-            params.put("endTime",sdf.format(new Date()));
-            params.put("deviceLevel",2);
-            //配置编码
-            params.put("configCode", "");
-            //检修区域坐标框
-            params.put("coordinatePixel", "");
-            sendPostRequest(Constant.Maintenance_Issued,params);
-        }
-    return this.tDeviceMaintenanceDao.batchDelete(list1);
+//        //给机器人下发检修区域指令
+//        {
+//            List<Long> list = tDeviceMaintenanceDao.selectDeviceIds2(list1);
+//            List<String> deviceList = tDeviceMaintenanceDao.selectRobotDeviceId(list);
+//
+//            HashMap<String,Object> params = new HashMap<>();
+//            params.put("enable",0);
+//            params.put("deviceList",deviceList);
+//            params.put("startTime",sdf.format(new Date()));
+//            params.put("endTime",sdf.format(new Date()));
+//            params.put("deviceLevel",2);
+//            //配置编码
+//            params.put("configCode", "");
+//            //检修区域坐标框
+//            params.put("coordinatePixel", "");
+//            sendPostRequest(Constant.Maintenance_Issued,params);
+//        }
+//    return this.tDeviceMaintenanceDao.batchDelete(list1);
     }
 
 
     @Transactional(rollbackFor = Exception.class)
-    public List<IdAndNameDetail> selectDevice(String deviceIds) {
+    public List<DeviceAndInstance> selectDevice(String deviceIds) {
         String[] list = deviceIds.split(",");
         List<Long> idList = new ArrayList<>();
         for (String item: list) {
@@ -327,48 +342,59 @@ public class TDeviceMaintenanceService{
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<Map<String,Object>> list = xmlBaseModel.getItems();
         for (Map<String,Object> item:list) {
-             String enable = item.get("enable").toString();
-             String start_time = item.get("start_time").toString();
-             String end_time = item.get("end_time").toString();
-             String device_level = item.get("device_level").toString();
-             String device_list = item.get("device_list").toString();
-             String coordinate_pixel = item.get("coordinate_pixel").toString();
-             String[] dd = device_list.split(",");
-             List<Long> idList = new ArrayList<>();
-             for (String str:dd) {
-                 idList.add(Long.valueOf(str));
-             }
-             if(!"".equals(device_level)){
-                 List<Long> deviceIdLst = new ArrayList<>();
-//                 if("1".equals(device_level)){
-//                   deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
-//                 }
-                 if("2".equals(device_level)){
+            String enable = item.get("enable").toString();
+            String start_time = item.get("start_time").toString();
+            String end_time = item.get("end_time").toString();
+            String device_level = item.get("device_level").toString();
+            String device_list = item.get("device_list").toString();
+            String coordinate_pixel = item.get("coordinate_pixel").toString();
+            String[] dd = device_list.split(",");
+            List<Long> idList = new ArrayList<>();
+            String edgeCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+            for (String str:dd) {
+                idList.add(Long.valueOf(str.replaceFirst(edgeCode,"")));
+            }
+            if(!"".equals(device_level)){
+                List<Long> deviceIdLst = new ArrayList<>();
+                if("1".equals(device_level)){
+                    deviceIdLst = tDeviceMaintenanceDao.selectDeviceByRegion(idList);
+                }
+                if("2".equals(device_level)){
                     deviceIdLst = idList;
-                 }
-//                 if("3".equals(device_level)){
-//                      deviceIdLst = tDeviceMaintenanceDao.selectDeviceIdListByIns(idList);
-//                 }
+                }
+                if("3".equals(device_level)){
+                    deviceIdLst = tDeviceMaintenanceDao.selectDeviceIdListByIns(idList);
+                }
 //                 if("4".equals(device_level)){
 //
 //                 }
 
-                 if("1".equals(enable)){
-                     //设置检修区域
-                     TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
-                     tDeviceMaintenance.setMaintenanceName("检修区域"+start_time);
-                     tDeviceMaintenance.setMaintenanceStart(simpleDateFormat.parse(start_time));
-                     tDeviceMaintenance.setMaintenanceStop(simpleDateFormat.parse(end_time));
-                     tDeviceMaintenance.setDeviceIdList(deviceIdLst);
-                     tDeviceMaintenance.setDeviceLevel(device_level);
-                     tDeviceMaintenance.setCoordinatePixel(coordinate_pixel);
-                     this.add(tDeviceMaintenance);
-                 }
-                 if("0".equals(enable)){
-                     //删除检修区域
-                     tDeviceMaintenanceDao.deleteByDeviceIdList(deviceIdLst,"检修区域"+start_time);
-                 }
-             }
+                if("1".equals(enable)){
+                    List<DeviceAndInstance> lists = new ArrayList<>();
+                    if (!deviceIdLst.isEmpty()){
+                        List<Long> ins = tDeviceMaintenanceDao.selectInsByDeviceId(deviceIdLst);
+                        ins.forEach(insItem ->{
+                            DeviceAndInstance deviceAndInstance = new DeviceAndInstance();
+                            deviceAndInstance.setInstanceId(insItem);
+                            lists.add(deviceAndInstance);
+                        });
+                    }
+                    //设置检修区域
+                    TDeviceMaintenance tDeviceMaintenance = new TDeviceMaintenance();
+                    tDeviceMaintenance.setMaintenanceName("检修区域"+start_time);
+                    tDeviceMaintenance.setMaintenanceStart(simpleDateFormat.parse(start_time));
+                    tDeviceMaintenance.setMaintenanceStop(simpleDateFormat.parse(end_time));
+                    tDeviceMaintenance.setDeviceIdList(deviceIdLst);
+                    tDeviceMaintenance.setDeviceLevel(device_level);
+                    tDeviceMaintenance.setDeviceAndInstanceList(lists);
+                    tDeviceMaintenance.setCoordinatePixel(coordinate_pixel);
+                    this.add(tDeviceMaintenance);
+                }
+                if("0".equals(enable)){
+                    //删除检修区域
+                    tDeviceMaintenanceDao.deleteByDeviceIdList(deviceIdLst,"检修区域"+start_time);
+                }
+            }
 
 
         }

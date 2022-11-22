@@ -2,6 +2,7 @@ package com.yjh.platform.module.device.controller;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
+import com.yjh.platform.module.device.entity.DeviceAndInstance;
 import com.yjh.platform.module.device.entity.IdAndNameDetail;
 import com.yjh.platform.module.device.entity.TDeviceMaintenanceDetail;
 import com.yjh.platform.module.device.service.TDeviceMaintenanceService;
@@ -107,8 +108,8 @@ public class TDeviceMaintenanceController {
     public Result selectByPrimaryId(@RequestParam(value = "maintenanceId", required = true) Long maintenanceId) {
         Result result = new Result();
         try {
-            List<TDeviceMaintenance> tDeviceMaintenanceList = tDeviceMaintenanceService.selectByPrimaryId(maintenanceId);
-            result.setData(tDeviceMaintenanceList);
+            TDeviceMaintenance tDeviceMaintenance = tDeviceMaintenanceService.selectByPrimaryId(maintenanceId);
+            result.setData(tDeviceMaintenance);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -200,7 +201,7 @@ public class TDeviceMaintenanceController {
     public Result selectDevice(@RequestParam(value = "deviceIds", required = true) String deviceIds) {
         Result result = new Result();
         try {
-            List<IdAndNameDetail> list = tDeviceMaintenanceService.selectDevice(deviceIds);
+            List<DeviceAndInstance> list = tDeviceMaintenanceService.selectDevice(deviceIds);
             result.setData(list);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());

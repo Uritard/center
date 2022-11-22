@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.WarnSubDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yjh.platform.module.user.entity.WarnSub">
+        <id column="warn_sub_id" property="warnSubId" />
+        <result column="user_id" property="userId" />
+        <result column="sub_warn_level" property="subWarnLevel" />
+        <result column="sub_warn_type" property="subWarnType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        warn_sub_id, user_id, sub_warn_level, sub_warn_type
+    </sql>
+
+
+    <select id="selectByUserId" resultType="com.yjh.platform.module.user.entity.WarnSub">
+        select * from warn_sub where user_id = #{userId}
+    </select>
+
+    <delete id="deleteByUserId">
+        delete from warn_sub where user_id = #{userId}
+    </delete>
+
+    <insert id="add" >
+        insert into warn_sub(
+             user_id, sub_warn_level, sub_warn_type
+        )value(
+            #{userId},
+            #{subWarnLevel},
+            #{subWarnType}
+        )
+    </insert>
+
+</mapper>
