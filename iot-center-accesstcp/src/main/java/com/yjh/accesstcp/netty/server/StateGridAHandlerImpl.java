@@ -7,6 +7,7 @@ package com.yjh.accesstcp.netty.server;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.entiy.Message;
 import io.netty.channel.ChannelHandlerContext;
@@ -34,10 +35,12 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
     private String server;
     private String cruise;
     private ChannelHandlerContext ctx;
+    private AnalysisUnionTaskFileService analysisUnionTaskFileService;
 
-    public StateGridAHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,String server,String cruise) {
+    public StateGridAHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService,String server,String cruise) {
         this.redisTemplate = redisTemplate;
         this.sendToUpSystemServices = sendToUpSystemServices;
+        this.analysisUnionTaskFileService = analysisUnionTaskFileService;
         this.server = server;
         this.cruise =cruise;
 
@@ -60,7 +63,7 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         if (xmlRes.getSendCode() == null) {
             log.info("客户端 {} 与服务端连接可能断了，等待重连.....", ctx.channel().remoteAddress());
         } else {
-            MessageThread.doProcessMessageSync(xmlRes, sendSessionId, this, sendToUpSystemServices, redisTemplate);
+            MessageThread.doProcessMessageSync(xmlRes, sendSessionId, this, sendToUpSystemServices, analysisUnionTaskFileService, redisTemplate);
             // doProcessMessage(ctx, xmlRes, sendSessionId, receiveSessionId);
             log.info("+++++++++++++++++解包完成+++++++++++++++++");
         }

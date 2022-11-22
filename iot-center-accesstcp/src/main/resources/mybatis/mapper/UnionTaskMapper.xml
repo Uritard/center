@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accesstcp.module.device.dao.UnionTaskDao">
+
+    <insert id="insertPlan" useGeneratedKeys="true" keyProperty="planId" parameterType="com.yjh.accesstcp.module.device.entity.TCruisePlan">
+        insert into t_cruise_plan(
+            plan_name,
+            `type`,
+            plan_code,
+            device_id,
+            up_region_id,
+            robot_id,
+            plan_point_types
+        )values(
+                #{planName},
+                218,
+                null,
+                null,
+                null,
+                null,
+                null
+        )
+    </insert>
+
+    <insert id="batchInsertPlanAttr">
+        insert into t_cruise_plan_attr(
+            plan_id,
+            instance_id,
+            point_type,
+            area_id,
+            cruise_region_ids,
+            exception_type,
+            sub_type,
+            robot_id,
+            `position`,
+            algorithm_id,
+            inferad_analyze,
+            ir_temp_box
+        )values
+        <foreach collection="instanceIdList" item="instanceId" separator=",">
+            (#{planId},#{instanceId},null,null,null,null,null,null,null,null,null,null)
+        </foreach>
+    </insert>
+
+    <insert id="batchInsertRule">
+        insert into t_cfg_union_rule(
+            plan_id,
+            rule_name,
+            rule_content,
+            input_param,
+            rule_type,
+            rule_delay,
+            camera_id,
+            preset_id,
+            description
+        )values
+        <foreach collection="tCfgUnionRuleList" item="tCfgUnionRule" separator=",">
+            (#{tCfgUnionRule.planId},#{tCfgUnionRule.ruleName},'1,==,1',#{tCfgUnionRule.inputParam},0,null,null,null,'-99999')
+        </foreach>
+    </insert>
+
+    <select id="selectPlanId" resultType="java.lang.Long">
+        select plan_id from t_cfg_union_rule where description = '-99999'
+    </select>
+
+    <delete id="deleteUnionRule">
+        delete from t_cfg_union_rule where plan_id in (
+            <foreach collection="planIdList" separator="," item="planId">
+                #{planId}
+            </foreach>
+        )
+    </delete>
+
+    <delete id="deletePlanAttr">
+        delete from t_cruise_plan_attr where plan_id in (
+        <foreach collection="planIdList" separator="," item="planId">
+            #{planId}
+        </foreach>
+        )
+    </delete>
+
+    <delete id="deletePlan">
+        delete from t_cruise_plan where plan_id in (
+        <foreach collection="planIdList" separator="," item="planId">
+            #{planId}
+        </foreach>
+        )
+    </delete>
+</mapper>

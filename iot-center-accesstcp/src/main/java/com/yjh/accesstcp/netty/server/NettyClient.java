@@ -1,6 +1,7 @@
 package com.yjh.accesstcp.netty.server;
 
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 @lombok.extern.slf4j.Slf4j
 public class NettyClient {
 
-    public void start(InetSocketAddress address, RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices,String server,String cruise) {
+    public void start(InetSocketAddress address, RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, String server, String cruise) {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap bootstrap = new Bootstrap()
@@ -29,7 +30,7 @@ public class NettyClient {
                     .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT)
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
-                    .handler(new TCPClientChannelInitializer(redisTemplate, sendToUpSystemServices,server, cruise));
+                    .handler(new TCPClientChannelInitializer(redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, server, cruise));
 
             Constant.bootstrapHashMap.put(1, bootstrap);
             bootstrap.connect(address).addListener((ChannelFuture futureListener) -> {

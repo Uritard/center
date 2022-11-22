@@ -9,6 +9,7 @@ import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
+import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.thread.*;
 import lombok.extern.slf4j.Slf4j;
@@ -36,10 +37,10 @@ public class MessageThread {
             new ThreadPoolExecutor.DiscardPolicy());
 
     public static void doProcessMessage(XMLBaseModel xmlBaseModel, long sendSessionId, TCPClientHandler clientHandler,
-        SendToUpSystemServices sendToUpSystemServices, RedisTemplate redisTemplate) {
+        SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, RedisTemplate redisTemplate) {
         executorService.execute(() -> {
             try {
-                processMessage(xmlBaseModel, sendSessionId, clientHandler, sendToUpSystemServices, redisTemplate);
+                processMessage(xmlBaseModel, sendSessionId, clientHandler, sendToUpSystemServices, analysisUnionTaskFileService, redisTemplate);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
@@ -47,16 +48,16 @@ public class MessageThread {
     }
 
     public static void doProcessMessageSync(XMLBaseModel xmlBaseModel, long sendSessionId, TCPClientHandler clientHandler,
-        SendToUpSystemServices sendToUpSystemServices, RedisTemplate redisTemplate) {
+                                            SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, RedisTemplate redisTemplate) {
         try {
-            processMessage(xmlBaseModel, sendSessionId, clientHandler, sendToUpSystemServices, redisTemplate);
+            processMessage(xmlBaseModel, sendSessionId, clientHandler, sendToUpSystemServices, analysisUnionTaskFileService, redisTemplate);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }
 
     private static void processMessage(XMLBaseModel xmlBaseModel, long sendSessionId, TCPClientHandler clientHandler,
-        SendToUpSystemServices sendToUpSystemServices, RedisTemplate redisTemplate) throws Exception {
+        SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, RedisTemplate redisTemplate) throws Exception {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         //解析的xml文件
@@ -371,6 +372,39 @@ public class MessageThread {
             } catch (Exception e) {
                 log.info("模型同步错误" + e);
                 //                sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", list);
+            }
+        }
+
+        //联动文件下发指令
+        if ("71".equals(xmlBaseModel.getType())) {
+            try {
+                log.info("--联动文件下发指令--");
+                Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+                Map<String, Object> item = xmlBaseModel.getItems().get(0);
+                String filePath = filePathMap.get("content") + "/" + String.valueOf(item.get("file_path"));
+                switch (xmlBaseModel.getCommand()) {
+                    //<1>: =联动配置文件
+                    case "1":
+                        log.info("联动配置文件{}", filePath);
+                        analysisUnionTaskFileService.handleUnionTaskFile(filePath);
+                        break;
+                    case "2":
+                    case "3":
+                        //<2>: =一键顺控视频确认反馈信息文件
+                        //<3>: =反向联动信息转发文件
+                        log.info("一键顺控视频确认反馈信息文件/反向联动信息转发文件{}", filePath);
+                        Map<String, List<String>> mapForSend = new HashMap<>(1);
+                        List<String> list = new ArrayList<>();
+                        list.add(filePath);
+                        mapForSend.put("list", list);
+                        Constant.otherServer(mapForSend, Constant.UDP_SEND);
+                        break;
+                    default:
+                        break;
+                }
+                sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
+            } catch (Exception e) {
+                log.info("联动文件下发指令" + e);
             }
         }
 

@@ -516,32 +516,32 @@ public class RobotService {
                                 addDevicePointRegion(mapList, robotId);
                             }
                             break;
-//                        case "robot_file_path":
-//                            // Robot Model Info
-//                            dealRobotFile(filePathMap,v.toString(),edgeCode);
-//                            break;
+                        case "robot_file_path":
+                            // Robot Model Info
+                            dealRobotFile(v.toString(), nodeCode, Constant.ROBOT);
+                            break;
                         case "property_file_path":
                             //Property Info 属性信息 与点位绑定
                             addPropertyModel(mapList, robotId);
                             break;
-//                        case "region_file_path":
-//                            addRegionModel(mapList);
-//                            break;
+                        case "region_file_path":
+                            dealRegionFile(v.toString(), nodeCode);
+                            break;
                         case "map_file_path":
-                            syncModelUpdate("9", v.toString(), nodeCode);
+                            dealMapFile(v.toString(), nodeCode);
                             break;
 //                        case "host_file_path":
 //                            dealHostFilePath(filePathMap,v.toString(),edgeCode);
 //                            break;
-//                        case "video_file_path":
-//                            dealCameraFile(filePathMap,v.toString(),edgeCode);
-//                            break;
-//                        case "drone_file_path":
-//                            dealDroneFile(filePathMap,v.toString(),edgeCode);
-//                            break;
-//                        case "voice_file_path":
-//                            dealVoiceFile(filePathMap,v.toString(),edgeCode);
-//                            break;
+                        case "video_file_path":
+                            dealCameraFile(v.toString(), nodeCode);
+                            break;
+                        case "drone_file_path":
+                            dealRobotFile(v.toString(), nodeCode, Constant.DRONE);
+                            break;
+                        case "voice_file_path":
+                            dealVoiceFile(v.toString(), nodeCode);
+                            break;
                         case "record_file_path":
                             dealRecordFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
                             break;
@@ -3019,10 +3019,10 @@ public class RobotService {
 //                log.info("检修区域配置模型 {}", filePath);
 //                dealMaintenanceFilePath(filePathMap,filePath,edgeCode);
 //                break;
-//            case "9":
-//                log.info("地图文件 {}", filePath);
-//                dealMapFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
-//                break;
+            case "9":
+                log.info("地图文件 {}", filePath);
+                dealMapFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                break;
             case "10":
                 log.info("设备资源信息配置文件 {}", filePath);
                 dealSourceFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
@@ -3037,6 +3037,29 @@ public class RobotService {
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * 处理地图文件
+     *
+     * @param picPath 地图文件路径
+     */
+    private void dealMapFile(String picPath, String edgeCode) {
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        String[] splitArray = picPath.split("/");
+        String fileName = splitArray[splitArray.length - 1];
+        String developMap = absoluteImgMap.get("content") + "/Map";
+        copyFileToDevelop(picPath, developMap);
+        String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
+        String robotNum = StringUtils.substringBefore(fileName, "_");
+        log.info("更新 robotNum 为{}的地图文件", robotNum);
+        Long robotId = tRobotInfoDao.selectRobotIdByRobotNum(robotNum, edgeCode);
+        if (Objects.nonNull(robotId)) {
+            TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
+            tRobotInfo.setPhotePath(developRelativeUrl);
+            tRobotInfoDao.update(tRobotInfo);
         }
     }
 

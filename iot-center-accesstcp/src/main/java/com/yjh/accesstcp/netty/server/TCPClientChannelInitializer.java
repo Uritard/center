@@ -2,6 +2,7 @@ package com.yjh.accesstcp.netty.server;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -21,12 +22,14 @@ public class TCPClientChannelInitializer extends ChannelInitializer<SocketChanne
 
     private RedisTemplate redisTemplate;
     private SendToUpSystemServices sendToUpSystemServices;
+    private AnalysisUnionTaskFileService analysisUnionTaskFileService;
     private String server;
     private String cruise;
     private EventExecutorGroup group;
-    public TCPClientChannelInitializer(RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices,String server,String cruise) {
+    public TCPClientChannelInitializer(RedisTemplate redisTemplate, SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, String server,String cruise) {
         this.redisTemplate =redisTemplate;
         this.sendToUpSystemServices = sendToUpSystemServices;
+        this.analysisUnionTaskFileService = analysisUnionTaskFileService;
         this.server =server;
         this.cruise = cruise;
         this.group = new DefaultEventExecutorGroup(NettyRuntime.availableProcessors() * 2,
@@ -38,10 +41,10 @@ public class TCPClientChannelInitializer extends ChannelInitializer<SocketChanne
         ChannelPipeline p = socketChannel.pipeline();
         if (Constant.handlerNew) {
             p.addLast(new StateGridADecoder());
-            StateGridAHandlerImpl robotServerHandler = new StateGridAHandlerImpl(redisTemplate, sendToUpSystemServices, server, cruise);
+            StateGridAHandlerImpl robotServerHandler = new StateGridAHandlerImpl(redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, server, cruise);
             p.addLast(group, robotServerHandler);
         } else {
-            TCPClientHandlerImpl robotServerHandler = new TCPClientHandlerImpl(redisTemplate, sendToUpSystemServices, server, cruise);
+            TCPClientHandlerImpl robotServerHandler = new TCPClientHandlerImpl(redisTemplate, sendToUpSystemServices, analysisUnionTaskFileService, server, cruise);
             p.addLast(robotServerHandler);
         }
     }
