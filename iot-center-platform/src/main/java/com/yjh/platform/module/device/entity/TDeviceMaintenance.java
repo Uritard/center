@@ -43,10 +43,9 @@ public class TDeviceMaintenance implements Serializable {
     @TableField(value = "maintenance_name",updateStrategy = FieldStrategy.IGNORED)
     private String maintenanceName;
 
-    @Max(value=999999999999999999l)
-    @ApiModelProperty(value = "设备ID")
-     @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
-    private Long deviceId;
+    @Length(max = 256,message = "deviceId长度必须小于等于256")
+    @TableField(value = "device_ids",updateStrategy = FieldStrategy.IGNORED)
+    private String deviceIds;
 
     @Max(value=99)
     @ApiModelProperty(value = "是否使用，0-不使用，1-使用")
@@ -72,9 +71,16 @@ public class TDeviceMaintenance implements Serializable {
 
     private List<Long> deviceIdList;
 
+    private List<DeviceAndInstance> deviceAndInstanceList;
+
     @Length(max = 256, message = "coordinatePixel长度必须小于等于256")
     private String coordinatePixel;
 
     private String deviceLevel;
+
+
+    @TableField(value = "instance_ids",updateStrategy = FieldStrategy.IGNORED)
+    private String instanceIds;
+
 
 }
