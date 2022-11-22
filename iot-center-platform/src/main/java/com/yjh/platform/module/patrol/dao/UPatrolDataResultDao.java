@@ -91,6 +91,12 @@ public interface UPatrolDataResultDao {
         @Param(value = "startDate")String startDate,
         @Param(value = "endDate")String endDate,
         @Param(value = "firName")String firName);
+    /**
+     * 插入巡视任务结果数据
+     * @param list 巡视点结果集
+     * @return int
+     */
+    int batchInsertUPatrolDataResult(List<UPatrolDataResult> list);
 
     List<Long> selectAllDeviceMeteId();
 

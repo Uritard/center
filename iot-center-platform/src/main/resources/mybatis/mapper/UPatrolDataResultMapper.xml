@@ -603,6 +603,87 @@
         ORDER BY a.fir_date DESC
     </select>
 
+    <insert id="batchInsertUPatrolDataResult">
+        insert into u_patrol_data_result(
+        cruise_data_id,
+        task_id,
+        device_id,
+        device_name,
+        instance_id,
+        instance_name,
+        cruise_id,
+        cruise_name,
+        cruise_time,
+        cruise_status,
+        cruise_type,
+        result_desc,
+        result_num,
+        modify_num,
+        picpath,
+        confirm_pic_path,
+        pic_path_anl,
+        person_check,
+        origpic,
+        orig_confirm_pic_path,
+        orig_pic_anl,
+        cruise_abnormal,
+        evaluation_state,
+        identify_state,
+        identify_result,
+        createtime,
+        remark,
+        check_user,
+        check_date,
+        is_warn,
+        cruise_result,
+        fir_name,
+        fir_date,
+        result_pic,
+        points,
+        voice_path
+        )values
+        <foreach collection="list" item="uPatrolDataResult" separator=",">
+            (
+            #{uPatrolDataResult.cruiseDataId, jdbcType=BIGINT},
+            #{uPatrolDataResult.taskId, jdbcType=VARCHAR},
+            #{uPatrolDataResult.deviceId, jdbcType=BIGINT},
+            #{uPatrolDataResult.deviceName, jdbcType=VARCHAR},
+            #{uPatrolDataResult.instanceId, jdbcType=BIGINT},
+            #{uPatrolDataResult.instanceName, jdbcType=VARCHAR},
+            #{uPatrolDataResult.cruiseId, jdbcType=BIGINT},
+            #{uPatrolDataResult.cruiseName, jdbcType=VARCHAR},
+            #{uPatrolDataResult.cruiseTime, jdbcType=TIMESTAMP},
+            #{uPatrolDataResult.cruiseStatus, jdbcType=INTEGER},
+            #{uPatrolDataResult.cruiseType, jdbcType=INTEGER},
+            #{uPatrolDataResult.resultDesc, jdbcType=VARCHAR},
+            #{uPatrolDataResult.resultNum, jdbcType=VARCHAR},
+            #{uPatrolDataResult.modifyNum, jdbcType=VARCHAR},
+            #{uPatrolDataResult.picpath, jdbcType=VARCHAR},
+            #{uPatrolDataResult.confirmPicPath, jdbcType=VARCHAR},
+            #{uPatrolDataResult.picPathAnl, jdbcType=VARCHAR},
+            #{uPatrolDataResult.personCheck, jdbcType=VARCHAR},
+            #{uPatrolDataResult.origpic, jdbcType=VARCHAR},
+            #{uPatrolDataResult.origConfirmPicPath, jdbcType=VARCHAR},
+            #{uPatrolDataResult.origPicAnl, jdbcType=VARCHAR},
+            #{uPatrolDataResult.cruiseAbnormal, jdbcType=INTEGER},
+            #{uPatrolDataResult.evaluationState, jdbcType=INTEGER},
+            #{uPatrolDataResult.identifyState, jdbcType=INTEGER},
+            #{uPatrolDataResult.identifyResult, jdbcType=INTEGER},
+            #{uPatrolDataResult.createtime, jdbcType=TIMESTAMP},
+            #{uPatrolDataResult.remark, jdbcType=VARCHAR},
+            #{uPatrolDataResult.checkUser, jdbcType=VARCHAR},
+            #{uPatrolDataResult.checkDate, jdbcType=TIMESTAMP},
+            #{uPatrolDataResult.isWarn, jdbcType=INTEGER},
+            #{uPatrolDataResult.cruiseResult, jdbcType=INTEGER},
+            #{uPatrolDataResult.firName, jdbcType=VARCHAR},
+            #{uPatrolDataResult.firDate, jdbcType=TIMESTAMP},
+            #{uPatrolDataResult.resultPic, jdbcType=VARCHAR},
+            #{uPatrolDataResult.points, jdbcType=VARCHAR},
+            #{uPatrolDataResult.voicePath, jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
     <select id="selectAllDeviceMeteId" resultType="java.lang.Long">
         SELECT  a.device_mete_id FROM t_std_devicemete_update a;
     </select>
