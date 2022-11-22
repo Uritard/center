@@ -43,7 +43,7 @@ public class CruiseResultAnalyzeMeteInfo extends CruiseResultAnalMeteInfo{
     private String identifyResultName;
 
     @ApiModelProperty(value = "最终状态:0-异常 1-正常")
-    private int finalState;
+    private Integer finalState = 0;
 
     @ApiModelProperty(value = "图片路径")
     private String picPath;
