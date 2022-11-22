@@ -603,4 +603,55 @@
         ORDER BY a.fir_date DESC
     </select>
 
+    <select id="selectAllDeviceMeteId" resultType="java.lang.Long">
+        SELECT  a.device_mete_id FROM t_std_devicemete_update a;
+    </select>
+
+    <select id="selectDeviceMeteList" resultType="com.yjh.platform.module.task.entity.TStdDeviceMeteUpdate">
+        SELECT *FROM
+        (
+        SELECT
+        a.instance_id,
+        b.device_mete_id,
+        a.cruise_time as update_time,
+        a.picpath,
+        a.cruise_result,
+        a.identify_result
+        FROM
+        u_patrol_data_result a,t_cruise_point_instance b
+        WHERE 1 = 1
+        and a.instance_id = b.instance_id
+        <if test="taskId != null and taskId != ''">and a.task_id = #{taskId,jdbcType=VARCHAR}
+        </if>
+        ORDER BY cruise_time DESC LIMIT 999999
+        )as bigTable
+        GROUP BY bigTable.device_mete_id
+    </select>
+
+    <update id="updateDeviceMeteUpdate">
+        update t_std_devicemete_update a <set>
+        <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
+        <if test="updateTime != null">a.update_time = #{updateTime},</if>
+        <if test="cruiseResult != null ">a.cruise_result = #{cruiseResult},</if>
+        a.identify_result = #{identifyResult},
+        <if test="picPath != null">a.pic_path = #{picPath},</if>
+    </set>
+        where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
+    </update>
+
+    <insert id="insertDeviceMeteUpdate">
+        insert into t_std_devicemete_update(
+        device_mete_id,
+        update_time,
+        cruise_result,
+        identify_result,
+        pic_path
+        )values(
+        #{deviceMeteId, jdbcType=BIGINT},
+        #{updateTime, jdbcType=TIMESTAMP},
+        #{cruiseResult, jdbcType=INTEGER},
+        #{identifyResult, jdbcType=INTEGER},
+        #{picPath, jdbcType=VARCHAR}
+        )
+    </insert>
 </mapper>

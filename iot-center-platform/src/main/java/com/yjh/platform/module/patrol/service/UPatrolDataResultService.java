@@ -1,9 +1,10 @@
 package com.yjh.platform.module.patrol.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.patrol.dao.UPatrolDataResultDao;
-import com.yjh.platform.module.task.dao.TCruiseDataResultDao;
 import com.yjh.platform.module.task.entity.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,5 +133,39 @@ public class UPatrolDataResultService {
         return listFir;
     }
 
+    public int updateCruiseAnalyze(String taskId) {
+        log.info("updateCruiseAnalyze taskId==={}", taskId);
+        if (StringUtils.isNotEmpty(taskId)) {
+            List<TStdDeviceMeteUpdate> list = uPatrolDataResultDao.selectDeviceMeteList(taskId);
+            log.info("list==={}", JSON.toJSONString(list));
+
+            for (TStdDeviceMeteUpdate res : list) {
+                List<Long> deviceMeteIdList = uPatrolDataResultDao.selectAllDeviceMeteId();
+                TStdDeviceMeteUpdate tStdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
+                    .setDeviceMeteId(res.getDeviceMeteId())
+                    .setIdentifyResult(res.getIdentifyResult());
+                if (Objects.nonNull(res.getUpdateTime())) {
+                    tStdDeviceMeteUpdate.setUpdateTime(res.getUpdateTime());
+                }
+                if (Objects.nonNull(res.getCruiseResult())) {
+                    tStdDeviceMeteUpdate.setCruiseResult(res.getCruiseResult());
+                }
+                if (Objects.nonNull(res.getPicPath())) {
+                    tStdDeviceMeteUpdate.setPicPath(res.getPicPath());
+                }
+                log.info("此时的tStdDeviceMeteUpdate===" + tStdDeviceMeteUpdate);
+                if (deviceMeteIdList.contains(res.getDeviceMeteId())) {
+                    //更新
+                    int updateRes = uPatrolDataResultDao.updateDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                    log.info(res.getDeviceMeteId() + "存在,更新值: " + updateRes);
+                } else {
+                    //插入
+                    int insertRes = uPatrolDataResultDao.insertDeviceMeteUpdate(tStdDeviceMeteUpdate);
+                    log.info(res.getDeviceMeteId() + "不存在,插入值: " + insertRes);
+                }
+            }
+        }
+        return 1;
+    }
 }
 

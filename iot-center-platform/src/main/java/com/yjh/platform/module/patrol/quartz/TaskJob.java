@@ -67,8 +67,8 @@ public class TaskJob extends QuartzJobBean {
         UPatrolTask task = uPatrolTaskDao.selectThisTaskByTaskCode(taskId);
         //任务的执行时间
         Date date = context.getScheduledFireTime();
-        String taskDate = simpleDateFormat.format(context.getScheduledFireTime());
-        task.setTaskName(ancestralTask.getTaskName()+"-"+taskDate);
+        String taskDate = DateTimeUtil.format2(context.getScheduledFireTime());
+        task.setTaskName(ancestralTask.getTaskName()+"_"+taskDate);
         try {
             Date startTime = context.getTrigger().getStartTime();
             Date fireTime = context.getFireTime();
@@ -102,7 +102,7 @@ public class TaskJob extends QuartzJobBean {
         }
         log.info("任务 {} 开始执行", task.getTaskName());
         log.info("任务Id {} ", task.getTaskId());
-        log.info("任务执行时间 {}, fireTime: {} ", new Date(), taskDate);
+        log.info("任务执行时间 {}, fireTime: {} ", DateTimeUtil.format(new Date()), taskDate);
         log.info("task.getStartTime {} ", task.getStartTime());
         List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
         //更改任务状态
@@ -112,7 +112,9 @@ public class TaskJob extends QuartzJobBean {
         //调用摄像机任务
         uPatrolTaskService.localTaskStart(task.getTaskId());
         //初始化下一次任务信息
-        uPatrolTaskService.initializeNextTaskInfo(ancestralTask, allInstanceList);
+        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
+            uPatrolTaskService.initializeNextTaskInfo(ancestralTask, allInstanceList);
+        }
 
     }
 
@@ -120,15 +122,21 @@ public class TaskJob extends QuartzJobBean {
         String taskId = task.getTaskId();
         String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
         UPatrolResult result = uPatrolTaskDao.selectForTaskId(realTaskId);
+        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
+            // 周期任务修改任务名称
+            result.setTaskName(task.getTaskName());
+        }
         result.setTaskState(CruiseConstant.TASK_STATE_EXECUTING);
         //任务开始时间
         result.setExecuteTime(date);
         uPatrolResultDao.update(result);
 
         uPatrolTaskService.updateTaskStateForRedis(taskId, String.valueOf(CruiseConstant.TASK_STATE_EXECUTING));
-
-        UPatrolTask utask = new UPatrolTask().setTaskId(taskId).setTaskName(task.getTaskName());
-        uPatrolTaskDao.update(utask);
+        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
+            // 周期任务修改任务名称
+            UPatrolTask utask = new UPatrolTask().setTaskId(taskId).setTaskName(task.getTaskName());
+            uPatrolTaskDao.update(utask);
+        }
     }
 
     /**
