@@ -3,6 +3,8 @@ package com.yjh.platform.module.patrol.thread;
 import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
@@ -15,8 +17,11 @@ import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +45,11 @@ public class RobotInspectionWarnThread implements Runnable{
     private final AnalyseDataOperateService analyseDataOperateService;
     private final UPatrolTaskService uPatrolTaskService;
     private final String taskCode;
+    @Autowired
+    private TRobotInspectionDao tRobotInspectionDao;
+
+    @Autowired
+    private AnalyseDataOperateDao analyseDataOperateDao;
 
     public RobotInspectionWarnThread(RobotPatrolTaskAlarm taskAlarm, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, String taskCode){
         this.taskAlarm = taskAlarm;
@@ -56,6 +66,13 @@ public class RobotInspectionWarnThread implements Runnable{
             log.info("开始处理巡视结果产生的告警数据 >>>>>>> taskAlarm==={}", JSON.toJSONString(taskAlarm));
             String taskId = taskAlarm.getTaskCode();
             String robotCode = taskAlarm.getRobotCode();
+            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
+            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
+            ));
+            if("2".equals(sysLevel) && (tRobotInspectionDao.selectRobotCount(edgeCode) > 0 || tRobotInspectionDao.selectRegion(edgeCode) > 0) || "3".equals(sysLevel)){
+                upSystemDealWith(taskId);
+                return;
+            }
 
             // taskId是巡视主机的id,robotTaskId是机器人上报的id
             String robotTaskId = taskCode;
@@ -102,6 +119,53 @@ public class RobotInspectionWarnThread implements Runnable{
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
+    }
+
+    private void upSystemDealWith(String taskId) throws ParseException {
+        TStdDeviceMete tStdDevicemete =
+                analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(taskAlarm.getDeviceId()));
+        DateFormat dateFormat =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        TWarnInfo warnInfo=new TWarnInfo()
+                .setTaskId(taskId)
+                .setAlarmSource(282)
+                .setConfMode(276)
+                .setCunstomId(tStdDevicemete.getCustomId())
+                .setDealPersonId(taskAlarm.getContent())
+                .setDeviceCode(analyseDataOperateDao.selectPatrolDevice(taskAlarm.getDeviceId()).get(
+                        "deviceCode"))
+                .setDeviceId(tStdDevicemete.getDeviceId())
+                .setDefectModel(Integer.valueOf(analyseDataOperateService.selectDictCode("defect_model", "其他")))
+                .setStdMeteId(tStdDevicemete.getDeviceMeteId())
+                .setValue(taskAlarm.getValue())
+                .setWarnContent(taskAlarm.getContent())
+                .setWarnName(taskAlarm.getContent())
+                .setWarnTime(dateFormat.parse(taskAlarm.getTime()));
+        String alarmLevel = taskAlarm.getAlarmLevel();
+        String alarmType = taskAlarm.getAlarmType();
+        if (StringUtils.isNotEmpty(alarmType)) {
+            warnInfo.setWarnType(analyseDataOperateService.selectDictCodeByUpDict("point_alarm_type", alarmType));
+            if (StringUtils.isNotEmpty(alarmLevel)) {
+                warnInfo.setWarnLevel(analyseDataOperateService.selectDictCodeByUpDict("alarm_level", alarmLevel));
+            }
+        }else {
+            switch (alarmLevel) {
+                case "1":
+                    warnInfo.setWarnLevel(130);
+                    break;
+                case "2":
+                    warnInfo.setWarnLevel(131);
+                    break;
+                case "3":
+                    warnInfo.setWarnLevel(132);
+                    break;
+                case "4":
+                    warnInfo.setWarnLevel(133);
+                    break;
+                default:
+                    break;
+            }
+        }
+        StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
     }
 
     private TWarnInfo getWarnInfo(TStdDeviceMete tStdDevicemete, String taskId, Long instanceId, String robotCode){

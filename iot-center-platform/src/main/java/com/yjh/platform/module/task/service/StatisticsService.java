@@ -11,6 +11,7 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -29,9 +30,18 @@ public class StatisticsService {
     @Autowired
     private StatisticsDao statisticsDao;
 
-    private static Result getNVRInfo(Long recordId) {
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    private Result getNVRInfo(Long recordId) {
         Result re = null;
         try {
+            Map entries = redisTemplate.opsForHash().entries("recorderInfo:" + recordId);
+            if (!CollectionUtils.isEmpty(entries)) {
+                re.setData(entries);
+                return re;
+            }
+            log.info("缓存中未获取到数据");
             ServiceRestTemplate serviceRestTemplate =
                     SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
             if (null != serviceRestTemplate) {
@@ -228,7 +238,7 @@ public class StatisticsService {
      */
     public List<Map<String, Object>> countCamera(Long id) {
         List<Map<String, Object>> mapList = statisticsDao.countCamera(id);
-        Map<Integer, Long> channelMap = new HashMap<Integer, Long>(16);
+        Set<Long> set = new HashSet();
         for (Map<String, Object> map : mapList) {
             double totalNum = Double.parseDouble(map.get("totalNum").toString());
             double lossNum = Double.parseDouble(map.get("lossNum").toString());
@@ -246,19 +256,12 @@ public class StatisticsService {
 
             // 根据cameraId查询recordId，查询摄像机完整率
             Long cameraId = (Long) map.get("cameraId");
-            Integer channelNum = (Integer) map.get("channelNum");
             Long recordId = statisticsDao.selectRecordByCamera(cameraId);
             map.put("recordId", recordId);
             if (recordId == null) {
                 log.error("相机cameraId={}无对应的录像机", cameraId);
                 continue;
             }
-            channelMap.put(channelNum, recordId);
-        }
-
-        Set<Long> set = new HashSet();
-        for (Map.Entry map : channelMap.entrySet()) {
-            Long recordId = (Long) map.getValue();
             set.add(recordId);
         }
         Map<Integer, String> percentMap = new HashMap<>(8);
