@@ -962,8 +962,8 @@ public class UPatrolTaskService {
 
     public void updateTaskStateForRedis(String taskId, String state) {
         String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
-        Map<String, String> map = redisTemplate.opsForHash().entries(strForCountAbnormal);
-        map.put("taskState", state);
+        log.info("任务转态变更, strForCountAbnormal:{}, {}", strForCountAbnormal, state);
+        redisTemplate.opsForHash().put(strForCountAbnormal, "taskState", state);
     }
 
     public String taskStatus(String taskId) {
@@ -994,7 +994,7 @@ public class UPatrolTaskService {
 //            return uPatrolResultDao.update(uPatrolResult);
 //        }
 
-        updateTaskStateForRedis(taskId, "239");
+        updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_PAUSE));
         localTaskStart(taskId);
 
         uPatrolResult.setTaskState(TASK_STATE_EXECUTING);
