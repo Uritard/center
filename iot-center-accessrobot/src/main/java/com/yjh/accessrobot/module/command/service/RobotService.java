@@ -518,29 +518,29 @@ public class RobotService {
                             break;
                         case "robot_file_path":
                             // Robot Model Info
-                            dealRobotFile(v.toString(), nodeCode, Constant.ROBOT);
+                            dealRobotFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode, Constant.ROBOT);
                             break;
                         case "property_file_path":
                             //Property Info 属性信息 与点位绑定
                             addPropertyModel(mapList, robotId);
                             break;
                         case "region_file_path":
-                            dealRegionFile(v.toString(), nodeCode);
+                            dealRegionFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
                             break;
                         case "map_file_path":
-                            dealMapFile(v.toString(), nodeCode);
+                            dealMapFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
                             break;
 //                        case "host_file_path":
 //                            dealHostFilePath(filePathMap,v.toString(),edgeCode);
 //                            break;
                         case "video_file_path":
-                            dealCameraFile(v.toString(), nodeCode);
+                            dealCameraFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
                             break;
                         case "drone_file_path":
-                            dealRobotFile(v.toString(), nodeCode, Constant.DRONE);
+                            dealRobotFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode, Constant.DRONE);
                             break;
                         case "voice_file_path":
-                            dealVoiceFile(v.toString(), nodeCode);
+                            dealVoiceFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
                             break;
                         case "record_file_path":
                             dealRecordFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
@@ -549,7 +549,7 @@ public class RobotService {
 //                            dealMaintenanceFilePath(filePathMap,v.toString(),edgeCode);
 //                            break;
                         case "source_file_path":
-                            dealSourceFile(filePath, nodeCode);
+                            dealSourceFile(filePathMap.get("content") + File.separator + filePath, nodeCode);
                             break;
                         default:
                             log.warn("模型解析未定义，{}: {}", k, filePath);
