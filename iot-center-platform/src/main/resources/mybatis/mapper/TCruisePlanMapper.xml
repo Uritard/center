@@ -287,7 +287,7 @@
                 LEFT JOIN t_camera_info h ON f.preset_id = h.camera_name AND h.camera_type = 206
                 LEFT JOIN t_dict_business i ON i.dict_code = a.cruise_type AND i.col_name = "cruise_type"
                 LEFT JOIN t_std_devicemete j ON j.device_mete_id = a.device_mete_id
-                LEFT JOIN t_dict_business k ON k.dict_code = b.custom_id AND k.col_name = "custom_type"
+                LEFT JOIN t_dict_business k ON k.dict_code = j.custom_id AND k.col_name = "custom_type"
         where 1 = 1 AND a.device_id IN
         <foreach collection="deviceIdList" item="deviceId" index="no" open="(" separator="," close=")">
             #{deviceId, jdbcType=BIGINT}
