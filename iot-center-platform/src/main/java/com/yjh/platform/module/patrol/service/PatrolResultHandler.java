@@ -69,7 +69,10 @@ public class PatrolResultHandler {
         for (RobotPatrolTaskAlarm taskAlarm : alarmList) {
             // 通过上报的任务id查询巡视主机上的任务id
             String taskCode = taskAlarm.getTaskCode();
-            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode);
+            // 增加时间判断，避免预先初始化导致数据传入下一个任务
+            String timeStr = StringUtils.substringAfterLast(taskAlarm.getTaskPatrolledId(), "_");
+            Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
             if (StringUtils.isEmpty(taskId)) {
                 taskId = taskCode;
                 log.info("taskId is empty, use taskCode as taskId");
@@ -112,7 +115,10 @@ public class PatrolResultHandler {
 
                 // 通过上报的任务id查询巡视主机上的任务id
                 String taskCode = robotPatrolTaskResult.getTaskCode();
-                String taskId = tRobotInspectionDao.selectRealTaskId(taskCode);
+                // 增加时间判断，避免预先初始化导致数据传入下一个任务
+                String timeStr = StringUtils.substringAfterLast(robotPatrolTaskResult.getTaskPatrolledId(), "_");
+                Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
+                String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
                 if (StringUtils.isEmpty(taskId)) {
                     taskId = taskCode;
                     log.info("taskId is empty, use taskCode as taskId");

@@ -6,6 +6,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -39,7 +40,10 @@ public class HttpClientUtils {
     public static synchronized HttpClientUtils getInstance() {
         if (instance == null) {
             instance = new HttpClientUtils();
-            client = HttpClients.createDefault();
+            RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(5000).setConnectionRequestTimeout(10000)
+                .setSocketTimeout(10000).build();
+            client = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
         }
         return instance;
     }

@@ -68,8 +68,9 @@ public class TaskJob extends QuartzJobBean {
         UPatrolTask task = uPatrolTaskDao.selectThisTaskByTaskCode(taskId);
         //任务的执行时间
         Date date = context.getScheduledFireTime();
-        String taskDate = DateTimeUtil.format2(context.getScheduledFireTime());
-        task.setTaskName(ancestralTask.getTaskName()+"_"+taskDate);
+        String taskDate = DateTimeUtil.format(context.getScheduledFireTime());
+        String taskNameTime = DateTimeUtil.format3(context.getScheduledFireTime());
+        task.setTaskName(ancestralTask.getTaskName()+"_"+taskNameTime);
         try {
             Date startTime = context.getTrigger().getStartTime();
             Date fireTime = context.getFireTime();
@@ -86,10 +87,11 @@ public class TaskJob extends QuartzJobBean {
                 //不需要执行任务
                 log.info(task.getTaskName() + "在 " + taskDate + " 时间不需要执行");
                 return;
-            } else if (Objects.nonNull(task.getEndTime()) && date.after(task.getEndTime())) {
+            } else if (Objects.nonNull(ancestralTask.getEndTime()) && date.after(ancestralTask.getEndTime())) {
                 log.info("此时间大于结束时间,以后都不会再做了,删除当前任务");
                 uPatrolTaskService.deleteByPrimaryId(taskId, DateTimeUtil.format(date));
-            } else if (Objects.nonNull(task.getStartTime()) && date.before(task.getStartTime())) {
+                return;
+            } else if (Objects.nonNull(ancestralTask.getStartTime()) && date.before(ancestralTask.getStartTime())) {
                 log.info(taskDate + "此时间小于开始时间,任务不需要执行");
                 return;
             }
@@ -105,15 +107,21 @@ public class TaskJob extends QuartzJobBean {
         log.info("任务Id {} ", task.getTaskId());
         log.info("任务执行时间 {}, fireTime: {} ", DateTimeUtil.format(new Date()), taskDate);
         log.info("task.getStartTime {} ", task.getStartTime());
-        List<Long> allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
-        //更改任务状态
-        setTaskResult(task, date);
-        //给机器人发任务启动
-        robotTaskStart(task);
-        //调用摄像机任务
-        uPatrolTaskService.localTaskStart(task.getTaskId());
+        List<Long> allInstanceList = null;
+        try {
+            allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
+            //更改任务状态
+            setTaskResult(task, date);
+            //给机器人发任务启动
+            robotTaskStart(task);
+            //调用摄像机任务
+            uPatrolTaskService.localTaskStart(task.getTaskId());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
         //初始化下一次任务信息
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
+            log.info("周期任务初始化下一次任务");
             uPatrolTaskService.initializeNextTaskInfo(ancestralTask, allInstanceList);
         }
 
