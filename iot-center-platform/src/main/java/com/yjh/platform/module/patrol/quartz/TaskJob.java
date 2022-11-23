@@ -147,6 +147,17 @@ public class TaskJob extends QuartzJobBean {
             UPatrolTask utask = new UPatrolTask().setTaskId(taskId).setTaskName(task.getTaskName());
             uPatrolTaskDao.update(utask);
         }
+        try {
+            Map<String, String> jasonMap = new HashMap<>();
+            jasonMap.put("type", "newTask");
+            jasonMap.put("taskId", task.getTaskId());
+            String json = JSON.toJSONString(jasonMap);
+            log.info("发送给前端的消息：   " + json);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+        }catch (Exception e){
+            log.info("发送给前端的 newTask 出错：", e);
+        }
+
     }
 
     /**
