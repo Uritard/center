@@ -373,8 +373,8 @@ public class UPatrolTaskService {
                     .setTaskSource(task.getTaskSource())
                     .setTaskLevel(task.getTaskLevel())
                     .setStartTime(task.getStartTime())
-                // 避免下一次的任务创建时间与当前任务创建时间重复，下一次任务创建时间 +1s
-                    .setCreateTime(new Date(System.currentTimeMillis() + 3000))
+                // 避免下一次的任务创建时间与当前任务创建时间重复，下一次任务创建时间 +30s
+                    .setCreateTime(new Date(System.currentTimeMillis() + 30000))
                     .setEndTime(task.getEndTime())
                     .setCreateUserId(task.getCreateUserId());
             // 周期任务初始化下一个，非周期初始化当前

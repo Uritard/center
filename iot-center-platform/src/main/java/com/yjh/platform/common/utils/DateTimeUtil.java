@@ -288,6 +288,17 @@ public class DateTimeUtil {
         return rtn;
     }
 
+    public static Date parseFormat(String source, String format) {
+        Date rtn = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            rtn = sdf.parse(source);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        return rtn;
+    }
+
     /**
      * 获得WEB服务器UTC时间。
      *

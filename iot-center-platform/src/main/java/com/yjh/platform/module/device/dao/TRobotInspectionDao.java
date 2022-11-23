@@ -9,6 +9,7 @@ import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +70,7 @@ public interface TRobotInspectionDao {
      * @param robotTaskId 任务id
      * @return String
      */
-    String selectRealTaskId(@Param(value = "robotTaskId")String robotTaskId);
+    String selectRealTaskId(@Param(value = "robotTaskId")String robotTaskId, @Param(value = "executeTime") Date executeTime);
     /**
      * 通过机器人编码查询巡视机器人类型
      * @param robotCode 机器人编码
