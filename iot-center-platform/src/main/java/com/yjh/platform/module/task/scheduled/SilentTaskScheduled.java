@@ -2,24 +2,24 @@ package com.yjh.platform.module.task.scheduled;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.task.entity.XMLBaseModel;
 import com.yjh.platform.module.user.service.TCameraPresetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -118,9 +118,15 @@ public class SilentTaskScheduled {
                     redisInfoMap.put("state", "0");
                     redisInfoMap.put("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                     redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
-
-                    // 分析
-                    analysePicture(result, Long.valueOf(presetId));
+                    String edgeLevel= (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM+"edgeLevel","content");
+                    //如果是边缘节点 上传巡视主机
+                    if(Constant.LEVEL_EDGE.equals(edgeLevel)){
+                        uploadPicture(result, cameraId, presetId, presetName);
+                        //否则调用算法分析
+                    }else{
+                        // 分析
+                        analysePicture(result, Long.valueOf(presetId));
+                    }
                 }catch (Exception e) {
                     log.error("设置摄像机状态出错" + e.getMessage());
                     redisInfoMap.put("state", "0");
@@ -128,6 +134,56 @@ public class SilentTaskScheduled {
                 }
             }
         }
+    }
+
+
+    /**
+     * 拿到相机拍照结果，边缘节点将图片上传至巡检主机
+     * @param result 相机抓图返回结果
+     * @param cameraId 相机id  充当巡检设备编码
+     * @param presetId 预置位id  充当巡视点ID
+     */
+    private void uploadPicture(Result result, String cameraId, String presetId, String presetName){
+        if (result == null || !MSG.equals(result.getMessage())) {
+            // 抓图失败 逻辑处理
+            log.info("抓图失败 result:{}", result);
+            return;
+        }
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            JSONObject jsonForRe = (JSONObject) JSON.toJSON(result.getData());
+            String absPath = String.valueOf(jsonForRe.get("absPath"));
+
+            //静默数据上送
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String, Object>> xmlItems = new ArrayList<>();
+            Map<String, Object> xmlItem = new HashMap<>();
+            xmlBaseModel.setType("64");
+            String edgeId= (String) redisTemplate.opsForHash().entries(Constant.T_SYS_PARAM+"edgeId").get("content");
+            xmlBaseModel.setCode(edgeId);
+            xmlItem.put("patroldevice_code", cameraId);
+            xmlItem.put("device_name", presetName);
+            xmlItem.put("device_id",presetId);
+            xmlItem.put("time", simpleDateFormat.format(new Date()));
+            xmlItem.put("rectangle", "");
+            xmlItem.put("file_type", "2");
+            xmlItem.put("file_path", absPath);
+            xmlItem.put("monitor_type", "");
+
+            xmlItems.add(xmlItem);
+            xmlBaseModel.setItems(xmlItems);
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            Map<String, List<XMLBaseModel>> cruiseResult = new HashMap<>();
+            cruiseResult.put("list", list);
+
+            log.info("信息上报：- " + cruiseResult);
+            Constant.otherServer(cruiseResult, Constant.TCP_URL);
+        } catch (Exception e) {
+            log.error("静默监视异常: " + e);
+            e.printStackTrace();
+        }
+
     }
 
     /**

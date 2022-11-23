@@ -234,4 +234,11 @@
         real_code =  #{realCode,jdbcType=VARCHAR}
         where   device_id = #{deviceId,jdbcType=BIGINT}
     </update>
+    <select id="selectByEdgeCodeAndOriginId" resultType="com.yjh.accessrobot.module.command.entity.TStdDevice">
+        select
+        <include refid="Base_Column_List" />
+        from t_std_device
+        where  edge_code = #{edgeCode} and origin_id=#{originId}
+    </select>
+
 </mapper>

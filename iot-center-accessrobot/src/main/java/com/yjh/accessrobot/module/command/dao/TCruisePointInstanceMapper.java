@@ -35,4 +35,7 @@ public interface TCruisePointInstanceMapper {
 
     int batchInsert(List<TCruisePointInstance> list);
 
+    TCruisePointInstance selectByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode, @Param("originId") String originId);
+
+    TCruisePointInstance selectByEdgeCodeAndCruiseId(@Param("edgeCode") String edgeCode, @Param("cruiseId") Long cruiseId);
 }

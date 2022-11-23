@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TWarnInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TWarnInfo">
+            <id property="warnId" column="warn_id" jdbcType="BIGINT"/>
+            <result property="warnLevel" column="warn_level" jdbcType="INTEGER"/>
+            <result property="warnTime" column="warn_time" jdbcType="TIMESTAMP"/>
+            <result property="warnType" column="warn_type" jdbcType="INTEGER"/>
+            <result property="warnName" column="warn_name" jdbcType="VARCHAR"/>
+            <result property="warnContent" column="warn_content" jdbcType="VARCHAR"/>
+            <result property="deviceId" column="device_id" jdbcType="BIGINT"/>
+            <result property="cunstomId" column="cunstom_id" jdbcType="VARCHAR"/>
+            <result property="instanceId" column="instance_id" jdbcType="BIGINT"/>
+            <result property="stdMeteId" column="std_mete_id" jdbcType="BIGINT"/>
+            <result property="confMode" column="conf_mode" jdbcType="INTEGER"/>
+            <result property="isWarn" column="is_warn" jdbcType="INTEGER"/>
+            <result property="dealType" column="deal_type" jdbcType="INTEGER"/>
+            <result property="dealInfo" column="deal_info" jdbcType="VARCHAR"/>
+            <result property="dealPersonId" column="deal_person_id" jdbcType="VARCHAR"/>
+            <result property="dealTime" column="deal_time" jdbcType="TIMESTAMP"/>
+            <result property="defectModel" column="defect_model" jdbcType="INTEGER"/>
+            <result property="alarmSource" column="alarm_source" jdbcType="INTEGER"/>
+            <result property="warnSubtype" column="warn_subtype" jdbcType="INTEGER"/>
+            <result property="deviceCode" column="device_code" jdbcType="VARCHAR"/>
+            <result property="imagePath" column="image_path" jdbcType="VARCHAR"/>
+            <result property="videoPath" column="video_path" jdbcType="VARCHAR"/>
+            <result property="value" column="value" jdbcType="VARCHAR"/>
+            <result property="outRange" column="out_range" jdbcType="VARCHAR"/>
+            <result property="taskId" column="task_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        warn_id,warn_level,warn_time,
+        warn_type,warn_name,warn_content,
+        device_id,cunstom_id,instance_id,
+        std_mete_id,conf_mode,is_warn,
+        deal_type,deal_info,deal_person_id,
+        deal_time,defect_model,alarm_source,
+        warn_subtype,device_code,image_path,
+        video_path,value,out_range,
+        task_id
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_warn_info
+        where  warn_id = #{warnId,jdbcType=BIGINT} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_warn_info
+        where  warn_id = #{warnId,jdbcType=BIGINT} 
+    </delete>
+    <insert id="insert" keyColumn="warn_id" keyProperty="warnId" parameterType="com.yjh.accessrobot.module.command.entity.TWarnInfo" useGeneratedKeys="true">
+        insert into t_warn_info
+        ( warn_level,warn_time
+        ,warn_type,warn_name,warn_content
+        ,device_id,cunstom_id,instance_id
+        ,std_mete_id,conf_mode,is_warn
+        ,deal_type,deal_info,deal_person_id
+        ,deal_time,defect_model,alarm_source
+        ,warn_subtype,device_code,image_path
+        ,video_path,value,out_range
+        ,task_id)
+        values (#{warnLevel,jdbcType=INTEGER},#{warnTime,jdbcType=TIMESTAMP}
+        ,#{warnType,jdbcType=INTEGER},#{warnName,jdbcType=VARCHAR},#{warnContent,jdbcType=VARCHAR}
+        ,#{deviceId,jdbcType=BIGINT},#{cunstomId,jdbcType=VARCHAR},#{instanceId,jdbcType=BIGINT}
+        ,#{stdMeteId,jdbcType=BIGINT},#{confMode,jdbcType=INTEGER},#{isWarn,jdbcType=INTEGER}
+        ,#{dealType,jdbcType=INTEGER},#{dealInfo,jdbcType=VARCHAR},#{dealPersonId,jdbcType=VARCHAR}
+        ,#{dealTime,jdbcType=TIMESTAMP},#{defectModel,jdbcType=INTEGER},#{alarmSource,jdbcType=INTEGER}
+        ,#{warnSubtype,jdbcType=INTEGER},#{deviceCode,jdbcType=VARCHAR},#{imagePath,jdbcType=VARCHAR}
+        ,#{videoPath,jdbcType=VARCHAR},#{value,jdbcType=VARCHAR},#{outRange,jdbcType=VARCHAR}
+        ,#{taskId,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="warn_id" keyProperty="warnId" parameterType="com.yjh.accessrobot.module.command.entity.TWarnInfo" useGeneratedKeys="true">
+        insert into t_warn_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="warnId != null">warn_id,</if>
+                <if test="warnLevel != null">warn_level,</if>
+                <if test="warnTime != null">warn_time,</if>
+                <if test="warnType != null">warn_type,</if>
+                <if test="warnName != null">warn_name,</if>
+                <if test="warnContent != null">warn_content,</if>
+                <if test="deviceId != null">device_id,</if>
+                <if test="cunstomId != null">cunstom_id,</if>
+                <if test="instanceId != null">instance_id,</if>
+                <if test="stdMeteId != null">std_mete_id,</if>
+                <if test="confMode != null">conf_mode,</if>
+                <if test="isWarn != null">is_warn,</if>
+                <if test="dealType != null">deal_type,</if>
+                <if test="dealInfo != null">deal_info,</if>
+                <if test="dealPersonId != null">deal_person_id,</if>
+                <if test="dealTime != null">deal_time,</if>
+                <if test="defectModel != null">defect_model,</if>
+                <if test="alarmSource != null">alarm_source,</if>
+                <if test="warnSubtype != null">warn_subtype,</if>
+                <if test="deviceCode != null">device_code,</if>
+                <if test="imagePath != null">image_path,</if>
+                <if test="videoPath != null">video_path,</if>
+                <if test="value != null">value,</if>
+                <if test="outRange != null">out_range,</if>
+                <if test="taskId != null">task_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="warnId != null">#{warnId,jdbcType=BIGINT},</if>
+                <if test="warnLevel != null">#{warnLevel,jdbcType=INTEGER},</if>
+                <if test="warnTime != null">#{warnTime,jdbcType=TIMESTAMP},</if>
+                <if test="warnType != null">#{warnType,jdbcType=INTEGER},</if>
+                <if test="warnName != null">#{warnName,jdbcType=VARCHAR},</if>
+                <if test="warnContent != null">#{warnContent,jdbcType=VARCHAR},</if>
+                <if test="deviceId != null">#{deviceId,jdbcType=BIGINT},</if>
+                <if test="cunstomId != null">#{cunstomId,jdbcType=VARCHAR},</if>
+                <if test="instanceId != null">#{instanceId,jdbcType=BIGINT},</if>
+                <if test="stdMeteId != null">#{stdMeteId,jdbcType=BIGINT},</if>
+                <if test="confMode != null">#{confMode,jdbcType=INTEGER},</if>
+                <if test="isWarn != null">#{isWarn,jdbcType=INTEGER},</if>
+                <if test="dealType != null">#{dealType,jdbcType=INTEGER},</if>
+                <if test="dealInfo != null">#{dealInfo,jdbcType=VARCHAR},</if>
+                <if test="dealPersonId != null">#{dealPersonId,jdbcType=VARCHAR},</if>
+                <if test="dealTime != null">#{dealTime,jdbcType=TIMESTAMP},</if>
+                <if test="defectModel != null">#{defectModel,jdbcType=INTEGER},</if>
+                <if test="alarmSource != null">#{alarmSource,jdbcType=INTEGER},</if>
+                <if test="warnSubtype != null">#{warnSubtype,jdbcType=INTEGER},</if>
+                <if test="deviceCode != null">#{deviceCode,jdbcType=VARCHAR},</if>
+                <if test="imagePath != null">#{imagePath,jdbcType=VARCHAR},</if>
+                <if test="videoPath != null">#{videoPath,jdbcType=VARCHAR},</if>
+                <if test="value != null">#{value,jdbcType=VARCHAR},</if>
+                <if test="outRange != null">#{outRange,jdbcType=VARCHAR},</if>
+                <if test="taskId != null">#{taskId,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TWarnInfo">
+        update t_warn_info
+        <set>
+                <if test="warnLevel != null">
+                    warn_level = #{warnLevel,jdbcType=INTEGER},
+                </if>
+                <if test="warnTime != null">
+                    warn_time = #{warnTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="warnType != null">
+                    warn_type = #{warnType,jdbcType=INTEGER},
+                </if>
+                <if test="warnName != null">
+                    warn_name = #{warnName,jdbcType=VARCHAR},
+                </if>
+                <if test="warnContent != null">
+                    warn_content = #{warnContent,jdbcType=VARCHAR},
+                </if>
+                <if test="deviceId != null">
+                    device_id = #{deviceId,jdbcType=BIGINT},
+                </if>
+                <if test="cunstomId != null">
+                    cunstom_id = #{cunstomId,jdbcType=VARCHAR},
+                </if>
+                <if test="instanceId != null">
+                    instance_id = #{instanceId,jdbcType=BIGINT},
+                </if>
+                <if test="stdMeteId != null">
+                    std_mete_id = #{stdMeteId,jdbcType=BIGINT},
+                </if>
+                <if test="confMode != null">
+                    conf_mode = #{confMode,jdbcType=INTEGER},
+                </if>
+                <if test="isWarn != null">
+                    is_warn = #{isWarn,jdbcType=INTEGER},
+                </if>
+                <if test="dealType != null">
+                    deal_type = #{dealType,jdbcType=INTEGER},
+                </if>
+                <if test="dealInfo != null">
+                    deal_info = #{dealInfo,jdbcType=VARCHAR},
+                </if>
+                <if test="dealPersonId != null">
+                    deal_person_id = #{dealPersonId,jdbcType=VARCHAR},
+                </if>
+                <if test="dealTime != null">
+                    deal_time = #{dealTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="defectModel != null">
+                    defect_model = #{defectModel,jdbcType=INTEGER},
+                </if>
+                <if test="alarmSource != null">
+                    alarm_source = #{alarmSource,jdbcType=INTEGER},
+                </if>
+                <if test="warnSubtype != null">
+                    warn_subtype = #{warnSubtype,jdbcType=INTEGER},
+                </if>
+                <if test="deviceCode != null">
+                    device_code = #{deviceCode,jdbcType=VARCHAR},
+                </if>
+                <if test="imagePath != null">
+                    image_path = #{imagePath,jdbcType=VARCHAR},
+                </if>
+                <if test="videoPath != null">
+                    video_path = #{videoPath,jdbcType=VARCHAR},
+                </if>
+                <if test="value != null">
+                    value = #{value,jdbcType=VARCHAR},
+                </if>
+                <if test="outRange != null">
+                    out_range = #{outRange,jdbcType=VARCHAR},
+                </if>
+                <if test="taskId != null">
+                    task_id = #{taskId,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   warn_id = #{warnId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TWarnInfo">
+        update t_warn_info
+        set 
+            warn_level =  #{warnLevel,jdbcType=INTEGER},
+            warn_time =  #{warnTime,jdbcType=TIMESTAMP},
+            warn_type =  #{warnType,jdbcType=INTEGER},
+            warn_name =  #{warnName,jdbcType=VARCHAR},
+            warn_content =  #{warnContent,jdbcType=VARCHAR},
+            device_id =  #{deviceId,jdbcType=BIGINT},
+            cunstom_id =  #{cunstomId,jdbcType=VARCHAR},
+            instance_id =  #{instanceId,jdbcType=BIGINT},
+            std_mete_id =  #{stdMeteId,jdbcType=BIGINT},
+            conf_mode =  #{confMode,jdbcType=INTEGER},
+            is_warn =  #{isWarn,jdbcType=INTEGER},
+            deal_type =  #{dealType,jdbcType=INTEGER},
+            deal_info =  #{dealInfo,jdbcType=VARCHAR},
+            deal_person_id =  #{dealPersonId,jdbcType=VARCHAR},
+            deal_time =  #{dealTime,jdbcType=TIMESTAMP},
+            defect_model =  #{defectModel,jdbcType=INTEGER},
+            alarm_source =  #{alarmSource,jdbcType=INTEGER},
+            warn_subtype =  #{warnSubtype,jdbcType=INTEGER},
+            device_code =  #{deviceCode,jdbcType=VARCHAR},
+            image_path =  #{imagePath,jdbcType=VARCHAR},
+            video_path =  #{videoPath,jdbcType=VARCHAR},
+            value =  #{value,jdbcType=VARCHAR},
+            out_range =  #{outRange,jdbcType=VARCHAR},
+            task_id =  #{taskId,jdbcType=VARCHAR}
+        where   warn_id = #{warnId,jdbcType=BIGINT} 
+    </update>
+
+
+    <select id="selectAlarmLevel" resultType="java.lang.String">
+        SELECT defect_level
+        FROM t_algorithm_info
+        WHERE is_ai = 0
+          AND defect_type in
+              (SELECT dict_code
+               FROM t_dict_business
+               WHERE col_name = #{colName,jdbcType=VARCHAR}
+                 AND dict_note = #{dictNote,jdbcType=VARCHAR})
+    </select>
+</mapper>

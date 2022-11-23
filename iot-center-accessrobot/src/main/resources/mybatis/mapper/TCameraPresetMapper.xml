@@ -204,4 +204,11 @@
             is_second_keep_watch_task =  #{isSecondKeepWatchTask,jdbcType=INTEGER}
         where   preset_id = #{presetId,jdbcType=BIGINT} 
     </update>
+    <select id="selectByEdgeCodeAndOriginId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_camera_preset
+        where edge_code = #{edgeCode} and origin_id=#{originId}
+    </select>
+
 </mapper>

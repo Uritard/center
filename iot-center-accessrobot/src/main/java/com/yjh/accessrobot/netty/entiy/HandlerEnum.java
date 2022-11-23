@@ -37,8 +37,12 @@ public enum HandlerEnum {
     ROBOT_INSPECTION_WARN("62","robotInspectionWarn"),
     //环境数据异常告警数据
     ENV_WARN("22","envWarn"),
+    // 静默监视数据  边缘节点->巡视主机
+    SILENT_MONITORING("64","silentMonitoring"),
+    // 静默监视数据  巡视主机->上级系统
+    SILENT_MONITORING_UPSYSTEM("63","silentMonitoringUpSystem"),
     //机器操作结果
-    OPERATION_RESULT("64","OperationResult"),
+    OPERATION_RESULT("100","OperationResult"),
     //机器人确认消息
     ROBOT_CONFIRM_MSG("81","robotConfirmMsg"),
     //操作步骤消息

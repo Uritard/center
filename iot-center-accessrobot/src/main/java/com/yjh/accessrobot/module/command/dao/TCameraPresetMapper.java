@@ -35,4 +35,6 @@ public interface TCameraPresetMapper {
     List<TCameraPreset> selectByEdgeCode(@Param("edgeCode") String edgeCode);
 
     int batchInsert(List<TCameraPreset> list);
+
+    TCameraPreset selectByEdgeCodeAndOriginId (@Param("edgeCode") String edgeCode ,@Param("originId") String originId );
 }
