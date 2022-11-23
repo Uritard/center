@@ -54,6 +54,7 @@
         where  edge_code = #{edgeCode}
     </select>
 
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from t_cruise_point_instance
         where  instance_id = #{instanceId,jdbcType=BIGINT} 
@@ -256,4 +257,16 @@
             edge_code =  #{edgeCode,jdbcType=VARCHAR}
         where   instance_id = #{instanceId,jdbcType=BIGINT} 
     </update>
+    <select id="selectByEdgeCodeAndOriginId" resultMap="BaseResultMap"   >
+        select
+        <include refid="Base_Column_List" />
+        from t_cruise_point_instance
+        where  edge_code = #{edgeCode} and origin_id=#{originId}
+    </select>
+    <select id="selectByEdgeCodeAndCruiseId"  resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_cruise_point_instance
+        where  edge_code = #{edgeCode} and cruise_id=#{cruiseId}
+    </select>
 </mapper>

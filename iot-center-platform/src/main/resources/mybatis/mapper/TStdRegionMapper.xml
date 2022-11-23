@@ -277,7 +277,7 @@
                 from t_dict_business b
                 where b.col_name = 'voltage_class' and b.dict_code = a.voltage_level) voltage_level_name
         from t_std_region a
-        where a.state = '1'
+        where a.state = '1' and a.up_region_id  <![CDATA[ <> ]]>  '-1'
         group by a.voltage_level
     </select>
 

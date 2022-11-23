@@ -37,4 +37,6 @@ public interface TStdDeviceMapper {
 
     int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
 
+    TStdDevice selectByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode, @Param("originId") String originId);
+
 }
