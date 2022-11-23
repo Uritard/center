@@ -1403,7 +1403,7 @@ public class UPatrolTaskService {
                     uPatrolDataResult.setCruiseResult(NumberUtils.toInt(redisInfoMap.get("cruiseResult")));
 
                     uPatrolDataResultList.add(uPatrolDataResult);
-                    if (!Objects.equals(CRUISE_RESULT_NORMAL, redisInfoMap.get("cruiseResult"))){
+                    if (CRUISE_RESULT_NORMAL != uPatrolDataResult.getCruiseResult()){
                         abnormalCounts++;
                     }
                 }
