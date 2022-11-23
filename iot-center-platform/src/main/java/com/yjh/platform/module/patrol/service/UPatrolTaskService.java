@@ -1741,8 +1741,8 @@ public class UPatrolTaskService {
 
             taskStartDate = new Date();
         }
-        DateTime firstDay = DateUtil.beginOfYear(taskStartDate);
-        DateTime lastDay = DateUtil.endOfYear(taskStartDate);
+        DateTime firstDay = DateUtil.beginOfMonth(taskStartDate);
+        DateTime lastDay = DateUtil.endOfMonth(taskStartDate);
 
         try {
             originTime = format.parse("2000-01-01 00:00:00");
@@ -1764,7 +1764,7 @@ public class UPatrolTaskService {
         for (TCruiseTaskCount tCruiseTaskCount : list) {
             Date dayBeforeTime = dayBefore;
             Date dayAfterTime = dayAfter;
-            if (tCruiseTaskCount.getIfRun() == 172 && tCruiseTaskCount.getStartTime().compareTo(originTime) == 0) {
+            if (tCruiseTaskCount.getIfRun() == 172 && !StringUtils.isEmpty(tCruiseTaskCount.getDateType())) {
                 if (tCruiseTaskCount.getStartTime().after(dayBeforeTime)){
                     dayBeforeTime = tCruiseTaskCount.getStartTime();
                 }
