@@ -599,7 +599,7 @@ public class UPatrolTaskService {
      */
     private void packageTaskProtocolInfo(TCruiseTaskAdd tCruiseTaskAdd, DateFormat format, RobotTaskInstanceInfo taskInfo, String ifFun) {
         try {
-            CruiseConstant.TaskTypeEnum taskType = CruiseConstant.TaskTypeEnum.getEnm(Integer.valueOf(ifFun));
+            CruiseConstant.TaskTypeEnum taskType = CruiseConstant.TaskTypeEnum.getEnm(NumberUtils.toInt(ifFun));
 
             switch (taskType) {
                 //立即任务
@@ -731,9 +731,9 @@ public class UPatrolTaskService {
                 i = uPatrolTaskDao.countInstance(task.getTaskId());
             } else {
                 Map<String, String> mapForGet = redisTemplate.opsForHash().entries(PATROL_SUMMARY_PREFIX + task.getTaskId());
-                Integer all = Integer.valueOf(mapForGet.get("all"));
-                Integer normal = Integer.valueOf(mapForGet.get("normal"));
-                Integer abnormal = Integer.valueOf(mapForGet.get("abnormal"));
+                Integer all = NumberUtils.toInt(mapForGet.get("all"));
+                Integer normal = NumberUtils.toInt(mapForGet.get("normal"));
+                Integer abnormal = NumberUtils.toInt(mapForGet.get("abnormal"));
                 i = all - normal - abnormal;
                 String progress = String.format("%.2f",(1.0f - Float.valueOf(i) / all) * 100);
                 item.put("task_progress", progress + "%");
@@ -949,8 +949,7 @@ public class UPatrolTaskService {
             log.info("发送给前端的消息：" + jsonMessage);
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapOnFinished);
         } catch (Exception e) {
-            log.error("任务暂停异常: " + e);
-            e.printStackTrace();
+            log.error("任务暂停异常: ", e);
         }
 
         //任务状态上报站端
@@ -994,12 +993,14 @@ public class UPatrolTaskService {
 //            return uPatrolResultDao.update(uPatrolResult);
 //        }
 
-        updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_PAUSE));
-        localTaskStart(taskId);
+        updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_EXECUTING));
 
         uPatrolResult.setTaskState(TASK_STATE_EXECUTING);
-        UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
+        uPatrolResultDao.update(uPatrolResult);
 
+        localTaskStart(taskId);
+
+        UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
 
         Map<String, String> jasonMapOnFinished = new HashMap<>();
         jasonMapOnFinished.put("type", "taskChange");
@@ -1010,7 +1011,7 @@ public class UPatrolTaskService {
 
         //任务状态上报站端
         sendTaskStateToUp(task, 2);
-        return uPatrolResultDao.update(uPatrolResult);
+        return 1;
     }
 
     /**
@@ -1144,6 +1145,7 @@ public class UPatrolTaskService {
                     }
                     // 异常原因，设备离线
                     m.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
+                    skipFlag = true;
                 }
             }
             if (skipFlag) {
@@ -1280,7 +1282,7 @@ public class UPatrolTaskService {
 
         if (abnormalCounts >= 0) {
             log.info("该点任务执行完成{}", taskId);
-            completionOfTask(taskId, abnormalCounts);
+            completionOfTask(taskId);
         }
     }
 
@@ -1350,9 +1352,8 @@ public class UPatrolTaskService {
      * 任务所有点做完,完成,并且进度为100%的处理
      *
      * @param taskId 任务id
-     * @param abnormalCounts 异常点位数
      */
-    private void completionOfTask(String taskId, Integer abnormalCounts) {
+    private void completionOfTask(String taskId) {
         try {
             Thread.sleep(15000);
             Map<String, String> jasonMap = new HashMap<>(2);
@@ -1360,15 +1361,6 @@ public class UPatrolTaskService {
             jasonMap.put("taskId", taskId);
             log.info("最后一个点-前端推送：{}", JSON.toJSONString(jasonMap));
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
-
-            // 更新upr
-            UPatrolResult uPatrolResult = new UPatrolResult()
-                    .setTaskId(taskId)
-                    .setTaskState(TASK_STATE_FINISHED)
-                    .setTaskWait(0)
-                    .setEndTime(new Date())
-                    .setTaskAbnormal(abnormalCounts);
-            uPatrolResultDao.update(uPatrolResult);
 
             // 插入updr
             //            List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);
@@ -1381,9 +1373,8 @@ public class UPatrolTaskService {
             //                }
             //            }
             //            log.info("删除已经入库的巡视点后==={}", instanceIdDoneList);
-
+            Integer abnormalCounts = 0;
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
-            List<String> cruiseResultIdList = new ArrayList<>();
             Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
             List<Map<String, String>> cruiseResultMapList = new ArrayList<>();
             for (String key : robotInfoKeys) {
@@ -1400,28 +1391,37 @@ public class UPatrolTaskService {
                     uPatrolDataResult.setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")));
                     uPatrolDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
                     uPatrolDataResult.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
-                    uPatrolDataResult.setCruiseStatus(Integer.valueOf(redisInfoMap.get("cruiseStatus")));
+                    uPatrolDataResult.setCruiseStatus(NumberUtils.toInt(redisInfoMap.get("cruiseStatus")));
                     uPatrolDataResult.setResultNum(redisInfoMap.get("resultNum"));
                     uPatrolDataResult.setPicpath(redisInfoMap.get("picpath"));
-                    uPatrolDataResult.setCruiseType(Integer.valueOf(redisInfoMap.get("cruiseType")));
+                    uPatrolDataResult.setCruiseType(NumberUtils.toInt(redisInfoMap.get("cruiseType")));
                     uPatrolDataResult.setOrigpic(redisInfoMap.get("origpic"));
                     uPatrolDataResult.setCruiseAbnormal(NumberUtils.toInt(redisInfoMap.get("cruiseAbnormal")));
                     uPatrolDataResult.setEvaluationState(MapUtils.getIntValue(redisInfoMap, "evaluationState", EVALUATION_STATE_UN));
                     uPatrolDataResult.setCreatetime(new Date());
-                    uPatrolDataResult.setIsWarn(Integer.valueOf(redisInfoMap.get("isWarn")));
-                    uPatrolDataResult.setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")));
+                    uPatrolDataResult.setIsWarn(NumberUtils.toInt(redisInfoMap.get("isWarn")));
+                    uPatrolDataResult.setCruiseResult(NumberUtils.toInt(redisInfoMap.get("cruiseResult")));
 
                     uPatrolDataResultList.add(uPatrolDataResult);
-                    cruiseResultIdList.add("");
-
-
+                    if (!Objects.equals(CRUISE_RESULT_NORMAL, redisInfoMap.get("cruiseResult"))){
+                        abnormalCounts++;
+                    }
                 }
             }
+            int taskStatus = NumberUtils.toInt(taskStatus(taskId), TASK_STATE_FINISHED);
+            taskStatus = taskStatus == TASK_STATE_EXECUTING ? TASK_STATE_FINISHED : taskStatus;
+            // 更新upr
+            UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
+            uPatrolResult.setTaskState(taskStatus);
+            uPatrolResult.setTaskWait(0);
+            uPatrolResult.setEndTime(new Date());
+            uPatrolResult.setTaskAbnormal(abnormalCounts);
+            uPatrolResultDao.update(uPatrolResult);
             log.info("taskId is:{} , uPatrolDataResultList size is:{}", taskId, uPatrolDataResultList.size());
 
             if (CollectionUtils.isNotEmpty(uPatrolDataResultList)){
                 batchInsertUPatrolDataResult(uPatrolDataResultList);
-                log.info("准备传其他服务的cruiseResultIdList==={}", cruiseResultIdList);
+                log.info("准备传其他服务的cruiseResultIdList==={}", taskId);
                 // todo:准备传其他服务的cruiseResultIdList
                 uPatrolDataResultService.updateCruiseAnalyze(taskId);
             }
