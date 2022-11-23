@@ -34,7 +34,7 @@ public class StatisticsService {
     private RedisTemplate redisTemplate;
 
     private Result getNVRInfo(Long recordId) {
-        Result re = null;
+        Result re = new Result();
         try {
             Map entries = redisTemplate.opsForHash().entries("recorderInfo:" + recordId);
             if (!CollectionUtils.isEmpty(entries)) {
@@ -371,7 +371,7 @@ public class StatisticsService {
                 result.add(st);
             }
         }
-        result.sort((t2, t1) -> t2.getDay().compareTo(t1.getDay()));
+        result.sort(Comparator.comparing(Statistics::getDay));
     }
 
     private void dealWeek(List<Statistics> result, Map<String, Object> objectMap) {
@@ -388,7 +388,7 @@ public class StatisticsService {
                 }
             }
         }
-        result.sort((t2, t1) -> t2.getWeek().compareTo(t1.getWeek()));
+        result.sort(Comparator.comparing(Statistics::getWeek));
     }
 
     private void dealMonth(List<Statistics> result, Map<String, Object> objectMap) {
@@ -402,7 +402,7 @@ public class StatisticsService {
                 result.add(st);
             }
         }
-        result.sort((t2, t1) -> t2.getMonth().compareTo(t1.getMonth()));
+        result.sort(Comparator.comparing(Statistics::getMonth));
     }
 
     /**
