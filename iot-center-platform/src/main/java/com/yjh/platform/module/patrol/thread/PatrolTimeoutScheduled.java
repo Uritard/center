@@ -77,8 +77,8 @@ public class PatrolTimeoutScheduled {
             Date lastTime = DateTimeUtil.parse(lastDate, taskStart);
             if (currentDate.getTime() - lastTime.getTime() >= timeOut * 60 * 1000L && !ArrayUtils.contains(
                 new int[] {TASK_STATE_FINISHED, TASK_STATE_PAUSE, TASK_STATE_INTERRUPT, TASK_STATE_ABNORMAL}, taskState)) {
-                // 判断超时
-                hashOperations.put(key, "taskState", String.valueOf(TASK_STATE_ABNORMAL));
+                // 设置任务状态超时
+                uPatrolTaskService.updateTaskStateForRedis(key, String.valueOf(TASK_STATE_TIMEOUT));
 
                 taskTimeout(taskId);
             }

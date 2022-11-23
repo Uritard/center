@@ -41,6 +41,10 @@ public interface CruiseConstant {
      */
     int TASK_STATE_ABNORMAL = 243;
     /**
+     * 任务状态，任务超期
+     */
+    int TASK_STATE_TIMEOUT = 244;
+    /**
      * 巡视结果正常
      */
     int CRUISE_RESULT_NORMAL = 246;

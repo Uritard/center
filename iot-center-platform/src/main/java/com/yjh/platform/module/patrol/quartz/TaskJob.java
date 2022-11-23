@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.quartz;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -120,8 +121,9 @@ public class TaskJob extends QuartzJobBean {
 
     private void setTaskResult(UPatrolTask task,Date date) {
         String taskId = task.getTaskId();
-        String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
-        UPatrolResult result = uPatrolTaskDao.selectForTaskId(realTaskId);
+        // String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
+        UPatrolResult result = uPatrolTaskDao.selectForTaskId(taskId);
+        log.info("TaskResult update, taskId: {}, result: {}", taskId, JSON.toJSONString(result));
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
             // 周期任务修改任务名称
             result.setTaskName(task.getTaskName());
