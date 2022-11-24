@@ -265,7 +265,7 @@
         f.cruise_type,
         n.dict_note as dataType,
         b.custom_id,
-        a.custom_name as componentName,
+        b.custom_name as componentName,
         a.up_region_name as intervalName,
         m.region_name as regionName
         from t_cruise_result q

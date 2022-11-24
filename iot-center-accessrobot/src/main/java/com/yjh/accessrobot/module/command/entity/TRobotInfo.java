@@ -35,8 +35,6 @@ public class TRobotInfo implements Serializable {
     private String robotCode;
     @TableField(value = "robot_name",updateStrategy = FieldStrategy.IGNORED)
     private String robotName;
-    @TableField(value = "station_code",updateStrategy = FieldStrategy.IGNORED)
-    private String stationCode;
      @TableField(value = "robot_status",updateStrategy = FieldStrategy.IGNORED)
     private String robotStatus;
      @TableField(value = "robot_type",updateStrategy = FieldStrategy.IGNORED)
