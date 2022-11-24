@@ -46,8 +46,6 @@ public class NonhomologousWarnService {
     private String key;
     @Value("${netty.server.ftps.local.path}")
     private String ftpsLocalPath;
-    @Value("${netty.server.name}")
-    private String sendCode;
 
     @Value("${other.webSocketUrl}")
     private String websocketUrl;

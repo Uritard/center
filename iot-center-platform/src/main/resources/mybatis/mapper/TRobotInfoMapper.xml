@@ -8,6 +8,7 @@
         <result property="robotCode" column="robot_code" jdbcType="VARCHAR"/>
         <result property="robotNum" column="robot_num" jdbcType="VARCHAR"/>
         <result property="robotName" column="robot_name" jdbcType="VARCHAR"/>
+        <result property="stationCode" column="station_code" jdbcType="VARCHAR"/>
         <result property="nestName" column="nest_name" jdbcType="VARCHAR"/>
         <result property="nestCode" column="nest_code" jdbcType="VARCHAR"/>
         <result property="robotStatus" column="robot_status" jdbcType="VARCHAR"/>
@@ -78,7 +79,7 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="robotId" parameterType="com.yjh.platform.module.user.entity.TRobotInfo">
         insert into t_robot_info
         ( robot_code,robot_num
-        ,robot_name,nest_name,nest_code
+        ,robot_name,station_code,nest_name,nest_code
         ,robot_status,robot_type,drone_type
         ,robot_ip,robot_port,light_ip
         ,light_port,identity_manager,identity_code
@@ -95,7 +96,7 @@
         ,off_line_count,edge_code,origin_id
         )
         values (#{robotCode,jdbcType=VARCHAR},#{robotNum,jdbcType=VARCHAR}
-               ,#{robotName,jdbcType=VARCHAR},#{nestName,jdbcType=VARCHAR},#{nestCode,jdbcType=VARCHAR}
+               ,#{robotName,jdbcType=VARCHAR},#{stationCode,jdbcType=VARCHAR},#{nestName,jdbcType=VARCHAR},#{nestCode,jdbcType=VARCHAR}
                ,#{robotStatus,jdbcType=VARCHAR},#{robotType,jdbcType=INTEGER},#{droneType,jdbcType=INTEGER}
                ,#{robotIp,jdbcType=VARCHAR},#{robotPort,jdbcType=INTEGER},#{lightIp,jdbcType=VARCHAR}
                ,#{lightPort,jdbcType=VARCHAR},#{identityManager,jdbcType=VARCHAR},#{identityCode,jdbcType=VARCHAR}
@@ -145,6 +146,7 @@
         update t_robot_info a <set>
         <if test="robotId != null "> a.robot_id = #{robotId},</if>
         <if test="robotCode != null "> a.robot_code = #{robotCode},</if>
+        <if test="stationCode != null "> a.station_code = #{stationCode},</if>
         <if test="robotNum != null "> a.robot_num = #{robotNum},</if>
         <if test="robotName != null ">a.robot_name = #{robotName},</if>
         <if test="nestCode != null ">a.nest_code = #{nestCode},</if>
@@ -290,6 +292,7 @@
         select
         a.robot_id,
         a.robot_code,
+        a.station_code,
         a.robot_num,
         a.robot_name,
         a.robot_status,
@@ -365,6 +368,7 @@
         select
         a.robot_id,
         a.robot_code,
+        a.station_code,
         a.robot_num,
         a.robot_name,
         a.nest_code,
@@ -609,5 +613,10 @@
         select count(1)
            from t_robot_info
         where drone_type is not null
+    </select>
+    <select id="selectAllStationCode" resultType="java.lang.String">
+        select
+        a.station_code
+        FROM t_robot_info a
     </select>
 </mapper>

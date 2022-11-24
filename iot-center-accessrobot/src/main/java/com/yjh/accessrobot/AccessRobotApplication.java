@@ -4,6 +4,7 @@ import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -41,10 +42,6 @@ public class AccessRobotApplication implements CommandLineRunner {
     private int port;
     @Value("${netty.server.robotCode}")
     private String robotCode;
-
-    @Value("${netty.server.name}")
-    private String sendCode;
-
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
@@ -75,7 +72,7 @@ public class AccessRobotApplication implements CommandLineRunner {
 //        String url = "192.168.40.71";
 
         Constant.robotCode = robotCode;
-        Constant.sendCode = sendCode;
+        Constant.sendCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
         Constant.handlerNew = handlerNew;
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);

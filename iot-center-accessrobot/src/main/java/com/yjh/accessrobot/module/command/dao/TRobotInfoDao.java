@@ -413,4 +413,8 @@ public interface TRobotInfoDao {
      */
     Long selectRobotIdByRobotNum(@Param(value = "robotNum") String robotNum, @Param(value = "edgeCode") String edgeCode);
 
+    List<Map<String, Object>> selectTCfgUnionRule(@Param(value = "edgeCode") String edgeCode);
+
+    String selectStationCodeByRobotCode(@Param(value = "robotCode") String robotCode);
+
 }

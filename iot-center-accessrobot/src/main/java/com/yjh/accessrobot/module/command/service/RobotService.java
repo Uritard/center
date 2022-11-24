@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
+import com.yjh.accessrobot.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
@@ -23,6 +24,7 @@ import com.yjh.accessrobot.module.device.utils.StatisticsUtil;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
+import io.swagger.models.auth.In;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -94,10 +96,6 @@ public class RobotService {
     private String key;
     @Value("${netty.server.ftps.local.path}")
     private String ftpsLocalPath;
-    @Value("${netty.server.name}")
-    private String sendCode;
-
-    private String stationCode;
     @Value("${inspect.flag}")
     private boolean flag;
 
@@ -234,7 +232,7 @@ public class RobotService {
         } else {
             TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                    .setSendCode(sendCode)
+                    .setSendCode(Constant.sendCode)
                     .setReceiveCode(robotCode)
                     .setCode(String.valueOf(tRobotInfo.getRobotNum()))
                     .setTime(DateTimeUtil.format(new Date()))
@@ -308,9 +306,9 @@ public class RobotService {
             log.error("==========该巡视设备处于离线状态,没有成功将模型文件同步指令下发到巡视设备==========");
             return false;
         }
-        stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+        String stationCode = tRobotInfoDao.selectStationCodeByRobotCode(robotCode);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode(sendCode)
+                .setSendCode(Constant.sendCode)
                 .setReceiveCode(robotCode)
                 .setCode(stationCode)
                 .setTime(DateTimeUtil.format(new Date()))
@@ -320,6 +318,112 @@ public class RobotService {
         log.info("生成的模型文件同步指令xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
         return true;
+    }
+
+
+    /**
+     * 巡视主机下发模型文件同步指令到边缘节点
+     * @param edgeCode 边缘节点编码
+     * @param command 类型
+     * @return boolean
+     */
+    public boolean feignEdgeTransfer(String edgeCode, String command) {
+        List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeCode, 1);
+        if (CollectionUtils.isNotEmpty(stdRegionList)) {
+            String stationCode = stdRegionList.get(0).getStationId();
+            XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                    .setSendCode(Constant.sendCode)
+                    .setReceiveCode(edgeCode)
+                    .setCode(stationCode)
+                    .setTime(DateTimeUtil.format(new Date()))
+                    .setType("61")
+                    .setCommand(command);
+            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+            log.info("生成的模型文件同步指令xml是<start>{}<end>", xmlString);
+            RobotServerHandler.send(generateByteOrder(xmlString, edgeCode), edgeCode);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 区域巡视主机生成联动、反向联动或顺控文件后，联动文件下发至边缘节点
+     * @param edgeCode 边缘节点编码
+     * @param command 类型
+     * @param filePath 文件路径
+     * <1>: =联动配置文件
+     * <2>: =一键顺控视频确认反馈信息文件
+     * <3>: =反向联动信息转发文件
+     * @return boolean
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public boolean linkageFileTransfer(String edgeCode, String command, String filePath) {
+        List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeCode, 1);
+        if (CollectionUtils.isNotEmpty(stdRegionList)) {
+            try {
+                List<Map<String, Object>> mapList = new ArrayList<>();
+                Map<String, Object> map = new HashMap<>(2);
+                String stationCode = stdRegionList.get(0).getStationId();
+                String serverUrl = stdRegionList.get(0).getServerUrl();
+                Integer port = stdRegionList.get(0).getPort();
+                String userName = stdRegionList.get(0).getUserName();
+                String password = stdRegionList.get(0).getPassword();
+                String targetPath = "";
+                switch (command) {
+                    case "1":
+                        //<1>: =联动配置文件
+                        String fileName = "linkage_model.xml";
+                        filePath = createLinkageModel(Constant.sendCode, stationCode);
+                        targetPath = stationCode + "/" + "LinkageModel" + "/" + fileName;
+                        sendToEdgeFile(filePath, targetPath, serverUrl, port, userName, password);
+                        break;
+                    case "2":
+                    case "3":
+                        //<2>: =一键顺控视频确认反馈信息文件
+                        //<3>: =反向联动信息转发文件
+                        String[] sArray = filePath.split("/");
+                        String ftpFileName = sArray[sArray.length - 1];
+                        targetPath = stationCode + "/" + "LinkageModel" + "/" + ftpFileName;
+                        sendToEdgeFile(filePath, targetPath, serverUrl, port, userName, password);
+                        break;
+                    default:
+                        break;
+                }
+                map.put("file_path", targetPath);
+                mapList.add(map);
+                XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                        .setSendCode(Constant.sendCode)
+                        .setReceiveCode(edgeCode)
+                        .setCode(stationCode)
+                        .setTime(DateTimeUtil.format(new Date()))
+                        .setType("71")
+                        .setCommand(command)
+                        .setItems(mapList);
+                String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+                log.info("生成的联动文件下发指令xml是<start>{}<end>", xmlString);
+                RobotServerHandler.send(generateByteOrder(xmlString, edgeCode), edgeCode);
+                return true;
+            } catch (Exception e) {
+                log.error("联动文件下发失败", e);
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 创建联动配置文件
+     * @return
+     * @throws Exception
+     */
+    private String createLinkageModel(String edgeCode, String stationCode) throws Exception {
+        //联动配置文件
+        Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
+        String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model" : mapForPath.get("content") + "/" + stationCode + "/LinkageModel";
+        List<Map<String,Object>> infoList = tRobotInfoDao.selectTCfgUnionRule(edgeCode);
+        return CreateModeXMLUtil.createXmlFile(infoList, path, "linkage_model.xml", "Effect_Config");
     }
 
     /**
@@ -518,38 +622,42 @@ public class RobotService {
                             break;
                         case "robot_file_path":
                             // Robot Model Info
-                            dealRobotFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode, Constant.ROBOT);
+                            if (isEdge){
+                                dealRobotFile(filePath, nodeCode, Constant.ROBOT);
+                            }else {
+                                addRobotModel(mapList, robotId);
+                            }
                             break;
                         case "property_file_path":
                             //Property Info 属性信息 与点位绑定
                             addPropertyModel(mapList, robotId);
                             break;
                         case "region_file_path":
-                            dealRegionFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
+                            dealRegionFile(filePath, nodeCode);
                             break;
                         case "map_file_path":
-                            dealMapFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
+                            dealMapFile(filePath, nodeCode);
                             break;
 //                        case "host_file_path":
 //                            dealHostFilePath(filePathMap,v.toString(),edgeCode);
 //                            break;
                         case "video_file_path":
-                            dealCameraFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
+                            dealCameraFile(filePath, nodeCode);
                             break;
                         case "drone_file_path":
-                            dealRobotFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode, Constant.DRONE);
+                            dealRobotFile(filePath, nodeCode, Constant.DRONE);
                             break;
                         case "voice_file_path":
-                            dealVoiceFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
+                            dealVoiceFile(filePath, nodeCode);
                             break;
                         case "record_file_path":
-                            dealRecordFile(filePathMap.get("content") + File.separator + v.toString(), nodeCode);
+                            dealRecordFile(filePath, nodeCode);
                             break;
 //                        case "overhaularea_file_path":
 //                            dealMaintenanceFilePath(filePathMap,v.toString(),edgeCode);
 //                            break;
                         case "source_file_path":
-                            dealSourceFile(filePathMap.get("content") + File.separator + filePath, nodeCode);
+                            dealSourceFile(filePath, nodeCode);
                             break;
                         default:
                             log.warn("模型解析未定义，{}: {}", k, filePath);
@@ -980,10 +1088,10 @@ public class RobotService {
         List<String> robotCodeList = tRobotInfoDao.selectOnline();
         log.info("在线的robotCodeList: {}", robotCodeList);
 
-        stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
         for (String robotCode : robotCodeList) {
+            String stationCode = tRobotInfoDao.selectStationCodeByRobotCode(robotCode);
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                    .setSendCode(sendCode)
+                    .setSendCode(Constant.sendCode)
                     .setReceiveCode(robotCode)
                     .setCode(stationCode)
                     .setType("81")
@@ -1205,7 +1313,7 @@ public class RobotService {
 
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setType(String.valueOf(resMap.get("type")))
-                .setSendCode(sendCode)
+                .setSendCode(Constant.sendCode)
                 .setReceiveCode(uniqueFlag)
                 .setCode(code)
                 .setTime(DateTimeUtil.format(new Date()))
@@ -1375,7 +1483,7 @@ public class RobotService {
 
                     XMLBaseModel xmlBaseModel = new XMLBaseModel()
                             .setType("41")
-                            .setSendCode(sendCode)
+                            .setSendCode(Constant.sendCode)
                             .setReceiveCode(receiveCode)
                             .setCode(code)
                             .setCommand(commandValue)
@@ -1420,7 +1528,7 @@ public class RobotService {
 
                     XMLBaseModel xmlBaseModel = new XMLBaseModel()
                             .setType("41")
-                            .setSendCode(sendCode)
+                            .setSendCode(Constant.sendCode)
                             .setReceiveCode(robotCode)
                             .setCode(code)
                             .setCommand(commandValue)
@@ -1497,7 +1605,7 @@ public class RobotService {
             if (cfmList.size() > 0) {
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setType("51")
-                        .setSendCode(sendCode)
+                        .setSendCode(Constant.sendCode)
                         .setReceiveCode(robotCode)
                         .setCode(taskId)
                         .setCommand("1")
@@ -1786,11 +1894,11 @@ public class RobotService {
         String robotCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), "");
         if (StringUtils.isEmpty(robotCode)) {
             xmlBaseModel
-                    .setSendCode(sendCode)
+                    .setSendCode(Constant.sendCode)
                     .setReceiveCode(robotCode);
         } else {
             xmlBaseModel
-                    .setSendCode(sendCode)
+                    .setSendCode(Constant.sendCode)
                     .setReceiveCode(Constant.robotCode);
         }
 
@@ -2564,7 +2672,7 @@ public class RobotService {
 
         TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                .setSendCode(sendCode)
+                .setSendCode(Constant.sendCode)
                 .setReceiveCode(robotCode)
                 .setCode(String.valueOf(tRobotInfo.getRobotNum()))
                 .setTime(DateTimeUtil.format(new Date()))
@@ -2628,6 +2736,18 @@ public class RobotService {
             }
         };
         TaskExecutePool.getInstance().execute(runnable);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void sendToEdgeFile(String localPath, String targetName, String serverUrl, Integer port, String userName, String password) {
+        try {
+            if ("".equals(localPath)) {
+                return;
+            }
+            FtpsUtil.putFile(localPath, targetName, serverUrl, port, key, userName, password);
+        } catch (Exception e) {
+            log.error("上传至ftps错误 " + e);
+        }
     }
 
     /**
@@ -2808,7 +2928,7 @@ public class RobotService {
         Result result = new Result();
         try {
             String robotCode = map.get("robotCode");
-            log.info("sendCode:{},robotCode:{}====", sendCode, robotCode);
+            log.info("sendCode:{},robotCode:{}====", Constant.sendCode, robotCode);
             if (StringUtils.isEmpty(robotCode)) {
                 log.error("当前不存在环控设备编码,没有成功将控制指令下发到环控设备....");
                 result.setMessage(200, "当前不存在环控设备编码,没有成功将控制指令下发到环控设备....");
@@ -2834,7 +2954,7 @@ public class RobotService {
                     }
                     Item.add(maps);
                     XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                            .setSendCode(sendCode)
+                            .setSendCode(Constant.sendCode)
                             .setReceiveCode(robotCode)
                             .setType(type)
                             .setCode(deviceId)
@@ -3229,6 +3349,10 @@ public class RobotService {
         return PlatformXMLUtil.readStringXmlOut(document);
     }
 
+    public Boolean selectByRegionCodeAndState(String sendCode, Integer state){
+        List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(sendCode, state);
+        return CollectionUtils.isNotEmpty(stdRegionList);
+    }
 
     /**
      * 判断消息发送是直连机器人 还是 下级节点机器人

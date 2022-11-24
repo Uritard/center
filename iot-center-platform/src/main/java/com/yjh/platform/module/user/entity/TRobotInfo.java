@@ -42,6 +42,11 @@ public class TRobotInfo implements Serializable {
     @TableField(value = "robot_name", updateStrategy = FieldStrategy.IGNORED)
     private String robotName;
 
+    @Length(max = 32, message = "stationCode长度必须小于等于32")
+    @ApiModelProperty(value = "机器人编号")
+    @TableField(value = "station_code", updateStrategy = FieldStrategy.IGNORED)
+    private String stationCode;
+
     @Length(max = 32, message = "nestCode长度必须小于等于32")
     @ApiModelProperty(value = "机巢编号")
     @TableField(value = "nest_code", updateStrategy = FieldStrategy.IGNORED)

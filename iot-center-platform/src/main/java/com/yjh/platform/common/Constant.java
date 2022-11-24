@@ -103,6 +103,7 @@ public class Constant {
     public static final String START_ROBOT_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/robotStartRealPlay?robotId={robotId}";
 
     public static final String Maintenance_Issued = "http://iot-center-accessrobot/robot/v1/deviceMaintenanceIssued";
+    public static final String LINKAGE_FILE_TRANSFER = "http://iot-center-accessrobot/robot/v1/linkageFileTransfer";
     public static final String UDP_SEND ="http://iot-center-accessudp/sendFile/v1/sendFile";
 
     //请求视频诊断监控点新增与修改

@@ -1331,6 +1331,47 @@
         a.robot_num = #{robotNum, jdbcType=VARCHAR}
         and a.edge_code = #{edgeCode, jdbcType=VARCHAR}
     </select>
+    <select id="selectTCfgUnionRule" resultType="java.util.Map">
+        SELECT
+        RIGHT (
+        a.input_param,
+        LENGTH(a.input_param) - LENGTH(b.edge_code)
+        ) AS source_code,
+        b.device_name AS source_name,
+        (
+        CASE (c.mete_kind)
+        WHEN 1 THEN
+        '遥信'
+        WHEN 2 THEN
+        '遥测'
+        WHEN 3 THEN
+        '遥控'
+        END
+        ) AS source_type,
+        (
+        SELECT
+        GROUP_CONCAT(
+        RIGHT (
+        d.instance_id,
+        LENGTH(d.instance_id) - LENGTH(b.edge_code)
+        )
+        )
+        FROM
+        t_cruise_plan_attr d
+        WHERE
+        d.plan_id = a.plan_id
+        ) AS device_id
+        FROM
+        `t_cfg_union_rule` a
+        LEFT JOIN t_cfg_device b ON a.input_param = b.device_id
+        LEFT JOIN t_cfg_mete c ON b.device_id = c.mete_id
+        WHERE
+        b.edge_code = #{edgeCode, jdbcType=VARCHAR}
+        AND c.edge_code = #{edgeCode, jdbcType=VARCHAR}
+    </select>
+    <select id="selectStationCodeByRobotCode" resultType="java.lang.String">
+        SELECT station_code FROM t_robot_info WHERE robot_code = #{robotCode, jdbcType=VARCHAR}
+    </select>
     <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
         update t_robot_info
         set robot_code          = #{robotCode,jdbcType=VARCHAR},
