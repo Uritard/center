@@ -40,8 +40,7 @@ public class LinkageSignalHandler implements MessageHandlerStrategy, Initializin
                 String time = String.valueOf(xmlBaseModel.getItems().get(0).get("source_time"));
                 //处理联动信号数据 入库
                 Map<String, Object> params = new HashMap<>(5);
-                String edgeCode = (String)redisTemplate.opsForHash().get("region:idRefCode", sendCode);
-                params.put("meteId", edgeCode + meteId);
+                params.put("meteId", sendCode + meteId);
                 params.put("meteKind", meteKind);
                 params.put("value", value);
                 params.put("commit", commit);

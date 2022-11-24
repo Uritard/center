@@ -31,7 +31,8 @@
         lolimit3,
         hilimit4,
         stander,
-        controlenable
+        controlenable,
+        edge_code
         )values
         <foreach collection="list" item="SYAllInfo" separator=",">
             (
@@ -62,7 +63,8 @@
             #{SYAllInfo.lolimit3, jdbcType=REAL},
             #{SYAllInfo.hilimit4, jdbcType=REAL},
             #{SYAllInfo.stander, jdbcType=REAL},
-            #{SYAllInfo.controlenable, jdbcType=INTEGER}
+            #{SYAllInfo.controlenable, jdbcType=INTEGER},
+            #{SYAllInfo.edgeCode, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -110,7 +112,8 @@
         relation_code,
         create_time,
         update_time,
-        remark
+        remark,
+        edge_code
         )values
         <foreach collection="list" item="SYAllInfo" separator=",">
             (
@@ -122,7 +125,8 @@
             #{SYAllInfo.relationCode, jdbcType=VARCHAR},
             CURRENT_TIME (),
             CURRENT_TIME (),
-            #{SYAllInfo.remark, jdbcType=VARCHAR}
+            #{SYAllInfo.remark, jdbcType=VARCHAR},
+            #{SYAllInfo.edgeCode, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

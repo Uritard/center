@@ -70,6 +70,9 @@ public class TCfgDevice implements Serializable {
     @ApiModelProperty(value = "描述")
     @TableField(value = "remark",updateStrategy = FieldStrategy.IGNORED)
     private String remark;
+    @TableField(value = "edge_code",updateStrategy = FieldStrategy.IGNORED)
+    @ApiModelProperty(value = "边缘节点编码")
+    private String edgeCode;
 
     private Integer pageNum = 1;
 

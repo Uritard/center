@@ -526,4 +526,8 @@ public class TRobotInfoService{
     public List<Integer> selectAllRobotNum(){
         return tRobotInfoDao.selectAllRobotNum();
     }
+
+    public List<String> selectAllStationCode() {
+        return tRobotInfoDao.selectAllStationCode();
+    }
 }

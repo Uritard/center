@@ -771,6 +771,7 @@ CREATE TABLE `t_cfg_device` (
   `create_time` datetime NOT NULL COMMENT '创建时间',
   `update_time` datetime NOT NULL COMMENT '更新时间',
   `remark` varchar(512) DEFAULT '' COMMENT '描述',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   PRIMARY KEY (`device_id`) USING BTREE,
   KEY `index_device_type` (`device_type`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='设备表';
@@ -808,6 +809,7 @@ CREATE TABLE `t_cfg_mete` (
   `hilimit4` float(7,3) DEFAULT '1',
   `stander` float(7,3) DEFAULT '1',
   `controlenable` int(11) DEFAULT '1',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   PRIMARY KEY (`mete_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='系统测点信息表';
 
@@ -1596,6 +1598,7 @@ CREATE TABLE `t_robot_info` (
   `robot_code` varchar(32) DEFAULT '',
   `robot_num` varchar(32) DEFAULT NULL COMMENT '机器人/无人机编号编码',
   `robot_name` varchar(64) DEFAULT '' COMMENT '机器人名称',
+  `station_id` varchar(32) DEFAULT NULL COMMENT '变电站编码',
   `nest_name` varchar(64) DEFAULT NULL COMMENT '机巢名称',
   `nest_code` varchar(32) DEFAULT NULL COMMENT '机巢编码',
   `robot_status` varchar(6) DEFAULT '' COMMENT '机器人在线状态，1-在线0-离线',

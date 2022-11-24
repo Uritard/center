@@ -103,6 +103,65 @@ public class RobotController {
         }
         return result;
     }
+
+
+    /**
+     * <1>: =边缘节点模型
+     * <2>: =机器人模型
+     * <3>: =摄像机模型
+     * <4>: =点位模型
+     * <5>: =无人机模型
+     * <6>: =声纹模型
+     * <8>: =检修区域配置文件
+     * <9>: =地图文件
+     * <10>:=设备资源信息配置文件
+     * @param edgeId
+     * @param command
+     * @return
+     */
+    @ApiOperation(value = "发送边缘节点同步指令接口")
+    @GetMapping(value = "/feignEdgeTransfer")
+    @Logs(title = "模型同步",content = "根据用户传递的参数给边缘节点发送模型同步指令",logType = 5,authority = "1234")
+    public Result feignEdgeTransfer(@RequestParam(value = "edgeId") String edgeId,
+                                    @RequestParam(value = "command") String command) {
+        Result result = new Result();
+        try {
+            result.setData(robotService.feignEdgeTransfer(edgeId, command));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("发送模型同步接口调用错误:", e);
+        }
+        return result;
+    }
+
+    /**
+     * <1>: =联动配置文件
+     * <2>: =一键顺控视频确认反馈信息文件
+     * <3>: =反向联动信息转发文件
+     * @param param
+     * @return
+     */
+    @ApiOperation(value = "发送联动文件下发指令接口")
+    @PostMapping(value = "/linkageFileTransfer")
+    @Logs(title = "文件下发",content = "根据用户传递的参数给边缘节点发送联动文件下发指令",logType = 5,authority = "1234")
+    public Result linkageFileTransfer( @RequestBody Map<String,String> param) {
+        Result result = new Result();
+        try {
+            String edgeCode = param.get("edgeCode");
+            String command = param.get("command");
+            String filePath = param.get("filePath");
+            result.setData(robotService.linkageFileTransfer(edgeCode, command, filePath));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("发送模型同步接口调用错误:", e);
+        }
+        return result;
+    }
+
     @ApiOperation(value = "发送任务指令接口")
     @PostMapping(value = "/taskIssued")
     @Logs(title = "巡视设备下发任务",content = "根据用户传递的参数给巡视设备下发任务",logType = 10)

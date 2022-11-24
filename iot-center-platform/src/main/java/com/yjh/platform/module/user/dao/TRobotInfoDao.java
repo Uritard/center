@@ -114,4 +114,5 @@ public interface TRobotInfoDao {
 
     int selectDroneCount();
 
+    List<String> selectAllStationCode();
 }

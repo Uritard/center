@@ -617,12 +617,21 @@ public class TSequentialConfService{
             bw.flush();
             bw.close();
 //                fw.close();
-            //将生成的顺控确认文件发送给主辅监控系统
-            Map<String,List<String>> mapForSend = new HashMap<>();
-            List<String> list = new ArrayList<>();
-            list.add(devicePath);
-            mapForSend.put("list",list);
-            Constant.otherServer(mapForSend,Constant.UDP_SEND);
+            String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+            if ("1".equals(edgeLevel)) {
+                Map<String, Object> mapForSend = new HashMap<>(3);
+                mapForSend.put("edgeCode", map.get("edgeCode"));
+                mapForSend.put("command", "2");
+                mapForSend.put("filePath", devicePath);
+                Constant.mapToOtherServer(mapForSend, Constant.LINKAGE_FILE_TRANSFER);
+            } else {
+                //将生成的顺控确认文件发送给主辅监控系统
+                Map<String, List<String>> mapForSend = new HashMap<>();
+                List<String> list = new ArrayList<>();
+                list.add(devicePath);
+                mapForSend.put("list", list);
+                Constant.otherServer(mapForSend, Constant.UDP_SEND);
+            }
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
@@ -666,11 +675,20 @@ public class TSequentialConfService{
             bw.close();
             fw.close();
             //将生成的反向联动文件发送给主辅监控系统
-            Map<String,List<String>> mapForSend = new HashMap<>();
-            List<String> list = new ArrayList<>();
-            list.add(devicePath);
-            mapForSend.put("list",list);
-            Constant.otherServer(mapForSend,Constant.UDP_SEND);
+            String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+            if ("1".equals(edgeLevel)) {
+                Map<String, Object> mapForSend = new HashMap<>(3);
+                mapForSend.put("edgeCode", tCfgDevice.getEdgeCode());
+                mapForSend.put("command", "3");
+                mapForSend.put("filePath", devicePath);
+                Constant.mapToOtherServer(mapForSend, Constant.LINKAGE_FILE_TRANSFER);
+            } else {
+                Map<String, List<String>> mapForSend = new HashMap<>();
+                List<String> list = new ArrayList<>();
+                list.add(devicePath);
+                mapForSend.put("list", list);
+                Constant.otherServer(mapForSend, Constant.UDP_SEND);
+            }
         }catch (IOException e){log.error("生成顺控确认文件失败"+e);}
          catch (Exception e) { log.error("发送顺控确认文件失败"+e); }
 

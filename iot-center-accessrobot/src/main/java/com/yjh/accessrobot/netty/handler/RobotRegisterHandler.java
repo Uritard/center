@@ -34,9 +34,6 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @Value("${netty.server.name}")
-    private String sendCode;
-
     @Value("${heart.beat.interval}")
     private Integer heartBeatInterval;
 
@@ -100,7 +97,7 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
 
         itemsList.add(items);
         XMLBaseModel xmlBaseModelTemp = new XMLBaseModel()
-                .setSendCode(sendCode)
+                .setSendCode(Constant.sendCode)
                 .setReceiveCode(robotCode)
                 .setType("251")
                 .setCode(code)

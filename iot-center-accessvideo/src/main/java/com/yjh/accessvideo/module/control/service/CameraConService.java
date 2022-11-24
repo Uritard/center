@@ -1875,8 +1875,8 @@ public class CameraConService {
         HCNetSDK.NET_DVR_DEVICEINFO_V40 strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();
 
         lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, strDeviceInfo);
-        log.info("register nvr {}, ip is {}, port is {}, lUserID:{}", recorderConInfo.getRecordName(), m_sDeviceIP,
-                m_port, lUserID);
+        log.info("register nvr {}, ip is {}, port is {}, user{}, pass{}, lUserID:{}", recorderConInfo.getRecordName(), m_sDeviceIP,
+                m_port, recorderConInfo.getIdentityManager(), recorderConInfo.getIdentityCode(), lUserID);
         if (lUserID == -1) {
             log.error("recordName:{}, register fail, error code:{}", recorderConInfo.getRecordName(),
                     hCNetSDK.NET_DVR_GetLastError());

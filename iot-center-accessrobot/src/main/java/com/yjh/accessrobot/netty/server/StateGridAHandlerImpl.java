@@ -3,6 +3,7 @@ package com.yjh.accessrobot.netty.server;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.module.command.entity.EdgeEnum;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import com.yjh.accessrobot.netty.entiy.Message;
@@ -95,7 +96,18 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
             String resultType = "251";
             String type = xmlBaseModel.getType();
             if (Objects.equals(resultType, type)) {
-                handlerType = type + xmlBaseModel.getCommand();
+                String command = xmlBaseModel.getCommand();
+                //判断本节点是巡视主机下级为边缘节点
+                String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+                boolean isEdge = robotService.selectByRegionCodeAndState(xmlBaseModel.getSendCode(), 1);
+                if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel) && isEdge) {
+                    if ("3".equals(command)){
+                        xmlBaseModel.setCommand("4");
+                    }else if ("4".equals(command)){
+                        xmlBaseModel.setCommand("3");
+                    }
+                }
+                handlerType = type + command;
             } else {
                 handlerType = type;
             }

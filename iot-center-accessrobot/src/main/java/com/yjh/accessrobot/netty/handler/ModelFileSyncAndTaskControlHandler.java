@@ -78,7 +78,6 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                     // model file sync
 
                     log.info("{} 模型同步的文件路径信息{}", sendCode, resultMap);
-
                     robotService.addRobotFile(resultMap, sendCode);
                 }
             }
