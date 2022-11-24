@@ -7,8 +7,9 @@ import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
-import com.yjh.platform.module.user.entity.*;
-import org.apache.poi.ss.formula.functions.T;
+import com.yjh.platform.module.user.entity.TCameraInfo;
+import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import static org.apache.catalina.startup.ExpandWar.deleteDir;
 
@@ -370,6 +372,22 @@ public class TCameraPresetService {
 
     public String getPresetUrlPath(){
         return (String)redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath", "content");
+    }
+
+    public Map<String, Object> selectInstanceInfo(Long presetId) {
+        return tCameraPresetDao.selectInstanceInfo(presetId);
+    }
+
+    public String selectAlarmLevel(String defectModel ,String desc) {
+        return tCameraPresetDao.selectAlarmLevel(defectModel,desc);
+    }
+
+    public int selectSilentByCameraIdAndPresetId(String cameraId, String presetId) {
+        return tCameraPresetDao.selectSilentByCameraIdAndPresetId(cameraId,presetId);
+    }
+
+    public List<Map<String, Object>> selectCameraBySecondSilent() {
+        return  tCameraPresetDao.selectCameraBySecondSilent();
     }
 }
 

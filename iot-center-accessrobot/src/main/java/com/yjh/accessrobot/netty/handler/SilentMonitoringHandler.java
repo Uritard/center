@@ -43,7 +43,7 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
     /**
      * 调用智能分析主机图像分析接口
      */
-    private static final String ANALYSE_URL = "http://iot-center-accessvideo/picAnalyseNoDetection";
+    private static final String ANALYSE_URL = "http://iot-center-platform/picAnalyseNoDetection";
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -82,59 +82,28 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
         String desc = getDesc(monitorType);
         log.info("desc :{}", desc);
         if (desc == null) {
-            // 调用算法接口分析结果
-            List<Analysis> analysisList = new ArrayList<>();
-            Analysis analysis = new Analysis()
-                    // 暂定静默监视识别类型为12,没有实际意义
-                    .setAnalyseType("12")
-                    .setInstanceId(tCameraPreset.getPresetId())
-                    .setTaskId("jm")
-                    .setPicPath(absPath);
-            analysisList.add(analysis);
-            try {
-                String result = serviceRestTemplate.postForObject(ANALYSE_URL, analysisList, String.class);
-                log.info("param:{},result:{}", StringUtils.join(analysisList), result);
-            } catch (Exception e) {
-                log.error("请求算法失败: ", e);
-            }
+            //调用算法
+            sendAnalyse(absPath, tCameraPreset);
         } else {
-            TCruisePointInstance tCruisePointInstance = tCruisePointInstanceMapper.selectByEdgeCodeAndCruiseId(sendCode, tCameraPreset.getPresetId());
-            if (tCruisePointInstance == null) {
-                log.error("tCruisePointInstance is null edgeCode:{} cruiseId:{}", sendCode, presetId);
-                return;
-            }
-            TWarnInfo tWarnInfo = silentMonitorHandle(absPath, desc, tCruisePointInstance);
-            alarmToUpSystem(tCruisePointInstance, tWarnInfo, monitorType);
+            // 生成告警 ，发送上级系统
+            processAlarm(sendCode, absPath, presetId, monitorType, tCameraPreset, desc);
         }
     }
 
-    private static String getDesc(String monitorType) {
-        String desc = null;
-        if ("103".equals(monitorType)) {
-            desc = "小动物入侵";
-        } else if ("3".equals(monitorType)) {
-            desc = "未穿工装";
-        } else if ("4".equals(monitorType)) {
-            desc = "人员聚集/徘徊";
-        } else if ("1".equals(monitorType)) {
-            desc = "未穿安全帽";
+    private void processAlarm(String sendCode, String absPath, String presetId, String monitorType, TCameraPreset tCameraPreset, String desc) {
+        TCruisePointInstance tCruisePointInstance = tCruisePointInstanceMapper.selectByEdgeCodeAndCruiseId(sendCode, tCameraPreset.getPresetId());
+        if (tCruisePointInstance == null) {
+            log.error("tCruisePointInstance is null edgeCode:{} cruiseId:{}", sendCode, presetId);
+            return;
         }
-        return desc;
-    }
-
-    /**
-     * 静默监视产生告警处理
-     */
-    private TWarnInfo silentMonitorHandle(String imageUrl, String desc, TCruisePointInstance tCruisePointInstance) {
-
         // 图片在ftps上的全路径
-        String resultAbsolutePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + imageUrl;
-        String targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content") + imageUrl;
+        String resultAbsolutePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + absPath;
+        String targetPath = redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content") + absPath;
         try {
             FileUtil.copyFileUsingStream(resultAbsolutePath, targetPath);
         } catch (IOException e) {
             log.error("复制文件失败，resultAbsolutePath:{}  targetPath:{} ", resultAbsolutePath, targetPath, e);
-            return null;
+            return;
         }
         String defectResultRealImg = targetPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg", "content")),
                 String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg", "content")));
@@ -156,37 +125,18 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
                 .setAlarmSource(800)
                 .setImagePath(defectResultRealImg);
         tWarnInfoMapper.insert(tWarnInfo);
-
-        //webSocket通知前端调用查询告警弹框的接口
-        Map<String, Object> jasonMaps = new HashMap<>(16);
-        jasonMaps.put("type", "alarmPopUp");
-        jasonMaps.put("warnType", "1");
-        jasonMaps.put("warnLevel", alarmLevel);
-        jasonMaps.put("warnId", tWarnInfo.getWarnId());
-        jasonMaps.put("defectModel", 450);
-        String json = JSON.toJSONString(jasonMaps);
-        log.info("发送给前端的消息：{}", json);
-        try {
-            String result = serviceRestTemplate.postForObject(syncWebsocketUrl, json, String.class);
-            log.info("param:{} result:{}", json, result);
-        } catch (Exception e) {
-            log.error("发送前端失败", e);
-        }
-        return tWarnInfo;
+        // webSocket通知前端调用查询告警弹框的接口
+        sendWebsocket( tWarnInfo);
+         // 上传消息到巡视主机
+        sendUpSystem(monitorType, tCruisePointInstance, tWarnInfo);
     }
 
-    /**
-     * 静默监视告警向上级系统上报
-     */
-    private void alarmToUpSystem(TCruisePointInstance tCruisePointInstance, TWarnInfo tWarnInfo, String monitorType) {
-        if (tWarnInfo == null) {
-            return;
-        }
+    private void sendUpSystem(String monitorType, TCruisePointInstance tCruisePointInstance, TWarnInfo tWarnInfo) {
         String warnTime = DateTimeUtil.format(tWarnInfo.getWarnTime());
-        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        XMLBaseModel xmlBaseModel1 = new XMLBaseModel();
         List<Map<String, Object>> xmlItems = new ArrayList<>();
         Map<String, Object> xmlItem = new HashMap<>(16);
-        xmlBaseModel.setType("63");
+        xmlBaseModel1.setType("63");
         xmlItem.put("patroldevice_code", tCruisePointInstance.getDeviceId());
         xmlItem.put("patroldevice_name", tStdDeviceMapper.selectByPrimaryKey(tCruisePointInstance.getDeviceId()).getDeviceName());
         xmlItem.put("alarm_level", AlarmLevelEnum.getAlarmLevelByCode(tWarnInfo.getWarnLevel().toString()).getProtocolCode());
@@ -201,9 +151,9 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
         xmlItem.put("time", warnTime);
         xmlItem.put("content", tWarnInfo.getWarnContent());
         xmlItems.add(xmlItem);
-        xmlBaseModel.setItems(xmlItems);
+        xmlBaseModel1.setItems(xmlItems);
         List<XMLBaseModel> list = new ArrayList<>();
-        list.add(xmlBaseModel);
+        list.add(xmlBaseModel1);
         Map<String, List<XMLBaseModel>> alarmMap = new HashMap<>(3);
         alarmMap.put("list", list);
         try {
@@ -212,8 +162,57 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
         } catch (RestClientException e) {
             log.error("上报异常: ", e);
         }
-
     }
+
+    private void sendWebsocket(TWarnInfo tWarnInfo) {
+        Map<String, Object> jasonMaps = new HashMap<>(16);
+        jasonMaps.put("type", "alarmPopUp");
+        jasonMaps.put("warnType", "1");
+        jasonMaps.put("warnLevel", tWarnInfo.getWarnLevel());
+        jasonMaps.put("warnId", tWarnInfo.getWarnId());
+        jasonMaps.put("defectModel", 450);
+        String json = JSON.toJSONString(jasonMaps);
+        log.info("发送给前端的消息：{}", json);
+        try {
+            String result = serviceRestTemplate.postForObject(syncWebsocketUrl, json, String.class);
+            log.info("param:{} result:{}", json, result);
+        } catch (Exception e) {
+            log.error("发送前端失败", e);
+        }
+    }
+
+    private void sendAnalyse(String absPath, TCameraPreset tCameraPreset) {
+        // 调用算法接口分析结果
+        List<Analysis> analysisList = new ArrayList<>();
+        Analysis analysis = new Analysis()
+                // 暂定静默监视识别类型为12,没有实际意义
+                .setAnalyseType("12")
+                .setInstanceId(tCameraPreset.getPresetId())
+                .setTaskId("jm")
+                .setPicPath(absPath);
+        analysisList.add(analysis);
+        try {
+            String result = serviceRestTemplate.postForObject(ANALYSE_URL, analysisList, String.class);
+            log.info("param:{},result:{}", StringUtils.join(analysisList), result);
+        } catch (Exception e) {
+            log.error("请求算法失败: ", e);
+        }
+    }
+
+    private static String getDesc(String monitorType) {
+        String desc = null;
+        if ("103".equals(monitorType)) {
+            desc = "小动物入侵";
+        } else if ("3".equals(monitorType)) {
+            desc = "未穿工装";
+        } else if ("4".equals(monitorType)) {
+            desc = "人员聚集/徘徊";
+        } else if ("1".equals(monitorType)) {
+            desc = "未穿安全帽";
+        }
+        return desc;
+    }
+
 
 
     /**

@@ -388,4 +388,64 @@
             t_camera_info a
         where a.camera_id = #{cameraId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectInstanceInfo" resultType="java.util.Map">
+        SELECT
+            a.preset_id,
+            a.camera_id,
+            b.cruise_id,
+            b.instance_id,
+            b.custom_id,
+            b.device_id,
+            d.device_name,
+            b.device_mete_id,
+            e.mete_name
+        FROM
+            t_camera_preset a,t_cruise_point_instance b,t_std_device d,t_std_devicemete e
+        where a.preset_id = b.cruise_id
+          and d.device_id = b.device_id and d.custom_id = b.custom_id
+          AND b.device_mete_id = e.device_mete_id
+          and a.preset_id = #{presetId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectAlarmLevel" resultType="java.lang.String">
+        SELECT
+            defect_level
+        FROM
+            t_algorithm_info
+        WHERE is_ai = 0
+          AND  defect_type in
+               (
+                   SELECT
+                       dict_code
+                   FROM
+                       t_dict_business
+                   WHERE
+                       col_name = #{colName,jdbcType=VARCHAR}
+                     AND dict_note = #{dictNote,jdbcType=VARCHAR}
+               )
+    </select>
+    <select id="selectSilentByCameraIdAndPresetId" resultType="int">
+        select count(1)
+        FROM t_camera_info a, t_camera_preset b
+        WHERE a.camera_id = b.camera_id
+          and b.is_second_keep_watch_task = 1
+          and a.camera_id = #{cameraId}
+          and b.preset_id = #{presetId}
+    </select>
+    <select id="selectCameraBySecondSilent" resultType="java.util.Map">
+        SELECT DISTINCT
+            a.camera_id,
+            b.preset_id,
+            b.preset_name,
+            a.camera_ip,
+            a.port,
+            a.camera_manager,
+            a.camera_code
+        FROM
+            t_camera_info a, t_camera_preset b
+        WHERE a.camera_id = b.camera_id
+          and b.is_second_keep_watch_task = 1
+    </select>
+
 </mapper>

@@ -3400,7 +3400,7 @@ public class CameraConService {
 //        } catch (Exception e) { e.getMessage(); }
         //todo 目前先不关闭ffmpeg进程,在多用户同时播放统一个相机视频，一个用户关闭进程后，另外一个用户则无法观看
         //回放视频流可停止
-        if (rtmpUrl.contains("history")) {
+        if (StringUtils.isNotBlank(rtmpUrl) && rtmpUrl.contains("history")) {
             cameraId = Long.valueOf(StringUtils.substringAfterLast(rtmpUrl, "/"));
             manager.terminate(cameraId);
         }

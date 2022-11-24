@@ -19,4 +19,6 @@ public class IntelligentAlgorithmConfig {
     private String silentMonitorType;
     private String defectType;
     private String distinguishType;
+    private String silentMonitorNameAndType;
+
 }
