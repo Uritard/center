@@ -82,6 +82,6 @@ public class SilentMonitoringHandlerUpSystem  implements MessageHandlerStrategy,
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        MessageHandlerStrategyFactory.register(HandlerEnum.SILENT_MONITORING_UPSYSTEM.getCode(), this);
+        MessageHandlerStrategyFactory.register(HandlerEnum.SILENT_MONITORING_ALARM.getCode(), this);
     }
 }

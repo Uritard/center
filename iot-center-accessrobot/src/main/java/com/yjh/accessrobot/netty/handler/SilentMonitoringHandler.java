@@ -235,6 +235,6 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        MessageHandlerStrategyFactory.register(HandlerEnum.SILENT_MONITORING.getCode(), this);
+        MessageHandlerStrategyFactory.register(HandlerEnum.SILENT_MONITORING_DATA.getCode(), this);
     }
 }

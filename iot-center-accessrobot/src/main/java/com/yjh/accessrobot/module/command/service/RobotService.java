@@ -24,7 +24,6 @@ import com.yjh.accessrobot.module.device.utils.StatisticsUtil;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
 import com.yjh.accessrobot.threadpool.TaskExecutePool;
 import io.netty.channel.ChannelHandlerContext;
-import io.swagger.models.auth.In;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.FileUtils;
@@ -3372,6 +3371,11 @@ public class RobotService {
             }
         }
         return sendCode;
+    }
+
+    public boolean isSubSystem(String robotCode){
+        List<TStdRegion>  tStdRegionList=tStdRegionDao.selectByRegionCodeAndState(robotCode,Constant.STATE_LOCAL);
+        return CollectionUtils.isNotEmpty(tStdRegionList);
     }
 }
 
