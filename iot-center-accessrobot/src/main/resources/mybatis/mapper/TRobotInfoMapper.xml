@@ -201,6 +201,7 @@
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInfo" resultType="com.yjh.accessrobot.module.command.entity.TRobotInfo">
+        select
         <include refid="Base_Column_List" />
         from t_robot_info a
         where 1 = 1

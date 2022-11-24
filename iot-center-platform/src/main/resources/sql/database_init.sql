@@ -537,6 +537,7 @@ CREATE TABLE `t_algorithm_mete` (
   `apply_module` int(11) DEFAULT '1' COMMENT '0不应用，1应用到日常巡视，2..待定',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
   PRIMARY KEY (`device_mete_id`,`algorithm_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='算法测点配置表';
 
