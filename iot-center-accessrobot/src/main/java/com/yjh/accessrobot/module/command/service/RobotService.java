@@ -306,11 +306,10 @@ public class RobotService {
             log.error("==========该巡视设备处于离线状态,没有成功将模型文件同步指令下发到巡视设备==========");
             return false;
         }
-        String stationCode = tRobotInfoDao.selectStationCodeByRobotCode(robotCode);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(Constant.sendCode)
                 .setReceiveCode(robotCode)
-                .setCode(stationCode)
+                .setCode(Constant.stationCode)
                 .setTime(DateTimeUtil.format(new Date()))
                 .setType("61")
                 .setCommand("1");
@@ -1089,11 +1088,10 @@ public class RobotService {
         log.info("在线的robotCodeList: {}", robotCodeList);
 
         for (String robotCode : robotCodeList) {
-            String stationCode = tRobotInfoDao.selectStationCodeByRobotCode(robotCode);
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(Constant.sendCode)
                     .setReceiveCode(robotCode)
-                    .setCode(stationCode)
+                    .setCode(Constant.stationCode)
                     .setType("81")
                     .setCommand("4")
                     .setItems(itemList);

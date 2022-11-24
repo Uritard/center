@@ -1598,7 +1598,6 @@ CREATE TABLE `t_robot_info` (
   `robot_code` varchar(32) DEFAULT '',
   `robot_num` varchar(32) DEFAULT NULL COMMENT '机器人/无人机编号编码',
   `robot_name` varchar(64) DEFAULT '' COMMENT '机器人名称',
-  `station_id` varchar(32) DEFAULT NULL COMMENT '变电站编码',
   `nest_name` varchar(64) DEFAULT NULL COMMENT '机巢名称',
   `nest_code` varchar(32) DEFAULT NULL COMMENT '机巢编码',
   `robot_status` varchar(6) DEFAULT '' COMMENT '机器人在线状态，1-在线0-离线',
