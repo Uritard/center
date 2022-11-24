@@ -1597,7 +1597,7 @@ public class UPatrolTaskService {
                     taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
                 }
 
-                taskCountMap.put("startTime", secondSdf.format(tCruiseTaskCount.getStartTime()));
+                taskCountMap.put("startTime", secondSdf.format(tCruiseTaskCount.getCreateTime()));
                 listTask.add(taskCountMap);
             }
         }
@@ -1846,7 +1846,7 @@ public class UPatrolTaskService {
                     taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
                 }
 
-                taskCountMap.put("startTime", sdfF2.format(tCruiseTaskCount.getStartTime()));
+                taskCountMap.put("startTime", sdfF2.format(tCruiseTaskCount.getCreateTime()));
                 listTask.add(taskCountMap);
             }
         }
