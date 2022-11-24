@@ -1362,18 +1362,7 @@ public class UPatrolTaskService {
             log.info("最后一个点-前端推送：{}", JSON.toJSONString(jasonMap));
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
 
-            // 插入updr
-            //            List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);
-            //            log.info("任务为{}已经做过的巡视点===={}", taskId, instanceIdDoneList);
-            //            List<Long> inDataBaseInstanceList = selectInstanceForTaskGoOn(taskId);
-            //            log.info("任务为{}已经入库的巡视点==={}", taskId, inDataBaseInstanceList);
-            //            if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
-            //                for (Long instanceIdInTable : inDataBaseInstanceList) {
-            //                    instanceIdDoneList.remove(instanceIdInTable.toString());
-            //                }
-            //            }
-            //            log.info("删除已经入库的巡视点后==={}", instanceIdDoneList);
-            Integer abnormalCounts = 0;
+            int abnormalCounts = 0;
             List<UPatrolDataResult> uPatrolDataResultList = new ArrayList<>();
             Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
             List<Map<String, String>> cruiseResultMapList = new ArrayList<>();
@@ -1421,8 +1410,7 @@ public class UPatrolTaskService {
 
             if (CollectionUtils.isNotEmpty(uPatrolDataResultList)){
                 batchInsertUPatrolDataResult(uPatrolDataResultList);
-                log.info("准备传其他服务的cruiseResultIdList==={}", taskId);
-                // todo:准备传其他服务的cruiseResultIdList
+                log.info("准备传其他服务的taskId==={}", taskId);
                 uPatrolDataResultService.updateCruiseAnalyze(taskId);
             }
 
