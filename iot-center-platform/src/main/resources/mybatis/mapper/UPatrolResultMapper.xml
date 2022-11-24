@@ -505,7 +505,7 @@
                 #{deviceIds,jdbcType=BIGINT}
             </foreach>
         </if>
-        ORDER BY b.cruise_time desc, b.instance_id asc, b.device_id asc, n.custom_id asc
+        ORDER BY b.cruise_time desc, b.instance_id asc, b.device_id asc
     </select>
 
     <select id="selectAbnormalResult" parameterType="com.yjh.platform.module.task.entity.CruiseResultDetail"
@@ -1174,7 +1174,7 @@
         f.cruise_type,
         n.dict_note as dataType,
         b.custom_id,
-        a.custom_name as componentName,
+        b.custom_name as componentName,
         a.up_region_name as intervalName,
         m.region_name as regionName
         from u_patrol_result q
