@@ -3,7 +3,6 @@ package com.yjh.platform.module.patrol.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
 import com.yjh.platform.common.mqtt.FtpsService;
@@ -19,7 +18,9 @@ import com.yjh.platform.configuration.IntelligentAlgorithmConfig;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
-import com.yjh.platform.module.patrol.entity.*;
+import com.yjh.platform.module.patrol.entity.AnalysePatrolTaskResult;
+import com.yjh.platform.module.patrol.entity.TAlgorithmInfo;
+import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.io.FileUtils;
@@ -998,6 +999,36 @@ public class IntelAnalysisService {
      */
     private void alarmToUpSystem(Map<String, Object> map, List<TWarnInfo> tWarnInfoList) {
         for (TWarnInfo tWarnInfo : tWarnInfoList){
+            String warnTime = DateTimeUtil.format(tWarnInfo.getWarnTime());
+            // 针对渗漏油、设备变形、设备断裂、设备倾斜四类隐患，每小时一次采集与识别
+            if (tWarnInfo.getWarnContent().contains("渗漏油") || tWarnInfo.getWarnContent().contains("设备变形")
+                    || tWarnInfo.getWarnContent().contains("设备断裂") || tWarnInfo.getWarnContent().contains("设备倾斜")) {
+                if (Objects.nonNull(map.get("preset_id")) && Objects.nonNull(map.get("camera_id"))) {
+                    log.info("渗漏油、设备变形... 采集与识别");
+                    String presetId = String.valueOf(map.get("preset_id"));
+                    String cameraId = String.valueOf(map.get("camera_id"));
+                    String silentMonitoringKey = "silent_monitoring:" + cameraId + ":" + presetId;
+                    Map<String, String> redisInfoMap = new HashMap<>();
+                    redisInfoMap.put("cameraId", cameraId);
+                    redisInfoMap.put("presetId", presetId);
+
+                    if (!redisTemplate.hasKey(silentMonitoringKey)) { // 判断是否有数据 没有初始化，有后续直接取
+                        redisInfoMap.put("lastTime", warnTime);
+                        redisTemplate.opsForHash().putAll(silentMonitoringKey, redisInfoMap);
+                    } else {
+                        String lastTime = String.valueOf(redisTemplate.opsForHash().get(silentMonitoringKey, "lastTime"));
+                        int i = DateTimeUtil.hoursBetween(DateTimeUtil.parse(lastTime), DateTimeUtil.parse(warnTime));
+                        if (i < 1) {
+                            return;
+                        } else {
+                            log.info("上次告警上传时间：" + lastTime + " -- 这次告警时间：" + warnTime);
+                            redisInfoMap.put("lastTime", warnTime);
+                            redisTemplate.opsForHash().putAll(silentMonitoringKey, redisInfoMap);
+                        }
+                    }
+                }
+            }
+
             XMLBaseModel xmlBaseModel = new XMLBaseModel();
             List<Map<String, Object>> xmlItems = new ArrayList<>();
             Map<String, Object> xmlItem = new HashMap<>(16);
@@ -1023,12 +1054,13 @@ public class IntelAnalysisService {
             }
 
             try {
-                if (tWarnInfo.getWarnContent().contains("安全帽")) {
-                    xmlItem.put("monitor_type", "1");
-                } else if (tWarnInfo.getWarnContent().contains("越线")) {
-                    xmlItem.put("monitor_type", "2");
-                } else if (tWarnInfo.getWarnContent().contains("工装")) {
-                    xmlItem.put("monitor_type", "3");
+                String[] alarmType = algorithmConfig.getSilentMonitorNameAndType().split(",");
+                for (String str : alarmType) {
+                    String[] split = new String(str.getBytes(StandardCharsets.ISO_8859_1),StandardCharsets.UTF_8).split(":");
+                    if (tWarnInfo.getWarnContent().contains(split[0])) {
+                        xmlItem.put("monitor_type", split[1]);
+                        break;
+                    }
                 }
                 // 目前都是识别图片 所以是5
                 xmlItem.put("file_type", "5");
@@ -1041,7 +1073,7 @@ public class IntelAnalysisService {
                 uploadFileToUpFtps(imgPath, "jm/" + targetNamePath, upFtpsConfig);
 
                 xmlItem.put("file_path", targetNamePath);
-                xmlItem.put("time", DateTimeUtil.format(tWarnInfo.getWarnTime()));
+                xmlItem.put("time", warnTime);
                 xmlItem.put("content", tWarnInfo.getWarnContent());
                 xmlItems.add(xmlItem);
                 xmlBaseModel.setItems(xmlItems);

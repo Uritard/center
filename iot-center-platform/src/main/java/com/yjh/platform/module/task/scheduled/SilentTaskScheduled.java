@@ -119,6 +119,10 @@ public class SilentTaskScheduled {
                     redisInfoMap.put("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                     redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
                     String edgeLevel= (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM+"edgeLevel","content");
+                    if(result==null || !MSG.equals(result.getMessage())){
+                        log.info("抓图失败 result:{}", result);
+                        return ;
+                    }
                     //如果是边缘节点 上传巡视主机
                     if(Constant.LEVEL_EDGE.equals(edgeLevel)){
                         uploadPicture(result, cameraId, presetId, presetName);
@@ -144,11 +148,6 @@ public class SilentTaskScheduled {
      * @param presetId 预置位id  充当巡视点ID
      */
     private void uploadPicture(Result result, String cameraId, String presetId, String presetName){
-        if (result == null || !MSG.equals(result.getMessage())) {
-            // 抓图失败 逻辑处理
-            log.info("抓图失败 result:{}", result);
-            return;
-        }
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             JSONObject jsonForRe = (JSONObject) JSON.toJSON(result.getData());
@@ -191,24 +190,19 @@ public class SilentTaskScheduled {
      * @param result 相机抓图返回结果
      * @param presetId 预置位id  充当巡视点ID
      */
-    private void analysePicture(Result result, Long presetId){
-        if(Objects.nonNull(result) && Objects.equals(MSG, result.getMessage())){
-            JSONObject jsonForRe = (JSONObject) JSON.toJSON(result.getData());
-            String absPath = String.valueOf(jsonForRe.get("absPath"));
-            // 调用算法接口分析结果
-            List<Analysis> analysisList = new ArrayList<>();
-            Analysis analysis = new Analysis()
-                    // 暂定静默监视识别类型为12,没有实际意义
-                    .setAnalyseType("12")
-                    .setInstanceId(presetId)
-                    .setTaskId("jm")
-                    .setPicPath(absPath);
-            analysisList.add(analysis);
-            restTemplatePost(ANALYSE_URL, analysisList);
-        }else {
-            // 抓图失败 逻辑处理
-            log.info("抓图失败");
-        }
+    private void analysePicture(Result result, Long presetId) {
+        JSONObject jsonForRe = (JSONObject) JSON.toJSON(result.getData());
+        String absPath = String.valueOf(jsonForRe.get("absPath"));
+        // 调用算法接口分析结果
+        List<Analysis> analysisList = new ArrayList<>();
+        Analysis analysis = new Analysis()
+                // 暂定静默监视识别类型为12,没有实际意义
+                .setAnalyseType("12")
+                .setInstanceId(presetId)
+                .setTaskId("jm")
+                .setPicPath(absPath);
+        analysisList.add(analysis);
+        restTemplatePost(ANALYSE_URL, analysisList);
     }
 
     /**
