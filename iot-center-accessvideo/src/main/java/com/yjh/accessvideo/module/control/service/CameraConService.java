@@ -66,6 +66,9 @@ public class CameraConService {
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
 
+    @Resource(name = "redisTemplates")
+    private RedisTemplate redisTemplates;
+
     @Value("${nvr.rtmp.video}")
     private String UrlTem;
 
@@ -1305,9 +1308,9 @@ public class CameraConService {
         List<RecorderConInfo> recordersInfo = cameraConDao.SelectRecords();
         recordersInfo.stream().map(RecorderConInfo::getRecordId).forEach(recordId -> {
             reRegister(recordId);
-            redisTemplate.opsForHash().putAll("recorderInfo:" + recordId,
+            redisTemplates.opsForHash().putAll("recorderInfo:" + recordId,
                     getNVRStoreAndChanle(recordId));
-            redisTemplate.expire("recorderInfo:" + recordId, 7, TimeUnit.DAYS);
+            redisTemplates.expire("recorderInfo:" + recordId, 7, TimeUnit.DAYS);
         });
     }
 
