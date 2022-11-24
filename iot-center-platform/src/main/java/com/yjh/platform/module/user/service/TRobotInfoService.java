@@ -527,7 +527,4 @@ public class TRobotInfoService{
         return tRobotInfoDao.selectAllRobotNum();
     }
 
-    public List<String> selectAllStationCode() {
-        return tRobotInfoDao.selectAllStationCode();
-    }
 }

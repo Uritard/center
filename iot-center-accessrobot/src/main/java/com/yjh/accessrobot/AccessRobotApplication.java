@@ -73,6 +73,7 @@ public class AccessRobotApplication implements CommandLineRunner {
 
         Constant.robotCode = robotCode;
         Constant.sendCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+        Constant.stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
         Constant.handlerNew = handlerNew;
         InetSocketAddress address = new InetSocketAddress(url, port);
         log.info("accessrobot is running, url is : " + url);
