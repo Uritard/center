@@ -332,13 +332,6 @@ public class PatrolResultHandler {
                 log.info("cruiseResultMap==={}", cruiseResultMap);
                 redisTemplate.opsForHash().putAll(redisKeyName, cruiseResultMap);
 
-//                // webSocket通知前端调用巡视监控的接口
-//                Map<String, String> jasonMap = new HashMap<>(3);
-//                jasonMap.put("type", "finishedOneInstance");
-//                jasonMap.put("taskId", taskId);
-//                log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMap));
-//                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
-
                 uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
 
                 // 缺陷和判别上报算法管理平台

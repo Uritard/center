@@ -783,49 +783,43 @@
 
     <select id="cruiseInspectCount" parameterType="java.lang.String" resultType="java.lang.Long">
         SELECT
-        count(*)
+            count(*)
         FROM
-        t_std_devicemete
+            t_std_devicemete
         WHERE
-        device_mete_id IN (
-        SELECT DISTINCT
-        a.device_mete_id
-        FROM
-        u_patrol_task_attr a
-        WHERE
-        a.task_id = #{taskId,jdbcType=VARCHAR}
-        )
+                device_mete_id IN (
+                SELECT DISTINCT
+                    a.device_mete_id
+                FROM
+                    u_patrol_task_attr a
+                WHERE
+                    a.task_id = #{taskId,jdbcType=VARCHAR}
+            )
         UNION ALL
         SELECT
-        count(*)
+            count(*)
         FROM
-        t_camera_info
+            u_patrol_task_attr a
+                LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
         WHERE
-        camera_id IN (
-        SELECT DISTINCT
-        c.camera_id
-        FROM
-        u_patrol_task_attr a
-        LEFT JOIN t_camera_preset c ON a.point_task_id = c.preset_id
-        WHERE
-        a.task_id = #{taskId,jdbcType=VARCHAR}
-        )
+            a.task_id = #{taskId,jdbcType=VARCHAR}
+          AND c.cruise_type in (229,230)
         UNION ALL
         SELECT
-        count(*)
+            count(*)
         FROM
-        u_patrol_task_attr a
-        LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
+            u_patrol_task_attr a
+                LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
         WHERE
-        a.task_id = #{taskId,jdbcType=VARCHAR}
-        AND c.cruise_type = 228
+            a.task_id = #{taskId,jdbcType=VARCHAR}
+          AND c.cruise_type = 228
         UNION ALL
         SELECT
-        count(*)
+            count(*)
         FROM
-        u_patrol_task_attr a
+            u_patrol_task_attr a
         WHERE
-        a.task_id = #{taskId,jdbcType=VARCHAR}
+            a.task_id = #{taskId,jdbcType=VARCHAR}
     </select>
 
     <update id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
