@@ -11,8 +11,6 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -90,7 +88,10 @@ public class TCameraPreset implements Serializable {
     @Max(value=999999999)
     @ApiModelProperty(value = "是否静默任务。0-不是，1-是")
     private Integer isKeepWatchTask ;
-
+    /**
+     * 是否秒级静默任务。0-不是，1-是
+     */
+    private Integer isSecondKeepWatchTask;
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;

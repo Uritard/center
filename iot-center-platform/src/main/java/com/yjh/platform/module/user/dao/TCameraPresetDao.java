@@ -72,6 +72,7 @@ public interface TCameraPresetDao {
                                       @Param(value = "presetId") Long presetId,
                                       @Param(value = "isKeepWatch") Integer isKeepWatch,
                                       @Param(value = "isKeepWatchTask") Integer isKeepWatchTask,
+                                      @Param(value = "isSecondKeepWatchTask")Integer isSecondKeepWatchTask,
                                       @Param(value = "selfPreset") Long selfPreset
     );
 
