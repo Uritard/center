@@ -313,7 +313,7 @@ public class ReportManageService {
 //        Integer meteNum = reportManageDao.selectMeteNumByTask(taskId);
         Integer meteNum = uPatrolResultDao.selectMeteNumByTask(taskId);
         taskVO.setMeteNum(meteNum);
-        String voltageClasses = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content")) + "kV";
+        String voltageClasses = redisTemplate.opsForHash().get("t_sys_param:stationVoltageGrade", "content") + "kV";
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
         taskVO.setVoltageClasses(voltageClasses);
         taskVO.setStationType(stationType);

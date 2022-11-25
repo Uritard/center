@@ -105,4 +105,9 @@ public interface StatisticsDao {
 
   List<Statistics> countTaskByMonth(
       @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
+
+  List<Map<String,String>> selectRobot();
+  List<Map<String,String>> selectDrone();
+
+  List<Map<String,String>> selectCamera();
 }

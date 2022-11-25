@@ -389,4 +389,36 @@
         FROM `t_camera_info`
         WHERE camera_id = #{cameraId}
     </select>
+
+    <select id="selectRobot" resultType="java.util.Map">
+        SELECT
+        robot_id as robotId,
+        robot_code as patrolDeviceCode,
+        robot_name as patrolDeviceName,
+        commission_date as commissionTime
+        FROM
+        t_robot_info
+        WHERE
+        robot_type IS NOT NULL
+    </select>
+    <select id="selectCamera" resultType="java.util.Map">
+        SELECT
+        camera_id as cameraId,
+        camera_id as patrolDeviceCode,
+        camera_name as patrolDeviceName,
+        create_time as commissionTime
+        FROM
+        t_camera_info
+    </select>
+    <select id="selectDrone" resultType="java.util.Map">
+        SELECT
+        robot_id as robotId,
+        robot_code as patrolDeviceCode,
+        robot_name as patrolDeviceName,
+        commission_date as commissionTime
+        FROM
+        t_robot_info
+        WHERE
+        drone_type IS NOT NULL
+    </select>
 </mapper>
