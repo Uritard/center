@@ -641,7 +641,7 @@ CREATE TABLE `t_camera_preset` (
   `remark` varchar(255) DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`preset_id`) USING BTREE,
   UNIQUE KEY `idx_camera_num` (`camera_id`,`preset_num`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='摄像机预位置表';
+) ENGINE=InnoDB AUTO_INCREMENT=21000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='摄像机预位置表';
 
 -- ----------------------------
 -- Table structure for t_camera_recorder
@@ -1668,7 +1668,7 @@ CREATE TABLE `t_robot_inspection` (
   `device_info` varchar(255) DEFAULT '' COMMENT '备注信息',
   `property_pic_path` varchar(255) DEFAULT '' COMMENT '测点属性图',
   PRIMARY KEY (`inspection_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='机器人测点信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=100000256 DEFAULT CHARSET=utf8 COMMENT='机器人测点信息表';
 
 -- ----------------------------
 -- Table structure for t_robot_inspection_attr
@@ -1744,7 +1744,7 @@ CREATE TABLE `t_std_device` (
   PRIMARY KEY (`device_id`) USING BTREE,
   KEY `index_create_date` (`create_time`) USING BTREE,
   KEY `index_device_type` (`device_type`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='标准化设备表';
+) ENGINE=InnoDB AUTO_INCREMENT=100000001 DEFAULT CHARSET=utf8 COMMENT='标准化设备表';
 
 -- ----------------------------
 -- Table structure for t_std_devicemete
@@ -1795,7 +1795,7 @@ CREATE TABLE `t_std_devicemete` (
   `remark` varchar(128) DEFAULT '' COMMENT '信号说明',
   `redundant_type` varchar(50) NOT NULL COMMENT '测点级别（1 = Ⅰ类 2 = Ⅱ 类型）',
   PRIMARY KEY (`device_mete_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=100000001 DEFAULT CHARSET=utf8 COMMENT='标准设备测点表';
+) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 COMMENT='标准设备测点表';
 
 -- ----------------------------
 -- Table structure for t_std_devicemete_update
