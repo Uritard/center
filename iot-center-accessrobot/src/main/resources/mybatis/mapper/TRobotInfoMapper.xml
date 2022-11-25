@@ -207,7 +207,7 @@
         where 1 = 1
         <if test="robotId != null and robotId != ''"> and a.robot_id = #{robotId, jdbcType=BIGINT}</if>
         <if test="robotCode != null and robotCode != ''"> and a.robot_code = #{robotCode, jdbcType=VARCHAR}</if>
-        <if test="robotNum != null"> and a.robot_num = #{robotNum, jdbcType=INTEGER}</if>
+        <if test="robotNum != null"> and a.robot_num = #{robotNum, jdbcType=VARCHAR}</if>
         <if test="robotName != null and robotName != ''"> and a.robot_name = #{robotName, jdbcType=VARCHAR}</if>
         <if test="robotStatus != null and robotStatus != ''"> and a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
         <if test="robotType != null and robotType != ''"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
