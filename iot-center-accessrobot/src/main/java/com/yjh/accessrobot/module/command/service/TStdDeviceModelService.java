@@ -2,7 +2,6 @@ package com.yjh.accessrobot.module.command.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.*;
 import com.yjh.accessrobot.module.command.entity.*;
@@ -20,7 +19,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -215,22 +213,21 @@ public class TStdDeviceModelService {
         } else {
             //将旧的数据和新的数据进行对比相同的去掉  不通的更新  新增的直接入库
             //预置位
-            List<TCameraPreset> insertCameraInfoList = dealCameraPreset(oldCameraPresetList, newCameraPresets, edgeCode);
+            List<TCameraPreset> insertCameraPresetList = dealCameraPreset(oldCameraPresetList, newCameraPresets, edgeCode);
             //机器人测点
-            List<TRobotInspection> insertRobotInfoList = dealRobotInspection(oldRobotInspectionList, newRobotInspections, edgeCode);
+            List<TRobotInspection> insertRobotInspectionList = dealRobotInspection(oldRobotInspectionList, newRobotInspections, edgeCode);
             //设备
             List<TStdDevice> insertStdDevice = dealStdDevice(oldStdDeviceList, newStdDevices, edgeCode);
             //测点
             List<TStdDeviceMete> insertStdDeviceMete = dealStdDeviceMete(oldStdDeviceMeteList, newStdDeviceMetes, edgeCode);
             //测点算法关系信息
-            List<TAlgorithmMete> insertAlgorithmMetes = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(newAlgorithmMetes)){
-                insertAlgorithmMetes = dealAlgorithmMete(oldAlgorithmMeteList, newAlgorithmMetes, edgeCode);
+                dealAlgorithmMete(oldAlgorithmMeteList, newAlgorithmMetes, edgeCode);
             }
             //巡视点
-            List<TCruisePointInstance> insertCruisePointInstanceList = dealCruisePointInstance(oldCruisePointInstanceList, newCruisePointInstances, edgeCode);
-            //新增的数据入库
-            insertDeviceModel(insertCameraInfoList, insertRobotInfoList, insertStdDevice, insertStdDeviceMete, insertCruisePointInstanceList, tVoiceDeviceList, insertAlgorithmMetes);
+            dealCruisePointInstance(insertCameraPresetList, oldCameraPresetList, insertRobotInspectionList, oldRobotInspectionList,
+                    insertStdDevice, oldStdDeviceList, insertStdDeviceMete, oldStdDeviceMeteList,
+                    oldCruisePointInstanceList, newCruisePointInstances, tVoiceDeviceList, edgeCode);
         }
     }
 
@@ -297,6 +294,7 @@ public class TStdDeviceModelService {
         List<TCameraPreset> insertList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
             insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
+            tCameraPresetMapper.batchInsert(insertList);
         }
         return insertList;
     }
@@ -330,6 +328,7 @@ public class TStdDeviceModelService {
         List<TRobotInspection> insertList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
             insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
+            tRobotInspectionDao.batchInsertTRobotInspection(insertList);
         }
         return insertList;
     }
@@ -339,9 +338,13 @@ public class TStdDeviceModelService {
      * @param oldList 旧数据
      * @param newList 新数据
      * @param edgeCode 节点编码
-     * @return 直接入库的数据
      */
-    private List<TCruisePointInstance> dealCruisePointInstance(List<TCruisePointInstance> oldList, List<TCruisePointInstance> newList, String edgeCode){
+    private void dealCruisePointInstance(List<TCameraPreset> insertCameraPresetList, List<TCameraPreset> oldCameraPresetList,
+                                         List<TRobotInspection> insertRobotInspectionList, List<TRobotInspection> oldRobotInspectionList,
+                                         List<TStdDevice> insertStdDevice, List<TStdDevice> oldStdDeviceList,
+                                         List<TStdDeviceMete> insertStdDeviceMete, List<TStdDeviceMete> oldStdDeviceMeteList,
+                                         List<TCruisePointInstance> oldList, List<TCruisePointInstance> newList,
+                                         List<TVoiceDevice> tVoiceDeviceList, String edgeCode){
         Map<String, TCruisePointInstance> oldMap = oldList.stream().collect(Collectors.toMap(TCruisePointInstance::getOriginId, Function.identity()));
         Map<String, TCruisePointInstance> newMap = newList.stream().collect(Collectors.toMap(TCruisePointInstance::getOriginId, Function.identity()));
         SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
@@ -363,11 +366,45 @@ public class TStdDeviceModelService {
         }
         //新增的数据
         SetUtils.SetView<String> insertIdSet = SetUtils.difference(newMap.keySet(), oldMap.keySet());
-        List<TCruisePointInstance> insertList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
-            insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
+            List<TCruisePointInstance> insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
+            insertList.forEach(tCruisePointInstance -> {
+                tCruisePointInstance.setDeviceId(CollectionUtils.isNotEmpty(insertStdDevice) ? insertStdDevice.stream().filter(tStdDevice ->
+                                String.valueOf(tCruisePointInstance.getDeviceId()).equals(tStdDevice.getOriginId()))
+                        .collect(Collectors.toList()).get(0).getDeviceId() : oldStdDeviceList.stream().filter(tStdDevice ->
+                                String.valueOf(tCruisePointInstance.getDeviceId()).equals(tStdDevice.getOriginId()))
+                        .collect(Collectors.toList()).get(0).getDeviceId());
+                tCruisePointInstance.setDeviceMeteId(CollectionUtils.isNotEmpty(insertStdDeviceMete) ? insertStdDeviceMete.stream().filter(tStdDeviceMete ->
+                                String.valueOf(tCruisePointInstance.getDeviceMeteId()).equals(tStdDeviceMete.getOriginId()))
+                        .collect(Collectors.toList()).get(0).getDeviceMeteId() : oldStdDeviceMeteList.stream().filter(tStdDeviceMete ->
+                                String.valueOf(tCruisePointInstance.getDeviceMeteId()).equals(tStdDeviceMete.getOriginId()))
+                        .collect(Collectors.toList()).get(0).getDeviceMeteId());
+                switch (tCruisePointInstance.getCruiseType()) {
+                    case 230:
+                    case 229:
+                        tCruisePointInstance.setCruiseId(CollectionUtils.isNotEmpty(insertCameraPresetList) ? insertCameraPresetList.stream().filter(tCameraPreset ->
+                                        String.valueOf(tCruisePointInstance.getCruiseId()).equals(tCameraPreset.getOriginId()))
+                                .collect(Collectors.toList()).get(0).getPresetId() : oldCameraPresetList.stream().filter(tCameraPreset ->
+                                        String.valueOf(tCruisePointInstance.getCruiseId()).equals(tCameraPreset.getOriginId()))
+                                .collect(Collectors.toList()).get(0).getPresetId());
+                        break;
+                    case 228:
+                    case 524:
+                        tCruisePointInstance.setCruiseId(CollectionUtils.isNotEmpty(insertRobotInspectionList) ? insertRobotInspectionList.stream().filter(tRobotInspection ->
+                                        String.valueOf(tCruisePointInstance.getCruiseId()).equals(tRobotInspection.getOriginId()))
+                                .collect(Collectors.toList()).get(0).getInspectionId() : oldRobotInspectionList.stream().filter(tRobotInspection ->
+                                        String.valueOf(tCruisePointInstance.getCruiseId()).equals(tRobotInspection.getOriginId()))
+                                .collect(Collectors.toList()).get(0).getInspectionId());
+                        break;
+                    default:
+                        tCruisePointInstance.setCruiseId(tVoiceDeviceList.stream().filter(tVoiceDevice ->
+                                        String.valueOf(tCruisePointInstance.getCruiseId()).equals(tVoiceDevice.getOriginId()))
+                                .collect(Collectors.toList()).get(0).getVoiceDeviceId());
+                        break;
+                }
+            });
+            tCruisePointInstanceMapper.batchInsert(insertList);
         }
-        return insertList;
     }
 
     /**
@@ -400,6 +437,7 @@ public class TStdDeviceModelService {
         List<TStdDeviceMete> insertList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
             insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
+            tStdDevicemeteMapper.batchInsert(insertList);
         }
         return insertList;
     }
@@ -409,9 +447,8 @@ public class TStdDeviceModelService {
      * @param oldList 旧数据
      * @param newList 新数据
      * @param edgeCode 节点编码
-     * @return 直接入库的数据
      */
-    private List<TAlgorithmMete> dealAlgorithmMete(List<TAlgorithmMete> oldList, List<TAlgorithmMete> newList, String edgeCode){
+    private void dealAlgorithmMete(List<TAlgorithmMete> oldList, List<TAlgorithmMete> newList, String edgeCode){
         Map<String, TAlgorithmMete> oldMap = oldList.stream().collect(Collectors.toMap(TAlgorithmMete::getOriginId, Function.identity()));
         Map<String, TAlgorithmMete> newMap = newList.stream().collect(Collectors.toMap(TAlgorithmMete::getOriginId, Function.identity()));
         SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
@@ -430,11 +467,10 @@ public class TStdDeviceModelService {
         }
         //新增的数据
         SetUtils.SetView<String> insertIdSet = SetUtils.difference(newMap.keySet(), oldMap.keySet());
-        List<TAlgorithmMete> insertList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
-            insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
+            List<TAlgorithmMete> insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
+            tAlgorithmMeteMapper.batchInsert(insertList);
         }
-        return insertList;
     }
 
     /**
@@ -466,6 +502,7 @@ public class TStdDeviceModelService {
         List<TStdDevice> insertList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
             insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
+            tStdDeviceMapper.batchInsert(insertList);
         }
         return insertList;
     }
