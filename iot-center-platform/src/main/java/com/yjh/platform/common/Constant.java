@@ -40,6 +40,7 @@ public class Constant {
     public static final String T_SYS_PARAM = "t_sys_param:";
     public static final String LEVEL_EDGE = "1";
     public static final String SILENT_SECOND = "silent_second:";
+    public static final Integer INTEGER_1 = 1;
 
     public static List<ConcurrentHashMap<String,Object>> taskMap = new LinkedList<>();
 

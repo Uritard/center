@@ -21,5 +21,5 @@ public class TCameraPresetExpand extends TCameraPreset{
     @ApiModelProperty(value = "摄像头名称")
     private String cameraName;
 
-    private String presetType;
+    private int presetType;
 }
