@@ -3,11 +3,11 @@ package com.yjh.accessrobot.netty.server;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
-import com.yjh.accessrobot.netty.handler.MessageHandlerStrategy;
-import com.yjh.accessrobot.netty.handler.MessageHandlerStrategyFactory;
+import com.yjh.accessrobot.netty.handler.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,7 +29,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.yjh.accessrobot.common.Constant.*;
+import static com.yjh.accessrobot.common.Constant.maps;
+import static com.yjh.accessrobot.common.Constant.robotChannels;
+import static com.yjh.accessrobot.common.Constant.robotHeartBeatCounts;
+import static com.yjh.accessrobot.common.Constant.robotRegisterCounts;
+import static com.yjh.accessrobot.common.Constant.robotRemoveCounts;
 
 /**
  * Created by tt on 2019/7/31.
@@ -270,12 +274,16 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
             } else {
                 handlerType = type;
             }
-
-            MessageHandlerStrategy messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
+            MessageHandlerStrategy messageHandlerStrategy;
+            // 63,64命令类型 私有协议与220kv规约冲突
+            if ("63".equals(type) || "64".equals(type)) {
+                messageHandlerStrategy = buildMessageHandlerStrategy(xmlBaseModel, type);
+            } else {
+                messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
+            }
             if (Optional.of(messageHandlerStrategy).isPresent()) {
                 messageHandlerStrategy.handler(ctx, this, xmlBaseModel, sendSessionId, receiveSessionId);
             }
-
         } catch (Exception e) {
             log.error("处理机器人响应消息错误:" + e.getMessage());
             String responseMsgXmlString = PlatformXMLUtil
@@ -285,6 +293,27 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
             send(responseMsgProtocol, xmlBaseModel.getSendCode());
             log.info("巡视主机给机器人{}响应了", xmlBaseModel.getSendCode());
         }
+    }
+
+    private MessageHandlerStrategy buildMessageHandlerStrategy(XMLBaseModel xmlBaseModel, String type) {
+        MessageHandlerStrategy messageHandlerStrategy;
+        boolean isSubSystem = robotService.isSubSystem(xmlBaseModel.getSendCode());
+        //下级系统
+        if (isSubSystem) {
+            if ("63".equals(type)) {
+                messageHandlerStrategy = StaticContextAccessor.getBean(SilentMonitoringHandlerUpSystem.class);
+            } else {
+                messageHandlerStrategy = StaticContextAccessor.getBean(SilentMonitoringHandler.class);
+            }
+            // 机器人
+        } else {
+            if ("63".equals(type)) {
+                messageHandlerStrategy = StaticContextAccessor.getBean(RobotCruiseReportHandler.class);
+            } else {
+                messageHandlerStrategy = StaticContextAccessor.getBean(OperationResultHandler.class);
+            }
+        }
+        return messageHandlerStrategy;
     }
 
     /**
