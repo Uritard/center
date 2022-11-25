@@ -140,7 +140,7 @@ public class UPatrolTaskController {
                          @RequestParam(value = "startTime", required = false) String startTime) {
         Result result = new Result();
         try {
-            result.setData("");
+            result.setData(uPatrolTaskService.deleteByPrimaryId(taskId,startTime));
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("删除任务异常:", e);
