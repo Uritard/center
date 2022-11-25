@@ -355,17 +355,17 @@ public class TCameraPresetController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(tCameraPreset.getPageNum()!=null?tCameraPreset.getPageNum():1, tCameraPreset.getPageSize()!=null?tCameraPreset.getPageSize():0,true,null,true);
+            Page page = PageHelper.startPage(tCameraPreset.getPageNum() != null ? tCameraPreset.getPageNum() : 1, tCameraPreset.getPageSize() != null ? tCameraPreset.getPageSize() : 0, true, null, true);
             List<TCameraPresetExpand> list = tCameraPresetService.selectByPage(tCameraPreset);
             for (TCameraPresetExpand tCameraPresetExpand : list) {
-                if (tCameraPresetExpand.getIsKeepWatchTask() == 1) {// 静默位
-                    tCameraPresetExpand.setPresetType("1");
-                } else if (tCameraPresetExpand.getIsKeepWatch() == 1) {// 守望位
-                    tCameraPresetExpand.setPresetType("2");
-                } else if (tCameraPresetExpand.getIsSecondKeepWatchTask() == 1) {// 秒级静默位
-                    tCameraPresetExpand.setPresetType("3");
+                if (Constant.INTEGER_1.equals(tCameraPresetExpand.getIsKeepWatchTask())) {// 静默位
+                    tCameraPresetExpand.setPresetType(1);
+                } else if (Constant.INTEGER_1.equals((tCameraPresetExpand.getIsKeepWatch()))) {// 守望位
+                    tCameraPresetExpand.setPresetType(2);
+                } else if (Constant.INTEGER_1.equals(tCameraPresetExpand.getIsSecondKeepWatchTask())) {// 秒级静默位
+                    tCameraPresetExpand.setPresetType(3);
                 } else {// 预置位
-                    tCameraPresetExpand.setPresetType("0");
+                    tCameraPresetExpand.setPresetType(0);
                 }
             }
             resultMap.put("count", page.getTotal());
