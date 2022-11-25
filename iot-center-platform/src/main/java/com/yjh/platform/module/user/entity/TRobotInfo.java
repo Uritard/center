@@ -254,7 +254,6 @@ public class TRobotInfo implements Serializable {
     @ApiModelProperty(value = "秘钥标识符", hidden=true)
     private String identifier;
 
-    @Max(value = 99999999)
     @ApiModelProperty(value = "机器人/无人机编号编码")
     @TableField(value = "robot_num", updateStrategy = FieldStrategy.IGNORED)
     private String robotNum;

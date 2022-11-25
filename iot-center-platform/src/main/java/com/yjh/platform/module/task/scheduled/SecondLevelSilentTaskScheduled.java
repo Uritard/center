@@ -46,6 +46,7 @@ public class SecondLevelSilentTaskScheduled {
         // 静默任务开关
         String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));
         if (Boolean.FALSE.toString().equals(silentFlag)) {
+            log.error("isSilentTask is false");
             return;
         }
 
