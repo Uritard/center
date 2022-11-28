@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author tt
@@ -47,11 +46,11 @@ public interface TCruiseTaskDao {
     List<CruiseInspectResult> selectCruiseInspectByTaskId(@Param(value = "taskId")String taskId);
     List<CruiseInspectResult> selectCruiseInspectByTaskIdYC(@Param(value = "taskId")String taskId);
 
-    List<WarnStatistical> selectForSevenDay();//近七天
+    List<WarnStatistical> selectForSevenDay(@Param(value = "regionCode")String regionCode);//近七天
 
-    List<WarnStatistical> selectForMonth();//近一个月
+    List<WarnStatistical> selectForMonth(@Param(value = "regionCode")String regionCode);//近一个月
 
-    List<WarnStatistical>selectForYear();//近一年
+    List<WarnStatistical>selectForYear(@Param(value = "regionCode")String regionCode);//近一年
 
     List<WarnStatistical> selectOnMonth();//本月
 

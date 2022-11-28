@@ -43,10 +43,10 @@ public class HomePageController {
 
     @ApiOperation(value = "巡视任务数据概览")
     @RequestMapping(value = "/taskInfo", method = RequestMethod.GET)
-    public Result taskInfo(@RequestParam(value = "date", required = true) Integer date) {
+    public Result taskInfo(@RequestParam(value = "date", required = true) Integer date,@RequestParam(value = "regionCode", required = false) String regionCode) {
         Result result = new Result();
         try {
-            result.setData(homePageService.taskInfo(date));
+            result.setData(homePageService.taskInfo(date,regionCode));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
@@ -417,6 +417,21 @@ public class HomePageController {
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("首页查询任务概览", e);
+        }
+        return result;
+    }
+
+
+    @ApiOperation(value = "首页查询站点列表")
+    @RequestMapping(value = "/queryStationList", method = RequestMethod.GET)
+    public Result queryStationList() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.queryStationList());
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("首页查询站点列表", e);
         }
         return result;
     }
