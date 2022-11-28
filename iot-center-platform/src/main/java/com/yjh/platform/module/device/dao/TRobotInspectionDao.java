@@ -1,9 +1,6 @@
 package com.yjh.platform.module.device.dao;
 
-import com.yjh.platform.module.device.entity.Robot;
-import com.yjh.platform.module.device.entity.TCruisePointAttr;
-import com.yjh.platform.module.device.entity.TRobotInspection;
-import com.yjh.platform.module.device.entity.TRobotInspectionTmp;
+import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.task.entity.ConfirmImmediately;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.ibatis.annotations.Param;
@@ -85,7 +82,7 @@ public interface TRobotInspectionDao {
      * @param edgeCode
      * @return
      */
-    String selectRealInstanceId(@Param(value = "originId") String deviceId,@Param(value = "edgeCode") String edgeCode);
+    TCruisePointInstance selectRealInstance(@Param(value = "originId") String deviceId,@Param(value = "edgeCode") String edgeCode);
 
     /**
      * 判断robotCode是上级系统传来的还是下级系统

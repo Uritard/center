@@ -382,7 +382,7 @@ public class TCruiseTaskResultService {
     public Map<String, Object> selectCruiseAdvance(String taskId) {
 
         Map<String, Object> countResult = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_SUMMARY_PREFIX + taskId);
-        String rate = (String)countResult.get("progress");
+        String rate = (String)countResult.get("taskProgress");
         if (StringUtils.isEmpty(rate)){
             rate = "0";
         }

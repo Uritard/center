@@ -84,7 +84,7 @@ public class CruiseRedisStorage {
 
             String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + insId;
             operations.opsForHash().putAll(key, m);
-            operations.expire(key, 7, TimeUnit.DAYS);
+            operations.expire(key, 3, TimeUnit.DAYS);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

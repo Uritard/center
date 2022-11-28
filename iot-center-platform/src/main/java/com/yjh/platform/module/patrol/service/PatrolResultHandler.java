@@ -106,11 +106,11 @@ public class PatrolResultHandler {
             return;
         }
 
-        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
-        ));
+        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
         log.info("resultList=={}", resultList);
-        try {
-            for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
+
+        for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
+            try {
                 Map<String, String> infoMap = new HashMap<>(8);
 
                 // 通过上报的任务id查询巡视主机上的任务id
@@ -148,39 +148,12 @@ public class PatrolResultHandler {
                     ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
                 }
                 // 巡视结果处理
-                InspectionResultThread cruiseResultDealThread = new InspectionResultThread(robotPatrolTaskResult, infoMap
-                        , redisTemplate, true);
+                InspectionResultThread cruiseResultDealThread =
+                    new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, true);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
+            } catch (Exception e) {
+                log.error("处理机器人/无人机/边缘节点巡视结果异常:", e);
             }
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
-            if ("2".equals(sysLevel) && (tRobotInspectionDao.selectRobotCount(edgeCode) > 0 || tRobotInspectionDao.selectRegion(edgeCode) > 0) || "3".equals(sysLevel)) {
-
-                redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX).keySet().forEach(taskId ->
-                {
-                    log.info("该点任务执行完成{}", taskId);
-                    UPatrolResult uPatrolResult = new UPatrolResult()
-                            .setRobotId(tRobotInspectionDao.selectRobotIdByRobotCode(edgeCode));
-                    AtomicInteger abnormalCounts = new AtomicInteger();
-                    AtomicInteger normalCounts = new AtomicInteger();
-                    redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId).keySet().forEach(instanceId -> {
-                        if (redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId).get(
-                                "cruiseAbnormal").equals(String.valueOf(CRUISE_RESULT_NORMAL))) {
-                            normalCounts.getAndIncrement();
-                        } else {
-                            abnormalCounts.getAndIncrement();
-                        }
-                    });
-                    uPatrolResult.setTaskAbnormal(abnormalCounts.get())
-                            .setTaskCount(abnormalCounts.get() + normalCounts.get())
-                            .setTaskState(TASK_STATE_FINISHED)
-                            .setTaskWait(0)
-                            .setEndTime(new Date());
-
-                    uPatrolResultDao.update(uPatrolResult);
-                });
-            }
-            }catch (Exception e){
-            log.error("处理机器人/无人机/边缘节点巡视结果异常:", e);
         }
     }
 
