@@ -82,122 +82,133 @@ public class TStdDeviceModelService {
         List<TStdDeviceMete> finalStdDeviceMeteList = new ArrayList<>();
         List<TAlgorithmMete> finalAlgorithmMeteList = new ArrayList<>();
         List<TCruisePointInstance> newCruisePointInstances = new ArrayList<>();
-        deviceModelList.stream().filter(d -> !JSON.parseObject(JSONArray.parseArray(d.get("video_pos").toString()).get(0).toString()).entrySet().isEmpty())
-                .forEach(device -> {
-                    //构建 t_std_device
-                    TStdDevice tStdDevice = new TStdDevice();
-                    tStdDevice.setEdgeCode(edgeCode);
-                    tStdDevice.setOriginId(String.valueOf(device.get("main_device_id")));
-                    tStdDevice.setDeviceName(String.valueOf(device.get("main_device_name")));
-                    tStdDevice.setUpRegionId(tStdRegionList.stream().filter(t -> device.get("bay_id").equals(String.valueOf(t.getOriginRegionId()))).map(TStdRegion::getRegionId).collect(Collectors.toList()).get(0));
-                    tStdDevice.setUpRegionName(String.valueOf(device.get("bay_name")));
-                    tStdDevice.setDeviceType(CollectionUtils.isNotEmpty(dictMapList) ? Integer.parseInt(dictMapList.stream().filter(s -> "device_type".equals(s.get("col_name")) && device.get("device_type").equals(String.valueOf(s.get("up_dict")))).map(d -> d.get("dict_code")).collect(Collectors.toList()).get(0)) : null);
-                    if (device.containsKey("real_code")) {
-                        tStdDevice.setRealCode(String.valueOf(device.get("real_code")));
-                    }
-                    finalDeviceList.add(tStdDevice);
-                    long cruiseId;
-                    int cruiseType;
-                    switch (String.valueOf(device.get("data_type"))) {
-                        case "1":
-                            //视频
-                            //构建 t_camera_preset
-                            TCameraPreset tCameraPreset = new TCameraPreset();
-                            JSONArray cameraArray = JSONArray.parseArray(device.get("video_pos").toString());
-                            tCameraPreset.setEdgeCode(edgeCode);
-                            cruiseId = Long.parseLong(JSON.parseObject(cameraArray.get(0).toString()).get("device_pos").toString());
-                            tCameraPreset.setOriginId(String.valueOf(cruiseId));
-                            String cameraOriginId = JSON.parseObject(cameraArray.get(0).toString()).get("device_code").toString();
-                            TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t -> cameraOriginId.equals(t.getOriginId()) && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
-                            tCameraPreset.setCameraId(tCameraInfo.getCameraId());
-                            tCameraPreset.setPresetName(String.valueOf(device.get("device_name")).contains("/") ? StringUtils.substringAfter(device.get("device_name").toString(), "/") : String.valueOf(device.get("device_name")));
-                            //当节点为巡视主机接入边缘节点时再触发
-                            if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
-                                tCameraPreset.setPresetNum((Integer) device.getOrDefault("preset_num", 1));
-                                tCameraPreset.setIsKeepWatch((Integer) device.getOrDefault("is_keep_watch", 0));
-                                tCameraPreset.setIsKeepWatchTask((Integer) device.getOrDefault("is_keep_watch_task", 0));
-                                tCameraPreset.setIsSecondKeepWatchTask((Integer) device.getOrDefault("is_second_keep_watch_task", 0));
-                                if (device.containsKey("preset_img")) {
-                                    String presetFtpsImg = ftpsPath + device.get("preset_img").toString();
-                                    String presetImg = presetPath + device.get("preset_img").toString();
-                                    File ftpsFile = new File(presetFtpsImg);
-                                    if (ftpsFile.exists()) {
-                                        try {
-                                            FileUtil.copyFileUsingStream(presetFtpsImg, presetImg);
-                                            tCameraPreset.setPresetImg(presetRealPath + device.get("preset_img").toString());
-                                        } catch (IOException e) {
-                                            log.error("预置位文件拷贝失败", e);
+        if (CollectionUtils.isNotEmpty(deviceModelList)) {
+            deviceModelList.stream().filter(d -> !JSON.parseObject(JSONArray.parseArray(d.get("video_pos").toString()).get(0).toString()).entrySet().isEmpty())
+                    .forEach(device -> {
+                        //构建 t_std_device
+                        TStdDevice tStdDevice = new TStdDevice();
+                        tStdDevice.setEdgeCode(edgeCode);
+                        tStdDevice.setOriginId(String.valueOf(device.get("main_device_id")));
+                        tStdDevice.setDeviceName(String.valueOf(device.get("main_device_name")));
+                        tStdDevice.setUpRegionId(tStdRegionList.stream().filter(t -> device.get("bay_id").equals(String.valueOf(t.getOriginRegionId()))).map(TStdRegion::getRegionId).collect(Collectors.toList()).get(0));
+                        tStdDevice.setUpRegionName(String.valueOf(device.get("bay_name")));
+                        tStdDevice.setDeviceType(CollectionUtils.isNotEmpty(dictMapList) ? Integer.parseInt(dictMapList.stream().filter(s -> "device_type".equals(s.get("col_name")) && device.get("device_type").equals(String.valueOf(s.get("up_dict")))).map(d -> d.get("dict_code")).collect(Collectors.toList()).get(0)) : null);
+                        if (device.containsKey("real_code")) {
+                            tStdDevice.setRealCode(String.valueOf(device.get("real_code")));
+                        }
+                        finalDeviceList.add(tStdDevice);
+                        long cruiseId;
+                        int cruiseType;
+                        switch (String.valueOf(device.get("data_type"))) {
+                            case "1":
+                                //视频
+                                //构建 t_camera_preset
+                                TCameraPreset tCameraPreset = new TCameraPreset();
+                                JSONArray cameraArray = JSONArray.parseArray(device.get("video_pos").toString());
+                                tCameraPreset.setEdgeCode(edgeCode);
+                                cruiseId = Long.parseLong(JSON.parseObject(cameraArray.get(0).toString()).get("device_pos").toString());
+                                tCameraPreset.setOriginId(String.valueOf(cruiseId));
+                                String cameraOriginId = JSON.parseObject(cameraArray.get(0).toString()).get("device_code").toString();
+                                TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t -> cameraOriginId.equals(t.getOriginId()) && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
+                                tCameraPreset.setCameraId(tCameraInfo.getCameraId());
+                                tCameraPreset.setPresetName(String.valueOf(device.get("device_name")).contains("/") ? StringUtils.substringAfter(device.get("device_name").toString(), "/") : String.valueOf(device.get("device_name")));
+                                //当节点为巡视主机接入边缘节点时再触发
+                                if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
+                                    tCameraPreset.setPresetNum((Integer) device.getOrDefault("preset_num", 1));
+                                    tCameraPreset.setIsKeepWatch((Integer) device.getOrDefault("is_keep_watch", 0));
+                                    tCameraPreset.setIsKeepWatchTask((Integer) device.getOrDefault("is_keep_watch_task", 0));
+                                    tCameraPreset.setIsSecondKeepWatchTask((Integer) device.getOrDefault("is_second_keep_watch_task", 0));
+                                    if (device.containsKey("preset_img")) {
+                                        String presetFtpsImg = ftpsPath + device.get("preset_img").toString();
+                                        String presetImg = presetPath + device.get("preset_img").toString();
+                                        File ftpsFile = new File(presetFtpsImg);
+                                        if (ftpsFile.exists()) {
+                                            try {
+                                                FileUtil.copyFileUsingStream(presetFtpsImg, presetImg);
+                                                tCameraPreset.setPresetImg(presetRealPath + device.get("preset_img").toString());
+                                            } catch (IOException e) {
+                                                log.error("预置位文件拷贝失败", e);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            finalCameraPresetList.add(tCameraPreset);
-                            cruiseType = tCameraInfo.getCameraType() == 206 ? 230 : 229;
-                            break;
-                        case "01":
-                        case "001":
-                            //机器人、无人机
-                            //构建 t_robot_inspection
-                            TRobotInspection tRobotInspection = new TRobotInspection();
-                            JSONArray robotArray = JSONArray.parseArray(device.get("video_pos").toString());
-                            String keyPos = "01".equals(device.get("data_type")) ? "robot_pos" : "uav_pos";
-                            String keyCode = "01".equals(device.get("data_type")) ? "robot_code" : "uav_code";
-                            tRobotInspection.setEdgeCode(edgeCode);
-                            cruiseId = Long.parseLong(JSON.parseObject(robotArray.get(0).toString()).get(keyPos).toString());
-                            cruiseType = "01".equals(device.get("data_type")) ? 228 : 524;
-                            tRobotInspection.setOriginId(String.valueOf(cruiseId));
-                            TRobotInfo tRobotInfo = tRobotInfoList.stream().filter(t -> String.valueOf(robotArray.getJSONObject(0).get(keyCode)).equals(String.valueOf(t.getRobotNum()))).collect(Collectors.toList()).get(0);
-                            tRobotInspection.setRobotId(tRobotInfo.getRobotId());
-                            tRobotInspection.setInspectionName(String.valueOf(device.get("device_name")).contains("/") ? StringUtils.substringAfter(device.get("device_name").toString(), "/") : String.valueOf(device.get("device_name")));
-                            finalRobotInspectionList.add(tRobotInspection);
-                            break;
-                        case "0001":
-                            //声纹
-                            JSONArray voiceArray = JSONArray.parseArray(device.get("video_pos").toString());
-                            boolean voiceFlag = JSON.parseObject(voiceArray.get(0).toString()).containsKey("voice_pos");
-                            cruiseId = voiceFlag ? Long.parseLong(JSON.parseObject(voiceArray.get(0).toString()).get("voice_pos").toString()) : Long.parseLong(JSON.parseObject(voiceArray.get(0).toString()).get("device_pos").toString());
-                            cruiseType = 232;
-                            break;
-                        default:
-                            return;
-                    }
-                    //构建 t_std_devicemete
-                    TStdDeviceMete tStdDeviceMete = new TStdDeviceMete();
-                    tStdDeviceMete.setMeteName(String.valueOf(device.get("device_name")).contains("/") ? StringUtils.substringBefore(device.get("device_name").toString().replace(" ", ""), "/") : String.valueOf(device.get("device_name")));
-                    tStdDeviceMete.setDeviceId(Long.valueOf(tStdDevice.getOriginId()));
-                    tStdDeviceMete.setCustomId(String.valueOf(device.get("component_id")));
-                    tStdDeviceMete.setCustomName(String.valueOf(device.get("component_name")));
-                    if (device.containsKey("device_mete_id")) {
-                        tStdDeviceMete.setOriginId(String.valueOf(device.get("device_mete_id")));
-                    } else {
-                        tStdDeviceMete.setOriginId(String.valueOf(device.get("device_id")));
-                    }
-                    tStdDeviceMete.setEdgeCode(edgeCode);
-                    tStdDeviceMete.setRedundantType(String.valueOf(device.getOrDefault("redundant_type", "1")));
-                    if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
-                        tStdDeviceMete = convertDeviceMete(device);
-                        if (device.containsKey("algorithm_id") &&  StringUtils.isNotEmpty(device.get("algorithm_id").toString())){
-                            TAlgorithmMete tAlgorithmMete = new TAlgorithmMete();
-                            tAlgorithmMete.setEdgeCode(edgeCode);
-                            tAlgorithmMete.setOriginId(tStdDeviceMete.getOriginId());
-                            tAlgorithmMete.setAlgorithmId((Long) device.get("algorithm_id"));
-                            finalAlgorithmMeteList.add(tAlgorithmMete);
+                                finalCameraPresetList.add(tCameraPreset);
+                                cruiseType = tCameraInfo.getCameraType() == 206 ? 230 : 229;
+                                break;
+                            case "01":
+                            case "001":
+                                //机器人、无人机
+                                //构建 t_robot_inspection
+                                TRobotInspection tRobotInspection = new TRobotInspection();
+                                JSONArray robotArray = JSONArray.parseArray(device.get("video_pos").toString());
+                                String keyPos = "01".equals(device.get("data_type")) ? "robot_pos" : "uav_pos";
+                                String keyCode = "01".equals(device.get("data_type")) ? "robot_code" : "uav_code";
+                                tRobotInspection.setEdgeCode(edgeCode);
+                                cruiseId = Long.parseLong(JSON.parseObject(robotArray.get(0).toString()).get(keyPos).toString());
+                                cruiseType = "01".equals(device.get("data_type")) ? 228 : 524;
+                                tRobotInspection.setOriginId(String.valueOf(cruiseId));
+                                TRobotInfo tRobotInfo = tRobotInfoList.stream().filter(t -> String.valueOf(robotArray.getJSONObject(0).get(keyCode)).equals(String.valueOf(t.getRobotNum()))).collect(Collectors.toList()).get(0);
+                                tRobotInspection.setRobotId(tRobotInfo.getRobotId());
+                                tRobotInspection.setInspectionName(String.valueOf(device.get("device_name")).contains("/") ? StringUtils.substringAfter(device.get("device_name").toString(), "/") : String.valueOf(device.get("device_name")));
+                                finalRobotInspectionList.add(tRobotInspection);
+                                break;
+                            case "0001":
+                                //声纹
+                                JSONArray voiceArray = JSONArray.parseArray(device.get("video_pos").toString());
+                                boolean voiceFlag = JSON.parseObject(voiceArray.get(0).toString()).containsKey("voice_pos");
+                                cruiseId = voiceFlag ? Long.parseLong(JSON.parseObject(voiceArray.get(0).toString()).get("voice_pos").toString()) : Long.parseLong(JSON.parseObject(voiceArray.get(0).toString()).get("device_pos").toString());
+                                cruiseType = 232;
+                                break;
+                            default:
+                                return;
                         }
-                    }
-                    finalStdDeviceMeteList.add(tStdDeviceMete);
-                    //构建 t_cruise_point_instance
-                    TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
-                    tCruisePointInstance.setDeviceMeteId(Long.valueOf(tStdDeviceMete.getOriginId()));
-                    tCruisePointInstance.setDeviceId(Long.valueOf(tStdDevice.getOriginId()));
-                    tCruisePointInstance.setCustomId(tStdDeviceMete.getCustomId());
-                    tCruisePointInstance.setCruiseId(cruiseId);
-                    tCruisePointInstance.setCruiseName(String.valueOf(device.get("device_name")).contains("/") ? StringUtils.substringAfter(device.get("device_name").toString(), "/") : String.valueOf(device.get("device_name")));
-                    tCruisePointInstance.setOriginId(String.valueOf(device.get("device_id")));
-                    tCruisePointInstance.setEdgeCode(edgeCode);
-                    tCruisePointInstance.setCruiseType(cruiseType);
-                    newCruisePointInstances.add(tCruisePointInstance);
+                        //构建 t_std_devicemete
+                        TStdDeviceMete tStdDeviceMete = new TStdDeviceMete();
+                        tStdDeviceMete.setMeteName(String.valueOf(device.get("device_name")).contains("/") ? StringUtils.substringBefore(device.get("device_name").toString().replace(" ", ""), "/") : String.valueOf(device.get("device_name")));
+                        tStdDeviceMete.setDeviceId(Long.valueOf(tStdDevice.getOriginId()));
+                        tStdDeviceMete.setCustomId(String.valueOf(device.get("component_id")));
+                        tStdDeviceMete.setCustomName(String.valueOf(device.get("component_name")));
+                        if (device.containsKey("device_mete_id")) {
+                            tStdDeviceMete.setOriginId(String.valueOf(device.get("device_mete_id")));
+                        } else {
+                            tStdDeviceMete.setOriginId(String.valueOf(device.get("device_id")));
+                        }
+                        tStdDeviceMete.setEdgeCode(edgeCode);
+                        tStdDeviceMete.setRedundantType(String.valueOf(device.getOrDefault("redundant_type", "1")));
+                        if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
+                            tStdDeviceMete = convertDeviceMete(device);
+                            if (device.containsKey("algorithm_id") && StringUtils.isNotEmpty(device.get("algorithm_id").toString())) {
+                                TAlgorithmMete tAlgorithmMete = new TAlgorithmMete();
+                                tAlgorithmMete.setEdgeCode(edgeCode);
+                                tAlgorithmMete.setOriginId(tStdDeviceMete.getOriginId());
+                                tAlgorithmMete.setAlgorithmId((Long) device.get("algorithm_id"));
+                                finalAlgorithmMeteList.add(tAlgorithmMete);
+                            }
+                        }
+                        finalStdDeviceMeteList.add(tStdDeviceMete);
+                        //构建 t_cruise_point_instance
+                        TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
+                        tCruisePointInstance.setDeviceMeteId(Long.valueOf(tStdDeviceMete.getOriginId()));
+                        tCruisePointInstance.setDeviceId(Long.valueOf(tStdDevice.getOriginId()));
+                        tCruisePointInstance.setCustomId(tStdDeviceMete.getCustomId());
+                        tCruisePointInstance.setCruiseId(cruiseId);
+                        tCruisePointInstance.setCruiseName(String.valueOf(device.get("device_name")).contains("/") ? StringUtils.substringAfter(device.get("device_name").toString(), "/") : String.valueOf(device.get("device_name")));
+                        tCruisePointInstance.setOriginId(String.valueOf(device.get("device_id")));
+                        tCruisePointInstance.setEdgeCode(edgeCode);
+                        tCruisePointInstance.setCruiseType(cruiseType);
+                        newCruisePointInstances.add(tCruisePointInstance);
 
-                });
+                    });
+        } else {
+            //模型为空 删除该节点的所有信息
+            tCameraPresetMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
+            tRobotInspectionDao.deleteByEdgeCodeAndOriginId(edgeCode, null);
+            tCruisePointInstanceMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
+            tAlgorithmMeteMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
+            tStdDevicemeteMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
+            tStdDeviceMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
+            return;
+        }
         //去重
         List<TCameraPreset> newCameraPresets = finalCameraPresetList.stream().distinct().collect(Collectors.toList());
         List<TRobotInspection> newRobotInspections = finalRobotInspectionList.stream().distinct().collect(Collectors.toList());

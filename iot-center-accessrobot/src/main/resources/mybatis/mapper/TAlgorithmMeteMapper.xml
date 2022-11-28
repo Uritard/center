@@ -49,14 +49,17 @@
         where  device_mete_id = #{deviceMeteId,jdbcType=BIGINT} AND algorithm_id = #{algorithmId,jdbcType=BIGINT} 
     </delete>
     <delete id="deleteByEdgeCodeAndOriginId">
-        delete from t_algorithm_mete  where edge_code=#{edgeCode}  and origin_id in (
-        SELECT
-        device_mete_id
-        FROM
-        t_std_devicemete a
-        WHERE
-        origin_id in <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
-        )
+        delete from t_algorithm_mete  where edge_code=#{edgeCode}
+        <if test="originId != null and originId != ''">
+            and origin_id in (
+            SELECT
+            device_mete_id
+            FROM
+            t_std_devicemete a
+            WHERE
+            origin_id in <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+            )
+        </if>
     </delete>
     <insert id="insert">
         insert into t_algorithm_mete
