@@ -190,4 +190,6 @@ public interface UPatrolResultDao {
 
     int selectCountByTaskId(String taskId);
 
+    List<Long> batchSelectAttr(@Param("instanceList") List<Long> instanceList);
+
 }

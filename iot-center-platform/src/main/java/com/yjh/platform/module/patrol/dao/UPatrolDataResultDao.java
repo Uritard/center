@@ -100,7 +100,7 @@ public interface UPatrolDataResultDao {
 
     List<Long> selectAllDeviceMeteId();
 
-    List<TStdDeviceMeteUpdate> selectDeviceMeteList(String taskId);
+    List<TStdDeviceMeteUpdate> selectDeviceMeteList(@Param(value = "taskId") String taskId);
 
     int updateDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
 
