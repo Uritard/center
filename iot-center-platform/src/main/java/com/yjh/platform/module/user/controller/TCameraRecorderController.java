@@ -61,6 +61,7 @@ public class TCameraRecorderController {
                 result.setMessage(209, "PMS编码已存在，不可重复");
             } else {
                 result.setData(tCameraRecorderService.insert(tCameraRecorder));
+                Constant.modelUpload("1002");
                 sendPostRequest(Constant.NVR_REGISTER_URL,tCameraRecorder.getRecordId());
             }
         } catch (BusinessException b) {
@@ -83,6 +84,7 @@ public class TCameraRecorderController {
                 result.setCode(209,"此录像服务器下存在摄像机");
             }else {
                 result.setData(re);
+                Constant.modelUpload("1002");
             }
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
@@ -105,6 +107,7 @@ public class TCameraRecorderController {
                 result.setCode(209,"录像服务器下存在摄像机");
             }else {
                 result.setData(re);
+                Constant.modelUpload("1002");
             }
             //result.setData(tCameraRecorderService.deleteSelectedRecord(recordIds));
         } catch (BusinessException e) {
@@ -130,6 +133,7 @@ public class TCameraRecorderController {
             } else {
                 log.info("tCameraRecorderName: "+tCameraRecorder.getRecordName());
                 result.setData(tCameraRecorderService.update(tCameraRecorder));
+                Constant.modelUpload("1002");
                 sendPostRequest(Constant.NVR_REGISTER_URL, tCameraRecorder.getRecordId());
             }
         } catch (BusinessException e) {
