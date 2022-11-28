@@ -53,14 +53,10 @@ public class InspectionResultThread implements Runnable{
     private final UPatrolTaskService uPatrolTaskService;
     private final AbstractVideoCruise abstractVideoCruise;
 
-    @Autowired
-    private TRobotInspectionDao tRobotInspectionDao;
+    private final TRobotInspectionDao tRobotInspectionDao;
+    private final UPatrolResultDao uPatrolResultDao;
+    private final AnalyseDataOperateDao analyseDataOperateDao;
 
-    @Autowired
-    private UPatrolResultDao uPatrolResultDao;
-
-    @Autowired
-    private AnalyseDataOperateDao analyseDataOperateDao;
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
                                   RedisTemplate redisTemplate, boolean changeTaskStatus){
         this.robotPatrolTaskResult = robotPatrolTaskResult;
@@ -69,6 +65,10 @@ public class InspectionResultThread implements Runnable{
         this.changeTaskStatus = changeTaskStatus;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.abstractVideoCruise = StaticContextAccessor.getBean(NormalVideoCruiseExecuteImpl.class);
+
+        this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
+        this.uPatrolResultDao = StaticContextAccessor.getBean(UPatrolResultDao.class);
+        this.analyseDataOperateDao = StaticContextAccessor.getBean(AnalyseDataOperateDao.class);
     }
 
     @Override
@@ -106,6 +106,7 @@ public class InspectionResultThread implements Runnable{
             if (StringUtils.isEmpty(instanceId)) {
                 String originId = robotPatrolTaskResult.getDeviceId();
                 insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
+                log.info("instanceInfo: {}", JSON.toJSONString(insInfo));
                 instanceId = String.valueOf(insInfo.getInstanceId());
             }
 
@@ -150,7 +151,7 @@ public class InspectionResultThread implements Runnable{
             // 巡视主机下发的任务或者站端本体任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);
             if (!flag) {
-                log.info("This is simulation tool task！！！");
+                log.info("This is simulation tool task！！！ {}", taskId);
                 simulationToolTaskHandler(infoMap.get("absolutePath"), taskId, instanceId, robotPatrolTaskResult.getValue(), robotPatrolTaskResult.getFilePath());
             }
         } catch (Exception e) {
@@ -159,6 +160,7 @@ public class InspectionResultThread implements Runnable{
     }
 
     private void upSystemTaskInfoInitialize(Map<String, String> map, String taskId, TCruisePointInstance insInfo) {
+        log.info("upSystemTaskInfoInitialize, taskId: {}", taskId);
         if(insInfo == null){
             log.error("task upSystem is error. taskId: {}", taskId);
         } else {
@@ -222,6 +224,7 @@ public class InspectionResultThread implements Runnable{
                     || "3".equals(sysLevel);
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
             boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
+            log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, sysLevel: {}", isSimulationTool, taskId, sysLevel);
             if (!isSimulationTool) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0) {
@@ -230,9 +233,10 @@ public class InspectionResultThread implements Runnable{
                 }
                 uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
                 // 区分是否为站端本体任务如果是站端本体任务,需更新任务状态
-                if (isSelfTask) {
-                    standTaskDealHandler(taskId, robotCode);
-                }
+                // 221128，可以不用在这更新，机器人上传任务状态的消息会处理任务状态
+                // if (isSelfTask) {
+                //     standTaskDealHandler(taskId, robotCode);
+                // }
                 return true;
             }
         } catch (Exception e) {
@@ -357,7 +361,7 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
             tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
             tCruiseTaskResultMap.put("resultDesc", "--");
-            tCruiseTaskResultMap.put("cruiseTime", tCruiseTaskResultMap.get("time"));
+            // tCruiseTaskResultMap.put("cruiseTime", tCruiseTaskResultMap.get("time"));
             tCruiseTaskResultMap.put("resultNum", Objects.nonNull(details.getAnalyseType()) ? "已录音" : "已拍照");
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);

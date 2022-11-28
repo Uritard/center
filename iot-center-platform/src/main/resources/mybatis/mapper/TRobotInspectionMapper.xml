@@ -416,7 +416,7 @@
             sort
         FROM
             t_cruise_point_instance
-        WHERE origin_id = #{deviceId, jdbcType=VARCHAR}
+        WHERE origin_id = #{originId, jdbcType=VARCHAR}
         and edge_code = #{edgeCode, jdbcType=VARCHAR}
     </select>
 
