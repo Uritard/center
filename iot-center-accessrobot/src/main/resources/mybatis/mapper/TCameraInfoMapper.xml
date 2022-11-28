@@ -300,6 +300,9 @@
         delete from t_camera_info  where edge_code=#{edgeCode}  and origin_id in
         <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
     </delete>
+    <delete id="deleteByEdgeCode">
+        delete from t_camera_info  where edge_code=#{edgeCode}
+    </delete>
     <insert id="insertBatch" parameterType="java.util.Collection"  useGeneratedKeys="true" keyColumn="camera_id" keyProperty="cameraId">
             insert into t_camera_info ( camera_name,camera_model
                                               ,pms_id,alias_name,record_id

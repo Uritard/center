@@ -30,5 +30,7 @@ public interface TVoiceConfigMapper {
 
     int insertBatch(Collection<TVoiceConfig> collection);
 
-    void deleteByDeviceEdgeCodeAndOriginId(@Param("edgeCode") String edgeNode,@Param("originIdList")  Collection<String> deleteIdCollection);
+    int deleteByDeviceEdgeCodeAndOriginId(@Param("edgeCode") String edgeNode,@Param("originIdList")  Collection<String> deleteIdCollection);
+
+    int deleteByDeviceEdgeCode(@Param("edgeCode") String edgeNode);
 }

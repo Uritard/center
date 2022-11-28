@@ -7,6 +7,7 @@ import com.yjh.accessrobot.module.command.entity.TStdRegion;
 import com.yjh.accessrobot.module.command.entity.TVoiceConfig;
 import com.yjh.accessrobot.module.command.entity.TVoiceDevice;
 import com.yjh.accessrobot.module.command.entity.VoiceDeviceModel;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  * @since [产品/模块版本] （可选）
  */
 @Service
+@Slf4j
 public class TVoiceDeviceService {
 
     @Autowired
@@ -38,6 +40,12 @@ public class TVoiceDeviceService {
 
     @Transactional
     public void saveReportData(List<VoiceDeviceModel> voiceDeviceModelList, String edgeNode) {
+        if (CollectionUtils.isEmpty(voiceDeviceModelList)) {
+            log.info("voiceDeviceModelList is null");
+            tVoiceConfigMapper.deleteByDeviceEdgeCode(edgeNode);
+            tVoiceDeviceMapper.deleteByEdgeCode(edgeNode);
+            return;
+        }
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeNode, null);
         Map<String, Long> stdRegionMap = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getOriginRegionId, TStdRegion::getRegionId));
         Map<String, TVoiceConfig> voiceConfigMap = new HashMap<>();
@@ -78,14 +86,12 @@ public class TVoiceDeviceService {
         List<TVoiceDevice> oldVoiceDeviceList = tVoiceDeviceMapper.selectByEdgeCode(edgeNode);
         // 不存在旧数据则更新
         if (CollectionUtils.isEmpty(oldVoiceDeviceList)) {
-            if(CollectionUtils.isNotEmpty( tVoiceDeviceList )){
-                tVoiceConfigMapper.insertBatch(voiceConfigMap.values());
-                tVoiceDeviceList.forEach(tVoiceDevice -> {
-                    TVoiceConfig tVoiceConfig = voiceConfigMap.get(tVoiceDevice.getOriginId());
-                    tVoiceDevice.setConfigId(tVoiceConfig.getConfigId());
-                });
-                tVoiceDeviceMapper.insertBatch(tVoiceDeviceList);
-            }
+            tVoiceConfigMapper.insertBatch(voiceConfigMap.values());
+            tVoiceDeviceList.forEach(tVoiceDevice -> {
+                TVoiceConfig tVoiceConfig = voiceConfigMap.get(tVoiceDevice.getOriginId());
+                tVoiceDevice.setConfigId(tVoiceConfig.getConfigId());
+            });
+            tVoiceDeviceMapper.insertBatch(tVoiceDeviceList);
             //否则对比
         } else {
             Map<String, TVoiceDevice> oldTVoiceDeviceMap = oldVoiceDeviceList.stream().collect(Collectors.toMap(TVoiceDevice::getOriginId, Function.identity()));

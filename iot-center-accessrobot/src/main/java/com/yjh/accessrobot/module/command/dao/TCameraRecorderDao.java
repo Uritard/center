@@ -34,4 +34,6 @@ public interface TCameraRecorderDao {
 
     int batchInsert(Collection<TCameraRecorder> cameraRecorderCollection);
 
+    int deleteByEdgeCode(@Param("edgeCode") String edgeCode);
+
 }
