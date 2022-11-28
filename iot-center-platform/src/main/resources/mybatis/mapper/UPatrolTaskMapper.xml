@@ -68,6 +68,13 @@
                 where task_id = #{taskId, jdbcType=VARCHAR}
     </delete>
 
+    <delete id="deleteInitByPrimaryId" parameterType="java.lang.String">
+        delete task,result from u_patrol_task task,u_patrol_result result
+        WHERE
+	task.task_code = #{taskId}
+	AND result.task_state = 238 and task.task_id = result.task_id
+    </delete>
+
     <update id="update" parameterType="com.yjh.platform.module.patrol.entity.UPatrolTask">
         update u_patrol_task a <set>
         <if test="taskCode != null and taskCode != ''">a.task_code = #{taskCode, jdbcType=VARCHAR},</if>
@@ -320,7 +327,7 @@
             a.task_type,
             DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
             DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
-            DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+            DATE_FORMAT(d.execute_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
                  LEFT JOIN t_dict_business b ON a.task_type = b.dict_code AND b.col_name = "plan_type"
                  LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
@@ -356,7 +363,7 @@
                 a.task_type,
                 DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
                 DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
-                DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+                DATE_FORMAT(d.execute_time ,'%Y-%m-%d %H:%i:%s') AS create_time
             from u_patrol_task a
                      LEFT JOIN t_dict_business b ON a.task_type = b.dict_code AND b.col_name = "plan_type"
                      LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
@@ -393,7 +400,7 @@
                 a.task_type,
                 DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
                 DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
-                DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+                DATE_FORMAT(d.execute_time ,'%Y-%m-%d %H:%i:%s') AS create_time
             from u_patrol_task a
                      LEFT JOIN t_dict_business b ON a.execute_type = b.dict_code AND b.col_name = "plan_type"
                      LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
@@ -451,7 +458,7 @@
         a.task_type,
         DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
         DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
-        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+        DATE_FORMAT(d.execute_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
         LEFT JOIN t_dict_business b ON a.task_type = b.dict_code AND b.col_name = "plan_type"
         LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
@@ -489,7 +496,7 @@
         a.task_type,
         DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
         DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
-        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+        DATE_FORMAT(d.execute_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
         LEFT JOIN t_dict_business b ON a.task_type = b.dict_code AND b.col_name = "plan_type"
         LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
@@ -528,7 +535,7 @@
         a.task_type,
         DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
         DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
-        DATE_FORMAT(a.create_time ,'%Y-%m-%d %H:%i:%s') AS create_time
+        DATE_FORMAT(d.execute_time,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
         LEFT JOIN t_dict_business b ON a.task_type = b.dict_code AND b.col_name = "plan_type"
         LEFT JOIN t_dict_business c ON a.execute_type = c.dict_code AND c.col_name = "if_run"
