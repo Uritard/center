@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.dao;
 
 import com.yjh.platform.module.device.entity.CruiseCountOfType;
+import com.yjh.platform.module.device.entity.TaskInfoBean;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.task.entity.*;
@@ -191,5 +192,8 @@ public interface UPatrolResultDao {
     int selectCountByTaskId(String taskId);
 
     List<Long> batchSelectAttr(@Param("instanceList") List<Long> instanceList);
+
+    TaskInfoBean queryTaskInfo();
+
 
 }

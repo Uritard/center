@@ -11,8 +11,10 @@ import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 import com.yjh.platform.module.device.entity.DeviceCountBean;
 import com.yjh.platform.module.device.entity.StationVoltageData;
+import com.yjh.platform.module.device.entity.TaskInfoBean;
 import com.yjh.platform.module.device.service.SystemInfoService;
 import com.yjh.platform.module.device.service.TStdRegionService;
+import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TDefectInfoDao;
 import com.yjh.platform.module.task.entity.*;
@@ -65,6 +67,8 @@ public class HomePageService {
     private TCameraInfoDao tCameraInfoDao;
     @Autowired
     private TVoiceDeviceDao tVoiceDeviceDao;
+    @Autowired
+    private UPatrolResultDao uPatrolResultDao;
 
     @Transactional(rollbackFor = Exception.class)
     public List<WarnStatistical> taskInfo(Integer date) {
@@ -461,5 +465,9 @@ public class HomePageService {
         deviceCountBeanList.add(new DeviceCountBean(robotCount, "robot", "机器人"));
         deviceCountBeanList.add(new DeviceCountBean(droneCount, "drone", "无人机"));
         return deviceCountBeanList;
+    }
+
+    public TaskInfoBean queryTaskInfo() {
+        return uPatrolResultDao.queryTaskInfo();
     }
 }

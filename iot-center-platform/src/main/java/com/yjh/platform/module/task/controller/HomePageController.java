@@ -406,4 +406,19 @@ public class HomePageController {
         }
         return result;
     }
+
+    @ApiOperation(value = "首页查询任务概览")
+    @RequestMapping(value = "/queryTaskInfo", method = RequestMethod.GET)
+    public Result queryTaskInfo() {
+        Result result = new Result();
+        try {
+            result.setData(homePageService.queryTaskInfo());
+            result.setCode(ResultCodeEnum.NORMAL.getCode(), ResultCodeEnum.NORMAL.getName());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("首页查询任务概览", e);
+        }
+        return result;
+    }
+
 }

@@ -508,15 +508,18 @@
                 and TO_DAYS(a.warn_time) =TO_DAYS(NOW())
                 <if test="alarmLevel != null "> and a.warn_level = #{alarmLevel, jdbcType=INTEGER}</if>
                 union all(-->
-                SELECT
-                c.alarm_time as warnTime,
-                c.alarm_info as warnContent,
-                d.robot_name as deviceName
-                from t_robot_alarm c
-                left join t_robot_info d on c.robot_id = d.robot_id
-                where 1=1
-                and TO_DAYS(c.alarm_time) =TO_DAYS(NOW())
-                <if test="alarmLevel != null "> and c.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
+        SELECT
+        c.alarm_time as warnTime,
+        c.alarm_info as warnContent,
+        d.robot_name as deviceName,
+        c.alarm_level,
+        (select f.dict_note from t_dict_business f where f.col_name='alarm_level' and f.dict_code =c.alarm_level)alarm_level_name,
+        (select g.region_name from t_std_region g where g.region_id= d.up_region_id)region_name
+        from t_robot_alarm c
+        left join t_robot_info d on c.robot_id = d.robot_id
+        where 1=1
+        and TO_DAYS(c.alarm_time) =TO_DAYS(NOW())
+        <if test="alarmLevel != null ">and c.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
         <!--        ) -->
         order by warnTime desc LIMIT 20
     </select>
