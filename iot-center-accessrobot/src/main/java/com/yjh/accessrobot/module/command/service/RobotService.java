@@ -3334,7 +3334,7 @@ public class RobotService {
             tStdRegionService.saveReportData(tStdRegionList, edgeCode);
             log.info("区域处理结束 edgeCode:{}", edgeCode);
             // 刷新缓存
-            StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(Constant.REGION_REFRESH_URL, Result.class);
+            SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class).getForObject(Constant.REGION_REFRESH_URL, Result.class);
         } catch (Exception e) {
             log.error("区域文件处理失败", e);
         }

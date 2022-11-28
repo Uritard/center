@@ -23,4 +23,10 @@ public class WarnInfoForHomePage {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date warnTime;
+
+    private  String alarmLevel;
+
+    private String alarmLevelName;
+
+    private String regionName;
 }
