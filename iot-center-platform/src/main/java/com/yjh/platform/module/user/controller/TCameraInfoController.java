@@ -71,6 +71,8 @@ public class TCameraInfoController {
                 } else {
                     result.setData(state);
                     //有变动 同步模型
+                    Constant.modelUpload("1001");
+                    Constant.modelUpload("1002");
                     Constant.modelUpload("4");
                 }
             }
@@ -97,6 +99,8 @@ public class TCameraInfoController {
             }else {
                 result.setData(re);
                 //有变动 同步模型
+                Constant.modelUpload("1001");
+                Constant.modelUpload("1002");
                 Constant.modelUpload("4");
             }
             //result.setData(tCameraInfoService.deleteByPrimaryId(cameraId));
@@ -124,6 +128,8 @@ public class TCameraInfoController {
             }else {
                 result.setData(re);
                 //有变动 同步模型
+                Constant.modelUpload("1001");
+                Constant.modelUpload("1002");
                 Constant.modelUpload("4");
             }
             //result.setData(tCameraInfoService.deleteSelectedCamera(cameraIds));
@@ -155,6 +161,8 @@ public class TCameraInfoController {
                     tCameraInfoService.stopStream(tCameraInfo.getCameraId());
                     result.setData(state);
                     //有变动 同步模型
+                    Constant.modelUpload("1001");
+                    Constant.modelUpload("1002");
                     Constant.modelUpload("4");
                 }
             }
