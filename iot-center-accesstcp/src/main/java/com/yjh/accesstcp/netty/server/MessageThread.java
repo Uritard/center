@@ -270,6 +270,7 @@ public class MessageThread {
                     } else {
                         tCruiseTaskAdd.setIfRun(174);
                     }
+                    tCruiseTaskAdd.setAreaId(xmlBaseModel.getSendCode());
                     tCruiseTaskAdd.setStartTime(simpleDateFormat.parse(item.get("fixed_start_time").toString()));
 
                     //                    Map<String,List<TCruiseTaskAdd>> map = new HashMap<>();

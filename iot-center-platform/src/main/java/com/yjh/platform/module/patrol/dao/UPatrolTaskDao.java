@@ -32,6 +32,7 @@ public interface UPatrolTaskDao {
 
     int add(UPatrolTask uPatrolTask);
     int deleteByPrimaryId(@Param(value = "taskId") String taskId);
+    int deleteInitByPrimaryId(@Param(value = "taskId") String taskId);
     int update(UPatrolTask uPatrolTask);
     UPatrolTask selectByPrimaryId(@Param(value = "taskId") String taskId);
     UPatrolTask selectThisTaskByTaskCode(@Param(value = "taskCode") String taskCode);

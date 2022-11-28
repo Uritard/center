@@ -246,6 +246,10 @@ public class UPatrolTaskService {
                 uPatrolTask.setEndTime(new Date());
             }
         }
+        if (tCruiseTaskAdd.getAreaId() == null){
+           String areaId =  redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content").toString();
+           tCruiseTaskAdd.setAreaId(areaId);
+        }
         uPatrolTask.setTaskName(tCruiseTaskAdd.getTaskName())
                 .setPlanId(tCruiseTaskAdd.getPlanId())
                 .setTaskCode(tCruiseTaskAdd.getTaskCode())
@@ -844,6 +848,8 @@ public class UPatrolTaskService {
                 log.info("taskMap del..." + Constant.taskMap);
                 log.info("del task totally...");
                 tCruiseTaskDelDao.deleteByPrimaryId(taskId);
+                //删除初始化的一条
+                uPatrolTaskDao.deleteInitByPrimaryId(taskId);
                 return uPatrolTaskDao.deleteByPrimaryId(taskId);
             }
         } else if (Objects.nonNull(task.getExecuteType()) && task.getExecuteType() == TaskTypeEnum.TIME.getType()) {
@@ -857,7 +863,8 @@ public class UPatrolTaskService {
                 }
             }
         }
-        tCruiseTaskDelDao.deleteByPrimaryId(taskId);
+        tCruiseTaskDelDao.deleteByPrimaryId(taskId);//删除初始化的一条
+        uPatrolTaskDao.deleteInitByPrimaryId(taskId);
         return this.uPatrolTaskDao.deleteByPrimaryId(taskId);
     }
 
@@ -1575,7 +1582,7 @@ public class UPatrolTaskService {
                         listTask.add(taskCountMap);
                     }
                 }
-            } else {
+            } else if (!(tCruiseTaskCount.getIfRun() == TaskTypeEnum.CYCLE.getType() && "238".equals(tCruiseTaskCount.getTaskState()))){
                 Map<String, Object> taskCountMap = new HashMap<>();
                 taskCountMap.put("type", tCruiseTaskCount.getIfRun());
                 taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
@@ -1752,7 +1759,7 @@ public class UPatrolTaskService {
         for (TCruiseTaskCount tCruiseTaskCount : list) {
             Date dayBeforeTime = dayBefore;
             Date dayAfterTime = dayAfter;
-            if (tCruiseTaskCount.getIfRun() == 172 && !StringUtils.isEmpty(tCruiseTaskCount.getDateType())) {
+            if (tCruiseTaskCount.getIfRun() == TaskTypeEnum.CYCLE.getType() && !StringUtils.isEmpty(tCruiseTaskCount.getDateType())) {
                 if (tCruiseTaskCount.getStartTime().after(dayBeforeTime)){
                     dayBeforeTime = tCruiseTaskCount.getStartTime();
                 }
@@ -1824,7 +1831,7 @@ public class UPatrolTaskService {
                         listTask.add(taskCountMap);
                     }
                 }
-            } else {
+            } else if (!(tCruiseTaskCount.getIfRun() == TaskTypeEnum.CYCLE.getType() && "238".equals(tCruiseTaskCount.getTaskState()))){
                 Map<String, Object> taskCountMap = new HashMap<>();
                 taskCountMap.put("type", tCruiseTaskCount.getIfRun());
                 taskCountMap.put("typeName", tCruiseTaskCount.getTypeName());
