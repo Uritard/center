@@ -7,6 +7,7 @@ import com.yjh.accessrobot.module.command.entity.RobotModel;
 import com.yjh.accessrobot.module.command.entity.TCameraRecorder;
 import com.yjh.accessrobot.module.command.entity.TRobotInfo;
 import com.yjh.accessrobot.module.command.entity.TStdRegion;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
  * @since 2020-11-19
  */
 @Service
+@Slf4j
 public class TRobotInfoService {
 
     @Autowired
@@ -73,6 +75,11 @@ public class TRobotInfoService {
 
     @Transactional
     public void saveReportData(List<RobotModel> robotModelList, String edgeNode, String type) {
+        if(CollectionUtils.isEmpty(robotModelList)){
+            log.info("robotModelList is null");
+            tRobotInfoDao.deleteByEdgeCodeAndType(edgeNode,type);
+            return ;
+        }
         List<TCameraRecorder> tCameraRecorderList = tCameraRecorderDao.selectByEdgeCode(edgeNode);
         Map<String, Long> tCameraRecorderMap = tCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, TCameraRecorder::getRecordId));
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeNode, null);
@@ -131,9 +138,7 @@ public class TRobotInfoService {
         }).collect(Collectors.toList());
         List<TRobotInfo> oldRobotInfoList = tRobotInfoDao.selectByEdgeCodeAndType(edgeNode, type);
         if (CollectionUtils.isEmpty(oldRobotInfoList)) {
-            if(CollectionUtils.isNotEmpty(tRobotInfoList)){
-                tRobotInfoDao.batchInsert(tRobotInfoList);
-            }
+            tRobotInfoDao.batchInsert(tRobotInfoList);
         } else {
             Map<String, TRobotInfo> oldTRobotInfoMap = oldRobotInfoList.stream().collect(Collectors.toMap(TRobotInfo::getOriginId, Function.identity()));
             Map<String, TRobotInfo> newTRobotInfoMap = tRobotInfoList.stream().collect(Collectors.toMap(TRobotInfo::getOriginId, Function.identity()));

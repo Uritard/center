@@ -415,4 +415,8 @@ public interface TRobotInfoDao {
 
     List<Map<String, Object>> selectTCfgUnionRule(@Param(value = "edgeCode") String edgeCode);
 
+    int deleteByEdgeCodeAndType(@Param(value = "edgeCode") String edgeCode, @Param("type") String type);
+
+
+
 }

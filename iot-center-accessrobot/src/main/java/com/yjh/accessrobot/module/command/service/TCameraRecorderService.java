@@ -27,8 +27,14 @@ public class TCameraRecorderService {
 
     @Autowired
     private TCameraRecorderDao tCameraRecorderDao;
+
     @Transactional
     public void saveReportData(List<TCameraRecorder> tCameraRecorderList, String edgeNode) {
+        if (CollectionUtils.isEmpty(tCameraRecorderList)) {
+            log.info("tCameraRecorderList is null");
+            tCameraRecorderDao.deleteByEdgeCode(edgeNode);
+            return;
+        }
         tCameraRecorderList.forEach(tCameraRecorder -> {
             tCameraRecorder.setOriginId(tCameraRecorder.getRecordId().toString());
             tCameraRecorder.setRecordId(null);
@@ -38,9 +44,7 @@ public class TCameraRecorderService {
         List<TCameraRecorder> oldTCameraRecorderList = tCameraRecorderDao.selectByEdgeCode(edgeNode);
         // 无历史数据则全部新增
         if (CollectionUtils.isEmpty(oldTCameraRecorderList)) {
-            if (CollectionUtils.isNotEmpty(tCameraRecorderList)) {
-                tCameraRecorderDao.batchInsert(tCameraRecorderList);
-            }
+            tCameraRecorderDao.batchInsert(tCameraRecorderList);
             // 否则对比数据
         } else {
             Map<String, TCameraRecorder> oldTCameraRecorderMap = oldTCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, Function.identity()));

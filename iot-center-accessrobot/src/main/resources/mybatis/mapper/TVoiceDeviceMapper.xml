@@ -172,5 +172,8 @@
         delete from t_voice_device  where edge_code=#{edgeCode}  and origin_id in
         <foreach collection="originIdList" item="originId" open="(" separator="," close=")"> #{originId} </foreach>
     </delete>
+    <delete id="deleteByEdgeCode">
+        delete from t_voice_device  where edge_code=#{edgeCode}
+    </delete>
 
 </mapper>

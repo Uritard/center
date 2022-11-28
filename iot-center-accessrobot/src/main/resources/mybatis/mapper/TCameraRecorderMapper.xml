@@ -228,6 +228,9 @@
         delete from t_camera_recorder  where edge_code=#{edgeCode}  and origin_id in
         <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
     </delete>
+    <delete id="deleteByEdgeCode">
+        delete from t_camera_recorder  where edge_code=#{edgeCode}
+    </delete>
 
     <insert id="batchInsert" useGeneratedKeys="true" keyProperty="recordId" parameterType="java.util.Collection">
         insert into t_camera_recorder

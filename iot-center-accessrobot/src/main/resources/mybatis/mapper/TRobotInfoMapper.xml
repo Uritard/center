@@ -1293,6 +1293,14 @@
         delete  from t_robot_info where edge_code=#{edgeCode}  and origin_id in
         <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
     </delete>
+    <delete id="deleteByEdgeCodeAndType">
+        delete  from t_robot_info where edge_code=#{edgeCode}
+         <if test="type=='robot'">and robot_type is not null</if>
+        <if test="type=='drone'">and drone_type is not null</if>
+    </delete>
+    <delete id="deleteDroneByEdgeCode">
+        delete  from t_robot_info where edge_code=#{edgeCode} and drone_type is not null
+    </delete>
 
     <select id="selectTaskByTaskCode" parameterType="java.lang.String" resultType="com.yjh.accessrobot.module.command.entity.UPatrolTask">
         select
