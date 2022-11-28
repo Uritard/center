@@ -82,7 +82,9 @@ public class TCameraInfoService {
 
         List<TCameraInfo> oldTCameraInfoList = tCameraInfoMapper.selectByEdgeCode(edgeNode);
         if (CollectionUtils.isEmpty(oldTCameraInfoList)) {
-            tCameraInfoMapper.insertBatch(tCameraInfoList);
+            if(CollectionUtils.isNotEmpty(tCameraInfoList)){
+                tCameraInfoMapper.insertBatch(tCameraInfoList);
+            }
         } else {
             Map<String, TCameraInfo> oldCameraInfoMap = oldTCameraInfoList.stream().collect(Collectors.toMap(TCameraInfo::getOriginId, Function.identity()));
             Map<String, TCameraInfo> newCameraInfoMap = tCameraInfoList.stream().collect(Collectors.toMap(TCameraInfo::getOriginId, Function.identity()));

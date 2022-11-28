@@ -78,12 +78,14 @@ public class TVoiceDeviceService {
         List<TVoiceDevice> oldVoiceDeviceList = tVoiceDeviceMapper.selectByEdgeCode(edgeNode);
         // 不存在旧数据则更新
         if (CollectionUtils.isEmpty(oldVoiceDeviceList)) {
-            tVoiceConfigMapper.insertBatch(voiceConfigMap.values());
-            tVoiceDeviceList.forEach(tVoiceDevice -> {
-                TVoiceConfig tVoiceConfig = voiceConfigMap.get(tVoiceDevice.getOriginId());
-                tVoiceDevice.setConfigId(tVoiceConfig.getConfigId());
-            });
-            tVoiceDeviceMapper.insertBatch(tVoiceDeviceList);
+            if(CollectionUtils.isNotEmpty( tVoiceDeviceList )){
+                tVoiceConfigMapper.insertBatch(voiceConfigMap.values());
+                tVoiceDeviceList.forEach(tVoiceDevice -> {
+                    TVoiceConfig tVoiceConfig = voiceConfigMap.get(tVoiceDevice.getOriginId());
+                    tVoiceDevice.setConfigId(tVoiceConfig.getConfigId());
+                });
+                tVoiceDeviceMapper.insertBatch(tVoiceDeviceList);
+            }
             //否则对比
         } else {
             Map<String, TVoiceDevice> oldTVoiceDeviceMap = oldVoiceDeviceList.stream().collect(Collectors.toMap(TVoiceDevice::getOriginId, Function.identity()));

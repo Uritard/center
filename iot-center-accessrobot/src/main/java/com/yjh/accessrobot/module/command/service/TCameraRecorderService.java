@@ -38,7 +38,9 @@ public class TCameraRecorderService {
         List<TCameraRecorder> oldTCameraRecorderList = tCameraRecorderDao.selectByEdgeCode(edgeNode);
         // 无历史数据则全部新增
         if (CollectionUtils.isEmpty(oldTCameraRecorderList)) {
-            tCameraRecorderDao.batchInsert(tCameraRecorderList);
+            if (CollectionUtils.isNotEmpty(tCameraRecorderList)) {
+                tCameraRecorderDao.batchInsert(tCameraRecorderList);
+            }
             // 否则对比数据
         } else {
             Map<String, TCameraRecorder> oldTCameraRecorderMap = oldTCameraRecorderList.stream().collect(Collectors.toMap(TCameraRecorder::getOriginId, Function.identity()));
