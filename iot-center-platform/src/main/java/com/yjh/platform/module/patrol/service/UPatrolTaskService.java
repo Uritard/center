@@ -759,6 +759,11 @@ public class UPatrolTaskService {
         }
     }
 
+    private void sendTaskStateToUp(String taskId, Integer state) {
+        UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
+        sendTaskStateToUp(task, state);
+    }
+
     private void sendTaskStateToUp(UPatrolTask task, Integer state) {
         //任务状态上报站端
 
@@ -1332,6 +1337,8 @@ public class UPatrolTaskService {
 
             // 巡视结果上报上一级系统
             processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultList, null, null);
+            //任务状态上报站端
+            sendTaskStateToUp(taskId, 2);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
@@ -1477,8 +1484,8 @@ public class UPatrolTaskService {
             //低优先任务继续
             lowTaskGoOn(taskId);
 
-            // todo:给上一级系统上报任务状态
-            processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultMapList, null, null);
+            //任务状态上报站端
+            sendTaskStateToUp(taskId, 1);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
