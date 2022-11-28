@@ -538,9 +538,9 @@ select *from (
         start_time,
         count( 1 ) AS count
         FROM
-        t_cruise_task
+        u_patrol_task
         WHERE
-        DATEDIFF( now( ), start_time ) &lt;= 7
+        DATEDIFF( now( ), start_time ) &lt;= 7   <if test="regionCode!=null and regionCode!=''  ">and area_id=#{regionCode}</if>
         GROUP BY
         date
         ) b ON a.timeNode = b.date
@@ -565,9 +565,9 @@ select *from (
         start_time,
         count( 1 ) AS count
         FROM
-        t_cruise_task
+        u_patrol_task
         WHERE
-        DATEDIFF( now( ), start_time ) &lt;= 31
+        DATEDIFF( now( ), start_time ) &lt;= 31    <if test="regionCode!=null and regionCode!=''  ">and area_id=#{regionCode}</if>
         GROUP BY
         date
         ) b ON a.timeNode = b.date
@@ -586,7 +586,7 @@ select *from (
                 UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 4 MONTH), '%Y-%m') AS `month`
                 UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 5 MONTH), '%Y-%m') AS `month`
                 UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 6 MONTH), '%Y-%m') AS `month`
-                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 7 MONTH), '%Y-%m') AS `month`
+                UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 7 MONTH), '%Y-%m') AS `mo nth`
                 UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 8 MONTH), '%Y-%m') AS `month`
                 UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 9 MONTH), '%Y-%m') AS `month`
                 UNION SELECT DATE_FORMAT((CURDATE() - INTERVAL 10 MONTH), '%Y-%m') AS `month`
@@ -596,7 +596,7 @@ select *from (
           DATE_FORMAT(start_time,'%Y-%m') timeNode,
           count(task_id) as count
         FROM
-          t_cruise_task
+            u_patrol_task   <if test="regionCode!=null and regionCode!=''  ">where area_id=#{regionCode}</if>
         GROUP BY
             DATE_FORMAT(start_time,'%Y-%m')) b
          on a.month = b.timeNode

@@ -8,9 +8,11 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.HttpClientUtils;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.dao.TVoiceDeviceDao;
 import com.yjh.platform.module.device.entity.DeviceCountBean;
 import com.yjh.platform.module.device.entity.StationVoltageData;
+import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.device.entity.TaskInfoBean;
 import com.yjh.platform.module.device.service.SystemInfoService;
 import com.yjh.platform.module.device.service.TStdRegionService;
@@ -44,7 +46,8 @@ public class HomePageService {
 
 
     private Logger log = LoggerFactory.getLogger(HomePageService.class);
-
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
     @Autowired
     private TCruiseTaskDao tCruiseTaskDao;
     @Autowired
@@ -71,7 +74,7 @@ public class HomePageService {
     private UPatrolResultDao uPatrolResultDao;
 
     @Transactional(rollbackFor = Exception.class)
-    public List<WarnStatistical> taskInfo(Integer date) {
+    public List<WarnStatistical> taskInfo(Integer date, String regionCode) {
         if (1 == date) {
             return tCruiseTaskDao.selectOnWeek();
         }
@@ -82,13 +85,13 @@ public class HomePageService {
             return tCruiseTaskDao.selectOnYear();
         }
         if (4 == date) {
-            return tCruiseTaskDao.selectForSevenDay();
+            return tCruiseTaskDao.selectForSevenDay(regionCode);
         }
         if (5 == date) {
-            return tCruiseTaskDao.selectForMonth();
+            return tCruiseTaskDao.selectForMonth(regionCode);
         }
         if (6 == date) {
-            return tCruiseTaskDao.selectForYear();
+            return tCruiseTaskDao.selectForYear(regionCode);
         }
         return null;
     }
@@ -470,4 +473,11 @@ public class HomePageService {
     public TaskInfoBean queryTaskInfo() {
         return uPatrolResultDao.queryTaskInfo();
     }
+
+    public List<TStdRegion> queryStationList() {
+        List<TStdRegion> list = tStdRegionDao.selectByState(Constant.STATE_LOCAL);
+        list.removeIf(tStdRegion -> tStdRegion.getUpRegionId() == -1);
+        return list;
+    }
+
 }
