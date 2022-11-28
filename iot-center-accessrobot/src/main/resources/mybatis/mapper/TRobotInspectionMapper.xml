@@ -386,7 +386,10 @@
         where   inspection_id = #{inspectionId,jdbcType=BIGINT}
     </update>
     <delete id="deleteByEdgeCodeAndOriginId">
-        delete from t_robot_inspection  where edge_code=#{edgeCode}  and origin_id in
-        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+        delete from t_robot_inspection  where edge_code=#{edgeCode}
+        <if test="originId != null and originId != ''">
+            and origin_id in
+            <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+        </if>
     </delete>
 </mapper>

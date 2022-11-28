@@ -60,8 +60,11 @@
         where  instance_id = #{instanceId,jdbcType=BIGINT} 
     </delete>
     <delete id="deleteByEdgeCodeAndOriginId">
-        delete from t_cruise_point_instance  where edge_code=#{edgeCode}  and origin_id in
-        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+        delete from t_cruise_point_instance  where edge_code=#{edgeCode}
+        <if test="originId != null and originId != ''">
+            and origin_id in
+            <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+        </if>
     </delete>
     <insert id="insert" keyColumn="instance_id" keyProperty="instanceId" parameterType="com.yjh.accessrobot.module.command.entity.TCruisePointInstance" useGeneratedKeys="true">
         insert into t_cruise_point_instance
