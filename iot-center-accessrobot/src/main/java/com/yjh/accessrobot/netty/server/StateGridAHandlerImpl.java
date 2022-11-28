@@ -111,8 +111,14 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
             } else {
                 handlerType = type;
             }
-
-            MessageHandlerStrategy messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
+            MessageHandlerStrategy messageHandlerStrategy;
+            // 63,64命令类型 私有协议与220kv规约冲突
+            if ("63".equals(type) || "64".equals(type)) {
+                boolean isSubSystem = robotService.isSubSystem(xmlBaseModel.getSendCode());
+                messageHandlerStrategy = buildMessageHandlerStrategy(type,isSubSystem);
+            } else {
+                messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
+            }
             if (Optional.of(messageHandlerStrategy).isPresent()) {
                 messageHandlerStrategy.handler(ctx, this, xmlBaseModel, sendSessionId, receiveSessionId);
             }
