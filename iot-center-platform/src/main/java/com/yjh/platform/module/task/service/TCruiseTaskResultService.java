@@ -26,6 +26,7 @@ import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
+import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_NORMAL;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -490,14 +493,23 @@ public class TCruiseTaskResultService {
         //计算运行时间
 
         UPatrolResult result = uPatrolResultDao.selectByPrimaryId(taskId);
+        int abnormalCounts = 0;
+        Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
+        for (String key : robotInfoKeys) {
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+            boolean conditionRes = ArrayUtils.contains(new String[]{String.valueOf(CRUISE_RESULT_NORMAL), String.valueOf(CRUISE_RESULT_ABNORMAL)}, redisInfoMap.get("cruiseResult"));
+            if (conditionRes && !Objects.equals(String.valueOf(CRUISE_RESULT_NORMAL), redisInfoMap.get("cruiseResult"))) {
+                abnormalCounts++;
+            }
+        }
         Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
 
         if (Objects.nonNull(countResult)) {
             //获取任务开始时间
             String startTime = countResult.get("taskStart").toString();
             Integer all = ValueUtil.toInteger(countResult.get("all"),0);
-            Integer normal = ValueUtil.toInteger(countResult.get("normal"),0);
-            Integer abnormal = ValueUtil.toInteger(countResult.get("abnormal"),0);
+            Integer normal = ValueUtil.toInteger(all - abnormalCounts, 0);
+            Integer abnormal = ValueUtil.toInteger(abnormalCounts,0);
             cruiseResultCounter.setAlarmCount(abnormal);
             cruiseResultCounter.setCruisedCount(normal+abnormal);
             cruiseResultCounter.setCruiseNotCount(all - abnormal -normal);
