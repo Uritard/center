@@ -60,7 +60,7 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
     private TWarnInfoMapper tWarnInfoMapper;
     @Autowired
     private UpFtpsConfig upFtpsConfig;
-    @Autowired
+    @Resource
     private ServiceRestTemplate serviceRestTemplate;
 
     @Override
