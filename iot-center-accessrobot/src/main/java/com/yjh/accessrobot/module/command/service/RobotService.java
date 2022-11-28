@@ -3301,8 +3301,8 @@ public class RobotService {
             List<RobotModel> robotModelList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, RobotModel.class)).collect(Collectors.toList());
             tRobotInfoService.saveReportData(robotModelList,edgeCode,type);
             log.info("机器人文件处理结束 edgeCode:{} type:{}", edgeCode,type);
-        } catch (DocumentException e) {
-            log.error("录像机文件处理失败", e);
+        } catch (Exception e) {
+            log.error("机器人/无人机文件处理失败", e);
         }
     }
 

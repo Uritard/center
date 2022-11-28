@@ -131,7 +131,9 @@ public class TRobotInfoService {
         }).collect(Collectors.toList());
         List<TRobotInfo> oldRobotInfoList = tRobotInfoDao.selectByEdgeCodeAndType(edgeNode, type);
         if (CollectionUtils.isEmpty(oldRobotInfoList)) {
-            tRobotInfoDao.batchInsert(tRobotInfoList);
+            if(CollectionUtils.isNotEmpty(tRobotInfoList)){
+                tRobotInfoDao.batchInsert(tRobotInfoList);
+            }
         } else {
             Map<String, TRobotInfo> oldTRobotInfoMap = oldRobotInfoList.stream().collect(Collectors.toMap(TRobotInfo::getOriginId, Function.identity()));
             Map<String, TRobotInfo> newTRobotInfoMap = tRobotInfoList.stream().collect(Collectors.toMap(TRobotInfo::getOriginId, Function.identity()));
