@@ -39,10 +39,8 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到机器人运行数据了+++++++++++++++++");
         // Deal with robot operation data
-        if(StringUtils.isBlank(xmlBaseModel.getCode())){
-            String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-            xmlBaseModel.setCode(stationCode);
-        }
+        String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+        xmlBaseModel.setCode(stationCode);
         String sendCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(sendCode)) {
             log.error("下级唯一标识为空");

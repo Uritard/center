@@ -266,14 +266,14 @@ public abstract class AbstractVideoCruise {
             List<Analysis> analysisList = new ArrayList<>();
             analysisList.add(analysis);
             log.info("算法信息：   {}", JSON.toJSONString(analysisList));
-            // 0-缺陷 1-表记
+            // analyseType：11-判别 398-缺陷 其他-表计
             Result result;
-            if (Objects.equals(1, algorithm.getIsAi())) {
+            if (StringUtils.equals("11", analysis.getAnalyseType()) || StringUtils.equals("398", analysis.getAnalyseType())) {
+                result = defect(analysisList);
+            } else {
                 // 算法额外参数设置，红外
                 analysisExt(analysis, jsonForRe);
                 result = analysis(analysisList);
-            } else {
-                result = defect(analysisList);
             }
             log.info("调用算法：   {}\n=========={}", JSON.toJSONString(analysisList), JSON.toJSONString(result));
 

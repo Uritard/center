@@ -37,6 +37,8 @@ public class NestStatusHandler implements MessageHandlerStrategy, InitializingBe
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler nestServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         log.info("+++++++++++++++++巡视主机收到无人机机巢状态数据了+++++++++++++++++");
+        String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+        xmlBaseModel.setCode(stationCode);
         String sendCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(sendCode)) {
             log.error("下级唯一标识为空");

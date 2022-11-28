@@ -251,7 +251,8 @@ public class IntelAnalysisService {
                     typeList.add("meter");
                     break;
                 case "5":
-                    typeList.add("light");
+                case "10":
+                    typeList.add("switch");
                     break;
                 case "6":
                     typeList.add("isolator");
@@ -262,9 +263,7 @@ public class IntelAnalysisService {
                 case "9":
                     typeList.add("infrared");
                     break;
-                case "10":
-                    typeList.add("switch");
-                    break;
+
                 case "13":
                     typeList.add("sound");
                     break;
