@@ -7,9 +7,11 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
@@ -21,6 +23,7 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.patrol.service.impl.NormalVideoCruiseExecuteImpl;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
@@ -74,13 +77,11 @@ public class InspectionResultThread implements Runnable{
         try {
             log.info("开始处理巡检结果并对其标准化 >>>>>>> robotPatrolTaskResult==={}", JSON.toJSONString(robotPatrolTaskResult));
             String taskId = infoMap.get("taskId");
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
-            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
-            ));
-            if ("2".equals(sysLevel) && (tRobotInspectionDao.selectRobotCount(edgeCode) > 0 || tRobotInspectionDao.selectRegion(edgeCode) > 0) || "3".equals(sysLevel)) {
+            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+            /*if ("3".equals(sysLevel)) {
                 upSystemDealWith(taskId);
                 return;
-            }
+            }*/
             String robotCode = robotPatrolTaskResult.getSendCode();
 
             // taskId是巡视主机的id,robotTaskId是机器人上报的id
@@ -100,9 +101,21 @@ public class InspectionResultThread implements Runnable{
             String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + robotPatrolTaskResult.getDeviceId();
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
             String instanceId = robotInfoKeyMap.get("instanceId");
+            // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
+            TCruisePointInstance insInfo = null;
+            if (StringUtils.isEmpty(instanceId)) {
+                String originId = robotPatrolTaskResult.getDeviceId();
+                insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
+                instanceId = String.valueOf(insInfo.getInstanceId());
+            }
 
             String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
             Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+            if (MapUtils.isEmpty(tCruiseTaskResultMap)) {
+                tCruiseTaskResultMap = new HashMap<>(32);
+                upSystemTaskInfoInitialize(tCruiseTaskResultMap, taskId, insInfo);
+            }
+
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
 
@@ -145,67 +158,46 @@ public class InspectionResultThread implements Runnable{
         }
     }
 
-    private void upSystemDealWith(String taskId) {
-
-        String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + robotPatrolTaskResult.getDeviceId();
-
-        Map<String, String> map = new HashMap<>(8);
-        if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
-            map.put("resultNum", robotPatrolTaskResult.getValue());
-            map.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-            map.put("cruiseAbnormal", "--");
+    private void upSystemTaskInfoInitialize(Map<String, String> map, String taskId, TCruisePointInstance insInfo) {
+        if(insInfo == null){
+            log.error("task upSystem is error. taskId: {}", taskId);
         } else {
-            // value无值且resultNum为--，若结果非音频文件，则为异常情况
-            map.put("resultNum", "--");
-            if ("3".equals(robotPatrolTaskResult.getFileType())) {
-                map.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                map.put("cruiseAbnormal", "--");
-            } else {
-                map.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                map.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-            }
+            String instanceId = String.valueOf(insInfo.getInstanceId());
+            map.put("deviceId", String.valueOf(insInfo.getDeviceId()));
+            map.put("instanceId", instanceId);
+            map.put("cruiseName", insInfo.getCruiseName());
+            map.put("deviceName", analyseDataOperateDao.selectPatrolDevice(instanceId).get("deviceName"));
+            map.put("cruiseId", String.valueOf(insInfo.getCruiseId()));
         }
+
+        map.put("instanceName", robotPatrolTaskResult.getDeviceName());
         map.put("picPathAnl", "");
         map.put("cruiseType", "");
-        map.put("instanceName", "");
         map.put("remark", "");
-        map.put("deviceId", analyseDataOperateDao.selectPatrolDevice(robotPatrolTaskResult.getDeviceId()).get(
-                "deviceId"));
-        map.put("deviceName", robotPatrolTaskResult.getPatrolDeviceName());
         map.put("points", "");
         map.put("serialVersionUID", "");
         map.put("origConfirmPicPath", "");
         map.put("firDate", "");
-        map.put("instanceId", robotPatrolTaskResult.getDeviceId());
         map.put("confirmPicPath", "");
         map.put("modifyNum", "");
         map.put("origPicAnl", "");
         map.put("identifyResult", "");
         map.put("personCheck", "");
-        map.put("createtime", "");
+        map.put("createtime", DateTimeUtil.getDateTimeString());
         map.put("identifyState", "");
-        map.put("cruiseDataId", "");
         map.put("resultPic", "");
-        map.put("cruiseName", "");
         map.put("firName", "");
         map.put("resultDesc", "");
         map.put("checkDate", "");
         map.put("cruiseTime", robotPatrolTaskResult.getTime());
-        map.put("cruiseId", "");
         map.put("checkUser", "");
         map.put("cameraId", "");
         map.put("voicePath", "");
-        map.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
         map.put("taskId", taskId);
-        map.put("picpath", infoMap.get("relativePath"));
-        map.put("origpic", infoMap.containsKey("absolutePath") ? infoMap.get("absolutePath") : "");
-        map.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-        map.put("isWarn", "0");
         map.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
         map.put("fileType", robotPatrolTaskResult.getFileType());
         map.put("rectangle", robotPatrolTaskResult.getRectangle());
         map.put("confidence", "");
-        redisTemplate.opsForHash().putAll(redisKeyName, map);
     }
 
     /**
@@ -217,13 +209,17 @@ public class InspectionResultThread implements Runnable{
      */
     private boolean judgeTaskSourceHandler(String taskId, String instanceId, String robotCode) {
         try {
+            String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
+
             Integer robotType = uPatrolTaskService.selectRobotType(robotPatrolTaskResult.getSendCode());
             // 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path 为模拟工具
             boolean isSimulationTool = StringUtils.isNotEmpty(robotPatrolTaskResult.getFilePath())
                     && StringUtils.isEmpty(robotPatrolTaskResult.getOriginFileResultPath())
                     && StringUtils.isEmpty(robotPatrolTaskResult.getOriginFilePath())
                     // 且是E机器人
-                    && Objects.equals(159, robotType);
+                    && Objects.equals(159, robotType)
+                    // 上级系统不走算法处理，只存数据
+                    || "3".equals(sysLevel);
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
             boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
             if (!isSimulationTool) {

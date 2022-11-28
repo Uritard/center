@@ -386,19 +386,38 @@
             a.task_id
         FROM
             u_patrol_result a
-        WHERE a.task_code = #{robotTaskId, jdbcType=VARCHAR} and a.create_time <![CDATA[<]]> #{executeTime, jdbcType=TIMESTAMP}
+        WHERE a.task_code = #{robotTaskId, jdbcType=VARCHAR} and a.task_state in (238,239,241) and a.create_time <![CDATA[<]]> #{executeTime, jdbcType=TIMESTAMP}
         ORDER BY a.create_time desc
             LIMIT 1
     </select>
 
-    <select id="selectRealInstanceId" resultType="java.lang.String">
+    <select id="selectRealInstance" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
         SELECT
-        a.instance_id
+            instance_id,
+            device_mete_id,
+            station_id,
+            station_name,
+            device_id,
+            custom_id,
+            data_format,
+            identify_type,
+            identify_son_type,
+            cruise_type,
+            cruise_id,
+            cruise_name,
+            cruise_content,
+            position_type,
+            unit,
+            if_sy,
+            sy_type,
+            if_videotape,
+            videotape_time,
+            text_desc,
+            sort
         FROM
-        t_cruise_point_instance a
-        WHERE a.origin_id = #{deviceId, jdbcType=VARCHAR}
-        and a.edge_code = #{edgeCode, jdbcType=VARCHAR}
-        and a.origin_id is not null
+            t_cruise_point_instance
+        WHERE origin_id = #{deviceId, jdbcType=VARCHAR}
+        and edge_code = #{edgeCode, jdbcType=VARCHAR}
     </select>
 
     <select id="selectRobotType" resultType="java.lang.Integer">

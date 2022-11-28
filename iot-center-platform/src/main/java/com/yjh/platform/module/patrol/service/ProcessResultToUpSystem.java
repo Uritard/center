@@ -90,17 +90,10 @@ public class ProcessResultToUpSystem {
         try {
 
             String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
-            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
-            ));
             for(Map<String, String> cruiseResultMap:cruiseResultList) {
                 Map<String, Object> xmlItem = new HashMap<>(16);
                 String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
-                String originId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
-                String instanceId = originId;
-                // 1的情况不用考虑，2的情况需要查t_std_region，有就是下级传的；t_robot_info有，就是上级
-                if ("2".equals(sysLevel) && (tRobotInspectionDao.selectRobotCount(edgeCode) > 0 || tRobotInspectionDao.selectRegion(edgeCode) > 0) || "3".equals(sysLevel)) {
-                    instanceId = tRobotInspectionDao.selectRealInstanceId(originId, edgeCode);
-                }
+                String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
                 String simpleDateFormat = DateTimeUtil.format3(new Date());
                 String analyseType = getAlgorithmTypeMap(instanceId);
                 HashMap<String, String> typeAndPathName = getTypeAndPathName(analyseType);
