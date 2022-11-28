@@ -202,6 +202,7 @@ public class StatisticsService {
             if (percentMap.size() > 0 && percentMap.get("percent") != null) {
                 map.put("lossPercent", percentMap.get("percent"));
             }
+            redisTemplate.opsForHash().putAll("deviceStaticsInfo:robotId:" + map.get("robotId"),map);
         }
         return list;
     }
@@ -291,6 +292,9 @@ public class StatisticsService {
                 map.put("intactPercent", percentMap.get(ipChanNum));
             }
         }
+        mapList.forEach(map ->
+                redisTemplate.opsForHash().putAll("deviceStaticsInfo:cameraId:" + map.get("cameraId"), map)
+        );
         return mapList;
     }
 
