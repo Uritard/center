@@ -2,8 +2,10 @@ package com.yjh.accessrobot.netty.server;
 
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.netty.handler.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
@@ -14,15 +16,15 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.yjh.accessrobot.common.Constant.*;
+import static com.yjh.accessrobot.common.Constant.maps;
+import static com.yjh.accessrobot.common.Constant.robotChannels;
+import static com.yjh.accessrobot.common.Constant.robotRegisterCounts;
 import static com.yjh.accessrobot.common.Constant.robotRemoveCounts;
 
 /**
@@ -161,4 +163,24 @@ public interface RobotServerHandler {
             robotRemoveCounts.remove(robotCode);
         }
     }
+    default MessageHandlerStrategy buildMessageHandlerStrategy(String type, boolean isSubSystem) {
+        MessageHandlerStrategy messageHandlerStrategy;
+        //下级系统
+        if (isSubSystem) {
+            if ("63".equals(type)) {
+                messageHandlerStrategy = StaticContextAccessor.getBean(SilentMonitoringHandlerUpSystem.class);
+            } else {
+                messageHandlerStrategy = StaticContextAccessor.getBean(SilentMonitoringHandler.class);
+            }
+            // 机器人
+        } else {
+            if ("63".equals(type)) {
+                messageHandlerStrategy = StaticContextAccessor.getBean(RobotCruiseReportHandler.class);
+            } else {
+                messageHandlerStrategy = StaticContextAccessor.getBean(OperationResultHandler.class);
+            }
+        }
+        return messageHandlerStrategy;
+    }
+
 }

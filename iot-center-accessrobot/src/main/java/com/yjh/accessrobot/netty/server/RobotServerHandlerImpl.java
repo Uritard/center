@@ -3,11 +3,11 @@ package com.yjh.accessrobot.netty.server;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
-import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
-import com.yjh.accessrobot.netty.handler.*;
+import com.yjh.accessrobot.netty.handler.MessageHandlerStrategy;
+import com.yjh.accessrobot.netty.handler.MessageHandlerStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -277,7 +277,8 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
             MessageHandlerStrategy messageHandlerStrategy;
             // 63,64命令类型 私有协议与220kv规约冲突
             if ("63".equals(type) || "64".equals(type)) {
-                messageHandlerStrategy = buildMessageHandlerStrategy(xmlBaseModel, type);
+                boolean isSubSystem = robotService.isSubSystem(xmlBaseModel.getSendCode());
+                messageHandlerStrategy = buildMessageHandlerStrategy(type,isSubSystem);
             } else {
                 messageHandlerStrategy = MessageHandlerStrategyFactory.getStrategyType(handlerType);
             }
@@ -295,26 +296,6 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
         }
     }
 
-    private MessageHandlerStrategy buildMessageHandlerStrategy(XMLBaseModel xmlBaseModel, String type) {
-        MessageHandlerStrategy messageHandlerStrategy;
-        boolean isSubSystem = robotService.isSubSystem(xmlBaseModel.getSendCode());
-        //下级系统
-        if (isSubSystem) {
-            if ("63".equals(type)) {
-                messageHandlerStrategy = StaticContextAccessor.getBean(SilentMonitoringHandlerUpSystem.class);
-            } else {
-                messageHandlerStrategy = StaticContextAccessor.getBean(SilentMonitoringHandler.class);
-            }
-            // 机器人
-        } else {
-            if ("63".equals(type)) {
-                messageHandlerStrategy = StaticContextAccessor.getBean(RobotCruiseReportHandler.class);
-            } else {
-                messageHandlerStrategy = StaticContextAccessor.getBean(OperationResultHandler.class);
-            }
-        }
-        return messageHandlerStrategy;
-    }
 
     /**
      * 快速创建command=3 的消息体
