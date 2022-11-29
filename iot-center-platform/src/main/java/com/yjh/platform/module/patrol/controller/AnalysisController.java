@@ -6,6 +6,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.UpdateRequest;
+import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.service.AnalysisService;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
@@ -37,14 +38,16 @@ public class AnalysisController {
     private final IntelAnalysisService intelAnalysisService;
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
+    private final AbstractVideoCruise abstractVideoCruise;
     @Autowired
     private RedisTemplate redisTemplate;
 
     private final Logger log = LoggerFactory.getLogger(AnalysisController.class);
 
-    public AnalysisController(AnalysisService analysisService, IntelAnalysisService intelAnalysisService) {
+    public AnalysisController(AnalysisService analysisService, IntelAnalysisService intelAnalysisService, AbstractVideoCruise abstractVideoCruise) {
         this.analysisService = analysisService;
         this.intelAnalysisService = intelAnalysisService;
+        this.abstractVideoCruise = abstractVideoCruise;
     }
 
     /**
@@ -199,6 +202,32 @@ public class AnalysisController {
         try {
             result.setData(analyseDataOperateService.alarmJudge(value, stdDeviceMeteName, meteKind, alarmState, stateZero, stateOne, alarmLevel,
                     highLimit1, lowLimit1, highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
+            log.error("告警判断处理异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("告警判断处理错误:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "test")
+    @GetMapping(value = "/test")
+    public Result test(){
+        Result result = new Result();
+        try {
+            List<Analysis> analysisList = new ArrayList<>();
+            Analysis analysis = new Analysis();
+            analysis.setAnalyseType("11");
+            analysis.setTaskId("123");
+            analysis.setInstanceId(111L);
+            analysis.setIsAi(0);
+            analysis.setPicPath("/home/xx");
+            analysis.setDevicePointId("3");
+            analysis.setReferenceImage("/home/yjh_iot_center/iot-picture/specimens/123/123.jpg");
+            analysisList.add(analysis);
+            abstractVideoCruise.defect(analysisList);
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
             log.error("告警判断处理异常:", e);

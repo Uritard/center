@@ -120,7 +120,7 @@ public class DeviceStatistics {
         Map<String,Object> map = new HashMap<>();
         map.put("patroldevice_name",device.getPatrolDeviceName());
         map.put("patroldevice_code",device.getPatrolDeviceCode());
-        map.put("commission_time",device.getCommissionTime());
+        map.put("commission_time",simpleDateFormat.format(device.getCommissionTime()));
         map.put("report_time",simpleDateFormat.format(new Date()));
         map.put("type",type.toString());
         switch (type){
