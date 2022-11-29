@@ -61,7 +61,6 @@ public class TVoiceDeviceController {
                 result.setData(re);
                 //有变动 同步模型
                 Constant.modelUpload("1001");
-                Constant.modelUpload("1002");
                 Constant.modelUpload("6");
             }
 
@@ -83,7 +82,6 @@ public class TVoiceDeviceController {
             result.setData(tVoiceDeviceService.deleteByPrimaryId(voiceDeviceId));
             //有变动 同步模型
             Constant.modelUpload("1001");
-            Constant.modelUpload("1002");
             Constant.modelUpload("6");
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), e.getMessage());
@@ -108,7 +106,6 @@ public class TVoiceDeviceController {
                 result.setData(re);
                 //有变动 同步模型
                 Constant.modelUpload("1001");
-                Constant.modelUpload("1002");
                 Constant.modelUpload("6");
             }
         } catch (BusinessException e) {
@@ -191,7 +188,6 @@ public class TVoiceDeviceController {
             result.setData(tVoiceDeviceService.batchAdd(list));
             //有变动 同步模型
             Constant.modelUpload("1001");
-            Constant.modelUpload("1002");
             Constant.modelUpload("6");
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
@@ -209,7 +205,6 @@ public class TVoiceDeviceController {
             result.setData(tVoiceDeviceService.batchDelete(voiceDeviceIds));
             //有变动 同步模型
             Constant.modelUpload("1001");
-            Constant.modelUpload("1002");
             Constant.modelUpload("6");
         } catch (BusinessException e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
