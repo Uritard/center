@@ -925,7 +925,8 @@ public class UPatrolTaskService {
                 }
             }
         }
-        tCruiseTaskDelDao.deleteByPrimaryId(taskId);//删除初始化的一条
+        tCruiseTaskDelDao.deleteByPrimaryId(taskId);
+        //删除初始化的一条
         uPatrolTaskDao.deleteInitByPrimaryId(taskId);
         return this.uPatrolTaskDao.deleteByPrimaryId(taskId);
     }
@@ -1674,7 +1675,7 @@ public class UPatrolTaskService {
                     taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
                 }
 
-                taskCountMap.put("startTime", secondSdf.format(tCruiseTaskCount.getCreateTime()));
+                taskCountMap.put("startTime", secondSdf.format(tCruiseTaskCount.getStartTime()));
                 listTask.add(taskCountMap);
             }
         }
@@ -1923,7 +1924,7 @@ public class UPatrolTaskService {
                     taskCountMap.put("taskStatus", tCruiseTaskCount.getTaskStatus());
                 }
 
-                taskCountMap.put("startTime", sdfF2.format(tCruiseTaskCount.getCreateTime()));
+                taskCountMap.put("startTime", sdfF2.format(tCruiseTaskCount.getStartTime()));
                 listTask.add(taskCountMap);
             }
         }
