@@ -863,4 +863,14 @@
         )
     </select>
 
+    <select id="selectRobotIsRunning" resultType="java.lang.String">
+        SELECT DISTINCT
+        e.robot_code
+        FROM
+        u_patrol_task_attr b , t_cruise_point_instance c ,t_robot_inspection d ,t_robot_info e
+        where 1=1
+        and b.instance_id = c.instance_id
+        and c.cruise_id = d.inspection_id and d.robot_id = e.robot_id
+        <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
 </mapper>

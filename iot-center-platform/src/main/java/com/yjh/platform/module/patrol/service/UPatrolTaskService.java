@@ -960,7 +960,7 @@ public class UPatrolTaskService {
     public int taskStart(String taskId) {
 
         try {
-            List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
             if (robotCodeList != null && robotCodeList.size() > 0) {
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
@@ -1002,7 +1002,7 @@ public class UPatrolTaskService {
 
             //Thread.sleep(10000);
             //机器人任务暂停
-            List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             log.info("机器人任务暂停,robotCodeList:{}", robotCodeList);
             if (robotCodeList != null && robotCodeList.size() > 0) {
                 Map<String, Object> robotTaskStatesMap = new HashMap<>();
@@ -1046,7 +1046,7 @@ public class UPatrolTaskService {
         UPatrolResult uPatrolResult = uPatrolTaskDao.selectForTaskId(taskId);
 
         //机器人任务继续
-        List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+        List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
         log.info("机器人任务继续,robotCodeList:{}", robotCodeList);
         if (robotCodeList != null && robotCodeList.size() > 0) {
             Map<String, Object> robotTaskStatesMap = new HashMap<>();
@@ -1096,7 +1096,7 @@ public class UPatrolTaskService {
         uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
 
-        List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(taskId);
+        List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
         Map<String, Object> robotTaskStatesMap = new HashMap<>();
         robotTaskStatesMap.put("taskId", taskId);
         robotTaskStatesMap.put("commandValue", 1);
