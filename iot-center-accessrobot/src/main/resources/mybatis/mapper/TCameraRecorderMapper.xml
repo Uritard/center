@@ -232,7 +232,7 @@
         delete from t_camera_recorder  where edge_code=#{edgeCode}
     </delete>
 
-    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="recordId" parameterType="java.util.Collection">
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="recordId" keyColumn="record_id" parameterType="java.util.Collection">
         insert into t_camera_recorder
         ( record_name,recorder_model
         ,recorder_type,vendor_id,pms_id
