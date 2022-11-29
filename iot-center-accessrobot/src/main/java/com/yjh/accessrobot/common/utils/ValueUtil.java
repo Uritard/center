@@ -1,5 +1,8 @@
 package com.yjh.accessrobot.common.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Objects;
@@ -228,5 +231,18 @@ public class ValueUtil {
 
     public static float safeParseFloat(String value) {
         return safeParseFloat(value, 0);
+    }
+
+    public static Float objToFloat(Object value){
+        return StringUtils.isEmpty(value.toString()) ? null : Float.parseFloat(value.toString());
+    }
+    public static Long objToLong(Object value){
+        return StringUtils.isEmpty(value.toString()) ? null : Long.parseLong(value.toString());
+    }
+    public static Integer objToInt(Object value){
+        return StringUtils.isEmpty(value.toString()) ? null : Integer.parseInt(value.toString());
+    }
+    public static BigDecimal objToBigDecimal(Object value){
+        return StringUtils.isEmpty(value.toString()) ? null : BigDecimal.valueOf(Long.parseLong(value.toString()));
     }
 }

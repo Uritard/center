@@ -1816,6 +1816,8 @@ CREATE TABLE `t_std_devicemete_update` (
 DROP TABLE IF EXISTS `t_std_device_attr`;
 CREATE TABLE `t_std_device_attr` (
   `device_id` bigint(32) NOT NULL,
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   `device_model` int(11) DEFAULT '1' COMMENT '设备型号',
   `pms_type` varchar(32) DEFAULT '' COMMENT 'PMS类型',
   `pms_id` varchar(32) DEFAULT '' COMMENT 'PMS ID',
