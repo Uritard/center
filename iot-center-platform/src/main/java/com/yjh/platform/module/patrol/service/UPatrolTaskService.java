@@ -474,7 +474,10 @@ public class UPatrolTaskService {
                     .setTaskName(robotPatrolTaskStatus.getTaskName())
                     // .setRobotId(robotId)
                     .setStartTime(startTime).setTaskSource(1)
-                    .setTaskType(218).setExecuteType(173).setTaskLevel(1).setCreateTime(createTime);
+                    .setTaskType(218)
+                    .setExecuteType(173)
+                    .setTaskLevel(1)
+                    .setCreateTime(createTime);
             UPatrolResult uPatrolResult = new UPatrolResult()
                     .setTaskId(taskId)
                     .setTaskState(Integer.valueOf(robotPatrolTaskStatus.getTaskState()))
@@ -482,10 +485,14 @@ public class UPatrolTaskService {
                     .setTaskName(robotPatrolTaskStatus.getTaskName())
                     .setAreaId(robotPatrolTaskStatus.getRobotCode())
                     // .setRobotId(robotId)
-                    .setTaskType(218).setExecuteType(173)
+                    .setTaskType(218)
+                    .setExecuteType(173)
                 // taskSource 表示下级创建主动上报任务
                     .setTaskSource(1)
-                    .setTaskLevel(1).setTaskState(TASK_STATE_NOT_START).setCreateTime(createTime);
+                    .setTaskLevel(1)
+                    .setTaskState(TASK_STATE_NOT_START)
+                    .setCreateTime(createTime)
+                    .setExecuteTime(startTime);
 
             UPatrolTask taskExsis = uPatrolTaskDao.selectByPrimaryId(taskId);
             if (taskExsis == null) {
