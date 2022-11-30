@@ -66,13 +66,6 @@ public class RobotInspectionWarnThread implements Runnable{
             log.info("开始处理巡视结果产生的告警数据 >>>>>>> taskAlarm==={}", JSON.toJSONString(taskAlarm));
             String taskId = taskAlarm.getTaskCode();
             String robotCode = taskAlarm.getRobotCode();
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
-            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"
-            ));
-            if("2".equals(sysLevel) && (tRobotInspectionDao.selectRobotCount(edgeCode) > 0 || tRobotInspectionDao.selectRegion(edgeCode) > 0) || "3".equals(sysLevel)){
-                upSystemDealWith(taskId);
-                return;
-            }
 
             // taskId是巡视主机的id,robotTaskId是机器人上报的id
             String robotTaskId = taskCode;
@@ -120,54 +113,6 @@ public class RobotInspectionWarnThread implements Runnable{
             log.error(e.getMessage(), e);
         }
     }
-
-    private void upSystemDealWith(String taskId) throws ParseException {
-        TStdDeviceMete tStdDevicemete =
-                analyseDataOperateService.selectDeviceMeteByInstanceId(Long.valueOf(taskAlarm.getDeviceId()));
-        DateFormat dateFormat =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        TWarnInfo warnInfo=new TWarnInfo()
-                .setTaskId(taskId)
-                .setAlarmSource(282)
-                .setConfMode(276)
-                .setCunstomId(tStdDevicemete.getCustomId())
-                .setDealPersonId(taskAlarm.getContent())
-                .setDeviceCode(analyseDataOperateDao.selectPatrolDevice(taskAlarm.getDeviceId()).get(
-                        "deviceCode"))
-                .setDeviceId(tStdDevicemete.getDeviceId())
-                .setDefectModel(Integer.valueOf(analyseDataOperateService.selectDictCode("defect_model", "其他")))
-                .setStdMeteId(tStdDevicemete.getDeviceMeteId())
-                .setValue(taskAlarm.getValue())
-                .setWarnContent(taskAlarm.getContent())
-                .setWarnName(taskAlarm.getContent())
-                .setWarnTime(dateFormat.parse(taskAlarm.getTime()));
-        String alarmLevel = taskAlarm.getAlarmLevel();
-        String alarmType = taskAlarm.getAlarmType();
-        if (StringUtils.isNotEmpty(alarmType)) {
-            warnInfo.setWarnType(analyseDataOperateService.selectDictCodeByUpDict("point_alarm_type", alarmType));
-            if (StringUtils.isNotEmpty(alarmLevel)) {
-                warnInfo.setWarnLevel(analyseDataOperateService.selectDictCodeByUpDict("alarm_level", alarmLevel));
-            }
-        }else {
-            switch (alarmLevel) {
-                case "1":
-                    warnInfo.setWarnLevel(130);
-                    break;
-                case "2":
-                    warnInfo.setWarnLevel(131);
-                    break;
-                case "3":
-                    warnInfo.setWarnLevel(132);
-                    break;
-                case "4":
-                    warnInfo.setWarnLevel(133);
-                    break;
-                default:
-                    break;
-            }
-        }
-        StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
-    }
-
     private TWarnInfo getWarnInfo(TStdDeviceMete tStdDevicemete, String taskId, Long instanceId, String robotCode){
         TWarnInfo warnInfo = new TWarnInfo();
         try {

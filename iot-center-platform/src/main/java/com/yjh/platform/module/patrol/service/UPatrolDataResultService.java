@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -60,7 +61,7 @@ public class UPatrolDataResultService {
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName) {
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
-        if (deviceIdList != null && !deviceIdList.isEmpty()) {
+        if (!CollectionUtils.isEmpty(deviceIdList)) {
             cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName);
             for (CruiseResultAnalyzeInfo cRAI : cruiseResultAnalyzeInfoList) {
                 if (Objects.isNull(cRAI.getIdentifyResult())) {
