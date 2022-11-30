@@ -138,8 +138,8 @@ public class InspectionResultThread implements Runnable{
                     log.info("taskId is {},instanceId is {},the result is abnormal", taskId, instanceId);
                 }
             }
-            tCruiseTaskResultMap.put("picpath", infoMap.get("relativePath"));
-            tCruiseTaskResultMap.put("origpic", infoMap.containsKey("absolutePath") ? infoMap.get("absolutePath") : "");
+            tCruiseTaskResultMap.put("picpath", infoMap.getOrDefault("relativePath", ""));
+            tCruiseTaskResultMap.put("origpic", infoMap.getOrDefault("absolutePath", ""));
             tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
             tCruiseTaskResultMap.put("isWarn", "0");
             tCruiseTaskResultMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
@@ -152,7 +152,7 @@ public class InspectionResultThread implements Runnable{
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);
             if (!flag) {
                 log.info("This is simulation tool task！！！ {}", taskId);
-                simulationToolTaskHandler(infoMap.get("absolutePath"), taskId, instanceId, robotPatrolTaskResult.getValue(), robotPatrolTaskResult.getFilePath());
+                simulationToolTaskHandler(infoMap.getOrDefault("absolutePath", ""), taskId, instanceId, robotPatrolTaskResult.getValue(), robotPatrolTaskResult.getFilePath());
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -221,7 +221,7 @@ public class InspectionResultThread implements Runnable{
                     // 且是E机器人
                     && Objects.equals(159, robotType)
                     // 上级系统不走算法处理，只存数据
-                    || "3".equals(sysLevel);
+                    && !"3".equals(sysLevel);
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
             boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, sysLevel: {}", isSimulationTool, taskId, sysLevel);

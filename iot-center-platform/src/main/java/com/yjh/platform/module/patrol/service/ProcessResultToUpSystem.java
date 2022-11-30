@@ -227,6 +227,9 @@ public class ProcessResultToUpSystem {
                 fileType = "3";
                 break;
             default:
+                recognitionType = "3";
+                fileNamePath = CCD_PATH;
+                fileType = "2";
                 break;
         }
         map.put("recognitionType", recognitionType);

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
@@ -15,6 +16,7 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,7 @@ import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_T
  * @date 2021/12/16
  * 机器人巡视结果的告警处理线程
  */
-@lombok.extern.slf4j.Slf4j
+@Slf4j
 public class RobotInspectionWarnThread implements Runnable{
 
     private final RobotPatrolTaskAlarm taskAlarm;
@@ -83,8 +85,15 @@ public class RobotInspectionWarnThread implements Runnable{
 
             String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + taskAlarm.getDeviceId();
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
-            Long instanceId = NumberUtils.toLong(robotInfoKeyMap.get("instanceId"));
-
+            long instanceId = NumberUtils.toLong(robotInfoKeyMap.get("instanceId"));
+            // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
+            TCruisePointInstance insInfo = null;
+            if (instanceId == 0) {
+                String originId = taskAlarm.getDeviceId();
+                insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
+                log.info("instanceInfo: {}", JSON.toJSONString(insInfo));
+                instanceId = insInfo.getInstanceId();
+            }
             TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(instanceId);
 
             TWarnInfo warnInfo = getWarnInfo(tStdDevicemete, taskId, instanceId, robotCode);
