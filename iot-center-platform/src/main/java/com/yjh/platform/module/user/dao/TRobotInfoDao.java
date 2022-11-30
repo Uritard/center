@@ -108,7 +108,7 @@ public interface TRobotInfoDao {
 
     String selectMapPathByCode(@Param(value = "robotCode") String robotCode);
 
-    List<Integer> selectAllRobotNum();
+    List<String> selectAllRobotNum();
 
     int selectRobotCount();
 

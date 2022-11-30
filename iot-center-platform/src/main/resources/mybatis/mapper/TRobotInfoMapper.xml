@@ -595,7 +595,7 @@
         WHERE a.robot_code = #{robotCode,jdbcType=VARCHAR}
     </select>
 
-    <select id="selectAllRobotNum" resultType="java.lang.Integer">
+    <select id="selectAllRobotNum" resultType="java.lang.String">
         select
             a.robot_num
         FROM t_robot_info a

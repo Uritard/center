@@ -75,7 +75,7 @@ public class TRobotInfoController {
                 result.setMessage(209, "该实物ID已存在，不可重复");
                 return result;
             }
-            List<Integer> allRobotNumList = tRobotInfoService.selectAllRobotNum();
+            List<String> allRobotNumList = tRobotInfoService.selectAllRobotNum();
             if (allRobotNumList.contains(tRobotInfo.getRobotNum())){
                 result.setMessage(209, "该设备编码已存在，不可重复");
                 return result;
@@ -132,7 +132,7 @@ public class TRobotInfoController {
                 result.setMessage(209, "该实物ID已存在，不可重复");
                 return result;
             }
-            List<Integer> allRobotNumList = tRobotInfoService.selectAllRobotNum();
+            List<String> allRobotNumList = tRobotInfoService.selectAllRobotNum();
             if (!Objects.equals(robotInfoTemp.getRobotNum(), tRobotInfo.getRobotNum()) && allRobotNumList.contains(tRobotInfo.getRobotNum())){
                 result.setMessage(209, "该设备编码已存在，不可重复");
                 return result;

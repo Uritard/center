@@ -517,13 +517,11 @@ public class TRobotInfoService{
     public String selectRobotCodeById(Long robotId) {
         return tRobotInfoDao.selectRobotCodeById(robotId);
     }
-    @Transactional(rollbackFor = Exception.class)
     public List<String> selectAllRobotCode2() {
         return tRobotInfoDao.selectAllRobotCode2();
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public List<Integer> selectAllRobotNum(){
+    public List<String> selectAllRobotNum(){
         return tRobotInfoDao.selectAllRobotNum();
     }
 
