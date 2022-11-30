@@ -88,4 +88,6 @@ public interface TCameraPresetDao {
 
     List<Map<String, Object>> selectCameraBySecondSilent();
 
+  int selectCameraPresetInTask(@Param(value = "presetId") String presetId );
+
 }

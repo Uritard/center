@@ -389,5 +389,9 @@ public class TCameraPresetService {
     public List<Map<String, Object>> selectCameraBySecondSilent() {
         return  tCameraPresetDao.selectCameraBySecondSilent();
     }
+
+    public int selectCameraPresetInTask(String presetId) {
+        return tCameraPresetDao.selectCameraPresetInTask(presetId);
+    }
 }
 
