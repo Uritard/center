@@ -61,7 +61,7 @@
             b.real_code
             FROM
             t_warn_info a
-            LEFT JOIN t_std_device b ON a.device_id = b.device_id and a.cunstom_id = b.custom_id
+            LEFT JOIN t_std_device b ON a.device_id = b.device_id
             LEFT JOIN t_dict_business c ON a.warn_level = c.dict_code
             LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code
             LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code
@@ -886,7 +886,7 @@
             f.dict_note as alarm_source_name,
             a.defect_model,
             m.dict_note as defect_model_name,
-            b.custom_name,
+            d.custom_name,
             a.device_code,
             d.low_limit1,
             d.low_limit2,
@@ -898,7 +898,7 @@
             d.high_limit4,
         b.up_region_name as region_name
         FROM t_warn_info a
-        LEFT JOIN t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
+        LEFT JOIN t_std_device b on a.device_id = b.device_id
         LEFT JOIN t_std_devicemete d on a.std_mete_id = d.device_mete_id
         LEFT JOIN t_dict_business e on e.dict_code = a.warn_level and e.col_name = 'alarm_level'
         LEFT JOIN t_dict_business f on f.dict_code = a.alarm_source and f.col_name = 'alarm_source'
@@ -932,7 +932,7 @@
         a.mete_name,
         b.device_name,
         b.real_code,
-        b.custom_name
+        a.custom_name
     FROM
         t_std_devicemete a,
         t_std_device b

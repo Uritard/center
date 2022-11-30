@@ -356,7 +356,7 @@
         a.defect_content
         FROM
         t_defect_info a
-        LEFT JOIN t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
+        LEFT JOIN t_std_device b on a.device_id = b.device_id
         LEFT JOIN t_std_devicemete k on a.std_mete_id = k.device_mete_id
         LEFT JOIN t_dict_business e on a.defect_type = e.dict_code
         LEFT JOIN t_dict_business f on a.conf_mode = f.dict_code
@@ -448,7 +448,7 @@
         a.defect_content
         FROM
         t_defect_info a
-        LEFT JOIN	t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
+        LEFT JOIN	t_std_device b on a.device_id = b.device_id
         LEFT JOIN t_std_mete d on a.std_mete_id = d.std_mete_id
         LEFT JOIN t_dict_business e on a.defect_type = e.dict_code
         LEFT JOIN t_dict_business f on a.conf_mode = f.dict_code
@@ -544,7 +544,7 @@
             a.defect_type as defect_model,
             m.dict_note as defect_model_name
         FROM t_defect_info a
-        LEFT JOIN t_std_device b on a.device_id = b.device_id and a.cunstom_id = b.custom_id
+        LEFT JOIN t_std_device b on a.device_id = b.device_id
         LEFT JOIN t_std_devicemete d on a.std_mete_id = d.device_mete_id
         LEFT JOIN t_dict_business e on e.dict_code = a.defect_level and e.col_name = 'alarm_level'
         LEFT JOIN t_dict_business f on f.dict_code = a.alarm_source and f.col_name = 'alarm_source'
