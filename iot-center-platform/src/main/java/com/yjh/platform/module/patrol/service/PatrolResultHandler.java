@@ -262,54 +262,51 @@ public class PatrolResultHandler {
         log.info("resultList=={}", resultList);
 
         try {
+            String taskId = resultList.get(0).getTaskId();
+            String instanceId = resultList.get(0).getInstanceId();
+            String analyseType = resultList.get(0).getAnalyseType();
+            String analyseResultImg = resultList.get(0).getAnalyseResultImg();
+            String resultDesc = resultList.get(0).getResultDesc();
+            String conf = resultList.get(0).getConf();
+            String firDocPath = resultList.get(0).getFirDocPath();
+
+            StringJoiner str = new StringJoiner(",");
             for (AnalysePatrolTaskResult patrolTaskResult : resultList) {
-                String taskId = patrolTaskResult.getTaskId();
-                String instanceId = patrolTaskResult.getInstanceId();
-                String analyseType = patrolTaskResult.getAnalyseType();
-                String analyseResultImg = patrolTaskResult.getAnalyseResultImg();
-                String resultValue = patrolTaskResult.getResultValue();
-                String resultDesc = patrolTaskResult.getResultDesc();
-                String conf = patrolTaskResult.getConf();
-                String firDocPath = patrolTaskResult.getFirDocPath();
-
-                String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
-                Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
-                log.info("Read from redis cruiseResultMap is：{}", cruiseResultMap);
-
-                String resultImage = cruiseResultMap.get("picpath");
-                if (StringUtils.isNotEmpty(analyseResultImg)) {
-                    resultImage = analyseResultImg;
-                }
-
-                if ("11".equals(analyseType) && "".equals(resultImage)) {
-                    continue;
-                }
-                TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(instanceId));
-                log.info("tStdDeviceMete==={}", JSON.toJSONString(tStdDevicemete));
-
-                String msgId = String.valueOf(UUID.randomUUID());
-                if (StringUtils.equals("11", analyseType)) {
-                    log.info("taskId is {} instanceId is {}:distinguish", taskId, instanceId);
-                    distinguishHandler(msgId, analyseResultImg, resultValue, cruiseResultMap);
-                } else if (StringUtils.equals("398", analyseType)) {
-                    log.info("taskId is {} instanceId is {}:defect", taskId, instanceId);
-                    defectHandler(msgId, analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
-                } else {
-                    log.info("taskId is {} instanceId is {}:recognition", taskId, instanceId);
-                    recognitionHandler(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
-                }
-
-                cruiseResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-                cruiseResultMap.put("isWarn", StringUtils.isNotEmpty(cruiseResultMap.get("isWarn")) ? "0" : "1");
-                cruiseResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-                log.info("cruiseResultMap==={}", cruiseResultMap);
-                redisTemplate.opsForHash().putAll(redisKeyName, cruiseResultMap);
-
-                uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
-
-                // 缺陷和判别上报算法管理平台
-                processResultToUpSystem.defectToAlgorithmM(taskId, instanceId, msgId);
+                str.add(patrolTaskResult.getResultValue());
             }
+            String resultValue = str.toString();
+            log.info("resultValue=={}", resultValue);
+
+            String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
+            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+            log.info("Read from redis cruiseResultMap is：{}", cruiseResultMap);
+
+            TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(instanceId));
+            log.info("tStdDeviceMete==={}", JSON.toJSONString(tStdDevicemete));
+
+            String msgId = String.valueOf(UUID.randomUUID());
+            if (StringUtils.equals("11", analyseType)) {
+                log.info("taskId is {} instanceId is {}:distinguish", taskId, instanceId);
+                distinguishHandler(msgId, analyseResultImg, resultValue, cruiseResultMap);
+            } else if (StringUtils.equals("398", analyseType)) {
+                log.info("taskId is {} instanceId is {}:defect", taskId, instanceId);
+                defectHandler(msgId, analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete);
+            } else {
+                log.info("taskId is {} instanceId is {}:recognition", taskId, instanceId);
+                recognitionHandler(analyseResultImg, resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
+            }
+
+            cruiseResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
+            cruiseResultMap.put("isWarn", StringUtils.isNotEmpty(cruiseResultMap.get("isWarn")) ? "0" : "1");
+            cruiseResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
+            log.info("cruiseResultMap==={}", cruiseResultMap);
+            redisTemplate.opsForHash().putAll(redisKeyName, cruiseResultMap);
+
+            uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
+
+            // 缺陷和判别上报算法管理平台
+            processResultToUpSystem.defectToAlgorithmM(taskId, instanceId, msgId);
+
         } catch (Exception e) {
             log.error("处理算法分析后的巡视结果异常：", e);
         }

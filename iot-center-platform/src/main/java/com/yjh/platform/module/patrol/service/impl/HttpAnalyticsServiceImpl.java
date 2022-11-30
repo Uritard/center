@@ -38,14 +38,14 @@ import java.util.*;
 @Component
 public class HttpAnalyticsServiceImpl implements AnalyticsService {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
     private final IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
     private final IntelligentAlgorithmConfig algorithmConfig;
 
     private HashOperations<String, String, String> hashOperations;
     private Map<String, List<String>> analyseTypeMap = new HashMap<>(16);
 
-    public HttpAnalyticsServiceImpl(RedisTemplate<String, String> redisTemplate, IntelAnalysisFtpsConfig intelAnalysisFtpsConfig,
+    public HttpAnalyticsServiceImpl(RedisTemplate<String, Object> redisTemplate, IntelAnalysisFtpsConfig intelAnalysisFtpsConfig,
         IntelligentAlgorithmConfig algorithmConfig) {
         this.redisTemplate = redisTemplate;
         this.intelAnalysisFtpsConfig = intelAnalysisFtpsConfig;
@@ -64,7 +64,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
         analyseTypeMap.put("1", Collections.singletonList("meter"));
         analyseTypeMap.put("2", Collections.singletonList("meter"));
         analyseTypeMap.put("3", Collections.singletonList("meter"));
-        analyseTypeMap.put("5", Collections.singletonList("light"));
+        analyseTypeMap.put("5", Collections.singletonList("switch"));
         analyseTypeMap.put("6", Collections.singletonList("isolator"));
         analyseTypeMap.put("8", Collections.singletonList("qrcode"));
         analyseTypeMap.put("9", Collections.singletonList("infrared"));
@@ -159,16 +159,18 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                 String imageNormalUrlPath = "";
                 String targetNamePath;
                 // 判别基准图
-                String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isEPRI", "content"));
+                String flag = hashOperations.get("t_sys_param:isEPRI", "content");
                 if (StringUtils.equals("false", flag)) {
                     // 拿提前拍好的预置位作为判别基准图
                     imageNormalUrlPath = analysis.getReferenceImage();
+                    log.info("拿提前拍好的预置位作为判别基准图:{}", imageNormalUrlPath);
                     String[] split = imageNormalUrlPath.split("/");
                     targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
                     analyseObject.setImageNormalUrlPath(targetNamePath);
 
                 } else {
                     // 拿电科院给的图
+                    log.info("flag:{}", flag);
                     String devicePointId = analysis.getDevicePointId();
                     String filePath = hashOperations.get("t_sys_param:distinguishReferencePath", "content");
                     File folder = new File(filePath + "/" + devicePointId);
@@ -181,6 +183,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                             }
                         }
                     }
+                    log.info("拿电科院给的图:{}", imageNormalUrlPath);
                     String[] split = imageNormalUrlPath.split("/");
                     targetNamePath = split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
                     analyseObject.setImageNormalUrlPath(targetNamePath);
