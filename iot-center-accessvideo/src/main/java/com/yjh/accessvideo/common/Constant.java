@@ -114,12 +114,13 @@ public class Constant {
 
     public static final String picRecBack = "http://iot-center-platform/tSequentialConf/v1/sequentialRecBack";
 
+    public static boolean videoSeparateDeploy;
     public static void  otherServerMap( Map<String,String> map, String url) {
         try{
-        Result re = new Result();
-        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
-        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url,map, Result.class);
+            if (!videoSeparateDeploy && url.contains("/copy-ftps")){
+                return;
+            }
+            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url,map, Result.class);
         }catch (Exception e){
            log.info("一键顺控："+e);
         }

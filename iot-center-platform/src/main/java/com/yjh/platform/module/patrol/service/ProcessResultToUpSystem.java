@@ -382,6 +382,7 @@ public class ProcessResultToUpSystem {
      */
     @Async
     public void defectAndDistinguishToUpSystem(Map<String, String> cruiseResultMap, Set<String> resultList){
+        log.info("cruiseResultMap=={},resultList=={}", cruiseResultMap, resultList);
         try {
             for (String key : resultList){
                 // 判别告警等级暂定为一般

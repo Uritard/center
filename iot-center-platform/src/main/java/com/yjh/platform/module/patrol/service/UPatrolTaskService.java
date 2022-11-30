@@ -1691,25 +1691,33 @@ public class UPatrolTaskService {
 
     private Map<String, String> monthHandle(Date taskStartDate) {
         Map<String, String> map = new HashMap<>();
-        if (Objects.equals(null, taskStartDate)) {
-            taskStartDate = new Date();
+        try {
+            if (Objects.equals(null, taskStartDate)) {
+                taskStartDate = new Date();
+            }
+            DateTime start = DateUtil.beginOfMonth(taskStartDate);
+            DateTime end = DateUtil.endOfMonth(taskStartDate);
+            map.put("firstDay", DateTimeUtil.format(start));
+            map.put("lastDay", DateTimeUtil.format(end));
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
-        DateTime start = DateUtil.beginOfMonth(taskStartDate);
-        DateTime end = DateUtil.endOfMonth(taskStartDate);
-        map.put("firstDay", DateTimeUtil.format(start));
-        map.put("lastDay", DateTimeUtil.format(end));
         return map;
     }
 
     private Map<String, String> yearHandle(Date taskStartDate) {
         Map<String, String> map = new HashMap<>();
-        if (Objects.equals(null, taskStartDate)) {
-            taskStartDate = new Date();
+        try {
+            if (Objects.equals(null, taskStartDate)) {
+                taskStartDate = new Date();
+            }
+            DateTime start = DateUtil.beginOfYear(taskStartDate);
+            DateTime end = DateUtil.endOfYear(taskStartDate);
+            map.put("firstDay", DateTimeUtil.format(start));
+            map.put("lastDay", DateTimeUtil.format(end));
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
         }
-        DateTime start = DateUtil.beginOfYear(taskStartDate);
-        DateTime end = DateUtil.endOfYear(taskStartDate);
-        map.put("firstDay", DateTimeUtil.format(start));
-        map.put("lastDay", DateTimeUtil.format(end));
         return map;
     }
 
