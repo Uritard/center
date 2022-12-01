@@ -144,6 +144,7 @@ public class UPatrolTaskService {
     public String insert(TCruiseTaskAdd tCruiseTaskAdd) {
         UPatrolTask uPatrolTask = dealTaskInfo(tCruiseTaskAdd);
 
+        // 设置任务优先级
         setLevel(uPatrolTask, tCruiseTaskAdd);
         try {
             uPatrolTask.setCreateTime(new Date());
@@ -270,6 +271,12 @@ public class UPatrolTaskService {
     private void setLevel(UPatrolTask uPatrolTask, TCruiseTaskAdd tCruiseTaskAdd) {
         Integer ifRun = uPatrolTask.getExecuteType();
         if (tCruiseTaskAdd.getTaskLevel() == null) {
+            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+            if("3".equals(sysLevel)) {
+                // 上级系统
+                uPatrolTask.setTaskLevel(2);
+                return;
+            }
             if (Objects.equals("0", tCruiseTaskAdd.getUnionTaskStatus()) || tCruiseTaskAdd.getUnionTaskStatus() == null) {
                 if (Objects.equals(TaskTypeEnum.NOW.getType(), ifRun)) {
                     uPatrolTask.setTaskLevel(3);

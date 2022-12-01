@@ -96,9 +96,7 @@ public class SystemInfoUtil {
             List<Map<String,String>> result = new LinkedList<>();
             Runtime rt = Runtime.getRuntime();
             Process p = rt.exec("pidstat -d");//df -hl 查看硬盘空间
-            BufferedReader in = null;
-            try {
-                in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            try(BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
                 String str = null;
                 String[] strArray = null;
                 int i = 1;
@@ -114,6 +112,20 @@ public class SystemInfoUtil {
 //                            log.info(item);
 //                        }
                         Map<String,String> map = new HashMap<>();
+//                        echo $(ps -ef | grep java | grep -v grep| grep 32398 | awk -F '\\s+' '{ print $NF }') | sed 's/bin.*//g'
+                        // 获取安装路径下所用的磁盘空间
+                        Process exec = rt.exec("echo $(ps -ef | grep java | grep -v grep| grep " + strArray[2] + "| awk -F " +
+                                "'\\s+' '{ print " +
+                                "$NF }) | sed 's/bin.*//g' | xargs du -h");
+                        try(BufferedReader ins = new BufferedReader(new InputStreamReader(exec.getInputStream()))){
+                            String s="";
+                            while ((s = ins.readLine()) != null) {
+                                if(s.contains("logs")){
+                                    String value = s.split("\\s+")[0];
+                                    map.put("logVolume", value);
+                                }
+                            }
+                        }
                         map.put("pid",strArray[2]);
                         map.put("read",strArray[3]);
                         map.put("write",strArray[4]);
@@ -125,8 +137,6 @@ public class SystemInfoUtil {
                 }
             } catch (Exception e) {
                 log.error("获取硬盘信息错误:", e);
-            } finally {
-                in.close();
             }
             return result;
         }
