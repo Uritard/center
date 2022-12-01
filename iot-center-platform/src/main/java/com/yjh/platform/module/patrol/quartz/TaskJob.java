@@ -112,8 +112,8 @@ public class TaskJob extends QuartzJobBean {
             allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
             //更改任务状态
             setTaskResult(task, date);
-            //给机器人发任务启动
-            robotTaskStart(task);
+            //给机器人发任务启动  没开率下级系统 暂时是考虑了机器人和无人机
+            uPatrolTaskService.taskToRobotOrDroneStart(ancestralTask);
             //调用摄像机任务
             uPatrolTaskService.localTaskStart(task.getTaskId());
         } catch (Exception e) {
@@ -181,27 +181,6 @@ public class TaskJob extends QuartzJobBean {
                 });
             }
         }
-    }
-
-    /**
-     * 机器人任务启动
-     */
-    private void robotTaskStart(UPatrolTask task) {
-        try {
-            List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(task.getTaskId());
-            log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
-            if (robotCodeList != null && robotCodeList.size() > 0) {
-                Map<String, Object> robotTaskStatesMap = new HashMap<>();
-                robotTaskStatesMap.put("taskId", task.getTaskId());
-                robotTaskStatesMap.put("commandValue", 1);
-                robotTaskStatesMap.put("isEdge", 0);
-                robotTaskStatesMap.put("robotCodeList", robotCodeList);
-                robotTaskStates(robotTaskStatesMap);
-            }
-        } catch (Exception e) {
-            log.error("发送机器人启动错误：", e);
-        }
-
     }
 
     private void robotTaskStates(Map<String, Object> robotTaskStatesMap) {

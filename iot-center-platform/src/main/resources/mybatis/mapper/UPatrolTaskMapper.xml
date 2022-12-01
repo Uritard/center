@@ -325,7 +325,7 @@
             a.robot_id,
             a.date_type,
             a.task_type,
-            DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+            DATE_FORMAT(if(d.execute_time is null,a.start_time,d.execute_time),'%Y-%m-%d %H:%i:%s') AS start_time,
             DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
             DATE_FORMAT(d.execute_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
@@ -361,7 +361,7 @@
                 a.robot_id,
                 a.date_type,
                 a.task_type,
-                DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+                DATE_FORMAT(if(d.execute_time is null,a.start_time,d.execute_time),'%Y-%m-%d %H:%i:%s') AS start_time,
                 DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
                 DATE_FORMAT(d.execute_time ,'%Y-%m-%d %H:%i:%s') AS create_time
             from u_patrol_task a
@@ -398,7 +398,7 @@
                 a.robot_id,
                 a.date_type,
                 a.task_type,
-                DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+                DATE_FORMAT(if(d.execute_time is null,a.start_time,d.execute_time),'%Y-%m-%d %H:%i:%s') AS start_time,
                 DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
                 DATE_FORMAT(d.execute_time ,'%Y-%m-%d %H:%i:%s') AS create_time
             from u_patrol_task a
@@ -456,7 +456,7 @@
         a.robot_id,
         a.date_type,
         a.task_type,
-        DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+        DATE_FORMAT(if(d.execute_time is null,a.start_time,d.execute_time),'%Y-%m-%d %H:%i:%s') AS start_time,
         DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
         DATE_FORMAT(d.execute_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
@@ -494,7 +494,7 @@
         a.robot_id,
         a.date_type,
         a.task_type,
-        DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+        DATE_FORMAT(if(d.execute_time is null,a.start_time,d.execute_time),'%Y-%m-%d %H:%i:%s') AS start_time,
         DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
         DATE_FORMAT(d.execute_time ,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
@@ -533,7 +533,7 @@
         a.robot_id,
         a.date_type,
         a.task_type,
-        DATE_FORMAT(a.start_time ,'%Y-%m-%d %H:%i:%s') AS start_time,
+        DATE_FORMAT(if(d.execute_time is null,a.start_time,d.execute_time),'%Y-%m-%d %H:%i:%s') AS start_time,
         DATE_FORMAT(a.end_time ,'%Y-%m-%d %H:%i:%s') AS end_time,
         DATE_FORMAT(d.execute_time,'%Y-%m-%d %H:%i:%s') AS create_time
         from u_patrol_task a
@@ -905,5 +905,15 @@
         and b.instance_id = c.instance_id
         and c.cruise_id = d.inspection_id and d.robot_id = e.robot_id
         <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
+
+
+    <select id="selectRobotOrDroneInsByTaskId" resultType="java.lang.Long">
+        SELECT
+            attr.instance_id
+        FROM
+            u_patrol_task_attr attr
+                join t_cruise_point_instance ins
+        where (ins.cruise_type = 228 or ins.cruise_type = 524) and attr.task_id = #{taskId}
     </select>
 </mapper>

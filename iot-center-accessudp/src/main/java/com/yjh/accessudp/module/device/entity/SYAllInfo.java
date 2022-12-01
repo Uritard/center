@@ -219,4 +219,6 @@ public class SYAllInfo implements Serializable {
         @ApiModelProperty(value = "防抖延时门限")
         private Integer delayTime;
 
+        private String edgeCode;
+
         }
