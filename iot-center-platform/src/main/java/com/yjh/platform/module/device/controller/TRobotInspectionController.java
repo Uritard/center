@@ -11,6 +11,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TRobotInspection;
 import com.yjh.platform.module.device.service.TRobotInspectionService;
+import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -44,6 +45,8 @@ public class TRobotInspectionController {
 
     @Autowired
     private final TRobotInspectionService tRobotInspectionService;
+    @Autowired
+    private UPatrolTaskService uPatrolTaskService;
 
     private Logger log = LoggerFactory.getLogger(TRobotInspectionController.class);
 
@@ -184,7 +187,8 @@ public class TRobotInspectionController {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Map<String,Object> map = tRobotInspectionService.selectRobotTaskProgress(robotId);
+//            Map<String,Object> map = tRobotInspectionService.selectRobotTaskProgress(robotId);
+            Map<String,Object> map = uPatrolTaskService.selectRobotTaskProgress(robotId);
             List<RobotTaskMessage> list = (List) map.get("list");
             if(list != null && list.size()>0){
                 resultMap.put("taskInfo",list);

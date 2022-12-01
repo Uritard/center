@@ -863,6 +863,39 @@
         )
     </select>
 
+
+    <select id="selectRobotTaskOnStart" resultType="java.lang.String">
+        SELECT DISTINCT
+            d.task_id
+        FROM
+            t_robot_inspection a,
+            t_cruise_point_instance b,
+            u_patrol_task_attr c,
+            u_patrol_result d
+        WHERE
+            a.robot_id = #{robotId,jdbcType=BIGINT}
+          AND a.inspection_id = b.cruise_id
+          AND b.instance_id = c.instance_id
+          AND c.task_id = d.task_id
+          AND (
+                    d.task_state = 239
+                OR d.task_state = 241
+            )
+          AND d.task_type != 508 AND d.task_type != 509 AND d.task_type != 456
+        ORDER BY d.create_time DESC
+            LIMIT 1
+    </select>
+
+    <select id="selectRobotTaskInstanceList" resultType="java.lang.String">
+        SELECT DISTINCT
+        c.instance_id
+        FROM
+        u_patrol_task_attr b , t_cruise_point_instance c ,t_robot_inspection d ,t_robot_info e
+        where 1=1
+        and b.instance_id = c.instance_id
+        and c.cruise_id = d.inspection_id and d.robot_id = e.robot_id
+        <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
     <select id="selectRobotIsRunning" resultType="java.lang.String">
         SELECT DISTINCT
         e.robot_code
