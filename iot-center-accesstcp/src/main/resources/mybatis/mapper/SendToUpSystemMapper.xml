@@ -58,6 +58,7 @@
         (b.appearance_type - 419)  as appearance_type,
         b.device_mete_id AS device_mete_id,
         b.device_point_id,
+        b.inspection_type,
         b.mete_kind,
         b.position_type,
         b.analyse_type,

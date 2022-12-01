@@ -138,7 +138,7 @@ public class TStdDeviceModelService {
                             TAlgorithmMete tAlgorithmMete = new TAlgorithmMete();
                             tAlgorithmMete.setEdgeCode(edgeCode);
                             tAlgorithmMete.setOriginId(tStdDeviceMete.getOriginId());
-                            tAlgorithmMete.setAlgorithmId((Long) device.get("algorithm_id"));
+                            tAlgorithmMete.setAlgorithmId(objToLong(device.get("algorithm_id")));
                             finalAlgorithmMeteList.add(tAlgorithmMete);
                         }
                         finalStdDeviceMeteList.add(tStdDeviceMete);
@@ -164,8 +164,8 @@ public class TStdDeviceModelService {
             insertRobotInspectionList.addAll(oldRobotInspectionList);
             //设备点位
             List<TStdDevice> insertStdDevice = dealStdDevice(oldStdDeviceList, newStdDevices, edgeCode);
-            dealStdDeviceAttr(oldStdDeviceAttrList, newStdDeviceAttrs, edgeCode);
             insertStdDevice.addAll(oldStdDeviceList);
+            dealStdDeviceAttr(insertStdDevice, oldStdDeviceAttrList, newStdDeviceAttrs, edgeCode);
             //标准测点
             List<TStdDeviceMete> insertStdDeviceMete = dealStdDeviceMete(insertStdDevice, oldStdDeviceMeteList, newStdDeviceMetes, edgeCode);
             insertStdDeviceMete.addAll(oldStdDeviceMeteList);
@@ -265,6 +265,7 @@ public class TStdDeviceModelService {
             tStdDeviceMete.setOriginId(String.valueOf(device.get("device_id")));
         }
         tStdDeviceMete.setEdgeCode(edgeCode);
+        tStdDeviceMete.setInspectionType(objToInt(device.getOrDefault("inspection_type", "1")));
         tStdDeviceMete.setRedundantType(String.valueOf(device.getOrDefault("redundant_type", "1")));
         return tStdDeviceMete;
     }
@@ -278,7 +279,6 @@ public class TStdDeviceModelService {
      */
     private TStdDeviceAttr createStdDeviceAttr(TStdDevice tStdDevice, Map<String, Object> device) {
         TStdDeviceAttr tStdDeviceAttr = new TStdDeviceAttr();
-        tStdDeviceAttr.setDeviceId(tStdDevice.getDeviceId());
         tStdDeviceAttr.setEdgeCode(tStdDevice.getEdgeCode());
         tStdDeviceAttr.setOriginId(tStdDevice.getOriginId());
         tStdDeviceAttr.setDeviceModel(objToInt(device.get("device_model")));
@@ -605,7 +605,7 @@ public class TStdDeviceModelService {
             List<TAlgorithmMete> insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
             insertList.forEach(tAlgorithmMete ->
                     tAlgorithmMete.setDeviceMeteId(insertStdDeviceMete.stream().filter(tStdDeviceMete ->
-                                    String.valueOf(tAlgorithmMete.getDeviceMeteId()).equals(tStdDeviceMete.getOriginId()))
+                                    tAlgorithmMete.getOriginId().equals(tStdDeviceMete.getOriginId()))
                             .collect(Collectors.toList()).get(0).getDeviceMeteId()));
             tAlgorithmMeteMapper.batchInsert(insertList);
         }
@@ -618,7 +618,7 @@ public class TStdDeviceModelService {
      * @param newList
      * @param edgeCode
      */
-    private void dealStdDeviceAttr(List<TStdDeviceAttr> oldList, List<TStdDeviceAttr> newList, String edgeCode) {
+    private void dealStdDeviceAttr(List<TStdDevice> insertStdDevice, List<TStdDeviceAttr> oldList, List<TStdDeviceAttr> newList, String edgeCode) {
         Map<String, TStdDeviceAttr> oldMap = oldList.stream().collect(Collectors.toMap(TStdDeviceAttr::getOriginId, Function.identity()));
         Map<String, TStdDeviceAttr> newMap = newList.stream().collect(Collectors.toMap(TStdDeviceAttr::getOriginId, Function.identity()));
         SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
@@ -639,6 +639,9 @@ public class TStdDeviceModelService {
         SetUtils.SetView<String> insertIdSet = SetUtils.difference(newMap.keySet(), oldMap.keySet());
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
             List<TStdDeviceAttr> insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
+            insertList.forEach(tStdDeviceAttr -> tStdDeviceAttr.setDeviceId(insertStdDevice.stream().filter(tStdDevice ->
+                            tStdDeviceAttr.getOriginId().equals(tStdDevice.getOriginId()))
+                    .collect(Collectors.toList()).get(0).getDeviceId()));
             tStdDeviceAttrMapper.batchInsert(insertList);
         }
     }
