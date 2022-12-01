@@ -284,7 +284,7 @@ public class InspectionResultThread implements Runnable{
             UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
             uPatrolResult.setTaskState(taskState);
             uPatrolResult.setExecuteTime(new Date());
-            StaticContextAccessor.getBean(UPatrolResultDao.class).update(uPatrolResult);
+            uPatrolResultDao.update(uPatrolResult);
         }catch (Exception e){
             log.error("更新站端本体任务状态异常：", e);
         }

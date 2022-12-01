@@ -22,8 +22,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +59,9 @@ public class RobotInspectionWarnThread implements Runnable{
         this.taskCode = taskCode;
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
+
+        this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
+        this.analyseDataOperateDao = StaticContextAccessor.getBean(AnalyseDataOperateDao.class);
     }
 
     @Override

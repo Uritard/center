@@ -141,11 +141,12 @@ public class PatrolTimeoutScheduled {
 
             outPointList.add(m);
         });
-        log.info("任务超时处理, task:{}", taskId);
+        log.info("任务超时处理, task:{}, outPointSize: {}", taskId, outPointList.size());
         // 存入 redis
         CruiseRedisStorage.piplinePutPatrolDetail(outPointList);
         // 更新 PATROL_SUMMARY_PREFIX 并存储
         uPatrolTaskService.patrolTaskResultHandler(outPointList);
+        uPatrolTaskService.forceCompletionTask(taskId);
     }
 
 }

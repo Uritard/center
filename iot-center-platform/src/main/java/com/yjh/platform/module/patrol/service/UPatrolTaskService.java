@@ -595,7 +595,7 @@ public class UPatrolTaskService {
     private void dealRobotTaskShutDown(String taskId) {
         try {
             //等待30秒
-            Thread.sleep(30 * 1000);
+            Thread.sleep(15 * 1000);
         } catch (Exception e) {
             log.error("等待出错：", e);
         }
@@ -603,7 +603,7 @@ public class UPatrolTaskService {
         String key = PATROL_SUMMARY_PREFIX + taskId;
         String taskSource = (String)redisTemplate.opsForHash().get(key, "taskSource");
         if ("1".equals(taskSource)) {
-            completionOfTask(taskId);
+            forceCompletionTask(taskId);
             return;
         }
 
@@ -1253,7 +1253,7 @@ public class UPatrolTaskService {
                     }
                 }
                 log.info("task [{}] shut down, skipPointList: {}", taskId, skipPointList.size());
-                ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true));
+                ThreadPoolUtil.PATROL_POOL.addThread(new LocalCruiseExecutThread<>(this, skipPointList, true, true, taskId));
             }
 
             log.info("任务终止成功=={}", taskId);
@@ -1263,7 +1263,7 @@ public class UPatrolTaskService {
 
         lowTaskGoOn(taskId);
         //任务状态上报站端
-        sendTaskStateToUp(task, 4);
+        // sendTaskStateToUp(task, 4);
         uPatrolResultDao.update(uPatrolResult);
     }
 
@@ -1436,7 +1436,11 @@ public class UPatrolTaskService {
      * 批量传入，则表示一定异常
      */
     public void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList) {
-        log.info("taskResultHandler task: {}, cruiseResultList: {},", cruiseResultList.get(0).get("taskId"), cruiseResultList.size());
+        if (CollectionUtils.isEmpty(cruiseResultList)) {
+            log.error("cruiseResultList is empty.");
+            return;
+        }
+        log.info("taskResultHandler task: {}, cruiseResultList: {}", cruiseResultList.get(0).get("taskId"), cruiseResultList.size());
         patrolTaskResultHandler(cruiseResultList, CRUISE_RESULT_ABNORMAL);
     }
     private void patrolTaskResultHandler(List<Map<String, String>> cruiseResultList, int cruiseResult) {
@@ -1533,6 +1537,24 @@ public class UPatrolTaskService {
     }
 
     /**
+     * 强制结束任务，无论任务是否做完
+     */
+    public void forceCompletionTask(String taskId) {
+        try {
+            String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
+            String endStr = (String)redisTemplate.opsForHash().get(strForCountAbnormal, "ended");
+
+            log.info("forceCompletionTask---task:{}, endStr:{}", taskId, endStr);
+
+            if (!Boolean.parseBoolean(endStr)) {
+                redisTemplate.opsForHash().put(strForCountAbnormal, "ended", "true");
+                completionOfTask(taskId);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+    /**
      * 任务所有点做完,完成,并且进度为100%的处理
      *
      * @param taskId 任务id
@@ -1611,8 +1633,21 @@ public class UPatrolTaskService {
             //低优先任务继续
             lowTaskGoOn(taskId);
 
+            int state = 1;
+            switch (taskStatus) {
+                case TASK_STATE_INTERRUPT:
+                case TASK_STATE_ABNORMAL:
+                    state = 4;
+                    break;
+                case TASK_STATE_TIMEOUT:
+                    state = 6;
+                    break;
+                default:
+                    break;
+            }
+
             //任务状态上报站端
-            sendTaskStateToUp(taskId, 1);
+            sendTaskStateToUp(taskId, state);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
