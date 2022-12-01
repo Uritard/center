@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_ABNORMALALARM;
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
@@ -153,6 +154,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
 
             redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
 
             StaticContextAccessor.getBean(PatrolResultHandler.class).pushAlarmInfo(warnInfo.getWarnName(), warnInfo.getWarnContent());
 
@@ -164,6 +166,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             infoMap.put("alarmLevel", String.valueOf(warnInfo.getWarnLevel()));
             infoMap.put("flag", "warn");
             infoMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
+            infoMap.put("warnId", String.valueOf(warnInfo.getWarnId()));
             StaticContextAccessor.getBean(PatrolResultHandler.class).alarmPopUp(tStdDevicemete, infoMap);
 
             // 将产生的告警上送至上一级系统

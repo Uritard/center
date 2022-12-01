@@ -18,7 +18,6 @@ import java.util.*;
 /**
  * 可靠性指标上报上级系统
  *
- * @author 丫C
  * @date 2022/5/31
  */
 

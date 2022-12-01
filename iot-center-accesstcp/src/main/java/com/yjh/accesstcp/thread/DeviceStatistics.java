@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -120,7 +121,11 @@ public class DeviceStatistics {
         Map<String,Object> map = new HashMap<>();
         map.put("patroldevice_name",device.getPatrolDeviceName());
         map.put("patroldevice_code",device.getPatrolDeviceCode());
-        map.put("commission_time",simpleDateFormat.format(device.getCommissionTime()));
+        try {
+            map.put("commission_time",simpleDateFormat.format(simpleDateFormat.parse(device.getCommissionTime())));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         map.put("report_time",simpleDateFormat.format(new Date()));
         map.put("type",type.toString());
         switch (type){

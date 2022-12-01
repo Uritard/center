@@ -9,14 +9,12 @@ import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
-import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +22,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
@@ -42,8 +39,9 @@ public class PatrolResultHandler {
     private final ProcessResultToUpSystem processResultToUpSystem;
     private final UPatrolTaskService uPatrolTaskService;
 
-    @Autowired
-    private UPatrolResultDao uPatrolResultDao;
+    private static final String JUDGE = "panbie";
+    private static final String DEFECT = "defect";
+    private static final String METER = "meter";
 
     Logger log = LoggerFactory.getLogger(PatrolResultHandler.class);
 
@@ -64,7 +62,7 @@ public class PatrolResultHandler {
         if (alarmList.isEmpty()) {
             return;
         }
-        log.info("alarmList=={}", alarmList);
+        log.info("robotPatrolTaskAlarm alarmList=={}", alarmList);
         try {
         for (RobotPatrolTaskAlarm taskAlarm : alarmList) {
             // 通过上报的任务id查询巡视主机上的任务id
@@ -107,7 +105,7 @@ public class PatrolResultHandler {
         }
 
         String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
-        log.info("resultList=={}", resultList);
+        log.info("robotPatrolTaskResult resultList=={}", resultList);
 
         for (RobotPatrolTaskResult robotPatrolTaskResult : resultList) {
             try {
@@ -259,7 +257,7 @@ public class PatrolResultHandler {
         if (resultList.isEmpty()) {
             return;
         }
-        log.info("resultList=={}", resultList);
+        log.info("analysePatrolTaskResult resultList=={}", resultList);
 
         try {
             String taskId = resultList.get(0).getTaskId();
@@ -326,7 +324,7 @@ public class PatrolResultHandler {
                                       String firDocPath) {
         String resultImage;
         try {
-            if(StringUtils.isNotEmpty(analyseResultImg)){
+            if(StringUtils.contains(analyseResultImg, METER)){
                 resultImage = analyseResultImg.replaceAll(
                         (String)redisTemplate.opsForHash().get("t_sys_param:meterResultImg", "content"),
                         (String)redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg", "content"));
@@ -514,6 +512,7 @@ public class PatrolResultHandler {
                         infoMap.put("alarmLevel", String.valueOf(tWarnInfo.getWarnLevel()));
                         infoMap.put("flag", "warn");
                         infoMap.put("defectModel", String.valueOf(tWarnInfo.getDefectModel()));
+                        infoMap.put("warnId", String.valueOf(tWarnInfo.getWarnId()));
                         alarmPopUp(tStdDevicemete, infoMap);
 
                         pushAlarmInfo(warningMsg.get("warnName"), warningMsg.get("warnContent"));
@@ -580,7 +579,7 @@ public class PatrolResultHandler {
     private void defectHandler(String msgID, String analyseResultImg, String resultValueItem, Map<String, String> cruiseResultMap, TStdDeviceMete tStdDevicemete)  {
         String resultImage;
         try {
-            if (StringUtils.isNotEmpty(analyseResultImg)){
+            if (StringUtils.contains(analyseResultImg, DEFECT)){
                 resultImage = analyseResultImg.replaceAll(
                         (String)redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content"),
                         (String)redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content"));
@@ -621,6 +620,7 @@ public class PatrolResultHandler {
                     infoMap.put("alarmLevel", defectMap.get("defectLevel"));
                     infoMap.put("flag", "defect");
                     infoMap.put("defectModel", defectMap.get("defectType"));
+                    infoMap.put("warnId", String.valueOf(tDefectInfo.getDefectId()));
                     alarmPopUp(tStdDevicemete, infoMap);
 
                     pushAlarmInfo(resultValue, tStdDevicemete.getMeteName() + "--" + resultValue);
@@ -645,7 +645,9 @@ public class PatrolResultHandler {
                         infoMap.put("alarmLevel", defectMap.get("defectLevel"));
                         infoMap.put("flag", "defect");
                         infoMap.put("defectModel", defectMap.get("defectType"));
+                        infoMap.put("warnId", String.valueOf(tDefectInfo.getDefectId()));
                         alarmPopUp(tStdDevicemete, infoMap);
+
                         defectNames = defectNames + res + " ";
                     }
 
@@ -699,7 +701,7 @@ public class PatrolResultHandler {
         // 弹框PlanB-推送
         Map<String, String> currentWarnInfo = new HashMap<>();
         try {
-            String warnId = String.valueOf(analyseDataOperateService.selectCurrentWarn());
+            String warnId = infoMap.get("warnId");
             currentWarnInfo.put("warnId", warnId);
             currentWarnInfo.put("defectModel", infoMap.get("defectModel"));
             currentWarnInfo.put("isPop", "false");
@@ -805,7 +807,7 @@ public class PatrolResultHandler {
     private void distinguishHandler(String msgID, String analyseResultImg, String resultValue, Map<String, String> cruiseResultMap) {
         String resultImage;
         try {
-            if (StringUtils.isNotEmpty(analyseResultImg)){
+            if (StringUtils.contains(analyseResultImg, JUDGE)){
                 resultImage = analyseResultImg.replaceAll(
                         (String)redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content"),
                         (String)redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content"));
