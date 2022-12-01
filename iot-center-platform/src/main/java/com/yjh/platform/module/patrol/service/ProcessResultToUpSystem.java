@@ -389,7 +389,7 @@ public class ProcessResultToUpSystem {
                 TWarnInfo tWarnInfo = new TWarnInfo();
 
                 String value = redisInfoMap.get("value");
-                if (value.contains("abnormal")){
+                if (value.contains("图像有差异")){
                     // 判别
                     tWarnInfo.setValue("图像有差异");
                     tWarnInfo.setWarnContent("图像有差异");
