@@ -1,5 +1,6 @@
 package com.yjh.accessvideo.module.control.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
@@ -65,9 +66,6 @@ public class CameraConService {
 
     @Resource(name = "redisTemplate")
     private RedisTemplate redisTemplate;
-
-    @Resource(name = "redisTemplates")
-    private RedisTemplate redisTemplates;
 
     @Value("${nvr.rtmp.video}")
     private String UrlTem;
@@ -1308,9 +1306,8 @@ public class CameraConService {
         List<RecorderConInfo> recordersInfo = cameraConDao.SelectRecords();
         recordersInfo.stream().map(RecorderConInfo::getRecordId).forEach(recordId -> {
             reRegister(recordId);
-            redisTemplates.opsForHash().putAll("recorderInfo:" + recordId,
-                    getNVRStoreAndChanle(recordId));
-            redisTemplates.expire("recorderInfo:" + recordId, 7, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set("recorderInfo:" + recordId, JSON.toJSONString(getNVRStoreAndChanle(recordId)));
+            redisTemplate.expire("recorderInfo:" + recordId, 7, TimeUnit.DAYS);
         });
     }
 
