@@ -88,13 +88,13 @@ public class RobotInspectionWarnThread implements Runnable{
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
             long instanceId = NumberUtils.toLong(robotInfoKeyMap.get("instanceId"));
             // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
-            TCruisePointInstance insInfo = null;
             if (instanceId == 0) {
                 String originId = taskAlarm.getDeviceId();
-                insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
+                TCruisePointInstance insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
                 log.info("instanceInfo: {}", JSON.toJSONString(insInfo));
                 instanceId = insInfo.getInstanceId();
             }
+
             TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(instanceId);
 
             TWarnInfo warnInfo = getWarnInfo(tStdDevicemete, taskId, instanceId, robotCode);
@@ -127,6 +127,7 @@ public class RobotInspectionWarnThread implements Runnable{
     }
 
     private TWarnInfo getWarnInfo(TStdDeviceMete tStdDevicemete, String taskId, Long instanceId, String robotCode){
+        log.info("设置告警信息，{}", JSON.toJSONString(tStdDevicemete));
         TWarnInfo warnInfo = new TWarnInfo();
         try {
             warnInfo.setWarnTime(DateTimeUtil.parse(taskAlarm.getTime()));
