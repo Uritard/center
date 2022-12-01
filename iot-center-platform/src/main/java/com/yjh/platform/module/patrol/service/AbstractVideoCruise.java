@@ -278,6 +278,8 @@ public abstract class AbstractVideoCruise {
             log.info("调用算法：   {}\n=========={}", JSON.toJSONString(analysisList), JSON.toJSONString(result));
 
             if (200 == result.getCode()) {
+                // 算法调用正常则将巡视结果置为空
+                inspectionMap.put("cruiseResult", "");
                 return false;
             }
             // 拍照结果处理

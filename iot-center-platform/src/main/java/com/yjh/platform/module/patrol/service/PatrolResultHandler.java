@@ -823,7 +823,7 @@ public class PatrolResultHandler {
 
             cruiseResultMap.put("resultNum", resultValue);
             cruiseResultMap.put("picpath", resultImage);
-            cruiseResultMap.put("cruiseResultMap", StringUtils.equals("abnormal", resultValue) ?
+            cruiseResultMap.put("cruiseResult", StringUtils.equals("abnormal", resultValue) ?
                     String.valueOf(CRUISE_RESULT_ABNORMAL) : String.valueOf(CRUISE_RESULT_NORMAL));
             cruiseResultMap.put("cruiseAbnormal", "--");
 

@@ -10,6 +10,7 @@ import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,38 +33,68 @@ public class LocalCruiseExecutThread<T> implements Runnable {
 
     private final UPatrolTaskService uPatrolTaskService;
     private final List<Map<String, String>> cruisePointList;
+    /**
+     * 跳过具体执行逻辑，直接存入缓存
+     */
     private final boolean skip;
+    /**
+     * 强制结束任务
+     */
+    private final boolean forceStop;
+    private String taskId;
+
+    public LocalCruiseExecutThread(UPatrolTaskService uPatrolTaskService, List<Map<String, String>> cruisePoints) {
+        this.uPatrolTaskService = uPatrolTaskService;
+        this.cruisePointList = cruisePoints;
+        this.skip = false;
+        this.forceStop = false;
+    }
 
     public LocalCruiseExecutThread(UPatrolTaskService uPatrolTaskService, List<Map<String, String>> cruisePoints, boolean skip) {
         this.uPatrolTaskService = uPatrolTaskService;
         this.cruisePointList = cruisePoints;
         this.skip = skip;
+        this.forceStop = false;
+    }
+
+    public LocalCruiseExecutThread(UPatrolTaskService uPatrolTaskService, List<Map<String, String>> cruisePoints, boolean skip,
+        boolean forceStop, String taskId) {
+
+        this.uPatrolTaskService = uPatrolTaskService;
+        this.cruisePointList = cruisePoints;
+        this.skip = skip;
+        this.forceStop = forceStop;
+        this.taskId = taskId;
     }
 
     @Override
     public void run() {
-        if (CollectionUtils.isEmpty(cruisePointList)) {
-            log.warn("cruisePoints is empty !!! skip: {}", skip);
-            return;
-        }
-
-        log.info("cruiseExecutThread start, size: {}", cruisePointList.size());
-
-        if (skip) {
-            skipPointList(cruisePointList);
-        } else {
-            for (Map<String, String> m : cruisePointList) {
-                int cruiseResult = MapUtils.getIntValue(m, "cruiseResult");
-                if (CRUISE_RESULT_ABNORMAL == cruiseResult) {
-                    skipPoint(m);
-                } else {
-                    // 执行点位，并判断是否暂停
-                    if (!pointExecut(m)) {
-                        break;
+        log.warn("cruiseExecutThread start, cruisePoints size: {}, skip: {}, forceStop: {}", CollectionUtils.size(cruisePointList), skip,
+            forceStop);
+        if (CollectionUtils.isNotEmpty(cruisePointList)) {
+            if (skip) {
+                skipPointList(cruisePointList);
+            } else {
+                for (Map<String, String> m : cruisePointList) {
+                    int cruiseResult = MapUtils.getIntValue(m, "cruiseResult");
+                    if (CRUISE_RESULT_ABNORMAL == cruiseResult) {
+                        skipPoint(m);
+                    } else {
+                        // 执行点位，并判断是否暂停
+                        if (!pointExecut(m)) {
+                            break;
+                        }
                     }
                 }
             }
         }
+        if (forceStop) {
+            if (StringUtils.isEmpty(taskId)) {
+                throw new RuntimeException("taskId can not be empty !!!");
+            }
+            uPatrolTaskService.forceCompletionTask(taskId);
+        }
+        log.info("cruiseExecutThread start, size: {}", cruisePointList.size());
 
     }
 
