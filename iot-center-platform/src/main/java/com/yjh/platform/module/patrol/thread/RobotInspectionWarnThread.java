@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_ABNORMALALARM;
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
@@ -100,6 +101,7 @@ public class RobotInspectionWarnThread implements Runnable{
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
 
             redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            redisTemplate.opsForHash().put(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
 
             getWarnMap(taskId, warnInfo);
 
@@ -116,12 +118,14 @@ public class RobotInspectionWarnThread implements Runnable{
             infoMap.put("alarmLevel", String.valueOf(warnInfo.getWarnLevel()));
             infoMap.put("flag", "robot");
             infoMap.put("defectModel", String.valueOf(warnInfo.getDefectModel()));
+            infoMap.put("warnId", String.valueOf(warnInfo.getWarnId()));
             patrolResultHandler.alarmPopUp(tStdDevicemete, infoMap);
 
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
     }
+
     private TWarnInfo getWarnInfo(TStdDeviceMete tStdDevicemete, String taskId, Long instanceId, String robotCode){
         TWarnInfo warnInfo = new TWarnInfo();
         try {

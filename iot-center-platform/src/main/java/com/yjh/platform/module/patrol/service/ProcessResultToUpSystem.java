@@ -9,7 +9,6 @@ import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
 import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
@@ -19,9 +18,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.net.ftp.FTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -44,31 +43,28 @@ import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_T
 @Service
 public class ProcessResultToUpSystem {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
-    @Autowired
-    private AnalyseDataOperateDao analyseDataOperateDao;
-    @Autowired
-    private AnalyseDataOperateService analyseDataOperateService;
-    @Autowired
-    private FtpsService ftpsservice;
-    @Autowired
-    private AlarmService alarmService;
-
-
-    @Autowired
-    private TRobotInspectionDao tRobotInspectionDao;
+    private final RedisTemplate redisTemplate;
+    private final AnalyseDataOperateDao analyseDataOperateDao;
+    private final AnalyseDataOperateService analyseDataOperateService;
+    private final FtpsService ftpsservice;
+    private final AlarmService alarmService;
 
     private static final String CCD_PATH = "/CCD/";
     private static final String FIR_PATH = "/FIR/";
     private static final String AUDIO_PATH = "/Audio/";
+    private static final String JUDGE = "panbie";
+    private static final String DEFECT = "defect";
+    private static final String METER = "meter";
+    private static final String FTPIMG = "ftpImg";
 
     private final Logger log = LoggerFactory.getLogger(ProcessResultToUpSystem.class);
 
-    public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao, AnalyseDataOperateService analyseDataOperateService) {
+    public ProcessResultToUpSystem(RedisTemplate redisTemplate, AnalyseDataOperateDao analyseDataOperateDao, AnalyseDataOperateService analyseDataOperateService, FtpsService ftpsservice, AlarmService alarmService) {
         this.redisTemplate = redisTemplate;
         this.analyseDataOperateDao = analyseDataOperateDao;
         this.analyseDataOperateService = analyseDataOperateService;
+        this.ftpsservice = ftpsservice;
+        this.alarmService = alarmService;
     }
 
     public XMLBaseModel alarmAndResultToUpSystem(Map<String, String> cruiseResultMap, String alarmLevel, TWarnInfo tWarnInfo){
@@ -250,11 +246,11 @@ public class ProcessResultToUpSystem {
     private Map<String, String> packageAlarmInfo(String alarmLevel, TWarnInfo tWarnInfo, Map<String, Object> xmlItem, String tagPath) {
         Map<String, String> resultPathMap = new HashMap<>(4);
         String imagePath = tWarnInfo.getImagePath();
-        if (imagePath.contains("meter")){
+        if (StringUtils.contains(imagePath, METER)){
             imagePath = imagePath.replaceAll(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content")));
-        }else if (imagePath.contains("ftpImg")){
+        }else if (StringUtils.contains(imagePath, FTPIMG)){
             imagePath = imagePath.replaceAll(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative","content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute","content")));
@@ -310,24 +306,23 @@ public class ProcessResultToUpSystem {
         String picPath = String.valueOf(redisTemplate.opsForHash().get(PATROL_TASK_PREFIX + taskId + ":" + instanceId, "picpath"));
         log.info("picPath====={}", picPath);
         // meter-表计 defect-缺陷 panbie-判别
-        if (picPath.contains("meter")){
+        if (StringUtils.contains(picPath, METER)){
             imgPath = picPath.replaceAll(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultRealImg","content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:meterResultImg","content")));
-        }else if (picPath.contains("defect")){
+        }else if (StringUtils.contains(picPath, DEFECT)){
             imgPath = picPath.replaceAll(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultRealImg","content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:defectResultImg","content")));
-        }else if (picPath.contains("panbie")){
+        }else if (StringUtils.contains(picPath, JUDGE)){
             imgPath = picPath.replaceAll(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultRealImg","content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:judgeResultImg","content")));
-        }else if (picPath.contains("ftpImg")){
+        }else if (StringUtils.contains(picPath, FTPIMG)){
             imgPath = picPath.replaceAll(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageRelative","content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpImageAbsolute","content")));
         }else{
-            // 原图
             imgPath = picPath.replaceAll(
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath","content")),
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgPath","content")));

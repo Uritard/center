@@ -96,7 +96,7 @@ public class AccessVideoApplication implements CommandLineRunner {
     /**
      * video服务是否单独部署
      */
-    @Value("${video.separate.deploy}")
+    @Value("${video.separate.deploy:false}")
     private String videoSeparateDeploy;
 
     /**
