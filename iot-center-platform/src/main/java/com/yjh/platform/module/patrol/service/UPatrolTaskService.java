@@ -699,6 +699,59 @@ public class UPatrolTaskService {
         return "";
     }
 
+    public void taskToRobotOrDroneStart(UPatrolTask task){
+
+
+        //找出机器人做任务的巡检点
+        List<Long> robotCruiseList = uPatrolTaskDao.selectRobotOrDroneInsByTaskId(task.getTaskId());
+        log.info("robotCruiseList   :" +robotCruiseList);
+        if(robotCruiseList.size() != 0){
+            List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
+            List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+            log.info("robotCode   :" +robotCode);
+            for (String item: robotCode){
+                RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
+                robotTaskInfo.setCruiseType(task.getTaskType());
+                robotTaskInfo.setTaskId(task.getTaskCode());
+//                robotTaskInfo.setPlanCode(task.getPlanCode());
+                robotTaskInfo.setPriority(task.getTaskLevel());//优先级
+                robotTaskInfo.setTaskName(task.getTaskName());
+                robotTaskInfo.setInstanceList(robotCruiseList);
+                robotTaskInfo.setIfRun("173");
+                robotTaskInfo.setRobotCode(item);
+                robotTaskInfo.setFixedStartTime(format.format(new Date()));
+                robotTaskInfoList.add(robotTaskInfo);
+            }
+            Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>();
+            robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
+
+            log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
+            //让机器人做任务
+            log.info("task=={}", task);
+            if (StringUtils.isNotEmpty(task.getDateType())) {
+                boolean moreTime = task.getDateType().split(" ")[2].contains(",");
+                if (moreTime && task.getExecuteType() == 172) {
+                    robotTask(robotTaskInfoMap);
+                    log.info("下发成功！！！");
+                }
+            }
+        }
+        try {
+            List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(task.getTaskId());
+            log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
+            if (robotCodeList != null && robotCodeList.size() > 0) {
+                Map<String, Object> robotTaskStatesMap = new HashMap<>();
+                robotTaskStatesMap.put("taskId", task.getTaskId());
+                robotTaskStatesMap.put("commandValue", 1);
+                robotTaskStatesMap.put("isEdge", 0);
+                robotTaskStatesMap.put("robotCodeList", robotCodeList);
+                robotTaskStates(robotTaskStatesMap);
+            }
+        } catch (Exception e) {
+            log.error("发送机器人启动错误：", e);
+        }
+    }
+
     /**
      * 根据任务信息及协议组装任务信息
      *
