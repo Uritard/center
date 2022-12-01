@@ -25,6 +25,7 @@ import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.device.entity.RobotTaskMessage;
 import com.yjh.platform.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.*;
@@ -36,6 +37,7 @@ import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.SysUserDao;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.commons.collections4.CollectionUtils;
@@ -87,6 +89,7 @@ public class UPatrolTaskService {
 
     public static final String PATROL_TASK_PREFIX = "patrol_task_result:";
     public static final String PATROL_SUMMARY_PREFIX = "countForAbnormal:";
+    public static final String ROBOT_OR_DRONE_TASK = "robotOrDroneTask:";
 
     @Autowired
     private UPatrolTaskDao uPatrolTaskDao;
@@ -121,6 +124,8 @@ public class UPatrolTaskService {
 
     @Autowired
     private UPatrolDataResultDao uPatrolDataResultDao;
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
 
     //jobName
     @Value("${spring.QingHua.jobName}")
@@ -458,6 +463,13 @@ public class UPatrolTaskService {
             if (robotEnd) {
                 // 机器人/下级系统任务终止
                 ThreadPoolUtil.PATROL_POOL.addThread(() -> dealRobotTaskShutDown(taskIdFinal));
+            }
+
+            //判断是不是机器人或者无人机
+            Long robotId = tRobotInfoDao.selectRobotIdByCode(robotPatrolTaskStatus.getRobotCode());
+            if (robotId != null){
+                //放入redis
+                redisTemplate.opsForHash().putAll(ROBOT_OR_DRONE_TASK+robotId,Object2Map.objectToMap(robotPatrolTaskStatus));
             }
         });
     }
@@ -2071,5 +2083,117 @@ public class UPatrolTaskService {
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,Object>> selectForSequenceInfoByMeteId(String meteId) {
         return uPatrolTaskDao.selectForSequenceInfoByMeteId(meteId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> selectRobotTaskProgress(Long robotId) throws Exception {
+        Map<String, Object> reMap = new HashMap<>();
+        String taskId = uPatrolTaskDao.selectRobotTaskOnStart(robotId);
+        if (!org.springframework.util.StringUtils.isEmpty(taskId)) {
+            reMap.put("taskId", taskId);
+            Map<String, String> robotOrDroneTaskInfo = redisTemplate.opsForHash().entries(ROBOT_OR_DRONE_TASK+robotId);
+            if (robotOrDroneTaskInfo.size() == 0) {
+                reMap.put("taskProgress", 0);
+                reMap.put("taskName", "");
+                reMap.put("startTime", "");
+                reMap.put("taskState", "");
+                return reMap;
+            }
+            String re = Optional.ofNullable(robotOrDroneTaskInfo.get("taskProgress")).orElse("0");
+            UPatrolResult result = uPatrolResultDao.selectByPrimaryId(taskId);
+            if (result == null) {
+                reMap.put("taskProgress", 0);
+                reMap.put("taskName", "");
+                reMap.put("startTime", "");
+                reMap.put("taskState", "");
+            } else {
+                if (result.getTaskState() == 239 || result.getTaskState() == 241) {
+                    reMap.put("taskProgress", re);
+                    reMap.put("taskName", result.getTaskName());
+                    reMap.put("startTime", robotOrDroneTaskInfo.get("startTime"));
+                    String state = robotOrDroneTaskInfo.get("taskState");
+                    reMap.put("taskState", taskStatusToString(state));
+                    List<RobotTaskMessage> list = selectRobotTaskMessage(taskId, robotId ,robotOrDroneTaskInfo);
+                    reMap.put("list", list);
+                } else {
+                    reMap.put("taskProgress", 0);
+                    reMap.put("taskName", "");
+                    reMap.put("startTime", "");
+                    reMap.put("taskState", "");
+                }
+            }
+
+        }else {
+            reMap.put("taskProgress", 0);
+            reMap.put("taskName", "");
+            reMap.put("startTime", "");
+            reMap.put("taskState", "");
+            reMap.put("taskId", "");
+        }
+        return reMap;
+    }
+
+    private String taskStatusToString(String state) {
+        if (!org.springframework.util.StringUtils.isEmpty(state)) {
+            //1=已执行 2=正在执行 3=暂停 4=终止 5=未执行 6=超期
+            if ("1".equals(state)) {
+                state = "已执行";
+            }
+            if ("2".equals(state)) {
+                state = "正在执行";
+            }
+            if ("3".equals(state)) {
+                state = "暂停";
+            }
+            if ("4".equals(state)) {
+                state = "终止";
+            }
+            if ("5".equals(state)) {
+                state = "未执行";
+            }
+            if ("6".equals(state)) {
+                state = "超期";
+            }
+        } else {
+            state = "";
+        }
+        return state;
+    }
+
+    public List<RobotTaskMessage> selectRobotTaskMessage(String taskId, Long robotId,Map<String, String> mapForRobotState) throws Exception {
+        List<RobotTaskMessage> re = new ArrayList<>();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //获取此机器人的巡视点
+        String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
+        String robotState = mapForRobotState.get("taskState");
+        if ("4".equals(robotState)) {
+            //机器人未在做任务
+//            Map<String,String> jasonMap=new HashMap<>();
+//            jasonMap.put("type","noTask");
+//            //jasonMap.put("taskId",tCruiseTask.getTaskId());
+//            String json= JSON.toJSONString(jasonMap);
+//            Constant.websocketSendMsg(Constant.WEBSOCKET_URL,jasonMap);
+//            log.info("发送给前端的消息-停止调接口：   "+json);
+            return null;
+        }
+
+        List<String> instanceIdList = uPatrolTaskDao.selectRobotTaskInstanceList(taskId);
+        //List<TCruisePointAttr> nameList =  tRobotInspectionDao.selectRobotTaskMessage(instanceIdList);
+        for (String item : instanceIdList) {
+            //获取任务数据
+            Map<String, String> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + item);
+            RobotTaskMessage robotTaskMessage = new RobotTaskMessage();
+            robotTaskMessage.setDeviceName(mapForRobotTaskMessage.get("deviceName"));
+            robotTaskMessage.setInstanceName(mapForRobotTaskMessage.get("instanceName"));
+            if (mapForRobotTaskMessage.get("cruiseTime") != null && !"null".equals(mapForRobotTaskMessage.get("cruiseTime"))) {
+                robotTaskMessage.setCruiseTime(mapForRobotTaskMessage.get("cruiseTime"));
+                robotTaskMessage.setResult(mapForRobotTaskMessage.get("resultNum"));
+            } else {
+                robotTaskMessage.setCruiseTime("");
+                robotTaskMessage.setResult("");
+            }
+            re.add(robotTaskMessage);
+        }
+        return re;
     }
 }

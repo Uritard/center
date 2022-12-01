@@ -5,6 +5,8 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.module.device.controller.TRobotInspectionController;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.*;
+import com.yjh.platform.module.patrol.dao.UPatrolTaskDao;
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.entity.TCruiseResult;
@@ -38,6 +40,8 @@ public class TRobotInspectionService {
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
     private TCruiseResultDao tCruiseResultDao;
+    @Autowired
+    private UPatrolTaskDao uPatrolTaskDao;
 
     private Logger log = LoggerFactory.getLogger(TRobotInspectionService.class);
 
@@ -765,7 +769,8 @@ public class TRobotInspectionService {
     public Map<String, Object> selectRobotTaskProgress(Long robotId) throws Exception {
         Map<String, Object> reMap = new HashMap<>();
         String robotCode = tRobotInspectionDao.selectRobotCode(robotId);
-        String taskId = tRobotInspectionDao.selectRobotTaskOnStart(robotId);
+//        String taskId = tRobotInspectionDao.selectRobotTaskOnStart(robotId);
+        String taskId = uPatrolTaskDao.selectRobotTaskOnStart(robotId);
         if (!StringUtils.isEmpty(taskId)) {
             reMap.put("taskId", taskId);
             Map<String, String> mapForRobotInstance = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);

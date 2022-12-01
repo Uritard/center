@@ -177,23 +177,23 @@ public class TCruiseTaskResultService {
             cruiseInspectResult.setEndTime(null);
 
             String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + cruiseInspectResult.getInstanceId();
-            Map<String, Object> resultMap = redisTemplate.opsForHash().entries(key);
+            Map<String, String> resultMap = redisTemplate.opsForHash().entries(key);
             if (resultMap.size()>0) {
                 //从redis拿数据
-                cruiseInspectResult.setCruiseStatus(tDictMap.get(resultMap.get("cruiseStatus").toString()));
-                if (resultMap.get("resultNum").toString().equals("") || resultMap.get("resultNum").toString().equals("null")) {
+                cruiseInspectResult.setCruiseStatus(tDictMap.get(resultMap.get("cruiseStatus")));
+                if (resultMap.get("resultNum").equals("") || resultMap.get("resultNum").equals("null")) {
                     cruiseInspectResult.setCruiseResultName("--");
-                } else { cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum").toString()); }
-                if (resultMap.get("cruiseTime").equals("null") || resultMap.get("cruiseTime").toString().equals("")) {
+                } else { cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum")); }
+                if (resultMap.get("cruiseTime").equals("null") || resultMap.get("cruiseTime").equals("")) {
                     cruiseInspectResult.setEndTime(null);
-                } else { cruiseInspectResult.setEndTime(sdf.parse(resultMap.get("cruiseTime").toString())); }
+                } else { cruiseInspectResult.setEndTime(sdf.parse(resultMap.get("cruiseTime"))); }
                 if (Objects.nonNull(resultMap.get("isWarn"))) {
-                    if (resultMap.get("isWarn").toString().equals("1")) {
+                    if (resultMap.get("isWarn").equals("1")) {
                         cruiseInspectResult.setIsWarn("有");
                     } else { cruiseInspectResult.setIsWarn("无"); }
                 }
                 if (Objects.nonNull(resultMap.get("picpath"))) {
-                    cruiseInspectResult.setImagePath(resultMap.get("picpath").toString());
+                    cruiseInspectResult.setImagePath(resultMap.get("picpath"));
                 } else { cruiseInspectResult.setImagePath("null"); }
                 Map<String, String> videoInfo = new HashMap<>();
                 if("230".equals(resultMap.containsKey("cruiseType") ?
@@ -253,9 +253,9 @@ public class TCruiseTaskResultService {
                 }
                 //todo 摄像机的没写
                 //拉机器人的红外和可见光的视频流
-                if (resultMap.containsKey("cameraId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("cameraId")))){
+                if (resultMap.containsKey("cameraId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("cameraId"))) && !"null".equals(resultMap.get("cameraId"))){
                     HashMap<String, Long> cameraId = new HashMap<>();
-                    cameraId.put("cameraId", Long.valueOf(resultMap.get("cameraId").toString()));
+                    cameraId.put("cameraId", Long.valueOf(resultMap.get("cameraId")));
                     Result result = sendGetRequest(Constant.START_CAMERA_URL, cameraId);
                     Map<String, String> cameraVideoInfo = (Map<String, String>) result.getData();
                     if (Objects.nonNull(cameraVideoInfo)) {
@@ -494,12 +494,15 @@ public class TCruiseTaskResultService {
 
         UPatrolResult result = uPatrolResultDao.selectByPrimaryId(taskId);
         int abnormalCounts = 0;
+        int normalCounts = 0;
         Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
         for (String key : robotInfoKeys) {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
             boolean conditionRes = ArrayUtils.contains(new String[]{String.valueOf(CRUISE_RESULT_NORMAL), String.valueOf(CRUISE_RESULT_ABNORMAL)}, redisInfoMap.get("cruiseResult"));
-            if (conditionRes && !Objects.equals(String.valueOf(CRUISE_RESULT_NORMAL), redisInfoMap.get("cruiseResult"))) {
+            if (conditionRes && Objects.equals(String.valueOf(CRUISE_RESULT_ABNORMAL), redisInfoMap.get("cruiseResult"))) {
                 abnormalCounts++;
+            } else if (conditionRes && Objects.equals(String.valueOf(CRUISE_RESULT_NORMAL), redisInfoMap.get("cruiseResult"))){
+                normalCounts++;
             }
         }
         Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
@@ -508,7 +511,7 @@ public class TCruiseTaskResultService {
             //获取任务开始时间
             String startTime = countResult.get("taskStart").toString();
             Integer all = ValueUtil.toInteger(countResult.get("all"),0);
-            Integer normal = ValueUtil.toInteger(all - abnormalCounts, 0);
+            Integer normal = ValueUtil.toInteger(normalCounts, 0);
             Integer abnormal = ValueUtil.toInteger(abnormalCounts,0);
             cruiseResultCounter.setAlarmCount(abnormal);
             cruiseResultCounter.setCruisedCount(normal+abnormal);
