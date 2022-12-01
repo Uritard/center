@@ -243,6 +243,6 @@ public class ValueUtil {
         return StringUtils.isEmpty(value.toString()) ? null : Integer.parseInt(value.toString());
     }
     public static BigDecimal objToBigDecimal(Object value){
-        return StringUtils.isEmpty(value.toString()) ? null : BigDecimal.valueOf(Long.parseLong(value.toString()));
+        return StringUtils.isEmpty(value.toString()) ? null : BigDecimal.valueOf(Double.parseDouble(value.toString()));
     }
 }
