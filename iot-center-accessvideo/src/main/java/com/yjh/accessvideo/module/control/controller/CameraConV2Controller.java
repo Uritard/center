@@ -4,6 +4,7 @@
 
 package com.yjh.accessvideo.module.control.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.sun.jna.NativeLong;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.commons.result.BusinessException;
@@ -54,7 +55,7 @@ public class CameraConV2Controller {
         try {
             cameraConService.reRegister(recordId);
             Map<String, Object> nvrStoreAndChannel = cameraConService.getNVRStoreAndChanle(recordId);
-            redisTemplate.opsForHash().putAll("recorderInfo:" + recordId,nvrStoreAndChannel);
+            redisTemplate.opsForValue().set("recorderInfo:" + recordId, JSON.toJSONString(nvrStoreAndChannel));
             result.setData(nvrStoreAndChannel);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());

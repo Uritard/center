@@ -72,7 +72,6 @@ public class RedisConfig extends CachingConfigurerSupport {
      * @param factory
      * @return
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
@@ -90,25 +89,4 @@ public class RedisConfig extends CachingConfigurerSupport {
 
     }
 
-    /**
-     * redisTemplate配置
-     *
-     * @param factory
-     * @return
-     */
-    @Bean(name = "redisTemplates")
-    public RedisTemplate<String, Object> redisTemplates(RedisConnectionFactory factory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
-        template.setConnectionFactory(factory);
-        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        // key采用String的序列化方式
-        template.setKeySerializer(stringRedisSerializer);
-        // hash的key也采用String的序列化方式
-        template.setHashKeySerializer(stringRedisSerializer);
-        template.setValueSerializer(stringRedisSerializer);
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<Object>(Object.class));
-        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-        template.afterPropertiesSet();
-        return template;
-    }
 }

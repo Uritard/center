@@ -420,7 +420,6 @@ public class UPatrolTaskService {
      * @return void
      */
     public void robotPatrolTaskStatus(List<RobotPatrolTaskStatus> statusList) {
-        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
         statusList.forEach(robotPatrolTaskStatus -> {
             String[] patrolledIds = robotPatrolTaskStatus.getTaskPatrolledId().split("_");
             String taskCode = robotPatrolTaskStatus.getTaskCode();
@@ -525,7 +524,7 @@ public class UPatrolTaskService {
     private void updateTaskProgress(RobotPatrolTaskStatus robotPatrolTaskStatus, String taskId, int taskState){
         String key = PATROL_SUMMARY_PREFIX + taskId;
         Map<String, String> map = redisTemplate.opsForHash().entries(key);
-        if (MapUtils.isEmpty(map)){
+        if (MapUtils.isEmpty(map)) {
             map = new HashMap<>(16);
             map.put("taskStart", robotPatrolTaskStatus.getStartTime());
             map.put("abnormal", "0");
@@ -538,18 +537,37 @@ public class UPatrolTaskService {
             return;
         }
 
-        map.put("taskState", String.valueOf(taskState));
-        String progress = robotPatrolTaskStatus.getTaskProgress();
-        if (StringUtils.contains(progress, "%")) {
-            float pf = NumberUtils.toFloat(StringUtils.remove(progress, "%")) / 100F;
-            progress = CommonUtils.percentFormat(pf, "#.####");
+        try {
+            if (TASK_STATE_NOT_START == MapUtils.getIntValue(map, "taskState", TASK_STATE_NOT_START) && TASK_STATE_EXECUTING == taskState) {
+                UPatrolResult result =
+                    new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING).setExecuteTime(new Date());
+                log.info("TaskResult start, taskId: {}", taskId);
+                uPatrolResultDao.update(result);
+            }
+
+            map.put("taskState", String.valueOf(taskState));
+            String progress = robotPatrolTaskStatus.getTaskProgress();
+            if (StringUtils.contains(progress, "%")) {
+                float pf = NumberUtils.toFloat(StringUtils.remove(progress, "%")) / 100F;
+                progress = CommonUtils.percentFormat(pf, "#.####");
+            }
+            if (StringUtils.isNotEmpty(progress)) {
+                map.put("taskProgress", progress);
+            }
+            map.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
+            log.info("update down task status: {}", JSON.toJSONString(map));
+
+            redisTemplate.opsForHash().putAll(key, map);
+            redisTemplate.expire(key, 3, TimeUnit.DAYS);
+
+            Map<String, String> jasonMap = new HashMap<>();
+            jasonMap.put("type", "newTask");
+            jasonMap.put("taskId", taskId);
+            log.info("发送给前端的消息：   {}", JSON.toJSONString(jasonMap));
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMap);
+        } catch (Exception e) {
+            log.error("更新任务状态失败， taskId: {}, state:{}, taskStatus: {}", taskId, taskState, JSON.toJSONString(robotPatrolTaskStatus));
         }
-        if (StringUtils.isNotEmpty(progress)) {
-            map.put("taskProgress", progress);
-        }
-        map.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
-        redisTemplate.opsForHash().putAll(key, map);
-        redisTemplate.expire(key, 3, TimeUnit.DAYS);
     }
 
     private void dealRobotTaskShutDown(String taskId) {

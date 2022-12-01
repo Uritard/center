@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
@@ -36,9 +37,9 @@ public class StatisticsService {
     private Result getNVRInfo(Long recordId) {
         Result re = new Result();
         try {
-            Map entries = redisTemplate.opsForHash().entries("recorderInfo:" + recordId);
-            if (!CollectionUtils.isEmpty(entries)) {
-                re.setData(entries);
+            String entries = (String)redisTemplate.opsForValue().get("recorderInfo:" + recordId);
+            if (!StringUtils.isEmpty(entries)) {
+                re.setData(JSON.parse(entries));
                 return re;
             }
             log.info("缓存中未获取到数据");
