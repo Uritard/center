@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao">
+    <insert id="insert" parameterType="com.yjh.platform.module.patrol.entity.DeviceStaticsInfo">
+        insert into device_statics_info_result(
+        device_code,
+        device_name,
+        device_type,
+        duration,
+        offline_count,
+        normal_day,
+        commission_days,
+        cruise_percent,
+        intact_percent
+        )values(
+                #{deviceCode, jdbcType=VARCHAR},
+                #{deviceName, jdbcType=VARCHAR},
+                #{deviceType, jdbcType=VARCHAR},
+                #{duration, jdbcType=VARCHAR},
+                #{offlineCount, jdbcType=VARCHAR},
+                #{normalDay, jdbcType=VARCHAR},
+                #{commissionDays, jdbcType=VARCHAR},
+                #{cruisePercent, jdbcType=VARCHAR},
+                #{intactPercent, jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <update id="updateByDeviceCode" parameterType="com.yjh.platform.module.patrol.entity.DeviceStaticsInfo">
+        update device_statics_info_result a <set>
+        <if test="deviceName != null ">a.device_name = #{deviceName, jdbcType=VARCHAR},</if>
+        <if test="duration != null ">a.duration = #{duration, jdbcType=VARCHAR},</if>
+        <if test="offlineCount != null ">a.offline_count = #{offlineCount, jdbcType=VARCHAR},</if>
+        <if test="normalDay != null ">a.normal_day = #{normalDay, jdbcType=VARCHAR},</if>
+        <if test="commissionDays != null ">a.commission_days = #{commissionDays, jdbcType=VARCHAR},</if>
+        <if test="cruisePercent != null">a.cruise_percent = #{cruisePercent, jdbcType=VARCHAR},</if>
+        <if test="intactPercent != null">a.intact_percent = #{intactPercent, jdbcType=VARCHAR},</if>
+    </set>
+        where a.device_code = #{deviceCode, jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectByDeviceCode" parameterType="java.lang.String"
+            resultType="java.util.Map">
+        select
+        device_code as deviceCode,
+        device_name as deviceName,
+        device_type as deviceType,
+        duration,
+        offline_count as offLineCount,
+        normal_day as normalDay,
+        commission_days as commissionDays,
+        cruise_percent as cruisePercent,
+        intact_percent as intactPercent
+        from device_statics_info_result
+        where device_code = #{deviceCode, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectStatisticsRobot" resultType="java.util.Map">
+        SELECT
+        device_code as deviceCode,
+        device_name as deviceName,
+        device_type as deviceType,
+        duration,
+        offline_count as offLineCount,
+        normal_day as normalDay,
+        commission_days as commissionDays,
+        cruise_percent as cruisePercent,
+        intact_percent as intactPercent
+        from device_statics_info_result
+        WHERE device_type = 0
+        <if test="deviceCode != null and deviceCode != ''">and device_code = #{deviceCode, jdbcType=BIGINT}</if>
+    </select>
+
+    <select id="selectStatisticsDrone" resultType="java.util.Map">
+        SELECT
+        device_code as deviceCode,
+        device_name as deviceName,
+        device_type as deviceType,
+        duration,
+        offline_count as offLineCount,
+        normal_day as normalDay,
+        commission_days as commissionDays,
+        cruise_percent as cruisePercent,
+        intact_percent as intactPercent
+        from device_statics_info_result
+        WHERE device_type = 1
+        <if test="deviceCode != null and deviceCode != ''">and device_code = #{deviceCode, jdbcType=BIGINT}</if>
+    </select>
+</mapper>

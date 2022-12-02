@@ -12,6 +12,7 @@ import com.yjh.platform.module.device.service.TStdDeviceService;
 import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskStatus;
 import com.yjh.platform.module.patrol.service.UPatrolDataResultService;
+import com.yjh.platform.module.patrol.service.UPatrolDeviceStaticsService;
 import com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo;
 import com.yjh.platform.module.task.entity.CruiseResultAnalyzeMeteInfo;
 import com.yjh.platform.module.task.entity.FirAndPicInfo;
@@ -42,7 +43,7 @@ public class UPatrolDeviceStaticsInfoController {
     private Logger log = LoggerFactory.getLogger(UPatrolDeviceStaticsInfoController.class);
 
     @Autowired
-    private UPatrolDataResultService uPatrolDataResultService;
+    private UPatrolDeviceStaticsService uPatrolDeviceStaticsService;
     @Autowired
     private TStdDeviceService tStdDeviceService;
     @Autowired
@@ -55,11 +56,12 @@ public class UPatrolDeviceStaticsInfoController {
 
     @ApiOperation(value = "巡视上报设备信息处理")
     @GetMapping(value = "/dealDeviceStaticsInfo")
-    public Result selectCruiseResultAnalyze(@RequestBody List<Map<String,String>> statusList) {
+    public Result selectCruiseResultAnalyze(@RequestBody List<Map<String, String>> staticsResults) {
         Result result = new Result();
         try {
-            log.info("The statusList from accessRobot is=={}", statusList);
-//            uPatrolTaskService.robotPatrolTaskStatus(statusList);
+            log.info("device statics result is {}", staticsResults);
+            uPatrolDeviceStaticsService.insertOrUpdate(staticsResults);
+            result.setData(1);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
