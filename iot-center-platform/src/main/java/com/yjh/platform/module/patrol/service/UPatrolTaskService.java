@@ -73,22 +73,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_INTERRUPT;
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_OFFLINE;
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_OVERHAUL;
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_NORMAL;
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_STATE_FAILED;
-import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_STATE_UN;
-import static com.yjh.platform.module.patrol.CruiseConstant.EVALUATION_STATE_UN;
-import static com.yjh.platform.module.patrol.CruiseConstant.TASK_STATE_EXECUTING;
-import static com.yjh.platform.module.patrol.CruiseConstant.TASK_STATE_FINISHED;
-import static com.yjh.platform.module.patrol.CruiseConstant.TASK_STATE_INTERRUPT;
-import static com.yjh.platform.module.patrol.CruiseConstant.TASK_STATE_NOT_START;
-import static com.yjh.platform.module.patrol.CruiseConstant.TASK_STATE_PAUSE;
-import static com.yjh.platform.module.patrol.CruiseConstant.TASK_STATE_TIMEOUT;
-import static com.yjh.platform.module.patrol.CruiseConstant.TaskTypeEnum;
-import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum;
+import static com.yjh.platform.module.patrol.CruiseConstant.*;
 
 /**
  * <功能描述>
