@@ -489,7 +489,7 @@ public class UPatrolTaskService {
             Long robotId = tRobotInfoDao.selectRobotIdByCode(robotPatrolTaskStatus.getRobotCode());
             if (robotId != null){
                 //放入redis
-                redisTemplate.opsForHash().putAll(ROBOT_OR_DRONE_TASK+robotId,Object2Map.objectToMap(robotPatrolTaskStatus));
+                redisTemplate.opsForHash().putAll(ROBOT_OR_DRONE_TASK+robotPatrolTaskStatus.getTaskCode()+":"+robotId,Object2Map.objectToMap(robotPatrolTaskStatus));
             }
         });
     }
@@ -2184,7 +2184,7 @@ public class UPatrolTaskService {
         String taskId = uPatrolTaskDao.selectRobotTaskOnStart(robotId);
         if (!org.springframework.util.StringUtils.isEmpty(taskId)) {
             reMap.put("taskId", taskId);
-            Map<String, String> robotOrDroneTaskInfo = redisTemplate.opsForHash().entries(ROBOT_OR_DRONE_TASK+robotId);
+            Map<String, String> robotOrDroneTaskInfo = redisTemplate.opsForHash().entries(ROBOT_OR_DRONE_TASK+taskId+":"+robotId);
             if (robotOrDroneTaskInfo.size() == 0) {
                 reMap.put("taskProgress", 0);
                 reMap.put("taskName", "");
@@ -2274,7 +2274,7 @@ public class UPatrolTaskService {
         //List<TCruisePointAttr> nameList =  tRobotInspectionDao.selectRobotTaskMessage(instanceIdList);
         for (String item : instanceIdList) {
             //获取任务数据
-            Map<String, String> mapForRobotTaskMessage = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + item);
+            Map<String, String> mapForRobotTaskMessage = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + item);
             RobotTaskMessage robotTaskMessage = new RobotTaskMessage();
             robotTaskMessage.setDeviceName(mapForRobotTaskMessage.get("deviceName"));
             robotTaskMessage.setInstanceName(mapForRobotTaskMessage.get("instanceName"));
