@@ -550,12 +550,11 @@
         ''
         END
         ) AS video_camera_type,
-        q.custom_name,
+        k.custom_name,
         region.region_name as edge_name
         FROM
         t_warn_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
-        LEFT JOIN t_std_devicemete q ON a.device_id = q.device_id
         LEFT JOIN t_dict_business c ON a.warn_level = c.dict_code and c.col_name = 'alarm_level'
         LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code and d.col_name = 'alarm_source'
         LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code and e.col_name = 'conf_mode'
@@ -608,12 +607,11 @@
         null as high_limit4,
         j.camera_id,
         '' AS video_camera_type,
-        q.custom_name,
+        k.custom_name,
         region.region_name as edge_name
         FROM
         t_defect_info a
         LEFT JOIN t_std_device b ON a.device_id = b.device_id
-        LEFT JOIN t_std_devicemete q ON a.device_id = q.device_id
         LEFT JOIN t_dict_business c ON a.defect_level = c.dict_code and c.col_name = 'alarm_level'
         LEFT JOIN t_dict_business d ON a.alarm_source = d.dict_code and d.col_name = 'alarm_source'
         LEFT JOIN t_dict_business e ON a.conf_mode = e.dict_code and e.col_name = 'conf_mode'

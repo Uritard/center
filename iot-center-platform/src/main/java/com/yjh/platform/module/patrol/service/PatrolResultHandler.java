@@ -823,13 +823,15 @@ public class PatrolResultHandler {
 
             cruiseResultMap.put("resultNum", resultValue);
             cruiseResultMap.put("picpath", resultImage);
-            cruiseResultMap.put("cruiseResult", StringUtils.equals("abnormal", resultValue) ?
+            cruiseResultMap.put("cruiseResult", StringUtils.equals("图像有差异", resultValue) ?
                     String.valueOf(CRUISE_RESULT_ABNORMAL) : String.valueOf(CRUISE_RESULT_NORMAL));
             cruiseResultMap.put("cruiseAbnormal", "--");
 
-            //判别异常
-            String msgName = "msg:" + msgID + ":" + String.valueOf(UUID.randomUUID()).replace("-", "");
-            redisTemplate.opsForHash().put(msgName, "value", resultValue);
+            // 判别异常
+            if (StringUtils.equals("图像有差异", resultValue)){
+                String msgName = "msg:" + msgID + ":" + String.valueOf(UUID.randomUUID()).replace("-", "");
+                redisTemplate.opsForHash().put(msgName, "value", resultValue);
+            }
         }catch (Exception e){
             log.error("判别结果处理异常：", e);
         }
