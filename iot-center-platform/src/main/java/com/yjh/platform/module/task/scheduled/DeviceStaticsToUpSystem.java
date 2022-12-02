@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.scheduled;
 
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.service.StatisticsService;
@@ -32,6 +33,9 @@ public class DeviceStaticsToUpSystem {
     private StatisticsDao statisticsDao;
 
     @Autowired
+    private UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao;
+
+    @Autowired
     private StatisticsService statisticsService;
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -50,8 +54,9 @@ public class DeviceStaticsToUpSystem {
         List<Map<String, String>> robotList = statisticsDao.selectRobot();
         List<Map<String, String>> cameraList = statisticsDao.selectCamera();
         List<Map<String, String>> droneList = statisticsDao.selectDrone();
-        statisticsService.selectStatisticsRobot(null,"robot");
-        statisticsService.selectStatisticsRobot(null,"");
+        // 加载进入redis缓存
+        statisticsService.selectStatisticsRobot(null, "robot");
+        statisticsService.selectStatisticsRobot(null, "");
         statisticsService.countCamera(null);
         robotList.addAll(cameraList);
         robotList.addAll(droneList);
@@ -86,7 +91,14 @@ public class DeviceStaticsToUpSystem {
 
 
     private void packageInfo(String key, Map<String, String> device, List<Map<String, Object>> infoMaps) {
-        Map deviceStaticsInfo = redisTemplate.opsForHash().entries("deviceStaticsInfo:" + key + ":" + device.get(key));
+        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        Map<String,String> deviceStaticsInfo =new HashMap(8);
+        if ("3".equals(sysLevel)) {
+            // 是上级系统上报，直接查询数据库
+            deviceStaticsInfo = uPatrolDeviceStaticsDao.selectByDeviceCode(device.get("patrolDeviceCode"));
+        }else {
+            deviceStaticsInfo = redisTemplate.opsForHash().entries("deviceStaticsInfo:" + key + ":" + device.get(key));
+        }
         for (int type = 1; type < 7; type++) {
             Map<String, Object> infoMap = new HashMap<>(16);
             infoMap.put("patroldevice_code", device.get("patrolDeviceCode"));
@@ -100,10 +112,10 @@ public class DeviceStaticsToUpSystem {
                     if (!device.containsKey("robotId")) {
                         break;
                     }
-                    if(StringUtils.isEmpty(deviceStaticsInfo.get("duration"))){
+                    if (StringUtils.isEmpty(deviceStaticsInfo.get("duration"))) {
                         infoMap.put("value", "0");
-                    }else {
-                        infoMap.put("value",deviceStaticsInfo.get("duration"));
+                    } else {
+                        infoMap.put("value", deviceStaticsInfo.get("duration"));
                     }
                     infoMap.put("value_unit", "时");
                     infoMap.put("unit", "分");
@@ -113,10 +125,10 @@ public class DeviceStaticsToUpSystem {
                     if (!device.containsKey("robotId")) {
                         break;
                     }
-                    if(StringUtils.isEmpty(deviceStaticsInfo.get("offLineCount"))){
+                    if (StringUtils.isEmpty(deviceStaticsInfo.get("offLineCount"))) {
                         infoMap.put("value", "0");
-                    }else {
-                        infoMap.put("value",deviceStaticsInfo.get("offLineCount"));
+                    } else {
+                        infoMap.put("value", deviceStaticsInfo.get("offLineCount"));
                     }
                     infoMap.put("value_unit", "次");
                     infoMap.put("unit", "次");
@@ -126,30 +138,30 @@ public class DeviceStaticsToUpSystem {
                     if (!device.containsKey("robotId")) {
                         break;
                     }
-                    if(StringUtils.isEmpty(deviceStaticsInfo.get("normalDay"))){
+                    if (StringUtils.isEmpty(deviceStaticsInfo.get("normalDay"))) {
                         infoMap.put("value", "0");
-                    }else {
-                        infoMap.put("value",deviceStaticsInfo.get("normalDay"));
+                    } else {
+                        infoMap.put("value", deviceStaticsInfo.get("normalDay"));
                     }
                     infoMap.put("value_unit", "天");
                     infoMap.put("unit", "天");
                     break;
                 case 4:
                     // 正常巡检天数
-                    if(StringUtils.isEmpty(deviceStaticsInfo.get("commissionDays"))){
+                    if (StringUtils.isEmpty(deviceStaticsInfo.get("commissionDays"))) {
                         infoMap.put("value", "0");
-                    }else {
-                        infoMap.put("value",deviceStaticsInfo.get("commissionDays"));
+                    } else {
+                        infoMap.put("value", deviceStaticsInfo.get("commissionDays"));
                     }
                     infoMap.put("value_unit", "天");
                     infoMap.put("unit", "天");
                     break;
                 case 5:
                     // 巡检出勤率
-                    if(StringUtils.isEmpty(deviceStaticsInfo.get("cruisePercent"))){
+                    if (StringUtils.isEmpty(deviceStaticsInfo.get("cruisePercent"))) {
                         infoMap.put("value", "0");
-                    }else {
-                        infoMap.put("value",deviceStaticsInfo.get("cruisePercent").toString().replace("%",""));
+                    } else {
+                        infoMap.put("value", deviceStaticsInfo.get("cruisePercent").replace("%", ""));
                     }
                     infoMap.put("value_unit", "%");
                     infoMap.put("unit", "%");
@@ -159,10 +171,10 @@ public class DeviceStaticsToUpSystem {
                     if (!device.containsKey("cameraId")) {
                         break;
                     }
-                    if(StringUtils.isEmpty(deviceStaticsInfo.get("intactPercent"))){
+                    if (StringUtils.isEmpty(deviceStaticsInfo.get("intactPercent"))) {
                         infoMap.put("value", "0");
-                    }else {
-                        infoMap.put("value",deviceStaticsInfo.get("intactPercent").toString().replace("%",""));
+                    } else {
+                        infoMap.put("value", deviceStaticsInfo.get("intactPercent").replace("%", ""));
                     }
                     infoMap.put("value_unit", "%");
                     infoMap.put("unit", "%");

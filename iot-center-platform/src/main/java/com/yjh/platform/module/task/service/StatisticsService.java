@@ -6,6 +6,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
 import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.entity.Statistics;
 import com.yjh.platform.module.user.entity.TRobotInfo;
@@ -30,6 +31,9 @@ import java.util.*;
 public class StatisticsService {
     @Autowired
     private StatisticsDao statisticsDao;
+
+    @Autowired
+    private UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -128,13 +132,24 @@ public class StatisticsService {
     }
 
     public List<Map<String, Object>> selectStatisticsRobot(Long robotId, String type) {
+        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
         List<Map<String, Object>> list = null;
         if ("robot".equals(type)) {
-            list = statisticsDao.selectStatisticsRobot(robotId);
+            if ("3".equals(sysLevel)) {
+                // 当前系统是上级系统,从数据中获取数据
+                list = uPatrolDeviceStaticsDao.selectStatisticsRobot(robotId);
+            } else {
+                list = statisticsDao.selectStatisticsRobot(robotId);
+            }
         } else {
-            list = statisticsDao.selectStatisticsDrone(robotId);
+            if ("3".equals(sysLevel)) {
+                // 当前系统是上级系统,从数据中获取数据
+                list = uPatrolDeviceStaticsDao.selectStatisticsDrone(robotId);
+            } else {
+                list = statisticsDao.selectStatisticsDrone(robotId);
+            }
         }
-        if (CollectionUtils.isEmpty(list)) {
+        if (CollectionUtils.isEmpty(list) || "3".equals(sysLevel)) {
             return list;
         }
         Long duration = null;
@@ -203,7 +218,7 @@ public class StatisticsService {
             if (percentMap.size() > 0 && percentMap.get("percent") != null) {
                 map.put("lossPercent", percentMap.get("percent"));
             }
-            redisTemplate.opsForHash().putAll("deviceStaticsInfo:robotId:" + map.get("robotId"),map);
+            redisTemplate.opsForHash().putAll("deviceStaticsInfo:robotId:" + map.get("robotId"), map);
         }
         return list;
     }
