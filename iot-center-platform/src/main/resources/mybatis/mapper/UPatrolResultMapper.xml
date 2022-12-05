@@ -772,12 +772,8 @@
         WHERE  remark = dict_code)
         ) AS "count"
         from t_dict_business
-        where dict_code IN
-        (
-        select dict_code
-        from t_dict_business
-        where col_name = 'abnormal_type'
-        )
+        where
+        col_name = 'abnormal_type'
         ORDER BY dict_code;
     </select>
 
