@@ -59,7 +59,7 @@ public class TStdDeviceModelService {
     public void saveReportData(List<Map<String, Object>> deviceModelList, String ftpsPath, String presetPath, String presetRealPath, String edgeCode, String edgeLevel) {
         if (CollectionUtils.isNotEmpty(deviceModelList)) {
             //字典表转换
-            List<Map<String, String>> dictMapList = tStdDeviceMapper.selectDictCodeByUpDict("device_type");
+            List<Map<String, String>> dictMapList = tStdDeviceMapper.selectDictCodeByUpDict("device_type,meter_type");
             //已存在的节点信息
             List<TStdRegion> tStdRegionList = tStdRegionDao.selectByRegionCodeAndState(edgeCode, null);
             //已存在的相机信息
@@ -133,7 +133,7 @@ public class TStdDeviceModelService {
                                 return;
                         }
                         //构建 t_std_devicemete
-                        TStdDeviceMete tStdDeviceMete = createStdDeviceMete(edgeCode, device, tStdDevice);
+                        TStdDeviceMete tStdDeviceMete = createStdDeviceMete(edgeCode, device, tStdDevice, dictMapList);
                         if (device.containsKey("algorithm_id") && StringUtils.isNotEmpty(device.get("algorithm_id").toString())) {
                             TAlgorithmMete tAlgorithmMete = new TAlgorithmMete();
                             tAlgorithmMete.setEdgeCode(edgeCode);
@@ -163,7 +163,7 @@ public class TStdDeviceModelService {
             List<TRobotInspection> insertRobotInspectionList = dealRobotInspection(oldRobotInspectionList, newRobotInspections, edgeCode);
             insertRobotInspectionList.addAll(oldRobotInspectionList);
             //设备点位
-            List<TStdDevice> insertStdDevice = dealStdDevice(oldStdDeviceList, newStdDevices, edgeCode);
+            List<TStdDevice> insertStdDevice = dealStdDevice(oldStdDeviceList, newStdDevices, insertCameraPresetList, tCameraInfoList, edgeCode);
             insertStdDevice.addAll(oldStdDeviceList);
             dealStdDeviceAttr(insertStdDevice, oldStdDeviceAttrList, newStdDeviceAttrs, edgeCode);
             //标准测点
@@ -222,7 +222,7 @@ public class TStdDeviceModelService {
      * @param tStdDevice
      * @return
      */
-    private TStdDeviceMete createStdDeviceMete(String edgeCode, Map<String, Object> device, TStdDevice tStdDevice) {
+    private TStdDeviceMete createStdDeviceMete(String edgeCode, Map<String, Object> device, TStdDevice tStdDevice, List<Map<String, String>> dictMapList) {
         TStdDeviceMete tStdDeviceMete = new TStdDeviceMete();
         tStdDeviceMete.setMeteName(String.valueOf(device.get("device_name")).contains("/")
                 ? StringUtils.substringBefore(device.get("device_name").toString().replace(" ", ""), "/")
@@ -234,7 +234,10 @@ public class TStdDeviceModelService {
             tStdDeviceMete.setOriginId(String.valueOf(device.get("device_mete_id")));
             tStdDeviceMete.setDevicePointId((String) device.get("device_point_id"));
             tStdDeviceMete.setMeteKind(objToInt(device.get("mete_kind")));
-            tStdDeviceMete.setMeterType(objToInt(device.get("meter_type")));
+            tStdDeviceMete.setMeterType(CollectionUtils.isNotEmpty(dictMapList) && StringUtils.isNotEmpty(String.valueOf(device.get("meter_type"))) ?
+                    Integer.parseInt(dictMapList.stream().filter(s -> "meter_type".equals(s.get("col_name"))
+                                    && device.get("meter_type").equals(String.valueOf(s.get("up_dict")))).map(d -> d.get("dict_code"))
+                            .collect(Collectors.toList()).get(0)) : null);
             tStdDeviceMete.setPositionType((String) device.get("position_type"));
             tStdDeviceMete.setAnalyseType(objToInt(device.get("analyse_type")));
             tStdDeviceMete.setIsAi((String) device.get("is_ai"));
@@ -651,13 +654,24 @@ public class TStdDeviceModelService {
      *
      * @param oldList  旧数据
      * @param newList  新数据
+     * @param insertCameraPresetList
+     * @param tCameraInfoList
      * @param edgeCode 节点编码
      * @return 直接入库的数据
      */
-    private List<TStdDevice> dealStdDevice(List<TStdDevice> oldList, List<TStdDevice> newList, String edgeCode) {
+    private List<TStdDevice> dealStdDevice(List<TStdDevice> oldList, List<TStdDevice> newList,
+                                           List<TCameraPreset> insertCameraPresetList, List<TCameraInfo> tCameraInfoList, String edgeCode) {
         Map<String, TStdDevice> oldMap = oldList.stream().collect(Collectors.toMap(TStdDevice::getOriginId, Function.identity()));
         Map<String, TStdDevice> newMap = newList.stream().collect(Collectors.toMap(TStdDevice::getOriginId, Function.identity()));
         SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
+        newList.forEach(tStdDevice -> {
+            tStdDevice.setCameraId(tCameraInfoList.stream().filter(tCameraInfo ->
+                            tCameraInfo.getOriginId().equals(String.valueOf(tStdDevice.getCameraId())))
+                    .collect(Collectors.toList()).get(0).getCameraId());
+            tStdDevice.setPresetId(insertCameraPresetList.stream().filter(tCameraPreset ->
+                            tCameraPreset.getOriginId().equals(String.valueOf(tStdDevice.getPresetId())))
+                    .collect(Collectors.toList()).get(0).getPresetId());
+        });
         if (CollectionUtils.isNotEmpty(updateIdSet)) {
             newList.stream().filter(t ->
                     updateIdSet.contains(t.getOriginId())).forEach(t -> {
