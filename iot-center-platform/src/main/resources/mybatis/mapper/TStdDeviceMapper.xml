@@ -61,7 +61,7 @@
         b.port,
         b.voltage_Level,
         b.sequence_point ,
-        b.real_code ,
+        a.real_code ,
         b.address
    </sql>
 
