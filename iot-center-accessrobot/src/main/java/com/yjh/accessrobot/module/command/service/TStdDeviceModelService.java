@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -664,7 +665,8 @@ public class TStdDeviceModelService {
         Map<String, TStdDevice> oldMap = oldList.stream().collect(Collectors.toMap(TStdDevice::getOriginId, Function.identity()));
         Map<String, TStdDevice> newMap = newList.stream().collect(Collectors.toMap(TStdDevice::getOriginId, Function.identity()));
         SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
-        newList.forEach(tStdDevice -> {
+        newList.stream().filter(tStdDevice -> Objects.nonNull(tStdDevice.getCameraId()) && Objects.nonNull(tStdDevice.getPresetId()))
+                .forEach(tStdDevice -> {
             tStdDevice.setCameraId(tCameraInfoList.stream().filter(tCameraInfo ->
                             tCameraInfo.getOriginId().equals(String.valueOf(tStdDevice.getCameraId())))
                     .collect(Collectors.toList()).get(0).getCameraId());
