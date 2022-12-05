@@ -269,4 +269,13 @@
           and a.plan_id = #{planId, jdbcType=BIGINT} ORDER BY b.device_id, b.custom_id,a.instance_id
     </select>
 
+    <delete id="deleteByInstanceId" parameterType="java.lang.Long">
+        delete from u_patrol_plan_attr
+        where instance_id in
+        <foreach collection="list" item="instanceId" separator="," open="(" close=")">
+            #{instanceId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+
 </mapper>

@@ -38,4 +38,5 @@ public interface UPatrolPlanAttrDao {
     int batchDelete(List<String> list);
     List<Long> seletcInsByPlan (@Param(value = "planId") Long planId);
     List<TCruisePlanAttrDetail> selectByPrimaryId(@Param(value = "planId") Long planId);
+    int deleteByInstanceId(@Param(value = "list") List<Long> list);
 }
