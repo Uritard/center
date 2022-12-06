@@ -25,6 +25,10 @@ public class Packet {
     private static final int PAYLOAD_LENGTH_SIZE = 4;
     private static final int MINIMUM_PARSING_SIZE = HEAD_SIZE + VERSION_SIZE + PAYLOAD_LENGTH_SIZE;
 
+    private byte version;
+
+    private int size;
+
     /**
      * 包号: “请求开始” 时， 包号置为 0， 逐帧连续累加， 直至“请求结束”。
      */
@@ -79,7 +83,8 @@ public class Packet {
     }
 
     private static int calcDataGroupSize(int dataSize) {
-        return dataSize - (8 + 6 + 6 + 3 + 1 + 2 + 3 + 1 + 2 + 1);
+        // 220 接口取消了 encoding，少减一个 1
+        return Constant.hasEncoding() ? dataSize - (8 + 6 + 6 + 3 + 1 + 2 + 3 + 1 + 2 + 1) : dataSize - (8 + 6 + 6 + 3 + 1 + 2 + 3 + 2 + 1);
     }
 
     public static Packet tryParse(IoBuffer in, boolean byteOrderLittleFlag) {
@@ -131,6 +136,8 @@ public class Packet {
         }
 
         Packet packet = new Packet();
+        packet.version = version;
+        packet.size = remainingLength;
         packet.timestamp = in.getLong();
         in.get(packet.basicInfo);
         in.get(packet.deviceId);
@@ -138,7 +145,12 @@ public class Packet {
         packet.hardware = String.format("%d", in.get());
         in.get(packet.protocol);
         in.get(packet.flag);
-        packet.encoding = AudioEncoding.getInstance(in.get());
+        // 220 接口取消了 encoding，增加配置
+        if(Constant.hasEncoding()) {
+            packet.encoding = AudioEncoding.getInstance(in.get());
+        } else {
+            packet.encoding = AudioEncoding.PCM;
+        }
         int dataGroupSize = calcDataGroupSize(remainingLength);
         byte[] dataGroupBytes = new byte[dataGroupSize];
         log.info("dataGroupBytes.len:{}",dataGroupBytes.length);
@@ -260,7 +272,9 @@ public class Packet {
     @Override
     public String toString() {
         return "Packet{" +
-                "timestamp=" + timestamp +
+                "version=" + version +
+                ", size=" + size +
+                ", timestamp=" + timestamp +
                 ", basicInfo=" + Arrays.toString(basicInfo) +
                 ", deviceId=" + Arrays.toString(deviceId) +
                 ", firmware='" + firmware + '\'' +

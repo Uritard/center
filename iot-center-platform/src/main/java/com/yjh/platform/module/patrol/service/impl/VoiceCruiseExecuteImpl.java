@@ -35,13 +35,16 @@ import static com.yjh.platform.module.patrol.CruiseConstant.TypeEnum.VOICE;
 @Component
 public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
     private final RedisTemplate<String, ?> redisTemplate;
-    private AudioDeviceManager audioDeviceManager;
-    private TVoiceDeviceService tVoiceDeviceService;
+    private final AudioDeviceManager audioDeviceManager;
+    private final TVoiceDeviceService tVoiceDeviceService;
 
     private final HashOperations<String, String, String> hashOperations;
 
-    public VoiceCruiseExecuteImpl(RedisTemplate<String, ?> redisTemplate) {
+    public VoiceCruiseExecuteImpl(RedisTemplate<String, ?> redisTemplate, AudioDeviceManager audioDeviceManager,
+        TVoiceDeviceService tVoiceDeviceService) {
         this.redisTemplate = redisTemplate;
+        this.audioDeviceManager = audioDeviceManager;
+        this.tVoiceDeviceService = tVoiceDeviceService;
         this.hashOperations = redisTemplate.opsForHash();
     }
 
@@ -93,7 +96,7 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
 
                 Thread.sleep(maoForTime * 1000);
 
-                audioDevice.stopRecordingAndSave(voicePath);
+                audioDevice.stopRecordingAndSave(voiceFilePath);
                 isok = true;
                 //文件替换
                 String absVoicePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:absVoicePath").get("content"));

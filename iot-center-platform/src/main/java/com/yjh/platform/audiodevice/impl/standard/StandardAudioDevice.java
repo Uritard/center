@@ -48,7 +48,9 @@ public class StandardAudioDevice implements AudioDevice {
 
     public void onAudioData(InboundMessage inboundMessage) {
         if (!isRecording.get()) {
-            log.warn("非录音时段收到录音数据: {}", inboundMessage);
+            if (Constant.isPacketLog()) {
+                log.warn("非录音时段收到录音数据: {}", inboundMessage);
+            }
             return;
         }
         if (Constant.isPacketLog()) {
@@ -232,7 +234,6 @@ public class StandardAudioDevice implements AudioDevice {
                         } else {
                             byteBuffers[j++].put(dates);
                         }
-
                     }
                 }
             } catch (Exception e) {
