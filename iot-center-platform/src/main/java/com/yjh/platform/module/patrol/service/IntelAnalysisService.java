@@ -3,6 +3,7 @@ package com.yjh.platform.module.patrol.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
 import com.yjh.platform.common.mqtt.FtpsService;
@@ -899,8 +900,10 @@ public class IntelAnalysisService {
                 jasonMaps.put("defectModel", 450);
                 String json = JSON.toJSONString(jasonMaps);
                 log.info("发送给前端的消息：{}", json);
-
-                postUrl(syncWebsocketUrl, json);
+                String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
+                if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
+                    postUrl(syncWebsocketUrl, json);
+                }
             }
             return list;
         } catch (Exception e) {

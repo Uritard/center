@@ -39,6 +39,10 @@ public class Constant {
     public static final String CAPTURE_PRESET_URL = "http://iot-center-accessvideo/camera/v1/capturePresetPicture?cameraId={cameraId}&presetId={presetId}&meteName={meteName}";
     public static final String T_SYS_PARAM = "t_sys_param:";
     public static final String LEVEL_EDGE = "1";
+    /*
+    *  上级系统层级
+    */
+    public static final String LEVEL_UP_SYSTEM = "3";
     public static final String SILENT_SECOND = "silent_second:";
     public static final Integer INTEGER_1 = 1;
 

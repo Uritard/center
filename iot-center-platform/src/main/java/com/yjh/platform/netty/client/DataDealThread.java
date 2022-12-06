@@ -3,6 +3,7 @@ package com.yjh.platform.netty.client;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.mqtt.AlarmService;
 import com.yjh.platform.common.mqtt.FtpsService;
@@ -488,7 +489,10 @@ public class DataDealThread implements Runnable {
                                                         jasonMaps2.put("defectModel", tWarnInfo.getDefectModel());
                                                         String json = JSON.toJSONString(jasonMaps2);
                                                         log.info("发送给前端的消息：" + json);
-                                                        postUrl(syncWebsocketUrl,json);
+                                                        String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
+                                                        if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
+                                                            postUrl(syncWebsocketUrl,json);
+                                                        }
                                                     }
 
                                                     //最近一条告警信息 入缓存
@@ -712,7 +716,10 @@ public class DataDealThread implements Runnable {
                                                 jasonMaps2.put("defectModel", defectMap.get("defectType"));
                                                 String json = JSON.toJSONString(jasonMaps2);
                                                 log.info("发送给前端的消息：" + json);
-                                                postUrl(syncWebsocketUrl,json);
+                                                String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
+                                                if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
+                                                    postUrl(syncWebsocketUrl,json);
+                                                }
                                             }
                                         }
 
@@ -789,7 +796,10 @@ public class DataDealThread implements Runnable {
                                                     jasonMaps2.put("defectModel", defectMap.get("defectType"));
                                                     String json = JSON.toJSONString(jasonMaps2);
                                                     log.info("发送给前端的消息：" + json);
-                                                    postUrl(syncWebsocketUrl,json);
+                                                    String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
+                                                    if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
+                                                        postUrl(syncWebsocketUrl,json);
+                                                    }
                                                 }
                                             }
 
