@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -77,7 +76,7 @@ public class TaskJob extends QuartzJobBean {
             List<JobExecutionContext> jobs = context.getScheduler().getCurrentlyExecutingJobs();
             log.info("任务开始执行, taskId: {}, startTime: {}, scheduledFireTime: {}, fireTime: {}, jobs: {}", taskId,
                 simpleDateFormat.format(startTime), taskDate,simpleDateFormat.format(fireTime), jobs.toArray());
-        } catch (SchedulerException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
 

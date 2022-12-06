@@ -13,6 +13,7 @@ import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
 import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -51,7 +52,12 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
      */
     @Override
     public boolean execute(Map<String, String> inspectionMap) {
-        voiceRecord(inspectionMap);
+        try {
+            log.info("声纹任务开始执行...");
+            voiceRecord(inspectionMap);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
         // 数据存入 redis
         CruiseRedisStorage.offer(inspectionMap);
@@ -74,12 +80,14 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
             "yyyyMMdd_HHmm").format(new Date(dateTimeAfter));
         String voiceFilePath = voicePath + "/" + cruiseId + "/1/" + timeAfterTem + "/" + voiceName + ".wav";
 
+        log.info("声纹录音开始，taskId: {}，deviceId: {}, voicePath: {}", taskId, cruiseId, voiceFilePath);
         //1 开始录音
         VoiceDeviceAllInfoDetail voiceDevice = tVoiceDeviceService.selectByPrimaryId(cruiseId);
-        AudioDevice audioDevice = audioDeviceManager.getAudioDevice(voiceDevice.getVoiceCode());
-
+        String voiceCode = voiceDevice.getVoiceCode();
+        AudioDevice audioDevice = audioDeviceManager.getAudioDevice(voiceCode);
+        log.info("录音设备，taskId: {}，voiceCode: {}", taskId, voiceDevice.getVoiceCode());
         boolean isok = false;
-        if (voiceDevice.getVoiceCode() != null && !"".equals(voiceDevice.getVoiceCode())) {
+        if (StringUtils.isNotEmpty(voiceCode)) {
             try {
                 audioDevice.startRecording();
 

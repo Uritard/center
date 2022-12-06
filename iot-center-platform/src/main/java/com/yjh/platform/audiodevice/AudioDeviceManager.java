@@ -1,5 +1,7 @@
 package com.yjh.platform.audiodevice;
 
+import java.util.List;
+
 /**
  * 录音设备管理器
  *
@@ -25,4 +27,9 @@ public interface AudioDeviceManager {
      */
     void registerAudioDevice(AudioDevice audioDevice);
 
+    /**
+     * 已经注册的设备列表
+     * @return 声纹设备 code 列表
+     */
+    List<String> registedDevices();
 }

@@ -309,4 +309,18 @@ public class TVoiceDeviceController {
         return result;
     }
 
+    @ApiOperation(value = "注册声纹设备")
+    @RequestMapping(value = "/voiceRegisted", method = RequestMethod.GET)
+    public Result voiceRegisted() {
+        Result result = new Result();
+        try {
+            result.setData(tVoiceDeviceService.voiceRegisted());
+        } catch (BusinessException e){
+            result.setCode(209,"获取注册列表失败");
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
 }

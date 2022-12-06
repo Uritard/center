@@ -117,15 +117,15 @@ public class UPatrolTaskController {
             tCruiseTaskAdd.setCreateUserId(Optional.ofNullable(userId).isPresent() ? Long.parseLong(userId) : null);
             int i = uPatrolTaskService.taskConfirmation(userId, tCruiseTaskAdd.getpCode(), request, tCruiseTaskAdd.getIdentifier());
             if (i == 1) {
-                result.setData(uPatrolTaskService.insert(tCruiseTaskAdd));
+                result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd));
             } else {
                 result.setCode(209);
                 result.setMessage("密码错误");
             }
             //result.setData(tCameraScreenService.update(tCameraScreen,userId));
         } catch (BusinessException e) {
-            result.setMessage(ResultCodeEnum.CODE10106.getCode(), e.getMessage());
-            log.error("密码错误:", e);
+            result.setMessage(e.getCode(), e.getMessage());
+            log.error("新增任务错误: {}", e.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("更新错误:", e);
@@ -284,10 +284,10 @@ public class UPatrolTaskController {
             log.info("--站端任务下发--"+tCruiseTaskAdd);
             tCruiseTaskAdd.setTaskCode(tCruiseTaskAdd.getTaskId());
             tCruiseTaskAdd.setTaskId(null);
-            result.setData(uPatrolTaskService.insert(tCruiseTaskAdd));
+            result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd));
         } catch (BusinessException e) {
-            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
-            log.error("站端任务控制异常:", e);
+            result.setMessage(e.getCode(), e.getMessage());
+            log.error("站端任务控制异常: {}", e.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("站端任务控制错误:", e);

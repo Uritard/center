@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,6 +92,7 @@ public class JobManager {
     /**
      *新建一个周期巡视任务
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String addCruiseTaskJob(QuartzTask quartzTask, String taskId) throws Exception {
         ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
@@ -121,6 +124,7 @@ public class JobManager {
     /**
      *新建一个立即巡视任务
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String addCruiseTaskJobNow(QuartzTask quartzTask, String taskId) throws Exception {
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         JobKey jobKey = new JobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
@@ -146,6 +150,7 @@ public class JobManager {
     /**
      *新建一个定时巡视任务
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String addCruiseTaskJobAtTime(QuartzTask quartzTask, String taskId) throws Exception {
         ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
@@ -176,6 +181,7 @@ public class JobManager {
         return "success";
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void pauseJob(QuartzTask quartzTask, String triggerName) throws Exception {
         JobKey jobKey = JobKey.jobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         StaticContextAccessor.getBean(Scheduler.class).pauseTrigger(new TriggerKey(triggerName, quartzTask.getJobGroup()));
@@ -183,6 +189,7 @@ public class JobManager {
         logger.info(quartzTask.getJobName()+"pause!");
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void resumeJob(QuartzTask quartzTask) throws Exception {
         JobKey jobKey = JobKey.jobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         StaticContextAccessor.getBean(Scheduler.class).resumeJob(jobKey);
@@ -190,6 +197,7 @@ public class JobManager {
         logger.info(quartzTask.getJobName()+"resume!");
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void deleteJob(QuartzTask quartzTask) throws Exception {
         JobKey jobKey = JobKey.jobKey(quartzTask.getJobName(), quartzTask.getJobGroup());
         StaticContextAccessor.getBean(Scheduler.class).deleteJob(jobKey);
@@ -249,6 +257,7 @@ public class JobManager {
     /**
      *任务终止
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String taskShutDown(QuartzTask quartzTask, String taskId) throws Exception {
         ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
@@ -281,7 +290,10 @@ public class JobManager {
 
     /**
      *新建一个周期巡视任务
+     * 不使用事物，否则会导致事物未提交 quartz 即开始查询触发器，查不到数据需要第二次查询才能获取数据，延时 20~30 秒
+     * 没有卵用，因为事物挂起，会导致任务正式执行时任务信息还未写入库中，导致任务失败
      */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String createTask(QuartzTask quartzTask, UPatrolTask task) throws Exception {
         ConcurrentHashMap<String,Object> taskMap = new ConcurrentHashMap<>();
         TriggerKey triggerKey = TriggerKey.triggerKey(quartzTask.getJobName(), quartzTask.getJobGroup());
@@ -312,7 +324,7 @@ public class JobManager {
                     .startNow()
                     .withSchedule(
                             SimpleScheduleBuilder.simpleSchedule()
-                                    .withMisfireHandlingInstructionFireNow())
+                                    .withMisfireHandlingInstructionIgnoreMisfires())
                     .build();
         } else if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.TIME.getType()) {
             trigger = TriggerBuilder.newTrigger()
@@ -320,12 +332,11 @@ public class JobManager {
                     .startAt(quartzTask.getStartTime())
                     .withSchedule(
                             SimpleScheduleBuilder.simpleSchedule()
-                                    .withMisfireHandlingInstructionFireNow())
+                                    .withMisfireHandlingInstructionIgnoreMisfires())
                     .build();
         }
 
         StaticContextAccessor.getBean(Scheduler.class).scheduleJob(jobDetail, trigger);
-        StaticContextAccessor.getBean(Scheduler.class).start();
         logger.info("周期任务创建成功");
         return "success";
     }

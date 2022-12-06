@@ -74,6 +74,10 @@ public class MqttUtilsServer {
      * 推送消息
      */
     public boolean pushMsg(String topic, Object msg, int qos) {
+        if (this.mqttClient == null) {
+            log.error("MqttUtilsServer did not init!!!");
+            return false;
+        }
         if (!this.mqttClient.isConnected()) {
             log.info("连接断开，重连接");
             this.reconnection();
