@@ -7,6 +7,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
 import com.yjh.platform.module.device.dao.*;
 import com.yjh.platform.module.device.entity.*;
+import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
@@ -60,6 +61,8 @@ public class TCruisePointInstanceService{
     private TVoiceDeviceDao tVoiceDeviceDao;
     @Autowired
     private UPatrolResultDao uPatrolResultDao;
+    @Autowired
+    private UPatrolPlanAttrDao uPatrolPlanAttrDao;
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
@@ -439,6 +442,7 @@ public class TCruisePointInstanceService{
             }
             tCruisePointInstanceDao.deleteByInstanceId(instanceIdList);
             tCruisePlanAttrDao.deleteByInstanceId(instanceIdList);
+            uPatrolPlanAttrDao.deleteByInstanceId(instanceIdList);
             tCruiseTypeDao.deleteForInstanceId(instanceIdList);
         }
         return result;
