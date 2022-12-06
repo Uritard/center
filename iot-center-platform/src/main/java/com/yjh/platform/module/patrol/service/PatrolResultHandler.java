@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
@@ -729,7 +730,10 @@ public class PatrolResultHandler {
                 jasonMaps.put("defectModel", infoMap.get("defectModel"));
                 log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMaps));
                 currentWarnInfo.put("isPop","true");
-                Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
+                String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
+                if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
+                    Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMaps);
+                }
             }
             redisTemplate.opsForValue().set("currentWarn", currentWarnInfo, 3, TimeUnit.MINUTES);
         }catch (Exception e){

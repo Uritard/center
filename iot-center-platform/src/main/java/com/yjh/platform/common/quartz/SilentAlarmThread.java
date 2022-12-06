@@ -2,6 +2,7 @@ package com.yjh.platform.common.quartz;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.utils.DateTimeUtil;
@@ -448,7 +449,10 @@ public class SilentAlarmThread implements Runnable {
             jasonMaps.put("defectModel", 450);
             String json = com.alibaba.fastjson.JSON.toJSONString(jasonMaps);
             log.info("发送给前端的消息: {}", json);
-            restTemplatePost(syncWebsocketUrl, json);
+            String edgeLevel = String.valueOf(ValueUtil.getOrDefault(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"),""));
+            if (!Constant.LEVEL_UP_SYSTEM.equals(edgeLevel)){
+                restTemplatePost(syncWebsocketUrl, json);
+            }
             return tWarnInfo;
         } catch (Exception e) {
             log.error("组装并存储告警信息出错: ", e);
