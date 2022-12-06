@@ -149,4 +149,6 @@ public interface UPatrolTaskDao {
 
 
     List<Long> selectRobotOrDroneInsByTaskId(@Param("taskId") String taskId);
+
+    List<Long>  selectInstanceIdByTaskId(@Param("taskId") String taskId);
 }

@@ -307,7 +307,7 @@ public class TCruiseTaskResultService {
             Map<String, Object> warnMap = redisTemplate.opsForHash().entries(warnKey);
             String instanceId = warnMap.get("instanceId").toString();
             Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
-            log.info("cruiseMap==={}", cruiseMap);
+//            log.info("cruiseMap==={}", cruiseMap);
             RealTimeWarn realTimeWarn = new RealTimeWarn();
             realTimeWarn.setDeviceName(cruiseMap.get("deviceName").toString());
             realTimeWarn.setInstanceName(cruiseMap.get("instanceName").toString());
@@ -329,7 +329,7 @@ public class TCruiseTaskResultService {
             Map<String, Object> defectMap = redisTemplate.opsForHash().entries(defectKey);
             String instanceId = defectMap.get("instanceId").toString();
             Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId);
-            log.info("cruiseMap==={}", cruiseMap);
+//            log.info("cruiseMap==={}", cruiseMap);
             RealTimeWarn realTimeWarn = new RealTimeWarn();
             realTimeWarn.setDeviceName(cruiseMap.get("deviceName").toString());
             realTimeWarn.setInstanceName(cruiseMap.get("instanceName").toString());

@@ -77,7 +77,8 @@ public interface UPatrolDataResultDao {
         @Param(value = "endTime") String endTime,
         @Param(value = "startTime") String startTime,
         @Param(value = "list") List<Long> list,
-        @Param(value = "instanceName") String instanceName);
+        @Param(value = "instanceName") String instanceName,
+        @Param(value = "stationName") String stationName);
 
     List<BrokenLineInfo> selectBrokenLine(@Param(value = "cruiseType") Integer cruiseType,
         @Param(value = "cType") Integer cType,

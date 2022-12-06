@@ -910,10 +910,25 @@
 
     <select id="selectRobotOrDroneInsByTaskId" resultType="java.lang.Long">
         SELECT
+            ins.cruise_id
+        FROM
+            u_patrol_task_attr attr
+                LEFT JOIN t_cruise_point_instance ins ON ins.instance_id = attr.instance_id
+                AND attr.task_id = #{taskId}
+        WHERE
+            ins.cruise_type = 228
+           OR ins.cruise_type = 524
+    </select>
+
+    <select id="selectInstanceIdByTaskId" resultType="java.lang.Long">
+        SELECT
             attr.instance_id
         FROM
             u_patrol_task_attr attr
-                join t_cruise_point_instance ins
-        where (ins.cruise_type = 228 or ins.cruise_type = 524) and attr.task_id = #{taskId}
+                LEFT JOIN t_cruise_point_instance ins ON ins.instance_id = attr.instance_id
+                AND attr.task_id = #{taskId}
+        WHERE
+            ins.cruise_type = 228
+           OR ins.cruise_type = 524
     </select>
 </mapper>
