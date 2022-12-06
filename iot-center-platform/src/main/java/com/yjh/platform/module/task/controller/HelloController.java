@@ -409,13 +409,14 @@ public class HelloController {
     }
     @ApiOperation(value = "告警弹框webSocket测试")
     @RequestMapping(value = "/warnWebSocket", method = RequestMethod.POST)
-    public Result warnWebSocket() {
+    public Result warnWebSocket(@RequestParam(value = "warnId", required = false) Long warnId,
+            @RequestParam(value = "defectModel", required = false) Integer defectModel) {
         Result result = new Result();
         try {
             Map<String, Object> jasonMaps2 = new HashMap<>();
             jasonMaps2.put("type", "alarmPopUp");
-            jasonMaps2.put("warnId", 51000000022l);
-            jasonMaps2.put("defectModel", 450);
+            jasonMaps2.put("warnId", warnId);
+            jasonMaps2.put("defectModel", defectModel);
             String json = JSON.toJSONString(jasonMaps2);
             log.info("发送给前端的消息：" + json);
             try{

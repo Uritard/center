@@ -704,38 +704,44 @@ public class UPatrolTaskService {
 
         //找出机器人做任务的巡检点
         List<Long> robotCruiseList = uPatrolTaskDao.selectRobotOrDroneInsByTaskId(task.getTaskId());
-        log.info("robotCruiseList   :" +robotCruiseList);
-        if(robotCruiseList.size() != 0){
-            List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
-            List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
-            log.info("robotCode   :" +robotCode);
-            for (String item: robotCode){
-                RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
-                robotTaskInfo.setCruiseType(task.getTaskType());
-                robotTaskInfo.setTaskId(task.getTaskCode());
-//                robotTaskInfo.setPlanCode(task.getPlanCode());
-                robotTaskInfo.setPriority(task.getTaskLevel());//优先级
-                robotTaskInfo.setTaskName(task.getTaskName());
-                robotTaskInfo.setInstanceList(robotCruiseList);
-                robotTaskInfo.setIfRun("173");
-                robotTaskInfo.setRobotCode(item);
-                robotTaskInfo.setFixedStartTime(format.format(new Date()));
-                robotTaskInfoList.add(robotTaskInfo);
-            }
-            Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>();
-            robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
+        log.info("robotCruiseList : {}", robotCruiseList);
+        List<Long> robotInstanceList = uPatrolTaskDao.selectInstanceIdByTaskId(task.getTaskId());
+        log.info("robotInstanceList : {}", robotInstanceList);
 
-            log.info("robotTaskInfoMap   :" +robotTaskInfoMap);
-            //让机器人做任务
-            log.info("task=={}", task);
-            if (StringUtils.isNotEmpty(task.getDateType())) {
-                boolean moreTime = task.getDateType().split(" ")[2].contains(",");
-                if (moreTime && task.getExecuteType() == 172) {
-                    robotTask(robotTaskInfoMap);
-                    log.info("下发成功！！！");
-                }
+        if (robotCruiseList.isEmpty()) {
+            log.info("There are no instanceId for robot or drone to do！！！");
+            return;
+        }
+        List<String> robotCode = tRobotInspectionDao.selectForRobotTask(robotCruiseList);
+        log.info("robotCode : {}", robotCode);
+        List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+        for (String item: robotCode){
+            RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
+            robotTaskInfo.setCruiseType(task.getTaskType());
+            robotTaskInfo.setTaskId(task.getTaskCode());
+//                robotTaskInfo.setPlanCode(task.getPlanCode());
+            robotTaskInfo.setPriority(task.getTaskLevel());//优先级
+            robotTaskInfo.setTaskName(task.getTaskName());
+            List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
+            robotTaskInfo.setInstanceList(robotTaskInstanceList);
+            robotTaskInfo.setIfRun("173");
+            robotTaskInfo.setRobotCode(item);
+            robotTaskInfo.setFixedStartTime(format.format(new Date()));
+            robotTaskInfoList.add(robotTaskInfo);
+        }
+        Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>();
+        robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
+        log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
+        //让机器人做任务
+        log.info("task=={}", task);
+        if (StringUtils.isNotEmpty(task.getDateType())) {
+            boolean moreTime = task.getDateType().split(" ")[2].contains(",");
+            if (moreTime && task.getExecuteType() == 172) {
+                robotTask(robotTaskInfoMap);
+                log.info("下发成功！！！");
             }
         }
+
         try {
             List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(task.getTaskId());
             log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
@@ -1964,7 +1970,7 @@ public class UPatrolTaskService {
         map.put("taskState", taskState);
         map.put("taskName", taskName);
         list = this.uPatrolTaskDao.afterTaskCount(map);
-        log.info("list: " + list);
+//        log.info("list: " + list);
         List<TCruiseTaskDel> listDel = this.tCruiseTaskDelDao.slectByTimeZone(dayBefore, dayAfter);
         List<Map<String, Object>> listTask = new ArrayList<>();
         for (TCruiseTaskCount tCruiseTaskCount : list) {
@@ -2068,7 +2074,7 @@ public class UPatrolTaskService {
                 listTask.add(taskCountMap);
             }
         }
-        log.info("listTask: " + listTask);
+//        log.info("listTask: " + listTask);
         return listTask;
     }
 

@@ -82,19 +82,28 @@ public class CruiseResultAnalyzeInfo implements Serializable {
     @ApiModelProperty(value = "巡视点数据id")
     private Long cruiseDataId;
 
-    @ApiModelProperty(value = "设备区域")
-    private String customName;
-
-    @ApiModelProperty(value = "间隔名称")
-    private Long upRegionName;
-
     @ApiModelProperty(value = "设备名称")
-    private Long deviceName;
+    private String deviceName;
 
     @ApiModelProperty(value = "设备类型")
-    private Long deviceType;
+    private String deviceType;
 
-    @ApiModelProperty(value = "告警级别")
-    private Long warnLevel;
+    @ApiModelProperty(value = "设备类型--字典表")
+    private String deviceTypeName;
+
+    @ApiModelProperty(value = "区域名称")
+    private String regionName;
+
+    @ApiModelProperty(value = "审核状态")
+    private String evaluationState;
+
+    @ApiModelProperty(value = "间隔名称")
+    private String upRegionName;
+
+    @ApiModelProperty(value = "变电站id")
+    private String stationId;
+
+    @ApiModelProperty(value = "变电站名称")
+    private String stationName;
 
 }

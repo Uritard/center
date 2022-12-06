@@ -165,7 +165,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
                     imageNormalUrlPath = analysis.getReferenceImage();
                     log.info("拿提前拍好的预置位作为判别基准图:{}", imageNormalUrlPath);
                     String[] split = imageNormalUrlPath.split("/");
-                    targetNamePath = split[split.length - 2] + "/" + split[split.length - 1];
+                    targetNamePath = split[split.length - 3] + "/" + split[split.length - 2] + "/" + split[split.length - 1];
                     analyseObject.setImageNormalUrlPath(targetNamePath);
 
                 } else {

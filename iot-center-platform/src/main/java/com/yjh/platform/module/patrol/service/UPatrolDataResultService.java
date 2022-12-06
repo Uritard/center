@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.ImmutableMap;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
 import com.yjh.platform.module.patrol.dao.UPatrolDataResultDao;
 import com.yjh.platform.module.task.entity.*;
@@ -14,10 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author czh
@@ -59,10 +57,10 @@ public class UPatrolDataResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName) {
+    public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName, String stationName) {
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(deviceIdList)) {
-            cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName);
+            cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
             for (CruiseResultAnalyzeInfo cRAI : cruiseResultAnalyzeInfoList) {
                 if (Objects.isNull(cRAI.getIdentifyResult())) {
                     cRAI.setIdentifyResultName(cRAI.getCruiseResultName());
@@ -70,6 +68,7 @@ public class UPatrolDataResultService {
                 if (Objects.isNull(cRAI.getPersonCheck())) {
                     cRAI.setPersonCheck(cRAI.getResultNum());
                 }
+                cRAI.setEvaluationState("257".equals(cRAI.getEvaluationState())?"未审核":"已审核");
             }
         }
         return cruiseResultAnalyzeInfoList;

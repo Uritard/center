@@ -100,7 +100,8 @@ public class UPatrolDataResultController {
                                          @RequestParam(value = "endTime", required = false) String endTime,
                                          @RequestParam(value = "startTime", required = false) String startTime,
                                          @RequestParam(value = "pageNum", required = false, defaultValue = "1") int pageNum,
-                                         @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize, HttpServletRequest request) {
+                                         @RequestParam(value = "pageSize", required = false, defaultValue = "0") int pageSize,
+                                         @RequestParam(value = "stationName", required = false) String stationName,HttpServletRequest request) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         Long userIds = Long.valueOf(request.getHeader("userId"));
@@ -164,7 +165,7 @@ public class UPatrolDataResultController {
                 }
             }
             Page page = PageHelper.startPage(pageNum, pageSize, true, null, true);
-            List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectCruiseDataReport(cType,meteType,meterType,endTime, startTime,deviceIdList,instanceName);
+            List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = uPatrolDataResultService.selectCruiseDataReport(cType,meteType,meterType,endTime, startTime,deviceIdList,instanceName, stationName);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultAnalyzeInfoList);
             result.setData(resultMap);
