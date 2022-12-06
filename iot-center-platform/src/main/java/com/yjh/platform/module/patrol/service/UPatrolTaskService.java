@@ -125,6 +125,8 @@ public class UPatrolTaskService {
     private UPatrolDataResultDao uPatrolDataResultDao;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+    @Autowired
+    private JobManager jobManager;
 
     //jobName
     @Value("${spring.QingHua.jobName}")
@@ -139,8 +141,26 @@ public class UPatrolTaskService {
     private final DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final SimpleDateFormat daySdf = new SimpleDateFormat("yyyy-MM-dd");
 
+    /**
+     * 任务下发，在外层处理设置定时器逻辑，不走事物，否则会导致定时器延时
+     */
+    public String addTask(TCruiseTaskAdd tCruiseTaskAdd){
+        // insert 需要走事物，使用 AopContext.currentProxy 获取当前代理，走事物处理
+        UPatrolTaskService proxy = SpringBeanUtils.getBean(UPatrolTaskService.class);
+        assert proxy != null;
+        UPatrolTask uPatrolTask = proxy.insert(tCruiseTaskAdd);
+
+        // 设置定时器，不走事物逻辑，否则会延时
+        setQuartzTask(uPatrolTask);
+
+        //任务状态上报站端
+        sendTaskStateToUp(uPatrolTask, 5);
+
+        return uPatrolTask.getTaskId();
+    }
+
     @Transactional(rollbackFor = Exception.class)
-    public String insert(TCruiseTaskAdd tCruiseTaskAdd) {
+    public UPatrolTask insert(TCruiseTaskAdd tCruiseTaskAdd) {
         UPatrolTask uPatrolTask = dealTaskInfo(tCruiseTaskAdd);
 
         // 设置任务优先级
@@ -182,14 +202,10 @@ public class UPatrolTaskService {
         // 找出机器人和无人机做任务的巡检点
         String res = taskToRobotOrDrone(uPatrolTask, tCruiseTaskAdd, format, detailList);
         if (StringUtils.isNotEmpty(res)) {
-            return res;
+            throw new BusinessException(ResultCodeEnum.CODE10001.getCode(), res);
         }
-        setQuartzTask(uPatrolTask);
 
-        //任务状态上报站端
-        sendTaskStateToUp(uPatrolTask, 5);
-
-        return uPatrolTask.getTaskId();
+        return uPatrolTask;
     }
 
     private UPatrolTask dealTaskInfo(TCruiseTaskAdd tCruiseTaskAdd){
@@ -848,7 +864,6 @@ public class UPatrolTaskService {
         QuartzTask quartzTask = new QuartzTask();
         quartzTask.setJobName(task.getTaskName());
         quartzTask.setJobGroup(jobName);
-        JobManager jobManager = new JobManager();
         if (task.getDateType() == null) {
             if (task.getExecuteType() == TaskTypeEnum.NOW.getType()) {
                 //立即执行
@@ -883,8 +898,7 @@ public class UPatrolTaskService {
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item = new HashMap<>();
             xmlBaseModel.setType("41");
-            SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
-            item.put("task_patrolled_id", task.getTaskId() + "_" + simpleDateFormat2.format(task.getStartTime()));
+            item.put("task_patrolled_id", task.getTaskId() + "_" + DateTimeUtil.format3(task.getStartTime()));
             item.put("task_name", task.getTaskName());
             item.put("task_code", task.getTaskCode());
             item.put("task_state", String.valueOf(state));

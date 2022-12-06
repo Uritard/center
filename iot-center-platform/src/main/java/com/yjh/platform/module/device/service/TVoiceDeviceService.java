@@ -4,8 +4,6 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.audiodevice.impl.AudioDeviceFactory;
-import com.yjh.platform.audiodevice.impl.standard.StandardAudioDevice;
-import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
@@ -22,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ws.schild.jave.MultimediaInfo;
@@ -31,11 +27,9 @@ import ws.schild.jave.MultimediaObject;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.nio.LongBuffer;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 
 /**
@@ -722,6 +716,10 @@ public class TVoiceDeviceService{
         voiceDevice.setInfoType("area");
         voiceDevice.setChildren(tVoiceDeviceDao.selectVoiceTree());
         return voiceDevice;
+    }
+
+    public List<String> voiceRegisted(){
+        return audioDeviceManager.registedDevices();
     }
 
     public void registerAudioDevice(){

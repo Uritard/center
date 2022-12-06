@@ -4,6 +4,9 @@ import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -28,5 +31,15 @@ public class AudioDeviceManagerImpl implements AudioDeviceManager {
     public void registerAudioDevice(AudioDevice audioDevice) {
         log.info("Register audio device({}) with device id: {}", audioDevice, audioDevice.getDeviceId());
         deviceMap.put(audioDevice.getDeviceId(), audioDevice);
+    }
+
+    /**
+     * 已经注册的设备列表
+     *
+     * @return 声纹设备 code 列表
+     */
+    @Override
+    public List<String> registedDevices() {
+        return Collections.unmodifiableList(new ArrayList<>(deviceMap.keySet()));
     }
 }

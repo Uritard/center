@@ -308,6 +308,9 @@ public class TCruiseTaskResultService {
             String instanceId = warnMap.get("instanceId").toString();
             Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
 //            log.info("cruiseMap==={}", cruiseMap);
+            if (cruiseMap == null) {
+                log.info("realTimeWarnInfo get cruiseMap empty, warnKey: {}", warnKey);
+            }
             RealTimeWarn realTimeWarn = new RealTimeWarn();
             realTimeWarn.setDeviceName(cruiseMap.get("deviceName").toString());
             realTimeWarn.setInstanceName(cruiseMap.get("instanceName").toString());

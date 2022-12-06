@@ -97,6 +97,8 @@ public class TCruiseTaskService {
 
     @Autowired
     private TVoiceDeviceService tVoiceDeviceService;
+    @Autowired
+    private JobManager jobManager;
 
     //模板图片路径
     private String picModelPath;
@@ -440,7 +442,6 @@ public class TCruiseTaskService {
                 //定时
                 quartzTask.setStartTime(tCruiseTask.getStartTime());
                 //quartzTask.setStartTime(new Date());
-                JobManager jobManager = new JobManager();
                 try {
                     jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
                 } catch (Exception e) {
@@ -452,7 +453,6 @@ public class TCruiseTaskService {
             quartzTask.setCronExpression(tCruiseTask.getDateType());
             //quartzTask.setCronExpression("0 */1 * * * ?");
             log.info("quartzTask: " + quartzTask.getCronExpression());
-            JobManager jobManager = new JobManager();
             try {
                 jobManager.addCruiseTaskJob(quartzTask, tCruiseTask.getTaskId());
             } catch (Exception e) {
@@ -1352,7 +1352,6 @@ public class TCruiseTaskService {
             quartzTaskForAre.setJobName(tCruiseTask.getTaskName() + "-" + System.currentTimeMillis());
             quartzTaskForAre.setJobGroup("jiancha");
             quartzTaskForAre.setStartTime(new Date());
-            JobManager jobManager = new JobManager();
             jobManager.taskShutDown(quartzTaskForAre, tCruiseTask.getTaskId());
             log.info("任务终止创建成功=="+taskId);
         } catch (Exception e) {
@@ -1897,7 +1896,6 @@ public class TCruiseTaskService {
                 //定时
                 quartzTask.setStartTime(tCruiseTask.getStartTime());
                 //quartzTask.setStartTime(new Date());
-                JobManager jobManager = new JobManager();
                 try {
                     jobManager.addCruiseTaskJobAtTime(quartzTask, tCruiseTask.getTaskId());
                 } catch (Exception e) {
@@ -1909,7 +1907,6 @@ public class TCruiseTaskService {
             quartzTask.setCronExpression(tCruiseTask.getDateType());
             //quartzTask.setCronExpression("0 */1 * * * ?");
             log.info("quartzTask: " + quartzTask.getCronExpression());
-            JobManager jobManager = new JobManager();
             try {
                 jobManager.addCruiseTaskJob(quartzTask, tCruiseTask.getTaskId());
             } catch (Exception e) {
