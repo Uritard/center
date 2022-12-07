@@ -141,7 +141,7 @@ public class IntelAnalysisService {
             int code = Integer.parseInt(String.valueOf(jsonObject.get("code")));
             return new Response(code);
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return Response.serverError();
         }
     }
@@ -348,7 +348,7 @@ public class IntelAnalysisService {
             JSONObject jsonObject = JSON.parseObject(result);
             code = Integer.parseInt(String.valueOf(jsonObject.get("code")));
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return Response.serverError();
         }
         return new Response(code);

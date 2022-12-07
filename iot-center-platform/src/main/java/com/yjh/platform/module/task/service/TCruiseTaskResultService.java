@@ -170,7 +170,9 @@ public class TCruiseTaskResultService {
         List<CruiseInspectResult> cruiseInspectResults = uPatrolResultDao.selectCruiseInspectByTaskIdYC(taskId);
         List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null, "", "cruise_data_state", "", null, null, null);
         HashMap<String, String> tDictMap = new HashMap<>();
-        for (TDictBusiness tDictBusiness:tDictBusinessList) tDictMap.put(tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
+        for (TDictBusiness tDictBusiness:tDictBusinessList) {
+            tDictMap.put(tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
+        }
 
         for (CruiseInspectResult cruiseInspectResult:cruiseInspectResults) {
             cruiseInspectResult.setCruiseResultName("--");
@@ -206,7 +208,9 @@ public class TCruiseTaskResultService {
                     //判断当前机器人巡视点的采集设备为 红外或可见光
 //                    String runningCameraFlag = tRobotInfoDao.selectRobotRunningCamera(Long.valueOf(resultMap.get("robotId").toString()), Long.valueOf(resultMap.get("instanceId").toString()));
                     String runningCameraFlag = cruiseInspectResult.getSaveTypeList();
-                    if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) videoInfo.put("videoCameraType", "2");
+                    if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) {
+                        videoInfo.put("videoCameraType", "2");
+                    }
                     //机器人历史视频流Map（更新后保存60s，若未取到则重新请求流接口）
                     //机器人可见光-历史视频流
 //                    Map<String, String> robotVideoHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotLight:" + resultMap.get("robotId").toString());
@@ -273,7 +277,9 @@ public class TCruiseTaskResultService {
 
         //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
         Integer index = cruiseInspectResults.indexOf(inspectResult);
-        if (index == -1) index = 0;
+        if (index == -1) {
+            index = 0;
+        }
         resultsMap.put("index", index);
         resultsMap.put("list", cruiseInspectResults);
         completeResult.add(resultsMap);

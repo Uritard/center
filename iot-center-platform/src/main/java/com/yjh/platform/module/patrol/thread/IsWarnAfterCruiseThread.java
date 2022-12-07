@@ -118,7 +118,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             }
             alarmStoreAndHandler(map, taskId, tStdDevicemete, instanceId);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
         }
     }
 

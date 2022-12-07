@@ -138,7 +138,7 @@ public class HttpAnalyticsServiceImpl implements AnalyticsService {
             int code = jsonObject.getIntValue("code");
             return new Response(code);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return Response.serverError();
         }
     }
