@@ -965,7 +965,7 @@
     <select id="selectTaskNameAndTime" resultType="com.yjh.platform.module.task.entity.TaskVO">
         SELECT
         a.task_name,
-        a.start_time as cruise_date,
+        DATE_FORMAT(d.execute_time, '%Y-%m-%d') as cruise_date,
         d.task_count as total,
         d.task_wait as wait,
         d.task_count - task_wait as already,
@@ -1164,7 +1164,7 @@
         f.evaluation_state,
         x.dict_note as evaluation_state_name,
         f.result_num,
-        f.origpic as picPath,
+        f.picpath as picPath,
         F.cruise_result,
         g.dict_note as cruise_result_name,
         f.cruise_time,

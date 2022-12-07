@@ -2349,7 +2349,7 @@ CREATE TABLE `u_patrol_result` (
   `check_date` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '审核时间',
   `weather` varchar(255) DEFAULT '' COMMENT '微气象',
   `create_time` datetime DEFAULT NULL COMMENT '巡检开始时间',
-  `end_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '巡检结束时间',
+  `end_time` datetime DEFAULT NULL COMMENT '巡检结束时间',
   `execute_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '执行时间',
   `is_review` varchar(10) DEFAULT '0' COMMENT '巡视点是否全部审核完成，1-是0-否',
   `task_abnormal` int(11) DEFAULT '0' COMMENT '巡检点异常数量',
