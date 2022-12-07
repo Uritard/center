@@ -5,7 +5,6 @@ import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
-import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
@@ -19,7 +18,6 @@ import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
@@ -46,11 +44,7 @@ public class RobotInspectionWarnThread implements Runnable{
     private final AnalyseDataOperateService analyseDataOperateService;
     private final UPatrolTaskService uPatrolTaskService;
     private final String taskCode;
-    @Autowired
-    private TRobotInspectionDao tRobotInspectionDao;
-
-    @Autowired
-    private AnalyseDataOperateDao analyseDataOperateDao;
+    private final TRobotInspectionDao tRobotInspectionDao;
 
     public RobotInspectionWarnThread(RobotPatrolTaskAlarm taskAlarm, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, String taskCode){
         this.taskAlarm = taskAlarm;
@@ -59,9 +53,7 @@ public class RobotInspectionWarnThread implements Runnable{
         this.taskCode = taskCode;
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
-
         this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
-        this.analyseDataOperateDao = StaticContextAccessor.getBean(AnalyseDataOperateDao.class);
     }
 
     @Override

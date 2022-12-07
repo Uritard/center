@@ -56,7 +56,7 @@ public class IntelAnalysisController {
         try {
             intelAnalysisService.picAnalyseRetNotify(response);
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             return Response.serverError();
         }
         return Response.ok();
@@ -76,7 +76,7 @@ public class IntelAnalysisController {
                 intelAnalysisService.algorithmUpdateResult(response);
             }
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
             Response.serverError();
         }
         return Response.ok();

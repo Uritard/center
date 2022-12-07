@@ -725,7 +725,8 @@
                     END
                 ) AS instanceName
         FROM
-            u_patrol_task_attr k
+            u_patrol_task a
+                LEFT JOIN u_patrol_plan_attr k ON a.plan_id = k.plan_id
                 LEFT JOIN t_cruise_point_instance n ON k.instance_id = n.instance_id
                 LEFT JOIN t_dict_business e ON n.cruise_type=e.dict_code AND e.col_name='cruise_type'
                 LEFT JOIN t_std_device m on m.device_id = n.device_id
@@ -733,7 +734,7 @@
                 LEFT JOIN t_robot_inspection c ON n.cruise_id = c.inspection_id
                 LEFT JOIN t_camera_preset d ON n.cruise_id = d.preset_id
         WHERE
-            k.task_id = #{taskId,jdbcType=VARCHAR}
+            a.task_id = #{taskId,jdbcType=VARCHAR}
         GROUP BY instanceId
     </select>
 
@@ -787,35 +788,39 @@
                 SELECT DISTINCT
                     a.device_mete_id
                 FROM
-                    u_patrol_task_attr a
+                    u_patrol_plan_attr a
+                        LEFT JOIN u_patrol_task b ON a.plan_id = b.plan_id
                 WHERE
-                    a.task_id = #{taskId,jdbcType=VARCHAR}
+                    b.task_id = #{taskId,jdbcType=VARCHAR}
             )
         UNION ALL
         SELECT
             count(*)
         FROM
-            u_patrol_task_attr a
+            u_patrol_plan_attr a
+                LEFT JOIN u_patrol_task b ON a.plan_id = b.plan_id
                 LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
         WHERE
-            a.task_id = #{taskId,jdbcType=VARCHAR}
-          AND c.cruise_type in (229,230)
+            b.task_id = #{taskId,jdbcType=VARCHAR}
+          AND c.cruise_type IN (229, 230)
         UNION ALL
         SELECT
             count(*)
         FROM
-            u_patrol_task_attr a
+            u_patrol_plan_attr a
+                LEFT JOIN u_patrol_task b ON a.plan_id = b.plan_id
                 LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
         WHERE
-            a.task_id = #{taskId,jdbcType=VARCHAR}
+            b.task_id = #{taskId,jdbcType=VARCHAR}
           AND c.cruise_type = 228
         UNION ALL
         SELECT
             count(*)
         FROM
-            u_patrol_task_attr a
+            u_patrol_plan_attr a
+                LEFT JOIN u_patrol_task b ON a.plan_id = b.plan_id
         WHERE
-            a.task_id = #{taskId,jdbcType=VARCHAR}
+            b.task_id = #{taskId,jdbcType=VARCHAR}
     </select>
 
     <update id="manualReview" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
