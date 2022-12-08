@@ -6,6 +6,7 @@ import com.yjh.accessrobot.module.command.entity.TStdRegion;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class TStdRegionService {
     @Autowired
     private TStdRegionDao tStdRegionDao;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void saveReportData(List<TStdRegion> tStdRegionList, String edgeNode) {
         // 查询是否创建对应边缘节点
         TStdRegion rootTStdRegion = Optional.of(tStdRegionDao.selectByRegionCodeAndState(edgeNode, Constant.STATE_LOCAL)).map(tStdRegionList1 -> tStdRegionList1.get(0)).orElse(null);
@@ -48,6 +49,14 @@ public class TStdRegionService {
         rootTStdRegion.setStationName(reportRootTStdRegion.getStationName());
         rootTStdRegion.setRegionPath(reportRootTStdRegion.getRegionPath());
         rootTStdRegion.setRemark(reportRootTStdRegion.getRemark());
+        if (StringUtils.isNotEmpty(reportRootTStdRegion.getLatitude())) {
+            rootTStdRegion.setLatitude(reportRootTStdRegion.getLatitude());
+        }
+        if (StringUtils.isNotEmpty(reportRootTStdRegion.getLongitude())) {
+            rootTStdRegion.setLongitude(reportRootTStdRegion.getLongitude());
+        }
+        rootTStdRegion.setVoltageLevel(reportRootTStdRegion.getVoltageLevel());
+
         tStdRegionDao.updateByPrimaryKey(rootTStdRegion);
         //保存上报数据非顶层节点数据
         tStdRegionList.removeIf(stdRegion -> stdRegion.getUpRegionId() == -1);
