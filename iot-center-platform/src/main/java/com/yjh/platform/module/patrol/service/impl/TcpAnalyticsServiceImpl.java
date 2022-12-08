@@ -80,7 +80,7 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
         try {
             int i = 1;
             for (Analysis analysis : analysisList) {
-                log.info("表计IsAI：" + analysis.getIsAi());
+                log.info("表计IsAI：{}" , analysis.getIsAi());
                 if (analysis.getIsAi() == 1) {
                     JSONObject pictureInfoObject = new JSONObject();
                     JSONObject pictureDataObject = new JSONObject();

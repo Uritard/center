@@ -890,28 +890,28 @@ public class UPatrolTaskService {
         sendTaskStateToUp(task, state);
     }
 
+    /**
+     * 任务状态上报上一级系统
+     *
+     * @param task 任务信息
+     * @param state 状态
+     */
     private void sendTaskStateToUp(UPatrolTask task, Integer state) {
-        //任务状态上报站端
-
-        try {
-            XMLBaseModel xmlBaseModel = new XMLBaseModel();
-            List<Map<String, Object>> items = new ArrayList<>();
-            Map<String, Object> item = new HashMap<>();
-            xmlBaseModel.setType("41");
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        List<Map<String, Object>> items = new ArrayList<>();
+        Map<String, Object> item = new HashMap<>();
+        xmlBaseModel.setType("41");
+       try {
             item.put("task_patrolled_id", task.getTaskId() + "_" + DateTimeUtil.format3(task.getStartTime()));
             item.put("task_name", task.getTaskName());
             item.put("task_code", task.getTaskCode());
             item.put("task_state", String.valueOf(state));
             item.put("plan_start_time", DateTimeUtil.format(task.getStartTime()));
             if (task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
-                try {
-                    //CronExpression expression = new CronExpression(tCruiseTask.getDateType());
-                    item.put("start_time", DateTimeUtil.format(task.getStartTime()));
-                } catch (Exception e) {
-                    log.info("上报出错", e);
-                }
-            } else {
+                //CronExpression expression = new CronExpression(tCruiseTask.getDateType());
                 item.put("start_time", DateTimeUtil.format(task.getStartTime()));
+            } else {
+                item.put("start_time", DateTimeUtil.format(new Date()));
             }
 
             Map<String, String> mapForGet = redisTemplate.opsForHash().entries(PATROL_SUMMARY_PREFIX + task.getTaskId());
@@ -931,11 +931,10 @@ public class UPatrolTaskService {
             list.add(xmlBaseModel);
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             map.put("list", list);
-            Result re = null;
             log.info("信息上报：-" + map);
-            re = Constant.otherServer(map, Constant.TCP_URL);//江苏要求
+            Constant.otherServer(map, Constant.TCP_URL);//江苏要求
         } catch (Exception e) {
-            log.info("上报出错" + e.getMessage());
+            log.info("任务状态上报上一级系统出错：", e);
         }
     }
 

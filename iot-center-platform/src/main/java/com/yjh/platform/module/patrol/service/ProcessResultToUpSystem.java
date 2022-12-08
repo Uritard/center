@@ -86,7 +86,8 @@ public class ProcessResultToUpSystem {
         try {
 
             String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
-            for(Map<String, String> cruiseResultMap:cruiseResultList) {
+            for(Map<String, String> cruiseResultMap : cruiseResultList) {
+                log.info("cruiseResultMap=={}", cruiseResultMap);
                 Map<String, Object> xmlItem = new HashMap<>(16);
                 String taskId = Optional.ofNullable(cruiseResultMap.get("taskId")).orElse("");
                 String instanceId = Optional.ofNullable(cruiseResultMap.get("instanceId")).orElse("");
@@ -146,6 +147,10 @@ public class ProcessResultToUpSystem {
     public String getAlgorithmTypeMap(String instanceId) {
         String analyseType = "";
         try {
+            if (StringUtils.isEmpty(instanceId)){
+                throw new Exception("instanceId is empty,please check with it...");
+            }
+
             // is_ai为on缺陷,is_judge为on判别,algorithm_id非空为表计
             Map<String, Object> algorithmTypeMap = analyseDataOperateDao.selectAlgorithmByInstanceId(Long.valueOf(instanceId));
             log.info("algorithmTypeMap==={}", JSON.toJSONString(algorithmTypeMap));
@@ -522,7 +527,7 @@ public class ProcessResultToUpSystem {
             log.info("判别告警发送算法管理平台结束");
 
             // 判别上报上一级系统
-            defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
+//            defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
         }
 
         if(CollectionUtils.isNotEmpty(defectList) && ("1".equals(flag))) {
@@ -602,7 +607,7 @@ public class ProcessResultToUpSystem {
             log.info("缺陷告警发送算法管理平台结束");
 
             // 缺陷上报上一级系统
-            defectAndDistinguishToUpSystem(cruiseResultMap, differentList);
+            defectAndDistinguishToUpSystem(cruiseResultMap, defectList);
         }
     }
 

@@ -316,6 +316,7 @@ public class TCruiseTaskResultService {
 //            log.info("cruiseMap==={}", cruiseMap);
             if (cruiseMap == null) {
                 log.info("realTimeWarnInfo get cruiseMap empty, warnKey: {}", warnKey);
+                break;
             }
             RealTimeWarn realTimeWarn = new RealTimeWarn();
             realTimeWarn.setDeviceName(cruiseMap.get("deviceName").toString());
