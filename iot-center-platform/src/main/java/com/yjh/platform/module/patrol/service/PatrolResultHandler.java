@@ -210,39 +210,41 @@ public class PatrolResultHandler {
             String developAbsoluteUrl = ftpImageAbsolute + "/" + filePathTemp;
             String developRelativeUrl = ftpImageRelative + "/" + filePathTemp;
 
+            boolean isAlarm = false;
+            String descFilePath;
+            String descRelativeUrl;
             switch (fileType) {
                 case "1":
-                    String descFirFilePath = developAbsoluteUrl + "/FIR/" + fileName;
-                    FileUtil.copyFileUsingStream(temporaryFilePath, descFirFilePath);
-                    infoMap.put("relativePath", developRelativeUrl + "/FIR/" + fileName);
-                    infoMap.put("absolutePath", descFirFilePath);
-
-                    isAlarmMap.put("relativePath", developRelativeUrl + "/FIR/" + fileName);
-                    isAlarmMap.put("absolutePath", descFirFilePath);
+                    descFilePath = developAbsoluteUrl + "/FIR/" + fileName;
+                    descRelativeUrl = developRelativeUrl + "/FIR/" + fileName;
+                    isAlarm = true;
                     break;
                 case "2":
-                    String descCcdFilePath = developAbsoluteUrl + "/CCD/" + fileName;
-                    FileUtil.copyFileUsingStream(temporaryFilePath, descCcdFilePath);
-                    infoMap.put("relativePath", developRelativeUrl + "/CCD/" + fileName);
-                    infoMap.put("absolutePath", descCcdFilePath);
-
-                    isAlarmMap.put("relativePath", developRelativeUrl + "/CCD/" + fileName);
-                    isAlarmMap.put("absolutePath", descCcdFilePath);
+                case "5":
+                    descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
+                    descRelativeUrl = developRelativeUrl + "/CCD/" + fileName;
+                    isAlarm = true;
                     break;
                 case "3":
-                    String descAudioFilePath = developAbsoluteUrl + "/Audio/" + fileName;
-                    FileUtil.copyFileUsingStream(temporaryFilePath, descAudioFilePath);
-                    infoMap.put("relativePath", developRelativeUrl + "/Audio/" + fileName);
-                    infoMap.put("absolutePath", descAudioFilePath);
+                    descFilePath = developAbsoluteUrl + "/Audio/" + fileName;
+                    descRelativeUrl = developRelativeUrl + "/Audio/" + fileName;
                     break;
                 case "4":
-                    String descVideoFilePath = developAbsoluteUrl + "/Video/" + fileName;
-                    FileUtil.copyFileUsingStream(temporaryFilePath, descVideoFilePath);
-                    infoMap.put("relativePath", developRelativeUrl + "/Video/" + fileName);
-                    infoMap.put("absolutePath", descVideoFilePath);
+                    descFilePath = developAbsoluteUrl + "/Video/" + fileName;
+                    descRelativeUrl = developRelativeUrl + "/Video/" + fileName;
                     break;
                 default:
+                    descFilePath = developAbsoluteUrl + "/CCD/" + fileName;
+                    descRelativeUrl = developRelativeUrl + "/CCD/" + fileName;
                     break;
+            }
+
+            FileUtil.copyFileUsingStream(temporaryFilePath, descFilePath);
+            infoMap.put("relativePath", descRelativeUrl);
+            infoMap.put("absolutePath", descFilePath);
+            if (isAlarm) {
+                isAlarmMap.put("relativePath", descRelativeUrl);
+                isAlarmMap.put("absolutePath", descFilePath);
             }
         } catch (Exception e) {
             log.error("机器人/无人机文件处理异常：", e);
