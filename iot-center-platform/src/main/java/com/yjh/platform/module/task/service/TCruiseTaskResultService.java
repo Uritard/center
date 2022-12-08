@@ -7,6 +7,8 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.CommonUtils;
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
@@ -25,6 +27,8 @@ import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.TDictBusiness;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -310,49 +314,49 @@ public class TCruiseTaskResultService {
         Set<String> defectKeys = redisScan("defectInfo:" + taskId);
         //表计告警
         for (String warnKey : warnKeys) {
-            Map<String, Object> warnMap = redisTemplate.opsForHash().entries(warnKey);
-            String instanceId = warnMap.get("instanceId").toString();
-            Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+            Map<String, String> warnMap = redisTemplate.opsForHash().entries(warnKey);
+            String instanceId = warnMap.get("instanceId");
+            Map<String, String> cruiseMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + instanceId);
 //            log.info("cruiseMap==={}", cruiseMap);
-            if (cruiseMap == null) {
+            if (MapUtils.isEmpty(cruiseMap)) {
                 log.info("realTimeWarnInfo get cruiseMap empty, warnKey: {}", warnKey);
                 break;
             }
             RealTimeWarn realTimeWarn = new RealTimeWarn();
-            realTimeWarn.setDeviceName(cruiseMap.get("deviceName").toString());
-            realTimeWarn.setInstanceName(cruiseMap.get("instanceName").toString());
-            realTimeWarn.setCruiseTypeName(tDictBusinessDao.selectDictNoteByDictCode(cruiseMap.get("cruiseType").toString()));
-            realTimeWarn.setWarnLevelName(tDictBusinessDao.selectDictNoteByDictCode(warnMap.get("warnLevel").toString()));
-            String cruiseTime = cruiseMap.get("cruiseTime").toString();
-            if (Objects.equals("null",cruiseTime)){
+            realTimeWarn.setDeviceName(cruiseMap.get("deviceName"));
+            realTimeWarn.setInstanceName(cruiseMap.get("instanceName"));
+            realTimeWarn.setCruiseTypeName(tDictBusinessDao.selectDictNoteByDictCode(cruiseMap.get("cruiseType")));
+            realTimeWarn.setWarnLevelName(tDictBusinessDao.selectDictNoteByDictCode(warnMap.get("warnLevel")));
+            String cruiseTime = cruiseMap.get("cruiseTime");
+            if (CommonUtils.isEmptyOrNullstr(cruiseTime)){
                 realTimeWarn.setCruiseTime(new Date());
             }else {
-                realTimeWarn.setCruiseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(cruiseTime));
+                realTimeWarn.setCruiseTime(DateTimeUtil.parse(cruiseTime));
             }
-            realTimeWarn.setInstanceId(Long.valueOf(cruiseMap.get("instanceId").toString()));
-            realTimeWarn.setAlarmContent(warnMap.get("warnContent").toString());
+            realTimeWarn.setInstanceId(NumberUtils.toLong(cruiseMap.get("instanceId")));
+            realTimeWarn.setAlarmContent(warnMap.get("warnContent"));
             realTimeWarns.add(realTimeWarn);
         }
 
         //缺陷告警
         for (String defectKey : defectKeys) {
-            Map<String, Object> defectMap = redisTemplate.opsForHash().entries(defectKey);
-            String instanceId = defectMap.get("instanceId").toString();
-            Map<String, Object> cruiseMap = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId);
+            Map<String, String> defectMap = redisTemplate.opsForHash().entries(defectKey);
+            String instanceId = defectMap.get("instanceId");
+            Map<String, String> cruiseMap = redisTemplate.opsForHash().entries(UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId);
 //            log.info("cruiseMap==={}", cruiseMap);
             RealTimeWarn realTimeWarn = new RealTimeWarn();
-            realTimeWarn.setDeviceName(cruiseMap.get("deviceName").toString());
-            realTimeWarn.setInstanceName(cruiseMap.get("instanceName").toString());
-            realTimeWarn.setCruiseTypeName(tDictBusinessDao.selectDictNoteByDictCode(cruiseMap.get("cruiseType").toString()));
-            realTimeWarn.setWarnLevelName(tDictBusinessDao.selectDictNoteByDictCode(defectMap.get("defectLevel").toString()));
-            String cruiseTime = cruiseMap.get("cruiseTime").toString();
-            if (Objects.equals("null",cruiseTime)){
+            realTimeWarn.setDeviceName(cruiseMap.get("deviceName"));
+            realTimeWarn.setInstanceName(cruiseMap.get("instanceName"));
+            realTimeWarn.setCruiseTypeName(tDictBusinessDao.selectDictNoteByDictCode(cruiseMap.get("cruiseType")));
+            realTimeWarn.setWarnLevelName(tDictBusinessDao.selectDictNoteByDictCode(defectMap.get("defectLevel")));
+            String cruiseTime = cruiseMap.get("cruiseTime");
+            if (CommonUtils.isEmptyOrNullstr(cruiseTime)){
                 realTimeWarn.setCruiseTime(new Date());
             }else {
-                realTimeWarn.setCruiseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(cruiseTime));
+                realTimeWarn.setCruiseTime(DateTimeUtil.parse(cruiseTime));
             }
-            realTimeWarn.setInstanceId(Long.valueOf(cruiseMap.get("instanceId").toString()));
-            realTimeWarn.setAlarmContent(defectMap.get("defectContent").toString());
+            realTimeWarn.setInstanceId(NumberUtils.toLong(cruiseMap.get("instanceId")));
+            realTimeWarn.setAlarmContent(defectMap.get("defectContent"));
             realTimeWarns.add(realTimeWarn);
         }
 

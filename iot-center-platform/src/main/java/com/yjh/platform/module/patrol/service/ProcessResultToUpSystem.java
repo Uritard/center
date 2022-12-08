@@ -152,7 +152,7 @@ public class ProcessResultToUpSystem {
             }
 
             // is_ai为on缺陷,is_judge为on判别,algorithm_id非空为表计
-            Map<String, Object> algorithmTypeMap = analyseDataOperateDao.selectAlgorithmByInstanceId(Long.valueOf(instanceId));
+            Map<String, Object> algorithmTypeMap = analyseDataOperateDao.selectAlgorithmByInstanceId(NumberUtils.toLong(instanceId));
             log.info("algorithmTypeMap==={}", JSON.toJSONString(algorithmTypeMap));
 
             // 判断巡视点配置的算法类型 398-缺陷 11判别 1-12表计

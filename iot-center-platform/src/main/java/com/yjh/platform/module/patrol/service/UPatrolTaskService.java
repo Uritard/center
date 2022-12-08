@@ -563,7 +563,8 @@ public class UPatrolTaskService {
         try {
             if (TASK_STATE_NOT_START == MapUtils.getIntValue(map, "taskState", TASK_STATE_NOT_START) && TASK_STATE_EXECUTING == taskState) {
                 UPatrolResult result =
-                    new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING).setExecuteTime(new Date());
+                    new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
+                        .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
                 log.info("TaskResult start, taskId: {}", taskId);
                 uPatrolResultDao.update(result);
             }
@@ -1583,11 +1584,11 @@ public class UPatrolTaskService {
                 if (conditionRes) {
                     UPatrolDataResult uPatrolDataResult = new UPatrolDataResult();
                     uPatrolDataResult.setTaskId(taskId);
-                    uPatrolDataResult.setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")));
+                    uPatrolDataResult.setDeviceId(NumberUtils.toLong(redisInfoMap.get("deviceId")));
                     uPatrolDataResult.setDeviceName(redisInfoMap.get("deviceName"));
-                    uPatrolDataResult.setInstanceId(Long.valueOf(redisInfoMap.get("instanceId")));
+                    uPatrolDataResult.setInstanceId(NumberUtils.toLong(redisInfoMap.get("instanceId")));
                     uPatrolDataResult.setInstanceName(redisInfoMap.get("instanceName"));
-                    uPatrolDataResult.setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")));
+                    uPatrolDataResult.setCruiseId(NumberUtils.toLong(redisInfoMap.get("cruiseId")));
                     uPatrolDataResult.setCruiseName(redisInfoMap.get("cruiseName"));
                     uPatrolDataResult.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
                     uPatrolDataResult.setCruiseStatus(NumberUtils.toInt(redisInfoMap.get("cruiseStatus")));

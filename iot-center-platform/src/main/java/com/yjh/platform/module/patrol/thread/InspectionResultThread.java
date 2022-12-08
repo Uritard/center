@@ -112,7 +112,7 @@ public class InspectionResultThread implements Runnable{
 
             String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
             Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
-            if (MapUtils.isEmpty(tCruiseTaskResultMap)) {
+            if (MapUtils.isEmpty(tCruiseTaskResultMap) || !tCruiseTaskResultMap.containsKey("deviceId") || !tCruiseTaskResultMap.containsKey("cruiseId")) {
                 tCruiseTaskResultMap = new HashMap<>(32);
                 upSystemTaskInfoInitialize(tCruiseTaskResultMap, taskId, insInfo);
             }
@@ -122,26 +122,26 @@ public class InspectionResultThread implements Runnable{
 
             if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
                 tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
-                tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                tCruiseTaskResultMap.put("cruiseAbnormal", "--");
+                tCruiseTaskResultMap.putIfAbsent("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                tCruiseTaskResultMap.putIfAbsent("cruiseAbnormal", "--");
                 log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
             }else {
                 // value无值且resultNum为--，若结果非音频文件，则为异常情况
-                tCruiseTaskResultMap.put("resultNum", "--");
+                tCruiseTaskResultMap.putIfAbsent("resultNum", "--");
                 if ("3".equals(robotPatrolTaskResult.getFileType())){
-                    tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                    tCruiseTaskResultMap.put("cruiseAbnormal", "--");
+                    tCruiseTaskResultMap.putIfAbsent("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                    tCruiseTaskResultMap.putIfAbsent("cruiseAbnormal", "--");
                     log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
                 }else {
-                    tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                    tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
+                    tCruiseTaskResultMap.putIfAbsent("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                    tCruiseTaskResultMap.putIfAbsent("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
                     log.info("taskId is {},instanceId is {},the result is abnormal", taskId, instanceId);
                 }
             }
             tCruiseTaskResultMap.put("picpath", infoMap.getOrDefault("relativePath", ""));
             tCruiseTaskResultMap.put("origpic", infoMap.getOrDefault("absolutePath", ""));
-            tCruiseTaskResultMap.put("evaluationState", String.valueOf(EVALUATION_STATE_UN));
-            tCruiseTaskResultMap.put("isWarn", "0");
+            tCruiseTaskResultMap.putIfAbsent("evaluationState", String.valueOf(EVALUATION_STATE_UN));
+            tCruiseTaskResultMap.putIfAbsent("isWarn", "0");
             tCruiseTaskResultMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
             tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
             tCruiseTaskResultMap.put("rectangle", robotPatrolTaskResult.getRectangle());
@@ -175,17 +175,16 @@ public class InspectionResultThread implements Runnable{
         map.put("instanceName", robotPatrolTaskResult.getDeviceName());
         map.put("picPathAnl", "");
         map.put("cruiseType", "");
-        map.put("remark", "");
+        map.putIfAbsent("remark", "");
         map.put("points", "");
-        map.put("serialVersionUID", "");
-        map.put("origConfirmPicPath", "");
+        map.putIfAbsent("origConfirmPicPath", "");
         map.put("firDate", "");
-        map.put("confirmPicPath", "");
+        map.putIfAbsent("confirmPicPath", "");
         map.put("modifyNum", "");
         map.put("origPicAnl", "");
         map.put("identifyResult", "");
         map.put("personCheck", "");
-        map.put("createtime", DateTimeUtil.getDateTimeString());
+        map.putIfAbsent("createtime", DateTimeUtil.getDateTimeString());
         map.put("identifyState", "");
         map.put("resultPic", "");
         map.put("firName", "");
@@ -193,13 +192,9 @@ public class InspectionResultThread implements Runnable{
         map.put("checkDate", "");
         map.put("cruiseTime", robotPatrolTaskResult.getTime());
         map.put("checkUser", "");
-        map.put("cameraId", "");
-        map.put("voicePath", "");
+        map.putIfAbsent("cameraId", "");
+        map.putIfAbsent("voicePath", "");
         map.put("taskId", taskId);
-        map.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
-        map.put("fileType", robotPatrolTaskResult.getFileType());
-        map.put("rectangle", robotPatrolTaskResult.getRectangle());
-        map.put("confidence", "");
     }
 
     /**
@@ -222,7 +217,7 @@ public class InspectionResultThread implements Runnable{
                     && Objects.equals(159, robotType)
                     // 上级系统不走算法处理，只存数据
                     && !"3".equals(sysLevel);
-
+            
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, sysLevel: {}", isSimulationTool, taskId, sysLevel);
             if (!isSimulationTool) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
