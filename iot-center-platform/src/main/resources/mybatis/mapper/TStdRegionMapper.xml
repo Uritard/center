@@ -280,6 +280,12 @@
         where a.state = '1' and a.up_region_id  <![CDATA[ <> ]]>  '-1'
         group by a.voltage_level
     </select>
+    <select id="countByRegionCode" resultType="java.lang.Integer">
+        select count(*)
+        from t_std_region a
+        where a.region_code = #{regionCode,jdbcType=VARCHAR}
+            and a.up_region_id = #{upRegionId,jdbcType=BIGINT}
+    </select>
 
 
 </mapper>
