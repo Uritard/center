@@ -179,13 +179,13 @@ public class TStdDeviceModelService {
                     oldCruisePointInstanceList, newCruisePointInstances, tVoiceDeviceList, edgeCode);
         } else {
             //模型为空 删除该节点的所有信息
-            tCameraPresetMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
-            tRobotInspectionDao.deleteByEdgeCodeAndOriginId(edgeCode, null);
-            tCruisePointInstanceMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
-            tAlgorithmMeteMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
-            tStdDevicemeteMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
-            tStdDeviceAttrMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
-            tStdDeviceMapper.deleteByEdgeCodeAndOriginId(edgeCode, null);
+            tCameraPresetMapper.deleteByEdgeCode(edgeCode);
+            tRobotInspectionDao.deleteByEdgeCode(edgeCode);
+            tCruisePointInstanceMapper.deleteByEdgeCode(edgeCode);
+            tAlgorithmMeteMapper.deleteByEdgeCode(edgeCode);
+            tStdDevicemeteMapper.deleteByEdgeCode(edgeCode);
+            tStdDeviceAttrMapper.deleteByEdgeCode(edgeCode);
+            tStdDeviceMapper.deleteByEdgeCode(edgeCode);
         }
     }
 

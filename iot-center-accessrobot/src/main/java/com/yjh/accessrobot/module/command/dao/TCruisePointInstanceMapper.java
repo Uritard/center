@@ -21,6 +21,8 @@ public interface TCruisePointInstanceMapper {
 
     int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
 
+    int deleteByEdgeCode(@Param("edgeCode") String edgeCode);
+
     int insert(TCruisePointInstance record);
 
     int insertSelective(TCruisePointInstance record);

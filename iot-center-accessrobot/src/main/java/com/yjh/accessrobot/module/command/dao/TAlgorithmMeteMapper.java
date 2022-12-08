@@ -5,6 +5,7 @@ import com.yjh.accessrobot.module.command.entity.TAlgorithmMete;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -29,7 +30,9 @@ public interface TAlgorithmMeteMapper {
 
     List<TAlgorithmMete> selectByEdgeCode(@Param("edgeCode") String edgeCode);
 
-    int deleteByEdgeCodeAndOriginId(String edgeCode, SetUtils.SetView<String> deleteIdSet);
+    int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode, @Param("originIdList") Collection<String> originIdList );
+
+    int deleteByEdgeCode(String edgeCode);
 
     int batchInsert(List<TAlgorithmMete> list);
 

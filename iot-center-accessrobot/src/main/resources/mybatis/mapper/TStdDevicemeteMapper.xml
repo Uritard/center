@@ -88,6 +88,9 @@
         delete from t_std_devicemete  where edge_code=#{edgeCode}  and origin_id in
         <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
     </delete>
+    <delete id="deleteByEdgeCode">
+        delete from t_std_devicemete  where edge_code=#{edgeCode}
+    </delete>
     <insert id="insert" keyColumn="device_mete_id" keyProperty="deviceMeteId" parameterType="com.yjh.accessrobot.module.command.entity.TStdDeviceMete" useGeneratedKeys="true">
         insert into t_std_devicemete
         ( device_mete_id,device_id,device_point_id

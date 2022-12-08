@@ -21,6 +21,8 @@ public interface TCameraPresetMapper {
 
     int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
 
+    int deleteByEdgeCode(@Param("edgeCode") String edgeCode);
+
     int insert(TCameraPreset record);
 
     int insertSelective(TCameraPreset record);

@@ -65,10 +65,11 @@
     </delete>
     <delete id="deleteByEdgeCodeAndOriginId">
         delete from t_std_device  where edge_code=#{edgeCode}
-        <if test="originId != null and originId != ''">
-            and origin_id in
-            <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
-        </if>
+        and origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+    </delete>
+    <delete id="deleteByEdgeCode">
+        delete from t_std_device  where edge_code=#{edgeCode}
     </delete>
     <insert id="insert" keyColumn="device_id" keyProperty="deviceId" parameterType="com.yjh.accessrobot.module.command.entity.TStdDevice" useGeneratedKeys="true">
         insert into t_std_device
