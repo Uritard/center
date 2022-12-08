@@ -50,16 +50,17 @@
     </delete>
     <delete id="deleteByEdgeCodeAndOriginId">
         delete from t_algorithm_mete  where edge_code=#{edgeCode}
-        <if test="originId != null and originId != ''">
-            and origin_id in (
-            SELECT
-            device_mete_id
-            FROM
-            t_std_devicemete a
-            WHERE
-            origin_id in <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
-            )
-        </if>
+        and origin_id in (
+        SELECT
+        device_mete_id
+        FROM
+        t_std_devicemete a
+        WHERE
+        origin_id in <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
+        )
+    </delete>
+    <delete id="deleteByEdgeCode">
+        delete from t_algorithm_mete  where edge_code=#{edgeCode}
     </delete>
     <insert id="insert">
         insert into t_algorithm_mete

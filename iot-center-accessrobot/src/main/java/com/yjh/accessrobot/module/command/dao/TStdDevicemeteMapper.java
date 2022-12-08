@@ -34,4 +34,6 @@ public interface TStdDevicemeteMapper {
 
     int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
 
+    int deleteByEdgeCode(@Param("edgeCode") String edgeCode);
+
 }

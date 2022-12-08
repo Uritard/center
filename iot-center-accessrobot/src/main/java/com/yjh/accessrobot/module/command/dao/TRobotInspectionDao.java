@@ -55,4 +55,6 @@ public interface TRobotInspectionDao {
     int updateByPrimaryKey(TRobotInspection record);
 
     int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
+
+    int deleteByEdgeCode(@Param("edgeCode") String edgeCode);
 }

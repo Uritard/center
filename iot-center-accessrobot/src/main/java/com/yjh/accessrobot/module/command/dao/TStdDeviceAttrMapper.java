@@ -31,5 +31,7 @@ public interface TStdDeviceAttrMapper {
 
     int deleteByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode , @Param("originIdList") Collection<String> originIdList );
 
+    int deleteByEdgeCode(@Param("edgeCode") String edgeCode);
+
     void batchInsert(List<TStdDeviceAttr> list);
 }
