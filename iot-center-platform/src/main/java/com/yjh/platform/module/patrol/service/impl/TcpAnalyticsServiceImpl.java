@@ -109,8 +109,15 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
             }
             analysisObject.put("msgData", msgDataObject);
             log.info("analysisObject----: {}", analysisObject);
-            AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort).sendDataReguest(analysisObject);
-            result.setCode(200, "SUCCESS");
+            AnalysisClientHandler handler = AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(recognizePort);
+            if(handler != null) {
+                handler.sendDataReguest(analysisObject);
+                result.setCode(200, "SUCCESS");
+            } else {
+                result.setCode(400, "ERROR");
+                log.error("表计识别算法未正确初始化 ！！！");
+            }
+
             log.info("算法数据初始化-----完成");
         } catch (Exception e) {
             result.setCode(400, "ERROR");
@@ -192,8 +199,14 @@ public class TcpAnalyticsServiceImpl implements AnalyticsService {
             analysisObject.put("msgData", msgDataObject);
             log.info("aiPort---------: {}", aiPort);
 
-            AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort).sendDataReguest(analysisObject);
-            result.setCode(200, "SUCCESS");
+            AnalysisClientHandler handler = AnalysisClientHandler.getAnalysisClientHandlerHashMap().get(aiPort);
+            if(handler != null) {
+                handler.sendDataReguest(analysisObject);
+                result.setCode(200, "SUCCESS");
+            } else {
+                result.setCode(400, "ERROR");
+                log.error("缺陷识别算法未正确初始化 ！！！");
+            }
             log.info("算法数据初始化-----完成");
         } catch (Exception e) {
             result.setCode(400, "ERROR");

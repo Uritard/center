@@ -268,7 +268,7 @@ public class DateTimeUtil {
      * @return 日期
      */
     public static Date parse(String source) {
-        return parse(source, null);
+        return parse(source, "");
     }
 
     public static Date parse(String source, String defaultDateStr) {
@@ -282,8 +282,23 @@ public class DateTimeUtil {
         } catch (Exception e) {
             logger.error(e.getMessage());
             if(!StringUtils.isNullOrEmpty(defaultDateStr)) {
-                parse(defaultDateStr, null);
+                parse(defaultDateStr, new Date());
             }
+        }
+        return rtn;
+    }
+
+    public static Date parse(String source, Date defaultDate) {
+        Date rtn;
+        try {
+            if(StringUtils.isNullOrEmpty(source)){
+                return defaultDate;
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat(getDateTimePattern());
+            rtn = sdf.parse(source);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            rtn = defaultDate;
         }
         return rtn;
     }
