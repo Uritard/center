@@ -222,8 +222,7 @@ public class InspectionResultThread implements Runnable{
                     && Objects.equals(159, robotType)
                     // 上级系统不走算法处理，只存数据
                     && !"3".equals(sysLevel);
-            UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
-            boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
+
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, sysLevel: {}", isSimulationTool, taskId, sysLevel);
             if (!isSimulationTool) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
@@ -234,6 +233,8 @@ public class InspectionResultThread implements Runnable{
                 uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
                 // 区分是否为站端本体任务如果是站端本体任务,需更新任务状态
                 // 221128，可以不用在这更新，机器人上传任务状态的消息会处理任务状态
+                // UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
+                // boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
                 // if (isSelfTask) {
                 //     standTaskDealHandler(taskId, robotCode);
                 // }

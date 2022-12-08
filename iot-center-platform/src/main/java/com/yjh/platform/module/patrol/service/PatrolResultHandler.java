@@ -610,6 +610,7 @@ public class PatrolResultHandler {
                     Map<String, String> defectMap = getDefectMap(resultImage, resultValueItem, cruiseResultMap, tStdDevicemete, resultValue);
                     log.info("defectMap=={}", JSON.toJSONString(defectMap));
                     redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
+                    // 为上报到算法管理平台暂存数据
                     redisTemplate.opsForHash().putAll("defect:" + msgID + ":" + redisKeyTemp, defectMap);
 
                     TDefectInfo tDefectInfo = getDefectInfo(defectMap);
@@ -635,6 +636,7 @@ public class PatrolResultHandler {
                         Map<String, String> defectMap = getDefectMap(resultImage, resultValueItem, cruiseResultMap, tStdDevicemete, res);
                         log.info("defectMap=={}", JSON.toJSONString(defectMap));
                         redisTemplate.opsForHash().putAll("defectInfo:" + cruiseResultMap.get("taskId") + ":" + redisKeyTemp, defectMap);
+                        // 为上报到算法管理平台暂存数据
                         redisTemplate.opsForHash().putAll("defect:" + msgID + ":" + redisKeyTemp, defectMap);
 
                         TDefectInfo tDefectInfo = getDefectInfo(defectMap);
@@ -831,7 +833,7 @@ public class PatrolResultHandler {
                     String.valueOf(CRUISE_RESULT_ABNORMAL) : String.valueOf(CRUISE_RESULT_NORMAL));
             cruiseResultMap.put("cruiseAbnormal", "--");
 
-            // 判别异常
+            // 判别异常 为上报到算法管理平台暂存数据
             if (StringUtils.equals("图像有差异", resultValue)){
                 String msgName = "msg:" + msgID + ":" + String.valueOf(UUID.randomUUID()).replace("-", "");
                 redisTemplate.opsForHash().put(msgName, "value", resultValue);
