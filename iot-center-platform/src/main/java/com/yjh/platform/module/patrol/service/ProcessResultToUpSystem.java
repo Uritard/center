@@ -131,7 +131,8 @@ public class ProcessResultToUpSystem {
             list.add(xmlBaseModel);
             Map<String, List<XMLBaseModel>> map = new HashMap<>();
             map.put("list", list);
-            log.info("The information to be reported one level up is==={}", map);
+            log.info("The {} information to be reported one level up is==={}",
+                    StringUtils.equals("61", xmlBaseModel.getType()) ? "cruiseResult" : "alarm", map);
             Constant.otherServer(map, Constant.TCP_URL);
         }catch (Exception e){
             log.error(e.getMessage(), e);

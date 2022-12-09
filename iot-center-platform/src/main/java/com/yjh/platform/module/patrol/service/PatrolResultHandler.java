@@ -5,6 +5,7 @@ import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.entity.*;
@@ -415,13 +416,11 @@ public class PatrolResultHandler {
                     warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
                     warnMap.put("defectModel", analyseDataOperateService.selectDictCode("defect_model", "其他"));
 
-                    String alarmLevel = "";
                     switch (meteKind){
                         case "1":
                             int warnRuleFlag = analyseDataOperateService.warnJudgementTelesignaling(resultValue, stateZero, stateOne, alarmState);
                             if (warnRuleFlag == 1){
                                 log.info("Alarm value is reached(遥信)");
-                                alarmLevel = String.valueOf(tStdDevicemete.getAlarmLevel());
                                 warnMap.put("warnLevel", String.valueOf(tStdDevicemete.getAlarmLevel()));
                                 warnMap.put("warnName", meteName + "状态异常");
                                 warnMap.put("warnTime", DateTimeUtil.format(new Date()));
@@ -460,28 +459,24 @@ public class PatrolResultHandler {
                                     case 1:
                                         warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "预警"));
                                         warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "预警");
-                                        alarmLevel = "1";
                                         warnMap.put("outRange", resultValueMeter >= highLimit1 ?
                                                 String.valueOf(resultValueMeter - highLimit1) : String.valueOf(lowLimit1 - resultValueMeter));
                                         break;
                                     case 2:
                                         warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
                                         warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "一般告警");
-                                        alarmLevel = "2";
                                         warnMap.put("outRange", resultValueMeter >= highLimit2 ?
                                                 String.valueOf(resultValueMeter - highLimit2) : String.valueOf(lowLimit2 - resultValueMeter));
                                         break;
                                     case 3:
                                         warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "严重告警"));
                                         warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "严重告警");
-                                        alarmLevel = "3";
                                         warnMap.put("outRange", resultValueMeter >= highLimit3 ?
                                                 String.valueOf(resultValueMeter - highLimit3) : String.valueOf(lowLimit3 - resultValueMeter));
                                         break;
                                     case 4:
                                         warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "危急告警"));
                                         warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "危急告警");
-                                        alarmLevel = "4";
                                         warnMap.put("outRange", resultValueMeter >= highLimit4 ?
                                                 String.valueOf(resultValueMeter - highLimit4) : String.valueOf(lowLimit4 - resultValueMeter));
                                         break;
@@ -522,7 +517,7 @@ public class PatrolResultHandler {
                         pushAlarmInfo(warningMsg.get("warnName"), warningMsg.get("warnContent"));
 
                         // 告警上报上一级系统
-                        processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, tWarnInfo);
+                        alarmToUpSystem(tWarnInfo, tWarnInfo.getTaskId(), tWarnInfo.getInstanceId());
                     }
                 }else {
                     cruiseResultMap.put("resultNum", resultValue);
@@ -539,6 +534,41 @@ public class PatrolResultHandler {
         }
         log.info("cruiseResultMap=={}", cruiseResultMap);
         return cruiseResultMap;
+    }
+
+    /**
+     * 将产生的告警上送至上级系统
+     *
+     * @param warnInfo 告警信息
+     * @param taskId 任务id
+     * @param instanceId 巡视点id
+     */
+    public void alarmToUpSystem(TWarnInfo warnInfo, String taskId, Long instanceId){
+        try{
+            String alarmLevel = "";
+            switch (warnInfo.getWarnLevel()){
+                case 130:
+                    alarmLevel = "1";
+                    break;
+                case 131:
+                    alarmLevel = "2";
+                    break;
+                case 132:
+                    alarmLevel = "3";
+                    break;
+                case 133:
+                    alarmLevel = "4";
+                    break;
+                default:
+                    break;
+            }
+
+            String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
+            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+            processResultToUpSystem.alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, warnInfo);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
     }
 
     /**
