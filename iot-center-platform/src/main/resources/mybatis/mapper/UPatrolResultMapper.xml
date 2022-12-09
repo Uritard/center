@@ -726,7 +726,7 @@
                 ) AS instanceName
         FROM
             u_patrol_task a
-                LEFT JOIN u_patrol_plan_attr k ON a.plan_id = k.plan_id
+                LEFT JOIN u_patrol_task_attr k ON a.task_code = k.task_id
                 LEFT JOIN t_cruise_point_instance n ON k.instance_id = n.instance_id
                 LEFT JOIN t_dict_business e ON n.cruise_type=e.dict_code AND e.col_name='cruise_type'
                 LEFT JOIN t_std_device m on m.device_id = n.device_id
