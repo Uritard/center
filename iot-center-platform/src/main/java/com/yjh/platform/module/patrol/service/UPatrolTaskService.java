@@ -153,9 +153,6 @@ public class UPatrolTaskService {
         // 设置定时器，不走事物逻辑，否则会延时
         setQuartzTask(uPatrolTask);
 
-        //任务状态上报站端
-        sendTaskStateToUp(uPatrolTask, 5);
-
         return uPatrolTask.getTaskId();
     }
 
@@ -381,6 +378,7 @@ public class UPatrolTaskService {
             redisTemplate.opsForHash().putAll(str, map);
         }
         initializeThisTaskInfo(task,instanceList);
+        sendTaskStateToUp(task, 5);
         return detailList;
     }
 
@@ -475,12 +473,12 @@ public class UPatrolTaskService {
                     robotEnd = true;
                     break;
                 case "5":
-                    addToUpSystem(robotPatrolTaskStatus, taskId);
+                    addToUpSystem(robotPatrolTaskStatus, taskIdFinal);
                     break;
                 default:
                     break;
             }
-            updateTaskProgress(robotPatrolTaskStatus, taskId, taskState);
+            updateTaskProgress(robotPatrolTaskStatus, taskIdFinal, taskState);
             if (robotEnd) {
                 // 机器人/下级系统任务终止
                 ThreadPoolUtil.PATROL_POOL.addThread(() -> dealRobotTaskShutDown(taskIdFinal));
@@ -526,7 +524,8 @@ public class UPatrolTaskService {
                     .setTaskLevel(1)
                     .setTaskState(TASK_STATE_NOT_START)
                     .setCreateTime(createTime)
-                    .setExecuteTime(startTime);
+//                    .setExecuteTime(startTime)
+                    ;
 
             UPatrolTask taskExsis = uPatrolTaskDao.selectByPrimaryId(taskId);
             if (taskExsis == null) {
