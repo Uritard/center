@@ -70,12 +70,14 @@ public class TaskJob extends QuartzJobBean {
         String taskDate = DateTimeUtil.format(context.getScheduledFireTime());
         String taskNameTime = DateTimeUtil.format3(context.getScheduledFireTime());
         task.setTaskName(ancestralTask.getTaskName()+"_"+taskNameTime);
+        Date nextTime = new Date();
         try {
             Date startTime = context.getTrigger().getStartTime();
             Date fireTime = context.getFireTime();
+            nextTime = context.getNextFireTime();
             List<JobExecutionContext> jobs = context.getScheduler().getCurrentlyExecutingJobs();
-            log.info("任务开始执行, taskId: {}, startTime: {}, scheduledFireTime: {}, fireTime: {}, jobs: {}", taskId,
-                simpleDateFormat.format(startTime), taskDate,simpleDateFormat.format(fireTime), jobs.toArray());
+            log.info("任务开始执行, taskId: {}, startTime: {}, nextTime: {}, scheduledFireTime: {}, fireTime: {}, jobs: {}", taskId,
+                simpleDateFormat.format(startTime), nextTime, taskDate,simpleDateFormat.format(fireTime), jobs.toArray());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -119,7 +121,7 @@ public class TaskJob extends QuartzJobBean {
             log.error(e.getMessage(), e);
         }
         //初始化下一次任务信息
-        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
+        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType() && nextTime.before(ancestralTask.getEndTime())) {
             log.info("周期任务初始化下一次任务");
             uPatrolTaskService.initializeNextTaskInfo(ancestralTask, allInstanceList);
         }
