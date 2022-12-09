@@ -234,7 +234,7 @@ public class UPatrolTaskService {
                 // 间隔
                 if (StringUtils.isNotEmpty(intervalType) && StringUtils.isNotEmpty(intervalNumber) && StringUtils.isNotEmpty(intervalExecuteTime)) {
                     String hour = intervalExecuteTime.substring(11, 13).startsWith("0") ? intervalExecuteTime.substring(12, 13) : intervalExecuteTime.substring(11, 13);
-                    String min = intervalExecuteTime.substring(14, 16).startsWith("0") ? intervalExecuteTime.substring(14, 15) : intervalExecuteTime.substring(14, 16);
+                    String min = intervalExecuteTime.substring(14, 16).startsWith("0") ? intervalExecuteTime.substring(15, 16) : intervalExecuteTime.substring(14, 16);
                     String second = intervalExecuteTime.substring(17, 19).startsWith("0") ? intervalExecuteTime.substring(18, 19) : intervalExecuteTime.substring(17, 19);
 
                     // 天: 秒 分 时 */日 * ?

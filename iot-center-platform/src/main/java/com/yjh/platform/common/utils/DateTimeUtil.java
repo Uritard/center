@@ -1064,7 +1064,8 @@ public class DateTimeUtil {
             if(date.compareTo(dayAfter) < 0 && date.compareTo(dayBefore) >= 0){
                 dd = exp.getNextValidTimeAfter(date);
             } else if(date.compareTo(dayAfter) < 0 && date.compareTo(dayBefore) < 0) {
-                dd = exp.getNextValidTimeAfter(dayBefore);
+//                dd = exp.getNextValidTimeAfter(dayBefore);
+                dd = dayBefore;
             } else {
                 return validTimeList;
             }
