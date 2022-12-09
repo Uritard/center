@@ -136,11 +136,6 @@ public class PatrolResultHandler {
 
                 // 文件处理
                 Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap);
-                // 巡视结果处理
-                InspectionResultThread cruiseResultDealThread =
-                    new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, true);
-                ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
-
                 if (!"3".equals(sysLevel)) {
                     // 告警处理
                     alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
@@ -152,6 +147,11 @@ public class PatrolResultHandler {
                     NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
                     ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
                 }
+                // 巡视结果处理
+                InspectionResultThread cruiseResultDealThread =
+                    new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, true);
+                ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
+
             } catch (Exception e) {
                 log.error("处理机器人/无人机/边缘节点巡视结果异常:", e);
             }

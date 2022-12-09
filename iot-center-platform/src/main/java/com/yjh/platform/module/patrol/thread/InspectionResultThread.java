@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
@@ -25,7 +26,6 @@ import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -119,25 +119,44 @@ public class InspectionResultThread implements Runnable{
 
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-
+            boolean isnormal = true;
             if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
                 tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
-                tCruiseTaskResultMap.putIfAbsent("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                tCruiseTaskResultMap.putIfAbsent("cruiseAbnormal", "--");
                 log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
-            }else {
+            } else {
                 // value无值且resultNum为--，若结果非音频文件，则为异常情况
-                tCruiseTaskResultMap.putIfAbsent("resultNum", "--");
-                if ("3".equals(robotPatrolTaskResult.getFileType())){
-                    tCruiseTaskResultMap.putIfAbsent("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                    tCruiseTaskResultMap.putIfAbsent("cruiseAbnormal", "--");
-                    log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
-                }else {
-                    tCruiseTaskResultMap.putIfAbsent("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                    tCruiseTaskResultMap.putIfAbsent("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
+                tCruiseTaskResultMap.put("resultNum", "--");
+                if (!"3".equals(robotPatrolTaskResult.getFileType())) {
+                    isnormal = false;
                     log.info("taskId is {},instanceId is {},the result is abnormal", taskId, instanceId);
                 }
             }
+            String valid = robotPatrolTaskResult.getValid();
+
+            if (StringUtils.isNotEmpty(valid)) {
+                switch (valid){
+                    case "1":
+                        computeEmpty(tCruiseTaskResultMap,"cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                        computeEmpty(tCruiseTaskResultMap,"cruiseAbnormal", "--");
+                        break;
+                    case "2":
+                        computeEmpty(tCruiseTaskResultMap,"cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                        computeEmpty(tCruiseTaskResultMap,"cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
+                        break;
+                    case "0":
+                    default:
+                        computeEmpty(tCruiseTaskResultMap,"cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                        computeEmpty(tCruiseTaskResultMap,"cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
+                        break;
+                }
+            } else if (isnormal) {
+                computeEmpty(tCruiseTaskResultMap,"cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                computeEmpty(tCruiseTaskResultMap,"cruiseAbnormal", "--");
+            } else {
+                computeEmpty(tCruiseTaskResultMap,"cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                computeEmpty(tCruiseTaskResultMap, "cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
+            }
+
             tCruiseTaskResultMap.put("picpath", infoMap.getOrDefault("relativePath", ""));
             tCruiseTaskResultMap.put("origpic", infoMap.getOrDefault("absolutePath", ""));
             tCruiseTaskResultMap.putIfAbsent("evaluationState", String.valueOf(EVALUATION_STATE_UN));
@@ -170,28 +189,28 @@ public class InspectionResultThread implements Runnable{
             map.put("cruiseName", insInfo.getCruiseName());
             map.put("deviceName", analyseDataOperateDao.selectPatrolDevice(instanceId).get("deviceName"));
             map.put("cruiseId", String.valueOf(insInfo.getCruiseId()));
+            map.put("cruiseType", String.valueOf(insInfo.getCruiseType()));
         }
 
         map.put("instanceName", robotPatrolTaskResult.getDeviceName());
         map.put("picPathAnl", "");
-        map.put("cruiseType", String.valueOf(insInfo.getCruiseType()));
         map.putIfAbsent("remark", "");
-        map.put("points", "");
+        map.putIfAbsent("points", "");
         map.putIfAbsent("origConfirmPicPath", "");
-        map.put("firDate", "");
+        map.putIfAbsent("firDate", "");
         map.putIfAbsent("confirmPicPath", "");
-        map.put("modifyNum", "");
-        map.put("origPicAnl", "");
-        map.put("identifyResult", "");
-        map.put("personCheck", "");
+        map.putIfAbsent("modifyNum", "");
+        map.putIfAbsent("origPicAnl", "");
+        map.putIfAbsent("identifyResult", "");
+        map.putIfAbsent("personCheck", "");
         map.putIfAbsent("createtime", DateTimeUtil.getDateTimeString());
-        map.put("identifyState", "");
-        map.put("resultPic", "");
-        map.put("firName", "");
-        map.put("resultDesc", "");
-        map.put("checkDate", "");
+        map.putIfAbsent("identifyState", "");
+        map.putIfAbsent("resultPic", "");
+        map.putIfAbsent("firName", "");
+        map.putIfAbsent("resultDesc", "");
+        map.putIfAbsent("checkDate", "");
         map.put("cruiseTime", robotPatrolTaskResult.getTime());
-        map.put("checkUser", "");
+        map.putIfAbsent("checkUser", "");
         map.putIfAbsent("cameraId", "");
         map.putIfAbsent("voicePath", "");
         map.put("taskId", taskId);
@@ -379,7 +398,7 @@ public class InspectionResultThread implements Runnable{
             MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
 
             ScanParams scanParams = new ScanParams();
-            scanParams.match("*" + key + "*");
+            scanParams.match(key + "*");
             scanParams.count(1000);
             ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
             while (null != scan.getStringCursor()) {
@@ -403,5 +422,14 @@ public class InspectionResultThread implements Runnable{
         boolean ftpsTurbo = Boolean.parseBoolean((String)redisTemplate.opsForHash().get("t_sys_param:ftpsTurbo", "content"));
         log.warn("ftpsTurbo is {}", ftpsTurbo);
         return ftpsTurbo;
+    }
+
+    public void computeEmpty(Map<String, String> map, String key, String value) {
+        map.compute(key, (k, v) -> {
+            if (CommonUtils.isEmptyOrNullstr(v)) {
+                return value;
+            }
+            return v;
+        });
     }
 }
