@@ -574,7 +574,7 @@ public class UPatrolTaskService {
                 float pf = NumberUtils.toFloat(StringUtils.remove(progress, "%")) / 100F;
                 progress = CommonUtils.percentFormat(pf, "#.####");
             }
-            if (StringUtils.isNotEmpty(progress)) {
+            if (NumberUtils.isCreatable(progress)) {
                 map.put("taskProgress", progress);
             }
             map.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
@@ -915,10 +915,12 @@ public class UPatrolTaskService {
             }
 
             Map<String, String> mapForGet = redisTemplate.opsForHash().entries(PATROL_SUMMARY_PREFIX + task.getTaskId());
-            Integer all = NumberUtils.toInt(mapForGet.get("all"));
+            int all = NumberUtils.toInt(mapForGet.get("all"));
+            all = Math.max(all, 1);
             Integer normal = NumberUtils.toInt(mapForGet.get("normal"));
             Integer abnormal = NumberUtils.toInt(mapForGet.get("abnormal"));
-            Integer i = all - normal - abnormal;
+            int i = all - normal - abnormal;
+            i = Math.max(i, 0);
             String progress = String.format("%.2f", 100F * (normal + abnormal) / all);
             item.put("task_progress", progress + "%");
 

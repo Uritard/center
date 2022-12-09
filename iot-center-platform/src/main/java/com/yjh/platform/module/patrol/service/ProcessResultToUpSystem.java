@@ -15,6 +15,7 @@ import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -32,6 +33,8 @@ import redis.clients.jedis.ScanResult;
 
 import java.util.*;
 
+import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_ABNORMALALARM;
+import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_NORMAL;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -368,7 +371,15 @@ public class ProcessResultToUpSystem {
             xmlItem.put("value_type", "0");
             xmlItem.put("rectangle", Optional.ofNullable(cruiseResultMap.get("rectangle")).orElse(""));
             xmlItem.put("data_type", cruiseType);
-            xmlItem.put("valid", ArrayUtils.contains(new String[]{"--", "null"}, resultNum) ? "0" : "1");
+            String valid = "1";
+            if (MapUtils.getIntValue(cruiseResultMap,"cruiseResult") != CRUISE_RESULT_NORMAL) {
+                if(MapUtils.getIntValue(cruiseResultMap,"cruiseAbnormal") == CRUISE_ABNORMAL_ABNORMALALARM){
+                    valid = "2";
+                } else {
+                    valid = "0";
+                }
+            }
+            xmlItem.put("valid", valid);
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
