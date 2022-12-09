@@ -1,7 +1,10 @@
 package com.yjh.platform.module.task.service;
 
 import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.yjh.commons.CollectionUtil;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -504,11 +507,37 @@ public class TCruiseTaskResultService {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public CruiseResultCounter selectCruiseStatusCountNew(String taskId) throws ParseException {
         CruiseResultCounter cruiseResultCounter = new CruiseResultCounter();
+        //处理上级系统逻辑
+        String systemLevel  = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        log.info("systemLevel:{}",systemLevel);
+        if ("3".equals(systemLevel)) {
+            //处理巡视点数量信息
+            getCruiseCountByCache(cruiseResultCounter, taskId);
+            Map<String, Object> countResult = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
+
+            if (!countResult.isEmpty()) {
+                //获取任务开始时间
+                String startTime = countResult.get("taskStart").toString();
+                //将两个时间字符串转为日期类型
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date d1 = simpleDateFormat.parse(startTime);
+                String d2String = simpleDateFormat.format(new Date());
+                Date d2 = simpleDateFormat.parse(d2String);
+                cruiseResultCounter.setRunningTime((d2.getTime() - d1.getTime()) / (60 * 1000));
+            } else {
+                cruiseResultCounter.setRunningTime(Long.valueOf("0"));
+            }
+             return cruiseResultCounter;
+
+        }
+
+
         //计算运行时间
 
         UPatrolResult result = uPatrolResultDao.selectByPrimaryId(taskId);
         int abnormalCounts = 0;
         int normalCounts = 0;
+
         Set<String> robotInfoKeys = redisScan(PATROL_TASK_PREFIX + taskId);
         for (String key : robotInfoKeys) {
             Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
@@ -543,6 +572,37 @@ public class TCruiseTaskResultService {
             cruiseResultCounter.setRunningTime(Long.valueOf("0"));
         }
         return cruiseResultCounter;
+    }
+
+
+
+    private void getCruiseCountByCache(CruiseResultCounter cruiseResultCounter,String taskId) {
+        //取出taskId对应下的所有instanceId
+        Integer cruiseNotCount = 0;
+        Integer cruisedCount = 0;
+        Integer alarmCount = 0;
+        Set<String> instanceKey = redisTemplate.keys(PATROL_TASK_PREFIX + taskId +":*");
+        log.info("查询任务[{}]下所有instance:{}", taskId, JSON.toJSONString(instanceKey));
+        if (CollectionUtil.isNotEmpty(instanceKey)) {
+            //遍历key，根据缓存信息判别巡视点结果
+            Iterator<String> iterator = instanceKey.iterator();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                Map<String, String> body = redisTemplate.opsForHash().entries(key);
+                if ("246".equals(body.get("cruiseResult"))) {
+                    cruisedCount ++;
+                } else if ("247".equals(body.get("cruiseResult"))) {
+                    cruiseNotCount++;
+                    if ("250".equals(body.get("cruiseAbnormal"))) {
+                        alarmCount ++;
+                    }
+                }
+            }
+        }
+        //填充数据
+        cruiseResultCounter.setCruisedCount(cruisedCount);
+        cruiseResultCounter.setCruiseNotCount(cruiseNotCount);
+        cruiseResultCounter.setAlarmCount(alarmCount);
     }
 
 
