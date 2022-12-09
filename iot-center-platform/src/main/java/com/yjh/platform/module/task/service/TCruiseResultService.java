@@ -5,6 +5,7 @@ import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yjh.commons.CollectionUtil;
 import com.yjh.platform.common.Constant;
 
 import com.yjh.platform.common.logs.SpringBeanUtils;
@@ -371,15 +372,55 @@ public class TCruiseResultService{
 //        List<TaskSimpleInfo> novelTaskList=tCruiseResultDao.selectTaskIsRunning();
         List<TaskSimpleInfo> novelTaskList=uPatrolResultDao.selectTaskIsRunning();
         for(TaskSimpleInfo temTask:novelTaskList){
-            List<Long> counts=tCruiseResultDao.cruiseInspectCount(temTask.getTaskId());
-            temTask.setDeviceMeteCount(counts.get(0));
-            temTask.setCameraCount(counts.get(1));
-            temTask.setRobotPointsCount(counts.get(2));
+            Map<String,String> systemLevelMap = redisTemplate.opsForHash().entries("t_sys_param:edgeLevel");
+            String systemLevel = "3";
+//            String systemLevel = systemLevelMap.getOrDefault("content","2");
+            log.info("systemLevel:{}",systemLevel);
+            if ("3".equals(systemLevel)) {
+                getTaskCountByCache(temTask);
+            } else {
+                List<Long> counts=tCruiseResultDao.cruiseInspectCount(temTask.getTaskId());
+                if (CollectionUtil.isEmpty(counts)) {
+                    getTaskCountByCache(temTask);
+                }
+                else {
+                    temTask.setDeviceMeteCount(counts.get(0));
+                    temTask.setCameraCount(counts.get(1));
+                    temTask.setRobotPointsCount(counts.get(2));
+                }
+            }
 
         }
 
         return novelTaskList ;
     }
+
+    private void getTaskCountByCache(TaskSimpleInfo temTask) {
+        //取出taskId对应下的所有instanceId
+        Set<String> instanceKey = redisTemplate.keys("patrol_task_result:"+ temTask.getTaskId() +":*");
+        log.info("查询任务[{}]下所有instance:{}", temTask.getTaskId(),JSON.toJSONString(instanceKey));
+        if (CollectionUtil.isNotEmpty(instanceKey)) {
+            Long instanceCount = (long) instanceKey.size();
+            Long cameraCount = 0L;
+            Long robotPoints = 0L;
+            //遍历key，根据缓存信息判别巡视点类型
+            Iterator<String> iterator = instanceKey.iterator();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                Map<String, String> body = redisTemplate.opsForHash().entries(key);
+                if ("229".equals(body.get("cruiseType")) || "230".equals(body.get("cruiseType"))) {
+                    cameraCount++;
+                } else if ("228".equals(body.get("cruiseType"))) {
+                    robotPoints++;
+                }
+            }
+            //填充数据
+            temTask.setDeviceMeteCount(instanceCount);
+            temTask.setRobotPointsCount(robotPoints);
+            temTask.setCameraCount(cameraCount);
+        }
+    }
+
     public int manualReviewTask(String taskId, String userId, HttpServletRequest request){
         Date date = new Date();
         String userName = tCruiseResultDao.selectUserName(Integer.valueOf(userId));
