@@ -43,4 +43,7 @@ public interface TStdRegionDao {
 
     List<StationVoltageData> selectStationVoltageData();
 
+    Integer countByRegionCode(@Param(value = "regionCode") String regionCode,
+                              @Param(value = "upRegionId") Long upRegionId);
+
 }
