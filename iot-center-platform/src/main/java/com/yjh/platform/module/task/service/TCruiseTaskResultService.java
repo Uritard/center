@@ -2,7 +2,6 @@ package com.yjh.platform.module.task.service;
 
 import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.yjh.commons.CollectionUtil;
 import com.yjh.commons.ValueUtil;
@@ -166,132 +165,162 @@ public class TCruiseTaskResultService {
 
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String, Object>> selectCruiseTaskResult(String taskId) throws ParseException {
-        //最终结果集容器
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
         List<Map<String, Object>> completeResult = new ArrayList<>();
         Map<String, Object> resultsMap = new HashMap<>();
-        CruiseInspectResult inspectResult = new CruiseInspectResult();
 
 //        List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskIdYC(taskId);
-        List<CruiseInspectResult> cruiseInspectResults = uPatrolResultDao.selectCruiseInspectByTaskIdYC(taskId);
+        List<CruiseInspectResult> cruiseInspectResults = new ArrayList<>();
+        cruiseInspectResults = uPatrolResultDao.selectCruiseInspectByTaskIdYC(taskId);
         List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null, "", "cruise_data_state", "", null, null, null);
         HashMap<String, String> tDictMap = new HashMap<>();
-        for (TDictBusiness tDictBusiness:tDictBusinessList) {
+        for (TDictBusiness tDictBusiness : tDictBusinessList) {
             tDictMap.put(tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
         }
-
-        for (CruiseInspectResult cruiseInspectResult:cruiseInspectResults) {
-            cruiseInspectResult.setCruiseResultName("--");
-            cruiseInspectResult.setEndTime(null);
-
-            String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + cruiseInspectResult.getInstanceId();
-            Map<String, String> resultMap = redisTemplate.opsForHash().entries(key);
-            if (resultMap.size()>0) {
-                //从redis拿数据
-                cruiseInspectResult.setCruiseStatus(tDictMap.get(resultMap.get("cruiseStatus")));
-                if (resultMap.get("resultNum").equals("") || resultMap.get("resultNum").equals("null")) {
-                    cruiseInspectResult.setCruiseResultName("--");
-                } else { cruiseInspectResult.setCruiseResultName(resultMap.get("resultNum")); }
-                if (resultMap.get("cruiseTime").equals("null") || resultMap.get("cruiseTime").equals("")) {
-                    cruiseInspectResult.setEndTime(null);
-                } else { cruiseInspectResult.setEndTime(sdf.parse(resultMap.get("cruiseTime"))); }
-                if (Objects.nonNull(resultMap.get("isWarn"))) {
-                    if (resultMap.get("isWarn").equals("1")) {
-                        cruiseInspectResult.setIsWarn("有");
-                    } else { cruiseInspectResult.setIsWarn("无"); }
-                }
-                if (Objects.nonNull(resultMap.get("picpath"))) {
-                    cruiseInspectResult.setImagePath(resultMap.get("picpath"));
-                } else { cruiseInspectResult.setImagePath("null"); }
-                Map<String, String> videoInfo = new HashMap<>();
-                if("230".equals(resultMap.containsKey("cruiseType") ?
-                        String.valueOf(resultMap.get("cruiseType")) : "")) {
-                    videoInfo.put("videoCameraType", "2");
-                }else { videoInfo.put("videoCameraType", "1"); }
-//                log.info("redis-robotId==:" + resultMap.get("robotId"));
-                //拉机器人的红外和可见光的视频流
-                if (resultMap.containsKey("robotId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("robotId")))) {
-                    //判断当前机器人巡视点的采集设备为 红外或可见光
-//                    String runningCameraFlag = tRobotInfoDao.selectRobotRunningCamera(Long.valueOf(resultMap.get("robotId").toString()), Long.valueOf(resultMap.get("instanceId").toString()));
-                    String runningCameraFlag = cruiseInspectResult.getSaveTypeList();
-                    if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) {
-                        videoInfo.put("videoCameraType", "2");
+        log.info("cruiseInspectResults size {}", cruiseInspectResults.size());
+        if (CollectionUtils.isEmpty(cruiseInspectResults)){
+            Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId);
+            if (keyResult.size() != 0) {
+                for (String keys : keyResult) {
+                    Map<String, String> resultMap = redisTemplate.opsForHash().entries(keys);
+                    log.info("resultMap {} ",resultMap);
+                    CruiseInspectResult inspectResult = new CruiseInspectResult();
+                    if (resultMap.size() > 0) {
+                        inspectResult.setCruiseResultName("--");
+                        inspectResult.setEndTime(null);
+                        getDataFromRedis(inspectResult, resultMap, tDictMap);
+                        log.info("inspectResult {} ",inspectResult);
+                        cruiseInspectResults.add(inspectResult);
                     }
-                    //机器人历史视频流Map（更新后保存60s，若未取到则重新请求流接口）
-                    //机器人可见光-历史视频流
-//                    Map<String, String> robotVideoHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotLight:" + resultMap.get("robotId").toString());
-//                    //机器人红外-历史视频流
-//                    Map<String, String> robotInfraredHistory = (Map<String, String>) redisTemplate.opsForValue().get("robotInfrared:" + resultMap.get("robotId").toString());
-//                    log.info("robotVideoHistory：" + robotVideoHistory + ",robotInfraredHistory：" + robotInfraredHistory + ",videoCameraType==" +videoInfo.get("videoCameraType"));
-                    HashMap<String, Long> robot = new HashMap<>();
-                    robot.put("robotId", Long.valueOf(resultMap.get("robotId").toString()));
-
-                    switch (videoInfo.get("videoCameraType")) {
-                        case "1":
-//                            if (Objects.isNull(robotVideoHistory)) {
-                                Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
-                                List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
-                                if (robotVideoInfo.size()>0) {
-                                    videoInfo.putAll(robotVideoInfo.get(0));
-                                }else {
-                                    videoInfo.put("flvUrl", null);
-                                    videoInfo.put("rtmpUrl", null);
-                                    videoInfo.put("webRtcUrl", null);
-                                }
-                                videoInfo.put("cameraId", robot.get("robotId").toString());
-                                cruiseInspectResult.setVideoInfo(videoInfo);
-//                                redisTemplate.opsForValue().set("robotLight:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
-//                            } else { cruiseInspectResult.setVideoInfo(robotVideoHistory); }
-                            break;
-                        case "2":
-//                            if (Objects.isNull(robotInfraredHistory)) {
-                                Result result2 = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
-                                List<Map<String, String>> robotInfraredVideoInfo = (List<Map<String, String>>) result2.getData();
-                                if(robotInfraredVideoInfo.size()>1) {
-                                    videoInfo.putAll(robotInfraredVideoInfo.get(1));
-                                }else {
-                                    videoInfo.put("flvUrl", null);
-                                    videoInfo.put("rtmpUrl", null);
-                                    videoInfo.put("webRtcUrl", null);
-                                }
-                                videoInfo.put("cameraId", robot.get("robotId").toString());
-                                cruiseInspectResult.setVideoInfo(videoInfo);
-//                                redisTemplate.opsForValue().set("robotInfrared:" + robot.get("robotId").toString(), videoInfo, 1, TimeUnit.MINUTES);
-//                            } else { cruiseInspectResult.setVideoInfo(robotInfraredHistory); }
-                            break;
+                    //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
+                    int index = cruiseInspectResults.indexOf(inspectResult);
+                    if (index == -1) {
+                        index = 0;
                     }
+                    resultsMap.put("index", index);
+                    resultsMap.put("list", cruiseInspectResults);
                 }
-                //todo 摄像机的没写
-                //拉机器人的红外和可见光的视频流
-                if (resultMap.containsKey("cameraId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("cameraId"))) && !"null".equals(resultMap.get("cameraId"))){
-                    HashMap<String, Long> cameraId = new HashMap<>();
-                    cameraId.put("cameraId", Long.valueOf(resultMap.get("cameraId")));
-                    Result result = sendGetRequest(Constant.START_CAMERA_URL, cameraId);
-                    Map<String, String> cameraVideoInfo = (Map<String, String>) result.getData();
-                    if (Objects.nonNull(cameraVideoInfo)) {
-                        videoInfo.putAll(cameraVideoInfo);
+            }
+        } else {
+            for (CruiseInspectResult cruiseInspectResult : cruiseInspectResults) {
+                cruiseInspectResult.setCruiseResultName("--");
+                cruiseInspectResult.setEndTime(null);
+                String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + cruiseInspectResult.getInstanceId();
+                Map<String, String> resultMap = redisTemplate.opsForHash().entries(key);
+                if (resultMap.size() > 0) {
+                    getDataFromRedis(cruiseInspectResult, resultMap, tDictMap);
+                }
+                //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
+                int index = cruiseInspectResults.indexOf(cruiseInspectResult);
+                if (index == -1) {
+                    index = 0;
+                }
+                resultsMap.put("index", index);
+                resultsMap.put("list", cruiseInspectResults);
+            }
+        }
+
+
+        completeResult.add(resultsMap);
+        return completeResult;
+    }
+
+    private void getDataFromRedis(CruiseInspectResult inspectResult, Map<String, String> resultMap, HashMap<String, String> tDictMap) throws ParseException {
+        //最终结果集容器
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //从redis拿数据
+        inspectResult.setInstanceId(Long.valueOf(resultMap.get("instanceId")));
+        inspectResult.setInstanceName(resultMap.get("instanceName"));
+        inspectResult.setCruiseType(Integer.valueOf(resultMap.get("cruiseType")));
+        inspectResult.setCruiseTypeName(resultMap.get("cruiseTypeName"));
+        inspectResult.setDeviceName(resultMap.get("deviceName"));
+        inspectResult.setCruiseStatus(tDictMap.get(resultMap.get("cruiseStatus")));
+        if ("".equals(resultMap.get("resultNum")) || "null".equals(resultMap.get("resultNum"))) {
+            inspectResult.setCruiseResultName("--");
+        } else {
+            inspectResult.setCruiseResultName(resultMap.get("resultNum"));
+        }
+        if ("null".equals(resultMap.get("cruiseTime")) || "".equals(resultMap.get("cruiseTime"))) {
+            inspectResult.setEndTime(null);
+        } else {
+            inspectResult.setEndTime(sdf.parse(resultMap.get("cruiseTime")));
+        }
+        if (Objects.nonNull(resultMap.get("isWarn"))) {
+            if ("1".equals(resultMap.get("isWarn"))) {
+                inspectResult.setIsWarn("有");
+            } else {
+                inspectResult.setIsWarn("无");
+            }
+        }
+        if (Objects.nonNull(resultMap.get("picpath"))) {
+            inspectResult.setImagePath(resultMap.get("picpath"));
+        } else {
+            inspectResult.setImagePath("null");
+        }
+        Map<String, String> videoInfo = new HashMap<>();
+        if ("230".equals(resultMap.containsKey("cruiseType") ?
+                String.valueOf(resultMap.get("cruiseType")) : "")) {
+            videoInfo.put("videoCameraType", "2");
+        } else {
+            videoInfo.put("videoCameraType", "1");
+        }
+        if (resultMap.containsKey("robotId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("robotId")))) {
+            //判断当前机器人巡视点的采集设备为 红外或可见光
+            String runningCameraFlag = inspectResult.getSaveTypeList();
+            if (Objects.nonNull(runningCameraFlag) && runningCameraFlag.equals("fir")) {
+                videoInfo.put("videoCameraType", "2");
+            }
+            HashMap<String, Long> robot = new HashMap<>();
+            robot.put("robotId", Long.valueOf(resultMap.get("robotId").toString()));
+
+            switch (videoInfo.get("videoCameraType")) {
+                case "1":
+                    Result result = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+                    List<Map<String, String>> robotVideoInfo = (List<Map<String, String>>) result.getData();
+                    if (robotVideoInfo.size() > 0) {
+                        videoInfo.putAll(robotVideoInfo.get(0));
                     } else {
                         videoInfo.put("flvUrl", null);
                         videoInfo.put("rtmpUrl", null);
                         videoInfo.put("webRtcUrl", null);
                     }
-                    cruiseInspectResult.setVideoInfo(videoInfo);
-                }
-                inspectResult = cruiseInspectResult;
+                    videoInfo.put("cameraId", robot.get("robotId").toString());
+                    inspectResult.setVideoInfo(videoInfo);
+                    break;
+                case "2":
+                    Result result2 = sendGetRequest(Constant.START_ROBOT_CAMERA_URL, robot);
+                    List<Map<String, String>> robotInfraredVideoInfo = (List<Map<String, String>>) result2.getData();
+                    if (robotInfraredVideoInfo.size() > 1) {
+                        videoInfo.putAll(robotInfraredVideoInfo.get(1));
+                    } else {
+                        videoInfo.put("flvUrl", null);
+                        videoInfo.put("rtmpUrl", null);
+                        videoInfo.put("webRtcUrl", null);
+                    }
+                    videoInfo.put("cameraId", robot.get("robotId").toString());
+                    inspectResult.setVideoInfo(videoInfo);
+                    break;
+                default:
+                    break;
             }
         }
-
-        //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
-        Integer index = cruiseInspectResults.indexOf(inspectResult);
-        if (index == -1) {
-            index = 0;
+        //todo 摄像机的没写
+        //拉机器人的红外和可见光的视频流
+        if (resultMap.containsKey("cameraId") && !StringUtils.isEmpty(String.valueOf(resultMap.get("cameraId"))) && !"null".equals(resultMap.get("cameraId"))) {
+            HashMap<String, Long> cameraId = new HashMap<>();
+            cameraId.put("cameraId", Long.valueOf(resultMap.get("cameraId")));
+            Result result = sendGetRequest(Constant.START_CAMERA_URL, cameraId);
+            Map<String, String> cameraVideoInfo = (Map<String, String>) result.getData();
+            if (Objects.nonNull(cameraVideoInfo)) {
+                videoInfo.putAll(cameraVideoInfo);
+            } else {
+                videoInfo.put("flvUrl", null);
+                videoInfo.put("rtmpUrl", null);
+                videoInfo.put("webRtcUrl", null);
+            }
+            inspectResult.setVideoInfo(videoInfo);
         }
-        resultsMap.put("index", index);
-        resultsMap.put("list", cruiseInspectResults);
-        completeResult.add(resultsMap);
-        return completeResult;
     }
+
     @Transactional(rollbackFor = Exception.class)
     public String cruiseCameraStop(String taskId) {
         String stopResult = "失败";
