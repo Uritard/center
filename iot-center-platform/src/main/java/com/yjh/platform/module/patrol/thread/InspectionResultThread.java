@@ -174,7 +174,7 @@ public class InspectionResultThread implements Runnable{
 
         map.put("instanceName", robotPatrolTaskResult.getDeviceName());
         map.put("picPathAnl", "");
-        map.put("cruiseType", "");
+        map.put("cruiseType", String.valueOf(insInfo.getCruiseType()));
         map.putIfAbsent("remark", "");
         map.put("points", "");
         map.putIfAbsent("origConfirmPicPath", "");
@@ -217,7 +217,7 @@ public class InspectionResultThread implements Runnable{
                     && Objects.equals(159, robotType)
                     // 上级系统不走算法处理，只存数据
                     && !"3".equals(sysLevel);
-            
+
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, sysLevel: {}", isSimulationTool, taskId, sysLevel);
             if (!isSimulationTool) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);

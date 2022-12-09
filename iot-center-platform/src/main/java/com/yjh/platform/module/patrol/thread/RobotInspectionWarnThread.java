@@ -88,6 +88,7 @@ public class RobotInspectionWarnThread implements Runnable{
                 instanceId = insInfo.getInstanceId();
             }
 
+            log.info("instanceId=={}", instanceId);
             TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(instanceId);
 
             TWarnInfo warnInfo = getWarnInfo(tStdDevicemete, taskId, instanceId, robotCode);
@@ -151,26 +152,22 @@ public class RobotInspectionWarnThread implements Runnable{
             String alarmType = taskAlarm.getAlarmType();
             if (StringUtils.isNotEmpty(alarmType)) {
                 warnInfo.setWarnType(analyseDataOperateService.selectDictCodeByUpDict("point_alarm_type", alarmType));
-                if (StringUtils.isNotEmpty(alarmLevel)) {
-                    warnInfo.setWarnLevel(analyseDataOperateService.selectDictCodeByUpDict("alarm_level", alarmLevel));
-                }
-            }else {
-                switch (alarmLevel) {
-                    case "1":
-                        warnInfo.setWarnLevel(130);
-                        break;
-                    case "2":
-                        warnInfo.setWarnLevel(131);
-                        break;
-                    case "3":
-                        warnInfo.setWarnLevel(132);
-                        break;
-                    case "4":
-                        warnInfo.setWarnLevel(133);
-                        break;
-                    default:
-                        break;
-                }
+            }
+            switch (alarmLevel) {
+                case "1":
+                    warnInfo.setWarnLevel(130);
+                    break;
+                case "2":
+                    warnInfo.setWarnLevel(131);
+                    break;
+                case "3":
+                    warnInfo.setWarnLevel(132);
+                    break;
+                case "4":
+                    warnInfo.setWarnLevel(133);
+                    break;
+                default:
+                    break;
             }
             warnInfo.setWarnContent(taskAlarm.getContent());
         }catch (Exception e){

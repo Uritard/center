@@ -49,6 +49,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private UPatrolTaskService uPatrolTaskService;
     private FtpsService ftpsservice;
     private AlarmService alarmService;
+    private PatrolResultHandler patrolResultHandler;
 
     public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate) {
         this.threadMap = threadMap;
@@ -56,6 +57,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         ftpsservice = StaticContextAccessor.getBean(FtpsService.class);
         alarmService = StaticContextAccessor.getBean(AlarmService.class);
+        this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
     }
 
     @Override
@@ -170,7 +172,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             StaticContextAccessor.getBean(PatrolResultHandler.class).alarmPopUp(tStdDevicemete, infoMap);
 
             // 将产生的告警上送至上一级系统
-            alarmToUpSystem(warnInfo, taskId, instanceId);
+            patrolResultHandler.alarmToUpSystem(warnInfo, taskId, instanceId);
 
             // 将产生的告警上送到算法管理平台
             alarmToAmPlatform(warnMap);
@@ -270,40 +272,6 @@ public class IsWarnAfterCruiseThread implements Runnable {
         return warnMap;
     }
 
-    /**
-     * 将产生的告警上送至上级系统
-     *
-     * @param warnInfo 告警信息
-     * @param taskId 任务id
-     * @param instanceId 巡视点id
-     */
-    private void alarmToUpSystem(TWarnInfo warnInfo, String taskId, Long instanceId){
-        try{
-            String alarmLevel = "";
-            switch (warnInfo.getWarnLevel()){
-                case 130:
-                    alarmLevel = "1";
-                    break;
-                case 131:
-                    alarmLevel = "2";
-                    break;
-                case 132:
-                    alarmLevel = "3";
-                    break;
-                case 133:
-                    alarmLevel = "4";
-                    break;
-                default:
-                    break;
-            }
-
-            String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
-            Map<String, String> cruiseResultMap = redisTemplate.opsForHash().entries(redisKeyName);
-            StaticContextAccessor.getBean(ProcessResultToUpSystem.class).alarmAndResultToUpSystem(cruiseResultMap, alarmLevel, warnInfo);
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-        }
-    }
 
     /**
      * Redis数据库批量查询Key值游标
