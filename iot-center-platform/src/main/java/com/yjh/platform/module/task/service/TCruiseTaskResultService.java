@@ -176,19 +176,16 @@ public class TCruiseTaskResultService {
         for (TDictBusiness tDictBusiness : tDictBusinessList) {
             tDictMap.put(tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
         }
-        log.info("cruiseInspectResults size {}", cruiseInspectResults.size());
         if (CollectionUtils.isEmpty(cruiseInspectResults)){
             Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId);
             if (keyResult.size() != 0) {
                 for (String keys : keyResult) {
                     Map<String, String> resultMap = redisTemplate.opsForHash().entries(keys);
-                    log.info("resultMap {} ",resultMap);
                     CruiseInspectResult inspectResult = new CruiseInspectResult();
                     if (resultMap.size() > 0) {
                         inspectResult.setCruiseResultName("--");
                         inspectResult.setEndTime(null);
                         getDataFromRedis(inspectResult, resultMap, tDictMap);
-                        log.info("inspectResult {} ",inspectResult);
                         cruiseInspectResults.add(inspectResult);
                     }
                     //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
