@@ -217,6 +217,22 @@ public class SystemInfoController {
         return result;
     }
 
+    @ApiOperation(value = "获取审计日志存储容量信息")
+    @RequestMapping(value = "/getLogsStorage",method = RequestMethod.GET)
+    @Logs(title = "获取审计日志存储容量信息", content = "获取审计日志存储容量信息", logType =29, authority = "1234")
+    public Result getSysLogsStorageInfo(HttpServletRequest request){
+        Result result = new Result();
+        try {
+            Long userId=Long.valueOf(request.getHeader("userId"));
+            result.setData(systemInfoService.getLogsStorageInfo(request,userId));
+        }catch (Exception e){
+            log.error("获取审计日志存储容量错误：",e);
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+
+        return result;
+    }
+
 //    @ApiOperation(value = "获取天气信息")
 //    @RequestMapping(value = "/getWeather", method = RequestMethod.GET)
 //    public Result getWeather(@RequestParam(value = "data") String data) {

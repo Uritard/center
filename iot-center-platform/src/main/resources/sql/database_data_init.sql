@@ -1314,6 +1314,8 @@ INSERT INTO `t_sys_param` VALUES ('100119', '404', 'adcode', '地图adcode', '50
 INSERT INTO `t_sys_param` VALUES ('100120', '402', 'isEncryption', '是否开启加解密', 'true', '是否开启加解密',null);
 INSERT INTO `t_sys_param` VALUES ('100121', '404', 'upSystemReceiveCode', '上级系统-上级系统唯一标识', '3000', '上级系统唯一标识', NULL);
 INSERT INTO `t_sys_param` VALUES ('100158', '404', 'sourceFilePath', '设备资源信息配置文件绝对路径', '/home/yjh_iot_center/iot-files/sourceFile/', '设备资源信息配置文件绝对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param` VALUES ('100160', '404', 'logMaximumStorage', '审计日志存储阈值上限', '1000000', '单位：条', '{\"rule\":\"^(\\d|[1-9]\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------

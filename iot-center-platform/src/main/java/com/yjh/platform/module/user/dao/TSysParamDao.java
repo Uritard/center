@@ -50,4 +50,7 @@ public interface TSysParamDao {
                      @Param(value = "content") String content);
 
     List<Version> selectVersion(int type);
+
+    Integer getUsedLogCapacity();
+
 }
