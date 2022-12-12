@@ -11,6 +11,7 @@ import com.yjh.platform.common.utils.HttpClientUtils;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.SystemInfoUtil;
 import com.yjh.platform.module.user.dao.TCameraRecorderDao;
+import com.yjh.platform.module.user.dao.TSysParamDao;
 import com.yjh.platform.module.user.entity.TCameraRecorderDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,9 @@ public class SystemInfoService {
     private TCameraRecorderDao tCameraRecorderDao;
     @Resource
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private TSysParamDao sysParamDao;
 
     private Logger log = LoggerFactory.getLogger(SystemInfoService.class);
 
@@ -241,4 +245,30 @@ public class SystemInfoService {
     }
 
 
+    public Object getLogsStorageInfo(HttpServletRequest request, Long userId) {
+        Map<String,Integer> storageInfo = new HashMap<>();
+        String logsMaxStorage = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logMaximumStorage","content"));
+        Integer usedCapacity = sysParamDao.getUsedLogCapacity();
+        if(logsMaxStorage !=null && usedCapacity != null){
+            storageInfo.put("used",usedCapacity);
+            storageInfo.put("total",Integer.parseInt(logsMaxStorage));
+            if(usedCapacity>= Integer.parseInt(logsMaxStorage)){
+                String userName=String.valueOf(redisTemplate.opsForHash().get("userInfo:"+userId,"userName"));
+                MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+                param.set("logType", "5");
+                param.set("ip", request.getHeader("HTTP_X_FORWARDED_FOR"));
+                param.set("title", "审计日志容量达到限定阈值");
+                param.set("state", 2);
+                param.set("userId", userId);
+                param.set("userName", userName);
+                param.set("requestOrigin", request.getRequestURL());
+                param.set("requestPath", request.getRequestURI());
+                param.set("requestMethod", request.getMethod());
+                param.set("content", "审计记录达到阈值上限报警");
+                LogsAspect logsAspects = new LogsAspect();
+                logsAspects.post(param);
+            }
+        }
+        return storageInfo;
+    }
 }

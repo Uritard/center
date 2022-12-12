@@ -174,4 +174,10 @@
     <select id="selectVersion" parameterType="java.lang.Integer" resultType="com.yjh.platform.module.user.entity.Version">
         select * from t_version where system_type = #{type, jdbcType=INTEGER}
     </select>
+    <select id="getUsedLogCapacity" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM
+        sys_logs
+    </select>
 </mapper>
