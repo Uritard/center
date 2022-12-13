@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class MessageThread {
     private static final ExecutorService executorService =
         new ThreadPoolExecutor(10, 30, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(128), new MyThreadFactory(true),
-            new ThreadPoolExecutor.DiscardPolicy());
+            new ThreadPoolExecutor.CallerRunsPolicy());
 
     public static void doProcessMessage(XMLBaseModel xmlBaseModel, long sendSessionId, TCPClientHandler clientHandler,
         SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, RedisTemplate redisTemplate) {
