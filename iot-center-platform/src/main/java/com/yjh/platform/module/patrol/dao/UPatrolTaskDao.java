@@ -151,4 +151,9 @@ public interface UPatrolTaskDao {
     List<Long> selectRobotOrDroneInsByTaskId(@Param("taskId") String taskId);
 
     List<Long>  selectInstanceIdByTaskId(@Param("taskId") String taskId);
+
+    List<Map<String, Object>> selectTaskPriorityConfigList();
+
+    void updateTaskPriorityConfig(@Param(value = "type")Integer type,
+                                  @Param(value = "level")Integer level);
 }

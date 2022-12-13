@@ -332,4 +332,32 @@ public class UPatrolTaskController {
         return result;
     }
 
+    @ApiOperation(value = "查询任务优先级")
+    @RequestMapping(value = "/selectTaskPriorityConfigList", method = RequestMethod.GET)
+    @Logs(title = "查询任务优先级",content = "查询任务优先级",logType = 2,authority = "1234")
+    public Result selectTaskPriorityConfigList() {
+        Result result = new Result();
+        try{
+            result.setData(uPatrolTaskService.selectTaskPriorityConfigList());
+        }catch (Exception e){
+            log.error("");
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "修改任务优先级")
+    @RequestMapping(value = "/updateTaskPriorityConfig", method = RequestMethod.GET)
+    @Logs(title = "修改任务优先级",content = "修改任务优先级",logType = 2,authority = "1234")
+    public Result updateTaskPriorityConfigList(@RequestParam(value = "type")Integer type,
+                                               @RequestParam(value = "level")Integer level) {
+        Result result = new Result();
+        try{
+            uPatrolTaskService.updateTaskPriorityConfig(type, level);
+        }catch (Exception e){
+            log.error("");
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+        return result;
+    }
 }
