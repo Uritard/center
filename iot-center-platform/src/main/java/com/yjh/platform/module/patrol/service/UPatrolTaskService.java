@@ -724,9 +724,9 @@ public class UPatrolTaskService {
 
 
         //找出机器人做任务的巡检点
-        List<Long> robotCruiseList = uPatrolTaskDao.selectRobotOrDroneInsByTaskId(task.getTaskId());
+        List<Long> robotCruiseList = uPatrolTaskDao.selectRobotOrDroneInsByTaskId(task.getTaskCode());
         log.info("robotCruiseList : {}", robotCruiseList);
-        List<Long> robotInstanceList = uPatrolTaskDao.selectInstanceIdByTaskId(task.getTaskId());
+        List<Long> robotInstanceList = uPatrolTaskDao.selectInstanceIdByTaskId(task.getTaskCode());
         log.info("robotInstanceList : {}", robotInstanceList);
 
         if (robotCruiseList.isEmpty()) {
@@ -739,7 +739,7 @@ public class UPatrolTaskService {
         for (String item: robotCode){
             RobotTaskInstanceInfo robotTaskInfo = new RobotTaskInstanceInfo();
             robotTaskInfo.setCruiseType(task.getTaskType());
-            robotTaskInfo.setTaskId(task.getTaskCode());
+            robotTaskInfo.setTaskId(task.getTaskId());
 //                robotTaskInfo.setPlanCode(task.getPlanCode());
             robotTaskInfo.setPriority(task.getTaskLevel());//优先级
             robotTaskInfo.setTaskName(task.getTaskName());

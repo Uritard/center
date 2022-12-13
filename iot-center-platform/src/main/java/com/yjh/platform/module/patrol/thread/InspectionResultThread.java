@@ -84,7 +84,7 @@ public class InspectionResultThread implements Runnable{
                 return;
             }*/
             String robotCode = robotPatrolTaskResult.getSendCode();
-
+/*
             // taskId是巡视主机的id,robotTaskId是机器人上报的id
             String robotTaskId = infoMap.get("taskCode");
             log.info("robotTaskId==={}", robotTaskId);
@@ -98,8 +98,9 @@ public class InspectionResultThread implements Runnable{
                 }
             }
             log.info("robotTaskId=={}", robotTaskId);
+*/
 
-            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + robotPatrolTaskResult.getDeviceId();
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotPatrolTaskResult.getDeviceId();
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
             String instanceId = robotInfoKeyMap.get("instanceId");
             // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
@@ -120,43 +121,7 @@ public class InspectionResultThread implements Runnable{
 
             tCruiseTaskResultMap.put("cruiseTime", robotPatrolTaskResult.getTime());
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-            boolean isnormal = true;
-            if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
-                tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
-                log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
-            } else {
-                // value无值且resultNum为--，若结果非音频文件，则为异常情况
-                tCruiseTaskResultMap.put("resultNum", "--");
-                if (!"3".equals(robotPatrolTaskResult.getFileType())) {
-                    isnormal = false;
-                    log.info("taskId is {},instanceId is {},the result is abnormal", taskId, instanceId);
-                }
-            }
-            String valid = robotPatrolTaskResult.getValid();
-
-            if (StringUtils.isNotEmpty(valid)) {
-                switch (valid){
-                    case "1":
-                        computeEmpty(tCruiseTaskResultMap,"cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                        computeEmpty(tCruiseTaskResultMap,"cruiseAbnormal", "--");
-                        break;
-                    case "2":
-                        computeEmpty(tCruiseTaskResultMap,"cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                        computeEmpty(tCruiseTaskResultMap,"cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
-                        break;
-                    case "0":
-                    default:
-                        computeEmpty(tCruiseTaskResultMap,"cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                        computeEmpty(tCruiseTaskResultMap,"cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-                        break;
-                }
-            } else if (isnormal) {
-                computeEmpty(tCruiseTaskResultMap,"cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
-                computeEmpty(tCruiseTaskResultMap,"cruiseAbnormal", "--");
-            } else {
-                computeEmpty(tCruiseTaskResultMap,"cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
-                computeEmpty(tCruiseTaskResultMap, "cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-            }
+            setCruiseResult(tCruiseTaskResultMap, instanceId);
 
             tCruiseTaskResultMap.put("picpath", infoMap.getOrDefault("relativePath", ""));
             tCruiseTaskResultMap.put("origpic", infoMap.getOrDefault("absolutePath", ""));
@@ -183,6 +148,55 @@ public class InspectionResultThread implements Runnable{
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * 判断当前点位的异常状态和点位结果是否正常
+     */
+    private void setCruiseResult(Map<String, String> tCruiseTaskResultMap, String instanceId) {
+        String taskId = infoMap.get("taskId");
+
+        boolean isnormal = true;
+        if (StringUtils.isNotEmpty(robotPatrolTaskResult.getValue())) {
+            tCruiseTaskResultMap.put("resultNum", robotPatrolTaskResult.getValue());
+            log.info("taskId is {},instanceId is {},the result is normal", taskId, instanceId);
+        } else {
+            // value无值且resultNum为--，若结果非音频文件，则为异常情况
+            tCruiseTaskResultMap.put("resultNum", "--");
+            if (!"3".equals(robotPatrolTaskResult.getFileType())) {
+                isnormal = false;
+                log.info("taskId is {},instanceId is {},the result is abnormal", taskId, instanceId);
+            }
+        }
+        String cruiseResult;
+        String cruiseAbnormal = "--";
+
+        String valid = robotPatrolTaskResult.getValid();
+        if (StringUtils.isNotEmpty(robotPatrolTaskResult.getAbnormalType())) {
+            cruiseAbnormal = robotPatrolTaskResult.getAbnormalType();
+        }
+        if (StringUtils.isNotEmpty(valid)) {
+            switch (valid) {
+                case "1":
+                    isnormal = true;
+                    break;
+                case "2":
+                    isnormal = false;
+                    cruiseAbnormal = String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM);
+                    break;
+                case "0":
+                default:
+                    isnormal = false;
+                    cruiseAbnormal = String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL);
+                    break;
+            }
+        } else {
+            cruiseAbnormal = isnormal ? String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL) : "--";
+        }
+        cruiseResult = String.valueOf(isnormal ? CRUISE_RESULT_NORMAL : CRUISE_RESULT_ABNORMAL);
+
+        computeEmpty(tCruiseTaskResultMap, "cruiseResult", cruiseResult);
+        computeEmpty(tCruiseTaskResultMap, "cruiseAbnormal", cruiseAbnormal);
     }
 
     private void upSystemTaskInfoInitialize(Map<String, String> map, String taskId, TCruisePointInstance insInfo) {

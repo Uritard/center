@@ -174,8 +174,13 @@ public class TCruiseTaskResultService {
         List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null, "", "cruise_data_state", "", null, null, null);
         HashMap<String, String> tDictMap = new HashMap<>();
         for (TDictBusiness tDictBusiness : tDictBusinessList) {
-            tDictMap.put(tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
+            tDictMap.put("cruise_data_state_" + tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
         }
+        List<TDictBusiness> tDictCruiseTypeList = tDictBusinessDao.select(null, "", "cruise_type", "", null, null, null);
+        for (TDictBusiness tDictBusiness : tDictCruiseTypeList) {
+            tDictMap.put("cruise_type_" + tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
+        }
+
         if (CollectionUtils.isEmpty(cruiseInspectResults)){
             Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId);
             if (keyResult.size() != 0) {
@@ -228,9 +233,9 @@ public class TCruiseTaskResultService {
         inspectResult.setInstanceId(Long.valueOf(resultMap.get("instanceId")));
         inspectResult.setInstanceName(resultMap.get("instanceName"));
         inspectResult.setCruiseType(Integer.valueOf(resultMap.get("cruiseType")));
-        inspectResult.setCruiseTypeName(resultMap.get("cruiseTypeName"));
+        inspectResult.setCruiseTypeName(tDictMap.get("cruise_type_" + resultMap.get("cruiseType")));
         inspectResult.setDeviceName(resultMap.get("deviceName"));
-        inspectResult.setCruiseStatus(tDictMap.get(resultMap.get("cruiseStatus")));
+        inspectResult.setCruiseStatus(tDictMap.get("cruise_data_state_" + resultMap.get("cruiseStatus")));
         if ("".equals(resultMap.get("resultNum")) || "null".equals(resultMap.get("resultNum"))) {
             inspectResult.setCruiseResultName("--");
         } else {

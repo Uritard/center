@@ -97,7 +97,7 @@ public class InspectionResultThread implements Runnable{
     private void robotSelfTask(String robotCode,
                                String taskId,
                                TCruiseResult tCruiseResult) throws Exception{
-        String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + taskId + ":" + cruiseResultMap.get("deviceId");
+        String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + cruiseResultMap.get("deviceId");
         Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
         Map<String,String> tCruiseTaskResultMap = new HashMap<>(16);
 //        List<Long> instanceIdList = new ArrayList<>();
@@ -192,13 +192,13 @@ public class InspectionResultThread implements Runnable{
                 String robotTaskId = StaticContextAccessor.getBean(RobotService.class).selectTaskId(taskId);
                 log.info("robotTaskId==={}", robotTaskId);
 
-                String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + cruiseResultMap.get("deviceId");
+                String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + cruiseResultMap.get("deviceId");
                 Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
                 String instanceId = robotInfoKeyMap.get("instanceId");
 
                 Map<String,String> tCruiseTaskResultMap = new HashMap<>(16);
                 tCruiseTaskResultMap.put("cruiseTime", cruiseResultMap.get("time"));
-                tCruiseTaskResultMap.put("cruiseTaskTime", robotInfoKeyMap.get("cruiseTime"));
+                // tCruiseTaskResultMap.put("cruiseTaskTime", robotInfoKeyMap.get("cruiseTime"));
                 tCruiseTaskResultMap.put("taskResultId", tCruiseResult.getTaskResultId());
                 tCruiseTaskResultMap.put("taskName", tCruiseResult.getTaskName());
                 tCruiseTaskResultMap.put("endTime", cruiseResultMap.get("time"));

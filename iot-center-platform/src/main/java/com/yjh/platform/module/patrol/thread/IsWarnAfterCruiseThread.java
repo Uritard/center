@@ -81,7 +81,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             }
             log.info("robotTaskId=={}", robotTaskId);
 
-            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + threadMap.get("deviceId");
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + threadMap.get("deviceId");
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
             Long instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
             TStdDeviceMete tStdDevicemete = uPatrolTaskService.selectDeviceMeteInfo(instanceId);

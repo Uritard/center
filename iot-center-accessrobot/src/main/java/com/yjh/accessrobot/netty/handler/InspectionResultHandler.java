@@ -75,6 +75,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             taskResult.setValid(Objects.nonNull(item.get("valid")) ? String.valueOf(item.get("valid")) : "");
             taskResult.setOriginFileResultPath(Objects.nonNull(item.get("origin_file_path")) ? String.valueOf(item.get("origin_file_path")) : "");
             taskResult.setOriginFilePath(Objects.nonNull(item.get("origin_file_result_path")) ? String.valueOf(item.get("origin_file_result_path")) : "");
+            taskResult.setAbnormalType((String)item.get("abnormal_type"));
             resultList.add(taskResult);
         }
         log.info("The resultList to platform is=={}", resultList);

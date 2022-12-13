@@ -1238,13 +1238,13 @@ public class RobotService {
                 redisInfoMap.put("robotCode", robotCode);
                 redisInfoMap.put("instanceId", instanceId + "");
                 redisInfoMap.put("inspectionCode", inspectionCode);
-                redisInfoMap.put("cruiseTime", DateTimeUtil.format(new Date()));
-                redisInfoMap.put("taskId", taskId);
+                // redisInfoMap.put("cruiseTime", DateTimeUtil.format(new Date()));
+                // redisInfoMap.put("taskId", taskId);
                 redisInfoList.add(redisInfoMap);
             }
             for (int i = 0; i < redisInfoList.size(); i++) {
                 redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + redisInfoList.get(i).get("robotCode")
-                        + ":" + redisInfoList.get(i).get("taskId") + ":" + redisInfoList.get(i).get("inspectionCode"), redisInfoList.get(i));
+                        + ":" + redisInfoList.get(i).get("inspectionCode"), redisInfoList.get(i));
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -1319,121 +1319,6 @@ public class RobotService {
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("生成的任务的xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, uniqueFlag), uniqueFlag);
-    }
-
-    /**
-     * 组装任务下发item内容
-     *
-     * @param str    点位id
-     * @param item   任务信息
-     * @param taskId 任务id
-     * @return Map<String, Object>
-     */
-    private Map<String, Object> packageItem(StringJoiner str, RobotTaskInstanceInfo item, String taskId) {
-        Map<String, Object> taskItemMap = new HashMap<>();
-        List<Map<String, Object>> mapList = new ArrayList<>();
-        Map<String, Object> map = new HashMap<>(16);
-
-        String deviceIdList = str.toString();
-
-        try {
-            if (Objects.isNull(item.getUnionTaskStatus())) {
-                log.info("这是正常的任务！！！！！！！！！！！！！");
-                // 巡视类型
-                Integer planType = null;
-                switch (item.getCruiseType()) {
-                    // 全面
-                    case 213:
-                        // 自定义
-                    case 218:
-                        planType = 4;
-                        break;
-                    // 例行
-                    case 214:
-                        planType = 1;
-                        break;
-                    // 熄灯
-                    case 215:
-                        // 专项
-                    case 217:
-                        planType = 3;
-                        break;
-                    // 特殊
-                    case 216:
-                        planType = 2;
-                        break;
-                    // 操作-操作票
-                    case 456:
-                        // 操作-单设备
-                    case 508:
-                        // 操作-紧急分合闸
-                    case 509:
-                        planType = 5;
-                        break;
-                    default:
-                        break;
-                }
-                map.put("type", planType);
-                map.put("task_code", taskId);
-//                map.put("plan_code", item.getPlanCode());
-                map.put("task_name", item.getTaskName());
-                map.put("priority", item.getPriority());
-                map.put("device_level", item.getDeviceLevel());
-                map.put("device_list", deviceIdList);
-                // 周期任务参数
-                if ("172".equals(item.getIfRun())) {
-                    map.put("cycle_month", Optional.ofNullable(item.getCycleMonth()).orElse(""));
-                    map.put("cycle_week", Optional.ofNullable(item.getCycleWeek()).orElse(""));
-                    map.put("cycle_execute_time", Optional.ofNullable(item.getCycleExecuteTime()).orElse(""));
-                    map.put("cycle_start_time", Optional.ofNullable(item.getCycleStartTime()).orElse(""));
-                    map.put("cycle_end_time", Optional.ofNullable(item.getCycleEndTime()).orElse(""));
-                    map.put("interval_number", Optional.ofNullable(item.getIntervalNumber()).orElse(""));
-                    map.put("interval_type", Optional.ofNullable(item.getIntervalType()).orElse(""));
-                    map.put("interval_execute_time", Optional.ofNullable(item.getIntervalExecuteTime()).orElse(""));
-                    map.put("interval_start_time", Optional.ofNullable(item.getIntervalStartTime()).orElse(""));
-                    map.put("interval_end_time", Optional.ofNullable(item.getIntervalEndTime()).orElse(""));
-                    map.put("fixed_start_time", "");
-                }
-                // 定期和立即任务参数
-                else {
-                    map.put("fixed_start_time", item.getFixedStartTime());
-//                    map.put("isocr", item.getIsOcr());
-                    map.put("cycle_month", "");
-                    map.put("cycle_week", "");
-                    map.put("cycle_execute_time", "");
-                    map.put("cycle_start_time", "");
-                    map.put("cycle_end_time", "");
-                    map.put("interval_number", "");
-                    map.put("interval_type", "");
-                    map.put("interval_execute_time", "");
-                    map.put("interval_start_time", "");
-                    map.put("interval_end_time", "");
-                }
-                map.put("invalid_start_time", "");
-                map.put("invalid_end_time", "");
-                map.put("isenable", "0");
-                map.put("creator", "1");
-                map.put("create_time", DateTimeUtil.format(new Date()));
-                mapList.add(map);
-
-                taskItemMap.put("type", "101");
-                taskItemMap.put("mapList", mapList);
-            } else {
-                log.info("这是联动任务！！！！！！！！！！！！！");
-                map.put("task_code", taskId);
-                map.put("task_name", item.getTaskName());
-                map.put("priority", 4);
-                map.put("device_level", 3);
-                map.put("device_list", deviceIdList);
-                mapList.add(map);
-
-                taskItemMap.put("type", "102");
-                taskItemMap.put("mapList", mapList);
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return taskItemMap;
     }
 
     /**
@@ -1540,6 +1425,121 @@ public class RobotService {
             log.error("给机器人/无人机/边缘节点下发任务控制指令异常:", e);
         }
         return result;
+    }
+
+    /**
+     * 组装任务下发item内容
+     *
+     * @param str    点位id
+     * @param item   任务信息
+     * @param taskId 任务id
+     * @return Map<String, Object>
+     */
+    private Map<String, Object> packageItem(StringJoiner str, RobotTaskInstanceInfo item, String taskId) {
+        Map<String, Object> taskItemMap = new HashMap<>();
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        Map<String, Object> map = new HashMap<>(16);
+
+        String deviceIdList = str.toString();
+
+        try {
+            if (Objects.isNull(item.getUnionTaskStatus())) {
+                log.info("这是正常的任务！！！！！！！！！！！！！");
+                // 巡视类型
+                Integer planType = null;
+                switch (item.getCruiseType()) {
+                    // 全面
+                    case 213:
+                        // 自定义
+                    case 218:
+                        planType = 4;
+                        break;
+                    // 例行
+                    case 214:
+                        planType = 1;
+                        break;
+                    // 熄灯
+                    case 215:
+                        // 专项
+                    case 217:
+                        planType = 3;
+                        break;
+                    // 特殊
+                    case 216:
+                        planType = 2;
+                        break;
+                    // 操作-操作票
+                    case 456:
+                        // 操作-单设备
+                    case 508:
+                        // 操作-紧急分合闸
+                    case 509:
+                        planType = 5;
+                        break;
+                    default:
+                        break;
+                }
+                map.put("type", planType);
+                map.put("task_code", taskId);
+                //                map.put("plan_code", item.getPlanCode());
+                map.put("task_name", item.getTaskName());
+                map.put("priority", item.getPriority());
+                map.put("device_level", item.getDeviceLevel());
+                map.put("device_list", deviceIdList);
+                // 周期任务参数
+                if ("172".equals(item.getIfRun())) {
+                    map.put("cycle_month", Optional.ofNullable(item.getCycleMonth()).orElse(""));
+                    map.put("cycle_week", Optional.ofNullable(item.getCycleWeek()).orElse(""));
+                    map.put("cycle_execute_time", Optional.ofNullable(item.getCycleExecuteTime()).orElse(""));
+                    map.put("cycle_start_time", Optional.ofNullable(item.getCycleStartTime()).orElse(""));
+                    map.put("cycle_end_time", Optional.ofNullable(item.getCycleEndTime()).orElse(""));
+                    map.put("interval_number", Optional.ofNullable(item.getIntervalNumber()).orElse(""));
+                    map.put("interval_type", Optional.ofNullable(item.getIntervalType()).orElse(""));
+                    map.put("interval_execute_time", Optional.ofNullable(item.getIntervalExecuteTime()).orElse(""));
+                    map.put("interval_start_time", Optional.ofNullable(item.getIntervalStartTime()).orElse(""));
+                    map.put("interval_end_time", Optional.ofNullable(item.getIntervalEndTime()).orElse(""));
+                    map.put("fixed_start_time", "");
+                }
+                // 定期和立即任务参数
+                else {
+                    map.put("fixed_start_time", item.getFixedStartTime());
+                    //                    map.put("isocr", item.getIsOcr());
+                    map.put("cycle_month", "");
+                    map.put("cycle_week", "");
+                    map.put("cycle_execute_time", "");
+                    map.put("cycle_start_time", "");
+                    map.put("cycle_end_time", "");
+                    map.put("interval_number", "");
+                    map.put("interval_type", "");
+                    map.put("interval_execute_time", "");
+                    map.put("interval_start_time", "");
+                    map.put("interval_end_time", "");
+                }
+                map.put("invalid_start_time", "");
+                map.put("invalid_end_time", "");
+                map.put("isenable", "0");
+                map.put("creator", "1");
+                map.put("create_time", DateTimeUtil.format(new Date()));
+                mapList.add(map);
+
+                taskItemMap.put("type", "101");
+                taskItemMap.put("mapList", mapList);
+            } else {
+                log.info("这是联动任务！！！！！！！！！！！！！");
+                map.put("task_code", taskId);
+                map.put("task_name", item.getTaskName());
+                map.put("priority", 4);
+                map.put("device_level", 3);
+                map.put("device_list", deviceIdList);
+                mapList.add(map);
+
+                taskItemMap.put("type", "102");
+                taskItemMap.put("mapList", mapList);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return taskItemMap;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -2345,7 +2345,7 @@ public class RobotService {
                     // 放数据到缓存
                     for (Map<String, String> stringStringMap : redisInfoList) {
                         redisTemplate.opsForHash().putAll("Robot_SPAndIN_Info:" + stringStringMap.get("robotCode")
-                                + ":" + stringStringMap.get("taskId") + ":" + stringStringMap.get("inspectionCode"), stringStringMap);
+                                + ":" + stringStringMap.get("inspectionCode"), stringStringMap);
                     }
 
                     log.info("tCruiseTaskAttrList==={}", tCruiseTaskAttrList);
