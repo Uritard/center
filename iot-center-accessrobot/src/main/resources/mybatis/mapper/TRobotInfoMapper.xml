@@ -385,7 +385,7 @@
         SELECT
             a.task_code
         FROM
-            t_cruise_task a,t_cruise_result b
+            u_patrol_task a,u_patrol_result b
         WHERE a.task_id = b.task_id
           and a.task_id = #{robotTaskId, jdbcType=VARCHAR}
         ORDER BY b.execute_time desc
