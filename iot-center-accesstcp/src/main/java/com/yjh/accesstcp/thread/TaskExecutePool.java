@@ -33,7 +33,7 @@ public class TaskExecutePool {
     private ExecutorService executorService = new ThreadPoolExecutor(10, 30, 20,
             TimeUnit.SECONDS,
             new ArrayBlockingQueue<>(32), // 使用有界队列，避免OOM
-            threadFactory, new ThreadPoolExecutor.DiscardPolicy());
+            threadFactory, new ThreadPoolExecutor.CallerRunsPolicy());
 
     public void execute(Runnable runnable) { this.executorService.execute(runnable); }
 

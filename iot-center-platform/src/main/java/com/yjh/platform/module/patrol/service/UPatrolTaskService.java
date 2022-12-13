@@ -763,15 +763,19 @@ public class UPatrolTaskService {
         }
 
         try {
-            List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(task.getTaskId());
-            log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
-            if (robotCodeList != null && robotCodeList.size() > 0) {
-                Map<String, Object> robotTaskStatesMap = new HashMap<>();
-                robotTaskStatesMap.put("taskId", task.getTaskId());
-                robotTaskStatesMap.put("commandValue", 1);
-                robotTaskStatesMap.put("isEdge", 0);
-                robotTaskStatesMap.put("robotCodeList", robotCodeList);
-                robotTaskStates(robotTaskStatesMap);
+            String startCommand = (String)redisTemplate.opsForHash().get("t_sys_param:robotStartCommand", "content");
+
+            if (Boolean.parseBoolean(startCommand)) {
+                List<String> robotCodeList = tRobotInspectionDao.selectRobotIsRunning(task.getTaskId());
+                log.info("机器人任务启动,robotCodeList:{}", robotCodeList);
+                if (robotCodeList != null && robotCodeList.size() > 0) {
+                    Map<String, Object> robotTaskStatesMap = new HashMap<>();
+                    robotTaskStatesMap.put("taskId", task.getTaskId());
+                    robotTaskStatesMap.put("commandValue", 1);
+                    robotTaskStatesMap.put("isEdge", 0);
+                    robotTaskStatesMap.put("robotCodeList", robotCodeList);
+                    robotTaskStates(robotTaskStatesMap);
+                }
             }
         } catch (Exception e) {
             log.error("发送机器人启动错误：", e);
@@ -1515,7 +1519,6 @@ public class UPatrolTaskService {
             resultCountsMap.put("taskProgress", progress);
 
             if (allCounts != 0 && normalCounts + abnormalCounts >= allCounts && !ended) {
-                resultCountsMap.put("ended", "true");
                 endOnece = true;
             }
 
@@ -1551,15 +1554,9 @@ public class UPatrolTaskService {
      */
     public void forceCompletionTask(String taskId) {
         try {
-            String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
-            String endStr = (String)redisTemplate.opsForHash().get(strForCountAbnormal, "ended");
+            log.info("forceCompletionTask---task:{}", taskId);
 
-            log.info("forceCompletionTask---task:{}, endStr:{}", taskId, endStr);
-
-            if (!Boolean.parseBoolean(endStr)) {
-                redisTemplate.opsForHash().put(strForCountAbnormal, "ended", "true");
-                completionOfTask(taskId);
-            }
+            completionOfTask(taskId);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -1614,30 +1611,42 @@ public class UPatrolTaskService {
                 }
             }
 
-            String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
-            Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
+            int taskStatus;
+            int all;
+            boolean ended;
+            synchronized (LOCK_FLAG) {
+                String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
+                Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
 
-            int taskStatus = NumberUtils.toInt(resultCountsMap.get("taskState"), TASK_STATE_FINISHED);
-            taskStatus = taskStatus == TASK_STATE_EXECUTING ? TASK_STATE_FINISHED : taskStatus;
+                ended = Boolean.parseBoolean(resultCountsMap.get("ended"));
+
+                taskStatus = NumberUtils.toInt(resultCountsMap.get("taskState"), TASK_STATE_FINISHED);
+                taskStatus = taskStatus == TASK_STATE_EXECUTING ? TASK_STATE_FINISHED : taskStatus;
+
+                all = MapUtils.getIntValue(resultCountsMap, "all", 0);
+
+                redisTemplate.opsForHash().put(strForCountAbnormal, "ended", "true");
+            }
             // 更新upr
             int allCounts = robotInfoKeys.size();
             UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
             uPatrolResult.setTaskState(taskStatus).setTaskWait(0).setEndTime(new Date()).setTaskAbnormal(abnormalCounts);
             // 如果 Redis 状态中总点数为 0，则表示非上级系统下发任务，需更新总点数值
-            if (MapUtils.getIntValue(resultCountsMap, "all", 0) == 0) {
+            if ( all == 0) {
                 uPatrolResult.setTaskCount(allCounts);
             }
             uPatrolResultDao.update(uPatrolResult);
-            log.info("taskId is:{} , uPatrolDataResultList size is:{}", taskId, uPatrolDataResultList.size());
+            log.info("taskId is:{} , uPatrolDataResultList size is:{}, ended； {}", taskId, uPatrolDataResultList.size(), ended);
 
-            if (CollectionUtils.isNotEmpty(uPatrolDataResultList)){
+            // 如果 ended=true,表示巡视结果已经入库过一次，不再重复入库，但需要修改
+            if (CollectionUtils.isNotEmpty(uPatrolDataResultList) && !ended){
                 batchInsertUPatrolDataResult(uPatrolDataResultList);
                 log.info("准备传其他服务的taskId==={}", taskId);
                 uPatrolDataResultService.updateCruiseAnalyze(taskId);
-            }
 
-            for (UPatrolDataResult up : uPatrolDataResultList){
-                updateIsWarn(taskId, up.getInstanceId(), up.getCruiseDataId());
+                for (UPatrolDataResult up : uPatrolDataResultList){
+                    updateIsWarn(taskId, up.getInstanceId(), up.getCruiseDataId());
+                }
             }
 
             //低优先任务继续
@@ -2212,7 +2221,7 @@ public class UPatrolTaskService {
                 try {
                     taskGoOn(lowTask);
                 }catch (Exception e){
-                    log.info("低优先级任务继续出错：{}",e);
+                    log.info("低优先级任务继续出错：",e);
                 }
             });
         }

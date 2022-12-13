@@ -15,6 +15,7 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.entity.TCruiseTaskDel;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
@@ -121,7 +122,7 @@ public class TaskJob extends QuartzJobBean {
             log.error(e.getMessage(), e);
         }
         //初始化下一次任务信息
-        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType() && nextTime.before(ancestralTask.getEndTime())) {
+        if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType() && nextTime.compareTo(ancestralTask.getEndTime()) <= 0) {
             log.info("周期任务初始化下一次任务");
             uPatrolTaskService.initializeNextTaskInfo(ancestralTask, allInstanceList);
         }
@@ -133,6 +134,10 @@ public class TaskJob extends QuartzJobBean {
         // String realTaskId = uPatrolTaskDao.selectTaskByRobotTaskCode(taskId);
         UPatrolResult result = uPatrolTaskDao.selectForTaskId(taskId);
         log.info("TaskResult update, taskId: {}, result: {}", taskId, JSON.toJSONString(result));
+        if (ArrayUtils.contains(new int[]{CruiseConstant.TASK_STATE_FINISHED, CruiseConstant.TASK_STATE_INTERRUPT, CruiseConstant.TASK_STATE_ABNORMAL, CruiseConstant.TASK_STATE_TIMEOUT}, result.getTaskState())) {
+            log.error("任务已经结束，不可再次执行，task: {}，taskState: {}", taskId, result.getTaskState());
+            return;
+        }
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
             // 周期任务修改任务名称
             result.setTaskName(task.getTaskName());
