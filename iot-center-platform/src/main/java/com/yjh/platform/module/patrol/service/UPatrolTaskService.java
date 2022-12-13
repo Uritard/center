@@ -89,6 +89,7 @@ public class UPatrolTaskService {
     public static final String PATROL_TASK_PREFIX = "patrol_task_result:";
     public static final String PATROL_SUMMARY_PREFIX = "countForAbnormal:";
     public static final String ROBOT_OR_DRONE_TASK = "robotOrDroneTask:";
+    private static final String TASK_PRIORITY_REDIS_KEY="task_priority_config:";
 
     @Autowired
     private UPatrolTaskDao uPatrolTaskDao;
@@ -281,6 +282,9 @@ public class UPatrolTaskService {
     }
 
     private void setLevel(UPatrolTask uPatrolTask, TCruiseTaskAdd tCruiseTaskAdd) {
+        Object level1 = redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "901", "level");
+        Object level3 = redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "903", "level");
+        Object level4 = redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY + "904", "level");
         Integer ifRun = uPatrolTask.getExecuteType();
         if (tCruiseTaskAdd.getTaskLevel() == null) {
             String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
@@ -291,12 +295,12 @@ public class UPatrolTaskService {
             }
             if (Objects.equals("0", tCruiseTaskAdd.getUnionTaskStatus()) || tCruiseTaskAdd.getUnionTaskStatus() == null) {
                 if (Objects.equals(TaskTypeEnum.NOW.getType(), ifRun)) {
-                    uPatrolTask.setTaskLevel(3);
+                    uPatrolTask.setTaskLevel(Objects.isNull(level3) ? 3 : Integer.parseInt(String.valueOf(level3)));
                 } else {
-                    uPatrolTask.setTaskLevel(1);
+                    uPatrolTask.setTaskLevel(Objects.isNull(level1) ? 1 : Integer.parseInt(String.valueOf(level1)));
                 }
             } else {
-                uPatrolTask.setTaskLevel(4);
+                uPatrolTask.setTaskLevel(Objects.isNull(level4) ? 4 : Integer.parseInt(String.valueOf(level4)));
             }
         }
     }
@@ -2329,5 +2333,35 @@ public class UPatrolTaskService {
             re.add(robotTaskMessage);
         }
         return re;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public List<Map<String,Object>> selectTaskPriorityConfigList(){
+        return uPatrolTaskDao.selectTaskPriorityConfigList();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void updateTaskPriorityConfig(Integer type,Integer level){
+        uPatrolTaskDao.updateTaskPriorityConfig(type, level);
+        taskPriorityConfigToRedis();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void taskPriorityConfigToRedis(){
+        List<Map<String,Object>> priorityConfigs = uPatrolTaskDao.selectTaskPriorityConfigList();
+        for(Map<String,Object> item:priorityConfigs){
+            String str = TASK_PRIORITY_REDIS_KEY+item.get("type");
+            log.info("str:{}",str);
+            Map<String,String> map = redisTemplate.opsForHash().entries(str);
+            if(map != null && map.size()>0){
+                redisTemplate.delete(str);
+            }else {
+                map = new HashMap<>();
+            }
+            map.put("type",item.get("type").toString());
+            map.put("level",item.get("level").toString());
+            map.put("name",item.get("name").toString());
+            redisTemplate.opsForHash().putAll(str, map);
+        }
     }
 }

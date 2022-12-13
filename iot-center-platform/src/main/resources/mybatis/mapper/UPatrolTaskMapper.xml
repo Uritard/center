@@ -587,6 +587,11 @@
         WHERE
         a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
     </update>
+    <update id="updateTaskPriorityConfig">
+        update t_task_priority_config
+        set execute_level = #{level, jdbcType=INTEGER}
+        where prioritized_task_type = #{type, jdbcType=INTEGER}
+    </update>
 
     <select id="selectDeviceMeteInfo"  parameterType="java.lang.Long" resultType="com.yjh.platform.module.patrol.entity.TStdDeviceMete">
         select
@@ -930,5 +935,17 @@
         WHERE
             ins.cruise_type = 228
            OR ins.cruise_type = 524
+    </select>
+
+    <select id="selectTaskPriorityConfigList" resultType="java.util.Map">
+        SELECT
+        a.prioritized_task_type AS type,
+        a.execute_level AS LEVEL,
+        b.dict_note AS NAME
+        FROM
+        t_task_priority_config a
+        LEFT JOIN t_dict_business b ON a.prioritized_task_type = b.dict_code
+        WHERE
+        b.col_name = "prioritized_task_type"
     </select>
 </mapper>
