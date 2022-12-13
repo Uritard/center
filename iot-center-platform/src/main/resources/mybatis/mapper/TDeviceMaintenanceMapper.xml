@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.yjh.platform.module.device.entity.TDeviceMaintenance">
         <id column="maintenance_id" jdbcType="BIGINT" property="maintenanceId" />
         <result column="maintenance_name" jdbcType="VARCHAR" property="maintenanceName" />
-        <result column="device_id" jdbcType="BIGINT" property="deviceId" />
+        <result column="device_ids" jdbcType="BIGINT" property="deviceIds" />
         <result column="is_valid" jdbcType="INTEGER" property="isValid" />
         <result column="maintenance_start" jdbcType="TIMESTAMP" property="maintenanceStart" />
         <result column="maintenance_stop" jdbcType="TIMESTAMP" property="maintenanceStop" />
@@ -22,27 +22,30 @@
         insert into t_device_maintenance(
             maintenance_id,
             maintenance_name,
-            device_id,
+            device_ids,
             is_valid,
             maintenance_start,
             maintenance_stop,
             coordinate_pixel,
-            device_level
+            device_level,
+            instance_ids
         )values(
-                #{maintenanceId, jdbcType=BIGINT},
-                #{maintenanceName, jdbcType=VARCHAR},
-                #{deviceId, jdbcType=BIGINT},
-                #{isValid, jdbcType=INTEGER},
-                #{maintenanceStart, jdbcType=TIMESTAMP},
-                #{maintenanceStop, jdbcType=TIMESTAMP},
-                #{coordinatePixel, jdbcType=VARCHAR},
-                #{deviceLevel, jdbcType=VARCHAR}
-        )
+                   #{maintenanceId, jdbcType=BIGINT},
+                   #{maintenanceName, jdbcType=VARCHAR},
+                   #{deviceIds, jdbcType=BIGINT},
+                   #{isValid, jdbcType=INTEGER},
+                   #{maintenanceStart, jdbcType=TIMESTAMP},
+                   #{maintenanceStop, jdbcType=TIMESTAMP},
+                   #{coordinatePixel, jdbcType=VARCHAR},
+                   #{deviceLevel, jdbcType=VARCHAR},
+                   #{instanceIds, jdbcType=BIGINT}
+               )
     </insert>
 
-    <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
+
+    <delete id="deleteByPrimaryId">
         delete from t_device_maintenance
-                where maintenance_id = #{maintenanceId, jdbcType=BIGINT}
+        where maintenance_id = #{maintenanceId}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TDeviceMaintenance">
@@ -59,26 +62,28 @@
             where a.maintenance_id = #{maintenanceId, jdbcType=BIGINT}
     </update>
 
+
     <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TDeviceMaintenance">
-        select
-        a.maintenance_id,
-        a.maintenance_name,
-        a.device_id,
-        a.is_valid,
-        a.maintenance_start,
-        a.maintenance_stop,
-        a.coordinate_pixel,
-        a.device_level
-        from t_device_maintenance a
+        select DISTINCT
+            f.maintenance_id,
+            f.maintenance_name,
+            f.device_ids,
+            f.is_valid,
+            f.maintenance_start,
+            f.maintenance_stop,
+            f.coordinate_pixel,
+            f.device_level,
+            f.instance_ids
+        from t_device_maintenance f
         where 1 = 1
-            and a.maintenance_id = #{maintenanceId, jdbcType=BIGINT}
+          and f.maintenance_id = #{maintenanceId}
     </select>
 
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TDeviceMaintenance" resultType="com.yjh.platform.module.device.entity.TDeviceMaintenance">
         select
         a.maintenance_id,
         a.maintenance_name,
-        a.device_id,
+        a.device_ids,
         a.is_valid,
         a.maintenance_start,
         a.maintenance_stop,
@@ -99,7 +104,7 @@
         select
         a.maintenance_id,
         a.maintenance_name,
-        a.device_id,
+        a.device_ids,
         a.is_valid,
         a.maintenance_start,
         a.maintenance_stop,
@@ -113,25 +118,27 @@
 
     <insert id="batchAdd">
         insert into t_device_maintenance(
-            maintenance_id,
-            maintenance_name,
-            device_id,
-            is_valid,
-            maintenance_start,
-            maintenance_stop,
+        maintenance_id,
+        maintenance_name,
+        device_ids,
+        is_valid,
+        maintenance_start,
+        maintenance_stop,
         coordinate_pixel,
-        device_level
+        device_level,
+        instance_ids
         )values
         <foreach collection="list" item="TDeviceMaintenance" separator=",">
             (
-                #{TDeviceMaintenance.maintenanceId, jdbcType=BIGINT},
-                #{TDeviceMaintenance.maintenanceName, jdbcType=VARCHAR},
-                #{TDeviceMaintenance.deviceId, jdbcType=BIGINT},
-                #{TDeviceMaintenance.isValid, jdbcType=INTEGER},
-                #{TDeviceMaintenance.maintenanceStart, jdbcType=TIMESTAMP},
-                #{TDeviceMaintenance.maintenanceStop, jdbcType=TIMESTAMP},
-                #{TDeviceMaintenance.coordinatePixel, jdbcType=VARCHAR},
-                #{TDeviceMaintenance.deviceLevel, jdbcType=VARCHAR}
+            #{TDeviceMaintenance.maintenanceId, jdbcType=BIGINT},
+            #{TDeviceMaintenance.maintenanceName, jdbcType=VARCHAR},
+            #{TDeviceMaintenance.deviceIds, jdbcType=BIGINT},
+            #{TDeviceMaintenance.isValid, jdbcType=INTEGER},
+            #{TDeviceMaintenance.maintenanceStart, jdbcType=TIMESTAMP},
+            #{TDeviceMaintenance.maintenanceStop, jdbcType=TIMESTAMP},
+            #{TDeviceMaintenance.coordinatePixel, jdbcType=VARCHAR},
+            #{TDeviceMaintenance.deviceLevel, jdbcType=VARCHAR},
+            #{TDeviceMaintenance.instanceIds, jdbcType=BIGINT}
             )
         </foreach>
     </insert>
@@ -183,19 +190,19 @@
 
     <select id="selectInstance" resultType="com.yjh.platform.module.device.entity.IdAndNameDetail">
         SELECT
-            (CASE WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_id )AND ISNULL( d.preset_name ) THEN ''
-             WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_name ) THEN d.preset_name
-             WHEN ISNULL( b.mete_name ) AND ISNULL( d.preset_img ) THEN c.inspection_name
-             WHEN ISNULL( c.inspection_name ) AND ISNULL( d.preset_name ) THEN b.mete_name
-             WHEN ISNULL( c.inspection_name ) THEN CONCAT( b.mete_name, ' /', d.preset_name )
-             WHEN ISNULL( d.preset_name ) THEN CONCAT( b.mete_name, ' /', c.inspection_name )
+        (CASE WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_id )AND ISNULL( d.preset_name ) THEN ''
+        WHEN ISNULL( b.mete_name )AND ISNULL( c.inspection_name ) THEN d.preset_name
+        WHEN ISNULL( b.mete_name ) AND ISNULL( d.preset_img ) THEN c.inspection_name
+        WHEN ISNULL( c.inspection_name ) AND ISNULL( d.preset_name ) THEN b.mete_name
+        WHEN ISNULL( c.inspection_name ) THEN CONCAT( b.mete_name, ' /', d.preset_name )
+        WHEN ISNULL( d.preset_name ) THEN CONCAT( b.mete_name, ' /', c.inspection_name )
         END) AS name,
-        a.device_id as id
-		FROM t_cruise_point_instance a
+        a.instance_id as id
+        FROM t_cruise_point_instance a
         LEFT JOIN t_std_devicemete b ON a.device_mete_id = b.device_mete_id
         LEFT JOIN t_robot_inspection c ON a.cruise_id = c.inspection_id
         LEFT JOIN t_camera_preset d ON a.cruise_id = d.preset_id
-		WHERE 1=1
+        WHERE 1=1
         <if test="deviceId != null and deviceId != ''"> and a.device_id =  #{deviceId, jdbcType=BIGINT} </if>
     </select>
 
@@ -228,7 +235,7 @@
     </select>
     <select id="selectDeviceIds2" resultType="java.lang.Long">
         select DISTINCT
-        a.device_id
+        a.device_ids
         from t_device_maintenance a
         where 1 = 1
             and a.maintenance_id in <foreach collection="list" item="maintenanceId" open="(" separator="," close=")">
@@ -238,19 +245,18 @@
 
     <select id="selectDeviceIdListByIns" resultType="java.lang.Long">
         select DISTINCT
-        a.device_id
+        a.device_ids
         from t_cruise_point_instance a
         where a.instance_id in <foreach collection="list" item="instanceId" open="(" separator="," close=")">
         #{instanceId, jdbcType=BIGINT}
     </foreach>
     </select>
 
+
     <delete id="deleteByDeviceIdList">
-         delete from t_device_maintenance
-         where maintenance_name = #{name,jdbcType=VARCHAR}
-         and device_id in <foreach collection="list" item="deviceId" open="(" separator="," close=")">
-        #{deviceId, jdbcType=BIGINT}
-    </foreach>
+        delete from t_device_maintenance
+        where maintenance_name = #{name,jdbcType=VARCHAR}
+          and device_id = #{deviceIds}
     </delete>
     <select id="selectRobotDeviceId" resultType="java.lang.String">
         SELECT DISTINCT
