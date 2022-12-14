@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**

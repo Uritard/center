@@ -89,7 +89,8 @@ public class UPatrolTaskService {
     public static final String PATROL_TASK_PREFIX = "patrol_task_result:";
     public static final String PATROL_SUMMARY_PREFIX = "countForAbnormal:";
     public static final String ROBOT_OR_DRONE_TASK = "robotOrDroneTask:";
-    private static final String TASK_PRIORITY_REDIS_KEY="task_priority_config:";
+    public static final String TASK_PRIORITY_REDIS_KEY="task_priority_config:";
+    public static final Map<String, Object> MAP_LOCK = new ConcurrentHashMap<>();
 
     @Autowired
     private UPatrolTaskDao uPatrolTaskDao;

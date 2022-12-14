@@ -36,6 +36,7 @@ import redis.clients.jedis.ScanResult;
 import java.util.*;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -166,7 +167,13 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.put("rectangle", robotPatrolTaskResult.getRectangle());
             tCruiseTaskResultMap.put("confidence", "");
             redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
-
+            Object waiter = MAP_LOCK.get(taskId + instanceId);
+            if (Objects.nonNull(waiter)) {
+                synchronized (waiter) {
+                    waiter.notifyAll();
+                }
+                MAP_LOCK.remove(taskId + instanceId);
+            }
             // 巡视主机下发的任务或者站端本体任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);
             if (!flag) {
