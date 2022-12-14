@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_ABNORMALALARM;
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -45,6 +46,7 @@ public class RobotInspectionWarnThread implements Runnable{
     private final UPatrolTaskService uPatrolTaskService;
     private final String taskCode;
     private final TRobotInspectionDao tRobotInspectionDao;
+    private final Object waiter = new Object();
 
     public RobotInspectionWarnThread(RobotPatrolTaskAlarm taskAlarm, RedisTemplate redisTemplate, AnalyseDataOperateService analyseDataOperateService, String taskCode){
         this.taskAlarm = taskAlarm;
@@ -147,7 +149,16 @@ public class RobotInspectionWarnThread implements Runnable{
             String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
             Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
             log.info("taskId是：{}，instanceId是：{}的 tCruiseTaskResultMap：{}", taskId, instanceId, tCruiseTaskResultMap);
-            warnInfo.setImagePath(tCruiseTaskResultMap.get("picpath"));
+            if (Objects.nonNull(tCruiseTaskResultMap.get("picpath"))) {
+                warnInfo.setImagePath(tCruiseTaskResultMap.get("picpath"));
+            } else {
+                MAP_LOCK.put(taskId + instanceId, waiter);
+                synchronized (waiter) {
+                    waiter.wait(5000);
+                }
+                tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+                warnInfo.setImagePath(tCruiseTaskResultMap.get("picpath"));
+            }
             String alarmLevel = taskAlarm.getAlarmLevel();
             String alarmType = taskAlarm.getAlarmType();
             if (StringUtils.isNotEmpty(alarmType)) {
