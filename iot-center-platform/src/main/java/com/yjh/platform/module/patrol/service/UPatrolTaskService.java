@@ -372,6 +372,7 @@ public class UPatrolTaskService {
             Map map = Object2Map.objectToMap(uPatrolDataResult, true);
             map.put("deviceMeteId", String.valueOf(item.getDeviceMeteId()));
             map.put("taskName", task.getTaskName());
+            map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
             if(item.getCruiseType() != 228){
                 map.put("cameraId", String.valueOf(item.getCameraId()));
                 map.put("robotId","");
@@ -395,9 +396,12 @@ public class UPatrolTaskService {
         if (task.getExecuteType() == CruiseConstant.TaskTypeEnum.CYCLE.getType()) {
             UPatrolTask nextTask = new UPatrolTask();
             String newTaskId = String.valueOf(UUID.randomUUID()).replace("-", "");
+            // 周期任务的下一次任务时间和名称在初始化时就通过cron表达式进行计算，不再通过任务执行时再修改名称
+            Date nextStartTime = DateTimeUtil.cornNextTime(task.getDateType(), task.getStartTime());
+            String taskNameTime = DateTimeUtil.format3(nextStartTime);
             nextTask.setTaskId(newTaskId)
                     .setTaskCode(task.getTaskCode())
-                    .setTaskName(task.getTaskName())
+                    .setTaskName(task.getTaskName() + "_" + taskNameTime)
                     .setPlanId(task.getPlanId())
                     .setAreaId(task.getAreaId())
                     .setTaskType(task.getTaskType())
@@ -406,7 +410,7 @@ public class UPatrolTaskService {
                     // .setDateType(task.getDateType())
                     .setTaskSource(task.getTaskSource())
                     .setTaskLevel(task.getTaskLevel())
-                    .setStartTime(task.getStartTime())
+                    .setStartTime(nextStartTime)
                 // 避免下一次的任务创建时间与当前任务创建时间重复，下一次任务创建时间 +30s
                     .setCreateTime(new Date(System.currentTimeMillis() + 30000))
                     .setEndTime(task.getEndTime())
@@ -424,9 +428,7 @@ public class UPatrolTaskService {
         mapForAbnormal.put("all", String.valueOf(instanceList.size()));
         mapForAbnormal.put("abnormal", "0");
         mapForAbnormal.put("normal", "0");
-        Date taskStart = new Date();
-
-        mapForAbnormal.put("taskStart", DateTimeUtil.format(taskStart));
+        mapForAbnormal.put("taskStart", DateTimeUtil.format(task.getStartTime()));
         mapForAbnormal.put("taskState", String.valueOf(CruiseConstant.TASK_STATE_NOT_START));
 
         String strForCountAbnormal = PATROL_SUMMARY_PREFIX + task.getTaskId();
@@ -502,8 +504,8 @@ public class UPatrolTaskService {
     private void addToUpSystem(RobotPatrolTaskStatus robotPatrolTaskStatus, String taskId) {
         try {
             // long robotId = tRobotInspectionDao.selectRobotIdByRobotCode(robotPatrolTaskStatus.getRobotCode());
-            Date createTime = format.parse(robotPatrolTaskStatus.getPlanStartTime());
-            Date startTime = format.parse(robotPatrolTaskStatus.getStartTime());
+            Date createTime = new Date(System.currentTimeMillis() + 30000);
+            Date startTime = format.parse(robotPatrolTaskStatus.getPlanStartTime());
             UPatrolTask uPatrolTask = new UPatrolTask()
                     .setTaskId(taskId)
                     .setTaskCode(robotPatrolTaskStatus.getTaskCode())
@@ -915,15 +917,13 @@ public class UPatrolTaskService {
             item.put("task_name", task.getTaskName());
             item.put("task_code", task.getTaskCode());
             item.put("task_state", String.valueOf(state));
-            item.put("plan_start_time", DateTimeUtil.format(task.getStartTime()));
-            if (task.getExecuteType() == TaskTypeEnum.CYCLE.getType()) {
-                //CronExpression expression = new CronExpression(tCruiseTask.getDateType());
-                item.put("start_time", DateTimeUtil.format(task.getStartTime()));
-            } else {
-                item.put("start_time", DateTimeUtil.format(new Date()));
-            }
+            String planTime = DateTimeUtil.format(task.getStartTime());
+            item.put("plan_start_time", planTime);
 
             Map<String, String> mapForGet = redisTemplate.opsForHash().entries(PATROL_SUMMARY_PREFIX + task.getTaskId());
+
+            item.put("start_time", mapForGet.getOrDefault("taskStart", planTime));
+
             int all = NumberUtils.toInt(mapForGet.get("all"));
             all = Math.max(all, 1);
             Integer normal = NumberUtils.toInt(mapForGet.get("normal"));

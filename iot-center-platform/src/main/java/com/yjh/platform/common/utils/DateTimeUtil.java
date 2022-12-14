@@ -1087,6 +1087,29 @@ public class DateTimeUtil {
         return validTimeList;
     }
 
+    public static Date cornNextTime(String cronExpression, Date startTime) {
+        Date date = new Date();
+        if (cronExpression == null || cronExpression.length() < 1) {
+            return date;
+        } else {
+            CronExpression exp;
+            try {
+                exp = new CronExpression(cronExpression);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                return date;
+            }
+            Date dd;
+
+            if(date.before(startTime)){
+                dd = exp.getNextValidTimeAfter(startTime);
+            } else {
+                dd = exp.getNextValidTimeAfter(date);
+            }
+            return dd;
+        }
+    }
+
     public static String createCronExpression(Map<String, String> mapTime){
 
         String croExp="";
