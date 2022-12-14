@@ -2,6 +2,7 @@ package com.yjh.accessrobot.module.command.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.google.common.collect.Lists;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.*;
@@ -435,7 +436,8 @@ public class TStdDeviceModelService {
         List<TCameraPreset> insertList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
             insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
-            tCameraPresetMapper.batchInsert(insertList);
+            List<List<TCameraPreset>> partitionList = Lists.partition(insertList, 1000);
+            partitionList.forEach(list -> tCameraPresetMapper.batchInsert(list));
         }
         return insertList;
     }
@@ -470,7 +472,8 @@ public class TStdDeviceModelService {
         List<TRobotInspection> insertList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
             insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
-            tRobotInspectionDao.batchInsertTRobotInspection(insertList);
+            List<List<TRobotInspection>> partitionList = Lists.partition(insertList, 1000);
+            partitionList.forEach(list -> tRobotInspectionDao.batchInsertTRobotInspection(list));
         }
         return insertList;
     }
@@ -536,7 +539,8 @@ public class TStdDeviceModelService {
                         break;
                 }
             });
-            tCruisePointInstanceMapper.batchInsert(insertList);
+            List<List<TCruisePointInstance>> partitionList = Lists.partition(insertList, 1000);
+            partitionList.forEach(list -> tCruisePointInstanceMapper.batchInsert(list));
         }
     }
 
@@ -574,7 +578,8 @@ public class TStdDeviceModelService {
             insertList.forEach(tStdDeviceMete -> tStdDeviceMete.setDeviceId(insertStdDevice.stream().filter(tStdDevice ->
                             String.valueOf(tStdDeviceMete.getDeviceId()).equals(tStdDevice.getOriginId()))
                     .collect(Collectors.toList()).get(0).getDeviceId()));
-            tStdDevicemeteMapper.batchInsert(insertList);
+            List<List<TStdDeviceMete>> partitionList = Lists.partition(insertList, 1000);
+            partitionList.forEach(list -> tStdDevicemeteMapper.batchInsert(list));
         }
         return insertList;
     }
@@ -611,7 +616,8 @@ public class TStdDeviceModelService {
                     tAlgorithmMete.setDeviceMeteId(insertStdDeviceMete.stream().filter(tStdDeviceMete ->
                                     tAlgorithmMete.getOriginId().equals(tStdDeviceMete.getOriginId()))
                             .collect(Collectors.toList()).get(0).getDeviceMeteId()));
-            tAlgorithmMeteMapper.batchInsert(insertList);
+            List<List<TAlgorithmMete>> partitionList = Lists.partition(insertList, 1000);
+            partitionList.forEach(list -> tAlgorithmMeteMapper.batchInsert(list));
         }
     }
 
@@ -646,7 +652,8 @@ public class TStdDeviceModelService {
             insertList.forEach(tStdDeviceAttr -> tStdDeviceAttr.setDeviceId(insertStdDevice.stream().filter(tStdDevice ->
                             tStdDeviceAttr.getOriginId().equals(tStdDevice.getOriginId()))
                     .collect(Collectors.toList()).get(0).getDeviceId()));
-            tStdDeviceAttrMapper.batchInsert(insertList);
+            List<List<TStdDeviceAttr>> partitionList = Lists.partition(insertList, 1000);
+            partitionList.forEach(list -> tStdDeviceAttrMapper.batchInsert(list));
         }
     }
 
@@ -692,7 +699,8 @@ public class TStdDeviceModelService {
         List<TStdDevice> insertList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
             insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
-            tStdDeviceMapper.batchInsert(insertList);
+            List<List<TStdDevice>> partitionList = Lists.partition(insertList, 1000);
+            partitionList.forEach(list -> tStdDeviceMapper.batchInsert(list));
         }
         return insertList;
     }
