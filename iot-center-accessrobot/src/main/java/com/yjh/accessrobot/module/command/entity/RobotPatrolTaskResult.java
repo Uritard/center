@@ -90,4 +90,9 @@ public class RobotPatrolTaskResult implements Serializable {
     @ApiModelProperty(value = "可见光原图、红外结果")
     private String originFileResultPath;
 
+    /**
+     * 下级系统拓展字段
+     */
+    @ApiModelProperty(value = "异常原因")
+    private String abnormalType;
 }

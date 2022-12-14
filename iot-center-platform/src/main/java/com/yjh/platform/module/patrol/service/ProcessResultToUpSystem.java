@@ -380,6 +380,7 @@ public class ProcessResultToUpSystem {
                 }
             }
             xmlItem.put("valid", valid);
+            xmlItem.put("abnormal_type", cruiseResultMap.get("cruiseAbnormal"));
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }

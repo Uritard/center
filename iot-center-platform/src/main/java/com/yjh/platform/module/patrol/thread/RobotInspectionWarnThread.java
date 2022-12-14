@@ -79,7 +79,7 @@ public class RobotInspectionWarnThread implements Runnable{
             }
             log.info("robotTaskId=={}", robotTaskId);
 
-            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + taskAlarm.getDeviceId();
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + taskAlarm.getDeviceId();
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
             long instanceId = NumberUtils.toLong(robotInfoKeyMap.get("instanceId"));
             // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId

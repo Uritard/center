@@ -85,7 +85,7 @@
         where 1 = 1
         <if test="dictId != null "> and a.dict_id = #{dictId, jdbcType=INTEGER}</if>
         <if test="dictCode != null and dictCode != ''"> and a.dict_code = #{dictCode, jdbcType=VARCHAR}</if>
-        <if test="colName != null and colName != ''"> and a.col_name LIKE CONCAT('%',#{colName, jdbcType=VARCHAR},'%')</if>
+        <if test="colName != null and colName != ''"> and a.col_name = #{colName, jdbcType=VARCHAR}</if>
         <if test="dictNote != null and dictNote != ''"> and a.dict_note = #{dictNote, jdbcType=VARCHAR}</if>
         <if test="upDict != null "> and a.up_dict = #{upDict, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>

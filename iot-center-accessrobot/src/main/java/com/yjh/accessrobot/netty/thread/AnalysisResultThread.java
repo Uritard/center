@@ -66,7 +66,7 @@ public class AnalysisResultThread implements Runnable{
         String taskId = cruiseResultMap.get("taskCode");
         String robotCode = cruiseResultMap.get("robotCode");
         String inspectionCode = cruiseResultMap.get("deviceId");
-        String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + taskId + ":" + cruiseResultMap.get("deviceId");
+        String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + cruiseResultMap.get("deviceId");
         Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
         Long instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
 

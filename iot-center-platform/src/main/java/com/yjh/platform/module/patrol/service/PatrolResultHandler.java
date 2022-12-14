@@ -863,9 +863,9 @@ public class PatrolResultHandler {
 
             cruiseResultMap.put("resultNum", resultValue);
             cruiseResultMap.put("picpath", resultImage);
-            cruiseResultMap.put("cruiseResult", StringUtils.equals("图像有差异", resultValue) ?
-                    String.valueOf(CRUISE_RESULT_ABNORMAL) : String.valueOf(CRUISE_RESULT_NORMAL));
-            cruiseResultMap.put("cruiseAbnormal", "--");
+            boolean abnormal = StringUtils.equals("图像有差异", resultValue);
+            cruiseResultMap.put("cruiseResult", String.valueOf(abnormal ? CRUISE_RESULT_ABNORMAL : CRUISE_RESULT_NORMAL));
+            cruiseResultMap.put("cruiseAbnormal", abnormal ? String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL) : "--");
 
             // 判别异常 为上报到算法管理平台暂存数据
             if (StringUtils.equals("图像有差异", resultValue)){

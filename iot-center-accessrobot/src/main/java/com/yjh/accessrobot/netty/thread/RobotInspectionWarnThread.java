@@ -78,7 +78,7 @@ public class RobotInspectionWarnThread implements Runnable{
                 }
             }
 
-            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotTaskId + ":" + warnResultMap.get("deviceId");
+            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + warnResultMap.get("deviceId");
             Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
             Long instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
 
