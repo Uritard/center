@@ -66,7 +66,6 @@ public class RobotService {
 
     private Logger log = LoggerFactory.getLogger(RobotService.class);
 
-    // String todayTime = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
     private static final String OFF_LINE = "离线";
 
     @Autowired

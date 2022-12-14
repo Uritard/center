@@ -398,7 +398,7 @@ public class TCruiseResultService{
     private void getTaskCountByCache(TaskSimpleInfo temTask) {
         //取出taskId对应下的所有instanceId
         Set<String> instanceKey = redisTemplate.keys("patrol_task_result:"+ temTask.getTaskId() +":*");
-        log.info("查询任务[{}]下所有instance:{}", temTask.getTaskId(),JSON.toJSONString(instanceKey));
+//        log.info("查询任务[{}]下所有instance:{}", temTask.getTaskId(),JSON.toJSONString(instanceKey));
         if (CollectionUtil.isNotEmpty(instanceKey)) {
             Long instanceCount = (long) instanceKey.size();
             Long cameraCount = 0L;

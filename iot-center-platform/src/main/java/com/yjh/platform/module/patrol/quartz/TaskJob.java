@@ -90,11 +90,11 @@ public class TaskJob extends QuartzJobBean {
                 log.info(task.getTaskName() + "在 " + taskDate + " 时间不需要执行");
                 return;
             } else if (Objects.nonNull(ancestralTask.getEndTime()) && date.after(ancestralTask.getEndTime())) {
-                log.info("此时间大于结束时间,以后都不会再做了,删除当前任务");
+                log.info("此时间大于结束时间,以后都不会再做了,删除当前任务:{}", taskId);
                 uPatrolTaskService.deleteByPrimaryId(taskId, DateTimeUtil.format(date));
                 return;
             } else if (Objects.nonNull(ancestralTask.getStartTime()) && date.before(ancestralTask.getStartTime())) {
-                log.info(taskDate + "此时间小于开始时间,任务不需要执行");
+                log.info(taskDate + "此时间小于开始时间,任务不需要执行:{}", taskId);
                 return;
             }
         }
@@ -114,7 +114,7 @@ public class TaskJob extends QuartzJobBean {
             allInstanceList = uPatrolTaskDao.selectInsByTask(taskId);
             //更改任务状态
             setTaskResult(task, date);
-            //给机器人发任务启动  没开率下级系统 暂时是考虑了机器人和无人机
+            //给机器人发任务启动  没考虑下级系统 暂时是考虑了机器人和无人机
             uPatrolTaskService.taskToRobotOrDroneStart(task);
             //调用摄像机任务
             uPatrolTaskService.localTaskStart(task.getTaskId());
