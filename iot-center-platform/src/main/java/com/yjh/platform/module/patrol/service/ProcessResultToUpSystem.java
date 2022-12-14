@@ -109,7 +109,7 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
                 xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
-                xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
+                xmlItem.put("task_patrolled_id", taskId + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
 
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
                 String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
