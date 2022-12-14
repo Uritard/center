@@ -25,13 +25,17 @@
     </delete>
 
     <insert id="add" >
-        insert into warn_sub(
-             user_id, sub_warn_level, sub_warn_type
-        )value(
+        insert into warn_sub
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            user_id,
+            <if test="subWarnLevel != null and subWarnLevel != '' ">sub_warn_level,</if>
+            <if test="subWarnType != null and subWarnType != ''">sub_warn_type,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
             #{userId},
-            #{subWarnLevel},
-            #{subWarnType}
-        )
+            <if test="subWarnLevel != null and subWarnLevel != ''">#{subWarnLevel},</if>
+            <if test="subWarnType != null and subWarnType != ''">#{subWarnType},</if>
+        </trim>
     </insert>
 
 </mapper>
