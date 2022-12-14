@@ -50,7 +50,7 @@
     </delete>
     <delete id="deleteByEdgeCodeAndOriginId">
         delete from t_algorithm_mete  where edge_code=#{edgeCode}
-        and origin_id in (
+        and device_mete_id in (
         SELECT
         device_mete_id
         FROM
