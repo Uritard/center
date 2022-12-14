@@ -538,6 +538,7 @@ CREATE TABLE `t_algorithm_mete` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
   `edge_code` varchar(32) DEFAULT NULL COMMENT '节点编码',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   PRIMARY KEY (`device_mete_id`,`algorithm_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='算法测点配置表';
 
