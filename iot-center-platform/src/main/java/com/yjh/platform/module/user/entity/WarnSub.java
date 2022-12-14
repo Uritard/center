@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.lang.NonNull;
 
 import java.io.Serializable;
 
@@ -31,6 +32,7 @@ public class WarnSub implements Serializable {
     private Long warnSubId;
 
     @ApiModelProperty(value = "用户id")
+    @NonNull
     private Long userId;
 
     @ApiModelProperty(value = "订阅的告警级别")
