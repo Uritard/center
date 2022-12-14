@@ -21,6 +21,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -34,12 +36,14 @@ import java.util.Map;
 public class StaticResourceHandler extends HandlerInterceptorAdapter {
     private static final Logger log = LoggerFactory.getLogger(StaticResourceHandler.class);
 
-    public static final String UNAUTH_MSG = "<html><head><title>404 Not Found</title></head><body bgcolor=\"white\"><center><h1>404 Not Found</h1></center><hr><center>webServer</center></body></html>";
+    public static final String UNAUTH_MSG =
+        "<html><head><title>404 Not Found</title></head><body bgcolor=\"white\"><center><h1>404 Not Found</h1></center><hr><center>webServer</center></body></html>";
     @Value("${sys.resource.send-error:false}")
     private boolean sendError;
 
     public static String[] NOAUTH_PATH;
     public static String[] RESOURCE_PATH;
+    public static Map<String, String[]> ROLE_PATH_MAP = new HashMap<>(8);
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -72,6 +76,13 @@ public class StaticResourceHandler extends HandlerInterceptorAdapter {
                 log.error("静态资源 token 已过期 >>>>>>>>>>>>>>>>");
                 return errorResponse(response, HttpStatus.SC_NOT_FOUND, UNAUTH_MSG, sendError);
             }
+        }
+
+        String userRole = (String)redisTemplate.opsForHash().entries("userInfo:" + userId).get("roleId");
+        String uri = request.getRequestURI();
+        if (!StringUtils.startsWithAny(uri, ROLE_PATH_MAP.get(userRole))) {
+            log.error("用户角色没有此资源权限，uri: {}, userRole: {}, Paths: {} >>>>>>>>>>>>>>>>", uri, userRole, Arrays.toString(ROLE_PATH_MAP.get(userRole)));
+            return errorResponse(response, HttpStatus.SC_NOT_FOUND, UNAUTH_MSG, sendError);
         }
 
         return true;
@@ -135,4 +146,20 @@ public class StaticResourceHandler extends HandlerInterceptorAdapter {
         }
     }
 
+    @Value("${sys.role.path:}")
+    public void setRolePathMap(String rolePath) {
+        String roleP = "1234:/imgs/zip,/imgs/specimens,/files/deviceTypeImage,/files/tcpFiles;"
+            + "1235:/imgs/model-picture,/imgs/ftpImg,/imgs/analyseResultImg,/imgs/resultImg,/imgs/video,/imgs/infrared,/imgs/presets,/imgs/specimens,/files/reportFiles,/files/temporaryFiles,/files/voiceFile;"
+            + "1236:";
+        if (StringUtils.isNotEmpty(rolePath)) {
+            roleP = rolePath;
+        }
+        String[] rolePaths = roleP.split(";");
+        for (String rp : rolePaths) {
+            if (StringUtils.isNotEmpty(rp)) {
+                String[] roles = rp.split(":", 2);
+                ROLE_PATH_MAP.put(roles[0], StringUtils.split(roles[1], ","));
+            }
+        }
+    }
 }
