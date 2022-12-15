@@ -2398,6 +2398,7 @@ CREATE TABLE `warn_sub` (
   PRIMARY KEY (`warn_sub_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='告警订阅信息';
 
+DROP TABLE IF EXISTS `t_task_priority_config`;
 CREATE TABLE `t_task_priority_config`(
     `prioritized_task_type` int(20) NOT NULL COMMENT '执行等级配置任务类型',
     `execute_level`         int(20) NOT NULL COMMENT '任务执行等级',

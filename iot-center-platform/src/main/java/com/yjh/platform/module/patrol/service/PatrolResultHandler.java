@@ -762,6 +762,8 @@ public class PatrolResultHandler {
                 //webSocket通知前端调用查询告警弹框的接口
                 Map<String, String> jasonMaps = new HashMap<>();
                 jasonMaps.put("type", "alarmPopUp");
+                jasonMaps.put("warnLevel", infoMap.getOrDefault("alarmLevel", ""));
+                jasonMaps.put("warnType", "1");
                 jasonMaps.put("warnId", warnId);
                 jasonMaps.put("defectModel", infoMap.get("defectModel"));
                 log.info("发送给前端的消息：{}", JSON.toJSONString(jasonMaps));
