@@ -531,8 +531,7 @@ public class UPatrolTaskService {
                     .setTaskLevel(1)
                     .setTaskState(TASK_STATE_NOT_START)
                     .setCreateTime(createTime)
-//                    .setExecuteTime(startTime)
-                    ;
+                    .setExecuteTime(startTime);
 
             UPatrolTask taskExsis = uPatrolTaskDao.selectByPrimaryId(taskId);
             if (taskExsis == null) {
