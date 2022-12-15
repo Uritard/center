@@ -1101,7 +1101,9 @@ public class DateTimeUtil {
             }
             Date dd;
 
-            if(date.before(startTime)){
+            if(date.before(startTime) && exp.isSatisfiedBy(startTime)){
+                dd = startTime;
+            } else if(date.before(startTime)) {
                 dd = exp.getNextValidTimeAfter(startTime);
             } else {
                 dd = exp.getNextValidTimeAfter(date);

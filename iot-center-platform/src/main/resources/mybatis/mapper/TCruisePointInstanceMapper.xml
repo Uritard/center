@@ -637,7 +637,7 @@
 
     <select id="selectTimeIsIn" resultType="java.lang.Long">
         SELECT DISTINCT
-        a.device_id
+        a.device_ids
         FROM
         t_device_maintenance a
         WHERE

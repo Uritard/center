@@ -54,7 +54,9 @@ public enum HandlerEnum {
     // 模型更新指令
     MODEL_UPDATE("11", "modelUpdate"),
     // 巡视报告数据
-    ROBOT_CRUISE_REPORT("63", "robotCruiseReport");
+    ROBOT_CRUISE_REPORT("63", "robotCruiseReport"),
+    // 任务审核结果
+    REVIEW_RESULT("611","reviewResult");
 
     /**
      * 状态值

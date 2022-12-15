@@ -115,7 +115,7 @@ public class TaskJob extends QuartzJobBean {
             //更改任务状态
             setTaskResult(task, fireTime);
             //给机器人发任务启动  没考虑下级系统 暂时是考虑了机器人和无人机
-            uPatrolTaskService.taskToRobotOrDroneStart(task);
+            uPatrolTaskService.taskToRobotOrDroneStart(task, ancestralTask.getDateType());
             //调用摄像机任务
             uPatrolTaskService.localTaskStart(task.getTaskId());
         } catch (Exception e) {

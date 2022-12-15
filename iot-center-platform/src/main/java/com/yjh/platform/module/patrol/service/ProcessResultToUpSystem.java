@@ -13,6 +13,7 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
+import com.yjh.platform.module.task.entity.CruiseManualReview;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -625,6 +626,51 @@ public class ProcessResultToUpSystem {
     }
 
     /**
+     * 审核结果上报上级系统
+     */
+    @Async
+    public XMLBaseModel reviewToUpSystem(List<CruiseManualReview> cruiseResultList, boolean all){
+        XMLBaseModel xmlBaseModel = new XMLBaseModel();
+        List<Map<String, Object>> xmlItems = new ArrayList<>();
+
+        try {
+
+            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
+            for(CruiseManualReview cruiseResultMap : cruiseResultList) {
+                log.info("cruiseResultMap=={}", cruiseResultMap);
+                Map<String, Object> xmlItem = new HashMap<>(16);
+                String taskId = cruiseResultMap.getTaskId();
+                String instanceId = String.valueOf(cruiseResultMap.getInstanceId());
+                String simpleDateFormat = DateTimeUtil.format3(new Date());
+
+                xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat);
+                xmlItem.put("task_code", taskId);
+                xmlItem.put("device_id", instanceId);
+                xmlItem.put("evaluation_state", cruiseResultMap.getEvaluationState());
+                xmlItem.put("evaluation_state_name", cruiseResultMap.getEvaluationState());
+                xmlItem.put("identify_result", cruiseResultMap.getIdentifyResult());
+                xmlItem.put("identify_result_name", cruiseResultMap.getIdentifyResultName());
+                xmlItem.put("identify_state", cruiseResultMap.getIdentifyState());
+                xmlItem.put("identify_state_name", cruiseResultMap.getIdentifyStateName());
+                xmlItem.put("check_user", cruiseResultMap.getCheckUser());
+                xmlItem.put("time", DateTimeUtil.format(cruiseResultMap.getCheckDate()));
+                xmlItems.add(xmlItem);
+            }
+            xmlBaseModel.setItems(xmlItems);
+            xmlBaseModel.setType("611");
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            Map<String, List<XMLBaseModel>> map = new HashMap<>();
+            map.put("list", list);
+            log.info("The review information to be reported one level up is==={}", map);
+            Constant.otherServer(map, Constant.TCP_URL);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+        return xmlBaseModel;
+    }
+
+    /**
      * Redis数据库批量查询Key值游标
      * @param key redis的key
      * @return Set<String>
@@ -637,7 +683,7 @@ public class ProcessResultToUpSystem {
             MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
 
             ScanParams scanParams = new ScanParams();
-            scanParams.match("*" + key + "*");
+            scanParams.match(key + "*");
             scanParams.count(1000);
             ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
             while (null != scan.getStringCursor()) {

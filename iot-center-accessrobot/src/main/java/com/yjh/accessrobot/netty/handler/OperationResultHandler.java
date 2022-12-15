@@ -142,6 +142,6 @@ public class OperationResultHandler implements MessageHandlerStrategy, Initializ
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        MessageHandlerStrategyFactory.register(HandlerEnum.OPERATION_RESULT.getCode(), this);
+        // MessageHandlerStrategyFactory.register(HandlerEnum.OPERATION_RESULT.getCode(), this);
     }
 }

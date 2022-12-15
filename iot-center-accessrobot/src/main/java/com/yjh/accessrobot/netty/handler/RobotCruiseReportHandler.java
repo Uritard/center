@@ -43,6 +43,6 @@ public class RobotCruiseReportHandler implements MessageHandlerStrategy, Initial
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        MessageHandlerStrategyFactory.register(HandlerEnum.ROBOT_CRUISE_REPORT.getCode(), this);
+        // MessageHandlerStrategyFactory.register(HandlerEnum.ROBOT_CRUISE_REPORT.getCode(), this);
     }
 }

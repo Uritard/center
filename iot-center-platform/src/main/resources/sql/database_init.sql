@@ -1301,17 +1301,17 @@ CREATE TABLE `t_defect_info` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_device_maintenance`;
 CREATE TABLE `t_device_maintenance` (
-                                        `maintenance_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '检修ID',
-                                        `maintenance_name` varchar(256) NOT NULL COMMENT '检修名称',
-                                        `device_ids` text COMMENT '设备ID',
-                                        `is_valid` int(2) DEFAULT '1' COMMENT '是否使用，0-不使用，1-使用',
-                                        `maintenance_start` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '开始检修时间',
-                                        `maintenance_stop` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '结束检修时间',
-                                        `edge_code` varchar(32) DEFAULT NULL COMMENT '边缘节点编码（从哪个边缘节点同步上来的）',
-                                        `coordinate_pixel` varchar(50) NOT NULL COMMENT '设备层级（1 = 间隔 2 = 主设备 3 = 设备点位 4 = 部件）',
-                                        `device_level` varchar(50) NOT NULL COMMENT '设备层级（1 = 间隔 2 = 主设备 3 = 设备点位 4 = 部件）',
-                                        `instance_ids` text COMMENT '巡视点id',
-                                        PRIMARY KEY (`maintenance_id`) USING BTREE
+  `maintenance_id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT '检修ID',
+  `maintenance_name` varchar(256) NOT NULL COMMENT '检修名称',
+  `device_ids` text COMMENT '设备ID',
+  `is_valid` int(2) DEFAULT '1' COMMENT '是否使用，0-不使用，1-使用',
+  `maintenance_start` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '开始检修时间',
+  `maintenance_stop` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '结束检修时间',
+  `edge_code` varchar(32) DEFAULT NULL COMMENT '边缘节点编码（从哪个边缘节点同步上来的）',
+  `coordinate_pixel` varchar(50) NOT NULL COMMENT '设备层级（1 = 间隔 2 = 主设备 3 = 设备点位 4 = 部件）',
+  `device_level` varchar(50) NOT NULL COMMENT '设备层级（1 = 间隔 2 = 主设备 3 = 设备点位 4 = 部件）',
+  `instance_ids` text COMMENT '巡视点id',
+  PRIMARY KEY (`maintenance_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='设备区域检修表';
 
 -- ----------------------------

@@ -52,7 +52,7 @@
         update t_device_maintenance a <set>
         <if test="maintenanceId != null ">a.maintenance_id = #{maintenanceId},</if>
         <if test="maintenanceName != null ">a.maintenance_name = #{maintenanceNam},</if>
-        <if test="deviceId != null ">a.device_id = #{deviceId},</if>
+        <if test="deviceIds != null ">a.device_ids = #{deviceIds},</if>
         <if test="isValid != null ">a.is_valid = #{isValid, jdbcType=INTEGER},</if>
         <if test="maintenanceStart != null ">a.maintenance_start = #{maintenanceStart, jdbcType=TIMESTAMP},</if>
         <if test="maintenanceStop != null ">a.maintenance_stop = #{maintenanceStop, jdbcType=TIMESTAMP},</if>
@@ -93,7 +93,7 @@
         where 1 = 1
         <if test="maintenanceId != null and maintenanceId != ''"> and a.maintenance_id = #{maintenanceId, jdbcType=BIGINT}</if>
         <if test="maintenanceName != null and maintenanceName != ''"> and a.maintenance_name LIKE CONCAT('%',#{maintenanceName, jdbcType=VARCHAR},'%')</if>
-        <if test="deviceId != null and deviceId != ''"> and a.device_id = #{deviceId, jdbcType=BIGINT}</if>
+        <if test="deviceIds != null and deviceIds != ''"> and a.device_ids = #{deviceIds, jdbcType=BIGINT}</if>
         <if test="isValid != null "> and a.is_valid = #{isValid, jdbcType=INTEGER}</if>
         <if test="maintenanceStart != null"> and a.maintenance_start = #{maintenanceStart, jdbcType=TIMESTAMP}</if>
         <if test="maintenanceStop != null "> and a.maintenance_stop = #{maintenanceStop, jdbcType=TIMESTAMP}</if>
@@ -208,7 +208,7 @@
 
     <delete id="deleteByDeviceId" >
          delete from t_device_maintenance
-                where device_id = #{deviceId, jdbcType=BIGINT}
+                where device_ids = #{deviceIds, jdbcType=BIGINT}
     </delete>
     <select id="selectDeviceIds" resultType="com.yjh.platform.module.device.entity.DeviceAndInstance">
         SELECT
@@ -256,7 +256,7 @@
     <delete id="deleteByDeviceIdList">
         delete from t_device_maintenance
         where maintenance_name = #{name,jdbcType=VARCHAR}
-          and device_id = #{deviceIds}
+          and device_ids = #{deviceIds}
     </delete>
     <select id="selectRobotDeviceId" resultType="java.lang.String">
         SELECT DISTINCT
