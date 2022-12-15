@@ -721,7 +721,7 @@ public class UPatrolTaskService {
         return "";
     }
 
-    public void taskToRobotOrDroneStart(UPatrolTask task){
+    public void taskToRobotOrDroneStart(UPatrolTask task, String dateType){
 
 
         //找出机器人做任务的巡检点
@@ -755,9 +755,9 @@ public class UPatrolTaskService {
         robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
         log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
         //让机器人做任务
-        log.info("task=={}", task);
-        if (StringUtils.isNotEmpty(task.getDateType())) {
-            boolean moreTime = task.getDateType().split(" ")[2].contains(",");
+        log.info("task=={}, dateType: {}", task, dateType);
+        if (StringUtils.isNotEmpty(dateType)) {
+            boolean moreTime = dateType.split(" ")[2].contains(",");
             if (moreTime && task.getExecuteType() == 172) {
                 robotTask(robotTaskInfoMap);
                 log.info("下发成功！！！");
@@ -1508,15 +1508,17 @@ public class UPatrolTaskService {
             } else {
                 abnormalCounts += size;
             }
-            String progress = "0";
+            String progress;
             if(allCounts != 0){
                 progress = CommonUtils.percentFormat((float)(normalCounts + abnormalCounts)/allCounts, "#.####");
+                // 如果 all==0，则表示这不是本机创建的任务，任务进度不由本级计算，不更新进度值
+                resultCountsMap.put("taskProgress", progress);
             }
             log.info("task:{}, normalCounts:{}, abnormalCounts:{}", taskId, normalCounts, abnormalCounts);
             resultCountsMap.put("abnormal", String.valueOf(abnormalCounts));
             resultCountsMap.put("normal", String.valueOf(normalCounts));
             resultCountsMap.put("lastCruiseTime", DateTimeUtil.getDateTimeString());
-            resultCountsMap.put("taskProgress", progress);
+
 
             if (allCounts != 0 && normalCounts + abnormalCounts >= allCounts && !ended) {
                 endOnece = true;
