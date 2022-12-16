@@ -234,7 +234,12 @@
     </select>
 
     <select id="selectIsIn" resultType="com.yjh.platform.module.device.entity.TStdRegion">
-        select * from t_std_region where region_id != #{ regionId,jdbcType=BIGINT} and region_code = #{regionCode,jdbcType=VARCHAR};
+        select
+        <include refid="Base_Column_List" />
+        from t_std_region
+        where region_id != #{ regionId,jdbcType=BIGINT}
+        and region_code = #{regionCode,jdbcType=VARCHAR}
+        and state = 1;
     </select>
     <select id="selectAll" resultMap="BaseResultMap">
         select

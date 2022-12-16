@@ -469,12 +469,14 @@ public class RobotService {
             }
         } else {
             Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
-            TRobotInfo tRobotInfo = new TRobotInfo()
-                    .setRobotId(robotId)
-                    .setRobotStatus(robotStatus);
-            StatisticsUtil.onlineDuration(tRobotInfo);
-            int res = tRobotInfoDao.update(tRobotInfo);
-            log.info("robotCode为==={},robotId为==={}的巡视设备状态是==={},修改结果==={}", robotCode, robotId, tRobotInfo.getRobotStatus(), res);
+            if (Objects.nonNull(robotId)) {
+                TRobotInfo tRobotInfo = new TRobotInfo()
+                        .setRobotId(robotId)
+                        .setRobotStatus(robotStatus);
+                StatisticsUtil.onlineDuration(tRobotInfo);
+                int res = tRobotInfoDao.update(tRobotInfo);
+                log.info("robotCode为==={},robotId为==={}的巡视设备状态是==={},修改结果==={}", robotCode, robotId, tRobotInfo.getRobotStatus(), res);
+            }
         }
     }
 
