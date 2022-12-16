@@ -453,11 +453,8 @@ public class UPatrolTaskService {
             // 增加时间判断，避免预先初始化导致数据传入下一个任务
             String timeStr = patrolledIds[1];
             Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
-            String taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
-            if (StringUtils.isEmpty(taskId)) {
-                taskId = patrolledIds[0];
-            }
-            String taskIdFinal = taskId;
+            String taskId = null;
+
             boolean robotEnd = false;
             int taskState = TASK_STATE_NOT_START;
             switch (robotPatrolTaskStatus.getTaskState()) {
@@ -480,13 +477,21 @@ public class UPatrolTaskService {
                     robotEnd = true;
                     break;
                 case "5":
-                    addToUpSystem(robotPatrolTaskStatus, taskIdFinal);
+                    // 任务状态为 5 未执行时，需要考虑这个任务是下级系统创建的还是上级系统创建的，如果是上级系统创建的，就不应该初始化，如果是下级系统创建的，则需要初始化
+                    taskId = addToUpSystem(robotPatrolTaskStatus, patrolledIds[0]);
                     break;
                 default:
                     break;
             }
-            updateTaskProgress(robotPatrolTaskStatus, taskIdFinal, taskState);
+            if (StringUtils.isEmpty(taskId)) {
+                taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
+            }
+            if (StringUtils.isEmpty(taskId)) {
+                taskId = patrolledIds[0];
+            }
+            updateTaskProgress(robotPatrolTaskStatus, taskId, taskState);
             if (robotEnd) {
+                String taskIdFinal = taskId;
                 // 机器人/下级系统任务终止
                 ThreadPoolUtil.PATROL_POOL.addThread(() -> dealRobotTaskShutDown(taskIdFinal));
             }
@@ -501,7 +506,7 @@ public class UPatrolTaskService {
     }
 
 
-    private void addToUpSystem(RobotPatrolTaskStatus robotPatrolTaskStatus, String taskId) {
+    private String addToUpSystem(RobotPatrolTaskStatus robotPatrolTaskStatus, String taskId) {
         try {
             // long robotId = tRobotInspectionDao.selectRobotIdByRobotCode(robotPatrolTaskStatus.getRobotCode());
             Date createTime = new Date(System.currentTimeMillis() + 30000);
@@ -512,7 +517,8 @@ public class UPatrolTaskService {
                     .setTaskName(robotPatrolTaskStatus.getTaskName())
                     .setAreaId(robotPatrolTaskStatus.getRobotCode())
                     // .setRobotId(robotId)
-                    .setStartTime(startTime).setTaskSource(1)
+                    .setStartTime(startTime)
+                    .setTaskSource(1)
                     .setTaskType(218)
                     .setExecuteType(173)
                     .setTaskLevel(1)
@@ -526,24 +532,31 @@ public class UPatrolTaskService {
                     // .setRobotId(robotId)
                     .setTaskType(218)
                     .setExecuteType(173)
-                // taskSource 表示下级创建主动上报任务
+                    // taskSource 表示下级创建主动上报任务
                     .setTaskSource(1)
                     .setTaskLevel(1)
                     .setTaskState(TASK_STATE_NOT_START)
                     .setCreateTime(createTime)
                     .setExecuteTime(startTime);
 
-            UPatrolTask taskExsis = uPatrolTaskDao.selectByPrimaryId(taskId);
-            if (taskExsis == null) {
+            UPatrolTask taskExsis = uPatrolTaskDao.selectThisTaskByTaskCode(robotPatrolTaskStatus.getTaskCode());
+            if (taskExsis == null || Optional.ofNullable(taskExsis.getTaskSource()).orElse(0) == 1) {
                 uPatrolTaskDao.add(uPatrolTask);
+            } else {
+                log.warn("Task already exsis, not insert, task: {}", JSON.toJSONString(taskExsis));
+                return null;
             }
             UPatrolResult resultExsis = uPatrolResultDao.selectByPrimaryId(taskId);
             if (resultExsis == null) {
                 uPatrolResultDao.add(uPatrolResult);
+            } else {
+                log.warn("Task result already exsis: {}", JSON.toJSONString(resultExsis));
             }
+            return taskId;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+        return null;
     }
 
     /**
@@ -562,6 +575,7 @@ public class UPatrolTaskService {
             map.put("taskSource", "1");
         }
         if (!"1".equals(map.get("taskSource"))) {
+            log.info("Task create by self, don`t continue, taskId: {}", taskId);
             return;
         }
 

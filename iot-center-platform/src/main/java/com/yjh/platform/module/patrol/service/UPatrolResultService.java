@@ -9,6 +9,7 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
@@ -20,6 +21,9 @@ import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -47,6 +51,8 @@ public class UPatrolResultService {
     private TStdDeviceDao tStdDeviceDao;
     @Autowired
     private TWarnInfoDao tWarnInfoDao;
+    @Autowired
+    private TRobotInspectionDao tRobotInspectionDao;
 
     public List<TCruiseResultExpand> selectTaskByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
         String endTime, List<Long> deviceIdList, Integer meteType, String customId, Integer isCheck) {
@@ -143,9 +149,60 @@ public class UPatrolResultService {
             new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(cruiseManualReview.getIdentifyResult());
         uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
 
+        afterManualReviewInfo(cruiseManualReview.getTaskId(), cruiseManualReview.getInstanceId(), userId, date);
+
+        int result2 = patrolTaskReview(cruiseManualReview.getTaskId());
+        //        insert QrDecode as device's real code. by tt.
+        TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
+        if (Objects.nonNull(tCruisePointInstance)) {
+            String analyseType = uPatrolResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
+            if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
+                TStdDevice tStdDevice = new TStdDevice();
+                tStdDevice.setDeviceId(tCruisePointInstance.getDeviceId());
+                tStdDevice.setRealCode(cruiseManualReview.getPersonCheck());
+                tStdDeviceDao.update(tStdDevice);
+            }
+        }
+        return result1 + result2;
+    }
+
+    /**
+     * 对整个任务状态进行判断，修改审核状态，并生成巡视报告
+     */
+    private int patrolTaskReview(String taskId) {
+        //获取审核后该任务下的巡检点审核信息
+        List<CruiseManualReview> cruiseManualReviewList = uPatrolResultDao.selectManualDetail(taskId);
+        //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
+        HashSet<String> haS1 = new HashSet<>();
+        int checkedSize = 0;
+        Date lastDate = null;
+        for (CruiseManualReview cmr : cruiseManualReviewList) {
+            if (cmr.getEvaluationState() == 256) {
+                haS1.add(cmr.getCheckUser());
+                checkedSize++;
+                if (lastDate == null || (cmr.getCheckDate() != null && cmr.getCheckDate().after(lastDate))) {
+                    lastDate = cmr.getCheckDate();
+                }
+            }
+        }
+        String checkUserName = StringUtils.join(haS1, ",");
+
+        int result2 = 0;
+        if (checkedSize == cruiseManualReviewList.size()) {
+            result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, "1");
+            //自动生成巡视报告
+            String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
+            log.info("自动生成巡视报告的路径是==" + reportFilePath);
+        }
+        return result2;
+    }
+
+    /**
+     * 对审核后的任务进行处理，判断告警
+     */
+    private void afterManualReviewInfo(String taskId, Long instanceId, String userId, Date date) {
         //查询该巡检点审核后的相关信息
-        AfterManualReviewInfo afterManualReviewInfo =
-            uPatrolResultDao.selectJudgeCondition(cruiseManualReview.getInstanceId(), cruiseManualReview.getTaskId());
+        AfterManualReviewInfo afterManualReviewInfo = uPatrolResultDao.selectJudgeCondition(instanceId, taskId);
         //查询该巡检点对应测点配置的告警阈值相关信息
         TStdDevicemete tStdDevicemete = uPatrolResultDao.selectDeviceMeteInfo(afterManualReviewInfo.getInstanceId());
         log.info("tStdDeviceMete===" + tStdDevicemete);
@@ -232,56 +289,10 @@ public class UPatrolResultService {
                     log.info("要插库的告警数据是===" + warnInfo);
                     tWarnInfoDao.insert(warnInfo);
                     sendWebSocket(warnInfo.getWarnId());
-                    uPatrolResultDao.updateIsWarn(cruiseManualReview.getCruiseDataId());
+                    uPatrolResultDao.updateIsWarn(taskId, instanceId);
                 }
             }
         }
-
-        //获取审核后该任务下的巡检点审核信息
-        List<CruiseManualReview> cruiseManualReviewList = uPatrolResultDao.selectManualDetail(cruiseManualReview.getTaskId());
-        //判断是否全部审核，若都已审核，统计所有的审核人，统计最晚审核的时间，将信息插入
-        HashSet<String> haS1 = new HashSet<>();
-        for (CruiseManualReview cMR : cruiseManualReviewList) {
-            if (cMR.getEvaluationState() == 257) {
-                break;
-            } else {
-                haS1.add(cMR.getCheckUser());
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        for (String checkUser : haS1) {
-            sb.append(checkUser + ",");
-        }
-        String checkUserName = sb.toString().substring(0, sb.toString().length() - 1);
-        String taskId = cruiseManualReview.getTaskId();
-        Date taskCheckDate = findLastDate(cruiseManualReviewList);
-        //更新任务审核人以及审核时间
-        List<String> list = new ArrayList<>();
-        for (CruiseManualReview cMR : cruiseManualReviewList) {
-            if (cMR.getEvaluationState() == 256) {
-                list.add(cMR.getCheckUser());
-            }
-        }
-        int result2 = 0;
-        if (list.size() == cruiseManualReviewList.size()) {
-            result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, taskCheckDate, "1");
-            //自动生成巡视报告
-            String taskID = cruiseManualReview.getTaskId();
-            String reportFilePath = reportManageService.cruiseReportGenerate(taskID);
-            log.info("自动生成巡视报告的路径是==" + reportFilePath);
-        }
-        //        insert QrDecode as device's real code. by tt.
-        TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
-        if (Objects.nonNull(tCruisePointInstance)) {
-            String analyseType = uPatrolResultDao.selectAlgorithmType(tCruisePointInstance.getDeviceMeteId());
-            if (Objects.nonNull(analyseType) && Objects.equals(analyseType, "8")) {
-                TStdDevice tStdDevice = new TStdDevice();
-                tStdDevice.setDeviceId(tCruisePointInstance.getDeviceId());
-                tStdDevice.setRealCode(cruiseManualReview.getPersonCheck());
-                tStdDeviceDao.update(tStdDevice);
-            }
-        }
-        return result1 + result2;
     }
 
     public int manualReviewTask(String taskId, String userId, HttpServletRequest request) {
@@ -295,7 +306,7 @@ public class UPatrolResultService {
         for (UPatrolDataResult res : list) {
             CruiseManualReview cruiseManualReview =
                 new CruiseManualReview().setCruiseDataId(res.getCruiseDataId()).setCheckUser(userName).setCheckDate(date)
-                    .setPersonCheck(res.getResultNum());
+                    .setPersonCheck(res.getResultNum()).setTaskId(res.getTaskId()).setInstanceId(res.getInstanceId());
             if (res.getCruiseResult() == 246) {//正常,实际:正常,算法:正确
                 cruiseManualReview.setIdentifyResult(261);
                 cruiseManualReview.setIdentifyState(258);
@@ -324,6 +335,33 @@ public class UPatrolResultService {
         return result + list.size();
     }
 
+    /**
+     * 下级系统审核信息同步
+     */
+    public int manualReviewTask(List<CruiseManualReview> resultList) {
+        // 审核任务
+        for (CruiseManualReview review : resultList) {
+            Long originId = review.getInstanceId();
+            TCruisePointInstance insInfo = tRobotInspectionDao.selectRealInstance(String.valueOf(originId), review.getSendCode());
+            log.info("originId: {}, edgeCode: {}, instanceInfo: {}", originId, review.getSendCode(), JSON.toJSONString(insInfo));
+            review.setInstanceId(insInfo.getInstanceId());
+
+            log.info("准备更改的的东西是==={}", JSON.toJSONString(review));
+            uPatrolResultDao.manualReviewByTaskInstance(review);
+
+            //更新测点信息
+            Long deviceMeteId = uPatrolResultDao.selectDeviceMeteId(review.getInstanceId());
+            TStdDeviceMeteUpdate stdDeviceMeteUpdate =
+                new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(review.getIdentifyResult());
+            uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
+
+            afterManualReviewInfo(review.getTaskId(), review.getInstanceId(), review.getCheckUser(), review.getCheckDate());
+        }
+        // 校验父级是否需要审核并生成巡视报告
+        int result = patrolTaskReview(resultList.get(0).getTaskId());
+        return result + resultList.size();
+    }
+
     public Result sendPostRequest(String url, Map<String, Object> params) {
         Result response = null;
         try {
@@ -335,33 +373,6 @@ public class UPatrolResultService {
             log.error(e.getMessage(), e);
         }
         return response;
-    }
-
-    public Date findLastDate(List<CruiseManualReview> list) {
-        CruiseManualReview cruiseManualReview = new CruiseManualReview();
-        Long datesArray[] = new Long[list.size()];
-
-        for (int i = 0; i < list.size(); i++) {
-            // 把date类型的时间对象转换为long类型，时间越往后，long的值就越大，
-            // 所以就依靠这个原理来判断距离现在最近的时间
-            Date timeTempOne = list.get(i).getCheckDate();
-            if (timeTempOne != null) {
-                datesArray[i] = timeTempOne.getTime();
-            } else {
-                datesArray[i] = Long.valueOf(0);
-            }
-        }
-        Long maxIndex = datesArray[0];// 定义最大值为该数组的第一个数
-        for (int j = 0; j < datesArray.length; j++) {
-            if (maxIndex < datesArray[j]) {
-                maxIndex = datesArray[j];
-                cruiseManualReview = list.get(j);
-            } else {
-                // 找到了这个j
-                cruiseManualReview = list.get(0);
-            }
-        }
-        return cruiseManualReview.getCheckDate();
     }
 
     public void sendWebSocket(Long warnId) {

@@ -1,4 +1,4 @@
-package com.yjh.platform.module.task.entity;
+package com.yjh.accessrobot.module.command.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -12,8 +12,6 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author YC
@@ -34,7 +32,6 @@ public class CruiseManualReview {
     private String taskId;
     @ApiModelProperty(value = "巡检点实例id")
     private Long instanceId;
-    @Length(max = 128,message = "人工校核结果长度必须小于等于128")
     @ApiModelProperty(value = "人工校核结果")
     @TableField(value = "person_check",updateStrategy = FieldStrategy.IGNORED)
     private String personCheck;

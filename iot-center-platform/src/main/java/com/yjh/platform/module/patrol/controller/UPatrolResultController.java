@@ -291,4 +291,20 @@ public class UPatrolResultController {
         return result;
     }
 
+    @ApiOperation(value = "下级系统巡视结果审核")
+    @PostMapping(value = "/robotPatrolTaskReview")
+    public Result robotPatrolTaskReview(@RequestBody List<CruiseManualReview> resultList) {
+        Result result = new Result();
+        try {
+            log.info("The resultList from accessRobot is=={}", resultList);
+            uPatrolResultService.manualReviewTask(resultList);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("接收并处理机器人/无人机/边缘节点巡视结果错误:", e);
+        }
+        return result;
+    }
+
 }

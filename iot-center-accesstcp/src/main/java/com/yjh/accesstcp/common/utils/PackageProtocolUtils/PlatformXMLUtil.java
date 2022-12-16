@@ -116,7 +116,7 @@ public class PlatformXMLUtil {
             for(Map<String, Object> item : itemsList) {
                 Element childNode61 = childNode6.addElement("Item");
                 for(String key : item.keySet()){
-                    childNode61.addAttribute(key, String.valueOf(item.get(key)));
+                    childNode61.addAttribute(key, String.valueOf(Optional.ofNullable(item.get(key)).orElse("")));
                 }
             }
         }

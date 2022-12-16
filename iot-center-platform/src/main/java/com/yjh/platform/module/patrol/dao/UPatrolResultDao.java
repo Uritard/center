@@ -129,11 +129,13 @@ public interface UPatrolResultDao {
 
     int manualReview(CruiseManualReview cruiseManualReview);
 
+    int manualReviewByTaskInstance(CruiseManualReview cruiseManualReview);
+
     int updateDeviceMeteUpdate(TStdDeviceMeteUpdate tStdDeviceMeteUpdate);
 
     TStdDevicemete selectDeviceMeteInfo(@Param(value = "instanceId")Long instanceId);
 
-    int updateIsWarn(@Param(value = "cruiseDataId")Long cruiseDataId);
+    int updateIsWarn(@Param(value = "taskId") String taskId, @Param(value = "instanceId") Long instanceId);
 
     int updateWarnInfo(@Param(value = "warnId")Long warnId,
         @Param(value = "warnName")String warnName,
