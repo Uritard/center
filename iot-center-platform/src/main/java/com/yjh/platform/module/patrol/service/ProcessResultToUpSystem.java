@@ -652,6 +652,7 @@ public class ProcessResultToUpSystem {
                 xmlItem.put("identify_result_name", cruiseResultMap.getIdentifyResultName());
                 xmlItem.put("identify_state", cruiseResultMap.getIdentifyState());
                 xmlItem.put("identify_state_name", cruiseResultMap.getIdentifyStateName());
+                xmlItem.put("value", cruiseResultMap.getPersonCheck());
                 xmlItem.put("check_user", cruiseResultMap.getCheckUser());
                 xmlItem.put("time", DateTimeUtil.format(cruiseResultMap.getCheckDate()));
                 xmlItems.add(xmlItem);

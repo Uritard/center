@@ -833,6 +833,17 @@
         where cruise_data_id = #{cruiseDataId,jdbcType =BIGINT }
     </update>
 
+    <update id="manualReviewByTaskInstance" parameterType="com.yjh.platform.module.task.entity.CruiseManualReview">
+        update u_patrol_data_result set
+        <if test="personCheck != null ">person_check = #{personCheck},</if>
+        <if test="identifyResult != null ">identify_result = #{identifyResult,jdbcType=INTEGER},</if>
+        evaluation_state = 256,
+        <if test="checkUser != null ">check_user = #{checkUser},</if>
+        <if test="checkDate != null ">check_date = #{checkDate,jdbcType=TIMESTAMP},</if>
+        <if test="identifyState != null ">identify_state = #{identifyState,jdbcType=INTEGER}</if>
+        where task_id = #{taskId,jdbcType =VARCHAR} and instance_id = #{instanceId,jdbcType =BIGINT}
+    </update>
+
     <update id="updateDeviceMeteUpdate">
         update t_std_devicemete_update a <set>
         <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
@@ -909,12 +920,12 @@
         a.warn_id = #{warnId, jdbcType=BIGINT}
     </update>
 
-    <update id="updateIsWarn" parameterType="java.lang.Long">
+    <update id="updateIsWarn">
         UPDATE u_patrol_data_result a <set>
         a.is_warn = 1
     </set>
         WHERE
-        a.cruise_data_id = #{cruiseDataId, jdbcType=BIGINT}
+        a.task_id = #{taskId, jdbcType=VARCHAR} and a.instance_id = #{instanceId, jdbcType=BIGINT}
     </update>
 
     <select id="selectWarnId" resultType="java.lang.Long">
