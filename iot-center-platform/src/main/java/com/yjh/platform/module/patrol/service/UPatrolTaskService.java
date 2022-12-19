@@ -501,6 +501,7 @@ public class UPatrolTaskService {
             if (robotId != null){
                 //放入redis
                 redisTemplate.opsForHash().putAll(ROBOT_OR_DRONE_TASK+robotPatrolTaskStatus.getTaskCode()+":"+robotId,Object2Map.objectToMap(robotPatrolTaskStatus));
+                redisTemplate.opsForHash().putAll("RobotTaskStatus:" + robotPatrolTaskStatus.getRobotCode() + ":" + taskCode, Object2Map.objectToMap(robotPatrolTaskStatus));
             }
         });
     }
@@ -573,9 +574,11 @@ public class UPatrolTaskService {
             map.put("all", "0");
             // taskSource==1 下级创建任务主动上报
             map.put("taskSource", "1");
+            map.put("taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
         }
         if (!"1".equals(map.get("taskSource"))) {
             log.info("Task create by self, don`t continue, taskId: {}", taskId);
+            redisTemplate.opsForHash().put(key, "taskPatrolledId", robotPatrolTaskStatus.getTaskPatrolledId());
             return;
         }
 

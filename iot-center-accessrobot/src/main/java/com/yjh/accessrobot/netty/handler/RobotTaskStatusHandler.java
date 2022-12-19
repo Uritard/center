@@ -91,8 +91,8 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
                 String json = JSON.toJSONString(jasonMap);
                 Constant.postUrl(websocketUrl, json);
 
-                StandTaskDealThread standTaskDealThread = new StandTaskDealThread(redisTemplate, taskCode, robotCode);
-                TaskExecutePool.getInstance().execute(standTaskDealThread);
+                // StandTaskDealThread standTaskDealThread = new StandTaskDealThread(redisTemplate, taskCode, robotCode);
+                // TaskExecutePool.getInstance().execute(standTaskDealThread);
             }
         }
         log.info("The statusList to platform is=={}", statusList);
