@@ -1279,10 +1279,9 @@ public class RobotService {
 
         String edgeCode = item.getEdgeCode();
         String taskId = item.getTaskId();
-        String edge = "Edge03,Edge04,Edge05,Edge06,Edge07,Edge08,Edge09";
         StringJoiner str = new StringJoiner(",");
         for (Long instanceId : item.getInstanceList()) {
-            str.add(edge.contains(edgeCode) ? "0" + instanceId : String.valueOf(instanceId));
+            str.add(String.valueOf(instanceId));
         }
         // 边缘节点任务临时信息存放至redis
         Map<String, Object> instanceListMap = new HashMap<>(5);
@@ -1304,9 +1303,9 @@ public class RobotService {
     private void packageXMLBaseModel(RobotTaskInstanceInfo item, String uniqueFlag, String taskId, StringJoiner str) {
         Map<String, Object> resMap = packageItem(str, item, taskId);
         String code = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-        if (StringUtils.startsWithIgnoreCase(uniqueFlag, "Edge") && !StringUtils.equalsAnyIgnoreCase(uniqueFlag, "Edge01", "Edge02")) {
-            code = StringUtils.removeStartIgnoreCase(uniqueFlag, "Edge");
-            code = StringUtils.removeStart(code, "0");
+        List<TStdRegion> tStdRegionList = tStdRegionDao.selectByRegionCodeAndState(uniqueFlag, 1);
+        if (CollectionUtils.isNotEmpty(tStdRegionList)) {
+            code = tStdRegionList.get(0).getStationId();
         }
 
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
@@ -3332,7 +3331,8 @@ public class RobotService {
             XMLBaseModel model = getXmlMessage(filePath);
             List<Map<String, Object>> mapList = model.getItems();
             List<TStdRegion> tStdRegionList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, TStdRegion.class)).collect(Collectors.toList());
-            tStdRegionService.saveReportData(tStdRegionList, edgeCode);
+            String stationId = StringUtils.substringBefore(filePath, "/");
+            tStdRegionService.saveReportData(tStdRegionList, edgeCode, stationId);
             log.info("区域处理结束 edgeCode:{}", edgeCode);
             // 刷新缓存
             SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class).getForObject(Constant.REGION_REFRESH_URL, Result.class);

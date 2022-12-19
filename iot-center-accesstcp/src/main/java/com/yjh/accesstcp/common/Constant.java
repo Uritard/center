@@ -92,14 +92,16 @@ public class Constant {
     }
 
     //任务状态控制
-    public static final String TASK_STATE_URL = "http://iot-center-platform/tCruiseTask/v1/upSystemCtrl";
+    public static final String TASK_STATE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemCtrl";
 
     //任务下发
-    public static final String TASK_ISSUE_URL = "http://iot-center-platform/tCruiseTask/v1/upSystemIssuedTask";
+    public static final String TASK_ISSUE_URL = "http://iot-center-platform/uPatrolTask/v1/upSystemIssuedTask";
     public static  XMLBaseModel weatherXmlModel = null;
 
     public static String stationCode="";
     public static boolean handlerNew = true;
 
     public static final String T_SYS_PARAM = "t_sys_param:";
+    //主站任务下发到机器人
+    public static final String ROBOT_TASK_ISSUE_URL = "http://iot-center-accessrobot/robot/v1/taskIssued";
 }

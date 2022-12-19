@@ -120,7 +120,7 @@
         <if test="deviceCode != null ">a.device_code = #{deviceCode},</if>
         <if test="deviceName != null">a.device_name = #{deviceName},</if>
         <if test="aliasName != null ">a.alias_name = #{aliasName},</if>
-        a.device_type = #{deviceType, jdbcType=INTEGER},
+        <if test="deviceType != null ">a.device_type = #{deviceType, jdbcType=INTEGER},</if>
         <if test="positionType != null ">a.position_type = #{positionType},</if>
         <if test="modelId != null ">a.model_id = #{modelId},</if>
         <if test="regionPath != null">a.region_path = #{regionPath},</if>
