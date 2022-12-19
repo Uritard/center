@@ -1343,7 +1343,7 @@ public class RobotService {
             // 1.任务启动 2.任务暂停 3.任务继续 4.任务停止
             String commandValue = String.valueOf(robotTaskControlMap.get("commandValue"));
             String code = "";
-
+            String tasSkPatrolledId = (String)redisTemplate.opsForHash().get("countForAbnormal:" + taskId, "taskPatrolledId");
             if (Objects.equals("1", String.valueOf(robotTaskControlMap.get("isEdge")))){
                 // 边缘节点
                 for (String edgeCode : robotCodeList) {
@@ -1354,10 +1354,10 @@ public class RobotService {
                     }
 
                     String receiveCode = String.valueOf(redisTemplate.opsForHash().get("region:" + edgeCode, "stationId"));
-                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + receiveCode + ":" + taskId);
-                    String tasSkPatrolledId = redisInfoMap.get("taskPatrolled_id");
+                    // Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + receiveCode + ":" + taskId);
+                    // String tasSkPatrolledId = redisInfoMap.get("taskPatrolledId");
                     code = flag ? "1".equals(commandValue) ? taskId : tasSkPatrolledId : taskId;
-                    log.info("taskId=={},robotTaskId=={},tasSkPatrolledId=={},code=={}", taskId, taskId, tasSkPatrolledId, code);
+                    log.info("taskId=={}, receiveCode=={}, tasSkPatrolledId=={}, code=={}", taskId, receiveCode, tasSkPatrolledId, code);
 
                     if (StringUtils.isEmpty(code)){
                         log.info("边缘节点未上报任务状态信息,无法获取当前巡视任务id");
@@ -1385,6 +1385,7 @@ public class RobotService {
                         return result;
                     }
 
+/*
                     // taskId是巡视主机的id,robotTaskId是机器人上报的id
                     String robotTaskId = selectTaskId(taskId);
                     log.info("robotTaskId==={}", robotTaskId);
@@ -1400,10 +1401,11 @@ public class RobotService {
                     log.info("robotTaskId=={}", robotTaskId);
 
                     Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + robotTaskId);
-                    String tasSkPatrolledId = redisInfoMap.get("taskPatrolled_id");
+                    String tasSkPatrolledId = redisInfoMap.get("taskPatrolledId");
+*/
 
                     code = flag ? "1".equals(commandValue) ? taskId : tasSkPatrolledId : taskId;
-                    log.info("taskId=={},robotTaskId=={},tasSkPatrolledId=={},最后code=={}", taskId, robotTaskId, tasSkPatrolledId, code);
+                    log.info("taskId=={}, tasSkPatrolledId=={}, 最后code=={}", taskId, tasSkPatrolledId, code);
                     if (StringUtils.isEmpty(code)) {
                         log.info("机器人未上报任务状态信息,无法获取当前巡视任务id");
                         return result;
