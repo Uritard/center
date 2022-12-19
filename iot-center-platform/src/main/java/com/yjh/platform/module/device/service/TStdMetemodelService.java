@@ -270,10 +270,10 @@ public class TStdMetemodelService {
 
     @Transactional(rollbackFor = Exception.class)
     public String createModel(){
-        Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:tempReflect");
+        Map<String,Object> mapForCreatePath  = redisTemplate.opsForHash().entries("t_sys_param:zipPath");
         String path = (String) mapForCreatePath.get("content");
-        Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:meteModelPath");
-        String returnPath = (String) mapForReturnPath.get("content");
+        Map<String,Object> mapForReturnPath  = redisTemplate.opsForHash().entries("t_sys_param:zipRealPath");
+        String returnPath = StringUtils.substringAfter((String) mapForReturnPath.get("content"), "/imgs");
 
 //        String path = "D:/code/voice";
 //        String returnPath = "D:/code/voice";
@@ -282,7 +282,7 @@ public class TStdMetemodelService {
         List<String> name = this.tStdMetemodelDetailDao.selectColumnName();
        boolean isOk = createModel(name,fileName,path);
        if(isOk){
-           return returnPath+"/"+fileName;
+           return "/imgs" + returnPath+"/"+fileName;
        }else {
          return "fail";
        }
