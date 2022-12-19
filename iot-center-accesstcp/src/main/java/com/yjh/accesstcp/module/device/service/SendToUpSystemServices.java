@@ -61,6 +61,8 @@ public class SendToUpSystemServices {
     private SendToUpSystemDao sendToUpSystemDao;
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    private static final String TASK_PRIORITY_REDIS_KEY="task_priority_config:";
+
     @Transactional(rollbackFor = Exception.class)
     public int sendResponse(long receiveSessionId, String type, String command, String code, List<Map<String, Object>> items, boolean isSend) {
 
@@ -681,4 +683,43 @@ public class SendToUpSystemServices {
     public List<Map<String, Object>> selectOnlinePatrolDevice(){
         return sendToUpSystemDao.selectOnlinePatrolDevice();
     }
+    /**
+     * 查询上级系统同步任务的巡检点信息
+     * @param list
+     * @return
+     */
+    public List<TCruisePointInstanceNameDetail> selectForTask(List<Long> list){
+        return sendToUpSystemDao.selectForTask(list);
+    }
+
+
+    /**
+     * 查询上级系统同步任务需转发的区域机器人Code
+     * @param list
+     * @return
+     */
+    public List<String> selectForRobotTask(List<Long> list){
+        return sendToUpSystemDao.selectRobotCodeForUpperTask(list);
+    }
+
+    public List<Long> selectRobotTaskInstanceId(List<Long> list, String robotCode){
+        return sendToUpSystemDao.selectRobotTaskInstanceId(list, robotCode);
+    }
+
+    /** 查询当前控制设备所属的边缘节点*/
+    public String selectEdgeCodeOfRobotOrDrone(String robotCode){
+        return sendToUpSystemDao.selectEdgeCodeOfRobotOrDrone(robotCode);
+    }
+
+    public Integer getUpperTaskLevel(){
+        Integer taskLevel = 2;
+        Object level2 = redisTemplate.opsForHash().get(TASK_PRIORITY_REDIS_KEY+"902","level");
+        if (Objects.nonNull(level2)){
+            taskLevel = Integer.valueOf(String.valueOf(level2));
+        }
+
+        return taskLevel;
+    }
+
+
 }

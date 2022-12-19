@@ -7,6 +7,7 @@ package com.yjh.platform.module.patrol.service;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.LogsAspect;
@@ -72,6 +73,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 
@@ -198,8 +201,8 @@ public class UPatrolTaskService {
         List<Long> instanceList = insertTaskAttr(uPatrolTask, tCruiseTaskAdd);
 
         List<TCruisePointInstanceNameDetail> detailList = initializeNextTaskInfo(uPatrolTask, instanceList);
-        // 找出机器人和无人机做任务的巡检点
-        String res = taskToRobotOrDrone(uPatrolTask, tCruiseTaskAdd, format, detailList);
+        // 找出下级设备或下级节点的点让其做任务
+        String res = taskToEdgeOrDevice(uPatrolTask, tCruiseTaskAdd, format, detailList);
         if (StringUtils.isNotEmpty(res)) {
             throw new BusinessException(ResultCodeEnum.CODE10001.getCode(), res);
         }
@@ -663,7 +666,7 @@ public class UPatrolTaskService {
     }
 
     /**
-     * 找出机器人和无人机的点让其做任务
+     * 找出下级设备或节点的点让其做任务
      *
      * @param task           任务信息
      * @param tCruiseTaskAdd 任务关联信息
@@ -671,9 +674,48 @@ public class UPatrolTaskService {
      * @param detailList     区域巡视主机上的巡视点信息
      * @return String
      */
-    private String taskToRobotOrDrone(UPatrolTask task, TCruiseTaskAdd tCruiseTaskAdd, DateFormat format,
+    private String taskToEdgeOrDevice(UPatrolTask task, TCruiseTaskAdd tCruiseTaskAdd, DateFormat format,
                                       List<TCruisePointInstanceNameDetail> detailList) {
         try {
+            List<TCruisePointInstanceNameDetail> edgeDetailList = detailList.stream()
+                    .filter(t -> StringUtils.isNotEmpty(t.getEdgeCode()) && StringUtils.isNotEmpty(t.getOriginId()))
+                    .collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(edgeDetailList)) {
+                Map<String, List<Long>> listMap = Maps.newHashMap();
+                edgeDetailList.forEach(t -> {
+                    List<Long> list = new ArrayList<>();
+                    if (listMap.containsKey(t.getEdgeCode())) {
+                        list = listMap.get(t.getEdgeCode());
+                    }
+                    list.add(Long.valueOf(t.getOriginId()));
+                    listMap.put(t.getEdgeCode(), list);
+                });
+                List<RobotTaskInstanceInfo> edgeTaskInfoList = new ArrayList<>();
+                listMap.forEach((edgeCode, instanceList) -> {
+                    RobotTaskInstanceInfo taskInfo = new RobotTaskInstanceInfo();
+                    taskInfo.setCruiseType(task.getTaskType());
+                    taskInfo.setTaskId(task.getTaskId());
+                    // 从巡视主机下发至边缘节点的任务等级为3级
+                    taskInfo.setPriority(3);
+                    taskInfo.setTaskName(task.getTaskName());
+                    taskInfo.setInstanceList(instanceList);
+                    String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
+                    taskInfo.setIfRun(ifFun);
+                    taskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
+                    taskInfo.setEdgeCode(edgeCode);
+                    packageTaskProtocolInfo(tCruiseTaskAdd, format, taskInfo, ifFun);
+                    edgeTaskInfoList.add(taskInfo);
+                });
+
+                Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+                robotTaskInfoMap.put("edgeTaskInfoList", edgeTaskInfoList);
+                log.info("edgeTaskInfoMap = {}", robotTaskInfoMap);
+
+                // 调用robot服务下发任务
+                Result result = robotTask(robotTaskInfoMap);
+                detailList.removeAll(edgeDetailList);
+            }
+
             // 找出机器人和无人机做任务的巡检点
             List<Long> robotCruiseList = new ArrayList<>();
             List<Long> robotInstanceList = new ArrayList<>();

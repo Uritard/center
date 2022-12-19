@@ -1,10 +1,9 @@
-package com.yjh.platform.module.device.entity;
+package com.yjh.accesstcp.module.device.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,6 +12,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Max;
+import java.io.Serializable;
 
 /**
  * @author tt
@@ -49,12 +49,12 @@ public class TCruisePointInstance implements Serializable {
 
     @Max(value=999999999999999999l)
     @ApiModelProperty(value = "关联设备id")
-     @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "device_id",updateStrategy = FieldStrategy.IGNORED)
     private Long deviceId;
 
     @Length(max = 32,message = "customId长度必须小于等于32")
     @ApiModelProperty(value = "关联部位表id")
-     @TableField(value = "custom_id",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "custom_id",updateStrategy = FieldStrategy.IGNORED)
     private String customId;
 
     @Length(max = 32,message = "dataFormat长度必须小于等于32")
@@ -86,12 +86,12 @@ public class TCruisePointInstance implements Serializable {
 
     @Length(max = 256,message = "cruiseContent长度必须小于等于256")
     @ApiModelProperty(value = "巡检内容")
-     @TableField(value = "cruise_content",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "cruise_content",updateStrategy = FieldStrategy.IGNORED)
     private String cruiseContent;
 
     @Length(max = 32,message = "positionType长度必须小于等于32")
     @ApiModelProperty(value = "波动值")
-     @TableField(value = "position_type",updateStrategy = FieldStrategy.IGNORED)
+    @TableField(value = "position_type",updateStrategy = FieldStrategy.IGNORED)
     private String positionType;
 
     @Length(max = 32,message = "unit长度必须小于等于32")
@@ -120,20 +120,14 @@ public class TCruisePointInstance implements Serializable {
     @ApiModelProperty(value = "文本描述")
     private String textDesc;
 
+    @Max(value=999999999999999999L)
+    @ApiModelProperty(value = "边缘节点编码")
+    private Long edgeCode;
+
     @Length(max = 32,message = "sort长度必须小于等于32")
     @ApiModelProperty(value = "排序序号")
     @TableField(value = "sort",updateStrategy = FieldStrategy.IGNORED)
     private String sort;
-
-    /**
-     * 节点编码
-     */
-    private String edgeCode;
-
-    /**
-     * 原始id(下级同步的id)
-     */
-    private String originId;
 
     private Integer pageNum=1;
 

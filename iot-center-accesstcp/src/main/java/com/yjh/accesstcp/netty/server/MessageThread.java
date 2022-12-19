@@ -7,6 +7,8 @@ package com.yjh.accesstcp.netty.server;
 import com.alibaba.fastjson.JSON;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.Result;
+import com.yjh.accesstcp.module.device.entity.RobotTaskInstanceInfo;
+import com.yjh.accesstcp.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
@@ -22,6 +24,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * <功能描述>
@@ -229,12 +232,12 @@ public class MessageThread {
                     tCruiseTaskAdd.setType(Integer.valueOf(type));
                     tCruiseTaskAdd.setTaskId(item.get("task_code").toString());
                     tCruiseTaskAdd.setTaskName(item.get("task_name").toString());
-                    if (item.get("priority") != null && "".equals(item.get("priority"))) {
-                        tCruiseTaskAdd.setTaskLevel(Integer.valueOf(item.get("priority").toString()));
-                    } else {
-                        tCruiseTaskAdd.setTaskLevel(2);
-                    }
-
+//                    if (item.get("priority") != null && "".equals(item.get("priority"))) {
+//                        tCruiseTaskAdd.setTaskLevel(Integer.valueOf(item.get("priority").toString()));
+//                    } else {
+//                        tCruiseTaskAdd.setTaskLevel(2);
+//                    }
+                    tCruiseTaskAdd.setTaskLevel(sendToUpSystemServices.getUpperTaskLevel());
                     if (item.get("fixed_start_time") != null || "".equals(item.get("fixed_start_time"))) {
                         tCruiseTaskAdd.setIfRun(172);
                         StringBuilder stringBuilder = new StringBuilder("0 0");
@@ -273,16 +276,21 @@ public class MessageThread {
                     tCruiseTaskAdd.setAreaId(xmlBaseModel.getSendCode());
                     tCruiseTaskAdd.setStartTime(simpleDateFormat.parse(item.get("fixed_start_time").toString()));
 
+                    log.info("开始分发任务");
+                    //统一调度分发主站平台下发的任务
+                    Result re = receivedTaskInfoHandler(sendToUpSystemServices, tCruiseTaskAdd, item);
                     //                    Map<String,List<TCruiseTaskAdd>> map = new HashMap<>();
                     //                    List<TCruiseTaskAdd> taskList = new ArrayList<>();
                     //                    taskList.add(tCruiseTaskAdd);
                     //                    map.put("list",taskList);
                     //Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);//江苏要求
-                    Map<String, List<XMLBaseModel>> map = new HashMap<>();
-                    List<XMLBaseModel> taskList = new ArrayList<>();
-                    taskList.add(xmlBaseModel);
-                    map.put("list", taskList);
-                    Result re = Constant.otherServer(map, Constant.ROBOT_TASK_URL);//国网要求
+//                    Map<String, List<XMLBaseModel>> map = new HashMap<>();
+//                    List<XMLBaseModel> taskList = new ArrayList<>();
+//                    taskList.add(xmlBaseModel);
+//                    map.put("list", taskList);
+//                    Result re = Constant.otherServer(map, Constant.ROBOT_TASK_URL);//国网要求
+
+
                     if (re == null) {
                         sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
                     } else if (200 == re.getCode()) {
@@ -307,8 +315,9 @@ public class MessageThread {
                     tCruiseTaskAdd.setTaskId(taskId);
                     String taskName = item.get("task_name").toString();
                     tCruiseTaskAdd.setTaskName(taskName);
-                    String taskLevel = item.get("priority").toString();
-                    tCruiseTaskAdd.setTaskLevel(Integer.valueOf(taskLevel));
+//                    String taskLevel = item.get("priority").toString();
+//                    tCruiseTaskAdd.setTaskLevel(Integer.valueOf(taskLevel));
+                    tCruiseTaskAdd.setTaskLevel(sendToUpSystemServices.getUpperTaskLevel());
                     String deviceList = item.get("device_list").toString();
                     tCruiseTaskAdd.setDeviceList(deviceList);
                     tCruiseTaskAdd.setIfRun(173);
@@ -319,11 +328,12 @@ public class MessageThread {
                     //                    listTask.add(tCruiseTaskAdd);
                     //                    map.put("list",listTask);
                     //Result re = Constant.otherServer(map,Constant.TASK_ISSUE_URL);//江苏要求
-                    Map<String, List<XMLBaseModel>> map = new HashMap<>();
-                    List<XMLBaseModel> taskList = new ArrayList<>();
-                    taskList.add(xmlBaseModel);
-                    map.put("list", taskList);
-                    Result re = Constant.otherServer(map, Constant.ROBOT_TASK_URL);//国网要求
+//                    Map<String, List<XMLBaseModel>> map = new HashMap<>();
+//                    List<XMLBaseModel> taskList = new ArrayList<>();
+//                    taskList.add(xmlBaseModel);
+//                    map.put("list", taskList);
+//                    Result re = Constant.otherServer(map, Constant.ROBOT_TASK_URL);//国网要求
+                    Result re = receivedTaskInfoHandler(sendToUpSystemServices, tCruiseTaskAdd, item);
                     List<Map<String, Object>> xmlItems = new ArrayList<>();
                     Map<String, Object> xmlItem = new HashMap<>();
                     SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
@@ -451,6 +461,178 @@ public class MessageThread {
             }
         }
 
+    }
+
+    private static Result receivedTaskInfoHandler(SendToUpSystemServices sendToUpSystemServices, TCruiseTaskAdd tCruiseTaskAdd, Map<String, Object> item){
+        String deviceIds = tCruiseTaskAdd.getDeviceList();
+        List<Long> allList = new ArrayList<>();
+        Result re = null;
+
+        String[] listArray = deviceIds.split(",");
+        for (int i = 0; i < listArray.length; i++) {
+            allList.add(Long.valueOf(listArray[i]));
+        }
+        List<TCruisePointInstanceNameDetail> taskPoints = sendToUpSystemServices.selectForTask(allList);
+
+        Map<Boolean,List<TCruisePointInstanceNameDetail>> edgePartlyMap=taskPoints
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.partitioningBy(tCruisePointInstanceNameDetail -> tCruisePointInstanceNameDetail.getEdgeCode()==null));
+
+        List<TCruisePointInstanceNameDetail> edgePointElement = edgePartlyMap.get(false);
+        List<TCruisePointInstanceNameDetail> nullEdgePointElement = edgePartlyMap.get(true);
+
+        List<Long> regionRobotInstances = nullEdgePointElement
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(cruiseInfo->cruiseInfo.getCruiseType()==228 || cruiseInfo.getCruiseType()==524)
+                .map(TCruisePointInstanceNameDetail::getInstanceId)
+                .collect(Collectors.toList());
+
+        List<Long> regionRobotInspections = nullEdgePointElement
+                .stream()
+                .filter(Objects::nonNull)
+                .filter(cruiseInfo->cruiseInfo.getCruiseType()==228 || cruiseInfo.getCruiseType()==524)
+                .map(TCruisePointInstanceNameDetail::getCruiseId)
+                .collect(Collectors.toList());
+
+        List<Long> regionDetectiveDevicePoints = nullEdgePointElement.stream()
+                .filter(cruiseInfo->cruiseInfo.getCruiseType()!=228 && cruiseInfo.getCruiseType()!=524)
+                .map(TCruisePointInstanceNameDetail::getInstanceId)
+                .collect(Collectors.toList());
+
+        if(regionRobotInstances.size()!=0){
+            log.info("任务分发：上层平台-->巡视主机机器人");
+            try {
+                re = sendTaskToRegionRobot(sendToUpSystemServices, tCruiseTaskAdd, item, regionRobotInspections, regionRobotInstances);
+            }catch (Exception e){
+                log.error("站端平台任务分发至机器人操作失败:",e);
+            }
+        }
+        if(regionDetectiveDevicePoints.size()!=0){
+            log.info("任务分发：上层平台-->巡视主机");
+            try {
+                re = sendTaskToRegionSystem(tCruiseTaskAdd, regionDetectiveDevicePoints);
+            }catch (Exception e){
+                log.error("站端平台任务分发至区域巡视主机操作失败:",e);
+            }
+        }
+        if(edgePointElement.size()!=0){
+            log.info("任务分发：上层平台-->巡视主机-->边缘节点");
+            try {
+                re = sendTaskToEdgeNode(tCruiseTaskAdd, item, edgePointElement);
+            }catch (Exception e){
+                log.error("站端平台任务分发至边缘节点操作失败:",e);
+            }
+        }
+
+        return re;
+    }
+
+    private static Result sendTaskToRegionSystem(TCruiseTaskAdd tCruiseTaskAdd,
+                                                 List<Long> regionDetectiveDevicePoints) throws Exception{
+        String regionDeviceList = "";
+        for(Long deviceId: regionDetectiveDevicePoints){
+            if(deviceId != null){
+                regionDeviceList = regionDeviceList+ deviceId.toString()+",";
+            }
+        }
+        regionDeviceList = regionDeviceList.substring(0,regionDeviceList.length()-1);
+
+        Map<String,List<TCruiseTaskAdd>> map = new HashMap<>();
+        List<TCruiseTaskAdd> taskList = new ArrayList<>();
+        taskList.add(tCruiseTaskAdd.setDeviceList(regionDeviceList));
+        map.put("list",taskList);
+        return Constant.otherServer(map,Constant.TASK_ISSUE_URL);
+    }
+
+    private static Result sendTaskToRegionRobot(SendToUpSystemServices sendToUpSystemServices,
+                                                TCruiseTaskAdd tCruiseTaskAdd,
+                                                Map<String, Object> item,
+                                                List<Long> regionRobotInspections,
+                                                List<Long> regionRobotInstances) throws Exception{
+        List<String> robotCodes = sendToUpSystemServices.selectForRobotTask(regionRobotInspections);
+        List<RobotTaskInstanceInfo> robotTaskInfoList = new ArrayList<>();
+        if(robotCodes==null || robotCodes.size()==0){
+            log.warn("未找到对应的robotCode");
+            return null;
+        }
+        for(String robotCode:robotCodes){
+            List<Long> individualDeviceIds = sendToUpSystemServices.selectRobotTaskInstanceId(regionRobotInstances, robotCode);
+            RobotTaskInstanceInfo robotTaskInstanceInfo = new RobotTaskInstanceInfo()
+                    .setCruiseType(tCruiseTaskAdd.getType())
+                    .setTaskId(tCruiseTaskAdd.getTaskId())
+                    .setIfRun(Objects.nonNull(tCruiseTaskAdd.getIfRun())?tCruiseTaskAdd.getIfRun().toString():null)
+                    .setRobotCode(robotCode)
+                    .setPriority(tCruiseTaskAdd.getTaskLevel())
+                    .setTaskName(tCruiseTaskAdd.getTaskName())
+                    .setInstanceList(individualDeviceIds)
+                    .setFixedStartTime(String.valueOf(item.get("fixed_start_time")))
+                    .setCycleMonth(String.valueOf(item.get("cycle_month")))
+                    .setCycleWeek(String.valueOf(item.get("cycle_week")))
+                    .setCycleExecuteTime(String.valueOf(item.get("cycle_execute_time")))
+                    .setIntervalType(String.valueOf(item.get("interval_type")))
+                    .setIntervalNumber(String.valueOf(item.get("interval_number")))
+                    .setIntervalExecuteTime(String.valueOf(item.get("interval_execute_time")))
+                    .setCycleStartTime(String.valueOf(item.get("cycle_start_time")))
+                    .setCycleEndTime(String.valueOf(item.get("cycle_end_time")))
+                    .setIntervalStartTime(String.valueOf(item.get("interval_start_time")))
+                    .setIntervalEndTime(String.valueOf(item.get("invalid_end_time")));
+
+            robotTaskInfoList.add(robotTaskInstanceInfo);
+        }
+        Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+        robotTaskInfoMap.put("robotTaskInfoList", robotTaskInfoList);
+        log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
+
+        // 调用robot服务下发任务
+        return Constant.otherServer(robotTaskInfoMap, Constant.ROBOT_TASK_ISSUE_URL);
+
+    }
+
+    private static Result sendTaskToEdgeNode(TCruiseTaskAdd tCruiseTaskAdd,
+                                             Map<String, Object> item,
+                                             List<TCruisePointInstanceNameDetail> edgePointElement) throws Exception{
+        List<RobotTaskInstanceInfo> edgeTaskInfoList = new ArrayList<>();
+
+        Map<Long,List<TCruisePointInstanceNameDetail>> allNodePoints = edgePointElement.stream()
+                .collect(Collectors.groupingBy(TCruisePointInstanceNameDetail::getEdgeCode));
+
+        Set<Long> edgeCodeSet = allNodePoints.keySet();
+        log.info("目标边缘节点对象集：{}",edgeCodeSet);
+        for(Long edgeCode : edgeCodeSet){
+            List<Long> individualDeviceIds = allNodePoints.get(edgeCode).stream()
+                    .map(TCruisePointInstanceNameDetail::getInstanceId)
+                    .collect(Collectors.toList());
+            RobotTaskInstanceInfo edgeTaskInfo = new RobotTaskInstanceInfo()
+                    .setCruiseType(tCruiseTaskAdd.getType())
+                    .setTaskId(tCruiseTaskAdd.getTaskId())
+                    .setIfRun(Objects.nonNull(tCruiseTaskAdd.getIfRun())?tCruiseTaskAdd.getIfRun().toString():null)
+                    .setEdgeCode(edgeCode.toString())
+                    .setPriority(tCruiseTaskAdd.getTaskLevel())
+                    .setTaskName(tCruiseTaskAdd.getTaskName())
+                    .setInstanceList(individualDeviceIds)
+                    .setFixedStartTime(String.valueOf(item.get("fixed_start_time")))
+                    .setCycleMonth(String.valueOf(item.get("cycle_month")))
+                    .setCycleWeek(String.valueOf(item.get("cycle_week")))
+                    .setCycleExecuteTime(String.valueOf(item.get("cycle_execute_time")))
+                    .setIntervalType(String.valueOf(item.get("interval_type")))
+                    .setIntervalNumber(String.valueOf(item.get("interval_number")))
+                    .setIntervalExecuteTime(String.valueOf(item.get("interval_execute_time")))
+                    .setCycleStartTime(String.valueOf(item.get("cycle_start_time")))
+                    .setCycleEndTime(String.valueOf(item.get("cycle_end_time")))
+                    .setIntervalStartTime(String.valueOf(item.get("interval_start_time")))
+                    .setIntervalEndTime(String.valueOf(item.get("invalid_end_time")));;
+
+            edgeTaskInfoList.add(edgeTaskInfo);
+
+        }
+        Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+        robotTaskInfoMap.put("robotTaskInfoList", edgeTaskInfoList);
+        log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
+
+        // 调用robot服务下发任务
+        return Constant.otherServer(robotTaskInfoMap, Constant.ROBOT_TASK_ISSUE_URL);
     }
 
 }

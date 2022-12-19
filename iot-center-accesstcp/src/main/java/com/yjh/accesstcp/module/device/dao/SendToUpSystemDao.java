@@ -42,4 +42,10 @@ public interface SendToUpSystemDao {
 
     List<Map<String, Object>> selectOnlinePatrolDevice();
 
+    List<TCruisePointInstanceNameDetail> selectForTask(@Param(value = "list")List<Long> list);
+    List<String> selectRobotCodeForUpperTask(@Param(value = "list") List<Long> list);
+    List<Long> selectRobotTaskInstanceId(@Param(value = "list") List<Long> list,
+                                         @Param(value = "robotCode") String robotCode);
+    String selectEdgeCodeOfRobotOrDrone(String robotCode);
+
 }
