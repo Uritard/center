@@ -1242,7 +1242,7 @@ public class UPatrolTaskService {
         List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
         Map<String, Object> robotTaskStatesMap = new HashMap<>();
         robotTaskStatesMap.put("taskId", taskId);
-        robotTaskStatesMap.put("commandValue", 1);
+        robotTaskStatesMap.put("commandValue", 4);
         robotTaskStatesMap.put("robotCodeList", robotCodeList);
         robotTaskStates(robotTaskStatesMap);
 
