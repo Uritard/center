@@ -193,15 +193,4 @@ public class TaskJob extends QuartzJobBean {
         }
     }
 
-    private void robotTaskStates(Map<String, Object> robotTaskStatesMap) {
-        try {
-            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-            if (null != serviceRestTemplate) {
-                serviceRestTemplate.postForObject(Constant.ROBOT_TASK_STATUS_URL, robotTaskStatesMap, String.class);
-            }
-        } catch (Exception e) {
-            log.error("调用机器人服务出错：", e);
-        }
-    }
-
 }
