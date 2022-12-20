@@ -2,20 +2,29 @@ package com.yjh.platform.module.patrol.service;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.patrol.dao.UPatrolDataResultDao;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
  * @author czh
@@ -26,9 +35,15 @@ public class UPatrolDataResultService {
 
     private final UPatrolDataResultDao uPatrolDataResultDao;
     private final TStdDevicemeteDao tStdDevicemeteDao;
+    @Autowired
+    private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    public static final String REGION_PREFIX = "region";
 
     @Autowired
-    public UPatrolDataResultService(UPatrolDataResultDao uPatrolDataResultDao, TStdDevicemeteDao tStdDevicemeteDao) {
+    public UPatrolDataResultService(UPatrolDataResultDao uPatrolDataResultDao, TStdDevicemeteDao tStdDevicemeteDao, RestTemplate restTemplate) {
         this.uPatrolDataResultDao = uPatrolDataResultDao;
         this.tStdDevicemeteDao = tStdDevicemeteDao;
     }
@@ -36,14 +51,14 @@ public class UPatrolDataResultService {
     private Logger log = LoggerFactory.getLogger(UPatrolDataResultService.class);
 
     @Transactional(rollbackFor = Exception.class)
-    public List<CruiseResultAnalyzeMeteInfo> selectCruiseResultAnalyze(List<Long> deviceIdList, Integer deviceType, String meteType, Integer meterType, Integer cruiseRes,Long customId) {
+    public List<CruiseResultAnalyzeMeteInfo> selectCruiseResultAnalyze(List<Long> deviceIdList, Integer deviceType, String meteType, Integer meterType, Integer cruiseRes, Long customId) {
         List<CruiseResultAnalyzeMeteInfo> cruiseResultAnalMeteInfoList = new ArrayList<>();
         if (deviceIdList != null && !deviceIdList.isEmpty()) {
             //cruiseRes:-1全部,1正常,0异常
             if (cruiseRes == 1) {
-                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList, deviceType, meteType, meterType, cruiseRes,customId);
+                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze(deviceIdList, deviceType, meteType, meterType, cruiseRes, customId);
             } else {
-                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze2(deviceIdList, deviceType, meteType, meterType, cruiseRes,customId);
+                cruiseResultAnalMeteInfoList = tStdDevicemeteDao.selectCruiseResultAnalyze2(deviceIdList, deviceType, meteType, meterType, cruiseRes, customId);
             }
             for (CruiseResultAnalyzeMeteInfo item : cruiseResultAnalMeteInfoList) {
                 if (item.getFinalState() == 246 || item.getFinalState() == 261) {
@@ -58,17 +73,34 @@ public class UPatrolDataResultService {
 
     @Transactional(rollbackFor = Exception.class)
     public List<CruiseResultAnalyzeInfo> selectCruiseDataReport(Integer cType, String meteType, Integer meterType, String endTime, String startTime, List<Long> deviceIdList, String instanceName, String stationName) {
+
+
         List<CruiseResultAnalyzeInfo> cruiseResultAnalyzeInfoList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(deviceIdList)) {
+
             cruiseResultAnalyzeInfoList = uPatrolDataResultDao.selectCruiseDataReport(cType, meteType, meterType, endTime, startTime, deviceIdList, instanceName, stationName);
-            for (CruiseResultAnalyzeInfo cRAI : cruiseResultAnalyzeInfoList) {
-                if (Objects.isNull(cRAI.getIdentifyResult())) {
-                    cRAI.setIdentifyResultName(cRAI.getCruiseResultName());
+
+            List<TStdRegion> stdRegionList = tStdRegionDao.selectAll();
+            Map<Long,TStdRegion> regionMaps = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getRegionId,Function.identity()));
+            for (CruiseResultAnalyzeInfo cruiseResultAnalyzeInfo : cruiseResultAnalyzeInfoList) {
+                if (Objects.isNull(cruiseResultAnalyzeInfo.getIdentifyResult())) {
+                    cruiseResultAnalyzeInfo.setIdentifyResultName(cruiseResultAnalyzeInfo.getCruiseResultName());
                 }
-                if (Objects.isNull(cRAI.getPersonCheck())) {
-                    cRAI.setPersonCheck(cRAI.getResultNum());
+                if (Objects.isNull(cruiseResultAnalyzeInfo.getPersonCheck())) {
+                    cruiseResultAnalyzeInfo.setPersonCheck(cruiseResultAnalyzeInfo.getResultNum());
                 }
-                cRAI.setEvaluationState("257".equals(cRAI.getEvaluationState())?"未审核":"已审核");
+
+                if (Objects.nonNull(cruiseResultAnalyzeInfo.getRegionId())) {
+                    TStdRegion tStdRegion = regionMaps.get(cruiseResultAnalyzeInfo.getRegionId());
+                    Long upRegionId = tStdRegion.getUpRegionId();
+                    TStdRegion up = regionMaps.get(upRegionId);
+                    if (Objects.nonNull(up)){
+                        cruiseResultAnalyzeInfo.setRegionName(up.getRegionName() );
+                    } else {
+                        cruiseResultAnalyzeInfo.setRegionName(tStdRegion.getRegionName());
+                    }
+                }
+                cruiseResultAnalyzeInfo.setEvaluationState("257".equals(cruiseResultAnalyzeInfo.getEvaluationState()) ? "未审核" : "已审核");
             }
         }
         return cruiseResultAnalyzeInfoList;
@@ -111,9 +143,9 @@ public class UPatrolDataResultService {
     @Transactional(rollbackFor = Exception.class)
     public List<FirAndPicInfo> selectByCameraId(Long cameraId, String startDate, String endDate, String firName) {
         List<FirAndPicInfo> listFir = new ArrayList<>();
-        List<TCruiseDataResult> list = uPatrolDataResultDao.selectByCameraId(cameraId,startDate,endDate,firName);
+        List<TCruiseDataResult> list = uPatrolDataResultDao.selectByCameraId(cameraId, startDate, endDate, firName);
         for (TCruiseDataResult t : list) {
-            if (t.getResultPic() != null && t.getResultPic() != "" &&!t.getResultPic().isEmpty()) {
+            if (t.getResultPic() != null && t.getResultPic() != "" && !t.getResultPic().isEmpty()) {
                 File file = new File(t.getResultPic());
                 FirAndPicInfo f = new FirAndPicInfo();
                 f.setCruiseDataId(t.getCruiseDataId());
@@ -121,10 +153,9 @@ public class UPatrolDataResultService {
                 f.setPicPath(arr[0] + "//" + arr[1] + "/" + arr[2] + "/resultImg" + "/" + t.getFirName() + ".jpg");
                 f.setFirPath(t.getResultPic());
                 f.setFirName(t.getFirName());
-                if (t.getFirDate()!=null){
+                if (t.getFirDate() != null) {
                     f.setDateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(t.getFirDate()));
-                }
-                else {
+                } else {
                     f.setDateTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                 }
                 listFir.add(f);
@@ -142,8 +173,8 @@ public class UPatrolDataResultService {
             for (TStdDeviceMeteUpdate res : list) {
                 List<Long> deviceMeteIdList = uPatrolDataResultDao.selectAllDeviceMeteId();
                 TStdDeviceMeteUpdate tStdDeviceMeteUpdate = new TStdDeviceMeteUpdate()
-                    .setDeviceMeteId(res.getDeviceMeteId())
-                    .setIdentifyResult(res.getIdentifyResult());
+                        .setDeviceMeteId(res.getDeviceMeteId())
+                        .setIdentifyResult(res.getIdentifyResult());
                 if (Objects.nonNull(res.getUpdateTime())) {
                     tStdDeviceMeteUpdate.setUpdateTime(res.getUpdateTime());
                 }

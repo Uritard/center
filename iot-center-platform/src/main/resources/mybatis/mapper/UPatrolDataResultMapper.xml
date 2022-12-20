@@ -531,7 +531,9 @@
         l.region_name as region_name,
         e.evaluation_state as evaluation_state,
         q.warn_level as alarm_level,
+        x.dict_note as alarm_level_name,
         k.up_region_name as up_region_name,
+        k.up_region_id as region_id,
         v.station_id as station_id,
         v.station_name as station_name
         FROM
@@ -549,6 +551,7 @@
         LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name = "mete_type"
         LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name = "meter_type"
         LEFT JOIN t_dict_business y ON y.dict_code = k.device_type AND y.col_name = "device_type"
+        LEFT JOIN t_dict_business x ON x.dict_code = q.warn_level AND x.col_name = "alarm_level"
         WHERE 1 = 1
         <if test="list != null and list.size() > 0">and e.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
