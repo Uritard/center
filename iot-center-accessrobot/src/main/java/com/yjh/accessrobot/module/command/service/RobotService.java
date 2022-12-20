@@ -3333,8 +3333,7 @@ public class RobotService {
             XMLBaseModel model = getXmlMessage(filePath);
             List<Map<String, Object>> mapList = model.getItems();
             List<TStdRegion> tStdRegionList = mapList.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, TStdRegion.class)).collect(Collectors.toList());
-            String stationId = StringUtils.substringBefore(filePath, "/");
-            tStdRegionService.saveReportData(tStdRegionList, edgeCode, stationId);
+            tStdRegionService.saveReportData(tStdRegionList, edgeCode);
             log.info("区域处理结束 edgeCode:{}", edgeCode);
             // 刷新缓存
             SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class).getForObject(Constant.REGION_REFRESH_URL, Result.class);

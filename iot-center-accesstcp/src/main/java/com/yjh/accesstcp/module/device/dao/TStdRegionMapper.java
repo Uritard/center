@@ -1,6 +1,7 @@
 package com.yjh.accesstcp.module.device.dao;
 
 import com.yjh.accesstcp.module.device.entity.TStdRegion;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public interface TStdRegionMapper {
 
     int updateByPrimaryKey(TStdRegion record);
 
-    List<TStdRegion> selectAll();
+    List<TStdRegion> selectAll(@Param(value = "stationCode") String stationCode,
+                               @Param(value = "stationName") String stationName);
 
 }

@@ -30,7 +30,7 @@ public class TStdRegionService {
     private TStdRegionDao tStdRegionDao;
 
     @Transactional(rollbackFor = Exception.class)
-    public void saveReportData(List<TStdRegion> tStdRegionList, String edgeNode, String stationId) {
+    public void saveReportData(List<TStdRegion> tStdRegionList, String edgeNode) {
         // 查询是否创建对应边缘节点
         TStdRegion rootTStdRegion = Optional.of(tStdRegionDao.selectByRegionCodeAndState(edgeNode, Constant.STATE_LOCAL)).map(tStdRegionList1 -> tStdRegionList1.get(0)).orElse(null);
         if (Objects.isNull(rootTStdRegion)) {
@@ -45,7 +45,7 @@ public class TStdRegionService {
         }
         // 更新上报数据顶层节点
         rootTStdRegion.setOriginRegionId(reportRootTStdRegion.getRegionId().toString());
-        rootTStdRegion.setStationId(stationId);
+        rootTStdRegion.setStationId(reportRootTStdRegion.getStationId());
         rootTStdRegion.setStationName(reportRootTStdRegion.getStationName());
         rootTStdRegion.setRegionPath(reportRootTStdRegion.getRegionPath());
         rootTStdRegion.setRemark(reportRootTStdRegion.getRemark());
