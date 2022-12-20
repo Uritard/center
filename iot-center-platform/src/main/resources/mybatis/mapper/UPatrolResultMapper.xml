@@ -688,9 +688,9 @@
 
     <select id="selectCruiseInspectByTaskIdYC" parameterType="java.lang.String" resultType="com.yjh.platform.module.task.entity.CruiseInspectResult">
         SELECT
-            n.device_id as'deviceId',
+            k.device_id as'deviceId',
                 m.device_name,
-            n.instance_id as 'instanceId',
+            k.instance_id as 'instanceId',
                 c.save_type_list,
             n.cruise_type as 'cruiseType',
                 e.dict_note as 'cruiseTypeName',

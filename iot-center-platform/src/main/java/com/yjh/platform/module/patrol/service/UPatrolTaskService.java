@@ -646,16 +646,16 @@ public class UPatrolTaskService {
 
         resultMap.forEach(result -> {
             //判断是不是机器人的点以及还是否完成
-            String cruiseType = result.get("cruiseType");
-            String cruiseState = result.get("cruiseStatus");
+            int cruiseType = MapUtils.getIntValue(result, "cruiseType");
+            int cruiseState = MapUtils.getIntValue(result,"cruiseStatus");
             String instanceId = result.get("instanceId");
-            if ("228".equals(cruiseType) && "253".equals(cruiseState)) {
+            if (TypeEnum.ROBOT.getCode() == cruiseType && CRUISE_STATE_UN == cruiseState) {
                 //这个点 没有做
                 result.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));//执行失败
                 result.put("resultNum", "机器人任务异常");
                 result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_DATAABNORMAL));//数据异常
                 result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
-                result.put("identifyResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
+                result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
 
                 String instanceKey = cruiseResultKey + instanceId;
                 redisTemplate.opsForHash().putAll(instanceKey, result);
@@ -1421,6 +1421,9 @@ public class UPatrolTaskService {
             }
 
             CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+
+
+
             switch (cruiseTypeEnum) {
                 case VIDEO: // 视频
                 case INFRARED: // 红外

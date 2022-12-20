@@ -1,6 +1,5 @@
 package com.yjh.platform.module.task.service;
 
-import com.alibaba.druid.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Sets;
 import com.yjh.commons.CollectionUtil;
@@ -33,6 +32,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,13 +164,11 @@ public class TCruiseTaskResultService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<Map<String, Object>> selectCruiseTaskResult(String taskId) throws ParseException {
+    public List<Map<String, Object>> selectCruiseTaskResult(String taskId, int pageNum, int pageSize) throws ParseException {
         List<Map<String, Object>> completeResult = new ArrayList<>();
         Map<String, Object> resultsMap = new HashMap<>();
 
-//        List<CruiseInspectResult> cruiseInspectResults = tCruiseTaskDao.selectCruiseInspectByTaskIdYC(taskId);
-        List<CruiseInspectResult> cruiseInspectResults = new ArrayList<>();
-        cruiseInspectResults = uPatrolResultDao.selectCruiseInspectByTaskIdYC(taskId);
+        List<CruiseInspectResult> cruiseInspectResults = uPatrolResultDao.selectCruiseInspectByTaskIdYC(taskId);
         List<TDictBusiness> tDictBusinessList = tDictBusinessDao.select(null, "", "cruise_data_state", "", null, null, null);
         HashMap<String, String> tDictMap = new HashMap<>();
         for (TDictBusiness tDictBusiness : tDictBusinessList) {
@@ -180,47 +178,58 @@ public class TCruiseTaskResultService {
         for (TDictBusiness tDictBusiness : tDictCruiseTypeList) {
             tDictMap.put("cruise_type_" + tDictBusiness.getDictCode(), tDictBusiness.getDictNote());
         }
+        pageSize = pageSize < 20 ? 100 : pageSize;
+        int start = (pageNum < 1) ? 1 : (pageNum - 1) * pageSize;
 
+        List<CruiseInspectResult> inspectPageResults = new ArrayList<>();
         if (CollectionUtils.isEmpty(cruiseInspectResults)){
             Set<String> keyResult = redisScan(UPatrolTaskService.PATROL_TASK_PREFIX + taskId);
             if (keyResult.size() != 0) {
-                for (String keys : keyResult) {
+                List<String> pageKeys = keyResult.stream().skip(start).limit(pageSize).collect(Collectors.toList());
+                for (String keys : pageKeys) {
                     Map<String, String> resultMap = redisTemplate.opsForHash().entries(keys);
                     CruiseInspectResult inspectResult = new CruiseInspectResult();
                     if (resultMap.size() > 0) {
                         inspectResult.setCruiseResultName("--");
                         inspectResult.setEndTime(null);
                         getDataFromRedis(inspectResult, resultMap, tDictMap);
-                        cruiseInspectResults.add(inspectResult);
+                        inspectPageResults.add(inspectResult);
                     }
                     //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
-                    int index = cruiseInspectResults.indexOf(inspectResult);
-                    if (index == -1) {
-                        index = 0;
-                    }
-                    resultsMap.put("index", index);
-                    resultsMap.put("list", cruiseInspectResults);
+                    // int index = cruiseInspectResults.indexOf(inspectResult);
+                    // if (index == -1) {
+                    //     index = 0;
+                    // }
+                    // resultsMap.put("index", index);
+                    // resultsMap.put("list", cruiseInspectResults);
                 }
             }
+            resultsMap.put("index", keyResult.size());
         } else {
-            for (CruiseInspectResult cruiseInspectResult : cruiseInspectResults) {
+            List<CruiseInspectResult> pageResults = cruiseInspectResults.stream().skip(start).limit(pageSize).collect(Collectors.toList());
+            for (CruiseInspectResult cruiseInspectResult : pageResults) {
                 cruiseInspectResult.setCruiseResultName("--");
                 cruiseInspectResult.setEndTime(null);
-                String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + cruiseInspectResult.getInstanceId();
+                String instanceId = String.valueOf(cruiseInspectResult.getInstanceId());
+                // 测试数据，正式使用需删除
+                instanceId = StringUtils.left(instanceId, 3);
+                String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId;
                 Map<String, String> resultMap = redisTemplate.opsForHash().entries(key);
                 if (resultMap.size() > 0) {
                     getDataFromRedis(cruiseInspectResult, resultMap, tDictMap);
+                    inspectPageResults.add(cruiseInspectResult);
                 }
                 //最新的巡视点在之前List的位置(查询发生产生结果点地索引)
-                int index = cruiseInspectResults.indexOf(cruiseInspectResult);
-                if (index == -1) {
-                    index = 0;
-                }
-                resultsMap.put("index", index);
-                resultsMap.put("list", cruiseInspectResults);
+                // int index = cruiseInspectResults.indexOf(cruiseInspectResult);
+                // if (index == -1) {
+                //     index = 0;
+                // }
+                // resultsMap.put("index", index);
+                // resultsMap.put("list", cruiseInspectResults);
             }
+            resultsMap.put("index", cruiseInspectResults.size());
         }
-
+        resultsMap.put("list", inspectPageResults);
 
         completeResult.add(resultsMap);
         return completeResult;
