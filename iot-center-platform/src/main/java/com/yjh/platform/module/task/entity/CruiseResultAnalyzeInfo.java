@@ -106,4 +106,13 @@ public class CruiseResultAnalyzeInfo implements Serializable {
     @ApiModelProperty(value = "变电站名称")
     private String stationName;
 
+    @ApiModelProperty(value = "告警级别")
+    private String alarmLevel;
+
+    @ApiModelProperty(value = "区域id")
+    private Long regionId;
+
+    @ApiModelProperty(value = "告警级别Desc")
+    private String alarmLevelName;
+
 }
