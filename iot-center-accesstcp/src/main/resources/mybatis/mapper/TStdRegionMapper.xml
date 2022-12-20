@@ -178,7 +178,33 @@
 
     <select id="selectAll" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+        region_id,
+        region_name,
+        sort,
+        up_region_id,
+        up_region_ids,
+        region_code,
+        origin_region_id,
+        CASE
+        WHEN up_region_id = - 1 THEN
+        #{stationCode,jdbcType=VARCHAR}
+        ELSE
+        NULL
+        END AS station_id,
+        CASE
+        WHEN up_region_id = - 1 THEN
+        #{stationName,jdbcType=VARCHAR}
+        ELSE
+        NULL
+        END AS station_name,
+        state,
+        edge_status,
+        region_path,
+        longitude,
+        latitude,
+        voltage_level,
+        remark,
+        create_time
         from t_std_region
     </select>
 

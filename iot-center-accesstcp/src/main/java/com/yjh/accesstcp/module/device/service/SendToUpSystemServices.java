@@ -408,7 +408,9 @@ public class SendToUpSystemServices {
     }
 
     public String createRegionModel(String path) throws Exception {
-        List<TStdRegion> tStdRegionList = tStdRegionMapper.selectAll();
+        String stationCode = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeId", "content");
+        String stationName = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "stationName", "content");
+        List<TStdRegion> tStdRegionList = tStdRegionMapper.selectAll(stationCode, stationName);
         SerializeConfig serializeConfig = new SerializeConfig();
         serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
         List<Map<String, Object>> list = tStdRegionList.stream().map((Function<TStdRegion, Map<String, Object>>) tStdRegion -> {
