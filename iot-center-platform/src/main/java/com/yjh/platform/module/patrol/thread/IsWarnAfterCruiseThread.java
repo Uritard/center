@@ -68,7 +68,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             String robotCode = threadMap.get("robotCode");
 
             // taskId是巡视主机的id,robotTaskId是机器人上报的id
-            String robotTaskId = threadMap.get("taskCode");;
+            String robotTaskId = threadMap.get("taskCode");
             log.info("robotTaskId==={}", robotTaskId);
 
             UPatrolTask uPatrolTaskTemp = uPatrolTaskService.selectTaskByTaskCode(robotTaskId);
