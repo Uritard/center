@@ -28,11 +28,9 @@
             sm.up_id as up_id,
             sm.menu_code as menu_code,
             sm.menu_name as menu_name,
-            srm.element_code as element_code,
-               srm.role_id as role_id
+               sm.role_id as role_id
         FROM
             `sys_menu` sm
-                LEFT JOIN (select * from sys_role_menu where role_id = #{roleId,jdbcType=BIGINT}) srm ON srm.menu_code = sm.menu_code
         WHERE
             sm.state = 1
           AND sm.up_id = #{parentId,jdbcType=BIGINT}
