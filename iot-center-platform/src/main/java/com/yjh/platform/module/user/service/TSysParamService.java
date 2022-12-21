@@ -1,7 +1,9 @@
 package com.yjh.platform.module.user.service;
 
+import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.common.utils.Object2Map;
@@ -222,6 +224,15 @@ public class TSysParamService{
         return this.tSysParamDao.selectByParamType(paramType);
     }
 
+    public Map<String,String> sysConfig(){
+        Map<String,String> result = Maps.newHashMap();
+        if (MapUtil.isNotEmpty(sysParamConfig.getSecure())) {
+            result.put("isEncryption", sysParamConfig.getSecure().get("isEncryption"));
+            result.put("isUkey", sysParamConfig.getSecure().get("isUkey"));
+            result.put("summaryFlag", sysParamConfig.getSecure().get("summaryFlag"));
+        }
+        return result;
+    }
 
     public List<Version> selectVersion(int type){
         return tSysParamDao.selectVersion(type);
