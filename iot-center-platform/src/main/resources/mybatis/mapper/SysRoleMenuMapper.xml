@@ -32,11 +32,10 @@
                srm.role_id as role_id
         FROM
             `sys_menu` sm
-                LEFT JOIN sys_role_menu srm ON srm.menu_code = sm.menu_code
+                LEFT JOIN (select * from sys_role_menu where role_id = #{roleId,jdbcType=BIGINT}) srm ON srm.menu_code = sm.menu_code
         WHERE
             sm.state = 1
           AND sm.up_id = #{parentId,jdbcType=BIGINT}
-          AND srm.role_id = #{roleId,jdbcType=BIGINT}
         ORDER BY sm.menu_id
     </select>
 
