@@ -63,6 +63,9 @@ public class RobotPatrolTaskAlarm implements Serializable {
     @ApiModelProperty(value = "内容")
     private String content;
 
+    @ApiModelProperty(value = "缺陷类型")
+    private String defectType;
+
     /**
      * 自家机器人拓展字段
      */

@@ -71,6 +71,7 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
             robotPatrolTaskAlarm.setTime(String.valueOf(item.get("time")));
             robotPatrolTaskAlarm.setTaskPatrolledId(String.valueOf(item.get("task_patrolled_id")));
             robotPatrolTaskAlarm.setContent(String.valueOf(item.get("content")));
+            robotPatrolTaskAlarm.setDefectType(String.valueOf(item.get("defect_type")));
             alarmList.add(robotPatrolTaskAlarm);
         }
 

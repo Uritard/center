@@ -6,6 +6,7 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
+import com.yjh.platform.module.task.entity.TDefectInfo;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
@@ -13,6 +14,7 @@ import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.ProcessResultToUpSystem;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.task.service.TDefectInfoService;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +23,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_ABNORMALALARM;
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
@@ -93,8 +93,15 @@ public class RobotInspectionWarnThread implements Runnable{
             log.info("instanceId=={}", instanceId);
             TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(instanceId);
 
-            TWarnInfo warnInfo = getWarnInfo(tStdDevicemete, taskId, instanceId, robotCode);
-            StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
+            TWarnInfo warnInfo = new TWarnInfo();
+            if (StringUtils.isEmpty(taskAlarm.getDefectType())){
+                warnInfo = getWarnInfo(tStdDevicemete, taskId, instanceId, robotCode, warnInfo);
+                putWarnMapRedis(taskId, warnInfo);
+            }else {
+                TDefectInfo tDefectInfo = getDefectInfo(tStdDevicemete, taskId, instanceId);
+                warnInfo.setWarnSubtype(tDefectInfo.getDefectType());
+                putDefectMapRedis(taskId, tDefectInfo);
+            }
 
             Map<String, String> cruiseMap = new HashMap<>();
             cruiseMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
@@ -103,8 +110,6 @@ public class RobotInspectionWarnThread implements Runnable{
             cruiseMap.put("instanceId", String.valueOf(instanceId));
 
             redisTemplate.opsForHash().putAll(PATROL_TASK_PREFIX + taskId + ":" + instanceId, cruiseMap);
-
-            getWarnMap(taskId, warnInfo);
 
             // 将产生的告警上送至上一级系统
             alarmToUpSystem(taskAlarm.getAlarmLevel(), warnInfo, taskId, instanceId);
@@ -127,9 +132,34 @@ public class RobotInspectionWarnThread implements Runnable{
         }
     }
 
-    private TWarnInfo getWarnInfo(TStdDeviceMete tStdDevicemete, String taskId, Long instanceId, String robotCode){
-        log.info("设置告警信息，{}", JSON.toJSONString(tStdDevicemete));
-        TWarnInfo warnInfo = new TWarnInfo();
+    private TDefectInfo getDefectInfo(TStdDeviceMete tStdDevicemete, String taskId, Long instanceId){
+        TDefectInfo tDefectInfo = new TDefectInfo();
+        try {
+            tDefectInfo.setDefectTime(DateTimeUtil.parse(taskAlarm.getTime()));
+            tDefectInfo.setDefectName(taskAlarm.getContent());
+            tDefectInfo.setDefectContent(taskAlarm.getContent());
+            tDefectInfo.setDeviceId(tStdDevicemete.getDeviceId());
+            tDefectInfo.setCunstomId(tStdDevicemete.getCustomId());
+            tDefectInfo.setInstanceId(instanceId);
+            tDefectInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
+            tDefectInfo.setConfMode(276);
+            tDefectInfo.setAlarmSource(282);
+            tDefectInfo.setValue(taskAlarm.getValue());
+            tDefectInfo.setDefectType(Integer.valueOf(taskAlarm.getDefectType()));
+
+            Map<String, String> info = getWarnOrDefectInfo(taskId, instanceId);
+            tDefectInfo.setImagePath(Optional.ofNullable(info.get("imagePath")).orElse(""));
+            tDefectInfo.setDefectLevel(Integer.valueOf(Optional.ofNullable(info.get("level")).orElse("0")));
+
+        }catch (Exception e){
+            log.error("组装缺陷信息异常：", e);
+        }
+        log.info("tDefectInfo==={}", tDefectInfo);
+        StaticContextAccessor.getBean(TDefectInfoService.class).insert(tDefectInfo);
+        return tDefectInfo;
+    }
+
+    private TWarnInfo getWarnInfo(TStdDeviceMete tStdDevicemete, String taskId, Long instanceId, String robotCode, TWarnInfo warnInfo){
         try {
             warnInfo.setWarnTime(DateTimeUtil.parse(taskAlarm.getTime()));
             warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
@@ -145,49 +175,25 @@ public class RobotInspectionWarnThread implements Runnable{
             String robotId = String.valueOf(StaticContextAccessor.getBean(TRobotInfoDao.class).selectRobotIdByCode(robotCode));
             warnInfo.setDeviceCode(robotId);
             warnInfo.setWarnName(taskAlarm.getContent());
-
-            String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
-            Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
-            log.info("taskId是：{}，instanceId是：{}的 tCruiseTaskResultMap：{}", taskId, instanceId, tCruiseTaskResultMap);
-            if (Objects.nonNull(tCruiseTaskResultMap.get("picpath"))) {
-                warnInfo.setImagePath(tCruiseTaskResultMap.get("picpath"));
-            } else {
-                MAP_LOCK.put(taskId + instanceId, waiter);
-                synchronized (waiter) {
-                    waiter.wait(5000);
-                }
-                tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
-                warnInfo.setImagePath(tCruiseTaskResultMap.get("picpath"));
-            }
-            String alarmLevel = taskAlarm.getAlarmLevel();
             String alarmType = taskAlarm.getAlarmType();
             if (StringUtils.isNotEmpty(alarmType)) {
                 warnInfo.setWarnType(analyseDataOperateService.selectDictCodeByUpDict("point_alarm_type", alarmType));
             }
-            switch (alarmLevel) {
-                case "1":
-                    warnInfo.setWarnLevel(130);
-                    break;
-                case "2":
-                    warnInfo.setWarnLevel(131);
-                    break;
-                case "3":
-                    warnInfo.setWarnLevel(132);
-                    break;
-                case "4":
-                    warnInfo.setWarnLevel(133);
-                    break;
-                default:
-                    break;
-            }
             warnInfo.setWarnContent(taskAlarm.getContent());
+
+            Map<String, String> info = getWarnOrDefectInfo(taskId, instanceId);
+            warnInfo.setImagePath(Optional.ofNullable(info.get("imagePath")).orElse(""));
+            warnInfo.setWarnLevel(Integer.valueOf(Optional.ofNullable(info.get("level")).orElse("0")));
+
         }catch (Exception e){
             log.error("组装告警信息异常：", e);
         }
         log.info("warnInfo==={}", warnInfo);
+        StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
         return warnInfo;
     }
-    private void getWarnMap(String taskId, TWarnInfo warnInfo) {
+
+    private void putWarnMapRedis(String taskId, TWarnInfo warnInfo) {
         String warnName = "warnInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
         Map<String, String> warnMap = new HashMap<>(16);
         try {
@@ -207,8 +213,70 @@ public class RobotInspectionWarnThread implements Runnable{
         }catch (Exception e){
             log.error("组装告警map异常：", e);
         }
-        log.info("warnMap===" + warnMap);
+        log.info("warnMap==={}", warnMap);
         redisTemplate.opsForHash().putAll(warnName, warnMap);
+    }
+
+    private void putDefectMapRedis(String taskId, TDefectInfo tDefectInfo) {
+        String defectName = "defectInfo:" + taskId + String.valueOf(UUID.randomUUID()).replace("-", "");
+        Map<String, String> defectMap = new HashMap<>(16);
+        try {
+            defectMap.put("defectLevel", String.valueOf(tDefectInfo.getDefectLevel()));
+            defectMap.put("defectContent", tDefectInfo.getDefectContent());
+            defectMap.put("deviceId", String.valueOf(tDefectInfo.getDeviceId()));
+            defectMap.put("instanceId", String.valueOf(tDefectInfo.getInstanceId()));
+            defectMap.put("customId", tDefectInfo.getCunstomId());
+            defectMap.put("stdMeteId", String.valueOf(tDefectInfo.getStdMeteId()));
+            defectMap.put("confMode", "276");
+            defectMap.put("alarmSource", String.valueOf(tDefectInfo.getAlarmSource()));
+            defectMap.put("defectTime", DateTimeUtil.format(new Date()));
+            defectMap.put("value", tDefectInfo.getValue());
+        }catch (Exception e){
+            log.error("组装缺陷map异常：" , e);
+        }
+        log.info("defectMap==={}", defectMap);
+        redisTemplate.opsForHash().putAll(defectName, defectMap);
+    }
+
+    private Map<String, String> getWarnOrDefectInfo(String taskId, Long instanceId){
+        HashMap<String, String> map = new HashMap<>(4);
+        try {
+            String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
+            Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+            log.info("taskId是：{}，instanceId是：{}的 tCruiseTaskResultMap：{}", taskId, instanceId, tCruiseTaskResultMap);
+            if (Objects.nonNull(tCruiseTaskResultMap.get("picpath"))) {
+                map.put("imagePath", tCruiseTaskResultMap.get("picpath"));
+            } else {
+                MAP_LOCK.put(taskId + instanceId, waiter);
+                synchronized (waiter) {
+                    waiter.wait(5000);
+                }
+                tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
+                map.put("imagePath", tCruiseTaskResultMap.get("picpath"));
+            }
+
+            String alarmLevel = taskAlarm.getAlarmLevel();
+            switch (alarmLevel) {
+                case "1":
+                    map.put("level", "130");
+                    break;
+                case "2":
+                    map.put("level", "131");
+                    break;
+                case "3":
+                    map.put("level", "132");
+                    break;
+                case "4":
+                    map.put("level", "133");
+                    break;
+                default:
+                    break;
+            }
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+        log.info("map==={}", map);
+        return map;
     }
 
     /**

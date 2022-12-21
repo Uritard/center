@@ -294,6 +294,7 @@ public class ProcessResultToUpSystem {
             xmlItem.put("unit", "");
             xmlItem.put("value_unit", Optional.ofNullable(tWarnInfo.getValue()).orElse(""));
             xmlItem.put("content", Optional.ofNullable(tWarnInfo.getWarnContent()).orElse(""));
+            xmlItem.put("defect_type", Optional.ofNullable(String.valueOf(tWarnInfo.getWarnSubtype())).orElse(""));
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
@@ -416,6 +417,8 @@ public class ProcessResultToUpSystem {
                     // 缺陷
                     tWarnInfo.setValue(Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
                     tWarnInfo.setWarnContent(Optional.ofNullable(redisInfoMap.get("defectContent")).orElse(""));
+
+                    tWarnInfo.setWarnSubtype(Integer.valueOf(Optional.ofNullable(redisInfoMap.get("defectType")).orElse("450")));
                     String defectLevel = redisInfoMap.get("defectContent");
                     switch (defectLevel){
                         case "130":
