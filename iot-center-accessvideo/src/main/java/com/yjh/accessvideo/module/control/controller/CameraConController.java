@@ -788,7 +788,7 @@ public class CameraConController {
 
     private void copyFile(String ftpsPath, String localPath){
         // 如果 ftpsTurbo 为 true，则表示设置了文件盘共享，不使用 ftps 对文件进行传输拷贝
-        if(Constant.ftpsTurbo()){
+        if(!Constant.videoSeparateDeploy || Constant.ftpsTurbo()){
             return;
         }
         try {
@@ -796,7 +796,7 @@ public class CameraConController {
             FtpsUtil.putFile(localPath, "video"+ftpsPath, platFromFtpsConfig.getIp(), platFromFtpsConfig.getPort(),
                     platFromFtpsConfig.getKeypw(), platFromFtpsConfig.getUsername(), platFromFtpsConfig.getPassword());
         } catch (Exception e) {
-            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+            log.error("将文件上传至 platform ftp 服务器错误:", e);
         }
         HashMap<String,String> param = new HashMap<>();
         param.put("ftpsPath","video"+ftpsPath);
