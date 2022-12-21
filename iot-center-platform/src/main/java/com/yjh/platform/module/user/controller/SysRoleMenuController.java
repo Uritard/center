@@ -178,4 +178,26 @@ public class SysRoleMenuController {
         return result;
     }
 
+
+
+    @ApiOperation(value = "根据角色查询菜单权限树")
+    @GetMapping(value = "/selectRoleMenuTree/{roleId}")
+    @Logs(title = "根据角色查询菜单权限树",content = "根据角色查询菜单权限树",logType = 2)
+    public Result selectRoleMenuTree(@PathVariable("roleId")Long roleId) {
+        Result result = new Result();
+        try {
+            result.setData(sysRoleMenuService.selectRoleMenuTree(roleId));
+        } catch (Exception e) {
+            if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_sys_role_name") != -1) {
+                result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), "业务描述");
+            } else {
+                result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), ResultCodeEnum.CREATEORUPDATEERROR.getName());
+            }
+            log.error("角色菜单表批量失败描述：", e);
+        }
+        return result;
+    }
+
+
+
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import com.yjh.platform.module.user.entity.MenuForHave;
 import com.yjh.platform.module.user.entity.SysRoleMenu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.yjh.platform.module.user.entity.SystemMenuTreeNode;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -30,4 +31,5 @@ public interface SysRoleMenuDao {
     int batchInsert(@Param("list") List<SysRoleMenu> list);
     List<String> selectByRoleId(@Param(value = "roleId") Long roleId);
     List<MenuForHave> selectOtherRoleHave(@Param(value = "roleId") Long roleId);
+    List<SystemMenuTreeNode> selectTreeMenu(@Param("parentId")Long parentId,@Param("roleId")Long roleId);
 }

@@ -10,11 +10,35 @@
         <result column="element_code" jdbcType="VARCHAR" property="elementCode" />
         <result column="role_id" jdbcType="BIGINT" property="roleId" />
     </resultMap>
-
+    <resultMap id="treeMap" type="com.yjh.platform.module.user.entity.SystemMenuTreeNode">
+        <id column="menu_id" jdbcType="BIGINT" property="menuId" />
+        <result column="menu_name" jdbcType="VARCHAR" property="menuName" />
+        <result column="menu_code" jdbcType="VARCHAR" property="menuCode" />
+        <result column="up_id" jdbcType="BIGINT" property="upId" />
+        <result column="role_id" jdbcType="BIGINT" property="roleId" />
+        <collection property="childrenList" select="selectTreeMenu" column="{parentId=menu_id,roleId=role_id}"/>
+    </resultMap>
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         rp_id, menu_code, sort, element_code, role_id
     </sql>
+    <select id="selectTreeMenu" resultMap="treeMap">
+        SELECT
+            sm.menu_id as menu_id,
+            sm.up_id as up_id,
+            sm.menu_code as menu_code,
+            sm.menu_name as menu_name,
+            srm.element_code as element_code,
+               srm.role_id as role_id
+        FROM
+            `sys_menu` sm
+                LEFT JOIN sys_role_menu srm ON srm.menu_code = sm.menu_code
+        WHERE
+            sm.state = 1
+          AND sm.up_id = #{parentId,jdbcType=BIGINT}
+          AND srm.role_id = #{roleId,jdbcType=BIGINT}
+        ORDER BY sm.menu_id
+    </select>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="rpId" parameterType="com.yjh.platform.module.user.entity.SysRoleMenu">
