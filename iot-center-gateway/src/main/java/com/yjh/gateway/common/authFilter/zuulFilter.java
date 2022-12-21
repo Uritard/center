@@ -93,7 +93,7 @@ public class zuulFilter extends ZuulFilter {
 
         String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
         String token = request.getHeader("token") != null ? request.getHeader("token") : "";
-        if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")) {
+        if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")&&!url.contains("/tSysParam/v1/sysConfig")) {
             if (StringUtils.isNoneBlank(token)) {
                 Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + userId + ":" + token);
                 String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));

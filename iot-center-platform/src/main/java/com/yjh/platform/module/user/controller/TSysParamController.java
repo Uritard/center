@@ -1,12 +1,15 @@
 package com.yjh.platform.module.user.controller;
 
+import com.baomidou.mybatisplus.extension.api.R;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.netflix.discovery.converters.Auto;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
+import com.yjh.platform.configuration.SysParamConfig;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.entity.SysUser;
@@ -14,6 +17,7 @@ import com.yjh.platform.module.user.entity.TSysParam;
 import com.yjh.platform.module.user.service.TSysParamService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.java.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +52,7 @@ public class TSysParamController {
     @Autowired
     @Qualifier("normalVideoCruiseExecute")
     private AbstractVideoCruise abstractVideoCruise;
+
 
     private Logger log = LoggerFactory.getLogger(TSysParamController.class);
 
@@ -268,5 +273,20 @@ public class TSysParamController {
             log.error("系统参数分页查询失败描述：", e);
         }
         return result;
+    }
+
+
+    @ApiOperation(value = "查询系统初始参数")
+    @GetMapping(value = "/sysConfig")
+    @Logs(title = "查询系统初始化参数", content = "查询系统初始化参数", logType = 1)
+    public Result  sysConfig() {
+        Result result = new Result();
+        try {
+            result.setData(tSysParamService.sysConfig());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("查询系统初始化参数：", e);
+        }
+        return  result;
     }
 }
