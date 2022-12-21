@@ -13,6 +13,7 @@ import com.yjh.platform.module.user.entity.TSysParam;
 import com.yjh.platform.module.user.entity.Version;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.xpath.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -224,12 +225,12 @@ public class TSysParamService{
         return this.tSysParamDao.selectByParamType(paramType);
     }
 
-    public Map<String,String> sysConfig(){
-        Map<String,String> result = Maps.newHashMap();
+    public Map<String,Boolean> sysConfig(){
+        Map<String,Boolean> result = Maps.newHashMap();
         if (MapUtil.isNotEmpty(sysParamConfig.getSecure())) {
-            result.put("isEncryption", sysParamConfig.getSecure().get("isEncryption"));
-            result.put("isUkey", sysParamConfig.getSecure().get("isUkey"));
-            result.put("summaryFlag", sysParamConfig.getSecure().get("summaryFlag"));
+            result.put("isEncryption", Boolean.valueOf(sysParamConfig.getSecure().get("isEncryption")));
+            result.put("isUkey", Boolean.valueOf(sysParamConfig.getSecure().get("isUkey")));
+            result.put("summaryFlag", Boolean.valueOf(sysParamConfig.getSecure().get("summaryFlag")));
         }
         return result;
     }
