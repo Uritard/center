@@ -130,12 +130,12 @@ public class CameraConService {
     private NativeLong m_lRealPlayHandle = new NativeLong(-1);// playhandle
     //    private NativeLong m_minsOne = new NativeLong(-1);
 //    private HCNetSDK.NET_DVR_PREVIEWINFO dvr_previewinfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
-    private NativeLong lUserIDLong = new NativeLong(-1);
+//     private NativeLong lUserIDLong = new NativeLong(-1);
     private HCNetSDK.NET_DVR_CLIENTINFO m_sClientInfo = new HCNetSDK.NET_DVR_CLIENTINFO();    // play structure
     private NativeLong m_lPort = new NativeLong(-1);
     private FRealDataCallBack fRealDataCallBack = new FRealDataCallBack();
 
-    private int lUserID = -1;//用户句柄
+    // private int lUserID = -1;//用户句柄
     private NativeLong mVoiceTalkHandle = new NativeLong(-1);//对讲句柄
     //设备登录信息
     private HCNetSDK.NET_DVR_USER_LOGIN_INFO m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();
@@ -993,7 +993,7 @@ public class CameraConService {
         lpJpegPara.wPicSize = 0xff;
         lpJpegPara.wPicQuality = 1;/* 图片质量系数 0-最好 1-较好 2-一般 */
         if (Objects.nonNull(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())))) {
-            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
             log.info("lUserIDLong: {}", lUserIDLong);
             if (cameraConInfo.getCameraType() == 207) {
                 log.info("红外相机，特殊拍照");
@@ -1124,7 +1124,7 @@ public class CameraConService {
         }
         int iChanNum = cameraConInfo.getChannelNum() + 32;
         int iPreset = cameraConInfo.getPresetNum();
-
+        NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
         hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, iChanNum, presetCmd, iPreset);
 
 //        m_lRealPlayHandle = realPlay(iChanNum, cameraConInfo.getRecordId());
@@ -1142,7 +1142,7 @@ public class CameraConService {
             try {
                 Runtime.getRuntime().exec(delPresetPic);
             } catch (Exception e) {
-                e.getMessage();
+                log.error(e.getMessage(), e);
             }
         }
         return true;
@@ -1156,7 +1156,7 @@ public class CameraConService {
         NativeLong iChanNumTem = new NativeLong(0);
         Map<String, String> channleStatusMap = new HashMap<>();
         if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
-            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
+            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
             IntByReference intByReference = new IntByReference(0);
             HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG(); //NET_DVR_IPPARACFG_V40
             // --支持128通道
@@ -1264,7 +1264,7 @@ public class CameraConService {
         NativeLong iChanNumTem = new NativeLong(0);
         Map<String, String> channleStatusMap = new HashMap<>();
         if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
-            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
+            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
             IntByReference ibrBytesReturned = new IntByReference(0);
             HCNetSDK.NET_DVR_HDCFG m_struHDCfg = new HCNetSDK.NET_DVR_HDCFG();
             m_struHDCfg.write();
@@ -1322,7 +1322,7 @@ public class CameraConService {
         NativeLong iChanNumTem = new NativeLong(0);
         Map<String, Object> channleStatusMap = new HashMap<>();
         if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
-            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
+            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
 
             // 查询磁盘信息
             IntByReference ibrBytesReturned = new IntByReference(0);
@@ -1822,7 +1822,7 @@ public class CameraConService {
     public void reRegister(Long recordId) {
         NativeLong iChanNumTem = new NativeLong(0);
         if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
-            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
+            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
 
             // 查询磁盘信息，判断NVR是否掉线
             IntByReference ibrBytesReturned = new IntByReference(0);
@@ -1843,7 +1843,7 @@ public class CameraConService {
     //@Logs(title = "NVR注册", code = "NVRRegister")
     @Transactional(rollbackFor = Exception.class)
     public String registerNVR(Long recordId) {
-
+        int lUserID = -1;
         RecorderConInfo recorderConInfo = cameraConDao.selectByRecordId(recordId);
         if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
             lUserID = Constant.maps.get(String.valueOf(recordId));
@@ -1893,6 +1893,7 @@ public class CameraConService {
 
     private NativeLong realPlay(int lChannel, long recordId) {
         m_sClientInfo.lChannel = new NativeLong(lChannel);
+        NativeLong lUserIDLong = new NativeLong(-1);
         if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
             lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
             return hCNetSDK.NET_DVR_RealPlay_V30(lUserIDLong,
@@ -1971,7 +1972,7 @@ public class CameraConService {
             createDirectory(videoPath);
             String path = videoPath + fileName;
             log.info("保存文件地址：" + path);
-            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
             HCNetSDK.NET_DVR_PREVIEWINFO struPlayInfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
             struPlayInfo.lChannel = new NativeLong(cameraConInfo.getChannelNum());
             struPlayInfo.dwStreamType = 0;
@@ -2045,7 +2046,7 @@ public class CameraConService {
             createDirectory(videoPath);
             String path = videoPath + fileName;
             log.info("保存文件地址：" + path);
-            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
             HCNetSDK.NET_DVR_PREVIEWINFO struPlayInfo = new HCNetSDK.NET_DVR_PREVIEWINFO();
             struPlayInfo.lChannel = new NativeLong(cameraConInfo.getChannelNum());
             struPlayInfo.dwStreamType = 0;
@@ -2122,7 +2123,7 @@ public class CameraConService {
             //保存文件地址
             String path = videoPath + fileName;
             log.info("保存文件地址：" + path);
-            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
             log.info("lUserIDLong获取到：" + lUserIDLong);
             Calendar c = Calendar.getInstance();
             //开始时间
@@ -2261,7 +2262,7 @@ public class CameraConService {
             // if (!login.isEmpty()) {
             //  log.info("登录成功：" + login);
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
             log.info("lUserIDLong获取到：" + lUserIDLong);
             Calendar c = Calendar.getInstance();
             //开始时间
@@ -2366,7 +2367,7 @@ public class CameraConService {
      */
     public Map<String, String> givePicFir(long cameraId, Long presetId, String meteName) {
         Map<String, String> map = new HashMap<String, String>();
-
+        int lUserID = -1;
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
@@ -2396,7 +2397,7 @@ public class CameraConService {
             log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
             lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
             log.info("NET_DVR_Login_V40:返回值" + lUserID);
-            lUserIDLong = new NativeLong(lUserID);
+            NativeLong lUserIDLong = new NativeLong(lUserID);
             //转到预置点
             boolean Preset = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, 2, HCNetSDK.GOTO_PRESET,
                     cameraConInfo.getPresetNum());
@@ -2537,7 +2538,7 @@ public class CameraConService {
      */
     public Map<String, String> givePicFir2(long cameraId, Long presetId, String meteName) {
         Map<String, String> map = new HashMap<String, String>();
-
+        int lUserID = -1;
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
@@ -2567,7 +2568,7 @@ public class CameraConService {
             log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
             lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
             log.info("NET_DVR_Login_V40:返回值" + lUserID);
-            lUserIDLong = new NativeLong(lUserID);
+            NativeLong lUserIDLong = new NativeLong(lUserID);
             //转到预置点
             boolean Preset = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, 2, HCNetSDK.GOTO_PRESET,
                     cameraConInfo.getPresetNum());
@@ -2588,7 +2589,7 @@ public class CameraConService {
                 log.error("error----" + e);
             }
 
-            m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+            /*m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
             System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
             m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
             System.arraycopy(userName.getBytes(), 0, m_strLoginInfo.sUserName, 0, userName.length());
@@ -2600,7 +2601,7 @@ public class CameraConService {
             log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
             lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
             log.info("NET_DVR_Login_V40:返回值" + lUserID);
-            lUserIDLong = new NativeLong(lUserID);
+            lUserIDLong = new NativeLong(lUserID);*/
             //透传url
             String strURL = "POST /ISAPI/Thermal/channels/2/thermometry/jpegPicWithAppendData?format=json";
             HCNetSDK.BYTE_ARRAY ptrUrl = new HCNetSDK.BYTE_ARRAY(BYTE_ARRAY_LEN);
@@ -2785,6 +2786,7 @@ public class CameraConService {
     public int startVoiceTalk(Long videoIntercomId) {
 
         int re = 1;
+        int lUserID = -1;
         log.info("开启可视对讲");
         try {
             String logpath = "/home/yjh/iot-center-accessvideo-1.0.0/logs";
@@ -2933,10 +2935,7 @@ public class CameraConService {
             thread.start();
             log.info("returnMap: " + returnMap);
         } catch (Exception e) {
-            e.getMessage();
-        } finally {
-            hCNetSDK.NET_DVR_Logout(lUserID);
-            // hCNetSDK.NET_DVR_Cleanup();
+            log.error(e.getMessage(), e);
         }
         return returnMap;
     }
@@ -2946,7 +2945,7 @@ public class CameraConService {
     public int getVidemoIntercomStatus(Long videoIntercomId) {
         int re = 1;
 
-        NativeLong iChanNumTem = new NativeLong(0);
+        int lUserID = -1;
         try {
             log.info("开启可视对讲videoIntercomId：" + videoIntercomId);
             String url = SERVICE_URL + "?videoIntercomId=" + videoIntercomId;
@@ -3098,6 +3097,7 @@ public class CameraConService {
             column = Integer.parseInt(arrs[0]);
             row = Integer.parseInt(arrs[1]) + 1;
         }
+        NativeLong lUserIDLong = new NativeLong(-1);
         try {
             CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, null);
             cameraConInfo.setChannelNum(cameraConInfo.getChannelNum() + 32);
@@ -3267,7 +3267,7 @@ public class CameraConService {
 //            //通道号
 //            pDownloadCond.dwChannel = cameraConInfo.getChannelNum();
 //            log.info("dwChannel：" + cameraConInfo.getChannelNum());
-//            lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
+//            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo.getRecordId())));
 //            Calendar c = Calendar.getInstance();
 //
 //            //开始时间
@@ -3522,7 +3522,7 @@ public class CameraConService {
 //            lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
 //            log.info("NET_DVR_Login_V40:返回值" + lUserID);
 //            //log.info("lUserIDLong:返回值"+lUserIDLong);
-//            lUserIDLong = new NativeLong(lUserID);// new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo
+//            NativeLong lUserIDLong = new NativeLong(lUserID);// new NativeLong(Constant.maps.get(String.valueOf(cameraConInfo
 //            .getRecordId())));
 //            log.info("lUserIDLong" + lUserIDLong);
 //            //getSetconfig(lUserIDLong);
