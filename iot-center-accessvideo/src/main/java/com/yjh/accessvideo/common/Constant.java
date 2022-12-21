@@ -122,7 +122,7 @@ public class Constant {
             }
             StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url,map, Result.class);
         }catch (Exception e){
-           log.info("一键顺控："+e);
+           log.info("接口错误：", e);
         }
     }
 

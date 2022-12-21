@@ -87,7 +87,7 @@ public class TranscodeThread implements Runnable {
     }
 
     private void copyFile(String ftpsPath, String localPath){
-        if(Constant.ftpsTurbo()){
+        if(!Constant.videoSeparateDeploy || Constant.ftpsTurbo()){
             return;
         }
         String remotePath = null;
@@ -97,7 +97,7 @@ public class TranscodeThread implements Runnable {
             FtpsUtil.putFile(localPath, remotePath, platFromFtpsConfig.getIp(), platFromFtpsConfig.getPort(),
                     platFromFtpsConfig.getKeypw(), platFromFtpsConfig.getUsername(), platFromFtpsConfig.getPassword());
         } catch (Exception e) {
-            log.error("将文件上传至上级系统ftp服务器错误:ftpsPath: {}, remotePath: {} ", ftpsPath, remotePath, e);
+            log.error("将文件上传至 platform ftp 服务器错误，ftpsPath: {}, remotePath: {} ", ftpsPath, remotePath, e);
         }
         HashMap<String,String> param = new HashMap<>();
         param.put("ftpsPath", remotePath);
