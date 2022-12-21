@@ -87,7 +87,8 @@ public class TranscodeThread implements Runnable {
     }
 
     private void copyFile(String ftpsPath, String localPath){
-        if(!Constant.videoSeparateDeploy || Constant.ftpsTurbo()){
+        // 如果 ftpsTurbo 为 true，则表示设置了文件盘共享，或者没有单独部署，不使用 ftps 对文件进行传输拷贝
+        if(Constant.ftpsTurbo()){
             return;
         }
         String remotePath = null;
