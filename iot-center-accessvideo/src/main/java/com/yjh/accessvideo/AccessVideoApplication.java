@@ -94,12 +94,6 @@ public class AccessVideoApplication implements CommandLineRunner {
     private String stationCode;
 
     /**
-     * video服务是否单独部署
-     */
-    @Value("${video.separate.deploy:false}")
-    private String videoSeparateDeploy;
-
-    /**
      * 用户句柄
      */
     private int lUserID;
@@ -119,7 +113,6 @@ public class AccessVideoApplication implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        Constant.videoSeparateDeploy = Boolean.valueOf(videoSeparateDeploy);
         Constant.WEBSOCKET_URL = syncWebsocketUrl;
         Constant.redisTemplate = redisTemplate;
         Constant.apiPermissions = Boolean.valueOf(interfaceApi);

@@ -1317,9 +1317,10 @@ INSERT INTO `t_sys_param` VALUES ('100118', '404', 'localLatitude', '当前变�
 INSERT INTO `t_sys_param` VALUES ('100119', '404', 'adcode', '地图adcode', '500101', '地图adcode',null);
 INSERT INTO `t_sys_param` VALUES ('100120', '402', 'isEncryption', '是否开启加解密', 'true', '是否开启加解密',null);
 INSERT INTO `t_sys_param` VALUES ('100121', '404', 'upSystemReceiveCode', '上级系统-上级系统唯一标识', '3000', '上级系统唯一标识', NULL);
-INSERT INTO `t_sys_param` VALUES ('100158', '404', 'sourceFilePath', '设备资源信息配置文件绝对路径', '/home/yjh_iot_center/iot-files/sourceFile/', '设备资源信息配置文件绝对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
-INSERT INTO `t_sys_param` VALUES ('100160', '404', 'logMaximumStorage', '审计日志存储阈值上限', '1000000', '单位：条', '{\"rule\":\"^(\\d|[1-9]\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
-
+INSERT INTO `t_sys_param` VALUES ('100122', '404', 'sourceFilePath', '设备资源信息配置文件绝对路径', '/home/yjh_iot_center/iot-files/sourceFile/', '设备资源信息配置文件绝对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param` VALUES ('100123', '404', 'logMaximumStorage', '审计日志存储阈值上限', '1000000', '单位：条', '{\"rule\":\"^(\\d|[1-9]\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
+INSERT INTO `t_sys_param` VALUES ('100124', '404', 'ftpsTurbo', 'ftps 服务加速', 'false', '开启则视频服务和业务服务之间不通过 ftps 传输文件', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param` VALUES ('100125', '404', 'analysisTurbo', '分析主机分析服务加速', 'false', '开启使用新逻辑减少IO，提升分析速度', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------
