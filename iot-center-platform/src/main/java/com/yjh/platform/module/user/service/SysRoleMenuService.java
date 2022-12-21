@@ -5,6 +5,7 @@ import com.yjh.platform.module.user.dao.SysRoleMenuDao;
 
 import java.util.List;
 
+import com.yjh.platform.module.user.entity.SystemMenuTreeNode;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -66,6 +67,10 @@ public class SysRoleMenuService{
     @Transactional(rollbackFor = Exception.class)
     public int batchInsert(List<SysRoleMenu> list) {
         return this.sysRoleMenuDao.batchInsert(list);
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public List<SystemMenuTreeNode> selectRoleMenuTree(Long roleId) {
+        return this.sysRoleMenuDao.selectTreeMenu(-1L,roleId);
     }
 
 }
