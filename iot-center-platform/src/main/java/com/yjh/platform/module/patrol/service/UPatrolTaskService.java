@@ -311,30 +311,52 @@ public class UPatrolTaskService {
 
     private List<Long> insertTaskAttr(UPatrolTask uPatrolTask, TCruiseTaskAdd tCruiseTaskAdd) {
         List<Long> instanceList = new ArrayList<>();
-
-        List<UPatrolPlanAttr> uPatrolPlanAttrList = uPatrolPlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());
         List<UPatrolTaskAttr> uPatrolTaskAttrs = new ArrayList<>();
-        for (UPatrolPlanAttr uPatrolPlanAttr : uPatrolPlanAttrList) {
-            UPatrolTaskAttr uPatrolTaskAttr = new UPatrolTaskAttr();
-            uPatrolTaskAttr.setTaskId(uPatrolTask.getTaskId());
-            uPatrolTaskAttr.setInstanceId(uPatrolPlanAttr.getInstanceId());
-            uPatrolTaskAttr.setDeviceMeteId(uPatrolPlanAttr.getDeviceMeteId());
-            uPatrolTaskAttr.setDeviceId(uPatrolPlanAttr.getDeviceId());
-            uPatrolTaskAttr.setDeviceMeteId(uPatrolPlanAttr.getDeviceMeteId());
-            uPatrolTaskAttr.setCustomId(uPatrolPlanAttr.getCustomId());
-            uPatrolTaskAttr.setPointTaskId(uPatrolTaskAttr.getPointTaskId());
-            instanceList.add(uPatrolPlanAttr.getInstanceId());
-            uPatrolTaskAttrs.add(uPatrolTaskAttr);
-            if (uPatrolTaskAttrs.size()%2000 == 0){
-                this.uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
-                uPatrolTaskAttrs = new ArrayList<>();
+        if (Optional.ofNullable(tCruiseTaskAdd.getPlanId()).isPresent()) {
+            List<UPatrolPlanAttr> uPatrolPlanAttrList = uPatrolPlanAttrDao.selectByPlanId(tCruiseTaskAdd.getPlanId());
+            for (UPatrolPlanAttr uPatrolPlanAttr : uPatrolPlanAttrList) {
+                UPatrolTaskAttr uPatrolTaskAttr = new UPatrolTaskAttr();
+                uPatrolTaskAttr.setTaskId(uPatrolTask.getTaskId());
+                uPatrolTaskAttr.setInstanceId(uPatrolPlanAttr.getInstanceId());
+                uPatrolTaskAttr.setDeviceMeteId(uPatrolPlanAttr.getDeviceMeteId());
+                uPatrolTaskAttr.setDeviceId(uPatrolPlanAttr.getDeviceId());
+                uPatrolTaskAttr.setCustomId(uPatrolPlanAttr.getCustomId());
+                uPatrolTaskAttr.setPointTaskId(uPatrolTaskAttr.getPointTaskId());
+                instanceList.add(uPatrolPlanAttr.getInstanceId());
+                uPatrolTaskAttrs.add(uPatrolTaskAttr);
+                if (uPatrolTaskAttrs.size() % 2000 == 0) {
+                    this.uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
+                    uPatrolTaskAttrs = new ArrayList<>();
+                }
+            }
+            TCruisePlanCount plan = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
+            tCruiseTaskAdd.setType(plan.getType());
+        } else {
+            String[] deviceInstancesFromUpperSystem = tCruiseTaskAdd.getDeviceList().split(",");
+            for (String item : deviceInstancesFromUpperSystem) {
+                instanceList.add(Long.valueOf(item));
+            }
+            List<TCruisePointInstance> tCruisePointInstanceList = uPatrolTaskAttrDao.batchSelect(instanceList);
+            for (TCruisePointInstance tCruisePointInstance : tCruisePointInstanceList) {
+                UPatrolTaskAttr uPatrolTaskAttr = new UPatrolTaskAttr();
+                uPatrolTaskAttr.setTaskId(uPatrolTask.getTaskId());
+                uPatrolTaskAttr.setInstanceId(tCruisePointInstance.getInstanceId());
+                uPatrolTaskAttr.setDeviceMeteId(tCruisePointInstance.getDeviceMeteId());
+                uPatrolTaskAttr.setDeviceId(tCruisePointInstance.getDeviceId());
+                uPatrolTaskAttr.setCustomId(tCruisePointInstance.getCustomId());
+                uPatrolTaskAttr.setPointTaskId(uPatrolTaskAttr.getPointTaskId());
+                uPatrolTaskAttrs.add(uPatrolTaskAttr);
+                if (uPatrolTaskAttrs.size() % 2000 == 0) {
+                    this.uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
+                    uPatrolTaskAttrs = new ArrayList<>();
+                }
             }
         }
+
         if (uPatrolTaskAttrs.size() > 0) {
             uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
         }
-        TCruisePlanCount plan = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
-        uPatrolTask.setTaskType(plan.getType());
+        uPatrolTask.setTaskType(tCruiseTaskAdd.getType());
         uPatrolTask.setCreateTime(new Date());
         uPatrolTaskDao.add(uPatrolTask);
         return instanceList;
@@ -373,6 +395,7 @@ public class UPatrolTaskService {
                     .setCruiseStatus(253)
                     .setCruiseType(item.getCruiseType()).setCreatetime(now);
             Map map = Object2Map.objectToMap(uPatrolDataResult, true);
+            map.put("edgeCode", item.getEdgeCode());
             map.put("deviceMeteId", String.valueOf(item.getDeviceMeteId()));
             map.put("taskName", task.getTaskName());
             map.put("startTime", DateTimeUtil.format3(task.getStartTime()));
@@ -708,7 +731,7 @@ public class UPatrolTaskService {
                 });
 
                 Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
-                robotTaskInfoMap.put("edgeTaskInfoList", edgeTaskInfoList);
+                robotTaskInfoMap.put("robotTaskInfoList", edgeTaskInfoList);
                 log.info("edgeTaskInfoMap = {}", robotTaskInfoMap);
 
                 // 调用robot服务下发任务
@@ -1356,7 +1379,8 @@ public class UPatrolTaskService {
             tasKeys.forEach(s -> connection.hGetAll(s.getBytes(StandardCharsets.UTF_8)));
             return null;
         });
-
+        //只取本层级的测点任务
+        taskInfoList = taskInfoList.stream().filter(t -> Objects.isNull(t.get("edgeCode"))).collect(Collectors.toList());
         log.info("taskInfoList size: {}", taskInfoList.size());
 
         // 查询检修区域

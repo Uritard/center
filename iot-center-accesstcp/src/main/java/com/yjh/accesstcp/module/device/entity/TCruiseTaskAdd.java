@@ -26,6 +26,9 @@ public class TCruiseTaskAdd implements Serializable {
     @ApiModelProperty(value = "巡检任务UUID")
     private String taskId;
 
+    @ApiModelProperty(value = "任务编码")
+    private String taskCode;
+
     @ApiModelProperty(value = "任务名称")
     private String taskName;
 
@@ -82,8 +85,55 @@ public class TCruiseTaskAdd implements Serializable {
     @ApiModelProperty(value = "定时时间类型（1.周，2.日）")
     private Long periodId;
 
-    private String password;
+    private String pCode;
+
     private String deviceList;
 
+    private Long instanceId;
+
+    @ApiModelProperty(value = "是否OCR识别 (0:是 1:否)")
+    private String isOcr;
+
+    private Long createUserId;
+
+    @ApiModelProperty(value = "预案编码")
+    private String planCode;
+
+    private String identifier;
+
+    private String endTime;
+
+    @ApiModelProperty(value = "是否为联动任务（1-是0否）")
+    private String unionTaskStatus;
+
+    @ApiModelProperty(value = "周期（月） ")
+    private String cycleMonth;
+
+    @ApiModelProperty(value = "周期（周） ")
+    private String cycleWeek;
+
+    @ApiModelProperty(value = "周期（执行时间） ")
+    private String cycleExecuteTime;
+
+    @ApiModelProperty(value = "周期（开始时间） ")
+    private String cycleStartTime;
+
+    @ApiModelProperty(value = "周期（结束时间） ")
+    private String cycleEndTime;
+
+    @ApiModelProperty(value = "间隔（数量） ")
+    private String intervalNumber;
+
+    @ApiModelProperty(value = "间隔（类型） ")
+    private String intervalType;
+
+    @ApiModelProperty(value = "间隔（执行时间） ")
+    private String intervalExecuteTime;
+
+    @ApiModelProperty(value = "间隔（开始时间） ")
+    private String intervalStartTime;
+
+    @ApiModelProperty(value = "间隔（结束时间） ")
+    private String intervalEndTime;
 
 }

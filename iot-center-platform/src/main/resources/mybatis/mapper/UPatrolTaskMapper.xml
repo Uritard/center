@@ -921,8 +921,9 @@
                 LEFT JOIN t_cruise_point_instance ins ON ins.instance_id = attr.instance_id
                 AND attr.task_id = #{taskId}
         WHERE
-            ins.cruise_type = 228
-           OR ins.cruise_type = 524
+        ins.edge_code IS NULL
+        AND ins.cruise_type = 228
+        OR ins.cruise_type = 524
     </select>
 
     <select id="selectInstanceIdByTaskId" resultType="java.lang.Long">
@@ -933,8 +934,9 @@
                 LEFT JOIN t_cruise_point_instance ins ON ins.instance_id = attr.instance_id
                 AND attr.task_id = #{taskId}
         WHERE
-            ins.cruise_type = 228
-           OR ins.cruise_type = 524
+        ins.edge_code IS NULL
+        AND ins.cruise_type = 228
+        OR ins.cruise_type = 524
     </select>
 
     <select id="selectTaskPriorityConfigList" resultType="java.util.Map">

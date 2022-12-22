@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.yjh.accessrobot.common.utils.ValueUtil.*;
+import static com.yjh.accessrobot.common.utils.ValueUtil.objToInt;
 
 /**
  * @author hyh
@@ -353,10 +354,10 @@ public class TStdDeviceModelService {
                 : String.valueOf(device.get("device_name")));
         //当节点为巡视主机接入边缘节点时再触发
         if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
-            tCameraPreset.setPresetNum((Integer) device.getOrDefault("preset_num", 1));
-            tCameraPreset.setIsKeepWatch((Integer) device.getOrDefault("is_keep_watch", 0));
-            tCameraPreset.setIsKeepWatchTask((Integer) device.getOrDefault("is_keep_watch_task", 0));
-            tCameraPreset.setIsSecondKeepWatchTask((Integer) device.getOrDefault("is_second_keep_watch_task", 0));
+            tCameraPreset.setPresetNum(objToInt(device.getOrDefault("preset_num", 1)));
+            tCameraPreset.setIsKeepWatch(objToInt(device.getOrDefault("is_keep_watch", 0)));
+            tCameraPreset.setIsKeepWatchTask(objToInt(device.getOrDefault("is_keep_watch_task", 0)));
+            tCameraPreset.setIsSecondKeepWatchTask(objToInt(device.getOrDefault("is_second_keep_watch_task", 0)));
             if (device.containsKey("preset_img")) {
                 String presetFtpsImg = ftpsPath + device.get("preset_img").toString();
                 String presetImg = presetPath + device.get("preset_img").toString();
