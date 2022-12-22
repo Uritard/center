@@ -69,8 +69,8 @@ public class SysRoleMenuService{
         return this.sysRoleMenuDao.batchInsert(list);
     }
     @Transactional(rollbackFor = Exception.class)
-    public List<SystemMenuTreeNode> selectRoleMenuTree(Long roleId) {
-        return this.sysRoleMenuDao.selectTreeMenu(-1L,roleId);
+    public List<SystemMenuTreeNode> selectRoleMenuTree() {
+        return this.sysRoleMenuDao.selectTreeMenu(-1L);
     }
 
 }

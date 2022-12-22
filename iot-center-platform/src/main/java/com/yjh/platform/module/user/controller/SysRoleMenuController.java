@@ -181,12 +181,12 @@ public class SysRoleMenuController {
 
 
     @ApiOperation(value = "根据角色查询菜单权限树")
-    @GetMapping(value = "/selectRoleMenuTree/{roleId}")
+    @GetMapping(value = "/selectRoleMenuTree")
     @Logs(title = "根据角色查询菜单权限树",content = "根据角色查询菜单权限树",logType = 2)
-    public Result selectRoleMenuTree(@PathVariable("roleId")Long roleId) {
+    public Result selectRoleMenuTree() {
         Result result = new Result();
         try {
-            result.setData(sysRoleMenuService.selectRoleMenuTree(roleId));
+            result.setData(sysRoleMenuService.selectRoleMenuTree());
         } catch (Exception e) {
             if (StringUtils.indexOfIgnoreCase(e.getCause().getMessage(), "idx_sys_role_name") != -1) {
                 result.setCode(ResultCodeEnum.CREATEORUPDATEERROR.getCode(), "业务描述");

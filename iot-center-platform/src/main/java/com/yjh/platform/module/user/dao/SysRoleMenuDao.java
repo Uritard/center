@@ -31,5 +31,5 @@ public interface SysRoleMenuDao {
     int batchInsert(@Param("list") List<SysRoleMenu> list);
     List<String> selectByRoleId(@Param(value = "roleId") Long roleId);
     List<MenuForHave> selectOtherRoleHave(@Param(value = "roleId") Long roleId);
-    List<SystemMenuTreeNode> selectTreeMenu(@Param("parentId")Long parentId,@Param("roleId")Long roleId);
+    List<SystemMenuTreeNode> selectTreeMenu(@Param("parentId")Long parentId);
 }

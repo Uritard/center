@@ -16,7 +16,7 @@
         <result column="menu_code" jdbcType="VARCHAR" property="menuCode" />
         <result column="up_id" jdbcType="BIGINT" property="upId" />
         <result column="role_id" jdbcType="BIGINT" property="roleId" />
-        <collection property="childrenList" select="selectTreeMenu" column="{parentId=menu_id,roleId=role_id}"/>
+        <collection property="childrenList" select="selectTreeMenu" column="{parentId=menu_id}"/>
     </resultMap>
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
