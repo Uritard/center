@@ -26,6 +26,7 @@ import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisCommands;
@@ -78,8 +79,8 @@ public class InspectionResultThread implements Runnable{
         try {
             log.info("开始处理巡检结果并对其标准化 >>>>>>> robotPatrolTaskResult==={}", JSON.toJSONString(robotPatrolTaskResult));
             String taskId = infoMap.get("taskId");
-            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
-            /*if ("3".equals(sysLevel)) {
+            /*String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+            if ("3".equals(sysLevel)) {
                 upSystemDealWith(taskId);
                 return;
             }*/
@@ -139,9 +140,9 @@ public class InspectionResultThread implements Runnable{
                 }
                 MAP_LOCK.remove(taskId + instanceId);
             }
-            // 巡视主机下发的任务或者站端本体任务
+            // 是否为本级系统下发给下级系统的任务
             boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);
-            if (!flag) {
+            if (Boolean.FALSE.equals(flag)) {
                 log.info("This is simulation tool task！！！ {}", taskId);
                 simulationToolTaskHandler(infoMap.getOrDefault("absolutePath", ""), taskId, instanceId, robotPatrolTaskResult.getValue(), robotPatrolTaskResult.getFilePath());
             }
@@ -238,17 +239,17 @@ public class InspectionResultThread implements Runnable{
     }
 
     /**
-     * 判断任务是否为巡视主机下发的任务
+     * 判断任务是否为本级系统下发给下级系统的任务
      * @param taskId 任务id
      * @param instanceId 巡视点id
-     * @param robotCode 机器人/无人机编码
+     * @param sendCode 下级唯一标识
      * @return boolean
      */
-    private boolean judgeTaskSourceHandler(String taskId, String instanceId, String robotCode) {
+    private boolean judgeTaskSourceHandler(String taskId, String instanceId, String sendCode) {
         try {
             String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
 
-            Integer robotType = uPatrolTaskService.selectRobotType(robotPatrolTaskResult.getSendCode());
+            Integer robotType = uPatrolTaskService.selectRobotType(sendCode);
             // 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path 为模拟工具
             boolean isSimulationTool = StringUtils.isNotEmpty(robotPatrolTaskResult.getFilePath())
                     && StringUtils.isEmpty(robotPatrolTaskResult.getOriginFileResultPath())
@@ -257,9 +258,11 @@ public class InspectionResultThread implements Runnable{
                     && Objects.equals(159, robotType)
                     // 上级系统不走算法处理，只存数据
                     && !"3".equals(sysLevel);
-
+            // 如果sendCode是边缘节点(1~1999) 也走模拟工具的逻辑
+            boolean isEdgeCode = NumberUtils.toInt(sendCode) >= 1 && NumberUtils.toInt(sendCode) <= 1999;
+            isSimulationTool = isSimulationTool || isEdgeCode;
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, sysLevel: {}", isSimulationTool, taskId, sysLevel);
-            if (!isSimulationTool) {
+            if (Boolean.FALSE.equals(isSimulationTool)) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0) {
                     log.info("taskId为{}巡视点instanceId为{}的点位产生了告警,需要更新图片", taskId, instanceId);
@@ -271,7 +274,7 @@ public class InspectionResultThread implements Runnable{
                 // UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
                 // boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
                 // if (isSelfTask) {
-                //     standTaskDealHandler(taskId, robotCode);
+                //     standTaskDealHandler(taskId, sendCode);
                 // }
                 return true;
             }
@@ -327,7 +330,7 @@ public class InspectionResultThread implements Runnable{
     }
 
     /**
-     * 工具上报的巡视结果处理
+     * 工具或下级上报的巡视结果处理
      *
      * @param originPath 巡视结果文件全路径
      * @param taskId     任务id
