@@ -520,7 +520,6 @@
         where 1=1
         and TO_DAYS(c.alarm_time) =TO_DAYS(NOW())
         <if test="alarmLevel != null ">and c.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
-        <!--        ) -->
         order by warnTime desc LIMIT 20
     </select>
     <select id="selectWarnPopUp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">

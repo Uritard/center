@@ -325,6 +325,7 @@
             t_std_region a
         WHERE
             a.region_code = #{edgeCode, jdbcType=VARCHAR}
+        and a.state = 1
     </select>
 
     <select id="selectIsUnionTask" resultType="java.lang.Integer">

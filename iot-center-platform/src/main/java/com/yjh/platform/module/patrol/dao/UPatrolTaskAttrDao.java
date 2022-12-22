@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.dao;
 
+import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.UPatrolTaskAttr;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -31,4 +32,7 @@ public interface UPatrolTaskAttrDao {
 
     int batchAdd(List<UPatrolTaskAttr> list);
     int batchDelete(List<String> list);
+
+    List<TCruisePointInstance> batchSelect(@Param("instanceList") List<Long> instanceList);
+
 }

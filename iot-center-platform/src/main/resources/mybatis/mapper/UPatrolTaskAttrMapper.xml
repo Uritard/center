@@ -138,6 +138,38 @@
         <if test="ifInferad != null and ifInferad != ''"> and a.if_inferad = #{ifInferad, jdbcType=INTEGER}</if>
         <if test="ifArtificial != null and ifArtificial != ''"> and a.if_artificial = #{ifArtificial, jdbcType=INTEGER}</if>
     </select>
+    <select id="batchSelect" resultType="com.yjh.platform.module.patrol.entity.TCruisePointInstance">
+        select
+        a.instance_id,
+        a.device_mete_id,
+        a.station_id,
+        a.station_name,
+        a.device_id,
+        a.custom_id,
+        a.data_format,
+        a.identify_type,
+        a.identify_son_type,
+        a.cruise_type,
+        a.cruise_id,
+        a.cruise_name,
+        a.cruise_content,
+        a.position_type,
+        a.unit,
+        a.if_sy,
+        a.sy_type,
+        a.if_videotape,
+        a.videotape_time,
+        a.text_desc,
+        a.sort
+        from t_cruise_point_instance a
+        WHERE 1 = 1
+        <if test="instanceList != null and instanceList.size() > 0">
+            AND instance_id IN
+            <foreach collection="instanceList" separator="," open="(" close=")" item="instanceId">
+                #{instanceId, jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
 
     <insert id="batchAdd">
         insert into u_patrol_task_attr(
