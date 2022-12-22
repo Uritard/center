@@ -141,7 +141,9 @@ public class PatrolResultHandler {
                 if (!"3".equals(sysLevel)) {
                     // 告警处理
                     alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
-                    // 非同源告警处理
+                }
+                if ("2".equals(sysLevel)){
+                    // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
                     taskAlarm.setValue(robotPatrolTaskResult.getValue());
