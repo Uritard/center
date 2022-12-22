@@ -250,12 +250,8 @@ public class InspectionResultThread implements Runnable{
             String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
 
             Integer robotType = uPatrolTaskService.selectRobotType(sendCode);
-            // 巡视结果只有file_path字段,没有origin_file_result_path和origin_file_path 为模拟工具
-            boolean isSimulationTool = StringUtils.isNotEmpty(robotPatrolTaskResult.getFilePath())
-                    && StringUtils.isEmpty(robotPatrolTaskResult.getOriginFileResultPath())
-                    && StringUtils.isEmpty(robotPatrolTaskResult.getOriginFilePath())
-                    // 且是E机器人
-                    && Objects.equals(159, robotType)
+            // 机器人类型为模拟机器人 为模拟工具
+            boolean isSimulationTool = Objects.equals(810, robotType)
                     // 上级系统不走算法处理，只存数据
                     && !"3".equals(sysLevel);
             // 如果sendCode是边缘节点(1~1999) 也走模拟工具的逻辑
