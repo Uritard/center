@@ -46,4 +46,6 @@ public interface TStdRegionDao {
     Integer countByRegionCode(@Param(value = "regionCode") String regionCode,
                               @Param(value = "upRegionId") Long upRegionId);
 
+
+    TStdRegion selectCruiseTree(@Param("upRegionId")Long upRegionId);
 }

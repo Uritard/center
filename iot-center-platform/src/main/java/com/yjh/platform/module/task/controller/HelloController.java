@@ -27,6 +27,7 @@ import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.scheduled.DeviceStaticsToUpSystem;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.service.TCameraPresetService;
@@ -95,6 +96,9 @@ public class HelloController {
     TCruisePointInstanceDao tCruisePointInstanceDao;
     @Autowired
     private TCameraPresetService tCameraPresetService;
+
+    @Autowired
+    private DeviceStaticsToUpSystem deviceStaticsToUpSystem;
 
     @Value("http://192.168.33.241:800/PSIA/Custom/SelfExt/AS/VQDDiagnose/queryStatus")
     private String URL;
@@ -624,5 +628,12 @@ public class HelloController {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("shabi", "123");
         System.out.println(JSON.toJSONString(jsonObject.getString("123")));
+    }
+
+    @GetMapping(value = "/resultToUpSystem")
+    @ApiOperation(value = "resultToUpSystem")
+    @Logs(title = "resultToUpSystem",content = "resultToUpSystem",logType = 2)
+    public void resultToUpSystem() {
+        deviceStaticsToUpSystem.resultToUpSystem();
     }
 }

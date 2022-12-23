@@ -2,6 +2,7 @@ package com.yjh.accessrobot.netty.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.google.common.collect.Maps;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -45,10 +46,13 @@ public class RobotConfirmMsgHandler implements MessageHandlerStrategy, Initializ
         log.info("巡视主机收到机器人确认消息了");
         String robotCode = xmlBaseModel.getSendCode();
         List<Map<String, Object>> items = xmlBaseModel.getItems();
-        if(items.get(0).containsKey("report_time")){
+        if ("".equals(xmlBaseModel.getCommand())) {
             log.info("上级系统收到巡视设备统计信息");
+            Map<String,Object> map = Maps.newHashMap();
+            map.put("regionCode",xmlBaseModel.getSendCode());
+            map.put("list",items);
             try {
-                StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.CRUISE_DEVICE_STATICS_PROCESS, items, Result.class);
+                StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.CRUISE_DEVICE_STATICS_PROCESS, map, Result.class);
             }catch (Exception e){
                 log.error("调用platform出错：{}", e.getMessage());
             }

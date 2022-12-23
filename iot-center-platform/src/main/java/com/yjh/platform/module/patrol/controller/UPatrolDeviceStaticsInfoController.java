@@ -55,8 +55,8 @@ public class UPatrolDeviceStaticsInfoController {
 
 
     @ApiOperation(value = "巡视上报设备信息处理")
-    @GetMapping(value = "/dealDeviceStaticsInfo")
-    public Result selectCruiseResultAnalyze(@RequestBody List<Map<String, String>> staticsResults) {
+    @PostMapping(value = "/dealDeviceStaticsInfo")
+    public Result selectCruiseResultAnalyze(@RequestBody Map<String,Object> staticsResults) {
         Result result = new Result();
         try {
             log.info("device statics result is {}", staticsResults);

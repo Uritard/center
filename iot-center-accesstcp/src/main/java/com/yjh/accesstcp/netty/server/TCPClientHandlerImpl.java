@@ -641,7 +641,8 @@ public class TCPClientHandlerImpl extends SimpleChannelInboundHandler<DatagramPa
                     }
                 }
             }
-            List<Map<String,Object>> list = sendToUpSystemServices.resultStatistical(xmlBaseModel.getCommand(),startTime,endTime);
+//            List<Map<String,Object>> list = sendToUpSystemServices.resultStatistical(xmlBaseModel.getCommand(),startTime,endTime);
+            List<Map<String,Object>> list = new ArrayList<>();
             if(list == null){
                 sendToUpSystemServices.sendResponse(sendSessionId, "251","4","100",null, false);
             }else {

@@ -1,5 +1,6 @@
 package com.yjh.platform.module.patrol.service;
 
+import com.google.common.collect.Maps;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
 import com.yjh.platform.module.patrol.entity.DeviceStaticsInfo;
 import com.yjh.platform.module.task.dao.StatisticsDao;
@@ -7,11 +8,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UPatrolDeviceStaticsService {
+
 
     @Autowired
     private UPatrolDeviceStaticsDao uPatrolDeviceStaticsDao;
@@ -21,36 +26,68 @@ public class UPatrolDeviceStaticsService {
 
     /**
      * 表中存在则更新，否则插入
-     * @param statusList
+     *
+     * @param statistic
      */
-    public void insertOrUpdate(List<Map<String, String>> statusList) {
-        statusList.forEach(staticsInfo -> {
-            String deviceCode = staticsInfo.get("patroldevice_code");
-            DeviceStaticsInfo deviceStaticsInfo = new DeviceStaticsInfo()
-                    .setDeviceCode(deviceCode)
-                    .setDeviceName(staticsInfo.get("patroldevice_name"))
-                    .setDuration(staticsInfo.get("duration"))
-                    .setCommissionDays(staticsInfo.get("commissionDays"))
-                    .setCruisePercent(staticsInfo.get("cruisePercent"))
-                    .setIntactPercent(staticsInfo.get("intactPercent"))
-                    .setOfflineCount(staticsInfo.get("offLineCount"))
-                    .setNormalDay(staticsInfo.get("normalDay"));
-            if(!CollectionUtils.isEmpty(statisticsDao.selectStatisticsRobot(Long.valueOf(deviceStaticsInfo.getDeviceCode())))){
-                deviceStaticsInfo.setDeviceType(0);
+    public void insertOrUpdate(Map<String,Object> statistic) {
+        String regionCode = statistic.get("regionCode").toString();
+        List<Map<String,String>> statisticInfoList = (List) statistic.get("list");
+        Map<String, DeviceStaticsInfo> statisticMap = Maps.newHashMap();
+        statisticInfoList.forEach(statisticInfo -> {
+            DeviceStaticsInfo deviceStaticsInfo;
+            //若结果集中已存在待处理信息，取出继续处理
+            if (statisticMap.keySet().contains(statisticInfo.get("patroldevice_code"))) {
+                deviceStaticsInfo = statisticMap.get(statisticInfo.get("patroldevice_code"));
             }
-            if(!CollectionUtils.isEmpty(statisticsDao.selectStatisticsDrone(Long.valueOf(deviceStaticsInfo.getDeviceCode())))){
-                deviceStaticsInfo.setDeviceType(1);
+            //不存在则新建对象
+            else {
+                deviceStaticsInfo = new DeviceStaticsInfo();
+                deviceStaticsInfo.setDeviceCode(statisticInfo.get("patroldevice_code"));
+                deviceStaticsInfo.setDeviceName(statisticInfo.get("patroldevice_name"));
+                deviceStaticsInfo.setDeviceType(statisticInfo.get("device_type"));
+                deviceStaticsInfo.setRegionCode(regionCode);
+                statisticMap.put(statisticInfo.get("patroldevice_code"),deviceStaticsInfo);
             }
-            if(!CollectionUtils.isEmpty(statisticsDao.countCamera(Long.valueOf(deviceStaticsInfo.getDeviceCode())))){
-                deviceStaticsInfo.setDeviceType(2);
+            //处理上报信息
+            switch (statisticInfo.get("type")) {
+                case StatisticType.DURATION:
+                    deviceStaticsInfo.setDuration("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    break;
+                case StatisticType.OFF_LINE_COUNT:
+                    deviceStaticsInfo.setOfflineCount("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    break;
+                case StatisticType.NORMAL_DAY:
+                    deviceStaticsInfo.setNormalDay("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    break;
+                case StatisticType.COMMISSION_DAY:
+                    deviceStaticsInfo.setCommissionDays("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    break;
+                case StatisticType.CRUISE_PERCENT:
+                    deviceStaticsInfo.setCruisePercent("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    break;
+                case StatisticType.INTACT_PERCENT:
+                    deviceStaticsInfo.setIntactPercent("1".equals(statisticInfo.get("value_unit"))? statisticInfo.get("value") + statisticInfo.get("unit") :statisticInfo.get("value"));
+                    break;
             }
-            Map<String, String> info = uPatrolDeviceStaticsDao.selectByDeviceCode(deviceCode);
-            if (CollectionUtils.isEmpty(info)) {
-                uPatrolDeviceStaticsDao.insert(deviceStaticsInfo);
-            } else {
-                uPatrolDeviceStaticsDao.updateByDeviceCode(deviceStaticsInfo);
-            }
-
         });
+        List<DeviceStaticsInfo> deviceStaticsInfos = new ArrayList<>(statisticMap.values());
+        Set<String> codeSet = statisticMap.keySet();
+        if (CollectionUtils.isEmpty(codeSet)) {
+            return;
+        }
+        uPatrolDeviceStaticsDao.batchDelete(codeSet);
+        uPatrolDeviceStaticsDao.batchInsert(deviceStaticsInfos);
+
+    }
+
+
+    private static class StatisticType {
+        public static final String DURATION = "1";
+        public static final String OFF_LINE_COUNT = "2";
+        public static final String NORMAL_DAY = "3";
+        public static final String COMMISSION_DAY = "4";
+        public static final String CRUISE_PERCENT = "5";
+        public static final String INTACT_PERCENT = "6";
+
     }
 }

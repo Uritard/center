@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.dao;
 
+import com.yjh.platform.module.task.entity.StatisticalDefectMapping;
 import com.yjh.platform.module.task.entity.Statistics;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.ibatis.annotations.Param;
@@ -25,6 +26,7 @@ public interface StatisticsDao {
    * @return
    */
   List<Map<String, Object>> selectStatisticsRobot(@Param(value = "robotId") Long robotId);
+  List<Long> selectAvailableRobotOrDrone(@Param("type")String type);
 
   /**
    * 查询机器人正常天数
@@ -106,8 +108,41 @@ public interface StatisticsDao {
   List<Statistics> countTaskByMonth(
       @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime);
 
-  List<Map<String,String>> selectRobot();
-  List<Map<String,String>> selectDrone();
+  List<Statistics> countTaskFrequencyByDay(
+          @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime
+  );
 
-  List<Map<String,String>> selectCamera();
+  List<Statistics> countTaskFrequencyByWeek(
+          @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime
+  );
+
+  List<Statistics> countTaskFrequencyByMonth(
+          @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime
+  );
+
+  List<Statistics>countTaskExecutedDurationByDay(
+          @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime
+  );
+
+  List<Statistics>countTaskExecutedDurationByWeek(
+          @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime
+  );
+
+  List<Statistics>countTaskExecutedDurationByMonth(
+          @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime
+  );
+
+  List<StatisticalDefectMapping>countFoundDefectByDay(
+          @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime
+  );
+  List<StatisticalDefectMapping>countFoundDefectByWeek(
+          @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime
+  );
+  List<StatisticalDefectMapping>countFoundDefectByMonth(
+          @Param(value = "startTime") Date startTime, @Param(value = "endTime") Date endTime
+  );
+  List<Map<String,Object>> selectRobot();
+  List<Map<String,Object>> selectDrone();
+
+  List<Map<String,Object>> selectCamera();
 }

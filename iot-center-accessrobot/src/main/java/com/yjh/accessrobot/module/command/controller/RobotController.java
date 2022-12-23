@@ -228,6 +228,22 @@ public class RobotController {
         }
         return result;
     }
+    @ApiOperation(value = "上级系统获取巡视系统巡视结果可靠性统计")
+    @PostMapping(value = "/cruiseStatistic")
+    @Logs(title = "上级系统获取巡视系统巡视结果可靠性统计",content = "上级系统获取巡视系统巡视结果可靠性统计",logType = 5)
+    public Result cruiseStatistic(@RequestBody Map<String,String> map){
+        Result result = new Result();
+        try {
+            log.info("--结果可靠性统计条件--{}",map);
+            result.setData(robotService.cruiseStatistic(map));
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("站端命令下发错误:", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "巡视主机向巡视设备下发检修区域指令接口")
     @PostMapping(value = "/deviceMaintenanceIssued")
     @Logs(title = "下发检修区域",content = "根据用户传递的参数给巡视设备下发检修区域指令",logType = 5)

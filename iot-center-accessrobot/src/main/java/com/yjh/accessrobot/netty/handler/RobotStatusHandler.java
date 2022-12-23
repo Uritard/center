@@ -78,6 +78,10 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
                     robotService.updateRobotInfo(robotCode, "离线");
                 }
             }
+            //若设备故障报警，记录设备状态及正常运行时长
+            if ("21".equals(res.get("type").toString())) {
+                robotService.changeStatistic(String.valueOf(res.get("patroldevice_code")),res.get("value").toString(),robotCode);
+            }
         });
         log.info("机器人状态数据是：" + robotStatusList);
 

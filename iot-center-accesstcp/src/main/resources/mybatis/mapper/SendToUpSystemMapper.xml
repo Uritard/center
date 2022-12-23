@@ -292,12 +292,12 @@
     <select id="countTask" resultType="java.util.LinkedHashMap">
         select count(1)                    as totalNum,
                (select count(1)
-                from t_cruise_result
+                from u_patrol_result
                 where execute_time BETWEEN #{startTime} and #{endTime}
-                  and c_state = 240) as validNum
-        from t_cruise_result
+                  and task_state = 240) as validNum
+        from u_patrol_result
         where execute_time BETWEEN #{startTime} and #{endTime}
-          and c_state in (240,242,243,244)
+          and task_state in (240,242,243,244)
     </select>
 
     <select id="countWarnCheck" resultType="java.util.LinkedHashMap">
@@ -329,17 +329,16 @@
     <select id="countInstanceLoss" resultType="java.util.LinkedHashMap">
         SELECT count(1)                                AS totalNum,
                sum(IF(detail.cruise_status = 252, 0, 1)) AS validNum
-        FROM t_cruise_task_result result
-                 LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
-        WHERE result.cruise_task_time BETWEEN #{startTime} and #{endTime}
+        FROM u_patrol_result result
+                 LEFT JOIN u_patrol_data_result detail ON detail.task_id = result.task_id
+        WHERE result.execute_time BETWEEN #{startTime} and #{endTime}
     </select>
 
     <select id="countResultCheck" resultType="java.util.LinkedHashMap">
         SELECT count(1)                      AS totalNum,
                count(result.identify_result) AS validNum
-        FROM t_cruise_data_result result
-                 LEFT JOIN t_cruise_task_result_detail detail ON result.cruise_result_id = detail.cruise_result_id
-            AND result.cruise_id = detail.instance_id
+        FROM u_patrol_result result
+                 LEFT JOIN u_patrol_data_result detail ON result.task_id = detail.task_id
         WHERE detail.cruise_time BETWEEN #{startTime} and #{endTime}
     </select>
 

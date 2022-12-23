@@ -2,18 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao">
     <insert id="insert" parameterType="com.yjh.platform.module.patrol.entity.DeviceStaticsInfo">
-        insert into device_statics_info_result(
-        device_code,
-        device_name,
-        device_type,
-        duration,
-        offline_count,
-        normal_day,
-        commission_days,
-        cruise_percent,
-        intact_percent
-        )values(
-                #{deviceCode, jdbcType=VARCHAR},
+        insert into device_statics_info_result(device_code,
+                                               device_name,
+                                               device_type,
+                                               duration,
+                                               offline_count,
+                                               normal_day,
+                                               commission_days,
+                                               cruise_percent,
+                                               intact_percent)
+        values (#{deviceCode, jdbcType=VARCHAR},
                 #{deviceName, jdbcType=VARCHAR},
                 #{deviceType, jdbcType=VARCHAR},
                 #{duration, jdbcType=VARCHAR},
@@ -21,37 +19,100 @@
                 #{normalDay, jdbcType=VARCHAR},
                 #{commissionDays, jdbcType=VARCHAR},
                 #{cruisePercent, jdbcType=VARCHAR},
-                #{intactPercent, jdbcType=VARCHAR}
-        )
+                #{intactPercent, jdbcType=VARCHAR})
     </insert>
 
     <update id="updateByDeviceCode" parameterType="com.yjh.platform.module.patrol.entity.DeviceStaticsInfo">
-        update device_statics_info_result a <set>
-        <if test="deviceName != null ">a.device_name = #{deviceName, jdbcType=VARCHAR},</if>
-        <if test="duration != null ">a.duration = #{duration, jdbcType=VARCHAR},</if>
-        <if test="offlineCount != null ">a.offline_count = #{offlineCount, jdbcType=VARCHAR},</if>
-        <if test="normalDay != null ">a.normal_day = #{normalDay, jdbcType=VARCHAR},</if>
-        <if test="commissionDays != null ">a.commission_days = #{commissionDays, jdbcType=VARCHAR},</if>
-        <if test="cruisePercent != null">a.cruise_percent = #{cruisePercent, jdbcType=VARCHAR},</if>
-        <if test="intactPercent != null">a.intact_percent = #{intactPercent, jdbcType=VARCHAR},</if>
-    </set>
+        update device_statics_info_result a
+        <set>
+            <if test="deviceName != null ">a.device_name = #{deviceName, jdbcType=VARCHAR},</if>
+            <if test="duration != null ">a.duration = #{duration, jdbcType=VARCHAR},</if>
+            <if test="offlineCount != null ">a.offline_count = #{offlineCount, jdbcType=VARCHAR},</if>
+            <if test="normalDay != null ">a.normal_day = #{normalDay, jdbcType=VARCHAR},</if>
+            <if test="commissionDays != null ">a.commission_days = #{commissionDays, jdbcType=VARCHAR},</if>
+            <if test="cruisePercent != null">a.cruise_percent = #{cruisePercent, jdbcType=VARCHAR},</if>
+            <if test="intactPercent != null">a.intact_percent = #{intactPercent, jdbcType=VARCHAR},</if>
+        </set>
         where a.device_code = #{deviceCode, jdbcType=VARCHAR}
     </update>
 
     <select id="selectByDeviceCode" parameterType="java.lang.String"
             resultType="java.util.Map">
-        select
-        device_code as deviceCode,
-        device_name as deviceName,
-        device_type as deviceType,
-        duration,
-        offline_count as offLineCount,
-        normal_day as normalDay,
-        commission_days as commissionDays,
-        cruise_percent as cruisePercent,
-        intact_percent as intactPercent
+        select device_code     as deviceCode,
+               device_name     as deviceName,
+               device_type     as deviceType,
+               duration,
+               offline_count   as offLineCount,
+               normal_day      as normalDay,
+               commission_days as commissionDays,
+               cruise_percent  as cruisePercent,
+               intact_percent  as intactPercent
         from device_statics_info_result
         where device_code = #{deviceCode, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectRobotInfo" parameterType="java.lang.Long"
+            resultType="java.util.Map">
+        select robot_id                                          robotId,
+               robot_name                                     as robotName,
+               robot_num                                      as deviceCode,
+               last_online_time                               as lastOnlineTime,
+               convert(duration / 60 / 1000, decimal (10, 0)) as duration,
+               off_line_count                                 as offLineCount,
+               commission_date
+        from t_robot_info
+        where robot_id = #{robotId,jdbcType=BIGINT} LIMIT 1
+    </select>
+
+    <select id="selectNormalDays" parameterType="java.lang.String"
+            resultType="java.lang.Integer">
+        SELECT CASE
+                   device_run
+                   WHEN 0 THEN
+                       commission_days + TO_DAYS(NOW()) - TO_DAYS(device_resume_date)
+                   ELSE commission_days
+                   END AS normal_day
+        FROM device_statics_info_result
+        where device_code = #{deivceCode,jdbcType=VARCHAR} LIMIT 1
+    </select>
+
+
+    <select id="selectCommissionDays" parameterType="java.lang.Long"
+            resultType="java.util.Map">
+        SELECT result.cruise_day                                                          as cruise_day,
+               result.commission_days                                                     as commission_days,
+               convert(result.cruise_day / result.commission_days * 100, decimal (15, 3)) AS cruise_rate
+        FROM (
+                 SELECT COUNT(
+                                DISTINCT TO_DAYS(updr.cruise_time))  AS cruise_day,
+                        TO_DAYS(
+                                NOW()) - TO_DAYS(tr.commission_date) AS commission_days
+                 FROM t_robot_info tr
+                          LEFT JOIN t_robot_inspection tri ON tr.robot_id = tri.robot_id
+                          LEFT JOIN t_cruise_point_instance tcpi ON tri.inspection_id = tcpi.cruise_id
+                          LEFT JOIN u_patrol_data_result updr ON updr.instance_id = tcpi.instance_id
+                 WHERE tri.robot_id = #{robotId,jdbcType=BIGINT}
+                   AND updr.cruise_time IS NOT NULL
+             ) result
+    </select>
+
+    <select id="selectCommissionDaysForCamera" parameterType="java.lang.Long"
+            resultType="java.util.Map">
+        SELECT result.cruise_day                                                          as cruise_day,
+               result.commission_days                                                     as commission_days,
+               convert(result.cruise_day / result.commission_days * 100, decimal (15, 3)) AS cruise_rate
+        FROM (
+                 SELECT COUNT(
+                                DISTINCT TO_DAYS(updr.cruise_time))  AS cruise_day,
+                        TO_DAYS(
+                                NOW()) - TO_DAYS(tc.commission_date) AS commission_days
+                 FROM t_camera_info tc
+                          LEFT JOIN t_camera_preset tcp ON tc.camera_id = tcp.camera_id
+                          LEFT JOIN t_cruise_point_instance tcpi ON tcp.preset_id = tcpi.cruise_id
+                          LEFT JOIN u_patrol_data_result updr ON updr.instance_id = tcpi.instance_id
+                 WHERE tc.camera_id = #{cameraId,jdbcType=BIGINT}
+                   AND updr.cruise_time IS NOT NULL
+             ) result
     </select>
 
     <select id="selectStatisticsRobot" resultType="java.util.Map">
@@ -66,8 +127,7 @@
         cruise_percent as cruisePercent,
         intact_percent as intactPercent
         from device_statics_info_result
-        WHERE device_type = 0
-        <if test="deviceCode != null and deviceCode != ''">and device_code = #{deviceCode, jdbcType=BIGINT}</if>
+        WHERE device_type = #{type,jdbcType=VARCHAR}
     </select>
 
     <select id="selectStatisticsDrone" resultType="java.util.Map">
@@ -83,6 +143,31 @@
         intact_percent as intactPercent
         from device_statics_info_result
         WHERE device_type = 1
-        <if test="deviceCode != null and deviceCode != ''">and device_code = #{deviceCode, jdbcType=BIGINT}</if>
     </select>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into device_statics_info_result
+        (device_code ,device_type,region_code,device_name, duration, offLine_count, normal_day, commission_days, cruise_percent, intact_percent)
+        values
+        <foreach collection="list" separator="," index="index" item="item">
+            (#{item.deviceCode,jdbcType=VARCHAR},
+            #{item.deviceType,jdbcType=VARCHAR},
+            #{item.regionCode,jdbcType=VARCHAR},
+            #{item.deviceName,jdbcType=VARCHAR},
+            #{item.duration,jdbcType=VARCHAR},
+            #{item.offlineCount,jdbcType=VARCHAR},
+            #{item.normalDay,jdbcType=VARCHAR},
+            #{item.commissionDays,jdbcType=VARCHAR},
+            #{item.cruisePercent,jdbcType=VARCHAR},
+            #{item.intactPercent,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <delete id="batchDelete" parameterType="java.util.Set">
+        delete from device_statics_info_result
+        where device_code in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item,jdbcType=VARCHAR}
+        </foreach>
+    </delete>
 </mapper>

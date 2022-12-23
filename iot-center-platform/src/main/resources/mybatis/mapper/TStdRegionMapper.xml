@@ -22,6 +22,26 @@
         <result property="remark" column="remark" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
+<resultMap id="TreeMap" type="com.yjh.platform.module.device.entity.TStdRegion">
+    <id property="regionId" column="region_id" jdbcType="BIGINT"/>
+    <result property="regionName" column="region_name" jdbcType="VARCHAR"/>
+    <result property="sort" column="sort" jdbcType="INTEGER"/>
+    <result property="upRegionId" column="up_region_id" jdbcType="BIGINT"/>
+    <result property="upRegionIds" column="up_region_ids" jdbcType="VARCHAR"/>
+    <result property="regionCode" column="region_code" jdbcType="VARCHAR"/>
+    <result property="originRegionId" column="origin_region_id" jdbcType="VARCHAR"/>
+    <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
+    <result property="stationName" column="station_name" jdbcType="VARCHAR"/>
+    <result property="state" column="state" jdbcType="INTEGER"/>
+    <result property="edgeStatus" column="edge_status" jdbcType="VARCHAR"/>
+    <result property="regionPath" column="region_path" jdbcType="VARCHAR"/>
+    <result property="longitude" column="longitude" jdbcType="VARCHAR"/>
+    <result property="latitude" column="latitude" jdbcType="VARCHAR"/>
+    <result property="voltageLevel" column="voltage_level" jdbcType="VARCHAR"/>
+    <result property="remark" column="remark" jdbcType="VARCHAR"/>
+    <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    <collection property="children" select="selectCruiseTree" column="{upRegionId=region_id}"/>
+    </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
@@ -292,5 +312,16 @@
             and a.up_region_id = #{upRegionId,jdbcType=BIGINT}
     </select>
 
-
+        <select id="selectCruiseTree" resultMap="TreeMap">
+            select
+                <include refid="Base_Column_List"/>
+            from t_std_region a
+            where 1 = 1
+            <if test="upRegionId == null">
+                AND up_region_id = -1
+            </if>
+            <if test="upRegionId != null">
+                AND up_region_id = #{upRegionId,jdbcType=BIGINT}
+            </if>
+        </select>
 </mapper>

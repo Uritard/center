@@ -1,5 +1,6 @@
 package com.yjh.accesstcp.module.device.controller;
 
+import com.google.common.collect.Maps;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.result.ResultCodeEnum;
@@ -92,12 +93,17 @@ public class SendToUpSystemController {
 
     @ApiOperation(value = "巡视结果查询")
     @RequestMapping(value = "/testCount", method = RequestMethod.GET)
-    public Result testCount(@RequestParam(value = "type") String type,
+    public Result testCount(@RequestParam(value = "type",required = false) String type,@RequestParam(value = "cmd") String cmd,
                             @RequestParam(value = "startTime") String startTime,
                             @RequestParam(value = "endTime") String endTime) {
         Result result = new Result();
         try {
-            result.setData(sendToUpSystemService.resultStatistical(type,startTime,endTime));
+            Map<String,Object> map = Maps.newHashMap();
+            map.put("type",type);
+            map.put("cmd",cmd);
+            map.put("begin_time",startTime);
+            map.put("end_time",endTime);
+            result.setData(sendToUpSystemService.resultStatistical(map));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);

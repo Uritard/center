@@ -68,12 +68,13 @@ public class StatisticsController {
   @RequestMapping(value = "/instance", method = RequestMethod.GET)
   @Logs(title = "巡视点位漏检率",content = "根据用户传递的参数查询巡视点位漏检率",logType = 1, authority = "1234")
   public Result instance(
+          @RequestParam(value = "code",required = false)String regionCode,
       @RequestParam(value = "type") Integer type,
       @RequestParam(value = "year") Integer year,
       @RequestParam(value = "month") Integer month) {
     Result result = new Result();
     try {
-      result.setData(statisticsService.countInstanceLoss(type, year, month));
+      result.setData(statisticsService.countInstanceLoss(regionCode,type, year, month));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
       log.error("失败查询描述：", e);
@@ -82,28 +83,17 @@ public class StatisticsController {
   }
 
   @ApiOperation(value = "告警审核完成率")
-  @ApiImplicitParams({
-    @ApiImplicitParam(
-        name = "type",
-        required = true,
-        value = "查询类型：1:日历 2:周历 3:月历",
-        dataType = "Integer"),
-    @ApiImplicitParam(
-        name = "month",
-        required = true,
-        value = "日历周历月份:202204，月历年份",
-        dataType = "String")
-  })
   @RequestMapping(value = "/warnCheck", method = RequestMethod.GET)
   @Logs(title = "告警审核完成率",content = "根据用户传递的参数查询告警审核完成率",logType = 1, authority = "1234")
   public Result countWarnCheck(
-      @RequestParam(value = "type") Integer type,
+          @RequestParam(value = "code",required = false)String regionCode,
+          @RequestParam(value = "type") Integer type,
       @RequestParam(value = "year") Integer year,
       @RequestParam(value = "month") Integer month) {
     Result result = new Result();
 
     try {
-      List<Statistics> list = statisticsService.countWarnCheck(type, year, month);
+      List<Statistics> list = statisticsService.countWarnCheck(regionCode,type, year, month);
       result.setData(list);
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
@@ -116,13 +106,14 @@ public class StatisticsController {
   @RequestMapping(value = "/warnAccuracy", method = RequestMethod.GET)
   @Logs(title = "巡视告警准确率",content = "根据用户传递的参数查询巡视告警准确率",logType = 1, authority = "1234")
   public Result countWarnAccuracy(
-      @RequestParam(value = "type") Integer type,
+          @RequestParam(value = "code",required = false)String regionCode,
+          @RequestParam(value = "type") Integer type,
       @RequestParam(value = "year") Integer year,
       @RequestParam(value = "month") Integer month) {
     Result result = new Result();
 
     try {
-      result.setData(statisticsService.countWarnAccuracy(type, year, month));
+      result.setData(statisticsService.countWarnAccuracy(regionCode,type, year, month));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
       log.error("失败查询描述：", e);
@@ -134,13 +125,14 @@ public class StatisticsController {
   @RequestMapping(value = "/resultCheck", method = RequestMethod.GET)
   @Logs(title = "巡视结果人工审核完成率",content = "根据用户传递的参数查询巡视结果人工审核完成率",logType = 1, authority = "1234")
   public Result countResultCheck(
-      @RequestParam(value = "type") Integer type,
+          @RequestParam(value = "code",required = false)String regionCode,
+          @RequestParam(value = "type") Integer type,
       @RequestParam(value = "year") Integer year,
       @RequestParam(value = "month") Integer month) {
     Result result = new Result();
 
     try {
-      result.setData(statisticsService.countResultCheck(type, year, month));
+      result.setData(statisticsService.countResultCheck(regionCode,type, year, month));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
       log.error("失败查询描述：", e);
@@ -152,17 +144,94 @@ public class StatisticsController {
   @RequestMapping(value = "/taskCheck", method = RequestMethod.GET)
   @Logs(title = "巡视任务闭环率",content = "根据用户传递的参数查询巡视任务闭环率",logType = 1, authority = "1234")
   public Result taskCheck(
+          @RequestParam(value = "code",required = false)String regionCode,
           @RequestParam(value = "type") Integer type,
           @RequestParam(value = "year") Integer year,
           @RequestParam(value = "month") Integer month) {
     Result result = new Result();
     try {
-      result.setData(statisticsService.countTask(type, year, month));
+      result.setData(statisticsService.countTask(regionCode,type, year, month));
     } catch (Exception e) {
       result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
       log.error("失败查询描述：", e);
     }
     return result;
   }
-  
+
+
+  @ApiOperation(value = "执行巡视任务次数")
+  @RequestMapping(value = "/taskFrequency", method = RequestMethod.GET)
+  @Logs(title = "巡视任务执行次数", content = "按日月周统计任务执行次数", logType = 1, authority = "1234")
+  public Result taskFrequency(
+          @RequestParam(value = "code",required = false)String regionCode,
+          @RequestParam(value = "type") Integer type,
+          @RequestParam(value = "year") Integer year,
+          @RequestParam(value = "month") Integer month
+  ) {
+    Result result = new Result();
+    try {
+      result.setData(statisticsService.countTaskFrequency(type, year, month));
+    } catch (Exception e) {
+      result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+      log.error("统计失败：", e);
+    }
+    return result;
+  }
+
+
+  @ApiOperation(value = "统计巡视任务时长")
+  @RequestMapping(value = "/taskExecutedPeriod", method = RequestMethod.GET)
+  @Logs(title = "统计巡视任务执行时长", content = "按日月周统计任务执行总时长", logType = 1, authority = "1234")
+  public Result taskExecutedPeriod(
+          @RequestParam(value = "type") Integer type,
+          @RequestParam(value = "year") Integer year,
+          @RequestParam(value = "month") Integer month
+  ) {
+    Result result = new Result();
+    try{
+      result.setData(statisticsService.countTaskExecutedDuration(type, year, month));
+    }catch (Exception e){
+      result.setCode(ResultCodeEnum.QUERYERROR.getCode(),ResultCodeEnum.QUERYERROR.getName());
+      log.info("统计失败：",e);
+    }
+    return result;
+  }
+
+  @ApiOperation(value = "统计任务执行发现的缺陷")
+  @RequestMapping(value = "/taskFoundDefects", method = RequestMethod.GET)
+  @Logs(title = "巡视任务执行次数", content = "按日月周统计任务执行次数", logType = 1, authority = "1234")
+  public Result taskFoundDefects(
+          @RequestParam(value = "type") Integer type,
+          @RequestParam(value = "year") Integer year,
+          @RequestParam(value = "month") Integer month
+  ) {
+    Result result = new Result();
+    try {
+      result.setData(statisticsService.countDefectsOfTask(type, year, month));
+    }catch (Exception e){
+      log.error("缺陷信息查询失败：",e);
+      result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+    }
+    return result;
+  }
+
+  @ApiOperation(value = "导出任务执行可靠性报表")
+  @RequestMapping(value = "exportTaskExecutedReliableTable",method = RequestMethod.GET)
+  @Logs(title = "导出任务执行可靠性报表",content = "按日月周导出任务执行次数、时长、发现缺陷的重量与数量", logType = 1, authority = "1234")
+  public Result exportTaskExecutedReliableTable(
+          @RequestParam(value = "type") Integer type,
+          @RequestParam(value = "year") Integer year,
+          @RequestParam(value = "month") Integer month
+  ){
+    Result result = new Result();
+    try{
+      result.setData(statisticsService.exportTable(type, year, month));
+    }catch (Exception e){
+      result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+    }
+    return result;
+  }
+
+
+
 }

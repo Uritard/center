@@ -4,6 +4,7 @@ package com.yjh.accessrobot.module.command.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
@@ -72,6 +73,8 @@ public class RobotService {
     private RedisTemplate redisTemplate;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+    @Autowired
+    private DeviceStatisticInfoResultDao deviceStatisticInfoResultDao;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
     @Autowired
@@ -1884,6 +1887,36 @@ public class RobotService {
     /**
      * 上层服务即集控命令下发
      *
+     * @param map xml格式的内容
+     * @return String
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public String cruiseStatistic(Map<String,String> map) {
+        Map<String,Object> item = Maps.newHashMap();
+        item.put("begin_time",map.get("beginDate"));
+        item.put("end_time",map.get("endDate"));
+        item.put("type",map.get("type"));
+        item.put("year",map.get("year"));
+        item.put("month",map.get("month"));
+
+        List<Map<String, Object>> items = new LinkedList<>();
+        items.add(item);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                .setSendCode(Constant.sendCode)
+                .setReceiveCode(map.get("robotCode"))
+                .setCode(Constant.stationCode)
+                .setType("121")
+                .setCommand(map.get("command"))
+                .setItems(items);
+
+        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+
+        RobotServerHandler.send(generateByteOrder(xmlString, map.get("robotCode")), map.get("robotCode"));
+        return "success";
+    }
+    /**
+     * 结果可靠性统计
+     *
      * @param xmlBaseModel xml格式的内容
      * @return String
      */
@@ -3378,6 +3411,55 @@ public class RobotService {
     public boolean isSubSystem(String robotCode){
         List<TStdRegion>  tStdRegionList=tStdRegionDao.selectByRegionCodeAndState(robotCode,Constant.STATE_LOCAL);
         return CollectionUtils.isNotEmpty(tStdRegionList);
+    }
+
+    public int changeStatistic(String deviceCode,String deviceRun,String robotCode) {
+        DeviceStatisticInfoResult deviceStatisticInfoResult = deviceStatisticInfoResultDao.select(deviceCode);
+        if (deviceStatisticInfoResult != null) {
+            deviceStatisticInfoResult.setDeviceRun(deviceRun);
+            return    deviceStatisticInfoResultDao.changeRun(deviceStatisticInfoResult);
+        }
+        else {
+            deviceStatisticInfoResult = new DeviceStatisticInfoResult();
+            TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+            deviceStatisticInfoResult.setDeviceCode(tRobotInfo.getRobotNum());
+            deviceStatisticInfoResult.setDeviceName(tRobotInfo.getRobotName());
+            deviceStatisticInfoResult.setDeviceRun(deviceRun);
+            deviceStatisticInfoResult.setDeviceResumeDate(new Date());
+            return deviceStatisticInfoResultDao.insertSelective(deviceStatisticInfoResult);
+        }
+    }
+
+    public void dealStatistic(String sendCode,List<Map<String, Object>> list) {
+        Map<String,Object> firstMap = list.get(0);
+        StringBuffer stringBuffer = new StringBuffer("statisticForUpSystem:");
+        stringBuffer.append(sendCode);
+        stringBuffer.append("_");
+        stringBuffer.append(firstMap.get("command"));
+        if (firstMap.get("type") == null) {
+            stringBuffer.append(":total:");
+            redisTemplate.opsForHash().putAll(stringBuffer.toString(),firstMap);
+        }else {
+            stringBuffer.append(firstMap.get("type"));
+            stringBuffer.append(":");
+            stringBuffer.append(firstMap.get("param_year"));
+            stringBuffer.append("_");
+            stringBuffer.append(firstMap.get("param_month"));
+            stringBuffer.append(":");
+            switch (String.valueOf(firstMap.get("type"))) {
+                case "1":
+                    list.forEach(map -> redisTemplate.opsForHash().putAll(stringBuffer +map.get("day").toString() ,map));
+                    break;
+                case "2":
+                    list.forEach(map -> redisTemplate.opsForHash().putAll(stringBuffer +map.get("week").toString() ,map));
+                    break;
+                case "3":
+                    list.forEach(map -> redisTemplate.opsForHash().putAll(stringBuffer +map.get("month").toString() ,map));
+                    break;
+            }
+        }
+
+
     }
 }
 

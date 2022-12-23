@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accesstcp.module.device.dao.StatisticsDao">
+
+    <select id="countTask" resultType="java.util.Map">
+        SELECT DATE_FORMAT(execute_time ${timeFormat} ${timeFlag},
+               SUM(IFNULL(task_state = 240, 0)) AS validNum,
+               SUM(
+                       IFNULL(task_state IN (240, 242, 243, 244), 0)
+                   )                         AS totalNum
+        FROM u_patrol_result
+        where execute_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY ${timeFlag}
+order By ${timeFlag}
+    </select>
+
+    <select id="countWarnCheckByMonth" resultType="java.util.Map">
+        SELECT DATE_FORMAT(t.`warn_time` ${timeFormat} ${timeFlag},
+               COUNT(1)           AS totalNum,
+               COUNT(t.deal_type) AS validNum
+        FROM (SELECT deal_type,
+                     warn_time
+              FROM t_warn_info
+              UNION
+                  ALL
+              (SELECT deal_type,
+                      defect_time warn_time
+               FROM t_defect_info)) t
+        WHERE t.warn_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY ${timeFlag}
+order by ${timeFlag}
+    </select>
+
+    <select id="countWarnAccuracyByMonth" resultType="java.util.Map">
+        SELECT DATE_FORMAT(t.warn_time ${timeFormat} ${timeFlag},
+               count(1)                         as totalNum,
+               sum(if(t.deal_type = 286, 1, 0)) as validNum
+        FROM (select deal_type, warn_time
+              from t_warn_info
+              where deal_type is not null
+              union all
+              (select deal_type, defect_time warn_time from t_defect_info where deal_type is not null)) t
+        where t.warn_time BETWEEN #{startTime} and #{endTime}
+        group by ${timeFlag}
+    </select>
+    <select id="countInstanceLossByMonth" resultType="java.util.Map">
+        SELECT
+        DATE_FORMAT(detail.cruise_time ${timeFormat} ${timeFlag},
+        count(1) AS totalNum,
+        SUM(
+        IF (
+        detail.cruise_status = 252,
+        0,
+        1
+        )
+        ) AS validNum
+        FROM
+            u_patrol_task tct
+                LEFT JOIN
+            u_patrol_data_result detail ON detail.task_id = tct.task_id
+        WHERE
+        detail.cruise_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY
+            ${timeFlag}
+    </select>
+
+    <select id="countResultCheckByDay" resultType="java.util.Map">
+        SELECT
+        DATE_FORMAT(
+                result.cruise_time
+                ${timeFormat} ${timeFlag},
+        count(1) AS totalNum,
+        count(result.identify_result) AS validNum
+        FROM
+            u_patrol_data_result result
+        WHERE
+            result.cruise_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY
+            ${timeFlag}
+    </select>
+
+</mapper>

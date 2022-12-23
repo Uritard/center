@@ -193,4 +193,17 @@ public class TStdRegionController {
         return result;
     }
 
+    @ApiOperation(value = "巡视系统区域树")
+    @RequestMapping(value = "/cruiseTree", method = RequestMethod.GET)
+    public Result cruiseTree() {
+        Result result = new Result();
+        try {
+            result.setData(tStdRegionService.cruiseTree());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("刷新区域缓存失败：", e);
+        }
+        return result;
+    }
+
 }
