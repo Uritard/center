@@ -198,6 +198,16 @@ public class TStdRegionService{
         return 1;
     }
 
+    public List<TStdRegion> cruiseTree() {
+       List<TStdRegion> tStdRegionList = new ArrayList<>();
+
+       TStdRegion tStdRegion = tStdRegionDao.selectCruiseTree(-1L);
+
+       treeToList(tStdRegionList,tStdRegion);
+
+       return tStdRegionList;
+    }
+
 
     public List<TStdRegion> queryStationPosition() {
         return tStdRegionDao.selectByState(Constant.STATE_LOCAL);
@@ -210,6 +220,21 @@ public class TStdRegionService{
     //判断当前区域编码是否在第2层节点已存在
     public Integer countByRegionCode(String regionCode, Long upRegionId) {
         return tStdRegionDao.countByRegionCode(regionCode, upRegionId);
+    }
+
+    private void treeToList(List<TStdRegion> tStdRegionList, TStdRegion tStdRegion) {
+        if (CollectionUtils.isNotEmpty(tStdRegion.getChildren())) {
+            List<TStdRegion> childrenList = tStdRegion.getChildren();
+            for (TStdRegion stdRegion : childrenList) {
+                if (StringUtils.isNotBlank(stdRegion.getRegionCode())) {
+                    stdRegion.setChildren(new ArrayList<>());
+                    tStdRegionList.add(stdRegion);
+                }
+                else {
+                    treeToList(tStdRegionList,stdRegion);
+                }
+            }
+        }
     }
 }
 

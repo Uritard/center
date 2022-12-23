@@ -1,4 +1,4 @@
-package com.yjh.platform.module.patrol.entity;
+package com.yjh.accessrobot.module.command.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -20,7 +20,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value = "DeviceStaticsInfo对象", description = "设备统计信息表")
-public class DeviceStaticsInfo implements Serializable {
+public class DeviceStatisticInfoResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @ApiModelProperty(value = "设备编码")
@@ -33,12 +33,7 @@ public class DeviceStaticsInfo implements Serializable {
      * 0是robot，1是无人机，2是摄像机
      */
     @ApiModelProperty(value = "设备类型")
-    private String deviceType;
-    /**
-     * 0是robot，1是无人机，2是摄像机
-     */
-    @ApiModelProperty(value = "巡视区域")
-    private String regionCode;
+    private int deviceType;
 
     @ApiModelProperty(value = "累积在线时长总和")
     private String duration;
@@ -62,5 +57,5 @@ public class DeviceStaticsInfo implements Serializable {
     private String deviceRun;
 
     @ApiModelProperty(value = "设备恢复正常时间")
-    private String deviceResumeDate;
+    private Date deviceResumeDate;
 }

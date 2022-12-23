@@ -43,7 +43,10 @@ public class ModelFileSyncAndTaskControlHandler implements MessageHandlerStrateg
                 log.info("机器人收到检修区域指令了,这是机器人的响应");
                 // maintenance area was issued successfully
                 robotService.receivingResponse(xmlBaseModel, receiveSessionId);
-            } else {
+            } else if(resultMap.containsKey("command")) {
+                robotService.dealStatistic(xmlBaseModel.getSendCode(),resultMapList);
+            }
+            else {
                 // 获取 Map中第一个值
                 String firstKey = resultMap.entrySet().stream().findFirst().get().getKey();
 

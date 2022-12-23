@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.DeviceStatisticInfoResultDao">
+    <resultMap id="entity" type="com.yjh.accessrobot.module.command.entity.DeviceStatisticInfoResult">
+        <result property="deviceCode" column="device_code" jdbcType="VARCHAR"/>
+        <result property="deviceName" column="device_name" jdbcType="VARCHAR"/>
+        <result property="commissionDays" column="commission_days" jdbcType="VARCHAR"/>
+        <result property="cruisePercent" column="cruise_percent" jdbcType="VARCHAR"/>
+        <result property="deviceResumeDate" column="device_resume_date" jdbcType="VARCHAR"/>
+        <result property="deviceRun" column="device_run" jdbcType="VARCHAR"/>
+        <result property="deviceType" column="device_type" jdbcType="VARCHAR"/>
+        <result property="duration" column="duration" jdbcType="VARCHAR"/>
+        <result property="normalDay" column="normal_day" jdbcType="VARCHAR"/>
+        <result property="offlineCount" column="offline_count" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="column_list">
+        device_code
+        ,device_name,commission_days,cruise_percent,device_resume_date,device_run,device_type,
+        duration,normal_day,offline_count
+    </sql>
+    <select id="select" parameterType="java.lang.String" resultMap="entity">
+        select
+        <include refid="column_list"/>
+        from device_statics_info_result
+        where device_code =#{deviceCode,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="insert" parameterType="com.yjh.accessrobot.module.command.entity.DeviceStatisticInfoResult">
+        insert into device_statics_info_result
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceCode != null">device_code,</if>
+            <if test="deviceName != null">device_name,</if>
+            <if test="commissionDays != null">commission_days,</if>
+            <if test="cruisePercent != null">cruise_percent,</if>
+            <if test="deviceResumeDate != null">device_resume_date,</if>
+            <if test="deviceRun != null">device_run,</if>
+            <if test="deviceType != null">device_type,</if>
+            <if test="duration != null">duration,</if>
+            <if test="normalDay != null">normal_day,</if>
+            <if test="offlineCount != null">offline_count,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceCode != null">#{deviceCode,jdbcType=VARCHAR},</if>
+            <if test="deviceName != null">#{deviceName,jdbcType=VARCHAR},</if>
+            <if test="commissionDays != null">#{commissionDays,jdbcType=VARCHAR},</if>
+            <if test="cruisePercent != null">#{cruisePercent,jdbcType=VARCHAR},</if>
+            <if test="deviceResumeDate != null">#{deviceResumeDate,jdbcType=TIMESTAMP},</if>
+            <if test="deviceRun != null">#{deviceResumeDate,jdbcType=VARCHAR},</if>
+            <if test="deviceType != null">#{deviceType,jdbcType=VARCHAR},</if>
+            <if test="duration != null">#{duration,jdbcType=VARCHAR},</if>
+            <if test="normalDay != null">#{normalDay,jdbcType=VARCHAR},</if>
+            <if test="offlineCount != null">#{offlineCount,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <insert id="insertSelective" parameterType="com.yjh.accessrobot.module.command.entity.DeviceStatisticInfoResult">
+        insert into device_statics_info_result
+        (
+                device_code,device_name,device_run,device_resume_date,commission_days
+               )
+        values(
+               #{deviceCode,jdbcType=VARCHAR},
+               #{deviceName,jdbcType=VARCHAR},
+               #{deviceRun,jdbcType=VARCHAR},
+               #{deviceResumeDate,jdbcType=TIMESTAMP},
+               TO_DAYS(now()) - TO_DAYS(#{deviceResumeDate,jdbcType=TIMESTAMP})
+              )
+    </insert>
+    <update id="changeRun" parameterType="com.yjh.accessrobot.module.command.entity.DeviceStatisticInfoResult">
+        update device_statics_info_result
+        <if test="deviceRun != null and deviceRun == '0'">
+            set device_run = 1,device_resume_date=now()
+        </if>
+        <if test="deviceRun != null and deviceRun =='1'">
+            set device_run = 0,commission_days = commission_days + TO_DAYS(now()) - TO_DAYS(device_resume_date)
+        </if>
+            where device_code = #{deviceCode,jdbcType=VARCHAR}
+    </update>
+</mapper>

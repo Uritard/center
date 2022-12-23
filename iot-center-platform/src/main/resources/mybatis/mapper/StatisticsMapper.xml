@@ -58,7 +58,7 @@
         tr.robot_name robotName,
         tr.commission_date commissionDate,
         TO_DAYS(CURDATE()) currentDays,
-        TO_DAYS(tr.`commission_date`) commissionDays,
+        TO_DAYS(CURDATE()) - TO_DAYS(tr.`commission_date`) commissionDays,
         COUNT(
         DISTINCT DAY(tcdr.`createtime`)
         ) cruiseDay
@@ -77,11 +77,26 @@
         GROUP BY
         robotId
     </select>
+    <select id="selectAvailableRobotOrDrone" resultType="java.lang.Long" parameterType="java.lang.String">
+        SELECT
+        robot_id robotId
+        FROM
+        t_robot_info tr
+        where
+        tr.commission_date <![CDATA[<=]]> NOW()
+        <if test="type != null and type == 'robot'">
+            AND tr.robot_type IS TRUE
+        </if>
+        <if test="type != null and type == 'drone'">
+            AND tr.drone_type IS TRUE
+        </if>
+        AND tr.commission_date IS TRUE
+    </select>
 
     <select id="selectNormalDayRobot" resultType="java.util.Map">
         SELECT
         tr.robot_id robotId,
-        COUNT(DISTINCT DAY(ta.alarm_time)) normalDay
+        COUNT(DISTINCT DATE(ta.alarm_time)) normalDay
         FROM
         t_robot_alarm ta
         JOIN t_robot_info tr ON tr.robot_id = ta.robot_id
@@ -100,7 +115,7 @@
         tr.robot_name robotName,
         tr.commission_date commissionDate,
         TO_DAYS(CURDATE()) currentDays,
-        TO_DAYS(tr.`commission_date`) commissionDays,
+        TO_DAYS(CURDATE()) - TO_DAYS(tr.`commission_date`) commissionDays,
         COUNT(
         DISTINCT DAY(tcdr.`createtime`)
         ) cruiseDay
@@ -122,9 +137,9 @@
 
     <select id="countTaskByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
         SELECT DATE_FORMAT(execute_time, '%Y-%m') MONTH,
-               SUM(IFNULL(c_state = 240, 0)) AS validNum,
+               SUM(IFNULL(task_state = 240, 0)) AS validNum,
                SUM(
-                       IFNULL(c_state IN (240, 242, 243, 244), 0)
+                       IFNULL(task_state IN (240, 242, 243, 244), 0)
                    )                         AS totalNum
         FROM u_patrol_result
         where execute_time BETWEEN #{startTime} and #{endTime}
@@ -132,9 +147,9 @@
     </select>
     <select id="countTaskByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
         SELECT DATE_FORMAT(execute_time, '%u') + 1 WEEK,
-               SUM(IFNULL(c_state = 240, 0)) AS    validNum,
+               SUM(IFNULL(task_state = 240, 0)) AS    validNum,
                SUM(
-                       IFNULL(c_state IN (240, 242, 243, 244), 0)
+                       IFNULL(task_state IN (240, 242, 243, 244), 0)
                    )                         AS    totalNum
         FROM u_patrol_result
         where execute_time BETWEEN #{startTime} and #{endTime}
@@ -142,9 +157,9 @@
     </select>
     <select id="countTaskByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
         SELECT DATE_FORMAT(execute_time, '%Y-%m-%d') DAY,
-               SUM(IFNULL(c_state = 240, 0)) AS validNum,
+               SUM(IFNULL(task_state = 240, 0)) AS validNum,
                SUM(
-                       IFNULL(c_state IN (240, 242, 243, 244), 0)
+                       IFNULL(task_state IN (240, 242, 243, 244), 0)
                    )                         AS totalNum
         FROM u_patrol_result
         where execute_time BETWEEN #{startTime} and #{endTime}
@@ -249,11 +264,9 @@
         )
         ) AS validNum
         FROM
-        t_cruise_task_result result
-        LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
-        LEFT JOIN u_patrol_data_result tcdr ON tcdr.task_id = result.task_id
-        AND tcdr.cruise_id = detail.instance_id
-        LEFT JOIN u_patrol_task tct ON tct.task_id = result.`task_id`
+            u_patrol_task tct
+                LEFT JOIN
+            u_patrol_data_result detail ON detail.task_id = tct.task_id
         WHERE
         detail.cruise_time BETWEEN #{startTime} and #{endTime}
         GROUP BY
@@ -272,11 +285,9 @@
         )
         ) AS validNum
         FROM
-        t_cruise_task_result result
-        LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
-        LEFT JOIN u_patrol_data_result tcdr ON tcdr.task_id = result.task_id
-        AND tcdr.cruise_id = detail.instance_id
-        LEFT JOIN u_patrol_task tct ON tct.task_id = result.`task_id`
+            u_patrol_task tct
+                LEFT JOIN
+            u_patrol_data_result detail ON detail.task_id = tct.task_id
         WHERE
         detail.cruise_time BETWEEN #{startTime} and #{endTime}
         GROUP BY
@@ -298,11 +309,9 @@
         )
         ) AS validNum
         FROM
-        t_cruise_task_result result
-        LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
-        LEFT JOIN u_patrol_data_result tcdr ON tcdr.task_id = result.task_id
-        AND tcdr.cruise_id = detail.instance_id
-        LEFT JOIN u_patrol_task tct ON tct.task_id = result.`task_id`
+             u_patrol_task tct
+             LEFT JOIN
+        u_patrol_data_result detail ON detail.task_id = tct.task_id
         WHERE
         detail.cruise_time BETWEEN #{startTime} and #{endTime}
         GROUP BY
@@ -320,14 +329,12 @@
         )
         ) AS validNum
         FROM
-        t_cruise_task_result result
-        LEFT JOIN t_cruise_task_result_detail detail ON detail.task_result_id = result.task_result_id
-        LEFT JOIN u_patrol_data_result tcdr ON tcdr.task_id = result.task_id
-        AND tcdr.cruise_id = detail.instance_id
-        LEFT JOIN u_patrol_task tct ON tct.task_id = result.`task_id`
+        u_patrol_task tct
+        LEFT JOIN
+        u_patrol_data_result detail ON detail.task_id = tct.task_id
         WHERE
         detail.cruise_time BETWEEN #{startTime} and #{endTime}
-        <if test="taskId != null and taskId != ''">and result.task_id = #{taskId}</if>
+        <if test="taskId != null and taskId != ''">and detail.task_id = #{taskId}</if>
         <if test="robotId != null and robotId != ''">and tct.robot_id = #{robotId, jdbcType=BIGINT}</if>
     </select>
 
@@ -335,50 +342,41 @@
     <select id="countResultCheckByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
         SELECT
         DATE_FORMAT(
-        detail.cruise_time,
+                result.cruise_time,
         '%Y-%m-%d'
         ) DAY,
         count(1) AS totalNum,
         count(result.identify_result) AS validNum
         FROM
-        u_patrol_data_result result
-        LEFT JOIN t_cruise_task_result tctr ON result.task_id = tctr.task_id
-        LEFT JOIN t_cruise_task_result_detail detail ON tctr.task_result_id = detail.task_result_id
-        AND result.cruise_id = detail.instance_id
+            u_patrol_data_result result
         WHERE
-        detail.cruise_time BETWEEN #{startTime} and #{endTime}
+            result.cruise_time BETWEEN #{startTime} and #{endTime}
         GROUP BY
         DAY
     </select>
 
     <select id="countResultCheckByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
         SELECT
-        DATE_FORMAT(detail.cruise_time, '%u') + 1 WEEK,
+        DATE_FORMAT(result.cruise_time, '%u') + 1 WEEK,
         count(1) AS totalNum,
         count(result.identify_result) AS validNum
         FROM
         u_patrol_data_result result
-        LEFT JOIN t_cruise_task_result tctr ON result.task_id = tctr.task_id
-        LEFT JOIN t_cruise_task_result_detail detail ON tctr.task_result_id = detail.task_result_id
-        AND result.cruise_id = detail.instance_id
         WHERE
-        detail.cruise_time BETWEEN #{startTime} and #{endTime}
+            result.cruise_time BETWEEN #{startTime} and #{endTime}
         GROUP BY
         WEEK
     </select>
 
     <select id="countResultCheckByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
         SELECT
-        DATE_FORMAT(detail.cruise_time, '%Y-%m') MONTH,
+        DATE_FORMAT(result.cruise_time, '%Y-%m') MONTH,
         count(1) AS totalNum,
         count(result.identify_result) AS validNum
         FROM
-        u_patrol_data_result result
-        LEFT JOIN t_cruise_task_result tctr ON result.task_id = tctr.task_id
-        LEFT JOIN t_cruise_task_result_detail detail ON tctr.task_result_id = detail.task_result_id
-        AND result.cruise_id = detail.instance_id
+            u_patrol_data_result result
         WHERE
-        detail.cruise_time BETWEEN #{startTime} and #{endTime}
+            result.cruise_time BETWEEN #{startTime} and #{endTime}
         GROUP BY
         MONTH
     </select>
@@ -390,10 +388,93 @@
         WHERE camera_id = #{cameraId}
     </select>
 
+
+    <select id="countTaskFrequencyByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(tcr.execute_time, '%Y-%m-%d') day,
+               count(1) AS validNum
+        FROM u_patrol_result tcr
+        WHERE tcr.execute_time BETWEEN #{startTime} and #{endTime}
+        group by day
+    </select>
+
+    <select id="countTaskFrequencyByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(tcr.execute_time, '%u') + 1 week,
+               count(1) AS validNum
+        FROM u_patrol_result tcr
+        WHERE tcr.execute_time BETWEEN #{startTime} and #{endTime}
+        group by week
+    </select>
+
+    <select id="countTaskFrequencyByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(tcr.execute_time, '%Y-%m') month,
+               count(1) AS validNum
+        FROM u_patrol_result tcr
+        WHERE tcr.execute_time BETWEEN #{startTime} and #{endTime}
+        group by month
+    </select>
+
+    <select id="countTaskExecutedDurationByDay" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(tct.start_time, '%Y-%m-%d') DAY,
+               SUM(timestampdiff(MINUTE, tct.start_time, tct.end_time )) AS validNum
+        FROM
+            u_patrol_task tct
+        WHERE tct.start_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY DAY
+    </select>
+
+    <select id="countTaskExecutedDurationByWeek" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(tct.start_time, '%u') + 1 week,
+               SUM(timestampdiff(MINUTE, tct.start_time, tct.end_time )) AS validNum
+        FROM
+            u_patrol_task tct
+        WHERE tct.start_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY week
+    </select>
+
+    <select id="countTaskExecutedDurationByMonth" resultType="com.yjh.platform.module.task.entity.Statistics">
+        SELECT DATE_FORMAT(tct.start_time, '%Y-%m') month,
+               SUM(timestampdiff(MINUTE, tct.start_time, tct.end_time )) AS validNum
+        FROM
+            u_patrol_task tct
+        WHERE tct.start_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY month
+    </select>
+
+    <select id="countFoundDefectByDay" resultType="com.yjh.platform.module.task.entity.StatisticalDefectMapping">
+        SELECT
+            DATE_FORMAT(defect_time, '%Y-%m-%d') DAY,
+            defect_content as 'defectType',
+                COUNT(1) AS count
+        FROM t_defect_info
+        WHERE defect_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY defectType,DAY
+    </select>
+
+    <select id="countFoundDefectByWeek" resultType="com.yjh.platform.module.task.entity.StatisticalDefectMapping">
+        SELECT
+            DATE_FORMAT(defect_time, '%u') + 1 week,
+            defect_content as 'defectType',
+                COUNT(1) AS count
+        FROM t_defect_info
+        WHERE defect_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY defectType,week
+    </select>
+
+    <select id="countFoundDefectByMonth" resultType="com.yjh.platform.module.task.entity.StatisticalDefectMapping">
+        SELECT
+            DATE_FORMAT(defect_time, '%Y-%m') month,
+            defect_content as 'defectType',
+                COUNT(1) AS count
+        FROM t_defect_info
+        WHERE defect_time BETWEEN #{startTime} and #{endTime}
+        GROUP BY defectType,month
+    </select>
+
     <select id="selectRobot" resultType="java.util.Map">
         SELECT
+               0 as device_type,
         robot_id as robotId,
-        robot_code as patrolDeviceCode,
+        robot_num as patrolDeviceCode,
         robot_name as patrolDeviceName,
         commission_date as commissionTime
         FROM
@@ -403,6 +484,7 @@
     </select>
     <select id="selectCamera" resultType="java.util.Map">
         SELECT
+            2 as device_type,
         camera_id as cameraId,
         camera_id as patrolDeviceCode,
         camera_name as patrolDeviceName,
@@ -412,8 +494,9 @@
     </select>
     <select id="selectDrone" resultType="java.util.Map">
         SELECT
+            1 as device_type,
         robot_id as robotId,
-        robot_code as patrolDeviceCode,
+        robot_num as patrolDeviceCode,
         robot_name as patrolDeviceName,
         commission_date as commissionTime
         FROM

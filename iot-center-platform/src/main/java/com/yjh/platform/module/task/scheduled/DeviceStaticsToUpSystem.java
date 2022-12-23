@@ -1,10 +1,12 @@
 package com.yjh.platform.module.task.scheduled;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.module.patrol.dao.UPatrolDeviceStaticsDao;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.dao.StatisticsDao;
 import com.yjh.platform.module.task.service.StatisticsService;
+import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,13 @@ public class DeviceStaticsToUpSystem {
     @Autowired
     private StatisticsService statisticsService;
 
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
+
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    public static final String MINUTE = "MINUTE";
+    public static final String DAY = "DAY";
 
     private final Logger log = LoggerFactory.getLogger(DeviceStaticsToUpSystem.class);
 
@@ -49,11 +57,12 @@ public class DeviceStaticsToUpSystem {
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void resultToUpSystem() {
+        String reportDate = simpleDateFormat.format(new Date());
         List<Map<String, Object>> infoMaps = new ArrayList<>();
         // 获取摄像机，机器人，无人机的信息
-        List<Map<String, String>> robotList = statisticsDao.selectRobot();
-        List<Map<String, String>> cameraList = statisticsDao.selectCamera();
-        List<Map<String, String>> droneList = statisticsDao.selectDrone();
+        List<Map<String, Object>> robotList = statisticsDao.selectRobot();
+        List<Map<String, Object>> cameraList = statisticsDao.selectCamera();
+        List<Map<String, Object>> droneList = statisticsDao.selectDrone();
         // 加载进入redis缓存
         statisticsService.selectStatisticsRobot(null, "robot");
         statisticsService.selectStatisticsRobot(null, "");
@@ -62,12 +71,13 @@ public class DeviceStaticsToUpSystem {
         robotList.addAll(droneList);
         robotList.forEach(device -> {
             if (device.containsKey("robotId")) {
-                packageInfo("robotId", device, infoMaps);
+                packageInfo("robotId", device, infoMaps, reportDate);
             }
             if (device.containsKey("cameraId")) {
-                packageInfo("cameraId", device, infoMaps);
+                packageInfo("cameraId", device, infoMaps, reportDate);
             }
         });
+        log.info("infoMaps:\n{}", JSON.toJSONString(infoMaps));
         sendInfoToUpSystem(infoMaps);
     }
 
@@ -90,21 +100,22 @@ public class DeviceStaticsToUpSystem {
     }
 
 
-    private void packageInfo(String key, Map<String, String> device, List<Map<String, Object>> infoMaps) {
+    private void packageInfoBack(String key, Map<String, String> device, List<Map<String, Object>> infoMaps, String reportDate) {
         String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
-        Map<String,String> deviceStaticsInfo =new HashMap(8);
+        Map<String, Object> deviceStaticsInfo;
         if ("3".equals(sysLevel)) {
             // 是上级系统上报，直接查询数据库
             deviceStaticsInfo = uPatrolDeviceStaticsDao.selectByDeviceCode(device.get("patrolDeviceCode"));
-        }else {
-            deviceStaticsInfo = redisTemplate.opsForHash().entries("deviceStaticsInfo:" + key + ":" + device.get(key));
+        } else {
+            String keys = "deviceStaticsInfo:" + key + ":" + device.get(key).toString();
+            deviceStaticsInfo = redisTemplate.opsForHash().entries(keys);
         }
         for (int type = 1; type < 7; type++) {
             Map<String, Object> infoMap = new HashMap<>(16);
             infoMap.put("patroldevice_code", device.get("patrolDeviceCode"));
             infoMap.put("patroldevice_name", device.get("patrolDeviceName"));
             infoMap.put("commission_time", Optional.ofNullable(device.get("commissionTime")).orElse(""));
-            infoMap.put("report_time", simpleDateFormat.format(new Date()));
+            infoMap.put("report_time", reportDate);
             infoMap.put("type", type);
             switch (type) {
                 case 1:
@@ -117,7 +128,7 @@ public class DeviceStaticsToUpSystem {
                     } else {
                         infoMap.put("value", deviceStaticsInfo.get("duration"));
                     }
-                    infoMap.put("value_unit", "时");
+                    infoMap.put("value_unit", "1");
                     infoMap.put("unit", "分");
                     break;
                 case 2:
@@ -130,7 +141,7 @@ public class DeviceStaticsToUpSystem {
                     } else {
                         infoMap.put("value", deviceStaticsInfo.get("offLineCount"));
                     }
-                    infoMap.put("value_unit", "次");
+                    infoMap.put("value_unit", "1");
                     infoMap.put("unit", "次");
                     break;
                 case 3:
@@ -143,7 +154,7 @@ public class DeviceStaticsToUpSystem {
                     } else {
                         infoMap.put("value", deviceStaticsInfo.get("normalDay"));
                     }
-                    infoMap.put("value_unit", "天");
+                    infoMap.put("value_unit", "1");
                     infoMap.put("unit", "天");
                     break;
                 case 4:
@@ -153,7 +164,7 @@ public class DeviceStaticsToUpSystem {
                     } else {
                         infoMap.put("value", deviceStaticsInfo.get("commissionDays"));
                     }
-                    infoMap.put("value_unit", "天");
+                    infoMap.put("value_unit", "1");
                     infoMap.put("unit", "天");
                     break;
                 case 5:
@@ -161,9 +172,9 @@ public class DeviceStaticsToUpSystem {
                     if (StringUtils.isEmpty(deviceStaticsInfo.get("cruisePercent"))) {
                         infoMap.put("value", "0");
                     } else {
-                        infoMap.put("value", deviceStaticsInfo.get("cruisePercent").replace("%", ""));
+                        infoMap.put("value", deviceStaticsInfo.get("cruisePercent").toString().replace("%", ""));
                     }
-                    infoMap.put("value_unit", "%");
+                    infoMap.put("value_unit", "1");
                     infoMap.put("unit", "%");
                     break;
                 case 6:
@@ -174,9 +185,9 @@ public class DeviceStaticsToUpSystem {
                     if (StringUtils.isEmpty(deviceStaticsInfo.get("intactPercent"))) {
                         infoMap.put("value", "0");
                     } else {
-                        infoMap.put("value", deviceStaticsInfo.get("intactPercent").replace("%", ""));
+                        infoMap.put("value", deviceStaticsInfo.get("intactPercent").toString().replace("%", ""));
                     }
-                    infoMap.put("value_unit", "%");
+                    infoMap.put("value_unit", "1");
                     infoMap.put("unit", "%");
                     break;
                 default:
@@ -184,5 +195,118 @@ public class DeviceStaticsToUpSystem {
             }
             infoMaps.add(infoMap);
         }
+    }
+
+    private void packageInfo(String key, Map<String, Object> device, List<Map<String, Object>> infoMaps, String reportDate) {
+        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        Map<String, Object> deviceStaticsInfo = new HashMap(8);
+        if ("3".equals(sysLevel)) {
+            // 是上级系统上报，直接查询数据库
+            deviceStaticsInfo = uPatrolDeviceStaticsDao.selectByDeviceCode(device.get("patrolDeviceCode").toString());
+        } else {
+            deviceStaticsInfo = redisTemplate.opsForHash().entries("deviceStaticsInfo:" + key + ":" + device.get(key).toString());
+        }
+        for (int type = 1; type < 7; type++) {
+            Map<String, Object> infoMap = new HashMap<>(16);
+            infoMap.put("patroldevice_code", device.get("patrolDeviceCode"));
+            infoMap.put("patroldevice_name", device.get("patrolDeviceName"));
+            infoMap.put("commission_time", Optional.ofNullable(device.get("commissionTime")).orElse(""));
+            infoMap.put("report_time", reportDate);
+            infoMap.put("type", type);
+            infoMap.put("device_type",device.get("device_type"));
+            switch (type) {
+                case 1:
+                    // 累积在线时长总和
+                    if (!device.containsKey("robotId")) {
+                        break;
+                    }
+                    deviceStaticsInfo = uPatrolDeviceStaticsDao.selectRobotInfo(Long.parseLong(device.get("robotId").toString()));
+                    infoMap.put("value", StringUtils.isEmpty(deviceStaticsInfo.get("duration")) ? 0L : parseDate(deviceStaticsInfo.get("duration").toString(), MINUTE));
+                    infoMap.put("value_unit", "1");
+                    infoMap.put("unit", "分");
+                    break;
+                case 2:
+                    // 累积离线次数总和
+                    if (!device.containsKey("robotId")) {
+                        break;
+                    }
+                    deviceStaticsInfo = uPatrolDeviceStaticsDao.selectRobotInfo(Long.parseLong(device.get("robotId").toString()));
+                    infoMap.put("value", StringUtils.isEmpty(deviceStaticsInfo.get("off_line_count")) ? 0 : Integer.parseInt(deviceStaticsInfo.get("off_line_count").toString()));
+                    infoMap.put("value_unit", "1");
+                    infoMap.put("unit", "次");
+                    break;
+                case 3:
+                    // 累计连续正常运行天数
+                    if (!device.containsKey("robotId")) {
+                        break;
+                    }
+                    Integer NormalDays = uPatrolDeviceStaticsDao.selectNormalDays(device.get("patrolDeviceCode").toString());
+                    if (NormalDays == null ) {
+                        Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
+                        NormalDays = (Integer) result.get("commission_days");
+                    }
+                    infoMap.put("value", NormalDays == null ? 0 : NormalDays);
+                    infoMap.put("value_unit", "1");
+                    infoMap.put("unit", "天");
+                    break;
+                case 4:
+                    // 正常巡检天数
+                    if (device.containsKey("robotId")) {
+                        Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
+                        infoMap.put("value",result.get("cruise_day") == null ?  0:result.get("cruise_day"));
+                        infoMap.put("value_unit", "1");
+                        infoMap.put("unit", "天");
+                    }
+                    else if (device.containsKey("cameraId"))  {
+                        Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDaysForCamera(Long.parseLong(device.get("cameraId").toString()));
+                        infoMap.put("value",result.get("cruise_day") == null ?  0:result.get("cruise_day"));
+                        infoMap.put("value_unit", "1");
+                        infoMap.put("unit", "天");
+                    }
+                    break;
+                case 5:
+                    // 巡检出勤率
+                    if (device.containsKey("robotId")) {
+                        Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDays(Long.parseLong(device.get("robotId").toString()));
+                        infoMap.put("value",result.get("cruise_rate") == null ?  0:Double.parseDouble(result.get("cruise_rate").toString()));
+                        infoMap.put("value_unit", "1");
+                        infoMap.put("unit", "%");
+                    }
+                    else if (device.containsKey("cameraId"))  {
+                        Map<String,Object> result = uPatrolDeviceStaticsDao.selectCommissionDaysForCamera(Long.parseLong(device.get("cameraId").toString()));
+                        infoMap.put("value",result.get("cruise_rate") == null ?  0:Double.parseDouble(result.get("cruise_rate").toString()));
+                        infoMap.put("value_unit", "1");
+                        infoMap.put("unit", "%");
+                    }
+                    break;
+                case 6:
+                    // 录像完整率
+                    if (!device.containsKey("cameraId")) {
+                        break;
+                    }
+                    if (StringUtils.isEmpty(deviceStaticsInfo.get("intactPercent"))) {
+                        infoMap.put("value", "0");
+                    } else {
+                        infoMap.put("value", deviceStaticsInfo.get("intactPercent").toString().replace("%", ""));
+                    }
+                    infoMap.put("value_unit", "1");
+                    infoMap.put("unit", "%");
+                    break;
+                default:
+                    break;
+            }
+            infoMaps.add(infoMap);
+        }
+    }
+
+    private Long parseDate(String dateString, String target) {
+        long ms = Long.parseLong(dateString);
+        if (MINUTE.equals(target)) {
+            return ms / 60 / 1000;
+        }
+        if (DAY.equals(target)) {
+            return ms / 1000 / 60 / 60 / 24;
+        }
+        return null;
     }
 }

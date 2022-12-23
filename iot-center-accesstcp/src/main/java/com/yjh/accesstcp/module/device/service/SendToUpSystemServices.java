@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.serializer.SerializeConfig;
+import com.google.common.collect.Maps;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
@@ -15,6 +16,7 @@ import com.yjh.accesstcp.module.device.entity.*;
 import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.netty.server.TCPClientHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
@@ -59,9 +62,18 @@ public class SendToUpSystemServices {
 
     @Autowired
     private SendToUpSystemDao sendToUpSystemDao;
+
+    @Autowired
+            private StatisticsDao statisticsDao;
+
+
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final String TASK_PRIORITY_REDIS_KEY="task_priority_config:";
+
+    public static final String DAY_FORMAT = ",'%Y-%m-%d')";
+    public static final String WEEK_FORMAT = " ,'%u') + 1";
+    public static final String MONTH_FORMAT = " ,'%Y-%m')";
 
     @Transactional(rollbackFor = Exception.class)
     public int sendResponse(long receiveSessionId, String type, String command, String code, List<Map<String, Object>> items, boolean isSend) {
@@ -549,31 +561,69 @@ public class SendToUpSystemServices {
         return mapAbsPath;
     }
 
-    public List<Map<String, Object>> resultStatistical(String cmd, String startTime, String endTime) {
+    public List<Map<String, Object>> resultStatistical(Map<String, Object> item) {
+        String startTime = null;
+        String endTime = null;
+        String type = null;
+        String year = null;
+        String month = null;
+        String cmd = null;
         // 1 - 巡视任务执行闭环率 任务执行闭环率=闭环任务数量/执行任务总数*100% 任务正常的判据（自主启停）；断点续传任务认为是闭环任务
         // 2 - 巡视告警人工审核完成率 巡视告警人工审核完成率=（已审核告警数量/告警总数）*100%
         // 3 - 巡视告警准确率 告警准确率=（已审核未人工修正的告警数量/已审核告警总数）*100%
         // 4 - 巡视结果人工审核完成率 巡视结果人工审核完成率 =  （已审核巡检结果数量/总巡检结果数量）*100%
-        // 5 - 巡视点位漏检率  漏检率=（漏检点位数量/巡视点位总数量）*100%
+        // 5 - 巡视点位漏检率  漏检率=（漏检点位数量/巡视点位总数量）*100%\
+
+        if (item.get("begin_time") != null) {
+            startTime = item.get("begin_time").toString();
+        }
+        if (item.get("end_time") != null) {
+            endTime = item.get("end_time").toString();
+        }
+        if (item.get("type") != null) {
+            type = item.get("type").toString();
+        }
+        if (item.get("cmd") != null) {
+            cmd = item.get("cmd").toString();
+        }
+        if (item.get("year") != null) {
+            year = item.get("year").toString();
+        }
+        if (item.get("month") != null) {
+            month = item.get("month").toString();
+        }
         List<Map<String, Object>> resultStatistical = new ArrayList<>();
         switch (cmd) {
             case "1":
-                resultStatistical.add(countTask(startTime, endTime));
+                resultStatistical.addAll(countTask(type,startTime, endTime));
                 break;
             case "2":
-                resultStatistical.add(countWarnCheck(startTime, endTime));
+                resultStatistical.addAll(countWarnCheck(type,startTime, endTime));
                 break;
             case "3":
-                resultStatistical.add(countWarnAccuracy(startTime, endTime));
+                resultStatistical.addAll(countWarnAccuracy(type,startTime, endTime));
                 break;
             case "4":
-                resultStatistical.add(countResultCheck(startTime, endTime));
+                resultStatistical.addAll(countResultCheck(type,startTime, endTime));
                 break;
             case "5":
-                resultStatistical.add(countInstanceLoss(startTime, endTime));
+                resultStatistical.addAll(countInstanceLoss(type,startTime, endTime));
                 break;
             default:
                 break;
+        }
+        if(CollectionUtils.isNotEmpty(resultStatistical)) {
+            for (Map<String,Object> st : resultStatistical) {
+                dealPercent(st);
+            }
+            Map<String,Object> st = resultStatistical.get(0);
+
+            st.put("command",cmd);
+            st.put("type",type);
+            st.put("param_year",year);
+            st.put("param_month",month);
+            st.put("startTime",startTime);
+            st.put("endTime",endTime);
         }
         return resultStatistical;
     }
@@ -591,30 +641,265 @@ public class SendToUpSystemServices {
         return reMap;
     }
 
-    public HashMap<String, Object> countTask(String startTime, String endTime) {
+    public List<Map<String, Object>> countTask(String type, String startTime, String endTime) {
         // 巡视任务闭环率
-        return dealCount(sendToUpSystemDao.countTask(startTime, endTime));
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (StringUtils.isBlank(type)) {
+            result.add(dealCount(sendToUpSystemDao.countTask(startTime, endTime)));
+        } else {
+            switch (type) {
+                case "1":
+                    result = statisticsDao.countTask(startTime, endTime, DAY_FORMAT, "day");
+                    dealDay(result, startTime, endTime);
+                    break;
+                case "2":
+                    result = statisticsDao.countTask(startTime, endTime, WEEK_FORMAT, "week");
+                    dealWeek(result, startTime, endTime);
+                    break;
+                case "3":
+                    result = statisticsDao.countTask(startTime, endTime, MONTH_FORMAT, "month");
+                    dealMonth(result, startTime, endTime);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+        return result;
     }
 
-    public HashMap<String, Object> countWarnCheck(String startTime, String endTime) {
-        // 人工审核完成率
-        return dealCount(sendToUpSystemDao.countWarnCheck(startTime, endTime));
+    public List<Map<String, Object>> countWarnCheck(String type, String startTime, String endTime) {
+        // 巡视任务闭环率
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (StringUtils.isBlank(type)) {
+            result.add(dealCount(sendToUpSystemDao.countWarnCheck(startTime, endTime)));
+        } else {
+
+            switch (type) {
+                case "1":
+                    result = statisticsDao.countWarnCheckByMonth(startTime, endTime, DAY_FORMAT, "day");
+                    dealDay(result, startTime, endTime);
+                    break;
+                case "2":
+                    result = statisticsDao.countWarnCheckByMonth(startTime, endTime, WEEK_FORMAT, "week");
+                    dealWeek(result, startTime, endTime);
+                    break;
+                case "3":
+                    result = statisticsDao.countWarnCheckByMonth(startTime, endTime, MONTH_FORMAT, "month");
+                    dealMonth(result, startTime, endTime);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return result;
     }
 
-    public HashMap<String, Object> countWarnAccuracy(String startTime, String endTime) {
+    public List<Map<String, Object>> countWarnAccuracy(String type, String startTime, String endTime) {
         // 巡视告警准确率
-        return dealCount(sendToUpSystemDao.countWarnAccuracy(startTime, endTime));
+        // 巡视任务闭环率
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (StringUtils.isBlank(type)) {
+            result.add(dealCount(sendToUpSystemDao.countWarnCheck(startTime, endTime)));
+        } else {
+            switch (type) {
+                case "1":
+                    result = statisticsDao.countWarnAccuracyByMonth(startTime, endTime, DAY_FORMAT, "day");
+                    dealDay(result, startTime, endTime);
+                    break;
+                case "2":
+                    result = statisticsDao.countWarnAccuracyByMonth(startTime, endTime, WEEK_FORMAT, "week");
+                    dealWeek(result, startTime, endTime);
+                    break;
+                case "3":
+                    result = statisticsDao.countWarnAccuracyByMonth(startTime, endTime, MONTH_FORMAT, "month");
+                    dealMonth(result, startTime, endTime);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+        return result;
     }
 
-    public HashMap<String, Object> countInstanceLoss(String startTime, String endTime) {
+    public List<Map<String, Object>> countInstanceLoss(String type, String startTime, String endTime) {
         // 巡视点位漏检率
-        return dealCount(sendToUpSystemDao.countInstanceLoss(startTime, endTime));
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (StringUtils.isBlank(type)) {
+            result.add(dealCount(sendToUpSystemDao.countInstanceLoss(startTime, endTime)));
+        } else {
+            switch (type) {
+                case "1":
+                    result = statisticsDao.countInstanceLossByMonth(startTime, endTime, DAY_FORMAT, "day");
+                    dealDay(result, startTime, endTime);
+                    break;
+                case "2":
+                    result = statisticsDao.countInstanceLossByMonth(startTime, endTime, WEEK_FORMAT, "week");
+                    dealWeek(result, startTime, endTime);
+                    break;
+                case "3":
+                    result = statisticsDao.countInstanceLossByMonth(startTime, endTime, MONTH_FORMAT, "month");
+                    dealMonth(result, startTime, endTime);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+        return result;
     }
 
-    public HashMap<String, Object> countResultCheck(String startTime, String endTime) {
+    public List<Map<String, Object>> countResultCheck(String type, String startTime, String endTime) {
         // 巡视结果人工审核完成率
-        return dealCount(sendToUpSystemDao.countResultCheck(startTime, endTime));
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (StringUtils.isBlank(type)) {
+            result.add(dealCount(sendToUpSystemDao.countResultCheck(startTime, endTime)));
+        } else {
+            switch (type) {
+                case "1":
+                    result = statisticsDao.countResultCheckByDay(startTime, endTime, DAY_FORMAT, "day");
+                    dealDay(result, startTime, endTime);
+                    break;
+                case "2":
+                    result = statisticsDao.countResultCheckByDay(startTime, endTime, WEEK_FORMAT, "week");
+                    dealWeek(result, startTime, endTime);
+                    break;
+                case "3":
+                    result = statisticsDao.countResultCheckByDay(startTime, endTime, MONTH_FORMAT, "month");
+                    dealMonth(result, startTime, endTime);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
+        return result;
     }
+
+    private List<String> getBetweenDates(Date start, Date end) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        List<String> result = new ArrayList<String>();
+        Calendar tempStart = Calendar.getInstance();
+        tempStart.setTime(start);
+        tempStart.add(Calendar.DATE, 0);
+
+        Calendar tempEnd = Calendar.getInstance();
+        tempEnd.setTime(end);
+        while (tempStart.before(tempEnd)) {
+            result.add(sdf.format(tempStart.getTime()));
+            tempStart.add(Calendar.DAY_OF_YEAR, +1);
+        }
+        return result;
+    }
+
+    private void dealPercent(Map<String,Object> statistics) {
+        if (statistics.get("totalNum") != null) {
+            Double totalNum = Double.valueOf(statistics.get("totalNum").toString());
+            Double validNum = Double.valueOf(statistics.get("validNum").toString());
+            String percent = String.format("%.2f", validNum * 100 / totalNum);
+            statistics.put("percent",percent + "%");
+        }
+    }
+
+    private void dealDay(List<Map<String,Object>> result, String startTimeString,String endTimeString) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        Date startTime = null;
+        Date endTime = null;
+        try {
+            startTime = simpleDateFormat.parse(startTimeString);
+            endTime =simpleDateFormat.parse(endTimeString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        List<String> dateList = getBetweenDates(startTime, endTime);
+        for (String date : dateList) {
+            boolean b = result.stream().anyMatch(m -> m.get("day").equals(date));
+            if (!b) {
+                Map<String,Object> st = Maps.newHashMap();
+                st.put("day",date);
+                result.add(st);
+            }
+        }
+        result.sort(Comparator.comparing(e->e.get("day").toString()));
+    }
+
+    private void dealWeek(List<Map<String,Object>> result, String startTimeString,String endTimeString) {
+        Date startTime = null;
+        Date endTime = null;
+        Integer startWeek = 0;
+        Integer endWeek = 0;
+        try {
+            startTime = simpleDateFormat.parse(startTimeString);
+            endTime =simpleDateFormat.parse(endTimeString);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(startTime);
+            startWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+            calendar.setTime(endTime);
+            endWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        result.forEach(map-> map.put("week", Double.valueOf(map.get("week").toString()).intValue()));
+        if (result.size() + 1 < (endWeek - startWeek)) {
+            for (Integer i = startWeek; i <= endWeek; i++) {
+                int f1 = i;
+                boolean b = result.stream().anyMatch(m -> m.get("week").equals(f1));
+                if (!b) {
+                    Map<String,Object> st = Maps.newHashMap();
+                    st.put("week",i);
+                    result.add(st);
+                }
+            }
+        }
+        result.sort(Comparator.comparing(e->e.get("week").toString()));
+    }
+
+    private void dealMonth(List<Map<String,Object>> result, String startTimeString,String endTimeString) {
+        Date startTime = null;
+        Date endTime = null;
+        try {
+        startTime = simpleDateFormat.parse(startTimeString);
+        endTime =simpleDateFormat.parse(endTimeString);
+    } catch (ParseException e) {
+        e.printStackTrace();
+    }
+        List<String> months = getMonths(startTime, endTime);
+        for (String date : months) {
+            boolean b = result.stream().anyMatch(m -> m.get("month").equals(date));
+            if (!b) {
+                Map<String,Object> st = Maps.newHashMap();
+                st.put("month",date);
+                result.add(st);
+            }
+        }
+        result.sort(Comparator.comparing(e->e.get("month").toString()));
+    }
+
+
+
+    private static List<String> getMonths(Date start, Date end) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        List<String> result = new ArrayList<String>();
+        Calendar tempStart = Calendar.getInstance();
+        tempStart.setTime(start);
+        tempStart.add(Calendar.DATE, 0);
+
+        Calendar tempEnd = Calendar.getInstance();
+        tempEnd.setTime(end);
+        while (tempStart.before(tempEnd)) {
+            result.add(sdf.format(tempStart.getTime()));
+            tempStart.add(Calendar.MONTH, +1);
+        }
+        return result;
+    }
+
 
     public String downloadFile(String type) {
         try {

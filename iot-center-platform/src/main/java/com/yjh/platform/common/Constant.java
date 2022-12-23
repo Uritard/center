@@ -57,6 +57,8 @@ public class Constant {
 
     public static final String ROBOT_CONFIRM_MSG_URL = "http://iot-center-accessrobot/robot/v1/sendConfirmMsg";
 
+    public static final String STATISTIC = "http://iot-center-accessrobot/robot/v1/cruiseStatistic";
+
     public static final String ALGORITHM_URL ="http://iot-center-accessvideo/analysis/v1/algorithm";
 
     public static final String NVR_URL = "http://iot-center-accessvideo/camera/v2/getNVRStoreInfo?recordId={recordId}";
@@ -325,5 +327,12 @@ public class Constant {
     public static final int STATE_SUB = 0;
 
     public static final String VIDEO_DOWNLOAD_FILE = "http://iot-center-accessvideo/intel-analysis/downloadPicture";
+
+
+    public static final int TASK_CHECK = 1;
+    public static final int RESULT_CHECK = 2;
+    public static final int WARN_ACCURACY = 3;
+    public static final int WARN_CHECK = 4;
+    public static final int INSTANCE_LOSS = 5;
 }
 

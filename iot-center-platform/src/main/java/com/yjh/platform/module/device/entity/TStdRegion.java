@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author tt
@@ -98,5 +99,7 @@ public class TStdRegion implements Serializable {
      * 站所地图路径
      */
     private String regionPath;
+
+    private List<TStdRegion> children;
 
 }

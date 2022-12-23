@@ -367,18 +367,13 @@ public class MessageThread {
             log.info("巡视结果统计查询：{}", JSON.toJSONString(xmlBaseModel));
             String startTime = "";
             String endTime = "";
+            String type = "";
+            List<Map<String, Object>> list = null;
             if (xmlBaseModel.getItems() != null && xmlBaseModel.getItems().size() > 0) {
-                List<Map<String, Object>> itemsList = xmlBaseModel.getItems();
-                for (Map<String, Object> item : itemsList) {
-                    if (item.get("begin_time") != null) {
-                        startTime = item.get("begin_time").toString();
-                    }
-                    if (item.get("end_time") != null) {
-                        endTime = item.get("end_time").toString();
-                    }
-                }
+                Map<String, Object> item = xmlBaseModel.getItems().get(0);
+                item.put("cmd",xmlBaseModel.getCommand());
+                list = sendToUpSystemServices.resultStatistical(item);
             }
-            List<Map<String, Object>> list = sendToUpSystemServices.resultStatistical(xmlBaseModel.getCommand(), startTime, endTime);
             if (list == null) {
                 sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "100", null, false);
             } else {
