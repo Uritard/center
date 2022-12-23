@@ -692,13 +692,13 @@ select *from (
                 c.start_time,
                 b.dict_note AS cruiseTypeName
                 FROM
-                t_cruise_result a
-                LEFT JOIN  t_dict_business b ON a.c_type = b.dict_code
-                LEFT JOIN  t_cruise_task c ON a.task_id = c.task_id
+                    u_patrol_result a
+                LEFT JOIN  t_dict_business b ON a.task_type = b.dict_code
+                LEFT JOIN  u_patrol_task c ON a.task_id = c.task_id
                 WHERE
                 b.col_name = 'plan_type'
-                and a.c_state IN (239,241)
-                and isNull(robot_id)
+                and a.task_state IN (239,241)
+                and isNull(a.robot_id)
                 order by c.start_time desc limit 3
     </select>
 

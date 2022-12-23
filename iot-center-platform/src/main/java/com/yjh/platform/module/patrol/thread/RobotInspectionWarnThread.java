@@ -208,7 +208,8 @@ public class RobotInspectionWarnThread implements Runnable{
             warnMap.put("defectModel", warnInfo.getDefectModel().toString());
             warnMap.put("warnLevel", warnInfo.getWarnLevel().toString());
             warnMap.put("warnName", warnInfo.getWarnName());
-            warnMap.put("warnTime", new SimpleDateFormat().format(warnInfo.getWarnTime()));
+            warnMap.put("warnTime", Objects.nonNull(warnInfo.getWarnTime()) ?
+                    DateTimeUtil.format(warnInfo.getWarnTime()) : DateTimeUtil.format(new Date()));
             warnMap.put("warnContent", warnInfo.getWarnContent());
         }catch (Exception e){
             log.error("组装告警map异常：", e);
