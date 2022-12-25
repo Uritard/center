@@ -405,7 +405,7 @@ public class MessageThread {
         tCruiseTaskAdd.setIntervalType(item.get("interval_type").toString());
         tCruiseTaskAdd.setIntervalStartTime(item.get("interval_start_time").toString());
         tCruiseTaskAdd.setIntervalEndTime(item.get("interval_end_time").toString());
-        if (StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleStartTime())){
+        if (StringUtils.isNotEmpty(item.get("fixed_start_time").toString())){
             long fixedStartTime = DateTimeUtil.parse(String.valueOf(item.get("fixed_start_time"))).getTime();
             log.info("fixedStartTime=={},当前时间:{}", fixedStartTime, System.currentTimeMillis());
             if (Math.abs(System.currentTimeMillis() - fixedStartTime) <= (5 * 60 * 1000)){

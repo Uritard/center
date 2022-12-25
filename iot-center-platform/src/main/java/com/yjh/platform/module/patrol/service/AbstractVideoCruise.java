@@ -189,14 +189,10 @@ public abstract class AbstractVideoCruise {
 
                 // 判断当前节点级别,如果是边缘节点,直接处理拍照的结果
                 String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
-                if (StringUtils.equals("1", sysLevel)){
-                    return true;
-                }
-
                 if (!picError) {
                     // 判断是否有配置算法
                     TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("deviceMeteId", "-1"), resultNum);
-                    if (algorithm != null) {
+                    if (algorithm != null && !StringUtils.equals("1", sysLevel)) {
                         log.info("request algorithm: {}", JSON.toJSONString(algorithm));
                         // 算法分析
                         isEnded = algorithmAnalysis(inspectionMap, presetId, taskId, jsonForRe, algorithm);
