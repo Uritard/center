@@ -5,7 +5,6 @@ import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
-import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.patrol.entity.*;
@@ -26,7 +25,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
-import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
 
 /**
@@ -57,9 +55,9 @@ public class PatrolResultHandler {
     }
 
     /**
-     * 处理机器人/无人机/边缘节点测点告警
+     * 处理下级系统的测点告警
      *
-     * @param alarmList 机器人/无人机/边缘节点测点告警
+     * @param alarmList 下级系统的测点告警
      */
     public void robotPatrolTaskAlarm(List<RobotPatrolTaskAlarm> alarmList) {
         if (alarmList.isEmpty()) {
@@ -68,7 +66,7 @@ public class PatrolResultHandler {
         log.info("robotPatrolTaskAlarm alarmList=={}", alarmList);
         try {
         for (RobotPatrolTaskAlarm taskAlarm : alarmList) {
-            // 通过上报的任务id查询巡视主机上的任务id
+            // 通过上报的任务id查询本级系统上的任务id
             String taskCode = taskAlarm.getTaskCode();
             // 增加时间判断，避免预先初始化导致数据传入下一个任务
             String timeStr = StringUtils.substringAfterLast(taskAlarm.getTaskPatrolledId(), "_");
@@ -94,14 +92,14 @@ public class PatrolResultHandler {
             }
         }
         }catch (Exception e){
-            log.error("处理机器人/无人机/边缘节点测点告警异常:", e);
+            log.error("处理下级系统的测点告警异常:", e);
         }
     }
 
     /**
-     * 处理机器人/无人机/边缘节点巡视结果
+     * 处理下级系统的巡视结果
      *
-     * @param resultList 机器人/无人机/边缘节点巡视结果
+     * @param resultList 下级系统的巡视结果
      */
     public void robotPatrolTaskResult(List<RobotPatrolTaskResult> resultList) {
         if (resultList.isEmpty()) {
@@ -115,7 +113,7 @@ public class PatrolResultHandler {
             try {
                 Map<String, String> infoMap = new HashMap<>(8);
 
-                // 通过上报的任务id查询巡视主机上的任务id
+                // 通过上报的任务id查询本级系统上的任务id
                 String taskCode = robotPatrolTaskResult.getTaskCode();
                 // 增加时间判断，避免预先初始化导致数据传入下一个任务
                 String timeStr = StringUtils.substringAfterLast(robotPatrolTaskResult.getTaskPatrolledId(), "_");
@@ -157,7 +155,7 @@ public class PatrolResultHandler {
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
 
             } catch (Exception e) {
-                log.error("处理机器人/无人机/边缘节点巡视结果异常:", e);
+                log.error("处理下级系统的巡视结果异常:", e);
             }
         }
     }
@@ -165,7 +163,7 @@ public class PatrolResultHandler {
     /**
      * 根据巡视结果判断是否生成告警
      *
-     * @param robotPatrolTaskResult 机器人/无人机/边缘节点巡视结果
+     * @param robotPatrolTaskResult 下级系统的巡视结果
      * @param taskId 任务id
      * @param isAlarmMap 告警信息map
      */
@@ -183,14 +181,14 @@ public class PatrolResultHandler {
             IsWarnAfterCruiseThread isWarnAfterCruiseThread = new IsWarnAfterCruiseThread(isAlarmMap, redisTemplate);
             ThreadPoolUtil.PATROL_POOL.addThread(isWarnAfterCruiseThread);
         }catch (Exception e){
-            log.error("机器人/无人机/边缘节点告警处理异常：", e);
+            log.error("下级系统的告警处理异常：", e);
         }
     }
 
     /**
-     * 对机器人/无人机结果文件处理
+     * 对下级系统的结果文件处理
      *
-     * @param robotPatrolTaskResult 机器人/无人机巡视结果
+     * @param robotPatrolTaskResult 下级系统的巡视结果
      * @param infoMap               任务结果其他信息
      * @return Map<String, String>
      */
@@ -252,7 +250,7 @@ public class PatrolResultHandler {
                 isAlarmMap.put("absolutePath", descFilePath);
             }
         } catch (Exception e) {
-            log.error("机器人/无人机文件处理异常：", e);
+            log.error("下级系统的文件处理异常：", e);
         }
         return isAlarmMap;
     }

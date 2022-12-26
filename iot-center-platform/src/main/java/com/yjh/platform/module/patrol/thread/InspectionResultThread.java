@@ -18,7 +18,6 @@ import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
-import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.patrol.service.impl.NormalVideoCruiseExecuteImpl;

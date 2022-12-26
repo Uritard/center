@@ -212,7 +212,7 @@ public class TCruiseTaskResultService {
                 cruiseInspectResult.setEndTime(null);
                 String instanceId = String.valueOf(cruiseInspectResult.getInstanceId());
                 // 测试数据，正式使用需删除
-                instanceId = StringUtils.left(instanceId, 3);
+//                instanceId = StringUtils.left(instanceId, 3);
                 String key = UPatrolTaskService.PATROL_TASK_PREFIX + taskId + ":" + instanceId;
                 Map<String, String> resultMap = redisTemplate.opsForHash().entries(key);
                 if (resultMap.size() > 0) {
