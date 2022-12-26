@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.serializer.SerializeConfig;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Maps;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
@@ -22,10 +23,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.MultiKeyCommands;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -91,6 +97,11 @@ public class SendToUpSystemServices {
             // 刷新sendSessionId
             log.error("服务未连接，请重试，port: {}", port);
             Constant.sendSessionId.set(0L);
+
+            // 把本级没有上报成功的巡视点结果暂存起来,重连服务后再上报上一级系统
+            if ("61".equals(type)){
+                saveCruiseResultForMoment(items);
+            }
             return -1;
         }
         if (code == null || StringUtils.isEmpty(code)) {
@@ -1008,5 +1019,92 @@ public class SendToUpSystemServices {
         return taskLevel;
     }
 
+    /**
+     * 将不能上报的巡视结果先存在redis,等和上一级系统连接之后再上传
+     */
+    private void saveCruiseResultForMoment(List<Map<String, Object>> items){
+        for (Map<String, Object> map : items) {
+            String redisKey = "FAILED:" + map.get("task_code") + "+" + map.get("device_id");
+            redisTemplate.opsForHash().putAll(redisKey, map);
+        }
+    }
 
+    /**
+     * 将没有成功上报的巡视结果重新上报
+     */
+    public void failReportCruiseResult(){
+        Set<String> failedInfoKeys = redisScan("FAILED:");
+        if (CollectionUtils.isEmpty(failedInfoKeys)){
+            log.info("FAILED is empty,no fail report cruise result...");
+            return;
+        }
+
+        for (String key : failedInfoKeys) {
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(key);
+            log.info("redisInfoMap===={}", redisInfoMap);
+
+            XMLBaseModel xmlBaseModel = new XMLBaseModel();
+            List<Map<String,Object>> xmlItems = new ArrayList<>();
+            Map<String,Object> xmlItem = new HashMap<>();
+            xmlBaseModel.setType("61");
+            xmlBaseModel.setCommand("1");
+            xmlItem.put("patroldevice_name", Optional.ofNullable(redisInfoMap.get("patroldevice_name")).orElse(""));
+            xmlItem.put("patroldevice_code", Optional.ofNullable(redisInfoMap.get("patroldevice_name")).orElse(""));
+            xmlItem.put("task_name", Optional.ofNullable(redisInfoMap.get("task_name")).orElse(""));
+            xmlItem.put("task_code", Optional.ofNullable(redisInfoMap.get("task_code")).orElse(""));
+            xmlItem.put("device_name", Optional.ofNullable(redisInfoMap.get("device_name")).orElse(""));
+            xmlItem.put("device_id", Optional.ofNullable(redisInfoMap.get("device_id")).orElse(""));
+            xmlItem.put("material_id", Optional.ofNullable(redisInfoMap.get("material_id")).orElse(""));
+            xmlItem.put("value", Optional.ofNullable(redisInfoMap.get("value")).orElse(""));
+            xmlItem.put("value_unit", Optional.ofNullable(redisInfoMap.get("value_unit")).orElse(""));
+            xmlItem.put("unit", Optional.ofNullable(redisInfoMap.get("unit")).orElse(""));
+            xmlItem.put("time", Optional.ofNullable(redisInfoMap.get("time")).orElse(""));
+            xmlItem.put("recognition_type", Optional.ofNullable(redisInfoMap.get("recognition_type")).orElse(""));
+            xmlItem.put("file_type", Optional.ofNullable(redisInfoMap.get("file_type")).orElse(""));
+            xmlItem.put("file_path", Optional.ofNullable(redisInfoMap.get("file_path")).orElse(""));
+            xmlItem.put("rectangle", Optional.ofNullable(redisInfoMap.get("rectangle")).orElse(""));
+            xmlItem.put("task_patrolled_id", Optional.ofNullable(redisInfoMap.get("task_patrolled_id")).orElse(""));
+            xmlItem.put("data_type", Optional.ofNullable(redisInfoMap.get("data_type")).orElse(""));
+            xmlItem.put("valid", Optional.ofNullable(redisInfoMap.get("valid")).orElse(""));
+
+            xmlItems.add(xmlItem);
+            xmlBaseModel.setItems(xmlItems);
+            List<XMLBaseModel> list = new ArrayList<>();
+            list.add(xmlBaseModel);
+            Map<String,List<XMLBaseModel>> cruiseResult = new HashMap<>();
+            cruiseResult.put("list",list);
+            log.info("failure info 上报：{}", cruiseResult);
+            sendXML(xmlBaseModel);
+        }
+    }
+
+    /**
+     * Redis数据库批量查询Key值游标
+     *
+     * @param key redis的key
+     * @return Set<String>
+     */
+    public Set<String> redisScan(String key) {
+        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = Sets.newHashSet();
+
+            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
+            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
+
+            ScanParams scanParams = new ScanParams();
+            scanParams.match("*" + key + "*");
+            scanParams.count(1000);
+            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
+            while (null != scan.getStringCursor()) {
+                keys.addAll(scan.getResult());
+                if (!StringUtils.equals("0", scan.getStringCursor())) {
+                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
+                    continue;
+                } else {
+                    break;
+                }
+            }
+            return keys;
+        });
+    }
 }

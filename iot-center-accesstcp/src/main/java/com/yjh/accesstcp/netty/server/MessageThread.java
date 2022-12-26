@@ -4,12 +4,10 @@
 
 package com.yjh.accesstcp.netty.server;
 
-import cn.hutool.core.date.DateUnit;
 import com.alibaba.fastjson.JSON;
 import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
-import com.yjh.accesstcp.commons.utils.http.HttpClientUtils;
 import com.yjh.accesstcp.module.device.entity.RobotTaskInstanceInfo;
 import com.yjh.accesstcp.module.device.entity.TCruisePointInstanceNameDetail;
 import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
@@ -66,16 +64,15 @@ public class MessageThread {
         SendToUpSystemServices sendToUpSystemServices, AnalysisUnionTaskFileService analysisUnionTaskFileService, RedisTemplate redisTemplate) throws Exception {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        //解析的xml文件
-        if ("251".equals(xmlBaseModel.getType())) {//系统消息
-            if ("4".equals(xmlBaseModel.getCommand())) {//响应注册
+        //系统消息
+        if ("251".equals(xmlBaseModel.getType())) {
+            //响应注册
+            if ("4".equals(xmlBaseModel.getCommand())) {
                 log.info("---注册响应---");
+                // 100:需要重发注册消息 200:服务端响应 我方开启心跳
                 if ("100".equals(xmlBaseModel.getCode())) {
-                    //需要重发注册消息
                     clientHandler.sendRegister();
                 } else if ("200".equals(xmlBaseModel.getCode())) {
-                    //服务端响应 我方开启心跳
-
                     List<Map<String, Object>> items = xmlBaseModel.getItems();
                     if (items == null || items.size() == 0) {
                         return;
@@ -83,46 +80,52 @@ public class MessageThread {
                     Constant.paramMap.put("sendCode", xmlBaseModel.getSendCode());
                     for (Map<String, Object> item : items) {
                         if (item.get("heart_beat_interval") != null) {
-                            Constant.paramMap.put("heart_beat_interval", item.get("heart_beat_interval").toString());//心跳间隔
+                            //心跳间隔
+                            Constant.paramMap.put("heart_beat_interval", item.get("heart_beat_interval").toString());
                         }
                         if (item.get("patroldevice_run_interval") != null) {
-                            Constant.paramMap.put("patroldevice_run_interval",
-                                item.get("patroldevice_run_interval").toString());//巡视设备运行数据间隔间隔
+                            //巡视设备运行数据间隔间隔
+                            Constant.paramMap.put("patroldevice_run_interval", item.get("patroldevice_run_interval").toString());
                         }
                         if (item.get("weather_interval") != null) {
-                            Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
+                            //微气象数据间隔
+                            Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());
                         }
                         if (item.get("nest_run_interval") != null) {
-                            Constant.paramMap.put("nest_run_interval", item.get("nest_run_interval").toString());//无人机巢运行数据间隔
+                            //无人机巢运行数据间隔
+                            Constant.paramMap.put("nest_run_interval", item.get("nest_run_interval").toString());
                         }
                     }
                     //将数据放入redis 做个保存
                     redisTemplate.opsForHash().putAll("upSystemParameter", Constant.paramMap);
                     //心跳线程发心跳
                     HeartBeatThead heartBeatThead = new HeartBeatThead(clientHandler, true);
-                    //                    //天气线程发天气
+                    //天气线程发天气
                     WeatherThread weatherThread = new WeatherThread(clientHandler, redisTemplate, true, sendToUpSystemServices);
-                    //                    //运行数据
+                    //运行数据
                     RunningThread runningThread = new RunningThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
                     // 无人机机巢数据线程
                     NestRunThread nestRunThread = new NestRunThread(clientHandler,redisTemplate,true, sendToUpSystemServices);
                     TaskExecutePool.getInstance().execute(nestRunThread);
                     TaskExecutePool.getInstance().execute(runningThread);
                     TaskExecutePool.getInstance().execute(heartBeatThead);
-                    TaskExecutePool.getInstance().execute(weatherThread);//江苏要求
+                    //江苏要求
+                    TaskExecutePool.getInstance().execute(weatherThread);
 
                     Map<String, List<XMLBaseModel>> robotMap = new HashMap<>();
                     List<XMLBaseModel> list = new ArrayList<>();
                     list.add(xmlBaseModel);
                     robotMap.put("list", list);
-                    Result re = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);//国网要求
+                    //国网要求
+                    Result re = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);
                 } else {
                     return;
                 }
 
             }
 
-            if ("3".equals(xmlBaseModel.getCommand())) {//响应心跳
+            //响应心跳
+            if ("3".equals(xmlBaseModel.getCommand())) {
                 log.info("--心跳响应--");
                 List<Map<String, Object>> items = xmlBaseModel.getItems();
                 if (items == null || items.size() == 0) {
@@ -130,30 +133,39 @@ public class MessageThread {
                 }
                 for (Map<String, Object> item : items) {
                     if (item.get("heart_beat_interval") != null) {
-                        Constant.paramMap.put("heart_beat_interval", item.get("heart_beat_interval").toString());//心跳间隔
+                        //心跳间隔
+                        Constant.paramMap.put("heart_beat_interval", item.get("heart_beat_interval").toString());
                     }
                     if (item.get("patroldevice_run_interval") != null) {
-                        Constant.paramMap.put("patroldevice_run_interval", item.get("patroldevice_run_interval").toString());//巡视设备运行数据间隔间隔
+                        //巡视设备运行数据间隔间隔
+                        Constant.paramMap.put("patroldevice_run_interval", item.get("patroldevice_run_interval").toString());
                     }
                     if (item.get("weather_interval") != null) {
-                        Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());//微气象数据间隔
+                        //微气象数据间隔
+                        Constant.paramMap.put("weather_interval", item.get("weather_interval").toString());
                     }
                     if (item.get("nest_run_interval") != null) {
-                        Constant.paramMap.put("nest_run_interval", item.get("nest_run_interval").toString());//无人机巢运行数据间隔
+                        //无人机巢运行数据间隔
+                        Constant.paramMap.put("nest_run_interval", item.get("nest_run_interval").toString());
                     }
                 }
                 //将数据放入redis 做个保存
                 redisTemplate.opsForHash().putAll("upSystemParameter", Constant.paramMap);
+
+                // 查询没有成功上报到上一级系统的巡视结果,若存在,重连后开始上报
+//                sendToUpSystemServices.failReportCruiseResult();
             }
         }
+        //控制消息
         if ("1".equals(xmlBaseModel.getType()) || "2".equals(xmlBaseModel.getType()) || "3".equals(xmlBaseModel.getType()) || "4".equals(
-            xmlBaseModel.getType()) || "21".equals(xmlBaseModel.getType()) || "22".equals(xmlBaseModel.getType())) {//控制消息
+            xmlBaseModel.getType()) || "21".equals(xmlBaseModel.getType()) || "22".equals(xmlBaseModel.getType())) {
             log.info("--响应控制 控制下发--");
             Map<String, List<XMLBaseModel>> robotMap = new HashMap<>();
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
             robotMap.put("list", list);
-            Result re = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);//国网要求
+            //国网要求
+            Result re = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);
             if (re == null) {
                 sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             } else if (200 == re.getCode()) {
@@ -163,15 +175,16 @@ public class MessageThread {
             }
             log.info("==控制响应== {}", re);
         }
+        //发给无人机
         if ("20001".equals(xmlBaseModel.getType()) || "20002".equals(xmlBaseModel.getType()) || "20003".equals(xmlBaseModel.getType())
             || "20004".equals(xmlBaseModel.getType()) || "20005".equals(xmlBaseModel.getType())) {
-            //发给无人机
             log.info("--响应控制 无人机控制下发--");
             Map<String, List<XMLBaseModel>> robotMap = new HashMap<>();
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
             robotMap.put("list", list);
-            Result re = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);//国网要求
+            //国网要求
+            Result re = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);
             if (re == null) {
                 sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             } else if (200 == re.getCode()) {
