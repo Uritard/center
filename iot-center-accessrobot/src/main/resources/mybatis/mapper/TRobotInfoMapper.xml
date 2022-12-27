@@ -1219,7 +1219,8 @@
             a.remarks,
             a.record_id,
             a.channel_num_light,
-            a.channel_num_inferad
+            a.channel_num_inferad,
+            a.edge_code
         from t_robot_info a
         where 1 = 1
           and a.robot_code = #{robotCode, jdbcType=VARCHAR}
