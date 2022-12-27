@@ -1,5 +1,6 @@
 package com.yjh.accessrobot.netty.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
@@ -12,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -72,6 +72,7 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
             robotOperationMap.put("unit", res.get("unit").toString());
             robotOperationList.add(robotOperationMap);
         });
+        log.info("robotOperationList: {}", JSON.toJSONString(robotOperationList));
 
         for (int i = 0; i < robotOperationList.size(); i++) {
             String robotOperation = "RobotOperation:" + robotCode + ":" + robotOperationList.get(i).get("type");

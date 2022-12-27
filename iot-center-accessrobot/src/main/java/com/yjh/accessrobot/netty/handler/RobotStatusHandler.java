@@ -79,7 +79,7 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
                 }
             }
             //若设备故障报警，记录设备状态及正常运行时长
-            if ("21".equals(res.get("type").toString()) && StringUtils.equals("1", String.valueOf(res.get("value")))) {
+            if ("21".equals(res.get("type").toString())) {
                 robotService.changeStatistic(String.valueOf(res.get("patroldevice_code")),res.get("value").toString(),robotCode);
             }
         });

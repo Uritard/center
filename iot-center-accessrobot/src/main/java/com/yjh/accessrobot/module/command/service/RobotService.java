@@ -232,6 +232,15 @@ public class RobotService {
             return scmap;
         } else {
             TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+            Integer code = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+
+            int robotType = 159;
+            if (code >=3000 && code <=3999){
+                robotCode = tRobotInfo.getEdgeCode();
+            }else {
+                robotType = tRobotInfoDao.selectRobotTypeByCode(robotCode);
+            }
+
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(Constant.sendCode)
                     .setReceiveCode(robotCode)
@@ -247,7 +256,7 @@ public class RobotService {
             Map<String, String> robotTaskStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":41");
             String robotTaskStatus = robotTaskStatusMap.get("value");
             String robotPattern = robotStatusMap.get("value");
-            int robotType = tRobotInfoDao.selectRobotTypeByCode(robotCode);
+
             if (StringUtils.equals("2", robotTaskStatus) || StringUtils.equals("4", robotTaskStatus)) {
                 String returnMsg = robotTaskStatus.equals("2") ? "巡视状态" : "检修状态";
                 log.error("==========当前巡视设备处于" + returnMsg + ",无法操作==========");
@@ -1885,7 +1894,7 @@ public class RobotService {
     }
 
     /**
-     * 上层服务即集控命令下发
+     * 结果可靠性统计
      *
      * @param map xml格式的内容
      * @return String
@@ -1915,7 +1924,7 @@ public class RobotService {
         return "success";
     }
     /**
-     * 结果可靠性统计
+     * 上层服务即集控命令下发
      *
      * @param xmlBaseModel xml格式的内容
      * @return String
@@ -1923,20 +1932,29 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public String upSystemCommand(XMLBaseModel xmlBaseModel) {
         //上级下发的 code 是robotNum
-        String robotCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), "");
-        if (StringUtils.isEmpty(robotCode)) {
-            xmlBaseModel
-                    .setSendCode(Constant.sendCode)
-                    .setReceiveCode(robotCode);
-        } else {
-            xmlBaseModel
-                    .setSendCode(Constant.sendCode)
-                    .setReceiveCode(Constant.robotCode);
+//        String robotCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), "");
+//        if (StringUtils.isEmpty(robotCode)) {
+//            xmlBaseModel
+//                    .setSendCode(Constant.sendCode)
+//                    .setReceiveCode(robotCode);
+//        } else {
+//            xmlBaseModel
+//                    .setSendCode(Constant.sendCode)
+//                    .setReceiveCode(Constant.robotCode);
+//        }
+        String receiveCode = xmlBaseModel.getReceiveCode();
+        List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(receiveCode, 1);
+        // 如果stdRegionList为空 则表示下级接的是机器人/无人机
+        boolean isEdge = CollectionUtils.isEmpty(stdRegionList);
+        if (isEdge){
+            receiveCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), receiveCode);
         }
 
+        xmlBaseModel.setSendCode(Constant.sendCode);
+        xmlBaseModel.setReceiveCode(receiveCode);
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("生成的机器人控制xml是<start>{}<end>", xmlString);
-        RobotServerHandler.send(generateByteOrder(xmlString, Constant.robotCode), Constant.robotCode);
+        RobotServerHandler.send(generateByteOrder(xmlString, receiveCode), receiveCode);
         return "success";
     }
 
@@ -3402,7 +3420,8 @@ public class RobotService {
                 sendCode = tRobotInfoDao.selectRobotCodeByNestNum(nestNum);
             }else {
                 String robotNum = xmlBaseModel.getItems().get(0).get("patroldevice_code").toString();
-                sendCode = tRobotInfoDao.selectRobotCodeByRobotNum(robotNum, sendCode);
+                String sendCodeItem = tRobotInfoDao.selectRobotCodeByRobotNum(robotNum, sendCode);
+                sendCode = StringUtils.isNotEmpty(sendCodeItem) ? sendCodeItem : sendCode;
             }
         }
         return sendCode;
