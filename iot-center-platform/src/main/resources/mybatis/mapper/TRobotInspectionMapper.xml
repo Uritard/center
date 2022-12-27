@@ -387,6 +387,17 @@
             and a.inspection_id = #{inspectionId, jdbcType=BIGINT}
         limit 1
     </select>
+    <select id="selectTRobotInspectionByIds" parameterType="java.util.List" resultType="com.yjh.platform.module.device.entity.TRobotInspectionTmp">
+        select
+               distinct
+        inspection_id,
+        inspection_name
+        from t_robot_inspection
+        where inspection_id in
+            <foreach collection="list" separator="," open="(" close=")" item="inspectionId">
+                #{inspectionId, jdbcType=BIGINT}
+            </foreach>
+    </select>
     <select id="selectInspection" resultType="java.util.Map">
         SELECT
         a.inspection_id,

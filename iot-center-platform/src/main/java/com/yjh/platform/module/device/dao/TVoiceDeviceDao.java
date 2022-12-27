@@ -17,6 +17,7 @@ public interface TVoiceDeviceDao {
     int deleteByPrimaryId(@Param(value = "voiceDeviceId") Long voiceDeviceId);
     int update(VoiceDeviceAllInfoDetail tVoiceDevice);
     VoiceDeviceAllInfoDetail selectByPrimaryId(@Param(value = "voiceDeviceId") Long voiceDeviceId);
+    List<VoiceDeviceAllInfoDetail> selectByPrimaryIds(@Param(value = "list") List<Long> voiceDeviceId);
     List<TVoiceDevice> select(@Param(value = "voiceDeviceId") Long voiceDeviceId,
                                 @Param(value = "voiceDeviceName") String voiceDeviceName,
                                 @Param(value = "stdDeviceId") Long stdDeviceId,

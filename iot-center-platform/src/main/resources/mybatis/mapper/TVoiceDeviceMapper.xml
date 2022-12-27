@@ -114,6 +114,18 @@
             and a.voice_device_id = #{voiceDeviceId, jdbcType=BIGINT}
     </select>
 
+    <select id="selectByPrimaryIds" parameterType="java.util.List" resultType="com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail">
+        SELECT DISTINCT
+            voice_device_id,
+            voice_device_name
+        FROM
+        t_voice_device
+        where voice_device_id in
+<foreach collection="list" separator="," open="(" close=")" item="voiceDeviceId">
+    #{voiceDeviceId, jdbcType=BIGINT}
+</foreach>
+    </select>
+
     <select id="select" parameterType="com.yjh.platform.module.device.entity.TVoiceDevice" resultType="com.yjh.platform.module.device.entity.TVoiceDevice">
         select
         <include refid="Base_Column_List" />

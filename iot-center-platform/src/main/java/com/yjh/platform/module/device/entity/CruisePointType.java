@@ -24,6 +24,7 @@ public class CruisePointType {
     private String cruiseType;
 
     private List<Map<Object,Object>> list = new LinkedList<>();
+    private List<String> cruiseIdList = new LinkedList<>();
 
     private String cruiseTypeName;
 }
