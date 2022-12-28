@@ -1,6 +1,7 @@
 package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
@@ -94,7 +95,7 @@ public class RobotInspectionWarnThread implements Runnable{
             TStdDeviceMete tStdDevicemete = analyseDataOperateService.selectDeviceMeteByInstanceId(instanceId);
 
             TWarnInfo warnInfo = new TWarnInfo();
-            if (StringUtils.isEmpty(taskAlarm.getDefectType())){
+            if (CommonUtils.isEmptyOrNullstr(taskAlarm.getDefectType())){
                 warnInfo = getWarnInfo(tStdDevicemete, taskId, instanceId, robotCode, warnInfo);
                 putWarnMapRedis(taskId, warnInfo);
             }else {

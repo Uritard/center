@@ -35,7 +35,7 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
-        log.info("+++++++++++++++++巡视主机收到机器人设备测点告警了+++++++++++++++++");
+        log.info("+++++++++++++++++收到下级的设备测点告警了+++++++++++++++++");
         // Deal with robot warn data
         String robotCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(robotCode)) {
@@ -51,7 +51,7 @@ public class RobotInspectionWarnHandler implements MessageHandlerStrategy, Initi
         String alarmXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
         RobotServerHandler.send( alarmProtocol, robotCode);
-        log.info("巡视主机给下级{}响应了", robotCode);
+        log.info("本级系统给下级{}响应了", robotCode);
 
         // 处理数据
         List<RobotPatrolTaskAlarm> alarmList = new ArrayList<>();

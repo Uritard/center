@@ -67,10 +67,10 @@
     </insert>
     <update id="changeRun" parameterType="com.yjh.accessrobot.module.command.entity.DeviceStatisticInfoResult">
         update device_statics_info_result
-        <if test="deviceRun != null and deviceRun == '0'">
+        <if test='deviceRun != null and deviceRun == "1"'>
             set device_run = 1,device_resume_date=now()
         </if>
-        <if test="deviceRun != null and deviceRun =='1'">
+        <if test='deviceRun != null and deviceRun =="1"'>
             set device_run = 0,commission_days = commission_days + TO_DAYS(now()) - TO_DAYS(device_resume_date)
         </if>
             where device_code = #{deviceCode,jdbcType=VARCHAR}

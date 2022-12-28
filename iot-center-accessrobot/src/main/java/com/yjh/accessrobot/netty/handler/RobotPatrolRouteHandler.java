@@ -40,7 +40,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
-        log.info("+++++++++++++++++巡视主机收到机器人巡视路线数据了+++++++++++++++++");
+        log.info("+++++++++++++++++收到下级的巡视路线数据了+++++++++++++++++");
         //Deal with robot operation data
         String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
         xmlBaseModel.setCode(stationCode);
@@ -58,7 +58,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
         String roadXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] roadProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, roadXmlString);
         RobotServerHandler.send(roadProtocol, sendCode);
-        log.info("巡视主机给下级{}响应了", sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
 
         // 处理数据
         Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
@@ -74,7 +74,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             robotRoadMap.put("patrolDeviceCode", String.valueOf(res.get("patroldevice_code")));
             if (res.containsKey("file_path")) {
                 String filePath = String.valueOf(res.get("file_path"));
-                robotService.uploadFile(filePath, filePath);
+//                robotService.uploadFile(filePath, filePath);
                 String[] splitArray = filePath.split("/");
                 String fileName = splitArray[splitArray.length - 1];
                 log.info("巡检路线图片名称==" + fileName);

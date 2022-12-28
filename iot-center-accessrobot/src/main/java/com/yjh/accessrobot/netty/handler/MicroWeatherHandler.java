@@ -41,7 +41,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
-        log.info("+++++++++++++++++巡视主机收到微气象数据了+++++++++++++++++");
+        log.info("+++++++++++++++++收到下级的微气象数据了+++++++++++++++++");
         // Deal with robot micro climate data
         String robotCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(robotCode)) {
@@ -57,7 +57,7 @@ public class MicroWeatherHandler implements MessageHandlerStrategy, Initializing
         String weatherXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] weatherProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, weatherXmlString);
         RobotServerHandler.send(weatherProtocol, robotCode);
-        log.info("巡视主机给下级{}响应了", robotCode);
+        log.info("本级系统给下级{}响应了", robotCode);
 
         List<Map<String, String>> weatherList = new ArrayList<>();
         Map<String, String> info = new HashMap<>();

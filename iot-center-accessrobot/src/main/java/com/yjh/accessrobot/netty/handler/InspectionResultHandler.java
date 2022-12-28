@@ -33,7 +33,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
-        log.info("+++++++++++++++++巡视主机收到巡视结果了+++++++++++++++++");
+        log.info("+++++++++++++++++收到下级的巡视结果了+++++++++++++++++");
         // Deal with robot task result data
         String sendCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(sendCode)) {
@@ -49,7 +49,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
         String cruiseResultXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true,sendCode));
         byte[] cruiseResultProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseResultXmlString);
         RobotServerHandler.send(cruiseResultProtocol, sendCode);
-        log.info("巡视主机给下级{}响应了", sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
 
         // 处理数据
         List<RobotPatrolTaskResult> resultList = new ArrayList<>();

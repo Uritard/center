@@ -37,7 +37,7 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
-        log.info("+++++++++++++++++巡视主机收到机器人运行数据了+++++++++++++++++");
+        log.info("+++++++++++++++++收到下级的运行数据了+++++++++++++++++");
         // Deal with robot operation data
         String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
         xmlBaseModel.setCode(stationCode);
@@ -55,7 +55,7 @@ public class RobotRunDataHandler implements MessageHandlerStrategy, Initializing
         String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
         RobotServerHandler.send( operationProtocol, sendCode);
-        log.info("巡视主机给下级{}响应了", sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
 
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> robotOperationList = new ArrayList<>();

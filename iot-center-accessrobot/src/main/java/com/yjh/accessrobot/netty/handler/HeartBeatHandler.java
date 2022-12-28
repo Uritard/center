@@ -36,7 +36,7 @@ public class HeartBeatHandler implements MessageHandlerStrategy, InitializingBea
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
-        log.info("+++++++++++++++++巡视主机收到心跳指令了+++++++++++++++++");
+        log.info("+++++++++++++++++收到下级的心跳指令了+++++++++++++++++");
         String robotCode = xmlBaseModel.getSendCode();
         Constant.robotRemoveCounts.put(robotCode, 0);
         Map<String, String> robotStatusMap = redisTemplate.opsForHash().entries("RobotStatus:" + robotCode + ":2");
@@ -52,7 +52,7 @@ public class HeartBeatHandler implements MessageHandlerStrategy, InitializingBea
         } else {
             List<String> robotCodeList = robotService.selectAllRobotCode();
             if (Constant.robotRegisterFlag.getOrDefault(robotCode, false) && robotCodeList.contains(robotCode)) {
-                log.info("缓存无,表中有,发送心跳相应");
+                log.info("缓存无,表中有,发送心跳响应");
                 robotServerHandler.heartBeatSuccessAfter(ctx, robotCode, sendSessionId, robotStatusMap);
             } else {
                 log.info("缓存无,表中无,断开连接");
