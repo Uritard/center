@@ -38,7 +38,7 @@ public class RobotCruiseReportHandler implements MessageHandlerStrategy, Initial
         String cruiseReportString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] cruiseReportProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, cruiseReportString);
         RobotServerHandler.send( cruiseReportProtocol, robotCode);
-        log.info("巡视主机给下级{}响应了", robotCode);
+        log.info("本级系统给下级{}响应了", robotCode);
     }
 
     @Override

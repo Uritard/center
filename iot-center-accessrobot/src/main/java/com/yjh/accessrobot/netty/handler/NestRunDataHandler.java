@@ -53,7 +53,7 @@ public class NestRunDataHandler implements MessageHandlerStrategy, InitializingB
         String operationXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] operationProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, operationXmlString);
         RobotServerHandler.send(operationProtocol, sendCode);
-        log.info("巡视主机给下级{}响应了", sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
 
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> nestOperationList = new ArrayList<>();

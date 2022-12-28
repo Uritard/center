@@ -9,10 +9,9 @@ import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
-import com.yjh.accessrobot.module.command.entity.EnvDeviceStatus;
-import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
-import com.yjh.accessrobot.module.command.entity.TRobotInfo;
-import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
+import com.yjh.accessrobot.module.command.dao.DeviceStatisticInfoResultDao;
+import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
+import com.yjh.accessrobot.module.command.entity.*;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,10 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 /**
@@ -48,6 +44,10 @@ public class RobotController {
     private RedisTemplate redisTemplate;
     @Autowired
     private Demo demo;
+    @Autowired
+    private TRobotInfoDao tRobotInfoDao;
+    @Autowired
+    private DeviceStatisticInfoResultDao deviceStatisticInfoResultDao;
 
     private Logger log = LoggerFactory.getLogger(RobotController.class);
 
@@ -400,11 +400,16 @@ public class RobotController {
 
     @ApiOperation(value = "测试")
     @GetMapping(value = "/test")
-    public Result test(@RequestParam(value = "source") String source,
-                       @RequestParam(value = "desc") String desc) {
+    public Result test(@RequestParam(value = "deviceCode") String deviceCode,
+                       @RequestParam(value = "deviceRun") String deviceRun) {
         Result result = new Result();
         try {
-            FileUtil.copyFileUsingStream(source, desc);
+//            FileUtil.copyFileUsingStream(source, desc);
+            DeviceStatisticInfoResult deviceStatisticInfoResult = deviceStatisticInfoResultDao.select(deviceCode);
+            if (deviceStatisticInfoResult != null) {
+                deviceStatisticInfoResult.setDeviceRun(deviceRun);
+                deviceStatisticInfoResultDao.changeRun(deviceStatisticInfoResult);
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("测试失败：", e);

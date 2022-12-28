@@ -48,7 +48,7 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
         String alarmXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] alarmProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, alarmXmlString);
         RobotServerHandler.send(alarmProtocol, sendCode);
-        log.info("巡视主机给下级{}响应了", sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
 
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         Map<String, String> robotAlarmMap = new HashMap<>(8);

@@ -37,7 +37,7 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
-        log.info("+++++++++++++++++巡视主机收到机器人状态数据了+++++++++++++++++");
+        log.info("+++++++++++++++++收到下级的状态数据了+++++++++++++++++");
         // Deal with robot status data
         String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
         xmlBaseModel.setCode(stationCode);
@@ -55,7 +55,7 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
         String statusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] statusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, statusXmlString);
         RobotServerHandler.send(statusProtocol, sendCode);
-        log.info("巡视主机给下级{}响应了", sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
 
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> robotStatusList = new ArrayList<>();
@@ -83,7 +83,7 @@ public class RobotStatusHandler implements MessageHandlerStrategy, InitializingB
                 robotService.changeStatistic(String.valueOf(res.get("patroldevice_code")),res.get("value").toString(),robotCode);
             }
         });
-        log.info("机器人状态数据是：" + robotStatusList);
+        log.info("下级的状态数据是：" + robotStatusList);
 
         for (int i = 0; i < robotStatusList.size(); i++) {
             String robotStatus = "RobotStatus:" + robotCode + ":" + robotStatusList.get(i).get("type");

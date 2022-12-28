@@ -44,7 +44,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
-        log.info("+++++++++++++++++巡视主机收到任务状态数据了+++++++++++++++++");
+        log.info("+++++++++++++++++收到下级的任务状态数据了+++++++++++++++++");
         // Deal with robot task status data
         String robotCode = xmlBaseModel.getSendCode();
         if (StringUtils.isEmpty(robotCode)) {
@@ -60,7 +60,7 @@ public class RobotTaskStatusHandler implements MessageHandlerStrategy, Initializ
         String taskStatusXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, robotCode));
         byte[] taskStatusProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, taskStatusXmlString);
         RobotServerHandler.send(taskStatusProtocol, robotCode);
-        log.info("巡视主机给下级{}响应了", robotCode);
+        log.info("本级系统给下级{}响应了", robotCode);
 
         // 任务状态数据上报上一级系统
         // robotService.upToCruise(xmlBaseModel);

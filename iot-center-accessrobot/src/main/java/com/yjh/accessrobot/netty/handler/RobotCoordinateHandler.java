@@ -53,7 +53,7 @@ public class RobotCoordinateHandler implements MessageHandlerStrategy, Initializ
         String coordinateXmlString = PlatformXMLUtil.generateXml(RobotServerHandler.sendMessageForCommandThree(true, sendCode));
         byte[] coordinateProtocol = PlatformPacketUtil.createPacket(Constant.sendSessionId, sendSessionId, false, coordinateXmlString);
         RobotServerHandler.send(coordinateProtocol, sendCode);
-        log.info("巡视主机给下级{}响应了", sendCode);
+        log.info("本级系统给下级{}响应了", sendCode);
 
         String robotCode = robotService.selectRobotOrEdgeRobot(xmlBaseModel, sendCode);
         List<Map<String, String>> robotCoordinateList = new ArrayList<>();
