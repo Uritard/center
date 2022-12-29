@@ -73,7 +73,7 @@ public class TRobotInfoService {
     }
 
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void saveReportData(List<RobotModel> robotModelList, String edgeNode, String type) {
         if(CollectionUtils.isEmpty(robotModelList)){
             log.info("robotModelList is null");

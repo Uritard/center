@@ -132,7 +132,7 @@ public class YcTestController {
                 TaskExecutePool.getInstance().execute(cruiseResultDealThread);
 
                 //非同源告警处理
-                NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap, redisTemplate, websocketUrl, 1);
+                NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(cruiseResultMap,1);
                 TaskExecutePool.getInstance().execute(nonhomologousWarnThread);
             }
             }catch (Exception e){

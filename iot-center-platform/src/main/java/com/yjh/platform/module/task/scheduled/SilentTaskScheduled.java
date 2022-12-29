@@ -62,18 +62,15 @@ public class SilentTaskScheduled {
         // 静默任务开关
         String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));
         if (StringUtils.equals(FLAG, silentFlag)) {
-            log.error("isSilentTask is false");
             return;
         }
         // 分析主机开关
         String flag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isIntelDefectAnalysis", "content"));
         if (StringUtils.equals(FLAG, flag)) {
-            log.error("isIntelDefectAnalysis is false");
             return;
         }
         List<Map<String, Object>> list = tCameraPresetService.selectCameraBySilent();
         if (CollectionUtils.isEmpty(list)) {
-            log.info("list is empty");
             return;
         }
         for (Map<String, Object> map : list) {
