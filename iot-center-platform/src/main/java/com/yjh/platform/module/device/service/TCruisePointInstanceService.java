@@ -2,6 +2,8 @@ package com.yjh.platform.module.device.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.device.controller.TCruisePointInstanceController;
@@ -17,15 +19,17 @@ import com.yjh.platform.module.user.entity.TCameraPreset;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author tt
@@ -66,6 +70,7 @@ public class TCruisePointInstanceService{
 
     private Logger log = LoggerFactory.getLogger(TCruisePointInstanceController.class);
 
+    private static final ExecutorService executorService = Executors.newFixedThreadPool(20);
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCruisePointInstance tCruisePointInstance) {
@@ -111,7 +116,7 @@ public class TCruisePointInstanceService{
             listAll.get(length).getRobotType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map = new HashMap<>();
             map.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
-            listAll.get(length).getRobotType().getList().add(map);
+            listAll.get(length).getRobotType().getCruiseIdList().add(tStdDeviceMeteForPointDetailItem.getCruiseId());
             listAll.get(length).getRobotType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
         }
         //视频 红外
@@ -119,7 +124,7 @@ public class TCruisePointInstanceService{
                 listAll.get(length).getCameraType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
                 Map<Object,Object> map1 = new HashMap<>();
                 map1.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
-                listAll.get(length).getCameraType().getList().add(map1);
+                listAll.get(length).getCameraType().getCruiseIdList().add(tStdDeviceMeteForPointDetailItem.getCruiseId());
                 listAll.get(length).getCameraType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
         }
 //        if("230".equals(tStdDeviceMeteForPointDetailItem.getCruiseTypeName())) {
@@ -142,14 +147,14 @@ public class TCruisePointInstanceService{
             listAll.get(length).getVoiceType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map3 = new HashMap<>();
             map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
-            listAll.get(length).getVoiceType().getList().add(map3);
+            listAll.get(length).getVoiceType().getCruiseIdList().add(tStdDeviceMeteForPointDetailItem.getCruiseId());
             listAll.get(length).getVoiceType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
         }
         if(droneTypeNum.equals((tStdDeviceMeteForPointDetailItem.getCruiseType()))) {
             listAll.get(length).getDroneType().setCruiseType(tStdDeviceMeteForPointDetailItem.getCruiseType());
             Map<Object,Object> map3 = new HashMap<>();
             map3.put("cruiseId",tStdDeviceMeteForPointDetailItem.getCruiseId());
-            listAll.get(length).getDroneType().getList().add(map3);
+            listAll.get(length).getDroneType().getCruiseIdList().add(tStdDeviceMeteForPointDetailItem.getCruiseId());
             listAll.get(length).getDroneType().setCruiseTypeName(tStdDeviceMeteForPointDetailItem.getCruiseTypeName());
         }
     }
@@ -337,7 +342,7 @@ public class TCruisePointInstanceService{
 
 
     @Transactional(rollbackFor = Exception.class)
-    public int instanceUpdate(TCruisePointInstanceDetail tCruisePointInstanceDetail){
+    public int instanceUpdate(TCruisePointInstanceDetail tCruisePointInstanceDetail) {
         TCruisePointInstance tCruisePointInstance = new TCruisePointInstance();
         tCruisePointInstance.setDeviceMeteId(tCruisePointInstanceDetail.getDeviceMeteId());
         tCruisePointInstance.setDeviceId(tCruisePointInstanceDetail.getDeviceId());
@@ -352,77 +357,28 @@ public class TCruisePointInstanceService{
         List<Long> cruiseIdList = tCruisePointInstanceDao.selectCruiseId(tCruisePointInstanceDetail);//已经有了的巡检点
         Integer cruiseType = tCruisePointInstanceDetail.getCruiseType();
         // 如果是可见光或者是红外需要将可见光和红外的巡检点全部查出来
-        if(cruiseType == 229 || cruiseType == 230){
+        if (cruiseType == 229 || cruiseType == 230) {
             int ctype = cruiseType == 229 ? 230 : 229;
             tCruisePointInstanceDetail.setCruiseType(ctype);
             List<Long> otherCruiseIdList = tCruisePointInstanceDao.selectCruiseId(tCruisePointInstanceDetail);
-            if(CollectionUtils.isNotEmpty(otherCruiseIdList)){
+            if (CollectionUtils.isNotEmpty(otherCruiseIdList)) {
                 cruiseIdList.addAll(otherCruiseIdList);
             }
         }
         int result = -1;
 
         //巡检点配置
-        if (tCruisePointInstanceDetail.getIds().size()!=0){
-            for (Long id:tCruisePointInstanceDetail.getIds()) {
-                if(cruiseIdList != null && cruiseIdList.size()>0){
-                    if(cruiseIdList.contains(id)){
+        if (tCruisePointInstanceDetail.getIds().size() != 0) {
+            List<TCruisePointInstance> list = new ArrayList<>();
+            List<Long> paramIds = new ArrayList<>();
+            for (Long id : tCruisePointInstanceDetail.getIds()) {
+                if (cruiseIdList != null && cruiseIdList.size() > 0) {
+                    if (cruiseIdList.contains(id)) {
                         cruiseIdList.remove(id);
                         continue;
-                    }else {
-                        TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
-                        if(cruiseType == 229 || cruiseType == 230){//视频
-                                TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
-                                tCruisePointInstance.setCruiseId(id);
-                                tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-                                tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tCameraPreset.getPresetName());
-                        }
-                        if(cruiseType == 228 || cruiseType == 524){//机器人或无人机
-//                            TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
-                            TRobotInspectionTmp tRobotInspection = tRobotInspectionDao.selectTRobotInspectionTmp(id);
-                            tCruisePointInstance.setCruiseId(id);
-                            tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
-                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tRobotInspection.getInspectionName());
-                        }
-                        if(cruiseType == 232){//声纹
-                            //声纹是一个测点对应一个巡视设备
-                            VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail = tVoiceDeviceDao.selectByPrimaryId(id);
-                            tCruisePointInstance.setCruiseId(id);
-                            tCruisePointInstance.setCruiseName(voiceDeviceAllInfoDetail.getVoiceDeviceName());
-                            tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+voiceDeviceAllInfoDetail.getVoiceDeviceName());
-                        }
-                        //新增配置号的巡检点
-                        result =  tCruisePointInstanceDao.insert(tCruisePointInstance);
-                        tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
-                        //tCruisePointAttrDao.add(tCruisePointAttr);
                     }
-                }else {
-                    TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
-                    if (cruiseType == 229 || cruiseType == 230) {//视频
-                        TCameraPreset tCameraPreset = tCameraPresetDao.selectByPrimaryId(id);
-                        tCruisePointInstance.setCruiseId(id);
-                        tCruisePointInstance.setCruiseName(tCameraPreset.getPresetName());
-                        tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName() + "/" + tCameraPreset.getPresetName());
-                    }
-                    if(cruiseType == 228 || cruiseType == 524){//机器人或无人机
-//                      TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
-                        TRobotInspectionTmp tRobotInspection = tRobotInspectionDao.selectTRobotInspectionTmp(id);
-                        tCruisePointInstance.setCruiseId(id);
-                        tCruisePointInstance.setCruiseName(tRobotInspection.getInspectionName());
-                        tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+tRobotInspection.getInspectionName());
-                    }
-                    if(cruiseType == 232){//声纹
-                        //声纹是一个测点对应一个巡视设备
-                        VoiceDeviceAllInfoDetail voiceDeviceAllInfoDetail = tVoiceDeviceDao.selectByPrimaryId(id);
-                        tCruisePointInstance.setCruiseId(id);
-                        tCruisePointInstance.setCruiseName(voiceDeviceAllInfoDetail.getVoiceDeviceName());
-                        tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName()+"/"+voiceDeviceAllInfoDetail.getVoiceDeviceName());
-                    }
-                    //新增配置号的巡检点
-                    result =  tCruisePointInstanceDao.insert(tCruisePointInstance);
-                    tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
-                    //tCruisePointAttrDao.add(tCruisePointAttr);
                 }
+                paramIds.add(id);
                 //插入信息关联表
 //                TCruisePointInfo tCruisePointInfo = new TCruisePointInfo();
 //                tCruisePointInfo.setInstanceId(tCruisePointInstance.getInstanceId());
@@ -430,13 +386,58 @@ public class TCruisePointInstanceService{
 //                tCruisePointInstanceDao.insertInstanceInfo(tCruisePointInfo);
 
             }
+
+            if (CollectionUtils.isNotEmpty(paramIds)) {
+                Map<Long, String> nameMap = Maps.newHashMap();
+                if (cruiseType == 229 || cruiseType == 230) {//视频
+                    List<TCameraPreset> tCameraPreset = tCameraPresetDao.selectByPrimaryIds(paramIds);
+                    nameMap = tCameraPreset.stream().collect(Collectors.toMap(TCameraPreset::getPresetId, TCameraPreset::getPresetName));
+                }
+                if (cruiseType == 228 || cruiseType == 524) {//机器人或无人机
+//                            TRobotInspection tRobotInspection = tRobotInspectionDao.selectByPrimaryId(id);
+                    List<TRobotInspectionTmp> tRobotInspection = tRobotInspectionDao.selectTRobotInspectionByIds(paramIds);
+                    nameMap = tRobotInspection.stream().collect(Collectors.toMap(TRobotInspectionTmp::getInspectionId, TRobotInspectionTmp::getInspectionName));
+                }
+                if (cruiseType == 232) {//声纹
+                    //声纹是一个测点对应一个巡视设备
+                    List<VoiceDeviceAllInfoDetail> voiceDeviceAllInfoDetail = tVoiceDeviceDao.selectByPrimaryIds(paramIds);
+                    nameMap = voiceDeviceAllInfoDetail.stream().collect(Collectors.toMap(VoiceDeviceAllInfoDetail::getVoiceDeviceId, VoiceDeviceAllInfoDetail::getVoiceDeviceName));
+                }
+
+                for (Long id : paramIds) {
+                    TCruisePointAttr tCruisePointAttr = new TCruisePointAttr();
+                    tCruisePointInstance.setCruiseId(id);
+                    tCruisePointInstance.setCruiseName(nameMap.get(id));
+                    TCruisePointInstance tCruisePointInstance1 = new TCruisePointInstance();
+                    BeanUtils.copyProperties(tCruisePointInstance,tCruisePointInstance1);
+                    list.add(tCruisePointInstance1);
+                    tCruisePointAttr.setInstanceName(tCruisePointInstanceDetail.getMeteName() + "/" + nameMap.get(id));
+                    tCruisePointAttr.setInstanceId(tCruisePointInstance.getInstanceId());
+
+                }
+
+            }
+
+            if (CollectionUtils.isNotEmpty(list)) {
+                if (list.size() > 1000) {
+                    List<List<TCruisePointInstance>> lists = Lists.partition(list, 1000);
+                    ExecutorService executorService = Executors.newFixedThreadPool(lists.size());
+                    lists.forEach(subList ->
+                            executorService.submit(() -> {
+                                tCruisePointInstanceDao.batchInsert(subList);
+                            }));
+                    executorService.shutdown();
+                } else {
+                    tCruisePointInstanceDao.batchInsert(list);
+                }
+            }
         }
         //删除关联表的巡检实例
-        if(cruiseIdList != null && cruiseIdList.size()>0){
-            List<Long> instanceIdList = tCruisePointInstanceDao.selectInstanceId(cruiseIdList,tCruisePointInstanceDetail.getDeviceMeteId());
+        if (cruiseIdList != null && cruiseIdList.size() > 0) {
+            List<Long> instanceIdList = tCruisePointInstanceDao.selectInstanceId(cruiseIdList, tCruisePointInstanceDetail.getDeviceMeteId());
 //            List<Long> instancePlanList = tCruisePlanAttrDao.batchSelectAttr(instanceIdList);
             List<Long> instancePlanList = uPatrolResultDao.batchSelectAttr(instanceIdList);
-            if (instancePlanList.size()>0) {
+            if (instancePlanList.size() > 0) {
                 result = -3;
                 return result;
             }

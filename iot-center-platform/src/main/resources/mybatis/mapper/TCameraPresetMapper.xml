@@ -121,6 +121,21 @@
             and a.preset_id = #{presetId, jdbcType=BIGINT}
         limit 1
     </select>
+
+    <select id="selectByPrimaryIds" parameterType="java.util.List" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+        a.preset_id,
+        a.preset_name
+        from t_camera_preset a
+        where 1 = 1
+            and a.preset_id in
+            <foreach collection="list" separator="," open="(" close=")" item="presetId">
+                #{presetId, jdbcType=BIGINT}
+            </foreach>
+        limit 1
+    </select>
+
+
     <!--根据预置位名称查询信息-->
     <select id="selectByPresetName" parameterType="com.yjh.platform.module.user.entity.TCameraPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
         select

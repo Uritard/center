@@ -59,6 +59,7 @@ public interface TRobotInspectionDao {
     TRobotInfo selectRobot(@Param(value = "robotId") Long robotId);
 
     TRobotInspectionTmp selectTRobotInspectionTmp(@Param(value = "inspectionId") Long inspectionId);
+    List<TRobotInspectionTmp> selectTRobotInspectionByIds(@Param(value = "list")List<Long> inspectionId);
 
     Map<String,Object> selectInspection(@Param(value = "inspectionCode") String inspectionCode);
 
