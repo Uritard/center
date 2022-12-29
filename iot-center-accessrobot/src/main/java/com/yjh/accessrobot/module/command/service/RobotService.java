@@ -100,9 +100,6 @@ public class RobotService {
     @Value("${inspect.flag}")
     private boolean flag;
 
-    @Value("${other.webSocketUrl}")
-    private String websocketUrl;
-
     @Resource
     LogsRecord logsRecord;
 
@@ -232,14 +229,24 @@ public class RobotService {
             return scmap;
         } else {
             TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
-            Integer code = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+            int robotType = 159;
+            List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
+            // 如果stdRegionList为空 则表示下级接的是机器人/无人机
+            boolean isEdge = CollectionUtils.isEmpty(stdRegionList);
+            if (isEdge){
+                robotType = tRobotInfoDao.selectRobotTypeByCode(robotCode);
+            }else {
+                robotCode = tRobotInfo.getEdgeCode();
+            }
+
+            /*Integer code = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
 
             int robotType = 159;
             if (code >=3000 && code <=3999){
                 robotCode = tRobotInfo.getEdgeCode();
             }else {
                 robotType = tRobotInfoDao.selectRobotTypeByCode(robotCode);
-            }
+            }*/
 
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(Constant.sendCode)
@@ -587,6 +594,13 @@ public class RobotService {
         }
     }
 
+
+    public static void main(String[] args) {
+
+
+
+
+    }
     /**
      * 处理机器人返回的模型文件
      *
@@ -611,7 +625,11 @@ public class RobotService {
 
         Long robotId = isEdge ? 1 : tRobotInfoDao.selectRobotIdByCode(nodeCode);
 
-        if (MapUtils.isNotEmpty(map)) {
+        if (MapUtils.isEmpty(map)) {
+            return;
+        }
+        try {
+            log.info("map=={}", map);
             map.forEach((k,v)->{
                 String filePath = filePathPrefix + File.separator + v;
                 try {
@@ -678,6 +696,8 @@ public class RobotService {
                     log.error("解析模型失败，modelPath: {}", filePath, e);
                 }
             });
+        }catch (Exception e){
+            log.error("处理机器人返回的模型文件异常: ", e);
         }
     }
     /**
@@ -688,72 +708,62 @@ public class RobotService {
      * @return void
      */
     public void addRobotModel(List<Map<String, Object>> robotMap, Long robotId) {
-        if (CollectionUtils.isNotEmpty(robotMap)) {
-            Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
-            Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
-            Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
-
-            String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
-            log.info("图片路径为：{}", picPath);
-
-            TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
-            try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Map<String, Object> robotModelMap = robotMap.get(0);
-                //生产日期
-                String productionDate = String.valueOf(robotModelMap.get("production_date"));
-                if (StringUtils.isNotEmpty(productionDate) && !"null".equals(productionDate)) {
-                    tRobotInfo.setMadeDate(simpleDateFormat.parse(productionDate));
-                }
-                //生产编号
-                String productionCode = String.valueOf(robotModelMap.get("production_code"));
-                if (StringUtils.isNotEmpty(productionCode) && !"null".equals(productionCode)) {
-                    tRobotInfo.setAppearanceNumber(productionCode);
-                }
-                //生产厂家
-                String manufacturer = String.valueOf(robotModelMap.get("manufacturer"));
-                if (StringUtils.isNotEmpty(manufacturer) && !"null".equals(manufacturer)) {
-                    String robotFactory = tRobotInfoDao.selectDictCodeByNote(manufacturer, "robot_factory");
-                    if (robotFactory != null) {
-                        tRobotInfo.setRobotFactory(robotFactory);
-                    }
-                }
-                //使用单位
-                String useUnit = String.valueOf(robotModelMap.get("use_unit"));
-                if (StringUtils.isNotEmpty(useUnit) && !"null".equals(useUnit)) {
-                    tRobotInfo.setBuildingUser(useUnit);
-                }
-//                String istransport = String.valueOf(robotModelMap.get("istransport"));
-                //设备来源
-                String deviceSource = String.valueOf(robotModelMap.get("device_source"));
-                if (StringUtils.isNotEmpty(deviceSource) && !"null".equals(deviceSource)) {
-                    tRobotInfo.setRobotSource(deviceSource);
-                }
-            } catch (Exception e) {
-                log.warn("模型文件解析出错：{}", e);
-            }
-
-            String[] splitArray = picPath.split("/");
-            String fileName = splitArray[splitArray.length - 1];
-            String developMap = absoluteImgMap.get("content") + "/Map";
-            copyFileToDevelop(picPath, developMap);
-            String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
-
-            tRobotInfo.setRobotId(robotId)
-                    .setPhotePath(developRelativeUrl);
-            tRobotInfoDao.update(tRobotInfo);
+        if (CollectionUtils.isEmpty(robotMap)) {
+            return;
         }
-    }
+        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
 
-    /**
-     * 机器人设备点位文件信息处理
-     *
-     * @param deviceMapList 设备点位文件信息
-     * @param robotId       机器人id
-     * @return void
-     */
-    public void addDeviceModel(List<Map<String, Object>> deviceMapList, Long robotId) {
+        String picPath = filePathMap.get("content") + "/" + robotMap.get(0).get("mappath").toString();
+        log.info("图片路径为：{}", picPath);
 
+        TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
+        try {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Map<String, Object> robotModelMap = robotMap.get(0);
+            //生产日期
+            String productionDate = String.valueOf(robotModelMap.get("production_date"));
+            if (StringUtils.isNotEmpty(productionDate) && !"null".equals(productionDate)) {
+                tRobotInfo.setMadeDate(simpleDateFormat.parse(productionDate));
+            }
+            //生产编号
+            String productionCode = String.valueOf(robotModelMap.get("production_code"));
+            if (StringUtils.isNotEmpty(productionCode) && !"null".equals(productionCode)) {
+                tRobotInfo.setAppearanceNumber(productionCode);
+            }
+            //生产厂家
+            String manufacturer = String.valueOf(robotModelMap.get("manufacturer"));
+            if (StringUtils.isNotEmpty(manufacturer) && !"null".equals(manufacturer)) {
+                String robotFactory = tRobotInfoDao.selectDictCodeByNote(manufacturer, "robot_factory");
+                if (robotFactory != null) {
+                    tRobotInfo.setRobotFactory(robotFactory);
+                }
+            }
+            //使用单位
+            String useUnit = String.valueOf(robotModelMap.get("use_unit"));
+            if (StringUtils.isNotEmpty(useUnit) && !"null".equals(useUnit)) {
+                tRobotInfo.setBuildingUser(useUnit);
+            }
+//                String istransport = String.valueOf(robotModelMap.get("istransport"));
+            //设备来源
+            String deviceSource = String.valueOf(robotModelMap.get("device_source"));
+            if (StringUtils.isNotEmpty(deviceSource) && !"null".equals(deviceSource)) {
+                tRobotInfo.setRobotSource(deviceSource);
+            }
+        } catch (Exception e) {
+            log.error("模型文件解析异常:", e);
+        }
+
+        String[] splitArray = picPath.split("/");
+        String fileName = splitArray[splitArray.length - 1];
+        String developMap = absoluteImgMap.get("content") + "/Map";
+        copyFileToDevelop(picPath, developMap);
+        String developRelativeUrl = relativeImgMap.get("content") + "/Map/" + fileName;
+
+        tRobotInfo.setRobotId(robotId)
+                .setPhotePath(developRelativeUrl);
+        tRobotInfoDao.update(tRobotInfo);
     }
 
     /**
@@ -788,50 +798,54 @@ public class RobotService {
     private void addDevicePoint(List<Map<String, Object>> deviceMapList, Long robotId) {
         List<TRobotInspection> deviceList = new ArrayList<>();
         for (Map<String, Object> deviceMap : deviceMapList) {
-            TRobotInspection tRobotInspection = new TRobotInspection()
-                    .setInspectionCode(deviceMap.get("device_id").toString())
-                    .setRobotId(robotId)
-                    .setInspectionName((deviceMap.get("main_device_name").toString() + "/" + deviceMap.get("device_name").toString()))
-                    .setSaveTypeList(deviceMap.get("save_type_list").toString())
-                    .setComponentId(deviceMap.get("main_device_id").toString())
-                    .setRecognitionTypeList(deviceMap.get("recognition_type_list").toString());
-            /*if (!"".equals(deviceMap.get("component_id").toString())){
-                tRobotInspection.setComponentId(deviceMap.get("component_id").toString());
-            }*/
-            int inspectionType = 1;
-            if (deviceMap.containsKey("point_type") && !"".equals(deviceMap.get("point_type").toString())) {
-                inspectionType = Integer.parseInt(deviceMap.get("point_type").toString());
-            }
-            tRobotInspection.setInspectionType(inspectionType);
-            if (!"".equals(deviceMap.get("meter_type").toString())) {
-                Integer meterType = selectDictCode("meterType", deviceMap.get("meter_type").toString(), "meter_type");
-                tRobotInspection.setMeterType(meterType);
-            }
-            if (!"".equals(deviceMap.get("appearance_type").toString())) {
-                Integer appearanceType = selectDictCode("appearanceType", deviceMap.get("appearance_type").toString(), "appearance_type");
-                tRobotInspection.setAppearanceType(appearanceType);
-            }
-            if (deviceMap.containsKey("main_operation_type") && !"".equals(deviceMap.get("main_operation_type").toString())) {
-                Integer mainOperationType = selectDictCode("mainOperationType", deviceMap.get("main_operation_type").toString(), "main_operation_type");
-                tRobotInspection.setMainOperationType(mainOperationType);
-            }
-            if (deviceMap.containsKey("operation_type") && !"".equals(deviceMap.get("operation_type").toString())) {
-                Integer operationType = selectDictCode("operationType", deviceMap.get("operation_type").toString(), "operation_type");
-                tRobotInspection.setOperationType(operationType);
-            }
-            if (!"".equals(deviceMap.get("phase").toString())) {
-                tRobotInspection.setPhase(deviceMap.get("phase").toString());
-            }
-            if (!"".equals(deviceMap.get("device_info").toString())) {
-                tRobotInspection.setDeviceInfo(deviceMap.get("device_info").toString());
-            }
-            if (deviceMap.containsKey("property_pic_path") && !"".equals(deviceMap.get("property_pic_path").toString())) {
-                String relativePropertyPicPath = convertPropertyPicPath(deviceMap.get("property_pic_path").toString());
-                tRobotInspection.setPropertyPicPath(relativePropertyPicPath);
-            }
+            try {
+                TRobotInspection tRobotInspection = new TRobotInspection()
+                        .setInspectionCode(deviceMap.get("device_id").toString())
+                        .setRobotId(robotId)
+                        .setInspectionName((deviceMap.get("main_device_name").toString() + "/" + deviceMap.get("device_name").toString()))
+                        // save_type_list和recognition_type_list为空的话，容错  默认为jpg和1
+                        .setSaveTypeList(deviceMap.containsKey("save_type_list") ?
+                                deviceMap.get("save_type_list").toString() : "jpg")
+                        .setComponentId(deviceMap.get("main_device_id").toString())
+                        .setRecognitionTypeList(deviceMap.containsKey("recognition_type_list") ?
+                                deviceMap.get("recognition_type_list").toString() : "1");
+                int inspectionType = 1;
+                if (deviceMap.containsKey("point_type") && !"".equals(deviceMap.get("point_type").toString())) {
+                    inspectionType = Integer.parseInt(deviceMap.get("point_type").toString());
+                }
+                tRobotInspection.setInspectionType(inspectionType);
+                if (!"".equals(deviceMap.get("meter_type").toString())) {
+                    Integer meterType = selectDictCode("meterType", deviceMap.get("meter_type").toString(), "meter_type");
+                    tRobotInspection.setMeterType(meterType);
+                }
+                if (!"".equals(deviceMap.get("appearance_type").toString())) {
+                    Integer appearanceType = selectDictCode("appearanceType", deviceMap.get("appearance_type").toString(), "appearance_type");
+                    tRobotInspection.setAppearanceType(appearanceType);
+                }
+                if (deviceMap.containsKey("main_operation_type") && !"".equals(deviceMap.get("main_operation_type").toString())) {
+                    Integer mainOperationType = selectDictCode("mainOperationType", deviceMap.get("main_operation_type").toString(), "main_operation_type");
+                    tRobotInspection.setMainOperationType(mainOperationType);
+                }
+                if (deviceMap.containsKey("operation_type") && !"".equals(deviceMap.get("operation_type").toString())) {
+                    Integer operationType = selectDictCode("operationType", deviceMap.get("operation_type").toString(), "operation_type");
+                    tRobotInspection.setOperationType(operationType);
+                }
+                if (!"".equals(deviceMap.get("phase").toString())) {
+                    tRobotInspection.setPhase(deviceMap.get("phase").toString());
+                }
+                if (!"".equals(deviceMap.get("device_info").toString())) {
+                    tRobotInspection.setDeviceInfo(deviceMap.get("device_info").toString());
+                }
+                if (deviceMap.containsKey("property_pic_path") && !"".equals(deviceMap.get("property_pic_path").toString())) {
+                    String relativePropertyPicPath = convertPropertyPicPath(deviceMap.get("property_pic_path").toString());
+                    tRobotInspection.setPropertyPicPath(relativePropertyPicPath);
+                }
 
-            deviceList.add(tRobotInspection);
-//            log.info("获得的deviceList是：" + deviceList);
+                deviceList.add(tRobotInspection);
+    //            log.info("获得的deviceList是：" + deviceList);
+            }catch (Exception e){
+                log.error("获取设备点位信息异常:", e);
+            }
         }
 
         // 该机器人现有的巡检点
@@ -846,8 +860,8 @@ public class RobotService {
                 addList.add(str);
             }
         }
-        log.info("最后要插库的deviceList是==={}", addList);
-        log.info("准备要删除的inspectionCodeList是==={}", nowList);
+        log.info("最后要插库的deviceList是==={}", addList.size());
+        log.info("准备要删除的inspectionCodeList是==={}", nowList.size());
         if (CollectionUtils.isNotEmpty(nowList)) {
             List<Long> inspectionIdList = tRobotInspectionDao.selectInspectionIdList(nowList);
 //            log.info("这些inspectionCode对应的inspectionIdList是==" + inspectionIdList);
@@ -875,7 +889,7 @@ public class RobotService {
         if (deviceList.containsAll(addList)) {
             deviceList.removeAll(addList);
         }
-        log.info("准备更新的deviceList是=={}", deviceList);
+        log.info("准备更新的deviceList是=={}", deviceList.size());
         for (TRobotInspection item : deviceList) {
             // 更新TRI
             tRobotInspectionDao.update(item);
@@ -1096,6 +1110,7 @@ public class RobotService {
         itemMap.put("device_list", deviceIdList);
         itemList.add(itemMap);
 
+        // 这样下发 如果是给多个机器人是有问题的
         List<String> robotCodeList = tRobotInfoDao.selectOnline();
         log.info("在线的robotCodeList: {}", robotCodeList);
 
@@ -1111,12 +1126,6 @@ public class RobotService {
             log.info("生成的检修区域指令xml是<start>{}<end>", xmlString);
             RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
         }
-
-//        String code = RobotServerHandler.getRobotResultMap().get("Code").toString();
-
-//        if ("200".equals(code)){
-//            return "true";
-//        }
         return "true";
     }
 
@@ -1593,7 +1602,7 @@ public class RobotService {
                 String jsons = JSON.toJSONString(robotConfirmMsg);
                 log.info("确认消息生成-前端推送：" + jsons);
                 try {
-                    Constant.postUrl(websocketUrl, jsons);
+                    Constant.postUrl(webSocketUrl, jsons);
                 } catch (IOException | URISyntaxException e) {
                     log.error(e.getMessage(), e);
                 }
@@ -1635,142 +1644,6 @@ public class RobotService {
         }
         redisTemplate.opsForHash().putAll("RobotConfirmMsg:" + robotCode + ":" + taskId, robotConfirmMsg);
         return result;
-    }
-
-    /**
-     * 更新任务状态及已做巡检点结果
-     *
-     * @param taskIdTemp 任务执行id
-     * @param taskStatus 任务状态
-     * @return void
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void modifyTaskResult(String taskIdTemp, Integer taskStatus) {
-        // taskPatrolled_id格式： taskId_20220202020202
-        log.info("taskIdTemp==={}", taskIdTemp);
-        String taskId = taskIdTemp.contains("_") ?
-                taskIdTemp.substring(0, taskIdTemp.length() - 15) : taskIdTemp.substring(0, taskIdTemp.length() - 14);
-        List<TCruiseDataResult> tcdrList = new ArrayList<>();
-        List<TCruiseTaskResultDetail> tctrdList = new ArrayList<>();
-        List<String> cruiseResultIdList = new ArrayList<>();
-
-        List<Long> instanceIdDoneList = Constant.flagMap.get(taskId);
-        log.info("任务为{}已经做过的巡视点===={}", taskId, instanceIdDoneList);
-
-        List<Long> inDataBaseInstanceList = StaticContextAccessor.getBean(RobotService.class).selectInstanceForTaskGoOn(taskId);
-        log.info("已经入库的巡视点==={}", inDataBaseInstanceList);
-        if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
-            for (Long instanceIdInTable : inDataBaseInstanceList) {
-                instanceIdDoneList.remove(instanceIdInTable.toString());
-            }
-        }
-        log.info("删除已经入库的巡视点后==={}", instanceIdDoneList);
-
-        if (CollectionUtils.isNotEmpty(instanceIdDoneList)) {
-            for (Long instanceId : instanceIdDoneList) {
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + instanceId.toString());
-                log.info("redisInfoMap的数据是{}", redisInfoMap);
-                // 缓存中该巡检点有结果
-                boolean conditionRes = !StringUtils.equals("设备检修中", redisInfoMap.get("resultNum"))
-                        && (StringUtils.equals("246", redisInfoMap.get("cruiseResult"))
-                        || StringUtils.equals("247", redisInfoMap.get("cruiseResult")));
-                if (Boolean.TRUE.equals(conditionRes)) {
-                    TCruiseTaskResultDetail tCruiseTaskResultDetail = new TCruiseTaskResultDetail()
-                            .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
-                            .setTaskResultId(redisInfoMap.get("taskResultId"))
-                            .setInstanceId(MapUtils.getLong(redisInfoMap, "instanceId"))
-                            .setInstanceName(redisInfoMap.get("instanceName"))
-                            .setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
-                            .setEndTime(DateTimeUtil.parse(redisInfoMap.get("endTime")))
-                            .setDeviceId(Long.valueOf(redisInfoMap.get("deviceId")))
-                            .setDeviceName(redisInfoMap.get("deviceName"))
-                            .setCruiseStatus(252)
-                            .setRemark(redisInfoMap.get("remark"));
-                    tctrdList.add(tCruiseTaskResultDetail);
-                    cruiseResultIdList.add(redisInfoMap.get("cruiseResultId"));
-
-                    TCruiseDataResult tCruiseDataResult = new TCruiseDataResult()
-                            .setCruiseResultId(redisInfoMap.get("cruiseResultId"))
-                            .setCruiseId(Long.valueOf(redisInfoMap.get("cruiseId")))
-                            .setCruiseName(redisInfoMap.get("cruiseName"))
-                            .setCruiseType(228)
-                            .setResultNum(redisInfoMap.get("resultNum"))
-                            .setModifyNum(redisInfoMap.get("modifyNum"))
-                            .setPicpath(redisInfoMap.get("picpath"))
-                            .setPicPathAnl(redisInfoMap.get("picPathAnl"))
-                            .setOrigpic(redisInfoMap.get("origpic"))
-                            .setOrigPicAnl(redisInfoMap.get("origPicAnl"))
-                            .setEvaluationState(257)
-                            .setCreatetime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")))
-                            .setIsWarn(0)
-                            .setCruiseResult(Integer.valueOf(redisInfoMap.get("cruiseResult")))
-                            .setCruiseAbnormal(Boolean.TRUE.equals(!"null".equals(redisInfoMap.get("cruiseAbnormal"))) ?
-                                    Integer.valueOf(redisInfoMap.get("cruiseAbnormal")) : null)
-                            .setResultPic(Boolean.TRUE.equals(!"null".equals(redisInfoMap.get("resultPic"))) ?
-                                    redisInfoMap.get("resultPic") : null)
-                            .setFirName("f");
-                    tcdrList.add(tCruiseDataResult);
-                }
-            }
-        }
-        log.info("任务{}的tCTRDList大小是:{},tCDRList大小是: {}", taskId, tctrdList.size(), tcdrList.size());
-
-        int res1 = 0;
-        int res2 = 0;
-        if (CollectionUtils.isNotEmpty(tctrdList)) {
-            res1 = batchInsertCruiseTaskResultDetail(tctrdList);
-        }
-        if (CollectionUtils.isNotEmpty(tcdrList)) {
-            res2 = batchInsertCruiseDataResult(tcdrList);
-            log.info("准备传其他服务的cruiseResultIdList==={}", cruiseResultIdList);
-            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.TASK_FINISH, cruiseResultIdList, Result.class);
-        }
-        log.info("插tCTRD的条数:{},插tCDR的条数:{}", res1, res2);
-
-        // 将已经做过的巡视点Map清空
-        if (CollectionUtils.isNotEmpty(Constant.flagMap.get(taskId))) {
-            log.info("将公共类的instanceIdList清空");
-            Constant.flagMap.remove(taskId);
-        }
-
-        Map<String, Object> abnormalCount = redisTemplate.opsForHash().entries("countForAbnormal:" + taskId);
-        Integer totalNum = Integer.valueOf(String.valueOf(abnormalCount.get("all")));
-        Integer abnormalNum = Integer.valueOf(String.valueOf(abnormalCount.get("abnormal")));
-        Integer normalNum = Integer.valueOf(String.valueOf(abnormalCount.get("normal")));
-        log.info("taskId为{}的总检测点数是==={}, 异常点数是==={}, 正常点数是==={}", taskId, totalNum, abnormalNum, normalNum);
-        Integer abnormal = abnormalNum;
-        Integer normal = normalNum;
-        Integer taskWait = totalNum - normal - abnormal;
-        TCruiseResult tCruiseResult = selectTaskResultId(taskId);
-        tCruiseResult.setTaskWait(taskWait);
-        if (taskStatus == 2) {
-            // 暂停
-            tCruiseResult.setCState(241);
-        } else if (taskStatus == 4) {
-            // 终止
-            tCruiseResult.setCState(242);
-        }
-        tCruiseResult.setTaskCode(taskId);
-        log.info("任务为{}的tCruiseResult内容是==={}", taskId, tCruiseResult);
-        // 更新TCR表
-        int res = updateTCruiseResult(tCruiseResult);
-        log.info("更新TCR的条数===={}", res);
-
-        for (TCruiseTaskResultDetail tctrd : tctrdList) {
-            updateIsWarn(taskId, tctrd.getInstanceId(), tctrd.getCruiseResultId());
-        }
-
-        int taskAbnormal = selectAlarmNumByTaskId(taskId);
-        // 最后在更新一下异常数
-        TCruiseTaskResult updateResult = new TCruiseTaskResult();
-        updateResult.setTaskId(taskId);
-        updateResult.setTaskAbnormal(taskAbnormal);
-        updateTCruiseTaskResult(updateResult);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public Result otherServer(List<String> cruiseResultIdList) {
-        return Constant.otherServerList(cruiseResultIdList, Constant.TASK_FINISH);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -2631,7 +2504,7 @@ public class RobotService {
         //webSocket通知前端确认消息
         String jsons = JSON.toJSONString(jasonMaps);
         log.info("确认消息生成-前端推送：" + jsons);
-        Constant.postUrl(websocketUrl, jsons);
+        Constant.postUrl(webSocketUrl, jsons);
     }
 
     /**

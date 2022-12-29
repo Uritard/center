@@ -405,10 +405,15 @@ public class RobotController {
         Result result = new Result();
         try {
 //            FileUtil.copyFileUsingStream(source, desc);
-            DeviceStatisticInfoResult deviceStatisticInfoResult = deviceStatisticInfoResultDao.select(deviceCode);
-            if (deviceStatisticInfoResult != null) {
-                deviceStatisticInfoResult.setDeviceRun(deviceRun);
-                deviceStatisticInfoResultDao.changeRun(deviceStatisticInfoResult);
+            String filePath = "D:\\testform\\generateXML\\device_model_E200.xml";
+
+            List<Map<String, Object>> mapList = new ArrayList<>();
+            XMLBaseModel model = robotService.getXmlMessage(filePath);
+            mapList = model.getItems();
+            for (Map<String, Object> map : mapList){
+                if (!map.containsKey("save_type_list")){
+                    System.out.println(map);
+                }
             }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

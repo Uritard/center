@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,23 +31,6 @@ public class NonhomologousWarnService {
     private RedisTemplate redisTemplate;
     @Resource
     private NonhomologousWarnDao nonhomologousWarnDao;
-    @Value("${other.webSocketUrl}")
-    private String webSocketUrl;
-    @Value("${netty.server.url}")
-    private String serverUrl;
-    @Value("${netty.server.ftps.port}")
-    private String ftpsPort;
-    @Value("${netty.server.ftps.username}")
-    private String ftpsUserName;
-    @Value("${netty.server.ftps.password}")
-    private String ftpsPassWord;
-    @Value("${netty.server.ftps.keypw}")
-    private String key;
-    @Value("${netty.server.ftps.local.path}")
-    private String ftpsLocalPath;
-
-    @Value("${other.webSocketUrl}")
-    private String websocketUrl;
 
 
     // 通过 -?[0-9]+(\\\\.[0-9]+)? 进行匹配是否为数字

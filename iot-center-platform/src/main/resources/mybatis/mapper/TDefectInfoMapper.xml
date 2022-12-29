@@ -498,7 +498,7 @@
     </select>
 
     <select id="selectThereWarn" resultType="com.yjh.platform.module.task.entity.WarnInfoForHomePage">
-        <!--        SELECT
+                SELECT
                 a.warn_time as warnTime,
                 a.warn_content as warnContent,
                 b.device_name as deviceName
@@ -506,8 +506,9 @@
                 left join (select DISTINCT device_id,device_name from t_std_device) b on a.device_id = b.device_id
                 where 1=1
                 and TO_DAYS(a.warn_time) =TO_DAYS(NOW())
-                <if test="alarmLevel != null "> and a.warn_level = #{alarmLevel, jdbcType=INTEGER}</if>
-                union all(-->
+        and a.conf_mode = 276
+        <!--<if test="alarmLevel != null "> and a.warn_level = #{alarmLevel, jdbcType=INTEGER}</if>
+        union all(
         SELECT
         c.alarm_time as warnTime,
         c.alarm_info as warnContent,
@@ -519,8 +520,8 @@
         left join t_robot_info d on c.robot_id = d.robot_id
         where 1=1
         and TO_DAYS(c.alarm_time) =TO_DAYS(NOW())
-        <if test="alarmLevel != null ">and c.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>
-        order by warnTime desc LIMIT 20
+        <if test="alarmLevel != null ">and c.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>-->
+        order by warnTime desc LIMIT 30
     </select>
     <select id="selectWarnPopUp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         SELECT
