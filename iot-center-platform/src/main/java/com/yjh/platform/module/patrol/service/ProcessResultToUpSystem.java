@@ -479,7 +479,7 @@ public class ProcessResultToUpSystem {
             TCruisePointInstance tCruisePointInstance = analyseDataOperateService.selectPointInstance(Long.valueOf(instanceId));
             // 获取巡视点位id
             String cruiseId=String.valueOf(tCruisePointInstance.getCruiseid());
-            String judgeBaseImagepath= redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content").toString();
+            String judgeBaseImagepath= (String)redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content");
             //判定基准图路径位presetImgPath+巡视点+巡视点.jpg
             judgeBaseImagepath=judgeBaseImagepath+"/"+cruiseId+"/"+cruiseId+".jpg";
             //拼接算法管理平台分析告警结果图片地址
