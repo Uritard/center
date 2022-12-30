@@ -799,16 +799,15 @@ public class RobotService {
         List<TRobotInspection> deviceList = new ArrayList<>();
         for (Map<String, Object> deviceMap : deviceMapList) {
             try {
-                TRobotInspection tRobotInspection = new TRobotInspection()
-                        .setInspectionCode(deviceMap.get("device_id").toString())
-                        .setRobotId(robotId)
-                        .setInspectionName((deviceMap.get("main_device_name").toString() + "/" + deviceMap.get("device_name").toString()))
-                        // save_type_list和recognition_type_list为空的话，容错  默认为jpg和1
-                        .setSaveTypeList(deviceMap.containsKey("save_type_list") ?
-                                deviceMap.get("save_type_list").toString() : "jpg")
-                        .setComponentId(deviceMap.get("main_device_id").toString())
-                        .setRecognitionTypeList(deviceMap.containsKey("recognition_type_list") ?
-                                deviceMap.get("recognition_type_list").toString() : "1");
+                TRobotInspection tRobotInspection = new TRobotInspection();
+                tRobotInspection.setInspectionCode(String.valueOf(deviceMap.getOrDefault("device_id", "")));
+                tRobotInspection.setRobotId(robotId);
+                tRobotInspection.setInspectionName(deviceMap.getOrDefault("main_device_name", "")
+                        + "/" + deviceMap.getOrDefault("device_name", ""));
+                // save_type_list和recognition_type_list为空的话，容错  默认为jpg和1
+                tRobotInspection.setSaveTypeList(String.valueOf(deviceMap.getOrDefault("save_type_list", "jpg")));
+                tRobotInspection.setComponentId(String.valueOf(deviceMap.getOrDefault("main_device_id", "")));
+                tRobotInspection.setRecognitionTypeList(String.valueOf(deviceMap.getOrDefault("recognition_type_list", "1")));
                 int inspectionType = 1;
                 if (deviceMap.containsKey("point_type") && !"".equals(deviceMap.get("point_type").toString())) {
                     inspectionType = Integer.parseInt(deviceMap.get("point_type").toString());
