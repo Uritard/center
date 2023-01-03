@@ -230,7 +230,7 @@ public class TSysParamService{
         if (MapUtil.isNotEmpty(sysParamConfig.getSecure())) {
             result.put("isEncryption", Boolean.valueOf(sysParamConfig.getSecure().get("isEncryption")));
             result.put("isUkey", Boolean.valueOf(sysParamConfig.getSecure().get("isUkey")));
-            result.put("summaryFlag", Boolean.valueOf(sysParamConfig.getSecure().get("summaryFlag")));
+            result.put("summaryFlag", Boolean.valueOf(sysParamConfig.getSecure().get("isDecode")));
         }
         return result;
     }
