@@ -1662,6 +1662,28 @@ public class UPatrolTaskService {
     private void completionOfTask(String taskId) {
         try {
             Thread.sleep(15000);
+
+            int taskStatus;
+            int all;
+            boolean ended;
+            synchronized (LOCK_FLAG) {
+                String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
+                Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
+
+                ended = Boolean.parseBoolean(resultCountsMap.get("ended"));
+
+                taskStatus = NumberUtils.toInt(resultCountsMap.get("taskState"), TASK_STATE_FINISHED);
+                taskStatus = taskStatus == TASK_STATE_EXECUTING ? TASK_STATE_FINISHED : taskStatus;
+
+                all = MapUtils.getIntValue(resultCountsMap, "all", 0);
+
+                redisTemplate.opsForHash().put(strForCountAbnormal, "ended", "true");
+            }
+            if (ended) {
+                log.warn("taskId is:{} , already ended； {}", taskId, ended);
+                return;
+            }
+
             Map<String, String> jasonMap = new HashMap<>(2);
             jasonMap.put("type", "lastOneInstance");
             jasonMap.put("taskId", taskId);
@@ -1704,22 +1726,6 @@ public class UPatrolTaskService {
                 }
             }
 
-            int taskStatus;
-            int all;
-            boolean ended;
-            synchronized (LOCK_FLAG) {
-                String strForCountAbnormal = PATROL_SUMMARY_PREFIX + taskId;
-                Map<String, String> resultCountsMap = redisTemplate.opsForHash().entries(strForCountAbnormal);
-
-                ended = Boolean.parseBoolean(resultCountsMap.get("ended"));
-
-                taskStatus = NumberUtils.toInt(resultCountsMap.get("taskState"), TASK_STATE_FINISHED);
-                taskStatus = taskStatus == TASK_STATE_EXECUTING ? TASK_STATE_FINISHED : taskStatus;
-
-                all = MapUtils.getIntValue(resultCountsMap, "all", 0);
-
-                redisTemplate.opsForHash().put(strForCountAbnormal, "ended", "true");
-            }
             // 更新upr
             int allCounts = robotInfoKeys.size();
             UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
@@ -1732,7 +1738,7 @@ public class UPatrolTaskService {
             log.info("taskId is:{} , uPatrolDataResultList size is:{}, ended； {}", taskId, uPatrolDataResultList.size(), ended);
 
             // 如果 ended=true,表示巡视结果已经入库过一次，不再重复入库，但需要修改
-            if (CollectionUtils.isNotEmpty(uPatrolDataResultList) && !ended){
+            if (CollectionUtils.isNotEmpty(uPatrolDataResultList)){
                 batchInsertUPatrolDataResult(uPatrolDataResultList);
                 log.info("准备传其他服务的taskId==={}", taskId);
                 uPatrolDataResultService.updateCruiseAnalyze(taskId);
