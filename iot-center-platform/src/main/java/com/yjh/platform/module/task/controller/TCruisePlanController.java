@@ -3,6 +3,7 @@ package com.yjh.platform.module.task.controller;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.patrol.service.UPatrolPlanAttrService;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.entity.input.CruisePlanReq;
 import com.yjh.platform.module.task.service.TCruisePlanAttrService;
 import com.yjh.platform.module.task.service.TCruisePlanService;
 
@@ -336,6 +337,47 @@ public class TCruisePlanController {
             } else {planDetailMap.put("subTypeName", "");}
             planDetailMap.put("instanceList", tCruisePlanAttrDetailList);
             planDetailMap.put("deviceIds", deviceIds);
+            result.setData(planDetailMap);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询预案详情")
+    @RequestMapping(value = "/selectPlanDetailByPage", method = RequestMethod.POST)
+    @Logs(title = "查询预案详情", content = "查询预案详情", logType = 1)
+    public Result selectPlanDetailByPage(@RequestBody CruisePlanReq cruisePlanReq) {
+        Result result = new Result();
+        try {
+            Map<String, Object> planDetailMap = new HashMap<>();
+            TCruisePlanCount tCruisePlanCount = tCruisePlanService.selectByPrimaryId(cruisePlanReq.getPlanId());
+            planDetailMap.put("planName", tCruisePlanCount.getPlanName());
+            planDetailMap.put("typeName", tCruisePlanCount.getPlanTypeName());
+            planDetailMap.put("type", tCruisePlanCount.getType());
+            Map<String, Object> resultMap = tCruisePlanAttrService
+                .selectPageByPrimaryId(cruisePlanReq.getPageSize(), cruisePlanReq.getPageNum(), cruisePlanReq.getPlanId());
+            if ((Long) resultMap.get("count") > 0) {
+                List<TCruisePlanAttrDetail> tCruisePlanAttrDetailList = (List<TCruisePlanAttrDetail>)resultMap.get("list");
+                List<Long> deviceIds = tCruisePlanAttrDetailList.stream()
+                    .map(TCruisePlanAttrDetail::getDeviceId)
+                    .distinct()
+                    .collect(Collectors.toList());
+                if (Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubType())) {
+                    planDetailMap.put("subType", tCruisePlanAttrDetailList.get(0).getSubType());
+                }
+                if (Objects.nonNull(tCruisePlanAttrDetailList.get(0).getSubTypeName())) {
+                    planDetailMap.put("subTypeName", tCruisePlanAttrDetailList.get(0).getSubTypeName());
+                }
+                planDetailMap.put("instanceList", resultMap.get("list"));
+                planDetailMap.put("count", resultMap.get("count"));
+                planDetailMap.put("deviceIds", deviceIds);
+            }else {
+                planDetailMap.put("subType", "");
+                planDetailMap.put("count", 0);
+                planDetailMap.put("subTypeName", "");
+            }
             result.setData(planDetailMap);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());

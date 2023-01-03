@@ -1,5 +1,9 @@
 package com.yjh.platform.module.task.service;
 
+import com.beust.jcommander.internal.Maps;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.patrol.dao.UPatrolPlanAttrDao;
 import com.yjh.platform.module.patrol.entity.UPatrolPlanAttr;
 import com.yjh.platform.module.task.entity.TCruisePlanAttr;
@@ -7,8 +11,10 @@ import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
 
 import java.util.List;
 import java.util.Date;
+import java.util.Map;
 
 import com.yjh.platform.module.task.entity.TCruisePlanAttrDetail;
+import com.yjh.platform.module.task.entity.TCruisePlanCount;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.yjh.platform.common.logs.Logs;
@@ -45,6 +51,16 @@ public class TCruisePlanAttrService{
     public List<TCruisePlanAttrDetail> selectByPrimaryId(Long planId) {
 //        return this.tCruisePlanAttrDao.selectByPrimaryId(planId);
         return this.uPatrolPlanAttrDao.selectByPrimaryId(planId);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> selectPageByPrimaryId(Integer pageSize, Integer pageNum, Long planId) {
+        Map<String, Object> resultMap = Maps.newHashMap();
+        Page page = PageHelper.startPage(pageNum != null ? pageNum : 1, pageSize != null ? pageSize : 0, true, null, true);
+        List<TCruisePlanAttrDetail> list = this.uPatrolPlanAttrDao.selectByPrimaryId(planId);
+        resultMap.put("count", page.getTotal());
+        resultMap.put("list", list);
+        return resultMap;
     }
 
     @Transactional(rollbackFor = Exception.class)
