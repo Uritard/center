@@ -2405,21 +2405,21 @@ CREATE TABLE `t_task_priority_config`(
     `update_time`           datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`prioritized_task_type`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='任务优先级配置信息';
-ROW_FORMAT=DYNAMIC COMMENT='告警订阅信息';
+
 
 DROP TABLE IF EXISTS `device_statics_info_result`;
-CREATE TABLE `device_statics_info_result` (
-                                              `device_code` varchar(255) NOT NULL COMMENT '设备编码',
-                                              `device_name` varchar(255) DEFAULT NULL COMMENT '设备名称',
-                                              `duration` varchar(255) DEFAULT NULL COMMENT '累积在线时长总和',
-                                              `offLine_count` varchar(255) DEFAULT NULL COMMENT '累积离线次数总和',
-                                              `normal_day` varchar(255) DEFAULT NULL COMMENT '累计连续正常运行天数',
-                                              `commission_days` varchar(255) DEFAULT NULL COMMENT '正常巡检天数',
-                                              `cruise_percent` varchar(255) DEFAULT NULL COMMENT '巡检出勤率',
-                                              `intact_percent` varchar(255) DEFAULT NULL COMMENT '录像完整率',
-                                              `device_run` varchar(1) DEFAULT NULL COMMENT '设备状态',
-                                              `device_resume_date` datetime DEFAULT NULL COMMENT '设备恢复时间',
-                                              `device_type` varchar(255) DEFAULT NULL COMMENT '设备类型',
-                                              `region_code` varchar(255) DEFAULT NULL COMMENT '区域编码',
-                                              PRIMARY KEY (`device_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `device_statics_info_result`  (
+                                               `device_code` varchar(255)  NOT NULL COMMENT '设备编码',
+                                               `device_name` varchar(255) DEFAULT NULL COMMENT '设备名称',
+                                               `duration` varchar(255) DEFAULT NULL COMMENT '累积在线时长总和',
+                                               `offLine_count` varchar(255) DEFAULT NULL COMMENT '累积离线次数总和',
+                                               `normal_day` varchar(255) DEFAULT NULL COMMENT '累计连续正常运行天数',
+                                               `commission_days` varchar(255) DEFAULT NULL COMMENT '正常巡检天数',
+                                               `cruise_percent` varchar(255) DEFAULT NULL COMMENT '巡检出勤率',
+                                               `intact_percent` varchar(255) DEFAULT NULL COMMENT '录像完整率',
+                                               `device_run` varchar(1) DEFAULT NULL COMMENT '设备状态',
+                                               `device_resume_date` datetime DEFAULT NULL COMMENT '设备恢复时间',
+                                               `device_type` varchar(255) DEFAULT NULL COMMENT '设备类型',
+                                               `region_code` varchar(255) DEFAULT NULL COMMENT '区域编码',
+                                               PRIMARY KEY (`device_code`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8  ROW_FORMAT = Dynamic COMMENT='可靠性指标统计表';
