@@ -67,7 +67,7 @@
     </insert>
     <update id="changeRun" parameterType="com.yjh.accessrobot.module.command.entity.DeviceStatisticInfoResult">
         update device_statics_info_result
-        <if test='deviceRun != null and deviceRun == "1"'>
+        <if test='deviceRun != null and deviceRun == "0"'>
             set device_run = 1,device_resume_date=now()
         </if>
         <if test='deviceRun != null and deviceRun =="1"'>

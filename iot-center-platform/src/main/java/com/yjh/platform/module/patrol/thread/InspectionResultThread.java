@@ -346,10 +346,11 @@ public class InspectionResultThread implements Runnable{
                 log.info("resultImagePath=={}", resultImagePath);
                 try {
                     // 调用video服务 将要分析的图片从ftps下载到本地
-                    Map<String, String> params = Maps.newLinkedHashMap();
-                    params.put("source", resultImagePath);
-                    params.put("target", filePath);
-                    SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class).postForObject(Constant.VIDEO_DOWNLOAD_FILE, params, String.class);
+//                    Map<String, String> params = Maps.newLinkedHashMap();
+//                    params.put("source", resultImagePath);
+//                    params.put("target", filePath);
+//                    SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class).postForObject(Constant.VIDEO_DOWNLOAD_FILE, params, String.class);
+                    uPatrolTaskService.downloadPicture(resultImagePath,filePath);
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }

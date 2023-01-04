@@ -398,6 +398,85 @@ public class FtpsUtil {
     }
 
 
+    public static void downloadFile(String filepath,
+                                    String remoteFilename,String host,int port,String key_pw,String username,String password) throws NoSuchAlgorithmException {
+        try {
+            log.info("-------------------------------文件下载开始");
+            log.info("filepath：{}，remoteFilename：{}，host：{}，port:{},key_pw:{},username：{}，password：{}",
+                    filepath,remoteFilename,host,port,key_pw,username,password);
+            File file = new File(filepath);
+            try {
+                FTPSClient ftpClient = null;
+                if (key_pw.equals("1") || key_pw.equals("2")) {
+                    ftpClient = new FTPSClient("TLS",true);
+                }else {
+                    ftpClient = new FTPSClient();
+                }
+                ftpClient.setAuthValue("TLS");
+                //        ftpClient.setTrustManager(getTrustManager());
+                //      ftpClient.setKeyManager(getKeyManager());
+                ftpClient.connect(host, port);
+                // Connect to host
+                int reply = ftpClient.getReplyCode();
+
+                SSLContext sslContext = SSLContext.getInstance("SSL");
+
+                if (FTPReply.isPositiveCompletion(reply)) {
+
+                    // Login
+                    if (ftpClient.login(username, password)) {
+                        if (FTPReply.isPositiveCompletion(ftpClient.sendCommand(
+                                "OPTS UTF8", "ON"))) {
+                            // 开启服务器对UTF-8的支持，
+                            LOCAL_CHARSET = "UTF-8";
+                        }
+
+                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                        ftpClient.setControlEncoding(LOCAL_CHARSET);
+                        if(key_pw.equals("1")){
+                            // Set protection buffer size
+                            ftpClient.execPBSZ(0);
+                            // Set data channel protection to private
+                            ftpClient.execPROT("P");
+                            // Enter local passive mode
+                            ftpClient.enterLocalPassiveMode();
+                        }else if(key_pw.equals("2")){
+                            // Set protection buffer size
+                            ftpClient.execPBSZ(0);
+                            // Set data channel protection to private
+                            ftpClient.execPROT("P");
+                            ftpClient.enterLocalActiveMode();
+                        }
+                        ftpClient.setFileTransferMode(FTP.STREAM_TRANSFER_MODE);
+                        // Store file on host
+                        File localFile = new File(filepath);
+                        OutputStream os = new FileOutputStream(localFile);
+                        ftpClient.retrieveFile(remoteFilename, os);
+
+                        os.close();
+
+                        // Logout
+                        ftpClient.logout();
+                        log.info("FTPS下载文件成功");
+                    } else {
+                        log.info("FTP login failed---登录失败");
+                    }
+
+                    // Disconnect
+                    ftpClient.disconnect();
+                } else {
+                    log.info("FTP connect to host failed---连接失败");
+                }
+            } catch (IOException ioe) {
+                log.error("FTPS下载文件失败", ioe);
+            } catch (Exception e) {
+                log.error("FTPS下载文件错误", e);
+            }
+        } catch (Exception e) {
+            log.error("FTPS上传文件参数有误", e);
+        }
+    }
         public static void main(String[] args) throws NoSuchAlgorithmException {
         String path = "D://test/test.txt";
         String fileName = "/3/E200/test.txt";
