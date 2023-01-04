@@ -18,11 +18,9 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.common.utils.CommonUtils;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.Object2Map;
-import com.yjh.platform.common.utils.ThreadPoolUtil;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.common.utils.smUtil.Demo;
+import com.yjh.platform.configuration.IntelAnalysisFtpsConfig;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.Analysis;
@@ -132,6 +130,8 @@ public class UPatrolTaskService {
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
     private JobManager jobManager;
+    @Autowired
+    private IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
 
     //jobName
     @Value("${spring.QingHua.jobName}")
@@ -2471,5 +2471,15 @@ public class UPatrolTaskService {
             map.put("name",item.get("name").toString());
             redisTemplate.opsForHash().putAll(str, map);
         }
+    }
+
+    public String downloadPicture(String source,String target) {
+        try {
+            FtpsUtil.downloadFile(source, target, intelAnalysisFtpsConfig.getIp(), intelAnalysisFtpsConfig.getPort(),
+                    intelAnalysisFtpsConfig.getKeypw(), intelAnalysisFtpsConfig.getUsername(), intelAnalysisFtpsConfig.getPassword());
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
+        return "";
     }
 }
