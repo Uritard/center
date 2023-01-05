@@ -861,7 +861,6 @@ public class UPatrolTaskService {
                     Map<String, Object> robotTaskStatesMap = new HashMap<>();
                     robotTaskStatesMap.put("taskId", task.getTaskId());
                     robotTaskStatesMap.put("commandValue", 1);
-                    robotTaskStatesMap.put("isEdge", 0);
                     robotTaskStatesMap.put("robotCodeList", robotCodeList);
                     robotTaskStates(robotTaskStatesMap);
                 }

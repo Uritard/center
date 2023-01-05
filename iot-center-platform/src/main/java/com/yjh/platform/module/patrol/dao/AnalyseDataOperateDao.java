@@ -98,4 +98,6 @@ public interface AnalyseDataOperateDao {
 
 
     HashMap<String, String> selectPatrolDevice(@Param(value = "instanceId") String instanceId);
+
+    Long selectPresetIdByInstanceId(@Param(value = "instanceId") String instanceId);
 }
