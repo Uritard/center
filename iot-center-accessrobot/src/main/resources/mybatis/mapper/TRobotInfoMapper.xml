@@ -234,7 +234,7 @@
         <if test="remarks != null and remarks != ''"> and a.remarks = #{remarks, jdbcType=VARCHAR}</if>
     </select>
 
-    <insert id="batchInsert">
+    <insert id="batchInsert" useGeneratedKeys="true" keyColumn="robot_id" keyProperty="robotId">
         insert into t_robot_info(
          robot_code,robot_num
         ,robot_name,nest_name,nest_code
@@ -296,6 +296,16 @@
         select robot_id from t_robot_info
         where 1 = 1
         <if test="robotCode != null and robotCode != ''"> and robot_code = #{robotCode, jdbcType=VARCHAR}</if>
+    </select>
+    <!--根据机器人Code列表查询机器人id列表-->
+    <select id="selectRobotIdsByCodes" parameterType="java.lang.String" resultType="java.lang.Long">
+        select robot_id from t_robot_info
+        where 1 = 1
+        <if test="list != null and list.size() > 0">and robot_code in
+            <foreach collection="list" separator="," open="(" close=")" item="robotCode">
+                #{robotCode,jdbcType=VARCHAR}
+            </foreach>
+        </if>
     </select>
     <!--根据机器人id查询机器人name-->
     <select id="selectRobotNameByCode" parameterType="java.lang.String" resultType="java.lang.String">

@@ -4,6 +4,7 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.entity.SysOrg;
+import com.yjh.platform.module.user.entity.input.CommonByIdReq;
 import com.yjh.platform.module.user.service.SysRoleService;
 import com.yjh.platform.module.user.entity.SysRole;
 import java.util.HashMap;
@@ -282,6 +283,24 @@ public class SysRoleController {
         }
         return result;
     }
+
+
+
+    @ApiOperation(value = "根据角色Id查询用户信息")
+    @RequestMapping(value = "/selectUserByRoleId", method = RequestMethod.POST)
+    @Logs(title = "根据角色Id查询用户信息",content = "根据角色Id查询用户信息",logType = 1)
+    public Result selectUserByRoleId(@RequestBody CommonByIdReq commonByIdReq){
+        Result result = new Result();
+        try{
+             result.setData(sysRoleService.selectUserByRoleId(commonByIdReq.getId()));
+        }catch (Exception e){
+            log.error("监视设备关联关系修改失败：",e);
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(),ResultCodeEnum.UPDATEERROR.getName());
+        }
+        return result;
+    }
+
+
 
 
 }

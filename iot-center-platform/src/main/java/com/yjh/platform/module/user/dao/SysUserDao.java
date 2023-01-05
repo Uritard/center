@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.yjh.platform.module.user.entity.*;
+import com.yjh.platform.module.user.entity.output.SysUserDTO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -68,4 +69,6 @@ public interface SysUserDao {
     int batchUpdate(@Param(value = "list") List<Long> list);
 
     List<SysUser> selectUserByUpdateTime();
+
+    List<SysUserDTO> selectUserByRoleId(@Param("roleId")Long roleId);
 }

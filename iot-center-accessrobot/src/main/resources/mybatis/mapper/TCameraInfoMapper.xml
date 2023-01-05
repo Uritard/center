@@ -303,7 +303,7 @@
     <delete id="deleteByEdgeCode">
         delete from t_camera_info  where edge_code=#{edgeCode}
     </delete>
-    <insert id="insertBatch" parameterType="java.util.Collection"  useGeneratedKeys="true" keyColumn="camera_id" keyProperty="cameraId">
+    <insert id="insertBatch" useGeneratedKeys="true" keyColumn="camera_id" keyProperty="cameraId">
             insert into t_camera_info ( camera_name,camera_model
                                               ,pms_id,alias_name,record_id
                                               ,up_region_id,channel_num,camera_num
@@ -315,7 +315,7 @@
                                               ,longitude,address,unit
                                               ,create_time,commission_date,edge_code
                                               ,origin_id)  values
-            <foreach collection="tCameraInfoList"  item="tCameraInfo" separator=",">                              
+            <foreach collection="list"  item="tCameraInfo" separator=",">
                    (#{tCameraInfo.cameraName,jdbcType=VARCHAR},#{tCameraInfo.cameraModel,jdbcType=INTEGER}
                    ,#{tCameraInfo.pmsId,jdbcType=VARCHAR},#{tCameraInfo.aliasName,jdbcType=VARCHAR},#{tCameraInfo.recordId,jdbcType=BIGINT}
                    ,#{tCameraInfo.upRegionId,jdbcType=VARCHAR},#{tCameraInfo.channelNum,jdbcType=INTEGER},#{tCameraInfo.cameraNum,jdbcType=INTEGER}

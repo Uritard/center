@@ -1,12 +1,10 @@
 package com.yjh.accessrobot.module.command.service;
 
+import com.yjh.accessrobot.module.command.dao.SysUserDao;
 import com.yjh.accessrobot.module.command.dao.TCameraRecorderDao;
 import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
 import com.yjh.accessrobot.module.command.dao.TStdRegionDao;
-import com.yjh.accessrobot.module.command.entity.RobotModel;
-import com.yjh.accessrobot.module.command.entity.TCameraRecorder;
-import com.yjh.accessrobot.module.command.entity.TRobotInfo;
-import com.yjh.accessrobot.module.command.entity.TStdRegion;
+import com.yjh.accessrobot.module.command.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
@@ -14,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,8 @@ public class TRobotInfoService {
     private TCameraRecorderDao tCameraRecorderDao;
     @Autowired
     private TStdRegionDao tStdRegionDao;
+    @Autowired
+    private SysUserDao sysUserDao;
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TRobotInfo tRobotInfo) {
@@ -139,6 +140,8 @@ public class TRobotInfoService {
         List<TRobotInfo> oldRobotInfoList = tRobotInfoDao.selectByEdgeCodeAndType(edgeNode, type);
         if (CollectionUtils.isEmpty(oldRobotInfoList)) {
             tRobotInfoDao.batchInsert(tRobotInfoList);
+            //更新权限信息
+            dealDevicePermission(tRobotInfoList.stream().map(TRobotInfo::getRobotId).collect(Collectors.toList()));
         } else {
             Map<String, TRobotInfo> oldTRobotInfoMap = oldRobotInfoList.stream().collect(Collectors.toMap(TRobotInfo::getOriginId, Function.identity()));
             Map<String, TRobotInfo> newTRobotInfoMap = tRobotInfoList.stream().collect(Collectors.toMap(TRobotInfo::getOriginId, Function.identity()));
@@ -161,7 +164,26 @@ public class TRobotInfoService {
             if (CollectionUtils.isNotEmpty(insertIdSet)) {
                 List<TRobotInfo> insertTRobotInfoList = tRobotInfoList.stream().filter(tRobotInfo -> insertIdSet.contains(tRobotInfo.getOriginId())).collect(Collectors.toList());
                 tRobotInfoDao.batchInsert(insertTRobotInfoList);
+                dealDevicePermission(insertTRobotInfoList.stream().map(TRobotInfo::getRobotId).collect(Collectors.toList()));
             }
+        }
+    }
+
+    private void dealDevicePermission(List<Long> robotIds) {
+        //更新权限信息
+        List<Long> userIds = sysUserDao.selectIdsByRoleId(1235L);
+        if (CollectionUtils.isNotEmpty(robotIds) && CollectionUtils.isNotEmpty(userIds)) {
+            //组装权限内容
+            List<SysUserDevicePermission> sysUserDevicePermissions = new ArrayList<>();
+            robotIds.forEach(robotId -> {
+                for (Long userId : userIds) {
+                    SysUserDevicePermission sysUserDevicePermission = new SysUserDevicePermission();
+                    sysUserDevicePermission.setUserId(userId);
+                    sysUserDevicePermission.setMonitorDeviceId(robotId);
+                    sysUserDevicePermissions.add(sysUserDevicePermission);
+                }
+            });
+            sysUserDao.batchInsertDevicePermission(sysUserDevicePermissions);
         }
     }
 

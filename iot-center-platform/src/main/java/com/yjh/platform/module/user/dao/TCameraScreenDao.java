@@ -38,4 +38,5 @@ public interface TCameraScreenDao {
                                                    @Param(value = "userId")Long userId);
 
     List<AreaInfoOfMonitorDevice> selectRegionMonitorDevice();
+    List<AreaInfoOfMonitorDevice> selectAllMonitorDevice();
 }

@@ -8,7 +8,9 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
+import com.yjh.platform.module.user.entity.output.SysUserDTO;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,8 @@ public class SysRoleService{
     private SysRoleRegionDao sysRoleRegionDao;
     @Autowired
     private SysRoleDeviceDao sysRoleDeviceDao;
+    @Autowired
+    private SysUserDao sysUserDao;
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(SysRole sysRole) {
@@ -332,6 +336,14 @@ public class SysRoleService{
             return -1;
         }
         return sysRoleDao.batchInsertMonitorDeviceRelation(validDataList);
+    }
+
+    public List<SysUserDTO> selectUserByRoleId(Long roleId) {
+        List<SysUserDTO> sysUsers =  sysUserDao.selectUserByRoleId(roleId);
+        if (CollectionUtils.isNotEmpty(sysUsers)) {
+            return sysUsers;
+        }
+        return new ArrayList<>();
     }
 
 

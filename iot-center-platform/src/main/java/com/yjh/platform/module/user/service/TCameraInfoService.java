@@ -9,6 +9,7 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
+import com.yjh.platform.module.user.entity.output.SysUserDTO;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.dom4j.Attribute;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.util.*;
@@ -48,7 +50,12 @@ public class TCameraInfoService {
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
     private TCameraRecorderDao tCameraRecorderDao;
+    @Autowired
+    private SysUserDao sysUserDao;
+    @Autowired
+    private SysUserDevicePermissionDao sysUserDevicePermissionDao;
 
+    public static final Long BUSINESS_ROLE_ID = 1235L;
     private Logger log = LoggerFactory.getLogger(TCameraInfoService.class);
 
     @Transactional(rollbackFor = Exception.class)
@@ -89,6 +96,18 @@ public class TCameraInfoService {
         tCameraInfo.setMonitorId(channel.getId());
         ModelDecodeUtil.decodeField(tCameraInfo, "cameraCode");
         this.tCameraInfoDao.insert(tCameraInfo);
+        //新增机器人时，对所有用户赋予机器人权限
+        List<SysUserDTO> sysUserDTOList = sysUserDao.selectUserByRoleId(BUSINESS_ROLE_ID);
+        if (!CollectionUtils.isEmpty(sysUserDTOList)) {
+            List<SysUserDevicePermissionDO> permissionDOS = new ArrayList<>(sysUserDTOList.size());
+            sysUserDTOList.forEach(sysUserDTO -> {
+                SysUserDevicePermissionDO sysUserDevicePermissionDO = new SysUserDevicePermissionDO();
+                sysUserDevicePermissionDO.setUserId(sysUserDTO.getUserId());
+                sysUserDevicePermissionDO.setMonitorDeviceId(tCameraInfo.getCameraId());
+                permissionDOS.add(sysUserDevicePermissionDO);
+            });
+            sysUserDevicePermissionDao.batchInsert(permissionDOS);
+        }
         return this.intoRedis();
     }
 
