@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.accessrobot.module.command.dao.TDeviceMaintenanceMapper">
+
+    <resultMap id="BaseResultMap" type="com.yjh.accessrobot.module.command.entity.TDeviceMaintenance">
+            <id property="maintenanceId" column="maintenance_id" jdbcType="BIGINT"/>
+            <result property="maintenanceName" column="maintenance_name" jdbcType="VARCHAR"/>
+            <result property="deviceIds" column="device_ids" jdbcType="VARCHAR"/>
+            <result property="isValid" column="is_valid" jdbcType="INTEGER"/>
+            <result property="maintenanceStart" column="maintenance_start" jdbcType="TIMESTAMP"/>
+            <result property="maintenanceStop" column="maintenance_stop" jdbcType="TIMESTAMP"/>
+            <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
+            <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
+            <result property="coordinatePixel" column="coordinate_pixel" jdbcType="VARCHAR"/>
+            <result property="deviceLevel" column="device_level" jdbcType="VARCHAR"/>
+            <result property="instanceIds" column="instance_ids" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        maintenance_id,maintenance_name,device_ids,
+        is_valid,maintenance_start,maintenance_stop,
+        edge_code,origin_id,coordinate_pixel,
+        device_level,instance_ids
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_device_maintenance
+        where  maintenance_id = #{maintenanceId,jdbcType=BIGINT} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from t_device_maintenance
+        where  maintenance_id = #{maintenanceId,jdbcType=BIGINT} 
+    </delete>
+    <insert id="insert" keyColumn="maintenance_id" keyProperty="maintenanceId" parameterType="com.yjh.accessrobot.module.command.entity.TDeviceMaintenance" useGeneratedKeys="true">
+        insert into t_device_maintenance
+        ( maintenance_id,maintenance_name,device_ids
+        ,is_valid,maintenance_start,maintenance_stop
+        ,edge_code,origin_id,coordinate_pixel
+        ,device_level,instance_ids)
+        values (#{maintenanceId,jdbcType=BIGINT},#{maintenanceName,jdbcType=VARCHAR},#{deviceIds,jdbcType=VARCHAR}
+        ,#{isValid,jdbcType=INTEGER},#{maintenanceStart,jdbcType=TIMESTAMP},#{maintenanceStop,jdbcType=TIMESTAMP}
+        ,#{edgeCode,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR},#{coordinatePixel,jdbcType=VARCHAR}
+        ,#{deviceLevel,jdbcType=VARCHAR},#{instanceIds,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="maintenance_id" keyProperty="maintenanceId" parameterType="com.yjh.accessrobot.module.command.entity.TDeviceMaintenance" useGeneratedKeys="true">
+        insert into t_device_maintenance
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="maintenanceId != null">maintenance_id,</if>
+                <if test="maintenanceName != null">maintenance_name,</if>
+                <if test="deviceIds != null">device_ids,</if>
+                <if test="isValid != null">is_valid,</if>
+                <if test="maintenanceStart != null">maintenance_start,</if>
+                <if test="maintenanceStop != null">maintenance_stop,</if>
+                <if test="edgeCode != null">edge_code,</if>
+                <if test="originId != null">origin_id,</if>
+                <if test="coordinatePixel != null">coordinate_pixel,</if>
+                <if test="deviceLevel != null">device_level,</if>
+                <if test="instanceIds != null">instance_ids,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="maintenanceId != null">#{maintenanceId,jdbcType=BIGINT},</if>
+                <if test="maintenanceName != null">#{maintenanceName,jdbcType=VARCHAR},</if>
+                <if test="deviceIds != null">#{deviceIds,jdbcType=VARCHAR},</if>
+                <if test="isValid != null">#{isValid,jdbcType=INTEGER},</if>
+                <if test="maintenanceStart != null">#{maintenanceStart,jdbcType=TIMESTAMP},</if>
+                <if test="maintenanceStop != null">#{maintenanceStop,jdbcType=TIMESTAMP},</if>
+                <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+                <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
+                <if test="coordinatePixel != null">#{coordinatePixel,jdbcType=VARCHAR},</if>
+                <if test="deviceLevel != null">#{deviceLevel,jdbcType=VARCHAR},</if>
+                <if test="instanceIds != null">#{instanceIds,jdbcType=VARCHAR},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TDeviceMaintenance">
+        update t_device_maintenance
+        <set>
+                <if test="maintenanceName != null">
+                    maintenance_name = #{maintenanceName,jdbcType=VARCHAR},
+                </if>
+                <if test="deviceIds != null">
+                    device_ids = #{deviceIds,jdbcType=VARCHAR},
+                </if>
+                <if test="isValid != null">
+                    is_valid = #{isValid,jdbcType=INTEGER},
+                </if>
+                <if test="maintenanceStart != null">
+                    maintenance_start = #{maintenanceStart,jdbcType=TIMESTAMP},
+                </if>
+                <if test="maintenanceStop != null">
+                    maintenance_stop = #{maintenanceStop,jdbcType=TIMESTAMP},
+                </if>
+                <if test="edgeCode != null">
+                    edge_code = #{edgeCode,jdbcType=VARCHAR},
+                </if>
+                <if test="originId != null">
+                    origin_id = #{originId,jdbcType=VARCHAR},
+                </if>
+                <if test="coordinatePixel != null">
+                    coordinate_pixel = #{coordinatePixel,jdbcType=VARCHAR},
+                </if>
+                <if test="deviceLevel != null">
+                    device_level = #{deviceLevel,jdbcType=VARCHAR},
+                </if>
+                <if test="instanceIds != null">
+                    instance_ids = #{instanceIds,jdbcType=VARCHAR},
+                </if>
+        </set>
+        where   maintenance_id = #{maintenanceId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TDeviceMaintenance">
+        update t_device_maintenance
+        set 
+            maintenance_name =  #{maintenanceName,jdbcType=VARCHAR},
+            device_ids =  #{deviceIds,jdbcType=VARCHAR},
+            is_valid =  #{isValid,jdbcType=INTEGER},
+            maintenance_start =  #{maintenanceStart,jdbcType=TIMESTAMP},
+            maintenance_stop =  #{maintenanceStop,jdbcType=TIMESTAMP},
+            edge_code =  #{edgeCode,jdbcType=VARCHAR},
+            origin_id =  #{originId,jdbcType=VARCHAR},
+            coordinate_pixel =  #{coordinatePixel,jdbcType=VARCHAR},
+            device_level =  #{deviceLevel,jdbcType=VARCHAR},
+            instance_ids =  #{instanceIds,jdbcType=VARCHAR}
+        where   maintenance_id = #{maintenanceId,jdbcType=BIGINT} 
+    </update>
+</mapper>

@@ -35,6 +35,7 @@ import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDelDao;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.*;
+import com.yjh.platform.module.task.service.RunAtNowTask;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.SysUser;
@@ -2480,5 +2481,26 @@ public class UPatrolTaskService {
             log.error(e.getMessage(), e);
         }
         return "";
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public int upSystemCtrl(XMLBaseModel xmlBaseModel) throws Exception {
+        String com = xmlBaseModel.getCommand();
+        String code = xmlBaseModel.getCode();
+        String taskId = code.contains("_") ? code.split("_").length > 2 ? StringUtils.substringBetween(code, "_") : StringUtils.substringBefore(code, "_") : code;
+        log.info("taskId : {} control", taskId);
+        switch (com) {
+            case "1":
+                return this.taskStart(taskId);
+            case "2":
+                return this.taskPause(taskId);
+            case "3":
+                return this.taskGoOn(taskId);
+            case "4":
+                this.taskShutDown(taskId);
+                return 1;
+            default:
+                return -1;
+        }
     }
 }

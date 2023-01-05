@@ -12,6 +12,7 @@ import com.yjh.accessrobot.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
+import com.yjh.accessrobot.common.utils.ValueUtil;
 import com.yjh.accessrobot.commons.logs.LogsRecord;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
@@ -49,6 +50,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -56,6 +58,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.yjh.accessrobot.netty.server.RobotServerHandler.getXmlMessage;
 import static org.apache.catalina.startup.ExpandWar.deleteDir;
 
 /**
@@ -115,6 +118,10 @@ public class RobotService {
 
     @Resource
     private TStdDeviceModelService tStdDeviceModelService;
+
+    @Resource
+    private TDeviceMaintenanceService tDeviceMaintenanceService;
+
     @Autowired
     private  TVoiceDeviceService tVoiceDeviceService;
 
@@ -573,9 +580,9 @@ public class RobotService {
                         case "map_file_path":
                             dealMapFile(filePath, nodeCode);
                             break;
-//                        case "host_file_path":
-//                            dealHostFilePath(filePathMap,v.toString(),edgeCode);
-//                            break;
+                        case "host_file_path":
+                            dealHostFilePath(filePath, nodeCode);
+                            break;
                         case "video_file_path":
                             dealCameraFile(filePath, nodeCode);
                             break;
@@ -588,9 +595,9 @@ public class RobotService {
                         case "record_file_path":
                             dealRecordFile(filePath, nodeCode);
                             break;
-//                        case "overhaularea_file_path":
-//                            dealMaintenanceFilePath(filePathMap,v.toString(),edgeCode);
-//                            break;
+                        case "overhaularea_file_path":
+                            dealMaintenanceFilePath(filePath, nodeCode);
+                            break;
                         case "source_file_path":
                             dealSourceFile(filePath, nodeCode);
                             break;
@@ -1020,6 +1027,18 @@ public class RobotService {
         log.info("在线的robotCodeList: {}", robotCodeList);
 
         for (String robotCode : robotCodeList) {
+            TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+            String status;
+            if (StringUtils.isNotEmpty(tRobotInfo.getEdgeCode()) && StringUtils.isNotEmpty(tRobotInfo.getOriginId())) {
+                status = tRobotInfoDao.selectStatusByEdgeCode(tRobotInfo.getEdgeCode());
+                robotCode = tRobotInfo.getEdgeCode();
+            } else {
+                status = tRobotInfoDao.selectStatusByRobotCode(robotCode);
+            }
+            if (Objects.equals(OFF_LINE, status)) {
+                log.info("The edge is currently offline......");
+                return "false";
+            }
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(Constant.sendCode)
                     .setReceiveCode(robotCode)
@@ -1683,6 +1702,7 @@ public class RobotService {
 
         xmlBaseModel.setSendCode(Constant.sendCode);
         xmlBaseModel.setReceiveCode(receiveCode);
+        log.info("xmlBaseModel {} ", xmlBaseModel);
         String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
         log.info("生成的机器人控制xml是<start>{}<end>", xmlString);
         RobotServerHandler.send(generateByteOrder(xmlString, receiveCode), receiveCode);
@@ -2896,10 +2916,10 @@ public class RobotService {
                 dealDevicePointModel(filePathMap.get("content") + File.separator + filePath, filePathMap.get("content"),
                         mapForPreset.get("content"), mapForPresetReal.get("content"), edgeCode, edgeLevel);
                 break;
-//            case "2":
-//                log.info("边缘节点模型 {}", filePath);
-//                dealHostFilePath(filePathMap,filePath,edgeCode);
-//                break;
+            case "2":
+                log.info("边缘节点模型 {}", filePath);
+                dealHostFilePath(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                break;
             case "3":
                 log.info("机器人模型 {}", filePath);
                 dealRobotFile(filePathMap.get("content") + File.separator + filePath,edgeCode, Constant.ROBOT);
@@ -2916,10 +2936,10 @@ public class RobotService {
                 log.info("声纹模型 {}", filePath);
                 dealVoiceFile(filePathMap.get("content") + File.separator + filePath,edgeCode);
                 break;
-//            case "8":
-//                log.info("检修区域配置模型 {}", filePath);
-//                dealMaintenanceFilePath(filePathMap,filePath,edgeCode);
-//                break;
+            case "8":
+                log.info("检修区域配置模型 {}", filePath);
+                dealMaintenanceFilePath(filePathMap.get("content") + File.separator + filePath, edgeCode);
+                break;
             case "9":
                 log.info("地图文件 {}", filePath);
                 dealMapFile(filePathMap.get("content") + File.separator + filePath, edgeCode);
@@ -2938,6 +2958,48 @@ public class RobotService {
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * 处理检修区域文件
+     * @param filePath
+     * @param edgeCode
+     */
+    private void dealMaintenanceFilePath(String filePath, String edgeCode) {
+        if (StringUtils.isBlank(filePath)) {
+            log.info("file path is null");
+            return;
+        }
+        try {
+            XMLBaseModel model = getXmlMessage(filePath);
+            List<Map<String, Object>> list = model.getItems();
+            List<TDeviceMaintenanceModel> deviceMaintenanceModelList = list.stream().map(JSON::toJSONString).map(jsonString -> JSON.parseObject(jsonString, TDeviceMaintenanceModel.class)).collect(Collectors.toList());
+            tDeviceMaintenanceService.saveReportData(deviceMaintenanceModelList, edgeCode);
+            log.info("节点 {} 的检修区域模型解析完成", edgeCode);
+        } catch (Exception e) {
+            log.error("检修区域模型处理失败", e);
+        }
+    }
+
+
+    /**
+     * 处理节点文件
+     * @param filePath
+     * @param nodeCode
+     */
+    private void dealHostFilePath(String filePath, String nodeCode) {
+        if (StringUtils.isBlank(filePath)) {
+            log.info("file path is null");
+            return;
+        }
+        try {
+            XMLBaseModel propertyModel = getXmlMessage(filePath);
+            Map<String, Object> hostMap = propertyModel.getItems().get(0);
+            //放到缓存里
+            redisTemplate.opsForHash().putAll("edge:" + nodeCode, hostMap);
+        } catch (Exception e) {
+            log.info("解析节点文件失败：", e);
         }
     }
 
