@@ -1,6 +1,7 @@
 package com.yjh.accessrobot.commons.utils.file;
 
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -12,10 +13,23 @@ import java.net.URLEncoder;
 /**
  * 文件路径生成和获取
  */
+@Slf4j
 public class FileUtil {
 
     private final static Log logger = LogFactory.getLog(FileUtil.class);
 
+    /**
+     * 创建文件夹
+     *
+     * @param directoryPath
+     */
+    public static void createDirectory(String directoryPath) {
+        try {
+            FileUtils.forceMkdir(new File(directoryPath));
+        } catch (Exception e) {
+            log.error("createDirectory: ", e);
+        }
+    }
     /**
      * 获取文件的绝对保存路径
      *
@@ -88,22 +102,13 @@ public class FileUtil {
     public static void copyFileUsingStream(String sourcePath, String descPath) throws IOException {
         File source = new File(sourcePath);
         File dest = new File(descPath);
-        InputStream is = null;
-        OutputStream os = null;
-        try {
-            is = new FileInputStream(source);
-            os = new FileOutputStream(dest);
+        //目标文件夹不存在会报错
+        createDirectory(StringUtils.substringBeforeLast(descPath,"/"));
+        try (InputStream is = new FileInputStream(source); OutputStream os = new FileOutputStream(dest)) {
             byte[] buffer = new byte[1024];
             int length;
             while ((length = is.read(buffer)) > 0) {
                 os.write(buffer, 0, length);
-            }
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-            if (os != null) {
-                os.close();
             }
         }
     }

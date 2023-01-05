@@ -97,8 +97,6 @@ public class RobotService {
     private String key;
     @Value("${netty.server.ftps.local.path}")
     private String ftpsLocalPath;
-    @Value("${inspect.flag}")
-    private boolean flag;
 
     @Resource
     LogsRecord logsRecord;
@@ -500,27 +498,6 @@ public class RobotService {
     }
 
     /**
-     * 更新无人机巢信息
-     *
-     * @param robotCode
-     * @param nestCode
-     * @param nestName
-     * @return
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public int updateNestInfo(String robotCode, String nestCode, String nestName) {
-        Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
-        TRobotInfo tRobotInfo = new TRobotInfo()
-                .setRobotId(robotId)
-                .setNestCode(nestCode)
-                .setNestName(nestName);
-        int res = tRobotInfoDao.update(tRobotInfo);
-        log.info("robotCode为==={},robotId为==={}的机巢信息code{}和机巢名称==={},修改结果==={}", robotCode, robotId, nestCode, nestName, res > 0);
-        return res;
-    }
-
-
-    /**
      * 查询表中所有的机器人
      *
      * @return List<String>
@@ -530,77 +507,6 @@ public class RobotService {
         return tRobotInfoDao.selectAllRobotCode();
     }
 
-    /**
-     * 查询是否是无人机
-     *
-     * @return List<String>
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public boolean selectIsDrone(String robotCode) {
-        return Objects.nonNull(tRobotInfoDao.selectIsDrone(robotCode));
-    }
-
-    /**
-     * 查询实物ID
-     *
-     * @return List<String>
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public String selectMaterialId(String deviceId) {
-        return tRobotInfoDao.selectMaterialId(deviceId);
-    }
-
-    /**
-     * 处理机器人返回的模型文件
-     *
-     * @param map 机器人返回的模型文件相关信息
-     * @return void
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void addRobotFile(Map<String, String> map) throws Exception {
-        String robotCode = map.get("robotCode");
-        if (StringUtils.isEmpty(robotCode)) {
-            log.error("机器人编码为空,robotCode：{}", robotCode);
-            throw new RuntimeException("机器人编码为空");
-        }
-        Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
-
-        Object deviceFile = map.getOrDefault("deviceFile", "");
-        Object robotFile = map.getOrDefault("robotFile", "");
-        Object propertyFile = map.getOrDefault("propertyFile", "");
-        XMLBaseModel deviceModel = getXmlMessage(filePathMap.get("content") + File.separator + deviceFile);
-        List<Map<String, Object>> deviceMap = deviceModel.getItems();
-
-        List<Map<String, Object>> robotMap = new ArrayList<>();
-        List<Map<String, Object>> propertyMap = new ArrayList<>();
-        if (!"".equals(propertyFile)) {
-            XMLBaseModel propertyModel = getXmlMessage(filePathMap.get("content") + File.separator + propertyFile);
-            propertyMap = propertyModel.getItems();
-        }
-        if (!"".equals(robotFile)) {
-            XMLBaseModel robotModel = getXmlMessage(filePathMap.get("content") + File.separator + robotFile);
-            robotMap = robotModel.getItems();
-        }
-        if (CollectionUtils.isNotEmpty(deviceMap)) {
-            Long robotId = tRobotInfoDao.selectRobotIdByCode(robotCode);
-            // Robot Model Info
-            addRobotModel(robotMap, robotId);
-            // Device Point Info
-            addDevicePoint(deviceMap, robotId);
-            //Property Info 属性信息 与点位绑定
-            addPropertyModel(propertyMap, robotId);
-            // Device Point Region Info
-            addDevicePointRegion(deviceMap, robotId);
-        }
-    }
-
-
-    public static void main(String[] args) {
-
-
-
-
-    }
     /**
      * 处理机器人返回的模型文件
      *
@@ -1347,12 +1253,12 @@ public class RobotService {
      * @return int
      */
     @Transactional(rollbackFor = Exception.class)
-    public Result feignRobotTaskControl(Map<String, Object> robotTaskControlMap){
+    public Result feignRobotTaskControl(Map<String, Object> robotTaskControlMap) {
         Result result = new Result();
         log.info("robotTaskControlMap==={}", robotTaskControlMap);
         try {
             String json = JSONObject.toJSONString(robotTaskControlMap.get("robotCodeList"));
-            if (StringUtils.equals("null", json)){
+            if (StringUtils.equals("null", json)) {
                 return result;
             }
 
@@ -1362,88 +1268,41 @@ public class RobotService {
             // 1.任务启动 2.任务暂停 3.任务继续 4.任务停止
             String commandValue = String.valueOf(robotTaskControlMap.get("commandValue"));
             String code = "";
-            String tasSkPatrolledId = (String)redisTemplate.opsForHash().get("countForAbnormal:" + taskId, "taskPatrolledId");
-            if (Objects.equals("1", String.valueOf(robotTaskControlMap.get("isEdge")))){
-                // 边缘节点
-                for (String edgeCode : robotCodeList) {
-                    String edgeStatus = tRobotInfoDao.selectStatusByEdgeCode(edgeCode);
-                    if (Objects.equals(OFF_LINE, edgeStatus)) {
-                        result.setMessage(209,"The edge is currently offline......");
-                        return result;
-                    }
-
-                    String receiveCode = String.valueOf(redisTemplate.opsForHash().get("region:" + edgeCode, "stationId"));
-                    // Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + receiveCode + ":" + taskId);
-                    // String tasSkPatrolledId = redisInfoMap.get("taskPatrolledId");
-                    code = flag ? "1".equals(commandValue) ? taskId : tasSkPatrolledId : taskId;
-                    log.info("taskId=={}, receiveCode=={}, tasSkPatrolledId=={}, code=={}", taskId, receiveCode, tasSkPatrolledId, code);
-
-                    if (StringUtils.isEmpty(code)){
-                        log.info("边缘节点未上报任务状态信息,无法获取当前巡视任务id");
-                        return result;
-                    }
-
-                    XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                            .setType("41")
-                            .setSendCode(Constant.sendCode)
-                            .setReceiveCode(receiveCode)
-                            .setCode(code)
-                            .setCommand(commandValue)
-                            .setTime(DateTimeUtil.format(new Date()));
-                    String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-                    log.info("生成的任务控制xml是<start>{}<end>", xmlString);
-
-                    RobotServerHandler.send(generateByteOrder(xmlString, receiveCode), receiveCode);
+            String tasSkPatrolledId = (String) redisTemplate.opsForHash().get("countForAbnormal:" + taskId, "taskPatrolledId");
+            for (String robotCode : robotCodeList) {
+                TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+                String status;
+                if (StringUtils.isNotEmpty(tRobotInfo.getEdgeCode()) && StringUtils.isNotEmpty(tRobotInfo.getOriginId())) {
+                    status = tRobotInfoDao.selectStatusByEdgeCode(tRobotInfo.getEdgeCode());
+                    robotCode = tRobotInfo.getEdgeCode();
+                } else {
+                    status = tRobotInfoDao.selectStatusByRobotCode(robotCode);
                 }
-            }else {
-                // 机器人
-                for (String robotCode : robotCodeList) {
-                    String robotStatus = tRobotInfoDao.selectStatusByRobotCode(robotCode);
-                    if (Objects.equals(OFF_LINE, robotStatus)) {
-                        result.setMessage(209, "The robot is currently offline......");
-                        return result;
-                    }
-
-/*
-                    // taskId是巡视主机的id,robotTaskId是机器人上报的id
-                    String robotTaskId = selectTaskId(taskId);
-                    log.info("robotTaskId==={}", robotTaskId);
-
-                    UPatrolTask uPatrolTaskTemp = selectTaskByTaskCode(robotTaskId);
-                    log.info("uPatrolTaskTemp=={}", uPatrolTaskTemp);
-                    if (Objects.nonNull(uPatrolTaskTemp) && StringUtils.isNotEmpty(uPatrolTaskTemp.getDateType())) {
-                        boolean moreTime = uPatrolTaskTemp.getDateType().split(" ")[2].contains(",");
-                        if (moreTime) {
-                            robotTaskId = taskId;
-                        }
-                    }
-                    log.info("robotTaskId=={}", robotTaskId);
-
-                    Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + robotTaskId);
-                    String tasSkPatrolledId = redisInfoMap.get("taskPatrolledId");
-*/
-
-                    code = flag ? "1".equals(commandValue) ? taskId : tasSkPatrolledId : taskId;
-                    log.info("taskId=={}, tasSkPatrolledId=={}, 最后code=={}", taskId, tasSkPatrolledId, code);
-                    if (StringUtils.isEmpty(code)) {
-                        log.info("机器人未上报任务状态信息,无法获取当前巡视任务id");
-                        return result;
-                    }
-
-                    XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                            .setType("41")
-                            .setSendCode(Constant.sendCode)
-                            .setReceiveCode(robotCode)
-                            .setCode(code)
-                            .setCommand(commandValue)
-                            .setTime(DateTimeUtil.format(new Date()));
-                    String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-                    log.info("生成的任务控制xml是<start>{}<end>", xmlString);
-
-                    RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
+                if (Objects.equals(OFF_LINE, status)) {
+                    result.setMessage(209, "The edge is currently offline......");
+                    return result;
                 }
+                code = "1".equals(commandValue) ? taskId : tasSkPatrolledId;
+                log.info("taskId=={}, receiveCode=={}, tasSkPatrolledId=={}, code=={}", taskId, robotCode, tasSkPatrolledId, code);
+
+                if (StringUtils.isEmpty(code)) {
+                    log.info("节点未上报任务状态信息,无法获取当前巡视任务id");
+                    return result;
+                }
+
+                XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                        .setType("41")
+                        .setSendCode(Constant.sendCode)
+                        .setReceiveCode(robotCode)
+                        .setCode(code)
+                        .setCommand(commandValue)
+                        .setTime(DateTimeUtil.format(new Date()));
+                String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+                log.info("生成的任务控制xml是<start>{}<end>", xmlString);
+
+                RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("给机器人/无人机/边缘节点下发任务控制指令异常:", e);
         }
         return result;

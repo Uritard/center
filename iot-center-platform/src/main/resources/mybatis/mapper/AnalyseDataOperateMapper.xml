@@ -1085,4 +1085,14 @@
         WHERE
             a.device_id = #{deviceId, jdbcType=BIGINT}
     </select>
+
+    <select id="selectPresetIdByInstanceId" resultType="java.lang.Long">
+        SELECT
+        b.preset_id
+        FROM
+        t_cruise_point_instance a
+        LEFT JOIN t_camera_preset b ON a.cruise_id = b.preset_id
+        WHERE
+        a.instance_id = #{instanceId}
+    </select>
 </mapper>
