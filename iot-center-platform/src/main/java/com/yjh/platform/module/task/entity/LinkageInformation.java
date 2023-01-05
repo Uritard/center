@@ -61,4 +61,9 @@ public class LinkageInformation {
     @ApiModelProperty(value = "全景摄像机预置位Id")
     private Long presetId;
 
+    @ApiModelProperty(value = "任务摄像机Id")
+    private long taskCameraId;
+
+    @ApiModelProperty(value = "任务机器人Id")
+    private long taskRobotId;
 }

@@ -1,10 +1,12 @@
 package com.yjh.platform.module.task.service;
 
+import com.alibaba.fastjson.JSON;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TUnionTaskAttrDao;
 import com.yjh.platform.module.task.dao.TUnionTaskDao;
 import com.yjh.platform.module.task.entity.*;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,7 +152,22 @@ public class TUnionTaskService{
     //联动弹窗--联动信息
     @Transactional(rollbackFor = Exception.class)
     public LinkageInformation linkageInformation(String taskId) {
-        return TUnionTaskAttrDao.linkageInformation(taskId);
+
+        List<Map<String, Object>> list = TUnionTaskAttrDao.linkageCruiseDevice(taskId);
+
+        log.info("linkageCruiseDevice: {}", JSON.toJSONString(list));
+
+        LinkageInformation info = TUnionTaskAttrDao.linkageInformation(taskId);
+        for (Map<String, Object> li : list) {
+            if (li.get("camera_id") != null) {
+                info.setTaskCameraId(MapUtils.getLongValue(li, "camera_id"));
+            }
+            if (li.get("robot_id") != null) {
+                info.setTaskRobotId(MapUtils.getLongValue(li, "robot_id"));
+            }
+        }
+
+        return info;
     }
 
     //联动弹窗--监测数据

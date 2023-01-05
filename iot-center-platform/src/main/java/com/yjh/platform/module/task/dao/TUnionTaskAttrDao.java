@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tt
@@ -32,6 +33,8 @@ public interface TUnionTaskAttrDao {
 
     int batchInsert(List<TUnionTaskAttr> list);
     LinkageInformation linkageInformation(@Param(value = "taskId")String taskId);
+
+    List<Map<String, Object>> linkageCruiseDevice(@Param(value = "taskId")String taskId);
 
     List<LinkageMonitorData> selectDeviceInfo(@Param(value = "taskId")String taskId);
 
