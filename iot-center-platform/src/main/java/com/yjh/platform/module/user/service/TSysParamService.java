@@ -234,6 +234,12 @@ public class TSysParamService{
         }
         return result;
     }
+    public Map<String,String > homePageInfo(){
+        Map<String,String> result = Maps.newHashMap();
+        Map<String,String> systemNameMap = redisTemplate.opsForHash().entries("t_sys_param:stationName");
+        result.put("systemName",systemNameMap.get("content"));
+        return result;
+    }
 
     public List<Version> selectVersion(int type){
         return tSysParamDao.selectVersion(type);
