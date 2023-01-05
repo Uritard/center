@@ -250,12 +250,10 @@ public class InspectionResultThread implements Runnable{
 
             Integer robotType = uPatrolTaskService.selectRobotType(sendCode);
             // 机器人类型为模拟机器人 为模拟工具
-            boolean isSimulationTool = Objects.equals(810, robotType)
-                    // 上级系统不走算法处理，只存数据
-                    && !"3".equals(sysLevel);
+            boolean isSimulationTool = Objects.equals(810, robotType);
             // 如果sendCode是边缘节点(1~1999) 也走模拟工具的逻辑
-            boolean isEdgeCode = NumberUtils.toInt(sendCode) >= 1 && NumberUtils.toInt(sendCode) <= 1999;
-            isSimulationTool = isSimulationTool || isEdgeCode;
+//            boolean isEdgeCode = NumberUtils.toInt(sendCode) >= 1 && NumberUtils.toInt(sendCode) <= 1999;
+//            isSimulationTool = isSimulationTool || isEdgeCode;
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, sysLevel: {}", isSimulationTool, taskId, sysLevel);
             if (Boolean.FALSE.equals(isSimulationTool)) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
@@ -338,7 +336,7 @@ public class InspectionResultThread implements Runnable{
             // 复制图片到算法分析指定的路径
             String ftpFileName = originPath.trim().substring(originPath.trim().lastIndexOf("/") + 1);
             String resultImagePath = redisTemplate.opsForHash().get("t_sys_param:resultImgPath", "content") + ftpFileName;
-            FileUtil.copyFileUsingStream(resultImagePath, resultImagePath);
+            FileUtil.copyFileUsingStream(originPath, resultImagePath);
 
             // 复制原图到算法分析指定的路径
             if (StringUtils.isNotEmpty(ftpFileName) && StringUtils.isNotEmpty(value) && !ftpsTurbo()){

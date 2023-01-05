@@ -201,8 +201,8 @@ public class MessageThread {
             List<XMLBaseModel> list = new ArrayList<>();
             list.add(xmlBaseModel);
             map.put("list", list);
-            //re = Constant.otherServer(map,Constant.TASK_STATE_URL);//江苏要求
-            re = Constant.otherServer(map, Constant.ROBOT_TASK_URL);//国网要求
+            re = Constant.otherServer(map,Constant.TASK_STATE_URL);
+//            re = Constant.otherServer(map, Constant.ROBOT_TASK_URL);//国网要求
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item = new HashMap<>();
             if (StringUtils.equals("1", xmlBaseModel.getCommand())){

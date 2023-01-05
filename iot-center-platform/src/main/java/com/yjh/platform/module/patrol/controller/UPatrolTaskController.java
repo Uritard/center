@@ -13,6 +13,7 @@ import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskStatus;
+import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
@@ -271,6 +272,24 @@ public class UPatrolTaskController {
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "站端任务控制")
+    @RequestMapping(value = "/upSystemCtrl", method = RequestMethod.POST)
+    public Result upSystemCtrl(@RequestBody Map<String,List<XMLBaseModel>> map) {
+        Result result = new Result();
+        try {
+            XMLBaseModel xmlBaseModel = map.get("list").get(0);
+            log.info("--站端任务控制-- {} ", xmlBaseModel);
+            result.setData(uPatrolTaskService.upSystemCtrl(xmlBaseModel));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("站端任务控制异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("站端任务控制错误:", e);
         }
         return result;
     }
