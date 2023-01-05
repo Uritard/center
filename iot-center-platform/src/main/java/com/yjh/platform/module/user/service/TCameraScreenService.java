@@ -3,7 +3,9 @@ package com.yjh.platform.module.user.service;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
 import com.yjh.platform.module.user.entity.*;
@@ -11,6 +13,7 @@ import com.yjh.platform.module.user.dao.TCameraScreenDao;
 
 import java.util.*;
 
+import com.yjh.platform.module.user.entity.enums.UserStateEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,9 @@ public class TCameraScreenService{
     private TCameraInfoDao tCameraInfoDao;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
+
+    @Autowired
+    private SysUserDao sysUserDao;
 
     @Transactional(rollbackFor = Exception.class)
     public int add(TCameraScreen tCameraScreen) {
@@ -224,7 +230,22 @@ public class TCameraScreenService{
     @Transactional(rollbackFor = Exception.class)
     public List<AreaInfoDetail> selectCameraTreeWithRobot(String cameraName, Integer flag, String robotFlag, Long userId) {
         List<AreaInfoDetail> listTree = new ArrayList<>();
-        listTree = tCameraScreenDao.selectCameraTreeWithRobot(cameraName, robotFlag, userId);
+        SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
+
+        if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
+            throw new BusinessException("用户不存在或已删除");
+        }
+        else {
+            if (1234L == sysUser.getRoleId()) {
+                listTree = tCameraScreenDao.selectCameraTreeWithRobot(cameraName, robotFlag, null);
+            }
+            else if(1235L == sysUser.getRoleId()) {
+                listTree = tCameraScreenDao.selectCameraTreeWithRobot(cameraName, robotFlag, userId);
+            }
+            else {
+                throw  new BusinessException("当前用户角色不可查看");
+            }
+        }
         List<AreaInfoDetail> areaInfoCountryList = new ArrayList<>();
         for(Iterator<AreaInfoDetail> it = listTree.iterator(); it.hasNext();){
             AreaInfoDetail areaInfoMap = it.next();

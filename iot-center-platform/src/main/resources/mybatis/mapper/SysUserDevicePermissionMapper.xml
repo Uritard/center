@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjh.platform.module.user.dao.SysUserDevicePermissionDao">
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into sys_user_device_permission (user_id,monitor_device_id)
+        values
+        <foreach collection="list" separator="," item="user">
+            (#{user.userId,jdbcType=BIGINT},
+            #{user.monitorDeviceId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
+    <delete id="delete" parameterType="java.lang.Long" >
+        delete from sys_user_device_permission where user_id = #{userId,jdbcType=BIGINT}
+    </delete>
+
+    <select id="getSelectedByUserId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.SysUserDevicePermissionDO">
+    select * from sys_user_device_permission where user_id =  #{userId,jdbcType=BIGINT}
+</select>
+</mapper>

@@ -275,7 +275,7 @@ public class TRobotInspectionController {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
-            result.setData(tRobotInspectionService.robotTree(robotType,userId));
+            result.setData(tRobotInspectionService.robotTree2(robotType,userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询机器人状态信息失败描述：", e);
@@ -291,7 +291,7 @@ public class TRobotInspectionController {
         Result result = new Result();
         try {
             Long userId = Long.valueOf(request.getHeader("userId"));
-            result.setData(tRobotInspectionService.droneTree(droneType,userId));
+            result.setData(tRobotInspectionService.droneTree2(droneType,userId));
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("查询无人机状态信息失败描述：", e);

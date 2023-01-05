@@ -71,5 +71,18 @@
         limit 1
     </select>
 
+    <select id="selectIdsByRoleId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select user_id from sys_user where role_id = #{roleId,jdbcType=BIGINT}
+    </select>
+
+    <insert id="batchInsertDevicePermission" parameterType="java.util.List">
+        insert into sys_user_device_permission (user_id,monitor_device_id)
+        values
+        <foreach collection="list" separator="," item="user">
+            (#{user.userId,jdbcType=BIGINT},
+            #{user.monitorDeviceId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
 
 </mapper>

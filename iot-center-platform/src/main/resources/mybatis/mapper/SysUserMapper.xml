@@ -459,5 +459,9 @@
        SELECT * from sys_user t where t.state!=0 AND (UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(T.update_time))/86400 >=t.invalid_time
    </select>
 
+    <select id="selectUserByRoleId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.user.entity.output.SysUserDTO">
+        select user_id, user_name
+        from sys_user t where role_id = #{roleId,jdbcType=BIGINT}
+    </select>
 
 </mapper>

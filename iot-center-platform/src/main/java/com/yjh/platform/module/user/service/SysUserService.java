@@ -14,10 +14,8 @@ import com.yjh.platform.common.utils.smUtil.Demo;
 import com.yjh.platform.configuration.RedisAndYxsjUtil;
 import com.yjh.platform.configuration.SecurityProperties;
 import com.yjh.platform.module.device.entity.AreaInfo;
-import com.yjh.platform.module.user.dao.SysRoleMenuDao;
-import com.yjh.platform.module.user.dao.SysUserBackUpDao;
+import com.yjh.platform.module.user.dao.*;
 import com.yjh.platform.module.user.entity.*;
-import com.yjh.platform.module.user.dao.SysUserDao;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -33,6 +31,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -60,6 +59,14 @@ public class SysUserService {
     private LogsRecord logsRecord;
     @Autowired
     private SysKeyService sysKeyService;
+    @Autowired
+    private TCameraScreenDao tCameraScreenDao;
+
+    @Autowired
+    private SysUserDevicePermissionDao sysUserDevicePermissionDao;
+
+
+    public static final Long BUSINESS_ROLE_ID = 1235L;
 
 //    @Resource
 //    private RedisAndYxsjUtil redisAndYxsjUtil;
@@ -90,6 +97,24 @@ public class SysUserService {
         }
         logsRecord.LoginLogsSend(request, "25", "数据备份", userName + "备份了" + sysUser.getUserName() + "用户信息", userName, String.valueOf(userIds), 1);
         logsRecord.LoginLogsSend(request, "17", "新增用户", userName + "用户新增了" + sysUser.getUserName() + "用户", userName, String.valueOf(userIds), 1);
+        if(BUSINESS_ROLE_ID.equals(sysUser.getRoleId())) {
+            //对新业务员赋予设备权限
+            List<AreaInfoOfMonitorDevice> areaInfoOfMonitorDevices = tCameraScreenDao.selectAllMonitorDevice();
+            if (!CollectionUtils.isEmpty(areaInfoOfMonitorDevices)) {
+                List<SysUser> sysUsers = sysUserDao.selectByUserNameTotal(sysUser.getUserName());
+                SysUser sysUserQuery = sysUsers.get(0);
+                //设备列表不为空，赋权
+                List<SysUserDevicePermissionDO> sysUserDevicePermissionDOS = new ArrayList<>(areaInfoOfMonitorDevices.size());
+                areaInfoOfMonitorDevices.forEach(areaInfoOfMonitorDevice -> {
+                    SysUserDevicePermissionDO sysUserDevicePermissionDO = new SysUserDevicePermissionDO();
+                    sysUserDevicePermissionDO.setUserId(sysUserQuery.getUserId());
+                    sysUserDevicePermissionDO.setMonitorDeviceId(areaInfoOfMonitorDevice.getId());
+                    sysUserDevicePermissionDOS.add(sysUserDevicePermissionDO);
+                });
+                sysUserDevicePermissionDao.batchInsert(sysUserDevicePermissionDOS);
+            }
+        }
+
         return total;
     }
 
@@ -105,6 +130,11 @@ public class SysUserService {
                 throw new BusinessException(10008, "用户无权限");
                 //return -1;
             }
+        }
+        SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
+        if (BUSINESS_ROLE_ID.equals(sysUser.getRoleId())) {
+            //删除业务员用户时，清空设备权限信息
+            sysUserDevicePermissionDao.delete(userId);
         }
         redisTemplate.delete("userInfo:" + userId);
         this.SysUserBackUpDao.deleteByPrimaryId(userId);

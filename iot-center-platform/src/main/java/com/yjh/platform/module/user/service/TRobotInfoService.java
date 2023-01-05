@@ -5,9 +5,14 @@ import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
+import com.yjh.platform.module.user.dao.SysUserDao;
+import com.yjh.platform.module.user.dao.SysUserDevicePermissionDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.SysUser;
+import com.yjh.platform.module.user.entity.SysUserDevicePermissionDO;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
+import com.yjh.platform.module.user.entity.output.SysUserDTO;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -21,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -44,6 +50,12 @@ public class TRobotInfoService{
     private TCameraInfoService tCameraInfoService;
     @Autowired
     private LogsRecord logsRecord;
+    @Autowired
+    private SysUserDevicePermissionDao sysUserDevicePermissionDao;
+    @Autowired
+    private SysUserDao sysUserDao;
+
+    public static final Long BUSINESS_ROLE_ID = 1235L;
 
     private String ROBOT_REMOVE_LINK =  "http://iot-center-accessrobot/robot/v1/removeLink?robotCode={robotCode}&robotId={robotId}";
 
@@ -64,6 +76,19 @@ public class TRobotInfoService{
         if (res > 0){
             Long robotId = tRobotInfoDao.selectRobotIdByCode(tRobotInfo.getRobotCode());
             redisTemplate.opsForHash().put("AllRobotCode",robotId.toString(),tRobotInfo.getRobotCode());
+
+            //新增机器人时，对所有用户赋予机器人权限
+            List<SysUserDTO> sysUserDTOList = sysUserDao.selectUserByRoleId(BUSINESS_ROLE_ID);
+            if (!CollectionUtils.isEmpty(sysUserDTOList)) {
+                List<SysUserDevicePermissionDO> permissionDOS = new ArrayList<>(sysUserDTOList.size());
+                sysUserDTOList.forEach(sysUserDTO -> {
+                    SysUserDevicePermissionDO sysUserDevicePermissionDO = new SysUserDevicePermissionDO();
+                    sysUserDevicePermissionDO.setUserId(sysUserDTO.getUserId());
+                    sysUserDevicePermissionDO.setMonitorDeviceId(robotId);
+                    permissionDOS.add(sysUserDevicePermissionDO);
+                });
+                sysUserDevicePermissionDao.batchInsert(permissionDOS);
+            }
         }
         return res;
     }

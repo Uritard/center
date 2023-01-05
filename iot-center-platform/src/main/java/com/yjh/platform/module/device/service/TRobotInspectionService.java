@@ -1,7 +1,9 @@
 package com.yjh.platform.module.device.service;
 
 import com.alibaba.fastjson.JSON;
+import com.netflix.discovery.converters.Auto;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.module.device.controller.TRobotInspectionController;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.*;
@@ -11,7 +13,10 @@ import com.yjh.platform.module.task.dao.TCruiseResultDao;
 import com.yjh.platform.module.task.dao.TCruiseTaskDao;
 import com.yjh.platform.module.task.entity.TCruiseResult;
 import com.yjh.platform.module.task.entity.TCruiseTask;
+import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.SysUser;
+import com.yjh.platform.module.user.entity.enums.UserStateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +47,8 @@ public class TRobotInspectionService {
     private TCruiseResultDao tCruiseResultDao;
     @Autowired
     private UPatrolTaskDao uPatrolTaskDao;
+    @Autowired
+    private SysUserDao sysUserDao;
 
     private Logger log = LoggerFactory.getLogger(TRobotInspectionService.class);
 
@@ -894,6 +901,44 @@ public class TRobotInspectionService {
         return reList;
     }
 
+    //机器人树
+    @Transactional(rollbackFor = Exception.class)
+    public List<Robot> robotTree2(Integer robotType, Long userId) {
+        List<Robot> reList = new ArrayList<>();
+        Robot node = new Robot();
+        node.setId(1L);
+        node.setLabel("机器人树");
+        node.setInfoType("tree");
+        SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
+
+        if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
+            throw new BusinessException("用户不存在或已删除");
+        }
+        else {
+            List<Robot> robotList = new ArrayList<>();
+            if (1234L == sysUser.getRoleId()) {
+                robotList = this.tRobotInspectionDao.selectRobotInfo(robotType, null);
+            }
+            else if(1235L == sysUser.getRoleId()) {
+                robotList = this.tRobotInspectionDao.selectRobotInfo(robotType, userId);
+            }
+            else {
+                throw  new BusinessException("当前用户角色不可查看");
+            }
+
+            for (Robot robot : robotList) {
+                robot.setId(robot.getRobotId());
+                robot.setLabel(robot.getRobotName());
+                robot.setUpId(1L);
+                robot.setUpName("机器人树");
+                robot.setInfoType("robot");
+            }
+            node.setChildren(robotList);
+            reList.add(node);
+        }
+        return reList;
+    }
+
     //无人机树
     @Transactional(rollbackFor = Exception.class)
     public List<Robot> droneTree(Integer droneType, Long userId) {
@@ -912,6 +957,44 @@ public class TRobotInspectionService {
         }
         node.setChildren(robotList);
         reList.add(node);
+        return reList;
+    }
+
+    //无人机树
+    @Transactional(rollbackFor = Exception.class)
+    public List<Robot> droneTree2(Integer droneType, Long userId) {
+        List<Robot> reList = new ArrayList<>();
+        Robot node = new Robot();
+        node.setId(1L);
+        node.setLabel("无人机树");
+        node.setInfoType("tree");
+        SysUser sysUser = sysUserDao.selectByPrimaryId(userId);
+
+        if (Objects.nonNull(sysUser) && UserStateEnum.INVALID.getCode() == sysUser.getState()) {
+            throw new BusinessException("用户不存在或已删除");
+        }
+        else {
+            List<Robot> robotList = new ArrayList<>();
+            if (1234L == sysUser.getRoleId()) {
+                robotList = this.tRobotInspectionDao.selectDroneInfo(droneType,null);
+            }
+            else if(1235L == sysUser.getRoleId()) {
+                robotList = this.tRobotInspectionDao.selectDroneInfo(droneType,userId);
+            }
+            else {
+                throw  new BusinessException("当前用户角色不可查看");
+            }
+
+            for (Robot robot : robotList) {
+                robot.setId(robot.getRobotId());
+                robot.setLabel(robot.getRobotName());
+                robot.setUpId(1L);
+                robot.setUpName("无人机树");
+                robot.setInfoType("drone");
+            }
+            node.setChildren(robotList);
+            reList.add(node);
+        }
         return reList;
     }
 
