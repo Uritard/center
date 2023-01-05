@@ -160,6 +160,23 @@
         <if test="taskId != null and taskId != ''"> and a.union_id = #{taskId, jdbcType=VARCHAR}</if>
         limit 1
     </select>
+
+    <!--联动巡视设备信息-->
+    <select id="linkageCruiseDevice" resultType="java.util.HashMap">
+        SELECT DISTINCT
+            a.union_id,
+            c.robot_id,
+            d.camera_id
+        FROM
+            t_union_task_attr a
+            LEFT JOIN t_cruise_point_instance b ON a.instance_id = b.instance_id
+            LEFT JOIN t_robot_inspection c ON b.cruise_id = c.inspection_id
+            LEFT JOIN t_camera_preset d ON b.cruise_id = d.preset_id
+        WHERE
+            1 = 1
+        <if test="taskId != null and taskId != ''"> and a.union_id = #{taskId, jdbcType=VARCHAR}</if>
+    </select>
+
     <!--根据instanceId查询设备相关信息-->
     <select id="selectDeviceInfo" resultType="com.yjh.platform.module.task.entity.LinkageMonitorData">
         SELECT
