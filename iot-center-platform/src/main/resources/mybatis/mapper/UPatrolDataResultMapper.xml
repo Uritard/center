@@ -507,51 +507,61 @@
     </select>
 
     <select id="selectCruiseDataReport" resultType="com.yjh.platform.module.task.entity.CruiseResultAnalyzeInfo">
-        SELECT DISTINCT
-        a.device_mete_id,
+        select result.device_mete_id,
+        result.mete_type,
+        result.meter_type,
+        result.cruise_time,
+        result.cruise_type,
+        result.instance_name,
+        result.result_num,
+        result.identify_result,
+        result.cruise_result,
+        result.picPath,
+        result.device_name,
+        result.evaluation_state,
+        result.task_type,
+        result.device_type,
+        result.up_region_name,
+        result.region_id,
+        result.station_id,
+        result.region_name,
+        result.alarm_level,
+        result.station_name,
+        i.dict_note AS c_type_name,
+        j.dict_note AS identify_result_name,
+        z.dict_note AS cruise_result_name,
+        m.dict_note AS mete_type_name,
+        n.dict_note AS meter_type_name,
+        y.dict_note AS device_type_name,
+        x.dict_note AS alarm_level_name
+        from (SELECT DISTINCT a.device_mete_id,
+        a.mete_type,
+        a.meter_type,
         e.cruise_time,
         e.cruise_type,
-        h.dict_note as cruise_type_name,
         e.instance_name,
-        g.task_type,
-        i.dict_note AS c_type_name,
         e.result_num,
         e.identify_result,
-        j.dict_note AS identify_result_name,
         e.cruise_result,
-        z.dict_note as cruise_result_name,
-        e.picpath as picPath,
-        a.mete_type,
-        m.dict_note as mete_type_name,
-        a.meter_type,
-        n.dict_note as meter_type_name,
-        e.device_name as device_name,
-        k.device_type as device_type,
-        y.dict_note as device_type_name,
-        l.region_name as region_name,
-        e.evaluation_state as evaluation_state,
-        q.warn_level as alarm_level,
-        x.dict_note as alarm_level_name,
-        k.up_region_name as up_region_name,
-        k.up_region_id as region_id,
-        v.station_id as station_id,
-        v.station_name as station_name
-        FROM
-        u_patrol_data_result e
+        e.picpath          AS picPath,
+        e.device_name      AS device_name,
+        e.evaluation_state AS evaluation_state,
+        g.task_type,
+        k.device_type      AS device_type,
+        k.up_region_name   AS up_region_name,
+        k.up_region_id     AS region_id,
+        v.station_id       AS station_id,
+        l.region_name      AS region_name,
+        q.warn_level       AS alarm_level,
+        v.station_name     AS station_name
+        FROM u_patrol_data_result e
         LEFT JOIN t_cruise_point_instance v ON e.instance_id = v.instance_id
         LEFT JOIN t_std_devicemete a ON a.device_mete_id = v.device_mete_id
-        LEFT JOIN t_warn_info q on q.task_id = e.task_id and q.instance_id = e.instance_id
+        LEFT JOIN t_warn_info q ON q.task_id = e.task_id
+        AND q.instance_id = e.instance_id
         LEFT JOIN t_std_device k ON k.device_id = a.device_id
         LEFT JOIN u_patrol_task g ON e.task_id = g.task_id
         LEFT JOIN t_std_region l ON l.region_id = g.area_id
-        LEFT JOIN t_dict_business h ON e.cruise_type = h.dict_code AND h.col_name = "cruise_type"
-        LEFT JOIN t_dict_business i ON g.task_type = i.dict_code AND i.col_name = "plan_type"
-        LEFT JOIN t_dict_business j ON e.identify_result = j.dict_code AND j.col_name = "identify_result"
-        LEFT JOIN t_dict_business z ON e.cruise_result = z.dict_code AND z.col_name = "cruise_result"
-        LEFT JOIN t_dict_business m ON m.dict_code = a.mete_type AND m.col_name = "mete_type"
-        LEFT JOIN t_dict_business n ON n.dict_code = a.meter_type AND n.col_name = "meter_type"
-        LEFT JOIN t_dict_business y ON y.dict_code = k.device_type AND y.col_name = "device_type"
-        LEFT JOIN t_dict_business x ON x.dict_code = q.warn_level AND x.col_name = "alarm_level"
         WHERE 1 = 1
         <if test="list != null and list.size() > 0">and e.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
@@ -564,7 +574,15 @@
         <if test="meterType != -1 ">and a.meter_type = #{meterType, jdbcType=INTEGER}</if>
         <if test="instanceName != null and instanceName != '' ">and e.instance_name LIKE CONCAT('%',#{instanceName, jdbcType=VARCHAR},'%')</if>
         <if test="stationName != null and stationName != '' ">and v.station_name LIKE CONCAT('%',#{stationName, jdbcType=VARCHAR},'%')</if>
-        ORDER BY e.cruise_time DESC
+        ORDER BY e.cruise_time DESC) result
+        LEFT JOIN t_dict_business h ON result.cruise_type = h.dict_code AND h.col_name = "cruise_type"
+        LEFT JOIN t_dict_business i ON result.task_type = i.dict_code AND i.col_name = "plan_type"
+        LEFT JOIN t_dict_business j ON result.identify_result = j.dict_code AND j.col_name = "identify_result"
+        LEFT JOIN t_dict_business z ON result.cruise_result = z.dict_code AND z.col_name = "cruise_result"
+        LEFT JOIN t_dict_business m ON m.dict_code = result.mete_type AND m.col_name = "mete_type"
+        LEFT JOIN t_dict_business n ON n.dict_code = result.meter_type AND n.col_name = "meter_type"
+        LEFT JOIN t_dict_business y ON y.dict_code = result.device_type AND y.col_name = "device_type"
+        LEFT JOIN t_dict_business x ON x.dict_code = result.alarm_level AND x.col_name = "alarm_level"
     </select>
 
     <select id="selectBrokenLine"  resultType="com.yjh.platform.module.task.entity.BrokenLineInfo">
