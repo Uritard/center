@@ -289,4 +289,18 @@ public class TSysParamController {
         }
         return  result;
     }
+
+    @ApiOperation(value = "主页需求信息接口")
+    @GetMapping(value = "/homePageInfo")
+    @Logs(title = "主页需求信息接口", content = "主页需求信息接口", logType = 1)
+    public Result  homePageInfo() {
+        Result result = new Result();
+        try {
+            result.setData(tSysParamService.homePageInfo());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
+            log.error("查询系统初始化参数：", e);
+        }
+        return  result;
+    }
 }

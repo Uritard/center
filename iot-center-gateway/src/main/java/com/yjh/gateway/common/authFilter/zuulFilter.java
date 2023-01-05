@@ -93,7 +93,12 @@ public class zuulFilter extends ZuulFilter {
 
         String userId = request.getHeader("userId") != null ? request.getHeader("userId") : "";
         String token = request.getHeader("token") != null ? request.getHeader("token") : "";
-        if (!url.contains("/sysUser/v1/login")&&!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/sysUser/v1/getPubk")&&!url.contains("/tSysParam/v1/sysConfig")) {
+        if (!url.contains("/sysUser/v1/login")
+            && !url.contains("/sysUser/v1/randomNumbers")
+            && !url.contains("/sysUser/v1/loginChangePassword")
+            && !url.contains("/sysUser/v1/getPubk")
+            && !url .contains("/tSysParam/v1/sysConfig")
+            && !url .contains("/tSysParam/v1/homePageInfo")) {
             if (StringUtils.isNoneBlank(token)) {
                 Map<String, String> appKeymap = redisTemplate.opsForHash().entries("appKey:" + userId + ":" + token);
                 String isLogin = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isLogin", "content"));
@@ -165,7 +170,12 @@ public class zuulFilter extends ZuulFilter {
         }
 
         if ("true".equals(isDecode)) {
-            if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/sysUser/v1/getPubk") && !url.contains("/sysUser/v1/login") && !url.contains("/sysUser/v1/loginChangePassword")&&!url.contains("/tSysParam/v1/sysConfig")) {
+            if (!url.contains("/sysUser/v1/randomNumbers")
+                &&!url.contains("/sysUser/v1/getPubk")
+                && !url.contains("/sysUser/v1/login")
+                && !url.contains("/sysUser/v1/loginChangePassword")
+                &&!url.contains("/tSysParam/v1/sysConfig")
+                && !url .contains("/tSysParam/v1/homePageInfo")) {
                 String absCode = request.getHeader("absCode") != null ? request.getHeader("absCode") : "";
                 if (StringUtils.isNoneBlank(userId)) {
                     StringBuilder sb = new StringBuilder();
@@ -326,7 +336,11 @@ public class zuulFilter extends ZuulFilter {
         }
         // 判断登录用户 ip 地址
         if ("true".equals(isIpLogin)) {
-            if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/sysUser/v1/getPubk")&&!url.contains("/tSysParam/v1/sysConfig")) {
+            if (!url.contains("/sysUser/v1/randomNumbers")
+                &&!url.contains("/homePage/v1/getWeatherInfo")
+                &&!url.contains("/sysUser/v1/getPubk")
+                &&!url.contains("/tSysParam/v1/sysConfig")
+                && !url .contains("/tSysParam/v1/homePageInfo")) {
                 if(StringUtils.isEmpty(userId)) {
                     return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
                 }
@@ -356,7 +370,12 @@ public class zuulFilter extends ZuulFilter {
         if ("true".equals(isUkey)) {
             String signStr = request.getHeader("signStr") != null ? request.getHeader("signStr") : "";
             String webcode = request.getHeader("summary") != null ? request.getHeader("summary") : "";
-            if (!url.contains("/sysUser/v1/randomNumbers")&&!url.contains("/homePage/v1/getWeatherInfo")&&!url.contains("/sysUser/v1/getPubk")&&!url.contains("/sysUser/v1/logout")&&!url.contains("/tSysParam/v1/sysConfig")) {
+            if (!url.contains("/sysUser/v1/randomNumbers")
+                &&!url.contains("/homePage/v1/getWeatherInfo")
+                &&!url.contains("/sysUser/v1/getPubk")
+                &&!url.contains("/sysUser/v1/logout")
+                &&!url.contains("/tSysParam/v1/sysConfig")
+                && !url .contains("/tSysParam/v1/homePageInfo")) {
                 if(StringUtils.isEmpty(userId)) {
                     return errorRespnse(ctx, HttpStatus.SC_UNAUTHORIZED, "{\"code\":401,\"message\":\"用户错误，请尝试强制刷新页面(CTRL + F5)!\"}");
                 }
