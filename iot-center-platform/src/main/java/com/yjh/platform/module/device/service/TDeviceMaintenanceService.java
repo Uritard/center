@@ -121,8 +121,8 @@ public class TDeviceMaintenanceService{
             HashMap<String,Object> params = new HashMap<>();
             params.put("enable",0);
             params.put("deviceList",deviceList);
-            params.put("startTime",sdf.format(new Date()));
-            params.put("endTime",sdf.format(new Date()));
+            params.put("startTime",sdf.format(tDeviceMaintenance.getMaintenanceStart()));
+            params.put("endTime",sdf.format(tDeviceMaintenance.getMaintenanceStop()));
             params.put("deviceLevel",tDeviceMaintenance.getDeviceLevel());
             //配置编码
             params.put("configCode", tDeviceMaintenance.getMaintenanceId());
@@ -393,7 +393,7 @@ public class TDeviceMaintenanceService{
                 }
                 if("0".equals(enable)){
                     //删除检修区域
-                    tDeviceMaintenanceDao.deleteByDeviceIdList(deviceIdLst,"检修区域"+start_time);
+                    tDeviceMaintenanceDao.deleteByDeviceIdList(device_list,"检修区域"+start_time);
                 }
             }
 
