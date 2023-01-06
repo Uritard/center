@@ -39,7 +39,7 @@ public interface TDeviceMaintenanceDao {
     List<Long> selectDeviceIds2(@Param(value = "list") List<String> list);
 
     List<Long> selectDeviceIdListByIns(@Param(value = "list") List<Long> list);
-    int deleteByDeviceIdList(@Param(value = "list") List<Long> list,
+    int deleteByDeviceIdList(@Param(value = "list") String list,
                              @Param(value = "name") String name);
 
     List<String> selectRobotDeviceId(@Param(value = "list") List<Long> list);
