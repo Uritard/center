@@ -1308,6 +1308,7 @@ CREATE TABLE `t_device_maintenance` (
   `maintenance_start` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '开始检修时间',
   `maintenance_stop` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '结束检修时间',
   `edge_code` varchar(32) DEFAULT NULL COMMENT '边缘节点编码（从哪个边缘节点同步上来的）',
+  `origin_id` varchar(64) DEFAULT NULL COMMENT '原始id(下级同步的id)',
   `coordinate_pixel` varchar(50) NOT NULL COMMENT '设备层级（1 = 间隔 2 = 主设备 3 = 设备点位 4 = 部件）',
   `device_level` varchar(50) NOT NULL COMMENT '设备层级（1 = 间隔 2 = 主设备 3 = 设备点位 4 = 部件）',
   `instance_ids` text COMMENT '巡视点id',
