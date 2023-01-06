@@ -2409,17 +2409,25 @@ CREATE TABLE `t_task_priority_config`(
 
 DROP TABLE IF EXISTS `device_statics_info_result`;
 CREATE TABLE `device_statics_info_result`  (
-                                               `device_code` varchar(255)  NOT NULL COMMENT '设备编码',
-                                               `device_name` varchar(255) DEFAULT NULL COMMENT '设备名称',
-                                               `duration` varchar(255) DEFAULT NULL COMMENT '累积在线时长总和',
-                                               `offLine_count` varchar(255) DEFAULT NULL COMMENT '累积离线次数总和',
-                                               `normal_day` varchar(255) DEFAULT NULL COMMENT '累计连续正常运行天数',
-                                               `commission_days` varchar(255) DEFAULT NULL COMMENT '正常巡检天数',
-                                               `cruise_percent` varchar(255) DEFAULT NULL COMMENT '巡检出勤率',
-                                               `intact_percent` varchar(255) DEFAULT NULL COMMENT '录像完整率',
-                                               `device_run` varchar(1) DEFAULT NULL COMMENT '设备状态',
-                                               `device_resume_date` datetime DEFAULT NULL COMMENT '设备恢复时间',
-                                               `device_type` varchar(255) DEFAULT NULL COMMENT '设备类型',
-                                               `region_code` varchar(255) DEFAULT NULL COMMENT '区域编码',
-                                               PRIMARY KEY (`device_code`) USING BTREE
+    `device_code` varchar(255)  NOT NULL COMMENT '设备编码',
+    `device_name` varchar(255) DEFAULT NULL COMMENT '设备名称',
+    `duration` varchar(255) DEFAULT NULL COMMENT '累积在线时长总和',
+    `offLine_count` varchar(255) DEFAULT NULL COMMENT '累积离线次数总和',
+    `normal_day` varchar(255) DEFAULT NULL COMMENT '累计连续正常运行天数',
+    `commission_days` varchar(255) DEFAULT NULL COMMENT '正常巡检天数',
+    `cruise_percent` varchar(255) DEFAULT NULL COMMENT '巡检出勤率',
+    `intact_percent` varchar(255) DEFAULT NULL COMMENT '录像完整率',
+    `device_run` varchar(1) DEFAULT NULL COMMENT '设备状态',
+    `device_resume_date` datetime DEFAULT NULL COMMENT '设备恢复时间',
+    `device_type` varchar(255) DEFAULT NULL COMMENT '设备类型',
+    `region_code` varchar(255) DEFAULT NULL COMMENT '区域编码',
+    PRIMARY KEY (`device_code`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8  ROW_FORMAT = Dynamic COMMENT='可靠性指标统计表';
+
+DROP TABLE IF EXISTS `sys_user_device_permission`;
+CREATE TABLE `sys_user_device_permission`  (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `user_id` bigint(20) NOT NULL COMMENT '用户id',
+  `monitor_device_id` bigint(20) NOT NULL COMMENT '监控设备id',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=0  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='用户设备权限表';
