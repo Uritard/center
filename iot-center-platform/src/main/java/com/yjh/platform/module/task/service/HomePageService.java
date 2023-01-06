@@ -124,7 +124,7 @@ public class HomePageService {
             }
             try {
                 Map<String, Object> map = tCruiseTaskResultService.selectCruiseAdvance(item.getTaskId());
-                Float i = (Float) map.get("rate");
+                Float i = Float.parseFloat(map.get("rate").toString());
                 i = i * 100F;
                 item.setTaskProgress(i.intValue());
             } catch (Exception e) {

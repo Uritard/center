@@ -256,7 +256,7 @@
     <delete id="deleteByDeviceIdList">
         delete from t_device_maintenance
         where maintenance_name = #{name,jdbcType=VARCHAR}
-          and device_ids = #{deviceIds}
+          and device_ids = #{list}
     </delete>
     <select id="selectRobotDeviceId" resultType="java.lang.String">
         SELECT DISTINCT
