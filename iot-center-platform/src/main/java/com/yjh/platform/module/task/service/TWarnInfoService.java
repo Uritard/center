@@ -434,7 +434,7 @@ public class TWarnInfoService{
             }
             tWarnInfoDetail.setThresholdValue(thresholdValue);
 
-            if (Objects.nonNull(tWarnInfoDetail.getDeviceCode()) && Objects.nonNull(tWarnInfoDetail.getDeviceCode())){
+            if (Objects.nonNull(tWarnInfoDetail.getDeviceCode()) && !"null".equals(tWarnInfoDetail.getDeviceCode())){
                 tWarnInfoDetail.setCameraId(Long.valueOf(tWarnInfoDetail.getDeviceCode()));
                 tWarnInfoDetail.setDeviceType(0);
                 String runningCameraFlag = tRobotInfoDao.selectRobotRunningCamera(Long.valueOf(tWarnInfoDetail.getDeviceCode()),tWarnInfoDetail.getInstanceId());

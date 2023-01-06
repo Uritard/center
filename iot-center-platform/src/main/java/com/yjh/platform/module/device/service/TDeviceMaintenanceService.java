@@ -59,6 +59,7 @@ public class TDeviceMaintenanceService{
         }
 
         List<Long> list = tDeviceMaintenance.getDeviceIdList();
+        list = list.stream().distinct().collect(Collectors.toList());
         List<DeviceAndInstance> deviceAndInstanceList = tDeviceMaintenance.getDeviceAndInstanceList();
         List<String> instanceList = new ArrayList<>();
         for(DeviceAndInstance item:deviceAndInstanceList){
@@ -137,6 +138,7 @@ public class TDeviceMaintenanceService{
     public int update(TDeviceMaintenance tDeviceMaintenance) {
         checkParam(tDeviceMaintenance);
         List<Long> list = tDeviceMaintenance.getDeviceIdList();
+        list = list.stream().distinct().collect(Collectors.toList());
         this.deleteByPrimaryId(tDeviceMaintenance.getMaintenanceId());
         if(tDeviceMaintenance.getMaintenanceStart() == null){
             tDeviceMaintenance.setMaintenanceStart(new Date());
@@ -350,9 +352,9 @@ public class TDeviceMaintenanceService{
             String coordinate_pixel = item.get("coordinate_pixel").toString();
             String[] dd = device_list.split(",");
             List<Long> idList = new ArrayList<>();
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+//            String edgeCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
             for (String str:dd) {
-                idList.add(Long.valueOf(str.replaceFirst(edgeCode,"")));
+                idList.add(Long.valueOf(str));
             }
             if(!"".equals(device_level)){
                 List<Long> deviceIdLst = new ArrayList<>();

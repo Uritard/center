@@ -364,7 +364,7 @@ public class MessageThread {
             list.add(xmlBaseModel);
             robotMap.put("list", list);
             Result re = Constant.otherServer(robotMap, Constant.MAINTENANCE_URL);//platfrom设置
-            Result re2 = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);//下发给机器人
+//            Result re2 = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);//下发给机器人
             log.info("--响应检修--" + re);
             if (re == null) {
                 sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
