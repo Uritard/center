@@ -201,8 +201,12 @@ public class TDeviceMaintenanceController {
     public Result selectDevice(@RequestParam(value = "deviceIds", required = true) String deviceIds) {
         Result result = new Result();
         try {
-            List<DeviceAndInstance> list = tDeviceMaintenanceService.selectDevice(deviceIds);
-            result.setData(list);
+            if ("".equals(deviceIds)){
+                result.setData(null);
+            }else {
+                List<DeviceAndInstance> list = tDeviceMaintenanceService.selectDevice(deviceIds);
+                result.setData(list);
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.QUERYERROR.getCode(), ResultCodeEnum.QUERYERROR.getName());
             log.error("失败描述：", e);

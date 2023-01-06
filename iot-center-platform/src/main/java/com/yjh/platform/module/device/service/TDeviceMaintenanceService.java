@@ -57,9 +57,8 @@ public class TDeviceMaintenanceService{
         if(tDeviceMaintenance.getMaintenanceStart() == null){
             tDeviceMaintenance.setMaintenanceStart(new Date());
         }
-
+        tDeviceMaintenance.setDeviceIdList(tDeviceMaintenance.getDeviceIdList().stream().distinct().collect(Collectors.toList()));
         List<Long> list = tDeviceMaintenance.getDeviceIdList();
-        list = list.stream().distinct().collect(Collectors.toList());
         List<DeviceAndInstance> deviceAndInstanceList = tDeviceMaintenance.getDeviceAndInstanceList();
         List<String> instanceList = new ArrayList<>();
         for(DeviceAndInstance item:deviceAndInstanceList){
@@ -137,8 +136,8 @@ public class TDeviceMaintenanceService{
     @Transactional(rollbackFor = Exception.class)
     public int update(TDeviceMaintenance tDeviceMaintenance) {
         checkParam(tDeviceMaintenance);
+        tDeviceMaintenance.setDeviceIdList(tDeviceMaintenance.getDeviceIdList().stream().distinct().collect(Collectors.toList()));
         List<Long> list = tDeviceMaintenance.getDeviceIdList();
-        list = list.stream().distinct().collect(Collectors.toList());
         this.deleteByPrimaryId(tDeviceMaintenance.getMaintenanceId());
         if(tDeviceMaintenance.getMaintenanceStart() == null){
             tDeviceMaintenance.setMaintenanceStart(new Date());
