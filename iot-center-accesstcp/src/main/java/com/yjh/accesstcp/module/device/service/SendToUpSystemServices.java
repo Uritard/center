@@ -11,6 +11,8 @@ import com.yjh.accesstcp.common.Constant;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accesstcp.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accesstcp.common.utils.ZipUtil;
+import com.yjh.accesstcp.commons.result.BusinessException;
 import com.yjh.accesstcp.commons.utils.DateTimeUtil;
 import com.yjh.accesstcp.module.device.dao.*;
 import com.yjh.accesstcp.module.device.entity.*;
@@ -959,12 +961,22 @@ public class SendToUpSystemServices {
                     String overhaulareaModelTargetPath = String.format(stationCode + "/Model/overhaularea_model.xml");
                     return createMaintenanceModel(path, stationCode);
                 case "9":
-                    String mapRealPath = sendToUpSystemDao.selectMapPath();
+                    List<String> mapFileList = sendToUpSystemDao.selectMapPathALl();
+                    if (mapFileList.isEmpty()){
+                        throw new BusinessException("不存在地图文件");
+                    }
                     String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath").get("content"));
                     String filePathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative").get("content"));
-                    String mapAbsPath = mapRealPath.replace(filePathMap, fileFtpPathMap);
-                    String mapModelTargetPath = stationCode + mapRealPath.replace(filePathMap, "");
-                    return mapAbsPath;
+                    mapFileList.forEach(mapFilePath ->{
+                        mapFilePath.replace(filePathMap, fileFtpPathMap);
+                    });
+                    Map<String,String> mapForMapPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
+                    String mapAbsPath = mapForMapPath.get("content");
+                    String dirPath = mapAbsPath + "/Model/";
+//                    dirPath = "C:/robotData/Model/";
+                    String zipName = "map_model.zip";
+                    ZipUtil.compressFiles(dirPath, zipName, mapFileList);
+                    return dirPath+zipName;
                 default:
                     break;
             }

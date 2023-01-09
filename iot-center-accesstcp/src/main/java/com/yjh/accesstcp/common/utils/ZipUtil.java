@@ -1,19 +1,18 @@
 package com.yjh.accesstcp.common.utils;
 
+import com.yjh.accesstcp.commons.result.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
+import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ZipUtil {
-    private Logger logger = LoggerFactory.getLogger(ZipUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(ZipUtil.class);
     static final int BUFFER = 8192;
 
     private File zipFile;
@@ -88,4 +87,59 @@ public class ZipUtil {
             }
         }
     }
+
+
+    /**
+     * @param zipPathDir  压缩包路径 ，如 /home/data/zip-folder/
+     * @param zipFileName 压缩包名称 ，如 测试文件.zip
+     * @param fileList    要压缩的文件列表（绝对路径），如 /home/person/test/测试.doc，/home/person/haha/测试.doc
+     * @return
+     */
+    public static void compressFiles(String zipPathDir, String zipFileName, List<String> fileList) {
+        Boolean isAllNotExists = true;
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(new File(zipPathDir + zipFileName)))) {
+            File zipFile = new File(zipPathDir);
+            if (!zipFile.exists()) {
+                zipFile.mkdirs();
+            }
+            for (String filePath : fileList) {
+                File file = new File(filePath);
+
+                if (file.exists()) {
+                    isAllNotExists = false;
+                    int index = file.getName().lastIndexOf('.');
+                    ZipEntry zipEntry = new ZipEntry(file.getName().substring(0, index) + file.getName().substring(index));
+                    zos.putNextEntry(zipEntry);
+                    byte[] buffer = new byte[2048];
+                    compressSingleFile(file, zos, buffer);
+                }
+            }
+            if (isAllNotExists){
+                File emptyZipFile = new File(zipPathDir+zipFileName);
+                if (emptyZipFile.exists()){
+                    emptyZipFile.delete();
+                }
+                emptyZipFile.createNewFile();
+            }
+            zos.flush();
+        } catch (Exception e) {
+            logger.error("压缩文建出错：",e);
+        }
+    }
+
+    //压缩单个文件
+    public static void compressSingleFile(File file, ZipOutputStream zos, byte[] buffer) {
+        int len;
+        try (FileInputStream fis = new FileInputStream(file)) {
+            while ((len = fis.read(buffer)) > 0) {
+                zos.write(buffer, 0, len);
+                zos.flush();
+            }
+            zos.closeEntry();
+        } catch (IOException e) {
+            logger.error("压缩单个文件异常：",e);
+        }
+    }
+
+
 }
