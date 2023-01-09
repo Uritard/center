@@ -135,9 +135,13 @@ public class SendToUpSystemController {
             String realPath = mapForPath.get("content");
             String path  = sendToUpSystemService.downloadFile(String.valueOf(map.get("type")));
 //            String path  = sendToUpSystemService.downloadFile("1");
-            File file = cn.hutool.core.util.ZipUtil.zip(path);
-            path = file.getPath();
-            result.setData(path.replace(abspath,realPath));
+            if ("9".equals(map.get("type"))){
+                result.setData(path);
+            }else {
+                File file = cn.hutool.core.util.ZipUtil.zip(path);
+                path = file.getPath();
+                result.setData(path.replace(abspath, realPath));
+            }
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);

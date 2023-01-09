@@ -40,6 +40,8 @@ public interface SendToUpSystemDao {
     List<DeviceStatisticsInfo>selectDrone();
     String selectMapPath();
 
+    List<String> selectMapPathALl();
+
     List<Map<String, Object>> selectOnlinePatrolDevice();
 
     List<TCruisePointInstanceNameDetail> selectForTask(@Param(value = "list")List<Long> list);

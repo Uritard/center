@@ -380,6 +380,14 @@
         where phote_path is not null
         limit 1
     </select>
+
+    <select id="selectMapPathALl" resultType="java.lang.String">
+        select
+            phote_path
+        from t_robot_info
+        where phote_path is not null
+    </select>
+
     <select id="selectOnlinePatrolDevice" resultType="java.util.Map">
         SELECT
         a.robot_code,
