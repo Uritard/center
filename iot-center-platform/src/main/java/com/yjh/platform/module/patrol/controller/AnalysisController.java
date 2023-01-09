@@ -140,7 +140,7 @@ public class AnalysisController {
 
     @ApiOperation(value = "算法分析接口测试")
     @GetMapping(value = "/algorithm-test")
-    public void algorithmTest(@RequestParam(value = "picPath",required = false) String picPath,
+    public Result algorithmTest(@RequestParam(value = "picPath",required = false) String picPath,
                               @RequestParam(value = "type", required = false) String type,
                               @RequestParam(value = "instanceId", required = false) Long instanceId) {
         Analysis analysis = new Analysis();
@@ -170,11 +170,10 @@ public class AnalysisController {
         log.info("算法信息:{}", analysisMap);
         Constant.algorithmTestPicPath = picPath;
         if (Objects.equals("-1", type)){
-            feignAlgorithm(analysisMap);
-            return;
+            return feignAlgorithm(analysisMap);
         }
 
-        feignDefect(analysisMap);
+        return feignDefect(analysisMap);
     }
 
     @ApiOperation(value = "算法更新接口测试")

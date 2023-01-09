@@ -2,6 +2,11 @@ package com.yjh.accessrobot.module.command.dao;
 
 
 import com.yjh.accessrobot.module.command.entity.TDeviceMaintenance;
+import org.apache.commons.collections4.SetUtils;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
 * @author YIJIAHE
@@ -23,4 +28,15 @@ public interface TDeviceMaintenanceMapper {
 
     int updateByPrimaryKey(TDeviceMaintenance record);
 
+    int deleteByEdgeCode(String edgeNode);
+
+    List<TDeviceMaintenance> selectByEdge(@Param(value = "edgeCode") String edgeCode);
+
+    int deleteByEdgeCodeAndOriginId(@Param(value = "edgeCode")String edgeNode, @Param("originIdList") Collection<String> originIdList);
+
+    int batchInsert(List<TDeviceMaintenance> list);
+
+    List<String> selectDeviceIdsList(@Param(value = "originIds") String originIds);
+
+    List<String> selectInstanceIdsList(@Param(value = "originIds") String originIds);
 }

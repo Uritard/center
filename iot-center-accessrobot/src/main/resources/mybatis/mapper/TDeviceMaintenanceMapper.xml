@@ -31,10 +31,39 @@
         from t_device_maintenance
         where  maintenance_id = #{maintenanceId,jdbcType=BIGINT} 
     </select>
+    <select id="selectByEdge" resultType="com.yjh.accessrobot.module.command.entity.TDeviceMaintenance">
+        select
+        <include refid="Base_Column_List" />
+        from t_device_maintenance
+        where edge_code=#{edgeCode}
+    </select>
+    <select id="selectDeviceIdsList" resultType="java.lang.String">
+        SELECT
+        device_id
+        FROM
+        t_std_device
+        WHERE
+        FIND_IN_SET(origin_id, #{originIds, jdbcType=VARCHAR})
+    </select>
+    <select id="selectInstanceIdsList" resultType="java.lang.String">
+        SELECT
+        instance_id
+        FROM
+        t_cruise_point_instance
+        WHERE
+        FIND_IN_SET(origin_id, #{originIds, jdbcType=VARCHAR})
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from t_device_maintenance
         where  maintenance_id = #{maintenanceId,jdbcType=BIGINT} 
+    </delete>
+    <delete id="deleteByEdgeCode">
+        delete  from t_device_maintenance where edge_code=#{edgeCode}
+    </delete>
+    <delete id="deleteByEdgeCodeAndOriginId">
+        delete  from t_device_maintenance where edge_code=#{edgeCode}  and origin_id in
+        <foreach collection="originIdList" item="originId" open="(" separator="," close=")">   #{originId} </foreach>
     </delete>
     <insert id="insert" keyColumn="maintenance_id" keyProperty="maintenanceId" parameterType="com.yjh.accessrobot.module.command.entity.TDeviceMaintenance" useGeneratedKeys="true">
         insert into t_device_maintenance
@@ -75,6 +104,20 @@
                 <if test="deviceLevel != null">#{deviceLevel,jdbcType=VARCHAR},</if>
                 <if test="instanceIds != null">#{instanceIds,jdbcType=VARCHAR},</if>
         </trim>
+    </insert>
+    <insert id="batchInsert">
+        insert into t_device_maintenance
+        (maintenance_id,maintenance_name,device_ids
+        ,is_valid,maintenance_start,maintenance_stop
+        ,edge_code,origin_id,coordinate_pixel
+        ,device_level,instance_ids
+        ) values
+        <foreach collection="list" item="TDeviceMaintenance" separator=",">
+            (#{TDeviceMaintenance.maintenanceId,jdbcType=BIGINT},#{TDeviceMaintenance.maintenanceName,jdbcType=VARCHAR},#{TDeviceMaintenance.deviceIds,jdbcType=VARCHAR}
+            ,#{TDeviceMaintenance.isValid,jdbcType=INTEGER},#{TDeviceMaintenance.maintenanceStart,jdbcType=TIMESTAMP},#{TDeviceMaintenance.maintenanceStop,jdbcType=TIMESTAMP}
+            ,#{TDeviceMaintenance.edgeCode,jdbcType=VARCHAR},#{TDeviceMaintenance.originId,jdbcType=VARCHAR},#{TDeviceMaintenance.coordinatePixel,jdbcType=VARCHAR}
+            ,#{TDeviceMaintenance.deviceLevel,jdbcType=VARCHAR},#{TDeviceMaintenance.instanceIds,jdbcType=VARCHAR})
+        </foreach>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.yjh.accessrobot.module.command.entity.TDeviceMaintenance">
         update t_device_maintenance
