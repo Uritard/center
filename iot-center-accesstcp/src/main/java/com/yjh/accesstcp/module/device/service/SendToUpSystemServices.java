@@ -35,6 +35,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -977,6 +978,14 @@ public class SendToUpSystemServices {
                     String zipName = "map_model.zip";
                     ZipUtil.compressFiles(dirPath, zipName, mapFileList);
                     return dirPath+zipName;
+                case "10":
+                    String sourcePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+                    String fileName = "source_file_model.cime";
+                    File file = new File(sourcePath+fileName);
+                    if (!file.exists()){
+                        throw new BusinessException("设备资源文件不存在");
+                    }
+                    return sourcePath+fileName;
                 default:
                     break;
             }
