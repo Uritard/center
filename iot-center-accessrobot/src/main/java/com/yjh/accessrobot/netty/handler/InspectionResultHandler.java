@@ -72,6 +72,7 @@ public class InspectionResultHandler implements MessageHandlerStrategy, Initiali
             taskResult.setRectangle(String.valueOf(item.get("rectangle")));
             taskResult.setFilePath(String.valueOf(item.get("file_path")));
             taskResult.setTaskPatrolledId(String.valueOf(item.get("task_patrolled_id")));
+            taskResult.setDataType(String.valueOf(item.get("data_type")));
             taskResult.setValid(Objects.nonNull(item.get("valid")) ? String.valueOf(item.get("valid")) : "");
             taskResult.setOriginFileResultPath(Objects.nonNull(item.get("origin_file_path")) ? String.valueOf(item.get("origin_file_path")) : "");
             taskResult.setOriginFilePath(Objects.nonNull(item.get("origin_file_result_path")) ? String.valueOf(item.get("origin_file_result_path")) : "");

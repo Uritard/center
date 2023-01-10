@@ -12,6 +12,7 @@ import com.yjh.platform.module.user.entity.*;
 import com.yjh.platform.module.user.entity.output.SysUserDTO;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -460,6 +461,8 @@ public class TCameraInfoService {
             Map<String, String> map = redisTemplate.opsForHash().entries(str);
             if (MapUtils.isEmpty(map)) {
                 map = new HashMap<>(8);
+            }
+            if (StringUtils.isEmpty(map.get("state"))) {
                 map.put("state", "0");
             }
             map.put("cameraId", String.valueOf(cameraId));

@@ -72,6 +72,9 @@ public class RobotPatrolTaskResult implements Serializable {
     @ApiModelProperty(value = "巡视任务执行ID")
     private String taskPatrolledId;
 
+    @ApiModelProperty(value = "数据来源（0x01视频设备，0x02机器人，0x03无人机，0x04声纹装置，0x05在线检测）")
+    private String dataType;
+
     @ApiModelProperty(value = "结论(0为失败，1为成功，2为判别异常)")
     private String valid;
 

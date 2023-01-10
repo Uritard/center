@@ -13,6 +13,7 @@ import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
+import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
@@ -140,7 +141,7 @@ public class InspectionResultThread implements Runnable{
                 MAP_LOCK.remove(taskId + instanceId);
             }
             // 是否为本级系统下发给下级系统的任务
-            boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode);
+            boolean flag = judgeTaskSourceHandler(taskId, instanceId, robotCode, tCruiseTaskResultMap.get("cruiseType"));
             if (Boolean.FALSE.equals(flag)) {
                 log.info("This is simulation tool task！！！ {}", taskId);
                 simulationToolTaskHandler(infoMap.getOrDefault("absolutePath", ""), taskId, instanceId, robotPatrolTaskResult.getValue(), robotPatrolTaskResult.getFilePath());
@@ -244,17 +245,19 @@ public class InspectionResultThread implements Runnable{
      * @param sendCode 下级唯一标识
      * @return boolean
      */
-    private boolean judgeTaskSourceHandler(String taskId, String instanceId, String sendCode) {
+    private boolean judgeTaskSourceHandler(String taskId, String instanceId, String sendCode, String cruiseType) {
         try {
             String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
 
+            CruiseConstant.TypeEnum cruiseTypeEnum = CruiseConstant.TypeEnum.getEnum(NumberUtils.toInt(cruiseType));
             Integer robotType = uPatrolTaskService.selectRobotType(sendCode);
             // 机器人类型为模拟机器人 为模拟工具
             boolean isSimulationTool = Objects.equals(810, robotType);
             // 如果sendCode是边缘节点(1~1999) 也走模拟工具的逻辑
 //            boolean isEdgeCode = NumberUtils.toInt(sendCode) >= 1 && NumberUtils.toInt(sendCode) <= 1999;
-//            isSimulationTool = isSimulationTool || isEdgeCode;
-            log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, sysLevel: {}", isSimulationTool, taskId, sysLevel);
+            boolean needAnalysis = robotType == null && !"3".equals(sysLevel) && (cruiseTypeEnum == TypeEnum.INFRARED || cruiseTypeEnum == TypeEnum.VIDEO);
+           isSimulationTool = isSimulationTool || needAnalysis;
+            log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", isSimulationTool, taskId, robotType, sysLevel, cruiseType);
             if (Boolean.FALSE.equals(isSimulationTool)) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0) {
