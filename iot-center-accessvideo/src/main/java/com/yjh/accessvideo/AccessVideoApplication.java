@@ -1,6 +1,7 @@
 package com.yjh.accessvideo;
 
 import com.alibaba.fastjson.JSON;
+import com.sun.jna.NativeLong;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
@@ -194,7 +195,7 @@ public class AccessVideoApplication implements CommandLineRunner {
 
                 m_strLoginInfo.wPort = m_port;
 
-                m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
+                m_strLoginInfo.bUseAsynLogin = false; //是否异步登录：0- 否，1- 是
 
                 m_strLoginInfo.write();
                 lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);

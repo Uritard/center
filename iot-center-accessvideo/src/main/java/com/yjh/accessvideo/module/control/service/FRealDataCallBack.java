@@ -13,7 +13,8 @@ public class FRealDataCallBack implements HCNetSDK.FRealDataCallBack_V30 {
     private static PlayCtrl playCtrl = PlayCtrl.INSTANCE;
 
     //预览回调
-    public void invoke(NativeLong lRealHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, Pointer pUser)
+    @Override
+    public void invoke(int lRealHandle, int dwDataType, ByteByReference pBuffer, int dwBufSize, Pointer pUser)
     {
         switch (dwDataType)
         {
