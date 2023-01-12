@@ -1009,47 +1009,18 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public String deviceMaintenanceIssued(Map<String, Object> resMap) {
         List<Map<String, Object>> itemList = new ArrayList<>();
-        Map<String, Object> itemMap = new HashMap<>(16);
-        //2022过检增加config_code：配置编码、coordinate_pixel：检修区域坐标框
-        itemMap.put("config_code", resMap.get("configCode").toString());
-        itemMap.put("coordinate_pixel", resMap.get("coordinatePixel").toString());
-        itemMap.put("enable", Integer.valueOf(resMap.get("enable").toString()));
-        itemMap.put("start_time", resMap.get("startTime").toString());
-        itemMap.put("end_time", resMap.get("endTime").toString());
-        itemMap.put("device_level", Integer.valueOf(resMap.get("deviceLevel").toString()));
-        String deviceList = resMap.get("deviceList").toString();
-        String deviceIdList = deviceList.substring(1, deviceList.length() - 1).replace(" ", "");
-        itemMap.put("device_list", deviceIdList);
-        itemList.add(itemMap);
-
-        // 这样下发 如果是给多个机器人是有问题的
-        List<String> robotCodeList = tRobotInfoDao.selectOnline();
-        log.info("在线的robotCodeList: {}", robotCodeList);
-
-        for (String robotCode : robotCodeList) {
-            TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
-            String status;
-            if (StringUtils.isNotEmpty(tRobotInfo.getEdgeCode()) && StringUtils.isNotEmpty(tRobotInfo.getOriginId())) {
-                status = tRobotInfoDao.selectStatusByEdgeCode(tRobotInfo.getEdgeCode());
-                robotCode = tRobotInfo.getEdgeCode();
-            } else {
-                status = tRobotInfoDao.selectStatusByRobotCode(robotCode);
-            }
-            if (Objects.equals(OFF_LINE, status)) {
-                log.info("The edge is currently offline......");
-                return "false";
-            }
-            XMLBaseModel xmlBaseModel = new XMLBaseModel()
-                    .setSendCode(Constant.sendCode)
-                    .setReceiveCode(robotCode)
-                    .setCode(Constant.stationCode)
-                    .setType("81")
-                    .setCommand("4")
-                    .setItems(itemList);
-            String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
-            log.info("生成的检修区域指令xml是<start>{}<end>", xmlString);
-            RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
-        }
+        String onlineCode = String.valueOf(resMap.get("online_code"));
+        itemList.add(resMap);
+        XMLBaseModel xmlBaseModel = new XMLBaseModel()
+                .setSendCode(Constant.sendCode)
+                .setReceiveCode(onlineCode)
+                .setCode(Constant.stationCode)
+                .setType("81")
+                .setCommand("4")
+                .setItems(itemList);
+        String xmlString = PlatformXMLUtil.generateXml(xmlBaseModel);
+        log.info("生成的检修区域指令xml是<start>{}<end>", xmlString);
+        RobotServerHandler.send(generateByteOrder(xmlString, onlineCode), onlineCode);
         return "true";
     }
 

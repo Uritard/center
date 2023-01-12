@@ -498,6 +498,11 @@
     </select>
 
     <select id="selectThereWarn" resultType="com.yjh.platform.module.task.entity.WarnInfoForHomePage">
+        SELECT
+        ss.deviceName,
+        ss.warnContent,
+        ss.warnTime
+        FROM (
                 SELECT
                 a.warn_time as warnTime,
                 a.warn_content as warnContent,
@@ -507,6 +512,8 @@
                 where 1=1
                 and TO_DAYS(a.warn_time) =TO_DAYS(NOW())
         and a.conf_mode = 276
+        order by warnTime desc LIMIT 30
+        ) ss
         <!--<if test="alarmLevel != null "> and a.warn_level = #{alarmLevel, jdbcType=INTEGER}</if>
         union all(
         SELECT
@@ -521,7 +528,6 @@
         where 1=1
         and TO_DAYS(c.alarm_time) =TO_DAYS(NOW())
         <if test="alarmLevel != null ">and c.alarm_level = #{alarmLevel, jdbcType=INTEGER}</if>-->
-        order by warnTime desc LIMIT 30
     </select>
     <select id="selectWarnPopUp" parameterType="java.lang.Long" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
         SELECT

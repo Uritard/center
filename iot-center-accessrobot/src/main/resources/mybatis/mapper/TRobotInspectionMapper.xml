@@ -268,6 +268,14 @@
         from t_robot_inspection
         where  edge_code = #{edgeCode}
     </select>
+    <select id="selectInspectionCodeList" resultType="java.lang.String">
+        SELECT
+        a.inspection_code
+        FROM
+        t_robot_inspection a
+        LEFT JOIN t_cruise_point_instance b ON a.inspection_id = b.cruise_id
+        WHERE  FIND_IN_SET(b.instance_id, #{deviceIdList, jdbcType=VARCHAR})
+    </select>
 
     <insert id="insertSelective" keyColumn="inspection_id" keyProperty="inspectionId" parameterType="com.yjh.accessrobot.module.command.entity.TRobotInspection" useGeneratedKeys="true">
         insert into t_robot_inspection

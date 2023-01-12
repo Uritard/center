@@ -42,9 +42,17 @@ public interface TDeviceMaintenanceDao {
     int deleteByDeviceIdList(@Param(value = "list") String list,
                              @Param(value = "name") String name);
 
-    List<String> selectRobotDeviceId(@Param(value = "list") List<Long> list);
-    List<String> selectCruiseIdAndDeviceId(@Param(value = "list") List<Long> list);
+    List<String> selectRegionIdList(@Param(value = "list") List<Long> list);
+    List<String> selectRobotRegionIdList(@Param(value = "list") List<Long> list);
+    List<String> selectMainDeviceIdList(@Param(value = "list") List<Long> list);
+    List<String> selectRobotMainDeviceIdList(@Param(value = "list") List<Long> list);
+    List<String> selectInstanceIdList(@Param(value = "list") List<Long> list);
+    List<String> selectRobotInstanceIdList(@Param(value = "list") List<Long> list);
+    List<String> selectRobotComponentIdList(@Param(value = "list") List<Long> list);
     List<Long>selectDeviceByRegion(@Param(value = "list") List<Long> list);
     List<Long> selectInsByDeviceId(@Param(value = "list") List<Long> list);
+
+    List<String> selectOnlineRobot(@Param(value = "list") List<Long> list);
+    List<String> selectOnlineEdge(@Param(value = "list") List<Long> list);
 
 }
