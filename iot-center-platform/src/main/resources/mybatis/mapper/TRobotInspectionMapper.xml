@@ -450,7 +450,17 @@
     </select>
 
     <select id="selectRobotType" resultType="java.lang.Integer">
-        SELECT robot_type from t_robot_info where robot_code = #{robotCode}
+        SELECT
+        CASE
+        WHEN robot_type IS NULL THEN
+        drone_type
+        ELSE
+        robot_type
+        END AS type
+        FROM
+        t_robot_info
+        WHERE
+        robot_code = #{robotCode}
     </select>
 
     <select id="selectRobotCount" resultType="java.lang.Integer">

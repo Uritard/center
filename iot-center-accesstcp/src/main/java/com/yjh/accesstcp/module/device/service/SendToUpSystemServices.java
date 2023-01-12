@@ -381,6 +381,7 @@ public class SendToUpSystemServices {
             item.put("video_pos",jsonArray.toJSONString());
             String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
             if ("1".equals(edgeLevel) && Objects.nonNull(item.get("preset_img")) && Objects.nonNull(item.get("local_path"))){
+                item.put("preset_img", "/" + stationCode + item.get("preset_img"));
                 String localPath = String.valueOf(item.get("local_path"));
                 String targetPath = String.valueOf(item.get("preset_img"));
                 try {

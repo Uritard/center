@@ -258,19 +258,32 @@
         where maintenance_name = #{name,jdbcType=VARCHAR}
           and device_ids = #{list}
     </delete>
-    <select id="selectRobotDeviceId" resultType="java.lang.String">
+    <select id="selectRegionIdList" resultType="java.lang.String">
         SELECT DISTINCT
-        b.region_id
+        a.origin_id
         FROM
-        t_robot_region b
-        LEFT JOIN t_robot_inspection a ON a.component_id = b.region_id
-        LEFT JOIN t_cruise_point_instance f ON f.cruise_id = a.inspection_id
-        LEFT JOIN t_robot_region d ON b.region_id = b.up_region_id
+        t_std_region a
+        LEFT JOIN t_std_device b ON b.up_region_id = a.region_id
         WHERE
         1 = 1
-        <if test="list != null and list.size() > 0">and f.device_id IN
+        <if test="list != null and list.size() > 0">and b.device_id IN
             <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
                 #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectRobotRegionIdList" resultType="java.lang.String">
+        SELECT DISTINCT
+        a.up_region_id
+        FROM
+        t_robot_region a
+        LEFT JOIN t_robot_inspection b ON a.region_id = b.main_device_id
+        LEFT JOIN t_cruise_point_instance c ON b.inspection_id = c.cruise_id
+        WHERE
+        1 = 1
+        <if test="list != null and list.size() > 0">and c.instance_id IN
+            <foreach collection="list" item="instanceIds" separator="," open="(" close=")" index="index">
+                #{instanceIds,jdbcType=BIGINT}
             </foreach>
         </if>
     </select>
@@ -290,6 +303,102 @@
         <foreach collection="list" item="deviceId" open="(" separator="," close=")">
             #{deviceId}
         </foreach>
+    </select>
+    <select id="selectMainDeviceIdList" resultType="java.lang.String">
+        SELECT DISTINCT
+        a.origin_id
+        FROM
+        t_std_device a
+        WHERE
+        1 = 1
+        <if test="list != null and list.size() > 0">and a.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectRobotMainDeviceIdList" resultType="java.lang.String">
+        SELECT DISTINCT
+        a.main_device_id
+        FROM t_robot_inspection a
+        LEFT JOIN t_cruise_point_instance c ON a.inspection_id = c.cruise_id
+        WHERE
+        1 = 1
+        <if test="list != null and list.size() > 0">and c.instance_id IN
+            <foreach collection="list" item="instanceIds" separator="," open="(" close=")" index="index">
+                #{instanceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectInstanceIdList" resultType="java.lang.String">
+        SELECT DISTINCT
+        a.origin_id
+        FROM
+        t_cruise_point_instance a
+        WHERE
+        1 = 1
+        <if test="list != null and list.size() > 0">and a.instance_id IN
+            <foreach collection="list" item="instanceIds" separator="," open="(" close=")" index="index">
+                #{instanceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectRobotInstanceIdList" resultType="java.lang.String">
+        SELECT DISTINCT
+        a.inspection_code
+        FROM t_robot_inspection a
+        LEFT JOIN t_cruise_point_instance c ON a.inspection_id = c.cruise_id
+        WHERE
+        1 = 1
+        <if test="list != null and list.size() > 0">and c.instance_id IN
+            <foreach collection="list" item="instanceIds" separator="," open="(" close=")" index="index">
+                #{instanceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectRobotComponentIdList" resultType="java.lang.String">
+        SELECT DISTINCT
+        a.component_id
+        FROM t_robot_inspection a
+        LEFT JOIN t_cruise_point_instance c ON a.inspection_id = c.cruise_id
+        WHERE
+        1 = 1
+        <if test="list != null and list.size() > 0">and c.instance_id IN
+            <foreach collection="list" item="instanceIds" separator="," open="(" close=")" index="index">
+                #{instanceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectOnlineRobot" resultType="java.lang.String">
+        SELECT
+        a.robot_code
+        FROM
+        t_robot_info a
+        LEFT JOIN t_robot_inspection b ON a.robot_id = b.robot_id
+        LEFT JOIN t_cruise_point_instance c ON c.cruise_id = b.inspection_id
+        WHERE
+        a.robot_status = '在线'
+        AND a.origin_id IS NULL
+        <if test="list != null and list.size() > 0">and c.instance_id IN
+            <foreach collection="list" item="instanceIds" separator="," open="(" close=")" index="index">
+                #{instanceIds, jdbcType=BIGINT}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectOnlineEdge" resultType="java.lang.String">
+        SELECT DISTINCT
+        a.region_code
+        FROM
+        t_std_region a
+        LEFT JOIN t_std_region b ON a.region_code = b.region_code
+        LEFT JOIN t_std_device c ON c.up_region_id = b.region_id
+        WHERE
+        a.edge_status = '在线'
+        <if test="list != null and list.size() > 0">and c.device_id IN
+            <foreach collection="list" item="deviceIds" separator="," open="(" close=")" index="index">
+                #{deviceIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
     </select>
 
 </mapper>

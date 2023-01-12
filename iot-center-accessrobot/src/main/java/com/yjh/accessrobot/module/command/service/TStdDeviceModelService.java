@@ -109,7 +109,7 @@ public class TStdDeviceModelService {
                                 JSONArray cameraArray = JSONArray.parseArray(device.get("video_pos").toString());
                                 String cameraOriginId = JSON.parseObject(cameraArray.get(0).toString()).get("device_code").toString();
                                 TCameraInfo tCameraInfo = tCameraInfoList.stream().filter(t -> cameraOriginId.equals(t.getOriginId()) && edgeCode.equals(t.getEdgeCode())).collect(Collectors.toList()).get(0);
-                                TCameraPreset tCameraPreset = createCameraPreset(edgeCode, device, cameraArray, tCameraInfo.getCameraId(), edgeLevel, ftpsPath, presetPath, presetRealPath);
+                                TCameraPreset tCameraPreset = createCameraPreset(edgeCode, device, cameraArray, tCameraInfo.getCameraId());
                                 cruiseId = Long.parseLong(JSON.parseObject(cameraArray.get(0).toString()).get("device_pos").toString());
                                 cruiseType = tCameraInfo.getCameraType() == 206 ? 230 : 229;
                                 finalCameraPresetList.add(tCameraPreset);
@@ -162,6 +162,10 @@ public class TStdDeviceModelService {
             //预置位
             List<TCameraPreset> insertCameraPresetList = dealCameraPreset(oldCameraPresetList, newCameraPresets, edgeCode);
             insertCameraPresetList.addAll(oldCameraPresetList);
+            //处理预置位图片
+            if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
+                dealCameraPresetImage(insertCameraPresetList, ftpsPath, presetPath, presetRealPath);
+            }
             //机器人测点
             List<TRobotInspection> insertRobotInspectionList = dealRobotInspection(oldRobotInspectionList, newRobotInspections, edgeCode);
             insertRobotInspectionList.addAll(oldRobotInspectionList);
@@ -189,6 +193,39 @@ public class TStdDeviceModelService {
             tStdDeviceAttrMapper.deleteByEdgeCode(edgeCode);
             tStdDeviceMapper.deleteByEdgeCode(edgeCode);
         }
+    }
+
+    /**
+     * 单独处理预置位图片
+     * @param insertCameraPresetList 入库后的预置位数据
+     * @param ftpsPath
+     * @param presetPath
+     * @param presetRealPath
+     */
+    private void dealCameraPresetImage(List<TCameraPreset> insertCameraPresetList, String ftpsPath,
+                                       String presetPath, String presetRealPath) {
+        log.info("处理预置位图片");
+        //当节点为巡视主机接入边缘节点时再触发
+        insertCameraPresetList.forEach(tCameraPreset -> {
+            if (StringUtils.isNotEmpty(tCameraPreset.getPresetImg())) {
+                String imgPath = tCameraPreset.getPresetImg().replace(presetRealPath, "")
+                        .replace(String.valueOf(tCameraPreset.getPresetId()), tCameraPreset.getOriginId());
+                log.info("预置位路径{}", imgPath);
+                String presetFtpsImg = ftpsPath + imgPath;
+                String newPresetImagePath = imgPath.replace(tCameraPreset.getOriginId(), tCameraPreset.getPresetId().toString());
+                String presetImg = presetPath + newPresetImagePath;
+                File ftpsFile = new File(presetFtpsImg);
+                if (ftpsFile.exists()) {
+                    try {
+                        FileUtil.copyFileUsingStream(presetFtpsImg, presetImg);
+                        tCameraPreset.setPresetImg(presetRealPath + newPresetImagePath);
+                    } catch (IOException e) {
+                        log.error("预置位文件拷贝失败", e);
+                    }
+                    tCameraPresetMapper.updateByPrimaryKey(tCameraPreset);
+                }
+            }
+        });
     }
 
     /**
@@ -335,15 +372,10 @@ public class TStdDeviceModelService {
      * @param device
      * @param cameraArray
      * @param cameraId
-     * @param edgeLevel
-     * @param ftpsPath
-     * @param presetPath
-     * @param presetRealPath
      * @return
      */
     private TCameraPreset createCameraPreset(String edgeCode, Map<String, Object> device, JSONArray cameraArray,
-                                             Long cameraId, String edgeLevel, String ftpsPath,
-                                             String presetPath, String presetRealPath) {
+                                             Long cameraId) {
         TCameraPreset tCameraPreset = new TCameraPreset();
         tCameraPreset.setEdgeCode(edgeCode);
         long cruiseId = Long.parseLong(JSON.parseObject(cameraArray.get(0).toString()).get("device_pos").toString());
@@ -352,26 +384,11 @@ public class TStdDeviceModelService {
         tCameraPreset.setPresetName(String.valueOf(device.get("device_name")).contains("/")
                 ? StringUtils.substringAfter(device.get("device_name").toString(), "/")
                 : String.valueOf(device.get("device_name")));
-        //当节点为巡视主机接入边缘节点时再触发
-        if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
-            tCameraPreset.setPresetNum(objToInt(device.getOrDefault("preset_num", 1)));
-            tCameraPreset.setIsKeepWatch(objToInt(device.getOrDefault("is_keep_watch", 0)));
-            tCameraPreset.setIsKeepWatchTask(objToInt(device.getOrDefault("is_keep_watch_task", 0)));
-            tCameraPreset.setIsSecondKeepWatchTask(objToInt(device.getOrDefault("is_second_keep_watch_task", 0)));
-            if (device.containsKey("preset_img")) {
-                String presetFtpsImg = ftpsPath + device.get("preset_img").toString();
-                String presetImg = presetPath + device.get("preset_img").toString();
-                File ftpsFile = new File(presetFtpsImg);
-                if (ftpsFile.exists()) {
-                    try {
-                        FileUtil.copyFileUsingStream(presetFtpsImg, presetImg);
-                        tCameraPreset.setPresetImg(presetRealPath + device.get("preset_img").toString());
-                    } catch (IOException e) {
-                        log.error("预置位文件拷贝失败", e);
-                    }
-                }
-            }
-        }
+        tCameraPreset.setPresetNum(objToInt(device.getOrDefault("preset_num", 1)));
+        tCameraPreset.setIsKeepWatch(objToInt(device.getOrDefault("is_keep_watch", 0)));
+        tCameraPreset.setIsKeepWatchTask(objToInt(device.getOrDefault("is_keep_watch_task", 0)));
+        tCameraPreset.setIsSecondKeepWatchTask(objToInt(device.getOrDefault("is_second_keep_watch_task", 0)));
+        tCameraPreset.setPresetImg(device.get("preset_img").toString());
         return tCameraPreset;
     }
 

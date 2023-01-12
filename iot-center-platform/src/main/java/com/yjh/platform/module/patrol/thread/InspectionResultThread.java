@@ -250,14 +250,14 @@ public class InspectionResultThread implements Runnable{
             String sysLevel = (String)redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content");
 
             CruiseConstant.TypeEnum cruiseTypeEnum = CruiseConstant.TypeEnum.getEnum(NumberUtils.toInt(cruiseType));
-            Integer robotType = uPatrolTaskService.selectRobotType(sendCode);
-            // 机器人类型为模拟机器人 为模拟工具
-            boolean isSimulationTool = Objects.equals(810, robotType);
+            Integer type = uPatrolTaskService.selectRobotType(sendCode);
+            // 机器人类型为模拟机器人/模拟无人机 为模拟工具
+            boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
             // 如果sendCode是边缘节点(1~1999) 也走模拟工具的逻辑
 //            boolean isEdgeCode = NumberUtils.toInt(sendCode) >= 1 && NumberUtils.toInt(sendCode) <= 1999;
-            boolean needAnalysis = robotType == null && !"3".equals(sysLevel) && (cruiseTypeEnum == TypeEnum.INFRARED || cruiseTypeEnum == TypeEnum.VIDEO);
+            boolean needAnalysis = type == null && !"3".equals(sysLevel) && (cruiseTypeEnum == TypeEnum.INFRARED || cruiseTypeEnum == TypeEnum.VIDEO);
            isSimulationTool = isSimulationTool || needAnalysis;
-            log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", isSimulationTool, taskId, robotType, sysLevel, cruiseType);
+            log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", isSimulationTool, taskId, type, sysLevel, cruiseType);
             if (Boolean.FALSE.equals(isSimulationTool)) {
                 Integer flag = uPatrolTaskService.selectIsAlarmByTask(taskId, instanceId);
                 if (flag > 0) {

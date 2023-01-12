@@ -711,6 +711,8 @@ INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('903', 'prioritized_task_type', '区域巡视系统控制任务', '0', '执行等级配置任务类型', '1');
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('904', 'prioritized_task_type', '主辅设备联动任务', '0', '执行等级配置任务类型', '1');
 INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('810', 'robot_type', '模拟机器人', NULL, '机器人类型', '0');
+INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('811', 'drone_type', '模拟无人机', NULL, '无人机型号', '1');
+INSERT INTO `t_dict_business`(`dict_code`, `col_name`, `dict_note`, `up_dict`, `remark`, `sort`) VALUES ('812', 'device_type', '变电站环境', '32', '设备类型', '1');
 
 
 
