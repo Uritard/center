@@ -206,19 +206,24 @@
             <classifier>jdk15</classifier>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.sun.jna</groupId>
             <artifactId>com.sun.jna.examples</artifactId>
             <version>1.0.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/lib/jna.jar</systemPath>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.sun.jna.examples</groupId>
             <artifactId>com.sun.jna.examples</artifactId>
             <version>1.0.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/lib/examples.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>4.5.2</version>
         </dependency>
 
         <dependency>
@@ -229,13 +234,19 @@
         <dependency>
             <groupId>ws.schild</groupId>
             <artifactId>jave-core</artifactId>
-            <version>2.4.6</version>
+            <version>3.3.1</version>
         </dependency>
         <!--linux下引入这个-->
         <dependency>
             <groupId>ws.schild</groupId>
-            <artifactId>jave-native-linux64</artifactId>
-            <version>2.4.6</version>
+            <artifactId>jave-nativebin-linux64</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+        <!--linux-arm 架构引入这个-->
+        <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-nativebin-linux-arm64</artifactId>
+            <version>3.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.paho</groupId>

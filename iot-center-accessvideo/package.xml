@@ -38,6 +38,7 @@
                 <include>*.properties</include>
                 <include>lib/*</include>
                 <include>lib/HCNetSDKCom/*</include>
+                <include>lib_arm64/**</include>
             </includes>
         </fileSet>
         <!-- 把项目脚本，打包进zip文件的script目录 -->

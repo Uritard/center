@@ -62,6 +62,7 @@
         c.identity_manager,
         c.identity_code,
         c.rtsp_port,
+        c.recorder_type,
         a.camera_ip,
         a.port,
         a.infread_port,

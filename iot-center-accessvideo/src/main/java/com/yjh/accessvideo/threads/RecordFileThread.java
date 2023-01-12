@@ -56,7 +56,7 @@ public class RecordFileThread implements Runnable{
                 int runnedTime = Math.toIntExact((System.currentTimeMillis() - startTime) / (1000 * 60));
                 int overTime = Integer.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:logoutTime", "content")));
                 if (runnedTime > overTime) {
-                    NativeLong lRealPlayHandle = Constant.recordLongMap.get(fileName);
+                    int lRealPlayHandle = Constant.recordLongMap.get(fileName);
                     hCNetSDK.NET_DVR_StopRealPlay(lRealPlayHandle);
                     String judge = savePath + fileName;
                     String path =  videoPath + fileName;

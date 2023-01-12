@@ -3,6 +3,10 @@ package com.yjh.accessvideo.commons.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import ws.schild.jave.*;
+import ws.schild.jave.encode.AudioAttributes;
+import ws.schild.jave.encode.EncodingAttributes;
+import ws.schild.jave.encode.VideoAttributes;
+import ws.schild.jave.info.VideoSize;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,9 +43,9 @@ public class VideoUtil {
             //位速率又叫比特率，是指在单位时间内可以传输多少数据
             audio.setBitRate(64000);
             //音频的通道数，一般来说 都是单通道和双通道（立体音）
-            audio.setChannels(1);
+            audio.setChannels(2);
             //是指在数码音频和视频技术应用中，当进行模拟/数码转换时，每秒钟对模拟信号进行取样时的快慢次数
-            audio.setSamplingRate(22050);
+            audio.setSamplingRate(44100);
             //视频编码器
             video.setCodec("libx264");
             //位速率又叫比特率，是指在单位时间内可以传输多少数据
@@ -50,7 +54,7 @@ public class VideoUtil {
             video.setFrameRate(20);
             video.setSize(new VideoSize(1920, 1080));
             EncodingAttributes attr = new EncodingAttributes();
-            attr.setFormat("mp4");
+            attr.setOutputFormat("mp4");
             attr.setAudioAttributes(audio);
             attr.setVideoAttributes(video);
             Encoder encoder = new Encoder();

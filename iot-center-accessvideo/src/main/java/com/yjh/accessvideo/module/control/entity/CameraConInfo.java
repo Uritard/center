@@ -53,6 +53,9 @@ public class CameraConInfo implements Serializable {
     @ApiModelProperty(value = "控制端口")
     private Integer rtspPort;
 
+    @ApiModelProperty(value = "NVR类型")
+    private String recorderType;
+
     @ApiModelProperty(value = "相机用户名")
     private String cameraManager;
 
