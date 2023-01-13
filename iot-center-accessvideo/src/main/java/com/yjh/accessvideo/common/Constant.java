@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class Constant {
 
     public static Map<String, Integer> maps = new ConcurrentHashMap<>();
+    public static Map<Integer, Long> DVRMaps = new ConcurrentHashMap<>();
 
     public static Map<Long, HCNetSDK.NET_DVR_DEVICEINFO_V40> deviceMaps = new ConcurrentHashMap<>();
 

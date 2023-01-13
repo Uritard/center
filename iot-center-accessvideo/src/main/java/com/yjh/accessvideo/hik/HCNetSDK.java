@@ -7,6 +7,7 @@ import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.ShortByReference;
 
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -4808,6 +4809,8 @@ DVR实现巡航数据结构
         public byte[] byRes = new byte[176];
     }
 
+
+
     // AI开放平台接入轮询视频检测报警结构体。
     public static class NET_AIOP_POLLING_VIDEO_HEAD extends StructureFieldOrder {
         public int dwSize;            //dwSize = sizeof(NET_AIOP_POLLING_VIDEO_HEAD)
@@ -9469,6 +9472,10 @@ DVR实现巡航数据结构
             Pointer pUser);
     }
 
+    public static interface MSGCallBack extends Callback  {
+        public void invoke(NativeLong lCommand, NET_DVR_ALARMER pAlarmer, Pointer pAlarmInfo, int dwBufLen, Pointer pUser);
+    }
+
 
 
     boolean NET_DVR_Init();
@@ -10472,6 +10479,70 @@ DVR实现巡航数据结构
         public byte bySupport256PresetNo;
         public byte[] byRes = new byte[6];
     }
+
+
+
+    public static class NET_SDK_LOCAL_CFG_TYPE {
+        public static final int COMM_ALARM_SHIPSDETECTION = 0x4521;
+        public static final int NET_SDK_LOCAL_CFG_TYPE_TCP_PORT_BIND = 0;
+        public static final int NET_SDK_LOCAL_CFG_TYPE_UDP_PORT_BIND = 1;
+        public static final int NET_SDK_LOCAL_CFG_TYPE_MEM_POOL = 2;
+        public static final int NET_SDK_LOCAL_CFG_TYPE_MODULE_RECV_TIMEOUT = 3;
+        public static final int NET_SDK_LOCAL_CFG_TYPE_ABILITY_PARSE = 4;
+        public static final int NET_SDK_LOCAL_CFG_TYPE_TALK_MODE = 5;
+        public static final int NET_SDK_LOCAL_CFG_TYPE_CHECK_DEV = 10;
+        public static final int NET_SDK_LOCAL_CFG_TYPE_CHAR_ENCODE = 13;
+        public static final int NET_DVR_LOCAL_CFG_TYPE_LOG = 15;
+        public static final int NET_DVR_LOCAL_CFG_TYPE_GENERAL = 17;
+        public static final int NET_DVR_LOCAL_CFG_TYPE_PTZ = 18;
+        public static final int NET_SDK_LOCAL_CFG_CERTIFICATION = 20;
+        public static final int NET_SDK_LOCAL_CFG_PORT_MULTIPLEX = 21;
+    }
+
+
+    public static class _VCA_RULE_EVENT_TYPE_EX_{
+        public static final int  ENUM_VCA_EVENT_TRAVERSE_PLANE      = 1,
+            ENUM_VCA_EVENT_ENTER_AREA          = 2,
+            ENUM_VCA_EVENT_EXIT_AREA           = 3,
+            ENUM_VCA_EVENT_INTRUSION           = 4,
+            ENUM_VCA_EVENT_LOITER              = 5,
+            ENUM_VCA_EVENT_LEFT_TAKE           = 6,
+            ENUM_VCA_EVENT_PARKING             = 7,
+            ENUM_VCA_EVENT_RUN                 = 8,
+            ENUM_VCA_EVENT_HIGH_DENSITY        = 9,
+            ENUM_VCA_EVENT_VIOLENT_MOTION      = 10,
+            ENUM_VCA_EVENT_REACH_HIGHT         = 11,
+            ENUM_VCA_EVENT_GET_UP              = 12,
+            ENUM_VCA_EVENT_LEFT                = 13,
+            ENUM_VCA_EVENT_TAKE                = 14,
+            ENUM_VCA_EVENT_LEAVE_POSITION      = 15,
+            ENUM_VCA_EVENT_TRAIL               = 16,
+            ENUM_VCA_EVENT_KEY_PERSON_GET_UP   = 17,
+            ENUM_VCA_EVENT_STANDUP             = 18,
+            ENUM_VCA_EVENT_FALL_DOWN           = 20,
+            ENUM_VCA_EVENT_AUDIO_ABNORMAL      = 21,
+            ENUM_VCA_EVENT_ADV_REACH_HEIGHT    = 22,
+            ENUM_VCA_EVENT_TOILET_TARRY        = 23,
+            ENUM_VCA_EVENT_YARD_TARRY          = 24,
+            ENUM_VCA_EVENT_ADV_TRAVERSE_PLANE  = 25,
+            ENUM_VCA_EVENT_LECTURE             = 26,
+            ENUM_VCA_EVENT_ANSWER              = 27,
+            ENUM_VCA_EVENT_HUMAN_ENTER         = 29,
+            ENUM_VCA_EVENT_OVER_TIME           = 30,
+            ENUM_VCA_EVENT_STICK_UP            = 31,
+            ENUM_VCA_EVENT_INSTALL_SCANNER     = 32,
+            ENUM_VCA_EVENT_PEOPLENUM_CHANGE    = 35,
+            ENUM_VCA_EVENT_SPACING_CHANGE      = 36,
+            ENUM_VCA_EVENT_COMBINED_RULE       = 37,
+            ENUM_VCA_EVENT_SIT_QUIETLY         = 38,
+            ENUM_VCA_EVENT_HIGH_DENSITY_STATUS = 39,
+            ENUM_VCA_EVENT_RUNNING             = 40,
+            ENUM_VCA_EVENT_RETENTION           = 41,
+            ENUM_VCA_EVENT_BLACKBOARD_WRITE   = 42,
+            ENUM_VCA_EVENT_PLAY_CELLPHONE   = 44,
+            ENUM_VCA_EVENT_DURATION = 45;
+    }
+
 }
 
 //windows gdi接口,gdi32.dll in system32 folder, 在设置遮挡区域,移动侦测区域等情况下使用

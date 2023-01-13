@@ -835,5 +835,10 @@ public class AnalyseDataOperateService {
     public String selectPMSByCameraId(Long cameraId){
         return analyseDataOperateDao.selectPMSByCameraId(cameraId);
     }
+
+
+    public Map<String,Object> selectCameraByRecorderIdAndChannelId(Long recorderId, Integer channelId) {
+        return analyseDataOperateDao.selectCameraByRecorderIdAndChannelId(recorderId,channelId);
+    }
 }
 
