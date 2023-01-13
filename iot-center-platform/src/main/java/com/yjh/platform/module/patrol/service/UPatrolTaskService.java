@@ -7,6 +7,7 @@ package com.yjh.platform.module.patrol.service;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
@@ -71,6 +72,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -2277,8 +2280,18 @@ public class UPatrolTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int batchInsertUPatrolDataResult(List<UPatrolDataResult> uPatrolDataResultList) {
-        return this.uPatrolDataResultDao.batchInsertUPatrolDataResult(uPatrolDataResultList);
+    public void batchInsertUPatrolDataResult(List<UPatrolDataResult> uPatrolDataResultList) {
+        if (uPatrolDataResultList.size() > 1000) {
+            List<List<UPatrolDataResult>> lists = Lists.partition(uPatrolDataResultList, 1000);
+            ExecutorService executorService = Executors.newFixedThreadPool(lists.size());
+            lists.forEach(subList ->
+                    executorService.submit(() -> {
+                        uPatrolDataResultDao.batchInsertUPatrolDataResult(subList);
+                    }));
+            executorService.shutdown();
+        } else {
+            uPatrolDataResultDao.batchInsertUPatrolDataResult(uPatrolDataResultList);
+        }
     }
 
 
