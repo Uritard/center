@@ -313,6 +313,7 @@
                         <classesDirectory>${project.basedir}/src/main/resources/</classesDirectory>
                         <exclude>*.properties</exclude>
                         <exclude>*.yml</exclude>
+                        <exclude>lib*/**</exclude>
                         <!--<exclude>*/*.*</exclude>-->
                     </excludes>
                 </configuration>

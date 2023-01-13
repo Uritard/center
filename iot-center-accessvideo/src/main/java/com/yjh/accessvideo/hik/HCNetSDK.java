@@ -7,7 +7,7 @@ import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.ShortByReference;
 
-
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -9873,8 +9873,10 @@ DVR实现巡航数据结构
     //2005-09-15
     boolean NET_DVR_CaptureJPEGPicture(int lUserID, int lChannel, NET_DVR_JPEGPARA lpJpegPara, byte[] sPicFileName);
 
+    boolean NET_DVR_CaptureJPEGPicture(int lUserID, int lChannel, NET_DVR_JPEGPARA lpJpegPara, String sPicFileName);
+
     //JPEG抓图到内存
-    boolean NET_DVR_CaptureJPEGPicture_NEW(int lUserID, int lChannel, NET_DVR_JPEGPARA lpJpegPara, Pointer sJpegPicBuffer, int dwPicSize, IntByReference lpSizeReturned);
+    boolean NET_DVR_CaptureJPEGPicture_NEW(int lUserID, int lChannel, NET_DVR_JPEGPARA lpJpegPara, ByteBuffer sJpegPicBuffer, int dwPicSize, IntByReference lpSizeReturned);
 
     //带全屏测温数据的设备抓图
     boolean NET_DVR_CaptureJPEGPicture_WithAppendData(int lUserID, int iChannelNum, NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppendData);

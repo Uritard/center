@@ -428,35 +428,37 @@ public class IntelAnalysisService {
                 taskResult.setAnalyseType(algorithmType);
                 for (AnalyseResultItem result : results) {
                     taskResult.setConf(String.valueOf(result.getConf()));
-                    if (StringUtils.equals("2001", result.getCode())){
-                        log.error("巡视点为{}图像数据错误", instanceId);
-                        taskResult.setResultValue("图像数据错误");
-                        taskResult.setResultDesc("图像数据错误");
-                        taskResult.setAnalyseResultImg(originPicPath);
-                        resultList.add(taskResult);
-                    }else if (StringUtils.equals("2002", result.getCode())){
-                        log.error("巡视点为{}算法分析失败", instanceId);
-                        taskResult.setResultValue("算法分析失败");
-                        taskResult.setResultDesc("算法分析失败");
-                        taskResult.setAnalyseResultImg(originPicPath);
-                        resultList.add(taskResult);
-                    }else if (StringUtils.equals("2000", result.getCode())){
-                        Map<String, String> map = getResultMap(resultValue, resultDesc, resultImg, originPicPath, result);
-
-                        if (Objects.equals("", map.get("resultValue").trim())) {
-                            log.info("没有识别出来任何缺陷");
+                    try {
+                        if (StringUtils.equals("2001", result.getCode())){
+                            log.error("巡视点为{}图像数据错误", instanceId);
+                            taskResult.setResultValue("图像数据错误");
+                            taskResult.setResultDesc("图像数据错误");
                             taskResult.setAnalyseResultImg(originPicPath);
-                        }else {
-                            log.info("识别出来了缺陷");
-                            List<String> resultImgList = new ArrayList<>();
-                            Collections.addAll(resultImgList, map.get("resultImg").split(" "));
-                            resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
-                            taskResult.setAnalyseResultImg(resultImgList.get(0));
+                        }else if (StringUtils.equals("2002", result.getCode())){
+                            log.error("巡视点为{}算法分析失败", instanceId);
+                            taskResult.setResultValue("算法分析失败");
+                            taskResult.setResultDesc("算法分析失败");
+                            taskResult.setAnalyseResultImg(originPicPath);
+                        }else if (StringUtils.equals("2000", result.getCode())){
+                            Map<String, String> map = getResultMap(resultValue, resultDesc, resultImg, originPicPath, result);
+
+                            if (StringUtils.isBlank(map.get("resultValue"))) {
+                                log.info("没有识别出来任何缺陷");
+                                taskResult.setAnalyseResultImg(originPicPath);
+                            }else {
+                                log.info("识别出来了缺陷");
+                                List<String> resultImgList = new ArrayList<>();
+                                Collections.addAll(resultImgList, StringUtils.split(map.get("resultImg"), " "));
+                                resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
+                                taskResult.setAnalyseResultImg(resultImgList.get(0));
+                            }
+                            taskResult.setResultDesc(map.getOrDefault("resultDesc", ""));
+                            taskResult.setResultValue(map.getOrDefault("resultValue", ""));
                         }
-                        taskResult.setResultDesc(Optional.ofNullable(map.get("resultDesc")).orElse(""));
-                        taskResult.setResultValue(Optional.ofNullable(map.get("resultValue")).orElse(""));
-                        resultList.add(taskResult);
+                    } catch (Exception e) {
+                        log.error("算法分析结果解析点位失败：", e);
                     }
+                    resultList.add(taskResult);
                 }
             }
         }catch (Exception e){
@@ -516,7 +518,7 @@ public class IntelAnalysisService {
         String targetPath;
         try {
             String resImageUrl = result.getResImageUrl();
-            if (Objects.isNull(resImageUrl)) {
+            if (StringUtils.isNotEmpty(resImageUrl)) {
                 resImageUrl = resImageUrl.startsWith("/") ? resImageUrl.substring(1) : resImageUrl;
             }
             if (StringUtils.equals("1", value)){
@@ -538,6 +540,9 @@ public class IntelAnalysisService {
             map.put("resultImg", String.valueOf(resultImg));
         }catch (Exception e){
             log.error("组装判别结果异常：", e);
+            map.put("resultDesc", "");
+            map.put("resultValue", "结果解析失败");
+            map.put("resultImg", resultImg.length() > 0 ? String.valueOf(resultImg) : originPicPath);
         }
         return map;
     }
@@ -597,7 +602,7 @@ public class IntelAnalysisService {
                 }else {
                     // 根据value获取对应的值
                     int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
-                    String resultDescTemp = RecogniseStatusEnum.getValueByCode(typeValue).getValue();
+                    String resultDescTemp = Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN).getValue();
                     resultValue.add(resultDescTemp);
                 }
             }
@@ -606,6 +611,9 @@ public class IntelAnalysisService {
             map.put("resultImg", String.valueOf(resultImg));
         }catch (Exception e){
             log.error("组装缺陷或识别结果异常：", e);
+            map.put("resultDesc", "");
+            map.put("resultValue", "结果解析失败");
+            map.put("resultImg", resultImg.length() > 0 ? String.valueOf(resultImg) : originPicPath);
         }
         return map;
     }
@@ -769,10 +777,8 @@ public class IntelAnalysisService {
 
             try {
                 postUrl(syncWebsocketUrl, json);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
         }
     }

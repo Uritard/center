@@ -22,7 +22,10 @@ import com.yjh.accessvideo.thread.TaskExecutePool;
 import com.yjh.accessvideo.threads.RecordFileThread;
 import com.yjh.accessvideo.threads.TranscodeThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1056,13 +1059,49 @@ public class CameraConService {
 //                    return "PlayM4_RenderPrivateDataEx, error code: "+iErr;
 //                }
             } else {
-                if (!hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNum, lpJpegPara, filePath.getBytes())) {
+
+                int captureMethod = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:captureMethod","content"), 3);
+
+                boolean flag = false;
+                InputStream inputStream = null;
+                // 这里提供三种抓图方式，1和3是SDK示例中提供的接口，但是1会导致文件名不正确，多了未知后缀，2和3可正常使用，2是直接生成图片，
+                // 3是将图片信息写入缓存，然后直接用缓存中信息添加水印，可以减少对磁盘IO
+                if (captureMethod == 1) {
+                    flag = hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNum, lpJpegPara, filePath.getBytes());
+                } else if (captureMethod == 2) {
+                    flag = hCNetSDK.NET_DVR_CaptureJPEGPicture(lUserIDLong, iChanNum, lpJpegPara, filePath);
+                } else if (captureMethod == 3) {
+                    // 返回图片大小
+                    IntByReference a = new IntByReference();
+                    // 图片缓冲区大小
+                    ByteBuffer jpegBuffer = ByteBuffer.allocate(1024 * 1024);
+                    flag = hCNetSDK.NET_DVR_CaptureJPEGPicture_NEW(lUserIDLong, iChanNum, lpJpegPara, jpegBuffer, 1024 * 1024, a);
+                    // 图片输出流
+                    inputStream = new ByteArrayInputStream(jpegBuffer.array(), 0, a.getValue());
+                }
+                log.info("capture picture method:{}, result: {}, inputStream: {}", captureMethod, flag, inputStream);
+
+                if (!flag) {
                     int iErr = hCNetSDK.NET_DVR_GetLastError();
                     log.error("capture picture fail(NET_DVR_CaptureJPEGPicture), error code: {}", iErr);
                     return "capture picture fail(NET_DVR_CaptureJPEGPicture), error code: " + iErr;
                 } else {
                     if (StringUtils.isNotEmpty(meteName)) {
-                        pictureWaterMark(filePath, DateTimeUtil.format(new Date()) + "--" + meteName);
+                        if (captureMethod == 3){
+                            pictureWaterMark(inputStream, filePath, DateTimeUtil.format(new Date()) + "--" + meteName);
+                        } else {
+                            pictureWaterMark(filePath, DateTimeUtil.format(new Date()) + "--" + meteName);
+                        }
+                    } else if (captureMethod == 3) {
+                        // 写入图片，没有调用 pictureWaterMark 方法需要手动的将图片写入文件
+                        try (FileOutputStream outputStream = new FileOutputStream(filePath)){
+                            IOUtils.copyLarge(inputStream, outputStream);
+                            outputStream.flush();
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        } finally {
+                            IOUtils.closeQuietly(inputStream);
+                        }
                     }
                 }
             }
@@ -1080,32 +1119,60 @@ public class CameraConService {
      */
     private void pictureWaterMark(String filePath, String waterMarkContent) {
         try {
-            String suffix = filePath.substring(filePath.lastIndexOf(".") + 1);
-
             File file = new File(filePath);
             BufferedImage image = ImageIO.read(file);
             //获取图片的宽
-            int srcImgWidth = image.getWidth();
-            //获取图片的高
-            int srcImgHeight = image.getHeight();
-
-            // 创建画笔
-            Graphics2D pen = image.createGraphics();
-            // 设置画笔颜色
-            pen.setColor(new Color(179, 250, 233, 200));
-            // 设置画笔字体样式
-            pen.setFont(new Font("微软雅黑", Font.BOLD, 30));
-
-            //设置水印的坐标(为原图片右下角)
-            int x = srcImgWidth - getWatermarkLength(waterMarkContent, pen) - 20;
-            int y = srcImgHeight - 20;
-
-            // 写上水印文字和坐标
-            pen.drawString(waterMarkContent, x, y);
-            FileImageOutputStream fos = new FileImageOutputStream(file);
-            ImageIO.write(image, suffix, fos);
+            waterMarkWrite(image, waterMarkContent, file);
         } catch (Exception e) {
             log.error("图片设置水印错误: ", e);
+        }
+    }
+
+    /**
+     * 给图片设置水印
+     *
+     * @param filePath         图片地址
+     * @param waterMarkContent 水印内容
+     */
+    private void pictureWaterMark(InputStream inputStream, String filePath, String waterMarkContent) {
+        try {
+            File file = new File(filePath);
+            if (!(!file.exists() && file.createNewFile())) {
+                log.error("创建文件失败，{}", filePath);
+            }
+            BufferedImage image = ImageIO.read(inputStream);
+            waterMarkWrite(image, waterMarkContent, file);
+        } catch (Exception e) {
+            log.error("图片设置水印错误: ", e);
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
+    }
+
+    private void waterMarkWrite(BufferedImage image, String waterMarkContent, File file) throws IOException {
+        String suffix = StringUtils.substringAfterLast(file.getName(), ".");
+        //获取图片的宽
+        int srcImgWidth = image.getWidth();
+        //获取图片的高
+        int srcImgHeight = image.getHeight();
+
+        // 创建画笔
+        Graphics2D pen = image.createGraphics();
+        // 设置画笔颜色
+        pen.setColor(new Color(179, 250, 233, 200));
+        // 设置画笔字体样式
+        pen.setFont(new Font("微软雅黑", Font.BOLD, 30));
+
+        //设置水印的坐标(为原图片右下角)
+        int x = srcImgWidth - getWatermarkLength(waterMarkContent, pen) - 20;
+        int y = srcImgHeight - 20;
+
+        // 写上水印文字和坐标
+        pen.drawString(waterMarkContent, x, y);
+        try (FileImageOutputStream fos = new FileImageOutputStream(file)){
+            ImageIO.write(image, suffix, fos);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
         }
     }
 

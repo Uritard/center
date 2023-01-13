@@ -37,7 +37,7 @@ public enum RecogniseStatusEnum {
     /**
      * 开关/压板-预留
      */
-    SWITCH_RESERVED(103, "预留"),
+    SWITCH_RESERVED(100, "预留"),
     /**
      * 声音-正常声音
      */
@@ -69,7 +69,11 @@ public enum RecogniseStatusEnum {
     /**
      * 指示灯、闪烁灯-红灯闪烁
      */
-    LIGHT_RED_FLICKER(56, "红灯闪烁");
+    LIGHT_RED_FLICKER(56, "红灯闪烁"),
+    /**
+     * 指示灯、闪烁灯-红灯闪烁
+     */
+    UNKNOWN(-1, "结果未识别");
 
     private int code;
     private String value;
