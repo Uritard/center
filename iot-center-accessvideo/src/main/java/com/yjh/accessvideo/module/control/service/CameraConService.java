@@ -991,7 +991,7 @@ public class CameraConService {
         }
         int iChanNum = cameraConInfo.getChannelNum() + 32;
         // 超脑类型 NVR 不加 32
-        if("810".equals(cameraConInfo.getRecorderType())){
+        if("813".equals(cameraConInfo.getRecorderType())){
             iChanNum = cameraConInfo.getChannelNum();
         }
 

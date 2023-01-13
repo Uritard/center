@@ -2,8 +2,10 @@ package com.yjh.accessvideo;
 
 import com.alibaba.fastjson.JSON;
 import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
 import com.yjh.accessvideo.common.Constant;
 import com.yjh.accessvideo.hik.HCNetSDK;
+import com.yjh.accessvideo.hik.handler.FMSGCallBack;
 import com.yjh.accessvideo.module.control.dao.CameraConDao;
 import com.yjh.accessvideo.module.control.entity.RecorderConInfo;
 import com.yjh.accessvideo.module.control.service.CameraConService;
@@ -21,7 +23,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.List;
-
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by tt on 2019/7/31
@@ -54,6 +56,13 @@ public class AccessVideoApplication implements CommandLineRunner {
      */
     @Value("${nvr.log.path}")
     private String sdkLogPath;
+
+
+    @Value("${nginx.picture.reflact}")
+    private String capturePath;//图片路径
+
+    @Value("${nvr.capture.result}")
+    private String captureResultPath;//结果路径
 
     /**
      * sdk日志等级
@@ -98,6 +107,22 @@ public class AccessVideoApplication implements CommandLineRunner {
      * 用户句柄
      */
     private int lUserID;
+
+    /**
+     * 报警布防句柄
+     */
+    private int lAlarmHandle = -1;
+
+    /**
+     *报警回调函数实现
+     */
+
+    FMSGCallBack fmsgCallBack;
+
+    /**
+     * 订阅通道
+     */
+    AtomicInteger iIndex = new AtomicInteger(0);
 
     /**
      * 设备登录信息
@@ -171,6 +196,13 @@ public class AccessVideoApplication implements CommandLineRunner {
             lUserID = -1;
         }
         List<RecorderConInfo> recorderConInfoList = cameraConDao.SelectRecords();
+
+        HCNetSDK.NET_DVR_LOCAL_GENERAL_CFG net_dvr_local_general_cfg = new HCNetSDK.NET_DVR_LOCAL_GENERAL_CFG();
+        net_dvr_local_general_cfg.byAlarmJsonPictureSeparate = 1;
+        net_dvr_local_general_cfg.write();
+        boolean setLocal = hCNetSDK.NET_DVR_SetSDKLocalCfg(HCNetSDK.NET_SDK_LOCAL_CFG_TYPE.NET_DVR_LOCAL_CFG_TYPE_GENERAL,
+            net_dvr_local_general_cfg.getPointer());
+
         cameraConService.refreshRecordsOnSchedule();
         log.info("NVR list: " + recorderConInfoList);
         new Thread(() -> {
@@ -203,8 +235,36 @@ public class AccessVideoApplication implements CommandLineRunner {
                 if (lUserID == -1) {
                     log.error(recorderConInfo.getRecordName() + " register fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
                 } else {
-                    Constant.maps.put(String.valueOf(recordId), lUserID);
-                    Constant.deviceMaps.put(recordId, m_strDeviceInfo);
+                    if ("813".equals(recorderConInfo.getRecorderType())) {
+                        if (lAlarmHandle < 0)//尚未布防,需要布防
+                        {
+                            if (fmsgCallBack == null) {
+                                fmsgCallBack = new FMSGCallBack(analyseDataOperateService,captureResultPath,capturePath);
+                                Pointer pUser = null;
+                                int index = iIndex.getAndIncrement();
+                                if (!hCNetSDK.NET_DVR_SetDVRMessageCallBack_V50(index,fmsgCallBack, pUser)) {
+                                    log.error("设置回调函数失败!");
+                                }
+                            }
+                            HCNetSDK.NET_DVR_SETUPALARM_PARAM m_strAlarmInfo = new HCNetSDK.NET_DVR_SETUPALARM_PARAM();
+                            m_strAlarmInfo.dwSize = m_strAlarmInfo.size();
+                            m_strAlarmInfo.byLevel = 1;
+                            m_strAlarmInfo.byAlarmInfoType = 1;
+                            m_strAlarmInfo.byDeployType = 1;
+                            m_strAlarmInfo.write();
+                            lAlarmHandle = hCNetSDK.NET_DVR_SetupAlarmChan_V41(lUserID, m_strAlarmInfo);
+                            if (lAlarmHandle == -1) {
+                                log.error(recorderConInfo.getRecordName() + " subscribe fail, error code:" + hCNetSDK.NET_DVR_GetLastError());
+                            } else {
+                                Constant.DVRMaps.put(lUserID, recordId);
+                                Constant.deviceMaps.put(recordId, m_strDeviceInfo);
+                            }
+                        }
+                    }
+                    else {
+                        Constant.maps.put(String.valueOf(recordId), lUserID);
+                        Constant.deviceMaps.put(recordId, m_strDeviceInfo);
+                    }
                     log.info("NVR " + recorderConInfo.getRecordName() + " register success.");
                     //IP通道个数
                     log.info("The max number of IP channels: {}", m_strDeviceInfo.struDeviceV30.byIPChanNum);

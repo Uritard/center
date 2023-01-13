@@ -90,4 +90,6 @@ public interface AnalyseDataOperateDao {
     String selectPMSByCameraId(@Param(value = "cameraId") Long cameraId);
 
     String selectAnalyseType(@Param(value = "instanceId") Long instanceId);
+
+    Map<String,Object> selectCameraByRecorderIdAndChannelId(@Param(value = "recorderId") Long recorderId,@Param(value = "channelId")  Integer channelId);
 }

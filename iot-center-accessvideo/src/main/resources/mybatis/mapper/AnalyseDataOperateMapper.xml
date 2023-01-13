@@ -1054,4 +1054,18 @@
         WHERE
             a.instance_id = #{instanceId,jdbcType=BIGINT}
     </select>
+
+    <select id="selectCameraByRecorderIdAndChannelId" resultType="java.util.Map">
+        SELECT
+            c.instance_id,
+            c.device_id,
+            c.device_mete_id,
+            c.custom_id
+        FROM
+            t_camera_info a
+                LEFT JOIN t_camera_preset b ON a.camera_id = b.camera_id
+                LEFT JOIN t_cruise_point_instance c ON b.preset_id = c.cruise_id
+            where channel_num = #{channelId,jdbcType=INTEGER}
+          and record_id = #{recorderId,jdbcType=BIGINT} limit 1
+    </select>
 </mapper>

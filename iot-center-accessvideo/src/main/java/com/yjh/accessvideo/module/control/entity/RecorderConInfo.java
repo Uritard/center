@@ -54,4 +54,7 @@ public class RecorderConInfo implements Serializable {
     @ApiModelProperty(value = "最大通道数")
     private Integer maxChannel;
 
+    @ApiModelProperty(value = "录像机类型")
+    private String recorderType;
+
 }

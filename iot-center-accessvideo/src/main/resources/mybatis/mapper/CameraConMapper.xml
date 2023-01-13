@@ -114,7 +114,8 @@
         a.rtsp_port,
         a.identity_manager,
         a.identity_code,
-        a.max_channel
+        a.max_channel,
+        a.recorder_type
         FROM t_camera_recorder a
     </select>
 
