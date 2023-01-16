@@ -77,6 +77,9 @@ public class TCruisePlanAttrDetail implements Serializable {
     @ApiModelProperty(value = "机器人点位或预置位点位或红外预置位")
     private String position;
 
+    @ApiModelProperty(value = "巡视设备名称")
+    private String cruiseDeviceName;
+
     @ApiModelProperty(value = "算法实例ID")
     private Long algorithmId;
 

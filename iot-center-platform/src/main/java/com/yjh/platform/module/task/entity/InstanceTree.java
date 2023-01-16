@@ -66,6 +66,9 @@ public class InstanceTree implements Serializable {
     @ApiModelProperty(value = "巡检点名称")
     private String instanceName;
 
+    @ApiModelProperty(value = "巡视设备名称")
+    private String cruiseDeviceName;
+
     @ApiModelProperty(value = "机器人名称")
     private String robotName;
 

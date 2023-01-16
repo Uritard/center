@@ -53,7 +53,6 @@ public class InspectionResultThread implements Runnable{
     private final RobotPatrolTaskResult robotPatrolTaskResult;
     private final Map<String, String> infoMap;
     private final UPatrolTaskService uPatrolTaskService;
-    private final AbstractVideoCruise abstractVideoCruise;
 
     private final TRobotInspectionDao tRobotInspectionDao;
     private final UPatrolResultDao uPatrolResultDao;
@@ -66,7 +65,6 @@ public class InspectionResultThread implements Runnable{
         this.redisTemplate = redisTemplate;
         this.changeTaskStatus = changeTaskStatus;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
-        this.abstractVideoCruise = StaticContextAccessor.getBean(NormalVideoCruiseExecuteImpl.class);
 
         this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
         this.uPatrolResultDao = StaticContextAccessor.getBean(UPatrolResultDao.class);
@@ -370,8 +368,12 @@ public class InspectionResultThread implements Runnable{
                     String.valueOf(redisTemplate.opsForHash().get("t_sys_param:resultImgRealPath", "content")));
             tCruiseTaskResultMap.put("picpath", picPath);
 
+            // 巡检点类型
+            int cruiseType = MapUtils.getIntValue(tCruiseTaskResultMap, "cruiseType");
+            AbstractVideoCruise abstractVideoCruise = AbstractVideoCruise.Factory.getVideoCruise(cruiseType);
+
             // 判断是否有配置算法
-            TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()));
+            TAlgorithmMeteInfo algorithm = abstractVideoCruise.needAnalysis(String.valueOf(details.getDeviceMeteId()), value);
             if (algorithm != null) {
                 JSONObject jsonForRe = new JSONObject();
                 jsonForRe.put("absPath", resultImagePath);

@@ -8,8 +8,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.CruiseConstant;
+import com.yjh.platform.module.patrol.service.impl.InfraredVideoCruiseExecuteImpl;
+import com.yjh.platform.module.patrol.service.impl.NormalVideoCruiseExecuteImpl;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
 import com.yjh.platform.module.user.dao.TAlgorithmInfoDao;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
@@ -418,6 +421,28 @@ public abstract class AbstractVideoCruise {
 
         public static void registerAnalytics(CruiseConstant.AnalyticsEnum analyticsEnum, AnalyticsService service) {
             ANALYTICS_SERVICE_MAP.put(analyticsEnum, service);
+        }
+    }
+
+    public static class Factory {
+        public static AbstractVideoCruise getVideoCruise(CruiseConstant.TypeEnum cruiseType) {
+            AbstractVideoCruise videoCruise;
+            switch (cruiseType){
+                case VIDEO:
+                    videoCruise = StaticContextAccessor.getBean(NormalVideoCruiseExecuteImpl.class);
+                    break;
+                case INFRARED:
+                default:
+                    videoCruise = StaticContextAccessor.getBean(InfraredVideoCruiseExecuteImpl.class);
+                    break;
+            }
+            return videoCruise;
+        }
+
+        public static AbstractVideoCruise getVideoCruise(int cruiseType) {
+            CruiseConstant.TypeEnum cruiseTypeEnum = TypeEnum.getEnum(cruiseType);
+
+            return getVideoCruise(cruiseTypeEnum);
         }
     }
 }

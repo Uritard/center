@@ -20,4 +20,7 @@ public class Camera {
 
     @ApiModelProperty(value = "摄像头名称")
     private String cameraName;
+
+    @ApiModelProperty(value = "摄像头类型，1：普通相机，2：机器人可见光 3：机器人红外")
+    private int cameraType;
 }
