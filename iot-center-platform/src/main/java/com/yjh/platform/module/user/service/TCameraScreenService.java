@@ -14,6 +14,7 @@ import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import java.util.*;
 
 import com.yjh.platform.module.user.entity.enums.UserStateEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,7 +74,7 @@ public class TCameraScreenService{
                 camera.setCameraId("");
                 camera.setCameraName("");
             }else {
-                if (item.contains("9901") || item.contains("9902")){
+                if (StringUtils.indexOfAny(item,"9901", "9902") >= 1){
                     Long robotId = item.contains("9901") ? Long.parseLong(item.replace("9901", "")) : Long.parseLong(item.replace("9902", ""));
                     TRobotInfo tRobotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
                     if (tRobotInfo == null) {
@@ -87,8 +88,10 @@ public class TCameraScreenService{
                     camera.setCameraId(item);
                     if (item.contains("9901")) {
                         camera.setCameraName(tRobotInfo.getRobotName() + "机器人可见光");
+                        camera.setCameraType(2);
                     } else {
                         camera.setCameraName(tRobotInfo.getRobotName() + "机器人红外");
+                        camera.setCameraType(3);
                     }
                 }else {
                     TCameraInfo tCameraInfo = tCameraInfoDao.selectCamera(Long.parseLong(item));
@@ -102,6 +105,7 @@ public class TCameraScreenService{
                     }
                     camera.setCameraId(tCameraInfo.getCameraId().toString());
                     camera.setCameraName(tCameraInfo.getCameraName());
+                    camera.setCameraType(1);
                 }
             }
             cameraList.add(camera);
