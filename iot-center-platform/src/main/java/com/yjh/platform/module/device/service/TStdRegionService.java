@@ -36,17 +36,11 @@ public class TStdRegionService{
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TStdRegion tStdRegion) {
-        //区域编码非空校验
-        if (StringUtils.isBlank(tStdRegion.getRegionCode())) {
-            throw new BusinessException(201, "区域编码不可为空");
-        }
-        //判断父节点是否为根节点，根节点下的2层节点，区域编码不可重复
-        TStdRegion tStdRegionParent = tStdRegionDao.selectByPrimaryId(tStdRegion.getUpRegionId());
-        if (Objects.nonNull(tStdRegionParent) && tStdRegionParent.getUpRegionId() == -1) {
-            Integer count = this.countByRegionCode(tStdRegion.getRegionCode(), tStdRegion.getUpRegionId());
-            if (count > 0) {
-                throw new BusinessException(201, "区域编码" + tStdRegion.getRegionCode() + "已存在");
-            }
+
+        // 判断当前区域编码是否与本级系统的区域编码重复
+        Integer count = this.countByRegionCode(tStdRegion.getRegionCode(), null);
+        if (count > 0) {
+            throw new BusinessException(201, "区域编码" + tStdRegion.getRegionCode() + "已存在");
         }
         return this.tStdRegionDao.insert(tStdRegion);
     }
@@ -67,7 +61,7 @@ public class TStdRegionService{
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdRegion tStdRegion) {
         String regionCode = tStdRegion.getRegionCode();
-        if (!Objects.equals("", regionCode) && Objects.nonNull(regionCode)) {
+        if (StringUtils.isNotEmpty(regionCode)) {
             List<TStdRegion> list = tStdRegionDao.selectIsIn(tStdRegion);
             if(list != null && list.size()>0){
                 throw new BusinessException(209,"编码与其他厂站区域重复");
@@ -217,7 +211,7 @@ public class TStdRegionService{
         return tStdRegionDao.selectStationVoltageData();
     }
 
-    //判断当前区域编码是否在第2层节点已存在
+    // 判断当前区域编码是否在本级已经存在
     public Integer countByRegionCode(String regionCode, Long upRegionId) {
         return tStdRegionDao.countByRegionCode(regionCode, upRegionId);
     }
