@@ -137,10 +137,15 @@ public class TStdDevicemeteService{
         }
         //配置算法
         if(tStdDeviceMeteDetail.getAnalyseType() != null){
-            tAlgorithmConfBakDao.deleteByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
             TAlgorithmConfBak tAlgorithmConfBak  = new TAlgorithmConfBak();
+            //若配置了算法，则判断数据库中是否存在当前数据，存在则传递edgeCode
+            TAlgorithmConfBak    tAlgorithmMeteBack = tAlgorithmConfBakDao.selectByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
+            tAlgorithmConfBakDao.deleteByPrimaryId(tStdDeviceMeteDetail.getDeviceMeteId());
             TAlgorithmInfo tAlgorithmInfo = tAlgorithmConfBakDao.selectByAnalyseType(String.valueOf(tStdDeviceMeteDetail.getAnalyseType()));
             if(tAlgorithmInfo != null){
+                if (Objects.nonNull(tAlgorithmMeteBack)) {
+                    tAlgorithmConfBak.setEdgeCode(tAlgorithmMeteBack.getEdgeCode());
+                }
                 tAlgorithmConfBak.setAlgorithmId(tAlgorithmInfo.getAlgorithmId());
                 tAlgorithmConfBak.setDeviceMeteId(tStdDeviceMeteDetail.getDeviceMeteId());
                 tAlgorithmConfBakDao.add(tAlgorithmConfBak);

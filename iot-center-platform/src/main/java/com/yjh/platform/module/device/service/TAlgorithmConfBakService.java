@@ -3,6 +3,7 @@ package com.yjh.platform.module.device.service;
 import com.yjh.platform.module.device.entity.TAlgorithmConfBak;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Date;
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class TAlgorithmConfBakService{
 
     @Transactional(rollbackFor = Exception.class)
     public List<TAlgorithmConfBak> selectByPrimaryId(Long deviceMeteId) {
-        return this.tAlgorithmConfBakDao.selectByPrimaryId(deviceMeteId);
+        return Collections.singletonList(this.tAlgorithmConfBakDao.selectByPrimaryId(deviceMeteId));
     }
 
 
