@@ -335,7 +335,28 @@ public class UPatrolTaskService {
             }
             TCruisePlanCount plan = tCruisePlanDao.selectByPrimaryId(tCruiseTaskAdd.getPlanId());
             tCruiseTaskAdd.setType(plan.getType());
+            uPatrolTask.setTaskType(tCruiseTaskAdd.getType());
         } else {
+            //处理报文中taskType字段为系统字典表中的字段
+            Integer taskType;
+            switch (tCruiseTaskAdd.getType()) {
+                case 1:
+                    //例行巡视
+                    taskType = 214;
+                    break;
+                case 2:
+                    //特殊巡视
+                    taskType = 216;
+                    break;
+                case 3:
+                    //专项巡视
+                    taskType = 217;
+                    break;
+                default:
+                    //自定义巡视
+                    taskType = 218;
+            }
+            uPatrolTask.setTaskType(taskType);
             String[] deviceInstancesFromUpperSystem = tCruiseTaskAdd.getDeviceList().split(",");
             for (String item : deviceInstancesFromUpperSystem) {
                 instanceList.add(Long.valueOf(item));
@@ -361,7 +382,6 @@ public class UPatrolTaskService {
         if (uPatrolTaskAttrs.size() > 0) {
             uPatrolTaskAttrDao.batchAdd(uPatrolTaskAttrs);
         }
-        uPatrolTask.setTaskType(tCruiseTaskAdd.getType());
         uPatrolTask.setCreateTime(new Date());
         uPatrolTaskDao.add(uPatrolTask);
         log.info("instanceList {}", instanceList);
