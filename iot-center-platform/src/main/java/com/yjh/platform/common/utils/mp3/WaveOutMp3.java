@@ -87,4 +87,12 @@ public class WaveOutMp3 {
         }
         phase0 += i * dt;
     }
+
+    public float getSampleRate(){
+        return af.getSampleRate();
+    }
+
+    public int getChannels(){
+        return af.getChannels();
+    }
 }

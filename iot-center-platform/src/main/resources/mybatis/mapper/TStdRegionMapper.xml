@@ -309,7 +309,10 @@
         select count(*)
         from t_std_region a
         where a.region_code = #{regionCode,jdbcType=VARCHAR}
+        <if test="upRegionId != null">
             and a.up_region_id = #{upRegionId,jdbcType=BIGINT}
+        </if>
+        and a.state = 1
     </select>
 
         <select id="selectCruiseTree" resultMap="TreeMap">

@@ -130,10 +130,10 @@ public class FFT {
 		for (i = j; i != 0; i--) {
 			tmpr = real[i];
 			tmpi = imag[i];
-//			if (tmpr > cosv && tmpr < sinv && tmpi > cosv && tmpi < sinv)
-//				realIO[i - 1] = 0;
-//			else
-				realIO[i - 1] = tmpr * tmpr + tmpi * tmpi;
+			if (tmpr > cosv && tmpr < sinv && tmpi > cosv && tmpi < sinv)
+				realIO[i - 1] = 0;
+			else
+				realIO[i - 1] = (float)Math.sqrt(tmpr * tmpr + tmpi * tmpi);
 		}
 	}
 
