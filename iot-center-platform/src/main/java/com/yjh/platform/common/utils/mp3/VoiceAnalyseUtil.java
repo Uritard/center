@@ -1,13 +1,17 @@
 package com.yjh.platform.common.utils.mp3;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.KeyValue;
+import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
+import org.apache.commons.io.IOUtils;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -29,10 +33,11 @@ public class VoiceAnalyseUtil {
     private BufferedImage spectrumImage, barImage;
     private Graphics spectrumGraphics;
     private boolean isAlive;
-    private java.util.List<Integer> max = new ArrayList<Integer>();
+    private List<Integer> max = new ArrayList<>();
     private int count;
+    private float rate;
 
-    private java.util.List<Integer> DBList;
+    private List<Integer> DBList;
 
     public VoiceAnalyseUtil(String mp3FilePath) {
         file = mp3FilePath;
@@ -170,24 +175,28 @@ public class VoiceAnalyseUtil {
 
 
     private void drawHistograms(float[] amp) {
-        spectrumGraphics.clearRect(0, 0, width, height);
+        /*spectrumGraphics.clearRect(0, 0, width, height);
 
         long t = System.currentTimeMillis();
         int speed = (int)(t - lastTimeMillis) / 30;	//峰值下落速度
-        lastTimeMillis = t;
+        lastTimeMillis = t;*/
 
-        List<Integer> list = new ArrayList<>();
-        int i = 0, x = 0, y = 0, xi, peaki, w = deltax - 1;
+        List<KeyValue<Float, Integer>> list = new ArrayList<>();
+        int i = 0, x = 0, y = 0,mxi, xi, peaki, w = deltax - 1;
         float maxAmp;
         for (; i != band; i++, x += deltax) {
-            maxAmp = 0; xi = xplot[i]; y = xplot[i + 1];
+            maxAmp = 0; xi = xplot[i]; y = xplot[i + 1]; mxi = xi;
             for (; xi < y; xi++) {
+                if (maxAmp <= amp[xi]) {
                     maxAmp = amp[xi];
+                    mxi = xi;
+                }
             }
             y = (maxAmp > Y0) ? (int) ((Math.log10(maxAmp) - logY0) * 20) : 0;
             max.add(y);
-            list.add(y);
-            // 使幅值匀速度下落
+            KeyValue<Float, Integer> maxDelta = new DefaultKeyValue<>(maxAmp, mxi);
+            list.add(maxDelta);
+            /*// 使幅值匀速度下落
             lastY[i] -= speed << 2;
             if(y < lastY[i]) {
                 y = lastY[i];
@@ -209,16 +218,14 @@ public class VoiceAnalyseUtil {
 
             // 画当前频段的直方图
             y = height - y;
-            spectrumGraphics.drawImage(barImage, x, y, x+w, height, 0, y, w, height, null);
+            spectrumGraphics.drawImage(barImage, x, y, x+w, height, 0, y, w, height, null);*/
         }
 
-        int listMax = list.stream().mapToInt(Integer::valueOf).sum();
-        DBList.add(listMax);
+        KeyValue<Float, Integer> listMax = list.stream().max(Comparator.comparingDouble(KeyValue::getKey)).get();
 
+        int fMax = (int)(listMax.getValue() * rate / (FFT.FFT_N - 16));
+        DBList.add(fMax);
     }
-
-
-
 
 
     public void paintComponent(Graphics g) {
@@ -318,9 +325,13 @@ public class VoiceAnalyseUtil {
         WaveOutMp3 wi = new WaveOutMp3(file);
         wi.open();
         wi.start();
+        rate = wi.getSampleRate();
+        int chanNum = wi.getChannels();
+        log.info("rate: {}, chanNum: {}", rate, chanNum);
 
         FFT fft = new FFT();
-        byte[] b = new byte[FFT.FFT_N << 1];
+        int fftLen = FFT.FFT_N * chanNum * 2;
+        byte[] b = new byte[fftLen];
         float[] realIO = new float[FFT.FFT_N];
         int i, j,nByteRead = 0;
         try {
@@ -328,24 +339,26 @@ public class VoiceAnalyseUtil {
             Date kaishi = new Date();
             count = 0;
             DBList = new ArrayList<>();
+            int len = 2 * chanNum;
             while (nByteRead!=-1) {
                 // 从混音器录制数据并转换为short类型的PCM
-                nByteRead = wi.read(b, FFT.FFT_N << 1);
-                for (i = j = 0; i != FFT.FFT_N; i++, j += 2)
-                    realIO[i] = (b[j + 1] << 8) | (b[j] & 0xff); //signed short
+                nByteRead = wi.read(b, fftLen);
+                for (i = 0, j = 0; i < FFT.FFT_N; i++, j += len) {
+                    realIO[i] = (b[j+1] << 8) | (b[j] & 0xff); //signed short
+                }
                 // 时域PCM数据变换到频域
                 fft.calculates(realIO);
                 // 绘制
                 drawHistograms(realIO);
             }
-            int max = getMaxVoice();
+            /*int max = getMaxVoice();
             this.max.stream().filter(a -> max != a).distinct().forEach(str -> {
                 File file = new File(filePath + str + ".png");
                 if (file.exists()) file.delete();
-            });
+            });*/
             wi.close();
         } catch (Exception e) {
-            // e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return DBList;
     }

@@ -6,6 +6,7 @@ import com.yjh.platform.audiodevice.AudioDeviceManager;
 import com.yjh.platform.audiodevice.impl.AudioDeviceFactory;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.LittlePriorityQueue;
 import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
@@ -517,7 +518,16 @@ public class TVoiceDeviceService{
         return big;
     }
 
-
+    /**
+     * 获取第3大的数据，避免噪点数据影响结果
+     */
+    public Integer findBigPeakClipp(List<Integer> list, int start, int end, int size){
+        LittlePriorityQueue<Integer> queue = new LittlePriorityQueue<>(size, size, 0);
+        for(int i = start;i<= end;i++){
+            queue.insert(list.get(i));
+        }
+        return queue.pop();
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public List<Map<String,String>> frequencyAnalyse(String frequencyPath) throws Exception{
@@ -602,11 +612,11 @@ public class TVoiceDeviceService{
                     map.put("time",df1.format(((timeList.get(j+1)-timeList.get(j))*hm)/1000F));
                 }
 
-                map.put("result",findBig(DBList,timeList.get(j),timeList.get(j+1)).toString());
+                map.put("result", findBigPeakClipp(DBList, timeList.get(j), timeList.get(j+1), 3).toString());
                 reList.add(map);
             }
         }catch (Exception e){
-            log.info("时间转化错误："+e);
+            log.info("时间转化错误：", e);
         }
         log.info("返回结果："+reList);
         return  reList;
