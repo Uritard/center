@@ -40,6 +40,8 @@ public class TCruiseNonhomologousPointInstanceService {
         if(checkExist>0){
             throw new BusinessException("该非同源告警规则关联的巡视点已绑定其他非同源告警规则！");
         }else{
+            tCruiseNonhomologousPointInstance.setOneCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseNonhomologousPointInstance.getInstanceIdOne()));
+            tCruiseNonhomologousPointInstance.setTwoCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseNonhomologousPointInstance.getInstanceIdTwo()));
             result = this.tCruiseNonhomologousPointInstanceDao.insert(tCruiseNonhomologousPointInstance);
         }
         return result;

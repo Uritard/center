@@ -75,18 +75,18 @@ public class NonhomologousWarnThread implements Runnable{
         cruiseResultMap.put("deviceId", robotPatrolTaskAlarm.getDeviceId());
         List<Map<String, Object>> list = nonhomologousWarnDao.getNonhomologousInspections(cruiseResultMap);
         for(Map<String, Object> map : list){
-            if (!Objects.isNull(map.get("robotInspectionName")) && !Objects.isNull(map.get("warnType"))){
+            if (!Objects.isNull(map.get("oneCruiseName")) && !Objects.isNull(map.get("warnType"))){
                 String warnType = String.valueOf(map.get("warnType"));
                 String warnThreshold = String.valueOf(map.get("warnThreshold"));
-                String robotInstanceId = String.valueOf(map.get("robotInstanceId"));
-                String videoInstanceId = String.valueOf(map.get("videoInstanceId"));
+                String robotInstanceId = String.valueOf(map.get("instanceIdOne"));
+                String videoInstanceId = String.valueOf(map.get("instanceIdTwo"));
                 String instanceId = String.valueOf(map.get("instanceId"));
 
-                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskCode + ":" + videoInstanceId);
+                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskCode + ":" +  map.get("oldId"));
                 // 1-红外 2-位置 3-表计数显 4-表计指针 5-相别 6-区间 7-五次不变
                 switch (warnType){
                     case "1":
-                        if (Objects.isNull(map.get("videoInspectionName"))){
+                        if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
                         if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("cruiseResultId"))
@@ -106,7 +106,7 @@ public class NonhomologousWarnThread implements Runnable{
                         }
                         break;
                     case "2":
-                        if (Objects.isNull(map.get("videoInspectionName"))){
+                        if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
                         if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("cruiseResultId"))
@@ -124,7 +124,7 @@ public class NonhomologousWarnThread implements Runnable{
                         }
                         break;
                     case "3":
-                        if (Objects.isNull(map.get("videoInspectionName"))){
+                        if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
                         if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("cruiseResultId"))
@@ -142,7 +142,7 @@ public class NonhomologousWarnThread implements Runnable{
                         }
                         break;
                     case "4":
-                        if (Objects.isNull(map.get("videoInspectionName"))){
+                        if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
                         if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("cruiseResultId"))
@@ -209,12 +209,8 @@ public class NonhomologousWarnThread implements Runnable{
                         List<Map<String,Object>> numResults= intervalResults.stream()
                                 .filter(mapItem -> isNumeric(mapItem.get("resultValue").toString()))
                                 .collect(Collectors.toList());
-                        Optional<Map<String,Object>> maxValueResultInfo = numResults.stream()
-                                .collect(Collectors.reducing(
-                                        (x,y) -> Double.parseDouble(x.get("resultValue").toString()) > Double.parseDouble(y.get("resultValue").toString()) ? x:y));
-                        Optional<Map<String,Object>> minValueResultInfo = numResults.stream()
-                                .collect(Collectors.reducing(
-                                        (x,y) -> Double.parseDouble(x.get("resultValue").toString()) < Double.parseDouble(y.get("resultValue").toString()) ? x:y));
+                        Optional<Map<String,Object>> maxValueResultInfo = numResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) > Double.parseDouble(y.get("resultValue").toString()) ? x : y);
+                        Optional<Map<String,Object>> minValueResultInfo = numResults.stream().reduce((x, y) -> Double.parseDouble(x.get("resultValue").toString()) < Double.parseDouble(y.get("resultValue").toString()) ? x : y);
                         log.info("区间非同源判断：maxInsResult为==={},minInsResult为==={},阈值是==={}", maxValueResultInfo, minValueResultInfo, warnThreshold);
                         if((Double.parseDouble(maxValueResultInfo.get().get("resultValue").toString()) -
                                 Double.parseDouble(minValueResultInfo.get().get("resultValue").toString())) >

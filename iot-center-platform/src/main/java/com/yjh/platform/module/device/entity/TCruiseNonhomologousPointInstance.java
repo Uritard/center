@@ -37,23 +37,13 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
 
     @Max(value=999999999999999999L)
     @ApiModelProperty(value = "关联机器人巡视点位id")
-     @TableField(value = "robot_instance_id",updateStrategy = FieldStrategy.IGNORED)
-    private Long robotInstanceId;
+    @TableField(value = "instance_id_one",updateStrategy = FieldStrategy.IGNORED)
+    private Long instanceIdOne;
 
     @Max(value=999999999999999999L)
     @ApiModelProperty(value = "关联视频巡视点位id")
-     @TableField(value = "video_preset_id",updateStrategy = FieldStrategy.IGNORED)
-    private Long videoPresetId;
-
-    @Max(value=32)
-    @ApiModelProperty(value = "关联机器人巡视点位名称")
-    @TableField(value = "robot_instance_name",updateStrategy = FieldStrategy.IGNORED)
-    private String robotInstanceName;
-
-    @Length(max = 32,message = "关联视频巡视点位名称")
-    @ApiModelProperty(value = "关联视频巡视点位名称")
-    @TableField(value = "video_preset_name",updateStrategy = FieldStrategy.IGNORED)
-    private String videoPresetName;
+    @TableField(value = "instance_id_two",updateStrategy = FieldStrategy.IGNORED)
+    private Long instanceIdTwo;
 
     @Max(value=999999999999999999L)
     @ApiModelProperty(value = "关联设备id")
@@ -131,4 +121,6 @@ public class TCruiseNonhomologousPointInstance implements Serializable {
 
     private Integer pageSize=0;
 
+    private String oneCruiseDeviceName;
+    private String twoCruiseDeviceName;
 }
