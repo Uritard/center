@@ -21,7 +21,7 @@ public class MaintenanceModel {
     private String startTime;//开始时间
     private String endTime;//结束时间
     private String deviceLevel;//设备层级
-    private List<String> deviceIds;
+    private String deviceIds;
     private String deviceList;//检修设备列表
     private String coordinatePixel;//坐标框
 }
