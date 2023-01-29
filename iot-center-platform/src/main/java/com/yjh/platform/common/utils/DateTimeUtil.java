@@ -251,6 +251,20 @@ public class DateTimeUtil {
      * 日期转为字符串.
      *
      * @param date 要格式化的日期
+     * @return 日期字符串 yyyy-mm-dd
+     */
+    public static String formatYMD(Date date) {
+        if (date == null) {
+            return "";
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat(getDatePattern());
+        return sdf.format(date);
+    }
+
+    /**
+     * 日期转为字符串.
+     *
+     * @param date 要格式化的日期
      * @return 日期字符串
      */
     public static String format3(Date date) {
