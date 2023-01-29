@@ -59,6 +59,7 @@
         <if test="robotId != null ">a.robot_id = #{robotId},</if>
         <if test="inspectionName != null ">a.inspection_name = #{inspectionName},</if>
         <if test="inspectionType != null ">a.inspection_type = #{inspectionType},</if>
+        <if test="componentId != null ">a.main_device_id = #{mainDeviceId},</if>
         <if test="componentId != null ">a.component_id = #{componentId},</if>
         <if test="meterType != null ">a.meter_type = #{meterType, jdbcType=INTEGER},</if>
         <if test="appearanceType != null ">a.appearance_type = #{appearanceType, jdbcType=INTEGER},</if>
@@ -220,6 +221,7 @@
         robot_id,
         inspection_name,
         inspection_type,
+        main_device_id,
         component_id,
         meter_type,
         appearance_type,
@@ -237,6 +239,7 @@
             #{TRobotInspection.robotId, jdbcType=BIGINT},
             #{TRobotInspection.inspectionName, jdbcType=VARCHAR},
             #{TRobotInspection.inspectionType, jdbcType=INTEGER},
+            #{TRobotInspection.mainDeviceId, jdbcType=INTEGER},
             #{TRobotInspection.componentId, jdbcType=VARCHAR},
             #{TRobotInspection.meterType, jdbcType=INTEGER},
             #{TRobotInspection.appearanceType, jdbcType=INTEGER},

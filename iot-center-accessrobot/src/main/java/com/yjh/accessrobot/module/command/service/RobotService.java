@@ -719,7 +719,8 @@ public class RobotService {
                         + "/" + deviceMap.getOrDefault("device_name", ""));
                 // save_type_list和recognition_type_list为空的话，容错  默认为jpg和1
                 tRobotInspection.setSaveTypeList(String.valueOf(deviceMap.getOrDefault("save_type_list", "jpg")));
-                tRobotInspection.setComponentId(String.valueOf(deviceMap.getOrDefault("main_device_id", "")));
+                tRobotInspection.setComponentId(String.valueOf(deviceMap.getOrDefault("component_id", "")));
+                tRobotInspection.setMainDeviceId(String.valueOf(deviceMap.getOrDefault("main_device_id", "")));
                 tRobotInspection.setRecognitionTypeList(String.valueOf(deviceMap.getOrDefault("recognition_type_list", "1")));
                 int inspectionType = 1;
                 if (deviceMap.containsKey("point_type") && !"".equals(deviceMap.get("point_type").toString())) {
