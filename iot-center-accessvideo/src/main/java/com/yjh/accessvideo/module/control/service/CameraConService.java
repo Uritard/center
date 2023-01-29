@@ -1226,16 +1226,16 @@ public class CameraConService {
     public Map<String, String> getCameraStatus(Long recordId) {
         List<CameraStatusInfo> cameraConInfoMap = cameraConDao.cameraInfoByNVR(recordId);
         log.info("cameraConInfoMap: " + cameraConInfoMap);
-        NativeLong iChanNumTem = new NativeLong(0);
+        int iChanNumTem = 0xFFFFFFFF;
         Map<String, String> channleStatusMap = new HashMap<>();
         if (Objects.nonNull(Constant.maps.get(String.valueOf(recordId)))) {
-            NativeLong lUserIDLong = new NativeLong(Constant.maps.get(String.valueOf(recordId)));
+            int lUserIDLong = Constant.maps.get(String.valueOf(recordId));
             IntByReference intByReference = new IntByReference(0);
             HCNetSDK.NET_DVR_IPPARACFG m_strIpparaCfg = new HCNetSDK.NET_DVR_IPPARACFG(); //NET_DVR_IPPARACFG_V40
             // --支持128通道
             m_strIpparaCfg.write();
             Pointer m_strIpparaCfgPointer = m_strIpparaCfg.getPointer();
-            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong.intValue(), HCNetSDK.NET_DVR_GET_IPPARACFG, iChanNumTem.intValue(),
+            if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_GET_IPPARACFG, iChanNumTem,
                     m_strIpparaCfgPointer, m_strIpparaCfg.size(), intByReference)) {
                 int iErr = hCNetSDK.NET_DVR_GetLastError();
                 log.error("get camera status fail, error code: " + iErr);
