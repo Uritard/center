@@ -272,9 +272,7 @@
         <result column="maintenance_stop" property="endTime"/>
         <result column="coordinate_pixel" property="coordinatePixel"/>
         <result column="device_level" property="deviceLevel"/>
-        <collection property="deviceIds" ofType="java.lang.String">
-            <id column="device_id"/>
-        </collection>
+        <result column="device_ids" property="deviceIds"/>
     </resultMap>
     <select id="selectMaintenanceInfo" resultMap="maintenanceMap">
         select

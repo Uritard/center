@@ -532,9 +532,7 @@ public class SendToUpSystemServices {
             maintenanceMap.put("start_time", item.getStartTime());
             maintenanceMap.put("end_time", item.getEndTime());
             maintenanceMap.put("device_level", item.getDeviceLevel());
-            maintenanceMap.put("device_list", item.getDeviceIds().toString().replace("[", "")
-                    .replace("]", "")
-                    .replace(" ", ""));
+            maintenanceMap.put("device_list", item.getDeviceIds());
             maintenanceMap.put("coordinate_pixel", item.getCoordinatePixel());
             finalList.add(maintenanceMap);
         });
