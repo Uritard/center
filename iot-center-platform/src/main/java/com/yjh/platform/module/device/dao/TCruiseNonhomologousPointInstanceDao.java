@@ -54,4 +54,6 @@ public interface TCruiseNonhomologousPointInstanceDao {
     int deleteByInstanceId(@Param(value = "list") List<Long> list);
 
     int checkNonhomologousPointInstanceExist(TCruiseNonhomologousPointInstance tCruiseNonhomologousPointInstance);
+
+    String selectCruiseDeviceByInstanceId(@Param(value = "instanceId") Long instanceId);
 }

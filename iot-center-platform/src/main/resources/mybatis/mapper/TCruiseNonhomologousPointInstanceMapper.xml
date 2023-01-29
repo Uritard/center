@@ -7,16 +7,16 @@
         <id column="instance_id" jdbcType="BIGINT" property="instanceId" />
         <!--<result column="station_id" jdbcType="VARCHAR" property="stationId" />-->
         <!--<result column="station_name" jdbcType="VARCHAR" property="stationName" />-->
-        <result column="robot_instance_id" jdbcType="BIGINT" property="robotInstanceId" />
-        <result column="video_preset_id" jdbcType="BIGINT" property="videoPresetId" />
-        <result column="robot_instance_name" jdbcType="VARCHAR" property="robotDeviceName" />
+        <result column="instance_id_one" jdbcType="BIGINT" property="instanceIdOne" />
+        <result column="instance_id_two" jdbcType="BIGINT" property="instanceIdTwo" />
+        <result column="one_cruise_device_name" jdbcType="VARCHAR" property="oneCruiseDeviceName" />
+        <result column="two_cruise_device_name" jdbcType="VARCHAR" property="twoCruiseDeviceName" />
         <result column="device_id" jdbcType="BIGINT" property="deviceId" />
         <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
         <result column="custom_id" jdbcType="BIGINT" property="customId" />
         <result column="custom_name" jdbcType="VARCHAR" property="customName" />
         <result column="device_mete_id" jdbcType="BIGINT" property="deviceMeteId" />
         <result column="mete_name" jdbcType="VARCHAR" property="deviceMeteName" />
-        <result column="video_preset_name" jdbcType="VARCHAR" property="videoPresetName" />
         <result column="identify_type" jdbcType="INTEGER" property="identifyType" />
         <result column="identify_son_type" jdbcType="INTEGER" property="identifySonType" />
         <result column="analyse_type" jdbcType="INTEGER" property="analyseType" />
@@ -32,54 +32,53 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        instance_id, robot_instance_id, video_preset_id, identify_type, identify_son_type, cruise_type, cruise_id, cruise_name, warn_threshold, warn_level, if_sy, sy_type
+        instance_id, instance_id_one, instance_id_two, identify_type, identify_son_type, cruise_type, cruise_id, cruise_name, warn_threshold, warn_level, if_sy, sy_type
     </sql>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="instanceId" parameterType="com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance">
         insert into t_cruise_nonhomologous_point_instance(
-            robot_instance_id,
-            video_preset_id,
-            device_mete_id,
-            device_id,
-            custom_id,
-            identify_type,
-            identify_son_type,
-            cruise_type,
-            cruise_name,
-            warn_threshold,
-            warn_level,
-            interval_type
+        instance_id_one,
+        one_cruise_device_name,
+        instance_id_two,
+        two_cruise_device_name,
+        device_mete_id,
+        device_id,
+        custom_id,
+        identify_type,
+        identify_son_type,
+        cruise_type,
+        cruise_name,
+        warn_threshold,
+        warn_level,
+        interval_type
         )values(
-                #{robotInstanceId, jdbcType=BIGINT},
-                #{videoPresetId, jdbcType=BIGINT},
-                #{deviceMeteId, jdbcType=BIGINT},
-                #{deviceId, jdbcType=BIGINT},
-                #{customId, jdbcType=BIGINT},
-                #{identifyType, jdbcType=INTEGER},
-                #{identifySonType, jdbcType=INTEGER},
-                #{cruiseType, jdbcType=INTEGER},
-                #{cruiseName, jdbcType=VARCHAR},
-                #{warnThreshold, jdbcType=VARCHAR},
-                #{warnLevel, jdbcType=INTEGER},
-                #{intervalType, jdbcType=INTEGER}
+        #{instanceIdOne},
+        #{oneCruiseDeviceName},
+        #{instanceIdTwo},
+        #{twoCruiseDeviceName},
+        #{deviceMeteId, jdbcType=BIGINT},
+        #{deviceId, jdbcType=BIGINT},
+        #{customId, jdbcType=BIGINT},
+        #{identifyType, jdbcType=INTEGER},
+        #{identifySonType, jdbcType=INTEGER},
+        #{cruiseType, jdbcType=INTEGER},
+        #{cruiseName, jdbcType=VARCHAR},
+        #{warnThreshold, jdbcType=VARCHAR},
+        #{warnLevel, jdbcType=INTEGER},
+        #{intervalType, jdbcType=INTEGER}
         )
     </insert>
 
     <delete id="deleteByPrimaryId" parameterType="java.lang.Long">
         delete from t_cruise_nonhomologous_point_instance
-                where instance_id = #{instanceId, jdbcType=BIGINT}
-    </delete>
-
-    <delete id="deleteByDeviceId" parameterType="java.lang.Long">
-        delete from t_cruise_nonhomologous_point_instance
-                where robot_instance_id = #{deviceId, jdbcType=BIGINT}
+        where instance_id = #{instanceId, jdbcType=BIGINT}
     </delete>
 
     <update id="update" parameterType="com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance">
         update t_cruise_nonhomologous_point_instance a <set>
-        <if test="robotInstanceId != null">a.robot_instance_id = #{robotInstanceId},</if>
-        <if test="videoPresetId != null">a.video_preset_id = #{videoPresetId},</if>
+        <if test="instanceIdOne != null">a.instance_id_one = #{instanceIdOne},</if>
+        <if test="instanceIdTwo != null">a.instance_id_two = #{instanceIdTwo},</if>
         <if test="cruiseName != null">a.cruise_name = #{cruiseName},</if>
         <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
         <if test="deviceId != null ">a.device_id = #{deviceId},</if>
@@ -94,20 +93,20 @@
         where a.instance_id = #{instanceId, jdbcType=BIGINT}
     </update>
 
-    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TCruisePointInstance">
+    <select id="selectByPrimaryId" parameterType="java.lang.Long" resultType="com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance">
         select
         a.instance_id,
         a.station_id,
         a.station_name,
-        a.robot_instance_id,
-        a.video_preset_id,
-        b.cruise_name as robot_instance_name,
-        c.cruise_name as video_preset_name,
+        a.instance_id_one,
+        a.instance_id_two,
+        b.cruise_name as oneCruiseDeviceName,
+        c.cruise_name as twoCruiseDeviceName,
         d.device_mete_name,
-        d.custom_id,
+        e.custom_id,
         f.device_id,
         d.mete_name,
-        d.custom_name,
+        e.custom_name,
         f.device_name,
         a.identify_type,
         a.identify_son_type,
@@ -117,44 +116,45 @@
         a.interval_type,
         a.if_sy,
         a.sy_type
-        from t_cruise_nonhomologous_point_instance a left join t_cruise_point_instance b on b.instance_id = a.robot_instance_id
-        left join t_cruise_point_instance c on c.instance_id = a.video_preset_id
+        from t_cruise_nonhomologous_point_instance a
+        left join t_cruise_point_instance b on b.instance_id = a.instance_id_one
+        left join t_cruise_point_instance c on c.instance_id = a.instance_id_two
         left join t_std_devicemete d on d.device_mete_id = a.device_mete_id
+        left join t_std_device e on e.custom_id = a.custom_id
         left join t_std_device f on f.device_id = a.device_id
         where 1 = 1
-            and a.instance_id = #{instanceId, jdbcType=BIGINT}
+        and a.instance_id = #{instanceId, jdbcType=BIGINT}
         limit 1
     </select>
 
     <select id="selectByPage" parameterType="com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance" resultType="com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance">
-        select
+        select distinct
         a.instance_id,
-        a.robot_instance_id,
-        a.video_preset_id,
-        b.cruise_name as robot_instance_name,
-        c.cruise_name as video_preset_name,
-        d.device_mete_id,
-        d.custom_id,
-        e.device_id,
-        d.mete_name as device_mete_name,
-        d.custom_name,
+        a.instance_id_one,
+        a.instance_id_two,
+        a.one_cruise_device_name as oneCruiseDeviceName,
+        a.two_cruise_device_name as twoCruiseDeviceName,
+        a.custom_id,
+        a.device_id,
+        b.dict_note as custom_name,
         e.device_name,
+        c.mete_name as deviceMeteName,
+        c.mete_type,
         a.identify_type,
         a.identify_son_type,
-        d.mete_type,
         a.cruise_type,
         a.cruise_name,
         a.warn_threshold,
         a.warn_level,
         a.interval_type
-        from t_cruise_nonhomologous_point_instance a left join t_cruise_point_instance b on b.instance_id = a.robot_instance_id
-        left join t_cruise_point_instance c on c.instance_id = a.video_preset_id
-        left join t_std_devicemete d on d.device_mete_id = a.device_mete_id
-        left join t_std_device e on d.device_id = e.device_id
+        from t_cruise_nonhomologous_point_instance a
+        left join t_std_devicemete c on a.device_mete_id = c.device_mete_id
+        left join t_std_device e on  a.device_id = e.device_id
+        left join t_dict_business b on c.custom_id = b.dict_code and b.col_name = 'custom_type'
         where 1 = 1
         <if test="instanceId != null and instanceId != ''"> and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="robotInstanceId != null and robotInstanceId != ''"> and a.robot_instance_id = #{robot_instance_id, jdbcType=BIGINT}</if>
-        <if test="videoPresetId != null and videoPresetId != ''"> and a.video_preset_id = #{videoPresetId, jdbcType=VARCHAR}</if>
+        <if test="instanceIdOne != null and instanceIdOne != ''"> and a.instance_id_one = #{instanceIdOne}</if>
+        <if test="instanceIdTwo != null and instanceIdTwo != ''"> and a.instance_id_two = #{instanceIdTwo}</if>
         <if test="identifyType != null "> and a.identify_type = #{identifyType, jdbcType=INTEGER}</if>
         <if test="identifySonType != null "> and a.identify_son_type = #{identifySonType, jdbcType=INTEGER}</if>
         <if test="cruiseType != null "> and a.cruise_type = #{cruiseType, jdbcType=INTEGER}</if>
@@ -167,43 +167,44 @@
 
     <select id="checkNonhomologousPointInstanceExist" parameterType="com.yjh.platform.module.device.entity.TCruiseNonhomologousPointInstance" resultType="java.lang.Integer">
         select count(m.instance_id) from
-        (select t.instance_id from t_cruise_nonhomologous_point_instance t where t.robot_instance_id = #{robotInstanceId, jdbcType=BIGINT} and t.cruise_type = #{cruiseType, jdbcType=INTEGER}
-        <if test="videoPresetId != null and videoPresetId != ''">
-            union
-            select r.instance_id from t_cruise_nonhomologous_point_instance r where r.video_preset_id = #{videoPresetId, jdbcType=BIGINT} and r.cruise_type = #{cruiseType, jdbcType=INTEGER}
-        </if>
-        ) m
+        t_cruise_nonhomologous_point_instance m
+        where m.instance_id_one in (#{instanceIdOne},#{instanceIdTwo}) or m.instance_id_two in (#{instanceIdOne},#{instanceIdTwo})
+    </select>
+
+    <select id="selectCruiseDeviceByInstanceId" resultType="java.lang.String">
+        select
+        IFNULL(h.robot_name,j.camera_name) as name
+        from t_cruise_point_instance a
+        left join t_robot_inspection g on g.inspection_id = a.cruise_id
+        left join t_robot_info h on h.robot_id = g.robot_id
+        left join t_camera_preset i on i.preset_id = a.cruise_id
+        left join t_camera_info j on j.camera_id = i.camera_id
+        where a.instance_id = #{instanceId}
     </select>
 
     <select id="selectWarnByPage" parameterType="com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnInfo" resultType="com.yjh.platform.module.device.entity.TCruiseNonhomologousWarnInfo">
         select * from (
-        select
+        select distinct
         a.warn_id,
         a.instance_id,
         a.warn_content,
         a.warn_time,
         d.device_mete_id,
-        d.custom_id,
+        e.custom_id,
         e.device_id,
         d.mete_name as device_mete_name,
-        d.custom_name,
+        e.custom_name,
         e.device_name,
         e.device_type,
         k.dict_note as device_type_name,
         a.warn_type,
         n.warn_level,
-        j.camera_name,
-        h.robot_name
-        from t_cruise_nonhomologous_warn a inner join t_cruise_nonhomologous_point_instance n on n.instance_id =
-        a.instance_id
-        left join t_cruise_point_instance b on b.instance_id = n.robot_instance_id
-        left join t_cruise_point_instance c on c.instance_id = n.video_preset_id
+        n.one_cruise_device_name,
+        n.two_cruise_device_name
+        from t_cruise_nonhomologous_warn a
+        inner join t_cruise_nonhomologous_point_instance n on n.instance_id =a.instance_id
         left join t_std_devicemete d on d.device_mete_id = n.device_mete_id
         left join t_std_device e on e.device_id = d.device_id
-        left join t_robot_inspection g on g.inspection_id = b.cruise_id
-        left join t_robot_info h on h.robot_id = g.robot_id
-        left join t_camera_preset i on i.preset_id = c.cruise_id
-        left join t_camera_info j on j.camera_id = i.camera_id
         left join t_dict_business k on k.dict_code = e.device_type
         where 1 = 1<if test="instanceId != null and instanceId != ''">and a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
         <if test="deviceType != null "> and e.device_type = #{deviceType, jdbcType=INTEGER}</if>
@@ -211,57 +212,6 @@
             '%',#{deviceName, jdbcType=VARCHAR},'%')</if>
         <if test="deviceMeteName != null and deviceMeteName != ''">and d.mete_name like
             concat('%',#{deviceMeteName, jdbcType=VARCHAR},'%')
-        </if>
-        <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
-        <if test="startTime != null  ">
-            <if test="endTime != null ">and a.warn_time between #{startTime,jdbcType=TIMESTAMP} and
-                #{endTime,jdbcType=TIMESTAMP}
-            </if>
-        </if>
-        union all
-        select
-        a.warn_id,
-        a.instance_id,
-        a.warn_content,
-        a.warn_time,
-        m.device_mete_id,
-        m.custom_id,
-        m.device_id,
-        m.device_mete_name,
-        m.custom_name,
-        m.device_name,
-        m.device_type,
-        m.device_type_name,
-        a.warn_type,
-        2 as warn_level,
-        null as camera_name,
-        m.robot_name
-        from t_cruise_nonhomologous_warn a INNER join
-        (select
-        n.warn_id,
-        GROUP_CONCAT(distinct d.device_mete_id) as device_mete_id,
-        GROUP_CONCAT(distinct d.custom_id) as custom_id,
-        GROUP_CONCAT(distinct e.device_id) as device_id,
-        GROUP_CONCAT(distinct d.mete_name) as device_mete_name,
-        GROUP_CONCAT(distinct d.custom_name) as custom_name,
-        GROUP_CONCAT(distinct e.device_name) as device_name,
-        GROUP_CONCAT(distinct e.device_type) as device_type,
-        GROUP_CONCAT(distinct k.dict_note) as device_type_name,
-        GROUP_CONCAT(distinct h.robot_name) as robot_name
-        from t_cruise_nonhomologous_warn_inspection n
-        left join t_cruise_point_instance b on b.instance_id = n.inspection_id
-        left join t_std_devicemete d on d.device_mete_id = b.device_mete_id
-        left join t_std_device e on e.device_id = b.device_id
-        left join t_robot_inspection g on g.inspection_id = b.cruise_id
-        left join t_robot_info h on h.robot_id = g.robot_id
-        left join t_dict_business k on k.dict_code = e.device_type
-        GROUP BY n.warn_id) m on m .warn_id = a.warn_id where a.warn_type=5<if test="instanceId != null and instanceId != ''">and
-        a.instance_id = #{instanceId, jdbcType=BIGINT}</if>
-        <if test="deviceType != null "> and m.device_type = #{deviceType, jdbcType=INTEGER}</if>
-        <if test="deviceName != null and deviceName != ''">and m.device_name like concat(
-            '%',#{deviceName, jdbcType=VARCHAR},'%')</if>
-        <if test="deviceMeteName != null and deviceMeteName != ''">and m.mete_name like concat(
-            '%',#{deviceMeteName, jdbcType=VARCHAR},'%')
         </if>
         <if test="warnType != null and warnType != ''"> and a.warn_type = #{warnType, jdbcType=INTEGER}</if>
         <if test="startTime != null  ">
@@ -279,76 +229,27 @@
         a.warn_content as  warnContent,
         a.warn_time as warnTime,
         d.mete_name as deviceMeteTime,
-        d.custom_id as customId,
+        e.custom_id as customId,
         e.device_id as deviceId,
         d.device_mete_id as deviceMeteId,
-        d.custom_name as customName,
+        e.custom_name as customName,
         e.device_name as  deviceName,
         e.device_type as deviceType,
         k.dict_note as deviceTypeName,
         f.region_name as delayName,
         f.region_id as delayId,
-        h.robot_name as robotName,
         a.warn_type as warnType,
         n.warn_level as warnLevel,
-        j.camera_name as cameraName
+        a.one_cruise_device_name,
+        a.two_cruise_device_name
         from t_cruise_nonhomologous_warn a inner join t_cruise_nonhomologous_point_instance n on n.instance_id = a.instance_id
         left join t_cruise_point_instance b on b.instance_id = n.robot_instance_id
         left join t_cruise_point_instance c on c.instance_id = n.video_preset_id
         left join t_std_devicemete d on d.device_mete_id = n.device_mete_id
-        left join t_std_device e on d.device_id = e.device_id
+        left join t_std_device e on d.custom_id = e.custom_id and d.device_id = e.device_id
         left join t_std_region f on e.up_region_id = f.region_id
-        left join t_robot_inspection g on g.inspection_id = b.cruise_id
-        left join t_robot_info h on h.robot_id = g.robot_id
-        left join t_camera_preset i on i.preset_id = c.cruise_id
-        left join t_camera_info j on j.camera_id = i.camera_id
         left join t_dict_business k on k.dict_code = e.device_type
         where 1 = 1
-        <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=VARCHAR}</if>
-
-        union all
-        select
-        a.warn_id as warnId,
-        a.instance_id as instanceId,
-        a.warn_content as  warnContent,
-        a.warn_time as warnTime,
-        m.device_mete_name as deviceMeteTime,
-        m.custom_id as customId,
-        m.device_id as deviceId,
-        m.device_mete_id as deviceMeteId,
-        m.custom_name as customName,
-        m.device_name as  deviceName,
-        m.device_type as deviceType,
-        m.device_type_name as deviceTypeName,
-        m.region_name as delayName,
-        m.region_id as delayId,
-        m.robot_name as robotName,
-        a.warn_type as warnType,
-        2 as warnLevel,
-        null as cameraName
-        from t_cruise_nonhomologous_warn a INNER join
-        (select
-        n.warn_id,
-        GROUP_CONCAT(distinct d.device_mete_id) as device_mete_id,
-        GROUP_CONCAT(distinct d.custom_id) as custom_id,
-        GROUP_CONCAT(distinct e.device_id) as device_id,
-        GROUP_CONCAT(distinct d.mete_name) as device_mete_name,
-        GROUP_CONCAT(distinct d.custom_name) as custom_name,
-        GROUP_CONCAT(distinct e.device_name) as device_name,
-        GROUP_CONCAT(distinct e.device_type) as device_type,
-        GROUP_CONCAT(distinct k.dict_note) as device_type_name,
-        GROUP_CONCAT(distinct f.region_name) as region_name,
-        GROUP_CONCAT(distinct f.region_id) as region_id,
-        GROUP_CONCAT(distinct h.robot_name) as robot_name
-        from t_cruise_nonhomologous_warn_inspection n
-        left join t_cruise_point_instance b on b.instance_id = n.inspection_id
-        left join t_std_devicemete d on d.device_mete_id = b.device_mete_id
-        left join t_std_device e on e.device_id = b.device_id
-        left join t_std_region f on e.up_region_id = f.region_id
-        left join t_robot_inspection g on g.inspection_id = b.cruise_id
-        left join t_robot_info h on h.robot_id = g.robot_id
-        left join t_dict_business k on k.dict_code = e.device_type
-        GROUP BY n.warn_id) m  on m.warn_id = a.warn_id where a.warn_type=5
         <if test="warnId != null and warnId != ''"> and a.warn_id = #{warnId, jdbcType=VARCHAR}</if>
     </select>
 
