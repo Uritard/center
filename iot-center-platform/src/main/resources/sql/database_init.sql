@@ -1660,6 +1660,7 @@ CREATE TABLE `t_robot_inspection` (
   `inspection_code` varchar(255) DEFAULT '' COMMENT '机器人检测点编码',
   `inspection_name` varchar(255) DEFAULT '' COMMENT '测点名称',
   `inspection_type` int(11) DEFAULT '1' COMMENT '点位类型',
+  `main_device_id` varchar(255) DEFAULT '' COMMENT '主设备id',
   `component_id` varchar(255) DEFAULT '' COMMENT '部件ID',
   `meter_type` int(11) DEFAULT '1' COMMENT '表计类型',
   `appearance_type` int(11) DEFAULT '1' COMMENT '外观类型',

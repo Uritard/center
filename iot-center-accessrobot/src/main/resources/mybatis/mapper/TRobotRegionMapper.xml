@@ -203,7 +203,7 @@
         t_robot_inspection a,t_robot_region b
         WHERE 1 = 1
         <if test="inspectionId != null"> and a.inspection_id = #{inspectionId, jdbcType=BIGINT}</if>
-        and a.component_id = b.region_id
+        and a.main_device_id = b.region_id
     </select>
 
 </mapper>

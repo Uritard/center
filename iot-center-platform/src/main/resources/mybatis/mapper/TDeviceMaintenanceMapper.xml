@@ -260,7 +260,7 @@
     </delete>
     <select id="selectRegionIdList" resultType="java.lang.String">
         SELECT DISTINCT
-        a.origin_id
+        a.origin_region_id
         FROM
         t_std_region a
         LEFT JOIN t_std_device b ON b.up_region_id = a.region_id

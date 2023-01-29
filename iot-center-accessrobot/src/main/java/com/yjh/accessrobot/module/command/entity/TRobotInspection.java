@@ -51,6 +51,9 @@ public class TRobotInspection implements Serializable {
     private String inspectionName;
 
     @ApiModelProperty(value = "部件ID")
+    @TableField(value = "main_device_id",updateStrategy = FieldStrategy.IGNORED)
+    private String mainDeviceId;
+    @ApiModelProperty(value = "部件ID")
     @TableField(value = "component_id",updateStrategy = FieldStrategy.IGNORED)
     private String componentId;
     @ApiModelProperty(value = "表计类型")
