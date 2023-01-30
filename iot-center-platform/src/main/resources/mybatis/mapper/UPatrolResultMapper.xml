@@ -743,8 +743,8 @@
         dict_code ,
         dict_note ,
         (select COUNT(*)
-        from u_patrol_result a,u_patrol_data_result b
-        where a.task_id = b.task_id
+        from u_patrol_result a
+        where 1=1
         and task_type = dict_code
         and a.execute_time BETWEEN #{start} and #{end}
         ) AS "count"
