@@ -238,9 +238,8 @@ public class RobotService {
             List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
             // 如果stdRegionList为空 则表示下级接的是机器人/无人机
             boolean isEdge = CollectionUtils.isEmpty(stdRegionList);
+            robotType = tRobotInfoDao.selectRobotTypeByCode(robotCode);
             if (isEdge){
-                robotType = tRobotInfoDao.selectRobotTypeByCode(robotCode);
-            }else {
                 robotCode = tRobotInfo.getEdgeCode();
             }
 
