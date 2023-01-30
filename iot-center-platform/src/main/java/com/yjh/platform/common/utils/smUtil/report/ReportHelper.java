@@ -280,7 +280,7 @@ public class ReportHelper {
 
             if (useAutoSize) {
                 try {
-                    sheet.autoSizeColumn(i);
+                    sheet.autoSizeColumn(i,true);
                     continue;
                 } catch (Exception e) {
                     logger.info("Failed to autoSize for column " + i);
