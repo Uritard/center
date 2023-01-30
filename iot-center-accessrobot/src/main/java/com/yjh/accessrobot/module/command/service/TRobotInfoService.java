@@ -110,7 +110,7 @@ public class TRobotInfoService {
             tRobotInfo.setRobotFactory(robotModel.getRobotFactory());
             tRobotInfo.setIsUse(robotModel.getIsUse());
             tRobotInfo.setCommissionDate(robotModel.getCommissionDate());
-            tRobotInfo.setUpRegionId(stdRegionMap.get(robotModel.getUpRegionId().toString()));
+            tRobotInfo.setUpRegionId(stdRegionMap.get(String.valueOf(robotModel.getUpRegionId())));
             tRobotInfo.setRobotPosition(robotModel.getRobotPosition());
             tRobotInfo.setRemarks(robotModel.getRemarks());
             tRobotInfo.setNestCode(robotModel.getNestCode());
@@ -130,7 +130,7 @@ public class TRobotInfoService {
             tRobotInfo.setDefectRecord(robotModel.getDefectRecord());
             tRobotInfo.setRepairRecord(robotModel.getRepairRecord());
             tRobotInfo.setExitPutintoRecord(robotModel.getExitPutintoRecord());
-            tRobotInfo.setRecordId(tCameraRecorderMap.get(robotModel.getRecordId().toString()));
+            tRobotInfo.setRecordId(tCameraRecorderMap.get(String.valueOf(robotModel.getRecordId())));
             tRobotInfo.setChannelNumLight(robotModel.getChannelNumLight());
             tRobotInfo.setChannelNumInferad(robotModel.getChannelNumInferad());
             tRobotInfo.setEdgeCode(edgeNode);
