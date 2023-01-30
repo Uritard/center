@@ -1,5 +1,6 @@
 package com.yjh.platform.common.utils.smUtil.report;
 
+import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.module.task.entity.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -101,7 +102,7 @@ public class ReportDataModel {
         elements.add(new TableCellElement(rowIndex, rowIndex, 0, 2, new String[]{TASK_INFO[2]},
                 TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setBold(true));
         if (null != taskVoInfo.getCruiseDate()){
-            elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{dataFormat(taskVoInfo.getCruiseDate())},
+            elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{DateTimeUtil.formatYMD(taskVoInfo.getCruiseDate())},
                     TableCellElement.TYPE_TEXT_STRING, (short) 10, 20, -1, TableCellElement.ALIGN_CENTER).setColorIndex(colorIndex).setBold(bold));
         }else{
             elements.add(new TableCellElement(rowIndex, rowIndex, 3, 4, new String[]{},
