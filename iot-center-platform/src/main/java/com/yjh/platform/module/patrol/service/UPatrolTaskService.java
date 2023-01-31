@@ -239,9 +239,9 @@ public class UPatrolTaskService {
                 }
                 // 间隔
                 if (StringUtils.isNotEmpty(intervalType) && StringUtils.isNotEmpty(intervalNumber) && StringUtils.isNotEmpty(intervalExecuteTime)) {
-                    String hour = intervalExecuteTime.substring(11, 13).startsWith("0") ? intervalExecuteTime.substring(12, 13) : intervalExecuteTime.substring(11, 13);
-                    String min = intervalExecuteTime.substring(14, 16).startsWith("0") ? intervalExecuteTime.substring(15, 16) : intervalExecuteTime.substring(14, 16);
-                    String second = intervalExecuteTime.substring(17, 19).startsWith("0") ? intervalExecuteTime.substring(18, 19) : intervalExecuteTime.substring(17, 19);
+                    String hour = intervalExecuteTime.startsWith("0") ? intervalExecuteTime.substring(1, 2) : intervalExecuteTime.substring(0,1);
+                    String min = intervalExecuteTime.substring(3, 5).startsWith("0") ? intervalExecuteTime.substring(7, 8) : intervalExecuteTime.substring(3, 5);
+                    String second = intervalExecuteTime.substring(6, 8).startsWith("0") ? intervalExecuteTime.substring(7, 8) : intervalExecuteTime.substring(6, 8);
 
                     // 天: 秒 分 时 */日 * ?
                     if (StringUtils.equals("2", intervalType)) {
@@ -274,8 +274,8 @@ public class UPatrolTaskService {
             }
         }
         if (tCruiseTaskAdd.getAreaId() == null){
-           String areaId =  redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content").toString();
-           tCruiseTaskAdd.setAreaId(areaId);
+            String areaId =  redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content").toString();
+            tCruiseTaskAdd.setAreaId(areaId);
         }
         uPatrolTask.setTaskName(tCruiseTaskAdd.getTaskName())
                 .setPlanId(tCruiseTaskAdd.getPlanId())
@@ -466,7 +466,7 @@ public class UPatrolTaskService {
                     .setTaskSource(task.getTaskSource())
                     .setTaskLevel(task.getTaskLevel())
                     .setStartTime(nextStartTime)
-                // 避免下一次的任务创建时间与当前任务创建时间重复，下一次任务创建时间 +30s
+                    // 避免下一次的任务创建时间与当前任务创建时间重复，下一次任务创建时间 +30s
                     .setCreateTime(new Date(System.currentTimeMillis() + 30000))
                     .setEndTime(task.getEndTime())
                     .setCreateUserId(task.getCreateUserId());
@@ -640,8 +640,8 @@ public class UPatrolTaskService {
         try {
             if (TASK_STATE_NOT_START == MapUtils.getIntValue(map, "taskState", TASK_STATE_NOT_START) && TASK_STATE_EXECUTING == taskState) {
                 UPatrolResult result =
-                    new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
-                        .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
+                        new UPatrolResult().setTaskId(taskId).setTaskState(CruiseConstant.TASK_STATE_EXECUTING)
+                                .setExecuteTime(DateTimeUtil.parse(robotPatrolTaskStatus.getStartTime(), new Date()));
                 log.info("TaskResult start, taskId: {}", taskId);
                 uPatrolResultDao.update(result);
             }
@@ -742,30 +742,36 @@ public class UPatrolTaskService {
                     list.add(Long.valueOf(t.getOriginId()));
                     listMap.put(t.getEdgeCode(), list);
                 });
-                List<RobotTaskInstanceInfo> edgeTaskInfoList = new ArrayList<>();
-                listMap.forEach((edgeCode, instanceList) -> {
-                    RobotTaskInstanceInfo taskInfo = new RobotTaskInstanceInfo();
-                    taskInfo.setCruiseType(task.getTaskType());
-                    taskInfo.setTaskId(task.getTaskId());
-                    // 从巡视主机下发至边缘节点的任务等级为3级
-                    taskInfo.setPriority(3);
-                    taskInfo.setTaskName(task.getTaskName());
-                    taskInfo.setInstanceList(instanceList);
-                    String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
-                    taskInfo.setIfRun(ifFun);
-                    taskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
-                    taskInfo.setEdgeCode(edgeCode);
-                    packageTaskProtocolInfo(tCruiseTaskAdd, format, taskInfo, ifFun);
-                    edgeTaskInfoList.add(taskInfo);
-                });
 
-                Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
-                robotTaskInfoMap.put("robotTaskInfoList", edgeTaskInfoList);
-                log.info("edgeTaskInfoMap = {}", robotTaskInfoMap);
+                String[] cycleExecuteTimeArray = tCruiseTaskAdd.getCycleExecuteTime().split(",");
+                if (cycleExecuteTimeArray.length > 1) {
+                    log.info("这种格式的周期任务走上层任务调度");
+                } else {
+                    List<RobotTaskInstanceInfo> edgeTaskInfoList = new ArrayList<>();
+                    listMap.forEach((edgeCode, instanceList) -> {
+                        RobotTaskInstanceInfo taskInfo = new RobotTaskInstanceInfo();
+                        taskInfo.setCruiseType(task.getTaskType());
+                        taskInfo.setTaskId(task.getTaskId());
+                        // 从巡视主机下发至边缘节点的任务等级为3级
+                        taskInfo.setPriority(3);
+                        taskInfo.setTaskName(task.getTaskName());
+                        taskInfo.setInstanceList(instanceList);
+                        String ifFun = String.valueOf(tCruiseTaskAdd.getIfRun());
+                        taskInfo.setIfRun(ifFun);
+                        taskInfo.setUnionTaskStatus(tCruiseTaskAdd.getUnionTaskStatus());
+                        taskInfo.setEdgeCode(edgeCode);
+                        packageTaskProtocolInfo(tCruiseTaskAdd, format, taskInfo, ifFun);
+                        edgeTaskInfoList.add(taskInfo);
+                    });
 
-                // 调用robot服务下发任务
-                Result result = robotTask(robotTaskInfoMap);
-                detailList.removeAll(edgeDetailList);
+                    Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+                    robotTaskInfoMap.put("robotTaskInfoList", edgeTaskInfoList);
+                    log.info("edgeTaskInfoMap = {}", robotTaskInfoMap);
+
+                    // 调用robot服务下发任务
+                    Result result = robotTask(robotTaskInfoMap);
+                    detailList.removeAll(edgeDetailList);
+                }
             }
 
             // 找出机器人和无人机做任务的巡检点
@@ -832,10 +838,52 @@ public class UPatrolTaskService {
         return "";
     }
 
-    public void taskToRobotOrDroneStart(UPatrolTask task, String dateType){
+    public void taskToRobotOrDroneStart(UPatrolTask task, String dateType, List<Long> allInstanceList){
+        List<TCruisePointInstanceNameDetail> detailList = tCruisePointInstanceDao.selectForTask(allInstanceList);
+        log.info("instancesList==={}", detailList);
+        //找出下级节点做任务的巡视点
+        List<TCruisePointInstanceNameDetail> edgeDetailList = detailList.stream()
+                .filter(t -> StringUtils.isNotEmpty(t.getEdgeCode()) && StringUtils.isNotEmpty(t.getOriginId()))
+                .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(edgeDetailList)) {
+            Map<String, List<Long>> listMap = Maps.newHashMap();
+            edgeDetailList.forEach(t -> {
+                List<Long> list = new ArrayList<>();
+                if (listMap.containsKey(t.getEdgeCode())) {
+                    list = listMap.get(t.getEdgeCode());
+                }
+                list.add(Long.valueOf(t.getOriginId()));
+                listMap.put(t.getEdgeCode(), list);
+            });
 
+            if (StringUtils.isNotEmpty(dateType)) {
+                boolean moreTime = dateType.split(" ")[2].contains(",");
+                if (moreTime && task.getExecuteType() == 172) {
+                    List<RobotTaskInstanceInfo> edgeTaskInfoList = new ArrayList<>();
+                    listMap.forEach((edgeCode, instanceList) -> {
+                        RobotTaskInstanceInfo taskInfo = new RobotTaskInstanceInfo();
+                        taskInfo.setCruiseType(task.getTaskType());
+                        taskInfo.setTaskId(task.getTaskId());
+                        taskInfo.setPriority(task.getTaskLevel());
+                        taskInfo.setTaskName(task.getTaskName());
+                        taskInfo.setInstanceList(instanceList);
+                        taskInfo.setIfRun("173");
+                        taskInfo.setEdgeCode(edgeCode);
+                        taskInfo.setFixedStartTime(format.format(new Date()));
+                        edgeTaskInfoList.add(taskInfo);
+                    });
 
-        //找出机器人做任务的巡检点
+                    Map<String, List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>(3);
+                    robotTaskInfoMap.put("robotTaskInfoList", edgeTaskInfoList);
+                    log.info("edgeTaskInfoMap = {}", robotTaskInfoMap);
+
+                    robotTask(robotTaskInfoMap);
+                    log.info("下发成功！！！");
+                }
+            }
+        }
+
+        //找出机器人和无人机做任务的巡检点
         List<Long> robotCruiseList = uPatrolTaskDao.selectRobotOrDroneInsByTaskId(task.getTaskCode());
         log.info("robotCruiseList : {}", robotCruiseList);
         List<Long> robotInstanceList = uPatrolTaskDao.selectInstanceIdByTaskId(task.getTaskCode());
@@ -853,7 +901,7 @@ public class UPatrolTaskService {
             robotTaskInfo.setCruiseType(task.getTaskType());
             robotTaskInfo.setTaskId(task.getTaskId());
 //                robotTaskInfo.setPlanCode(task.getPlanCode());
-            robotTaskInfo.setPriority(task.getTaskLevel());//优先级
+            robotTaskInfo.setPriority(task.getTaskLevel());
             robotTaskInfo.setTaskName(task.getTaskName());
             List<Long> robotTaskInstanceList = tRobotInspectionDao.selectRobotTaskInstanceId(robotInstanceList, item);
             robotTaskInfo.setInstanceList(robotTaskInstanceList);
@@ -865,7 +913,7 @@ public class UPatrolTaskService {
         Map<String,List<RobotTaskInstanceInfo>> robotTaskInfoMap = new HashMap<>();
         robotTaskInfoMap.put("robotTaskInfoList",robotTaskInfoList);
         log.info("robotTaskInfoMap = {}", robotTaskInfoMap);
-        //让机器人做任务
+        //让机器人和无人机做任务
         log.info("task=={}, dateType: {}", task, dateType);
         if (StringUtils.isNotEmpty(dateType)) {
             boolean moreTime = dateType.split(" ")[2].contains(",");
@@ -875,6 +923,7 @@ public class UPatrolTaskService {
             }
         }
 
+        // 暂时只给机器人和无人机发送了任务启动的命令 下级节点未考虑
         try {
             String startCommand = (String)redisTemplate.opsForHash().get("t_sys_param:robotStartCommand", "content");
 
@@ -890,7 +939,7 @@ public class UPatrolTaskService {
                 }
             }
         } catch (Exception e) {
-            log.error("发送机器人启动错误：", e);
+            log.error("发送机器人/无人机启动错误：", e);
         }
     }
 
@@ -1021,7 +1070,7 @@ public class UPatrolTaskService {
         List<Map<String, Object>> items = new ArrayList<>();
         Map<String, Object> item = new HashMap<>();
         xmlBaseModel.setType("41");
-       try {
+        try {
             item.put("task_patrolled_id", task.getTaskId() + "_" + DateTimeUtil.format3(task.getStartTime()));
             item.put("task_name", task.getTaskName());
             item.put("task_code", task.getTaskCode());
