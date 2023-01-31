@@ -1136,7 +1136,7 @@ CREATE TABLE `t_cruise_point_instance` (
   `text_desc` varchar(128) DEFAULT '' COMMENT '文本描述',
   `sort` varchar(32) DEFAULT '' COMMENT '排序序号',
   PRIMARY KEY (`instance_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点实例表';
+) ENGINE=InnoDB AUTO_INCREMENT=100000000001 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='巡检点实例表';
 
 -- ----------------------------
 -- Table structure for t_cruise_result
