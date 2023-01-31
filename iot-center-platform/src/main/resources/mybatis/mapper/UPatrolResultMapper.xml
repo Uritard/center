@@ -911,7 +911,7 @@
         <if test="warnContent != null ">a.warn_content = #{warnContent},</if>
         a.conf_mode = 275,
         a.deal_type = #{dealType},
-        a.deal_info = "程序正常，告警属实",
+        a.deal_info = #{dealInfo},
         <if test="outRange != null ">a.out_range = #{outRange},</if>
         <if test="dealPersonId != null ">a.deal_person_id = #{dealPersonId, jdbcType=VARCHAR},</if>
         a.deal_time = #{dealTime, jdbcType=TIMESTAMP}

@@ -10,10 +10,7 @@ import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
-import com.yjh.platform.common.utils.DateTimeUtil;
-import com.yjh.platform.common.utils.FileUtil;
-import com.yjh.platform.common.utils.FtpsUtil;
-import com.yjh.platform.common.utils.HttpClientUtils;
+import com.yjh.platform.common.utils.*;
 import com.yjh.platform.configuration.IntelAnalysisFtpsConfig;
 import com.yjh.platform.configuration.IntelligentAlgorithmConfig;
 import com.yjh.platform.configuration.UpFtpsConfig;
@@ -514,7 +511,7 @@ public class IntelAnalysisService {
      * 判别结果处理
      */
     private Map<String, String> distinguishResultHandler(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
-                                                      String originPicPath, String type, String value,  Map<String, String> map) {
+                                                         String originPicPath, String type, String value,  Map<String, String> map) {
         String targetPath;
         try {
             String resImageUrl = result.getResImageUrl();
@@ -551,7 +548,7 @@ public class IntelAnalysisService {
      * 缺陷和识别结果处理
      */
     private Map<String, String> defectOrRecognizeHandler(AnalyseResultItem result, StringJoiner resultDesc, StringJoiner resultValue, StringJoiner resultImg,
-                                                            String originPicPath, String type, String value, String desc, Map<String, String> map) {
+                                                         String originPicPath, String type, String value, String desc, Map<String, String> map) {
         String targetPath;
         try {
             String resImageUrl = result.getResImageUrl().startsWith("/") ? result.getResImageUrl().substring(1) : result.getResImageUrl();
@@ -653,7 +650,7 @@ public class IntelAnalysisService {
             //基准图
             String imageNormalUrlPath = analyseDataOperateDao.selectPresetImgByCruise(Long.valueOf(response.getResultsList().get(0).getObjectId()));
             String basePath = imageNormalUrlPath.replaceAll(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetRealImgPath","content")),
-                    String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content")))
+                            String.valueOf(redisTemplate.opsForHash().get("t_sys_param:presetImgPath","content")))
                     .replace("//","/");
             log.info("判别基准："+basePath);
             Alarm alarmDetail=new Alarm();
@@ -915,7 +912,7 @@ public class IntelAnalysisService {
         } catch (Exception e) {
             log.error("组装并存储告警信息异常：", e);
         }
-       return null;
+        return null;
     }
 
     private void alarmToSFZJ(Boolean isHave, String instanceId, List<AnalyseResultItem> results){
@@ -1103,7 +1100,12 @@ public class IntelAnalysisService {
      *
      */
     private Map<String, Object> generateMapFormat() {
-        String path = this.getClass().getClassLoader().getResource(fileName).toString();
+        Map<String, Object> map = new HashMap<>(16);
+        String path = String.valueOf(this.getClass().getClassLoader().getResource(fileName));
+        if (CommonUtils.isEmptyOrNullstr(path)){
+            return map;
+        }
+
         path = path.replace("\\", "/");
 
         if (path.contains(":")) {
@@ -1116,7 +1118,7 @@ public class IntelAnalysisService {
         } catch (IOException e) {
             log.error("json解析失败: ", e);
         }
-        Map<String, Object> map = new HashMap<>(16);
+
         if (Objects.nonNull(jsonObject)){
             for (Map.Entry<String, Object> entry : jsonObject.entrySet()){
                 map.put(entry.getKey(), entry.getValue());

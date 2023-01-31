@@ -306,10 +306,10 @@ public class UPatrolTaskController {
             result.setData(uPatrolTaskService.addTask(tCruiseTaskAdd));
         } catch (BusinessException e) {
             result.setMessage(e.getCode(), e.getMessage());
-            log.error("站端任务控制异常: {}", e.getMessage());
+            log.error("站端任务下发异常: {}", e.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
-            log.error("站端任务控制错误:", e);
+            log.error("站端任务下发错误:", e);
         }
         return result;
     }

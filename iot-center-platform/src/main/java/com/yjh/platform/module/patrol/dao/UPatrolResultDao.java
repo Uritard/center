@@ -112,8 +112,8 @@ public interface UPatrolResultDao {
      * 巡视任务结果统计
      */
     List<StatisticalTools> taskStatistical(@Param(value = "colName1")String colName1,
-        @Param(value = "start")String start,
-        @Param(value = "end")String end);
+                                           @Param(value = "start")String start,
+                                           @Param(value = "end")String end);
 
     List<CruiseStatistical> cruiseStatisticalByAbnormal();
 
@@ -138,21 +138,22 @@ public interface UPatrolResultDao {
     int updateIsWarn(@Param(value = "taskId") String taskId, @Param(value = "instanceId") Long instanceId);
 
     int updateWarnInfo(@Param(value = "warnId")Long warnId,
-        @Param(value = "warnName")String warnName,
-        @Param(value = "warnLevel")Integer warnLevel,
-        @Param(value = "warnContent")String warnContent,
-        @Param(value = "dealType")int dealType,
-        @Param(value = "outRange")String outRange,
-        @Param(value = "dealPersonId")String dealPersonId,
-        @Param(value = "dealTime")Date dealTime);
+                       @Param(value = "warnName")String warnName,
+                       @Param(value = "warnLevel")Integer warnLevel,
+                       @Param(value = "warnContent")String warnContent,
+                       @Param(value = "dealInfo")String dealInfo,
+                       @Param(value = "dealType")int dealType,
+                       @Param(value = "outRange")String outRange,
+                       @Param(value = "dealPersonId")String dealPersonId,
+                       @Param(value = "dealTime")Date dealTime);
 
     List<Long> selectWarnId(@Param(value = "taskId")String taskId,
-        @Param(value = "instanceId")Long instanceId);
+                            @Param(value = "instanceId")Long instanceId);
 
     int updateCheck(@Param(value = "taskId")String taskId,
-        @Param(value = "checkUserName")String checkUserName,
-        @Param(value = "checkDate")Date checkDate,
-        @Param(value = "remark")String remark);
+                    @Param(value = "checkUserName")String checkUserName,
+                    @Param(value = "checkDate")Date checkDate,
+                    @Param(value = "remark")String remark);
 
     String selectAlgorithmType(@Param(value = "deviceMeteId") Long deviceMeteId);
 

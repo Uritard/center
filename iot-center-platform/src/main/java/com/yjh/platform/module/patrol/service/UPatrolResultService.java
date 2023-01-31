@@ -268,11 +268,13 @@ public class UPatrolResultService {
                     if (Boolean.TRUE.equals(isWarN)) {//触发告警
                         // 修改告警信息表
                         uPatrolResultDao.updateWarnInfo(warnId, map.get("warnName").toString(),
-                            Integer.valueOf(map.get("warnLevel").toString()), map.get("warnContent").toString(), 286, outRange, userId,
+                            Integer.valueOf(map.get("warnLevel").toString()), map.get("warnContent").toString(),
+                                "程序正常，告警属实",286, outRange, userId,
                             date);
                         sendWebSocket(warnId);
                     } else {
-                        uPatrolResultDao.updateWarnInfo(warnId, null, null, null, 287, null, userId, date);
+                        uPatrolResultDao.updateWarnInfo(warnId, null, null, null,
+                                "程序异常，告警误报", 287, null, userId, date);
                         sendWebSocket(warnId);
                     }
                 }
@@ -324,7 +326,8 @@ public class UPatrolResultService {
                 List<Long> warnIdList =
                     uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
                 for (Long warnId : warnIdList) {
-                    uPatrolResultDao.updateWarnInfo(warnId, null, null, null, 286, null, userId, date);
+                    uPatrolResultDao.updateWarnInfo(warnId, null, null, null,
+                            "程序正常，告警属实", 286, null, userId, date);
                     sendWebSocket(warnId);
                 }
             }
