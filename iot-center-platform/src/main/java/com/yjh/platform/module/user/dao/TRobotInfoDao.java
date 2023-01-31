@@ -73,6 +73,12 @@ public interface TRobotInfoDao {
                                   @Param(value = "address") String address,
                                   @Param(value = "regionIdList") List<Long> regionIdList);
 
+    List<TRobotInfo> selectRobotOnline(@Param(value = "robotPosition")Integer robotPosition,
+        @Param(value = "robotType") Integer robotType,
+        @Param(value = "robotStatus") String robotStatus,
+        @Param(value = "isUse") Integer isUse,
+        @Param(value = "regionIdList") List<Long> regionIdList);
+
     List<TRobotInfo> selectDroneByPage(@Param(value = "robotName") String robotName,
                                 @Param(value = "buildingUser") String buildingUser,
                                   @Param(value = "robotFactory") Integer robotFactory,
