@@ -24,6 +24,7 @@ import com.yjh.platform.module.user.dao.TCameraGroupDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraScreenDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
+import com.yjh.platform.module.user.entity.TRobotInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author lqh
@@ -291,8 +293,7 @@ public class HomePageService {
         return tCameraGroupDao.selectGroupName();
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public List<Long> getCameraIdInfo() {
+    public List<String> getCameraIdInfo() {
         Map<String, String> map = new HashMap<>();
         //获取相机的状态
         List<Long> recordIdList = tCameraScreenDao.selectRecordId();
@@ -300,20 +301,40 @@ public class HomePageService {
             HashMap<String, Object> recordIdMap = new HashMap<>();
             recordIdMap.put("recordId", recordId);
             Result re = cameraStates(recordIdMap);
-//            if(re == null){
-//                continue;
-//            }
             log.info("re.getData()==========={}", re.getData());
             // 前提是video有非空返回值
-            map.putAll((Map<String, String>) re.getData());
+            map.putAll((Map<String, String>)re.getData());
         }
-        List<Long> re = new ArrayList<>();
+        List<String> re = new ArrayList<>();
         List<Long> cameraIdList = tCameraGroupDao.selectCameraIdInfo();
         for (Long item : cameraIdList) {
-            //String str = map.get(item.toString());
             if ("1".equals(map.get(item.toString()))) {
-                re.add(item);
+                re.add(String.valueOf(item));
             }
+            // 最多取3个，避免取太多流消耗资源且无意义
+            if (re.size() >= 3) {
+                break;
+            }
+        }
+        // 没有取得摄像机，取机器人
+        if (re.size() < 3) {
+            List<TRobotInfo> robotList = tRobotInfoDao.selectRobotOnline(-1, -1, "在线", -1, null);
+            re.addAll(robotList.stream().limit(3 - re.size()).map(r -> r.getRobotId() + "9901").collect(Collectors.toList()));
+        }
+
+        return re;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> getWeatherInfo() throws Exception {
+        //String url = "http://192.168.10.100:18713/format/v1/getWeatherInfo";
+        String url = redisTemplate.opsForHash().entries("t_sys_param:weatherInfoService").get("content").toString();
+
+        String services = HttpClientUtils.getInstance().getUrl(url, null);
+        JSONObject jsonObject = JSONObject.parseObject(services);
+        Map<String, Object> re = (Map<String, Object>) jsonObject.get("data");
+        if (re == null || re.size() == 0) {
+            return null;
         }
         return re;
     }
@@ -339,20 +360,6 @@ public class HomePageService {
             if ("1".equals(map.get(item))) {
                 re.add(item);
             }
-        }
-        return re;
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> getWeatherInfo() throws Exception {
-        //String url = "http://192.168.10.100:18713/format/v1/getWeatherInfo";
-        String url = redisTemplate.opsForHash().entries("t_sys_param:weatherInfoService").get("content").toString();
-
-        String services = HttpClientUtils.getInstance().getUrl(url, null);
-        JSONObject jsonObject = JSONObject.parseObject(services);
-        Map<String, Object> re = (Map<String, Object>) jsonObject.get("data");
-        if (re == null || re.size() == 0) {
-            return null;
         }
         return re;
     }

@@ -361,6 +361,60 @@
         ORDER BY robot_id
     </select>
 
+    <select id="selectRobotOnline" parameterType="com.yjh.platform.module.user.entity.TRobotInfo" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
+        select
+        a.robot_id,
+        a.robot_code,
+        a.robot_num,
+        a.robot_name,
+        a.robot_status,
+        a.robot_type,
+        a.robot_ip,
+        a.robot_port,
+        a.light_ip,
+        a.light_port,
+        a.identity_manager,
+        a.lnferad_IP,
+        a.Inferad_Port,
+        a.Inferad_username,
+        a.phote_path,
+        a.create_by,
+        a.create_date,
+        a.update_by,
+        a.update_date,
+        a.robot_factory,
+        a.made_in,
+        a.made_date,
+        a.is_use,
+        a.commission_date,
+        a.up_region_id,
+        a.robot_position ,
+        a.drone_position ,
+        a.robot_source,
+        a.address,
+        a.building_user,
+        a.appearance_number,
+        a.defect_record,
+        a.repair_record,
+        a.exit_putInto_record,
+        a.remarks,
+        a.record_id,
+        a.channel_num_light,
+        a.channel_num_inferad
+        from t_robot_info a
+        where 1 = 1
+        <if test="robotType != -1"> and a.robot_type = #{robotType, jdbcType=INTEGER}</if>
+        <if test="robotStatus != null and robotStatus != '' ">and a.robot_status = #{robotStatus, jdbcType=VARCHAR}</if>
+        <if test="robotPosition != -1 ">and a.robot_position = #{robotPosition,jdbcType=INTEGER}</if>
+        <if test="isUse != -1 ">and a.is_use = #{isUse,jdbcType=INTEGER}</if>
+        <if test="regionIdList != null and regionIdList.size() > 0">and a.up_region_id in
+            <foreach collection="regionIdList" item="upRegionIds"  separator="," open="(" close=")"  >
+                #{upRegionIds,jdbcType=BIGINT}
+            </foreach>
+        </if>
+        ORDER BY robot_id
+    </select>
+
     <select id="selectDroneByPage" parameterType="com.yjh.platform.module.user.entity.TRobotInfo" resultType="com.yjh.platform.module.user.entity.TRobotInfo">
         select
         a.robot_id,
