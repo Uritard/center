@@ -53,6 +53,8 @@ public class UPatrolResultService {
     private TWarnInfoDao tWarnInfoDao;
     @Autowired
     private TRobotInspectionDao tRobotInspectionDao;
+    @Autowired
+    private ProcessResultToUpSystem processResultToUpSystem;
 
     public List<TCruiseResultExpand> selectTaskByPage(String taskName, Integer cState, Integer cType, Integer deviceType, String startTime,
         String endTime, List<Long> deviceIdList, Integer meteType, String customId, Integer isCheck) {
@@ -151,6 +153,9 @@ public class UPatrolResultService {
 
         afterManualReviewInfo(cruiseManualReview.getTaskId(), cruiseManualReview.getInstanceId(), userId, date);
 
+        // 审核结果向上级系统同步
+        processResultToUpSystem.reviewToUpSystem(Collections.singletonList(cruiseManualReview), false);
+
         int result2 = patrolTaskReview(cruiseManualReview.getTaskId());
         //        insert QrDecode as device's real code. by tt.
         TCruisePointInstance tCruisePointInstance = tCruisePointInstanceDao.selectByPrimaryId(cruiseManualReview.getInstanceId());
@@ -192,7 +197,7 @@ public class UPatrolResultService {
             result2 = uPatrolResultDao.updateCheck(taskId, checkUserName, lastDate, "1");
             //自动生成巡视报告
             String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
-            log.info("自动生成巡视报告的路径是==" + reportFilePath);
+            log.info("自动生成巡视报告的路径是=={}", reportFilePath);
         }
         return result2;
     }
@@ -305,6 +310,7 @@ public class UPatrolResultService {
         //审核未被审核的巡视点
         List<UPatrolDataResult> list = uPatrolResultDao.selectCruiseDataResult(taskId);
         log.info("未被审核的点==" + list);
+        List<CruiseManualReview> reviewList = new ArrayList<>();
         for (UPatrolDataResult res : list) {
             CruiseManualReview cruiseManualReview =
                 new CruiseManualReview().setCruiseDataId(res.getCruiseDataId()).setCheckUser(userName).setCheckDate(date)
@@ -331,7 +337,12 @@ public class UPatrolResultService {
                     sendWebSocket(warnId);
                 }
             }
+
+            reviewList.add(cruiseManualReview);
         }
+        // 审核结果向上级系统同步
+        processResultToUpSystem.reviewToUpSystem(reviewList, true);
+
         //自动生成巡视报告
         String reportFilePath = reportManageService.cruiseReportGenerate(taskId);
         log.info("自动生成巡视报告的路径是==" + reportFilePath);
@@ -357,8 +368,8 @@ public class UPatrolResultService {
             TStdDeviceMeteUpdate stdDeviceMeteUpdate =
                 new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(review.getIdentifyResult());
             uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
-
-            afterManualReviewInfo(review.getTaskId(), review.getInstanceId(), review.getCheckUser(), review.getCheckDate());
+            // 下级系统同步审核信息不对告警进行重新判断
+            // afterManualReviewInfo(review.getTaskId(), review.getInstanceId(), review.getCheckUser(), review.getCheckDate());
         }
         // 校验父级是否需要审核并生成巡视报告
         int result = patrolTaskReview(resultList.get(0).getTaskId());
