@@ -36,11 +36,12 @@ public class TStdRegionService{
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TStdRegion tStdRegion) {
-
-        // 判断当前区域编码是否与本级系统的区域编码重复
-        Integer count = this.countByRegionCode(tStdRegion.getRegionCode(), null);
-        if (count > 0) {
-            throw new BusinessException(201, "区域编码" + tStdRegion.getRegionCode() + "已存在");
+        if (StringUtils.isNotBlank(tStdRegion.getRegionCode())) {
+            // 判断当前区域编码是否与本级系统的区域编码重复
+            Integer count = this.countByRegionCode(tStdRegion.getRegionCode(), null);
+            if (count > 0) {
+                throw new BusinessException(201, "区域编码" + tStdRegion.getRegionCode() + "已存在");
+            }
         }
         return this.tStdRegionDao.insert(tStdRegion);
     }
@@ -61,9 +62,9 @@ public class TStdRegionService{
     @Transactional(rollbackFor = Exception.class)
     public int update(TStdRegion tStdRegion) {
         String regionCode = tStdRegion.getRegionCode();
-        if (StringUtils.isNotEmpty(regionCode)) {
+        if (StringUtils.isNotBlank(regionCode)) {
             List<TStdRegion> list = tStdRegionDao.selectIsIn(tStdRegion);
-            if(list != null && list.size()>0){
+            if (CollectionUtils.isNotEmpty(list)) {
                 throw new BusinessException(209,"编码与其他厂站区域重复");
             }
         }
