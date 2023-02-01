@@ -5,6 +5,7 @@ import com.yjh.platform.module.task.entity.TableCellElement;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -132,7 +133,7 @@ public class ReportHelper {
         return ((int) (CHChars * (bold ? CH_CHAR_BOLD_WEIGHT : CH_CHAR_WEIGHT) + EN_CHAR_WEIGHT * ENChars)) * 256;
     }
     public static boolean createDocument(int rowNum, int columnNum, List<TableCellElement> elements, File dest) {
-        final Workbook wb = new XSSFWorkbook();
+        final Workbook wb = new SXSSFWorkbook();
         final Sheet sheet = wb.createSheet("巡检报告");
         final CellStyle defaultCellStyle = getDefaultCellStyle(wb);
         Row row;
