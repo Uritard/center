@@ -1410,6 +1410,7 @@ public class UPatrolTaskService {
             log.info("taskInfoList size: {}", taskInfoList.size());
 
             if(taskInfoList.size() != 0) {
+                SimpleDateFormat  simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 List<Map<String, String>> skipPointList = new ArrayList<>();
                 for (Map<String, String> taskInfo : taskInfoList) {
                     if (MapUtils.isNotEmpty(taskInfo)) {
@@ -1419,6 +1420,7 @@ public class UPatrolTaskService {
                             taskInfo.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                             taskInfo.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
                             taskInfo.put("cruiseStatus", String.valueOf(CRUISE_STATE_UN));
+                            taskInfo.put("cruiseTime",simpleDateFormat.format(new Date()));
                             taskInfo.put("resultNum", "任务终止");
                             skipPointList.add(taskInfo);
                         }
