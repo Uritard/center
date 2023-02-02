@@ -61,17 +61,17 @@
     <insert id="insert" keyColumn="preset_id" keyProperty="presetId" parameterType="com.yjh.accessrobot.module.command.entity.TCameraPreset" useGeneratedKeys="true">
         insert into t_camera_preset
         ( preset_id,camera_id,preset_num
-        ,preset_name,is_keep_watch,is_keep_watch_task
+        ,preset_name,preset_type
         ,creator_user,creator_time,is_use
         ,preset_img,inspection_postion,collect_status
         ,calibration_status,remark,origin_id
-        ,edge_code,is_second_keep_watch_task)
+        ,edge_code)
         values (#{presetId,jdbcType=BIGINT},#{cameraId,jdbcType=BIGINT},#{presetNum,jdbcType=INTEGER}
-        ,#{presetName,jdbcType=VARCHAR},#{isKeepWatch,jdbcType=INTEGER},#{isKeepWatchTask,jdbcType=INTEGER}
+        ,#{presetName,jdbcType=VARCHAR},#{presetType,jdbcType=INTEGER}
         ,#{creatorUser,jdbcType=VARCHAR},#{creatorTime,jdbcType=TIMESTAMP},#{isUse,jdbcType=INTEGER}
         ,#{presetImg,jdbcType=VARCHAR},#{inspectionPostion,jdbcType=INTEGER},#{collectStatus,jdbcType=INTEGER}
         ,#{calibrationStatus,jdbcType=INTEGER},#{remark,jdbcType=VARCHAR},#{originId,jdbcType=VARCHAR}
-        ,#{edgeCode,jdbcType=VARCHAR},#{isSecondKeepWatchTask,jdbcType=INTEGER})
+        ,#{edgeCode,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" keyColumn="preset_id" keyProperty="presetId" parameterType="com.yjh.accessrobot.module.command.entity.TCameraPreset" useGeneratedKeys="true">
         insert into t_camera_preset
@@ -80,8 +80,7 @@
                 <if test="cameraId != null">camera_id,</if>
                 <if test="presetNum != null">preset_num,</if>
                 <if test="presetName != null">preset_name,</if>
-                <if test="isKeepWatch != null">is_keep_watch,</if>
-                <if test="isKeepWatchTask != null">is_keep_watch_task,</if>
+                <if test="presetType != null">preset_type,</if>
                 <if test="creatorUser != null">creator_user,</if>
                 <if test="creatorTime != null">creator_time,</if>
                 <if test="isUse != null">is_use,</if>
@@ -92,15 +91,13 @@
                 <if test="remark != null">remark,</if>
                 <if test="originId != null">origin_id,</if>
                 <if test="edgeCode != null">edge_code,</if>
-                <if test="isSecondKeepWatchTask != null">is_second_keep_watch_task,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="presetId != null">#{presetId,jdbcType=BIGINT},</if>
                 <if test="cameraId != null">#{cameraId,jdbcType=BIGINT},</if>
                 <if test="presetNum != null">#{presetNum,jdbcType=INTEGER},</if>
                 <if test="presetName != null">#{presetName,jdbcType=VARCHAR},</if>
-                <if test="isKeepWatch != null">#{isKeepWatch,jdbcType=INTEGER},</if>
-                <if test="isKeepWatchTask != null">#{isKeepWatchTask,jdbcType=INTEGER},</if>
+                <if test="presetType != null">#{presetType,jdbcType=INTEGER},</if>
                 <if test="creatorUser != null">#{creatorUser,jdbcType=VARCHAR},</if>
                 <if test="creatorTime != null">#{creatorTime,jdbcType=TIMESTAMP},</if>
                 <if test="isUse != null">#{isUse,jdbcType=INTEGER},</if>
@@ -111,25 +108,24 @@
                 <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>
                 <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
                 <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
-                <if test="isSecondKeepWatchTask != null">#{isSecondKeepWatchTask,jdbcType=INTEGER},</if>
         </trim>
     </insert>
     <insert id="batchInsert" keyColumn="preset_id" keyProperty="presetId" parameterType="java.util.List" useGeneratedKeys="true">
         insert into t_camera_preset
         (camera_id,preset_num
-        ,preset_name,is_keep_watch,is_keep_watch_task
+        ,preset_name,preset_type
         ,creator_user,creator_time,is_use
         ,preset_img,inspection_postion,collect_status
         ,calibration_status,remark,origin_id
-        ,edge_code,is_second_keep_watch_task)
+        ,edge_code)
         values
         <foreach collection="list"  item="tCameraPreset" separator=",">
             (#{tCameraPreset.cameraId,jdbcType=BIGINT},#{tCameraPreset.presetNum,jdbcType=INTEGER}
-            ,#{tCameraPreset.presetName,jdbcType=VARCHAR},#{tCameraPreset.isKeepWatch,jdbcType=INTEGER},#{tCameraPreset.isKeepWatchTask,jdbcType=INTEGER}
+            ,#{tCameraPreset.presetName,jdbcType=VARCHAR},#{tCameraPreset.presetType,jdbcType=INTEGER}
             ,#{tCameraPreset.creatorUser,jdbcType=VARCHAR},#{tCameraPreset.creatorTime,jdbcType=TIMESTAMP},#{tCameraPreset.isUse,jdbcType=INTEGER}
             ,#{tCameraPreset.presetImg,jdbcType=VARCHAR},#{tCameraPreset.inspectionPostion,jdbcType=INTEGER},#{tCameraPreset.collectStatus,jdbcType=INTEGER}
             ,#{tCameraPreset.calibrationStatus,jdbcType=INTEGER},#{tCameraPreset.remark,jdbcType=VARCHAR},#{tCameraPreset.originId,jdbcType=VARCHAR}
-            ,#{tCameraPreset.edgeCode,jdbcType=VARCHAR},#{tCameraPreset.isSecondKeepWatchTask,jdbcType=INTEGER})
+            ,#{tCameraPreset.edgeCode,jdbcType=VARCHAR})
         </foreach>
     </insert>
 

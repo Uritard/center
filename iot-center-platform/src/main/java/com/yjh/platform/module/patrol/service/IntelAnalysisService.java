@@ -21,6 +21,8 @@ import com.yjh.platform.module.patrol.entity.TAlgorithmInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
+import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.entity.TCameraPreset;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -93,6 +95,8 @@ public class IntelAnalysisService {
     private PatrolResultHandler patrolResultHandler;
     @Autowired
     private AlarmService alarmService;
+    @Autowired
+    private TCameraPresetDao tCameraPresetDao;
 
 
     private final Logger log = LoggerFactory.getLogger(IntelAnalysisService.class);
@@ -170,18 +174,11 @@ public class IntelAnalysisService {
         for (Analysis analysis: analysisList) {
             // 如果是静默监视识别 只要求识别越线闯入、未穿工装和未带安全帽
             if (Objects.equals("12", analysis.getAnalyseType())) {
+                //静默的
+                String recognizeType = tCameraPresetDao.selectRecognizeTypeByPresetId(analysis.getInstanceId().intValue());
                 AnalyseObject analyseObject = new AnalyseObject();
-                List<String> crossLineTypeList = new ArrayList<>();
-                crossLineTypeList.add("yxcr");
-                analyseObject.setTypeList(crossLineTypeList);
+                analyseObject.setTypeList(Arrays.asList(recognizeType.split(",")));
                 list.add(packagePicAnalyseRequest(analysis, analyseObject));
-
-                AnalyseObject analyseObject2 = new AnalyseObject();
-                List<String> fireSmokeTypeList = new ArrayList<>();
-                fireSmokeTypeList.add("wcaqm");
-                fireSmokeTypeList.add("wcgz");
-                analyseObject2.setTypeList(fireSmokeTypeList);
-                list.add(packagePicAnalyseRequest(analysis, analyseObject2));
             }else {
                 AnalyseObject analyseObject = setAnalyseObject(analysis);
                 list.add(packagePicAnalyseRequest(analysis, analyseObject));

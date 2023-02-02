@@ -1,5 +1,6 @@
 package com.yjh.platform.module.user.dao;
 
+import com.yjh.platform.module.user.entity.SilentConf;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import org.apache.ibatis.annotations.Param;
@@ -70,10 +71,6 @@ public interface TCameraPresetDao {
     TCameraPreset selectKeepWatch(@Param(value = "cameraId") Long cameraId);
 
     TCameraPreset selectKeepWatchTask(@Param(value = "cameraId") Long cameraId,
-                                      @Param(value = "presetId") Long presetId,
-                                      @Param(value = "isKeepWatch") Integer isKeepWatch,
-                                      @Param(value = "isKeepWatchTask") Integer isKeepWatchTask,
-                                      @Param(value = "isSecondKeepWatchTask")Integer isSecondKeepWatchTask,
                                       @Param(value = "selfPreset") Long selfPreset
     );
 
@@ -90,5 +87,15 @@ public interface TCameraPresetDao {
     List<Map<String, Object>> selectCameraBySecondSilent();
 
   int selectCameraPresetInTask(@Param(value = "presetId") String presetId );
+
+    List<SilentConf> selectSilentInfo(@Param(value = "presetType") Integer presetType );
+
+    List<TCameraPreset> selectCameraByPresetType(@Param(value = "presetType") Integer presetType);
+
+    String selectRecognizeTypeByPresetId(@Param(value = "presetId") Integer presetId);
+
+    List<SilentConf> selectPresetTypeInfo();
+
+    int updateSilentConf(SilentConf silentConf);
 
 }

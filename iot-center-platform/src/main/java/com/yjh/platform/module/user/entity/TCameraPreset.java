@@ -82,16 +82,12 @@ public class TCameraPreset implements Serializable {
 
 
     @Max(value=999999999)
-    @ApiModelProperty(value = "是否守望位置。0-不是，1-是")
-    private Integer isKeepWatch ;
+    @ApiModelProperty(value = "守望位类型")
+    private Integer presetType;
 
-    @Max(value=999999999)
-    @ApiModelProperty(value = "是否静默任务。0-不是，1-是")
-    private Integer isKeepWatchTask ;
-    /**
-     * 是否秒级静默任务。0-不是，1-是
-     */
-    private Integer isSecondKeepWatchTask;
+    @ApiModelProperty(value = "守望位类型")
+    private String presetTypeName;
+
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;

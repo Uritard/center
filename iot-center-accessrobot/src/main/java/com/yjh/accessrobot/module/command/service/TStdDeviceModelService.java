@@ -385,9 +385,10 @@ public class TStdDeviceModelService {
                 ? StringUtils.substringAfter(device.get("device_name").toString(), "/")
                 : String.valueOf(device.get("device_name")));
         tCameraPreset.setPresetNum(objToInt(device.getOrDefault("preset_num", 1)));
-        tCameraPreset.setIsKeepWatch(objToInt(device.getOrDefault("is_keep_watch", 0)));
-        tCameraPreset.setIsKeepWatchTask(objToInt(device.getOrDefault("is_keep_watch_task", 0)));
-        tCameraPreset.setIsSecondKeepWatchTask(objToInt(device.getOrDefault("is_second_keep_watch_task", 0)));
+        tCameraPreset.setPresetType(objToInt(device.getOrDefault("preset_type", 0)));
+//        tCameraPreset.setIsKeepWatch(objToInt(device.getOrDefault("is_keep_watch", 0)));
+//        tCameraPreset.setIsKeepWatchTask(objToInt(device.getOrDefault("is_keep_watch_task", 0)));
+//        tCameraPreset.setIsSecondKeepWatchTask(objToInt(device.getOrDefault("is_second_keep_watch_task", 0)));
         tCameraPreset.setPresetImg(device.get("preset_img").toString());
         return tCameraPreset;
     }
