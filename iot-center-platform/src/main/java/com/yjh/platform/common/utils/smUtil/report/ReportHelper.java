@@ -133,7 +133,7 @@ public class ReportHelper {
         return ((int) (CHChars * (bold ? CH_CHAR_BOLD_WEIGHT : CH_CHAR_WEIGHT) + EN_CHAR_WEIGHT * ENChars)) * 256;
     }
     public static boolean createDocument(int rowNum, int columnNum, List<TableCellElement> elements, File dest) {
-        final Workbook wb = new SXSSFWorkbook();
+        final SXSSFWorkbook wb = new SXSSFWorkbook();
         final Sheet sheet = wb.createSheet("巡检报告");
         final CellStyle defaultCellStyle = getDefaultCellStyle(wb);
         Row row;
@@ -299,7 +299,7 @@ public class ReportHelper {
         try {
             fileOut = new FileOutputStream(dest);
             wb.write(fileOut);
-            fileOut.close();
+            wb.dispose();
         } catch (Exception e) {
             logger.info("createDocument: ", e);
         } finally {
