@@ -2937,7 +2937,7 @@ public class RobotService {
      * @param filePath
      * @param edgeCode
      */
-    private void dealMaintenanceFilePath(String filePath, String edgeCode) {
+    public void dealMaintenanceFilePath(String filePath, String edgeCode) {
         if (StringUtils.isBlank(filePath)) {
             log.info("file path is null");
             return;

@@ -280,7 +280,7 @@
         select
             maintenance_id,
             maintenance_name,
-            device_ids,
+            IF(device_level=3,instance_ids,device_ids) AS device_ids,
             is_valid ,
             DATE_FORMAT(maintenance_start, '%Y-%m-%d %H:%i:%s') as maintenance_start,
             DATE_FORMAT(maintenance_stop, '%Y-%m-%d %H:%i:%s') as maintenance_stop,
