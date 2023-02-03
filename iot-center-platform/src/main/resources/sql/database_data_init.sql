@@ -177,7 +177,6 @@ INSERT INTO `t_algorithm_info` VALUES ('1000003', '表计识别-计数', 'meter'
 INSERT INTO `t_algorithm_info` VALUES ('1000004', '表计识别-数显', 'meter', '', '003', '3', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000005', '表计识别-油位', '油位识别', '', '004', '4', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000011', '表计识别-指示灯', 'light', '', '005', '5', '1', '450', '1');
-INSERT INTO `t_algorithm_info` VALUES ('1000011', '表计识别-指示灯', 'light', '', '005', '5', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000007', '表计识别-刀闸', 'isolator', '', '006', '6', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000008', '表计识别-吸湿', '吸湿识别', '', '007', '7', '1', '450', '1');
 INSERT INTO `t_algorithm_info` VALUES ('1000009', '表计识别-物体', 'qrcode', '', '008', '8', '1', '450', '1');
