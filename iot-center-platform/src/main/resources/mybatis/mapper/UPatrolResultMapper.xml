@@ -660,16 +660,10 @@
                     COUNT(*)
                 FROM
                     t_cruise_point_instance a
-                        LEFT JOIN (
-                        (
-                            t_cruise_plan b
-                                JOIN u_patrol_plan_attr c ON b.plan_id = c.plan_id
-                            )
-                            LEFT JOIN u_patrol_task d ON b.plan_id = d.plan_id
-                        ) ON a.instance_id = c.instance_id
+                        LEFT JOIN u_patrol_task_attr c ON a.instance_id = c.instance_id
                 WHERE
                     a.cruise_type=dict_code
-                  AND d.task_id=#{taskId,jdbcType=VARCHAR}
+                  AND c.task_id=#{taskId,jdbcType=VARCHAR}
             ) AS "Count"
         FROM
             t_dict_business
