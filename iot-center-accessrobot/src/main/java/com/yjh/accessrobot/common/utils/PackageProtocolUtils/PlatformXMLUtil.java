@@ -10,14 +10,7 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -29,7 +22,9 @@ import java.util.*;
 @Slf4j
 public class PlatformXMLUtil {
 
-    public static String XMLROOTNAME = "PatrolDevice";
+    public static String XMLROOTNAME_DEVICE = "PatrolDevice";
+    public static String XMLROOTNAME_HOST = "PatrolHost";
+
     // 解析xml
     public static XMLBaseModel readStringXmlOut(Document doc) {
         XMLBaseModel xmlBaseModel = new XMLBaseModel();
@@ -122,7 +117,7 @@ public class PlatformXMLUtil {
     public static String generateXml(XMLBaseModel xmlBaseModel){
         // 根据sendcode来判断设备类型对应rootname  Client1开头无人机 其他默认机器人
         String sendCode = xmlBaseModel.getSendCode();
-        String rootName = XMLROOTNAME;
+        String rootName = getXmlRootName(xmlBaseModel);
 
         Document document = DocumentHelper.createDocument();
         // 根节点
@@ -193,6 +188,22 @@ public class PlatformXMLUtil {
             }
         }
         return requestXML;
+    }
+
+    /**
+     * 获取报文根节点
+     *
+     * @param xmlBaseModel xmlBaseModel
+     * @return result
+     */
+    private static String getXmlRootName(XMLBaseModel xmlBaseModel) {
+        String robotCode = xmlBaseModel.getReceiveCode();
+        boolean isRobot = RobotCodeCheckUtil.checkRobotCode(robotCode);
+        if (isRobot) {
+            return XMLROOTNAME_DEVICE;
+        } else {
+            return XMLROOTNAME_HOST;
+        }
     }
 }
 

@@ -26,15 +26,11 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.data.redis.config.ConfigureRedisAction;
-import org.springframework.web.client.RestTemplate;
 import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
@@ -42,8 +38,6 @@ import redis.clients.jedis.ScanResult;
 
 import javax.annotation.Resource;
 import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @SpringBootApplication(scanBasePackages = {"com.yjh.platform", "com.yjh.platform.common.logs"})
@@ -72,6 +66,9 @@ public class PlatformApplication  implements CommandLineRunner {
     private TDeviceTypeImgService tDeviceTypeImgService;
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
+    @Autowired
+    private TRobotInfoService tRobotInfoService;
+
     private NettyClient nettyClient = new NettyClient();
     @Value("${spring.websocket.send.url}")
     private String url;
@@ -115,6 +112,7 @@ public class PlatformApplication  implements CommandLineRunner {
         tVoiceDeviceService.registerAudioDevice();//声纹设备注册
         //区域信息加载到缓存
         tStdRegionService.loadRegionIntoRedis();
+        tRobotInfoService.initAllRobotCode(); // RobotCode初始化
         Constant.WEBSOCKET_URL = url;
         Constant.redisTemplate = redisTemplate;
         Constant.apiPermissions= Boolean.valueOf(interfaceApi);
