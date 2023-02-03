@@ -222,4 +222,13 @@
                 LEFT JOIN t_algorithm_info b ON d.analyse_type = b.analyse_type
         WHERE d.device_mete_id=#{deviceMeteId}
     </select>
+
+    <select id="selectEdgeCodeByInstanceId" resultType="java.lang.String">
+        SELECT
+            a.edge_code
+        FROM
+            t_cruise_point_instance a
+        WHERE
+            a.instance_id = #{instanceId}
+    </select>
 </mapper>

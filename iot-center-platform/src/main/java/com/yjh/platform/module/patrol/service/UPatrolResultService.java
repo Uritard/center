@@ -8,22 +8,19 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
-import com.yjh.platform.module.device.dao.TStdDeviceAttrDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.device.entity.TStdDevice;
-import com.yjh.platform.module.device.entity.TStdDeviceAttr;
 import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolDataResult;
 import com.yjh.platform.module.task.dao.TWarnInfoDao;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.task.service.ReportManageService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -151,6 +148,7 @@ public class UPatrolResultService {
             new TStdDeviceMeteUpdate().setDeviceMeteId(deviceMeteId).setIdentifyResult(cruiseManualReview.getIdentifyResult());
         uPatrolResultDao.updateDeviceMeteUpdate(stdDeviceMeteUpdate);
 
+        // 对审核后的任务进行处理，判断告警
         afterManualReviewInfo(cruiseManualReview.getTaskId(), cruiseManualReview.getInstanceId(), userId, date);
 
         // 审核结果向上级系统同步
@@ -211,95 +209,114 @@ public class UPatrolResultService {
         //查询该巡检点对应测点配置的告警阈值相关信息
         TStdDevicemete tStdDevicemete = uPatrolResultDao.selectDeviceMeteInfo(afterManualReviewInfo.getInstanceId());
         log.info("tStdDeviceMete===" + tStdDevicemete);
-        //该巡视点还在,能找到对应测点信息
-        if (Objects.nonNull(tStdDevicemete)) {
-            Map<String, Object> params = new HashMap<>();
-            String personCheck = afterManualReviewInfo.getPersonCheck().split(",")[0];
-            params.put("value", personCheck);
-            params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
-            params.put("meteKind", tStdDevicemete.getMeteKind());
-            params.put("alarmState", tStdDevicemete.getAlarmState());
-            params.put("stateZero", tStdDevicemete.getStateZero());
-            params.put("stateOne", tStdDevicemete.getStateOne());
-            params.put("alarmLevel", tStdDevicemete.getAlarmLevel());
-            params.put("highLimit1", tStdDevicemete.getHighLimit1());
-            params.put("lowLimit1", tStdDevicemete.getLowLimit1());
-            params.put("highLimit2", tStdDevicemete.getHighLimit2());
-            params.put("lowLimit2", tStdDevicemete.getLowLimit2());
-            params.put("highLimit3", tStdDevicemete.getHighLimit3());
-            params.put("lowLimit3", tStdDevicemete.getLowLimit3());
-            params.put("highLimit4", tStdDevicemete.getHighLimit4());
-            params.put("lowLimit4", tStdDevicemete.getLowLimit4());
-            log.info("params的值是===" + params);
 
-            Result result = sendPostRequest(Constant.WARN_JUDGE, params);
-            Map<String, Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
-            log.info("object转map的东西===" + map);
-            Boolean isWarN = false;
-            String outRange = null;
-            if (Objects.nonNull(map)) {
-                isWarN = (Boolean)map.get("isWarn");
-                if (Objects.nonNull(map.get("outRange"))) {
-                    outRange = map.get("outRange").toString();
-                }
-            }
+        // 该巡视点无了,找不到对应
+        if (Objects.isNull(tStdDevicemete)){
+            return;
+        }
+        String personCheck = afterManualReviewInfo.getPersonCheck().split(",")[0];
 
-            //组装告警基本信息
-            TWarnInfo warnInfo = new TWarnInfo();
-            warnInfo.setWarnTime(date);
-            //        warnInfo.setWarnType(Integer.valueOf(tStdDevicemete.getAlarmNote()));
-            warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
-            warnInfo.setCunstomId(tStdDevicemete.getCustomId());
-            warnInfo.setInstanceId(afterManualReviewInfo.getInstanceId());
-            warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
-            warnInfo.setConfMode(275);//已核查
-            warnInfo.setDealType(286);//属实
-            warnInfo.setDealInfo("程序正常，告警属实");
-            Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他", "defect_model"));
-            warnInfo.setDefectModel(warnFlag);//其他
-            warnInfo.setAlarmSource(282);//主辅设备
-            warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
-            warnInfo.setValue(afterManualReviewInfo.getPersonCheck());
-            warnInfo.setTaskId(afterManualReviewInfo.getTaskId());
-            log.info("warnInfo==" + warnInfo);
+        Map<String, String> initInfo = new HashMap<>(16);
+        initInfo.put("valueTemp", personCheck);
 
-            //判断该点是否已在告警表
-            if (afterManualReviewInfo.getIsWarn() == 1) {
-                List<Long> warnIdList =
-                    uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
-                for (Long warnId : warnIdList) {
-                    //存在
-                    //判断该点是否产生告警以及告警信息
-                    if (Boolean.TRUE.equals(isWarN)) {//触发告警
-                        // 修改告警信息表
-                        uPatrolResultDao.updateWarnInfo(warnId, map.get("warnName").toString(),
-                            Integer.valueOf(map.get("warnLevel").toString()), map.get("warnContent").toString(),
-                                "程序正常，告警属实",286, outRange, userId,
-                            date);
-                        sendWebSocket(warnId);
-                    } else {
-                        uPatrolResultDao.updateWarnInfo(warnId, null, null, null,
-                                "程序异常，告警误报", 287, null, userId, date);
-                        sendWebSocket(warnId);
-                    }
-                }
-            } else {
-                //不存在
-                //判断该点是否产生告警以及告警信息
-                if (Boolean.TRUE.equals(isWarN)) {//触发告警
-                    warnInfo.setWarnName(map.get("warnName").toString());
-                    warnInfo.setWarnLevel(Integer.valueOf(map.get("warnLevel").toString()));
-                    warnInfo.setWarnContent(map.get("warnContent").toString());
-                    warnInfo.setOutRange(outRange);
-                    warnInfo.setDealTime(date);
-                    warnInfo.setDealPersonId(userId);
-                    log.info("要插库的告警数据是===" + warnInfo);
-                    tWarnInfoDao.insert(warnInfo);
-                    sendWebSocket(warnInfo.getWarnId());
-                    uPatrolResultDao.updateIsWarn(taskId, instanceId);
-                }
+        boolean isTemDif = 1 == tStdDevicemete.getIsTemdif() && Objects.equals(222, tStdDevicemete.getMeteType());
+        if (isTemDif){
+            // 配置了红外温差任务用差值去判断告警
+            String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
+            if (CommonUtils.isEmptyOrNullstr(temperature)){
+                double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(personCheck));
+                initInfo.put("valueTemp", String.valueOf(abs));
+                initInfo.put("temperature", temperature);
+                initInfo.put("warnName", tStdDevicemete.getMeteName() + "温差任务");
+                initInfo.put("warnContent", "传感器环境温度与测温产生温差:" + temperature + "--" + personCheck);
+                initInfo.put("outRange", String.valueOf(abs));
             }
         }
+        Map<String, Object> params = new HashMap<>();
+        params.put("value", personCheck);
+        params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
+        params.put("meteKind", tStdDevicemete.getMeteKind());
+        params.put("alarmState", tStdDevicemete.getAlarmState());
+        params.put("stateZero", tStdDevicemete.getStateZero());
+        params.put("stateOne", tStdDevicemete.getStateOne());
+        params.put("alarmLevel", tStdDevicemete.getAlarmLevel());
+        params.put("highLimit1", tStdDevicemete.getHighLimit1());
+        params.put("lowLimit1", tStdDevicemete.getLowLimit1());
+        params.put("highLimit2", tStdDevicemete.getHighLimit2());
+        params.put("lowLimit2", tStdDevicemete.getLowLimit2());
+        params.put("highLimit3", tStdDevicemete.getHighLimit3());
+        params.put("lowLimit3", tStdDevicemete.getLowLimit3());
+        params.put("highLimit4", tStdDevicemete.getHighLimit4());
+        params.put("lowLimit4", tStdDevicemete.getLowLimit4());
+        log.info("params的值是===" + params);
+
+        Result result = sendPostRequest(Constant.WARN_JUDGE, params);
+        Map<String, Object> map = JSONObject.parseObject(JSON.toJSONString(result.getData()));
+        log.info("object转map的东西===" + map);
+        Boolean isWarN = false;
+        String outRange = null;
+        if (Objects.nonNull(map)) {
+            isWarN = (Boolean)map.get("isWarn");
+            if (Objects.nonNull(map.get("outRange"))) {
+                outRange = map.get("outRange").toString();
+            }
+        }
+
+        //组装告警基本信息
+        TWarnInfo warnInfo = new TWarnInfo();
+        warnInfo.setWarnTime(date);
+        warnInfo.setDeviceId(tStdDevicemete.getDeviceId());
+        warnInfo.setCunstomId(tStdDevicemete.getCustomId());
+        warnInfo.setInstanceId(afterManualReviewInfo.getInstanceId());
+        warnInfo.setStdMeteId(tStdDevicemete.getDeviceMeteId());
+        warnInfo.setConfMode(275);
+        warnInfo.setDealType(286);
+        warnInfo.setDealInfo("程序正常，告警属实");
+        Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他", "defect_model"));
+        warnInfo.setDefectModel(warnFlag);
+        warnInfo.setAlarmSource(282);
+        warnInfo.setImagePath(afterManualReviewInfo.getPicPath());
+        warnInfo.setValue(afterManualReviewInfo.getPersonCheck());
+        warnInfo.setTaskId(afterManualReviewInfo.getTaskId());
+        log.info("warnInfo==" + warnInfo);
+
+        //判断该点是否已在告警表
+        if (afterManualReviewInfo.getIsWarn() == 1) {
+            List<Long> warnIdList =
+                uPatrolResultDao.selectWarnId(afterManualReviewInfo.getTaskId(), afterManualReviewInfo.getInstanceId());
+            for (Long warnId : warnIdList) {
+                //存在
+                //判断该点是否产生告警以及告警信息
+                if (Boolean.TRUE.equals(isWarN)) {//触发告警
+                    // 修改告警信息表
+                    uPatrolResultDao.updateWarnInfo(warnId, isTemDif ? initInfo.get("warnName") : String.valueOf(map.get("warnName")),
+                        Integer.valueOf(map.get("warnLevel").toString()), isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")),
+                            "程序正常，告警属实",286, isTemDif ? initInfo.get("outRange") : outRange, userId,
+                        date);
+                    sendWebSocket(warnId);
+                } else {
+                    uPatrolResultDao.updateWarnInfo(warnId, null, null, null,
+                            "程序异常，告警误报", 287, null, userId, date);
+                    sendWebSocket(warnId);
+                }
+            }
+        } else {
+            //不存在
+            //判断该点是否产生告警以及告警信息
+            if (Boolean.TRUE.equals(isWarN)) {//触发告警
+                warnInfo.setWarnName(isTemDif ? initInfo.get("warnName") : String.valueOf(map.get("warnName")));
+                warnInfo.setWarnLevel(Integer.valueOf(String.valueOf(map.get("warnLevel"))));
+                warnInfo.setWarnContent(isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")));
+                warnInfo.setOutRange(isTemDif ? initInfo.get("outRange") :outRange);
+                warnInfo.setDealTime(date);
+                warnInfo.setDealPersonId(userId);
+                log.info("要插库的告警数据是===" + warnInfo);
+                tWarnInfoDao.insert(warnInfo);
+                sendWebSocket(warnInfo.getWarnId());
+                uPatrolResultDao.updateIsWarn(taskId, instanceId);
+            }
+        }
+
     }
 
     public int manualReviewTask(String taskId, String userId, HttpServletRequest request) {

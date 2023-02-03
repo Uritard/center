@@ -191,6 +191,10 @@ public class TStdDeviceMete implements Serializable {
     @TableField(value = "state_one",updateStrategy = FieldStrategy.IGNORED)
     private String stateOne;
 
+    @Max(value = 99999999)
+    @ApiModelProperty(value = "是否温差任务（0-否；1-是）")
+    private Integer isTemdif;
+
     @Max(value = 99)
     private Integer alarmState;
 

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Max;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -121,5 +122,8 @@ public class TStdDevicemete implements Serializable {
     @ApiModelProperty(value = "信号说明")
     private String remark;
 
+    @Max(value = 99999999)
+    @ApiModelProperty(value = "是否温差任务（0-否；1-是）")
+    private Integer isTemdif;
 
 }

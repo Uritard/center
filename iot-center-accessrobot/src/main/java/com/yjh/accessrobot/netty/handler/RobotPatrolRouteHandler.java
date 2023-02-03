@@ -116,9 +116,6 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             redisTemplate.expire("RobotRoad:" + robotCode, 7, TimeUnit.DAYS);
         }
 
-        // 国网要求
-//        robotService.upToCruise(xmlBaseModel);
-
         roadToUpSystem(xmlBaseModel);
     }
 
@@ -129,14 +126,12 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
      */
     private void roadToUpSystem(XMLBaseModel xmlBaseModel) {
         try {
-            Map<String, Object> item = xmlBaseModel.getItems().get(0);
-            // 这是机器人放在巡视主机ftps服务下的路径
-            String value = String.valueOf(item.get("file_path"));
-            String tagPath = "robotTask/" + value;
-            log.info("tagPath==={}", tagPath);
-            String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/" + item.get("file_path");
-            uploadFileToUpFtps(imgPath, "/" + tagPath, upFtpsConfig);
-            xmlBaseModel.getItems().get(0).put("file_path", tagPath);
+            for (Map<String, Object> item : xmlBaseModel.getItems()){
+                String filePath = String.valueOf(item.get("file_path"));
+                // 这是机器人放在巡视主机ftps服务下的路径
+                String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content") + "/" + filePath;
+                uploadFileToUpFtps(imgPath, filePath, upFtpsConfig);
+            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -159,7 +154,7 @@ public class RobotPatrolRouteHandler implements MessageHandlerStrategy, Initiali
             FtpsUtil.putFile(sourcePath, targetPathName, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
                     upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
         } catch (Exception e) {
-            log.error("将文件上传至上级系统ftp服务器错误:{}", e);
+            log.error("将文件上传至上级系统ftp服务器错误: ", e);
         }
     }
 

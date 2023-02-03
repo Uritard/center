@@ -51,6 +51,9 @@ public class CruiseResultDetail extends TStdDeviceMete {
     @ApiModelProperty(value = "巡视值")
     private String resultNum;
 
+    @ApiModelProperty(value = "温差值")
+    private String resultDesc;
+
     @ApiModelProperty(value = "巡视执行结果")
     private Integer cruiseResult;
     @ApiModelProperty(value = "巡视执行结果-字典表")

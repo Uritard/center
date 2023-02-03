@@ -250,7 +250,14 @@ public abstract class AbstractVideoCruise {
             analysis.setPicPath(jsonForRe.getString("absPath"));
 
             analysis.setPicModelPath(picModelPath + "/" + presetId);
-            analysis.setReferenceImage(presetImgPath + "/" + presetId + "/" + presetId + ".jpg");
+            // 判别该点为本级系统的点还是下级系统的
+            String edgeCode = tAlgorithmInfoDao.selectEdgeCodeByInstanceId(analysis.getInstanceId());
+            if (StringUtils.isNotEmpty(edgeCode)) {
+                String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + edgeCode).get("stationId"));
+                analysis.setReferenceImage(presetImgPath + "/" + stationId + "/" + presetId + "/" + presetId + ".jpg");
+            }else {
+                analysis.setReferenceImage(presetImgPath + "/" + presetId + "/" + presetId + ".jpg");
+            }
 
             // 表计
             if (StringUtils.isNotEmpty(algorithm.getMeteAnalyse())) {

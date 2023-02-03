@@ -243,15 +243,6 @@ public class RobotService {
                 robotCode = tRobotInfo.getEdgeCode();
             }
 
-            /*Integer code = NumberUtils.toInt((String)redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
-
-            int robotType = 159;
-            if (code >=3000 && code <=3999){
-                robotCode = tRobotInfo.getEdgeCode();
-            }else {
-                robotType = tRobotInfoDao.selectRobotTypeByCode(robotCode);
-            }*/
-
             XMLBaseModel xmlBaseModel = new XMLBaseModel()
                     .setSendCode(Constant.sendCode)
                     .setReceiveCode(robotCode)

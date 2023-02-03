@@ -389,6 +389,8 @@
     <select id="selectOnlinePatrolDevice" resultType="java.util.Map">
         SELECT
         a.robot_code,
+        a.robot_num,
+        a.robot_name,
         (
         CASE
         WHEN a.robot_type IS NULL THEN

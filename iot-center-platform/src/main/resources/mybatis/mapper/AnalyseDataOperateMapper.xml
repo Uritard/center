@@ -708,6 +708,7 @@
         a.threshold_abs,
         a.threshold_per,
         a.modulus,
+        a.is_temdif,
         a.remark
         from t_cruise_point_instance b left join t_std_devicemete a
         on b.device_mete_id=a.device_mete_id
@@ -1094,5 +1095,14 @@
         LEFT JOIN t_camera_preset b ON a.cruise_id = b.preset_id
         WHERE
         a.instance_id = #{instanceId}
+    </select>
+
+    <select id="selectRobotCodeIsExist" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            t_robot_info a
+        WHERE
+            a.robot_code = #{robotCode, jdbcType=VARCHAR}
     </select>
 </mapper>

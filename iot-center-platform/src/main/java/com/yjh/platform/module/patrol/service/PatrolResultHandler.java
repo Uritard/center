@@ -3,10 +3,12 @@ package com.yjh.platform.module.patrol.service;
 import com.alibaba.fastjson.JSON;
 import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.module.device.dao.TRobotInspectionDao;
+import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.thread.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
@@ -136,10 +138,15 @@ public class PatrolResultHandler {
 
                 // 文件处理
                 Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap);
-                if (!"3".equals(sysLevel)) {
+                // 除了不带机器人/无人机的边缘节点与节点之间不需要处理告警
+                TCruisePointInstance instance = tRobotInspectionDao.selectRealInstance(robotPatrolTaskResult.getDeviceId(), robotPatrolTaskResult.getSendCode());
+                if ("2".equals(sysLevel) && !ArrayUtils.contains(new Integer[]{228,524}, instance.getCruiseType())){
+                    log.info("No alarms need to be handled...");
+                }else {
                     // 告警处理
                     alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
                 }
+
                 if ("2".equals(sysLevel)){
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
@@ -404,7 +411,7 @@ public class PatrolResultHandler {
                 int warnFlag = analyseDataOperateService.warnSettings(meteKind, stateZero, alarmState, highLimit1, lowLimit1,
                         highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
                 if (warnFlag == 1){
-                    Map<String, String> warnMap = new HashMap<>();
+                    Map<String, String> warnMap = new HashMap<>(16);
                     String warnName = "warnInfo:" + cruiseResultMap.get("taskId") + String.valueOf(UUID.randomUUID()).replace("-", "");
 
                     warnMap.put("deviceId", String.valueOf(cruiseResultMap.get("deviceId")));
@@ -448,51 +455,87 @@ public class PatrolResultHandler {
                             break;
                         case "2":
                             Float resultValueMeter = NumberUtils.toFloat(resultStringValue);
-                            int warnRuleMeter = analyseDataOperateService.warnJudgement(resultValueMeter, highLimit1, lowLimit1,
+
+                            Map<String, String> initInfo = new HashMap<>(16);
+                            initInfo.put("valueTemp", String.valueOf(resultValueMeter));
+
+                            boolean isTemDif = 1 == tStdDevicemete.getIsTemdif() && Objects.equals(222, tStdDevicemete.getMeteType());
+                            if (isTemDif){
+                                // 配置了红外温差任务用差值去判断告警
+                                String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
+                                if (CommonUtils.isEmptyOrNullstr(temperature)){
+                                    double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(resultStringValue));
+                                    initInfo.put("valueTemp", String.valueOf(abs));
+                                    initInfo.put("temperature", temperature);
+                                    initInfo.put("warnName", meteName + "温差任务");
+                                    initInfo.put("warnContent", "传感器环境温度与测温产生温差:" + temperature + "--" + resultStringValue);
+                                    initInfo.put("outRange", String.valueOf(abs));
+                                }
+                            }
+
+                            int warnRuleMeter = analyseDataOperateService.warnJudgement(Float.valueOf(initInfo.get("valueTemp")), highLimit1, lowLimit1,
                                     highLimit2, lowLimit2, highLimit3, lowLimit3, highLimit4, lowLimit4);
                             log.info("warnRuleMeter=={}", warnRuleMeter);
 
-                            if (warnRuleMeter > 0){
+                            if (warnRuleMeter > 0) {
                                 log.info("Alarm value is reached(遥测)");
-                                warnMap.put("warnName", meteName + "数据异常");
+                                warnMap.put("warnName", isTemDif ? initInfo.get("warnName") : meteName + "数据异常");
                                 warnMap.put("warnTime", DateTimeUtil.format(new Date()));
 
-                                switch (warnRuleMeter){
+                                String warnLevel = "";
+                                String warnContent = "";
+                                String outRange = "";
+
+                                switch (warnRuleMeter) {
                                     case 1:
-                                        warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "预警"));
-                                        warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "预警");
-                                        warnMap.put("outRange", resultValueMeter >= highLimit1 ?
-                                                String.valueOf(resultValueMeter - highLimit1) : String.valueOf(lowLimit1 - resultValueMeter));
+                                        warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "预警");
+                                        warnContent = isTemDif ?
+                                                initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "预警";
+                                        outRange = isTemDif ?
+                                                initInfo.get("outRange") : resultValueMeter >= highLimit1 ?
+                                                String.valueOf(resultValueMeter - highLimit1) : String.valueOf(lowLimit1 - resultValueMeter);
                                         break;
                                     case 2:
-                                        warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
-                                        warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "一般告警");
-                                        warnMap.put("outRange", resultValueMeter >= highLimit2 ?
-                                                String.valueOf(resultValueMeter - highLimit2) : String.valueOf(lowLimit2 - resultValueMeter));
+                                        warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "一般告警");
+                                        warnContent = isTemDif ?
+                                                initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "一般告警";
+                                        outRange = isTemDif ?
+                                                initInfo.get("outRange") : resultValueMeter >= highLimit2 ?
+                                                String.valueOf(resultValueMeter - highLimit2) : String.valueOf(lowLimit2 - resultValueMeter);
                                         break;
                                     case 3:
-                                        warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "严重告警"));
-                                        warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "严重告警");
-                                        warnMap.put("outRange", resultValueMeter >= highLimit3 ?
-                                                String.valueOf(resultValueMeter - highLimit3) : String.valueOf(lowLimit3 - resultValueMeter));
+                                        warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "严重告警");
+                                        warnContent = isTemDif ?
+                                                initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "严重告警";
+                                        outRange = isTemDif ?
+                                                initInfo.get("outRange") : resultValueMeter >= highLimit3 ?
+                                                String.valueOf(resultValueMeter - highLimit3) : String.valueOf(lowLimit3 - resultValueMeter);
                                         break;
                                     case 4:
-                                        warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "危急告警"));
-                                        warnMap.put("warnContent", meteName + ":" + resultValue + "--" + "危急告警");
-                                        warnMap.put("outRange", resultValueMeter >= highLimit4 ?
-                                                String.valueOf(resultValueMeter - highLimit4) : String.valueOf(lowLimit4 - resultValueMeter));
+                                        warnLevel = analyseDataOperateService.selectDictCode("alarm_level", "危急告警");
+                                        warnContent = isTemDif ?
+                                                initInfo.get("warnContent") : meteName + ":" + resultValue + "--" + "危急告警";
+                                        outRange = isTemDif ?
+                                                initInfo.get("outRange") : resultValueMeter >= highLimit4 ?
+                                                String.valueOf(resultValueMeter - highLimit4) : String.valueOf(lowLimit4 - resultValueMeter);
                                         break;
                                     default:
                                         break;
                                 }
+
+                                warnMap.put("warnLevel", warnLevel);
+                                warnMap.put("warnContent", warnContent);
+                                warnMap.put("outRange", outRange);
+
                                 log.info("warnMap=={}", warnMap);
+                                // 将告警信息放入redis
                                 redisTemplate.opsForHash().putAll(warnName, warnMap);
 
                                 cruiseResultMap.put("isWarn", "1");
                                 cruiseResultMap.put("resultNum", resultValue);
                                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
-                            }else {
+                            } else {
                                 log.info("Alarm value is not reached(遥测)");
                                 cruiseResultMap.put("resultNum", resultValue);
                                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
@@ -509,6 +552,7 @@ public class PatrolResultHandler {
                         TWarnInfo tWarnInfo =  getWarnInfo(warningMsg);
                         analyseDataOperateService.insertWarnInfo(tWarnInfo);
 
+                        // 告警推送
                         Map<String, String> infoMap = new HashMap<>(5);
                         infoMap.put("alarmLevel", String.valueOf(tWarnInfo.getWarnLevel()));
                         infoMap.put("flag", "warn");
@@ -518,7 +562,7 @@ public class PatrolResultHandler {
 
                         pushAlarmInfo(warningMsg.get("warnName"), warningMsg.get("warnContent"));
 
-                        // 告警上报上一级系统
+                        // 将产生的告警上送至上一级系统
                         alarmToUpSystem(tWarnInfo, tWarnInfo.getTaskId(), tWarnInfo.getInstanceId());
                     }
                 }else {

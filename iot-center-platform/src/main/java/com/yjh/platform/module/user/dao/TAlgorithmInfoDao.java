@@ -40,4 +40,6 @@ public interface TAlgorithmInfoDao {
     TStdDeviceMete selectDeviceMete(@Param(value = "deviceMeteId") Long deviceMeteId);
 
     List<TAlgorithmMeteInfo> selectAlgorithmMete(@Param(value = "deviceMeteId") String deviceMeteId);
+
+    String selectEdgeCodeByInstanceId(@Param(value = "instanceId") Long instanceId);
 }
