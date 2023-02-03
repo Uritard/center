@@ -1,15 +1,22 @@
 package com.yjh.platform.module.user.service;
 
+import com.yjh.platform.common.quartz.JobManager;
+import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.module.device.entity.AreaInfo;
+import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
+import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.user.dao.TAlgorithmConfDao;
 import com.yjh.platform.module.user.dao.TCameraInfoDao;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.entity.SilentConf;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.xmlbeans.impl.common.ConcurrentReaderHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static org.apache.catalina.startup.ExpandWar.deleteDir;
 
@@ -41,6 +49,13 @@ public class TCameraPresetService {
     private TAlgorithmConfDao tAlgorithmConfDao;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private IntelAnalysisService intelAnalysisService;
+
+    ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(10);
+
+    private static Map<Integer,ScheduledFuture> silentConfMap = new ConcurrentReaderHashMap();
+
 
     private Logger log = LoggerFactory.getLogger(TCameraPresetService.class);
 
@@ -361,9 +376,8 @@ public class TCameraPresetService {
         return tCameraPresetDao.selectKeepWatch(cameraId);
     }
 
-    public TCameraPreset countKeepWatchTask(Long cameraId,Long preset,Integer isKeepWatch,Integer isKeepWatchTask,Integer isSecondKeepWatchTask,Long selfPreset){
-        return tCameraPresetDao.selectKeepWatchTask(cameraId,preset,
-                isKeepWatch,isKeepWatchTask,isSecondKeepWatchTask,selfPreset);
+    public TCameraPreset countKeepWatchTask(Long cameraId,Long selfPreset){
+        return tCameraPresetDao.selectKeepWatchTask(cameraId,selfPreset);
     }
 
     public String getPresetBasePath(){
@@ -392,6 +406,37 @@ public class TCameraPresetService {
 
     public int selectCameraPresetInTask(String presetId) {
         return tCameraPresetDao.selectCameraPresetInTask(presetId);
+    }
+
+    public void startSilentTask(){
+        List<SilentConf> silentConfs = tCameraPresetDao.selectSilentInfo(null);
+        silentConfs.forEach(this::creatSilentTask);
+    }
+
+    public void creatSilentTask(SilentConf silentConf){
+        // 静默任务开关
+        String silentFlag = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:isSilentTask", "content"));
+        if (StringUtils.equals("false", silentFlag)) {
+            log.info("静默任务开关：isSilentTask 没开");
+            return;
+        }
+        ScheduledFuture future = silentConfMap.get(silentConf.getPresetType());
+        if (future != null){
+            future.cancel(true);
+            executor.setRemoveOnCancelPolicy(true);
+        }
+        SilentTaskJob silentTaskJob = new SilentTaskJob(tCameraPresetDao,redisTemplate,intelAnalysisService,silentConf.getPresetType());
+        future = executor.scheduleAtFixedRate(silentTaskJob,0,silentConf.getChillTime(), TimeUnit.SECONDS);
+        silentConfMap.put(silentConf.getPresetType(),future);
+    }
+
+    public List<SilentConf> selectSilentConfInfo(){
+        return tCameraPresetDao.selectPresetTypeInfo();
+    }
+
+    public int updateSilentConf(SilentConf silentConf){
+        this.creatSilentTask(silentConf);
+        return tCameraPresetDao.updateSilentConf(silentConf);
     }
 }
 

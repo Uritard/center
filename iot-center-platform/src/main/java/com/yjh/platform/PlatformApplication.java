@@ -8,10 +8,7 @@ import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
-import com.yjh.platform.module.user.service.SysKeyService;
-import com.yjh.platform.module.user.service.SysUserService;
-import com.yjh.platform.module.user.service.TCameraInfoService;
-import com.yjh.platform.module.user.service.TSysParamService;
+import com.yjh.platform.module.user.service.*;
 import com.yjh.platform.netty.client.NettyClient;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.StringUtils;
@@ -95,6 +92,8 @@ public class PlatformApplication  implements CommandLineRunner {
      */
     @Value("${netty.server.url}")
     private String serverUrl;
+    @Autowired
+    private TCameraPresetService tCameraPresetService;
 
     public static void main(String[] args) {
         SpringApplication.run(PlatformApplication.class, args);
@@ -111,6 +110,7 @@ public class PlatformApplication  implements CommandLineRunner {
         tSysParamService.insertIntoRedis(true);
         tCameraInfoService.intoRedis();
         tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
+        tCameraPresetService.startSilentTask();//开启摄像头静默任务
         sysUserService.insertIntoRedis();
         tVoiceDeviceService.registerAudioDevice();//声纹设备注册
         //区域信息加载到缓存

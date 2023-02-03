@@ -42,6 +42,11 @@ public class TCameraPreset implements Serializable {
     private Integer isKeepWatchTask;
 
     /**
+     * 预置位类型
+     */
+    private Integer presetType;
+
+    /**
      * 
      */
     private String creatorUser;

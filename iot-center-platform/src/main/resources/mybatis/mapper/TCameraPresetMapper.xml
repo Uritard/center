@@ -10,8 +10,7 @@
         <result column="preset_name" jdbcType="VARCHAR" property="presetName" />
         <result column="creator_user" jdbcType="VARCHAR" property="creatorUser" />
         <result column="creator_time" jdbcType="TIMESTAMP" property="creatorTime" />
-        <result column="is_keep_watch" jdbcType="INTEGER" property="isKeepWatch" />
-        <result column="is_keep_watch_task" jdbcType="INTEGER" property="isKeepWatchTask" />
+        <result column="preset_type" jdbcType="INTEGER" property="presetType" />
         <result column="is_use" jdbcType="INTEGER" property="isUse" />
         <result column="preset_img" jdbcType="VARCHAR" property="presetImg" />
         <result column="inspection_postion" jdbcType="INTEGER" property="inspectionPostion" />
@@ -23,7 +22,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        preset_id, camera_id, preset_num, preset_name, is_keep_watch,is_keep_watch_task, creator_user, creator_time, is_use, preset_img, inspection_postion, collect_status, calibration_status,remark
+        preset_id, camera_id, preset_num, preset_name, preset_type, creator_user, creator_time, is_use, preset_img, inspection_postion, collect_status, calibration_status,remark
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="presetId" parameterType="com.yjh.platform.module.user.entity.TCameraPreset">
@@ -32,8 +31,7 @@
             camera_id,
             preset_num,
             preset_name,
-            is_keep_watch,
-            is_keep_watch_task,
+            preset_type,
             creator_user,
             creator_time,
             is_use,
@@ -47,8 +45,7 @@
                 #{cameraId, jdbcType=BIGINT},
                 #{presetNum, jdbcType=INTEGER},
                 #{presetName, jdbcType=VARCHAR},
-                #{isKeepWatch, jdbcType=INTEGER},
-                #{isKeepWatchTask, jdbcType=INTEGER},
+                #{presetType, jdbcType=INTEGER},
                 #{creatorUser, jdbcType=VARCHAR},
                 #{creatorTime, jdbcType=TIMESTAMP},
                 #{isUse, jdbcType=INTEGER},
@@ -87,8 +84,7 @@
         <if test="cameraId != null ">a.camera_id = #{cameraId,},</if>
         <if test="presetNum != null ">a.preset_num = #{presetNum, jdbcType=INTEGER},</if>
         <if test="presetName != null ">a.preset_name = #{presetName},</if>
-        <if test="isKeepWatch != null ">a.is_keep_watch = #{isKeepWatch},</if>
-        <if test="isKeepWatchTask != null ">a.is_keep_watch_task = #{isKeepWatchTask},</if>
+        <if test="presetType != null ">a.preset_type = #{presetType},</if>
         <if test="creatorUser != null  ">a.creator_user = #{creatorUser},</if>
         <if test="creatorTime != null ">a.creator_time = #{creatorTime, jdbcType=TIMESTAMP},</if>
         <if test="isUse != null ">a.is_use = #{isUse, jdbcType=INTEGER},</if>
@@ -107,8 +103,7 @@
         a.camera_id,
         a.preset_num,
         a.preset_name,
-        a.is_keep_watch,
-        a.is_keep_watch_task,
+        a.preset_type,
         a.creator_user,
         a.creator_time,
         a.is_use,
@@ -143,8 +138,7 @@
         a.camera_id,
         a.preset_num,
         a.preset_name,
-        a.is_keep_watch,
-        a.is_keep_watch_task,
+        a.preset_type,
         a.creator_user,
         a.creator_time,
         a.is_use,
@@ -164,8 +158,7 @@
         a.camera_id,
         a.preset_num,
         a.preset_name,
-        a.is_keep_watch,
-        a.is_keep_watch_task,
+        a.preset_type,
         a.creator_user,
         a.creator_time,
         a.is_use,
@@ -185,8 +178,7 @@
         a.camera_id,
         a.preset_num,
         a.preset_name,
-        a.is_keep_watch,
-        a.is_keep_watch_task,
+        a.preset_type,
         a.creator_user,
         a.creator_time,
         a.is_use,
@@ -216,8 +208,7 @@
         b.camera_name,
         a.preset_num,
         a.preset_name,
-        a.is_keep_watch,
-        a.is_keep_watch_task,
+        a.preset_type,
         a.creator_user,
         a.creator_time,
         a.is_use,
@@ -250,8 +241,7 @@
             camera_id,
             preset_num,
             preset_name,
-            is_keep_watch,
-            is_keep_watch_task,
+            preset_type,
             creator_user,
             creator_time,
             is_use,
@@ -267,8 +257,7 @@
                 #{TCameraPreset.cameraId, jdbcType=BIGINT},
                 #{TCameraPreset.presetNum, jdbcType=INTEGER},
                 #{TCameraPreset.presetName, jdbcType=VARCHAR},
-                #{TCameraPreset.isKeepWatch, jdbcType=INTEGER},
-                #{TCameraPreset.isKeepWatchTask, jdbcType=INTEGER},
+                #{TCameraPreset.presetType, jdbcType=INTEGER},
                 #{TCameraPreset.creatorUser, jdbcType=VARCHAR},
                 #{TCameraPreset.creatorTime, jdbcType=TIMESTAMP},
                 #{TCameraPreset.isUse, jdbcType=INTEGER},
@@ -372,7 +361,7 @@
             *
         from t_camera_preset
         where camera_id = #{cameraId}
-        and is_keep_watch = 1
+        and preset_type = 2
     </select>
 
     <select id="selectKeepWatchTask" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
@@ -380,10 +369,7 @@
             *
         from t_camera_preset
         where camera_id = #{cameraId}
-        <if test="presetId != null and presetId != ''"> and preset_id = #{presetId, jdbcType=BIGINT}</if>
-        <if test="isKeepWatch != null and isKeepWatch != ''"> and is_keep_watch = 1</if>
-        <if test="isKeepWatchTask != null and isKeepWatchTask != ''"> and is_keep_watch_task = 1</if>
-        <if test="isSecondKeepWatchTask != null and isSecondKeepWatchTask != ''"> and is_second_keep_watch_task = 1</if>
+        and preset_type &lt;&gt; 1
         <if test="selfPreset != null and selfPreset != ''"> and preset_id &lt;&gt; #{selfPreset, jdbcType=BIGINT}</if>
     </select>
 
@@ -395,7 +381,7 @@
         FROM
             t_camera_info a, t_camera_preset b
         WHERE a.camera_id = b.camera_id
-          and b.is_keep_watch_task = 1
+          and b.preset_type in(4,5)
     </select>
 
     <select id="selectPMSByCameraId" resultType="java.lang.String">
@@ -445,7 +431,7 @@
         select count(1)
         FROM t_camera_info a, t_camera_preset b
         WHERE a.camera_id = b.camera_id
-          and b.is_second_keep_watch_task = 1
+          and b.preset_type = 3
           and a.camera_id = #{cameraId}
           and b.preset_id = #{presetId}
     </select>
@@ -461,7 +447,7 @@
         FROM
             t_camera_info a, t_camera_preset b
         WHERE a.camera_id = b.camera_id
-          and b.is_second_keep_watch_task = 1
+          and b.preset_type = 3
     </select>
     <select id="selectCameraPresetInTask" resultType="java.lang.Integer">
         select
@@ -478,4 +464,37 @@
                  and a.task_state in (239, 241))
     </select>
 
+    <select id="selectSilentInfo" resultType="com.yjh.platform.module.user.entity.SilentConf">
+        select * from silent_conf where 1=1 and chill_time &lt;&gt; -1
+        <if test="presetType != null and presetType != ''"> and preset_type = #{presetType}</if>
+    </select>
+
+    <select id="selectCameraByPresetType" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+        *
+        from t_camera_preset
+        where preset_type = #{presetType}
+    </select>
+
+    <select id="selectRecognizeTypeByPresetId" resultType="java.lang.String">
+        select
+            silent.recognize_type
+        from t_camera_preset preset
+        left join silent_conf silent on preset.preset_type = silent.preset_type
+            where preset.preset_id = #{presetId}
+    </select>
+
+    <select id="selectPresetTypeInfo" resultType="com.yjh.platform.module.user.entity.SilentConf">
+        select * from silent_conf
+    </select>
+
+    <update id="updateSilentConf" parameterType="com.yjh.platform.module.user.entity.SilentConf">
+        update silent_conf a <set>
+        <if test="presetType != null">a.preset_type = #{presetType},</if>
+        <if test="presetTypeName != null and presetTypeName != ''">a.preset_type_name = #{presetTypeName},</if>
+        <if test="recognizeType != null and recognizeType != ''">a.recognize_type = #{recognizeType},</if>
+        <if test="chillTime != null ">a.chill_time = #{chillTime},</if>
+    </set>
+        where a.id = #{id}
+    </update>
 </mapper>

@@ -12,6 +12,7 @@ import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.entity.SilentConf;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
 import com.yjh.platform.module.user.service.TCameraPresetService;
@@ -74,19 +75,19 @@ public class TCameraPresetController {
                     params.put("presetId",tCameraPreset.getPresetId());
                     params.put("meteName",tCameraPreset.getPresetName());
 
-                    Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
-                    if (response1.getData().equals(true)) {
-                        Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
-                        JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
-                        tCameraPreset.setPresetImg((String) json.get("urlPath"));
-                        tCameraPresetService.update(tCameraPreset);//存图
-                        result.setData(resultNum);
-                    } else {
-                        tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
-                        resultNum = 0;
-                        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
-                        result.setData(resultNum);
-                    }
+//                    Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
+//                    if (response1.getData().equals(true)) {
+//                        Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
+//                        JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
+//                        tCameraPreset.setPresetImg((String) json.get("urlPath"));
+//                        tCameraPresetService.update(tCameraPreset);//存图
+//                        result.setData(resultNum);
+//                    } else {
+//                        tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
+//                        resultNum = 0;
+//                        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+//                        result.setData(resultNum);
+//                    }
                 }
             }
         } catch (BusinessException b) {
@@ -195,63 +196,11 @@ public class TCameraPresetController {
     public Result update(@Validated @RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
-            if(tCameraPreset.getIsKeepWatch() == 1){//设置预置位为守望位
-                TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),null,1,null,null,tCameraPreset.getPresetId());
+            if( tCameraPreset.getPresetType() != 1 ){//设置预置位特殊预置位
+                //判断这个相机是否已有特殊预置位
+                TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId());
                 if (keepWatchPreset != null){
-                    //已有守望位
-                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此相机已有守望位，是预置位："+keepWatchPreset.getPresetName());
-                    return result;
-                }
-                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),null,1,null,null);
-                if (keepWatchPreset != null){
-                    //此位置是静默任务预置位
-                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此预置位为静默任务预置位");
-                    return result;
-                }
-                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),null,null,1,null);
-                if (keepWatchPreset != null){
-                    //此位置是秒级静默任务预置位
-                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此预置位为秒级静默任务预置位");
-                    return result;
-                }
-            }
-            if(tCameraPreset.getIsKeepWatchTask() == 1){//设置预置位为静默任务为
-                TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),null,null,1,null,tCameraPreset.getPresetId());
-                if (keepWatchPreset != null){
-                    //已有静默任务预置位
-                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此相机已有静默任务预置位，是预置位："+keepWatchPreset.getPresetName());
-                    return result;
-                }
-                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),1,null,null,null);
-                if (keepWatchPreset != null){
-                    //此位置是守望位
-                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此预置位为守望预置位");
-                    return result;
-                }
-                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),null,null,1,null);
-                if (keepWatchPreset != null){
-                    //此位置是秒级静默任务预置位
-                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此预置位为秒级静默任务预置位");
-                    return result;
-                }
-            }
-            if (tCameraPreset.getIsSecondKeepWatchTask() == 1) {//设置预置位为秒级静默任务
-                TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),null,null,null,1,tCameraPreset.getPresetId());
-                if (keepWatchPreset != null){
-                    //已有秒级静默任务预置位
-                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此相机已有秒级静默任务预置位，是预置位："+keepWatchPreset.getPresetName());
-                    return result;
-                }
-                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),1,null,null,null);
-                if (keepWatchPreset != null){
-                    //此位置是守望位
-                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此预置位为守望预置位");
-                    return result;
-                }
-                keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId(),null,1,null,null);
-                if (keepWatchPreset != null){
-                    //此位置是静默任务预置位
-                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此预置位为静默任务预置位");
+                    result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),"此相机已有特殊预置位，是预置位："+keepWatchPreset.getPresetName());
                     return result;
                 }
             }
@@ -357,17 +306,17 @@ public class TCameraPresetController {
         try {
             Page page = PageHelper.startPage(tCameraPreset.getPageNum() != null ? tCameraPreset.getPageNum() : 1, tCameraPreset.getPageSize() != null ? tCameraPreset.getPageSize() : 0, true, null, true);
             List<TCameraPresetExpand> list = tCameraPresetService.selectByPage(tCameraPreset);
-            for (TCameraPresetExpand tCameraPresetExpand : list) {
-                if (Constant.INTEGER_1.equals(tCameraPresetExpand.getIsKeepWatchTask())) {// 静默位
-                    tCameraPresetExpand.setPresetType(1);
-                } else if (Constant.INTEGER_1.equals((tCameraPresetExpand.getIsKeepWatch()))) {// 守望位
-                    tCameraPresetExpand.setPresetType(2);
-                } else if (Constant.INTEGER_1.equals(tCameraPresetExpand.getIsSecondKeepWatchTask())) {// 秒级静默位
-                    tCameraPresetExpand.setPresetType(3);
-                } else {// 预置位
-                    tCameraPresetExpand.setPresetType(0);
-                }
-            }
+//            for (TCameraPresetExpand tCameraPresetExpand : list) {
+//                if (Constant.INTEGER_1.equals(tCameraPresetExpand.getIsKeepWatchTask())) {// 静默位
+//                    tCameraPresetExpand.setPresetType(1);
+//                } else if (Constant.INTEGER_1.equals((tCameraPresetExpand.getIsKeepWatch()))) {// 守望位
+//                    tCameraPresetExpand.setPresetType(2);
+//                } else if (Constant.INTEGER_1.equals(tCameraPresetExpand.getIsSecondKeepWatchTask())) {// 秒级静默位
+//                    tCameraPresetExpand.setPresetType(3);
+//                } else {// 预置位
+//                    tCameraPresetExpand.setPresetType(0);
+//                }
+//            }
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
@@ -437,6 +386,37 @@ public class TCameraPresetController {
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询预置位树失败：" + e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询预置位配置信息")
+    @GetMapping(value = "/selectSilentConf")
+    @Logs(title = "查询预置位配置信息",content = "根据用户传递的参数查询预置位配置信息",logType = 1)
+    public Result selectSilentConf() {
+        Result result = new Result();
+        try {
+            result.setData(tCameraPresetService.selectSilentConfInfo());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "更新预置位配置信息")
+    @PostMapping(value = "/updateSilentConf")
+    @Logs(title = "修改新增预置位配置信息",content = "根据用户传递的参数修改预置配置位信息",logType = 3,authority = "1234")
+    public Result updateSilentConf(@Validated @RequestBody SilentConf silentConf) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraPresetService.updateSilentConf(silentConf));
+        } catch (BusinessException e) {
+            result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("更新预置位信息异常:", e);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("更新预置位信息错误:", e);
         }
         return result;
     }
