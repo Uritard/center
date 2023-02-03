@@ -205,12 +205,13 @@ public class MessageThread {
 //            re = Constant.otherServer(map, Constant.ROBOT_TASK_URL);//国网要求
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item = new HashMap<>();
-            if (StringUtils.equals("1", xmlBaseModel.getCommand())){
+            String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
+//            if (StringUtils.equals("1", xmlBaseModel.getCommand())){
                 String time = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-                item.put("task_patrolled_id", xmlBaseModel.getCode() + "_" + time);
-            }else{
-                item.put("task_patrolled_id", xmlBaseModel.getCode());
-            }
+                item.put("task_patrolled_id", stationCode + "_" +xmlBaseModel.getCode() + "_" + time);
+//            }else{
+//                item.put("task_patrolled_id", xmlBaseModel.getCode());
+//            }
             items.add(item);
             if (re == null) {
                 sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", items, false);
@@ -275,9 +276,10 @@ public class MessageThread {
                     List<Map<String, Object>> xmlItems = new ArrayList<>();
                     Map<String, Object> xmlItem = new HashMap<>();
                     SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                    String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
                     if (re == null) {
                         xmlItem.put("error_code", "3");
-                        xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat2.format(new Date()));
+                        xmlItem.put("task_patrolled_id", stationCode + "_" + taskId + "_" + simpleDateFormat2.format(new Date()));
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
                     } else if (200 == re.getCode()) {
@@ -287,7 +289,7 @@ public class MessageThread {
                         sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
                     } else {
                         xmlItem.put("error_code", "1");
-                        xmlItem.put("task_patrolled_id", taskId + "_" + simpleDateFormat2.format(new Date()));
+                        xmlItem.put("task_patrolled_id", stationCode + "_" + taskId + "_" + simpleDateFormat2.format(new Date()));
                         xmlItems.add(xmlItem);
                         sendToUpSystemServices.sendResponse(sendSessionId, "251", "4", "200", xmlItems, false);
                     }

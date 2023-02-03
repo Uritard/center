@@ -15,6 +15,7 @@ import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.dao.TUnionTaskDao;
 import com.yjh.platform.module.task.entity.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
@@ -314,7 +315,7 @@ public class TCfgDataCurrentService {
             // 联动任务优先级
             tCruiseTaskAdd.setTaskLevel(4);
 //            Result result=tCruiseTaskController.insert(tCruiseTaskAdd);
-            String taskId=uPatrolTaskService.addTask(tCruiseTaskAdd);//联动任务ID
+            String taskId= StringUtils.substringBetween(uPatrolTaskService.addTask(tCruiseTaskAdd),"_");//联动任务ID
             cLogger.info("联动开始执行");
             //联动记录插库
             TCfgDataCurrent unionForGetTime = tCfgDataCurrentDao.selectCurrentDataByMeteId(Long.valueOf(meteMap));
