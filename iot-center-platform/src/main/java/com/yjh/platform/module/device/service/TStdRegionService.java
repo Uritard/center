@@ -177,7 +177,7 @@ public class TStdRegionService{
     }
 
     public int loadRegionIntoRedis() {
-        List<TStdRegion> list = tStdRegionDao.select(null, null, null, null, null, null, null, null, null);
+        List<TStdRegion> list = tStdRegionDao.select(null, null, null, null, null, null, null, 1, null);
         Set<String> keys = redisTemplate.keys("region:*");
         // 删除所有区域信息重新加载
         if (CollectionUtils.isNotEmpty(keys)) {

@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.module.device.service.TDeviceTypeImgService;
+import com.yjh.platform.module.device.service.TStdRegionService;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.patrol.service.AnalyseDataOperateService;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
@@ -42,6 +43,7 @@ import redis.clients.jedis.MultiKeyCommands;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
+import javax.annotation.Resource;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +67,8 @@ public class PlatformApplication  implements CommandLineRunner {
     private SysKeyService sysKeyService;
     @Autowired
     private TVoiceDeviceService tVoiceDeviceService;
+    @Resource
+    private TStdRegionService tStdRegionService;
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -109,6 +113,8 @@ public class PlatformApplication  implements CommandLineRunner {
         tCameraInfoService.startKeepWatch();//开启摄像头守望位置任务
         sysUserService.insertIntoRedis();
         tVoiceDeviceService.registerAudioDevice();//声纹设备注册
+        //区域信息加载到缓存
+        tStdRegionService.loadRegionIntoRedis();
         Constant.WEBSOCKET_URL = url;
         Constant.redisTemplate = redisTemplate;
         Constant.apiPermissions= Boolean.valueOf(interfaceApi);

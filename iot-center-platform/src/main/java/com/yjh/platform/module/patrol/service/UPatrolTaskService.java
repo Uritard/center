@@ -162,7 +162,8 @@ public class UPatrolTaskService {
         // 设置定时器，不走事物逻辑，否则会延时
         setQuartzTask(uPatrolTask);
 
-        return uPatrolTask.getTaskId();
+        String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+        return stationCode + "_" + uPatrolTask.getTaskId() + "_" + DateTimeUtil.format3(uPatrolTask.getStartTime());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -506,7 +507,8 @@ public class UPatrolTaskService {
             String[] patrolledIds = robotPatrolTaskStatus.getTaskPatrolledId().split("_");
             String taskCode = robotPatrolTaskStatus.getTaskCode();
             // 增加时间判断，避免预先初始化导致数据传入下一个任务
-            String timeStr = patrolledIds[1];
+            String timeStr = patrolledIds.length > 2 ? patrolledIds[2] : patrolledIds[1];
+            String patrolledId = patrolledIds.length > 2 ? patrolledIds[1] : patrolledIds[0];
             Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
             String taskId = null;
 
@@ -533,7 +535,7 @@ public class UPatrolTaskService {
                     break;
                 case "5":
                     // 任务状态为 5 未执行时，需要考虑这个任务是下级系统创建的还是上级系统创建的，如果是上级系统创建的，就不应该初始化，如果是下级系统创建的，则需要初始化
-                    taskId = addToUpSystem(robotPatrolTaskStatus, patrolledIds[0]);
+                    taskId = addToUpSystem(robotPatrolTaskStatus, patrolledId);
                     break;
                 default:
                     break;
@@ -542,7 +544,7 @@ public class UPatrolTaskService {
                 taskId = tRobotInspectionDao.selectRealTaskId(taskCode, date);
             }
             if (StringUtils.isEmpty(taskId)) {
-                taskId = patrolledIds[0];
+                taskId = patrolledId;
             }
             updateTaskProgress(robotPatrolTaskStatus, taskId, taskState);
             if (robotEnd) {
@@ -1071,7 +1073,8 @@ public class UPatrolTaskService {
         Map<String, Object> item = new HashMap<>();
         xmlBaseModel.setType("41");
         try {
-            item.put("task_patrolled_id", task.getTaskId() + "_" + DateTimeUtil.format3(task.getStartTime()));
+            String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
+            item.put("task_patrolled_id", stationCode + "_" +task.getTaskId() + "_" + DateTimeUtil.format3(task.getStartTime()));
             item.put("task_name", task.getTaskName());
             item.put("task_code", task.getTaskCode());
             item.put("task_state", String.valueOf(state));
