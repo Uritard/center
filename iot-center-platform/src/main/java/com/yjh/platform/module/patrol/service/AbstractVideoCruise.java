@@ -149,13 +149,14 @@ public abstract class AbstractVideoCruise {
             }
 
             log.info("capture result: {}", JSON.toJSONString(re));
-
+            String nowTime = DateTimeUtil.getDateTimeString();
             try {
                 boolean isEnded = true;
                 // 抓图失败处理
                 boolean picError = re == null || !"success".equals(re.getMessage());
                 JSONObject jsonForRe = null;
                 String resultNum = "已拍照";
+
                 if (picError) {
                     inspectionMap.put("resultNum", "抓图失败");
                     inspectionMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
@@ -167,7 +168,7 @@ public abstract class AbstractVideoCruise {
                     inspectionMap.put("picpath", "--");
                     // 巡检数据状态，执行失败
                     inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
-                    inspectionMap.put("cruiseTime", DateTimeUtil.getDateTimeString());
+                    inspectionMap.put("cruiseTime", nowTime);
                 } else {
                     jsonForRe = (JSONObject)JSONObject.toJSON(re.getData());
                     String urlPath = jsonForRe.getString("urlPath");
@@ -187,21 +188,21 @@ public abstract class AbstractVideoCruise {
                     inspectionMap.put("origpic", absPath);
                     // 巡检数据状态，已经执行
                     inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-                    inspectionMap.put("endTime", DateTimeUtil.getDateTimeString());
+                    inspectionMap.put("endTime", nowTime);
+                    inspectionMap.put("cruiseTime", nowTime);
                 }
 
                 // 判断当前节点级别,如果是边缘节点,直接处理拍照的结果
                 String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
-                if (!picError) {
+                if (!picError && !StringUtils.equals("1", sysLevel)) {
                     // 判断是否有配置算法
                     TAlgorithmMeteInfo algorithm = needAnalysis(inspectionMap.getOrDefault("deviceMeteId", "-1"), resultNum);
-                    if (algorithm != null && !StringUtils.equals("1", sysLevel)) {
+                    if (algorithm != null) {
                         log.info("request algorithm: {}", JSON.toJSONString(algorithm));
                         // 算法分析
                         isEnded = algorithmAnalysis(inspectionMap, presetId, taskId, jsonForRe, algorithm);
                     } else {
                         // 如果不进行算法处理，则本级处理结果信息
-                        inspectionMap.put("cruiseTime", DateTimeUtil.getDateTimeString());
                         resultRecognition(inspectionMap);
                     }
                 }
