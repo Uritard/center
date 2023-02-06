@@ -418,6 +418,7 @@
         b.cruise_type,
         h.dict_note as cruise_type_name,
         b.result_num,
+        b.result_desc,
         b.cruise_result,
         j.dict_note as cruise_result_name,
         b.cruise_time,
@@ -882,6 +883,7 @@
         a.threshold_abs,
         a.threshold_per,
         a.modulus,
+        a.is_temdif,
         a.remark
         from t_cruise_point_instance b left join t_std_devicemete a
         on b.device_mete_id=a.device_mete_id
@@ -979,6 +981,7 @@
         MIN(d.execute_time) as cruiseStartTime,
         MAX(d.end_time) as cruiseEndTime,
         d.check_user as reviewer,
+        d.weather as envInfo,
         d.check_date as reviewTime
         from
         u_patrol_task a,u_patrol_result d, u_patrol_data_result c

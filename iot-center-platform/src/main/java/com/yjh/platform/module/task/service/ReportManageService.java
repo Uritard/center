@@ -317,11 +317,7 @@ public class ReportManageService {
         String stationType = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:stationType", "content"));
         taskVO.setVoltageClasses(voltageClasses);
         taskVO.setStationType(stationType);
-        String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "1").get("valueUnit"));
-        String airPressure = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "6").get("valueUnit"));
-        String windSpeed = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "3").get("valueUnit"));
-        String envInfo = "气温" + temperature + ",气压" + airPressure + ",风速" + windSpeed;
-        taskVO.setEnvInfo(envInfo);
+
         String CruiseStatistics = "总点位" + taskVO.getTotal() + "个,已检点位" + taskVO.getAlready() + "个,未检点位" + taskVO.getWait()
                 + "个,正常点位" + taskVO.getNormal() + "个,异常点位" + taskVO.getAbnormal() +  "个";
         if (Objects.nonNull(taskVO.getUnReview())){

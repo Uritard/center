@@ -36,8 +36,6 @@ public class UPatrolResultController {
     private LogsRecord logsRecord;
 
     @Autowired
-    private ReportManageService reportManageService;
-    @Autowired
     private TStdDeviceService tStdDeviceService;
     @Autowired
     private TStdRegionService tStdRegionService;
@@ -91,9 +89,6 @@ public class UPatrolResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
-//        } catch (BusinessException e) {
-//            result.setMessage(10008, "用户无权限");
-            //log.error("日志统计失败：" + e);
         }catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -133,7 +128,6 @@ public class UPatrolResultController {
 
     @ApiOperation(value = "分页查询--巡视结果任务详情查询")
     @GetMapping(value = "/selectCruiseByPage")
-   // @Logs(title = "巡视结果任务详情查询",content = "根据用户传递的参数查询巡视结果任务详情",logType = 1)
     public Result selectCruiseByPage(@RequestParam(value = "taskId", required = false) String taskId,
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
@@ -176,9 +170,6 @@ public class UPatrolResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
-//        }catch (BusinessException e) {
-//            result.setMessage(10008, "用户无权限");
-            //log.error("日志统计失败：" + e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);
@@ -188,7 +179,6 @@ public class UPatrolResultController {
 
     @ApiOperation(value = "分页查询--识别异常点位")
     @GetMapping(value = "/selectAbnormalResult")
-//    @Logs(title = "识别异常点位查询",content = "根据用户传递的参数查询识别异常点位",logType = 1, authority = "1235")
     public Result selectAbnormalResult(@RequestParam(value = "taskResultId", required = false) String taskResultId,
                                      @RequestParam(value = "cruiseType", required = false) Integer cruiseType,
                                      @RequestParam(value = "cruiseResult", required = false) Integer cruiseResult,
@@ -209,7 +199,6 @@ public class UPatrolResultController {
             }else{
                 logsRecord.LogsSend(request,"1","识别异常点位查询","根据用户传递的参数查询识别异常点位");
             }
-//            logsRecord.LogsSend(request,"1","识别异常点位查询","根据用户传递的参数查询识别异常点位");
 
             if (Objects.isNull(startTime) || "".equals(startTime)){
                 startTime = null;
@@ -234,9 +223,6 @@ public class UPatrolResultController {
             resultMap.put("count", page.getTotal());
             resultMap.put("list", cruiseResultDetailList);
             result.setData(resultMap);
-//        }catch (BusinessException e) {
-//            result.setMessage(10008, "用户无权限");
-            //log.error("日志统计失败：" + e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败描述：", e);

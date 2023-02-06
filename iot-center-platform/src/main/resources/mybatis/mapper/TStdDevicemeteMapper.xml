@@ -92,6 +92,7 @@
             state_zero,
             state_one,
             alarm_state,
+            is_temdif,
             redundant_type
         )values(
                 #{deviceMeteId, jdbcType=BIGINT},
@@ -134,6 +135,7 @@
                 #{stateZero, jdbcType=VARCHAR},
                 #{stateOne, jdbcType=VARCHAR},
                 #{alarmState, jdbcType=INTEGER},
+                #{isTemdif, jdbcType=INTEGER},
                 #{redundantType, jdbcType=VARCHAR}
         )
     </insert>
@@ -179,6 +181,7 @@
         remark,
         state_zero,
         state_one,
+        is_temdif,
         alarm_state
         )values
         <foreach collection="list" item="TStdMeteModelDetail" separator=",">
@@ -222,6 +225,7 @@
             #{TStdMeteModelDetail.remark, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.stateZero, jdbcType=VARCHAR},
             #{TStdMeteModelDetail.stateOne, jdbcType=VARCHAR},
+            #{TStdMeteModelDetail.isTemdif, jdbcType=INTEGER},
             #{TStdMeteModelDetail.alarmState, jdbcType=INTEGER}
             )
         </foreach>
@@ -279,6 +283,7 @@
         a.state_one = #{stateOne},
         a.alarm_state = #{alarmState, jdbcType=INTEGER},
         a.redundant_type = #{redundantType},
+        <if test="isTemdif != null ">a.is_temdif = #{isTemdif},</if>
     </set>
             where a.device_mete_id = #{deviceMeteId, jdbcType=BIGINT}
     </update>
@@ -320,6 +325,7 @@
         state_zero,
         state_one,
         alarm_state,
+        a.is_temdif,
         a.redundant_type
         from t_std_devicemete a
         where 1 = 1
@@ -377,6 +383,7 @@
         e.up_region_id,
         h.dict_note as unitName,
         a.analyse_type,
+        a.is_temdif,
         l.dict_note as analyseTypeName
         from t_std_devicemete a
         left join  t_dict_business g on a.alarm_level= g.dict_code
@@ -417,6 +424,7 @@
         <if test="thresholdPer != null and thresholdPer != ''"> and a.threshold_per = #{thresholdPer, jdbcType=NUMERIC}</if>
         <if test="meteType != null and meteType != ''"> and a.mete_type = #{meteType, jdbcType=VARCHAR}</if>
         <if test="modulus != null "> and a.modulus = #{modulus, jdbcType=INTEGER}</if>
+        <if test="isTemdif != null "> and a.is_temdif = #{isTemdif, jdbcType=INTEGER}</if>
         <if test="remark != null and remark != ''"> and a.remark = #{remark, jdbcType=VARCHAR}</if>
         <if test="stateZero != null and stateZero != ''">a.state_zero = #{stateZero, jdbcType=VARCHAR}</if>
         <if test="stateOne != null and stateOne != ''">a.state_one = #{stateOne, jdbcType=VARCHAR}</if>
@@ -484,6 +492,7 @@
         e.up_region_id,
         a.analyse_type,
         l.dict_note as analyseTypeName,
+        a.is_temdif,
         a.redundant_type
         from t_std_devicemete a
         left join  t_dict_business g on a.alarm_level= g.dict_code
@@ -548,6 +557,7 @@
             remark,
             state_zero,
             state_one,
+            is_temdif,
             alarm_state
         )values
         <foreach collection="list" item="TStdDevicemete" separator=",">
@@ -587,6 +597,7 @@
                 #{TStdDevicemete.remark, jdbcType=VARCHAR},
                 #{TStdDevicemete.stateZero, jdbcType=VARCHAR},
                 #{TStdDevicemete.stateOne, jdbcType=VARCHAR},
+                #{TStdDevicemete.isTemdif, jdbcType=INTEGER},
                 #{TStdDevicemete.alarmState, jdbcType=INTEGER}
             )
         </foreach>

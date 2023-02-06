@@ -1811,6 +1811,9 @@ public class UPatrolTaskService {
             if ( all == 0) {
                 uPatrolResult.setTaskCount(allCounts);
             }
+            // 获取当前站内的环境数据并添加
+            getStationWeather(uPatrolResult);
+
             uPatrolResultDao.update(uPatrolResult);
             log.info("taskId is:{} , uPatrolDataResultList size is:{}, ended； {}", taskId, uPatrolDataResultList.size(), ended);
 
@@ -1846,6 +1849,24 @@ public class UPatrolTaskService {
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }
+    }
+
+    private void getStationWeather(UPatrolResult uPatrolResult){
+        String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "1").getOrDefault("valueUnit", ""));
+        String humidity = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "2").getOrDefault("valueUnit", ""));
+        String windSpeed = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "3").getOrDefault("valueUnit", ""));
+        String precipitation = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "4").getOrDefault("valueUnit", ""));
+        String windDirection = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "5").getOrDefault("valueUnit", ""));
+        String airPressure = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:" + "6").getOrDefault("valueUnit", ""));
+        temperature = StringUtils.isEmpty(temperature) ? "暂无" : temperature;
+        humidity = StringUtils.isEmpty(humidity) ? "暂无" : humidity;
+        windSpeed = StringUtils.isEmpty(windSpeed) ? "暂无" : windSpeed;
+        precipitation = StringUtils.isEmpty(precipitation) ? "暂无" : precipitation;
+        windDirection = StringUtils.isEmpty(windDirection) ? "暂无" : windDirection;
+        airPressure = StringUtils.isEmpty(airPressure) ? "暂无" : airPressure;
+        String weather = "气温:" + temperature + ",湿度:" + humidity + ",风速:" + windSpeed + ",雨量:" + precipitation + ",风向:" + windDirection + ",气压:" + airPressure;
+        log.info("====Now the environmental data is {}", weather);
+        uPatrolResult.setWeather(weather);
     }
 
     @Transactional(rollbackFor = Exception.class)

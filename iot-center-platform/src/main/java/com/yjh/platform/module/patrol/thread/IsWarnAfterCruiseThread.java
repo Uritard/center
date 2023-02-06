@@ -8,8 +8,10 @@ import com.yjh.platform.common.mqtt.FtpsService;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
@@ -22,10 +24,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_ABNORMAL_ABNORMALALARM;
 import static com.yjh.platform.module.patrol.CruiseConstant.CRUISE_RESULT_ABNORMAL;
@@ -84,12 +83,33 @@ public class IsWarnAfterCruiseThread implements Runnable {
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
             log.info("taskId is {} uPatrolTask is: {}", taskId, uPatrolTask);
 
+            // 该巡视点无了,找不到对应
             if (Objects.isNull(tStdDevicemete)){
                 return;
             }
-            // 该巡视点还在,能找到对应
+
+            Map<String, String> initInfo = new HashMap<>(16);
+            initInfo.put("valueTemp", threadMap.get("value"));
+
+            // 下级是否为机器人节点
+            boolean isDevice = StaticContextAccessor.getBean(AnalyseDataOperateDao.class).selectRobotCodeIsExist(robotCode) == 1 ? true : false;
+            boolean isTemDif = isDevice && 1 == tStdDevicemete.getIsTemdif() && Objects.equals(222, tStdDevicemete.getMeteType());
+            initInfo.put("isTemDif", String.valueOf(isTemDif));
+            if (isTemDif) {
+                // 配置了红外温差任务用差值去判断告警
+                String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
+                if (CommonUtils.isEmptyOrNullstr(temperature)) {
+                    double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(threadMap.get("value")));
+                    initInfo.put("valueTemp", String.valueOf(abs));
+                    initInfo.put("temperature", temperature);
+                    initInfo.put("warnName", tStdDevicemete.getMeteName() + "温差任务");
+                    initInfo.put("warnContent", "传感器环境温度与测温产生温差:" + temperature + "--" + threadMap.get("value"));
+                    initInfo.put("outRange", String.valueOf(abs));
+                }
+            }
+
             Map<String, Object> params = new HashMap<>(16);
-            params.put("value", threadMap.get("value"));
+            params.put("value", initInfo.get("valueTemp"));
             params.put("stdDeviceMeteName", tStdDevicemete.getMeteName());
             params.put("meteKind", tStdDevicemete.getMeteKind());
             params.put("alarmState", tStdDevicemete.getAlarmState());
@@ -113,7 +133,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
             if (Boolean.FALSE.equals(isWarN)) {
                 return;
             }
-            alarmStoreAndHandler(map, taskId, tStdDevicemete, instanceId);
+            alarmStoreAndHandler(map, taskId, tStdDevicemete, instanceId, initInfo);
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -126,9 +147,12 @@ public class IsWarnAfterCruiseThread implements Runnable {
      * @param taskId         任务id
      * @param tStdDevicemete 测点信息
      * @param instanceId     巡视点id
+     * @param initInfo       温差任务告警信息
      */
-    private void alarmStoreAndHandler(Map<String, Object> map, String taskId, TStdDeviceMete tStdDevicemete, Long instanceId) {
+    private void alarmStoreAndHandler(Map<String, Object> map, String taskId, TStdDeviceMete tStdDevicemete, Long instanceId, Map<String, String> initInfo) {
         log.info("An alarm is generated！！！");
+        log.info("initInfo=={}", initInfo);
+        boolean isTemDif = Boolean.valueOf(initInfo.get("isTemDif"));
         TWarnInfo warnInfo = new TWarnInfo();
         try {
             warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
@@ -143,10 +167,10 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setValue(threadMap.get("value"));
             warnInfo.setTaskId(taskId);
             warnInfo.setDeviceCode(String.valueOf(uPatrolTaskService.selectRobotInfoByCode(threadMap.get("robotCode")).getRobotId()));
-            warnInfo.setWarnName(String.valueOf(map.get("warnName")));
+            warnInfo.setWarnName(isTemDif ? initInfo.get("warnName") : String.valueOf(map.get("warnName")));
             warnInfo.setWarnLevel(Integer.valueOf(String.valueOf(map.get("warnLevel"))));
-            warnInfo.setWarnContent(String.valueOf(map.get("warnContent")));
-            warnInfo.setOutRange(Objects.nonNull(map.get("outRange"))? String.valueOf(map.get("outRange")) : null);
+            warnInfo.setWarnContent(isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")));
+            warnInfo.setOutRange(isTemDif ? initInfo.get("outRange") : Objects.nonNull(map.get("outRange")) ? String.valueOf(map.get("outRange")) : null);
             log.info("warnInfo==={}", JSON.toJSONString(warnInfo));
             StaticContextAccessor.getBean(TWarnInfoService.class).insert(warnInfo);
 
