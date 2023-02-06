@@ -8,7 +8,6 @@ import com.yjh.platform.common.utils.smUtil.ModelDecodeUtil;
 import com.yjh.platform.module.user.dao.SysUserDao;
 import com.yjh.platform.module.user.dao.SysUserDevicePermissionDao;
 import com.yjh.platform.module.user.dao.TRobotInfoDao;
-import com.yjh.platform.module.user.entity.SysUser;
 import com.yjh.platform.module.user.entity.SysUserDevicePermissionDO;
 import com.yjh.platform.module.user.entity.TRobotInfo;
 import com.yjh.platform.module.user.entity.TRobotInspectionTree;
@@ -196,9 +195,7 @@ public class TRobotInfoService{
         }else {
             tRobotInfoList = tRobotInfoDao.selectRobotByPage(robotPosition,robotName,buildingUser,robotFactory,robotType,robotSource,isUse,address,regionIdList);
         }
-        for (TRobotInfo tRobotInfo : tRobotInfoList){
-            redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
-        }
+
         return tRobotInfoList;
     }
 
@@ -548,6 +545,20 @@ public class TRobotInfoService{
 
     public List<String> selectAllRobotNum(){
         return tRobotInfoDao.selectAllRobotNum();
+    }
+
+    /**
+     * RobotCode初始化
+     */
+    public void initAllRobotCode() {
+        List<TRobotInfo> tRobotInfoList = tRobotInfoDao.selectAllRobotCode();
+        if (CollectionUtils.isEmpty(tRobotInfoList)) {
+            return;
+        }
+
+        for (TRobotInfo tRobotInfo : tRobotInfoList){
+            redisTemplate.opsForHash().put("AllRobotCode",tRobotInfo.getRobotId().toString(),tRobotInfo.getRobotCode());
+        }
     }
 
 }
