@@ -12,14 +12,12 @@ import com.yjh.platform.module.user.service.TRecordFileInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author hyh
@@ -78,5 +76,30 @@ public class TRecordFileInfoController {
         }
         return result;
     }
+
+
+    @ApiOperation(value = "查询历史录像文件列表")
+    @GetMapping(value = "/getFileList")
+    @Logs(title = "查询历史录像文件列表", content = "根据用户传递的参数查询历史录像文件列表", logType = 1, authority = "1235")
+    public Result getFileList(
+        @RequestParam(value = "cameraId") Long cameraId,
+        @RequestParam(value = "startTime") String startTime,
+        @RequestParam(value = "endTime") String endTime
+    ) {
+        Result result = new Result();
+        try {
+            if (cameraId == null || StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)) {
+                result.setData(Collections.EMPTY_LIST);
+                return result;
+            }
+            result = tRecordFileInfoService.getFileList(cameraId, startTime, endTime);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("失败描述：", e);
+        }
+        return result;
+    }
+
+
 
 }
