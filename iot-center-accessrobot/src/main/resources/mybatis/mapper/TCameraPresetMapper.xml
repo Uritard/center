@@ -9,8 +9,7 @@
             <result property="cameraId" column="camera_id" jdbcType="BIGINT"/>
             <result property="presetNum" column="preset_num" jdbcType="INTEGER"/>
             <result property="presetName" column="preset_name" jdbcType="VARCHAR"/>
-            <result property="isKeepWatch" column="is_keep_watch" jdbcType="INTEGER"/>
-            <result property="isKeepWatchTask" column="is_keep_watch_task" jdbcType="INTEGER"/>
+            <result property="presetType" column="preset_type" jdbcType="INTEGER"/>
             <result property="creatorUser" column="creator_user" jdbcType="VARCHAR"/>
             <result property="creatorTime" column="creator_time" jdbcType="TIMESTAMP"/>
             <result property="isUse" column="is_use" jdbcType="INTEGER"/>
@@ -26,7 +25,7 @@
 
     <sql id="Base_Column_List">
         preset_id,camera_id,preset_num,
-        preset_name,is_keep_watch,is_keep_watch_task,
+        preset_name,preset_type,
         creator_user,creator_time,is_use,
         preset_img,inspection_postion,collect_status,
         calibration_status,remark,origin_id,
@@ -141,11 +140,8 @@
                 <if test="presetName != null">
                     preset_name = #{presetName,jdbcType=VARCHAR},
                 </if>
-                <if test="isKeepWatch != null">
-                    is_keep_watch = #{isKeepWatch,jdbcType=INTEGER},
-                </if>
-                <if test="isKeepWatchTask != null">
-                    is_keep_watch_task = #{isKeepWatchTask,jdbcType=INTEGER},
+                <if test="presetType != null">
+                    preset_type = #{presetType,jdbcType=INTEGER},
                 </if>
                 <if test="creatorUser != null">
                     creator_user = #{creatorUser,jdbcType=VARCHAR},
@@ -189,8 +185,7 @@
             camera_id =  #{cameraId,jdbcType=BIGINT},
             preset_num =  #{presetNum,jdbcType=INTEGER},
             preset_name =  #{presetName,jdbcType=VARCHAR},
-            is_keep_watch =  #{isKeepWatch,jdbcType=INTEGER},
-            is_keep_watch_task =  #{isKeepWatchTask,jdbcType=INTEGER},
+            preset_type =  #{presetType,jdbcType=INTEGER},
             creator_user =  #{creatorUser,jdbcType=VARCHAR},
             creator_time =  #{creatorTime,jdbcType=TIMESTAMP},
             is_use =  #{isUse,jdbcType=INTEGER},
