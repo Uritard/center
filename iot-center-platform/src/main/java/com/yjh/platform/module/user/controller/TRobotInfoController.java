@@ -151,6 +151,10 @@ public class TRobotInfoController {
                     result.setCode(ResultCodeEnum.CODE10105.getCode(), ResultCodeEnum.CODE10105.getName());
                 }
             }
+            //设置为-1,用于清空前端传null值
+            if(tRobotInfo.getRecordId() == null) {
+                tRobotInfo.setRecordId(-1L);
+            }
 
             result.setData(tRobotInfoService.update(tRobotInfo,userId));
             //有变动 同步模型
