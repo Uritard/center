@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.yjh.accessrobot.common.Constant;
+import com.yjh.accessrobot.common.enumeration.ModelFileEnum;
 import com.yjh.accessrobot.common.smUtil.Demo;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
@@ -961,6 +962,11 @@ public class RobotService {
                     copyFileToDevelop(temporaryPath, developAbsoluteUrl);
                     RobotServerHandler.getRobotResultMap().put("developAbsoluteUrl", developAbsoluteUrl);
                     RobotServerHandler.getRobotResultMap().put("developRelativeUrl", developRelativeUrl);
+                }
+                if (ModelFileEnum.getMapByNameSet(map.keySet()) != null) {
+                    String code = ModelFileEnum.getMapByNameSet(map.keySet()).get("code");
+                    String name = ModelFileEnum.getMapByNameSet(map.keySet()).get("name");
+                    syncModelUpdate(code,map.get(name).toString(),xmlBaseModel.getSendCode());
                 }
             }
         } else {
