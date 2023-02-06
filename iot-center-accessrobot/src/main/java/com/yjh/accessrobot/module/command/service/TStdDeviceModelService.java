@@ -174,7 +174,7 @@ public class TStdDeviceModelService {
             insertStdDevice.addAll(oldStdDeviceList);
             dealStdDeviceAttr(insertStdDevice, oldStdDeviceAttrList, newStdDeviceAttrs, edgeCode);
             //标准测点
-            List<TStdDeviceMete> insertStdDeviceMete = dealStdDeviceMete(insertStdDevice, oldStdDeviceMeteList, newStdDeviceMetes, edgeCode);
+            List<TStdDeviceMete> insertStdDeviceMete = dealStdDeviceMete(insertStdDevice, oldStdDeviceMeteList, newStdDeviceMetes, edgeCode, edgeLevel);
             insertStdDeviceMete.addAll(oldStdDeviceMeteList);
             //标准测点算法关系信息
             if (CollectionUtils.isNotEmpty(newAlgorithmMetes)) {
@@ -571,7 +571,7 @@ public class TStdDeviceModelService {
      * @param edgeCode 节点编码
      * @return 直接入库的数据
      */
-    private List<TStdDeviceMete> dealStdDeviceMete(List<TStdDevice> insertStdDevice, List<TStdDeviceMete> oldList, List<TStdDeviceMete> newList, String edgeCode) {
+    private List<TStdDeviceMete> dealStdDeviceMete(List<TStdDevice> insertStdDevice, List<TStdDeviceMete> oldList, List<TStdDeviceMete> newList, String edgeCode, String edgeLevel) {
         Map<String, TStdDeviceMete> oldMap = oldList.stream().collect(Collectors.toMap(TStdDeviceMete::getOriginId, Function.identity()));
         Map<String, TStdDeviceMete> newMap = newList.stream().collect(Collectors.toMap(TStdDeviceMete::getOriginId, Function.identity()));
         SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
@@ -581,6 +581,31 @@ public class TStdDeviceModelService {
                 TStdDeviceMete old = oldMap.get(t.getOriginId());
                 t.setDeviceMeteId(old.getDeviceMeteId());
                 t.setDeviceId(old.getDeviceId());
+                //告警由巡视主机去配置,同步之后不能覆盖
+                if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)){
+                    t.setMeteKind(old.getMeteKind());
+                    t.setUnit(old.getUnit());
+                    t.setAlarmNote(old.getAlarmNote());
+                    t.setAlarmType(old.getAlarmType());
+                    t.setUpEffect(old.getUpEffect());
+                    t.setDownEffect(old.getDownEffect());
+                    t.setStateZero(old.getStateZero());
+                    t.setStateOne(old.getStateOne());
+                    t.setAlarmState(old.getAlarmState());
+                    t.setAlarmLevel(old.getAlarmLevel());
+                    t.setHighLimit1(old.getHighLimit1());
+                    t.setHighLimit2(old.getHighLimit2());
+                    t.setHighLimit3(old.getHighLimit3());
+                    t.setHighLimit4(old.getHighLimit4());
+                    t.setLowLimit1(old.getLowLimit1());
+                    t.setLowLimit2(old.getLowLimit2());
+                    t.setLowLimit3(old.getLowLimit3());
+                    t.setLowLimit4(old.getLowLimit4());
+                    t.setAlarmDelay(old.getAlarmDelay());
+                    t.setAlarmCnt(old.getAlarmCnt());
+                    t.setThresholdAbs(old.getThresholdAbs());
+                    t.setThresholdPer(old.getThresholdPer());
+                }
                 tStdDevicemeteMapper.updateByPrimaryKey(t);
             });
         }
