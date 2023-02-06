@@ -105,11 +105,20 @@ public class Constant {
             log.error("模型文件上传失败", e);
         }
     }
+    public static Result videoServer(String type,String url,Object... objects){
+        try {
+            return StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class,objects);//江苏要求
+        }catch (Exception e){
+            log.error("录像文件查询失败", e);
+        }
+        return null;
+    }
 
     public static Map<String,String> userInfo= new HashMap<>();
     public static final String START_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/startRealPlay?cameraId={cameraId}";
     public static final String STOP_CAMERA_URL= "http://iot-center-accessvideo/camera/v1/stopRealPlay?cameraId={cameraId}&rtmpUrl={rtmpUrl}";
     public static final String START_ROBOT_CAMERA_URL = "http://iot-center-accessvideo/camera/v1/robotStartRealPlay?robotId={robotId}";
+    public static final String PLAY_BACK_FILE_LIST_URL = "http://iot-center-accessvideo/camera/v1/getFileList?cameraId={cameraId}&startTime={startTime}&endTime={endTime}";
 
     public static final String Maintenance_Issued = "http://iot-center-accessrobot/robot/v1/deviceMaintenanceIssued";
     public static final String LINKAGE_FILE_TRANSFER = "http://iot-center-accessrobot/robot/v1/linkageFileTransfer";

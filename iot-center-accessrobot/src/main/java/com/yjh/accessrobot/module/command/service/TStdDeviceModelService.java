@@ -411,7 +411,7 @@ public class TStdDeviceModelService {
                 device.get("bay_id").equals(String.valueOf(t.getOriginRegionId()))).map(TStdRegion::getRegionId)
                 .collect(Collectors.toList()).get(0));
         tStdDevice.setUpRegionName(String.valueOf(device.get("bay_name")));
-        tStdDevice.setDeviceType(CollectionUtils.isNotEmpty(dictMapList) ?
+           tStdDevice.setDeviceType(CollectionUtils.isNotEmpty(dictMapList) ?
                 Integer.parseInt(dictMapList.stream().filter(s -> "device_type".equals(s.get("col_name"))
                         && device.get("device_type").equals(String.valueOf(s.get("up_dict")))).map(d -> d.get("dict_code"))
                         .collect(Collectors.toList()).get(0)) : null);

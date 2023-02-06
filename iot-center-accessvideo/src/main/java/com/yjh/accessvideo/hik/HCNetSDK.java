@@ -1128,6 +1128,10 @@ public interface HCNetSDK extends Library {
         public String toStringTime() {
             return String.format("%02d/%02d/%02d%02d:%02d:%02d", dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond);
         }
+        //用于列表中显示
+        public String toFormatTime() {
+            return String.format("%02d-%02d-%02d %02d:%02d:%02d", dwYear, dwMonth, dwDay, dwHour, dwMinute, dwSecond);
+        }
 
         //存储文件名使用
         public String toStringTitle() {

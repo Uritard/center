@@ -1,21 +1,14 @@
 package com.yjh.accessvideo.module.control.controller;
 
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.yjh.accessvideo.common.Constant;
-import com.yjh.accessvideo.common.logs.Logs;
 import com.yjh.accessvideo.common.utils.FtpsUtil;
 import com.yjh.accessvideo.commons.result.BusinessException;
 import com.yjh.accessvideo.commons.result.Result;
 import com.yjh.accessvideo.commons.result.ResultCodeEnum;
-import com.yjh.accessvideo.commons.utils.http.HttpClientUtils;
 import com.yjh.accessvideo.configuration.PlatFromFtpsConfig;
 import com.yjh.accessvideo.hik.HCNetSDK;
 import com.yjh.accessvideo.module.control.entity.TemperatureInfo;
 import com.yjh.accessvideo.module.control.service.CameraConService;
-import com.yjh.accessvideo.module.control.service.StreamInfoThread;
-import com.yjh.accessvideo.module.control.service.StreamStopThread;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -24,15 +17,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -582,50 +570,35 @@ public class CameraConController {
         }
         return result;
     }
+
     @ApiOperation(value = "获取到视频文件列表")
     @RequestMapping(value = "/getFileList", method = RequestMethod.GET)
-    public Result getFileList(@RequestParam(value = "cameraId") Long cameraId,
-                              @RequestParam(value = "startTime") String startTime,
-                              @RequestParam(value = "endTime") String endTime){
+    public Result getFileList(@RequestParam(value = "cameraId") Long cameraId, @RequestParam(value = "startTime") String startTime,
+        @RequestParam(value = "endTime") String endTime) {
         Result result = new Result();
         try {
-                List<HCNetSDK.NET_DVR_FIND_DATA> list= cameraConService.geifile(cameraId,startTime,endTime);
-                Map<String,String> map =new HashMap<String,String>();
-                String[] s = new String[2];
-                int iTemp;
-                String MyString;
-                if (list.size()>0)
-                {
-                    for (HCNetSDK.NET_DVR_FIND_DATA po :list)
-                    {
-                        s = new String(po.sFileName).split("\0", 2);
-                        map.put("FileName",new String(s[0]));
-                        map.put("startTime",po.struStartTime.toStringTime());
-                        map.put("endTime",po.struStopTime.toStringTime());
-                        if (po.dwFileSize < 1024 * 1024)
-                        {
-                            iTemp = (po.dwFileSize) / (1024);
-                            MyString = iTemp + "K ";
-                        }
-                        else
-                        {
-                            iTemp = (po.dwFileSize) / (1024 * 1024);
-                            MyString = iTemp + "M";
-                            iTemp = ((po.dwFileSize) % (1024 * 1024)) / (1204);
-                            MyString = MyString + iTemp + "K";
-                        }
-                        map.put("fileSize",MyString);
-                    }
-                    result.setData(map);
-                   // result.setData(list);
-                }else {result.setData("文件不存在");}
-        }catch (Exception e)
-        {
+            List<Map<String, String>> list = cameraConService.getFile(cameraId, startTime, endTime);
+            result.setData(list);
+        } catch (Exception e) {
             result.setData(ResultCodeEnum.SYSTEMERROR);
             log.info(e.getMessage());
         }
         return result;
 
+    }
+
+    @RequestMapping(value = "/playBackByTime",method = RequestMethod.GET)
+    public Result playBackByTime(@RequestParam("cameraId")Long cameraId, @RequestParam(value = "startTime") String startTime,
+        @RequestParam(value = "endTime") String endTime) {
+        Result result = new Result();
+        try {
+            Map<String, String> resultMap = cameraConService.playBackByTime(cameraId,startTime,endTime);
+            result.setData(resultMap);
+        } catch (Exception e) {
+            result.setData(ResultCodeEnum.SYSTEMERROR);
+            log.info(e.getMessage());
+        }
+        return result;
     }
 //    @ApiOperation(value = "获取全屏最大温度值")
 //    @RequestMapping(value = "/getTemperature", method = RequestMethod.GET)
