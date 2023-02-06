@@ -183,7 +183,10 @@
         <if test="repairRecord != null ">a.repair_record = #{repairRecord},</if>
         <if test="exitPutIntoRecord != null ">a.exit_putInto_record = #{exitPutIntoRecord},</if>
         <if test="remarks != null ">a.remarks = #{remarks},</if>
-        <if test="recordId != null ">a.record_id = #{recordId},</if>
+        <choose>
+            <when test="recordId != null and -1 == recordId">a.record_id = null,</when>
+            <when test="recordId != null and -1 != recordId">a.record_id = #{recordId,jdbcType=BIGINT},</when>
+        </choose>
         <if test="channelNumLight != null ">a.channel_num_light = #{channelNumLight},</if>
         <if test="channelNumInferad != null ">a.channel_num_inferad = #{channelNumInferad},</if>
     </set>
