@@ -143,6 +143,9 @@ public interface UPatrolTaskDao {
     List<Map<String,Object>> selectForSequenceInfoByMeteId(@Param(value = "cfgDeviceId") String cfgDeviceId);
 
     List<String> selectRobotIsRunning(@Param(value = "taskId") String taskId);
+
+    List<String> selectEdgeIsRunning(@Param(value = "taskId") String taskId);
+
     List<String> selectRobotTaskInstanceList(@Param(value = "taskId") String taskId);
 
     String selectRobotTaskOnStart(@Param(value = "robotId") Long robotId);
