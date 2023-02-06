@@ -379,7 +379,7 @@ public class InspectionResultThread implements Runnable{
                 log.info("presetId====== {}",preset);
                 abstractVideoCruise.algorithmAnalysis(tCruiseTaskResultMap, preset, taskId, jsonForRe, algorithm);
             } else {
-                updatePointStatusNum(taskId, tCruiseTaskResultMap, details);
+                updatePointStatusNum(taskId, tCruiseTaskResultMap, details, value);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -393,14 +393,14 @@ public class InspectionResultThread implements Runnable{
      * @param tCruiseTaskResultMap 巡视结果map
      * @param details              测点信息
      */
-    private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details) {
+    private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details, String value) {
         try {
             tCruiseTaskResultMap.put("cruiseAbnormal", "null");
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
             tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
             tCruiseTaskResultMap.put("resultDesc", "--");
             // tCruiseTaskResultMap.put("cruiseTime", tCruiseTaskResultMap.get("time"));
-            tCruiseTaskResultMap.put("resultNum", Objects.nonNull(details.getAnalyseType()) ? "已录音" : "已拍照");
+            tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ? value : Objects.isNull(details.getAnalyseType()) || 13 == details.getAnalyseType() ? "已录音" : "已拍照");
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
