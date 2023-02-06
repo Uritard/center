@@ -1292,19 +1292,29 @@ public class UPatrolTaskService {
             //机器人任务暂停
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
             log.info("机器人任务暂停,robotCodeList:{}", robotCodeList);
-            if (robotCodeList != null && robotCodeList.size() > 0) {
-                Map<String, Object> robotTaskStatesMap = new HashMap<>();
-                robotTaskStatesMap.put("taskId", taskId);
-                robotTaskStatesMap.put("commandValue", 2);
+            Map<String, Object> robotTaskStatesMap = new HashMap<>(6);
+            robotTaskStatesMap.put("taskId", taskId);
+            robotTaskStatesMap.put("commandValue", 2);
+
+            if (CollectionUtils.isNotEmpty(robotCodeList)) {
                 robotTaskStatesMap.put("robotCodeList", robotCodeList);
                 robotTaskStates(robotTaskStatesMap);
             }
+
+            // 给下级系统任务暂停
+            List<String> edgeCodeList = uPatrolTaskDao.selectEdgeIsRunning(taskId);
+            log.info("下级系统任务暂停,edgeCodeList:{}", edgeCodeList);
+            if (CollectionUtils.isNotEmpty(edgeCodeList)) {
+                robotTaskStatesMap.put("robotCodeList", edgeCodeList);
+                robotTaskStates(robotTaskStatesMap);
+            }
+
             updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_PAUSE));
             Map<String, String> jasonMapOnFinished = new HashMap<>();
             jasonMapOnFinished.put("type", "taskChange");
             jasonMapOnFinished.put("taskId", taskId);
             String jsonMessage = JSON.toJSONString(jasonMapOnFinished);
-            log.info("发送给前端的消息：" + jsonMessage);
+            log.info("发送给前端的消息：{}", jsonMessage);
             Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapOnFinished);
         } catch (Exception e) {
             log.error("任务暂停异常: ", e);
@@ -1330,45 +1340,53 @@ public class UPatrolTaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public int taskGoOn(String taskId) throws Exception {
+    public int taskGoOn(String taskId) {
         UPatrolResult uPatrolResult = uPatrolTaskDao.selectForTaskId(taskId);
 
-        //机器人任务继续
-        List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
-        log.info("机器人任务继续,robotCodeList:{}", robotCodeList);
-        if (robotCodeList != null && robotCodeList.size() > 0) {
+        try {
+            //机器人任务继续
+            List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
+            log.info("机器人任务继续,robotCodeList:{}", robotCodeList);
             Map<String, Object> robotTaskStatesMap = new HashMap<>();
             robotTaskStatesMap.put("taskId", taskId);
             robotTaskStatesMap.put("commandValue", 3);
-            robotTaskStatesMap.put("robotCodeList", robotCodeList);
-            robotTaskStates(robotTaskStatesMap);
+
+            if (CollectionUtils.isNotEmpty(robotCodeList)) {
+                robotTaskStatesMap.put("robotCodeList", robotCodeList);
+                robotTaskStates(robotTaskStatesMap);
+            }
+
+            // 给下级系统任务暂停
+            List<String> edgeCodeList = uPatrolTaskDao.selectEdgeIsRunning(taskId);
+            log.info("下级系统任务继续,edgeCodeList:{}", edgeCodeList);
+            if (CollectionUtils.isNotEmpty(edgeCodeList)) {
+                robotTaskStatesMap.put("robotCodeList", edgeCodeList);
+                robotTaskStates(robotTaskStatesMap);
+            }
+            if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED || uPatrolResult.getTaskState() == TASK_STATE_EXECUTING) {
+                return 1;
+            }
+
+            updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_EXECUTING));
+
+            uPatrolResult.setTaskState(TASK_STATE_EXECUTING);
+            uPatrolResultDao.update(uPatrolResult);
+
+            localTaskStart(taskId);
+
+            UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
+
+            Map<String, String> jasonMapOnFinished = new HashMap<>();
+            jasonMapOnFinished.put("type", "taskChange");
+            jasonMapOnFinished.put("taskId", taskId);
+            String jsonMessage = JSON.toJSONString(jasonMapOnFinished);
+            log.info("发送给前端的消息：{}" + jsonMessage);
+            Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapOnFinished);
+            //任务状态上报站端
+            sendTaskStateToUp(task, 2);
+        } catch (Exception e) {
+            log.error("任务继续异常: ", e);
         }
-        if (uPatrolResult.getTaskState() == TASK_STATE_FINISHED || uPatrolResult.getTaskState() == TASK_STATE_EXECUTING) {
-            return 1;
-        }
-//        if(Constant.taskStateMap.get(taskId) != null && Constant.taskStateMap.get(taskId) == 1){
-//            uPatrolResult.setTaskState(239);
-//            return uPatrolResultDao.update(uPatrolResult);
-//        }
-
-        updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_EXECUTING));
-
-        uPatrolResult.setTaskState(TASK_STATE_EXECUTING);
-        uPatrolResultDao.update(uPatrolResult);
-
-        localTaskStart(taskId);
-
-        UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
-
-        Map<String, String> jasonMapOnFinished = new HashMap<>();
-        jasonMapOnFinished.put("type", "taskChange");
-        jasonMapOnFinished.put("taskId", taskId);
-        String jsonMessage = JSON.toJSONString(jasonMapOnFinished);
-        log.info("发送给前端的消息：" + jsonMessage);
-        Constant.websocketSendMsg(Constant.WEBSOCKET_URL, jasonMapOnFinished);
-
-        //任务状态上报站端
-        sendTaskStateToUp(task, 2);
         return 1;
     }
 
@@ -1384,12 +1402,25 @@ public class UPatrolTaskService {
         uPatrolResult.setTaskState(TASK_STATE_INTERRUPT);
         UPatrolTask task = uPatrolTaskDao.selectByPrimaryId(taskId);
 
+        // 机器人任务终止
         List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
+        log.info("机器人任务终止,robotCodeList:{}", robotCodeList);
         Map<String, Object> robotTaskStatesMap = new HashMap<>();
         robotTaskStatesMap.put("taskId", taskId);
         robotTaskStatesMap.put("commandValue", 4);
-        robotTaskStatesMap.put("robotCodeList", robotCodeList);
-        robotTaskStates(robotTaskStatesMap);
+
+        if (CollectionUtils.isNotEmpty(robotCodeList)) {
+            robotTaskStatesMap.put("robotCodeList", robotCodeList);
+            robotTaskStates(robotTaskStatesMap);
+        }
+
+        // 给下级系统任务终止
+        List<String> edgeCodeList = uPatrolTaskDao.selectEdgeIsRunning(taskId);
+        log.info("边缘节点任务终止,edgeCodeList:{}",edgeCodeList);
+        if (CollectionUtils.isNotEmpty(edgeCodeList)) {
+            robotTaskStatesMap.put("robotCodeList", edgeCodeList);
+            robotTaskStates(robotTaskStatesMap);
+        }
 
         updateTaskStateForRedis(taskId, String.valueOf(TASK_STATE_INTERRUPT));
         try {

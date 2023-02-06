@@ -912,6 +912,17 @@
         <if test="taskId != null and taskId != ''"> and b.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
 
+    <select id="selectEdgeIsRunning" resultType="java.lang.String">
+        SELECT DISTINCT
+        c.edge_code
+        FROM
+        u_patrol_task a , u_patrol_task_attr b , t_cruise_point_instance c
+        where 1=1
+        and a.task_id = b.task_id and b.instance_id = c.instance_id
+        <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
+        and c.edge_code !='' and c.origin_id !=''
+    </select>
+
 
     <select id="selectRobotOrDroneInsByTaskId" resultType="java.lang.Long">
         SELECT
