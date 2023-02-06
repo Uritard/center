@@ -3040,6 +3040,13 @@ public class RobotService {
                 //list.add(str);
             }
             Constant.otherServerList(list, Constant.SOURCE_FILE_URL);
+
+            //将文件复制到存放设备资源配置的地方
+            String sourcePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
+            String fileName = "source_file_model.cime";
+            File dir = new File(sourcePath);
+
+            FileUtil.copyFileUsingStream(filePath,sourcePath+"/"+fileName);
         } catch (Exception e) {
             log.error("设备资源信息配置文件处理失败", e);
         }
