@@ -741,6 +741,7 @@
         from u_patrol_result a
         where 1=1
         and task_type = dict_code
+        and a.task_state != 239 and a.task_state != 241 and a.task_state != 238
         and a.execute_time BETWEEN #{start} and #{end}
         ) AS "count"
         from t_dict_business
