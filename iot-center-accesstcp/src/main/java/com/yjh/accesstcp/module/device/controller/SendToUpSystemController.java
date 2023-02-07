@@ -2,6 +2,8 @@ package com.yjh.accesstcp.module.device.controller;
 
 import com.google.common.collect.Maps;
 import com.yjh.accesstcp.common.Constant;
+import com.yjh.accesstcp.common.utils.ZipUtil;
+import com.yjh.accesstcp.commons.result.BusinessException;
 import com.yjh.accesstcp.commons.result.Result;
 import com.yjh.accesstcp.commons.result.ResultCodeEnum;
 import com.yjh.accesstcp.module.device.entity.SysLogs;
@@ -133,15 +135,24 @@ public class SendToUpSystemController {
             String abspath = mapForPath.get("content");
             mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelRelativePath");
             String realPath = mapForPath.get("content");
+
+            mapForPath = redisTemplate.opsForHash().entries("t_sys_param:fileAbsPath");
+            String fileAbsPath = mapForPath.get("content");
+            mapForPath = redisTemplate.opsForHash().entries("t_sys_param:fileRealPath");
+            String fileRealPath = mapForPath.get("content");
+
             String path  = sendToUpSystemService.downloadFile(String.valueOf(map.get("type")));
 //            String path  = sendToUpSystemService.downloadFile("1");
-            if ("9".equals(map.get("type"))){
-                result.setData(path);
+            if ("9".equals(map.get("type")) || "10".equals(map.get("type"))){
+                result.setData(path.replace(fileAbsPath,fileRealPath));
             }else {
                 File file = cn.hutool.core.util.ZipUtil.zip(path);
                 path = file.getPath();
                 result.setData(path.replace(abspath, realPath));
             }
+        } catch (BusinessException e){
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), e.getMessage());
+            log.error("失败查询描述：", e);
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
             log.error("失败查询描述：", e);
