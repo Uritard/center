@@ -42,6 +42,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -491,6 +492,8 @@ public class RobotService {
                 StatisticsUtil.onlineDuration(tRobotInfo);
                 int res = tRobotInfoDao.update(tRobotInfo);
                 log.info("robotCode为==={},robotId为==={}的巡视设备状态是==={},修改结果==={}", robotCode, robotId, tRobotInfo.getRobotStatus(), res);
+                TRobotInfo robotInfo = tRobotInfoDao.selectByPrimaryId(robotId);
+                RobotStatusObserver.postNetStatus(robotInfo.getRobotName(), robotInfo.getRobotNum(), robotStatus);
             }
         }
     }
