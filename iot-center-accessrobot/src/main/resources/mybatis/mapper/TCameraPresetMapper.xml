@@ -20,7 +20,6 @@
             <result property="remark" column="remark" jdbcType="VARCHAR"/>
             <result property="originId" column="origin_id" jdbcType="VARCHAR"/>
             <result property="edgeCode" column="edge_code" jdbcType="VARCHAR"/>
-            <result property="isSecondKeepWatchTask" column="is_second_keep_watch_task" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -29,7 +28,7 @@
         creator_user,creator_time,is_use,
         preset_img,inspection_postion,collect_status,
         calibration_status,remark,origin_id,
-        edge_code,is_second_keep_watch_task
+        edge_code
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -173,9 +172,6 @@
                 <if test="edgeCode != null">
                     edge_code = #{edgeCode,jdbcType=VARCHAR},
                 </if>
-                <if test="isSecondKeepWatchTask != null">
-                    is_second_keep_watch_task = #{isSecondKeepWatchTask,jdbcType=INTEGER},
-                </if>
         </set>
         where   preset_id = #{presetId,jdbcType=BIGINT} 
     </update>
@@ -195,9 +191,8 @@
             calibration_status =  #{calibrationStatus,jdbcType=INTEGER},
             remark =  #{remark,jdbcType=VARCHAR},
             origin_id =  #{originId,jdbcType=VARCHAR},
-            edge_code =  #{edgeCode,jdbcType=VARCHAR},
-            is_second_keep_watch_task =  #{isSecondKeepWatchTask,jdbcType=INTEGER}
-        where   preset_id = #{presetId,jdbcType=BIGINT} 
+            edge_code =  #{edgeCode,jdbcType=VARCHAR}
+        where   preset_id = #{presetId,jdbcType=BIGINT}
     </update>
     <select id="selectByEdgeCodeAndOriginId" resultMap="BaseResultMap">
         select
