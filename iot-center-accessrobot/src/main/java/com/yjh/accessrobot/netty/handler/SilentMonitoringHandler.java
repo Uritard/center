@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.enumeration.AlarmLevelEnum;
 import com.yjh.accessrobot.common.utils.FtpsUtil;
+import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
@@ -70,24 +71,43 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
         if (!Constant.robotRegisterFlag.getOrDefault(sendCode, false)) {
             return;
         }
-        String absPath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
-        String presetId = String.valueOf(xmlBaseModel.getItems().get(0).get("device_id"));
-        String monitorType = String.valueOf(xmlBaseModel.getItems().get(0).get("monitor_type"));
-        TCameraPreset tCameraPreset = tCameraPresetMapper.selectByEdgeCodeAndOriginId(sendCode, presetId);
-        if (tCameraPreset == null) {
-            log.error("tCameraPreset is null edgeCode:{} originId:{}", sendCode, presetId);
-            return;
+        List<SilentInfo> silentInfos = new ArrayList<>();
+        for(Map<String, Object> item : xmlBaseModel.getItems()){
+            SilentInfo silentInfo = new SilentInfo();
+            silentInfo.setPatrolDeviceCode(String.valueOf(item.get("patroldevice_code")))
+                    .setDeviceName(String.valueOf(item.get("device_name")))
+                    .setDeviceName(String.valueOf(item.get("device_id")))
+                    .setDeviceName(String.valueOf(item.get("time")))
+                    .setDeviceName(String.valueOf(item.get("rectangle")))
+                    .setDeviceName(String.valueOf(item.get("file_type")))
+                    .setDeviceName(String.valueOf(item.get("file_path")))
+                    .setDeviceName(String.valueOf(item.get("monitor_type")));
+            silentInfos.add(silentInfo);
         }
-
-        String desc = getDesc(monitorType);
-        log.info("desc :{}", desc);
-        if (desc == null) {
-            //调用算法
-            sendAnalyse(absPath, tCameraPreset);
-        } else {
-            // 生成告警 ，发送上级系统
-            processAlarm(sendCode, absPath, presetId, monitorType, tCameraPreset, desc);
+        try {
+            StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.SILENT_INFO_PROCESS, silentInfos, Result.class);
+        }catch (Exception e){
+            log.error("调用platform出错：{}", e.getMessage());
         }
+//        String absPath = String.valueOf(xmlBaseModel.getItems().get(0).get("file_path"));
+//        String presetId = String.valueOf(xmlBaseModel.getItems().get(0).get("device_id"));
+//        String monitorType = String.valueOf(xmlBaseModel.getItems().get(0).get("monitor_type"));
+//        TCameraPreset tCameraPreset = tCameraPresetMapper.selectByEdgeCodeAndOriginId(sendCode, presetId);
+//        if (tCameraPreset == null) {
+//            log.error("tCameraPreset is null edgeCode:{} originId:{}", sendCode, presetId);
+//            return;
+//        }
+//
+//        // 图片copy到reseultImg下
+//        String desc = getDesc(monitorType);
+//        log.info("desc :{}", desc);
+//        if (desc == null) {
+//            //调用算法
+//            sendAnalyse(absPath, tCameraPreset);
+//        } else {
+//            // 生成告警 ，发送上级系统
+//            processAlarm(sendCode, absPath, presetId, monitorType, tCameraPreset, desc);
+//        }
     }
 
     private void processAlarm(String sendCode, String absPath, String presetId, String monitorType, TCameraPreset tCameraPreset, String desc) {

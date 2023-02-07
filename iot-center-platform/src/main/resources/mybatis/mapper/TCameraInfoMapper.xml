@@ -328,6 +328,7 @@
     <select id="selectCameraAll" resultType="java.lang.Long">
         select camera_id
         from t_camera_info
+        where edge_code is null
     </select>
 
     <select id="selectHavePreset" resultType="java.lang.Long">

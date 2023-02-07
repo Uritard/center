@@ -6,6 +6,8 @@ import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.Result;
+import com.yjh.platform.common.utils.FtpsUtil;
+import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.entity.interlanalysis.Response;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
@@ -42,14 +44,22 @@ public class SilentTaskJob implements Runnable {
 
     private Integer presetType;
 
+    private UpFtpsConfig upFtpsConfig;
+
+    private String stationCode;
+
     public SilentTaskJob(TCameraPresetDao tCameraPresetDao,
                          RedisTemplate redisTemplate,
                          IntelAnalysisService intelAnalysisService,
-                         Integer presetType){
+                         Integer presetType,
+                         UpFtpsConfig upFtpsConfig,
+                         String stationCode){
         this.tCameraPresetDao = tCameraPresetDao;
         this.redisTemplate = redisTemplate;
         this.intelAnalysisService = intelAnalysisService;
         this.presetType = presetType;
+        this.upFtpsConfig = upFtpsConfig;
+        this.stationCode = stationCode;
     }
     /**
      * 调用相机转到预置位接口
@@ -166,7 +176,13 @@ public class SilentTaskJob implements Runnable {
             xmlItem.put("time", simpleDateFormat.format(new Date()));
             xmlItem.put("rectangle", "");
             xmlItem.put("file_type", "2");
-            xmlItem.put("file_path", absPath);
+
+            //上传图片
+            String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+            String ftpsTarPath = "jm/"+stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+".jpg";
+            FtpsUtil.putFile(absPath, ftpsTarPath, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
+                    upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
+            xmlItem.put("file_path", ftpsTarPath);
             xmlItem.put("monitor_type", "");
 
             xmlItems.add(xmlItem);

@@ -5,6 +5,7 @@ import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.FileUtil;
+import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
 import com.yjh.platform.module.patrol.service.IntelAnalysisService;
@@ -20,6 +21,7 @@ import org.apache.xmlbeans.impl.common.ConcurrentReaderHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +53,13 @@ public class TCameraPresetService {
     private RedisTemplate redisTemplate;
     @Autowired
     private IntelAnalysisService intelAnalysisService;
+    @Autowired
+    private UpFtpsConfig upFtpsConfig;
+    /**
+     * 变电站编码
+     */
+    @Value("${station.code}")
+    private String stationCode;
 
     ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(10);
 
@@ -425,7 +434,8 @@ public class TCameraPresetService {
             future.cancel(true);
             executor.setRemoveOnCancelPolicy(true);
         }
-        SilentTaskJob silentTaskJob = new SilentTaskJob(tCameraPresetDao,redisTemplate,intelAnalysisService,silentConf.getPresetType());
+        SilentTaskJob silentTaskJob = new SilentTaskJob(tCameraPresetDao,redisTemplate,intelAnalysisService,
+                silentConf.getPresetType(),upFtpsConfig,stationCode);
         future = executor.scheduleAtFixedRate(silentTaskJob,0,silentConf.getChillTime(), TimeUnit.SECONDS);
         silentConfMap.put(silentConf.getPresetType(),future);
     }

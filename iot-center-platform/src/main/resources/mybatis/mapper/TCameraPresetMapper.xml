@@ -474,6 +474,7 @@
         *
         from t_camera_preset
         where preset_type = #{presetType}
+        and edge_code is null
     </select>
 
     <select id="selectRecognizeTypeByPresetId" resultType="java.lang.String">
