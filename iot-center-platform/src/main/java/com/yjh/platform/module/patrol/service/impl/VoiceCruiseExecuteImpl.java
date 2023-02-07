@@ -6,20 +6,27 @@ package com.yjh.platform.module.patrol.service.impl;
 
 import com.yjh.platform.audiodevice.AudioDevice;
 import com.yjh.platform.audiodevice.AudioDeviceManager;
+import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.mp3.VoiceAnalyseUtil;
 import com.yjh.platform.module.device.entity.VoiceDeviceAllInfoDetail;
 import com.yjh.platform.module.device.service.TVoiceDeviceService;
 import com.yjh.platform.module.patrol.service.CruiseExecuteFactory;
 import com.yjh.platform.module.patrol.service.CruiseInspectionExecute;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.thread.CruiseRedisStorage;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
@@ -37,14 +44,16 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
     private final RedisTemplate<String, ?> redisTemplate;
     private final AudioDeviceManager audioDeviceManager;
     private final TVoiceDeviceService tVoiceDeviceService;
+    private final PatrolResultHandler patrolResultHandler;
 
     private final HashOperations<String, String, String> hashOperations;
 
     public VoiceCruiseExecuteImpl(RedisTemplate<String, ?> redisTemplate, AudioDeviceManager audioDeviceManager,
-        TVoiceDeviceService tVoiceDeviceService) {
+        TVoiceDeviceService tVoiceDeviceService, PatrolResultHandler patrolResultHandler) {
         this.redisTemplate = redisTemplate;
         this.audioDeviceManager = audioDeviceManager;
         this.tVoiceDeviceService = tVoiceDeviceService;
+        this.patrolResultHandler = patrolResultHandler;
         this.hashOperations = redisTemplate.opsForHash();
     }
 
@@ -121,6 +130,8 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
             inspectionMap.put("voicePath", voiceFilePath);
             // 巡检数据状态，已经执行
             inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
+
+            voiceAnalyse(inspectionMap, voicePath, voiceDevice);
         } else {
             // 录音结果处理
             inspectionMap.put("resultNum", "录音失败");
@@ -131,6 +142,46 @@ public class VoiceCruiseExecuteImpl implements CruiseInspectionExecute {
             // 巡检数据状态，已经执行
             inspectionMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_FAILED));
         }
+    }
+
+    private String voiceAnalyse(Map<String, String> cruiseResultMap, String voicePath, VoiceDeviceAllInfoDetail voiceDevice){
+
+        // 频率数组
+        List<Integer> fList = null;
+        VoiceAnalyseUtil voiceAnalyseUtil = new VoiceAnalyseUtil(voicePath);
+        try {
+            fList = voiceAnalyseUtil.analyticalDecibelsPl();
+        }catch (Exception e){
+            throw new BusinessException(209,"音频文件读取异常");
+        }
+
+        int fWarn = warning(fList, voiceDevice.getfValue(), cruiseResultMap, "频率");
+
+        List<Integer> dbList = null;
+        try {
+            dbList = voiceAnalyseUtil.analyticalDecibels();
+        }catch (Exception e){
+            throw new BusinessException(209,"音频文件读取异常");
+        }
+
+        int dbWarn = warning(dbList, voiceDevice.getDbValue(), cruiseResultMap, "分贝");
+
+        String retVal = "DB:" + dbWarn + "  F:" + fWarn;
+        cruiseResultMap.put("resultNum", retVal);
+
+        return retVal;
+    }
+
+    private int warning(List<Integer> dbList, String warnDb, Map<String, String> cruiseResultMap,  String alarmPrefix) {
+        if (CollectionUtils.isEmpty(dbList) || StringUtils.isEmpty(warnDb)) {
+            return 0;
+        }
+        int warnVal = NumberUtils.toInt(warnDb);
+        int maxVal = dbList.stream().max(Comparator.comparingInt(Integer::intValue)).orElse(0);
+        if (maxVal > warnVal) {
+            patrolResultHandler.voiceResultHandler(String.valueOf(maxVal), cruiseResultMap, maxVal - warnVal, alarmPrefix);
+        }
+        return maxVal > warnVal ? maxVal : 0;
     }
 
     @Override

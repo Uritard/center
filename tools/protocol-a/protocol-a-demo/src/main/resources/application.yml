@@ -20,7 +20,7 @@ server:
   port: 18088
 
 platform:
-  ip: 192.168.20.11
+  ip: 127.0.0.1
   port: 10011
   send-code: Client01
   receive-code: Server01
