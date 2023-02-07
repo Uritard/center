@@ -147,18 +147,34 @@ public class PatrolResultHandler {
                     alarmHandlerAfterCruise(robotPatrolTaskResult, taskId, isAlarmMap);
                 }
 
-                if ("2".equals(sysLevel)){
+                //device_id转换
+                String robotCode = robotPatrolTaskResult.getSendCode();
+                String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotPatrolTaskResult.getDeviceId();
+                Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
+                String instanceId = robotInfoKeyMap.get("instanceId");
+                // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
+                TCruisePointInstance insInfo = null;
+                if (StringUtils.isEmpty(instanceId)) {
+                    String originId = robotPatrolTaskResult.getDeviceId();
+                    insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
+                    log.info("instanceInfo: {}", JSON.toJSONString(insInfo));
+                    instanceId = String.valueOf(insInfo.getInstanceId());
+                }
+                infoMap.put("instanceId", instanceId);
+
+                //机器人是有值的处理非同源
+                if ("2".equals(sysLevel) && instance.getCruiseType() == 228){
                     // 只有巡视主机 非同源告警处理
                     RobotPatrolTaskAlarm taskAlarm = new RobotPatrolTaskAlarm();
                     taskAlarm.setTaskCode(robotPatrolTaskResult.getTaskCode());
                     taskAlarm.setValue(robotPatrolTaskResult.getValue());
-                    taskAlarm.setDeviceId(robotPatrolTaskResult.getDeviceId());
+                    taskAlarm.setDeviceId(instanceId);
                     NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(taskAlarm, redisTemplate, 1);
                     ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
                 }
                 // 巡视结果处理
                 InspectionResultThread cruiseResultDealThread =
-                    new InspectionResultThread(robotPatrolTaskResult, infoMap, redisTemplate, true);
+                    new InspectionResultThread(robotPatrolTaskResult, infoMap, insInfo, redisTemplate, true);
                 ThreadPoolUtil.PATROL_POOL.addThread(cruiseResultDealThread);
 
             } catch (Exception e) {
@@ -579,6 +595,13 @@ public class PatrolResultHandler {
             log.error("正常识别结果处理异常：", e);
         }
         log.info("cruiseResultMap=={}", cruiseResultMap);
+        //非同源处理
+        RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
+        robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
+        robotPatrolTaskAlarm.setValue(resultValue);
+        robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
+        NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
+        ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
         return cruiseResultMap;
     }
 

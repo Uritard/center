@@ -47,6 +47,7 @@ public class InspectionResultThread implements Runnable{
     private Boolean changeTaskStatus;
     private final RobotPatrolTaskResult robotPatrolTaskResult;
     private final Map<String, String> infoMap;
+    private final TCruisePointInstance insInfo;
     private final UPatrolTaskService uPatrolTaskService;
 
     private final TRobotInspectionDao tRobotInspectionDao;
@@ -54,9 +55,11 @@ public class InspectionResultThread implements Runnable{
     private final AnalyseDataOperateDao analyseDataOperateDao;
 
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
+                                  TCruisePointInstance insInfo,
                                   RedisTemplate redisTemplate, boolean changeTaskStatus){
         this.robotPatrolTaskResult = robotPatrolTaskResult;
         this.infoMap = infoMap;
+        this.insInfo = insInfo;
         this.redisTemplate = redisTemplate;
         this.changeTaskStatus = changeTaskStatus;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
@@ -94,18 +97,7 @@ public class InspectionResultThread implements Runnable{
             log.info("robotTaskId=={}", robotTaskId);
 */
 
-            String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + robotPatrolTaskResult.getDeviceId();
-            Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
-            String instanceId = robotInfoKeyMap.get("instanceId");
-            // 上级系统没有存储对应值，DeviceId 就是下级的 instanceId
-            TCruisePointInstance insInfo = null;
-            if (StringUtils.isEmpty(instanceId)) {
-                String originId = robotPatrolTaskResult.getDeviceId();
-                insInfo = tRobotInspectionDao.selectRealInstance(originId, robotCode);
-                log.info("instanceInfo: {}", JSON.toJSONString(insInfo));
-                instanceId = String.valueOf(insInfo.getInstanceId());
-            }
-
+            String instanceId = infoMap.get("instanceId");
             String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
             Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
             if (MapUtils.isEmpty(tCruiseTaskResultMap) || !tCruiseTaskResultMap.containsKey("deviceId") || !tCruiseTaskResultMap.containsKey("cruiseId")) {
