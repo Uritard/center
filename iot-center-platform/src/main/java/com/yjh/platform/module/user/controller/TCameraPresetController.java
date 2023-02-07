@@ -75,19 +75,19 @@ public class TCameraPresetController {
                     params.put("presetId",tCameraPreset.getPresetId());
                     params.put("meteName",tCameraPreset.getPresetName());
 
-//                    Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
-//                    if (response1.getData().equals(true)) {
-//                        Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
-//                        JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
-//                        tCameraPreset.setPresetImg((String) json.get("urlPath"));
-//                        tCameraPresetService.update(tCameraPreset);//存图
-//                        result.setData(resultNum);
-//                    } else {
-//                        tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
-//                        resultNum = 0;
-//                        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
-//                        result.setData(resultNum);
-//                    }
+                    Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
+                    if (response1.getData().equals(true)) {
+                        Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
+                        JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
+                        tCameraPreset.setPresetImg((String) json.get("urlPath"));
+                        tCameraPresetService.update(tCameraPreset);//存图
+                        result.setData(resultNum);
+                    } else {
+                        tCameraPresetDao.deleteByPrimaryId(tCameraPreset.getPresetId());
+                        resultNum = 0;
+                        result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(),ResultCodeEnum.SYSTEMERROR.getName());
+                        result.setData(resultNum);
+                    }
                 }
             }
         } catch (BusinessException b) {

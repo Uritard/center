@@ -361,6 +361,7 @@ public class TStdDeviceModelService {
         tRobotInspection.setInspectionName(String.valueOf(device.get("device_name")).contains("/")
                 ? StringUtils.substringAfter(device.get("device_name").toString(), "/")
                 : String.valueOf(device.get("device_name")));
+        tRobotInspection.setInspectionType(objToInt(device.getOrDefault("inspection_type", 1)));
         return tRobotInspection;
     }
 
