@@ -10,11 +10,9 @@ import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
-import com.yjh.platform.module.patrol.entity.RobotPatrolTaskAlarm;
-import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
-import com.yjh.platform.module.patrol.entity.RobotPatrolTaskStatus;
-import com.yjh.platform.module.patrol.entity.XMLBaseModel;
+import com.yjh.platform.module.patrol.entity.*;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
+import com.yjh.platform.module.patrol.service.SilentHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.dao.TPeriodModelDao;
 import com.yjh.platform.module.task.entity.TCruiseTaskAdd;
@@ -47,6 +45,7 @@ public class UPatrolTaskController {
 
     private final UPatrolTaskService uPatrolTaskService;
     private final PatrolResultHandler patrolResultHandler;
+    private final SilentHandler silentHandler;
 
     @Resource
     private RedisTemplate redisTemplate;
@@ -55,9 +54,11 @@ public class UPatrolTaskController {
 
     private Logger log = LoggerFactory.getLogger(UPatrolTaskController.class);
 
-    public UPatrolTaskController(UPatrolTaskService uPatrolTaskService, PatrolResultHandler patrolResultHandler) {
+    public UPatrolTaskController(UPatrolTaskService uPatrolTaskService, PatrolResultHandler patrolResultHandler,
+                                 SilentHandler silentHandler) {
         this.uPatrolTaskService = uPatrolTaskService;
         this.patrolResultHandler = patrolResultHandler;
+        this.silentHandler = silentHandler;
     }
 
     @ApiOperation(value = "下级系统的巡视结果")
@@ -376,6 +377,24 @@ public class UPatrolTaskController {
         }catch (Exception e){
             log.error("");
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "下级系统的静默监视数据")
+    @PostMapping(value = "/robotSilentInfo")
+    public Result robotSilentInfo(@RequestBody List<SilentInfo> silentInfos) {
+        Result result = new Result();
+        try {
+            log.info("The silentInfo from accessRobot is=={}", silentInfos);
+            silentInfos.forEach(silentInfo -> {
+                silentHandler.silentHandler(silentInfo.getFilePath(),silentInfo.getDeviceId());
+            });
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("接收并处理静默监视巡视结果错误:", e);
         }
         return result;
     }
