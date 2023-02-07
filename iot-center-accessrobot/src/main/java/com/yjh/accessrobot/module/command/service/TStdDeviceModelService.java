@@ -175,11 +175,9 @@ public class TStdDeviceModelService {
             dealStdDeviceAttr(insertStdDevice, oldStdDeviceAttrList, newStdDeviceAttrs, edgeCode);
             //标准测点
             List<TStdDeviceMete> insertStdDeviceMete = dealStdDeviceMete(insertStdDevice, oldStdDeviceMeteList, newStdDeviceMetes, edgeCode, edgeLevel);
-            insertStdDeviceMete.addAll(oldStdDeviceMeteList);
             //标准测点算法关系信息
-            if (CollectionUtils.isNotEmpty(newAlgorithmMetes)) {
-                dealAlgorithmMete(insertStdDeviceMete, oldAlgorithmMeteList, newAlgorithmMetes, edgeCode);
-            }
+            dealAlgorithmMete(insertStdDeviceMete, oldAlgorithmMeteList, newAlgorithmMetes, edgeCode);
+            insertStdDeviceMete.addAll(oldStdDeviceMeteList);
             //巡视点
             dealCruisePointInstance(insertCameraPresetList, insertRobotInspectionList, insertStdDevice, insertStdDeviceMete,
                     oldCruisePointInstanceList, newCruisePointInstances, tVoiceDeviceList, edgeCode);
@@ -612,6 +610,7 @@ public class TStdDeviceModelService {
         //删除的数据
         SetUtils.SetView<String> deleteIdSet = SetUtils.difference(oldMap.keySet(), newMap.keySet());
         if (CollectionUtils.isNotEmpty(deleteIdSet)) {
+            tAlgorithmMeteMapper.deleteByEdgeCodeAndOriginId(edgeCode, deleteIdSet);
             tStdDevicemeteMapper.deleteByEdgeCodeAndOriginId(edgeCode, deleteIdSet);
         }
         //新增的数据
@@ -648,10 +647,10 @@ public class TStdDeviceModelService {
             });
         }
         //删除的数据
-        SetUtils.SetView<String> deleteIdSet = SetUtils.difference(oldMap.keySet(), newMap.keySet());
-        if (CollectionUtils.isNotEmpty(deleteIdSet)) {
-            tAlgorithmMeteMapper.deleteByEdgeCodeAndOriginId(edgeCode, deleteIdSet);
-        }
+//        SetUtils.SetView<String> deleteIdSet = SetUtils.difference(oldMap.keySet(), newMap.keySet());
+//        if (CollectionUtils.isNotEmpty(deleteIdSet)) {
+//            tAlgorithmMeteMapper.deleteByEdgeCodeAndOriginId(edgeCode, deleteIdSet);
+//        }
         //新增的数据
         SetUtils.SetView<String> insertIdSet = SetUtils.difference(newMap.keySet(), oldMap.keySet());
         if (CollectionUtils.isNotEmpty(insertIdSet)) {
