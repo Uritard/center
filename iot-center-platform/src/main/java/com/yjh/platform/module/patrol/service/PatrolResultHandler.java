@@ -582,6 +582,69 @@ public class PatrolResultHandler {
         return cruiseResultMap;
     }
 
+    public Map<String, String> voiceResultHandler(String resultValue, Map<String, String> cruiseResultMap, int outRang, String alarmPrefix) {
+        try {
+
+            TStdDeviceMete tStdDevicemete =
+                analyseDataOperateService.selectDeviceMeteByInstanceId(NumberUtils.toLong(cruiseResultMap.get("instanceId")));
+
+            String meteName = tStdDevicemete.getMeteName();
+
+            Map<String, String> warnMap = new HashMap<>();
+            String warnName = "warnInfo:" + cruiseResultMap.get("taskId") + String.valueOf(UUID.randomUUID()).replace("-", "");
+
+            warnMap.put("deviceId", String.valueOf(cruiseResultMap.get("deviceId")));
+            warnMap.put("customId", tStdDevicemete.getCustomId());
+            warnMap.put("instanceId", cruiseResultMap.get("instanceId"));
+            warnMap.put("stdMeteId", String.valueOf(tStdDevicemete.getDeviceMeteId()));
+            warnMap.put("taskId", cruiseResultMap.get("taskId"));
+            warnMap.put("value", resultValue);
+            warnMap.put("imagePath", cruiseResultMap.get("picpath"));
+            warnMap.put("voicePath", cruiseResultMap.get("voicePath"));
+            warnMap.put("confMode", "276");
+            warnMap.put("alarmSource", analyseDataOperateService.selectDictCode("alarm_source", "主辅设备"));
+            warnMap.put("defectModel", analyseDataOperateService.selectDictCode("defect_model", "其他"));
+
+            log.info("Alarm value is reached(遥测)");
+            warnMap.put("warnName", meteName + alarmPrefix + "数据异常");
+            warnMap.put("warnTime", DateTimeUtil.format(new Date()));
+
+            warnMap.put("warnLevel", analyseDataOperateService.selectDictCode("alarm_level", "一般告警"));
+            warnMap.put("warnContent", meteName + alarmPrefix + ":" + resultValue + "--" + "一般告警");
+            warnMap.put("outRange", String.valueOf(outRang));
+
+            log.info("warnMap=={}", warnMap);
+            redisTemplate.opsForHash().putAll(warnName, warnMap);
+
+            // 巡视结果告警处理
+            cruiseResultMap.put("isWarn", "1");
+            cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));
+
+            // 告警入库
+            TWarnInfo tWarnInfo = getWarnInfo(warnMap);
+            analyseDataOperateService.insertWarnInfo(tWarnInfo);
+
+            Map<String, String> infoMap = new HashMap<>(5);
+            infoMap.put("alarmLevel", String.valueOf(tWarnInfo.getWarnLevel()));
+            infoMap.put("flag", "warn");
+            infoMap.put("defectModel", String.valueOf(tWarnInfo.getDefectModel()));
+            infoMap.put("warnId", String.valueOf(tWarnInfo.getWarnId()));
+            alarmPopUp(tStdDevicemete, infoMap);
+
+            // 告警推送前端页面
+            pushAlarmInfo(warnMap.get("warnName"), warnMap.get("warnContent"));
+
+            // 告警上报上一级系统
+            alarmToUpSystem(tWarnInfo, tWarnInfo.getTaskId(), tWarnInfo.getInstanceId());
+
+        } catch (Exception e) {
+            log.error("声纹告警处理结果异常：", e);
+        }
+        log.info("cruiseResultMap=={}", cruiseResultMap);
+        return cruiseResultMap;
+    }
+
     /**
      * 将产生的告警上送至上级系统
      *
