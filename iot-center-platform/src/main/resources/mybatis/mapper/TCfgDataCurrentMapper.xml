@@ -108,17 +108,15 @@
         a.mete_kind,
         a.region_id,
         a.mete_value,
-        a.last_mete_value
+        a.last_mete_value,
+        b.device_name as deviceName,
+        c.dict_note as meteKindName
         from t_cfg_data_current a
-        where 1 = 1
-        <if test="meteId != null and meteId != ''">a.mete_id = #{meteId, jdbcType=BIGINT},</if>
-        <if test="deviceId != null and deviceId != ''">a.device_id = #{deviceId, jdbcType=BIGINT},</if>
-        <if test="cunstomId != null and cunstomId != ''">a.cunstom_id = #{cunstomId, jdbcType=VARCHAR},</if>
-        <if test="recordTime != null and recordTime != ''">a.record_time = #{recordTime, jdbcType=TIMESTAMP},</if>
-        <if test="meteKind != null">a.mete_kind = #{meteKind, jdbcType=INTEGER},</if>
-        <if test="regionId != null and regionId != ''">a.region_id = #{regionId, jdbcType=VARCHAR},</if>
-        <if test="meteValue != null and meteValue != ''">a.mete_value = #{meteValue, jdbcType=VARCHAR},</if>
-        <if test="lastMeteValue != null and lastMeteValue != ''">a.last_mete_value = #{lastMeteValue, jdbcType=VARCHAR}</if>
+        left join t_cfg_device b on a.mete_id = b.device_id
+        left join t_dict_business c on a.mete_kind = c.dict_code and c.col_name = 'mete_kind'
+        where 1=1
+        <if test="meteName != null and meteName != ''">and b.device_name like concat ('%',#{meteName, jdbcType=VARCHAR},'%')</if>
+        <if test="startDate != null and endDate != null">and a.record_time BETWEEN #{startDate, jdbcType=TIMESTAMP} AND #{endDate, jdbcType=TIMESTAMP}</if>
     </select>
 
     <insert id="batchInsert">

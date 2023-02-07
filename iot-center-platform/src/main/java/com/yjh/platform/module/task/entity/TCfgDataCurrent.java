@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -43,7 +44,7 @@ public class TCfgDataCurrent implements Serializable {
     @TableField(value = "cunstom_id", updateStrategy = FieldStrategy.IGNORED)
     private String cunstomId;
 
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "数值时间")
     private Date recordTime;
 
@@ -70,4 +71,9 @@ public class TCfgDataCurrent implements Serializable {
     private Integer pageNum = 1;
 
     private Integer pageSize = 0;
+
+    private String region;
+    private String stationName;
+    private String deviceName;
+    private String meteKindName;
 }
