@@ -331,11 +331,6 @@ public class InspectionResultThread implements Runnable{
                 log.info("ftpFileName and value is not empty...");
                 log.info("resultImagePath=={}", resultImagePath);
                 try {
-                    // 调用video服务 将要分析的图片从ftps下载到本地
-//                    Map<String, String> params = Maps.newLinkedHashMap();
-//                    params.put("source", resultImagePath);
-//                    params.put("target", filePath);
-//                    SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class).postForObject(Constant.VIDEO_DOWNLOAD_FILE, params, String.class);
                     uPatrolTaskService.downloadPicture(resultImagePath,filePath);
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
@@ -384,6 +379,7 @@ public class InspectionResultThread implements Runnable{
      * @param taskId               任务id
      * @param tCruiseTaskResultMap 巡视结果map
      * @param details              测点信息
+     * @param value                值
      */
     private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details, String value) {
         try {

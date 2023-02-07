@@ -766,7 +766,6 @@ public class PatrolResultHandler {
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DEFECT));
 
-                List<TDefectInfo> defectInfoList = new ArrayList<>();
                 String[] resultArr = resultValue.split("\\s+");
                 if (resultArr.length == 1) {
                     log.info("Only one defect is generated！！！");
@@ -780,7 +779,7 @@ public class PatrolResultHandler {
 
                     TDefectInfo tDefectInfo = getDefectInfo(defectMap);
                     log.info("tDefectInfo=={}", JSON.toJSONString(tDefectInfo));
-                    defectInfoList.add(tDefectInfo);
+                    analyseDataOperateService.insertDefectInfo(tDefectInfo);
 
                     // 缺陷告警推送
                     Map<String, String> infoMap = new HashMap<>(5);
@@ -806,7 +805,7 @@ public class PatrolResultHandler {
 
                         TDefectInfo tDefectInfo = getDefectInfo(defectMap);
                         log.info("tDefectInfo=={}", JSON.toJSONString(tDefectInfo));
-                        defectInfoList.add(tDefectInfo);
+                        analyseDataOperateService.insertDefectInfo(tDefectInfo);
 
                         // 缺陷告警推送
                         Map<String, String> infoMap = new HashMap<>(5);
@@ -821,12 +820,6 @@ public class PatrolResultHandler {
 
                     pushAlarmInfo(defectNames, tStdDevicemete.getMeteName() + "--" + defectNames);
                 }
-
-                // 缺陷批量实时入库
-                if (CollectionUtils.isNotEmpty(defectInfoList)) {
-                    analyseDataOperateService.batchInsertDefectInfo(defectInfoList);
-                }
-                log.info("--------缺陷入库完成-----");
             }else {
                 cruiseResultMap.put("resultNum", resultValue.contains("device") ? resultValue.replaceAll("device","") : "--");
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));

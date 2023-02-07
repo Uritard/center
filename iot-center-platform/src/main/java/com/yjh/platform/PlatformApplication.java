@@ -119,9 +119,10 @@ public class PlatformApplication  implements CommandLineRunner {
         tDeviceTypeImgService.findPic();//本地启动把此行注掉
         CruiseRedisStorage.start(redisTemplate);
 
-        InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
+        // 算法暂时为http方式 先注释
+        /*InetSocketAddress remoteAddress1 = new InetSocketAddress(serverUrl, recognizePort);
         InetSocketAddress remoteAddress2 = new InetSocketAddress(serverUrl, aiPort);
-        nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate, analyseDataOperateService, url);
+        nettyClient.start(remoteAddress1, remoteAddress2, redisTemplate, analyseDataOperateService, url);*/
     }
 
     @Bean
