@@ -1,6 +1,7 @@
 package com.yjh.accessudp;
 
 import com.yjh.accessudp.common.Constant;
+import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessudp.module.device.entity.SYAllInfo;
 import com.yjh.accessudp.module.device.entity.TSysParam;
 import com.yjh.accessudp.module.device.service.TCfgMeteService;
@@ -12,8 +13,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.AnnotationBeanNameGenerator;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -79,6 +82,14 @@ public class AccessUdpApplication implements CommandLineRunner {
         log.info("accessudp is running, url is : " + url);
         nettyServer.start(address, redisTemplate,tCfgMeteService,UNION_URL, SEQUENCE_URL,SEQUENCEREC_URL);
     }
+
+
+    @LoadBalanced
+    @Bean(name = "serviceRestTemplate")
+    ServiceRestTemplate serviceRestTemplate() {
+        return new ServiceRestTemplate();
+    }
+
     public void loadDeviceInfo()throws IOException{
         //读取联动设备的信息
         TSysParam tSysParam = tCfgMeteService.selectByParamType("unionDeviceInfoPath");
