@@ -26,6 +26,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -561,4 +562,46 @@ public class TRobotInfoService{
         }
     }
 
+    /**
+     * 新增机器人履历信息
+     *
+     * @param insertInfo insertInfo
+     * @param oriInfo oriInfo
+     * @return result
+     */
+    public int updateRobotResumeInfo(TRobotInfo insertInfo, TRobotInfo oriInfo) {
+        if (!StringUtils.isEmpty(insertInfo.getRepairRecord())) {
+            oriInfo.setRepairRecord(getMergeInfo(insertInfo.getRepairRecord(), oriInfo.getRepairRecord()));
+        }
+
+        if (!StringUtils.isEmpty(insertInfo.getDefectRecord())) {
+            oriInfo.setDefectRecord(getMergeInfo(insertInfo.getDefectRecord(), oriInfo.getDefectRecord()));
+        }
+
+        if (!StringUtils.isEmpty(insertInfo.getExitPutIntoRecord())) {
+            oriInfo.setExitPutIntoRecord(getMergeInfo(insertInfo.getExitPutIntoRecord(), oriInfo.getExitPutIntoRecord()));
+        }
+
+        return tRobotInfoDao.update(oriInfo);
+    }
+
+    /**
+     * 合并库中已有信息,倒序 换行
+     *
+     * @param insertInfoStr insertInfoStr
+     * @param oriInfoStr oriInfoStr
+     * @return result
+     */
+    private String getMergeInfo(String insertInfoStr, String oriInfoStr) {
+        if (!StringUtils.isEmpty(insertInfoStr)) {
+        return new StringBuilder()
+            .append(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()))
+            .append(" ")
+            .append(insertInfoStr)
+            .append("\r\n")
+            .append(oriInfoStr).toString().trim();
+        } else {
+            return oriInfoStr;
+        }
+    }
 }
