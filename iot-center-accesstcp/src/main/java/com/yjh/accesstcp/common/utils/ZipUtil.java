@@ -95,13 +95,19 @@ public class ZipUtil {
      * @param fileList    要压缩的文件列表（绝对路径），如 /home/person/test/测试.doc，/home/person/haha/测试.doc
      * @return
      */
-    public static void compressFiles(String zipPathDir, String zipFileName, List<String> fileList) {
+    public static void compressFiles(String zipPathDir, String zipFileName, List<String> fileList) throws Exception{
         Boolean isAllNotExists = true;
+        File dir = new File(zipPathDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        File zipFile = new File(zipPathDir + zipFileName);
+        if (zipFile.exists()) {
+            zipFile.delete();
+        }
+        zipFile.createNewFile();
         try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(new File(zipPathDir + zipFileName)))) {
-            File zipFile = new File(zipPathDir);
-            if (!zipFile.exists()) {
-                zipFile.mkdirs();
-            }
+
             for (String filePath : fileList) {
                 File file = new File(filePath);
 
@@ -112,6 +118,8 @@ public class ZipUtil {
                     zos.putNextEntry(zipEntry);
                     byte[] buffer = new byte[2048];
                     compressSingleFile(file, zos, buffer);
+                } else {
+                  logger.info("文件不存在:{}",filePath);
                 }
             }
             if (isAllNotExists){

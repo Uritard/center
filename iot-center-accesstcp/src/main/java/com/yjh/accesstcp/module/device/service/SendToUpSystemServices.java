@@ -914,15 +914,15 @@ public class SendToUpSystemServices {
     }
 
 
-    public String downloadFile(String type) {
-        try {
+    public String downloadFile(String type) throws Exception {
             String stationCode =  (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
             List<Map<String, Object>> list = new ArrayList<>();
             Map<String, Object> map = new HashMap<>();
             Map<String, String> mapForPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
             String path = System.getProperty("os.name").toUpperCase().startsWith("WINDOWS") ? "C:\\robotData\\Model" : mapForPath.get("content") + "/" + stationCode + "/Model";
             list.add(map);
-
+            Map<String,String> mapForMapPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
+            String mapAbsPath = mapForMapPath.get("content");
             map.put("time", DateTimeUtil.getDateTimeString());
             map.put("type", type);
             log.info("模型文件路径：" + path);
@@ -970,8 +970,6 @@ public class SendToUpSystemServices {
                     mapFileList.forEach(mapFilePath ->{
                         mapFilePath.replace(filePathMap, fileFtpPathMap);
                     });
-                    Map<String,String> mapForMapPath = redisTemplate.opsForHash().entries("t_sys_param:modelAbsolutePath");
-                    String mapAbsPath = mapForMapPath.get("content");
                     String dirPath = mapAbsPath + "/Model/";
 //                    dirPath = "C:/robotData/Model/";
                     String zipName = "map_model.zip";
@@ -980,18 +978,20 @@ public class SendToUpSystemServices {
                 case "10":
                     String sourcePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
                     String fileName = "source_file_model.cime";
+                    List<String> fileList = new ArrayList<>();
+                    fileList.add(sourcePath+fileName);
+                    String sourceDirPath = mapAbsPath + "/Model/";
+                    String sourceZipName = "source_model.zip";
                     File file = new File(sourcePath+fileName);
                     if (!file.exists()){
                         throw new BusinessException("设备资源文件不存在");
                     }
-                    return sourcePath+fileName;
+                    ZipUtil.compressFiles(sourceDirPath, sourceZipName, fileList);
+                    return sourceDirPath+sourceZipName;
                 default:
                     break;
             }
 
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
         return "";
     }
     /**
