@@ -49,6 +49,31 @@ public class TRobotInfoController {
         this.tStdDeviceService = tStdDeviceService;
     }
 
+    /**
+     * 新增机器人履历信息
+     *
+     * @param request request
+     * @param tRobotInfo tRobotInfo
+     * @return result
+     */
+    @ApiOperation(value = "插入机器人履历信息")
+    @PostMapping(value = "/addResumeInfo")
+    @Logs(title = "新增机器人履历信息",content = "根据用户传递的参数新增机器人履历信息",logType = 2,authority = "1234", codeName="droneType")
+    public Result insertRobotResumeInfo(HttpServletRequest request, @Validated @RequestBody TRobotInfo tRobotInfo) {
+        Result result = new Result();
+        try {
+            TRobotInfo robotInfoTemp = tRobotInfoService.selectByPrimaryId(tRobotInfo.getRobotId());
+            // 从robotInfoTemp获取 缺陷记录、大修记录、退出再重放记录内容，并追加到tRobotInfo中
+            result.setData(tRobotInfoService.updateRobotResumeInfo(tRobotInfo, robotInfoTemp));
+            result.setCode(ResultCodeEnum.NORMAL.getCode());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("更新错误:", e);
+        }
+
+        return result;
+    }
+
     @ApiOperation(value = "插入")
     @PostMapping(value = "/add")
     @Logs(title = "新增机器人信息",content = "根据用户传递的参数新增机器人信息",logType = 2,authority = "1234", codeName="droneType")
