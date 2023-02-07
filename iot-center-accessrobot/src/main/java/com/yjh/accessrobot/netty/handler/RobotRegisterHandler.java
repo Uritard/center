@@ -5,6 +5,7 @@ import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.dao.TStdRegionDao;
+import com.yjh.accessrobot.module.command.entity.EdgeEnum;
 import com.yjh.accessrobot.module.command.entity.TStdRegion;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.swing.plaf.synth.Region;
 import java.util.*;
 
 /**
@@ -87,8 +89,13 @@ public class RobotRegisterHandler implements MessageHandlerStrategy, Initializin
         //巡视设备运行时间间隔 2022过检 robot_run_interval修改为patroldevice_run_interval
         items.put("patroldevice_run_interval", patroldeviceRunInterval);
         //环境数据间隔 2022过检  weather interval 修改为 env_interval
-        // 220kv改为weather_interval  
-        items.put("weather_interval", envInterval);
+        // 220kv改为weather_interval
+        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
+        if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
+            items.put("env_interval", envInterval);
+        }else {
+            items.put("weather_interval", envInterval);
+        }
         // 220kv过检
 //        if (isEdge || robotService.selectIsDrone(robotCode)) {
         //2022过检新增 无人机机巢运行数据间隔
