@@ -405,11 +405,15 @@ public class SendToUpSystemServices {
         List<RobotModel> robotModelList = tRobotInfoMapper.selectAllRobot();
         String stationCode = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "edgeId", "content");
         String stationName = (String) redisTemplate.opsForHash().get(Constant.T_SYS_PARAM + "stationName", "content");
+
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
         SerializeConfig serializeConfig = new SerializeConfig();
         serializeConfig.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
         List<Map<String, Object>> list = robotModelList.stream().peek(robotModel -> {
             robotModel.setStationCode(stationCode);
             robotModel.setStationName(stationName);
+            robotModel.setPhotePath(robotModel.getPhotePath().replace(relativeImgMap.get("content"),absoluteImgMap.get("content")));
         }).map((Function<RobotModel, Map<String, Object>>) robotModel -> {
             JSONObject jsonObject = (JSONObject) JSON.toJSON(robotModel, serializeConfig);
             return jsonObject.toJavaObject(Map.class);
