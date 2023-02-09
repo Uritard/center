@@ -28,6 +28,17 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +47,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -2260,14 +2272,14 @@ public class CameraConService {
                 log.info("转到预置点失败错误码" + iErr);
             }
 
-            try {
-                long waitTime =
-                        Long.parseLong(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content").toString());
-                log.info("waitTime:----------" + waitTime);
-                Thread.sleep(waitTime);
-            } catch (Exception e) {
-                log.error("error----" + e);
-            }
+//            try {
+//                long waitTime =
+//                        Long.parseLong(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content").toString());
+//                log.info("waitTime:----------" + waitTime);
+//                Thread.sleep(waitTime);
+//            } catch (Exception e) {
+//                log.error("error----" + e);
+//            }
             //       getSetconfig(lUserIDLong);
             HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA m_strJpegWithAppenData =
                     new HCNetSDK.NET_DVR_JPEGPICTURE_WITH_APPENDDATA();
@@ -2419,9 +2431,9 @@ public class CameraConService {
             log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
             lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
             log.info("NET_DVR_Login_V40:返回值" + lUserID);
-            int lUserIDLong = lUserID;
+//            int lUserIDLong = lUserID;
             //转到预置点
-            boolean Preset = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, 2, HCNetSDK.GOTO_PRESET,
+            boolean Preset = hCNetSDK.NET_DVR_PTZPreset_Other(lUserID, 2, HCNetSDK.GOTO_PRESET,
                     cameraConInfo.getPresetNum());
             if (Preset) {
                 log.info("转到预置点成功：Preset->" + Preset);
@@ -2440,24 +2452,24 @@ public class CameraConService {
                 log.error("error----" + e);
             }
 
-            /*m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
-            System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
-            m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
-            System.arraycopy(userName.getBytes(), 0, m_strLoginInfo.sUserName, 0, userName.length());
-            m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
-            System.arraycopy(password.getBytes(), 0, m_strLoginInfo.sPassword, 0, password.length());
-            m_strLoginInfo.wPort = Short.parseShort(port);
-            m_strLoginInfo.bUseAsynLogin = 0; //是否异步登录：0- 否，1- 是
-            m_strLoginInfo.write();
-            log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
-            lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
-            log.info("NET_DVR_Login_V40:返回值" + lUserID);
-            lUserIDLong = new NativeLong(lUserID);*/
+//            m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
+//            System.arraycopy(cameraIp.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, cameraIp.length());
+//            m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
+//            System.arraycopy(userName.getBytes(), 0, m_strLoginInfo.sUserName, 0, userName.length());
+//            m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
+//            System.arraycopy(password.getBytes(), 0, m_strLoginInfo.sPassword, 0, password.length());
+//            m_strLoginInfo.wPort = Short.parseShort(port);
+//            m_strLoginInfo.bUseAsynLogin = false; //是否异步登录：0- 否，1- 是
+//            m_strLoginInfo.write();
+//            log.info("登录账号:" + userName + "ip地址" + cameraIp + "登录密码" + password + "端口号" + port);
+//            lUserID = hCNetSDK.NET_DVR_Login_V40(m_strLoginInfo, m_strDeviceInfo);
+//            log.info("NET_DVR_Login_V40:返回值" + lUserID);
+//            lUserIDLong = new NativeLong(lUserID);
             //透传url
-            String strURL = "POST /ISAPI/Thermal/channels/2/thermometry/jpegPicWithAppendData?format=json";
-            HCNetSDK.BYTE_ARRAY ptrUrl = new HCNetSDK.BYTE_ARRAY(BYTE_ARRAY_LEN);
-            ptrUrl.byValue = strURL.getBytes();
-            ptrUrl.write();
+            String strURL = "/ISAPI/Thermal/channels/2/thermometry/jpegPicWithAppendData?format=json";
+//            HCNetSDK.BYTE_ARRAY ptrUrl = new HCNetSDK.BYTE_ARRAY(BYTE_ARRAY_LEN);
+//            ptrUrl.byValue = strURL.getBytes();
+//            ptrUrl.write();
             //透传json standard 标准模式
             String buf = "{\n" +
                     "\t\"JpegPicWithAppendDataParam\":\n" +
@@ -2465,41 +2477,44 @@ public class CameraConService {
                     "\t\t\"captureMode\":\"standard\"\n" +
                     "\t}\n" +
                     "}";
-            HCNetSDK.BYTE_ARRAY pbuf = new HCNetSDK.BYTE_ARRAY(BYTE_ARRAY_LEN);
-            pbuf.byValue = buf.getBytes();
-            pbuf.write();
-
-            HCNetSDK.NET_DVR_XML_CONFIG_INPUT struXMLInput = new HCNetSDK.NET_DVR_XML_CONFIG_INPUT();
-            struXMLInput.read();
-            struXMLInput.dwSize = struXMLInput.size();
-            struXMLInput.lpRequestUrl = ptrUrl.getPointer();
-            struXMLInput.dwRequestUrlLen = ptrUrl.byValue.length;
-            struXMLInput.lpInBuffer = pbuf.getPointer();
-            struXMLInput.dwInBufferSize = buf.length();
-            struXMLInput.write();
-
-            HCNetSDK.BYTE_ARRAY ptrStatusByte = new HCNetSDK.BYTE_ARRAY(ISAPI_STATUS_LEN);
-            ptrStatusByte.read();
-
+//            HCNetSDK.BYTE_ARRAY pbuf = new HCNetSDK.BYTE_ARRAY(BYTE_ARRAY_LEN);
+//            pbuf.byValue = buf.getBytes();
+//            pbuf.write();
+//
+//            HCNetSDK.NET_DVR_XML_CONFIG_INPUT struXMLInput = new HCNetSDK.NET_DVR_XML_CONFIG_INPUT();
+//            struXMLInput.read();
+//            struXMLInput.dwSize = struXMLInput.size();
+//            struXMLInput.lpRequestUrl = ptrUrl.getPointer();
+//            struXMLInput.dwRequestUrlLen = ptrUrl.byValue.length;
+//            struXMLInput.lpInBuffer = pbuf.getPointer();
+//            struXMLInput.dwInBufferSize = buf.length();
+//            struXMLInput.write();
+//
+//            HCNetSDK.BYTE_ARRAY ptrStatusByte = new HCNetSDK.BYTE_ARRAY(ISAPI_STATUS_LEN);
+//            ptrStatusByte.read();
+//
             HCNetSDK.BYTE_ARRAY ptrOutByte = new HCNetSDK.BYTE_ARRAY(ISAPI_DATA_LEN);
             ptrOutByte.read();
 
-            HCNetSDK.NET_DVR_XML_CONFIG_OUTPUT struXMLOutput = new HCNetSDK.NET_DVR_XML_CONFIG_OUTPUT();
-            struXMLOutput.read();
-            struXMLOutput.dwSize = struXMLOutput.size();
-            struXMLOutput.lpOutBuffer = ptrOutByte.getPointer();
-            struXMLOutput.dwOutBufferSize = ptrOutByte.size();
-            struXMLOutput.lpStatusBuffer = ptrStatusByte.getPointer();
-            struXMLOutput.dwStatusSize = ptrStatusByte.size();
-            struXMLOutput.write();
+//            HCNetSDK.NET_DVR_XML_CONFIG_OUTPUT struXMLOutput = new HCNetSDK.NET_DVR_XML_CONFIG_OUTPUT();
+//            struXMLOutput.read();
+//            struXMLOutput.dwSize = struXMLOutput.size();
+//            struXMLOutput.lpOutBuffer = ptrOutByte.getPointer();
+//            struXMLOutput.dwOutBufferSize = ptrOutByte.size();
+//            struXMLOutput.lpStatusBuffer = ptrStatusByte.getPointer();
+//            struXMLOutput.dwStatusSize = ptrStatusByte.size();
+//            struXMLOutput.write();
 
-            if (!hCNetSDK.NET_DVR_STDXMLConfig(lUserID, struXMLInput, struXMLOutput)) {
-                int iErr = hCNetSDK.NET_DVR_GetLastError();
-                log.error("NET_DVR_STDXMLConfig失败，错误号：" + iErr);
-            } else {
-                struXMLOutput.read();
+//            if (!hCNetSDK.NET_DVR_STDXMLConfig(lUserID, struXMLInput, struXMLOutput)) {
+//                int iErr = hCNetSDK.NET_DVR_GetLastError();
+//                log.error("NET_DVR_STDXMLConfig失败，错误号：" + iErr);
+//            } else {
+            byte [] result = postISAPI(cameraIp,userName,password,strURL, buf);
+//                struXMLOutput.read();
+                ptrOutByte.byValue= result;
+                ptrOutByte.write();
                 ptrOutByte.read();
-                ptrStatusByte.read();
+//                ptrStatusByte.read();
                 FileOutputStream fout;
                 String newName = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
                 try {
@@ -2508,11 +2523,12 @@ public class CameraConService {
                     String picPath = hotPic + newName + ".jpg";
                     log.info("hotPic地址：" + picPath);
                     fout = new FileOutputStream(picPath);
-                    long offsetPic = 419;
+//                    long offsetPic = 419;
+                    long offsetPic = 327;
                     ByteBuffer picBuffers = ptrOutByte.getPointer().getByteBuffer(offsetPic,
-                            (struXMLOutput.dwReturnedXMLSize - offsetPic));
+                            (result.length - offsetPic));
                     byte[] picBytes =
-                            new byte[struXMLOutput.dwReturnedXMLSize - Integer.parseInt(String.valueOf(offsetPic + 16))];
+                            new byte[result.length - Integer.parseInt(String.valueOf(offsetPic + 16))];
                     picBuffers.rewind();
                     picBuffers.get(picBytes);
                     fout.write(picBytes);
@@ -2569,9 +2585,9 @@ public class CameraConService {
                     //将字节写入文件
                     long offset = offsetPic + size1;
                     ByteBuffer buffers = ptrOutByte.getPointer().getByteBuffer(offset,
-                            struXMLOutput.dwReturnedXMLSize - offset);
+                            result.length - offset);
                     byte[] bytes =
-                            new byte[struXMLOutput.dwReturnedXMLSize - Integer.parseInt(String.valueOf(size3 + offset + 16))];
+                            new byte[result.length - Integer.parseInt(String.valueOf(size3 + offset + 16))];
                     buffers.rewind();
                     buffers.get(bytes);
                     fout.write(bytes);
@@ -2619,7 +2635,7 @@ public class CameraConService {
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
                 }
-            }
+//            }
         } catch (Exception e) {
             int iErr = hCNetSDK.NET_DVR_GetLastError();
             log.error("红外图片抓取异常 [{}]", iErr, e);
@@ -2629,6 +2645,28 @@ public class CameraConService {
         return map;
     }
 
+    /**
+     * 透传ISAPI
+     * @param ip
+     * @param username
+     * @param password
+     * @param isapiUrl
+     * @param json
+     * @return
+     * @throws Exception
+     */
+    public static byte[] postISAPI(String ip, String username, String password, String isapiUrl, String json)
+            throws Exception {
+        String url = "http://" + ip + isapiUrl;
+        HttpPost httpPost = new HttpPost(url);
+        Credentials creds = new UsernamePasswordCredentials(username, password);
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(AuthScope.ANY, creds);
+        CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build();
+        httpPost.setEntity(new StringEntity(json, "UTF-8"));
+        HttpResponse response = httpclient.execute(httpPost);
+        return  EntityUtils.toByteArray(response.getEntity());
+    }
     /**
      * 语音对讲开始
      *
@@ -3442,29 +3480,6 @@ public class CameraConService {
 //        }
 //        return list;
 //    }
-
-    public static void main(String[] args) {
-        CameraConService service = new CameraConService();
-        long time1 = 36 * 1000 + 198;
-        String s1 = service.timeStr(time1);
-        System.out.println(s1);
-
-        time1 = 1000 * 18 * 60 + 1000 * 60 * 52 + 198;
-        s1 = service.timeStr(time1);
-        System.out.println(s1);
-
-        time1 = 1000 * 60 * 60 * 14 + 1000 * 60 * 52 + 198;
-        s1 = service.timeStr(time1);
-        System.out.println(s1);
-
-        time1 = 1000 * 60 * 60 * 64 + 1000 * 60 * 36 + 198;
-        s1 = service.timeStr(time1);
-        System.out.println(s1);
-
-        time1 = 1000 * 60 * 60 * 24 * 9 + 1000 * 60 * 52 + 198;
-        s1 = service.timeStr(time1);
-        System.out.println(s1);
-    }
 
     public void pushCtrlTime(Long cameraId) {
         try {

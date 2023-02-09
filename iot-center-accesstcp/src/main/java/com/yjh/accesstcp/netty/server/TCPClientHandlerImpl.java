@@ -9,6 +9,7 @@ import com.yjh.accesstcp.module.device.entity.TCruiseTaskAdd;
 import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
+import com.yjh.accesstcp.thread.RegisterManager;
 import com.yjh.accesstcp.thread.TaskExecutePool;
 import com.yjh.accesstcp.thread.WeatherThread;
 import io.netty.buffer.ByteBuf;
@@ -40,13 +41,16 @@ public class TCPClientHandlerImpl extends SimpleChannelInboundHandler<DatagramPa
     private AnalysisUnionTaskFileService analysisUnionTaskFileService;
     private String server;
     private String cruise;
+    private RegisterManager registerManager;
 
-    public TCPClientHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService,String server,String cruise) {
+
+    public TCPClientHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService,String server,String cruise, RegisterManager registerManager) {
         this.redisTemplate = redisTemplate;
         this.sendToUpSystemServices = sendToUpSystemServices;
         this.analysisUnionTaskFileService = analysisUnionTaskFileService;
         this.server = server;
         this.cruise =cruise;
+        this.registerManager =registerManager;
 
     }
     private boolean isThreadStart = true;
@@ -292,7 +296,7 @@ public class TCPClientHandlerImpl extends SimpleChannelInboundHandler<DatagramPa
         if (xmlRes.getSendCode() == null) {
             log.info("连接可能断了，等待重连.....");
         } else {
-            MessageThread.doProcessMessage(xmlRes, sendSessionId, this, sendToUpSystemServices, analysisUnionTaskFileService, redisTemplate);
+            MessageThread.doProcessMessage(xmlRes, sendSessionId, this, sendToUpSystemServices, analysisUnionTaskFileService, redisTemplate, registerManager);
             // doProcessMessage(xmlRes, sendSessionId, receiveSessionId);
         }
 

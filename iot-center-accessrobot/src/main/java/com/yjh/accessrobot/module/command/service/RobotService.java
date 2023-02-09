@@ -1010,6 +1010,7 @@ public class RobotService {
     public String deviceMaintenanceIssued(Map<String, Object> resMap) {
         List<Map<String, Object>> itemList = new ArrayList<>();
         String onlineCode = String.valueOf(resMap.get("online_code"));
+        resMap.remove("online_code");
         itemList.add(resMap);
         XMLBaseModel xmlBaseModel = new XMLBaseModel()
                 .setSendCode(Constant.sendCode)
