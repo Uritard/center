@@ -102,9 +102,9 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
                 boolean isEdge = robotService.selectByRegionCodeAndState(xmlBaseModel.getSendCode(), 1);
                 if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel) && isEdge) {
                     if ("3".equals(command)){
-                        xmlBaseModel.setCommand("4");
+                        command = "4";
                     }else if ("4".equals(command)){
-                        xmlBaseModel.setCommand("3");
+                        command = "3";
                     }
                 }
                 handlerType = type + command;

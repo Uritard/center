@@ -10,6 +10,7 @@ import com.yjh.accesstcp.module.device.entity.XMLBaseModel;
 import com.yjh.accesstcp.module.device.service.AnalysisUnionTaskFileService;
 import com.yjh.accesstcp.module.device.service.SendToUpSystemServices;
 import com.yjh.accesstcp.netty.entiy.Message;
+import com.yjh.accesstcp.thread.RegisterManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.dom4j.Document;
@@ -34,15 +35,17 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
     private SendToUpSystemServices sendToUpSystemServices;
     private String server;
     private String cruise;
+    private RegisterManager registerManager;
     private ChannelHandlerContext ctx;
     private AnalysisUnionTaskFileService analysisUnionTaskFileService;
 
-    public StateGridAHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService,String server,String cruise) {
+    public StateGridAHandlerImpl(RedisTemplate redisTemplate,SendToUpSystemServices sendToUpSystemServices,AnalysisUnionTaskFileService analysisUnionTaskFileService,String server,String cruise, RegisterManager registerManager) {
         this.redisTemplate = redisTemplate;
         this.sendToUpSystemServices = sendToUpSystemServices;
         this.analysisUnionTaskFileService = analysisUnionTaskFileService;
         this.server = server;
         this.cruise =cruise;
+        this.registerManager =registerManager;
 
     }
     private boolean isThreadStart = true;
@@ -63,7 +66,7 @@ public class StateGridAHandlerImpl extends SimpleChannelInboundHandler<Message> 
         if (xmlRes.getSendCode() == null) {
             log.info("客户端 {} 与服务端连接可能断了，等待重连.....", ctx.channel().remoteAddress());
         } else {
-            MessageThread.doProcessMessageSync(xmlRes, sendSessionId, this, sendToUpSystemServices, analysisUnionTaskFileService, redisTemplate);
+            MessageThread.doProcessMessageSync(xmlRes, sendSessionId, this, sendToUpSystemServices, analysisUnionTaskFileService, redisTemplate, registerManager);
             // doProcessMessage(ctx, xmlRes, sendSessionId, receiveSessionId);
             log.info("+++++++++++++++++解包完成+++++++++++++++++");
         }
