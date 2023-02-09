@@ -414,10 +414,11 @@ public class TWarnInfoService{
     }
     //告警弹窗
     @Transactional(rollbackFor = Exception.class)
-    public TWarnInfoDetail selectWarnPopUp(String warnId,Integer defectModel) throws Exception{
-        TWarnInfoDetail tWarnInfoDetail = new TWarnInfoDetail();
+    public TWarnInfoDetail selectWarnPopUp(String warnId,Integer defectModel){
+        TWarnInfoDetail tWarnInfoDetail;
         Integer warnFlag = Integer.valueOf(tWarnInfoDao.selectDictCodeByNote("其他","defect_model"));
-        if (defectModel.equals(warnFlag)){//告警信息
+        // 告警信息
+        if (defectModel.equals(warnFlag)){
             tWarnInfoDetail = tWarnInfoDao.selectWarnPopUp(Long.valueOf(warnId));
             String thresholdValue = "";
             if (Objects.nonNull(tWarnInfoDetail.getLowLimit1()) && Objects.nonNull(tWarnInfoDetail.getHighLimit1())){
@@ -446,39 +447,10 @@ public class TWarnInfoService{
             }else {
                 tWarnInfoDetail.setDeviceType(1);
             }
-        }else {//缺陷信息
-//            tWarnInfoDetail = tDefectInfoDao.selectWarnPopUp(warnId);
-            Map<String, String> defectMap = redisTemplate.opsForHash().entries("defectInfo:"+warnId);
-            String alarmLevelName = tWarnInfoDao.selectDictNoteByCode(defectMap.get("defectLevel"),"alarm_level");
-            String alarmSourceName = tWarnInfoDao.selectDictNoteByCode(defectMap.get("alarmSource"),"alarm_source");
-            String defectModelName = tWarnInfoDao.selectDictNoteByCode(defectMap.get("defectType"),"defect_model");
-            Map<String,String> nameMap = tWarnInfoDao.selectName(Long.valueOf(defectMap.get("stdMeteId")));
-            Long presetId = tWarnInfoDao.selectPresetId(Long.valueOf(defectMap.get("instanceId")));
-            Long cameraId = tWarnInfoDao.selectCameraId(Long.valueOf(defectMap.get("instanceId")));
-
-            String regionName = tWarnInfoDao.selectRegionNameByDeviceId(Long.valueOf(defectMap.get("deviceId")));
-            tWarnInfoDetail.setRegionName(regionName);
-            tWarnInfoDetail.setThresholdValue("");
-            tWarnInfoDetail.setWarnContent(defectMap.get("defectContent"));
-            tWarnInfoDetail.setAlarmTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(defectMap.get("defectTime")));
-            tWarnInfoDetail.setDeviceId(Long.valueOf(defectMap.get("deviceId")));
-            tWarnInfoDetail.setDeviceName(nameMap.get("device_name"));
-            tWarnInfoDetail.setInstanceId(Long.valueOf(defectMap.get("instanceId")));
-            tWarnInfoDetail.setPresetId(presetId);
-            tWarnInfoDetail.setCameraId(cameraId);
-            tWarnInfoDetail.setStdMeteId(Long.valueOf(defectMap.get("stdMeteId")));
-            tWarnInfoDetail.setMeteName(nameMap.get("mete_name"));
-            tWarnInfoDetail.setAlarmLevel(Integer.valueOf(defectMap.get("defectLevel")));
-            tWarnInfoDetail.setAlarmLevelName(alarmLevelName);
-            tWarnInfoDetail.setRealCode(nameMap.get("real_code"));
-            tWarnInfoDetail.setImagePath(defectMap.get("imagePath"));
-            tWarnInfoDetail.setAlarmSource(Integer.valueOf(defectMap.get("alarmSource")));
-            tWarnInfoDetail.setAlarmSourceName(alarmSourceName);
-            tWarnInfoDetail.setDefectModel(Integer.valueOf(defectMap.get("defectType")));
-            tWarnInfoDetail.setDefectModelName(defectModelName);
-            tWarnInfoDetail.setCustomName(nameMap.get("custom_name"));
+        }else {
+            //缺陷信息
+            tWarnInfoDetail = tDefectInfoDao.selectWarnPopUp(Long.valueOf(warnId));
             tWarnInfoDetail.setDeviceType(1);
-
         }
         return tWarnInfoDetail;
     }

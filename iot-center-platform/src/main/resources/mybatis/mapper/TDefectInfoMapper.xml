@@ -540,15 +540,17 @@
             a.defect_time as alarm_time,
             a.std_mete_id,
             d.mete_name,
+            d.custom_name,
             a.defect_level as alarm_level,
             e.dict_note as alarm_level_name,
-            a.defect_content,
+            a.defect_content as warn_content,
             b.real_code,
             a.image_path,
             a.alarm_source,
             f.dict_note as alarm_source_name,
             a.defect_type as defect_model,
-            m.dict_note as defect_model_name
+            m.dict_note as defect_model_name,
+        b.up_region_name as region_name
         FROM t_defect_info a
         LEFT JOIN t_std_device b on a.device_id = b.device_id
         LEFT JOIN t_std_devicemete d on a.std_mete_id = d.device_mete_id
