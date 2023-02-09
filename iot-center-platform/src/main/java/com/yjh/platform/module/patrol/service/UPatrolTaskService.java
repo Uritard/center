@@ -597,18 +597,24 @@ public class UPatrolTaskService {
                     .setCreateTime(createTime)
                     .setExecuteTime(startTime);
 
-            UPatrolTask taskExsis = uPatrolTaskDao.selectThisTaskByTaskCode(robotPatrolTaskStatus.getTaskCode());
-            if (taskExsis == null || Optional.ofNullable(taskExsis.getTaskSource()).orElse(0) == 1) {
-                uPatrolTaskDao.add(uPatrolTask);
-            } else {
-                log.warn("Task already exsis, not insert, task: {}", JSON.toJSONString(taskExsis));
+            UPatrolTask taskExist = uPatrolTaskDao.selectThisTaskByTaskCode(robotPatrolTaskStatus.getTaskCode());
+            if (StringUtils.isEmpty(taskExist.getDateType())){
+                if (taskExist == null || Optional.ofNullable(taskExist.getTaskSource()).orElse(0) == 1) {
+                    uPatrolTaskDao.add(uPatrolTask);
+                } else {
+                    log.warn("Task already exist, not insert, task: {}", JSON.toJSONString(taskExist));
+                    return null;
+                }
+            }else {
+                // 如果是周期任务, 上一级系统初始化过了
+                log.warn("Task already exist, not insert, task: {}", JSON.toJSONString(taskExist));
                 return null;
             }
             UPatrolResult resultExsis = uPatrolResultDao.selectByPrimaryId(taskId);
             if (resultExsis == null) {
                 uPatrolResultDao.add(uPatrolResult);
             } else {
-                log.warn("Task result already exsis: {}", JSON.toJSONString(resultExsis));
+                log.warn("Task result already exist: {}", JSON.toJSONString(resultExsis));
             }
             return taskId;
         } catch (Exception e) {
@@ -880,7 +886,7 @@ public class UPatrolTaskService {
                     log.info("edgeTaskInfoMap = {}", robotTaskInfoMap);
 
                     robotTask(robotTaskInfoMap);
-                    log.info("下发成功！！！");
+                    log.info("===============The task was successfully sent to the edge===============");
                 }
             }
         }
@@ -921,7 +927,7 @@ public class UPatrolTaskService {
             boolean moreTime = dateType.split(" ")[2].contains(",");
             if (moreTime && task.getExecuteType() == 172) {
                 robotTask(robotTaskInfoMap);
-                log.info("下发成功！！！");
+                log.info("===============The task was successfully sent to the robot===============");
             }
         }
 
@@ -999,10 +1005,7 @@ public class UPatrolTaskService {
 
                     taskInfo.setIntervalType(Optional.ofNullable(tCruiseTaskAdd.getIntervalType()).orElse(""));
                     taskInfo.setIntervalNumber(Optional.ofNullable(tCruiseTaskAdd.getIntervalNumber()).orElse(""));
-
-                    String intervalExecuteTime = tCruiseTaskAdd.getIntervalExecuteTime();
-                    intervalExecuteTime = StringUtils.isNotEmpty(intervalExecuteTime) ? intervalExecuteTime.substring(11) : intervalExecuteTime;
-                    taskInfo.setIntervalExecuteTime(intervalExecuteTime);
+                    taskInfo.setIntervalExecuteTime(Optional.ofNullable(tCruiseTaskAdd.getIntervalExecuteTime()).orElse(""));
 
                     boolean isInterval = StringUtils.isEmpty(tCruiseTaskAdd.getIntervalType());
                     taskInfo.setCycleStartTime(isInterval ? tCruiseTaskAdd.getCycleStartTime() : "");

@@ -113,7 +113,7 @@ public class RobotServerHandlerImpl extends ChannelInboundHandlerAdapter impleme
                 Constant.robotChannels.remove(robotCode);
                 Constant.robotThreadFlag.put(robotCode, false);
                 Constant.robotRegisterFlag.put(robotCode, false);
-                log.info("id: " + channel.id() + ", robotCode: " + robotCode + " left," + "onlineSize: " + maps.size());
+                log.info("id: " + channel.id() + ", robotCode: " + robotCode + " left," + "_onlineSize: " + maps.size());
             }
         }
 

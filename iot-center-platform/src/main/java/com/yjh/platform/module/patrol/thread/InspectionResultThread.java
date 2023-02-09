@@ -2,19 +2,15 @@ package com.yjh.platform.module.patrol.thread;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Sets;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
-import com.yjh.platform.module.device.dao.TRobotInspectionDao;
 import com.yjh.platform.module.device.entity.TCruisePointInstance;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
-import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
-import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
@@ -22,14 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
-import redis.clients.jedis.JedisCommands;
-import redis.clients.jedis.MultiKeyCommands;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import static com.yjh.platform.module.patrol.CruiseConstant.*;
 import static com.yjh.platform.module.patrol.service.UPatrolTaskService.MAP_LOCK;
@@ -49,9 +42,6 @@ public class InspectionResultThread implements Runnable{
     private final Map<String, String> infoMap;
     private final TCruisePointInstance insInfo;
     private final UPatrolTaskService uPatrolTaskService;
-
-    private final TRobotInspectionDao tRobotInspectionDao;
-    private final UPatrolResultDao uPatrolResultDao;
     private final AnalyseDataOperateDao analyseDataOperateDao;
 
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
@@ -63,9 +53,6 @@ public class InspectionResultThread implements Runnable{
         this.redisTemplate = redisTemplate;
         this.changeTaskStatus = changeTaskStatus;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
-
-        this.tRobotInspectionDao = StaticContextAccessor.getBean(TRobotInspectionDao.class);
-        this.uPatrolResultDao = StaticContextAccessor.getBean(UPatrolResultDao.class);
         this.analyseDataOperateDao = StaticContextAccessor.getBean(AnalyseDataOperateDao.class);
     }
 
@@ -75,28 +62,7 @@ public class InspectionResultThread implements Runnable{
         try {
             log.info("开始处理巡检结果并对其标准化 >>>>>>> robotPatrolTaskResult==={}", JSON.toJSONString(robotPatrolTaskResult));
             String taskId = infoMap.get("taskId");
-            /*String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
-            if ("3".equals(sysLevel)) {
-                upSystemDealWith(taskId);
-                return;
-            }*/
             String robotCode = robotPatrolTaskResult.getSendCode();
-/*
-            // taskId是巡视主机的id,robotTaskId是机器人上报的id
-            String robotTaskId = infoMap.get("taskCode");
-            log.info("robotTaskId==={}", robotTaskId);
-
-            UPatrolTask uPatrolTaskTemp = uPatrolTaskService.selectTaskByTaskCode(robotTaskId);
-            log.info("uPatrolTaskTemp=={}", uPatrolTaskTemp);
-            if (Objects.nonNull(uPatrolTaskTemp) && StringUtils.isNotEmpty(uPatrolTaskTemp.getDateType())){
-                boolean moreTime = uPatrolTaskTemp.getDateType().split(" ")[2].contains(",");
-                if (moreTime) {
-                    robotTaskId = taskId;
-                }
-            }
-            log.info("robotTaskId=={}", robotTaskId);
-*/
-
             String instanceId = infoMap.get("instanceId");
             String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
             Map<String, String> tCruiseTaskResultMap = redisTemplate.opsForHash().entries(redisKeyName);
@@ -238,8 +204,7 @@ public class InspectionResultThread implements Runnable{
             Integer type = uPatrolTaskService.selectRobotType(sendCode);
             // 机器人类型为模拟机器人/模拟无人机 为模拟工具
             boolean isSimulationTool = Objects.equals(810, type) || Objects.equals(811, type);
-            // 如果sendCode是边缘节点(1~1999) 也走模拟工具的逻辑
-//            boolean isEdgeCode = NumberUtils.toInt(sendCode) >= 1 && NumberUtils.toInt(sendCode) <= 1999;
+            // 如果是节点 也走模拟工具的逻辑
             boolean needAnalysis = type == null && !"3".equals(sysLevel) && (cruiseTypeEnum == TypeEnum.INFRARED || cruiseTypeEnum == TypeEnum.VIDEO);
            isSimulationTool = isSimulationTool || needAnalysis;
             log.info("simulation tool flag, isSimulationTool: {}, taskId: {}, robotType: {}, sysLevel: {}, cruiseType: {}", isSimulationTool, taskId, type, sysLevel, cruiseType);
@@ -250,64 +215,12 @@ public class InspectionResultThread implements Runnable{
                     uPatrolTaskService.updatePicPath(taskId, instanceId, infoMap.get("relativePath"));
                 }
                 uPatrolTaskService.patrolTaskResultHandler(taskId, Long.valueOf(instanceId));
-                // 区分是否为站端本体任务如果是站端本体任务,需更新任务状态
-                // 221128，可以不用在这更新，机器人上传任务状态的消息会处理任务状态
-                // UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);
-                // boolean isSelfTask = Objects.equals(110, uPatrolTask.getTaskSource());
-                // if (isSelfTask) {
-                //     standTaskDealHandler(taskId, sendCode);
-                // }
                 return true;
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return false;
-    }
-
-    /**
-     * 更新站端本体任务状态
-     * @param taskId 任务id
-     * @param robotCode 机器人/无人机编码
-     */
-    private void standTaskDealHandler(String taskId, String robotCode){
-        try {
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("RobotTaskStatus:" + robotCode + ":" + taskId);
-            log.info("redisInfoMap=={}", redisInfoMap);
-            Integer taskState = Integer.valueOf(String.valueOf(redisInfoMap.get("taskState")));
-            if (Objects.isNull(taskState)){
-                return;
-            }
-            // 238-任务未开始,239-正在执行,240-已执行,241-任务暂停,242-任务终止,244-任务超期
-            switch (taskState){
-                case 1:
-                    taskState = 240;
-                    break;
-                case 2:
-                    taskState = 239;
-                    break;
-                case 3:
-                    taskState = 241;
-                    break;
-                case 4:
-                    taskState = 242;
-                    break;
-                case 5:
-                    taskState = 238;
-                    break;
-                case 6:
-                    taskState = 244;
-                    break;
-                default:
-                    break;
-            }
-            UPatrolResult uPatrolResult = new UPatrolResult().setTaskId(taskId);
-            uPatrolResult.setTaskState(taskState);
-            uPatrolResult.setExecuteTime(new Date());
-            uPatrolResultDao.update(uPatrolResult);
-        }catch (Exception e){
-            log.error("更新站端本体任务状态异常：", e);
-        }
     }
 
     /**
@@ -383,12 +296,31 @@ public class InspectionResultThread implements Runnable{
      */
     private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details, String value) {
         try {
-            tCruiseTaskResultMap.put("cruiseAbnormal", "null");
+            tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+            switch (value){
+                // 目前异常情况会出现的结果 后续再更新
+                case "抓图失败":
+                    tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_NOPIC));
+                    break;
+                case "机器人离线,未执行":
+                    tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OFFLINE));
+                    break;
+                case "机器人处于检修状态,未执行":
+                case "设备检修中":
+                    tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_OVERHAUL));
+                    break;
+                case "任务终止":
+                    tCruiseTaskResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_INTERRUPT));
+                    break;
+                default:
+                    tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
+                    tCruiseTaskResultMap.put("cruiseAbnormal", "null");
+                    break;
+            }
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
-            tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
             tCruiseTaskResultMap.put("resultDesc", "--");
-            // tCruiseTaskResultMap.put("cruiseTime", tCruiseTaskResultMap.get("time"));
-            tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ? value : Objects.isNull(details.getAnalyseType()) || 13 == details.getAnalyseType() ? "已录音" : "已拍照");
+            tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ?
+                    value : Objects.isNull(details.getAnalyseType()) || 13 == details.getAnalyseType() ? "已录音" : "已拍照");
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
@@ -396,34 +328,6 @@ public class InspectionResultThread implements Runnable{
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-    }
-
-    /**
-     * Redis数据库批量查询Key值游标
-     */
-    public Set<String> redisScan(String key) {
-        return (Set<String>) redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
-            Set<String> keys = Sets.newHashSet();
-
-            JedisCommands commands = (JedisCommands) connection.getNativeConnection();
-            MultiKeyCommands multiKeyCommands = (MultiKeyCommands) commands;
-
-            ScanParams scanParams = new ScanParams();
-            scanParams.match(key + "*");
-            scanParams.count(1000);
-            ScanResult<String> scan = multiKeyCommands.scan("0", scanParams);
-            while (null != scan.getStringCursor()) {
-                keys.addAll(scan.getResult());
-                if (!StringUtils.equals("0", scan.getStringCursor())) {
-                    scan = multiKeyCommands.scan(scan.getStringCursor(), scanParams);
-                    continue;
-                } else {
-                    break;
-                }
-            }
-
-            return keys;
-        });
     }
 
     /**

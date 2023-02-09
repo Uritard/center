@@ -31,7 +31,6 @@ public class AnalysePatrolTaskResult implements Serializable {
 
     @ApiModelProperty(value = "算法类型")
     private String analyseType;
-
     @ApiModelProperty(value = "巡视结果图片")
     private String analyseResultImg;
 
