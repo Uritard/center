@@ -423,7 +423,7 @@ public class MessageThread {
         if (StringUtils.isNotEmpty(item.get("fixed_start_time").toString())){
             long fixedStartTime = DateTimeUtil.parse(String.valueOf(item.get("fixed_start_time"))).getTime();
             log.info("fixedStartTime=={},当前时间:{}", fixedStartTime, System.currentTimeMillis());
-            if (Math.abs(System.currentTimeMillis() - fixedStartTime) <= (5 * 60 * 1000)){
+            if (Math.abs(System.currentTimeMillis() - fixedStartTime) <= (60 * 1000)){
                 // 立即(fixed_start_time和当前时间相差5min)
                 tCruiseTaskAdd.setIfRun(173);
             }else {
