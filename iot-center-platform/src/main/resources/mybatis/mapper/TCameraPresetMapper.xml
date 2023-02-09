@@ -448,6 +448,7 @@
             t_camera_info a, t_camera_preset b
         WHERE a.camera_id = b.camera_id
           and b.preset_type = 3
+        and b.edge_code is null
     </select>
     <select id="selectCameraPresetInTask" resultType="java.lang.Integer">
         select
