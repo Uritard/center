@@ -92,4 +92,7 @@ public interface TCruisePointInstanceDao {
     List<Map<Object,Object>>selectRobotByDeviceMeteId(@Param(value = "deviceMeteId")Long deviceMeteId);
 
     String selectMeteNameByInstanceId(@Param("instanceId") Long instanceId);
+
+
+    TCruisePointInstance selectByEdgeCodeAndOriginId(@Param("edgeCode") String edgeCode, @Param("originId") String originId);
 }

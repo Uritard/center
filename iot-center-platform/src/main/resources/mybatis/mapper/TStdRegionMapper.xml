@@ -327,4 +327,13 @@
                 AND up_region_id = #{upRegionId,jdbcType=BIGINT}
             </if>
         </select>
+    <select id="selectByRegionCodeAndState" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from t_std_region a
+        where   a.region_code=#{regionCode}
+        <if test="state!=null"> and state=#{state}</if>
+    </select>
+
+
 </mapper>

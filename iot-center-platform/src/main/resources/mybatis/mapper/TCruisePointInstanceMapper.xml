@@ -725,4 +725,11 @@
         WHERE
             tcpi.instance_id = #{instanceId}
     </select>
+
+    <select id="selectByEdgeCodeAndOriginId" resultMap="BaseResultMap"   >
+        select
+        <include refid="Base_Column_List" />
+        from t_cruise_point_instance
+        where  edge_code = #{edgeCode} and origin_id=#{originId}
+    </select>
 </mapper>

@@ -336,16 +336,19 @@
 
     <select id="selectJudgeCondition"
             resultType="com.yjh.platform.module.task.entity.AfterManualReviewInfo">
-        select a.is_warn,
-               a.instance_id,
-               a.task_id,
-               a.identify_result,
-               a.person_check,
-               a.picpath
-        FROM u_patrol_data_result a
-        WHERE 1 = 1
-          and a.instance_id = #{instanceId}
-          and a.task_id = #{taskId}
+        SELECT
+            ( SELECT count(*) FROM t_warn_info warn WHERE warn.task_id = #{taskId} AND instance_id = #{instanceId} LIMIT 1 ) AS is_warn,
+	a.instance_id,
+	a.task_id,
+	a.identify_result,
+	a.person_check,
+	a.picpath
+        FROM
+            u_patrol_data_result a
+        WHERE
+            1 = 1
+          AND a.instance_id = #{instanceId}
+          AND a.task_id = #{taskId}
     </select>
 
     <select id="selectTaskByPage" parameterType="com.yjh.platform.module.task.entity.TCruiseResultExpand"
