@@ -90,7 +90,7 @@ public class TCruiseNonhomologousPointInstanceService {
         Map<String,Object> tCruiseNonhomologousWarnInfo = tCruiseNonhomologousPointInstanceDao.selectWarnByPrimaryId(warnId);
         List<Map<String,Object>> warnDetailInfo = tCruiseNonhomologousPointInstanceDao.selectWarnInspections(warnId);
         for(Map<String,Object> m : warnDetailInfo){
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + m.get("taskId").toString() + ":" + m.get("instanceId").toString());
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("patrol_task_result:" + m.get("taskId").toString() + ":" + m.get("instanceId").toString());
             if(redisInfoMap.size()>0){
                 m.putAll(redisInfoMap);
             }

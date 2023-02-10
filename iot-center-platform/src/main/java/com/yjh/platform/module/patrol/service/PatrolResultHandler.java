@@ -585,6 +585,12 @@ public class PatrolResultHandler {
                     cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_NORMAL));
                     cruiseResultMap.put("cruiseAbnormal", "--");
                 }
+                RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
+                robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
+                robotPatrolTaskAlarm.setValue(resultStringValue);
+                robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
+                NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
+                ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
             }else {
                 cruiseResultMap.put("resultNum", resultValue);
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
@@ -595,12 +601,6 @@ public class PatrolResultHandler {
         }
         log.info("cruiseResultMap=={}", cruiseResultMap);
         //非同源处理
-        RobotPatrolTaskAlarm robotPatrolTaskAlarm = new RobotPatrolTaskAlarm();
-        robotPatrolTaskAlarm.setTaskCode(cruiseResultMap.get("taskId"));
-        robotPatrolTaskAlarm.setValue(resultValue);
-        robotPatrolTaskAlarm.setDeviceId(cruiseResultMap.get("instanceId"));
-        NonhomologousWarnThread nonhomologousWarnThread = new NonhomologousWarnThread(robotPatrolTaskAlarm, redisTemplate, 1);
-        ThreadPoolUtil.PATROL_POOL.addThread(nonhomologousWarnThread);
         return cruiseResultMap;
     }
 

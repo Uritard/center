@@ -28,8 +28,10 @@ public class TStdMeterTypeModel {
 
     private static final long serialVersionUID = 1L;
 
+    @Max(value = 999999999999999999L)
+    @TableId(value = "id", type = IdType.AUTO)
+    @TableField(value = "id",updateStrategy = FieldStrategy.IGNORED)
     @ApiModelProperty(value = "ID")
-    @TableId(value = "id")
     private Long id;
 
 

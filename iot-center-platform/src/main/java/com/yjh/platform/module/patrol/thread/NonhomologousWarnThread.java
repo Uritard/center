@@ -89,7 +89,7 @@ public class NonhomologousWarnThread implements Runnable{
                         if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("cruiseResultId"))
+                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("instanceId"))
                                 && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             String videoInsResult = StringUtils.substringBefore(redisInfoMap.get("resultNum"), ",");
@@ -109,7 +109,7 @@ public class NonhomologousWarnThread implements Runnable{
                         if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("cruiseResultId"))
+                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("instanceId"))
                                 && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             String videoInsResult = redisInfoMap.get("resultNum");
@@ -127,7 +127,7 @@ public class NonhomologousWarnThread implements Runnable{
                         if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("cruiseResultId"))
+                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("instanceId"))
                                 && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             String videoInsResult = redisInfoMap.get("resultNum");
@@ -145,7 +145,7 @@ public class NonhomologousWarnThread implements Runnable{
                         if (Objects.isNull(map.get("oneCruiseName"))){
                             break;
                         }
-                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("cruiseResultId"))
+                        if(!redisInfoMap.isEmpty() && StringUtils.isNotEmpty(redisInfoMap.get("instanceId"))
                                 && !checkWarnExist(robotInstanceId, taskCode, instanceId)){
 
                             String videoInsResult = redisInfoMap.get("resultNum");

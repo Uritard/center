@@ -1940,7 +1940,7 @@ CREATE TABLE `t_std_metemodel_detail` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_std_meter_type_model`;
 CREATE TABLE `t_std_meter_type_model` (
-  `id` int(8) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `id` int(32) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `meter_type` int(8) DEFAULT '1' COMMENT '表计类型',
   `device_type` int(8) DEFAULT '1' COMMENT '设备类型',
   `mete_kind` varchar(20) DEFAULT '' COMMENT '测点类型:0-遥信，1-遥测',
@@ -1968,7 +1968,7 @@ CREATE TABLE `t_std_meter_type_model` (
   `modulus` int(11) DEFAULT '1' COMMENT '系数',
   `remark` varchar(128) DEFAULT '' COMMENT '信号说明',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='告警设置模板表';
+) ENGINE=InnoDB AUTO_INCREMENT=154220 DEFAULT CHARSET=utf8 COMMENT='告警设置模板表';
 
 -- ----------------------------
 -- Table structure for t_std_region
