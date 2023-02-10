@@ -344,7 +344,7 @@ public class PatrolResultHandler {
      *
      * @param analyseResultImg 巡视结果图
      * @param resultValue      巡视结果值
-     * @param cruiseResultMap  redis中巡视点结果信息
+     * @param cruiseResultMap  redis中巡视点结果信息ma
      * @param tStdDevicemete   测点信息
      * @return String
      */

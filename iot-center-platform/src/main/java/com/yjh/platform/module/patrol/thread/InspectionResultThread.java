@@ -295,6 +295,7 @@ public class InspectionResultThread implements Runnable{
      * @param value                值
      */
     private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details, String value) {
+        log.info("====This is the result of no algorithm===");
         try {
             tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
             switch (value){
