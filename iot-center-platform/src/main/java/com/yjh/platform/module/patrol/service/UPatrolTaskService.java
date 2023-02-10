@@ -262,10 +262,6 @@ public class UPatrolTaskService {
                 throw new BusinessException(ResultCodeEnum.CODE10005.getName());
             }
         } else {
-            if (Objects.nonNull(tCruiseTaskAdd.getTaskCode())) {
-                uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskCode());
-                uPatrolTask.setTaskCode(tCruiseTaskAdd.getTaskCode());
-            }
             if (Objects.nonNull(tCruiseTaskAdd.getStartTime()) && !Objects.equals("", tCruiseTaskAdd.getStartTime())) {
                 uPatrolTask.setStartTime(tCruiseTaskAdd.getStartTime());
             } else {
@@ -273,6 +269,10 @@ public class UPatrolTaskService {
                 uPatrolTask.setStartTime(new Date());
                 uPatrolTask.setEndTime(new Date());
             }
+        }
+        if (Objects.nonNull(tCruiseTaskAdd.getTaskCode())) {
+            uPatrolTask.setTaskId(tCruiseTaskAdd.getTaskCode());
+            uPatrolTask.setTaskCode(tCruiseTaskAdd.getTaskCode());
         }
         if (tCruiseTaskAdd.getAreaId() == null){
             String areaId =  redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content").toString();
