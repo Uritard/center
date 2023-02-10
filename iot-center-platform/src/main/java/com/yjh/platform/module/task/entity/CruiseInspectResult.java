@@ -24,6 +24,8 @@ public class CruiseInspectResult implements Serializable {
 
     @ApiModelProperty(value = "设备ID")
     private Long deviceId;
+    @ApiModelProperty(value = "任务ID")
+    private String taskId;
     @ApiModelProperty(value = "设备名称")
     private String deviceName;
     @ApiModelProperty(value = "巡检点ID")

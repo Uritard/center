@@ -86,4 +86,6 @@ public interface TWarnInfoDao {
     List<HashMap<String,String>> selectOperationWarn(List<Long> deviceIdList,
                              @Param(value = "startTime")String startTime,
                              @Param(value = "endTime")String endTime);
+
+    Integer countByInstanceIdAndTaskId(@Param("instanceId")Long instanceId, @Param("taskId")String taskId);
 }
