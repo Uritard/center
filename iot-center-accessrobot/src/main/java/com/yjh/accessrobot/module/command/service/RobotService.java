@@ -188,6 +188,11 @@ public class RobotService {
             if (zcz.get("code") != null) {
                 return zcz;
             }
+        } else if ("4".equals(command) && "20001".equals(type)) { //无人机自动降落
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
         } else if ("5".equals(command) && "20001".equals(type)) { //无人机控制模式
             Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
             if (zcz.get("code") != null) {
@@ -198,12 +203,37 @@ public class RobotService {
             if (zcz.get("code") != null) {
                 return zcz;
             }
+        } else if ("7".equals(command) && "20001".equals(type)) { //无人机控制权释放
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
         } else if ("8".equals(command) && "20001".equals(type)) { //无人机电源管理
             Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
             if (zcz.get("code") != null) {
                 return zcz;
             }
+        }else if ("7".equals(command) && "20002".equals(type)) { //无人机急停
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
         } else if ("5".equals(command) && "20003".equals(type)) { //无人机云台重置
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
+        } else if ("1".equals(command) && "20005".equals(type)) { //机巢
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
+        } else if ("2".equals(command) && "20005".equals(type)) { //机巢急停
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
+        } else if ("3".equals(command) && "20005".equals(type)) { //机巢舱门
             Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
             if (zcz.get("code") != null) {
                 return zcz;

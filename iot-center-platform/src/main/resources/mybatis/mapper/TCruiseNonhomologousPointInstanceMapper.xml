@@ -239,8 +239,8 @@
         f.region_id as delayId,
         a.warn_type as warnType,
         n.warn_level as warnLevel,
-        n.one_cruise_device_name,
-        n.two_cruise_device_name
+        n.one_cruise_device_name as oneCruiseDeviceName,
+        n.two_cruise_device_name as twoCruiseDeviceName
         from t_cruise_nonhomologous_warn a inner join t_cruise_nonhomologous_point_instance n on n.instance_id = a.instance_id
         left join t_cruise_point_instance b on b.instance_id = n.one_cruise_device_name
         left join t_cruise_point_instance c on c.instance_id = n.two_cruise_device_name
