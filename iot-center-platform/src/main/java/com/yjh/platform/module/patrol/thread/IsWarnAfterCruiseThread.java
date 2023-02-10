@@ -11,6 +11,9 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
+import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.entity.UPatrolTask;
@@ -19,6 +22,7 @@ import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.task.service.TWarnInfoService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -44,6 +48,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private FtpsService ftpsservice;
     private AlarmService alarmService;
     private PatrolResultHandler patrolResultHandler;
+    private TStdRegionDao tStdRegionDao;
+    private TCruisePointInstanceDao tCruisePointInstanceDao;
 
     public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate) {
         this.threadMap = threadMap;
@@ -52,6 +58,8 @@ public class IsWarnAfterCruiseThread implements Runnable {
         ftpsservice = StaticContextAccessor.getBean(FtpsService.class);
         alarmService = StaticContextAccessor.getBean(AlarmService.class);
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
+        this.tStdRegionDao = StaticContextAccessor.getBean(TStdRegionDao.class);
+        this.tCruisePointInstanceDao = StaticContextAccessor.getBean(TCruisePointInstanceDao.class);
     }
 
     @Override
@@ -76,8 +84,16 @@ public class IsWarnAfterCruiseThread implements Runnable {
             log.info("robotTaskId=={}", robotTaskId);
 
             String redisKey = "Robot_SPAndIN_Info:" + robotCode + ":" + threadMap.get("deviceId");
-            Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
-            Long instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
+            Long instanceId = null;
+            List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
+            // 如果stdRegionList为空 则表示下级接的是机器人/无人机
+            boolean isEdge = CollectionUtils.isEmpty(stdRegionList);
+            if (isEdge) {
+                instanceId = tCruisePointInstanceDao.selectByEdgeCodeAndOriginId(robotCode,threadMap.get("deviceId")).getInstanceId();
+            }else {
+                Map<String,String> robotInfoKeyMap = redisTemplate.opsForHash().entries(redisKey);
+                instanceId = Long.valueOf(robotInfoKeyMap.get("instanceId"));
+            }
             TStdDeviceMete tStdDevicemete = uPatrolTaskService.selectDeviceMeteInfo(instanceId);
 
             UPatrolTask uPatrolTask = uPatrolTaskService.selectByPrimaryId(taskId);

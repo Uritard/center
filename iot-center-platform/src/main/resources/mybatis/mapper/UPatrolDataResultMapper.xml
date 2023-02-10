@@ -641,7 +641,7 @@
         ORDER BY a.fir_date DESC
     </select>
 
-    <insert id="batchInsertUPatrolDataResult">
+    <insert id="batchInsertUPatrolDataResult" useGeneratedKeys="true" keyProperty="cruiseDataId" keyColumn="cruise_data_id">
         insert into u_patrol_data_result(
         cruise_data_id,
         task_id,
