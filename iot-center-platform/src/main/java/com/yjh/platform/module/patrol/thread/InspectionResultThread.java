@@ -329,7 +329,8 @@ public class InspectionResultThread implements Runnable{
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
             String resultValue = tCruiseTaskResultMap.get("resultNum");
-            resultHandler.normalRecognitionHandler(resultValue, tCruiseTaskResultMap, null);
+            Map<String, String> cruiseResultMap = resultHandler.normalRecognitionHandler(resultValue, tCruiseTaskResultMap, null);
+            redisTemplate.opsForHash().putAll(str, cruiseResultMap);
             uPatrolTaskService.patrolTaskResultHandler(taskId, details.getInstanceId());
         } catch (Exception e) {
             log.error(e.getMessage(), e);

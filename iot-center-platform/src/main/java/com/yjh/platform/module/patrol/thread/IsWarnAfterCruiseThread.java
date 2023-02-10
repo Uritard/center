@@ -93,12 +93,12 @@ public class IsWarnAfterCruiseThread implements Runnable {
 
             // 下级是否为机器人节点
             boolean isDevice = StaticContextAccessor.getBean(AnalyseDataOperateDao.class).selectRobotCodeIsExist(robotCode) == 1 ? true : false;
-            boolean isTemDif = isDevice && 1 == tStdDevicemete.getIsTemdif() && Objects.equals(222, tStdDevicemete.getMeteType());
+            boolean isTemDif = isDevice && 1 == tStdDevicemete.getIsTemdif() && Objects.equals("222", tStdDevicemete.getMeteType());
             initInfo.put("isTemDif", String.valueOf(isTemDif));
             if (isTemDif) {
                 // 配置了红外温差任务用差值去判断告警
                 String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
-                if (CommonUtils.isEmptyOrNullstr(temperature)) {
+                if (!CommonUtils.isEmptyOrNullstr(temperature)) {
                     double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(threadMap.get("value")));
                     initInfo.put("valueTemp", String.valueOf(abs));
                     initInfo.put("temperature", temperature);
