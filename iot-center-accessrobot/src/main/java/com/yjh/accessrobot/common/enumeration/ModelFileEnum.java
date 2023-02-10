@@ -56,6 +56,7 @@ public enum ModelFileEnum {
             if(name.contains(modelFileEnum.name)) {
                 map.put("name",modelFileEnum.name);
                 map.put("code",modelFileEnum.code);
+                return map;
             }
         }
         return null;

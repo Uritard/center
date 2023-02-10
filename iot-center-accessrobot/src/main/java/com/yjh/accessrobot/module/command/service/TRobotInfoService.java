@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TRobotInfoService {
 
+    @Autowired
+    private RedisTemplate redisTemplate;
     @Autowired
     private TRobotInfoDao tRobotInfoDao;
     @Autowired
@@ -76,6 +79,10 @@ public class TRobotInfoService {
 
     @Transactional(rollbackFor = Exception.class)
     public void saveReportData(List<RobotModel> robotModelList, String edgeNode, String type) {
+
+        Map<String, String> relativeImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative");
+        Map<String, String> absoluteImgMap = redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute");
+
         if(CollectionUtils.isEmpty(robotModelList)){
             log.info("robotModelList is null");
             tRobotInfoDao.deleteByEdgeCodeAndType(edgeNode,type);
@@ -102,7 +109,7 @@ public class TRobotInfoService {
             tRobotInfo.setInferadPort(robotModel.getInferadPort());
             tRobotInfo.setInferadUsername(robotModel.getInferadUsername());
             tRobotInfo.setInferadPassword(robotModel.getInferadPassword());
-            tRobotInfo.setPhotePath(robotModel.getPhotePath());
+            tRobotInfo.setPhotePath(robotModel.getPhotePath().replace(absoluteImgMap.get("content"),relativeImgMap.get("content")));
             tRobotInfo.setCreateBy(robotModel.getCreateBy());
             tRobotInfo.setCreateDate(robotModel.getCreateDate());
             tRobotInfo.setUpdateBy(robotModel.getUpdateBy());
