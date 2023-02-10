@@ -1323,6 +1323,8 @@ INSERT INTO `t_sys_param` VALUES ('100122', '404', 'sourceFilePath', '设备资�
 INSERT INTO `t_sys_param` VALUES ('100123', '404', 'logMaximumStorage', '审计日志存储阈值上限', '1000000', '单位：条', '{\"rule\":\"^(\\d|[1-9]\\d{1,6})$\",\"msg\":\"请输入0-9999999的整数\"}');
 INSERT INTO `t_sys_param` VALUES ('100124', '404', 'ftpsTurbo', 'ftps 服务加速', 'true', '开启则视频服务和业务服务之间不通过 ftps 传输文件', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
 INSERT INTO `t_sys_param` VALUES ('100125', '404', 'analysisTurbo', '分析主机分析服务加速', 'false', '开启使用新逻辑减少IO，提升分析速度', '{\"rule\":\"^(true|false)$\",\"msg\":\"只能填 true 或 false\"}');
+INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ( 404, 'fileAbsPath', '文件映射相对路径', '/home/yjh_iot_center/iot-files/', '文件映射相对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
+INSERT INTO `t_sys_param`(`param_type`, `param_code`, `param_name`, `content`, `remark`, `rules`) VALUES ( 404, 'fileRealPath', '文件映射绝对路径', 'https://172.24.39.9/files/', '文件映射相对路径', '{\"rule\":\"^\\\\/([^\\\\/`$%^&*+<>?\\\"{}]+\\\\/?)*$\",\"msg\":\"请输入正确路径\"}');
 -- ----------------------------
 -- Records of t_version
 -- ----------------------------
@@ -1332,3 +1334,9 @@ INSERT INTO `t_version` VALUES ('3', '1', '1.5.8.210608_relase', '巡视主机�
 INSERT INTO `t_version` VALUES ('4', '1', '2.0.1.220506_RC', '巡视主机新特高压检测版本，添加新特高压检测要求。', '1.修复个别BUG\n2.巡检功能逻辑优化\n3.数据采集功能优化\n4.视频播放功能优化\n5.配置逻辑优化', '2022-05-06 09:09:11');
 INSERT INTO `t_version` VALUES ('5', '2', '1.1.1.220422_beta', '增加用户定制需求，性能优化。', '1.修复个别BUG\n2.增加用户定制需求\n3.性能优化，提高检测精度', '2022-04-22 14:09:11');
 INSERT INTO `t_version` VALUES ('6', '2', '1.1.1.220610_beta', '特高压检测版本，添加新特高压检测要求，增加检测类型。', '1.修复若干BUG\n2.检测接口优化修改\n3.图片传输方式修改\n4.性能优化，增加检测类型，提高检测精度\n5.配置逻辑优化', '2022-06-10 16:22:53');
+
+INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (1, '普通预置位','', -1);
+INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (2, '守望位','', -1);
+INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (3, '秒级静默任务','', -1);
+INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (4, '设备隐患静默任务', 'sly_bjbmyw,sly_dmyw,pzqcd,drqgd,yxdghsg,dxdg', 3600);
+INSERT INTO `silent_conf`(`preset_type`,`preset_type_name`, `recognize_type`, `chill_time`) VALUES (5, '安全隐患静默任务', 'hzyw,yw_gkxfw', 120);
