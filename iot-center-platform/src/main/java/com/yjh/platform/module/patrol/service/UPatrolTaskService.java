@@ -1294,7 +1294,7 @@ public class UPatrolTaskService {
             //Thread.sleep(10000);
             //机器人任务暂停
             List<String> robotCodeList = uPatrolTaskDao.selectRobotIsRunning(taskId);
-            log.info("机器人任务暂停,robotCodeList:{}", robotCodeList);
+            log.info("===Robot task pause,robotCodeList:{}", robotCodeList);
             Map<String, Object> robotTaskStatesMap = new HashMap<>(6);
             robotTaskStatesMap.put("taskId", taskId);
             robotTaskStatesMap.put("commandValue", 2);
@@ -1306,7 +1306,7 @@ public class UPatrolTaskService {
 
             // 给下级系统任务暂停
             List<String> edgeCodeList = uPatrolTaskDao.selectEdgeIsRunning(taskId);
-            log.info("下级系统任务暂停,edgeCodeList:{}", edgeCodeList);
+            log.info("===Edge task pause,edgeCodeList:{}", edgeCodeList);
             if (CollectionUtils.isNotEmpty(edgeCodeList)) {
                 robotTaskStatesMap.put("robotCodeList", edgeCodeList);
                 robotTaskStates(robotTaskStatesMap);

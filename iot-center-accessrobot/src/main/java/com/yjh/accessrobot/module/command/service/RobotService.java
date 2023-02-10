@@ -1269,7 +1269,7 @@ public class RobotService {
     }
 
     /**
-     * 给机器人/无人机/边缘节点下发任务控制指令
+     * 给下级节点下发任务控制指令
      * @param robotTaskControlMap 传来的任务相关信息
      * @return int
      */
@@ -1324,7 +1324,7 @@ public class RobotService {
                 RobotServerHandler.send(generateByteOrder(xmlString, robotCode), robotCode);
             }
         } catch (Exception e) {
-            log.error("给机器人/无人机/边缘节点下发任务控制指令异常:", e);
+            log.error("给下级节点下发任务控制指令异常:", e);
         }
         return result;
     }
@@ -1346,7 +1346,7 @@ public class RobotService {
 
         try {
             if (Objects.isNull(item.getUnionTaskStatus())) {
-                log.info("这是正常的任务！！！！！！！！！！！！！");
+                log.info("This is a normal task！！！！！！！！！！！！！");
                 // 巡视类型
                 Integer planType = null;
                 switch (item.getCruiseType()) {
@@ -1427,7 +1427,7 @@ public class RobotService {
                 taskItemMap.put("type", "101");
                 taskItemMap.put("mapList", mapList);
             } else {
-                log.info("这是联动任务！！！！！！！！！！！！！");
+                log.info("This is a linkage task！！！！！！！！！！！！！");
                 map.put("task_code", taskId);
                 map.put("task_name", item.getTaskName());
                 map.put("priority", 4);
