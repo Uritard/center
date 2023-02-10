@@ -1009,4 +1009,7 @@
             ORDER BY a.warn_time DESC
     </select>
 
+    <select id="countByInstanceIdAndTaskId">
+        select count(*) from t_warn_info where task_id = #{taskId} and instance_id = #{instanceId}
+    </select>
 </mapper>

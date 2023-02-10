@@ -19,10 +19,7 @@ import com.yjh.platform.module.patrol.dao.UPatrolResultDao;
 import com.yjh.platform.module.patrol.entity.UPatrolResult;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.task.controller.HelloController;
-import com.yjh.platform.module.task.dao.TCruiseResultDao;
-import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
-import com.yjh.platform.module.task.dao.TCruiseTaskDao;
-import com.yjh.platform.module.task.dao.TCruiseTaskResultDao;
+import com.yjh.platform.module.task.dao.*;
 import com.yjh.platform.module.task.entity.*;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
@@ -97,6 +94,9 @@ public class TCruiseTaskResultService {
 
     @Autowired
     private UPatrolResultDao uPatrolResultDao;
+
+    @Autowired
+    private TWarnInfoDao tWarnInfoDao;
 
     private Logger log = LoggerFactory.getLogger(HelloController.class);
 
@@ -190,6 +190,7 @@ public class TCruiseTaskResultService {
                     Map<String, String> resultMap = redisTemplate.opsForHash().entries(keys);
                     CruiseInspectResult inspectResult = new CruiseInspectResult();
                     if (resultMap.size() > 0) {
+                        inspectResult.setTaskId(taskId);
                         inspectResult.setCruiseResultName("--");
                         inspectResult.setEndTime(null);
                         getDataFromRedis(inspectResult, resultMap, tDictMap);
@@ -255,13 +256,16 @@ public class TCruiseTaskResultService {
         } else {
             inspectResult.setEndTime(sdf.parse(resultMap.get("cruiseTime")));
         }
-        if (Objects.nonNull(resultMap.get("isWarn"))) {
+/*        if (Objects.nonNull(resultMap.get("isWarn"))) {
             if ("1".equals(resultMap.get("isWarn"))) {
                 inspectResult.setIsWarn("有");
             } else {
                 inspectResult.setIsWarn("无");
             }
-        }
+        }*/
+        Integer count = tWarnInfoDao.countByInstanceIdAndTaskId(inspectResult.getInstanceId(), inspectResult.getTaskId());
+        inspectResult.setIsWarn(count > 0 ? "有":"无");
+
         if (Objects.nonNull(resultMap.get("picpath"))) {
             inspectResult.setImagePath(resultMap.get("picpath"));
         } else {
