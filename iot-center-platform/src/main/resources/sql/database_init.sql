@@ -628,9 +628,7 @@ CREATE TABLE `t_camera_preset` (
   `camera_id` bigint(20) DEFAULT '1' COMMENT '摄像头id',
   `preset_num` int(11) DEFAULT '1' COMMENT '预置位号',
   `preset_name` varchar(128) DEFAULT '' COMMENT '预置位名称',
-  `is_keep_watch` int(1) DEFAULT '0' COMMENT '是否守望位置。0-不是，1-是',
-  `is_keep_watch_task` int(1) DEFAULT '0' COMMENT '是否静默任务。0-不是，1-是',
-  `is_second_keep_watch_task` int(1) DEFAULT '0' COMMENT '是否秒级静默任务。0-不是，1-是',
+  `preset_type` int(11) DEFAULT 1 COMMENT '预置位类型',
   `creator_user` varchar(64) DEFAULT '',
   `creator_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `is_use` int(11) DEFAULT '1' COMMENT '是否使用',
@@ -2435,3 +2433,13 @@ CREATE TABLE `sys_user_device_permission`  (
   `monitor_device_id` bigint(20) NOT NULL COMMENT '监控设备id',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=0  DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='用户设备权限表';
+
+DROP TABLE IF EXISTS `silent_conf`;
+CREATE TABLE `silent_conf` (
+                               `id` bigint(32) NOT NULL AUTO_INCREMENT COMMENT 'id',
+                               `preset_type` int(11) DEFAULT NULL COMMENT '预置位类型',
+                               `preset_type_name` varchar(255) DEFAULT NULL COMMENT '预置位类型名称',
+                               `recognize_type` varchar(255) DEFAULT NULL COMMENT '要识别的类型，以逗号隔开 如:wcanm,wcgz',
+                               `chill_time` int(64) DEFAULT -1 COMMENT '此类型识别的时间间隔，单位：秒',
+                               PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='静默监视配置表';
