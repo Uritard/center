@@ -12,6 +12,7 @@ import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
+import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import com.yjh.platform.module.user.entity.TAlgorithmMeteInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,7 @@ public class InspectionResultThread implements Runnable{
     private final TCruisePointInstance insInfo;
     private final UPatrolTaskService uPatrolTaskService;
     private final AnalyseDataOperateDao analyseDataOperateDao;
+    private final PatrolResultHandler resultHandler;
 
     public InspectionResultThread(RobotPatrolTaskResult robotPatrolTaskResult, Map<String, String> infoMap,
                                   TCruisePointInstance insInfo,
@@ -54,6 +56,7 @@ public class InspectionResultThread implements Runnable{
         this.changeTaskStatus = changeTaskStatus;
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.analyseDataOperateDao = StaticContextAccessor.getBean(AnalyseDataOperateDao.class);
+        this.resultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
     }
 
     @Override
@@ -325,6 +328,8 @@ public class InspectionResultThread implements Runnable{
             String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
+            String resultValue = tCruiseTaskResultMap.get("resultNum");
+            resultHandler.normalRecognitionHandler(resultValue, tCruiseTaskResultMap, null);
             uPatrolTaskService.patrolTaskResultHandler(taskId, details.getInstanceId());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
