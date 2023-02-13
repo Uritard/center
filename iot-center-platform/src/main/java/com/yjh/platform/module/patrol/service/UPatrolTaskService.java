@@ -1036,7 +1036,7 @@ public class UPatrolTaskService {
     private void setQuartzTask(UPatrolTask task) {
         //开启定时任务
         QuartzTask quartzTask = new QuartzTask();
-        quartzTask.setJobName(task.getTaskName());
+        quartzTask.setJobName(task.getTaskId());
         quartzTask.setJobGroup(jobName);
         if (task.getDateType() == null) {
             if (task.getExecuteType() == TaskTypeEnum.NOW.getType()) {
