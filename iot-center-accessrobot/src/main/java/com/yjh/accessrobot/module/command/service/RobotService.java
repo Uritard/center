@@ -1291,14 +1291,23 @@ public class RobotService {
             String code = "";
             String tasSkPatrolledId = (String) redisTemplate.opsForHash().get("countForAbnormal:" + taskId, "taskPatrolledId");
             for (String robotCode : robotCodeList) {
-                TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
+//                TRobotInfo tRobotInfo = tRobotInfoDao.selectRobotInfoByCode(robotCode);
                 String status;
-                if (StringUtils.isNotEmpty(tRobotInfo.getEdgeCode()) && StringUtils.isNotEmpty(tRobotInfo.getOriginId())) {
-                    status = tRobotInfoDao.selectStatusByEdgeCode(tRobotInfo.getEdgeCode());
-                    robotCode = tRobotInfo.getEdgeCode();
-                } else {
+                String isEdge = tRobotInfoDao.selectStatusByEdgeCode(robotCode);
+                if (StringUtils.isNotEmpty(isEdge)){
+                    // 下级节点
+                    status = tRobotInfoDao.selectStatusByEdgeCode(robotCode);
+                }else{
+                    // 设备
                     status = tRobotInfoDao.selectStatusByRobotCode(robotCode);
                 }
+
+//                if (StringUtils.isNotEmpty(tRobotInfo.getEdgeCode()) && StringUtils.isNotEmpty(tRobotInfo.getOriginId())) {
+//                    status = tRobotInfoDao.selectStatusByEdgeCode(tRobotInfo.getEdgeCode());
+//                    robotCode = tRobotInfo.getEdgeCode();
+//                } else {
+//                    status = tRobotInfoDao.selectStatusByRobotCode(robotCode);
+//                }
                 if (Objects.equals(OFF_LINE, status)) {
                     result.setMessage(209, "The edge is currently offline......");
                     return result;
