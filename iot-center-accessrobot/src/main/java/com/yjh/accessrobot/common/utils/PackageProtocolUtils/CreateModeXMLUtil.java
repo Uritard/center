@@ -21,28 +21,28 @@ import static org.apache.catalina.startup.ExpandWar.deleteDir;
  */
 public class CreateModeXMLUtil {
     //生成xml
-    public static String createXmlFile(List<Map<String,Object>> list,String failPath,String fileName,String model) throws Exception{
+    public static String createXmlFile(List<Map<String, Object>> list, String ftpsFilePath, String stationCode, String fileName, String model) throws Exception {
+        String failPath = stationCode + "/linkage/";
         Document document = DocumentHelper.createDocument();
         Element rss = document.addElement(model);//根节点
 
-        if(list!=null && list.size()>0) {
-            List<Map<String,Object>> itemsList = list;
-            for(Map<String, Object> item : itemsList) {
+        if (list != null && list.size() > 0) {
+            for (Map<String, Object> item : list) {
                 Element childNode61 = rss.addElement("Item");
-                for(String key : item.keySet()){
-                    childNode61.addAttribute(key, ValueUtil.Object2String(item.get(key),""));
+                for (String key : item.keySet()) {
+                    childNode61.addAttribute(key, ValueUtil.Object2String(item.get(key), ""));
                 }
             }
         }
         OutputFormat format = OutputFormat.createPrettyPrint();
         format.setEncoding("UTF-8");
-        File dir = new File(failPath);
-        if(!dir.exists()){
+        File dir = new File(ftpsFilePath + "/" + failPath);
+        if (!dir.exists()) {
             dir.mkdirs();
         }
-        File file = new File(failPath+"/"+fileName);
-        if(file.exists()){
-            deleteDir(new File(failPath + "/"+fileName));
+        File file = new File(ftpsFilePath + "/" + failPath + fileName);
+        if (file.exists()) {
+            deleteDir(new File(ftpsFilePath + "/" + failPath + fileName));
         }
         XMLWriter writer = new XMLWriter(new FileOutputStream(file), format);
         // 设置是否转义，默认使用转义字符
@@ -50,7 +50,7 @@ public class CreateModeXMLUtil {
         writer.write(document);
         writer.close();
 
-        return  failPath+"/"+fileName;
+        return failPath + fileName;
     }
 }
 

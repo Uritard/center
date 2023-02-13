@@ -23,22 +23,41 @@
     </insert>
 
     <insert id="batchInsertPlanAttr">
-        insert into t_cruise_plan_attr(
-            plan_id,
-            instance_id,
-            point_type,
-            area_id,
-            cruise_region_ids,
-            exception_type,
-            sub_type,
-            robot_id,
-            `position`,
-            algorithm_id,
-            inferad_analyze,
-            ir_temp_box
+        insert into u_patrol_plan_attr(
+        plan_id,
+        device_id,
+        device_name,
+        device_mete_id,
+        device_mete_name,
+        instance_id,
+        instance_name,
+        position_id,
+        position_name,
+        robot_id,
+        area_id,
+        point_type,
+        cruise_region_ids,
+        create_time,
+        update_time
         )values
-        <foreach collection="instanceIdList" item="instanceId" separator=",">
-            (#{planId},#{instanceId},null,null,null,null,null,null,null,null,null,null)
+        <foreach collection="list" item="UPatrolPlanAttr" separator=",">
+            (
+            #{UPatrolPlanAttr.planId, jdbcType=BIGINT},
+            #{UPatrolPlanAttr.deviceId, jdbcType=BIGINT},
+            #{UPatrolPlanAttr.deviceName, jdbcType=VARCHAR},
+            #{UPatrolPlanAttr.deviceMeteId},
+            #{UPatrolPlanAttr.deviceMeteName},
+            #{UPatrolPlanAttr.instanceId, jdbcType=BIGINT},
+            #{UPatrolPlanAttr.instanceName, jdbcType=VARCHAR},
+            #{UPatrolPlanAttr.positionId, jdbcType=BIGINT},
+            #{UPatrolPlanAttr.positionName, jdbcType=VARCHAR},
+            #{UPatrolPlanAttr.robotId, jdbcType=BIGINT},
+            #{UPatrolPlanAttr.areaId, jdbcType=VARCHAR},
+            #{UPatrolPlanAttr.pointType, jdbcType=INTEGER},
+            #{UPatrolPlanAttr.cruiseRegionIds, jdbcType=VARCHAR},
+            #{UPatrolPlanAttr.createTime, jdbcType=TIMESTAMP},
+            #{UPatrolPlanAttr.updateTime, jdbcType=TIMESTAMP}
+            )
         </foreach>
     </insert>
 
@@ -55,12 +74,66 @@
             description
         )values
         <foreach collection="tCfgUnionRuleList" item="tCfgUnionRule" separator=",">
-            (#{tCfgUnionRule.planId},#{tCfgUnionRule.ruleName},'1,==,1',#{tCfgUnionRule.inputParam},0,null,null,null,'-99999')
+            (#{tCfgUnionRule.planId},#{tCfgUnionRule.ruleName},'1,==,1',#{tCfgUnionRule.inputParam},0,null,null,null,'')
         </foreach>
     </insert>
 
     <select id="selectPlanId" resultType="java.lang.Long">
-        select plan_id from t_cfg_union_rule where description = '-99999'
+        SELECT
+            plan_id
+        FROM
+            t_cfg_union_rule
+        WHERE
+            input_param IN (
+                <foreach collection="list" item="item" separator=",">
+                    #{item.source_code, jdbcType=VARCHAR}
+                </foreach>
+            )
+    </select>
+    <select id="selectPatrolPlan" resultType="com.yjh.accesstcp.module.device.entity.UPatrolPlanAttr">
+        SELECT
+            #{planId} as plan_id,
+            c.device_id,
+            c.device_name,
+            b.device_mete_id,
+            b.mete_name AS device_mete_name,
+            a.instance_id,
+            a.cruise_name AS instance_name,
+            CASE
+                WHEN cruise_type = 229
+                    OR cruise_type = 230 THEN
+                    d.preset_id
+                WHEN cruise_type = 228
+                    OR cruise_type = 524 THEN
+                    e.inspection_id
+                ELSE
+                    f.voice_device_id
+                END AS position_id,
+            CASE
+                WHEN cruise_type = 229
+                    OR cruise_type = 230 THEN
+                    d.preset_name
+                WHEN cruise_type = 228
+                    OR cruise_type = 524 THEN
+                    e.inspection_name
+                ELSE
+                    f.voice_device_name
+                END AS position_name,
+            e.robot_id,
+            a.cruise_type AS point_type
+        FROM
+            t_cruise_point_instance a
+                LEFT JOIN t_std_devicemete b ON b.device_mete_id = a.device_mete_id
+                LEFT JOIN t_std_device c ON c.device_id = a.device_id
+                LEFT JOIN t_camera_preset d ON d.preset_id = a.cruise_id
+                LEFT JOIN t_robot_inspection e ON e.inspection_id = a.cruise_id
+                LEFT JOIN t_voice_device f ON f.voice_device_id = a.cruise_id
+        WHERE
+        a.instance_id IN (
+            <foreach collection="instanceIdList" item="instanceId" separator=",">
+                #{instanceId, jdbcType=BIGINT}
+            </foreach>
+        )
     </select>
 
     <delete id="deleteUnionRule">
@@ -72,7 +145,7 @@
     </delete>
 
     <delete id="deletePlanAttr">
-        delete from t_cruise_plan_attr where plan_id in (
+        delete from u_patrol_plan_attr where plan_id in (
         <foreach collection="planIdList" separator="," item="planId">
             #{planId}
         </foreach>
