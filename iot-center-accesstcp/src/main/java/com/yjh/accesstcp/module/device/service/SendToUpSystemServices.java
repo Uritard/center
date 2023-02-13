@@ -73,7 +73,10 @@ public class SendToUpSystemServices {
     private SendToUpSystemDao sendToUpSystemDao;
 
     @Autowired
-            private StatisticsDao statisticsDao;
+    private StatisticsDao statisticsDao;
+
+    @Autowired
+    private PatrolTaskDao patrolTaskDao;
 
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -488,11 +491,11 @@ public class SendToUpSystemServices {
 
     public String createTaskModel(String path, String stationCode) throws Exception {
         //任务模型
-        List<Map<String, Object>> list = sendToUpSystemDao.selectTaskInfo();
+        List<Map<String, Object>> list = patrolTaskDao.selectTaskInfo();
         //CronExpression expression;
         for (Map<String, Object> item : list) {
             String taskId = item.get("task_code").toString();
-            List<Long> instanceIdList = sendToUpSystemDao.selectInstanceId(taskId);
+            List<Long> instanceIdList = patrolTaskDao.selectInstanceId(taskId);
             item.put("station_code", stationCode);
             item.put("station_name", getStationName());
             item.put("device_list", instanceIdList.toString().replaceFirst("\\[", "").replace("]", "").replace(" ", ""));
