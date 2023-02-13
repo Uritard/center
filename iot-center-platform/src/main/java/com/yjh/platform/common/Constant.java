@@ -85,10 +85,8 @@ public class Constant {
     public static final String CAMERA_STREAM_STOP_ALL="http://iot-center-accessvideo/camera/v1/stopAllStream";
 
     public static<T> Result otherServer(Map<String, List<T>> map, String url) throws Exception{
-        Result re = new Result();
-        //ServiceRestTemplate serviceRestTemplate1 = serviceRestTemplate;
-        //SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-        re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);//江苏要求
+        Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(url, map, Result.class);//江苏要求
+        log.info("request: {} \nresult: {}", url, JSON.toJSONString(re));
         return re;
     }
     public static final String TCP_URL = "http://iot-center-accesstcp/sendToUpSystem/v1/sendXML";
@@ -100,7 +98,8 @@ public class Constant {
         try {
             Map<String, Object> param = new HashMap<>();
             param.put("type", type);
-            StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);//江苏要求
+            Result re = StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(TCP_MODEL_URL, Result.class,param);//江苏要求
+            log.info("modelUpload result: {}", JSON.toJSONString(re));
         }catch (Exception e){
             log.error("模型文件上传失败", e);
         }
