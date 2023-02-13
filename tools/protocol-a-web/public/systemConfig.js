@@ -2,7 +2,7 @@ const SYS_CONFIG = {
     homePageTimerStep: 10000,   //ms
     isBuild: true,
     stationName: '南京亿嘉和变电站11',
-    wsServer:'ws://192.168.10.194:12140/ws',
+    wsServer:'ws://127.0.0.1:18088/ws',
     logoutDuration: 60 * 60, // 60分钟
     barHeight:'33' // 时域波形起伏大小调节（一档：33，二档：xxx,三档：xxx,四档：xxx,）
 }
