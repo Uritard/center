@@ -162,7 +162,8 @@
         a.preset_id as presetId,
         e.preset_name as presetName,
         h.instance_id as instanceId,
-        i.analyse_type as analyseType
+        i.analyse_type as analyseType,
+        g.edge_code AS edgeCode
         FROM t_sequential_conf a
         left join t_cfg_data_current b on a.cfg_device_id = b.mete_id
         left join (SELECT CAST((@i:=@i+1) AS SIGNED) as sort,x.cfg_device_id FROM t_sequential_conf x,(Select @i:=-1) z) c on a.cfg_device_id = c.cfg_device_id

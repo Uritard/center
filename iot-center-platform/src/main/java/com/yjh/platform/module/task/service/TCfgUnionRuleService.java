@@ -1,5 +1,6 @@
 package com.yjh.platform.module.task.service;
 
+import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.module.device.dao.TCfgMeteDao;
 import com.yjh.platform.module.device.entity.AreaInfo;
@@ -8,6 +9,8 @@ import com.yjh.platform.module.task.dao.TCfgUnionRuleDao;
 import com.yjh.platform.module.task.dao.TCruisePlanDao;
 import com.yjh.platform.module.task.entity.TCfgUnionRule;
 import com.yjh.platform.module.task.entity.TCfgUnionRuleDetail;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,7 @@ import java.util.regex.Pattern;
 * @since 2020-09-18
 */
 @Service
+@Slf4j
 public class TCfgUnionRuleService{
 
     @Autowired
@@ -41,7 +45,11 @@ public class TCfgUnionRuleService{
             }
         tCfgUnionRule.setInputParam(list.toString().replaceAll("\\[","")
                 .replaceAll("]",""));
-            return this.tCfgUnionRuleDao.add(tCfgUnionRule);
+        int num = this.tCfgUnionRuleDao.add(tCfgUnionRule);
+        if (num > 0) {
+            this.transferToEdge(tCfgUnionRule.getInputParam());
+        }
+        return num;
     }
 
 
@@ -60,7 +68,29 @@ public class TCfgUnionRuleService{
             }
             tCfgUnionRule.setInputParam(list.toString().replaceAll("\\[","")
                                                        .replaceAll("]",""));
-            return this.tCfgUnionRuleDao.update(tCfgUnionRule);
+        int num = this.tCfgUnionRuleDao.update(tCfgUnionRule);
+        if (num > 0) {
+            this.transferToEdge(tCfgUnionRule.getInputParam());
+        }
+        return num;
+    }
+
+    private void transferToEdge(String inputParam) {
+        if (StringUtils.isNotEmpty(inputParam)) {
+            List<String> edgeCodeList = tCfgMeteDao.selectAllEdgeCode(inputParam.replace(" ", ""));
+            edgeCodeList.forEach(edgeCode -> {
+                Map<String, Object> map = new HashMap<>(2);
+                map.put("edgeCode", edgeCode);
+                map.put("command", "1");
+                try {
+                    Constant.mapToOtherServer(map, Constant.LINKAGE_FILE_TRANSFER);
+                } catch (Exception e) {
+                    log.error("联动配置信息转发失败！", e);
+                }
+            });
+        } else {
+            log.info("联动配置未添加触发点");
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

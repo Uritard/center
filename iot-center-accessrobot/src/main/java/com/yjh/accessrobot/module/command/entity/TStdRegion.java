@@ -87,14 +87,6 @@ public class TStdRegion implements Serializable {
      */
     private String voltageLevel;
 
-    private String serverUrl;
-
-    private Integer port;
-
-    private String userName;
-
-    private String password;
-
     /**
      * 备注
      */

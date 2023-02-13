@@ -337,28 +337,26 @@ public class MessageThread {
         if ("71".equals(xmlBaseModel.getType())) {
             try {
                 log.info("--联动文件下发指令--");
-                Map<String, String> filePathMap = redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath");
                 Map<String, Object> item = xmlBaseModel.getItems().get(0);
-                String filePath = filePathMap.get("content") + "/" + String.valueOf(item.get("file_path"));
-                switch (xmlBaseModel.getCommand()) {
-                    //<1>: =联动配置文件
-                    case "1":
-                        log.info("联动配置文件{}", filePath);
-                        analysisUnionTaskFileService.handleUnionTaskFile(filePath);
-                        break;
-                    case "2":
-                    case "3":
-                        //<2>: =一键顺控视频确认反馈信息文件
-                        //<3>: =反向联动信息转发文件
-                        log.info("一键顺控视频确认反馈信息文件/反向联动信息转发文件{}", filePath);
-                        Map<String, List<String>> mapForSend = new HashMap<>(1);
-                        List<String> list = new ArrayList<>();
-                        list.add(filePath);
-                        mapForSend.put("list", list);
-                        Constant.otherServer(mapForSend, Constant.UDP_SEND);
-                        break;
-                    default:
-                        break;
+                String filePath = String.valueOf(item.get("file_path"));
+                if (StringUtils.isNotEmpty(filePath)) {
+                    switch (xmlBaseModel.getCommand()) {
+                        //<1>: =联动配置文件
+                        case "1":
+                            log.info("联动配置文件{}", filePath);
+                            analysisUnionTaskFileService.handleUnionTaskFile(filePath);
+                            break;
+                        case "2":
+                        case "3":
+                            //<2>: =一键顺控视频确认反馈信息文件
+                            //<3>: =反向联动信息转发文件
+                            sendToUpSystemServices.dealLinkage(filePath);
+                            break;
+                        default:
+                            break;
+                    }
+                } else {
+                    log.error("联动文件下发 filePath is empty !!!");
                 }
                 sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
             } catch (Exception e) {

@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import com.yjh.accesstcp.module.device.dao.UnionTaskDao;
 import com.yjh.accesstcp.module.device.entity.TCfgUnionRule;
 import com.yjh.accesstcp.module.device.entity.TCruisePlan;
+import com.yjh.accesstcp.module.device.utils.FtpsUtil;
 import com.yjh.accesstcp.module.device.utils.ValueUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -17,6 +18,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +31,24 @@ import java.util.Set;
 public class AnalysisUnionTaskFileService {
 
     @Autowired
+    private FtpsUtil ftpsUtil;
+
+    @Autowired
     private UnionTaskDao unionTaskDao;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Transactional
     public void handleUnionTaskFile(String filePath) {
         log.info("handleUnionTaskFile begin,filePath:{}", filePath);
         try {
-            JSONArray jsonArray = readUnionTaskXml(filePath);
+            String fileName = StringUtils.substringAfter(filePath, "/linkage/");
+            log.info("联动配置文件 fileName {}", fileName);
+            String localFilePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/linkage/" + fileName;
+            log.info("联动配置文件 localFilePath {}", localFilePath);
+            ftpsUtil.downloadFile(localFilePath, filePath);
+            JSONArray jsonArray = readUnionTaskXml(localFilePath);
             deleteData();
             saveData(jsonArray);
             log.info("handleUnionTaskFile success,filePath:{}", filePath);
