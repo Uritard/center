@@ -305,9 +305,9 @@ public class TSequentialConfService{
     public String sequentialRec(String meteId) throws Exception{
         {
 
-            String edgeCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+            String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
             String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-            log.info("edgeCode==={}", edgeCode);
+            log.info("stationCode==={}", stationCode);
             Map<String,Object> map = tSequentialConfDao.selectForSequenceInfoByMeteId(meteId).get(0);
             Map<String , Object> param = new HashMap<>();
             // 开关
@@ -376,7 +376,7 @@ public class TSequentialConfService{
                 String filePath = String.valueOf(param.get("picPath"));
                 String fileName = filePath.replace(resultImgPath, "");
                 filePathMap.put("filePath", filePath);
-                filePathMap.put("targetPath", "VideoFile" + "/" + fileName);
+                filePathMap.put("targetPath", stationCode + "/" + "videoFile" + "/" + fileName);
                 Constant.mapToOtherServer(filePathMap, Constant.TCP_UPLOAD_FILE);
                 String videoName = String.valueOf(param.get("fileName"));
                 String videoFilePath = String.valueOf(param.get("voicePath"));
@@ -394,7 +394,7 @@ public class TSequentialConfService{
                 xmlItem.put("patroldevice_name", "");
                 xmlItem.put("patroldevice_code", "");
                 xmlItem.put("task_name", "一键顺控任务");
-                xmlItem.put("task_code", edgeCode+meteId);
+                xmlItem.put("task_code", stationCode + meteId);
                 xmlItem.put("device_name", map.get("deviceName"));
                 xmlItem.put("device_id", map.get("instanceId"));
                 xmlItem.put("value_type", "0");
@@ -405,7 +405,7 @@ public class TSequentialConfService{
                 //一键顺控检测
                 xmlItem.put("recognition_type", "1001");
                 xmlItem.put("file_type",  param.get("fileType"));
-                xmlItem.put("file_path", edgeCode + "/VideoFile" + "/" + fileName);
+                xmlItem.put("file_path", stationCode + "/videoFile" + "/" + fileName);
                 xmlItem.put("rectangle", "");
                 xmlItem.put("task_patrolled_id", meteId);
                 xmlItem.put("data_type", "01");
@@ -596,8 +596,9 @@ public class TSequentialConfService{
                 case "4": value = "合不到位"; break;
                 default: value = "无效状态"; break;
             }
-            TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
-            String devicePath = tSysParam.getContent()+"/"+videocfmresultFile.replace("{{date}}",simpleDateFormat2.format(new Date()));
+            String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+            String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
+            String devicePath = ftpsFilePath + "/" + stationCode + "/linkage/" + videocfmresultFile.replace("{{date}}", simpleDateFormat2.format(new Date()));
 
             File txt=new File(devicePath);
             if(txt.exists()){
@@ -606,23 +607,24 @@ public class TSequentialConfService{
             if (!txt.exists()) {
                 txt.createNewFile();
             }
+            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + map.get("edgeCode")).get("stationId"));
+            String meteId = StringUtils.substringAfter(recBack.get("meteId"), stationId);
 //                FileWriter fw = new FileWriter(txt, true);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(txt,true), fileCharset));
             bw.write("<!Entity=设备状态请求结果\tver='V1.0'\ttime='"+simpleDateFormat.format(new Date())+"'(文件最新时间)!>\r\n");
             bw.write("<DeviceInfo::设备状态>\r\n");
             bw.write("@序号\t站序号\t监控索引号\t设备名称\t设备状态\t事件时标\r\n");
-            bw.write("#1\t"+1+"\t"+ recBack.get("meteId")+"\t"+ map.get("deviceName")+"\t"+ value +"\t"+simpleDateFormat.format(new Date())+"\r\n");
+            bw.write("#1\t"+1+"\t"+ meteId +"\t"+ map.get("deviceName")+"\t"+ value +"\t"+simpleDateFormat.format(new Date())+"\r\n");
             bw.write("</DeviceInfo::设备状态>\r\n");
             bw.flush();
             bw.close();
 //                fw.close();
-            String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-            if ("1".equals(edgeLevel)) {
+            if (Objects.nonNull(map.get("edgeCode"))) {
                 Map<String, Object> mapForSend = new HashMap<>(3);
                 mapForSend.put("edgeCode", map.get("edgeCode"));
                 mapForSend.put("command", "2");
-                mapForSend.put("filePath", devicePath);
+                mapForSend.put("filePath", devicePath.replace(ftpsFilePath, ""));
                 Constant.mapToOtherServer(mapForSend, Constant.LINKAGE_FILE_TRANSFER);
             } else {
                 //将生成的顺控确认文件发送给主辅监控系统
@@ -647,11 +649,12 @@ public class TSequentialConfService{
 
         try{
             TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
-            TSysParam tSysParam = tSysParamDao.selectByParamType("unionDeviceInfoPath");
+            String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+            String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
 
-            String devicePath = tSysParam.getContent()+"/"+returnlinkageFile.replace("{{date}}",simpleDateFormat2.format(new Date()));
+            String devicePath = ftpsFilePath + "/" + stationCode + "/linkage/" + returnlinkageFile.replace("{{date}}",simpleDateFormat2.format(new Date()));
             File txt=new File(devicePath);
 
             if(txt.exists()){
@@ -660,6 +663,8 @@ public class TSequentialConfService{
             if (!txt.exists()) {
                 txt.createNewFile();
             }
+            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode()).get("stationId"));
+            cfgDeviceId = StringUtils.substringAfter(cfgDeviceId, stationId);
             FileWriter fw = new FileWriter(txt, true);
             //BufferedWriter bw = new BufferedWriter(fw,"UTF-8");
             BufferedWriter bw = new BufferedWriter(
@@ -675,12 +680,11 @@ public class TSequentialConfService{
             bw.close();
             fw.close();
             //将生成的反向联动文件发送给主辅监控系统
-            String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
-            if ("1".equals(edgeLevel)) {
+            if (Objects.nonNull(tCfgDevice.getEdgeCode())) {
                 Map<String, Object> mapForSend = new HashMap<>(3);
                 mapForSend.put("edgeCode", tCfgDevice.getEdgeCode());
                 mapForSend.put("command", "3");
-                mapForSend.put("filePath", devicePath);
+                mapForSend.put("filePath", devicePath.replace(ftpsFilePath,""));
                 Constant.mapToOtherServer(mapForSend, Constant.LINKAGE_FILE_TRANSFER);
             } else {
                 Map<String, List<String>> mapForSend = new HashMap<>();
@@ -694,8 +698,5 @@ public class TSequentialConfService{
 
         return "ok";
     }
-
-
-
 }
 

@@ -300,6 +300,12 @@
         <if test="stander != null and stander != ''"> and a.stander = #{stander, jdbcType=REAL}</if>
         <if test="controlenable != null "> and a.controlenable = #{controlenable, jdbcType=INTEGER}</if>
     </select>
+    <select id="selectAllEdgeCode" resultType="java.lang.String">
+        SELECT DISTINCT
+            a.edge_code
+        FROM
+            `t_cfg_mete` a WHERE FIND_IN_SET(a.mete_id,#{inputParam, jdbcType=VARCHAR});
+    </select>
 
     <insert id="batchInsert">
         insert into t_cfg_mete(

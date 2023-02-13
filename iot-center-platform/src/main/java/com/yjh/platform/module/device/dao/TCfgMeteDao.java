@@ -52,4 +52,6 @@ public interface TCfgMeteDao {
     int batchInsert(List<TCfgMete> list);
     int insertForAll(SYAllInfo syAllInfo);
     int updateForAll(SYAllInfo syAllInfo);
+
+    List<String> selectAllEdgeCode(@Param(value = "inputParam") String inputParam);
 }

@@ -3,6 +3,8 @@ package com.yjh.accessrobot.netty.handler;
 import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
+import com.yjh.accessrobot.module.command.dao.TStdRegionDao;
+import com.yjh.accessrobot.module.command.entity.TStdRegion;
 import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.netty.entiy.HandlerEnum;
 import com.yjh.accessrobot.netty.server.RobotServerHandler;
@@ -13,8 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author hyh
@@ -24,13 +29,18 @@ import java.util.Map;
 @Service
 public class LinkageSignalHandler implements MessageHandlerStrategy, InitializingBean {
 
-    @Autowired
-    private RedisTemplate redisTemplate;
+    @Resource
+    private TStdRegionDao tStdRegionDao;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
         String sendCode = xmlBaseModel.getSendCode();
         if (Constant.robotRegisterFlag.getOrDefault(sendCode, false)) {
+            TStdRegion stdRegion = Optional.of(tStdRegionDao.selectByRegionCodeAndState(sendCode, Constant.STATE_LOCAL)).map(tStdRegionList1 -> tStdRegionList1.get(0)).orElse(null);
+            if (Objects.isNull(stdRegion)) {
+                log.error("未配置该边缘节点 edgeCode:{}", sendCode);
+                return;
+            }
             try {
                 log.info("收到边缘节点 {} 的联动信号数据了", sendCode);
                 String meteId = String.valueOf(xmlBaseModel.getItems().get(0).get("source_code"));
@@ -40,7 +50,7 @@ public class LinkageSignalHandler implements MessageHandlerStrategy, Initializin
                 String time = String.valueOf(xmlBaseModel.getItems().get(0).get("source_time"));
                 //处理联动信号数据 入库
                 Map<String, Object> params = new HashMap<>(5);
-                params.put("meteId", sendCode + meteId);
+                params.put("meteId", stdRegion.getStationId() + meteId);
                 params.put("meteKind", meteKind);
                 params.put("value", value);
                 params.put("commit", commit);

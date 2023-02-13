@@ -998,6 +998,30 @@ public class SendToUpSystemServices {
 
         return "";
     }
+
+
+    /**
+     * 处理一键顺控视频确认反馈信息文件/反向联动信息转发文件
+     * @param filePath 文件地址 需从巡视主机下载
+     */
+    public void dealLinkage(String filePath) {
+        log.info("一键顺控视频确认反馈信息文件/反向联动信息转发文件{}", filePath);
+        try {
+            String fileName = StringUtils.substringAfter(filePath, "/linkage/");
+            log.info("fileName {}", fileName);
+            String localFilePath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath","content") + "/linkage/" + fileName;
+            log.info("localFilePath {}", localFilePath);
+            ftpsUtil.downloadFile(localFilePath, filePath);
+            Map<String, List<String>> mapForSend = new HashMap<>(1);
+            List<String> list = new ArrayList<>();
+            list.add(filePath);
+            mapForSend.put("list", list);
+            Constant.otherServer(mapForSend, Constant.UDP_SEND);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * 查询所有在线设备
      * @return

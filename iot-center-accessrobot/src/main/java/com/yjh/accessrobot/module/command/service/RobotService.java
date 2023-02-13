@@ -408,32 +408,11 @@ public class RobotService {
                 List<Map<String, Object>> mapList = new ArrayList<>();
                 Map<String, Object> map = new HashMap<>(2);
                 String stationCode = stdRegionList.get(0).getStationId();
-                String serverUrl = stdRegionList.get(0).getServerUrl();
-                Integer port = stdRegionList.get(0).getPort();
-                String userName = stdRegionList.get(0).getUserName();
-                String password = stdRegionList.get(0).getPassword();
-                String targetPath = "";
-                switch (command) {
-                    case "1":
-                        //<1>: =联动配置文件
-                        String fileName = "linkage_model.xml";
-                        filePath = createLinkageModel(Constant.sendCode, stationCode);
-                        targetPath = stationCode + "/" + "LinkageModel" + "/" + fileName;
-                        sendToEdgeFile(filePath, targetPath, serverUrl, port, userName, password);
-                        break;
-                    case "2":
-                    case "3":
-                        //<2>: =一键顺控视频确认反馈信息文件
-                        //<3>: =反向联动信息转发文件
-                        String[] sArray = filePath.split("/");
-                        String ftpFileName = sArray[sArray.length - 1];
-                        targetPath = stationCode + "/" + "LinkageModel" + "/" + ftpFileName;
-                        sendToEdgeFile(filePath, targetPath, serverUrl, port, userName, password);
-                        break;
-                    default:
-                        break;
+                //<1>: =联动配置文件
+                if ("1".equals(command)) {
+                    filePath = createLinkageModel(Constant.sendCode, stationCode);
                 }
-                map.put("file_path", targetPath);
+                map.put("file_path", filePath);
                 mapList.add(map);
                 XMLBaseModel xmlBaseModel = new XMLBaseModel()
                         .setSendCode(Constant.sendCode)
@@ -3035,6 +3014,11 @@ public class RobotService {
      */
     private void dealSourceFile(String filePath, String edgeCode) {
         log.info("处理设备资源信息配置文件：filePath:{}, edgeCode:{}",filePath,edgeCode);
+        TStdRegion stdRegion = Optional.of(tStdRegionDao.selectByRegionCodeAndState(edgeCode, Constant.STATE_LOCAL)).map(tStdRegionList1 -> tStdRegionList1.get(0)).orElse(null);
+        if (Objects.isNull(stdRegion)) {
+            log.error("未配置该边缘节点 edgeCode:{}", edgeCode);
+            return;
+        }
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             StringBuilder stringBuilder = new StringBuilder();
@@ -3068,9 +3052,9 @@ public class RobotService {
                 } else {
                     meteName = mete[mete.length - 1] + "-" + strArray[4];
                 }
-                syAllInfo.setMeteId(edgeCode + strArray[2]);
+                syAllInfo.setMeteId(stdRegion.getStationId() + strArray[2]);
                 syAllInfo.setMeteName(meteName);
-                syAllInfo.setDeviceId(edgeCode + strArray[2]);
+                syAllInfo.setDeviceId(stdRegion.getStationId() + strArray[2]);
                 syAllInfo.setEdgeCode(edgeCode);
                 syAllInfo.setDeviceName(strArray[3]);
                 Integer meteKind = strArray[4].contains("遥信") ? 1 : (strArray[4].contains("遥测") ? 2 : (strArray[4].contains("遥控") ? 3 : (strArray[4].contains("遥调") ? 4 : 5)));
