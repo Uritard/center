@@ -28,13 +28,13 @@
       </div>
       <el-input
           type="textarea"
-          :rows="20"
+          :rows="14"
           placeholder="请输入报文"
           v-model="textarea">
       </el-input>
     </div>
     <div class="reception">
-      <el-scrollbar style="width: 1920px;height: 500px;">
+      <el-scrollbar style="width: 100%;">
       <div v-for="item in textReceptionList" class="text-reception" v-text="item.name"></div>
       </el-scrollbar>
     </div>
@@ -48,7 +48,7 @@ export default {
   name: "test",
   data() {
     return {
-      wsIp:'ws://192.168.20.11:18088/demo/message',
+      wsIp:'ws://127.0.0.1:18088/demo/message',
       ws_platform: null,
       textarea:'<?xmlversion="1.0"encoding="UTF-8"?>\n' +
           '<PatrolDevice>\n' +
@@ -147,7 +147,7 @@ export default {
 }
 .send {
   width: 100%;
-  height: 50%;
+  height: 318px;
   border: 1px solid #0AAFB7;
   .connect {
     width: 100%;
@@ -156,7 +156,7 @@ export default {
 }
 .reception {
   width: 100%;
-  height: 50%;
+  height: calc(100vh - 324px);
   .text-reception {
     width: 100%;
     height: 50px;

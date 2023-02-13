@@ -146,7 +146,7 @@ module.exports = {
         hotOnly: false, // 热更新
         proxy: {
             '^/demo': {
-                target: 'http://192.168.20.11:18088/demo/',
+                target: 'http://172.24.39.139:18088/demo/',
                 ws: true, // 开启WebSocket
                 secure: false, // 如果是https接口，需要配置这个参数
                 changeOrigin: true,
