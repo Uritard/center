@@ -186,6 +186,7 @@ public class SilentAlarmThread implements Runnable {
         if (str.contains("[bg_upload:1]")) {
             return;
         }
+        log.info("秒级静默监视数据处理 -- img");
         try {
             if (Objects.equals("fielddetection", eventType) || Objects.equals("mixedTargetDetection", eventType) ||
                     Objects.equals("anquanmao", eventType) || Objects.equals("renyuan", eventType)) {
@@ -341,25 +342,29 @@ public class SilentAlarmThread implements Runnable {
     }
 
     public void stopAlarmGuard(boolean flag) {
-        String cameraId = this.cameraId;
-        String presetId = this.presetId;
-        String key =Constant.SILENT_SECOND+ cameraId + ":" + presetId;
-        Map<String, Object> entries = redisTemplate.opsForHash().entries(key);
-        if (cameraId.equals(String.valueOf(entries.get("cameraId"))) && presetId.equals(String.valueOf(entries.get("presetId")))) {
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
-            String state = redisInfoMap.get("state");
-            if (!StringUtils.equals("0", state)) {
-                redisTemplate.opsForHash().delete(key);
-                return;
+        try {
+            String cameraId = this.cameraId;
+            String presetId = this.presetId;
+            String key = Constant.SILENT_SECOND + cameraId + ":" + presetId;
+            Map<String, Object> entries = redisTemplate.opsForHash().entries(key);
+            if (cameraId.equals(String.valueOf(entries.get("cameraId"))) && presetId.equals(String.valueOf(entries.get("presetId")))) {
+                Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("camera_info:" + cameraId);
+                String state = redisInfoMap.get("state");
+                if (!StringUtils.equals("0", state)) {
+                    redisTemplate.opsForHash().delete(key);
+                    return;
+                }
+                if (tCameraPresetService.selectSilentByCameraIdAndPresetId(cameraId, presetId) == 0) {
+                    log.info("tCameraPresetService.selectSilentByCameraIdAndPresetId(cameraId, presetId) == 0");
+                    redisTemplate.opsForHash().delete(key);
+                    return;
+                }
+                if (flag) {
+                    redisTemplate.opsForHash().delete(key);
+                }
             }
-            if (tCameraPresetService.selectSilentByCameraIdAndPresetId(cameraId, presetId) == 0) {
-                log.info("tCameraPresetService.selectSilentByCameraIdAndPresetId(cameraId, presetId) == 0");
-                redisTemplate.opsForHash().delete(key);
-                return;
-            }
-            if (flag) {
-                redisTemplate.opsForHash().delete(key);
-            }
+        }catch (Exception e){
+            log.error("秒级静默监视删除redis配置出错：",e);
         }
     }
 
