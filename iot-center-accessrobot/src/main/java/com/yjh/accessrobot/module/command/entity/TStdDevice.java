@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.stream.Stream;
 
 /**
  * 标准化设备表

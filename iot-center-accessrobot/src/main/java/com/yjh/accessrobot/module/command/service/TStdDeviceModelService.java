@@ -3,6 +3,7 @@ package com.yjh.accessrobot.module.command.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.google.common.collect.Lists;
+import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.commons.utils.file.FileUtil;
 import com.yjh.accessrobot.module.command.dao.*;
@@ -17,10 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -176,8 +174,8 @@ public class TStdDeviceModelService {
             //标准测点
             List<TStdDeviceMete> insertStdDeviceMete = dealStdDeviceMete(insertStdDevice, oldStdDeviceMeteList, newStdDeviceMetes, edgeCode, edgeLevel);
             //标准测点算法关系信息
-            dealAlgorithmMete(insertStdDeviceMete, oldAlgorithmMeteList, newAlgorithmMetes, edgeCode);
             insertStdDeviceMete.addAll(oldStdDeviceMeteList);
+            dealAlgorithmMete(insertStdDeviceMete, oldAlgorithmMeteList, newAlgorithmMetes, edgeCode);
             //巡视点
             dealCruisePointInstance(insertCameraPresetList, insertRobotInspectionList, insertStdDevice, insertStdDeviceMete,
                     oldCruisePointInstanceList, newCruisePointInstances, tVoiceDeviceList, edgeCode);
@@ -718,13 +716,15 @@ public class TStdDeviceModelService {
         SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
         newList.stream().filter(tStdDevice -> Objects.nonNull(tStdDevice.getCameraId()) && Objects.nonNull(tStdDevice.getPresetId()))
                 .forEach(tStdDevice -> {
-            tStdDevice.setCameraId(tCameraInfoList.stream().filter(tCameraInfo ->
-                            tCameraInfo.getOriginId().equals(String.valueOf(tStdDevice.getCameraId())))
-                    .collect(Collectors.toList()).get(0).getCameraId());
-            tStdDevice.setPresetId(insertCameraPresetList.stream().filter(tCameraPreset ->
-                            tCameraPreset.getOriginId().equals(String.valueOf(tStdDevice.getPresetId())))
-                    .collect(Collectors.toList()).get(0).getPresetId());
-        });
+                    List<TCameraInfo> cameraList = tCameraInfoList.stream().filter(tCameraInfo -> tCameraInfo.getOriginId().equals(String.valueOf(tStdDevice.getCameraId()))).collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(cameraList)) {
+                        tStdDevice.setCameraId(cameraList.get(0).getCameraId());
+                    }
+                    List<TCameraPreset> presetList = insertCameraPresetList.stream().filter(tCameraPreset -> tCameraPreset.getOriginId().equals(String.valueOf(tStdDevice.getPresetId()))).collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(presetList)) {
+                        tStdDevice.setPresetId(presetList.get(0).getPresetId());
+                    }
+                });
         if (CollectionUtils.isNotEmpty(updateIdSet)) {
             newList.stream().filter(t ->
                     updateIdSet.contains(t.getOriginId())).forEach(t -> {
