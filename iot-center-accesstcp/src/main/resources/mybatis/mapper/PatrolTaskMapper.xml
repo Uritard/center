@@ -8,7 +8,7 @@
                a.task_name,
                a.task_level                         as priority,
                "3"                                  as device_level,
---                IFNULL(a.date_type, "") as time,
+               a.date_type as time,
                "" as cycle_month,
                "" as  cycle_week,
                "" as cycle_execute_time,
@@ -24,6 +24,7 @@
                '0' isenable,
                u.user_name as creator,
                DATE_FORMAT(a.start_time, '%Y-%m-%d %H:%i:%s')  as fixed_start_time,
+               DATE_FORMAT(a.end_time, '%Y-%m-%d %H:%i:%s')  as end_time,
                DATE_FORMAT(a.create_time, '%Y-%m-%d %H:%i:%s') as create_time
         from u_patrol_task a
         left join sys_user u on a.create_user_id = u.user_id
