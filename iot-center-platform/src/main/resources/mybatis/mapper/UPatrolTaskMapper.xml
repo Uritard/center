@@ -829,11 +829,8 @@
         SELECT
             a.task_code
         FROM
-            u_patrol_task a,u_patrol_result b
-        WHERE a.task_id = b.task_id
-          and a.task_id = #{taskId, jdbcType=VARCHAR}
-        ORDER BY b.execute_time desc
-            LIMIT 1
+            u_patrol_task a
+        WHERE a.task_id = #{taskId, jdbcType=VARCHAR}
     </select>
 
     <select id="selectForSequenceInfoByMeteId" resultType="java.util.Map">

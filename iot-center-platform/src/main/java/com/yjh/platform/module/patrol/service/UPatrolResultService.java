@@ -228,7 +228,7 @@ public class UPatrolResultService {
                 initInfo.put("valueTemp", String.valueOf(abs));
                 initInfo.put("temperature", temperature);
                 initInfo.put("warnName", tStdDevicemete.getMeteName() + "温差任务");
-                initInfo.put("warnContent", "传感器环境温度与测温产生温差:" + temperature + "--" + personCheck);
+                initInfo.put("warnContent", "传感器环境温度与测温产生温差:环境" + temperature + "--测温" + personCheck + "--温差" + abs);
                 initInfo.put("outRange", String.valueOf(abs));
             }
         }

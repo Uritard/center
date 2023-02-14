@@ -1077,7 +1077,14 @@ public class UPatrolTaskService {
         xmlBaseModel.setType("41");
         try {
             String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId", "content");
-            item.put("task_patrolled_id", stationCode + "_" +task.getTaskId() + "_" + DateTimeUtil.format3(task.getStartTime()));
+            String taskPatrolledIdTemp = task.getTaskId();
+
+            UPatrolTask uPatrolTask = selectTaskByTaskCode(task.getTaskCode());
+            if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
+                taskPatrolledIdTemp = task.getTaskCode();
+            }
+
+            item.put("task_patrolled_id", stationCode + "_" +taskPatrolledIdTemp + "_" + DateTimeUtil.format3(task.getStartTime()));
             item.put("task_name", task.getTaskName());
             item.put("task_code", task.getTaskCode());
             item.put("task_state", String.valueOf(state));
