@@ -420,4 +420,42 @@ public class TCameraPresetController {
         }
         return result;
     }
+
+    @ApiOperation(value = "重置预置位")
+    @PostMapping(value = "/reset")
+    @Logs(title = "重置预置位",content = "根据用户传递的参数更新预置位角度",logType = 3,authority = "1234,1235")
+    public Result reset( @Validated @RequestBody TCameraPreset tCameraPreset) {
+        Result result = new Result();
+        try {
+
+            TCameraPreset cameraPreset = tCameraPresetService.selectByPrimaryId(tCameraPreset.getPresetId());
+            if (cameraPreset == null) {
+                result.setMessage(ResultCodeEnum.UPDATEERROR.getCode(), "预置位信息有误，请检查预置位信息或联系管理员");
+                result.setData(0);
+                return result;
+            }
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("cameraId", cameraPreset.getCameraId());
+            params.put("presetId", cameraPreset.getPresetId());
+            params.put("meteName", cameraPreset.getPresetName());
+
+            Result response1 = sendPostRequest(Constant.SET_PRESET_URL, params);//设置预置点
+            if (response1.getData().equals(true)) {
+                Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
+                JSONObject json = (JSONObject)JSON.toJSON(response2.getData());
+                cameraPreset.setPresetImg((String)json.get("urlPath"));
+                tCameraPresetService.update(cameraPreset);//存图
+                result.setData(1);
+            } else {
+                result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+                result.setData(0);
+            }
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("添加预置位信息错误:", e);
+        }
+        return result;
+    }
 }

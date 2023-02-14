@@ -419,11 +419,12 @@ public class CameraConController {
     @ApiOperation(value = "设置预置点")
     @RequestMapping(value = "/setPreset", method = RequestMethod.GET)
     public Result setPreset(@RequestParam(value = "presetId") Long presetId,
-                            @RequestParam(value = "cameraId") Long cameraId) {
+                            @RequestParam(value = "cameraId") Long cameraId,
+                            @RequestParam(value = "presetName", required = false) String presetName) {
         Result result = new Result();
         try {
             cameraConService.isCameraControlled(cameraId);
-            result.setData(cameraConService.presetAction(presetId, cameraId, HCNetSDK.SET_PRESET));
+            result.setData(cameraConService.presetAction(presetId, cameraId, HCNetSDK.SET_PRESET, presetName));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

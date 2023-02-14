@@ -4,25 +4,24 @@ import com.yjh.platform.common.result.Result;
 import com.yjh.platform.module.device.dao.TAlgorithmConfBakDao;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
-import com.yjh.platform.module.device.entity.*;
 import com.yjh.platform.module.device.dao.TStdDevicemeteDao;
-
-import java.math.BigDecimal;
-import java.util.*;
-
+import com.yjh.platform.module.device.entity.*;
+import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
+import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
 import com.yjh.platform.module.task.dao.TCruiseTypeDao;
 import com.yjh.platform.module.user.dao.TDictBusinessDao;
 import com.yjh.platform.module.user.entity.TAlgorithmInfo;
-import com.yjh.platform.module.user.entity.TDictBusiness;
-import com.yjh.platform.module.task.dao.TCruisePlanAttrDao;
-import com.yjh.platform.module.task.dao.TCruiseTaskAttrDao;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
 * @author tt
@@ -271,6 +270,11 @@ public class TStdDevicemeteService{
                 }
             }else {
                 detail.setIsRedundant(1);
+            }
+
+            if (StringUtils.isEmpty(detail.getAnalyseTypeName())) {
+                String analyseName = "on".equals(detail.getIsAi()) ? "缺陷" : "on".equals(detail.getIsJudge()) ? "判别" : "无";
+                detail.setAnalyseTypeName(analyseName);
             }
         }
 

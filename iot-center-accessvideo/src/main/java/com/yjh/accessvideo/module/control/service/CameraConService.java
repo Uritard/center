@@ -23,7 +23,6 @@ import com.yjh.accessvideo.thread.TaskExecutePool;
 import com.yjh.accessvideo.threads.RecordFileThread;
 import com.yjh.accessvideo.threads.TranscodeThread;
 import com.yjh.accessvideo.videostreamer.ProcessManager;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -47,7 +46,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
@@ -968,9 +966,11 @@ public class CameraConService {
         return g.getFontMetrics(g.getFont()).charsWidth(waterMarkContent.toCharArray(), 0, waterMarkContent.length());
     }
 
-    //@Logs(title = "预置点调用", code = "presetAction")
-    @Transactional(rollbackFor = Exception.class)
     public boolean presetAction(Long presetId, Long cameraId, int presetCmd) {
+        return presetAction(presetId, cameraId, presetCmd, null);
+    }
+
+    public boolean presetAction(Long presetId, Long cameraId, int presetCmd, String presetName) {
         CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
         if (cameraConInfo == null) {
             //摄像机id和预置位Id不正确
@@ -979,18 +979,21 @@ public class CameraConService {
         int iChanNum = cameraConInfo.getChannelNum() + 32;
         int iPreset = cameraConInfo.getPresetNum();
         int lUserIDLong = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
-        hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, iChanNum, presetCmd, iPreset);
+        boolean ret = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, iChanNum, presetCmd, iPreset);
 
-//        m_lRealPlayHandle = realPlay(iChanNum, cameraConInfo.getRecordId());
-//        if (m_lRealPlayHandle.intValue() == -1) {
-//            log.error("preview fail,error code:" + hCNetSDK.NET_DVR_GetLastError());
-//            return false;
-//        }
-//        if (!hCNetSDK.NET_DVR_PTZPreset(m_lRealPlayHandle, presetCmd, iPreset)) {
-//            log.error("set presetPoint fail, presetId：" + iPreset+", error code: "+hCNetSDK.NET_DVR_GetLastError());
-//            return false;
-//        }
-        if (presetCmd == 9) {
+        // 设置预置位名称 通过NVR设置名称没卵用，注掉，可能需要通过直连相机来设置预置位名称
+        if (ret && HCNetSDK.SET_PRESET == presetCmd && StringUtils.isNotBlank(presetName)) {
+            HCNetSDK.NET_DVR_PRESET_NAME dvrPresetName = new HCNetSDK.NET_DVR_PRESET_NAME();
+            dvrPresetName.wPresetNum = (short)iPreset;
+            System.arraycopy(presetName.getBytes(), 0, dvrPresetName.byName, 0, presetName.length());
+            dvrPresetName.write();
+
+            if (!hCNetSDK.NET_DVR_SetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_SET_PRESET_NAME, iChanNum, dvrPresetName.getPointer(), dvrPresetName.size())) {
+                log.error("设置预置位名称失败， name: {}, err: {}", presetName, hCNetSDK.NET_DVR_GetLastError());
+            }
+        }
+
+        if (ret && presetCmd == HCNetSDK.CLE_PRESET) {
             String capturePresetPath = getPresetBasePath();
             String delPresetPic = "rm -rf " + capturePresetPath + "/" + presetId;
             try {
@@ -999,7 +1002,7 @@ public class CameraConService {
                 log.error(e.getMessage(), e);
             }
         }
-        return true;
+        return ret;
     }
 
     //@Logs(title = "获取相机状态", code = "getCameraStatus", content = "获取相机状态信息")
