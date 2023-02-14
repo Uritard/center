@@ -25,7 +25,9 @@ public interface TCfgDataCurrentDao {
                                 @Param(value = "regionId") String regionId,
                                 @Param(value = "meteValue") String meteValue,
                                 @Param(value = "lastMeteValue") String lastMeteValue);
-    List<TCfgDataCurrent> selectByPage(TCfgDataCurrent tCfgDataCurrent);
+    List<TCfgDataCurrent> selectByPage(@Param(value = "meteName") String meteName,
+                                       @Param(value = "startDate") Date startDate,
+                                       @Param(value = "endDate") Date endDate);
 
     int batchInsert(List<TCfgDataCurrent> list);
     List<Long> selectAllMeteId();

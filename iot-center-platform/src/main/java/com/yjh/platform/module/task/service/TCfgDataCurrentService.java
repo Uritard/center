@@ -189,8 +189,14 @@ public class TCfgDataCurrentService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public List<TCfgDataCurrent> selectByPage(TCfgDataCurrent tCfgDataCurrent) {
-        List<TCfgDataCurrent> tCfgDataCurrentList = tCfgDataCurrentDao.selectByPage(tCfgDataCurrent);
+    public List<TCfgDataCurrent> selectByPage(String meteName,Date startDate,Date endDate) {
+        List<TCfgDataCurrent> tCfgDataCurrentList = tCfgDataCurrentDao.selectByPage(meteName,startDate,endDate);
+        tCfgDataCurrentList.forEach(item -> {
+            String[] nameList = item.getDeviceName().split("/");
+            item.setRegion(nameList[0].split("\\.")[0]);
+            item.setStationName(nameList[0].split("\\.")[1]);
+            item.setDeviceName(nameList[1].split("\\.")[1]+"/"+nameList[2]);
+        });
         return tCfgDataCurrentList;
     }
 

@@ -11,6 +11,7 @@ import java.util.*;
 import io.swagger.annotations.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,15 +136,19 @@ public class TCfgDataCurrentController {
     }
 
     @ApiOperation(value = "分页查询")
-    @RequestMapping(value = "/selectByPage", method = RequestMethod.POST)
+    @RequestMapping(value = "/selectByPage", method = RequestMethod.GET)
     @Logs(title = "查询实时数据",content = "根据用户传递的参数分页查询实时数据",logType = 1)
-    public Result selectByPage(@RequestBody TCfgDataCurrent tCfgDataCurrent
-                               ) {
+    public Result selectByPage(@RequestParam(value = "meteName",required = false) String meteName,
+                               @RequestParam(value = "startDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date startDate,
+                               @RequestParam(value = "endDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endDate,
+                               @RequestParam(value = "pageNum",required = false) Integer pageNum,
+                               @RequestParam(value = "pageSize",required = false) Integer pageSize
+    ) {
         Result result = new Result();
         Map<String, Object> resultMap = new HashMap<>();
         try {
-            Page page = PageHelper.startPage(tCfgDataCurrent.getPageNum()!=null?tCfgDataCurrent.getPageNum():1, tCfgDataCurrent.getPageSize()!=null?tCfgDataCurrent.getPageSize():0,true,null,true);
-            List<TCfgDataCurrent> list = tCfgDataCurrentService.selectByPage(tCfgDataCurrent);
+            Page page = PageHelper.startPage(pageNum!=null?pageNum:1, pageSize!=null?pageSize:0,true,null,true);
+            List<TCfgDataCurrent> list = tCfgDataCurrentService.selectByPage(meteName,startDate,endDate);
             resultMap.put("count", page.getTotal());
             resultMap.put("list", list);
             result.setData(resultMap);
