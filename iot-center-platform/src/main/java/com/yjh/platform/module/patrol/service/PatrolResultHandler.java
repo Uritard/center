@@ -483,7 +483,7 @@ public class PatrolResultHandler {
                                     initInfo.put("valueTemp", String.valueOf(abs));
                                     initInfo.put("temperature", temperature);
                                     initInfo.put("warnName", meteName + "温差任务");
-                                    initInfo.put("warnContent", "传感器环境温度与测温产生温差:" + temperature + "--" + resultStringValue);
+                                    initInfo.put("warnContent", "传感器环境温度与测温产生温差:环境" + temperature + "--测温" + resultStringValue + "--温差" + abs);
                                     initInfo.put("outRange", String.valueOf(abs));
                                 }
                             }

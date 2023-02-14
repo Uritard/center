@@ -93,7 +93,7 @@ public class WeatherThread implements Runnable{
     public static Map<String, Object> createMap(String now, Integer type, Map<String, Object> mapForRedis, Map<String, Object> device){
         Map<String, Object> map = new HashMap<>(7);
         String patrolDeviceName = String.valueOf(device.get("robot_name"));
-        String patrolDeviceCode = String.valueOf(device.get("robot_code"));
+        String patrolDeviceCode = String.valueOf(device.get("robot_num"));
         map.put("patroldevice_name", patrolDeviceName);
         map.put("patroldevice_code", patrolDeviceCode);
         map.put("time", now);

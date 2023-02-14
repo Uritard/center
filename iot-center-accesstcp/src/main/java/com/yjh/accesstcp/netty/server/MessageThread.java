@@ -425,6 +425,25 @@ public class MessageThread {
         tCruiseTaskAdd.setIntervalType(item.get("interval_type").toString());
         tCruiseTaskAdd.setIntervalStartTime(item.get("interval_start_time").toString());
         tCruiseTaskAdd.setIntervalEndTime(item.get("interval_end_time").toString());
+
+
+        // 周期任务需要处理
+        String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
+        if (StringUtils.isNotEmpty(cycleExecuteTime)){
+            cycleExecuteTime = cycleExecuteTime.startsWith("0") ? cycleExecuteTime.substring(1, 2) : cycleExecuteTime.substring(0,1);
+            tCruiseTaskAdd.setCycleExecuteTime(cycleExecuteTime);
+        }
+        String cycleWeek = tCruiseTaskAdd.getCycleWeek();
+        StringJoiner str = new StringJoiner(",");
+        if (StringUtils.isNotEmpty(cycleWeek)){
+            String[] split = cycleWeek.split(",");
+            for (int i = 0; i < split.length; i++) {
+                split[i] = String.valueOf(Integer.parseInt(split[i]) + 1);
+                str.add(split[i]);
+            }
+            tCruiseTaskAdd.setCycleWeek(str.toString());
+        }
+
         if (StringUtils.isNotEmpty(item.get("fixed_start_time").toString())){
             long fixedStartTime = DateTimeUtil.parse(String.valueOf(item.get("fixed_start_time"))).getTime();
             log.info("fixedStartTime=={},当前时间:{}", fixedStartTime, System.currentTimeMillis());

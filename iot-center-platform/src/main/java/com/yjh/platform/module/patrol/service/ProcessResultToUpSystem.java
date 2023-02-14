@@ -9,9 +9,11 @@ import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
 import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
 import com.yjh.platform.common.utils.DateTimeUtil;
+import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstance;
+import com.yjh.platform.module.patrol.entity.UPatrolTask;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.task.entity.CruiseManualReview;
 import com.yjh.platform.module.task.entity.TWarnInfo;
@@ -88,7 +90,6 @@ public class ProcessResultToUpSystem {
         List<Map<String, Object>> xmlItems = new ArrayList<>();
 
         try {
-
             String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
             String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeId", "content"));
             for(Map<String, String> cruiseResultMap : cruiseResultList) {
@@ -101,22 +102,27 @@ public class ProcessResultToUpSystem {
                 HashMap<String, String> typeAndPathName = getTypeAndPathName(analyseType);
 
                 Map<String, String> patrolDevice = analyseDataOperateDao.selectPatrolDevice(instanceId);
+                String taskCode = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskCodeByTaskId(taskId);
+                UPatrolTask uPatrolTask = StaticContextAccessor.getBean(UPatrolTaskService.class).selectTaskByTaskCode(taskCode);
+                String taskPatrolledIdTemp = taskId;
+                if (StringUtils.isNotEmpty(uPatrolTask.getDateType())){
+                    taskPatrolledIdTemp = taskCode;
+                }
 
                 xmlItem.put("patroldevice_code", patrolDevice.get("deviceCode"));
                 xmlItem.put("patroldevice_name", patrolDevice.get("deviceName"));
                 xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
-                xmlItem.put("task_code", taskId);
                 xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
                 xmlItem.put("device_id", instanceId);
                 xmlItem.put("time", Optional.ofNullable(cruiseResultMap.get("cruiseTime")).orElse(""));
                 xmlItem.put("file_type", typeAndPathName.getOrDefault("fileType", ""));
                 xmlItem.put("recognition_type", typeAndPathName.getOrDefault("recognitionType", ""));
-                xmlItem.put("task_patrolled_id", stationCode + "_" + taskId + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
+                xmlItem.put("task_code", taskPatrolledIdTemp);
+                xmlItem.put("task_patrolled_id", stationCode + "_" + taskPatrolledIdTemp + "_" + cruiseResultMap.getOrDefault("startTime", simpleDateFormat));
 
                 // 文件格式：变电站编码/年/月/日/巡视任务编码/CCD或FIR/设备点位ID_编码_时间.jpg
-
                 String tagPath = stationCode + "/" + simpleDateFormat.substring(0, 4) + "/" + simpleDateFormat.substring(4, 6) + "/" + simpleDateFormat.substring(6,
-                    8) + "/" + taskId + typeAndPathName.get("fileNamePath") + instanceId + "_"+edgeCode +"_" + simpleDateFormat + ".jpg";
+                    8) + "/" + taskPatrolledIdTemp + typeAndPathName.get("fileNamePath") + instanceId + "_"+edgeCode +"_" + simpleDateFormat + ".jpg";
 
                 Map<String, String> resMap;
                 if (Objects.isNull(tWarnInfo)) {
