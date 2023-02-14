@@ -79,6 +79,8 @@
         update t_cruise_nonhomologous_point_instance a <set>
         <if test="instanceIdOne != null">a.instance_id_one = #{instanceIdOne},</if>
         <if test="instanceIdTwo != null">a.instance_id_two = #{instanceIdTwo},</if>
+        <if test="oneCruiseDeviceName != null">a.one_cruise_device_name = #{oneCruiseDeviceName},</if>
+        <if test="twoCruiseDeviceName != null">a.two_cruise_device_name = #{twoCruiseDeviceName},</if>
         <if test="cruiseName != null">a.cruise_name = #{cruiseName},</if>
         <if test="deviceMeteId != null ">a.device_mete_id = #{deviceMeteId},</if>
         <if test="deviceId != null ">a.device_id = #{deviceId},</if>
