@@ -499,6 +499,9 @@ public class SendToUpSystemServices {
             item.put("station_code", stationCode);
             item.put("station_name", getStationName());
             item.put("device_list", instanceIdList.toString().replaceFirst("\\[", "").replace("]", "").replace(" ", ""));
+
+            // 填充任务模型中时间相关字段
+            fillTaskModelField(item);
 //            if(!"".equals(item.get("time"))){
 //                //计算 todo 内容不完整
 //                String time = item.get("time").toString();
@@ -1157,5 +1160,189 @@ public class SendToUpSystemServices {
             }
             return keys;
         });
+    }
+
+    /**
+     * 根据定时任务表达式，反推并填充其他时间字段
+     *
+     * @param map map
+     */
+    private void fillTaskModelField(Map<String, Object> map) {
+        if (map == null || map.size() == 0) {
+            return;
+        }
+
+        String timeStr = "";
+        Object timeObj = map.get("time");
+        if (timeObj != null) {
+            timeStr = timeObj.toString();
+        }
+
+        if (org.springframework.util.StringUtils.isEmpty(timeStr)) {
+            return;
+        }
+
+        Integer taskType = getTaskType(timeStr);
+        switch (taskType) {
+            case 1:
+                processIntervalHourTask(map);
+                break;
+            case 2:
+                processIntervalDayTask(map);
+                break;
+            case 3:
+                processCycleTask(map);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 根据任务定时执行的表达式，判断任务类型
+     * 表达式有：“8 8 *\/2 * * ?     0 0 0 *\/3 * ?  0 0 5,6 ? 1,2 4,5  等类型
+     *
+     * @param timeStr timeStr
+     * @return result
+     */
+    private Integer getTaskType(String timeStr) {
+        if (org.springframework.util.StringUtils.isEmpty(timeStr)) {
+            return -1;
+        }
+
+        if (timeStr.endsWith("* * ?")) {
+            return 1;
+        } else if (timeStr.endsWith("* ?")) {
+            return 2;
+        } else if (timeStr.contains("?")) {
+            return 3;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * 获取间隔任务执行时间，以小时为单位
+     *
+     * 格式有：8 8 *\/2 * * ?     0 0 *\/3 * * ?
+     *
+     * @param timeStr timeStr
+     * @return result
+     */
+    private String getIntervalHour(String timeStr) {
+        String[] arr = timeStr.split(" ");
+        if (arr == null || arr.length != 6) {
+            return "";
+        }
+
+        String[] arrSub = arr[2].split("/");
+        if (arrSub == null || arrSub.length != 2) {
+            return "";
+        }
+
+        return arrSub[1];
+    }
+
+    /**
+     * 获取间隔任务执行时间，以天为单位
+     * 格式为：0 0 0 *\/3 * ?
+     *
+     * @param timeStr timeStr
+     * @return result
+     */
+    private String getIntervalDay(String timeStr) {
+        String[] arr = timeStr.split(" ");
+        if (arr == null || arr.length != 6) {
+            return "";
+        }
+
+        String[] arrSub = arr[3].split("/");
+        if (arrSub == null || arrSub.length != 2) {
+            return "";
+        }
+
+        return arrSub[1];
+    }
+
+    /**
+     * 获取周期任务执行时间
+     * 格式为：0 0 5,6 ? 1,2 4,5     0 0 1,3,4,14 ? 1,3,5 2,3,4,5,6,7
+     *
+     * @param timeStr timeStr
+     * @param map map
+     */
+    private void processCycleDate(String timeStr, Map<String, Object> map) {
+        String[] arr = timeStr.split(" ");
+        if (arr == null || arr.length != 6) {
+            return;
+        }
+
+        map.put("cycle_execute_time", arr[2]);
+        map.put("cycle_month", arr[4]);
+        map.put("cycle_week", arr[5]);
+    }
+
+    /**
+     * 根据开始日期时间，获取执行开始时间
+     *
+     * @param map map
+     * @return result
+     */
+    private String getExecuteTime(Map<String, Object> map) {
+        Object startTimeObj = map.get("fixed_start_time");
+        if (startTimeObj == null) {
+            return "";
+        }
+
+        String[] arr = startTimeObj.toString().split(" ");
+        if (arr == null || arr.length != 2) {
+            return "";
+        }
+
+        return arr[1];
+    }
+
+    /**
+     * 处理间隔任务 天
+     *
+     * @param map map
+     */
+    private void processIntervalDayTask(Map<String, Object> map) {
+        String timeStr = map.get("time").toString();
+        String intervalNumber = getIntervalDay(timeStr);
+        String executeTime = getExecuteTime(map);
+        map.put("interval_execute_time", executeTime);
+        map.put("interval_number", intervalNumber);
+        map.put("interval_type", "2");
+        map.put("interval_start_time", map.get("fixed_start_time"));
+        map.put("interval_end_time", map.get("end_time"));
+    }
+
+    /**
+     * 处理间隔任务 小时
+     *
+     * @param map map
+     */
+    private void processIntervalHourTask(Map<String, Object> map) {
+        String timeStr = map.get("time").toString();
+        String intervalNumber = getIntervalHour(timeStr);
+        String executeTime = getExecuteTime(map);
+        map.put("interval_execute_time", executeTime);
+        map.put("interval_number", intervalNumber);
+        map.put("interval_type", "1");
+        map.put("interval_start_time", map.get("fixed_start_time"));
+        map.put("interval_end_time", map.get("end_time"));
+    }
+
+    /**
+     * 处理周期任务
+     *
+     * @param map map
+     */
+    private void processCycleTask(Map<String, Object> map) {
+        String timeStr = map.get("time").toString();
+        processCycleDate(timeStr, map);
+        map.put("cycle_start_time", map.get("fixed_start_time"));
+        map.put("cycle_end_time", map.get("end_time"));
     }
 }
