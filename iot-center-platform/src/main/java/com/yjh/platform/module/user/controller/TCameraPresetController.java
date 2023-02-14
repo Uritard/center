@@ -196,7 +196,7 @@ public class TCameraPresetController {
     public Result update(@Validated @RequestBody TCameraPreset tCameraPreset) {
         Result result = new Result();
         try {
-            if( tCameraPreset.getPresetType() != 1 ){//设置预置位特殊预置位
+            if( tCameraPreset.getPresetType() != null && tCameraPreset.getPresetType() != 1 ){//设置预置位特殊预置位
                 //判断这个相机是否已有特殊预置位
                 TCameraPreset keepWatchPreset = tCameraPresetService.countKeepWatchTask(tCameraPreset.getCameraId(),tCameraPreset.getPresetId());
                 if (keepWatchPreset != null){
