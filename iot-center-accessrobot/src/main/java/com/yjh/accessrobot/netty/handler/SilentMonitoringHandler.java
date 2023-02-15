@@ -69,6 +69,7 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
         log.info("+++++++++++++++++巡视主机收到静默监视的数据了+++++++++++++++++ xmlBaseModel:{}", JSON.toJSONString(xmlBaseModel));
         String sendCode = xmlBaseModel.getSendCode();
         if (!Constant.robotRegisterFlag.getOrDefault(sendCode, false)) {
+            log.info("未注册");
             return;
         }
         List<SilentInfo> silentInfos = new ArrayList<>();
@@ -76,12 +77,12 @@ public class SilentMonitoringHandler implements MessageHandlerStrategy, Initiali
             SilentInfo silentInfo = new SilentInfo();
             silentInfo.setPatrolDeviceCode(String.valueOf(item.get("patroldevice_code")))
                     .setDeviceName(String.valueOf(item.get("device_name")))
-                    .setDeviceName(String.valueOf(item.get("device_id")))
-                    .setDeviceName(String.valueOf(item.get("time")))
-                    .setDeviceName(String.valueOf(item.get("rectangle")))
-                    .setDeviceName(String.valueOf(item.get("file_type")))
-                    .setDeviceName(String.valueOf(item.get("file_path")))
-                    .setDeviceName(String.valueOf(item.get("monitor_type")));
+                    .setDeviceId(String.valueOf(item.get("device_id")))
+                    .setTime(String.valueOf(item.get("time")))
+                    .setRectangle(String.valueOf(item.get("rectangle")))
+                    .setFileType(String.valueOf(item.get("file_type")))
+                    .setFilePath(String.valueOf(item.get("file_path")))
+                    .setMonitorType(String.valueOf(item.get("monitor_type")));
             silentInfos.add(silentInfo);
         }
         try {

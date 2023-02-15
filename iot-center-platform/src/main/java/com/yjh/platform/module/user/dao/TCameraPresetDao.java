@@ -92,10 +92,12 @@ public interface TCameraPresetDao {
 
     List<TCameraPreset> selectCameraByPresetType(@Param(value = "presetType") Integer presetType);
 
-    String selectRecognizeTypeByPresetId(@Param(value = "presetId") Integer presetId);
+    String selectRecognizeTypeByPresetId(@Param(value = "presetId") Long presetId);
 
     List<SilentConf> selectPresetTypeInfo();
 
     int updateSilentConf(SilentConf silentConf);
+
+    TCameraPreset selectIsDownSystemPreset(@Param(value = "presetId") Long presetId);
 
 }

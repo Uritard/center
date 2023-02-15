@@ -174,8 +174,17 @@ public class IntelAnalysisService {
         for (Analysis analysis: analysisList) {
             // 如果是静默监视识别 只要求识别越线闯入、未穿工装和未带安全帽
             if (Objects.equals("12", analysis.getAnalyseType())) {
-                //静默的
-                String recognizeType = tCameraPresetDao.selectRecognizeTypeByPresetId(analysis.getInstanceId().intValue());
+                //静默的  判断他是本系统的还是下级
+                TCameraPreset tCameraPreset = tCameraPresetDao.selectIsDownSystemPreset(analysis.getInstanceId());
+                String recognizeType = "";
+                if (analysis.getTaskId().contains("this")){
+                    log.info("是本级系统来的--{}",analysis.getInstanceId());
+                    recognizeType = tCameraPresetDao.selectRecognizeTypeByPresetId(analysis.getInstanceId());
+                } else {
+                    //下级来的
+                    recognizeType = tCameraPresetDao.selectRecognizeTypeByPresetId(tCameraPreset.getPresetId());
+
+                }
                 AnalyseObject analyseObject = new AnalyseObject();
                 analyseObject.setTypeList(Arrays.asList(recognizeType.split(",")));
                 list.add(packagePicAnalyseRequest(analysis, analyseObject));

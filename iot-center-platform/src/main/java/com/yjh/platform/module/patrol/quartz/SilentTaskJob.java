@@ -179,7 +179,8 @@ public class SilentTaskJob implements Runnable {
 
             //上传图片
             String timeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-            String ftpsTarPath = "jm/"+stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+".jpg";
+            String edgeCode = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeCode").get("content"));
+            String ftpsTarPath = edgeCode+"/jm/"+stationCode + "/" + timeFormat.substring(0,4) + "/" + timeFormat.substring(4,6) + "/" + timeFormat.substring(6,8)+"/"+cameraId+"/"+presetId+".jpg";
             FtpsUtil.putFile(absPath, ftpsTarPath, upFtpsConfig.getIp(), upFtpsConfig.getPort(),
                     upFtpsConfig.getKeypw(), upFtpsConfig.getUsername(), upFtpsConfig.getPassword());
             xmlItem.put("file_path", ftpsTarPath);
@@ -216,7 +217,7 @@ public class SilentTaskJob implements Runnable {
                 // 暂定静默监视识别类型为12,没有实际意义
                 .setAnalyseType("12")
                 .setInstanceId(presetId)
-                .setTaskId("jm")
+                .setTaskId("jm#this")
                 .setPicPath(absPath);
         analysisList.add(analysis);
         List<Response> responseList= intelAnalysisService.picAnalyseNoDetection(analysisList);
