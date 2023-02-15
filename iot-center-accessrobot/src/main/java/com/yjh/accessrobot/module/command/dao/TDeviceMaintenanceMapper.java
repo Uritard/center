@@ -39,4 +39,8 @@ public interface TDeviceMaintenanceMapper {
     List<String> selectDeviceIdsList(@Param(value = "originIds") String originIds);
 
     List<String> selectInstanceIdsList(@Param(value = "originIds") String originIds);
+
+    List<String> selectDeviceIdsByInstanceList(List<String> list);
+
+    List<String> selectInstanceIdsByDeviceIdList(List<String> list);
 }

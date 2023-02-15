@@ -55,10 +55,14 @@ public class TDeviceMaintenanceService {
                 case "2":
                     List<String> deviceList = tDeviceMaintenanceMapper.selectDeviceIdsList(deviceMaintenanceMode.getDeviceList());
                     tDeviceMaintenance.setDeviceIds(deviceList.toString().replace("[","").replace("]",""));
+                    List<String> instanceLists = tDeviceMaintenanceMapper.selectInstanceIdsByDeviceIdList(deviceList);
+                    tDeviceMaintenance.setInstanceIds(instanceLists.toString().replace("[","").replace("]",""));
                     break;
                 //点位
                 case "3":
                     List<String> instanceList = tDeviceMaintenanceMapper.selectInstanceIdsList(deviceMaintenanceMode.getDeviceList());
+                    List<String> deviceLists = tDeviceMaintenanceMapper.selectDeviceIdsByInstanceList(instanceList);
+                    tDeviceMaintenance.setDeviceIds(deviceLists.toString().replace("[","").replace("]",""));
                     tDeviceMaintenance.setInstanceIds(instanceList.toString().replace("[","").replace("]",""));
                     break;
                 //部件
@@ -78,7 +82,7 @@ public class TDeviceMaintenanceService {
         if (CollectionUtils.isNotEmpty(updateSet)){
             tDeviceMaintenanceList.stream().filter(tDeviceMaintenance -> updateSet.contains(tDeviceMaintenance.getOriginId())).forEach(tDeviceMaintenance -> {
                 TDeviceMaintenance oldDeviceMaintenance = oldDeviceMaintenanceMap.get(tDeviceMaintenance.getOriginId());
-                oldDeviceMaintenance.setMaintenanceId(oldDeviceMaintenance.getMaintenanceId());
+                tDeviceMaintenance.setMaintenanceId(oldDeviceMaintenance.getMaintenanceId());
                 tDeviceMaintenanceMapper.updateByPrimaryKey(tDeviceMaintenance);
             });
         }
