@@ -53,6 +53,30 @@
         WHERE
         FIND_IN_SET(origin_id, #{originIds, jdbcType=VARCHAR})
     </select>
+    <select id="selectDeviceIdsByInstanceList" resultType="java.lang.String">
+        SELECT DISTINCT
+            device_id
+        FROM
+            t_cruise_point_instance
+        WHERE
+            instance_id IN (
+                <foreach collection="list" item="instanceId" separator=",">
+                    #{instanceId, jdbcType=BIGINT}
+                </foreach>
+            )
+    </select>
+    <select id="selectInstanceIdsByDeviceIdList" resultType="java.lang.String">
+        SELECT DISTINCT
+            instance_id
+        FROM
+            t_cruise_point_instance
+        WHERE
+            device_id IN (
+            <foreach collection="list" item="deviceId" separator=",">
+                #{deviceId, jdbcType=BIGINT}
+            </foreach>
+        )
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from t_device_maintenance

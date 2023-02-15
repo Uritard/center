@@ -183,7 +183,12 @@ public class RobotService {
                 return zcz;
             }
         }
-        if ("3".equals(command) && "20001".equals(type)) { //无人机一键返航
+        if ("2".equals(command) && "20001".equals(type)) { //无人机系统自检
+            Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
+            if (zcz.get("code") != null) {
+                return zcz;
+            }
+        } else if ("3".equals(command) && "20001".equals(type)) { //无人机一键返航
             Map<String, Object> zcz = this.booleanZcz(key, userId, password, request);
             if (zcz.get("code") != null) {
                 return zcz;
