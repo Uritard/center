@@ -38,6 +38,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -3564,5 +3565,48 @@ public class CameraConService {
         param.put("ftpsPath", "video" + ftpsPath);
         param.put("localPath", localPath);
         Constant.otherServerMap(param, Constant.COPY_FILE_URL);
+    }
+
+    /**
+     * 获取相机对应与之位的PTZ数据
+     *
+     * @param presetId presetId
+     * @param cameraId cameraId
+     * @return result
+     */
+    public String getCameraPTZ(Long presetId, Long cameraId) {
+        CameraConInfo cameraConInfo = cameraConDao.selectConInfo(cameraId, presetId);
+        int userId = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
+        Integer channelNum = cameraConInfo.getChannelNum();
+        return getCameraPTZ(userId, channelNum, cameraConInfo.getPresetNum());
+    }
+
+    /**
+     * 调用相机SDK，获取相机对应与之位的PTZ数据
+     *
+     * @param userId userId
+     * @param channelNum channelNum
+     * @param presetNum presetNum
+     * @return result
+     */
+    private String getCameraPTZ(Integer userId, Integer channelNum, int presetNum) {
+        try {
+            IntByReference ibrBytesReturned = new IntByReference();
+
+            HCNetSDK.NET_DVR_PRESET_NAME dvrPresetName = new HCNetSDK.NET_DVR_PRESET_NAME();
+            dvrPresetName.write();
+            dvrPresetName.wPresetNum = (short)presetNum;
+            if (hCNetSDK.NET_DVR_GetDVRConfig(userId, HCNetSDK.NET_DVR_GET_PRESET_NAME, channelNum + 32,
+                dvrPresetName.getPointer(), dvrPresetName.size(), ibrBytesReturned)) {
+                dvrPresetName.read();
+                return String.format("%d,%d,%d", dvrPresetName.wPanPos, dvrPresetName.wTiltPos, dvrPresetName.wZoomPos);
+            } else {
+                System.out.printf("error:%s", hCNetSDK.NET_DVR_GetLastError());
+            }
+        } catch (Exception e) {
+            log.error("获取相机预置位PTZ参数错误:", e);
+        }
+
+        return "";
     }
 }

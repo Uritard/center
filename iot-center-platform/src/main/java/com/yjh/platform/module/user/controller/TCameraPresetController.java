@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -76,10 +77,11 @@ public class TCameraPresetController {
                     params.put("meteName",tCameraPreset.getPresetName());
 
                     Result response1 = sendPostRequest(Constant.SET_PRESET_URL,params);//设置预置点
-                    if (response1.getData().equals(true)) {
+                    if (!StringUtils.isEmpty(response1.getData().toString())) {
                         Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
                         JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
                         tCameraPreset.setPresetImg((String) json.get("urlPath"));
+                        tCameraPreset.setRemark(response1.getData().toString());
                         tCameraPresetService.update(tCameraPreset);//存图
                         result.setData(resultNum);
                     } else {
@@ -357,6 +359,20 @@ public class TCameraPresetController {
         } catch (Exception e) {
             result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("查询预置位树失败：" + e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "查询预置偏移校验结果")
+    @GetMapping(value = "/queryPresetCheckResult")
+    @Logs(title = "查询预置偏移校验结果",content = "根据用户传递的参数查询预置偏移校验结果",logType = 1)
+    public Result queryPresetCheckResult(@RequestParam(value = "cameraId", required = false) Long cameraId) {
+        Result result = new Result();
+        try {
+            result.setData(tCameraPresetService.queryPresetCheckResult(cameraId));
+        } catch (Exception e) {
+            result.setMessage(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("查询预置偏移校验结果：" + e);
         }
         return result;
     }
