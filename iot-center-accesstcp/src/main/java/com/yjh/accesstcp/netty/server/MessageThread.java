@@ -208,7 +208,6 @@ public class MessageThread {
             list.add(xmlBaseModel);
             map.put("list", list);
             re = Constant.otherServer(map,Constant.TASK_STATE_URL);
-//            re = Constant.otherServer(map, Constant.ROBOT_TASK_URL);//国网要求
             List<Map<String, Object>> items = new ArrayList<>();
             Map<String, Object> item = new HashMap<>();
             String stationCode = (String) redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
@@ -237,6 +236,14 @@ public class MessageThread {
                 List<Map<String, Object>> list = xmlBaseModel.getItems();
                 for (Map<String, Object> item : list) {
                     TCruiseTaskAdd tCruiseTaskAdd = covertBean(item);
+                    //如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
+                    String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+                    if ("2".equals(edgeLevel)){
+                        List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_id").toString());
+                        tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
+                    }else {
+                        tCruiseTaskAdd.setDeviceList(item.get("device_list").toString());
+                    }
 //                    tCruiseTaskAdd.setUnionTaskStatus("0");
                     tCruiseTaskAdd.setAreaId(xmlBaseModel.getSendCode());
                     log.info("101任务组装好发送platform:{}", tCruiseTaskAdd);
@@ -269,6 +276,14 @@ public class MessageThread {
                 for (Map<String, Object> item : list) {
                     String taskId = item.get("task_code").toString();
                     TCruiseTaskAdd tCruiseTaskAdd = covertBean(item);
+                    //如果从上级系统下发  点位为机器人的id 需要转为 巡视系统的instanceId
+                    String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
+                    if ("2".equals(edgeLevel)){
+                        List<String> instanceIds = sendToUpSystemServices.selectForTaskInstanceId(item.get("device_id").toString());
+                        tCruiseTaskAdd.setDeviceList(StringUtils.join(instanceIds, ","));
+                    }else {
+                        tCruiseTaskAdd.setDeviceList(item.get("device_list").toString());
+                    }
                     tCruiseTaskAdd.setUnionTaskStatus("1");
                     tCruiseTaskAdd.setAreaId(xmlBaseModel.getSendCode());
                     log.info("102联动任务组装好发送platform:{}", tCruiseTaskAdd);
@@ -370,7 +385,6 @@ public class MessageThread {
             list.add(xmlBaseModel);
             robotMap.put("list", list);
             Result re = Constant.otherServer(robotMap, Constant.MAINTENANCE_URL);//platfrom设置
-//            Result re2 = Constant.otherServer(robotMap, Constant.ROBOT_TASK_URL);//下发给机器人
             log.info("--响应检修--" + re);
             if (re == null) {
                 sendToUpSystemServices.sendResponse(sendSessionId, "251", "3", "200", null, false);
@@ -413,7 +427,6 @@ public class MessageThread {
         tCruiseTaskAdd.setTaskName(item.get("task_name").toString());
         tCruiseTaskAdd.setCreateTime(DateTimeUtil.getDate(item.get("create_time").toString()));
         tCruiseTaskAdd.setType(Integer.valueOf(item.get("type").toString()));
-        tCruiseTaskAdd.setDeviceList(item.get("device_list").toString());
         tCruiseTaskAdd.setCycleExecuteTime(item.get("cycle_execute_time").toString());
         tCruiseTaskAdd.setCycleMonth(item.get("cycle_month").toString());
         tCruiseTaskAdd.setCycleWeek(item.get("cycle_week").toString());
