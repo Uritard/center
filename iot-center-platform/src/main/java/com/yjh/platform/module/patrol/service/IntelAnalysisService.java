@@ -16,13 +16,13 @@ import com.yjh.platform.configuration.IntelligentAlgorithmConfig;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.Analysis;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
+import com.yjh.platform.module.patrol.entity.AlgorithmExceptionEnum;
 import com.yjh.platform.module.patrol.entity.AnalysePatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TAlgorithmInfo;
 import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
-import com.yjh.platform.module.user.entity.TCameraPreset;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -425,8 +425,8 @@ public class IntelAnalysisService {
                     try {
                         if (StringUtils.equals("2001", result.getCode())){
                             log.error("巡视点为{}图像数据错误", instanceId);
-                            taskResult.setResultValue("图像数据错误");
-                            taskResult.setResultDesc("图像数据错误");
+                            taskResult.setResultValue(AlgorithmExceptionEnum.getInstance(result.getDesc()).getContent());
+                            taskResult.setResultDesc(result.getDesc());
                             taskResult.setAnalyseResultImg(originPicPath);
                         }else if (StringUtils.equals("2002", result.getCode())){
                             log.error("巡视点为{}算法分析失败", instanceId);

@@ -370,7 +370,11 @@ public class PatrolResultHandler {
                 cruiseResultMap.put("resultNum", resultValue + ",识别失败");
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-            } else {
+            } else if (AlgorithmExceptionEnum.isInclude(resultValue)){
+                cruiseResultMap.put("resultNum", resultValue);
+                cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
+                cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
+            }else{
                 normalRecognitionHandler(resultValue, cruiseResultMap, tStdDevicemete, firDocPath);
             }
         } catch (Exception e) {
