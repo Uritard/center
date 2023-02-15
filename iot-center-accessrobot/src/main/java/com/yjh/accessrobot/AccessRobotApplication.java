@@ -40,8 +40,6 @@ public class AccessRobotApplication implements CommandLineRunner {
 
     @Value("${netty.server.port}")
     private int port;
-    @Value("${netty.server.robotCode}")
-    private String robotCode;
     @SuppressWarnings("rawtypes")
     @Autowired
     private RedisTemplate redisTemplate;
@@ -71,7 +69,6 @@ public class AccessRobotApplication implements CommandLineRunner {
         String url = getLocalIp();
 //        String url = "192.168.40.71";
 
-        Constant.robotCode = robotCode;
         Constant.sendCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
         Constant.stationCode = (String)redisTemplate.opsForHash().get("t_sys_param:edgeId","content");
         Constant.handlerNew = handlerNew;

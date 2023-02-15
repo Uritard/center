@@ -551,6 +551,7 @@ public class PatrolResultHandler {
                                 redisTemplate.opsForHash().putAll(warnName, warnMap);
 
                                 cruiseResultMap.put("isWarn", "1");
+                                cruiseResultMap.put("resultDesc", isTemDif ? initInfo.get("valueTemp") : "");
                                 cruiseResultMap.put("resultNum", resultValue);
                                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_ABNORMALALARM));

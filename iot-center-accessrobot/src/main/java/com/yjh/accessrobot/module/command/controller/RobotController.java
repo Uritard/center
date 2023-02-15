@@ -8,14 +8,12 @@ import com.yjh.accessrobot.commons.logs.Logs;
 import com.yjh.accessrobot.commons.result.BusinessException;
 import com.yjh.accessrobot.commons.result.Result;
 import com.yjh.accessrobot.commons.result.ResultCodeEnum;
-import com.yjh.accessrobot.commons.utils.file.FileUtil;
-import com.yjh.accessrobot.module.command.dao.DeviceStatisticInfoResultDao;
-import com.yjh.accessrobot.module.command.dao.TRobotInfoDao;
-import com.yjh.accessrobot.module.command.entity.*;
+import com.yjh.accessrobot.module.command.entity.EnvDeviceStatus;
+import com.yjh.accessrobot.module.command.entity.RobotTaskInstanceInfo;
+import com.yjh.accessrobot.module.command.entity.XMLBaseModel;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.java.Log;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +23,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -44,10 +44,6 @@ public class RobotController {
     private RedisTemplate redisTemplate;
     @Autowired
     private Demo demo;
-    @Autowired
-    private TRobotInfoDao tRobotInfoDao;
-    @Autowired
-    private DeviceStatisticInfoResultDao deviceStatisticInfoResultDao;
 
     private Logger log = LoggerFactory.getLogger(RobotController.class);
 
@@ -398,18 +394,14 @@ public class RobotController {
     }
 
 
-    @ApiOperation(value = "测试")
-    @GetMapping(value = "/test")
-    public Result test(@RequestParam(value = "deviceCode") String deviceCode,
-                       @RequestParam(value = "deviceRun") String deviceRun) {
+    @ApiOperation(value = "测试模型文件是否符合标准")
+    @GetMapping(value = "/testDeviceModelFile")
+    public Result testDeviceModelFile() {
         Result result = new Result();
         try {
-//            FileUtil.copyFileUsingStream(source, desc);
             String filePath = "D:\\testform\\generateXML\\device_model_E200.xml";
-
-            List<Map<String, Object>> mapList = new ArrayList<>();
             XMLBaseModel model = robotService.getXmlMessage(filePath);
-            mapList = model.getItems();
+            List<Map<String, Object>> mapList = model.getItems();
             for (Map<String, Object> map : mapList){
                 if (!map.containsKey("save_type_list")){
                     System.out.println(map);
