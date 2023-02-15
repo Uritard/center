@@ -238,7 +238,7 @@ public class MessageThread {
                 List<Map<String, Object>> list = xmlBaseModel.getItems();
                 for (Map<String, Object> item : list) {
                     TCruiseTaskAdd tCruiseTaskAdd = covertBean(item);
-                    tCruiseTaskAdd.setUnionTaskStatus("0");
+//                    tCruiseTaskAdd.setUnionTaskStatus("0");
                     tCruiseTaskAdd.setAreaId(xmlBaseModel.getSendCode());
                     log.info("101任务组装好发送platform:{}", tCruiseTaskAdd);
                     //统一调度分发主站平台下发的任务
@@ -430,7 +430,7 @@ public class MessageThread {
         // 周期任务需要处理
         String cycleExecuteTime = tCruiseTaskAdd.getCycleExecuteTime();
         if (StringUtils.isNotEmpty(cycleExecuteTime)){
-            cycleExecuteTime = cycleExecuteTime.startsWith("0") ? cycleExecuteTime.substring(1, 2) : cycleExecuteTime.substring(0,1);
+            cycleExecuteTime = cycleExecuteTime.startsWith("0") ? cycleExecuteTime.substring(1, 2) : cycleExecuteTime.substring(0,2);
             tCruiseTaskAdd.setCycleExecuteTime(cycleExecuteTime);
         }
         String cycleWeek = tCruiseTaskAdd.getCycleWeek();
