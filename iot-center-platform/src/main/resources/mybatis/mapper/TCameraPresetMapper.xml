@@ -478,6 +478,13 @@
         and edge_code is null
     </select>
 
+    <select id="selectIsDownSystemPreset" resultType="com.yjh.platform.module.user.entity.TCameraPreset">
+        select
+            *
+        from t_camera_preset
+        where origin_id = #{presetId}
+    </select>
+
     <select id="selectRecognizeTypeByPresetId" resultType="java.lang.String">
         select
             silent.recognize_type
