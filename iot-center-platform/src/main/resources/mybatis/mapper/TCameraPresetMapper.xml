@@ -165,7 +165,8 @@
         a.preset_img,
         a.inspection_postion,
         a.collect_status,
-        a.calibration_status
+        a.calibration_status,
+        a.remark
         from t_camera_preset a
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>

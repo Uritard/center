@@ -424,12 +424,31 @@ public class CameraConController {
         Result result = new Result();
         try {
             cameraConService.isCameraControlled(cameraId);
-            result.setData(cameraConService.presetAction(presetId, cameraId, HCNetSDK.SET_PRESET, presetName));
+            cameraConService.presetAction(presetId, cameraId, HCNetSDK.SET_PRESET, presetName);
+            result.setData(cameraConService.getCameraPTZ(presetId, cameraId));
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
             log.error("设置预置点失败:", e);
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "获取相机预置点的PTZ值")
+    @RequestMapping(value = "/getPresetPTZ", method = RequestMethod.GET)
+    public Result getAllPreset(@RequestParam(value = "presetId") Long presetId,
+                               @RequestParam(value = "cameraId") Long cameraId) {
+        Result result = new Result();
+        try {
+            cameraConService.isCameraControlled(cameraId);
+            String ptxStr = cameraConService.getCameraPTZ(presetId, cameraId);
+            result.setData(ptxStr);
+        } catch (BusinessException b) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());
+            log.error("获取预置点的PTZ值失败:", e);
         }
         return result;
     }

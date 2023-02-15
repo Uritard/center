@@ -23,6 +23,7 @@ import com.yjh.platform.module.patrol.entity.XMLBaseModel;
 import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
+import com.yjh.platform.module.user.entity.TCameraPreset;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
