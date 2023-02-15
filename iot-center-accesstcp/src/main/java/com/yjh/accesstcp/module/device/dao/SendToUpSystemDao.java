@@ -50,4 +50,6 @@ public interface SendToUpSystemDao {
                                          @Param(value = "robotCode") String robotCode);
     String selectEdgeCodeOfRobotOrDrone(String robotCode);
 
+    List<String> selectForTaskInstanceId(@Param(value = "devicePointId") String devicePointId);
+
 }

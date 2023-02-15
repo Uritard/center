@@ -1674,11 +1674,16 @@ public class RobotService {
     public String upSystemCommand(XMLBaseModel xmlBaseModel) {
         //上级下发的 code 是robotNum
         String receiveCode = xmlBaseModel.getReceiveCode();
-        List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(receiveCode, 1);
-        // 如果stdRegionList为空 则表示下级接的是机器人/无人机
-        boolean isEdge = CollectionUtils.isEmpty(stdRegionList);
-        if (isEdge){
-            receiveCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), receiveCode);
+        //到边缘节点 receiveCode 为巡视设备的唯一标识
+        if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)) {
+            receiveCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), "");
+        } else {
+            List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(receiveCode, 1);
+            // 如果stdRegionList为空 则表示下级接的是机器人/无人机
+            boolean isEdge = CollectionUtils.isEmpty(stdRegionList);
+            if (isEdge) {
+                receiveCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), receiveCode);
+            }
         }
 
         xmlBaseModel.setSendCode(Constant.sendCode);

@@ -1044,6 +1044,14 @@ public class SendToUpSystemServices {
         return sendToUpSystemDao.selectForTask(list);
     }
 
+    /**
+     * 查询上级系统同步任务的巡检点信息
+     * @param devicePointId
+     * @return
+     */
+    public List<String> selectForTaskInstanceId(String devicePointId) {
+        return sendToUpSystemDao.selectForTaskInstanceId(devicePointId);
+    }
 
     /**
      * 查询上级系统同步任务需转发的区域机器人Code
