@@ -1674,6 +1674,7 @@ public class RobotService {
     public String upSystemCommand(XMLBaseModel xmlBaseModel) {
         //上级下发的 code 是robotNum
         String receiveCode = xmlBaseModel.getReceiveCode();
+        String edgeLevel = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeLevel", "content"));
         //到边缘节点 receiveCode 为巡视设备的唯一标识
         if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)) {
             receiveCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), "");
