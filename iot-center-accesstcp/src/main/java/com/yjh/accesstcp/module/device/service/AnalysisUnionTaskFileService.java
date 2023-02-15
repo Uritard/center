@@ -1,7 +1,5 @@
 package com.yjh.accesstcp.module.device.service;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.yjh.accesstcp.commons.utils.file.FileUtil;
@@ -40,7 +38,7 @@ public class AnalysisUnionTaskFileService {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void handleUnionTaskFile(String filePath) {
         log.info("handleUnionTaskFile begin,filePath:{}", filePath);
         try {

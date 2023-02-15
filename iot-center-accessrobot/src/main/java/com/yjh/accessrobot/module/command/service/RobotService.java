@@ -13,7 +13,6 @@ import com.yjh.accessrobot.common.utils.PackageProtocolUtils.CreateModeXMLUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformPacketUtil;
 import com.yjh.accessrobot.common.utils.PackageProtocolUtils.PlatformXMLUtil;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
-import com.yjh.accessrobot.common.utils.ValueUtil;
 import com.yjh.accessrobot.commons.logs.LogsRecord;
 import com.yjh.accessrobot.commons.logs.SpringBeanUtils;
 import com.yjh.accessrobot.commons.restTemplate.ServiceRestTemplate;
@@ -42,7 +41,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -52,7 +50,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -60,7 +57,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.yjh.accessrobot.netty.server.RobotServerHandler.getXmlMessage;
 import static org.apache.catalina.startup.ExpandWar.deleteDir;
 
 /**
@@ -1677,16 +1673,6 @@ public class RobotService {
     @Transactional(rollbackFor = Exception.class)
     public String upSystemCommand(XMLBaseModel xmlBaseModel) {
         //上级下发的 code 是robotNum
-//        String robotCode = tRobotInfoDao.selectRobotCodeByRobotNum(xmlBaseModel.getCode(), "");
-//        if (StringUtils.isEmpty(robotCode)) {
-//            xmlBaseModel
-//                    .setSendCode(Constant.sendCode)
-//                    .setReceiveCode(robotCode);
-//        } else {
-//            xmlBaseModel
-//                    .setSendCode(Constant.sendCode)
-//                    .setReceiveCode(Constant.robotCode);
-//        }
         String receiveCode = xmlBaseModel.getReceiveCode();
         List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(receiveCode, 1);
         // 如果stdRegionList为空 则表示下级接的是机器人/无人机
@@ -1728,16 +1714,8 @@ public class RobotService {
                 result = StaticContextAccessor.getBean(ServiceRestTemplate.class).postForObject(Constant.SEND_ROBOT_URL, robotMap, Result.class);
             }
         } catch (Exception e) {
-//            log.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
-//        try {
-//            ServiceRestTemplate serviceRestTemplate = SpringBeanUtils.getBean("serviceRestTemplate", ServiceRestTemplate.class);
-//            if (null != serviceRestTemplate) {
-//                result = serviceRestTemplate.postForObject(Constant.SEND_ROBOT_URL, robotMap, Result.class);
-//            }
-//        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
-//        }
         return result;
     }
 
@@ -1752,257 +1730,6 @@ public class RobotService {
     public Integer selectDictCode(String valueName, String value, String colName) {
         return NumberUtils.toInt(tRobotInfoDao.selectDictCodeByUpdict(colName, value));
     }
-//    public Integer selectDictCode(String valueName, String value, String colName){
-//        String dictNote = null;
-//        if (Objects.equals("appearanceType", valueName)){
-//            switch (value){
-//                case "1": dictNote = "电子围栏";break;
-//                case "2": dictNote = "红外对射";break;
-//                case "3": dictNote = "泡沫喷淋";break;
-//                case "4": dictNote = "消防水泵";break;
-//                case "5": dictNote = "消防栓";break;
-//                case "6": dictNote = "消防室";break;
-//                case "7": dictNote = "设备室";break;
-//                case "8": dictNote = "照明灯";break;
-//                case "9": dictNote = "摄像头";break;
-//                case "10": dictNote = "水位线";break;
-//                case "11": dictNote = "排水泵";break;
-//                case "12": dictNote = "沉降监测点";break;
-//                default: break;
-//            }
-//        }else if (Objects.equals("meterType", valueName)){
-//            switch (value){
-//                case "1": dictNote = "油位表";break;
-//                case "2": dictNote = "避雷器动作次数表";break;
-//                case "3": dictNote = "泄漏电流表";break;
-//                case "4": dictNote = "SF6压力表";break;
-//                case "5": dictNote = "液压表";break;
-//                case "6": dictNote = "开关动作次数表";break;
-//                case "7": dictNote = "油温表";break;
-//                case "8": dictNote = "档位表";break;
-//                case "9": dictNote = "气压表";break;
-//                default: break;
-//            }
-//        }else if (Objects.equals("deviceType", valueName)){
-//            switch (value){
-//                case "1": dictNote = "油浸式变压器";break;
-//                case "2": dictNote = "断路器";break;
-//                case "3": dictNote = "组合电器";break;
-//                case "4": dictNote = "隔离开关";break;
-//                case "5": dictNote = "开关柜";break;
-//                case "6": dictNote = "电流互感器";break;
-//                case "7": dictNote = "电压互感器";break;
-//                case "8": dictNote = "避雷器";break;
-//                case "9": dictNote = "并联电容器组";break;
-//                case "10": dictNote = "干式电抗器";break;
-//                case "11": dictNote = "串联补偿装置";break;
-//                case "12": dictNote = "母线及绝缘子";break;
-//                case "13": dictNote = "穿墙套管";break;
-//                case "14": dictNote = "消弧线圈";break;
-//                case "15": dictNote = "高频阻波器";break;
-//                case "16": dictNote = "耦合电容器";break;
-//                case "17": dictNote = "高压熔断器";break;
-//                case "18": dictNote = "中性点隔直装置";break;
-//                case "19": dictNote = "接地装置";break;
-//                case "20": dictNote = "端子箱及检修电源箱";break;
-//                case "21": dictNote = "站用变";break;
-//                case "22": dictNote = "站用交流电源";break;
-//                case "23": dictNote = "站用直流电源";break;
-//                case "24": dictNote = "构支架";break;
-//                case "25": dictNote = "辅助设施";break;
-//                case "26": dictNote = "土建设施";break;
-//                case "27": dictNote = "避雷针";break;
-//                case "28": dictNote = "避雷器动作次数表";break;
-//                default: break;
-//            }
-//        } else if (valueName.equals("mainOperationType")){
-//            switch (value) {
-//                case "1":
-//                    dictNote = "旋钮";
-//                    break;
-//                case "2":
-//                    dictNote = "按钮";
-//                    break;
-//                case "3":
-//                    dictNote = "手车";
-//                    break;
-//                case "4":
-//                    dictNote = "地刀";
-//                    break;
-//                case "5":
-//                    dictNote = "紧急分合闸";
-//                    break;
-//                case "6":
-//                    dictNote = "手车验电";
-//                    break;
-//                case "7":
-//                    dictNote = "机械位判断";
-//                    break;
-//                case "8":
-//                    dictNote = "压板";
-//                    break;
-//                case "9":
-//                    dictNote = "其他";
-//                    break;
-//                default:
-//                    break;
-//            }
-//        } else if (valueName.equals("operationType")) {
-//            switch (value) {
-//                case "1":
-//                    dictNote = "转换开关";
-//                    break;
-//                case "2":
-//                    dictNote = "控制开关";
-//                    break;
-//                case "3":
-//                    dictNote = "储能开关";
-//                    break;
-//                case "4":
-//                    dictNote = "手车旋钮";
-//                    break;
-//                case "5":
-//                    dictNote = "转换控制开关";
-//                    break;
-//                case "6":
-//                    dictNote = "电压选择旋钮";
-//                    break;
-//                case "7":
-//                    dictNote = "手车操作开关";
-//                    break;
-//                case "8":
-//                    dictNote = "接地刀操作开关";
-//                    break;
-//                case "9":
-//                    dictNote = "闭锁开关";
-//                    break;
-//                case "10":
-//                    dictNote = "风机旋钮";
-//                    break;
-//                case "11":
-//                    dictNote = "加热器旋钮";
-//                    break;
-//                case "12":
-//                    dictNote = "复归按钮";
-//                    break;
-//                case "13":
-//                    dictNote = "带电显示器";
-//                    break;
-//                case "14":
-//                    dictNote = "线路保护装置";
-//                    break;
-//                case "15":
-//                    dictNote = "手车";
-//                    break;
-//                case "16":
-//                    dictNote = "地刀";
-//                    break;
-//                case "17":
-//                    dictNote = "许继_紧急分合闸";
-//                    break;
-//                case "18":
-//                    dictNote = "西门子_紧急分合闸";
-//                    break;
-//                case "19":
-//                    dictNote = "华电_紧急分合闸";
-//                    break;
-//                case "20":
-//                    dictNote = "天灵_紧急分合闸";
-//                    break;
-//                case "21":
-//                    dictNote = "北辰_紧急分合闸";
-//                    break;
-//                case "22":
-//                    dictNote = "江苏_紧急分合闸";
-//                    break;
-//                case "23":
-//                    dictNote = "手车验电装置";
-//                    break;
-//                case "24":
-//                    dictNote = "地刀机械位判断拍照";
-//                    break;
-//                case "25":
-//                    dictNote = "断路器开关";
-//                    break;
-//                case "26":
-//                    dictNote = "压板";
-//                    break;
-//                case "27":
-//                    dictNote = "OCR识别";
-//                    break;
-//                case "28":
-//                    dictNote = "五防逻辑识别";
-//                    break;
-//                case "29":
-//                    dictNote = "电压转换开关";
-//                    break;
-//                case "30":
-//                    dictNote = "解锁/联锁控制开关";
-//                    break;
-//                case "31":
-//                    dictNote = "并列/解锁控制开关";
-//                    break;
-//                default:
-//                    break;
-//            }
-//        } else if (valueName.equals("pointAlarmType")) {
-//            switch (value) {
-//                case "1":
-//                    dictNote = "超温告警";
-//                    break;
-//                case "2":
-//                    dictNote = "温升告警";
-//                    break;
-//                case "3":
-//                    dictNote = "三相温差告警";
-//                    break;
-//                case "4":
-//                    dictNote = "三相对比告警";
-//                    break;
-//                case "5":
-//                    dictNote = "声音异常";
-//                    break;
-//                case "6":
-//                    dictNote = "外观异常";
-//                    break;
-//                case "7":
-//                    dictNote = "仪表越限告警";
-//                    break;
-//                case "8":
-//                    dictNote = "仪表超量程告警";
-//                    break;
-//                case "9":
-//                    dictNote = "仪表三相对比";
-//                    break;
-//                case "10":
-//                    dictNote = "变位告警";
-//                    break;
-//                case "11":
-//                    dictNote = "操作告警";
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }else if (valueName.equals("alarmLevel")) {
-//            switch (value) {
-//                case "1":
-//                    dictNote = "预警";
-//                    break;
-//                case "2":
-//                    dictNote = "一般告警";
-//                    break;
-//                case "3":
-//                    dictNote = "严重告警";
-//                    break;
-//                case "4":
-//                    dictNote = "危急告警";
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
-//        return Integer.valueOf(selectDictCodeByNote(dictNote, colName));
-//    }
 
     /**
      * 若修改机器人编码或删除机器人断开在线的机器人连接
@@ -2013,11 +1740,6 @@ public class RobotService {
      */
     public String removeLink(String robotCode, Long robotId) {
         RobotServerHandler.removeLink(robotCode);
-        /*TRobotInfo tRobotInfo = new TRobotInfo()
-                .setRobotId(robotId)
-                .setRobotStatus(OFF_LINE);
-        int res = tRobotInfoDao.update(tRobotInfo);
-        log.info("修改成功==="+res);*/
         return OFF_LINE;
     }
 

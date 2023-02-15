@@ -2,7 +2,6 @@ package com.yjh.accessudp.netty.server;
 
 import com.yjh.accessudp.common.Constant;
 import com.yjh.accessudp.common.utils.ByteUtil;
-import com.yjh.accessudp.common.utils.MeteValueUtils;
 import com.yjh.accessudp.commons.logs.SpringBeanUtils;
 import com.yjh.accessudp.commons.restTemplate.ServiceRestTemplate;
 import com.yjh.accessudp.module.device.entity.EdgeEnum;
@@ -14,7 +13,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -60,8 +58,6 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
     //场站号
     private String strChannelID = "TT";
 
-    private byte[] bufBytes = new byte[1024];
-    private int bufdateLen;
     private ChannelHandlerContext ctx;
 
 
@@ -126,22 +122,6 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
         }
 
     }
-
-//    @Override
-//    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-//        ByteBuf byteBuf = (ByteBuf) msg;
-//        byte[] bytes = new byte[byteBuf.readableBytes()];
-//        byteBuf.readBytes(bytes);
-//        log.info("bytes: "+new String(bytes).replace("\0", ""));
-//        log.info("online.. " + "remoteAddress: " + ctx.channel().remoteAddress());
-//        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        Date dataTime=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(df.format(new Date()));
-//        DataDealThread dataDealThread = new DataDealThread(this, true);
-//        Thread thread = new Thread(dataDealThread);
-//        thread.setDaemon(true);
-//        thread.start();
-//        ReferenceCountUtil.release(byteBuf);
-//    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, DatagramPacket datagramPacket) throws Exception {
@@ -481,11 +461,6 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             return toStringHex(str);
         }
         return str;
-    }
-
-
-    private void handleDate(String msgData) {
-        //TODO
     }
 
     private void send(ChannelHandlerContext ctx, byte[] bytes) {
