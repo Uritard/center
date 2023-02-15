@@ -83,7 +83,8 @@ public class TCameraPreset implements Serializable {
 
     @Max(value=999999999)
     @ApiModelProperty(value = "守望位类型")
-    private Integer presetType;
+    // 默认普通预置位
+    private Integer presetType = 1;
 
     @ApiModelProperty(value = "守望位类型")
     private String presetTypeName;
