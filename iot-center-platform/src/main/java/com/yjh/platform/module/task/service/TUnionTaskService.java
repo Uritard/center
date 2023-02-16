@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.yjh.platform.module.patrol.service.UPatrolTaskService.PATROL_TASK_PREFIX;
+
 /**
  * @author tt
  * @since 2020-09-04
@@ -178,14 +180,14 @@ public class TUnionTaskService{
         List<LinkageMonitorData> linkageMonitorDataList = TUnionTaskAttrDao.selectDeviceInfo(taskId);
 
         for (LinkageMonitorData lmd : linkageMonitorDataList){
-            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries("t_cruise_task_result:" + taskId + ":" + lmd.getInstanceId());
+            Map<String, String> redisInfoMap = redisTemplate.opsForHash().entries(PATROL_TASK_PREFIX + taskId + ":" + lmd.getInstanceId());
             if (!redisInfoMap.isEmpty()){
                 if (Objects.nonNull(redisInfoMap.get("cruiseResult")) &&
                         ("246".equals(redisInfoMap.get("cruiseResult")) || "247".equals(redisInfoMap.get("cruiseResult")))){
                     log.info("redisInfoMap==="+redisInfoMap);
                     lmd.setPresetId(Long.valueOf(redisInfoMap.get("cruiseId")));
-                    lmd.setEndTime(redisInfoMap.get("endTime"));
-                    lmd.setStartTime(redisInfoMap.get("startTime"));
+//                    lmd.setEndTime(redisInfoMap.get("endTime"));
+//                    lmd.setStartTime(redisInfoMap.get("startTime"));
                     if (Objects.nonNull(redisInfoMap.get("cameraId")) && !"".equals(redisInfoMap.get("cameraId"))){
                         lmd.setCameraId(Long.valueOf(redisInfoMap.get("cameraId")));
                         lmd.setDeviceType(1);
