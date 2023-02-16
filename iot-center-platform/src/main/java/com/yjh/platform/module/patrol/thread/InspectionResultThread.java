@@ -11,6 +11,7 @@ import com.yjh.platform.module.patrol.CruiseConstant;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.RobotPatrolTaskResult;
 import com.yjh.platform.module.patrol.entity.TCruisePointInstanceDetail;
+import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
 import com.yjh.platform.module.patrol.service.AbstractVideoCruise;
 import com.yjh.platform.module.patrol.service.PatrolResultHandler;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
@@ -85,7 +86,7 @@ public class InspectionResultThread implements Runnable{
             tCruiseTaskResultMap.put("recognitionType", robotPatrolTaskResult.getRecognitionType());
             tCruiseTaskResultMap.put("fileType", robotPatrolTaskResult.getFileType());
             tCruiseTaskResultMap.put("rectangle", robotPatrolTaskResult.getRectangle());
-            tCruiseTaskResultMap.put("confidence", "");
+            tCruiseTaskResultMap.put("valueType", robotPatrolTaskResult.getValueType());
             redisTemplate.opsForHash().putAll(redisKeyName, tCruiseTaskResultMap);
             Object waiter = MAP_LOCK.get(taskId + instanceId);
             if (Objects.nonNull(waiter)) {
@@ -299,6 +300,8 @@ public class InspectionResultThread implements Runnable{
      */
     private void updatePointStatusNum(String taskId,  Map<String, String> tCruiseTaskResultMap, TCruisePointInstanceDetail details, String value) {
         log.info("====This is the result of no algorithm===");
+        String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
+
         try {
             tCruiseTaskResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
             switch (value){
@@ -323,9 +326,36 @@ public class InspectionResultThread implements Runnable{
             }
             tCruiseTaskResultMap.put("cruiseStatus", String.valueOf(CRUISE_STATE_DONE));
             tCruiseTaskResultMap.put("resultDesc", "--");
-            tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ?
-                    value : Objects.isNull(details.getAnalyseType()) || 13 == details.getAnalyseType() ? "已录音" : "已拍照");
-            String str = PATROL_TASK_PREFIX + taskId + ":" + details.getInstanceId();
+            TStdDeviceMete stdDeviceMete = uPatrolTaskService.selectDeviceMeteInfo(Long.valueOf(tCruiseTaskResultMap.get("instanceId")));
+
+            String resultNum = tCruiseTaskResultMap.get("resultNum");
+            if (StringUtils.equals("693", stdDeviceMete.getMeteType())){
+                // 模拟工具局放类型的点位处理
+                String resultNumItem = "";
+                switch (tCruiseTaskResultMap.get("valueType")){
+                    case "11":
+                        resultNumItem = "局放频次:" + value;
+                        break;
+                    case "12":
+                        resultNumItem =  "放电峰值:" + value;
+                        break;
+                    case "13":
+                        resultNumItem =  "信号均值:" + value;
+                        break;
+                    default:
+                        break;
+                }
+                if (StringUtils.isNotEmpty(resultNum)){
+                    resultNum = resultNum + "," + resultNumItem;
+                    tCruiseTaskResultMap.put("resultNum", resultNum);
+                    redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
+                    return;
+                }
+                tCruiseTaskResultMap.put("resultNum", resultNumItem);
+            }else {
+                tCruiseTaskResultMap.put("resultNum", StringUtils.isNotEmpty(value) ?
+                        value : Objects.isNull(details.getAnalyseType()) || 13 == details.getAnalyseType() ? "已录音" : "已拍照");
+            }
             redisTemplate.opsForHash().putAll(str, tCruiseTaskResultMap);
 
             String resultValue = tCruiseTaskResultMap.get("resultNum");

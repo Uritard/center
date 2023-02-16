@@ -404,7 +404,7 @@ public class IntelAnalysisService {
                 String instanceId = analyseResult.getObjectId();
                 String redisKeyName = PATROL_TASK_PREFIX + taskId + ":" + instanceId;
                 String originPicPath = String.valueOf(redisTemplate.opsForHash().get(redisKeyName, "origpic"));
-                log.info("originPicPath===={}", originPicPath);
+//                log.info("originPicPath===={}", originPicPath);
 
                 String algorithmType = getAlgorithmTypeMap(instanceId);
                 // 判断该巡视点是否为27大类的点 若是  直接拿假数据  不用判断返回的巡视结果
@@ -434,12 +434,12 @@ public class IntelAnalysisService {
                     taskResult.setConf(String.valueOf(result.getConf()));
                     try {
                         if (StringUtils.equals("2001", result.getCode())){
-                            log.error("巡视点为{}图像数据错误", instanceId);
+//                            log.error("巡视点为{}图像数据错误", instanceId);
                             taskResult.setResultValue(AlgorithmExceptionEnum.getInstance(result.getDesc()).getContent());
                             taskResult.setResultDesc(result.getDesc());
                             taskResult.setAnalyseResultImg(originPicPath);
                         }else if (StringUtils.equals("2002", result.getCode())){
-                            log.error("巡视点为{}算法分析失败", instanceId);
+//                            log.error("巡视点为{}算法分析失败", instanceId);
                             taskResult.setResultValue("算法分析失败");
                             taskResult.setResultDesc("算法分析失败");
                             taskResult.setAnalyseResultImg(originPicPath);
@@ -447,10 +447,10 @@ public class IntelAnalysisService {
                             Map<String, String> map = getResultMap(resultValue, resultDesc, resultImg, originPicPath, result);
 
                             if (StringUtils.isBlank(map.get("resultValue"))) {
-                                log.info("没有识别出来任何缺陷");
+//                                log.info("没有识别出来任何缺陷");
                                 taskResult.setAnalyseResultImg(originPicPath);
                             }else {
-                                log.info("识别出来了缺陷");
+//                                log.info("识别出来了缺陷");
                                 List<String> resultImgList = new ArrayList<>();
                                 Collections.addAll(resultImgList, StringUtils.split(map.get("resultImg"), " "));
                                 resultImgList = resultImgList.stream().distinct().collect(Collectors.toList());
