@@ -209,7 +209,7 @@ public class TCfgDataCurrentService {
 
 
     //TODO: 测试方法 用完删除
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     public List<TCruiseTask> unionRulesMatchAndCalculate(String meteMap) throws Exception {
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Set<Long> plans = new HashSet<>();//满足触发条件的预案
