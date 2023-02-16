@@ -87,7 +87,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             Long instanceId = null;
             List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
             // 如果stdRegionList为空 则表示下级接的是机器人/无人机
-            boolean isEdge = CollectionUtils.isEmpty(stdRegionList);
+            boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
             if (isEdge) {
                 instanceId = tCruisePointInstanceDao.selectByEdgeCodeAndOriginId(robotCode,threadMap.get("deviceId")).getInstanceId();
             }else {
