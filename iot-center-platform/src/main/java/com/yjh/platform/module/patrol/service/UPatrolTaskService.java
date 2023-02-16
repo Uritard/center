@@ -1828,6 +1828,7 @@ public class UPatrolTaskService {
                     uPatrolDataResult.setCruiseTime(DateTimeUtil.parse(redisInfoMap.get("cruiseTime")));
                     uPatrolDataResult.setCruiseStatus(NumberUtils.toInt(redisInfoMap.get("cruiseStatus")));
                     uPatrolDataResult.setResultNum(redisInfoMap.get("resultNum"));
+                    uPatrolDataResult.setResultDesc(redisInfoMap.get("resultDesc"));
                     uPatrolDataResult.setPicpath(redisInfoMap.get("picpath"));
                     uPatrolDataResult.setCruiseType(NumberUtils.toInt(redisInfoMap.get("cruiseType")));
                     uPatrolDataResult.setOrigpic(redisInfoMap.get("origpic"));
