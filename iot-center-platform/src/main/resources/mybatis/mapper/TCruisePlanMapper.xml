@@ -164,7 +164,7 @@
         a.plan_name,
         a.type,
         a.plan_point_types,
-        (select count(*) from t_cruise_plan_attr b where b.plan_id = a.plan_id) as total,
+        (select count(*) from u_patrol_plan_attr b where b.plan_id = a.plan_id) as total,
         a.create_time,
         a.update_time
         from t_cruise_plan a
@@ -224,7 +224,7 @@
         a.type,
         b.dict_note AS type_name,
         a.plan_point_types,
-        (select count(*) from t_cruise_plan_attr b where b.plan_id = a.plan_id) as total,
+        (select count(*) from u_patrol_plan_attr b where b.plan_id = a.plan_id) as total,
         a.create_time,
         a.update_time
         from t_cruise_plan a

@@ -317,7 +317,7 @@
     <delete id="deletePlanInstance">
         DELETE
         FROM
-        t_cruise_plan_attr
+        u_patrol_plan_attr
         WHERE
         instance_id IN
         <foreach collection="list" item="instanceId" open="(" separator="," close=")">

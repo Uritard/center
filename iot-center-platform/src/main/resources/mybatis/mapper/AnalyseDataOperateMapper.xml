@@ -787,7 +787,7 @@
 	       b.instance_id
         FROM
 	       t_cruise_task a
-        LEFT JOIN t_cruise_plan_attr b ON a.plan_id = b.plan_id
+        LEFT JOIN u_patrol_plan_attr b ON a.plan_id = b.plan_id
         WHERE
 	        a.task_id =#{taskId,jdbcType=VARCHAR}
     </select>

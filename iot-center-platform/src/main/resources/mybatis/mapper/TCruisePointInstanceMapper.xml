@@ -450,7 +450,7 @@
       LEFT JOIN (
 	   (
 		  t_cruise_plan b
-		  JOIN t_cruise_plan_attr c ON b.plan_id = c.plan_id
+		  JOIN u_patrol_plan_attr c ON b.plan_id = c.plan_id
 	   )
 	  LEFT JOIN t_cruise_task d ON b.plan_id = d.plan_id
      ) ON a.instance_id = c.instance_id
@@ -469,7 +469,7 @@
 		     LEFT JOIN (
 			   (
 				   t_cruise_plan b
-				   JOIN t_cruise_plan_attr c ON b.plan_id = c.plan_id
+				   JOIN u_patrol_plan_attr c ON b.plan_id = c.plan_id
 			   )
 			 LEFT JOIN t_cruise_task d ON b.plan_id = d.plan_id
 		   ) ON a.instance_id = c.instance_id
