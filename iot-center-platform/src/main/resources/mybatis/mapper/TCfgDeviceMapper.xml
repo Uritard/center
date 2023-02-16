@@ -68,6 +68,7 @@
     <select id="selectByPrimaryId" parameterType="java.lang.String" resultType="com.yjh.platform.module.device.entity.TCfgDevice">
         select
         a.device_id,
+        a.edge_code,
         a.device_name,
         a.device_type,
         a.device_code,

@@ -235,7 +235,7 @@ public class MessageThread {
                 log.info("--响应任务 任务下发--");
                 List<Map<String, Object>> list = xmlBaseModel.getItems();
                 for (Map<String, Object> item : list) {
-                    TCruiseTaskAdd tCruiseTaskAdd = covertBean(item);
+                    TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, false);
                     //如果从上级系统下发  点位为机器人的id 对应t_std_devicemete表中的device_point_id 需要转为 巡视系统的instanceId
                     String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
                     if ("2".equals(edgeLevel)){
@@ -275,7 +275,7 @@ public class MessageThread {
                 List<Map<String, Object>> list = xmlBaseModel.getItems();
                 for (Map<String, Object> item : list) {
                     String taskId = item.get("task_code").toString();
-                    TCruiseTaskAdd tCruiseTaskAdd = covertBean(item);
+                    TCruiseTaskAdd tCruiseTaskAdd = covertBean(item, true);
                     //如果从上级系统下发  点位为机器人的id 需要转为 巡视系统的instanceId
                     String edgeLevel = (String)redisTemplate.opsForHash().get("t_sys_param:edgeLevel","content");
                     if ("2".equals(edgeLevel)){
@@ -419,24 +419,25 @@ public class MessageThread {
     /**
      *
      * @param item
+     * @param linkage 是否为联动任务
      * @return
      */
-    public static TCruiseTaskAdd covertBean(Map<String, Object> item){
+    public static TCruiseTaskAdd covertBean(Map<String, Object> item, Boolean linkage){
         TCruiseTaskAdd tCruiseTaskAdd = new TCruiseTaskAdd();
         tCruiseTaskAdd.setTaskId(item.get("task_code").toString());
         tCruiseTaskAdd.setTaskName(item.get("task_name").toString());
-        tCruiseTaskAdd.setCreateTime(DateTimeUtil.getDate(item.get("create_time").toString()));
-        tCruiseTaskAdd.setType(Integer.valueOf(item.get("type").toString()));
-        tCruiseTaskAdd.setCycleExecuteTime(item.get("cycle_execute_time").toString());
-        tCruiseTaskAdd.setCycleMonth(item.get("cycle_month").toString());
-        tCruiseTaskAdd.setCycleWeek(item.get("cycle_week").toString());
-        tCruiseTaskAdd.setCycleEndTime(item.get("cycle_end_time").toString());
-        tCruiseTaskAdd.setCycleStartTime(item.get("cycle_start_time").toString());
-        tCruiseTaskAdd.setIntervalExecuteTime(item.get("interval_execute_time").toString());
-        tCruiseTaskAdd.setIntervalNumber(item.get("interval_number").toString());
-        tCruiseTaskAdd.setIntervalType(item.get("interval_type").toString());
-        tCruiseTaskAdd.setIntervalStartTime(item.get("interval_start_time").toString());
-        tCruiseTaskAdd.setIntervalEndTime(item.get("interval_end_time").toString());
+        tCruiseTaskAdd.setCreateTime(item.containsKey("create_time") ? DateTimeUtil.getDate(item.get("create_time").toString()) : new Date());
+        tCruiseTaskAdd.setType(item.containsKey("type") ? Integer.parseInt(item.get("type").toString()) : 1);
+        tCruiseTaskAdd.setCycleExecuteTime(item.getOrDefault("cycle_execute_time", "").toString());
+        tCruiseTaskAdd.setCycleMonth(item.getOrDefault("cycle_month", "").toString());
+        tCruiseTaskAdd.setCycleWeek(item.getOrDefault("cycle_week", "").toString());
+        tCruiseTaskAdd.setCycleEndTime(item.getOrDefault("cycle_end_time", "").toString());
+        tCruiseTaskAdd.setCycleStartTime(item.getOrDefault("cycle_start_time", "").toString());
+        tCruiseTaskAdd.setIntervalExecuteTime(item.getOrDefault("interval_execute_time", "").toString());
+        tCruiseTaskAdd.setIntervalNumber(item.getOrDefault("interval_number", "").toString());
+        tCruiseTaskAdd.setIntervalType(item.getOrDefault("interval_type", "").toString());
+        tCruiseTaskAdd.setIntervalStartTime(item.getOrDefault("interval_start_time", "").toString());
+        tCruiseTaskAdd.setIntervalEndTime(item.getOrDefault("interval_end_time", "").toString());
 
 
         // 周期任务需要处理
@@ -456,21 +457,27 @@ public class MessageThread {
             tCruiseTaskAdd.setCycleWeek(str.toString());
         }
 
-        if (StringUtils.isNotEmpty(item.get("fixed_start_time").toString())){
-            long fixedStartTime = DateTimeUtil.parse(String.valueOf(item.get("fixed_start_time"))).getTime();
-            log.info("fixedStartTime=={},当前时间:{}", fixedStartTime, System.currentTimeMillis());
-            if (Math.abs(System.currentTimeMillis() - fixedStartTime) <= (60 * 1000)){
-                // 立即(fixed_start_time和当前时间相差5min)
-                tCruiseTaskAdd.setIfRun(173);
-            }else {
-                // 定期
-                tCruiseTaskAdd.setIfRun(174);
+        //联动任务立即执行
+        if (linkage) {
+            tCruiseTaskAdd.setIfRun(173);
+            tCruiseTaskAdd.setStartTime(new Date());
+        } else {
+            if (StringUtils.isNotEmpty(item.get("fixed_start_time").toString())) {
+                long fixedStartTime = DateTimeUtil.parse(String.valueOf(item.get("fixed_start_time"))).getTime();
+                log.info("fixedStartTime=={},当前时间:{}", fixedStartTime, System.currentTimeMillis());
+                if (Math.abs(System.currentTimeMillis() - fixedStartTime) <= (60 * 1000)) {
+                    // 立即(fixed_start_time和当前时间相差5min)
+                    tCruiseTaskAdd.setIfRun(173);
+                } else {
+                    // 定期
+                    tCruiseTaskAdd.setIfRun(174);
+                }
+                tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(item.get("fixed_start_time").toString()));
+            } else {
+                tCruiseTaskAdd.setIfRun(172);
+                String startTime = StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleStartTime()) ? tCruiseTaskAdd.getCycleStartTime() : tCruiseTaskAdd.getIntervalStartTime();
+                tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(startTime));
             }
-            tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(item.get("fixed_start_time").toString()));
-        }else {
-            tCruiseTaskAdd.setIfRun(172);
-            String startTime = StringUtils.isNotEmpty(tCruiseTaskAdd.getCycleStartTime()) ? tCruiseTaskAdd.getCycleStartTime() : tCruiseTaskAdd.getIntervalStartTime();
-            tCruiseTaskAdd.setStartTime(DateTimeUtil.getDate(startTime));
         }
         return tCruiseTaskAdd;
     }

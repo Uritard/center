@@ -194,7 +194,7 @@
         WHEN ISNULL(k.preset_name) THEN CONCAT(n.mete_name,'/',m.inspection_name)
         END) AS instance_name
         FROM
-        t_cruise_task_attr a
+        u_patrol_task_attr a
         LEFT JOIN t_std_device b on a.device_id = b.device_id
         LEFT JOIN	t_cruise_point_instance l on l.instance_id = a.instance_id
         LEFT JOIN t_camera_preset k ON l.cruise_id = k.preset_id
@@ -209,7 +209,7 @@
     <select id="selectTaskName" resultType="java.lang.String">
         SELECT
             a.task_name
-        FROM t_cruise_task a
+        FROM u_patrol_task a
         where 1 = 1
         <if test="taskId != null and taskId != ''"> and a.task_id = #{taskId, jdbcType=VARCHAR}</if>
     </select>
