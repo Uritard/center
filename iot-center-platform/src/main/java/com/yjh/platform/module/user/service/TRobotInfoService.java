@@ -595,7 +595,7 @@ public class TRobotInfoService{
     private String getMergeInfo(String insertInfoStr, String oriInfoStr) {
         if (!StringUtils.isEmpty(insertInfoStr)) {
         return new StringBuilder()
-            .append(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()))
+            .append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()))
             .append(" ")
             .append(insertInfoStr)
             .append("\r\n")
