@@ -335,7 +335,7 @@
         d.custom_id as device_custom_id,
         d.cruise_type,
         e.dict_note as cruise_type_name
-        from t_cfg_union_rule a left JOIN t_cruise_plan_attr b on a.plan_id = b.plan_id
+        from t_cfg_union_rule a left JOIN u_patrol_plan_attr b on a.plan_id = b.plan_id
         LEFT JOIN t_cruise_point_instance d on b.instance_id = d.instance_id
         LEFT JOIN t_dict_business e on e.dict_code = d.cruise_type
         where 1 = 1

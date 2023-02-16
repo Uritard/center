@@ -352,7 +352,7 @@
             a.type,
             b.dict_note AS type_name,
             a.plan_point_types,
-            (select count(*) from t_cruise_plan_attr b where b.plan_id = a.plan_id) as total,
+            (select count(*) from u_patrol_plan_attr b where b.plan_id = a.plan_id) as total,
             a.create_time,
             a.update_time
             from t_cruise_plan a
@@ -368,7 +368,7 @@
             <if test="modelName != null and modelName != ''"> and a.plan_id in (SELECT
                 DISTINCT d.plan_id
                 FROM
-                t_cruise_plan_attr d
+                u_patrol_plan_attr d
                 LEFT JOIN t_cruise_point_instance e ON d.instance_id = e.instance_id
                 LEFT JOIN t_robot_inspection f ON f.inspection_id = e.cruise_id
                 LEFT JOIN t_camera_preset g ON e.cruise_id = g.preset_id

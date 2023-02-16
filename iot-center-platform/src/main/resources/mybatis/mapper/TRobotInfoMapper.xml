@@ -133,7 +133,7 @@
     <delete id="deleteCruisePlan">
         DELETE a,b,c FROM
 	    t_cruise_point_instance AS a,
-	    t_cruise_plan_attr AS b,
+	    u_patrol_plan_attr AS b,
 	    t_cruise_plan AS c
         WHERE
 	    b.instance_id = a.instance_id
