@@ -12,7 +12,12 @@ public enum AlgorithmExceptionEnum {
     /**
      * 2001
      */
-    NO_TEMPLATE("No Template!", "缺少标定文件");
+    NO_TEMPLATE("No Template!", "缺少标定文件"),
+
+    /**
+     * 2001
+     */
+    FAIL_DOWNLOAD_PICTURE("Faild to download image", "算法下载图片失败");
 
 
 
