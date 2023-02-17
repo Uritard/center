@@ -84,10 +84,10 @@ public class UPatrolDataResultService {
             Map<Long,TStdRegion> regionMaps = stdRegionList.stream().collect(Collectors.toMap(TStdRegion::getRegionId,Function.identity()));
             for (CruiseResultAnalyzeInfo cruiseResultAnalyzeInfo : cruiseResultAnalyzeInfoList) {
                 if (Objects.isNull(cruiseResultAnalyzeInfo.getIdentifyResult())) {
-                    cruiseResultAnalyzeInfo.setIdentifyResultName(cruiseResultAnalyzeInfo.getCruiseResultName());
+                    cruiseResultAnalyzeInfo.setIdentifyResultName(cruiseResultAnalyzeInfo.getIdentifyResultName());
                 }
                 if (Objects.isNull(cruiseResultAnalyzeInfo.getPersonCheck())) {
-                    cruiseResultAnalyzeInfo.setPersonCheck(cruiseResultAnalyzeInfo.getResultNum());
+                    cruiseResultAnalyzeInfo.setPersonCheck(cruiseResultAnalyzeInfo.getPersonCheck());
                 }
 
                 if (Objects.nonNull(cruiseResultAnalyzeInfo.getRegionId())) {
