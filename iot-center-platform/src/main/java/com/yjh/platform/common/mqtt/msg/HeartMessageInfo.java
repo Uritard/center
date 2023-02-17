@@ -20,6 +20,8 @@ public class HeartMessageInfo {
     private String voltLevel;
     @JsonProperty("station_name")
     private String stationName;
+    @JsonProperty("section_name")
+    private String sectionName;
     @JsonProperty("section_ip")
     private String sectionIp;
     @JsonProperty("node_id")
