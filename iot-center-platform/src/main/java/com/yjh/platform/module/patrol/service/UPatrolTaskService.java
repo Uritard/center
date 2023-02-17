@@ -704,6 +704,7 @@ public class UPatrolTaskService {
             return null;
         });
 
+        SimpleDateFormat  simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         resultMap.forEach(result -> {
             //判断是不是机器人的点以及还是否完成
             int cruiseType = MapUtils.getIntValue(result, "cruiseType");
@@ -716,6 +717,7 @@ public class UPatrolTaskService {
                 result.put("cruiseAbnormal", String.valueOf(CruiseConstant.CRUISE_ABNORMAL_DATAABNORMAL));//数据异常
                 result.put("evaluationState", String.valueOf(CruiseConstant.EVALUATION_STATE_UN));//未审核
                 result.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));//异常
+                result.put("cruiseTime",simpleDateFormat.format(new Date()));
 
                 String instanceKey = cruiseResultKey + instanceId;
                 redisTemplate.opsForHash().putAll(instanceKey, result);

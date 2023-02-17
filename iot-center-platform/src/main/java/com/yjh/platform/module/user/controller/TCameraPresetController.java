@@ -81,7 +81,7 @@ public class TCameraPresetController {
                         Result response2 = sendPostRequest(Constant.CAPTURE_PRESET_URL, params);//预置位抓图
                         JSONObject json = (JSONObject) JSON.toJSON(response2.getData());
                         tCameraPreset.setPresetImg((String) json.get("urlPath"));
-                        tCameraPreset.setRemark(response1.getData().toString());
+                        tCameraPreset.setPresetPtz(response1.getData().toString());
                         tCameraPresetService.update(tCameraPreset);//存图
                         result.setData(resultNum);
                     } else {

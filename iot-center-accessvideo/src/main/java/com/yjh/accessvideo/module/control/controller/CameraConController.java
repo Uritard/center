@@ -435,15 +435,30 @@ public class CameraConController {
         return result;
     }
 
-    @ApiOperation(value = "获取相机预置点的PTZ值")
-    @RequestMapping(value = "/getPresetPTZ", method = RequestMethod.GET)
-    public Result getAllPreset(@RequestParam(value = "presetId") Long presetId,
-                               @RequestParam(value = "cameraId") Long cameraId) {
+    @ApiOperation(value = "获取相机预置点的PTZ值，并抓图")
+    @RequestMapping(value = "/getPresetPTZAndPic", method = RequestMethod.GET)
+    public Result getPresetPTZAndPic(@RequestParam(value = "presetId") Long presetId,
+                                     @RequestParam(value = "cameraId") Long cameraId,
+                                     @RequestParam(value = "presetName", required = false) String presetName) {
         Result result = new Result();
         try {
+            Map<String, Object> resultMap = new HashMap<>();
             cameraConService.isCameraControlled(cameraId);
-            String ptxStr = cameraConService.getCameraPTZ(presetId, cameraId);
-            result.setData(ptxStr);
+            cameraConService.presetAction(presetId, cameraId, HCNetSDK.GOTO_PRESET);
+            Thread.sleep(10000); // 等10秒钟，确保相机镜头调整到位
+
+            // 获取预置位的PTZ数据
+            String ptzStr = cameraConService.getCameraPTZ(presetId, cameraId);
+            resultMap.put("cameraPtz", ptzStr);
+
+            // 抓图
+            Result resultPic = capturePicture(cameraId, presetName);
+            if (result != null && resultPic.getData() != null) {
+                Map<String, Object> picMap = (Map<String, Object>) resultPic.getData();
+                resultMap.putAll(picMap);
+            }
+
+            result.setData(resultMap);
         } catch (BusinessException b) {
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), b.getMessage());
         } catch (Exception e) {

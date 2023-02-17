@@ -15,6 +15,7 @@
         <result column="preset_img" jdbcType="VARCHAR" property="presetImg" />
         <result column="inspection_postion" jdbcType="INTEGER" property="inspectionPostion" />
         <result column="collect_status" jdbcType="INTEGER" property="collectStatus" />
+        <result column="preset_ptz" jdbcType="VARCHAR" property="presetPtz" />
         <result column="calibration_status" jdbcType="INTEGER" property="calibrationStatus" />
         <result column="remark" jdbcType="VARCHAR" property="remark" />
 
@@ -92,6 +93,7 @@
         <if test="inspectionPostion != null ">a.inspection_postion = #{inspectionPostion, jdbcType=INTEGER},</if>
         <if test="collectStatus != null ">a.collect_status = #{collectStatus, jdbcType=INTEGER},</if>
         <if test="calibrationStatus != null ">a.calibration_status = #{calibrationStatus, jdbcType=INTEGER},</if>
+        <if test="presetPtz != null ">a.preset_ptz = #{presetPtz, jdbcType=VARCHAR},</if>
         <if test="remark != null ">a.remark = #{remark, jdbcType=VARCHAR},</if>
     </set>
             where a.preset_id = #{presetId, jdbcType=BIGINT}
@@ -166,7 +168,7 @@
         a.inspection_postion,
         a.collect_status,
         a.calibration_status,
-        a.remark
+        a.preset_ptz
         from t_camera_preset a
         where 1 = 1
         <if test="cameraId != null and cameraId != ''"> and a.camera_id = #{cameraId, jdbcType=BIGINT}</if>
