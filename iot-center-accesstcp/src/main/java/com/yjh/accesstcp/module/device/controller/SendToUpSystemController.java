@@ -80,6 +80,18 @@ public class SendToUpSystemController {
         }
         return result;
     }
+    @ApiOperation(value = "上传文件")
+    @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+    public Result uploadFile(@RequestBody Map<String, String> fileMap) {
+        Result result = new Result();
+        try {
+            result.setData(sendToUpSystemService.putFile(fileMap.get("filePath"), fileMap.get("targetPath")));
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("发送失败描述：", e);
+        }
+        return result;
+    }
     @ApiOperation(value = "模型同步")
     @RequestMapping(value = "/creatModel", method = RequestMethod.GET)
     public Result creatFile(@RequestParam(value = "type") String type) {
