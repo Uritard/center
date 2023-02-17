@@ -581,4 +581,36 @@
             and a.conf_mode = #{state}
             order by warnTime desc LIMIT 50
     </select>
+
+    <select id="selectRobotWarn" resultType="com.yjh.platform.module.task.entity.TWarnInfoDetail">
+        SELECT
+            alarm.robot_alarm_id AS warnId,
+            alarm.alarm_time,
+            alarm.alarm_level,
+            a.dict_note AS alarmLevelName,
+            alarm.alarm_state AS confMode,
+            b.dict_note AS confModeName,
+            '279' AS alarmSource,
+            '机器人' AS alarmSourceName,
+            alarm.robot_id AS deviceId,
+            c.robot_name AS deviceName,
+            alarm.alarm_name AS warnContent,
+            alarm.deal_info,
+            alarm.deal_type,
+            d.dict_note AS dealTypeName,
+            alarm.deal_time,
+            '本体' AS customName,
+            c.robot_num AS deviceCode
+        FROM
+            t_robot_alarm alarm
+                LEFT JOIN t_dict_business a ON alarm.alarm_level = a.dict_code
+                AND a.col_name = "alarm_level"
+                LEFT JOIN t_dict_business b ON alarm.alarm_state = b.dict_code
+                AND b.col_name = "conf_mode"
+                LEFT JOIN t_robot_info c ON alarm.robot_id = c.robot_id
+                LEFT JOIN t_dict_business d ON alarm.deal_type = d.dict_code
+                AND b.col_name = "deal_type"
+        WHERE
+            robot_alarm_id = #{warnId}
+    </select>
 </mapper>

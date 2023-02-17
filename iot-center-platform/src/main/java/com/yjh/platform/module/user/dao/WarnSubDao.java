@@ -22,4 +22,6 @@ public interface WarnSubDao {
 
     int add(WarnSub warnSub);
 
+    Integer selectAlarmNote(@Param(value = "warnId") Long warnId);
+
 }

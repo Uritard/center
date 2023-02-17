@@ -873,16 +873,16 @@ public class PatrolResultHandler {
             currentWarnInfo.put("isPop", "false");
 
             Integer alarmLevel = NumberUtils.toInt(infoMap.get("alarmLevel"));
-            boolean isSet = StringUtils.isNotEmpty(tStdDevicemete.getAlarmNote()) && StringUtils.equals("1", tStdDevicemete.getAlarmNote());
+//            boolean isSet = StringUtils.isNotEmpty(tStdDevicemete.getAlarmNote()) && StringUtils.equals("1", tStdDevicemete.getAlarmNote());
             boolean reachDefectLevel = Objects.equals(133, alarmLevel);
             boolean reachAlarmLevel = Objects.nonNull(tStdDevicemete.getAlarmLevel()) &&
                     (alarmLevel.compareTo(tStdDevicemete.getAlarmLevel()) == 0 || alarmLevel > tStdDevicemete.getAlarmLevel());
 
             boolean reachWarnCondition;
             if (StringUtils.equals("warn", infoMap.get("flag"))){
-                reachWarnCondition = Boolean.TRUE.equals(isSet) && Boolean.TRUE.equals(reachAlarmLevel);
+                reachWarnCondition =  Boolean.TRUE.equals(reachAlarmLevel);
             }else if (StringUtils.equals("defect", infoMap.get("flag"))){
-                reachWarnCondition = Boolean.TRUE.equals(isSet) && Boolean.TRUE.equals(reachDefectLevel);
+                reachWarnCondition = Boolean.TRUE.equals(reachDefectLevel);
             }else {
                 reachWarnCondition = true;
             }
