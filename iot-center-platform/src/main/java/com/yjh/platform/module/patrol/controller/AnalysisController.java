@@ -1,6 +1,11 @@
 package com.yjh.platform.module.patrol.controller;
 
 import com.yjh.platform.common.Constant;
+import com.yjh.platform.common.mqtt.AlarmService;
+import com.yjh.platform.common.mqtt.FtpsService;
+import com.yjh.platform.common.mqtt.alarmMsgBody.Alarm;
+import com.yjh.platform.common.mqtt.alarmMsgBody.Defect;
+import com.yjh.platform.common.mqtt.alarmMsgBody.Different;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.result.ResultCodeEnum;
@@ -20,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -41,6 +47,10 @@ public class AnalysisController {
     private final AbstractVideoCruise abstractVideoCruise;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private AlarmService alarmService;
+    @Autowired
+    private FtpsService ftpsservice;
 
     private final Logger log = LoggerFactory.getLogger(AnalysisController.class);
 
@@ -143,6 +153,11 @@ public class AnalysisController {
     public Result algorithmTest(@RequestParam(value = "picPath",required = false) String picPath,
                               @RequestParam(value = "type", required = false) String type,
                               @RequestParam(value = "instanceId", required = false) Long instanceId) {
+
+        if ("11398".equals(type)){
+            return upToAlgorithm(instanceId,picPath);
+        }
+
         Analysis analysis = new Analysis();
         analysis.setTaskId("666666");
         if (instanceId == null){
@@ -236,4 +251,77 @@ public class AnalysisController {
         }
         return result;
     }
+
+    private Result upToAlgorithm(Long instanceId, String path) {
+        Result result = new Result();
+        try {
+            Alarm alarmDetail = new Alarm();
+            HashMap<String, String> nameMap = analyseDataOperateService.selectDeviceNameInfo(instanceId);
+
+            alarmDetail.setBay_name(nameMap.get("upRegionName"));
+            alarmDetail.setDevice_name(nameMap.get("deviceName"));
+            alarmDetail.setPoint_name(nameMap.get("meteName"));
+            alarmDetail.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+
+            SimpleDateFormat ym = new SimpleDateFormat("yyyyMM");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            String yearMonth = ym.format(new Date());
+            String nowTime = timeFormat.format(new Date());
+
+            List<Different> differentList = new ArrayList<>();
+
+            Different different = new Different();
+            different.setX1(68);
+            different.setY1(576);
+            different.setX2(1848);
+            different.setY2(1028);
+            differentList.add(different);
+
+            List<Defect> defectList = new ArrayList<>();
+            Defect defect = new Defect();
+            defect.setX1(512);
+            defect.setY1(644);
+            defect.setX2(679);
+            defect.setY2(1125);
+            defect.setType("gbps");
+
+            int confidence = 86;
+            defect.setConfidence(confidence);
+            defect.setDesc("盖板破损或缺失" + "(坐标位置 " + defect.getX1() + "," +
+                defect.getY1() + "," +
+                defect.getX2() + "," +
+                defect.getY2() + ";" +
+                "置信度 " + confidence
+                + "%)");
+            defectList.add(defect);
+
+            String picF = nowTime + "_" + nameMap.get("upRegionName") + "_" + nameMap.get("deviceName") + "_" + nameMap.get("meteName") + "_";
+
+            String remoteImgPath = ftpsservice.getFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "原图.jpg";
+            String remoteBaseImgPath = ftpsservice.getFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别基准.jpg";
+            String remoteDifResultPath = ftpsservice.getFtpsRemotePath() + "/" + "判别" + "/" + yearMonth + "/" + picF + "判别告警.jpg";
+            String remoteDefectFilepath = ftpsservice.getFtpsRemotePath() + "/" + "缺陷" + "/" + yearMonth + "/" + picF + "缺陷告警.jpg";
+
+            ftpsservice.uploadFile("原始图片",path+"/img.jpg",remoteImgPath);  //原始图片上传
+            ftpsservice.uploadFile("缺陷告警结果图片",path+"/defectResultImg.jpg",remoteDefectFilepath);  //缺陷告警
+            ftpsservice.uploadFile("判别基准图片",path+"/diffBaseImg.jpg",remoteBaseImgPath);  //判别基准图片上传
+            ftpsservice.uploadFile("判别结果图片",path+"/differentResulImg.jpg",remoteDifResultPath);  //判别结果图片
+
+            alarmDetail.setPic_raw(remoteImgPath);         //图片原图
+            alarmDetail.setPic_diff_base(remoteBaseImgPath);               //判别基准图路径
+            alarmDetail.setPic_different(remoteDifResultPath);               //判别告警图路径,判别结果图
+            alarmDetail.setPic_defect(remoteDefectFilepath);      //缺陷告警图路径//
+            alarmDetail.setDifferent(differentList);
+            alarmDetail.setDefect(defectList);
+
+            log.info("算法发送测试消息：{} ", alarmDetail);
+            alarmService.PushMsg(alarmDetail);
+            result.setMessage("success");
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), "与算法管理平台交互失败");
+            log.info("与算法管理平台交互失败" + e);
+        }
+        return result;
+    }
+
 }
