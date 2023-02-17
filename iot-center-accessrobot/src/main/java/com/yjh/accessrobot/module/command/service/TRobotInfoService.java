@@ -8,6 +8,7 @@ import com.yjh.accessrobot.module.command.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -109,7 +110,8 @@ public class TRobotInfoService {
             tRobotInfo.setInferadPort(robotModel.getInferadPort());
             tRobotInfo.setInferadUsername(robotModel.getInferadUsername());
             tRobotInfo.setInferadPassword(robotModel.getInferadPassword());
-            tRobotInfo.setPhotePath(robotModel.getPhotePath().replace(absoluteImgMap.get("content"),relativeImgMap.get("content")));
+            tRobotInfo.setPhotePath(StringUtils.isBlank(robotModel.getPhotePath()) ? robotModel.getPhotePath() :
+                robotModel.getPhotePath().replace(relativeImgMap.get("content"), absoluteImgMap.get("content")));
             tRobotInfo.setCreateBy(robotModel.getCreateBy());
             tRobotInfo.setCreateDate(robotModel.getCreateDate());
             tRobotInfo.setUpdateBy(robotModel.getUpdateBy());

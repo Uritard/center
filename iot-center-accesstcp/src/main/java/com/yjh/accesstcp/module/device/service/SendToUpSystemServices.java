@@ -416,7 +416,8 @@ public class SendToUpSystemServices {
         List<Map<String, Object>> list = robotModelList.stream().peek(robotModel -> {
             robotModel.setStationCode(stationCode);
             robotModel.setStationName(stationName);
-            robotModel.setPhotePath(robotModel.getPhotePath().replace(relativeImgMap.get("content"),absoluteImgMap.get("content")));
+            robotModel.setPhotePath(StringUtils.isBlank(robotModel.getPhotePath()) ? robotModel.getPhotePath() :
+                robotModel.getPhotePath().replace(relativeImgMap.get("content"), absoluteImgMap.get("content")));
         }).map((Function<RobotModel, Map<String, Object>>) robotModel -> {
             JSONObject jsonObject = (JSONObject) JSON.toJSON(robotModel, serializeConfig);
             return jsonObject.toJavaObject(Map.class);
