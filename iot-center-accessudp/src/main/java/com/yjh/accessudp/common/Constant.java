@@ -51,6 +51,16 @@ public class Constant {
         return re;
     }
 
+    public static final String SEQUENCE_URL = "http://iot-center-platform/tSequentialConf/v1/sequential?meteId={meteId}";
+
+    public static final String SEQUENCE_REC_URL = "http://iot-center-platform/tSequentialConf/v1/sequentialRec?meteId={meteId}";
+
+    public static final String UNION_URL = "http://iot-center-platform/tCfgDataCurrent/v1/unionTest?meteId={meteId}";
+
+    public static Result restTemplateGet(String url, Map<String, Object> params) {
+        return StaticContextAccessor.getBean(ServiceRestTemplate.class).getForObject(url, Result.class, params);
+    }
+
     //自定义遥脉，遥测，遥信，遥调,遥控
     public static final String YX="YX";
     public static final String YC="YC";

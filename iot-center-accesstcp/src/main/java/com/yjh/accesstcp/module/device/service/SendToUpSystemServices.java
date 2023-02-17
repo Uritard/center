@@ -341,6 +341,23 @@ public class SendToUpSystemServices {
         return this.sendResponse(0L, xmlBaseModel.getType(), xmlBaseModel.getCommand(), xmlBaseModel.getCode(), xmlBaseModel.getItems(), true);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public String putFile(String filePath, String targetPath) {
+        try {
+            log.info("---------文件上传区域巡视主机, filepath:{}, targetPath: {}", filePath, targetPath);
+            File file = new File(filePath);
+            if (file.exists()){
+                ftpsUtil.putFile(filePath, targetPath);
+                return "文件上传成功！";
+            }else {
+                return "文件不存在！";
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return "文件上传错误！";
+        }
+    }
+
     public String createDeviceModel(String path, String stationCode) throws Exception {
         List<Map<String,Object>> list = sendToUpSystemDao.selectDeviceModel();
         list.forEach(item->{

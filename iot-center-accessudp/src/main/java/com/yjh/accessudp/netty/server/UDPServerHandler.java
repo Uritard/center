@@ -215,27 +215,30 @@ public class UDPServerHandler extends SimpleChannelInboundHandler<DatagramPacket
             //将实时表里的数据更新到历史表里
             tCfgMeteService.insertIntoHis(tCfgDataCurrent);
 
+            Map<String,Object> params = new HashMap<>();
+            params.put("meteId", meteId.toString());
             //边缘节点处理方式
             if (EdgeEnum.EDGE_NODE.getCode().equals(edgeLevel)){
                 //联动信息上送 A接口
                 LinkageUploadThread linkageUploadThread = new LinkageUploadThread(meteId.toString(), meteKind == 3 ? "0" : meteKind.toString(), value, commit, time);
                 TaskExecutePool.getInstance().execute(linkageUploadThread);
+
                 {//遥控信号
                     if(meteKind == 3){
-                        getUrl(SEQUENCE_URL,meteId.toString());
+                        Constant.restTemplateGet(Constant.SEQUENCE_URL, params);
                     }else if(meteKind == 1 && "变位".equals(value)){
-                        getUrl(SEQUENCEREC_URL,meteId.toString());
+                        Constant.restTemplateGet(Constant.SEQUENCE_REC_URL, params);
                     }
                 }
             }else {
                 {//遥控信号
                     if(meteKind == 3){
-                        getUrl(SEQUENCE_URL,meteId.toString());
-                        getUrl(UNION_URL,meteId.toString());
+                        Constant.restTemplateGet(Constant.SEQUENCE_URL, params);
+                        Constant.restTemplateGet(Constant.UNION_URL, params);
                     }else if(meteKind == 1 && "变位".equals(value)){
-                        getUrl(SEQUENCEREC_URL,meteId.toString());
+                        Constant.restTemplateGet(Constant.SEQUENCE_REC_URL, params);
                     }else {
-                        getUrl(UNION_URL,meteId.toString());
+                        Constant.restTemplateGet(Constant.UNION_URL, params);
                     }
                 }
             }

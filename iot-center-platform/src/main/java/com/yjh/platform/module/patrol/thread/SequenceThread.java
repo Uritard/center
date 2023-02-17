@@ -6,6 +6,8 @@ import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.configuration.IntelAnalysisFtpsConfig;
+import com.yjh.platform.module.device.entity.Analysis;
+import com.yjh.platform.module.patrol.service.IntelAnalysisService;
 import com.yjh.platform.module.patrol.service.UPatrolTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.yjh.platform.common.Constant.redisTemplate;
 
 /**
  * @author hyh
@@ -29,7 +33,8 @@ public class SequenceThread implements Runnable {
     private final String meteId;
     private final UPatrolTaskService uPatrolTaskService;
     private final String filePath;
-    private IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
+    private final IntelAnalysisFtpsConfig intelAnalysisFtpsConfig;
+    private final IntelAnalysisService intelAnalysisService;
 
     public SequenceThread(RedisTemplate redisTemplate, String meteId, String filePath) {
         this.redisTemplate = redisTemplate;
@@ -37,13 +42,13 @@ public class SequenceThread implements Runnable {
         this.uPatrolTaskService = StaticContextAccessor.getBean(UPatrolTaskService.class);
         this.filePath = filePath;
         this.intelAnalysisFtpsConfig = StaticContextAccessor.getBean(IntelAnalysisFtpsConfig.class);
+        this.intelAnalysisService = StaticContextAccessor.getBean(IntelAnalysisService.class);
     }
 
     @Override
     public void run() {
         try {
             Map<String, Object> map = uPatrolTaskService.selectForSequenceInfoByMeteId(meteId).get(0);
-            Map<String, Object> param = new HashMap<>(6);
             String imgPath = redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content")+"/"+filePath;
 
             String[] str = filePath.split("/");
@@ -53,12 +58,6 @@ public class SequenceThread implements Runnable {
 
             log.info("imgPath:{} resultImagePath:{}",imgPath,resultImagePath);
             FileUtil.copyFileUsingStream(imgPath, resultImagePath);
-
-            param.put("picPath", resultImagePath);
-            param.put("analyseType", 6);
-            param.put("instanceId", map.get("cfgDeviceId"));
-            //模板图片路径
-            param.put("isAi", 1);
             Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
             String picModelPath = (String) mapForPicModelPath.get("content")+ "/" + map.get("presetId");
             //标定文件上传到ftp服务下面
@@ -75,15 +74,16 @@ public class SequenceThread implements Runnable {
             }
             picModelPath = split[split.length - 2] + "/" + split[split.length - 1] + "/tmodel.txt";
             log.info("最后的picModelPath=={}", picModelPath);
-            param.put("picModelPath",picModelPath);
-            //任务名称最后一个#携带边缘节点id
-            param.put("taskId", "yjsk#meteId=" + map.get("cfgDeviceId"));
-            List<Map<String, Object>> analysis = new ArrayList<>();
-            analysis.add(param);
-            log.info("调用video算法识别接口param={},url={}", JSON.toJSONString(analysis), Constant.ALGORITHM_URL);
-            Map<String, List<Map<String, Object>>> analysisList = new HashMap<>(1);
-            analysisList.put("list", analysis);
-            Constant.otherServer(analysisList, Constant.ALGORITHM_URL);
+            Analysis analysis = new Analysis();
+            analysis.setAnalyseType("6");
+            analysis.setInstanceId(Long.valueOf(map.get("cfgDeviceId").toString()));
+            analysis.setIsAi(1);
+            analysis.setPicModelPath(picModelPath+"/"+map.get("presetId"));
+            analysis.setTaskId("yjsk#meteId="+map.get("cfgDeviceId"));
+            analysis.setPicPath(resultImagePath);
+            List<Analysis> analysisList = new ArrayList<>();
+            analysisList.add(analysis);
+            intelAnalysisService.picAnalyseNoDetection(analysisList);
         } catch (Exception e) {
             log.error("一键顺控-变位信号-调用算法识别主机失败", e);
         }

@@ -169,7 +169,7 @@
     </select>
 
     <select id="selectUnionTask"  resultType="com.yjh.platform.module.task.entity.UnionTaskInfo">
-        SELECT
+        SELECT DISTINCT
         a.union_id,
         g.mete_name,
         i.mete_value,
@@ -178,17 +178,16 @@
         d.picpath as origpic,
         d.person_check,
         b.task_name,
-        c.cruise_time as cruiseTime,
+        b.execute_time as cruiseTime,
         j.device_id,
         j.device_name,
         g.mete_kind,
         k.dict_note as meteKindName,
-        c.instance_name
+        d.instance_name
         FROM
         t_union_task a
-        LEFT JOIN t_cruise_result b ON a.union_id = b.task_id
-        LEFT JOIN t_cruise_task_result_detail c ON b.task_result_id = c.task_result_id
-        LEFT JOIN t_cruise_data_result d ON c.cruise_result_id = d.cruise_result_id
+        LEFT JOIN u_patrol_result b ON a.union_id = b.task_id
+        LEFT JOIN u_patrol_data_result d ON b.task_id = d.task_id
         left join t_cfg_mete g on a.mete_id = g.mete_id
         left join (select mete_id,mete_value,record_time from t_his_signal_data union all (select mete_id,mete_value,record_time from t_his_telemeter_data)) i on a.mete_id = i.mete_id and a.triggering_time = i.record_time
         left join t_cfg_device j on a.mete_id = j.device_id

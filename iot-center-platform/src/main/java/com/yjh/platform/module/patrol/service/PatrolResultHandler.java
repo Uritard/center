@@ -117,6 +117,12 @@ public class PatrolResultHandler {
 
                 // 通过上报的任务id查询本级系统上的任务id
                 String taskCode = robotPatrolTaskResult.getTaskCode();
+                // 一键顺控文件
+                if (StringUtils.equals("1001", robotPatrolTaskResult.getRecognitionType())) {
+                    SequenceThread sequenceThread = new SequenceThread(redisTemplate, taskCode, robotPatrolTaskResult.getFilePath());
+                    ThreadPoolUtil.PATROL_POOL.addThread(sequenceThread);
+                    continue;
+                }
                 // 增加时间判断，避免预先初始化导致数据传入下一个任务
                 String timeStr = StringUtils.substringAfterLast(robotPatrolTaskResult.getTaskPatrolledId(), "_");
                 Date date = DateTimeUtil.parseFormat(timeStr, DateTimeUtil.getDateTimePattern3());
@@ -128,13 +134,6 @@ public class PatrolResultHandler {
                 log.info("taskCode==={},taskId===={}", taskCode, taskId);
                 infoMap.put("taskId", taskId);
                 infoMap.put("taskCode", taskCode);
-
-                // 一键顺控文件
-                if (StringUtils.equals("1001", robotPatrolTaskResult.getRecognitionType())) {
-                    SequenceThread sequenceThread = new SequenceThread(redisTemplate, taskCode, robotPatrolTaskResult.getFilePath());
-                    ThreadPoolUtil.PATROL_POOL.addThread(sequenceThread);
-                    continue;
-                }
 
                 // 文件处理
                 Map<String, String> isAlarmMap = resultFileHandler(robotPatrolTaskResult, infoMap);
