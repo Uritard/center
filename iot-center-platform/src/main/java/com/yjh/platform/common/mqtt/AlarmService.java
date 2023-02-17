@@ -25,6 +25,8 @@ public class AlarmService {
 
     @Value("${mqtt.station_name}")
     private String stationName;
+    @Value("${mqtt.section_name}")
+    private String sectionName;
 
     @Value("${mqtt.section_ip}")
     private String sectionIP;
@@ -44,6 +46,7 @@ public class AlarmService {
         alarmMqttMsg.setProvince_name(encode(provinceName));
         alarmMqttMsg.setCity_name(encode(cityName));
         alarmMqttMsg.setStation_name(encode(stationName));
+        alarmMqttMsg.setSection_name(encode(sectionName));
         alarmMqttMsg.setSection_ip(sectionIP);
         alarmMqttMsg.setNode_id(encode(nodeId));
         alarmMqttMsg.setVolt_level(voltLevel);

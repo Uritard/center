@@ -11,6 +11,7 @@ public class AlarmMqttMsg {
     String city_name;
     String volt_level;
     String  station_name;
+    String  section_name;
     String section_ip;
     String node_id;
     String msg_type;

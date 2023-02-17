@@ -32,6 +32,8 @@ public class HeartBeatJob {
 
     @Value("${mqtt.station_name}")
     private String stationName;
+    @Value("${mqtt.section_name}")
+    private String sectionName;
 
     @Value("${mqtt.section_ip}")
     private String sectionIP;
@@ -56,6 +58,7 @@ public class HeartBeatJob {
         heartMsg.setProvinceName(encode(provinceName));
         heartMsg.setCityName(encode(cityName));
         heartMsg.setStationName(encode(stationName));
+        heartMsg.setSectionName(sectionName);
         heartMsg.setTime(LocalDateTime.now().format(pattern));
         heartMsg.setSectionIp(sectionIP);
         heartMsg.setNodeId(nodeId);
