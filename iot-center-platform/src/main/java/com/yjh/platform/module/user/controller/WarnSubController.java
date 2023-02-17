@@ -62,10 +62,11 @@ public class WarnSubController {
     @Logs(title = "查询",content = "根据用户传递的参数查询",logType = 4,authority = "1235")
     public Result isPop(@RequestParam(value = "userId", required = true) Long userId,
                          @RequestParam(value = "type", required = true) String type,
+                         @RequestParam(value = "warnId", required = true) Long warnId,
                          @RequestParam(value = "level", required = true) String level) {
         Result result = new Result();
         try {
-            result.setData(warnSubService.select(userId,type,level));
+            result.setData(warnSubService.select(userId,type,level,warnId));
         } catch (Exception e) {
             log.error("查询告警订阅失败：",e);
             result.setCode(ResultCodeEnum.SYSTEMERROR.getCode(), ResultCodeEnum.SYSTEMERROR.getName());

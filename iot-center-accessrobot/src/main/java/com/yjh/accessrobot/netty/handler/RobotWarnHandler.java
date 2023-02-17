@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -29,6 +30,8 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
 
     @Autowired
     private RobotService robotService;
+    @Value("${other.webSocketUrl}")
+    private String syncWebsocketUrl;
 
     @Override
     public void handler(ChannelHandlerContext ctx, RobotServerHandler robotServerHandler, XMLBaseModel xmlBaseModel, long sendSessionId, long receiveSessionId) throws Exception {
@@ -60,7 +63,7 @@ public class RobotWarnHandler implements MessageHandlerStrategy, InitializingBea
         robotAlarmMap.put("content", xmlBaseModel.getItems().get(0).get("content").toString());
 
         // Start alarmResultDealThread
-        RobotWarnThread alarmResultDealThread = new RobotWarnThread(robotAlarmMap, robotService);
+        RobotWarnThread alarmResultDealThread = new RobotWarnThread(robotAlarmMap, robotService,syncWebsocketUrl);
         TaskExecutePool.getInstance().execute(alarmResultDealThread);
 
         // 国网要求

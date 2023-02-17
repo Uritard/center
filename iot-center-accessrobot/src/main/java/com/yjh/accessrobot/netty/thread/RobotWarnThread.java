@@ -1,11 +1,15 @@
 package com.yjh.accessrobot.netty.thread;
 
+import com.alibaba.fastjson.JSON;
+import com.yjh.accessrobot.common.Constant;
 import com.yjh.accessrobot.common.utils.StaticContextAccessor;
 import com.yjh.accessrobot.commons.utils.DateTimeUtil;
 import com.yjh.accessrobot.module.command.entity.TRobotAlarm;
 import com.yjh.accessrobot.module.command.service.RobotService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -19,10 +23,12 @@ public class RobotWarnThread implements Runnable{
 
     private Map<String,String> robotAlarmMap;
     private RobotService robotService;
+    private String syncWebsocketUrl;
 
-    public RobotWarnThread(Map<String, String> robotAlarmMap, RobotService robotService) {
+    public RobotWarnThread(Map<String, String> robotAlarmMap, RobotService robotService,String syncWebsocketUrl) {
         this.robotAlarmMap = robotAlarmMap;
         this.robotService = robotService;
+        this.syncWebsocketUrl = syncWebsocketUrl;
     }
 
     @Override
@@ -47,6 +53,15 @@ public class RobotWarnThread implements Runnable{
                 log.info("tRobotAlarm的内容==={}", tRobotAlarm);
                 int res = robotService.insertRobotAlarm(tRobotAlarm);
                 log.info("插告警表的结果="+res);
+
+                Map<String, Object> jasonMaps = new HashMap<>(16);
+                jasonMaps.put("type", "alarmPopUp");
+                jasonMaps.put("warnId", tRobotAlarm.getRobotAlarmId());
+                jasonMaps.put("warnType", "2");
+                String json = JSON.toJSONString(jasonMaps);
+                log.info("发送给前端的消息：{}", json);
+                Constant.postUrl(syncWebsocketUrl, json);
+
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

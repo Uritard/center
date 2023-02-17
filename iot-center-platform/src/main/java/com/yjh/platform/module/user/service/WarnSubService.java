@@ -14,13 +14,17 @@ public class WarnSubService {
     @Autowired
     private WarnSubDao warnSubDao;
 
-    public boolean select(Long userId,String type,String level) {
-        WarnSub warnSub = warnSubDao.selectByUserId(userId);
-        if (warnSub == null){
+    public boolean select(Long userId,String type,String level,Long warnId) {
+        Integer isPop = warnSubDao.selectAlarmNote(warnId);
+        if (isPop != null && isPop == 1 && !"2".equals(type)){
             return true;
         }
+        WarnSub warnSub = warnSubDao.selectByUserId(userId);
+        if (warnSub == null){
+            return false;
+        }
         if (StringUtils.isEmpty(warnSub.getSubWarnType())){
-            return true;
+            return false;
         }
         if (warnSub.getSubWarnType().contains(type)){
             if (warnSub.getSubWarnLevel().contains(level)){

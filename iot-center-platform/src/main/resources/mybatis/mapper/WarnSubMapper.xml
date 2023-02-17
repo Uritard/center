@@ -38,4 +38,12 @@
         </trim>
     </insert>
 
+    <select id="selectAlarmNote" resultType="java.lang.Integer">
+        select
+               mete.alarm_note
+        from  t_warn_info info
+        left join t_std_devicemete mete on info.std_mete_id = mete.device_mete_id
+        where info.warn_id = #{warnId}
+    </select>
+
 </mapper>

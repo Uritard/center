@@ -50,6 +50,7 @@ import java.util.concurrent.locks.ReentrantLock;
 //import static com.yjh.accessvideo.common.Constant.TASKID;
 
 @Slf4j
+@Deprecated
 public class DataDealThread implements Runnable {
 
     private String body;
@@ -469,13 +470,11 @@ public class DataDealThread implements Runnable {
                                                     postUrl(syncWebsocketUrl,jsons);
 
                                                     //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
-                                                    String alarmNote = tStdDevicemeteM.getAlarmNote();
                                                     Integer alarmLevel = tStdDevicemeteM.getAlarmLevel();
                                                     Integer warnLevel = tWarnInfo.getWarnLevel();
-                                                    log.info("该测点是否配置了告警提示是===" + alarmNote);
                                                     log.info("该测点告警推送配置的告警等级是===" + alarmLevel);
                                                     log.info("产生的该条告警等级是===" + warnLevel);
-                                                    boolean one = (Objects.nonNull(alarmNote) && "1".equals(alarmNote));
+                                                    boolean one = true;
                                                     boolean two = (Objects.nonNull(alarmLevel) && (warnLevel.compareTo(alarmLevel) == 0 || warnLevel > alarmLevel));
                                                     log.info("一层判断" + one + "二层判断"+two);
 
@@ -702,11 +701,8 @@ public class DataDealThread implements Runnable {
                                         postUrl(syncWebsocketUrl,jsons);
 
                                         //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
-                                        String alarmNote = tStdDevicemete.getAlarmNote();
-                                        log.info("该测点是否配置了告警提示是===" + alarmNote);
                                         Integer defectLevel = NumberUtils.toInt(defectMap.get("defectLevel"));
                                         log.info("产生的该条缺陷的等级是===" + defectLevel);
-                                        if (alarmNote != null && "1".equals(alarmNote)) {
                                             if (defectLevel == 133) {//危急
                                                 //webSocket通知前端调用查询告警弹框的接口
                                                 currentWarnInfo.put("isPop","true");
@@ -721,7 +717,6 @@ public class DataDealThread implements Runnable {
                                                     postUrl(syncWebsocketUrl,json);
                                                 }
                                             }
-                                        }
 
                                         //最近一条缺陷信息-入缓存
                                         redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3, TimeUnit.MINUTES);
@@ -782,11 +777,8 @@ public class DataDealThread implements Runnable {
 
 
                                             //判断该测点是否设置了告警推送,若是,则将配置的告警信息组成告警弹框所需内容推给前端;不是,不推
-                                            String alarmNote = tStdDevicemete.getAlarmNote();  //jeff测试注释
-                                            log.info("该测点是否配置了告警提示是===" + alarmNote);
                                             Integer defectLevel = NumberUtils.toInt(defectMap.get("defectLevel"));
                                             log.info("产生的该条缺陷的等级是===" + defectLevel);
-                                            if (alarmNote != null && "1".equals(alarmNote)) {
                                                 if (defectLevel == 133) {//危急
                                                     //webSocket通知前端调用查询告警弹框的接口
                                                     currentWarnInfo.put("isPop","true");
@@ -801,7 +793,6 @@ public class DataDealThread implements Runnable {
                                                         postUrl(syncWebsocketUrl,json);
                                                     }
                                                 }
-                                            }
 
                                             redisTemplate.opsForValue().set("currentWarn",currentWarnInfo,3, TimeUnit.MINUTES);
                                             log.info("currentWarnInfo666"+currentWarnInfo);

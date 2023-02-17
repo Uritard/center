@@ -539,6 +539,20 @@ public class TWarnInfoController {
         return result;
     }
 
+    @ApiOperation(value = "机器人本体告警弹框")
+    @GetMapping(value = "/robotWarnPopUp")
+    @Logs(title = "机器人本体告警弹框",content = "机器人本体告警弹框",logType = 1,authority = "1235")
+    public Result robotWarnPopUp(@RequestParam(value = "warnId") Long warnId) {
+        Result result = new Result();
+        try {
+            TWarnInfoDetail tWarnInfoDetail = tWarnInfoService.selectRobotWarn(warnId);
+            result.setData(tWarnInfoDetail);
+        } catch (Exception e) {
+            result.setCode(ResultCodeEnum.UPDATEERROR.getCode(), ResultCodeEnum.UPDATEERROR.getName());
+            log.error("查询机器人本体告警弹框内容失败：", e);
+        }
+        return result;
+    }
 
 
 }
