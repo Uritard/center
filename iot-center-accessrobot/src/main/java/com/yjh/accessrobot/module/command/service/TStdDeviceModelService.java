@@ -218,7 +218,7 @@ public class TStdDeviceModelService {
                     } catch (IOException e) {
                         log.error("预置位文件拷贝失败", e);
                     }
-                    tCameraPresetMapper.updateByPrimaryKey(tCameraPreset);
+                    tCameraPresetMapper.updateByPrimaryKeySelective(tCameraPreset);
                 }
             }
         });
