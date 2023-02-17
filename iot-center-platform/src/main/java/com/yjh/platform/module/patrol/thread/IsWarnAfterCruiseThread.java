@@ -26,6 +26,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -116,10 +117,13 @@ public class IsWarnAfterCruiseThread implements Runnable {
                 String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
                 if (!CommonUtils.isEmptyOrNullstr(temperature)) {
                     double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(threadMap.get("value")));
-                    initInfo.put("valueTemp", String.valueOf(abs));
-                    initInfo.put("temperature", temperature);
+                    String valueTemp = new DecimalFormat("#0.0").format(Double.valueOf(abs));
+                    String temperatureTemp = new DecimalFormat("#0.0").format(Double.valueOf(temperature));
+
+                    initInfo.put("valueTemp", valueTemp);
+                    initInfo.put("temperature", temperatureTemp);
                     initInfo.put("warnName", tStdDevicemete.getMeteName() + "温差任务");
-                    initInfo.put("warnContent", "传感器环境温度与测温产生温差:环境" + temperature + "--测温" + threadMap.get("value") + "--温差" + abs);
+                    initInfo.put("warnContent", "传感器环境温度与测温产生温差:环境" + temperatureTemp + "--测温" + threadMap.get("value") + "--温差" + valueTemp);
                     initInfo.put("outRange", String.valueOf(abs));
                 }
             }
