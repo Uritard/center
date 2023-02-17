@@ -649,12 +649,12 @@ public class TSequentialConfService{
 
         try{
             TCfgDevice tCfgDevice = tCfgDeviceDao.selectByPrimaryId(cfgDeviceId);
-            String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
             String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("_yyyyMMdd_HHmmss");
-
-            String devicePath = ftpsFilePath + "/" + stationCode + "/linkage/" + returnlinkageFile.replace("{{date}}",simpleDateFormat2.format(new Date()));
+            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode()).get("stationId"));
+            String devicePath = ftpsFilePath + "/" + stationId + "/linkage/" + returnlinkageFile.replace("{{date}}",simpleDateFormat2.format(new Date()));
+            log.info("unionTask devicePath {}", devicePath);
             File txt=new File(devicePath);
 
             if(txt.exists()){
@@ -663,7 +663,7 @@ public class TSequentialConfService{
             if (!txt.exists()) {
                 txt.createNewFile();
             }
-            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + tCfgDevice.getEdgeCode()).get("stationId"));
+
             cfgDeviceId = StringUtils.substringAfter(cfgDeviceId, stationId);
             FileWriter fw = new FileWriter(txt, true);
             //BufferedWriter bw = new BufferedWriter(fw,"UTF-8");
@@ -675,7 +675,7 @@ public class TSequentialConfService{
             bw.write("<DeviceInfo::控制状态信息>\r\n");
             bw.write("@序号\t站序号\t监控索引号\t设备名称\t类型\t联动指令\r\n");
             bw.write("#1\t"+1+"\t"+cfgDeviceId+"\t"+tCfgDevice.getDeviceName()+"\t"+"遥控"+"\t"+order+"\r\n");
-            bw.write("</DeviceInfo::设备资源信息>\r\n");
+            bw.write("</DeviceInfo::控制状态信息>\r\n");
             bw.flush();
             bw.close();
             fw.close();
