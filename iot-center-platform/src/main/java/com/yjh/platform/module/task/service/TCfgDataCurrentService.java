@@ -1,6 +1,7 @@
 package com.yjh.platform.module.task.service;
 
 import com.alibaba.fastjson.JSON;
+import com.yjh.commons.ValueUtil;
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.Logs;
 import com.yjh.platform.common.result.Result;
@@ -193,9 +194,17 @@ public class TCfgDataCurrentService {
         List<TCfgDataCurrent> tCfgDataCurrentList = tCfgDataCurrentDao.selectByPage(meteName,startDate,endDate);
         tCfgDataCurrentList.forEach(item -> {
             String[] nameList = item.getDeviceName().split("/");
-            item.setRegion(nameList[0].split("\\.")[0]);
-            item.setStationName(nameList[0].split("\\.")[1]);
-            item.setDeviceName(nameList[1].split("\\.")[1]+"/"+nameList[2]);
+            String defaultName = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+            if (nameList.length<3){
+                item.setRegion(defaultName);
+                item.setStationName(defaultName);
+                item.setDeviceName(nameList[nameList.length-1]);
+            } else {
+                item.setRegion(nameList[0]);
+                item.setStationName(nameList[0]);
+                item.setDeviceName(nameList[1]+"/"+nameList[2]);
+            }
+
         });
         return tCfgDataCurrentList;
     }

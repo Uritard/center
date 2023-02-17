@@ -453,7 +453,7 @@
         a.meter_type,
         a.mete_name,
         a.appearance_type,
-        a.device_type,
+        e.device_type,
         a.inspection_type,
         a.position_type,
         a.is_ai,
