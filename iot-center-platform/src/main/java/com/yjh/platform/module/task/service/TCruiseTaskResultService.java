@@ -256,15 +256,18 @@ public class TCruiseTaskResultService {
         } else {
             inspectResult.setEndTime(sdf.parse(resultMap.get("cruiseTime")));
         }
-/*        if (Objects.nonNull(resultMap.get("isWarn"))) {
+        if (Objects.nonNull(resultMap.get("isWarn"))) {
             if ("1".equals(resultMap.get("isWarn"))) {
                 inspectResult.setIsWarn("有");
             } else {
                 inspectResult.setIsWarn("无");
             }
-        }*/
-        Integer count = tWarnInfoDao.countByInstanceIdAndTaskId(inspectResult.getInstanceId(), inspectResult.getTaskId());
-        inspectResult.setIsWarn(count > 0 ? "有":"无");
+        }
+//        Integer count = tWarnInfoDao.countByInstanceIdAndTaskId(inspectResult.getInstanceId(), inspectResult.getTaskId());
+//        inspectResult.setIsWarn(count > 0 ? "有":"无");
+
+
+//        inspectResult.setIsWarn(resultMap.get("isWarn"));
 
         if (Objects.nonNull(resultMap.get("picpath"))) {
             inspectResult.setImagePath(resultMap.get("picpath"));
