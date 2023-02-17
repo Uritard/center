@@ -86,6 +86,7 @@
         b.threshold_abs,
         b.threshold_per,
         b.redundant_type,
+        b.is_temdif,
         ""               as save_type_list,
         k.dict_note      as recognition_type_list,
         ""               as phase,

@@ -25,6 +25,7 @@ import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -504,7 +505,7 @@ public class IntelAnalysisService {
         String desc = Optional.ofNullable(result.getDesc()).orElse("");
 
         Map<String, String> map = new HashMap<>(5);
-        if (Objects.isNull(type) || Objects.equals("tx_pb",type)){
+        if (Objects.equals("tx_pb",type)){
             // 判别
             map = distinguishResultHandler(result, resultDesc, resultValue, resultImg, originPicPath, type, value, map);
         }else {
@@ -605,9 +606,13 @@ public class IntelAnalysisService {
                     resultValue.add(value);
                 }else {
                     // 根据value获取对应的值
-                    int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
-                    String resultDescTemp = Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN).getValue();
-                    resultValue.add(resultDescTemp);
+                    if (ArrayUtils.contains(new String[]{"0","1","2","3","4","5","6"}, value)){
+                        int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
+                        String resultDescTemp = Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN).getValue();
+                        resultValue.add(resultDescTemp);
+                    }else {
+                        resultValue.add("算法返回格式不正确");
+                    }
                 }
             }
             map.put("resultDesc", String.valueOf(resultDesc));

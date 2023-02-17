@@ -300,6 +300,7 @@ public class TStdDeviceModelService {
             tStdDeviceMete.setStateZero((String) device.get("state_zero"));
             tStdDeviceMete.setStateOne((String) device.get("state_one"));
             tStdDeviceMete.setAlarmState(objToInt(device.get("alarm_state")));
+            tStdDeviceMete.setIsTemdif(objToInt(device.get("is_temdif")));
         } else {
             tStdDeviceMete.setOriginId(String.valueOf(device.get("device_id")));
         }
