@@ -981,17 +981,18 @@ public class CameraConService {
         int lUserIDLong = Constant.maps.get(String.valueOf(cameraConInfo.getRecordId()));
         boolean ret = hCNetSDK.NET_DVR_PTZPreset_Other(lUserIDLong, iChanNum, presetCmd, iPreset);
 
-        // 设置预置位名称 通过NVR设置名称没卵用，注掉，可能需要通过直连相机来设置预置位名称
-        if (ret && HCNetSDK.SET_PRESET == presetCmd && StringUtils.isNotBlank(presetName)) {
+        // 设置预置位名称 调用接口报参数错误，比对参数后未发现问题，取消设置预置位名称
+        /*if (ret && HCNetSDK.SET_PRESET == presetCmd && StringUtils.isNotBlank(presetName)) {
             HCNetSDK.NET_DVR_PRESET_NAME dvrPresetName = new HCNetSDK.NET_DVR_PRESET_NAME();
             dvrPresetName.wPresetNum = (short)iPreset;
+            dvrPresetName.byPTZPosExEnable = 0;
             System.arraycopy(presetName.getBytes(), 0, dvrPresetName.byName, 0, presetName.length());
             dvrPresetName.write();
 
             if (!hCNetSDK.NET_DVR_SetDVRConfig(lUserIDLong, HCNetSDK.NET_DVR_SET_PRESET_NAME, iChanNum, dvrPresetName.getPointer(), dvrPresetName.size())) {
                 log.error("设置预置位名称失败， name: {}, err: {}", presetName, hCNetSDK.NET_DVR_GetLastError());
             }
-        }
+        }*/
 
         if (ret && presetCmd == HCNetSDK.CLE_PRESET) {
             String capturePresetPath = getPresetBasePath();
@@ -3541,7 +3542,7 @@ public class CameraConService {
             log.info("webrtc:{}",webRtc);
             returnMap.put("webRtcUrl", webRtc);
         } catch (Exception e) {
-            e.getMessage();
+            log.error(e.getMessage(), e);
         }
         return returnMap;
     }
@@ -3600,7 +3601,7 @@ public class CameraConService {
                 ipcfg.read();
                 return String.format("%d,%d,%d", ipcfg.wPanPos, ipcfg.wTiltPos, ipcfg.wZoomPos);
             } else {
-                System.out.printf("error:%s", hCNetSDK.NET_DVR_GetLastError());
+                log.error("获取预置位信息失败, error: {}", hCNetSDK.NET_DVR_GetLastError());
             }
         } catch (Exception e) {
             log.error("获取相机预置位PTZ参数错误:", e);

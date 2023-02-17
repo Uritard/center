@@ -7772,6 +7772,15 @@ DVR实现巡航数据结构
 
     }
 
+    public static class NET_PTZ_INFO_EX extends StructureFieldOrder {
+        public float fPan;//P值 精确到小数点后3位 范围[0,360.000]
+        public float fTilt; //Z值 精确到小数点后3位 范围[-90.000,90.000]
+        public float fVisibleZoom;//可见光zoom 精确到小数点后1位 不会超过[0，10000.0]
+        public int dwVisibleFocus;//可见光focus[0,65535]
+        public float fThermalZoom;//热成像zoom 精确到小数点后1位 不会超过[0，10000.0]
+        public int dwThermalFocus;//热成像focus[0,65535]
+    }
+
     public static class NET_DVR_PRESET_NAME extends StructureFieldOrder {
         public int dwSize;
         public short wPresetNum;   //预置点编号
@@ -7780,7 +7789,10 @@ DVR实现巡航数据结构
         public short wPanPos;  //水平参数 如果获取到的数据大于360默认减去360
         public short wTiltPos; //垂直参数 如果获取到的数据大于360默认减去360
         public short wZoomPos; //变倍参数如果获取到的数据大于360默认减去360
-        public byte[] byRes = new byte[58];
+        public byte byRes2;
+        public byte byPTZPosExEnable; /*是否启用PTZ坐标扩展，0~不启用，PTZ坐标值以wPanPos、wTiltPos、wZoomPos为准。1~启用，PTZ坐标值以struPtzPosEx为准*/
+        public NET_PTZ_INFO_EX struPtzPosEx = new NET_PTZ_INFO_EX();// ptz坐标扩展(支持高精度PTZ值)
+        public byte[] byRes = new byte[32];
     }
 
     //Sensor信息
