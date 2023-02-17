@@ -2,13 +2,10 @@ package com.yjh.platform.module.user.service;
 
 import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.logs.SpringBeanUtils;
-import com.yjh.platform.common.quartz.JobManager;
-import com.yjh.platform.common.quartz.QuartzTask;
 import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.FileUtil;
-import com.yjh.platform.common.utils.JSONUtil;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
@@ -21,8 +18,6 @@ import com.yjh.platform.module.user.entity.SilentConf;
 import com.yjh.platform.module.user.entity.TCameraInfo;
 import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TCameraPresetExpand;
-import com.yjh.platform.threadpool.TaskExecutePool;
-import org.apache.bcel.generic.ARETURN;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.impl.common.ConcurrentReaderHashMap;
 import org.slf4j.Logger;
@@ -30,6 +25,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -75,6 +73,8 @@ public class TCameraPresetService {
      */
     @Value("${camera.preset.second.check}")
     private boolean cameraPresetSecondCheck;
+
+    private static final Long LOCK_REDIS_TIMEOUT = 10L;
 
     ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(10);
 
@@ -479,6 +479,7 @@ public class TCameraPresetService {
         return resultMap;
     }
 
+    @Async
     private void cameraPresetCheck(Long cameraId) {
         // 获取该相机所有预置位（含库中PTZ值）
         // 批量查询相机各个预置位对应的PTZ值
@@ -489,17 +490,9 @@ public class TCameraPresetService {
         // 比对通过标记1，否则标记-1；
         // 将比对结果写入redis中
 
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    checkCameraPreset(cameraId);
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        };
-        TaskExecutePool.getInstance().execute(runnable);
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(() -> {checkCameraPreset(cameraId);});
+        executorService.shutdown();
     }
 
     /**
@@ -508,23 +501,54 @@ public class TCameraPresetService {
      * @param cameraId cameraId
      */
     private void checkCameraPreset(Long cameraId) {
-        List<TCameraPreset> presetList = getAllCameraPreset(cameraId);
-        if (CollectionUtils.isEmpty(presetList)) {
-            return;
-        }
-
-        // 对所有预置位的校验结果进行初始化，值为 0 进行中……
-        List<CameraPresetCheckResult> checkResults = initPresetCheckResult(presetList);
-
-        // 循环遍历所有预置位，进行PTZ比对和图片对比，每处理完一个预置位，立即同步结果到redis
-        checkResults.forEach(item -> {
-            try {
-                item.setPresetCheckResult(checkOnePreset(item.getPreset()));
-                setPresetCheckResultToRedis(checkResults);
-            } catch (Exception e) {
-                log.error("checkCameraPreset err: {}", e.getMessage());
+        try {
+            // 获取锁
+            if (!getLock(cameraId)) {
+                // 已有任务正在处理，不再重复校验
+                return;
             }
-        });
+
+            List<TCameraPreset> presetList = getAllCameraPreset(cameraId);
+            if (CollectionUtils.isEmpty(presetList)) {
+                return;
+            }
+
+            // 对所有预置位的校验结果进行初始化，值为 0 进行中……，并立即上传到redis
+            List<CameraPresetCheckResult> checkResults = initPresetCheckResult(presetList);
+            setPresetCheckResultToRedis(checkResults);
+
+            // 循环遍历所有预置位，进行PTZ比对和图片对比，每处理完一个预置位，立即同步结果到redis
+            checkResults.forEach(item -> {
+                try {
+                    item.setPresetCheckResult(checkOnePreset(item.getPreset()));
+                    setPresetCheckResultToRedis(checkResults);
+                } catch (Exception e) {
+                    log.error("checkCameraPreset err: {}", e.getMessage());
+                }
+            });
+        } finally {
+            // 释放锁
+            releaseLock(cameraId);
+        }
+    }
+
+    /**
+     *  加锁
+     **/
+    public Boolean getLock(Long cameraId){
+        String locoKey = getPresetRedisLockByCameraId(cameraId);
+        return this.redisTemplate.opsForValue().setIfAbsent(locoKey, locoKey);
+    }
+
+    /**
+     *  释放锁
+     **/
+    public Long releaseLock(Long cameraId) {
+        String locoKey = getPresetRedisLockByCameraId(cameraId);
+        String luaScript = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+        RedisScript<Long> redisScript = new DefaultRedisScript<>(luaScript, Long.class);
+        Long releaseStatus = (Long) this.redisTemplate.execute(redisScript, Collections.singletonList(locoKey), locoKey);
+        return releaseStatus;
     }
 
     /**
@@ -564,7 +588,14 @@ public class TCameraPresetService {
      */
     private Integer checkOnePreset(TCameraPreset tCameraPreset) {
         try {
-            String onLinePTZStr = getCameraPresetPTZOnLine(tCameraPreset);
+            Map<String, Object> resultMap = getPTZAndPicOnLine(tCameraPreset);
+            String onLinePTZStr = "";
+            String picOnline = "";
+            if (resultMap != null && resultMap.size() > 0) {
+                onLinePTZStr = resultMap.get("cameraPtz").toString();
+                picOnline = resultMap.get("urlPath").toString();
+            }
+
             if (!cmpPTZ(onLinePTZStr, tCameraPreset.getRemark())) {
                 return -1;
             }
@@ -574,7 +605,7 @@ public class TCameraPresetService {
                 return 1;
             }
 
-            return checkPresetByPic(tCameraPreset);
+            return checkPresetByPic(tCameraPreset, picOnline);
         } catch (Exception e) {
             log.error("checkOnePreset err: {}", e.getMessage());
             return -1;
@@ -587,8 +618,7 @@ public class TCameraPresetService {
      * @param tCameraPreset tCameraPreset
      * @return result
      */
-    private Integer checkPresetByPic(TCameraPreset tCameraPreset) {
-        String picOnline = getImageFromCamera(tCameraPreset);
+    private Integer checkPresetByPic(TCameraPreset tCameraPreset, String picOnline) {
         if (sendPic(picOnline, tCameraPreset.getPresetImg())) {
             return 1;
         } else {
@@ -613,38 +643,17 @@ public class TCameraPresetService {
      * @param tCameraPreset tCameraPreset
      * @return result
      */
-    private String getCameraPresetPTZOnLine(TCameraPreset tCameraPreset) {
+    private Map<String, Object> getPTZAndPicOnLine(TCameraPreset tCameraPreset) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("cameraId",tCameraPreset.getCameraId());
         params.put("presetId",tCameraPreset.getPresetId());
         params.put("meteName",tCameraPreset.getPresetName());
-        Result response = sendPostRequest(Constant.GET_PRESET_PTZ_URL,params);
+        Result response = sendPostRequest(Constant.GET_PRESET_PTZ_AND_PIC_URL,params);
         if (response != null && !org.springframework.util.StringUtils.isEmpty(response.getData())) {
-            return response.getData().toString();
+            return (Map<String, Object>) response.getData();
         }
 
-        return "";
-    }
-
-//    // 根据配置项，确认是否需要调用算法接口进行二次比对，如果需要筛选首次对比结果为1的记录
-//    private List<TCameraPreset> selectPresetNeedSecondCheck(List<CameraPresetCheckResult> firstCheckResult) {
-//        if (CollectionUtils.isEmpty(firstCheckResult) || !cameraPresetSecondCheck) {
-//            return null;
-//        }
-//
-//        // 筛选首次对比结果为1的记录
-//        return firstCheckResult.stream().filter(result -> result.getPresetCheckResult() > 0).map(item -> item.getPreset()).collect(Collectors.toList());
-//    }
-
-    /**
-     * 操作相机抓图
-     *
-     * @param tCameraPreset tCameraPreset
-     * @return result
-     */
-    private String getImageFromCamera(TCameraPreset tCameraPreset) {
-        // 发送同步消息获取图片
-        return "";
+        return null;
     }
 
     /**
@@ -658,12 +667,6 @@ public class TCameraPresetService {
         // 发送预置位图片和实时抓取图片到算法，进行对比
         return true;
     }
-
-//    private void setPicCmpResult(List<CameraPresetCheckResult> checkResults, TCameraPreset tCameraPreset) {
-//        // 将图片校验不通过的结果写回预置位检测列表
-//        Optional<CameraPresetCheckResult> result = checkResults.stream().filter(item ->item.getPreset().getPresetId().equals(tCameraPreset.getPresetId())).findFirst();
-//        result.get().setPresetCheckResult(-1);
-//    }
 
     /**
      * 将当前相机预置位检测结果写入redis
@@ -697,10 +700,15 @@ public class TCameraPresetService {
         return String.format("CAMERA_PRESET_CHECK_RESULT_%d", cameraId);
     }
 
-//    private String getPresetRedisValue(List<CameraPresetCheckResult> checkResults) {
-//        Map<Long, Integer> map = getPresetCheckResultMap(checkResults);
-//        return JSONUtil.toJSONString(map);
-//    }
+    /**
+     * 生成相机预置位的redisKey
+     *
+     * @param cameraId cameraId
+     * @return result
+     */
+    private String getPresetRedisLockByCameraId(Long cameraId) {
+        return String.format("CAMERA_PRESET_CHECK_LOCK_%d", cameraId);
+    }
 
     /**
      * 获取CameraId

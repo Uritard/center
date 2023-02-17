@@ -80,6 +80,9 @@ public class TCameraPreset implements Serializable {
     @ApiModelProperty(value = "备注")
     private String remark ;
 
+    @Length(max = 255,message = "presetPtz长度必须小于等于255")
+    @ApiModelProperty(value = "相机预置位PTZ值")
+    private String presetPtz ;
 
     @Max(value=999999999)
     @ApiModelProperty(value = "守望位类型")

@@ -33,7 +33,7 @@ public class Constant {
     public static final String account_lock_times = "account_lock_times:userAccountID";
 
     public static final String SET_PRESET_URL = "http://iot-center-accessvideo/camera/v1/setPreset?cameraId={cameraId}&presetId={presetId}&presetName={meteName}";
-    public static final String GET_PRESET_PTZ_URL = "http://iot-center-accessvideo/camera/v1/getPresetPTZ?cameraId={cameraId}&presetId={presetId}";
+    public static final String GET_PRESET_PTZ_AND_PIC_URL = "http://iot-center-accessvideo/camera/v1/getPresetPTZAndPic?cameraId={cameraId}&presetId={presetId}&presetName={meteName}";
 
     public static final String CANCEL_PRESET_URL = "http://iot-center-accessvideo/camera/v1/cancelPreset?cameraId={cameraId}&presetId={presetId}";
 
