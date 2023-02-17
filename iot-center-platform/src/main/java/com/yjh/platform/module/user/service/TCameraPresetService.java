@@ -6,6 +6,8 @@ import com.yjh.platform.common.restTemplate.ServiceRestTemplate;
 import com.yjh.platform.common.result.BusinessException;
 import com.yjh.platform.common.result.Result;
 import com.yjh.platform.common.utils.FileUtil;
+import com.yjh.platform.common.utils.FtpsUtil;
+import com.yjh.platform.common.utils.ThreadPoolUtil;
 import com.yjh.platform.configuration.UpFtpsConfig;
 import com.yjh.platform.module.device.entity.AreaInfo;
 import com.yjh.platform.module.patrol.quartz.SilentTaskJob;
@@ -479,7 +481,6 @@ public class TCameraPresetService {
         return resultMap;
     }
 
-    @Async
     private void cameraPresetCheck(Long cameraId) {
         // 获取该相机所有预置位（含库中PTZ值）
         // 批量查询相机各个预置位对应的PTZ值
@@ -490,9 +491,18 @@ public class TCameraPresetService {
         // 比对通过标记1，否则标记-1；
         // 将比对结果写入redis中
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(() -> {checkCameraPreset(cameraId);});
-        executorService.shutdown();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    checkCameraPreset(cameraId);
+                } catch (Exception e) {
+                    log.error("预置位校验失败，错误: {}" + e.getMessage());
+                }
+            }
+        };
+
+        ThreadPoolUtil.COMMON_POOL.addThread(runnable);
     }
 
     /**
@@ -596,7 +606,7 @@ public class TCameraPresetService {
                 picOnline = resultMap.get("urlPath").toString();
             }
 
-            if (!cmpPTZ(onLinePTZStr, tCameraPreset.getRemark())) {
+            if (!cmpPTZ(onLinePTZStr, tCameraPreset.getPresetPtz())) {
                 return -1;
             }
 

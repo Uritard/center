@@ -3604,7 +3604,7 @@ public class CameraConService {
                 log.error("获取预置位信息失败, error: {}", hCNetSDK.NET_DVR_GetLastError());
             }
         } catch (Exception e) {
-            log.error("获取相机预置位PTZ参数错误:", e);
+            log.error("获取相机预置位PTZ参数错误: {}", e.getMessage());
         }
 
         return "";
