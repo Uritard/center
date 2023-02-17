@@ -977,15 +977,17 @@ public class SendToUpSystemServices {
                     if (mapFileList.isEmpty()){
                         throw new BusinessException("不存在地图文件");
                     }
-                    String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpsFilePath").get("content"));
+                    String fileFtpPathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageAbsolute").get("content"));
                     String filePathMap = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:ftpImageRelative").get("content"));
-                    mapFileList.forEach(mapFilePath ->{
-                        mapFilePath.replace(filePathMap, fileFtpPathMap);
-                    });
+                    List<String> ftpFilePathList = new ArrayList<>(mapFileList.size());
+                    for (String mapFilePath : mapFileList) {
+                        ftpFilePathList.add(mapFilePath.replace(filePathMap, fileFtpPathMap));
+                    }
+
                     String dirPath = mapAbsPath + "/Model/";
 //                    dirPath = "C:/robotData/Model/";
                     String zipName = "map_model.zip";
-                    ZipUtil.compressFiles(dirPath, zipName, mapFileList);
+                    ZipUtil.compressFiles(dirPath, zipName, ftpFilePathList);
                     return dirPath+zipName;
                 case "10":
                     String sourcePath = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:sourceFilePath").get("content"));
