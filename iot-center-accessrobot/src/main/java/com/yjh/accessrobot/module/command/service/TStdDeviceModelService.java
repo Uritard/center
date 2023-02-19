@@ -158,12 +158,8 @@ public class TStdDeviceModelService {
 
             //将旧的数据和新的数据进行对比相同的去掉  不同的更新  新增的直接入库
             //预置位
-            List<TCameraPreset> insertCameraPresetList = dealCameraPreset(oldCameraPresetList, newCameraPresets, edgeCode);
+            List<TCameraPreset> insertCameraPresetList = dealCameraPreset(oldCameraPresetList, newCameraPresets, edgeCode, presetPath, presetRealPath, edgeLevel, ftpsPath);
             insertCameraPresetList.addAll(oldCameraPresetList);
-            //处理预置位图片
-            if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
-                dealCameraPresetImage(insertCameraPresetList, ftpsPath, presetPath, presetRealPath);
-            }
             //机器人测点
             List<TRobotInspection> insertRobotInspectionList = dealRobotInspection(oldRobotInspectionList, newRobotInspections, edgeCode);
             insertRobotInspectionList.addAll(oldRobotInspectionList);
@@ -193,35 +189,33 @@ public class TStdDeviceModelService {
 
     /**
      * 单独处理预置位图片
-     * @param insertCameraPresetList 入库后的预置位数据
+     * @param tCameraPreset 入库后的预置位数据
      * @param ftpsPath
      * @param presetPath
      * @param presetRealPath
      */
-    private void dealCameraPresetImage(List<TCameraPreset> insertCameraPresetList, String ftpsPath,
+    private void dealCameraPresetImage(TCameraPreset tCameraPreset, String ftpsPath,
                                        String presetPath, String presetRealPath) {
         log.info("处理预置位图片");
         //当节点为巡视主机接入边缘节点时再触发
-        insertCameraPresetList.forEach(tCameraPreset -> {
-            if (StringUtils.isNotEmpty(tCameraPreset.getPresetImg())) {
-                String imgPath = tCameraPreset.getPresetImg().replace(presetRealPath, "")
-                        .replace(String.valueOf(tCameraPreset.getPresetId()), tCameraPreset.getOriginId());
-                log.info("预置位路径{}", imgPath);
-                String presetFtpsImg = ftpsPath + imgPath;
-                String newPresetImagePath = imgPath.replace(tCameraPreset.getOriginId(), tCameraPreset.getPresetId().toString());
-                String presetImg = presetPath + newPresetImagePath;
-                File ftpsFile = new File(presetFtpsImg);
-                if (ftpsFile.exists()) {
-                    try {
-                        FileUtil.copyFileUsingStream(presetFtpsImg, presetImg);
-                        tCameraPreset.setPresetImg(presetRealPath + newPresetImagePath);
-                    } catch (IOException e) {
-                        log.error("预置位文件拷贝失败", e);
-                    }
-                    tCameraPresetMapper.updateByPrimaryKeySelective(tCameraPreset);
+        if (StringUtils.isNotEmpty(tCameraPreset.getPresetImg())) {
+            String imgPath = tCameraPreset.getPresetImg().replace(presetRealPath, "")
+                    .replace(String.valueOf(tCameraPreset.getPresetId()), tCameraPreset.getOriginId());
+            log.info("预置位路径{}", imgPath);
+            String presetFtpsImg = ftpsPath + imgPath;
+            String newPresetImagePath = imgPath.replace(tCameraPreset.getOriginId(), tCameraPreset.getPresetId().toString());
+            String presetImg = presetPath + newPresetImagePath;
+            File ftpsFile = new File(presetFtpsImg);
+            if (ftpsFile.exists()) {
+                try {
+                    FileUtil.copyFileUsingStream(presetFtpsImg, presetImg);
+                    tCameraPreset.setPresetImg(presetRealPath + newPresetImagePath);
+                } catch (IOException e) {
+                    log.error("预置位文件拷贝失败", e);
                 }
+                tCameraPresetMapper.updateByPrimaryKeySelective(tCameraPreset);
             }
-        });
+        }
     }
 
     /**
@@ -430,7 +424,9 @@ public class TStdDeviceModelService {
      * @param edgeCode 节点编码
      * @return 直接入库的数据
      */
-    private List<TCameraPreset> dealCameraPreset(List<TCameraPreset> oldList, List<TCameraPreset> newList, String edgeCode) {
+    private List<TCameraPreset> dealCameraPreset(List<TCameraPreset> oldList, List<TCameraPreset> newList,
+                                                 String edgeCode, String presetPath, String presetRealPath,
+                                                 String edgeLevel, String ftpsPath) {
         Map<String, TCameraPreset> oldMap = oldList.stream().collect(Collectors.toMap(TCameraPreset::getOriginId, Function.identity()));
         Map<String, TCameraPreset> newMap = newList.stream().collect(Collectors.toMap(TCameraPreset::getOriginId, Function.identity()));
         SetUtils.SetView<String> updateIdSet = SetUtils.intersection(oldMap.keySet(), newMap.keySet());
@@ -440,11 +436,19 @@ public class TStdDeviceModelService {
                 TCameraPreset old = oldMap.get(t.getOriginId());
                 t.setPresetId(old.getPresetId());
                 tCameraPresetMapper.updateByPrimaryKey(t);
+                if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
+                    dealCameraPresetImage(old, ftpsPath, presetPath, presetRealPath);
+                }
             });
+
         }
         //删除的预置位数据
         SetUtils.SetView<String> deleteIdSet = SetUtils.difference(oldMap.keySet(), newMap.keySet());
         if (CollectionUtils.isNotEmpty(deleteIdSet)) {
+            deleteIdSet.forEach(deleteId -> {
+                String presetImg = oldMap.get(deleteId).getPresetImg();
+                FileUtil.deleteDirectory(StringUtils.substringBeforeLast(presetImg.replace(presetRealPath, presetPath), "/"));
+            });
             tCameraPresetMapper.deleteByEdgeCodeAndOriginId(edgeCode, deleteIdSet);
         }
         //新增的预置位数据
@@ -454,6 +458,12 @@ public class TStdDeviceModelService {
             insertList = newList.stream().filter(t -> insertIdSet.contains(t.getOriginId())).collect(Collectors.toList());
             List<List<TCameraPreset>> partitionList = Lists.partition(insertList, 1000);
             partitionList.forEach(list -> tCameraPresetMapper.batchInsert(list));
+            //处理预置位图片
+            if (EdgeEnum.REGION_NODE.getCode().equals(edgeLevel)) {
+                insertList.forEach(tCameraPreset -> {
+                    dealCameraPresetImage(tCameraPreset, ftpsPath, presetPath, presetRealPath);
+                });
+            }
         }
         return insertList;
     }
