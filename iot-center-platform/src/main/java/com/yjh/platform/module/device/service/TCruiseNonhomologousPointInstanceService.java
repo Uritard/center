@@ -59,6 +59,8 @@ public class TCruiseNonhomologousPointInstanceService {
 
     @Transactional(rollbackFor = Exception.class)
     public int update(TCruiseNonhomologousPointInstance tCruiseNonhomologousPointInstance) {
+        tCruiseNonhomologousPointInstance.setOneCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseNonhomologousPointInstance.getInstanceIdOne()));
+        tCruiseNonhomologousPointInstance.setTwoCruiseDeviceName(tCruiseNonhomologousPointInstanceDao.selectCruiseDeviceByInstanceId(tCruiseNonhomologousPointInstance.getInstanceIdTwo()));
         return this.tCruiseNonhomologousPointInstanceDao.update(tCruiseNonhomologousPointInstance);
     }
 
