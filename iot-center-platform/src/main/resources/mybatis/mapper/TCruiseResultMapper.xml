@@ -841,6 +841,29 @@
             u_patrol_task_attr a
         WHERE
             a.task_id = #{taskId,jdbcType=VARCHAR}
+
+        UNION ALL
+        SELECT
+            count(*)
+        FROM
+            u_patrol_plan_attr a
+                LEFT JOIN u_patrol_task b ON a.plan_id = b.plan_id
+                LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
+        WHERE
+            b.task_id = #{taskId,jdbcType=VARCHAR}
+
+          AND c.cruise_type = 232
+        UNION ALL
+        SELECT
+            count(*)
+        FROM
+            u_patrol_plan_attr a
+                LEFT JOIN u_patrol_task b ON a.plan_id = b.plan_id
+                LEFT JOIN t_cruise_point_instance c ON a.instance_id = c.instance_id
+        WHERE
+            b.task_id = #{taskId,jdbcType=VARCHAR}
+
+          AND c.cruise_type = 524
     </select>
 
 

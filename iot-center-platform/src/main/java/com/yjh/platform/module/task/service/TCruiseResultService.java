@@ -387,6 +387,8 @@ public class TCruiseResultService{
                     temTask.setDeviceMeteCount(counts.get(0));
                     temTask.setCameraCount(counts.get(1));
                     temTask.setRobotPointsCount(counts.get(2));
+                    temTask.setVoicePointsCount(counts.get(3));
+                    temTask.setDronePointsCount(counts.get(4));
                 }
             }
 
@@ -400,24 +402,40 @@ public class TCruiseResultService{
         Set<String> instanceKey = redisTemplate.keys("patrol_task_result:"+ temTask.getTaskId() +":*");
 //        log.info("查询任务[{}]下所有instance:{}", temTask.getTaskId(),JSON.toJSONString(instanceKey));
         if (CollectionUtil.isNotEmpty(instanceKey)) {
-            Long instanceCount = (long) instanceKey.size();
+            Long instanceCount = (long)instanceKey.size();
             Long cameraCount = 0L;
             Long robotPoints = 0L;
+            Long voicePoints = 0L;
+            Long dronePoints = 0L;
             //遍历key，根据缓存信息判别巡视点类型
             Iterator<String> iterator = instanceKey.iterator();
             while (iterator.hasNext()) {
                 String key = iterator.next();
                 Map<String, String> body = redisTemplate.opsForHash().entries(key);
-                if ("229".equals(body.get("cruiseType")) || "230".equals(body.get("cruiseType"))) {
-                    cameraCount++;
-                } else if ("228".equals(body.get("cruiseType"))) {
-                    robotPoints++;
+                switch (body.get("cruiseType")) {
+                    case "229":
+                    case "230":
+                        cameraCount++;
+                        break;
+                    case "228":
+                        robotPoints++;
+                        break;
+                    case "232":
+                        voicePoints++;
+                        break;
+                    case "524":
+                        dronePoints++;
+                        break;
+                    default:
+                        ;
                 }
             }
             //填充数据
             temTask.setDeviceMeteCount(instanceCount);
             temTask.setRobotPointsCount(robotPoints);
             temTask.setCameraCount(cameraCount);
+            temTask.setDronePointsCount(dronePoints);
+            temTask.setVoicePointsCount(voicePoints);
         }
     }
 
