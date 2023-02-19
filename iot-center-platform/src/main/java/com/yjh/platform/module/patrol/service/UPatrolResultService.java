@@ -71,6 +71,12 @@ public class UPatrolResultService {
             cruiseResultDetailList =
                 uPatrolResultDao.selectCruiseByPage(taskId, cruiseType, cruiseResult, deviceType, startTime, endTime, deviceIdList,
                     customId);
+            String currentEdge = (String) redisTemplate.opsForHash().get("t_sys_param:edgeName", "content");
+            cruiseResultDetailList.forEach(c -> {
+                if (StringUtils.isBlank(c.getEdgeName())) {
+                    c.setEdgeName(currentEdge);
+                }
+            });
         }
         return cruiseResultDetailList;
     }
