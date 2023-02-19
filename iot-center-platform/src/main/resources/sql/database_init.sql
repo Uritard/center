@@ -635,6 +635,7 @@ CREATE TABLE `t_camera_preset` (
   `preset_img` varchar(255) DEFAULT '',
   `inspection_postion` int(10) DEFAULT '1' COMMENT '检测点位置，0-室外 1-室内',
   `collect_status` int(10) DEFAULT '1' COMMENT '采集状态，0-未采集 1-已采集',
+  `preset_ptz` varchar(255) DEFAULT NULL COMMENT '相机预置位PTZ值',
   `calibration_status` int(10) DEFAULT '1' COMMENT '标定状态，0-未标定 1-已标定',
   `remark` varchar(255) DEFAULT '' COMMENT '备注',
   PRIMARY KEY (`preset_id`) USING BTREE,
