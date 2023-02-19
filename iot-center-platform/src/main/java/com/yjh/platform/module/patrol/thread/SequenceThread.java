@@ -1,7 +1,5 @@
 package com.yjh.platform.module.patrol.thread;
 
-import com.alibaba.fastjson.JSON;
-import com.yjh.platform.common.Constant;
 import com.yjh.platform.common.utils.FileUtil;
 import com.yjh.platform.common.utils.FtpsUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
@@ -13,13 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.yjh.platform.common.Constant.redisTemplate;
 
 /**
  * @author hyh
@@ -58,27 +53,10 @@ public class SequenceThread implements Runnable {
 
             log.info("imgPath:{} resultImagePath:{}",imgPath,resultImagePath);
             FileUtil.copyFileUsingStream(imgPath, resultImagePath);
-            Map<String, Object> mapForPicModelPath = redisTemplate.opsForHash().entries("t_sys_param:picModelPath");
-            String picModelPath = (String) mapForPicModelPath.get("content")+ "/" + map.get("presetId");
-            //标定文件上传到ftp服务下面
-            String[] split = picModelPath.split("/");
-            File dir = new File(picModelPath);
-            File[] files = dir.listFiles();
-            for(int i=0; i<files.length; i++) {
-                if(files[i].isFile()) {
-                    log.info(files[i].getPath());
-                    String[] path = files[i].getPath().split("/");
-                    String targetNamePath = path[path.length - 3] + "/" + path[path.length - 2] + "/" + path[path.length - 1];
-                    uploadFileToFtps(files[i].getPath(), targetNamePath, intelAnalysisFtpsConfig);
-                }
-            }
-            picModelPath = split[split.length - 2] + "/" + split[split.length - 1] + "/tmodel.txt";
-            log.info("最后的picModelPath=={}", picModelPath);
             Analysis analysis = new Analysis();
             analysis.setAnalyseType("6");
             analysis.setInstanceId(Long.valueOf(map.get("cfgDeviceId").toString()));
             analysis.setIsAi(1);
-            analysis.setPicModelPath(picModelPath+"/"+map.get("presetId"));
             analysis.setTaskId("yjsk#meteId="+map.get("cfgDeviceId"));
             analysis.setPicPath(resultImagePath);
             List<Analysis> analysisList = new ArrayList<>();

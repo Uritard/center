@@ -24,6 +24,8 @@ import com.yjh.platform.module.patrol.entity.interlanalysis.*;
 import com.yjh.platform.module.task.entity.TWarnInfo;
 import com.yjh.platform.module.user.dao.TCameraPresetDao;
 import com.yjh.platform.module.user.entity.TCameraPreset;
+import com.yjh.platform.module.user.entity.TSysParam;
+import com.yjh.platform.module.user.service.TSequentialConfService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -40,12 +42,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -72,11 +74,6 @@ public class IntelAnalysisService {
      */
     @Value("${conf.file.name}")
     private String fileName;
-    /**
-     * 一键顺控-变位结果返回
-     */
-    @Value("${sequential.picRecBack}")
-    private String picRecBack;
 
     @Autowired
     private AnalyseDataOperateService analyseDataOperateService;
@@ -98,6 +95,9 @@ public class IntelAnalysisService {
     private AlarmService alarmService;
     @Autowired
     private TCameraPresetDao tCameraPresetDao;
+    @Lazy
+    @Autowired
+    private TSequentialConfService tSequentialConfService;
 
 
     private final Logger log = LoggerFactory.getLogger(IntelAnalysisService.class);
@@ -801,7 +801,7 @@ public class IntelAnalysisService {
             recBack.put("resImageUrl",response.getResultsList().get(0).getResults().get(0).getResImageUrl());
             recBack.put("type",response.getResultsList().get(0).getResults().get(0).getType());
             recBack.put("value",response.getResultsList().get(0).getResults().get(0).getValue());
-            String services = HttpClientUtils.getInstance().postUrl(picRecBack, JSON.toJSONString(recBack));
+            String services = tSequentialConfService.sequentialRecBack(recBack);
             log.info("一键顺控services：{}" , services);
         }catch (Exception e){
             log.error("一键顺控-变相信号-分析主机返回处理失败: ", e);
