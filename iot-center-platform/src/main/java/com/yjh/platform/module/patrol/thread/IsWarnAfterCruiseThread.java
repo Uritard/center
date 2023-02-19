@@ -14,6 +14,7 @@ import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
 import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
+import com.yjh.platform.module.device.entity.TStdDevice;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
 import com.yjh.platform.module.patrol.entity.TStdDeviceMete;
@@ -63,6 +64,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
         this.patrolResultHandler = StaticContextAccessor.getBean(PatrolResultHandler.class);
         this.tStdRegionDao = StaticContextAccessor.getBean(TStdRegionDao.class);
         this.tCruisePointInstanceDao = StaticContextAccessor.getBean(TCruisePointInstanceDao.class);
+        this.tStdDeviceDao = StaticContextAccessor.getBean(TStdDeviceDao.class);
     }
 
     @Override
