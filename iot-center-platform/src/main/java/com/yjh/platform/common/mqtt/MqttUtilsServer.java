@@ -43,9 +43,18 @@ public class MqttUtilsServer {
             options.setKeepAliveInterval(60);
             options.setAutomaticReconnect(true);
             this.mqttClient.setCallback(new PushCallback());
-            this.mqttClient.connect(options);
+            new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        mqttClient.connect(options);
+                    } catch (Exception e) {
+                        log.error("connetct mqttserver-异常\nclientId:{}\nexception:{}", serverClientId, e.getMessage());
+                    }
+                }
+            };
         } catch (Exception e) {
-            log.error("connetct mqttserver-异常\nclientId:{}\nexception:{}", serverClientId, e.getMessage());
+            log.error("init mqttserver-异常\nclientId:{}\nexception:{}", serverClientId, e.getMessage());
         }
     }
 
