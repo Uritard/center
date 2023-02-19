@@ -434,17 +434,14 @@ public class IntelAnalysisService {
                 for (AnalyseResultItem result : results) {
                     taskResult.setConf(String.valueOf(result.getConf()));
                     try {
-                        if (StringUtils.equals("2001", result.getCode())){
-//                            log.error("巡视点为{}图像数据错误", instanceId);
-                            taskResult.setResultValue(AlgorithmExceptionEnum.getInstance(result.getDesc()).getContent());
+                        // 2000:正确 2001:图像数据错误 2002:算法分析失败
+                        if (StringUtils.equals("2001", result.getCode()) || StringUtils.equals("2002", result.getCode())){
+                            boolean includeDesc = AlgorithmExceptionEnum.isIncludeDesc(result.getDesc());
+                            taskResult.setResultValue(includeDesc ?
+                                    AlgorithmExceptionEnum.getInstance(result.getDesc()).getContent() : result.getDesc());
                             taskResult.setResultDesc(result.getDesc());
                             taskResult.setAnalyseResultImg(originPicPath);
-                        }else if (StringUtils.equals("2002", result.getCode())){
-//                            log.error("巡视点为{}算法分析失败", instanceId);
-                            taskResult.setResultValue("算法分析失败");
-                            taskResult.setResultDesc("算法分析失败");
-                            taskResult.setAnalyseResultImg(originPicPath);
-                        }else if (StringUtils.equals("2000", result.getCode())){
+                        }else {
                             Map<String, String> map = getResultMap(resultValue, resultDesc, resultImg, originPicPath, result);
 
                             if (StringUtils.isBlank(map.get("resultValue"))) {

@@ -12,6 +12,7 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
@@ -51,6 +52,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private PatrolResultHandler patrolResultHandler;
     private TStdRegionDao tStdRegionDao;
     private TCruisePointInstanceDao tCruisePointInstanceDao;
+    private TStdDeviceDao tStdDeviceDao;
 
     public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate) {
         this.threadMap = threadMap;
@@ -108,17 +110,16 @@ public class IsWarnAfterCruiseThread implements Runnable {
             Map<String, String> initInfo = new HashMap<>(16);
             initInfo.put("valueTemp", threadMap.get("value"));
 
-            // 下级是否为机器人节点
-            boolean isDevice = StaticContextAccessor.getBean(AnalyseDataOperateDao.class).selectRobotCodeIsExist(robotCode) == 1 ? true : false;
-            boolean isTemDif = isDevice && 1 == tStdDevicemete.getIsTemdif() && Objects.equals("222", tStdDevicemete.getMeteType());
+            // 下级为机器人节点传上来的值
+            boolean isTemDif = 1 == tStdDevicemete.getIsTemdif() && Objects.equals("222", tStdDevicemete.getMeteType());
             initInfo.put("isTemDif", String.valueOf(isTemDif));
             if (isTemDif) {
                 // 配置了红外温差任务用差值去判断告警
                 String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
                 if (!CommonUtils.isEmptyOrNullstr(temperature)) {
                     double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(threadMap.get("value")));
-                    String valueTemp = new DecimalFormat("#0.0").format(Double.valueOf(abs));
-                    String temperatureTemp = new DecimalFormat("#0.0").format(Double.valueOf(temperature));
+                    String valueTemp = new DecimalFormat("#0.00").format(Double.valueOf(abs));
+                    String temperatureTemp = new DecimalFormat("#0.00").format(Double.valueOf(temperature));
 
                     initInfo.put("valueTemp", valueTemp);
                     initInfo.put("temperature", temperatureTemp);
@@ -186,7 +187,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setImagePath(threadMap.get("relativePath"));
             warnInfo.setValue(threadMap.get("value"));
             warnInfo.setTaskId(taskId);
-            warnInfo.setDeviceCode(String.valueOf(uPatrolTaskService.selectRobotInfoByCode(threadMap.get("robotCode")).getRobotId()));
+            warnInfo.setDeviceCode(tStdDeviceDao.selectByUnionKeys(tStdDevicemete.getDeviceId()).getDeviceCode());
             warnInfo.setWarnName(isTemDif ? initInfo.get("warnName") : String.valueOf(map.get("warnName")));
             warnInfo.setWarnLevel(Integer.valueOf(String.valueOf(map.get("warnLevel"))));
             warnInfo.setWarnContent(isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")));

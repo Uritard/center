@@ -626,6 +626,7 @@
             a.threshold_abs,
             a.threshold_per,
             a.modulus,
+            a.is_temdif,
             a.remark
         from t_cruise_point_instance b left join t_std_devicemete a
                                                  on b.device_mete_id=a.device_mete_id

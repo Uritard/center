@@ -55,10 +55,21 @@ public enum AlgorithmExceptionEnum {
         return null;
     }
 
-    public static boolean isInclude(String content){
+    public static boolean isIncludeContent(String content){
         boolean include = false;
         for (AlgorithmExceptionEnum e : AlgorithmExceptionEnum.values()){
             if(e.getContent().equals(content)){
+                include = true;
+                break;
+            }
+        }
+        return include;
+    }
+
+    public static boolean isIncludeDesc(String desc){
+        boolean include = false;
+        for (AlgorithmExceptionEnum e : AlgorithmExceptionEnum.values()){
+            if(e.getDesc().equals(desc)){
                 include = true;
                 break;
             }

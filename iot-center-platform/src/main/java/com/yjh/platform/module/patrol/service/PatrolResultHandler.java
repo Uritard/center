@@ -372,7 +372,7 @@ public class PatrolResultHandler {
                 cruiseResultMap.put("resultNum", resultValue + ",识别失败");
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-            } else if (AlgorithmExceptionEnum.isInclude(resultValue)){
+            } else if (AlgorithmExceptionEnum.isIncludeContent(resultValue)){
                 cruiseResultMap.put("resultNum", resultValue);
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
@@ -486,8 +486,8 @@ public class PatrolResultHandler {
                                 String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
                                 if (!CommonUtils.isEmptyOrNullstr(temperature)){
                                     double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(resultStringValue));
-                                    String valueTemp = new DecimalFormat("#0.0").format(Double.valueOf(abs));
-                                    String temperatureTemp = new DecimalFormat("#0.0").format(Double.valueOf(temperature));
+                                    String valueTemp = new DecimalFormat("#0.00").format(Double.valueOf(abs));
+                                    String temperatureTemp = new DecimalFormat("#0.00").format(Double.valueOf(temperature));
 
                                     initInfo.put("valueTemp", valueTemp);
                                     initInfo.put("temperature", temperatureTemp);

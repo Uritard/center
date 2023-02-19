@@ -71,7 +71,7 @@
         select
         <include refid="Base_Column_List" />
         from t_std_devicemete
-        where  device_mete_id = #{deviceMeteId,jdbcType=BIGINT} 
+        where  device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </select>
     <select id="selectByEdgeCode" resultType="com.yjh.accessrobot.module.command.entity.TStdDeviceMete">
         select
@@ -82,7 +82,7 @@
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from t_std_devicemete
-        where  device_mete_id = #{deviceMeteId,jdbcType=BIGINT} 
+        where  device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </delete>
     <delete id="deleteByEdgeCodeAndOriginId">
         delete from t_std_devicemete  where edge_code=#{edgeCode}  and origin_id in
@@ -170,6 +170,7 @@
                 <if test="redundantType != null">redundant_type,</if>
                 <if test="originId != null">origin_id,</if>
                 <if test="edgeCode != null">edge_code,</if>
+                <if test="isTemdif != null">is_temdif,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="deviceMeteId != null">#{deviceMeteId,jdbcType=BIGINT},</if>
@@ -215,6 +216,7 @@
                 <if test="redundantType != null">#{redundantType,jdbcType=VARCHAR},</if>
                 <if test="originId != null">#{originId,jdbcType=VARCHAR},</if>
                 <if test="edgeCode != null">#{edgeCode,jdbcType=VARCHAR},</if>
+                <if test="isTemdif != null">#{isTemdif,jdbcType=INTEGER},</if>
         </trim>
     </insert>
     <insert id="batchInsert" keyColumn="device_mete_id" keyProperty="deviceMeteId" parameterType="java.util.List" useGeneratedKeys="true">
@@ -231,7 +233,7 @@
         ,high_limit2,low_limit2,high_limit3
         ,low_limit3,high_limit4,low_limit4
         ,alarm_delay,alarm_cnt,threshold_abs
-        ,threshold_per,modulus,remark
+        ,threshold_per,modulus,remark,is_temdif
         ,redundant_type,origin_id,edge_code
         )
         values
@@ -249,7 +251,7 @@
             ,#{tStdDeviceMete.lowLimit3,jdbcType=FLOAT},#{tStdDeviceMete.highLimit4,jdbcType=FLOAT},#{tStdDeviceMete.lowLimit4,jdbcType=FLOAT}
             ,#{tStdDeviceMete.alarmDelay,jdbcType=INTEGER},#{tStdDeviceMete.alarmCnt,jdbcType=INTEGER},#{tStdDeviceMete.thresholdAbs,jdbcType=DECIMAL}
             ,#{tStdDeviceMete.thresholdPer,jdbcType=DECIMAL},#{tStdDeviceMete.modulus,jdbcType=INTEGER},#{tStdDeviceMete.remark,jdbcType=VARCHAR}
-            ,#{tStdDeviceMete.redundantType,jdbcType=VARCHAR},#{tStdDeviceMete.originId,jdbcType=VARCHAR},#{tStdDeviceMete.edgeCode,jdbcType=VARCHAR}
+            ,#{tStdDeviceMete.isTemdif,jdbcType=INTEGER},#{tStdDeviceMete.redundantType,jdbcType=VARCHAR},#{tStdDeviceMete.originId,jdbcType=VARCHAR},#{tStdDeviceMete.edgeCode,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -383,11 +385,11 @@
                     edge_code = #{edgeCode,jdbcType=VARCHAR},
                 </if>
         </set>
-        where   device_mete_id = #{deviceMeteId,jdbcType=BIGINT} 
+        where   device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.yjh.accessrobot.module.command.entity.TStdDeviceMete">
         update t_std_devicemete
-        set 
+        set
             device_id =  #{deviceId,jdbcType=BIGINT},
             device_point_id =  #{devicePointId,jdbcType=VARCHAR},
             custom_id =  #{customId,jdbcType=VARCHAR},
@@ -429,7 +431,8 @@
             remark =  #{remark,jdbcType=VARCHAR},
             redundant_type =  #{redundantType,jdbcType=VARCHAR},
             origin_id =  #{originId,jdbcType=VARCHAR},
+            is_temdif =  #{isTemdif,jdbcType=INTEGER},
             edge_code =  #{edgeCode,jdbcType=VARCHAR}
-        where   device_mete_id = #{deviceMeteId,jdbcType=BIGINT} 
+        where   device_mete_id = #{deviceMeteId,jdbcType=BIGINT}
     </update>
 </mapper>
