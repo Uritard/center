@@ -595,9 +595,9 @@ public class TSequentialConfService{
                 case "4": value = "合不到位"; break;
                 default: value = "无效状态"; break;
             }
-            String stationCode = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:edgeCode", "content"));
+            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + map.get("edgeCode")).get("stationId"));
             String ftpsFilePath = String.valueOf(redisTemplate.opsForHash().get("t_sys_param:ftpsFilePath", "content"));
-            String devicePath = ftpsFilePath + "/" + stationCode + "/linkage/" + videocfmresultFile.replace("{{date}}", simpleDateFormat2.format(new Date()));
+            String devicePath = ftpsFilePath + "/" + stationId + "/linkage/" + videocfmresultFile.replace("{{date}}", simpleDateFormat2.format(new Date()));
 
             File txt=new File(devicePath);
             if(txt.exists()){
@@ -606,7 +606,6 @@ public class TSequentialConfService{
             if (!txt.exists()) {
                 txt.createNewFile();
             }
-            String stationId = String.valueOf(redisTemplate.opsForHash().entries("region:" + map.get("edgeCode")).get("stationId"));
             String meteId = StringUtils.substringAfter(recBack.get("meteId"), stationId);
 //                FileWriter fw = new FileWriter(txt, true);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
