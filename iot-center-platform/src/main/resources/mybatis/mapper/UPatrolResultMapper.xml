@@ -465,6 +465,7 @@
         q.alarm_state,
         q.alarm_level,
         q.is_temdif,
+        q.custom_name as customName,
         s.dict_note as alarm_level_name,
         n.device_type,
         b.voice_path,
