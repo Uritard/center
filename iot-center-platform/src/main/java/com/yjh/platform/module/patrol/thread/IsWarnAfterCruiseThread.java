@@ -173,7 +173,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private void alarmStoreAndHandler(Map<String, Object> map, String taskId, TStdDeviceMete tStdDevicemete, Long instanceId, Map<String, String> initInfo) {
         log.info("An alarm is generated！！！");
         log.info("initInfo=={}", initInfo);
-        boolean isTemDif = Boolean.valueOf(initInfo.get("isTemDif"));
+        boolean isTemDif = Boolean.parseBoolean(initInfo.get("isTemDif"));
         TWarnInfo warnInfo = new TWarnInfo();
         try {
             warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
