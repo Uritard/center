@@ -1721,7 +1721,8 @@ public class UPatrolTaskService {
             }
             String progress;
             if(allCounts != 0){
-                progress = CommonUtils.percentFormat((float)(normalCounts + abnormalCounts)/allCounts, "#.####");
+                float progressF = (float)(normalCounts + abnormalCounts)/allCounts;
+                progress = CommonUtils.percentFormat(Math.min(progressF, 1.0F), "#.####");
                 // 如果 all==0，则表示这不是本机创建的任务，任务进度不由本级计算，不更新进度值
                 resultCountsMap.put("taskProgress", progress);
             }
