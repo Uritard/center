@@ -219,7 +219,10 @@ public class UPatrolResultService {
         Map<String, String> initInfo = new HashMap<>(16);
         initInfo.put("valueTemp", personCheck);
 
-        boolean isTemDif = 1 == tStdDevicemete.getIsTemdif() && Objects.equals("222", tStdDevicemete.getMeteType());
+        String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+        boolean isTemDif = StringUtils.equals("2", sysLevel)
+                && 1 == tStdDevicemete.getIsTemdif()
+                && Objects.equals("222", tStdDevicemete.getMeteType());
         if (isTemDif){
             // 配置了红外温差任务用差值去判断告警
             String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));

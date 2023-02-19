@@ -112,8 +112,10 @@ public class IsWarnAfterCruiseThread implements Runnable {
             Map<String, String> initInfo = new HashMap<>(16);
             initInfo.put("valueTemp", threadMap.get("value"));
 
-            // 下级为机器人节点传上来的值
-            boolean isTemDif = 1 == tStdDevicemete.getIsTemdif() && Objects.equals("222", tStdDevicemete.getMeteType());
+            String sysLevel = String.valueOf(redisTemplate.opsForHash().entries("t_sys_param:edgeLevel").get("content"));
+            boolean isTemDif = StringUtils.equals("2", sysLevel)
+                    && 1 == tStdDevicemete.getIsTemdif()
+                    && Objects.equals("222", tStdDevicemete.getMeteType());
             initInfo.put("isTemDif", String.valueOf(isTemDif));
             if (isTemDif) {
                 // 配置了红外温差任务用差值去判断告警
