@@ -386,6 +386,7 @@ public class UPatrolTaskService {
         uPatrolTask.setCreateTime(new Date());
         uPatrolTaskDao.add(uPatrolTask);
         log.info("instanceList {}", instanceList);
+        Constant.modelUpload("7");
         return instanceList;
     }
 
