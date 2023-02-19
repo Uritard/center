@@ -41,4 +41,7 @@ public class VideoInfo implements Serializable {
 
     @ApiModelProperty(value = "是否自启动")
     private Boolean enable;
+
+    @ApiModelProperty(value = "是否回放")
+    private Boolean back = false;
 }
