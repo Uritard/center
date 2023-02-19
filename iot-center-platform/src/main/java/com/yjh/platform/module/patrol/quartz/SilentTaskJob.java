@@ -113,9 +113,9 @@ public class SilentTaskJob implements Runnable {
             HashMap<String, Object> moveMap = new HashMap<>(5);
             moveMap.put("cameraId", cameraId);
             moveMap.put("presetId", presetId);
-            // 转预置位 先霸占相机
-            redisInfoMap.put("state", "1");
-            redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
+//            // 转预置位 先霸占相机
+//            redisInfoMap.put("state", "1");
+//            redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
             moveToPreset(moveMap);
             // 等待摄像头转到预置位
             Long waitTime = Long.valueOf(String.valueOf(redisTemplate.opsForHash().get("t_sys_param:waitTime", "content")));
@@ -126,9 +126,9 @@ public class SilentTaskJob implements Runnable {
             // 拍照
             Result result = capturePicture(captureMap);
             // 将相机状态置为闲置
-            redisInfoMap.put("state", "0");
-            redisInfoMap.put("lastTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
+//            redisInfoMap.put("state", "0");
+//            redisInfoMap.put("lastTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+//            redisTemplate.opsForHash().putAll("camera_info:" + cameraId, redisInfoMap);
             if (result == null || !MSG.equals(result.getMessage())) {
                 log.info("抓图失败 result:{}", result);
                 return;
