@@ -109,8 +109,8 @@ public class ProcessResultToUpSystem {
                     taskPatrolledIdTemp = taskCode;
                 }
 
-                xmlItem.put("patroldevice_code", patrolDevice.get("deviceCode"));
-                xmlItem.put("patroldevice_name", patrolDevice.get("deviceName"));
+                xmlItem.put("patroldevice_code", MapUtils.getString(patrolDevice, "deviceCode"));
+                xmlItem.put("patroldevice_name", MapUtils.getString(patrolDevice, "deviceName"));
                 xmlItem.put("task_name", Optional.ofNullable(cruiseResultMap.get("taskName")).orElse(""));
                 xmlItem.put("device_name", Optional.ofNullable(cruiseResultMap.get("instanceName")).orElse(""));
                 xmlItem.put("device_id", instanceId);
