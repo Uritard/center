@@ -22,6 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -370,7 +371,7 @@ public class PatrolResultHandler {
                 cruiseResultMap.put("resultNum", resultValue + ",识别失败");
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
-            } else if (AlgorithmExceptionEnum.isInclude(resultValue)){
+            } else if (AlgorithmExceptionEnum.isIncludeContent(resultValue)){
                 cruiseResultMap.put("resultNum", resultValue);
                 cruiseResultMap.put("cruiseResult", String.valueOf(CRUISE_RESULT_ABNORMAL));
                 cruiseResultMap.put("cruiseAbnormal", String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL));
@@ -484,10 +485,13 @@ public class PatrolResultHandler {
                                 String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
                                 if (!CommonUtils.isEmptyOrNullstr(temperature)){
                                     double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(resultStringValue));
-                                    initInfo.put("valueTemp", String.valueOf(abs));
-                                    initInfo.put("temperature", temperature);
+                                    String valueTemp = new DecimalFormat("#0.00").format(Double.valueOf(abs));
+                                    String temperatureTemp = new DecimalFormat("#0.00").format(Double.valueOf(temperature));
+
+                                    initInfo.put("valueTemp", valueTemp);
+                                    initInfo.put("temperature", temperatureTemp);
                                     initInfo.put("warnName", meteName + "温差任务");
-                                    initInfo.put("warnContent", "传感器环境温度与测温产生温差:环境" + temperature + "--测温" + resultStringValue + "--温差" + abs);
+                                    initInfo.put("warnContent", "传感器环境温度与测温产生温差:环境" + temperatureTemp + "--测温" + resultStringValue + "--温差" + valueTemp);
                                     initInfo.put("outRange", String.valueOf(abs));
                                 }
                             }

@@ -103,7 +103,7 @@ public class TCruiseTaskAdd implements Serializable {
 
     private String endTime;
 
-    @ApiModelProperty(value = "是否为联动任务（1-是0否）")
+    @ApiModelProperty(value = "是否为联动任务（1表达联动任务，正常任务为空）")
     private String unionTaskStatus;
 
     @ApiModelProperty(value = "周期（月） ")

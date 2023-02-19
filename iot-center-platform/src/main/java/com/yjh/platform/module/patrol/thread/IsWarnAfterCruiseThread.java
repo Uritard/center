@@ -12,6 +12,7 @@ import com.yjh.platform.common.utils.CommonUtils;
 import com.yjh.platform.common.utils.DateTimeUtil;
 import com.yjh.platform.common.utils.StaticContextAccessor;
 import com.yjh.platform.module.device.dao.TCruisePointInstanceDao;
+import com.yjh.platform.module.device.dao.TStdDeviceDao;
 import com.yjh.platform.module.device.dao.TStdRegionDao;
 import com.yjh.platform.module.device.entity.TStdRegion;
 import com.yjh.platform.module.patrol.dao.AnalyseDataOperateDao;
@@ -26,6 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -50,6 +52,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private PatrolResultHandler patrolResultHandler;
     private TStdRegionDao tStdRegionDao;
     private TCruisePointInstanceDao tCruisePointInstanceDao;
+    private TStdDeviceDao tStdDeviceDao;
 
     public IsWarnAfterCruiseThread(Map<String, String> threadMap, RedisTemplate redisTemplate) {
         this.threadMap = threadMap;
@@ -87,7 +90,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             Long instanceId = null;
             List<TStdRegion> stdRegionList = tStdRegionDao.selectByRegionCodeAndState(robotCode, 1);
             // 如果stdRegionList为空 则表示下级接的是机器人/无人机
-            boolean isEdge = CollectionUtils.isEmpty(stdRegionList);
+            boolean isEdge = CollectionUtils.isNotEmpty(stdRegionList);
             if (isEdge) {
                 instanceId = tCruisePointInstanceDao.selectByEdgeCodeAndOriginId(robotCode,threadMap.get("deviceId")).getInstanceId();
             }else {
@@ -107,19 +110,21 @@ public class IsWarnAfterCruiseThread implements Runnable {
             Map<String, String> initInfo = new HashMap<>(16);
             initInfo.put("valueTemp", threadMap.get("value"));
 
-            // 下级是否为机器人节点
-            boolean isDevice = StaticContextAccessor.getBean(AnalyseDataOperateDao.class).selectRobotCodeIsExist(robotCode) == 1 ? true : false;
-            boolean isTemDif = isDevice && 1 == tStdDevicemete.getIsTemdif() && Objects.equals("222", tStdDevicemete.getMeteType());
+            // 下级为机器人节点传上来的值
+            boolean isTemDif = 1 == tStdDevicemete.getIsTemdif() && Objects.equals("222", tStdDevicemete.getMeteType());
             initInfo.put("isTemDif", String.valueOf(isTemDif));
             if (isTemDif) {
                 // 配置了红外温差任务用差值去判断告警
                 String temperature = String.valueOf(redisTemplate.opsForHash().entries("stationWeather:1").getOrDefault("value", ""));
                 if (!CommonUtils.isEmptyOrNullstr(temperature)) {
                     double abs = Math.abs(Double.parseDouble(temperature) - Double.parseDouble(threadMap.get("value")));
-                    initInfo.put("valueTemp", String.valueOf(abs));
-                    initInfo.put("temperature", temperature);
+                    String valueTemp = new DecimalFormat("#0.00").format(Double.valueOf(abs));
+                    String temperatureTemp = new DecimalFormat("#0.00").format(Double.valueOf(temperature));
+
+                    initInfo.put("valueTemp", valueTemp);
+                    initInfo.put("temperature", temperatureTemp);
                     initInfo.put("warnName", tStdDevicemete.getMeteName() + "温差任务");
-                    initInfo.put("warnContent", "传感器环境温度与测温产生温差:环境" + temperature + "--测温" + threadMap.get("value") + "--温差" + abs);
+                    initInfo.put("warnContent", "传感器环境温度与测温产生温差:环境" + temperatureTemp + "--测温" + threadMap.get("value") + "--温差" + valueTemp);
                     initInfo.put("outRange", String.valueOf(abs));
                 }
             }
@@ -168,7 +173,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
     private void alarmStoreAndHandler(Map<String, Object> map, String taskId, TStdDeviceMete tStdDevicemete, Long instanceId, Map<String, String> initInfo) {
         log.info("An alarm is generated！！！");
         log.info("initInfo=={}", initInfo);
-        boolean isTemDif = Boolean.valueOf(initInfo.get("isTemDif"));
+        boolean isTemDif = Boolean.parseBoolean(initInfo.get("isTemDif"));
         TWarnInfo warnInfo = new TWarnInfo();
         try {
             warnInfo.setWarnTime(DateTimeUtil.parse(threadMap.get("time")));
@@ -182,7 +187,7 @@ public class IsWarnAfterCruiseThread implements Runnable {
             warnInfo.setImagePath(threadMap.get("relativePath"));
             warnInfo.setValue(threadMap.get("value"));
             warnInfo.setTaskId(taskId);
-            warnInfo.setDeviceCode(String.valueOf(uPatrolTaskService.selectRobotInfoByCode(threadMap.get("robotCode")).getRobotId()));
+            warnInfo.setDeviceCode(tStdDeviceDao.selectByUnionKeys(tStdDevicemete.getDeviceId()).getDeviceCode());
             warnInfo.setWarnName(isTemDif ? initInfo.get("warnName") : String.valueOf(map.get("warnName")));
             warnInfo.setWarnLevel(Integer.valueOf(String.valueOf(map.get("warnLevel"))));
             warnInfo.setWarnContent(isTemDif ? initInfo.get("warnContent") : String.valueOf(map.get("warnContent")));

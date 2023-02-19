@@ -192,6 +192,10 @@ public class TStdDeviceMete implements Serializable {
     @Max(value = 99999999)
     private Integer alarmState;
 
+    @Max(value = 99999999)
+    @ApiModelProperty(value = "是否温差任务（0-否；1-是）")
+    private Integer isTemdif;
+
     /**
      * 节点编码
      */

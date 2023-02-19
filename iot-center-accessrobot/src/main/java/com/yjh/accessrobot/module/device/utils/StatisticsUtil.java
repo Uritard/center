@@ -160,8 +160,8 @@ public class StatisticsUtil {
         if (ON_LINE.equals(robotInfo.getRobotStatus())
                 || robotInfo.getLastOnlineTime() == null
                 || robotInfo.getCommissionDate().after(now)) {
-          log.info("离线次数统计不符合离线条件，robotId: {}, status: {}, lastOnline: {}, commissionDate: {}",
-                  robotInfo.getRobotId(), robotInfo.getRobotStatus(), robotInfo.getLastOnlineTime(), DateTimeUtil.format(robotInfo.getCommissionDate()));
+          /*log.info("离线次数统计不符合离线条件，robotId: {}, status: {}, lastOnline: {}, commissionDate: {}",
+                  robotInfo.getRobotId(), robotInfo.getRobotStatus(), robotInfo.getLastOnlineTime(), DateTimeUtil.format(robotInfo.getCommissionDate()));*/
           continue;
         }
         long offlineTime = currTime - robotInfo.getLastOnlineTime();

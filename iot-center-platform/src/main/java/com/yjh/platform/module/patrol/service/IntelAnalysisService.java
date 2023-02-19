@@ -27,6 +27,7 @@ import com.yjh.platform.module.user.entity.TCameraPreset;
 import com.yjh.platform.module.user.entity.TSysParam;
 import com.yjh.platform.module.user.service.TSequentialConfService;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -537,17 +538,14 @@ public class IntelAnalysisService {
                 for (AnalyseResultItem result : results) {
                     taskResult.setConf(String.valueOf(result.getConf()));
                     try {
-                        if (StringUtils.equals("2001", result.getCode())){
-//                            log.error("巡视点为{}图像数据错误", instanceId);
-                            taskResult.setResultValue(AlgorithmExceptionEnum.getInstance(result.getDesc()).getContent());
+                        // 2000:正确 2001:图像数据错误 2002:算法分析失败
+                        if (StringUtils.equals("2001", result.getCode()) || StringUtils.equals("2002", result.getCode())){
+                            boolean includeDesc = AlgorithmExceptionEnum.isIncludeDesc(result.getDesc());
+                            taskResult.setResultValue(includeDesc ?
+                                    AlgorithmExceptionEnum.getInstance(result.getDesc()).getContent() : result.getDesc());
                             taskResult.setResultDesc(result.getDesc());
                             taskResult.setAnalyseResultImg(originPicPath);
-                        }else if (StringUtils.equals("2002", result.getCode())){
-//                            log.error("巡视点为{}算法分析失败", instanceId);
-                            taskResult.setResultValue("算法分析失败");
-                            taskResult.setResultDesc("算法分析失败");
-                            taskResult.setAnalyseResultImg(originPicPath);
-                        }else if (StringUtils.equals("2000", result.getCode())){
+                        }else {
                             Map<String, String> map = getResultMap(resultValue, resultDesc, resultImg, originPicPath, result);
 
                             if (StringUtils.isBlank(map.get("resultValue"))) {
@@ -608,7 +606,7 @@ public class IntelAnalysisService {
         String desc = Optional.ofNullable(result.getDesc()).orElse("");
 
         Map<String, String> map = new HashMap<>(5);
-        if (Objects.isNull(type) || Objects.equals("tx_pb",type)){
+        if (Objects.equals("tx_pb",type)){
             // 判别
             map = distinguishResultHandler(result, resultDesc, resultValue, resultImg, originPicPath, type, value, map);
         }else {
@@ -709,9 +707,13 @@ public class IntelAnalysisService {
                     resultValue.add(value);
                 }else {
                     // 根据value获取对应的值
-                    int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
-                    String resultDescTemp = Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN).getValue();
-                    resultValue.add(resultDescTemp);
+                    if (ArrayUtils.contains(new String[]{"0","1","2","3","4","5","6"}, value)){
+                        int typeValue = Integer.parseInt(list.get(0).getAnalyseType() + value);
+                        String resultDescTemp = Optional.ofNullable(RecogniseStatusEnum.getValueByCode(typeValue)).orElse(RecogniseStatusEnum.UNKNOWN).getValue();
+                        resultValue.add(resultDescTemp);
+                    }else {
+                        resultValue.add("算法返回格式不正确");
+                    }
                 }
             }
             map.put("resultDesc", String.valueOf(resultDesc));

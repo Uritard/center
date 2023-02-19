@@ -12,7 +12,12 @@ public enum AlgorithmExceptionEnum {
     /**
      * 2001
      */
-    NO_TEMPLATE("No Template!", "缺少标定文件");
+    NO_TEMPLATE("No Template!", "缺少标定文件"),
+
+    /**
+     * 2001
+     */
+    FAIL_DOWNLOAD_PICTURE("Faild to download image", "算法下载图片失败");
 
 
 
@@ -50,10 +55,21 @@ public enum AlgorithmExceptionEnum {
         return null;
     }
 
-    public static boolean isInclude(String content){
+    public static boolean isIncludeContent(String content){
         boolean include = false;
         for (AlgorithmExceptionEnum e : AlgorithmExceptionEnum.values()){
             if(e.getContent().equals(content)){
+                include = true;
+                break;
+            }
+        }
+        return include;
+    }
+
+    public static boolean isIncludeDesc(String desc){
+        boolean include = false;
+        for (AlgorithmExceptionEnum e : AlgorithmExceptionEnum.values()){
+            if(e.getDesc().equals(desc)){
                 include = true;
                 break;
             }

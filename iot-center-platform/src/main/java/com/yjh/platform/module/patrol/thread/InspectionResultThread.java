@@ -143,7 +143,7 @@ public class InspectionResultThread implements Runnable{
                 case "0":
                 default:
                     isnormal = false;
-                    cruiseAbnormal = String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL);
+                    cruiseAbnormal = StringUtils.isNotEmpty(cruiseAbnormal) ? cruiseAbnormal : String.valueOf(CRUISE_ABNORMAL_DATAABNORMAL);
                     break;
             }
         } else {

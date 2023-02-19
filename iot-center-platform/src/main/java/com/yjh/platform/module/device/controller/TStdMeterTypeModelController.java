@@ -73,7 +73,7 @@ public class TStdMeterTypeModelController {
         try {
             int i = tStdMeterTypeModelService.update(tStdMeterTypeModel);
             if (i==0) {
-                result.setMessage("AI判别不能和识别算法或者AI缺陷同时选择！");
+                result.setMessage("请选择识别类型");
                 result.setCode(10102);
             } else { result.setData(i); }
         } catch (BusinessException e) {
