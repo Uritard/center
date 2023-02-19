@@ -89,6 +89,9 @@ public class TCameraPresetService {
 
     @Transactional(rollbackFor = Exception.class)
     public int insert(TCameraPreset tCameraPreset) {
+        if (tCameraPreset.getPresetType() == null || tCameraPreset.getPresetType() == 0) {
+            tCameraPreset.setPresetType(1);
+        }
         return this.tCameraPresetDao.insert(tCameraPreset);
     }
 
